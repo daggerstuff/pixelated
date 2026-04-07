@@ -408,8 +408,8 @@ h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-6);
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
@@ -498,22 +498,22 @@ h6 {
 
 /* Button Sizes */
 .btn-xs {
-  padding: var(--space-1) var(--space-3);
+  padding: var(--spacing-1) var(--spacing-3);
   font-size: var(--text-xs);
 }
 
 .btn-sm {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--spacing-2) var(--spacing-4);
   font-size: var(--text-xs);
 }
 
 .btn-lg {
-  padding: var(--space-4) var(--space-8);
+  padding: var(--spacing-4) var(--spacing-8);
   font-size: var(--text-base);
 }
 
 .btn-xl {
-  padding: var(--space-6) var(--space-12);
+  padding: var(--spacing-6) var(--spacing-12);
   font-size: var(--text-lg);
 }
 
@@ -522,7 +522,7 @@ h6 {
   background: var(--color-surface);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--spacing-6);
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
@@ -570,8 +570,8 @@ h6 {
 
 /* Card Header */
 .card-header {
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-4);
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
   border-bottom: 1px solid var(--border-primary);
 }
 
@@ -579,7 +579,7 @@ h6 {
   font-size: var(--text-xl);
   font-weight: var(--weight-semibold);
   color: var(--text-primary);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--spacing-2);
 }
 
 .card-subtitle {
@@ -589,8 +589,8 @@ h6 {
 
 /* Card Footer */
 .card-footer {
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
   border-top: 1px solid var(--border-primary);
 }
 
@@ -600,7 +600,7 @@ h6 {
   background: var(--color-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--spacing-3) var(--spacing-4);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -619,12 +619,12 @@ h6 {
 }
 
 .input--large {
-  padding: var(--space-4) var(--space-6);
+  padding: var(--spacing-4) var(--spacing-6);
   font-size: var(--text-lg);
 }
 
 .input--small {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--spacing-2) var(--spacing-3);
   font-size: var(--text-sm);
 }
 
@@ -641,7 +641,7 @@ h6 {
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-8);
+  gap: var(--spacing-8);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -653,7 +653,7 @@ h6 {
   text-decoration: none;
   font-weight: var(--weight-medium);
   font-size: var(--text-sm);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
@@ -683,8 +683,8 @@ h6 {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-3);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   text-transform: uppercase;
@@ -726,7 +726,7 @@ h6 {
 /* === GRID SYSTEM === */
 .grid {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--spacing-6);
 }
 
 .grid--2 {
@@ -742,15 +742,15 @@ h6 {
 }
 
 .grid--dense {
-  gap: var(--space-4);
+  gap: var(--spacing-4);
 }
 
 .grid--loose {
-  gap: var(--space-8);
+  gap: var(--spacing-8);
 }
 
 .grid--tight {
-  gap: var(--space-2);
+  gap: var(--spacing-2);
 }
 
 /* === ANIMATION SYSTEM === */
@@ -899,11 +899,11 @@ h6 {
   }
 
   .nav {
-    gap: var(--space-4);
+    gap: var(--spacing-4);
   }
 
   .card {
-    padding: var(--space-4);
+    padding: var(--spacing-4);
   }
 
   h1 {
@@ -922,7 +922,7 @@ h6 {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--space-6);
+  padding: 0 var(--spacing-6);
 }
 
 .container--narrow {
@@ -934,15 +934,15 @@ h6 {
 }
 
 .section {
-  padding: var(--space-20) 0;
+  padding: var(--spacing-20) 0;
 }
 
 .section--compact {
-  padding: var(--space-16) 0;
+  padding: var(--spacing-16) 0;
 }
 
 .section--minimal {
-  padding: var(--space-12) 0;
+  padding: var(--spacing-12) 0;
 }
 
 .divider {
@@ -953,7 +953,7 @@ h6 {
     var(--border-primary),
     transparent
   );
-  margin: var(--space-8) 0;
+  margin: var(--spacing-8) 0;
 }
 
 .divider--thick {

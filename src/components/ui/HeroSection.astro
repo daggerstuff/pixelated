@@ -140,7 +140,7 @@ const {
 
 <style>
   .hero-section {
-    padding: var(--space-40) 0 var(--space-32);
+    padding: var(--spacing-40) 0 var(--spacing-32);
     background: var(--bg-primary);
     position: relative;
     overflow: hidden;
@@ -161,7 +161,7 @@ const {
   .hero-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 var(--space-8);
+    padding: 0 var(--spacing-8);
     position: relative;
     z-index: 1;
   }
@@ -169,7 +169,7 @@ const {
   .hero-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-20);
+    gap: var(--spacing-20);
     align-items: center;
     min-height: 85vh;
   }
@@ -177,16 +177,16 @@ const {
   @media (max-width: 768px) {
     .hero-grid {
       grid-template-columns: 1fr;
-      gap: var(--space-12);
+      gap: var(--spacing-12);
       min-height: auto;
-      padding: var(--space-12) 0;
+      padding: var(--spacing-12) 0;
     }
   }
 
   .hero-content {
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: var(--spacing-8);
   }
 
   .section-label {
@@ -195,15 +195,15 @@ const {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--accent-primary);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--spacing-4);
     display: block;
   }
 
   .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-6);
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-6);
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.15);
     border-radius: var(--radius-full);
@@ -220,7 +220,7 @@ const {
   .hero-heading {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--spacing-6);
   }
 
   .hero-title {
@@ -252,15 +252,15 @@ const {
   .hero-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-8);
-    margin: var(--space-10) 0;
-    padding: var(--space-6) 0;
+    gap: var(--spacing-8);
+    margin: var(--spacing-10) 0;
+    padding: var(--spacing-6) 0;
   }
 
   @media (max-width: 640px) {
     .hero-stats {
       grid-template-columns: 1fr;
-      gap: var(--space-4);
+      gap: var(--spacing-4);
     }
   }
 
@@ -273,7 +273,7 @@ const {
     font-weight: var(--weight-bold);
     line-height: 1;
     color: var(--accent-primary);
-    margin-bottom: var(--space-1);
+    margin-bottom: var(--spacing-1);
   }
 
   .stat-label {
@@ -285,17 +285,17 @@ const {
 
   .hero-cta {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--spacing-4);
     flex-wrap: wrap;
-    margin-top: var(--space-4);
+    margin-top: var(--spacing-4);
   }
 
   .btn-primary,
   .btn-secondary {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-5) var(--space-10);
+    gap: var(--spacing-3);
+    padding: var(--spacing-5) var(--spacing-10);
     font-size: var(--text-lg);
     font-weight: var(--weight-semibold);
     border-radius: var(--radius-xl);
@@ -342,7 +342,7 @@ const {
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-2xl);
-    padding: var(--space-8);
+    padding: var(--spacing-8);
     position: relative;
     overflow: hidden;
   }
@@ -363,11 +363,11 @@ const {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--spacing-6);
   }
 
   .hero-card-badge {
-    padding: var(--space-1) var(--space-3);
+    padding: var(--spacing-1) var(--spacing-3);
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.2);
     border-radius: var(--radius-md);
@@ -398,13 +398,13 @@ const {
   .hero-chat {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
   }
 
   .chat-message {
     display: flex;
-    gap: var(--space-3);
+    gap: var(--spacing-3);
   }
 
   .chat-avatar {
@@ -436,7 +436,7 @@ const {
   .chat-content p {
     font-size: var(--text-sm);
     color: var(--text-primary);
-    margin: 0 0 var(--space-2) 0;
+    margin: 0 0 var(--spacing-2) 0;
     line-height: 1.5;
   }
 
@@ -444,7 +444,7 @@ const {
   .chat-status {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--spacing-2);
     font-size: var(--text-xs);
     color: var(--text-muted);
   }
@@ -457,7 +457,7 @@ const {
   }
 
   .chat-status span {
-    padding: var(--space-1) var(--space-2);
+    padding: var(--spacing-1) var(--spacing-2);
     background: rgba(16, 185, 129, 0.1);
     border-radius: var(--radius-sm);
     color: var(--accent-primary);
@@ -467,7 +467,7 @@ const {
   }
 
   .hero-analytics {
-    padding: var(--space-4);
+    padding: var(--spacing-4);
     background: var(--bg-level-1);
     border-radius: var(--radius-lg);
   }
@@ -476,7 +476,7 @@ const {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--spacing-4);
     font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -494,7 +494,7 @@ const {
   .analytics-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
+    gap: var(--spacing-4);
   }
 
   .analytics-item {
@@ -505,7 +505,7 @@ const {
     font-size: var(--text-lg);
     font-weight: var(--weight-bold);
     line-height: 1;
-    margin-bottom: var(--space-1);
+    margin-bottom: var(--spacing-1);
   }
 
   .analytics-primary {
@@ -527,7 +527,7 @@ const {
 
   @media (max-width: 768px) {
     .hero-card {
-      margin-top: var(--space-6);
+      margin-top: var(--spacing-6);
     }
   }
 </style>

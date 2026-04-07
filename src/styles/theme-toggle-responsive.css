@@ -40,7 +40,7 @@
   transform: translateX(-50%) scale(0);
   background: var(--bg-level-2);
   color: var(--text-primary);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-sm);
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
@@ -59,7 +59,7 @@
     height: 2.5rem;
     min-width: 44px;
     min-height: 44px;
-    padding: var(--space-2);
+    padding: var(--spacing-2);
     border-radius: var(--radius-sm);
   }
 
@@ -70,7 +70,7 @@
 
   .theme-tooltip {
     font-size: var(--text-xs);
-    padding: var(--space-1) var(--space-2);
+    padding: var(--spacing-1) var(--spacing-2);
     bottom: -2rem;
   }
 
@@ -108,7 +108,7 @@
     height: 2.75rem;
     min-width: 48px;
     min-height: 48px;
-    padding: var(--space-2);
+    padding: var(--spacing-2);
   }
 
   .theme-toggle-unified svg {
@@ -118,7 +118,7 @@
 
   .theme-tooltip {
     font-size: var(--text-xs);
-    padding: var(--space-2);
+    padding: var(--spacing-2);
   }
 }
 
@@ -136,7 +136,7 @@
 
   .theme-tooltip {
     font-size: var(--text-sm);
-    padding: var(--space-2) var(--space-3);
+    padding: var(--spacing-2) var(--spacing-3);
   }
 }
 
@@ -154,7 +154,7 @@
 
   .theme-tooltip {
     font-size: var(--text-sm);
-    padding: var(--space-2) var(--space-3);
+    padding: var(--spacing-2) var(--spacing-3);
   }
 }
 
@@ -172,7 +172,7 @@
 
   .theme-tooltip {
     font-size: var(--text-sm);
-    padding: var(--space-2) var(--space-3);
+    padding: var(--spacing-2) var(--spacing-3);
   }
 }
 
@@ -190,7 +190,7 @@
 
   .theme-tooltip {
     font-size: var(--text-base);
-    padding: var(--space-3) var(--space-4);
+    padding: var(--spacing-3) var(--spacing-4);
     bottom: -3rem;
   }
 
@@ -219,7 +219,7 @@
     height: 2.25rem;
     min-width: 40px;
     min-height: 40px;
-    padding: var(--space-1);
+    padding: var(--spacing-1);
   }
 
   .theme-toggle-unified svg {
@@ -229,7 +229,7 @@
 
   .theme-tooltip {
     font-size: var(--text-xs);
-    padding: var(--space-1);
+    padding: var(--spacing-1);
     bottom: -1.5rem;
   }
 }
@@ -336,7 +336,7 @@
 
   .theme-tooltip {
     font-size: var(--text-lg);
-    padding: var(--space-3) var(--space-4);
+    padding: var(--spacing-3) var(--spacing-4);
   }
 }
 

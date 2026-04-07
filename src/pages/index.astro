@@ -3,7 +3,7 @@
  * Homepage - Pixelated Brutalism Design
  * Modern + Minimalist + Brutalist aesthetic
  */
-import BrutalistLayout from '@/layouts/BrutalistLayout.astro'
+import Layout from '@/layouts/Layout.astro'
 import BrutalistHero from '@/components/BrutalistHero.astro'
 import InfoStrip from '@/components/homepage/InfoStrip.astro'
 import IntroSection from '@/components/homepage/IntroSection.astro'
@@ -12,6 +12,7 @@ import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
 import { homepageContent } from '@/lib/content'
 import '@/styles/homepage.css'
+
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -38,11 +39,11 @@ const organizationSchema = {
 }
 ---
 
-<BrutalistLayout
+<Layout
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Bring one difficult case into clinical rehearsal, keep the transcript, and coach the retry from a record a supervisor can actually use."
-  footerProps={homepageContent.footer}
 >
+
   <script
     type="application/ld+json"
     set:html={JSON.stringify(organizationSchema)}
@@ -58,8 +59,9 @@ const organizationSchema = {
     artifact={homepageContent.hero.artifact}
   />
 
-  <section class="trust-band-section">
-    <div class="pe-page-shell trust-band-shell">
+  <section class="trust-band-section border-y border-white/5 bg-black/10">
+    <div class="container trust-band-shell">
+
       <InfoStrip
         className="trust-band"
         label="Trust markers"
@@ -107,18 +109,13 @@ const organizationSchema = {
     secondaryCTA={homepageContent.cta.secondaryCTA}
     meta={homepageContent.cta.meta}
   />
-</BrutalistLayout>
+</Layout>
+
 
 <style>
   .trust-band-section {
     position: relative;
-    margin-top: -1.25rem;
-    padding-bottom: clamp(1.35rem, 2.4vw, 2rem);
-    background: linear-gradient(
-      180deg,
-      rgba(8, 12, 13, 1),
-      rgba(8, 12, 13, 0.94)
-    );
+    padding: 1.5rem 0;
   }
 
   .trust-band-shell {
@@ -127,7 +124,7 @@ const organizationSchema = {
   }
 
   .trust-band {
-    max-width: 76rem;
-    margin: 0 auto;
+    width: 100%;
   }
+
 </style>

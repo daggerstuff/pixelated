@@ -74,15 +74,15 @@ const Element = tag
 
   /* Enhanced responsive padding that respects safe areas */
   .container-responsive {
-    padding-left: max(var(--space-responsive-sm), env(safe-area-inset-left));
-    padding-right: max(var(--space-responsive-sm), env(safe-area-inset-right));
+    padding-left: max(var(--spacing-responsive-sm), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-responsive-sm), env(safe-area-inset-right));
   }
 
   @media (min-width: 640px) {
     .container-responsive {
-      padding-left: max(var(--space-responsive-md), env(safe-area-inset-left));
+      padding-left: max(var(--spacing-responsive-md), env(safe-area-inset-left));
       padding-right: max(
-        var(--space-responsive-md),
+        var(--spacing-responsive-md),
         env(safe-area-inset-right)
       );
     }
@@ -90,9 +90,9 @@ const Element = tag
 
   @media (min-width: 1024px) {
     .container-responsive {
-      padding-left: max(var(--space-responsive-lg), env(safe-area-inset-left));
+      padding-left: max(var(--spacing-responsive-lg), env(safe-area-inset-left));
       padding-right: max(
-        var(--space-responsive-lg),
+        var(--spacing-responsive-lg),
         env(safe-area-inset-right)
       );
     }

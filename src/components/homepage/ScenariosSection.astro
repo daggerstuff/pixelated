@@ -18,16 +18,16 @@ export interface Props {
 const { content } = Astro.props
 ---
 
-<section class="pe-page-section home-section home-section--scenarios">
-  <div class="pe-page-shell home-shell">
-    <span class="pe-page-label">{content.label}</span>
-    <h2 class="pe-page-heading">{content.title}</h2>
+<section class="home-section home-section--scenarios">
+  <div class="container">
+    <span class="pe-meta-label">{content.label}</span>
+    <h2 class="pe-heading-l">{content.title}</h2>
 
     <div class="home-card-grid home-card-grid--spaced">
       {content.cards.map((card, index) => (
-        <article class:list={['home-card', index === 0 && 'home-card--featured', index === 2 && 'home-card--muted']}>
+        <article class:list={['home-card', 'glass-panel', index === 0 && 'home-card--featured', index === 2 && 'home-card--muted']}>
           <span class="home-card-kicker">{card.kicker}</span>
-          <h3>{card.title}</h3>
+          <h3 class="pe-heading-s">{card.title}</h3>
           <p>{card.body}</p>
         </article>
       ))}
@@ -46,63 +46,67 @@ const { content } = Astro.props
 
 <style>
   .home-section--scenarios {
-    background: linear-gradient(180deg, rgba(8, 12, 13, 0.98), rgba(8, 12, 13, 1));
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: var(--section-padding-y) 0;
+    position: relative;
+    overflow: hidden;
   }
 
   .home-card-kicker {
     display: inline-block;
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
-    letter-spacing: 0.03em;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--accent-primary);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--spacing-4);
+    opacity: 0.8;
   }
 
   .home-card-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-6);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-6);
   }
 
   .home-card-grid--spaced {
-    margin-top: var(--space-12);
+    margin-top: var(--spacing-12);
   }
 
   .home-card {
-    min-width: 0;
-    display: grid;
-    gap: var(--space-4);
-    padding: clamp(1.65rem, 2.2vw, 2.35rem);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    padding: var(--spacing-8);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .home-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--accent-primary-rgb), 0.25);
   }
 
   .home-card--featured {
-    background:
-      linear-gradient(180deg, rgba(125, 211, 168, 0.13), rgba(125, 211, 168, 0.03) 38%, rgba(255, 255, 255, 0.018));
-  }
-
-  .home-card--featured h3 {
-    font-size: clamp(1.4rem, 1.2rem + 0.45vw, 1.85rem);
-    max-width: 14ch;
+    background: rgba(var(--accent-primary-rgb), 0.035);
+    border-color: rgba(var(--accent-primary-rgb), 0.15);
   }
 
   .home-card--muted {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.012));
+    opacity: 0.85;
+  }
+
+  .home-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin: 0;
   }
 
   .home-use-strip--spaced {
-    margin-top: var(--space-10);
+    margin-top: clamp(4rem, 8vw, 6.5rem);
   }
 
-  @media (max-width: 1080px) {
+  @media (max-width: 880px) {
     .home-card-grid {
       grid-template-columns: 1fr;
-    }
-
-    .home-card--featured {
-      grid-row: auto;
     }
   }
 </style>

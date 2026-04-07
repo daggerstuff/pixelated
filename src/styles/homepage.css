@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 88rem;
   margin: 0 auto;
-  padding: 0 var(--space-6);
+  padding: 0 var(--spacing-6);
 }
 
 .pe-page-section {
@@ -53,12 +53,12 @@
   letter-spacing: 0.1em;
   text-transform: none;
   color: var(--accent-primary);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--spacing-3);
   opacity: 0.76;
 }
 
 .pe-page-heading {
-  margin-top: var(--space-4);
+  margin-top: var(--spacing-4);
   max-width: 15ch;
   font-family: var(--font-display);
   font-size: clamp(2rem, 1.78rem + 0.9vw, 2.9rem);
@@ -72,7 +72,7 @@
 
 @media (min-width: 768px) {
   .pe-page-shell {
-    padding: 0 var(--space-8);
+    padding: 0 var(--spacing-8);
   }
 }
 
