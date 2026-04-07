@@ -1,3 +1,11 @@
+/*
+ * ⚠️ ALTERNATIVE DESIGN SYSTEM
+ * This file is ONLY used by BrutalistLayout.astro
+ * Do NOT import into main design system (BaseLayout.astro)
+ *
+ * Uses: Outfit/Inter fonts (violates DESIGN.md "Monospace Only")
+ * Used by: Brutalist layout for landing pages
+ */
 /* ================================================
    PIXELATED BRUTALISM DESIGN SYSTEM
    A refined clinical editorial system with visible structure,
