@@ -242,6 +242,7 @@
     "helmet": "^8.1.0",
     "html-escaper": "^3.0.3",
     "ioredis": "^5.10.1",
+    "isomorphic-dompurify": "^3.7.1",
     "jigsawstack": "^0.4.3",
     "jotai": "^2.19.0",
     "jsonwebtoken": "^9.0.3",
