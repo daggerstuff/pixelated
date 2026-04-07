@@ -1,5 +1,20 @@
 # Design System: Technical-Humanist (Final)
 
+## 📁 Canonical CSS Files
+
+The following files are the **source of truth** for design tokens:
+- `src/styles/variables.css` - Core design tokens (colors, spacing, animation)
+- `src/styles/fonts.css` - Typography definitions (Berkeley Mono)
+- `src/styles/design-system.css` - Component DNA and utility classes
+- `src/styles/main.css` - Entry point (imports the above)
+
+**Alternative Layouts** (different design systems for specific purposes):
+- `BrutalistLayout.astro` → `brutalist-minimal.css` (Outfit/Geist Sans fonts)
+- `AdminLayout.astro` → `enhanced-theme.css` (admin dashboard styling)
+- `ResearchLayout.astro` → `research.css` (research pages)
+
+> ⚠️ Do NOT modify alternative CSS files unless intentionally changing those layouts.
+
 ## 🏛 Architecture: The Monospace Core
 Our interface is a refined, terminal-native experience that balances technical precision with high-end aesthetic warmth. It is **Monospace-First** and **Grid-Bound**.
 

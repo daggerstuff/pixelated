@@ -1,3 +1,11 @@
+/*
+ * ⚠️ ALTERNATIVE DESIGN SYSTEM
+ * This file is ONLY used by AdminLayout.astro
+ * Do NOT import into main design system (BaseLayout.astro)
+ *
+ * Uses: Geist Sans fonts and box-shadows (violates DESIGN.md)
+ * Used by: Admin dashboard pages
+ */
 html,
 body,
 .enhanced-dark-theme {
