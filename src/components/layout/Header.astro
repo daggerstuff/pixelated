@@ -21,7 +21,7 @@ const navLinks = [
   <div class="container-refined header-container">
     <div
       class="flex items-center justify-between header-content"
-      style="height: var(--space-16);"
+      style="height: var(--spacing-16);"
       class:list={['md:height-20']}
       <!--
       Brutalist
@@ -86,7 +86,7 @@ const navLinks = [
       <nav class="nav-responsive items-center enterprise-nav">
         <ul
           class="nav-minimal"
-          style="gap: var(--space-8);"
+          style="gap: var(--spacing-8);"
           class:list={['md:gap-6', 'lg:gap-8']}
         >
           {
@@ -99,7 +99,7 @@ const navLinks = [
                     link.highlight ? 'nav-link--highlighted' : '',
                     'touch-focus',
                   ]}
-                  style="position: relative; display: flex; align-items: center; gap: var(--space-2); font-weight: var(--weight-medium); text-transform: uppercase; letter-spacing: 0.025em;"
+                  style="position: relative; display: flex; align-items: center; gap: var(--spacing-2); font-weight: var(--weight-medium); text-transform: uppercase; letter-spacing: 0.025em;"
                 >
                   {link.highlight && (
                     <span class="corporate-badge text-responsive--caption">
@@ -116,7 +116,7 @@ const navLinks = [
         <!-- Enterprise CTA with Minimalist Approach -->
         <div
           class="flex items-center gap-2 md:gap-3 header-actions"
-          style="margin-left: var(--space-8);"
+          style="margin-left: var(--spacing-8);"
           class:list={['lg:margin-left-12']}
         >
           <ThemeToggle />
@@ -124,7 +124,7 @@ const navLinks = [
           <a
             href="/contact"
             class="btn-brutalist btn-brutalist--primary btn-enterprise animate-pulse-glow btn-responsive"
-            style="font-size: var(--text-sm); padding: var(--space-3) var(--space-6); border-radius: var(--radius-full); font-weight: var(--weight-bold); display: none; letter-spacing: 0.05em; text-transform: uppercase;"
+            style="font-size: var(--text-sm); padding: var(--spacing-3) var(--spacing-6); border-radius: var(--radius-full); font-weight: var(--weight-bold); display: none; letter-spacing: 0.05em; text-transform: uppercase;"
             class:list={[{ 'display': 'flex', 'md:display': 'flex' }]}
           >
             <span class="text-responsive--small">GET STARTED</span>
@@ -139,7 +139,7 @@ const navLinks = [
         <button
           id="mobile-menu-button-v2"
           class="btn-brutalist btn-brutalist--ghost touch-target mobile-menu-btn"
-          style="padding: var(--space-2); border-radius: var(--radius-md); position: relative; overflow: hidden;"
+          style="padding: var(--spacing-2); border-radius: var(--radius-md); position: relative; overflow: hidden;"
           aria-label="Toggle mobile menu"
           aria-expanded="false"
         >
@@ -203,7 +203,7 @@ const navLinks = [
           id="mobile-menu-close"
           class="btn-brutalist btn-brutalist--ghost touch-target mobile-close-btn"
           aria-label="Close mobile menu"
-          style="padding: var(--space-2); border-radius: var(--radius-md); position: relative; overflow: hidden;"
+          style="padding: var(--spacing-2); border-radius: var(--radius-md); position: relative; overflow: hidden;"
         >
           <svg
             width="20"
@@ -303,7 +303,7 @@ const navLinks = [
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-1);
+    gap: var(--spacing-1);
   }
 
   .branding-primary {
@@ -352,7 +352,7 @@ const navLinks = [
     display: flex;
     align-items: center;
     height: 100%;
-    gap: var(--space-2);
+    gap: var(--spacing-2);
   }
 
   .nav-link-enterprise {
@@ -361,14 +361,14 @@ const navLinks = [
     text-decoration: none;
     font-weight: var(--weight-medium);
     font-size: var(--text-base);
-    padding: var(--space-2) var(--space-4);
+    padding: var(--spacing-2) var(--spacing-4);
     border-radius: var(--radius-md);
     text-transform: none;
     letter-spacing: 0.01em;
     transition: color var(--transition-base);
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--spacing-2);
   }
 
   .nav-link-enterprise:hover {
@@ -423,8 +423,8 @@ const navLinks = [
   .header-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    margin-left: var(--space-8);
+    gap: var(--spacing-3);
+    margin-left: var(--spacing-8);
   }
 
   /* Responsive Design - Enterprise Brevity */
@@ -443,7 +443,7 @@ const navLinks = [
     }
 
     .header-actions {
-      margin-left: var(--space-4);
+      margin-left: var(--spacing-4);
     }
   }
 
@@ -505,7 +505,7 @@ const navLinks = [
   /* Mobile menu styles - Unified Dark Theme */
   .mobile-menu {
     position: fixed;
-    top: var(--space-16);
+    top: var(--spacing-16);
     left: 0;
     right: 0;
     bottom: 0;
@@ -531,7 +531,7 @@ const navLinks = [
   }
 
   .mobile-menu__content {
-    padding: var(--space-responsive-xl);
+    padding: var(--spacing-responsive-xl);
     min-height: 100vh;
     background: var(--bg-glass);
     backdrop-filter: blur(16px);
@@ -542,15 +542,15 @@ const navLinks = [
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-responsive-xl);
-    padding-bottom: var(--space-responsive-md);
+    margin-bottom: var(--spacing-responsive-xl);
+    padding-bottom: var(--spacing-responsive-md);
     border-bottom: 1px solid var(--border-primary);
   }
 
   .mobile-branding {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--spacing-3);
   }
 
   .mobile-brand-title {
@@ -619,12 +619,12 @@ const navLinks = [
   }
 
   .mobile-menu__nav-item {
-    margin-bottom: var(--space-responsive-md);
+    margin-bottom: var(--spacing-responsive-md);
   }
 
   .mobile-menu__nav-link {
     display: block;
-    padding: var(--space-responsive-md) var(--space-responsive-sm);
+    padding: var(--spacing-responsive-md) var(--spacing-responsive-sm);
     font-size: var(--text-responsive-lg);
     font-weight: var(--weight-medium);
     color: var(--text-primary);
@@ -676,7 +676,7 @@ const navLinks = [
   /* iOS Safe Area Support */
   @supports (padding-top: env(safe-area-inset-top)) {
     .ios-safe-area {
-      padding-top: max(var(--space-4), env(safe-area-inset-top));
+      padding-top: max(var(--spacing-4), env(safe-area-inset-top));
     }
   }
 
@@ -732,7 +732,7 @@ const navLinks = [
   /* Container responsive margin */
   @media (min-width: 1024px) {
     .lg\\:margin-left-8 {
-      margin-left: var(--space-8) !important;
+      margin-left: var(--spacing-8) !important;
     }
   }
 
@@ -749,13 +749,13 @@ const navLinks = [
   /* Responsive spacing */
   @media (min-width: 640px) {
     .sm\\:gap-3 {
-      gap: var(--space-3) !important;
+      gap: var(--spacing-3) !important;
     }
   }
 
   @media (min-width: 768px) {
     .md\\:gap-3 {
-      gap: var(--space-3) !important;
+      gap: var(--spacing-3) !important;
     }
   }
 
@@ -783,7 +783,7 @@ const navLinks = [
   /* iOS Safe Area Support */
   @supports (padding-top: env(safe-area-inset-top)) {
     .ios-safe-area {
-      padding-top: max(var(--space-4), env(safe-area-inset-top));
+      padding-top: max(var(--spacing-4), env(safe-area-inset-top));
     }
   }
 

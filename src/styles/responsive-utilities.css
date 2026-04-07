@@ -42,15 +42,15 @@
 .container-responsive {
   width: 100%;
   margin: 0 auto;
-  padding-left: var(--space-responsive-sm);
-  padding-right: var(--space-responsive-sm);
+  padding-left: var(--spacing-responsive-sm);
+  padding-right: var(--spacing-responsive-sm);
 }
 
 @media (min-width: 640px) {
   .container-responsive {
     max-width: var(--container-sm);
-    padding-left: var(--space-responsive-md);
-    padding-right: var(--space-responsive-md);
+    padding-left: var(--spacing-responsive-md);
+    padding-right: var(--spacing-responsive-md);
   }
 }
 
@@ -63,8 +63,8 @@
 @media (min-width: 1024px) {
   .container-responsive {
     max-width: var(--container-lg);
-    padding-left: var(--space-responsive-lg);
-    padding-right: var(--space-responsive-lg);
+    padding-left: var(--spacing-responsive-lg);
+    padding-right: var(--spacing-responsive-lg);
   }
 }
 
@@ -83,7 +83,7 @@
 /* Responsive Grid System */
 .grid-responsive {
   display: grid;
-  gap: var(--space-responsive-sm);
+  gap: var(--spacing-responsive-sm);
   width: 100%;
 }
 
@@ -97,7 +97,7 @@
 
 @media (min-width: 640px) {
   .grid-responsive {
-    gap: var(--space-responsive-md);
+    gap: var(--spacing-responsive-md);
   }
 
   .grid-responsive-2-sm {
@@ -121,7 +121,7 @@
 
 @media (min-width: 1024px) {
   .grid-responsive {
-    gap: var(--space-responsive-lg);
+    gap: var(--spacing-responsive-lg);
   }
 
   .grid-responsive-4-lg {
@@ -142,7 +142,7 @@
 /* Responsive Flexbox System */
 .flex-responsive {
   display: flex;
-  gap: var(--space-responsive-sm);
+  gap: var(--spacing-responsive-sm);
   flex-wrap: wrap;
 }
 
@@ -156,7 +156,7 @@
 
 @media (min-width: 640px) {
   .flex-responsive {
-    gap: var(--space-responsive-md);
+    gap: var(--spacing-responsive-md);
   }
 
   .flex-responsive-row-sm {
@@ -180,7 +180,7 @@
 
 @media (min-width: 1024px) {
   .flex-responsive {
-    gap: var(--space-responsive-lg);
+    gap: var(--spacing-responsive-lg);
   }
 
   .flex-responsive-row-lg {
@@ -194,35 +194,35 @@
 
 /* Responsive Spacing Utilities */
 .spacing-responsive-xs {
-  margin: var(--space-responsive-xs);
+  margin: var(--spacing-responsive-xs);
 }
 .spacing-responsive-sm {
-  margin: var(--space-responsive-sm);
+  margin: var(--spacing-responsive-sm);
 }
 .spacing-responsive-md {
-  margin: var(--space-responsive-md);
+  margin: var(--spacing-responsive-md);
 }
 .spacing-responsive-lg {
-  margin: var(--space-responsive-lg);
+  margin: var(--spacing-responsive-lg);
 }
 .spacing-responsive-xl {
-  margin: var(--space-responsive-xl);
+  margin: var(--spacing-responsive-xl);
 }
 
 .padding-responsive-xs {
-  padding: var(--space-responsive-xs);
+  padding: var(--spacing-responsive-xs);
 }
 .padding-responsive-sm {
-  padding: var(--space-responsive-sm);
+  padding: var(--spacing-responsive-sm);
 }
 .padding-responsive-md {
-  padding: var(--space-responsive-md);
+  padding: var(--spacing-responsive-md);
 }
 .padding-responsive-lg {
-  padding: var(--space-responsive-lg);
+  padding: var(--spacing-responsive-lg);
 }
 .padding-responsive-xl {
-  padding: var(--space-responsive-xl);
+  padding: var(--spacing-responsive-xl);
 }
 
 /* Responsive Typography */
@@ -333,20 +333,20 @@
   background: var(--color-card-bg, rgba(20, 20, 20, 0.85));
   border-radius: var(--radius-md, 8px);
   border: 1px solid var(--color-border, rgba(50, 50, 50, 0.3));
-  padding: var(--space-responsive-sm);
+  padding: var(--spacing-responsive-sm);
   width: 100%;
   box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
   .card-responsive {
-    padding: var(--space-responsive-md);
+    padding: var(--spacing-responsive-md);
   }
 }
 
 @media (min-width: 1024px) {
   .card-responsive {
-    padding: var(--space-responsive-lg);
+    padding: var(--spacing-responsive-lg);
   }
 }
 
@@ -354,21 +354,21 @@
 .dashboard-responsive {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-responsive-sm);
+  gap: var(--spacing-responsive-sm);
   min-height: 100vh;
 }
 
 @media (min-width: 768px) {
   .dashboard-responsive {
     grid-template-columns: 250px 1fr;
-    gap: var(--space-responsive-md);
+    gap: var(--spacing-responsive-md);
   }
 }
 
 @media (min-width: 1024px) {
   .dashboard-responsive {
     grid-template-columns: 280px 1fr;
-    gap: var(--space-responsive-lg);
+    gap: var(--spacing-responsive-lg);
   }
 }
 
@@ -377,7 +377,7 @@
   .mobile-stack {
     display: flex;
     flex-direction: column;
-    gap: var(--space-responsive-sm);
+    gap: var(--spacing-responsive-sm);
   }
 
   .mobile-full-width {
@@ -399,7 +399,7 @@
   .tablet-grid-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-responsive-md);
+    gap: var(--spacing-responsive-md);
   }
 
   .tablet-sidebar {
@@ -412,13 +412,13 @@
   .desktop-grid-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-responsive-lg);
+    gap: var(--spacing-responsive-lg);
   }
 
   .desktop-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-responsive-lg);
+    gap: var(--spacing-responsive-lg);
   }
 
   .desktop-sidebar {

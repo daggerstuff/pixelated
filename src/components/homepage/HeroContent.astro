@@ -109,16 +109,10 @@ const {
     align-items: center;
     gap: 0.5rem;
     padding: 0.44rem 0.8rem;
-    border-radius: 0.62rem;
-    border: 1px solid rgba(143, 184, 162, 0.18);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(143, 184, 162, 0.12),
-        rgba(143, 184, 162, 0.04)
-      ),
-      rgba(255, 255, 255, 0.025);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-glass);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
   }
 
   .hero-kicker-dot {
@@ -127,6 +121,7 @@ const {
     border-radius: 999px;
     background: var(--accent-primary);
   }
+
 
   .hero-kicker,
   .hero-secondary-link,
@@ -139,11 +134,11 @@ const {
   .hero-kicker {
     font-family: var(--font-mono);
     font-size: 0.66rem;
-    letter-spacing: 0.1em;
-    text-transform: none;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--accent-primary);
-    opacity: 0.8;
   }
+
 
   .hero-title {
     max-width: 11ch;
@@ -181,23 +176,17 @@ const {
     gap: 0.45rem;
     min-width: 0;
     padding: 0.96rem 1rem 1.02rem;
-    border-radius: 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.045),
-        rgba(255, 255, 255, 0.02)
-      ),
-      rgba(255, 255, 255, 0.018);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-secondary);
     transition:
       border-color var(--duration-fast) var(--ease-out),
       background var(--duration-fast) var(--ease-out);
   }
 
   .hero-proof-card:hover {
-    border-color: rgba(143, 184, 162, 0.2);
-    background: rgba(255, 255, 255, 0.035);
+    border-color: var(--accent-primary);
+    background: var(--bg-glass);
   }
 
   .hero-proof-card:focus-visible {
@@ -209,23 +198,25 @@ const {
   .hero-operator-note__label {
     font-family: var(--font-mono);
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.14em;
-    text-transform: none;
+    text-transform: uppercase;
   }
+
 
   .hero-proof-card__index {
     color: var(--accent-primary);
-    opacity: 0.82;
   }
+
 
   .hero-proof-card__copy {
     margin: 0;
     font-size: 0.92rem;
     line-height: 1.62;
-    color: #e8e2d7;
+    color: var(--text-secondary);
     text-wrap: pretty;
   }
+
 
   .hero-actions {
     display: flex;
@@ -241,22 +232,21 @@ const {
     padding: 0.86rem 1.5rem;
     background: var(--accent-primary);
     border: 1px solid var(--accent-primary);
-    border-radius: 0.72rem;
-    color: #09100e;
-    font-family: var(--font-sans);
+    border-radius: var(--radius-sm);
+    color: var(--bg-primary);
+    font-family: var(--font-mono);
     font-size: 0.88rem;
     font-weight: 600;
-    text-transform: none;
-    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     overflow: hidden;
     text-decoration: none;
     display: inline-block;
-    box-shadow: 0 14px 34px rgba(143, 184, 162, 0.2);
     transition:
       transform var(--duration-fast) var(--ease-out),
-      box-shadow var(--duration-fast) var(--ease-out),
-      border-color var(--duration-fast) var(--ease-out);
+      filter var(--duration-fast) var(--ease-out);
   }
+
 
   .btn-premium:focus-visible {
     outline: 2px solid var(--accent-primary);
@@ -290,16 +280,18 @@ const {
     gap: 0.5rem;
     color: var(--text-secondary);
     text-decoration: none;
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     font-size: 0.84rem;
     font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     padding: 0.76rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.72rem;
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: var(--bg-glass);
+    backdrop-filter: var(--glass-blur);
   }
+
 
   .hero-secondary-link:hover {
     text-decoration: none;

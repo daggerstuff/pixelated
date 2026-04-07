@@ -16,28 +16,26 @@ const { label, value, compact = false } = Astro.props
 <style>
   .data-point {
     display: grid;
-    gap: 0.3rem;
+    gap: var(--spacing-1);
   }
 
   .data-point__label {
     font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    font-variant-caps: normal;
-    text-transform: none;
-    color: rgba(255, 255, 255, 0.46);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+    opacity: 0.5;
   }
 
   .data-point__value {
-    font-size: 0.95rem;
-    line-height: 1.42;
-    color: rgba(255, 255, 255, 0.92);
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    font-weight: 500;
   }
 
   .data-point--compact .data-point__value {
-    font-size: 0.8rem;
-    letter-spacing: 0.03em;
-    text-transform: none;
+    font-size: 0.85rem;
   }
 </style>

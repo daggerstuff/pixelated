@@ -20,8 +20,8 @@ const {
 
 <div class:list={['info-strip', `info-strip--${theme}`, className]}>
   <div class="info-strip__lead">
-    <span class="pe-page-panel-label">{label}</span>
-    {title ? <h3>{title}</h3> : null}
+    <span class="pe-meta-label">{label}</span>
+    {title ? <h3 class="pe-heading-s">{title}</h3> : null}
     {body ? <p>{body}</p> : null}
   </div>
   <div class="info-strip__grid">
@@ -39,158 +39,85 @@ const {
 <style>
   .info-strip {
     display: grid;
-    grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr);
-    gap: clamp(1.35rem, 2.8vw, 3rem);
-    padding: clamp(1.3rem, 2.2vw, 2rem);
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8);
+    border-radius: 4px;
     position: relative;
     overflow: hidden;
-    border-radius: 0.96rem;
-    box-shadow: var(--shadow-panel);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  .info-strip::before {
-    content: '';
-    position: absolute;
-    inset: 0.95rem 1.2rem auto 1.2rem;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      var(--accent-primary),
-      rgba(136, 201, 165, 0.08)
-    );
   }
 
   .info-strip__lead {
     display: grid;
-    gap: 0.6rem;
+    gap: var(--spacing-4);
     align-content: start;
   }
 
-  .info-strip__lead :is(h3, p) {
-    max-width: 30rem;
-    text-wrap: pretty;
-  }
-
-  .info-strip__lead h3 {
-    max-width: 18ch;
-    font-size: clamp(1.35rem, 1.2rem + 0.55vw, 1.9rem);
-    line-height: 1.08;
-    letter-spacing: -0.04em;
-  }
-
   .info-strip__lead p {
-    max-width: 28rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin: 0;
   }
 
   .info-strip__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.9rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
   }
 
   .info-strip__item {
+    padding: var(--spacing-4);
+    border: 1px solid var(--divider-subtle);
+    background: var(--bg-ghost);
+    border-radius: 2px;
     display: grid;
-    align-content: start;
-    gap: 0.35rem;
-    min-width: 0;
-    min-height: 100%;
-    padding: 1.05rem 1.1rem;
-    border: 1px solid rgba(17, 23, 22, 0.08);
-    border-radius: 0.82rem;
-    background: rgba(255, 255, 255, 0.62);
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
-
-  .info-strip__item,
-  .info-strip__item strong {
-    text-wrap: balance;
-    hyphens: auto;
+    gap: var(--spacing-2);
   }
 
   .info-strip__item span {
     font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: none;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.5;
   }
 
   .info-strip__item strong {
-    font-size: 0.92rem;
-    line-height: 1.45;
+    font-size: 1rem;
+    font-weight: 500;
   }
 
-  .info-strip--paper {
-    border: 1px solid var(--ink-border);
-    background: var(--surface-paper-panel);
-    color: var(--ink-primary);
-    box-shadow: 0 14px 32px rgba(17, 23, 22, 0.05);
-  }
-
-  .info-strip--paper .info-strip__lead :is(h3, p) {
-    color: inherit;
-  }
-
-  .info-strip--paper .info-strip__item span {
-    color: var(--ink-muted);
-  }
-
-  .info-strip--paper .info-strip__item strong {
-    color: var(--ink-primary);
-  }
-
+  /* Dark / Terminal Theme */
   .info-strip--dark {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background:
-      linear-gradient(
-        135deg,
-        rgba(143, 184, 162, 0.1),
-        rgba(143, 184, 162, 0.02) 34%,
-        rgba(255, 255, 255, 0.025) 100%
-      ),
-      rgba(12, 17, 18, 0.96);
-    color: var(--text-primary);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
-  }
-
-  .info-strip--dark .info-strip__lead :is(h3, p) {
-    color: inherit;
-  }
-
-  .info-strip--dark .info-strip__item span {
-    color: rgba(255, 255, 255, 0.46);
-  }
-
-  .info-strip--dark .info-strip__item strong {
+    border: 1px solid var(--border-glass);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     color: var(--text-primary);
   }
 
   .info-strip--dark .info-strip__item {
-    border-color: rgba(255, 255, 255, 0.07);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.05);
   }
 
-  @media (max-width: 1080px) {
+  /* Paper / Light Theme */
+  .info-strip--paper {
+    background: var(--surface-paper);
+    color: var(--ink-primary);
+    border: 1px solid var(--ink-border);
+  }
+
+  .info-strip--paper .info-strip__item {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 880px) {
     .info-strip {
       grid-template-columns: 1fr;
     }
-
-    .info-strip__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 860px) {
-    .info-strip__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 720px) {
-    .info-strip,
+    
     .info-strip__grid {
       grid-template-columns: 1fr;
     }

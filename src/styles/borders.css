@@ -54,5 +54,5 @@
     var(--border-primary),
     transparent
   );
-  margin: var(--space-12) 0;
+  margin: var(--spacing-12) 0;
 }
