@@ -1,7 +1,21 @@
+/* ================================================
+   TECHNICAL-HUMANIST TYPOGRAPHY
+   Berkeley Mono as the Primary Voice
+   ================================================ */
+
 @font-face {
-  font-family: 'Babies Playtime';
-  src: url('/fonts/FriendlyStranger.ttf') format('opentype');
-  font-weight: normal;
+  font-family: 'Berkeley Mono';
+  src: local('Berkeley Mono'), local('IBM Plex Mono'), local('Menlo'), local('Monaco'), local('Courier New'), monospace;
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: local('Berkeley Mono Bold'), local('IBM Plex Mono Bold'), local('Menlo Bold'), local('Monaco Bold'), local('Courier New Bold'), monospace;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+

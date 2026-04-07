@@ -440,8 +440,8 @@ h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-6);
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
@@ -521,17 +521,17 @@ h6 {
 
 /* Button Sizes */
 .btn-sm {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--spacing-2) var(--spacing-4);
   font-size: var(--text-xs);
 }
 
 .btn-lg {
-  padding: var(--space-4) var(--space-8);
+  padding: var(--spacing-4) var(--spacing-8);
   font-size: var(--text-base);
 }
 
 .btn-xl {
-  padding: var(--space-6) var(--space-12);
+  padding: var(--spacing-6) var(--spacing-12);
   font-size: var(--text-lg);
 }
 
@@ -540,7 +540,7 @@ h6 {
   background: var(--color-surface);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--spacing-6);
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
@@ -630,7 +630,7 @@ h6 {
   background: var(--color-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--spacing-3) var(--spacing-4);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -649,12 +649,12 @@ h6 {
 }
 
 .input--large {
-  padding: var(--space-4) var(--space-6);
+  padding: var(--spacing-4) var(--spacing-6);
   font-size: var(--text-lg);
 }
 
 .input--small {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--spacing-2) var(--spacing-3);
   font-size: var(--text-sm);
 }
 
@@ -662,7 +662,7 @@ h6 {
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-8);
+  gap: var(--spacing-8);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -674,7 +674,7 @@ h6 {
   text-decoration: none;
   font-weight: var(--weight-medium);
   font-size: var(--text-sm);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
@@ -704,8 +704,8 @@ h6 {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-3);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   text-transform: uppercase;
@@ -741,7 +741,7 @@ h6 {
 /* === GRID SYSTEM === */
 .grid {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--spacing-6);
 }
 
 .grid--2 {
@@ -757,11 +757,11 @@ h6 {
 }
 
 .grid--dense {
-  gap: var(--space-4);
+  gap: var(--spacing-4);
 }
 
 .grid--loose {
-  gap: var(--space-8);
+  gap: var(--spacing-8);
 }
 
 /* === ANIMATION SYSTEM === */
@@ -969,11 +969,11 @@ select:focus-visible {
   }
 
   .nav {
-    gap: var(--space-4);
+    gap: var(--spacing-4);
   }
 
   .card {
-    padding: var(--space-4);
+    padding: var(--spacing-4);
   }
 
   /* Optimize for mobile performance */
@@ -1011,7 +1011,7 @@ select:focus-visible {
   }
 
   .grid--2 > * {
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--spacing-6);
   }
 
   .grid--2 > *:last-child {
@@ -1027,7 +1027,7 @@ select:focus-visible {
 
   .nav__link {
     display: block;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--spacing-2);
   }
 
   .nav__link:last-child {
@@ -1090,8 +1090,8 @@ select:focus-visible {
 /* Mobile Navigation Enhancements */
 .mobile-nav-toggle {
   position: fixed;
-  top: var(--space-4);
-  right: var(--space-4);
+  top: var(--spacing-4);
+  right: var(--spacing-4);
   z-index: var(--z-dropdown);
   width: 44px;
   height: 44px;
@@ -1155,7 +1155,7 @@ select:focus-visible {
   height: 100vh;
   background: var(--color-primary);
   z-index: var(--z-dropdown);
-  padding: var(--space-8) var(--space-6);
+  padding: var(--spacing-8) var(--spacing-6);
   overflow-y: auto;
   transition: left 0.3s var(--transition-spring);
   box-shadow: var(--shadow-2xl);
@@ -1183,15 +1183,15 @@ select:focus-visible {
 
 .mobile-nav-menu .nav {
   flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-8);
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-8);
 }
 
 .mobile-nav-menu .nav__link {
   display: block;
   width: 100%;
   text-align: left;
-  padding: var(--space-4) var(--space-6);
+  padding: var(--spacing-4) var(--spacing-6);
   border-radius: var(--radius-md);
   margin: 0;
   transition: all var(--transition-normal);
@@ -1254,11 +1254,11 @@ select:focus-visible {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--space-6);
+  padding: 0 var(--spacing-6);
 }
 
 .section {
-  padding: var(--space-20) 0;
+  padding: var(--spacing-20) 0;
 }
 
 .divider {
@@ -1269,7 +1269,7 @@ select:focus-visible {
     var(--border-primary),
     transparent
   );
-  margin: var(--space-8) 0;
+  margin: var(--spacing-8) 0;
 }
 
 /* Status indicators */
