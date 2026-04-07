@@ -23,7 +23,7 @@
     "setup:dev": "./scripts/setup-dev.sh",
     "jules:setup": "bash scripts/devops/jules-setup.sh",
     "jules:check": "git status | grep 'on branch staging' || (echo '❌ ERROR: Jules must work on staging branch' && exit 1) && pnpm check:all",
-    "hooks:install": "if [ -f scripts/devops/install-git-hooks.sh ]; then bash scripts/devops/install-git-hooks.sh; else echo \"Skipping git hooks install: scripts/devops/install-git-hooks.sh not found.\"; fi",
+    "hooks:install": "[ -f scripts/devops/install-git-hooks.sh ] && bash scripts/devops/install-git-hooks.sh || echo \"Skipping git hooks install: scripts/devops/install-git-hooks.sh not found.\"",
     "prepare": "pnpm run -s hooks:install",
     "build": "CI=true node scripts/ci/build-with-pipe-handling.mjs",
     "build:railway": "DEPLOY_TARGET=railway astro build",

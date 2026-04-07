@@ -2,25 +2,26 @@
 Tests for unified memory interface and providers.
 """
 
+from __future__ import annotations
+
+from unittest.mock import AsyncMock, Mock
+
 import pytest
 
-pytestmark = pytest.mark.skip(reason="Module ai.memory.unified_memory not implemented")
-
-from unittest.mock import AsyncMock, MagicMock, Mock
-from typing import Dict, Any, List, Optional
-
-from ai.memory.unified_memory import (
-    MemoryCategory,
-    CrisisSeverity,
-    MemoryMetadata,
-    Memory,
-    MemoryProvider,
-)
+from ai.memory.dual_storage_provider import DualStorageProvider
 from ai.memory.hindsight_provider import HindsightMemoryProvider
 from ai.memory.letta_provider import LettaMemoryProvider
-from ai.memory.dual_storage_provider import DualStorageProvider
 from ai.memory.memory_sync_service import MemorySyncService, SyncDirection
 from ai.memory.unified_client import UnifiedMemoryClient, create_client
+from ai.memory.unified_memory import (
+    CrisisSeverity,
+    Memory,
+    MemoryCategory,
+    MemoryMetadata,
+    MemoryProvider,
+)
+
+pytestmark = pytest.mark.skip(reason="Module ai.memory.unified_memory not implemented")
 
 
 class TestMemoryCategory:
@@ -122,7 +123,7 @@ class MockMemoryProvider(MemoryProvider):
     """Mock provider for testing."""
 
     def __init__(self):
-        self._memories: Dict[str, Memory] = {}
+        self._memories: dict[str, Memory] = {}
 
     async def add_memory(self, content: str, metadata: MemoryMetadata) -> str:
         memory_id = f"mem-{len(self._memories)}"
@@ -139,8 +140,8 @@ class MockMemoryProvider(MemoryProvider):
     async def update_memory(
         self,
         memory_id: str,
-        content: Optional[str] = None,
-        metadata: Optional[MemoryMetadata] = None,
+        content: str | None = None,
+        metadata: MemoryMetadata | None = None,
     ) -> None:
         if memory_id in self._memories:
             if content:
@@ -152,15 +153,15 @@ class MockMemoryProvider(MemoryProvider):
         if memory_id in self._memories:
             del self._memories[memory_id]
 
-    async def search_memories(self, query: str, user_id: str, limit: int = 10) -> List[Memory]:
+    async def search_memories(self, _query: str, _user_id: str, limit: int = 10) -> list[Memory]:
         return list(self._memories.values())[:limit]
 
-    async def get_memories_by_user(self, user_id: str, limit: int = 100) -> List[Memory]:
+    async def get_memories_by_user(self, _user_id: str, limit: int = 100) -> list[Memory]:
         return list(self._memories.values())[:limit]
 
     async def get_memories_by_category(
-        self, category: MemoryCategory, user_id: Optional[str] = None, limit: int = 100
-    ) -> List[Memory]:
+        self, category: MemoryCategory, _user_id: str | None = None, limit: int = 100
+    ) -> list[Memory]:
         return [m for m in self._memories.values() if m.metadata.category == category][:limit]
 
 
@@ -278,7 +279,7 @@ class TestDualStorageProvider:
             category=MemoryCategory.GENERAL,
             user_id="user123",
         )
-        memory_id = await provider.add_memory("General content", metadata)
+        _memory_id = await provider.add_memory("General content", metadata)
 
         mock_hindsight.add_memory.assert_called_once()
         mock_letta.add_memory.assert_called_once()
@@ -314,7 +315,7 @@ class TestMemorySyncService:
         assert service.hindsight == mock_hindsight
         assert service.letta == mock_letta
         assert service.sync_interval == 300
-        assert service.auto_sync == False
+        assert not service.auto_sync
 
     def test_init_with_config(self):
         """Test initialization with config."""
@@ -323,7 +324,7 @@ class TestMemorySyncService:
         config = {"sync_interval": 600, "auto_sync": True}
         service = MemorySyncService(mock_hindsight, mock_letta, config)
         assert service.sync_interval == 600
-        assert service.auto_sync == True
+        assert service.auto_sync
 
     @pytest.mark.asyncio
     async def test_sync_now(self):

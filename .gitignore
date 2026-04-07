@@ -310,3 +310,5 @@ gha-creds-*.json
 NOTES.md
 memory.db-shm
 memory.db-wal
+
+.worktrees/hidden-audit
