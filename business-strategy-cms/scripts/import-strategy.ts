@@ -210,7 +210,7 @@ async function importStrategy() {
     console.log(`Wrote last import metadata to ${lastImportPath}.`)
 
     await runPostImportAnalysis()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Import failed:', error)
   } finally {
     await mongoose.connection.close()

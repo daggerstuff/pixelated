@@ -44,7 +44,7 @@ router.post('/complete', async (req, res) => {
       data: { user, tokens },
       message: 'Onboarding completed successfully',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(500).json({
       success: false,
       error: {
@@ -85,7 +85,7 @@ router.get('/status/:userId', async (req, res) => {
         },
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(500).json({
       success: false,
       error: {

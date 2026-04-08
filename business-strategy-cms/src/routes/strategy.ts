@@ -83,7 +83,7 @@ router.get('/dashboard', async (_req, res) => {
       },
       data: dashboardData.sort((a, b) => b.aiScore - a.aiScore),
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Dashboard Error:', error)
     res.status(500).json({ error: 'Failed to generate strategy dashboard' })
   }

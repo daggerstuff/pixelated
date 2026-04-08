@@ -100,7 +100,7 @@ export class YahooFinanceService {
 
       this.setCache(cacheKey, quote)
       return quote
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch quote', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -169,7 +169,7 @@ export class YahooFinanceService {
 
       this.setCache(cacheKey, data)
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch historical data', {
         symbol,
         period,
@@ -212,7 +212,7 @@ export class YahooFinanceService {
 
       this.setCache(cacheKey, profile)
       return profile
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch company profile', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
