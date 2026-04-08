@@ -1,5 +1,7 @@
 // API endpoint for bias detection analysis
 
+import type { APIRoute } from 'astro'
+
 import type {
   SessionData,
   BiasAnalysisResults,

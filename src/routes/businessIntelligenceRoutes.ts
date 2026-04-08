@@ -14,7 +14,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const { symbol } = req.params
       const marketData = await biService
         .getMarketData(symbol.toUpperCase())
-        .slice(________)
+        .slice(0, 100)
       res.json(marketData)
     } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch market data' })

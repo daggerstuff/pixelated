@@ -304,7 +304,7 @@ export * from './DeploymentOrchestrator'
  * Create a fully configured multi-region deployment system
  */
 export async function createMultiRegionSystem(
-  configOverrides?: Partial<MultiRegionConfig>,
+  configOverrides?: Partial<import('./ConfigurationManager').MultiRegionConfig>,
 ) {
   const config = new ConfigurationManager()
 

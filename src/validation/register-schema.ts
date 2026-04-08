@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   MaxLength,
   MinLength,
+  IsEqualTo,
 } from 'class-validator'
 
 export class RegisterDto {

@@ -10,6 +10,8 @@
  * - Configurable rules with role-based bypass
  */
 
+import { redis } from '../redis'
+
 export { DistributedRateLimiter, createRateLimiter } from './rate-limiter'
 export { RateLimitAnalytics, rateLimitAnalytics } from './analytics'
 
