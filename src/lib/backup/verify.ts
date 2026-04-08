@@ -109,7 +109,7 @@ export class BackupVerificationService extends EventEmitter {
       const checksum = this.calculateChecksum(data);
 
       // Parse backup data
-      const backup = JSON.parse(data.toString() as unknown);
+      const backup = JSON.parse(data.toString()) as Record<string, unknown>;
 
       // Verify structure
       if (!this.isValidBackupStructure(backup)) {
@@ -247,16 +247,16 @@ export class BackupVerificationService extends EventEmitter {
     try {
       // Read backup file
       const backupData = await fs.readFile(backupPath);
-      const backup = JSON.parse(backupData.toString() as unknown);
+      const backup = JSON.parse(backupData.toString()) as Record<string, unknown>;
 
       // Verify backup structure
-      if (!backup.data || !backup.metadata) {
+      if (!((backup as Record<string, unknown>).data) || !backup.metadata) {
         throw new Error("Invalid backup structure");
       }
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        this.verifyDataIntegrity(backup.data);
+        this.verifyDataIntegrity(((backup as Record<string, unknown>).data);
       }
 
       // Verify restoration capability
@@ -281,7 +281,7 @@ export class BackupVerificationService extends EventEmitter {
       await testRedis.connect();
 
       // Test restore a small subset of data
-      const testData = this.extractTestData(backup.data);
+      const testData = this.extractTestData(((backup as Record<string, unknown>).data);
       await this.restoreTestData(testRedis, testData);
 
       // Verify restored data
@@ -328,7 +328,7 @@ export class BackupVerificationService extends EventEmitter {
       if (user && typeof user === "object" && "id" in user) {
         const userId = (user as { id: string }).id;
         const restored = await redis.get(`user:${userId}`);
-        if (!restored || (JSON.parse(restored) as unknown.id) !== userId) {
+        if (!restored || (JSON.parse(restored) as { id: unknown }) !== userId) {
           throw new Error(`Restoration verification failed for user: ${userId}`);
         }
       }
@@ -340,7 +340,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       const metadataPath = path.join(this.backupDir, `${backupFile}.meta`);
       const data = await fs.readFile(metadataPath, "utf-8");
-      return JSON.parse(data) as unknown;
+      return JSON.parse(data) as Record<string, unknown>;
     } catch {
       return null;
     }

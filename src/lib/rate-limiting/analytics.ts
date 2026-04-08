@@ -340,18 +340,18 @@ export class RateLimitAnalytics {
 
     switch (alert.type) {
       case 'rate_limit_exceeded':
-        return !thresholds.rps || alert.details.blockedRate > thresholds.rps
+        return !thresholds.rps || ((alert.details.blockedRate as number) || 0) > thresholds.rps
       case 'attack_detected':
         return true // Always trigger for attack detection
       case 'ddos_detected':
         return (
           !thresholds.blockedPercentage ||
-          alert.details.blockPercentage > thresholds.blockedPercentage
+          ((alert.details.blockPercentage as number) || 0) > thresholds.blockedPercentage
         )
       case 'system_error':
         return (
           !thresholds.errorRate ||
-          alert.details.errorRate > thresholds.errorRate
+          ((alert.details.errorRate as number) || 0) > thresholds.errorRate
         )
       default:
         return false

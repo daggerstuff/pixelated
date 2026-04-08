@@ -174,7 +174,7 @@ class IntegrationTestRunner {
       } catch (error) {
         console.warn(
           `⚠️  ${service.name} health check failed (attempt ${attempt}/${maxRetries}):`,
-          error.message,
+          (error as Error).message,
         )
       }
 
@@ -209,7 +209,7 @@ class IntegrationTestRunner {
           console.log(`❌ ${check.name}: HTTP ${response.status}`)
         }
       } catch (error) {
-        console.log(`❌ ${check.name}: ${error.message}`)
+        console.log(`❌ ${check.name}: ${(error as Error).message}`)
       }
     }
   }
@@ -256,11 +256,11 @@ class IntegrationTestRunner {
         failed: 1,
         skipped: 0,
         duration,
-        errors: [error.message],
+        errors: [(error as Error).message],
       })
 
       console.log(`❌ ${suiteName}: Failed (${duration}ms)`)
-      console.error('Error:', error.message)
+      console.error('Error:', (error as Error).message)
     }
   }
 
@@ -384,7 +384,7 @@ class IntegrationTestRunner {
         }
       } catch (error) {
         performanceResults[benchmark.name] = {
-          error: error.message,
+          error: (error as Error).message,
           passed: false,
         }
       }
