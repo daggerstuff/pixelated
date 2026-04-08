@@ -72,14 +72,19 @@ export async function createSession(
   const timeout = rememberMe ? EXTENDED_SESSION_TIMEOUT : SESSION_TIMEOUT
 
   // Check concurrent session limit
-  const existingSessions = (await getFromCache(`user:sessions:${userId}`)) || []
+  const existingSessionsRaw = (await getFromCache(
+    `user:sessions:${userId}`,
+  )) as SessionData[] | null | undefined
+  const existingSessions = existingSessionsRaw || []
   if (existingSessions.length >= MAX_CONCURRENT_SESSIONS) {
     // Remove oldest session
-    const oldestSession = existingSessions.sort(
+    const sortedSessions = existingSessions.sort(
       (a, b) => a.lastActivity - b.lastActivity,
-    )[0]
-    await removeFromCache(`session:${oldestSession.sessionId}`)
-    await removeFromCache(`session:device:${oldestSession.sessionId}`)
+    )
+    if (sortedSessions[0]) {
+      await removeFromCache(`session:${sortedSessions[0].sessionId}`)
+      await removeFromCache(`session:device:${sortedSessions[0].sessionId}`)
+    }
   }
 
   const sessionData: SessionData = {
