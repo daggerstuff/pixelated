@@ -715,7 +715,7 @@ export class FeedbackService implements FeedbackServiceInterface {
       ])
 
       // Run inference
-      const prediction = this.techniqueModel.predict(features) as unknown // tf.Tensor
+      const prediction = this.techniqueModel.predict(features) as tf.Tensor // tf.Tensor
       const predictionData = await prediction.data()
 
       // Clean up tensors

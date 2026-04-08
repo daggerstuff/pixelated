@@ -381,11 +381,11 @@ export class AutomatedThreatResponseOrchestratorCore
 
     switch (condition.operator) {
       case 'greater_than':
-        return value > condition.value
+        return value > (condition.value as number)
       case 'less_than':
-        return value < condition.value
+        return value < (condition.value as number)
       case 'equals':
-        return value === condition.value
+        return value === (condition.value as number)
       default:
         return false
     }
@@ -398,11 +398,11 @@ export class AutomatedThreatResponseOrchestratorCore
     const value = this.getThreatValue(threat, condition.condition)
 
     if (condition.operator === 'contains') {
-      return String(value).includes(String(condition.value))
+      return String(value).includes(String(condition.value as unknown))
     }
 
     if (condition.operator === 'matches') {
-      const regex = new RegExp(String(condition.value))
+      const regex = new RegExp(String(condition.value as unknown))
       return regex.test(String(value))
     }
 
