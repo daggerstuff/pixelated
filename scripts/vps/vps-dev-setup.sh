@@ -632,9 +632,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 
-# kluster.ai
-export PATH="$HOME/.kluster/cli/bin:$PATH"
-source <(kluster completion zsh) 2>/dev/null || true
 
 # rbenv
 eval "$(rbenv init -)" 2>/dev/null || true
