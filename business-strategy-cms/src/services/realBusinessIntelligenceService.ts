@@ -67,7 +67,7 @@ export class RealBusinessIntelligenceService {
 
       await this.db.storeCompetitorAnalysis(analysis)
       return analysis
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to analyze competitive landscape', {
         industry,
         error: error instanceof Error ? error.message : String(error),
@@ -117,7 +117,7 @@ export class RealBusinessIntelligenceService {
       const score =
         marketSizeScore + profitabilityScore + valuationScore + growthScore
       return Math.min(100, score)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to score market opportunity', {
         params,
         error: error instanceof Error ? error.message : String(error),
@@ -159,7 +159,7 @@ export class RealBusinessIntelligenceService {
       }
 
       return marketData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get real-time market data', {
         industry,
         error: error instanceof Error ? error.message : String(error),
@@ -245,7 +245,7 @@ export class RealBusinessIntelligenceService {
         (a, b) =>
           (urgencyOrder[b.urgency] || 0) - (urgencyOrder[a.urgency] || 0),
       )
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to generate business insights', {
         error: error instanceof Error ? error.message : String(error),
       })
@@ -286,7 +286,7 @@ export class RealBusinessIntelligenceService {
       )
 
       return results.filter(Boolean)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get stock intelligence', {
         symbols,
         error: error instanceof Error ? error.message : String(error),
@@ -321,7 +321,7 @@ export class RealBusinessIntelligenceService {
       }
 
       return alerts
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to monitor market changes', {
         symbols,
         threshold,

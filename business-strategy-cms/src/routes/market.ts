@@ -41,7 +41,7 @@ router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Quote error:', error)
     return res.status(500).json({
       success: false,
@@ -71,7 +71,7 @@ router.post('/bulk', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Bulk data error:', error)
     return res.status(500).json({
       success: false,
@@ -108,7 +108,7 @@ router.get('/technical/:symbol', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Technical analysis error:', error)
     return res.status(500).json({
       success: false,
@@ -129,7 +129,7 @@ router.get('/sectors', async (_req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Sectors error:', error)
     return res.status(500).json({
       success: false,
@@ -150,7 +150,7 @@ router.get('/economic', async (_req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Economic indicators error:', error)
     return res.status(500).json({
       success: false,
@@ -180,7 +180,7 @@ router.get('/sentiment/:symbol', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Sentiment error:', error)
     return res.status(500).json({
       success: false,

@@ -31,7 +31,7 @@ export class BusinessIntelligenceService {
       await this.db.storeCompetitorAnalysis(analysis)
 
       return analysis
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to analyze competitive landscape', {
         error,
         industry,

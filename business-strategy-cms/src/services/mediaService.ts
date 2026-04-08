@@ -125,7 +125,7 @@ export class MediaService {
             size: file.Size || 0,
             url,
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.warn(
             'Failed to generate signed URL for file:',
             file.Key,

@@ -71,7 +71,7 @@ export class SocketService {
 
         socket.user = payload
         next()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Socket authentication error:', error)
         next(new Error('Authentication failed'))
       }
@@ -161,7 +161,7 @@ export class SocketService {
       socket.emit('recent-changes', recentChanges)
 
       logger.info(`User ${socket.user.userId} joined document ${documentId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error joining document:', error)
       socket.emit('error', { message: 'Failed to join document' })
     }
@@ -274,7 +274,7 @@ export class SocketService {
       logger.info(
         `Document ${socket.documentId} saved by ${socket.user.userId}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error saving document:', error)
       socket.emit('error', { message: 'Failed to save document' })
     }
@@ -301,7 +301,7 @@ export class SocketService {
       }
 
       await redisClient.setEx(key, 3600, JSON.stringify(changes)) // 1 hour TTL
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error storing change in Redis:', error)
     }
   }

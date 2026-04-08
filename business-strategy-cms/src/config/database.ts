@@ -37,7 +37,7 @@ export const connectMongoDB = async (): Promise<void> => {
       })
 
       return
-    } catch (error) {
+    } catch (error: unknown) {
       retries++
       logger.error(`MongoDB connection attempt ${retries} failed:`, error)
       if (retries >= MAX_RETRIES) throw error
@@ -67,7 +67,7 @@ export const testPostgresConnection = async (): Promise<void> => {
       logger.info('PostgreSQL connected successfully')
       client.release()
       return
-    } catch (error) {
+    } catch (error: unknown) {
       retries++
       logger.error(`PostgreSQL connection attempt ${retries} failed:`, error)
       if (retries >= MAX_RETRIES) throw error
@@ -101,7 +101,7 @@ export const connectRedis = async (): Promise<void> => {
         logger.warn('Redis disconnected')
       })
       return
-    } catch (error) {
+    } catch (error: unknown) {
       retries++
       logger.error(`Redis connection attempt ${retries} failed:`, error)
       if (retries >= MAX_RETRIES) throw error
@@ -119,7 +119,7 @@ export const initializeDatabases = async (): Promise<void> => {
       connectRedis(),
     ])
     logger.info('All database connections established successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to initialize database connections:', error)
     throw error
   }
@@ -134,7 +134,7 @@ export const closeDatabaseConnections = async (): Promise<void> => {
       redisClient.quit(),
     ])
     logger.info('All database connections closed successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error closing database connections:', error)
   }
 }
