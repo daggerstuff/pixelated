@@ -243,7 +243,7 @@ export class Auth0AdaptiveMFAService {
         requiresMFA,
         recommendedAction,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to calculate risk score:', error)
 
       // In case of error, default to medium risk requiring MFA
@@ -298,7 +298,7 @@ export class Auth0AdaptiveMFAService {
           description = `New or unusual IP address for user`
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze IP address:', error)
     }
 
@@ -346,7 +346,7 @@ export class Auth0AdaptiveMFAService {
         description = `Unusual location change detected`
         value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze geolocation:', error)
     }
 
@@ -399,7 +399,7 @@ export class Auth0AdaptiveMFAService {
           description = `Login within allowed time windows`
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze time context:', error)
     }
 
@@ -460,7 +460,7 @@ export class Auth0AdaptiveMFAService {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze user behavior:', error)
     }
 
@@ -518,7 +518,7 @@ export class Auth0AdaptiveMFAService {
           description = `Potential automated tool detected`
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze device:', error)
     }
 

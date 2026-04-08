@@ -242,7 +242,7 @@ export async function isSuspiciousIP(
         cacheHit: threatResult.cacheHit,
         sources: threatResult.sources,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       // Log error but don't fail the check - fallback to basic heuristics
       logger.warn(`Failed to query threat intelligence for IP ${ip}`, {
         error: String(error),
@@ -318,7 +318,7 @@ export async function checkSuspiciousIPWithIntelligence(
     const result = await isSuspiciousIP(ip, threatService)
     await threatService.shutdown()
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn(
       'Failed to use threat intelligence service, falling back to basic check',
       {

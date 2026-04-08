@@ -262,7 +262,7 @@ export class MultiModalRiskAssessmentService {
         interventionPriority,
         monitoringFocus,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in multi-modal risk assessment:', error)
 
       // Fallback assessment

@@ -107,7 +107,7 @@ describe("Middleware Stack Integration", () => {
 
     try {
       await mockAuthMiddleware(mockRequest, mockResponse, mockNext);
-    } catch (error) {
+    } catch (error: unknown) {
       expect(error).toBeDefined();
     }
 

@@ -114,7 +114,7 @@ export class BatchProcessor implements IBatchProcessor {
         // return this.api.processBatch(optimizedBatch);
         return Promise.resolve()
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Batch processing failed due to circuit breaker being open',
         { error },

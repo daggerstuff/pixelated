@@ -154,7 +154,7 @@ export async function detectMetricAnomalies(
           : undefined,
       }))
       .filter((result) => result.isAnomaly)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error detecting anomalies:', error)
 
     // Fallback to simple statistical method
@@ -215,7 +215,7 @@ export async function getPerformanceMetrics(
         cacheHitRate: parseFloat(metricsData.cacheHitRate || '0'),
       },
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting performance metrics:', error)
 
     // Return default metrics
@@ -265,7 +265,7 @@ export async function storePerformanceMetrics(
     pipeline.expire('performance:metrics', 86400)
 
     await pipeline.exec()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error storing performance metrics:', error)
   }
 }

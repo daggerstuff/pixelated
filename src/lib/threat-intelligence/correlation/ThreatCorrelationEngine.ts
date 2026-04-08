@@ -112,7 +112,7 @@ export class ThreatCorrelationEngineCore
 
       this.emit('engine_initialized')
       logger.info('Threat Correlation Engine initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Correlation Engine:', { error })
       this.emit('initialization_error', { error })
       throw error
@@ -124,7 +124,7 @@ export class ThreatCorrelationEngineCore
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for correlation engine')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -139,7 +139,7 @@ export class ThreatCorrelationEngineCore
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_correlation')
       logger.info('MongoDB connection established for correlation engine')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -183,7 +183,7 @@ export class ThreatCorrelationEngineCore
       })
 
       logger.info('ML model loaded for correlation analysis')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load ML model:', { error })
       // Continue without ML model - will use rule-based correlation
     }
@@ -201,7 +201,7 @@ export class ThreatCorrelationEngineCore
       }
 
       logger.info(`Loaded ${patterns.length} correlation patterns`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load correlation patterns:', { error })
     }
   }
@@ -211,7 +211,7 @@ export class ThreatCorrelationEngineCore
     setInterval(async () => {
       try {
         await this.monitorNewCorrelations()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Correlation monitoring error:', { error })
       }
     }, 30000)
@@ -269,7 +269,7 @@ export class ThreatCorrelationEngineCore
       })
 
       return correlationData
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to correlate threat:', {
         error,
         threatId: threatData.threatId,
@@ -318,7 +318,7 @@ export class ThreatCorrelationEngineCore
       })
 
       return groupedCorrelations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to correlate threats:', { error })
       this.emit('correlation_error', { error })
       throw error
@@ -363,7 +363,7 @@ export class ThreatCorrelationEngineCore
         analysisMethod: 'pairwise_comparison',
         timestamp: new Date(),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to correlate threat pair:', { error })
       return null
     }
@@ -418,7 +418,7 @@ export class ThreatCorrelationEngineCore
 
       // Normalize score
       return weightSum > 0 ? totalScore / weightSum : 0
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate similarity score:', { error })
       return 0
     }
@@ -457,7 +457,7 @@ export class ThreatCorrelationEngineCore
       }
 
       return totalComparisons > 0 ? matchingIndicators / totalComparisons : 0
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to compare indicators:', { error })
       return 0
     }
@@ -622,7 +622,7 @@ export class ThreatCorrelationEngineCore
       } else {
         return 'general'
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to determine correlation type:', { error })
       return 'unknown'
     }
@@ -719,7 +719,7 @@ export class ThreatCorrelationEngineCore
       confidence *= regionFactor
 
       return Math.min(confidence, 1)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate correlation confidence:', { error })
       return similarityScore * 0.8 // Fallback confidence
     }
@@ -758,7 +758,7 @@ export class ThreatCorrelationEngineCore
         .toArray()
 
       return similarThreats
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to find similar threats in window:', { error })
       return []
     }
@@ -824,7 +824,7 @@ export class ThreatCorrelationEngineCore
         confidence: Math.min(averageSimilarity * 0.9, 1),
         method: 'similarity_analysis',
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze correlations:', { error })
       return {
         strength: 0,
@@ -879,7 +879,7 @@ export class ThreatCorrelationEngineCore
       weights += 0.1
 
       return weights > 0 ? score / weights : 0
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate threat similarity:', { error })
       return 0
     }
@@ -928,7 +928,7 @@ export class ThreatCorrelationEngineCore
       } else {
         return 'weak'
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to determine single threat correlation type:', {
         error,
       })
@@ -1030,7 +1030,7 @@ export class ThreatCorrelationEngineCore
       })
 
       return similarThreatData
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to find similar threats:', { error, threatId })
       this.emit('similarity_search_error', { error, threatId })
       throw error
@@ -1120,7 +1120,7 @@ export class ThreatCorrelationEngineCore
       })
 
       return relevantPatterns
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get correlation patterns:', { error })
       throw error
     }
@@ -1149,7 +1149,7 @@ export class ThreatCorrelationEngineCore
 
       this.emit('algorithm_updated', { algorithmId: algorithm.algorithmId })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update correlation algorithm:', { error })
       return false
     }
@@ -1215,7 +1215,7 @@ export class ThreatCorrelationEngineCore
         activeCorrelations: this.activeCorrelations.size,
         patternCount: this.correlationPatterns.size,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1228,7 +1228,7 @@ export class ThreatCorrelationEngineCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1238,7 +1238,7 @@ export class ThreatCorrelationEngineCore
     try {
       await this.db.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MongoDB health check failed:', { error })
       return false
     }
@@ -1253,7 +1253,7 @@ export class ThreatCorrelationEngineCore
         correlationData.correlationId,
         correlationData,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store correlation data:', { error })
       throw error
     }
@@ -1273,7 +1273,7 @@ export class ThreatCorrelationEngineCore
       }
 
       await this.redis.setex(cacheKey, 1800, JSON.stringify(cacheData)) // 30 minutes TTL
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cache correlation data:', { error })
     }
   }
@@ -1325,7 +1325,7 @@ export class ThreatCorrelationEngineCore
       await this.db
         .collection('correlation_patterns')
         .replaceOne({ patternId: pattern.patternId }, pattern, { upsert: true })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update correlation patterns:', { error })
     }
   }
@@ -1346,7 +1346,7 @@ export class ThreatCorrelationEngineCore
         regions: [], // Will be populated from correlated threats
         indicators: [], // Will be populated from correlated threats
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to extract pattern info:', { error })
       return null
     }
@@ -1408,7 +1408,7 @@ export class ThreatCorrelationEngineCore
       } else {
         return 'stable'
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze pattern trend:', { error })
       return 'stable'
     }
@@ -1459,7 +1459,7 @@ export class ThreatCorrelationEngineCore
       }
 
       return mergedCorrelations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to group correlations:', { error })
       return correlations
     }
@@ -1511,7 +1511,7 @@ export class ThreatCorrelationEngineCore
         analysisMethod: 'grouped_correlation',
         timestamp: new Date(),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to merge correlation group:', { error })
       return null
     }
@@ -1541,7 +1541,7 @@ export class ThreatCorrelationEngineCore
           recentCorrelations,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Correlation monitoring error:', { error })
     }
   }
@@ -1566,7 +1566,7 @@ export class ThreatCorrelationEngineCore
 
       this.emit('engine_shutdown')
       logger.info('Threat Correlation Engine shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

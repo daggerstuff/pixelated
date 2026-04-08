@@ -168,7 +168,7 @@ export class BiasDetectionEngine {
           enableDistributedCache: this.config.cacheConfig?.enableDistributedCache !== false,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       // Fallback to null if performance optimizer fails to initialize
       this.performanceOptimizer = null;
       console.warn("Performance optimizer initialization failed, using fallback mode:", error);
@@ -1059,7 +1059,7 @@ export class BiasDetectionEngine {
               total: sessions.length,
             });
           }
-        } catch (error) {
+        } catch (error: unknown) {
           const err = { session, error: error as Error };
           errors.push(err);
           if (options.onError) {
@@ -1083,7 +1083,7 @@ export class BiasDetectionEngine {
 
     if (options.logErrors !== false && errors.length > 0) {
       errors.forEach(({ session, error }) => {
-        console.error(`[BatchError] Session ${session.sessionId}: ${error.message}`);
+        console.error(`[BatchError] Session ${session.sessionId}: ${(error instanceof Error ? error.message : "Unknown error")}`);
       });
     }
 

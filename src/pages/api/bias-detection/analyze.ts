@@ -174,7 +174,7 @@ export const POST = async ({
       JSON.stringify({
         success: false,
         error: 'Analysis Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         processingTime,
       }),
       {
@@ -251,7 +251,7 @@ export const GET = async ({
       JSON.stringify({
         success: false,
         error: 'Get Analysis Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         processingTime,
       }),
       {

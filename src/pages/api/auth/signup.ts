@@ -137,14 +137,14 @@ export const POST = async ({
     console.error('Sign up error:', error)
 
     await logSecurityEvent('error', {
-      error: error.message,
+      error: (error instanceof Error ? error.message : "Unknown error"),
       clientInfo,
       timestamp: Date.now(),
     })
 
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Sign up failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Sign up failed',
       }),
       {
         status: 400,

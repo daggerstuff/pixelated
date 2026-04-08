@@ -188,10 +188,10 @@ export class Auth0SocialAuthService {
         expiresIn: data.expires_in,
         tokenType: data.token_type,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Token exchange failed:', error)
       throw new Error(
-        `Token exchange failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Token exchange failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -219,10 +219,10 @@ export class Auth0SocialAuthService {
         emailVerified: userInfo.email_verified || false,
         createdAt: new Date().toISOString(),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user info:', error)
       throw new Error(
-        `Failed to get user info: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to get user info: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -249,10 +249,10 @@ export class Auth0SocialAuthService {
         expiresIn: data.expires_in,
         tokenType: data.token_type,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Token refresh failed:', error)
       throw new Error(
-        `Token refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Token refresh failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -362,13 +362,13 @@ export class Auth0SocialAuthService {
         userId,
         `social_account_linked_${connection}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to link social account ${connection} to user ${userId}:`,
         error,
       )
       throw new Error(
-        `Failed to link social account: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to link social account: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -407,13 +407,13 @@ export class Auth0SocialAuthService {
         userId,
         `social_account_unlinked_${connection}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to unlink social account ${connection} from user ${userId}:`,
         error,
       )
       throw new Error(
-        `Failed to unlink social account: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to unlink social account: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -430,7 +430,7 @@ export class Auth0SocialAuthService {
       const response = await auth0Management.users.get({ id: userId })
       const user = response.data
       return user.identities || []
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to get social connections for user ${userId}:`,
         error,

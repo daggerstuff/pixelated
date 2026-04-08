@@ -132,7 +132,7 @@ export class AutomatedEscalationService {
       this.activeEscalations.set(escalationEvent.id, escalationEvent)
 
       return escalationEvent
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error triggering escalation:', error)
 
       // Emergency fallback protocol
@@ -170,7 +170,7 @@ export class AutomatedEscalationService {
           // Queue manual action for human intervention
           await this.queueManualAction(action, escalationEvent)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Error executing action ${action.type}:`, error)
 
         // Log failed action but continue with others
@@ -245,7 +245,7 @@ export class AutomatedEscalationService {
           )
           escalationEvent.outcomes.contactsReached.push(contact.contact)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Failed to contact ${contact.contact}:`, error)
       }
     }

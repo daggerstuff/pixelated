@@ -151,14 +151,14 @@ export function usePipelineWebSocket({
               }
               break
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Failed to parse WebSocket message:', error)
           onError?.(new Error('Failed to parse WebSocket message'))
         }
       }
 
       setSocket(ws)
-    } catch (error) {
+    } catch (error: unknown) {
       if (!isMountedRef.current) return
 
       setConnectionStatus('error')

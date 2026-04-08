@@ -73,7 +73,7 @@ export class DistributedRateLimiter {
         resetTime: this.getResetTime(rule.windowMs),
         retryAfter: null,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('DEBUG RATE LIMITER ERROR:', error)
       logger.error('Rate limit check failed:', {
         error,
@@ -128,7 +128,7 @@ export class DistributedRateLimiter {
 
       // Set expiration on attack tracking
       await redis.expire(attackKey, 3600)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Attack pattern detection failed:', { error, identifier })
     }
   }
@@ -283,7 +283,7 @@ export class DistributedRateLimiter {
 
       await redis.lpush(eventKey, JSON.stringify(event))
       await redis.expire(eventKey, 86400 * 7) // Keep for 7 days
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to log security event:', { error, eventType })
     }
   }
@@ -348,7 +348,7 @@ export class DistributedRateLimiter {
         resetTime: this.getResetTime(rule.windowMs),
         retryAfter: count >= rule.maxRequests ? rule.windowMs / 1000 : null,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get rate limit status:', {
         error,
         identifier,

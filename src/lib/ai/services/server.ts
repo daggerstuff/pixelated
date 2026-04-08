@@ -66,11 +66,11 @@ class AIServer {
             provider,
             status: service ? 'available' : 'unavailable',
           }
-        } catch (error) {
+        } catch (error: unknown) {
           return {
             provider,
             status: 'error',
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           }
         }
       })
@@ -84,11 +84,11 @@ class AIServer {
           uptime: process.uptime(),
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Health check failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Health check failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Health check failed',
       })
     }
   }
@@ -157,12 +157,12 @@ class AIServer {
           provider: selectedProvider,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Chat completion failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
-          error instanceof Error ? error.message : 'Chat completion failed',
+          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Chat completion failed',
       })
     }
   }
@@ -263,12 +263,12 @@ Respond in JSON format with the following structure:
           model: completion.model,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Emotion analysis failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
-          error instanceof Error ? error.message : 'Emotion analysis failed',
+          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Emotion analysis failed',
       })
     }
   }
@@ -347,16 +347,16 @@ Respond in JSON format with the following structure:
 
       res.write('data: [DONE]\n\n')
       res.end()
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Streaming chat failed:', error)
       if (!res.headersSent) {
         this.sendJsonResponse(res, 500, {
           success: false,
-          error: error instanceof Error ? error.message : 'Streaming failed',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Streaming failed',
         })
       } else {
         res.write(
-          `data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Streaming failed' })}\n\n`,
+          `data: ${JSON.stringify({ error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Streaming failed' })}\n\n`,
         )
         res.end()
       }
@@ -372,10 +372,10 @@ Respond in JSON format with the following structure:
       req.on('end', () => {
         try {
           resolve(body ? JSON.parse(body) : {})
-        } catch (error) {
+        } catch (error: unknown) {
           reject(
             new Error(
-              `Invalid JSON: ${error instanceof Error ? error.message : String(error)}`,
+              `Invalid JSON: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
             ),
           )
         }
@@ -456,7 +456,7 @@ Respond in JSON format with the following structure:
           })
           apiMetrics.request('/ai-service/unknown', method, 404)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const durationMs = Date.now() - startTime
       const errorType =
         error instanceof Error ? error.constructor.name : 'UnknownError'
@@ -507,7 +507,7 @@ Respond in JSON format with the following structure:
           appLogger.error('Server error:', error)
           reject(error)
         })
-      } catch (error) {
+      } catch (error: unknown) {
         reject(error)
       }
     })

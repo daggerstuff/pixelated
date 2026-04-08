@@ -51,7 +51,7 @@ export class CircuitBreaker implements ICircuitBreaker {
       const result = await fn()
       this.success()
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.fail(error as Error)
       throw error
     }

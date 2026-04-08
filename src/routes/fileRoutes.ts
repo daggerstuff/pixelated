@@ -34,7 +34,7 @@ export function createFileRoutes(db: Pool) {
         version: result.version,
       });
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Unknown error";
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
       res.status(500).json({ error: message });
     }
   });
@@ -51,8 +51,9 @@ export function createFileRoutes(db: Pool) {
       });
 
       res.json(presignedUrl);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -70,8 +71,9 @@ export function createFileRoutes(db: Pool) {
       }
 
       res.json(history);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -88,8 +90,9 @@ export function createFileRoutes(db: Pool) {
       }
 
       res.json(versionRecord);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -109,8 +112,9 @@ export function createFileRoutes(db: Pool) {
       const downloadUrl = await fileStorage.getPresignedDownloadUrl(versionRecord.s3Key);
 
       res.json({ downloadUrl });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -127,8 +131,9 @@ export function createFileRoutes(db: Pool) {
         success: true,
         version: newVersion,
       });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -152,8 +157,9 @@ export function createFileRoutes(db: Pool) {
       await versioningService.deleteFileVersion(fileId, versionNumber);
 
       res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -169,8 +175,9 @@ export function createFileRoutes(db: Pool) {
         success: true,
         folderId,
       });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -183,8 +190,9 @@ export function createFileRoutes(db: Pool) {
       const contents = await versioningService.getFolderContents(folderId, userId);
 
       res.json(contents);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -233,8 +241,9 @@ export function createFileRoutes(db: Pool) {
       }));
 
       res.json(files);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 
@@ -287,8 +296,9 @@ export function createFileRoutes(db: Pool) {
       }));
 
       res.json(files);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error";
+      res.status(500).json({ error: message });
     }
   });
 

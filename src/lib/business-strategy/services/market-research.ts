@@ -52,7 +52,7 @@ export class MarketResearchService extends BaseService {
       })
 
       return analysis
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'createAnalysis')
     }
   }
@@ -67,7 +67,7 @@ export class MarketResearchService extends BaseService {
         .find({ marketId })
         .sort({ date: -1 })
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'getMarketTrends')
     }
   }
@@ -83,7 +83,7 @@ export class MarketResearchService extends BaseService {
         .collection<Opportunity>('market_opportunities')
         .find({ marketId, status: 'open' })
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'identifyOpportunities')
     }
   }

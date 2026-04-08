@@ -280,7 +280,7 @@ export function createTogetherAIService(
 
     if (data && typeof data === 'object' && 'error' in data) {
       const errorData = data as { error: { message?: string; code?: string } }
-      errorMessage = `Together AI API error: ${errorData.error.message || JSON.stringify(errorData.error)}`
+      errorMessage = `Together AI API error: ${errorData.(error instanceof Error ? error.message : "Unknown error") || JSON.stringify(errorData.error)}`
       errorCode = errorData.error.code || errorCode
     }
 
@@ -432,7 +432,7 @@ export function createTogetherAIService(
           } catch (error: unknown) {
             span.setStatus({
               code: SpanStatusCode.ERROR,
-              message: error instanceof Error ? error.message : String(error),
+              message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
             })
             if (error instanceof TogetherAIError) {
               throw error
@@ -661,7 +661,7 @@ export function createTogetherAIService(
       } catch (error: unknown) {
         span.setStatus({
           code: SpanStatusCode.ERROR,
-          message: error instanceof Error ? error.message : String(error),
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         })
         span.end()
         if (error instanceof TogetherAIError) {

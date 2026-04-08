@@ -65,7 +65,7 @@ export class RateLimitAnalytics {
       if (eventType === 'blocked' || eventType === 'attack_detected') {
         await this.checkAlertConditions(rule, identifier, eventType, metadata)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to record rate limit event:', {
         error,
         eventType,
@@ -113,7 +113,7 @@ export class RateLimitAnalytics {
           analytics.push(analyticsEntry)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get analytics:', { error, ruleName, days })
     }
 
@@ -212,7 +212,7 @@ export class RateLimitAnalytics {
           .slice(0, 10)
           .map(([identifier, requests]) => ({ identifier, requests })),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get real-time metrics:', { error })
       return {
         totalRequests: 0,
@@ -324,7 +324,7 @@ export class RateLimitAnalytics {
       }
 
       logger.warn('Rate limit alert triggered:', alert)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to trigger alert:', { error, alert })
     }
   }
@@ -402,7 +402,7 @@ export class RateLimitAnalytics {
       }
 
       return alerts
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent alerts:', { error })
       return []
     }
@@ -511,7 +511,7 @@ export class RateLimitAnalytics {
             details: metrics,
           })
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Monitoring check failed:', { error })
       }
     }, 30000) // 30 seconds
@@ -539,7 +539,7 @@ export class RateLimitAnalytics {
           deletedKeys: keysToDelete.length,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cleanup analytics data:', { error })
     }
   }

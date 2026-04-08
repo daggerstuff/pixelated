@@ -79,7 +79,7 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
         )
         await this.loadBrowserVersion()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize TensorFlow.js compatibility layer', {
         error,
       })
@@ -110,7 +110,7 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
       if (this._tf && this._tf.dispose) {
         this._tf.dispose()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error disposing TensorFlow.js resources', { error })
     }
   }

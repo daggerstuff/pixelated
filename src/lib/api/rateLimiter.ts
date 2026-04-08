@@ -156,7 +156,7 @@ class RateLimiter {
         remaining: rule.maxRequests - currentCount,
         resetTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Rate limiter error:', error)
 
       // On Redis error, allow request but log the issue
@@ -201,7 +201,7 @@ class RateLimiter {
       }
 
       return false
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to reset rate limit:', error)
       return false
     }
@@ -264,7 +264,7 @@ class RateLimiter {
       }
 
       return cleanedCount
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Rate limiter cleanup error:', error)
       return 0
     }

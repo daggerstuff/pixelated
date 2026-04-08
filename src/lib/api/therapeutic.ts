@@ -100,7 +100,7 @@ export class TherapeuticClient {
       }
 
       return await response.json()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Therapeutic API Request Failed: ${endpoint}`, error)
       throw error
     }
@@ -136,7 +136,7 @@ export class TherapeuticClient {
     try {
       const response = await fetch(`${this.baseUrl}/health`)
       return await response.json()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Health check failed', error)
       throw error
     }

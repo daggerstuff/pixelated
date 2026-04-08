@@ -103,7 +103,7 @@ export function handleMemoryApiError(
     memoryApiLogger.error(`Error ${action}:`, {
       correlationId,
       status: error.status,
-      message: error.message,
+      message: (error instanceof Error ? error.message : "Unknown error"),
     })
     if (error.status === 404) {
       return jsonError(404, 'Not Found', 'Memory not found')
@@ -132,7 +132,7 @@ export function handleMemoryApiError(
     memoryApiLogger.error(`Error ${action}:`, {
       correlationId,
       name: error.name,
-      message: error.message,
+      message: (error instanceof Error ? error.message : "Unknown error"),
     })
     return jsonError(
       500,

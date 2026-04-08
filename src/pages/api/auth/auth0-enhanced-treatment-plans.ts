@@ -457,7 +457,7 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -465,7 +465,7 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -611,7 +611,7 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -619,7 +619,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -734,7 +734,7 @@ export const PATCH: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -742,7 +742,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

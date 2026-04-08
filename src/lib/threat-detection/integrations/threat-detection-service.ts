@@ -149,7 +149,7 @@ export class ThreatDetectionService {
       })
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat analysis failed:', {
         error,
         threatId: threatData.threatId,
@@ -198,7 +198,7 @@ export class ThreatDetectionService {
         threatResponse: result.threatResponse,
         shouldBlock: result.shouldBlock,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Request check failed:', { error, identifier })
       // Fail open - allow request if check fails
       return {
@@ -498,7 +498,7 @@ export class ThreatDetectionService {
         recentThreats: 0, // Would be populated from analytics
         recentResponses: bridgeStatus.recentIntegrations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get health status:', { error })
       return {
         healthy: false,
@@ -534,7 +534,7 @@ export class ThreatDetectionService {
         threatDistribution: {},
         responseDistribution: {},
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get statistics:', { error })
       return {
         totalThreats: 0,

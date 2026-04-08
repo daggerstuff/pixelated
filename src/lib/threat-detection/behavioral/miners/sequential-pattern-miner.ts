@@ -38,7 +38,7 @@ export class SequentialPatternMiner implements PatternMiner {
         significantPatterns,
         processedSequences,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in sequential pattern mining:', error)
       return []
     }

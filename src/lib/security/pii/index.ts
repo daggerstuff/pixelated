@@ -217,7 +217,7 @@ class PIIDetectionService {
       logger.info(`FHE key rotation completed for keyId: ${keyId}`)
     } catch (error: unknown) {
       logger.error(`Failed to rotate FHE keys for keyId: ${keyId}`, {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
       throw error
     }
@@ -264,7 +264,7 @@ class PIIDetectionService {
       })
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
       logger.error('Failed to load ML model', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -472,7 +472,7 @@ class PIIDetectionService {
       return result
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
       logger.error('Error detecting PII', {
         error: errorMessage,
         textLength: text.length,
@@ -580,7 +580,7 @@ class PIIDetectionService {
       return detectionResult
     } catch (error: unknown) {
       logger.error('Error detecting PII in encrypted text', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         encryptedTextLength: encryptedText.length,
         timestamp: new Date().toISOString(),
       })

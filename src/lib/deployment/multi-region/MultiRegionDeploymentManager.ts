@@ -118,11 +118,11 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       logger.info('Multi-Region Deployment Manager initialized successfully')
 
       this.emit('initialized', { regions: this.config.regions.length })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Multi-Region Deployment Manager', {
         error,
       })
-      throw new Error(`Initialization failed: ${error.message}`, {
+      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
         cause: error,
       })
     }
@@ -167,9 +167,9 @@ export class MultiRegionDeploymentManager extends EventEmitter {
 
       this.emit('deployment-complete', { statuses })
       return statuses
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Multi-region deployment failed', { error })
-      throw new Error(`Deployment failed: ${error.message}`, { cause: error })
+      throw new Error(`Deployment failed: ${(error instanceof Error ? error.message : "Unknown error")}`, { cause: error })
     }
   }
 
@@ -216,7 +216,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
 
       this.emit('region-deployed', { region: region.id, status })
       return status
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Region deployment failed: ${region.name}`, {
         region: region.id,
         error,
@@ -228,14 +228,14 @@ export class MultiRegionDeploymentManager extends EventEmitter {
         lastDeployment: new Date(),
         healthScore: 0,
         activeInstances: 0,
-        errors: [error.message],
+        errors: [(error instanceof Error ? error.message : "Unknown error")],
         metrics: { latency: 0, throughput: 0, errorRate: 1 },
       }
 
       this.deploymentStatuses.set(region.id, status)
       this.emit('region-deployment-failed', {
         region: region.id,
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
 
       throw error
@@ -290,12 +290,12 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       await this.configureSecurityPolicies(region, deploymentResult)
 
       logger.info(`Regional services configured for: ${region.name}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to configure regional services for: ${region.name}`,
         { error },
       )
-      throw new Error(`Service configuration failed: ${error.message}`, {
+      throw new Error(`Service configuration failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
         cause: error,
       })
     }
@@ -463,7 +463,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       this.isInitialized = false
 
       logger.info('Multi-Region Deployment Manager cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cleanup failed', { error })
       throw error
     }

@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ params, request }) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(JSON.stringify({ error: "Failed to fetch turn" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

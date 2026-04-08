@@ -123,10 +123,10 @@ export class Auth0MFAService {
         .map((factor: any) => factor.name)
 
       return availableFactorTypes
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get available MFA factors:', error)
       throw new Error(
-        `Failed to get available MFA factors: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to get available MFA factors: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -205,10 +205,10 @@ export class Auth0MFAService {
       )
 
       return challenge
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to start MFA enrollment:', error)
       throw new Error(
-        `Failed to start MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to start MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -250,10 +250,10 @@ export class Auth0MFAService {
       )
 
       return enrolledFactor
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to complete MFA enrollment:', error)
       throw new Error(
-        `Failed to complete MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to complete MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -281,7 +281,7 @@ export class Auth0MFAService {
       }))
 
       return factors
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user MFA factors:', error)
       return []
     }
@@ -310,13 +310,13 @@ export class Auth0MFAService {
         userId,
         `mfa_factor_deleted_${factorId}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to delete MFA factor ${factorId} for user ${userId}:`,
         error,
       )
       throw new Error(
-        `Failed to delete MFA factor: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to delete MFA factor: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -357,10 +357,10 @@ export class Auth0MFAService {
       )
 
       return challenge
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to challenge user for MFA:', error)
       throw new Error(
-        `Failed to challenge user for MFA: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to challenge user for MFA: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -395,14 +395,14 @@ export class Auth0MFAService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to verify MFA challenge:', error)
 
       // Log failed verification event
       logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, {
         userId: userId,
         challengeType: verification.challengeType,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 

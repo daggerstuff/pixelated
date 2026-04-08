@@ -798,7 +798,7 @@ export class BackupSecurityManager {
         }
       } catch (error: unknown) {
         logger.error(
-          `Error searching for backup metadata in ${location}: ${error instanceof Error ? error.message : String(error)}`,
+          `Error searching for backup metadata in ${location}: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
         )
       }
     }
@@ -839,7 +839,7 @@ export class BackupSecurityManager {
           }
         }
       } catch (error: unknown) {
-        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? error.message : String(error)}`);
+        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`);
       }
     }
 
@@ -893,7 +893,7 @@ export class BackupSecurityManager {
 
       appDataJson += '}}';
     } catch (error: unknown) {
-      logger.error(`Failed to collect data for backup: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error(`Failed to collect data for backup: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`);
       throw error; // Fail loudly to prevent silent data corruption
     }
 

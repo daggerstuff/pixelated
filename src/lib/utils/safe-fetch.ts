@@ -109,7 +109,7 @@ export const safeFetch = async (
       statusText: response.statusText,
       headers: response.headers,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     clearTimeout(timeoutId)
 
     if (error instanceof Error && error.name === 'AbortError') {

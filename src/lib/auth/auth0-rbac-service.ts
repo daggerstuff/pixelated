@@ -406,13 +406,13 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
           _roleId = existingRole.id!
           console.log(`Role already exists: ${roleName}`)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(`Failed to create role ${roleName}:`, error)
       }
     }
 
     console.log('Auth0 roles initialization completed')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to initialize Auth0 roles and permissions:', error)
     throw error
   }
@@ -453,7 +453,7 @@ export async function assignRoleToUser(
       userId,
       `role_assigned_${roleName}`,
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to assign role ${roleName} to user ${userId}:`, error)
     throw error
   }
@@ -494,7 +494,7 @@ export async function removeRoleFromUser(
 
     // Update Phase 6 MCP server with role removal progress
     await updatePhase6AuthenticationProgress(userId, `role_removed_${roleName}`)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       `Failed to remove role ${roleName} from user ${userId}:`,
       error,
@@ -514,7 +514,7 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
   try {
     const userRoles = await auth0Management.getUserRoles({ id: userId })
     return userRoles.map((role) => role.name as UserRole).filter(Boolean)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to get roles for user ${userId}:`, error)
     return []
   }
@@ -564,7 +564,7 @@ export async function userHasPermission(
     }
 
     return false
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       `Failed to check permission ${permission} for user ${userId}:`,
       error,
@@ -608,7 +608,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
     }
 
     return Array.from(permissions)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to get permissions for user ${userId}:`, error)
     return []
   }

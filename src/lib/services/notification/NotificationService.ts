@@ -188,12 +188,12 @@ export class NotificationService {
     this.templates = new Map()
     this.initializeVAPIDKeys().catch((error) => {
       logger.error('Failed to initialize VAPID keys', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
     })
     this.initializeCrisisTemplate().catch((error) => {
       logger.error('Failed to initialize crisis template', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
     })
   }
@@ -356,7 +356,7 @@ export class NotificationService {
     while (true) {
       try {
         await this.processQueue()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error in notification processing loop', {
           error: error instanceof Error ? String(error) : String(error),
         })
