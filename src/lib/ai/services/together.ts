@@ -280,7 +280,7 @@ export function createTogetherAIService(
 
     if (data && typeof data === 'object' && 'error' in data) {
       const errorData = data as { error: { message?: string; code?: string } }
-      errorMessage = `Together AI API error: ${errorData.(error instanceof Error ? error.message : "Unknown error") || JSON.stringify(errorData.error)}`
+      errorMessage = `Together AI API error: ${errorData.error?.message || (error instanceof Error ? error.message : "Unknown error")}`
       errorCode = errorData.error.code || errorCode
     }
 
