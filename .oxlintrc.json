@@ -109,6 +109,8 @@
     "typescript/no-unnecessary-type-arguments": "warn",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unnecessary-type-constraint": "warn",
-    "typescript/non-nullable-type-assertion-style": "warn"
+    "typescript/non-nullable-type-assertion-style": "warn",
+    "typescript/no-unsafe-assignment": "warn",
+    "typescript/no-misused-spread": "warn"
   }
 }
