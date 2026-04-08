@@ -2,7 +2,9 @@
 .Jules/
 .claude/
 .cursor/
+.gemini/
 .omg/
+.qwen/
 .serena/
 .sonarlint
 .vscode/
@@ -201,8 +203,6 @@ tmp/
 .agent/internal/tracking
 .brv
 .endgame
-.gemini/
-.kilocode
 .memory/
 .notes/
 .agent/internal/
@@ -313,3 +313,6 @@ memory.db-shm
 memory.db-wal
 
 .worktrees/hidden-audit
+
+# === COPILOT CLI ===
+.github/copilot/settings.local.json

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.ai/
+.qwen/
+.gemini/
+.opencode/
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+pnpm-lock.yaml
+ai/

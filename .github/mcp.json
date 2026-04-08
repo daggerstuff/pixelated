@@ -1,0 +1,67 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-context7"],
+      "env": {},
+      "timeout": 30000
+    },
+    "rube": {
+      "httpUrl": "https://rube.app/mcp",
+      "timeout": 60000
+    },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-linear"],
+      "timeout": 30000
+    },
+    "hindsight": {
+      "command": "npx",
+      "args": ["-y", "hindsight-mcp"],
+      "env": {
+        "HINDSIGHT_DB_PATH": ".copilot/hindsight.db"
+      },
+      "timeout": 30000
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-brave-search"],
+      "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" },
+      "timeout": 30000
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-firecrawl"],
+      "env": { "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}" },
+      "timeout": 60000
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-sequential-thinking"],
+      "timeout": 30000
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-github"],
+      "env": { "GITHUB_ACCESS_TOKEN": "${GH_TOKEN}" },
+      "timeout": 60000
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-playwright"],
+      "timeout": 60000
+    },
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-sentry"],
+      "env": { "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}" },
+      "timeout": 30000
+    },
+    "e2b-sandbox": {
+      "command": "npx",
+      "args": ["-y", "@e2b/mcp"],
+      "env": { "E2B_API_KEY": "${E2B_API_KEY}" },
+      "timeout": 60000
+    }
+  }
+}

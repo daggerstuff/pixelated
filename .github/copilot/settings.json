@@ -1,0 +1,51 @@
+{
+  // ============================================================================
+  // MODEL & EFFORT
+  // ============================================================================
+  // Model precedence: agent definition > --model flag > COPILOT_MODEL env > config > default
+  "model": "gpt-5.1",
+  "reasoning_effort": "medium",
+
+  // ============================================================================
+  // LOGGING & UPDATES
+  // ============================================================================
+  "log_level": "warning",
+  "auto_update": true,
+
+  // ============================================================================
+  // ASK USER & PERMISSIONS
+  // ============================================================================
+  // Controls whether the agent pauses for user input during tasks.
+  // false = don't auto-ask; true = ask when uncertain
+  "ask_user": false,
+
+  // ============================================================================
+  // GIT & CO-AUTHOR
+  // ============================================================================
+  "include_co_authored_by": true,
+
+  // ============================================================================
+  // SKILLS — Built-in skill discovery directories
+  // ============================================================================
+  // "skill_directories": ["~/.agents/skills/", "~/.copilot/skills/"],
+  // Disable specific built-in skills that add context bloat
+  "disabled_skills": [],
+
+  // ============================================================================
+  // HOOKS
+  // ============================================================================
+  // Disable all hooks (set true if you want zero hook processing)
+  "disable_all_hooks": false,
+
+  // ============================================================================
+  // GITIGNORE
+  // ============================================================================
+  // Include gitignored files in @ search (usually false for security)
+  "include_gitignored": false,
+
+  // ============================================================================
+  // SESSION
+  // ============================================================================
+  // Copy session output to clipboard on selection (alt-screen mode)
+  "copy_on_select": false
+}

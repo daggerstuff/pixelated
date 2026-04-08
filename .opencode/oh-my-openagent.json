@@ -1,0 +1,323 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  // ============================================================================
+  // BLOCK ALL CLAUDE CODE IMPORTS
+  // ============================================================================
+  // Every flag defaults to true if the block is missing. All six MUST be false.
+  "claude_code": {
+    "mcp": false,
+    "commands": false,
+    "skills": false,
+    "agents": false,
+    "hooks": false,
+    "plugins": false
+  },
+
+  // ============================================================================
+  // AGENT CONFIGURATIONS
+  // ============================================================================
+  "agents": {
+    "sisyphus": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "max",
+      "fallback_models": [
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "deepseek-ai/deepseek-v3.2", "variant": "high" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512", "variant": "high" }
+      ]
+    },
+    "hephaestus": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "qwen/qwen3-coder-480b-a35b-instruct", "variant": "high" },
+        { "model": "mistralai/devstral-2-123b-instruct-2512" },
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" }
+      ]
+    },
+    "oracle": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "deepseek-ai/deepseek-v3.2", "variant": "high" },
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512", "variant": "high" }
+      ]
+    },
+    "explore": {
+      "model": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "nvidia/nemotron-3-nano-30b-a3b" },
+        { "model": "mistralai/mistral-small-4-119b-2603" },
+        { "model": "meta/llama-3.1-8b-instruct" }
+      ]
+    },
+    "multimodal-looker": {
+      "model": "google/gemma-4-31b-it",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "microsoft/phi-4-multimodal-instruct" },
+        { "model": "meta/llama-3.2-90b-vision-instruct" },
+        { "model": "qwen/qwen3.5-397b-a17b" }
+      ]
+    },
+    "prometheus": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "max",
+      "fallback_models": [
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "deepseek-ai/deepseek-v3.2", "variant": "high" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512", "variant": "high" }
+      ]
+    },
+    "metis": {
+      "model": "deepseek-ai/deepseek-v3.2",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1", "variant": "high" }
+      ]
+    },
+    "momus": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "deepseek-ai/deepseek-v3.2", "variant": "high" },
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512", "variant": "high" }
+      ]
+    },
+    "atlas": {
+      "model": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "moonshotai/kimi-k2.5" },
+        { "model": "meta/llama-3.3-70b-instruct" },
+        { "model": "nvidia/nemotron-3-super-120b-a12b" }
+      ]
+    },
+    "sisyphus-junior": {
+      "model": "nvidia/llama-3.1-nemotron-nano-8b-v1",
+      "fallback_models": [
+        { "model": "microsoft/phi-4-mini-instruct" },
+        { "model": "meta/llama-3.2-3b-instruct" },
+        { "model": "nvidia/nemotron-3-nano-30b-a3b" }
+      ]
+    },
+    "librarian": {
+      "model": "moonshotai/kimi-k2.5",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "qwen/qwen3-coder-480b-a35b-instruct" },
+        { "model": "nvidia/llama-3.3-nemotron-super-49b-v1.5" },
+        { "model": "mistralai/mistral-small-4-119b-2603" }
+      ]
+    }
+  },
+
+  // ============================================================================
+  // CATEGORY CONFIGURATIONS
+  // ============================================================================
+  "categories": {
+    "visual-engineering": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512", "variant": "high" },
+        { "model": "google/gemma-4-31b-it", "variant": "high" }
+      ]
+    },
+    "ultrabrain": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "xhigh",
+      "fallback_models": [
+        { "model": "deepseek-ai/deepseek-v3.2", "variant": "high" },
+        { "model": "qwen/qwen3.5-397b-a17b", "variant": "high" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512", "variant": "high" }
+      ]
+    },
+    "deep": {
+      "model": "qwen/qwen3.5-397b-a17b",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1", "variant": "high" },
+        { "model": "deepseek-ai/deepseek-v3.2", "variant": "high" },
+        { "model": "mistralai/devstral-2-123b-instruct-2512" }
+      ]
+    },
+    "artistry": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "high",
+      "fallback_models": [
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512" },
+        { "model": "qwen/qwen3.5-397b-a17b" },
+        { "model": "google/gemma-4-31b-it" }
+      ]
+    },
+    "quick": {
+      "model": "nvidia/llama-3.1-nemotron-nano-8b-v1",
+      "fallback_models": [
+        { "model": "microsoft/phi-4-mini-instruct" },
+        { "model": "meta/llama-3.2-3b-instruct" },
+        { "model": "nvidia/nemotron-3-nano-30b-a3b" }
+      ]
+    },
+    "unspecified-low": {
+      "model": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "meta/llama-3.3-70b-instruct" },
+        { "model": "mistralai/mistral-small-4-119b-2603" },
+        { "model": "nvidia/nemotron-3-nano-30b-a3b" }
+      ]
+    },
+    "unspecified-high": {
+      "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "qwen/qwen3.5-397b-a17b" },
+        { "model": "deepseek-ai/deepseek-v3.2" },
+        { "model": "mistralai/mistral-large-3-675b-instruct-2512" }
+      ]
+    },
+    "writing": {
+      "model": "mistralai/mistral-large-3-675b-instruct-2512",
+      "variant": "medium",
+      "fallback_models": [
+        { "model": "moonshotai/kimi-k2.5" },
+        { "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1" },
+        { "model": "qwen/qwen3.5-397b-a17b" }
+      ]
+    }
+  },
+
+  // ============================================================================
+  // MODEL-SPECIFIC WORKAROUNDS & TUNING
+  // ============================================================================
+  "model_options": {
+    // GLM-5: Tool calling JSON fix — lowered temperature, zero penalties
+    "z-ai/glm5": {
+      "temperature": 0.1,
+      "top_p": 0.95,
+      "frequency_penalty": 0,
+      "presence_penalty": 0
+    },
+    // Qwen 3.5 (122B): System message must be first — enable proper chat template
+    "qwen/qwen3.5-122b-a10b": {
+      "temperature": 0.2,
+      "top_p": 0.95
+    },
+    // Qwen 3.5 (397B): Newer, better for agentic — same system prompt handling
+    "qwen/qwen3.5-397b-a17b": {
+      "temperature": 0.2,
+      "top_p": 0.95
+    },
+    // Nemotron Ultra: Excellent default for coding + tool use
+    "nvidia/llama-3.1-nemotron-ultra-253b-v1": {
+      "temperature": 0.2,
+      "top_p": 0.95
+    }
+  },
+
+  // ============================================================================
+  // SKILLS CONFIGURATION
+  // ============================================================================
+  "skills": {
+    "playwright": { "enabled": true },
+    "agent-browser": { "enabled": true },
+    "git-master": {
+      "enabled": true,
+      "options": {
+        "commit_footer": "\n\nSigned-off-by: OhMyOpenAgent <agent@ohmyopenagent.com>",
+        "include_co_authored_by": false
+      }
+    }
+  },
+
+  // ============================================================================
+  // HOOKS CONFIGURATION
+  // ============================================================================
+  "hooks": {
+    "agent-usage-reminder": true,
+    "category-skill-reminder": true,
+    "task-reminder": true,
+    "rules-injector": true,
+    "directory-agents-injector": true,
+    "directory-readme-injector": true,
+    "edit-error-recovery": true,
+    "delegate-task-retry": true,
+    "session-recovery": true,
+    "compaction-context-injector": true,
+    "compaction-todo-preserver": true,
+    "think-mode": true,
+    "thinking-block-validator": true,
+    "start-work": true,
+    "stop-continuation-guard": true
+  },
+
+  // ============================================================================
+  // MCPs CONFIGURATION
+  // ============================================================================
+  "mcps": {
+    // Built-in MCPs (OhMyOpenAgent native)
+    "websearch": { "enabled": true },
+    "context7": { "enabled": true },
+    "grep_app": { "enabled": true }
+  },
+
+  // ============================================================================
+  // LSP CONFIGURATION
+  // ============================================================================
+  "lsp": {
+    "typescript": {
+      "command": "pnpm exec typescript-language-server",
+      "args": ["--stdio"],
+      "extensions": [".ts", ".tsx", ".js", ".jsx"],
+      "priority": 100
+    },
+    "python": {
+      "command": "uv run pylsp",
+      "extensions": [".py"],
+      "priority": 90
+    },
+    "rust": {
+      "command": "rust-analyzer",
+      "extensions": [".rs"],
+      "priority": 90
+    }
+  },
+
+  // ============================================================================
+  // EXPERIMENTAL FEATURES
+  // ============================================================================
+  "experimental": {
+    "aggressive_truncation": true,
+    "auto_resume": true,
+    "preemptive_compaction": true,
+    "truncate_all_tool_outputs": true
+  },
+
+  // ============================================================================
+  // PERMISSIONS
+  // ============================================================================
+  "permissions": {
+    "edit": "allow",
+    "bash": "ask",
+    "webfetch": "allow",
+    "doom_loop": "deny",
+    "external_directory": "ask"
+  },
+
+  // ============================================================================
+  // BACKGROUND TASKS
+  // ============================================================================
+  "backgroundTasks": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 300000,
+    "providerConcurrency": 10,
+    "modelConcurrency": 3
+  }
+}
