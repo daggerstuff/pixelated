@@ -107,7 +107,7 @@ export const detectBiasServerlessHandler = createServerlessHandler(
         body: JSON.stringify({
           success: false,
           error: 'Bias detection failed',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         }),
       }
     }

@@ -52,7 +52,7 @@ export class RealFHEService implements FHEService {
         await homomorphicOps.initialize(options)
         this.initialized = true
         logger.info('Real FHE service initialized')
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to initialize Real FHE service', { error })
         this.initPromise = null // Allow retry
         throw error
@@ -119,7 +119,7 @@ export class RealFHEService implements FHEService {
       }
     } catch (error: unknown) {
       logger.error('Encryption failed in RealFHEService', { error })
-      throw new Error(`Encryption failed: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(`Encryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`)
     } finally {
       // Ensure all resources are released
       scope.releaseAll()
@@ -152,7 +152,7 @@ export class RealFHEService implements FHEService {
       return result
     } catch (error: unknown) {
       logger.error('Decryption failed in RealFHEService', { error })
-      throw new Error(`Decryption failed: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(`Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`)
     } finally {
       // Ensure all resources are released
       scope.releaseAll()
@@ -199,12 +199,12 @@ export class RealFHEService implements FHEService {
     } catch (error: unknown) {
       logger.error('Error in RealFHEService.processEncrypted', {
         operation: op,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         operation: op,
         timestamp: Date.now(),
         metadata: {

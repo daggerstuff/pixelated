@@ -64,7 +64,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       this.logger.info('ServiceDiscoveryManager initialized successfully')
 
       this.emit('initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to initialize ServiceDiscoveryManager', {
         error,
       })
@@ -97,7 +97,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         }
 
         this.logger.info(`Discovery backends initialized for region: ${region}`)
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Failed to initialize discovery backends for region: ${region}`,
           { error },
@@ -135,7 +135,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.logger.info(`Consul client initialized for region: ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to initialize Consul for region: ${region}`, {
         error,
       })
@@ -176,7 +176,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.logger.info(`etcd client initialized for region: ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to initialize etcd for region: ${region}`, {
         error,
       })
@@ -208,7 +208,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.logger.info(`ZooKeeper client initialized for region: ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to initialize ZooKeeper for region: ${region}`,
         { error },
@@ -265,10 +265,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
           status: 'healthy',
           message: `${healthyBackends.length}/${totalBackends} backends healthy`,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Service discovery check failed: ${error.message}`,
+          message: `Service discovery check failed: ${(error instanceof Error ? error.message : "Unknown error")}`,
         }
       }
     })
@@ -286,7 +286,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         if (isHealthy) {
           healthyBackends.push(backend)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Backend health check failed`, {
           backend: backend.type,
           region: backend.region,
@@ -324,7 +324,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           return false
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return false
     }
   }
@@ -360,10 +360,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
             status: 'healthy',
             message: `${healthyInstances.length}/${totalInstances} instances healthy for ${serviceName}`,
           }
-        } catch (error) {
+        } catch (error: unknown) {
           return {
             status: 'unhealthy',
-            message: `Service health check failed for ${serviceName}: ${error.message}`,
+            message: `Service health check failed for ${serviceName}: ${(error instanceof Error ? error.message : "Unknown error")}`,
           }
         }
       })
@@ -449,7 +449,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.emit('serviceRegistered', instance)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to register service', { service, error })
       throw error
     }
@@ -493,7 +493,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           break
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to register with ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -656,7 +656,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       return sortedInstances
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Service discovery failed', {
         serviceName,
         options,
@@ -741,7 +741,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           return []
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to discover from ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -817,7 +817,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           lastHeartbeat: new Date(),
           tags: data.tags || [],
         })
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn('Failed to parse etcd service data', { key, error })
       }
     }
@@ -866,7 +866,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
                 tags: serviceData.tags || [],
               })
             }
-          } catch (error) {
+          } catch (error: unknown) {
             this.logger.warn('Failed to parse ZooKeeper service data', {
               instanceId,
               region,
@@ -1007,7 +1007,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Heartbeat process failed', { error })
     }
   }
@@ -1037,7 +1037,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           break
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to send heartbeat to ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -1083,7 +1083,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           this.serviceCache.delete(key)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Cleanup process failed', { error })
     }
   }
@@ -1109,7 +1109,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       }
 
       return loadBalancer.selectInstance(instances, options)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get service instance', {
         serviceName,
         options,
@@ -1139,7 +1139,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         try {
           const instances = await this.discoverService(serviceName, options)
           callback(instances)
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.error('Service watch error', { serviceName, error })
         }
 
@@ -1156,7 +1156,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         isWatching = false
         this.logger.info('Service watch stopped', { serviceName })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to start service watch', {
         serviceName,
         options,
@@ -1202,7 +1202,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       stats.totalServices = Object.keys(stats.services).length
 
       return stats
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get service statistics', {
         serviceName,
         error,
@@ -1261,7 +1261,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.emit('serviceDeregistered', { serviceName, instanceId })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to deregister service', {
         serviceName,
         instanceId,
@@ -1299,7 +1299,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           break
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to deregister from ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -1333,7 +1333,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         for (const instance of instances) {
           try {
             await this.deregisterService(serviceName, instance.id)
-          } catch (error) {
+          } catch (error: unknown) {
             this.logger.warn('Failed to deregister service during shutdown', {
               serviceName,
               instance: instance.id,
@@ -1368,7 +1368,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       this.logger.info('ServiceDiscoveryManager shutdown completed')
 
       this.emit('shutdown')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error during shutdown', { error })
       throw error
     }

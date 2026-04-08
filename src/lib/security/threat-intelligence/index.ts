@@ -137,7 +137,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Global Threat Intelligence Network initialized successfully')
 
       this.emit('initialized', { timestamp: new Date() })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Intelligence Network', {
         error: (error as Error).message,
       })
@@ -160,7 +160,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await database.initialize()
       this.components.set('database', database)
       logger.info('Threat Intelligence Database initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize database', {
         error: (error as Error).message,
       })
@@ -180,7 +180,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await globalNetwork.initialize()
       this.components.set('global', globalNetwork)
       logger.info('Global Threat Intelligence Network initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize global network', {
         error: (error as Error).message,
       })
@@ -200,7 +200,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await edgeDetection.initialize()
       this.components.set('edge', edgeDetection)
       logger.info('Edge Threat Detection System initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize edge detection', {
         error: (error as Error).message,
       })
@@ -220,7 +220,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await correlationEngine.initialize()
       this.components.set('correlation', correlationEngine)
       logger.info('Threat Correlation Engine initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize correlation engine', {
         error: (error as Error).message,
       })
@@ -240,7 +240,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await responseOrchestrator.initialize()
       this.components.set('response', responseOrchestrator)
       logger.info('Automated Threat Response Orchestrator initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize response orchestrator', {
         error: (error as Error).message,
       })
@@ -258,7 +258,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await huntingSystem.initialize()
       this.components.set('hunting', huntingSystem)
       logger.info('Threat Hunting System initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize hunting system', {
         error: (error as Error).message,
       })
@@ -278,7 +278,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await feedIntegration.initialize()
       this.components.set('feeds', feedIntegration)
       logger.info('External Threat Feed Integration initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize feed integration', {
         error: (error as Error).message,
       })
@@ -298,7 +298,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await validationSystem.initialize()
       this.components.set('validation', validationSystem)
       logger.info('Threat Validation System initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize validation system', {
         error: (error as Error).message,
       })
@@ -322,7 +322,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       await this.configureDataFlow()
 
       logger.info('Component integration setup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to setup component integration', {
         error: (error as Error).message,
       })
@@ -431,7 +431,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
           ['accuracy', 'completeness', 'reliability'],
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling threat detected event', {
         error: (error as Error).message,
       })
@@ -452,7 +452,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       if (globalNetwork) {
         await globalNetwork.processThreat(event)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling edge threat detected event', {
         error: (error as Error).message,
       })
@@ -490,7 +490,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         data: event,
         source: 'correlation_engine',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling threat correlated event', {
         error: (error as Error).message,
       })
@@ -534,7 +534,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling feed sync completed event', {
         error: (error as Error).message,
       })
@@ -566,7 +566,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
             1) /
           (this.metrics.totalThreatsProcessed + 1)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling validation completed event', {
         error: (error as Error).message,
       })
@@ -614,7 +614,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling hunt completed event', {
         error: (error as Error).message,
       })
@@ -644,7 +644,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         data: event,
         source: 'response_orchestrator',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error handling response triggered event', {
         error: (error as Error).message,
       })
@@ -680,7 +680,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
           } else {
             healthStatus[name] = 'warning'
           }
-        } catch (error) {
+        } catch (error: unknown) {
           healthStatus[name] = 'down'
           logger.error(`Component ${name} health check failed`, {
             error: (error as Error).message,
@@ -713,7 +713,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         status: overallStatus,
         components: healthStatus,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking system health', {
         error: (error as Error).message,
       })
@@ -739,7 +739,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         timestamp: new Date(),
         metrics: this.metrics,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error updating metrics', {
         error: (error as Error).message,
       })
@@ -829,7 +829,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         status: 'processing',
         pipeline_results: pipelineResults,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error processing threat through pipeline', {
         error: (error as Error).message,
       })
@@ -897,7 +897,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       this.emit('shutdown', { timestamp: new Date() })
       logger.info('Threat Intelligence Network shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown', { error: (error as Error).message })
       throw error
     }

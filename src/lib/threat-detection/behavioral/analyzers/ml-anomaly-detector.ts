@@ -58,7 +58,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
       anomalies.push(...temporalAnomalies)
 
       return this.filterAndRankAnomalies(anomalies)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in ML anomaly detection:', error)
       return []
     }
@@ -192,7 +192,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
           timestamp: new Date(),
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in ML anomaly detection:', error)
     }
 

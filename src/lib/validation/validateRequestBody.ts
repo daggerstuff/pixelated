@@ -32,7 +32,7 @@ export async function validateRequestBody<T extends z.ZodType>(
     const validatedData = await schema.parseAsync(body)
 
     return [validatedData, null]
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       // Convert Zod errors to field error map
       const fieldErrors: Record<string, string> = {}
@@ -54,7 +54,7 @@ export async function validateRequestBody<T extends z.ZodType>(
       null,
       {
         details: {
-          body: error instanceof Error ? error.message : 'Invalid request body',
+          body: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Invalid request body',
         },
       },
     ]

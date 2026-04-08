@@ -360,7 +360,7 @@ export async function retry<T>(
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await fn()
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error as Error
       if (i < maxRetries - 1) {
         await sleep(delay * Math.pow(2, i))

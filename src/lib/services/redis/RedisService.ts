@@ -78,7 +78,7 @@ export class RedisService extends EventEmitter implements IRedisService {
               this.config.url = urlObj.toString()
             }
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to read Redis password file:', {
             file: redisPasswordFile,
             error: String(error),

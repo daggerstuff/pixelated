@@ -174,7 +174,7 @@ export class EmbeddingAgentClient {
 
       const data = await response.json()
       return toCamelCase<T>(data)
-    } catch (error) {
+    } catch (error: unknown) {
       clearTimeout(timeoutId)
       if (error instanceof EmbeddingAgentError) {
         throw error
@@ -183,7 +183,7 @@ export class EmbeddingAgentClient {
         throw new EmbeddingAgentError('Request timeout', 408)
       }
       throw new EmbeddingAgentError(
-        error instanceof Error ? error.message : 'Unknown error',
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         0,
       )
     }

@@ -25,7 +25,7 @@ export class ThreatInvestigationRepository {
         'EX',
         3600 * 24, // 24-hour cache
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store investigation', {
         error,
         investigationId: investigation.investigationId,
@@ -51,7 +51,7 @@ export class ThreatInvestigationRepository {
         'EX',
         3600 * 24,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update investigation', {
         error,
         investigationId: investigation.investigationId,
@@ -72,7 +72,7 @@ export class ThreatInvestigationRepository {
       return (await db
         .collection('investigations')
         .findOne({ investigationId })) as Investigation | null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to find investigation', { error, investigationId })
       return null
     }
@@ -90,7 +90,7 @@ export class ThreatInvestigationRepository {
         .sort({ createdAt: -1 })
         .limit(limit)
         .toArray()) as Investigation[]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to query investigations', { error, filter })
       return []
     }

@@ -111,10 +111,10 @@ export class PatternDiscoveryService {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Pattern discovery failed', { error })
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'
       throw new Error(`Pattern discovery failed: ${errorMessage}`, {
         cause: error,
       })

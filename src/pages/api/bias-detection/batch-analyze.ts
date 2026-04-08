@@ -92,7 +92,7 @@ export async function POST({ request }: { request: Request }) {
         'Cache-Control': 'no-store',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
       headers: {

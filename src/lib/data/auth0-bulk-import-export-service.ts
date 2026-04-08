@@ -222,12 +222,12 @@ export class Auth0BulkImportExportService {
                 timestamp: new Date().toISOString(),
               },
             )
-          } catch (error) {
+          } catch (error: unknown) {
             result.failedImports++
             result.errors.push({
               row: rowIndex,
               email: user.email,
-              error: error instanceof Error ? error.message : 'Unknown error',
+              error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
             })
 
             // Log import error
@@ -238,7 +238,7 @@ export class Auth0BulkImportExportService {
                 importedBy: initiatedBy,
                 email: user.email,
                 rowIndex: rowIndex,
-                error: error instanceof Error ? error.message : 'Unknown error',
+                error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
                 timestamp: new Date().toISOString(),
               },
             )
@@ -267,18 +267,18 @@ export class Auth0BulkImportExportService {
       )
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to import users from JSON:', error)
 
       // Log bulk import error
        logSecurityEvent(SecurityEventType.BULK_IMPORT_ERROR, null, {
         importedBy: initiatedBy,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to import users: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to import users: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -329,18 +329,18 @@ export class Auth0BulkImportExportService {
 
       // Import users
       return await this.importUsersFromJson(users, options, initiatedBy)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to import users from CSV:', error)
 
       // Log CSV import error
        logSecurityEvent(SecurityEventType.BULK_IMPORT_ERROR, null, {
         importedBy: initiatedBy,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to import users from CSV: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to import users from CSV: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -432,19 +432,19 @@ export class Auth0BulkImportExportService {
         fileSize: fileSize,
         fileName: `users-export-${new Date().toISOString().slice(0, 10)}.json`,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to export users to JSON:', error)
 
       // Log export error
        logSecurityEvent(SecurityEventType.BULK_EXPORT_ERROR, null, {
         exportedBy: initiatedBy,
         format: 'json',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to export users to JSON: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to export users to JSON: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -578,19 +578,19 @@ export class Auth0BulkImportExportService {
         fileSize: fileSize,
         fileName: `users-export-${new Date().toISOString().slice(0, 10)}.csv`,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to export users to CSV:', error)
 
       // Log export error
        logSecurityEvent(SecurityEventType.BULK_EXPORT_ERROR, null, {
         exportedBy: initiatedBy,
         format: 'csv',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to export users to CSV: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to export users to CSV: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -634,7 +634,7 @@ export class Auth0BulkImportExportService {
           failed: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get import job status:', error)
 
       // Log job status check error
@@ -644,13 +644,13 @@ export class Auth0BulkImportExportService {
         {
           jobId: jobId,
           checkedBy: initiatedBy,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
 
       throw new Error(
-        `Failed to get import job status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to get import job status: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -790,7 +790,7 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
         .toArray()
 
       return exports
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get export history:', error)
       return []
     }
@@ -837,7 +837,7 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to schedule recurring export:', error)
 
       // Log scheduled export error
@@ -847,7 +847,7 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
         {
           scheduledBy: initiatedBy,
           cronExpression: cronExpression,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )

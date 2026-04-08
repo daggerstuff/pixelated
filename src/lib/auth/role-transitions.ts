@@ -218,10 +218,10 @@ export async function requestRoleTransition(
     )
 
     return transitionRequest
-  } catch (error) {
+  } catch (error: unknown) {
     await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED, {
       userId: userId,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       requestedRole,
       requestedBy,
     })
@@ -350,10 +350,10 @@ export async function processRoleTransitionApproval(
     )
 
     return request
-  } catch (error) {
+  } catch (error: unknown) {
     await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED, {
       userId: approverId,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       requestId,
       decision,
     })
@@ -419,10 +419,10 @@ async function executeRoleTransition(
       request.userId,
       'role_transition_completed',
     )
-  } catch (error) {
+  } catch (error: unknown) {
     await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED, {
       userId: request.userId,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       requestId: request.id,
     })
 
@@ -504,12 +504,12 @@ export async function cancelRoleTransitionRequest(
       request.userId,
       'role_transition_cancelled',
     )
-  } catch (error) {
+  } catch (error: unknown) {
     await logSecurityEvent(
       SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
       {
         userId: userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         requestId,
       },
     )
@@ -544,7 +544,7 @@ export async function getUserRoleTransitionRequests(
     requests.sort((a, b) => b.requestedAt - a.requestedAt)
 
     return requests
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting user role transition requests:', error)
     return []
   }
@@ -579,7 +579,7 @@ export async function getPendingRoleTransitionRequests(
     eligibleRequests.sort((a, b) => a.requestedAt - b.requestedAt)
 
     return eligibleRequests
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting pending role transition requests:', error)
     return []
   }
@@ -632,7 +632,7 @@ async function addUserPendingRequest(
     pendingRequests.push(requestId)
 
     await setInCache(pendingKey, pendingRequests, 7 * 24 * 60 * 60) // 7 days
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error adding user pending request:', error)
   }
 }
@@ -655,7 +655,7 @@ async function removeUserPendingRequest(
     } else {
       await removeFromCache(pendingKey)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error removing user pending request:', error)
   }
 }
@@ -680,7 +680,7 @@ async function getPendingRoleRequests(
     }
 
     return requests
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting pending role requests:', error)
     return []
   }
@@ -721,7 +721,7 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
       userAgent: 'system',
       sessionId: 'system',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error expiring role transition request:', error)
   }
 }
@@ -766,7 +766,7 @@ async function logRoleTransitionAudit(
       actorId: auditLog.actorId,
       actorRole: auditLog.actorRole,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error logging role transition audit:', error)
   }
 }
@@ -837,7 +837,7 @@ export async function getRoleTransitionAuditTrail(
     auditLogs.sort((a, b) => b.timestamp - a.timestamp)
 
     return auditLogs
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting role transition audit trail:', error)
     return []
   }
@@ -939,7 +939,7 @@ export async function validateRoleAssignment(
 
     validation.canTransition = validation.restrictions.length === 0
     return validation
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error validating role assignment:', error)
     validation.restrictions.push('Validation failed due to system error')
     return validation

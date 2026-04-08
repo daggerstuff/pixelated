@@ -16,7 +16,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         .getMarketData(symbol.toUpperCase())
         .slice(________)
       res.json(marketData)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch market data' })
     }
   })
@@ -27,7 +27,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const { industry } = req.params
       const trends = await biService.getMarketTrends(industry)
       res.json(trends)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch market trends' })
     }
   })
@@ -38,7 +38,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const { industry } = req.params
       const analysis = await biService.getCompetitorAnalysis(industry)
       res.json(analysis)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch competitor analysis' })
     }
   })
@@ -49,7 +49,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const { industry } = req.params
       const opportunities = await biService.getMarketOpportunities(industry)
       res.json(opportunities)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch market opportunities' })
     }
   })
@@ -66,7 +66,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         year ? parseInt(year as string) : undefined,
       )
       res.json(metrics)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch business metrics' })
     }
   })
@@ -77,7 +77,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const metric = { ...req.body, userId: req.body.userId }
       await biService.addBusinessMetric(metric)
       res.json({ success: true })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to add business metric' })
     }
   })
@@ -93,7 +93,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         parseInt(limit as string),
       )
       res.json(alerts)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch business alerts' })
     }
   })
@@ -104,7 +104,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const alert = req.body
       await biService.createBusinessAlert(alert)
       res.json({ success: true })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to create business alert' })
     }
   })
@@ -120,7 +120,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         parseInt(days as string),
       )
       res.json(forecast)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to generate market forecast' })
     }
   })
@@ -131,7 +131,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       const { industry } = req.params
       const analysis = await biService.getIndustryAnalysis(industry)
       res.json(analysis)
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to generate industry analysis' })
     }
   })
@@ -153,7 +153,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         recentAnalysis,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch dashboard data' })
     }
   })
@@ -176,7 +176,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         industry,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ error: 'Failed to fetch market insights' })
     }
   })

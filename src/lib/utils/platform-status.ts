@@ -95,13 +95,13 @@ export class PlatformStatusMonitor {
 
       status.responseTime = Date.now() - startTime
       status.lastCheck = new Date()
-    } catch (error) {
+    } catch (error: unknown) {
       status = {
         name,
         status: 'down',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }
     }
 
@@ -125,12 +125,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'database',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Connection failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Connection failed',
       }
     }
   }
@@ -150,12 +150,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'redis',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Connection failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Connection failed',
       }
     }
   }
@@ -175,12 +175,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'ai-service',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Service unavailable',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Service unavailable',
       }
     }
   }
@@ -201,12 +201,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'voice-pipeline',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Pipeline unavailable',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Pipeline unavailable',
       }
     }
   }
@@ -228,12 +228,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'safety-filter',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Filter unavailable',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Filter unavailable',
       }
     }
   }
@@ -253,12 +253,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'mcp-integration',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'MCP unavailable',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'MCP unavailable',
       }
     }
   }
@@ -278,12 +278,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'auth-service',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Auth unavailable',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Auth unavailable',
       }
     }
   }
@@ -301,13 +301,13 @@ export class PlatformStatusMonitor {
           directTest: testResult,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'content-filter',
         status: 'down',
         lastCheck: new Date(),
         error:
-          error instanceof Error ? error.message : 'ContentFilter unavailable',
+          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'ContentFilter unavailable',
       }
     }
   }
@@ -317,7 +317,7 @@ export class PlatformStatusMonitor {
       // This would normally import and test the Python ContentFilter
       // For now, we'll simulate a successful test
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Direct ContentFilter test failed', { error })
       return false
     }
@@ -338,12 +338,12 @@ export class PlatformStatusMonitor {
           statusCode: response.status,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name,
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? error.message : 'Service unavailable',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Service unavailable',
       }
     }
   }
@@ -391,7 +391,7 @@ export class PlatformStatusMonitor {
 
       try {
         await this.checkAllComponents()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Platform monitoring error', { error })
       }
 

@@ -108,10 +108,10 @@ export class AnonymizationService {
         privacyMetrics,
         auditLog,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Anonymization pipeline failed', { error })
       throw new Error(
-        `Anonymization failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Anonymization failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
         { cause: error },
       )
     }

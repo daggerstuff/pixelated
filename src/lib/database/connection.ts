@@ -51,7 +51,7 @@ export async function connectMongoDB() {
     })
 
     return mongoConnection
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('MongoDB connection failed:', error)
     throw error
   }
@@ -91,7 +91,7 @@ export async function connectPostgreSQL() {
     })
 
     return postgresPool
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('PostgreSQL connection failed:', error)
     throw error
   }
@@ -133,7 +133,7 @@ export async function connectRedis() {
     console.log('Redis connection test: PONG')
 
     return redisClient
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Redis connection failed:', error)
     throw error
   }
@@ -217,7 +217,7 @@ export async function withPostgresTransaction<T>(
     const result = await callback(client)
     await client.query('COMMIT')
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query('ROLLBACK')
     throw error
   } finally {
@@ -236,7 +236,7 @@ export async function withMongoSession<T>(
     const result = await callback(session)
     await session.commitTransaction()
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     await session.abortTransaction()
     throw error
   } finally {

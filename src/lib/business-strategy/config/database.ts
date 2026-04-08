@@ -128,7 +128,7 @@ export async function initializeDatabases(): Promise<DatabaseConfig> {
     }
 
     return databaseConfig
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to initialize business strategy databases:', error)
     throw new Error('Database initialization failed')
   }
@@ -320,7 +320,7 @@ export async function checkDatabaseHealth(): Promise<{
     // Check MongoDB
     await config.mongodb.client.db('admin').command({ ping: 1 })
     results.mongodb = true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('MongoDB health check failed:', error)
   }
 
@@ -330,7 +330,7 @@ export async function checkDatabaseHealth(): Promise<{
     await client.query('SELECT 1')
     client.release()
     results.postgresql = true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('PostgreSQL health check failed:', error)
   }
 
@@ -338,7 +338,7 @@ export async function checkDatabaseHealth(): Promise<{
     // Check Redis
     await config.redis.client.ping()
     results.redis = true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Redis health check failed:', error)
   }
 

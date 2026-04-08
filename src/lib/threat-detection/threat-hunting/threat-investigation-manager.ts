@@ -49,7 +49,7 @@ export class ThreatInvestigationManager extends EventEmitter {
 
       this.emit('investigation_started', { investigationId, huntId: params.huntId })
       return investigationId
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to start investigation', { error, huntId: params.huntId })
       this.emit('investigation_failed', { huntId: params.huntId, error })
       throw error
@@ -154,14 +154,14 @@ export class ThreatInvestigationManager extends EventEmitter {
 
       await this.repository.update(investigation)
       return { findings: stepFindings }
-    } catch (error) {
+    } catch (error: unknown) {
       stepResult = {
         stepId,
         name: action,
         status: 'failed',
         executionTime: Date.now() - startTime,
         timestamp: new Date(),
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       }
 
       investigation.steps.push(stepResult)
@@ -205,7 +205,7 @@ export class ThreatInvestigationManager extends EventEmitter {
 
       this.emit('investigation_completed', { investigationId })
       return investigation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to close investigation', { error, investigationId })
       throw error
     }

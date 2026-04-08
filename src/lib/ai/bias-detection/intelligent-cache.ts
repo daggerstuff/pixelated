@@ -260,7 +260,7 @@ export class IntelligentCache {
 
       this.updateResponseTime()
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache get error', { key, error })
       this.analytics.misses++
       return null
@@ -291,7 +291,7 @@ export class IntelligentCache {
         ? { ...restOptions, strategy: optStrategy }
         : { ...restOptions }
       await this.setToTiers(key, value, internalOptions as any)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache set error', { key, error })
     }
   }
@@ -321,7 +321,7 @@ export class IntelligentCache {
       if (this.config.enableCDNCache) {
         await this.cacheService.delete(key)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache delete error', { key, error })
     }
   }
@@ -675,7 +675,7 @@ export class IntelligentCache {
   private async setToCDN<T>(key: string, value: T, ttl: number): Promise<void> {
     try {
       await this.cacheService.set(key, JSON.stringify(value), ttl)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('CDN cache set error', { key, error })
     }
   }
@@ -850,7 +850,7 @@ export class IntelligentCache {
               const internalOptions = str ? { ...rest, strategy: str } : rest
               await this.setToTiers(op.key, op.value, internalOptions as any)
               op.resolve(undefined)
-            } catch (error) {
+            } catch (error: unknown) {
               op.reject(error as Error)
             }
           }),
@@ -863,13 +863,13 @@ export class IntelligentCache {
             try {
               await this.delete(op.key)
               op.resolve(undefined)
-            } catch (error) {
+            } catch (error: unknown) {
               op.reject(error as Error)
             }
           }),
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       batch.forEach((op) => op.reject(error as Error))
     }
     // Schedule next batch if queue is not empty

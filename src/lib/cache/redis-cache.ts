@@ -83,7 +83,7 @@ export class RedisCache {
       }
 
       return JSON.parse(cached) as T
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache get error:', error)
       return null
     }
@@ -99,7 +99,7 @@ export class RedisCache {
       const finalTtl = ttl || this.config.ttl
 
       await this.client.setEx(this.generateKey(key), finalTtl, serializedValue)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache set error:', error)
     }
   }
@@ -111,7 +111,7 @@ export class RedisCache {
       }
 
       await this.client.del(this.generateKey(key))
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache delete error:', error)
     }
   }
@@ -124,7 +124,7 @@ export class RedisCache {
 
       const result = await this.client.exists(this.generateKey(key))
       return result === 1
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache exists error:', error)
       return false
     }
@@ -160,7 +160,7 @@ export class RedisCache {
       if (keys.length > 0) {
         await this.client.del(keys)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache invalidate pattern error:', error)
     }
   }
@@ -175,7 +175,7 @@ export class RedisCache {
       if (keys.length > 0) {
         await this.client.del(keys)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache clear error:', error)
     }
   }
@@ -198,7 +198,7 @@ export class RedisCache {
         keys,
         memory: this.parseRedisInfo(info),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Redis cache stats error:', error)
       return {
         connected: false,
