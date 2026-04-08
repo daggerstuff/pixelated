@@ -50,7 +50,7 @@ export function usePersistentState<T>({
             setState(newValue.value)
             lastStoredValueRef.current = newValue.value
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.warn('Failed to parse storage change:', error)
         }
       }

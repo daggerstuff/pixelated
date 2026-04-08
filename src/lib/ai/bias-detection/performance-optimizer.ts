@@ -239,7 +239,7 @@ export class IntelligentCacheManager {
       }
 
       return JSON.parse(cached) as T
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache get error', { key, error })
       this.stats.misses++
       return null
@@ -274,7 +274,7 @@ export class IntelligentCacheManager {
         ttl || this.config.defaultTtl,
       )
       this.stats.totalSize += Buffer.byteLength(dataToStore, 'utf8')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache set error', { key, error })
     }
   }
@@ -306,7 +306,7 @@ export class IntelligentCacheManager {
       }
 
       return processed
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache mget error', { keys, error })
       return keys.reduce((acc, key) => ({ ...acc, [key]: null }), {})
     }
@@ -472,7 +472,7 @@ export class BatchProcessor {
 
         this.stats.totalProcessingTime += Date.now() - startTime
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         lastError = error as Error
 
         if (attempt < retries) {
@@ -600,7 +600,7 @@ export class BackgroundJobQueue {
         }
 
         await this.processJob(job)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Worker error', { error })
       }
     }
@@ -628,7 +628,7 @@ export class BackgroundJobQueue {
 
       job.status = 'completed'
       logger.debug('Job completed', { jobId: job.id })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Job failed', { jobId: job.id, error })
 
       if (job.attempts >= job.maxAttempts) {
@@ -936,7 +936,7 @@ export class PerformanceOptimizer {
 
         // Note: Custom event emission removed to avoid TypeScript errors
         // If external monitoring is needed, use the logger output or implement a proper event system
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error collecting performance metrics', { error })
       }
     }, this.config.monitoring.metricsInterval)

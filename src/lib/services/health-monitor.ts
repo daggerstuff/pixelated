@@ -69,11 +69,11 @@ export class HealthMonitor {
         ]);
         result.responseTime = performance.now() - checkStart;
         return result;
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           name,
           status: "unhealthy" as const,
-          message: error instanceof Error ? String(error.message) : "Unknown error",
+          message: error instanceof Error ? String((error instanceof Error ? error.message : "Unknown error")) : "Unknown error",
           responseTime: performance.now() - startTime,
         };
       }
@@ -134,7 +134,7 @@ export class HealthMonitor {
           release: os.release(),
         },
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: "system",
         status: "unhealthy",
@@ -173,7 +173,7 @@ export class HealthMonitor {
           usagePercent: Math.round(usagePercent * 100) / 100,
         },
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: "memory",
         status: "unhealthy",
@@ -207,7 +207,7 @@ export class HealthMonitor {
           heapUsagePercent: Math.round(heapUsagePercent * 100) / 100,
         },
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: "disk",
         status: "unhealthy",

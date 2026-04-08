@@ -328,7 +328,7 @@ export function decrypt(data: string, key: string): string {
       error: error instanceof Error ? String(error) : String(error),
     })
     throw new Error(
-      `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
       { cause: error },
     )
   }

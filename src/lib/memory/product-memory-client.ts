@@ -25,7 +25,7 @@ export class ProductMemoryClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
-      throw new Error(error.message || `Failed to add memory: ${response.statusText}`)
+      throw new Error((error instanceof Error ? error.message : "Unknown error") || `Failed to add memory: ${response.statusText}`)
     }
 
     const data = await response.json()

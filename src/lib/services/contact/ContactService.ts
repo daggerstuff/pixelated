@@ -68,7 +68,7 @@ export class ContactService {
       await this.initializationPromise
       this.isInitialized = true
       this.initializationPromise = null
-    } catch (error) {
+    } catch (error: unknown) {
       this.initializationPromise = null
       throw error
     }

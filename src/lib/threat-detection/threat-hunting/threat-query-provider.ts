@@ -35,7 +35,7 @@ export class ThreatQueryProvider {
       ])
 
       return [...redisFindings, ...mongoFindings, ...logFindings]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Hunt query failed:', { error })
       throw error
     }
@@ -76,7 +76,7 @@ export class ThreatQueryProvider {
         }
       }
       return findings
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('queryRedis failed:', { error })
       return []
     }
@@ -209,7 +209,7 @@ export class ThreatQueryProvider {
       }
 
       return { matchedKeys, totalCount, isCapped }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('discoverKeys failed:', { error, pattern })
       return { matchedKeys: [], totalCount: 0, isCapped: false }
     }

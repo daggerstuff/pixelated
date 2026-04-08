@@ -107,9 +107,9 @@ export class HealthMonitor extends EventEmitter {
       logger.info('Health Monitor initialized successfully')
 
       this.emit('initialized', { regions: regions.length })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Health Monitor', { error })
-      throw new Error(`Initialization failed: ${error.message}`, {
+      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
         cause: error,
       })
     }
@@ -189,7 +189,7 @@ export class HealthMonitor extends EventEmitter {
       )
 
       await Promise.allSettled(checkPromises)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check cycle failed', { error })
     }
   }
@@ -220,7 +220,7 @@ export class HealthMonitor extends EventEmitter {
         overallScore: healthScore.overallScore,
         status: healthScore.status,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Health check failed for region: ${region.name}`, { error })
 
       // Create degraded health score on failure
@@ -245,7 +245,7 @@ export class HealthMonitor extends EventEmitter {
       this.updateHealthScore(region.id, failedScore)
       this.emit('health-check-failed', {
         regionId: region.id,
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
     }
   }
@@ -286,7 +286,7 @@ export class HealthMonitor extends EventEmitter {
       }
 
       return metrics
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to collect health metrics for region: ${region.name}`,
         { error },
@@ -716,7 +716,7 @@ export class HealthMonitor extends EventEmitter {
           `Generated ${alerts.length} health alerts for region: ${regionId}`,
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to check for health alerts for region: ${regionId}`,
         { error },
@@ -883,7 +883,7 @@ export class HealthMonitor extends EventEmitter {
           )
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cleanup old metrics', { error })
     }
   }
@@ -911,7 +911,7 @@ export class HealthMonitor extends EventEmitter {
       this.isInitialized = false
 
       logger.info('Health Monitor cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health Monitor cleanup failed', { error })
       throw error
     }

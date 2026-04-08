@@ -350,7 +350,7 @@ export class ContextDetector {
         needsSpecialHandling: false,
         urgency: 'low',
         metadata: {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }

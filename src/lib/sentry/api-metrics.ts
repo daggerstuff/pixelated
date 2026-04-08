@@ -36,7 +36,7 @@ export function withMetrics<T extends (...args: any[]) => Promise<Response>>(
       apiMetrics.responseTime(endpoint, durationMs, 'POST')
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       errorType =
         error instanceof Error ? error.constructor.name : 'UnknownError'
       statusCode = 500

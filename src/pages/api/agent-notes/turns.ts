@@ -265,7 +265,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return createErrorResponse(
       500,
       "INTERNAL_ERROR",
-      error instanceof Error ? error.message : "An unexpected error occurred while processing the turn.",
+      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "An unexpected error occurred while processing the turn.",
     );
   }
 };

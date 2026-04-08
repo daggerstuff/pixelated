@@ -24,7 +24,7 @@ async function startWorker() {
   wsServer.on('error', (error: Error) => {
     logger.error('WebSocket server error', {
       workerId: WORKER_ID,
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
   })
 

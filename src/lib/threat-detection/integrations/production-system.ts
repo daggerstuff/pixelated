@@ -55,9 +55,9 @@ class ProductionThreatDetectionService {
         action,
         riskScore,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Threat detection failed:", { error });
-      return { success: false, error: error.message, riskScore: 0 };
+      return { success: false, error: (error instanceof Error ? error.message : "Unknown error"), riskScore: 0 };
     }
   }
 
@@ -105,7 +105,7 @@ class ProductionThreatDetectionService {
       }
 
       return 0;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn("IP reputation check failed:", { error });
       return 0;
     }
@@ -122,7 +122,7 @@ class ProductionThreatDetectionService {
       if (count > 50) return 0.5;
       if (count > 20) return 0.3;
       return 0;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn("Request frequency analysis failed:", { error });
       return 0;
     }
@@ -232,7 +232,7 @@ class ProductionThreatDetectionService {
           body: request.body,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to log threat detection:", { error });
     }
   }
@@ -272,7 +272,7 @@ class ProductionThreatDetectionService {
           threatDistribution: {},
         }
       );
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to get statistics:", { error });
       return {
         totalThreats: 0,
@@ -496,9 +496,9 @@ class ProductionHuntingService extends EventEmitter {
       });
 
       return { success: true, huntId: Date.now().toString() };
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to trigger hunt:", { error });
-      return { success: false, error: error.message };
+      return { success: false, error: (error instanceof Error ? error.message : "Unknown error") };
     }
   }
 
@@ -631,7 +631,7 @@ class ProductionIntelligenceService extends EventEmitter {
       const results = intelligence ? [intelligence] : [];
       this.cache.set(cacheKey, results);
       return results;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("IOC lookup failed:", { error });
       return [];
     }
@@ -676,7 +676,7 @@ class ProductionIntelligenceService extends EventEmitter {
           });
         }
         successCount++;
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Feed update failed for ${feed.name}:`, { error });
       }
     }
@@ -731,7 +731,7 @@ class ProductionIntelligenceService extends EventEmitter {
       }
 
       return { found: false, intelligence: [], sources: [] };
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Threat intelligence query failed:", { error });
       return { found: false, intelligence: [], sources: [] };
     }
@@ -852,11 +852,11 @@ export function createCompleteThreatDetectionSystem(
           insights,
           timestamp: new Date(),
         };
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error("Request processing failed:", { error });
         return {
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : "Unknown error",
           timestamp: new Date(),
         };
       }

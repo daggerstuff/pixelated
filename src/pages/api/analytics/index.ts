@@ -35,7 +35,7 @@ export const POST = async ({ request }: APIContext) => {
       code: 'PROCESSING_ERROR',
       errorMessage: 'Failed to process analytics request',
       details: {
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         source: 'analytics-index',
       },
     }
@@ -80,7 +80,7 @@ export const GET = async ({ request }: APIContext) => {
       code: 'PROCESSING_ERROR',
       errorMessage: 'Failed to retrieve analytics data',
       details: {
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         source: 'analytics-index',
       },
     }

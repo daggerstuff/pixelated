@@ -208,7 +208,7 @@ export class BiasAuditService {
           result.quarantineStatus,
           'system',
         )
-      } catch (error) {
+      } catch (error: unknown) {
         // On error, revert to pending_review
         dataset.quarantineStatus = 'pending_review'
         datasetsStore.set(datasetId, dataset)

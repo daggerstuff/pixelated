@@ -113,7 +113,7 @@ export function use3DEmotionData(params: {
         }
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error adding emotion point', { error, emotionData })
         throw error
       }
@@ -168,7 +168,7 @@ export function useTreatmentPlans(params: {
         await loadTreatmentPlans()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error saving treatment plan', { error, planData })
         throw error
       }
@@ -192,7 +192,7 @@ export function useTreatmentPlans(params: {
         await loadTreatmentPlans()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error updating treatment plan', { error, updates })
         throw error
       }
@@ -286,7 +286,7 @@ export function useParticleSystem(params: {
         await loadParticleSystem()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error updating particle system', { error, updates })
         throw error
       }
@@ -335,7 +335,7 @@ export function useCarouselContent(params: {
         await loadCarouselContent()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error saving carousel configuration', {
           error,
           configData,
@@ -475,13 +475,13 @@ export function useServiceHealth(checkInterval: number = 60000) {
     try {
       const healthData = await componentIntegrationService.getServiceHealth()
       setHealth(healthData)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed', { error })
       setHealth({
         overall: 'error',
         services: [],
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       })
     } finally {
       setLoading(false)

@@ -227,7 +227,7 @@ export class Auth0SoftDeleteService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to soft delete user:', error)
 
       // Log soft delete error
@@ -237,7 +237,7 @@ export class Auth0SoftDeleteService {
         {
           deletedBy: deleteRequest.deletedBy,
           reason: deleteRequest.reason,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -295,13 +295,13 @@ export class Auth0SoftDeleteService {
       await updatePhase6AuthenticationProgress(userId, 'user_restored')
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to restore user:', error)
 
       // Log restore error
        logSecurityEvent(SecurityEventType.USER_RESTORE_ERROR, userId, {
         restoredBy: restoredBy,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -328,7 +328,7 @@ export class Auth0SoftDeleteService {
         .skip(offset)
         .limit(limit)
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get soft deleted users:', error)
       return []
     }
@@ -347,7 +347,7 @@ export class Auth0SoftDeleteService {
 
       // Find deleted user record
       return await collection.findOne({ auth0UserId: userId })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get soft deleted user:', error)
       return null
     }
@@ -395,7 +395,7 @@ export class Auth0SoftDeleteService {
           await this.notifyUserBeforePurge(userRecord)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to check and purge users:', error)
     }
   }
@@ -446,12 +446,12 @@ export class Auth0SoftDeleteService {
       await updatePhase6AuthenticationProgress(userId, 'user_purged')
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to purge user:', error)
 
       // Log purge error
        logSecurityEvent(SecurityEventType.USER_PURGE_ERROR, userId, {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -494,7 +494,7 @@ export class Auth0SoftDeleteService {
         userRecord.auth0UserId,
         'user_purge_notification_sent',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to notify user before purge:', error)
     }
   }
@@ -541,7 +541,7 @@ export class Auth0SoftDeleteService {
         auth0UserId: userId,
       })
       return !!deletedUserRecord
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to check if user is soft deleted:', error)
       return false
     }
@@ -563,7 +563,7 @@ export class Auth0SoftDeleteService {
         retentionPeriod: this.defaultPolicy.retentionPeriod,
         purgeAfter: this.defaultPolicy.purgeAfter,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user purge schedule:', error)
       return null
     }
@@ -623,7 +623,7 @@ export class Auth0SoftDeleteService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to extend user retention:', error)
 
       // Log retention extension error
@@ -633,7 +633,7 @@ export class Auth0SoftDeleteService {
         {
           extendedBy: extendedBy,
           additionalDays: additionalDays,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )

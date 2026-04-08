@@ -699,10 +699,10 @@ class PatientManager {
       try {
         await this.updatePatient(patientId, updates, updatedBy, reason)
         successCount++
-      } catch (error) {
+      } catch (error: unknown) {
         failureCount++
         errors.push(
-          `Patient ${patientId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Patient ${patientId}: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
         )
       }
     }

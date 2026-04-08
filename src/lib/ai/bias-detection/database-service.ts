@@ -40,7 +40,7 @@ export class BiasDetectionDatabaseService {
       return db
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
       logger.error('Database connection failed', {
         error: errorMessage,
         timestamp: new Date().toISOString(),

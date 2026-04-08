@@ -25,7 +25,7 @@ function getSecret(envVar: string, fileEnvVar: string): string {
   if (filePath && fs.existsSync(filePath)) {
     try {
       return fs.readFileSync(filePath, 'utf8').trim()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `[Auth0Config] Failed to read secret from ${filePath}:`,
         error,

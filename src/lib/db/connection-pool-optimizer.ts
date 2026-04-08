@@ -141,7 +141,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       })
 
       this.pool.on('error', (error, client) => {
-        logger.error('Pool error', { error: error.message, client: !!client })
+        logger.error('Pool error', { error: (error instanceof Error ? error.message : "Unknown error"), client: !!client })
         this.metrics.failedQueries++
         this.updateHealthScore()
         this.emit('connection-error', error, client)
@@ -153,7 +153,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         host: this.config.host || 'localhost',
         database: this.config.database || 'pixelated',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize connection pool', { error })
       throw error
     }
@@ -191,7 +191,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       })
 
       return client
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.waitingClients++
       this.updateMetrics()
 
@@ -222,7 +222,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         this.metrics.activeConnections - 1,
       )
       this.updateMetrics()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to release client', { error })
       this.metrics.failedQueries++
       this.updateMetrics()
@@ -270,14 +270,14 @@ export class OptimizedConnectionPool extends EventEmitter {
         rowCount: result.rowCount || 0,
         duration,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime
       this.recordQueryStats(duration, false)
 
       logger.error('Query execution failed', {
         query: text.substring(0, 100),
         duration,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
 
       throw error
@@ -306,7 +306,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       this.recordQueryStats(duration, true)
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime
       this.recordQueryStats(duration, false)
 
@@ -445,7 +445,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         healthScore: this.metrics.healthScore,
         activeConnections: this.metrics.activeConnections,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed', { error })
       this.metrics.healthScore = Math.max(0, this.metrics.healthScore - 30)
       this.emit('health-changed', this.metrics.healthScore, 'unhealthy')

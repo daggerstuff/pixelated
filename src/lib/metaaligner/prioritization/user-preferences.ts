@@ -265,7 +265,7 @@ export class UserPreferenceManager {
     try {
       const preferences = JSON.parse(data) as UserPreferences
       return this.setPreferences(userId, preferences)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to import preferences', { userId, error })
       return {
         valid: false,

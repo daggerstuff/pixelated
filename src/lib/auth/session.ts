@@ -113,7 +113,7 @@ export async function getUserProfile(userId: string) {
       avatarUrl: user.avatar_url,
       role: user.role,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in getUserProfile:', error)
     return null
   }

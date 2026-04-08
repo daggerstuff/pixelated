@@ -195,7 +195,7 @@ export class ErrorResponseFormatter {
       details?: Record<string, unknown>
     } = {
       error: error.name,
-      message: error.message,
+      message: (error instanceof Error ? error.message : "Unknown error"),
       code: error.code,
     }
 
@@ -326,7 +326,7 @@ export class AuthenticationErrorLogger {
   ): void {
     const logData = {
       error: error.name,
-      message: error.message,
+      message: (error instanceof Error ? error.message : "Unknown error"),
       code: error.code,
       context,
       timestamp: new Date().toISOString(),

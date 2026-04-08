@@ -126,7 +126,7 @@ export const POST: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving skill scores:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -196,7 +196,7 @@ export const GET: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching skill scores:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

@@ -102,7 +102,7 @@ export class AIMonitoringService extends EventEmitter {
 
         // Sleep for 30 seconds
         await new Promise((resolve) => setTimeout(resolve, 30000))
-      } catch (error) {
+      } catch (error: unknown) {
         this.emit('error', error)
         await new Promise((resolve) => setTimeout(resolve, 5000))
       }
@@ -340,7 +340,7 @@ export class AIMonitoringService extends EventEmitter {
       }
 
       this.emit('aiInsights', { insights, alertCount: recentAlerts.length })
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('error', error)
     }
   }

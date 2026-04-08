@@ -142,7 +142,7 @@ export function createRateLimitMiddleware(
         }
 
         return response
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Rate limiting middleware error:', { error })
 
         // Fail open - allow request if middleware fails
@@ -180,7 +180,7 @@ async function extractRateLimitContext(
       // For now, we'll check for a simple role header
       userRole = request.headers.get('x-user-role') || undefined
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.debug('Could not extract user role', { error })
   }
 
@@ -236,7 +236,7 @@ async function checkBypassRules(
         if (result) {
           return true
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Bypass rule custom condition failed:', {
           error,
           rule: rule.name,

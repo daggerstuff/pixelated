@@ -161,12 +161,12 @@ export class OptimizedBiasDetectionService {
         createdAt: new Date().toISOString(),
         cached: false,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const processingTime = Math.round(performance.now() - startTime)
       logger.error('Bias analysis failed', {
         analysisId,
         processingTime,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
       throw error
     }
@@ -186,7 +186,7 @@ export class OptimizedBiasDetectionService {
       )
 
       return await Promise.race([cachePromise, timeoutPromise])
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Cache lookup failed', { cacheKey, error })
       return null
     }
@@ -258,9 +258,9 @@ export class OptimizedBiasDetectionService {
         detectedBiases: [...new Set(detectedBiases)],
         recommendations: result.recommendations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Engine analysis failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
       throw error
     }
@@ -380,7 +380,7 @@ export class OptimizedBiasDetectionService {
           timeoutPromise,
         ])
         await client.query('COMMIT')
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as Error).message === 'Database operation timeout') {
           // In-flight queries are still running on this connection — do not
           // attempt ROLLBACK (would cause pg sync errors). Mark for destruction.
@@ -413,7 +413,7 @@ export class OptimizedBiasDetectionService {
           : PERFORMANCE_CONFIG.CACHE_TTL.ANALYSIS_RESULTS
 
       await this.cache.set(cacheKey, data, ttl)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to cache analysis results', { cacheKey, error })
     }
   }
@@ -477,7 +477,7 @@ export class OptimizedBiasDetectionService {
       )
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get bias summary', { therapistId, days, error })
       throw error
     }
@@ -540,7 +540,7 @@ export class OptimizedBiasDetectionService {
             confidence: result.confidence,
             processingTimeMs: processingTime,
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Batch analysis failed for text', { analysisId, error })
           return {
             id: analysisId,

@@ -56,7 +56,7 @@ export class MemoryCrisisTagger {
     } catch (error: unknown) {
       appLogger.error('Crisis tagging failed for memory object', {
         memoryId: memory.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       });
       return ['ERROR_ANALYSIS_FAILED'];
     }

@@ -241,7 +241,7 @@ export function formatTurnError(error: unknown): TurnSubmissionFailure {
   if (error instanceof Error) {
     return {
       ok: false,
-      errors: [{ code: "INTERNAL_ERROR", message: error.message }],
+      errors: [{ code: "INTERNAL_ERROR", message: (error instanceof Error ? error.message : "Unknown error") }],
     };
   }
 

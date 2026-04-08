@@ -115,7 +115,7 @@ export class RedisConnectionPool {
     for (let i = 0; i < this.config.minConnections; i++) {
       try {
         await this.createConnection()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Failed to create initial connection ${i}`, {
           pool: this.name,
           error,
@@ -235,7 +235,7 @@ export class RedisConnectionPool {
         this.updateResponseTime(responseTime)
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         lastError = error as Error
         this.stats.errors++
 
@@ -303,7 +303,7 @@ export class RedisConnectionPool {
         pool: this.name,
         connectionId: connection.id,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error destroying connection', {
         pool: this.name,
         connectionId: connection.id,
@@ -356,7 +356,7 @@ export class RedisConnectionPool {
       while (this.connections.size < this.config.minConnections) {
         try {
           await this.createConnection()
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to create connection during health check', {
             pool: this.name,
             error,

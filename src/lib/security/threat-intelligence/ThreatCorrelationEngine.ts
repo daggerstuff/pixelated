@@ -270,12 +270,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
       logger.info('Threat Correlation Engine initialized successfully')
 
       this.emit('initialized', { timestamp: new Date() })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Correlation Engine', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw new Error(
-        `Failed to initialize threat correlation engine: ${error.message}`,
+        `Failed to initialize threat correlation engine: ${(error instanceof Error ? error.message : "Unknown error")}`,
         { cause: error },
       )
     }
@@ -303,9 +303,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       ])
 
       logger.info('Database indexes created successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create database indexes', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -324,16 +324,16 @@ export class ThreatCorrelationEngine extends EventEmitter {
         try {
           const threatData = JSON.parse(message)
           await this.queueThreatForCorrelation(threatData.threat_id)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process new threat notification', {
-            error: error.message,
+            error: (error instanceof Error ? error.message : "Unknown error"),
           })
         }
       })
 
       logger.info('Redis pub/sub setup completed')
-    } catch (error) {
-      logger.error('Failed to setup Redis pub/sub', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to setup Redis pub/sub', { error: (error instanceof Error ? error.message : "Unknown error") })
       throw error
     }
   }
@@ -356,9 +356,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       }
 
       logger.debug('Threat queued for correlation', { threatId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to queue threat for correlation', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
         threatId,
       })
       throw error
@@ -405,9 +405,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       logger.info('Correlation batch processing completed', {
         count: correlations.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process correlation queue', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
     } finally {
       this.isProcessing = false
@@ -422,8 +422,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
       return await this.threatsCollection
         .find({ id: { $in: threatIds } })
         .toArray()
-    } catch (error) {
-      logger.error('Failed to get threats by IDs', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to get threats by IDs', { error: (error instanceof Error ? error.message : "Unknown error") })
       throw error
     }
   }
@@ -480,8 +480,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
       })
 
       return correlations
-    } catch (error) {
-      logger.error('Failed to analyze correlations', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to analyze correlations', { error: (error instanceof Error ? error.message : "Unknown error") })
       throw error
     }
   }
@@ -528,9 +528,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       }
 
       return correlations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze temporal correlations', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -660,9 +660,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         },
         time_span,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate temporal correlation', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -711,9 +711,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       }
 
       return correlations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze spatial correlations', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -827,9 +827,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         ),
         geographic_span: geographicSpan,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate spatial correlation', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -1000,9 +1000,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       }
 
       return correlations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze behavioral correlations', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -1191,9 +1191,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         },
         similarity_metrics: similarityMetrics,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate behavioral correlation', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -1243,9 +1243,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       }
 
       return correlations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze attribution correlations', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -1331,9 +1331,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         },
         confidence_factors: confidenceFactors,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate attribution correlation', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -1639,9 +1639,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         type: correlation.correlation_type,
         confidence: correlation.confidence,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store correlation', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
         correlationId: correlation.id,
       })
       throw error
@@ -1661,9 +1661,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         .sort({ timestamp: -1 })
         .limit(limit)
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get correlations by type', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
         type,
       })
       throw error
@@ -1681,9 +1681,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         .find({ 'threats.threat_id': threatId })
         .sort({ timestamp: -1 })
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get correlations by threat ID', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
         threatId,
       })
       throw error
@@ -1727,9 +1727,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         .sort({ timestamp: -1 })
         .limit(query.limit || 100)
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to search correlations', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
         query,
       })
       throw error
@@ -1784,9 +1784,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
         confidence_distribution: confidenceDistribution,
         recent_correlations_24h: recentCorrelations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get correlation statistics', {
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       })
       throw error
     }
@@ -1810,8 +1810,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
       this.emit('shutdown', { timestamp: new Date() })
 
       logger.info('Threat Correlation Engine shutdown completed')
-    } catch (error) {
-      logger.error('Error during shutdown', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Error during shutdown', { error: (error instanceof Error ? error.message : "Unknown error") })
       throw error
     }
   }

@@ -345,7 +345,7 @@ class EncryptionManager {
       try {
         await this.rotateKeys()
         console.log('Encryption keys rotated successfully')
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Key rotation failed:', error)
       }
     }, rotationInterval)

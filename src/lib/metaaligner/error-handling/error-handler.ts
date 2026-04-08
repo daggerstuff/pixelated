@@ -72,7 +72,7 @@ export class ErrorHandler implements IErrorHandler {
       enhancedResponse: 'Error: Could not process the response.',
       originalResponse: '',
       alignment: {} as any,
-      errors: [{ message: error.message, stage: 'processing' }],
+      errors: [{ message: (error instanceof Error ? error.message : "Unknown error"), stage: 'processing' }],
     }
   }
 
@@ -83,7 +83,7 @@ export class ErrorHandler implements IErrorHandler {
       enhancedResponse: 'Error: Invalid request format.',
       originalResponse: '',
       alignment: {} as any,
-      errors: [{ message: error.message, stage: 'validation' }],
+      errors: [{ message: (error instanceof Error ? error.message : "Unknown error"), stage: 'validation' }],
     }
   }
 
@@ -94,7 +94,7 @@ export class ErrorHandler implements IErrorHandler {
       enhancedResponse: 'Error: Could not enhance the response.',
       originalResponse: '',
       alignment: {} as any,
-      errors: [{ message: error.message, stage: 'enhancement' }],
+      errors: [{ message: (error instanceof Error ? error.message : "Unknown error"), stage: 'enhancement' }],
     }
   }
 
@@ -103,7 +103,7 @@ export class ErrorHandler implements IErrorHandler {
       enhancedResponse: 'An unexpected error occurred.',
       originalResponse: '',
       alignment: {} as any,
-      errors: [{ message: error.message, stage: 'unknown' }],
+      errors: [{ message: (error instanceof Error ? error.message : "Unknown error"), stage: 'unknown' }],
     }
   }
 

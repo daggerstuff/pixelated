@@ -492,7 +492,7 @@ export async function validateMergedDataset(filePath: string): Promise<{
       default:
         sampleCount = await validateJSONLDataset(validatedPath, errors);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     errors.push(`Read error: ${error}`);
   }
 

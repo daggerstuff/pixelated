@@ -128,7 +128,7 @@ class AuthClient {
 
       return { data, error: null }
     } catch (error: any) {
-      return { error: error.message || 'An unexpected error occurred' }
+      return { error: (error instanceof Error ? error.message : "Unknown error") || 'An unexpected error occurred' }
     } finally {
       this._isLoading = false
     }
@@ -154,7 +154,7 @@ class AuthClient {
 
       return { data, error: null }
     } catch (error: any) {
-      return { error: error.message || 'An unexpected error occurred' }
+      return { error: (error instanceof Error ? error.message : "Unknown error") || 'An unexpected error occurred' }
     } finally {
       this._isLoading = false
     }
@@ -173,7 +173,7 @@ class AuthClient {
 
       this._session = null
       window.location.href = '/'
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Sign out failed:', error)
     }
   }

@@ -300,7 +300,7 @@ export class AdvancedPredictiveThreatIntelligence
         forecastId: forecast.forecastId,
       })
       return forecast
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('threat_forecast_error', { error })
       throw error
     }
@@ -358,7 +358,7 @@ export class AdvancedPredictiveThreatIntelligence
       })
 
       return threatsWithRecommendations
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('emerging_threat_detection_error', { error })
       throw error
     }
@@ -426,7 +426,7 @@ export class AdvancedPredictiveThreatIntelligence
         modelId: propagationModel.modelId,
       })
       return propagationModel
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('threat_propagation_modeling_error', { error })
       throw error
     }
@@ -492,7 +492,7 @@ export class AdvancedPredictiveThreatIntelligence
         patternCount: significantPatterns.length,
       })
       return significantPatterns
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('seasonal_pattern_identification_error', { error })
       throw error
     }
@@ -622,7 +622,7 @@ export class AdvancedPredictiveThreatIntelligence
         assessmentId: riskAssessment.assessmentId,
       })
       return riskAssessment
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('risk_assessment_error', { error })
       throw error
     }
@@ -695,7 +695,7 @@ export class AdvancedPredictiveThreatIntelligence
         forecastId: forecast.forecastId,
       })
       return forecast
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('time_series_forecast_error', { error })
       throw error
     }

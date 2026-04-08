@@ -63,7 +63,7 @@ export const GET: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Phase 8 status check failed:', error)
     return new Response(
       JSON.stringify({
