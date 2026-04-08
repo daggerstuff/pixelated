@@ -72,7 +72,7 @@ export class WorkflowEngineService extends BaseService {
       })
 
       return execution
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'startWorkflow')
     }
   }
@@ -123,7 +123,7 @@ export class WorkflowEngineService extends BaseService {
         result: 'success',
         details: { stepId },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'approveStep')
     }
   }

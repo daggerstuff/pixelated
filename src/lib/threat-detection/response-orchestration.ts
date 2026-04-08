@@ -186,7 +186,7 @@ export class AdvancedResponseOrchestrator
         threatId,
       })
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('orchestration_error', { threatId, error })
       throw error
     }
@@ -231,7 +231,7 @@ export class AdvancedResponseOrchestrator
       })
 
       return validationResults.success
-    } catch (error) {
+    } catch (error: unknown) {
       response.status = 'failed'
       await this.updateThreatResponse(response)
       this.emit('response_execution_error', {
@@ -271,7 +271,7 @@ export class AdvancedResponseOrchestrator
       })
 
       return rollbackSuccess
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('response_rollback_error', { responseId, error })
       return false
     }
@@ -298,7 +298,7 @@ export class AdvancedResponseOrchestrator
       }
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Action validation error:', error)
       return false
     }
@@ -328,7 +328,7 @@ export class AdvancedResponseOrchestrator
         responseId: escalatedResponse.responseId,
       })
       return escalatedResponse
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('threat_escalation_error', { threatId, reason, error })
       throw error
     }
@@ -353,7 +353,7 @@ export class AdvancedResponseOrchestrator
       this.emit('system_integration_completed', {
         responseId: response.responseId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('system_integration_error', {
         responseId: response.responseId,
         error,
@@ -759,7 +759,7 @@ export class AdvancedResponseOrchestrator
       await this.mongoClient.db('admin').command({ ping: 1 })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Orchestrator health check failed:', error)
       return false
     }

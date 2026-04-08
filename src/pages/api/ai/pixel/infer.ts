@@ -135,12 +135,12 @@ async function callPixelService(
     }
 
     return await response.json()
-  } catch (error) {
+  } catch (error: unknown) {
     if (retries < MAX_RETRIES) {
       logger.warn(
         `Pixel API call failed, retrying (${retries + 1}/${MAX_RETRIES})`,
         {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         },
       )
       // Exponential backoff
@@ -152,7 +152,7 @@ async function callPixelService(
 
     logger.error('Pixel API call failed after retries', {
       endpoint,
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
     throw error
   }
@@ -208,13 +208,13 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Failed to get Pixel status', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Failed to get Pixel model status',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -354,13 +354,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Pixel inference failed', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Pixel inference failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

@@ -218,14 +218,14 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Research Platform initialization failed', { error })
 
       return {
         success: false,
         error: {
           code: 'INITIALIZATION_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
         metadata: {
           timestamp: new Date().toISOString(),
@@ -258,12 +258,12 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'STATUS_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
         metadata: {
           timestamp: new Date().toISOString(),
@@ -338,12 +338,12 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'SUBMISSION_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }
@@ -403,12 +403,12 @@ export class ResearchPlatform {
           processingTime: result.metadata?.executionTime || 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'QUERY_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }
@@ -466,12 +466,12 @@ export class ResearchPlatform {
           processingTime: patterns.metadata.processingTime,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'PATTERN_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }
@@ -529,12 +529,12 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'EVIDENCE_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }
@@ -598,12 +598,12 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'CONSENT_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }
@@ -648,12 +648,12 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'AUDIT_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }
@@ -685,12 +685,12 @@ export class ResearchPlatform {
           processingTime: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: {
           code: 'COMPLIANCE_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       }
     }

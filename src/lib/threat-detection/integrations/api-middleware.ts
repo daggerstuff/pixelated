@@ -309,7 +309,7 @@ export class ThreatDetectionMiddleware {
         enabled: this.config.enabled,
         recentRequests: bridgeStatus.recentIntegrations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get middleware health status:', { error })
       return {
         healthy: false,

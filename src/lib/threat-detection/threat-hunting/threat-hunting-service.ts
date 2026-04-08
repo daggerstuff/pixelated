@@ -78,7 +78,7 @@ export class ThreatHuntingService extends EventEmitter {
       this.isInitialized = true
       this.emit('service_initialized')
       logger.info('ThreatHuntingService ready')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize ThreatHuntingService', { error })
       throw error
     }
@@ -126,7 +126,7 @@ export class ThreatHuntingService extends EventEmitter {
       }, frequency)
 
       this.emit('hunting_started', { frequency })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to start threat hunting:', { error })
       this.emit('hunting_error', error)
       throw error
@@ -153,7 +153,7 @@ export class ThreatHuntingService extends EventEmitter {
       async (rule) => {
         try {
           await this.executeRule(rule)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(`Failed to execute rule: ${rule.name}`, { error, ruleId: rule.ruleId })
         }
       },

@@ -124,7 +124,7 @@ export class AutomatedThreatResponseOrchestratorCore
       logger.info(
         'Automated Threat Response Orchestrator initialized successfully',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to initialize Automated Threat Response Orchestrator:',
         { error },
@@ -139,7 +139,7 @@ export class AutomatedThreatResponseOrchestratorCore
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for response orchestrator')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -153,7 +153,7 @@ export class AutomatedThreatResponseOrchestratorCore
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_response')
       logger.info('MongoDB connection established for response orchestrator')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -171,7 +171,7 @@ export class AutomatedThreatResponseOrchestratorCore
       logger.info(
         `Loaded ${strategies.length} response strategies from database`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load response strategies:', { error })
     }
   }
@@ -181,7 +181,7 @@ export class AutomatedThreatResponseOrchestratorCore
     setInterval(async () => {
       try {
         await this.monitorActiveResponses()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Response monitoring error:', { error })
       }
     }, 30000)
@@ -192,7 +192,7 @@ export class AutomatedThreatResponseOrchestratorCore
     setInterval(async () => {
       try {
         await this.collectMetrics()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Metrics collection error:', { error })
       }
     }, 300000)
@@ -263,7 +263,7 @@ export class AutomatedThreatResponseOrchestratorCore
       })
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to orchestrate threat response:', {
         error,
         threatId: threat.threatId,
@@ -294,7 +294,7 @@ export class AutomatedThreatResponseOrchestratorCore
       // Select the best matching strategy based on priority and conditions
       matchingStrategies.sort((a, b) => b.priority - a.priority)
       return matchingStrategies[0]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to select response strategy:', { error })
       return this.getDefaultStrategy(threat)
     }
@@ -330,7 +330,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking strategy match:', { error })
       return false
     }
@@ -367,7 +367,7 @@ export class AutomatedThreatResponseOrchestratorCore
         default:
           return false
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error evaluating condition:', { error, condition })
       return false
     }
@@ -582,7 +582,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Sort by priority (highest first)
       return actions.sort((a, b) => b.priority - a.priority)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate response actions:', { error })
       return strategy.responseActions
     }
@@ -635,7 +635,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return customizedAction
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to customize action:', { error })
       return action
     }
@@ -658,7 +658,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return validatedActions
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to validate response actions:', { error })
       return actions
     }
@@ -691,7 +691,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Action validation error:', {
         error,
         actionId: action.actionId,
@@ -706,7 +706,7 @@ export class AutomatedThreatResponseOrchestratorCore
       // This would typically involve health checks or API calls
       // For now, we'll assume all targets are available
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Target availability check failed:', { error, target })
       return false
     }
@@ -742,7 +742,7 @@ export class AutomatedThreatResponseOrchestratorCore
       const confidenceImpact = threat.confidence * 0.2
 
       return Math.min(baseImpact + actionImpact + confidenceImpact, 1)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate estimated impact:', { error })
       return 0.5
     }
@@ -801,7 +801,7 @@ export class AutomatedThreatResponseOrchestratorCore
       })
 
       return allSuccessful
-    } catch (error) {
+    } catch (error: unknown) {
       response.status = 'failed'
       response.completedTime = new Date()
       await this.updateThreatResponse(response)
@@ -871,7 +871,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return executionResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Action execution failed:', {
         error,
         actionId: action.actionId,
@@ -902,7 +902,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Simulate successful blocking
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Block action execution failed:', { error })
       return false
     }
@@ -924,7 +924,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Simulate successful isolation
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Isolate action execution failed:', { error })
       return false
     }
@@ -948,7 +948,7 @@ export class AutomatedThreatResponseOrchestratorCore
       await this.sendNotifications(response)
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Alert action execution failed:', { error })
       return false
     }
@@ -971,7 +971,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Simulate successful investigation initiation
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Investigate action execution failed:', { error })
       return false
     }
@@ -993,7 +993,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Simulate successful mitigation
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Mitigate action execution failed:', { error })
       return false
     }
@@ -1017,7 +1017,7 @@ export class AutomatedThreatResponseOrchestratorCore
         responseId: response.responseId,
         severity: response.severity,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to queue response for manual review:', { error })
     }
   }
@@ -1055,7 +1055,7 @@ export class AutomatedThreatResponseOrchestratorCore
           await this.sendLowPriorityNotification(notificationData)
           break
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send notifications:', { error })
     }
   }
@@ -1100,7 +1100,7 @@ export class AutomatedThreatResponseOrchestratorCore
           await this.sendToIntegrationEndpoint(endpoint, response)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('External system integration failed:', { error })
     }
   }
@@ -1117,7 +1117,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Simulate API call to integration endpoint
       // In a real implementation, this would make actual HTTP requests
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Integration endpoint communication failed:', {
         error,
         endpoint: endpoint.endpointId,
@@ -1131,7 +1131,7 @@ export class AutomatedThreatResponseOrchestratorCore
       await responsesCollection.insertOne(response)
 
       this.activeResponses.set(response.responseId, response)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store threat response:', { error })
       throw error
     }
@@ -1146,7 +1146,7 @@ export class AutomatedThreatResponseOrchestratorCore
       )
 
       this.activeResponses.set(response.responseId, response)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update threat response:', { error })
       throw error
     }
@@ -1171,7 +1171,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       const logsCollection = this.db.collection('response_execution_logs')
       await logsCollection.insertOne(executionLog)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to log response execution:', { error })
     }
   }
@@ -1219,7 +1219,7 @@ export class AutomatedThreatResponseOrchestratorCore
       })
 
       return rollbackSuccessful
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to rollback threat response:', { error, responseId })
       this.emit('rollback_error', { error, responseId })
       return false
@@ -1250,7 +1250,7 @@ export class AutomatedThreatResponseOrchestratorCore
           })
           return false
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Rollback action execution failed:', {
         error,
         actionId: action.actionId,
@@ -1278,7 +1278,7 @@ export class AutomatedThreatResponseOrchestratorCore
       })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Rollback block action failed:', { error })
       return false
     }
@@ -1298,7 +1298,7 @@ export class AutomatedThreatResponseOrchestratorCore
       })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Rollback rate limit action failed:', { error })
       return false
     }
@@ -1323,7 +1323,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threat response:', { error, responseId })
       return null
     }
@@ -1351,7 +1351,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       this.emit('strategy_updated', { strategyId: strategy.strategyId })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update response strategy:', { error })
       return false
     }
@@ -1386,7 +1386,7 @@ export class AutomatedThreatResponseOrchestratorCore
         .toArray()
 
       return responses
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get response history:', { error, threatId })
       throw error
     }
@@ -1417,7 +1417,7 @@ export class AutomatedThreatResponseOrchestratorCore
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Active response monitoring failed:', { error })
     }
   }
@@ -1427,7 +1427,7 @@ export class AutomatedThreatResponseOrchestratorCore
       const metrics = await this.calculateResponseMetrics()
 
       this.emit('metrics_collected', metrics)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Metrics collection failed:', { error })
     }
   }
@@ -1458,7 +1458,7 @@ export class AutomatedThreatResponseOrchestratorCore
         responseByType: responsesByType,
         responseBySeverity: responsesBySeverity,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate response metrics:', { error })
       return {
         totalResponses: 0,
@@ -1496,7 +1496,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return totalTime / completedResponses.length
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate average response time:', { error })
       return 0
     }
@@ -1518,7 +1518,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return responsesByType
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get responses by type:', { error })
       return {}
     }
@@ -1540,7 +1540,7 @@ export class AutomatedThreatResponseOrchestratorCore
       }
 
       return responsesBySeverity
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get responses by severity:', { error })
       return {}
     }
@@ -1584,7 +1584,7 @@ export class AutomatedThreatResponseOrchestratorCore
         activeResponses: this.activeResponses.size,
         successRate,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1597,7 +1597,7 @@ export class AutomatedThreatResponseOrchestratorCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1607,7 +1607,7 @@ export class AutomatedThreatResponseOrchestratorCore
     try {
       await this.db.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MongoDB health check failed:', { error })
       return false
     }
@@ -1632,7 +1632,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       this.emit('orchestrator_shutdown')
       logger.info('Automated Threat Response Orchestrator shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

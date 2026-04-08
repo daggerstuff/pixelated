@@ -142,9 +142,9 @@ export class AnonymizationPipelineService {
         anonymizedData: finalAnonymizedData,
         auditReport,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Anonymization pipeline error:', error)
-      throw new Error(`Anonymization failed: ${error.message}`, {
+      throw new Error(`Anonymization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
         cause: error,
       })
     }

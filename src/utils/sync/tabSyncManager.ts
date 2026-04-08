@@ -165,7 +165,7 @@ export class MessagingTransport {
       })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('MessagingTransport: Failed to initialize', error)
       return false
     }
@@ -194,7 +194,7 @@ export class MessagingTransport {
     try {
       this.channel.postMessage(message)
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('MessagingTransport: Failed to broadcast', error)
       return false
     }
@@ -221,7 +221,7 @@ export class MessagingTransport {
     this.messageHandlers.get(event)?.forEach((handler) => {
       try {
         handler(message)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`MessagingTransport: Handler error for ${event}`, error)
       }
     })

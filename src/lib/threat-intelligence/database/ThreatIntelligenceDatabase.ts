@@ -136,7 +136,7 @@ export class ThreatIntelligenceDatabaseCore
 
       this.emit('database_initialized')
       logger.info('Threat Intelligence Database initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Intelligence Database:', {
         error,
       })
@@ -162,7 +162,7 @@ export class ThreatIntelligenceDatabaseCore
       this.db = this.mongoClient.db(this.config.primary.database)
 
       logger.info('MongoDB connection established')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -181,7 +181,7 @@ export class ThreatIntelligenceDatabaseCore
       logger.info(
         'Redis connection established for threat intelligence database',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -231,7 +231,7 @@ export class ThreatIntelligenceDatabaseCore
       await validationCollection.createIndex({ validationDate: 1 })
 
       logger.info('Database indexes created successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create database indexes:', { error })
       throw error
     }
@@ -257,7 +257,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       logger.info('STIX collections initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize STIX collections:', { error })
       throw error
     }
@@ -315,7 +315,7 @@ export class ThreatIntelligenceDatabaseCore
       await taxiiObjectsCollection.createIndex({ created: 1 })
 
       logger.info('TAXII collections initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize TAXII collections:', { error })
       throw error
     }
@@ -326,7 +326,7 @@ export class ThreatIntelligenceDatabaseCore
     setInterval(async () => {
       try {
         await this.performDatabaseMaintenance()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Database maintenance error:', { error })
       }
     }, 3600000) // Every hour
@@ -335,7 +335,7 @@ export class ThreatIntelligenceDatabaseCore
     setInterval(async () => {
       try {
         await this.cleanupExpiredCache()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Cache cleanup error:', { error })
       }
     }, 1800000) // Every 30 minutes
@@ -376,7 +376,7 @@ export class ThreatIntelligenceDatabaseCore
         threatId: threat.threatId,
         intelligenceId: threat.intelligenceId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store threat intelligence:', { error })
       this.emit('storage_error', { error, threatId: threat.threatId })
       throw error
@@ -426,7 +426,7 @@ export class ThreatIntelligenceDatabaseCore
           { upsert: true },
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store threat indicators:', { error })
       throw error
     }
@@ -447,7 +447,7 @@ export class ThreatIntelligenceDatabaseCore
           upsert: true,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update STIX objects:', { error })
       throw error
     }
@@ -546,7 +546,7 @@ export class ThreatIntelligenceDatabaseCore
       // Cache by global threat ID
       const globalCacheKey = `global_threat:${threat.globalThreatId}`
       await this.redis.setex(globalCacheKey, 3600, JSON.stringify(cacheData))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cache threat intelligence:', { error })
     }
   }
@@ -591,7 +591,7 @@ export class ThreatIntelligenceDatabaseCore
         threatId: threat.threatId,
         intelligenceId: threat.intelligenceId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update threat intelligence:', { error })
       this.emit('update_error', { error, threatId: threat.threatId })
       throw error
@@ -620,7 +620,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       return threat
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threat by ID:', { error, threatId })
       throw error
     }
@@ -648,7 +648,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       return threat
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threat by intelligence ID:', {
         error,
         intelligenceId,
@@ -675,7 +675,7 @@ export class ThreatIntelligenceDatabaseCore
 
       // Then get the associated threat
       return await this.getThreatById(indicator.threatId)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threat by indicator:', {
         error,
         indicatorType,
@@ -708,7 +708,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       return threatsByRegion
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threats by region:', { error, region })
       throw error
     }
@@ -736,7 +736,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       return threatsBySeverity
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threats by severity:', { error, region })
       throw error
     }
@@ -757,7 +757,7 @@ export class ThreatIntelligenceDatabaseCore
         .toArray()
 
       return threats
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent threats:', { error, region, limit })
       throw error
     }
@@ -769,7 +769,7 @@ export class ThreatIntelligenceDatabaseCore
       const query = region ? { regions: region } : {}
 
       return await threatsCollection.countDocuments(query)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get total threat count:', { error, region })
       throw error
     }
@@ -790,7 +790,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       return await threatsCollection.countDocuments(query)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get active threat count:', { error, region })
       throw error
     }
@@ -817,7 +817,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       return await correlationsCollection.countDocuments(query)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get correlation count:', { error, region })
       throw error
     }
@@ -835,7 +835,7 @@ export class ThreatIntelligenceDatabaseCore
       this.emit('correlation_stored', {
         correlationId: correlation.correlationId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store correlation data:', { error })
       throw error
     }
@@ -854,7 +854,7 @@ export class ThreatIntelligenceDatabaseCore
       const objects = await collection.find(query).toArray()
 
       return objects
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get STIX objects:', { error, objectType })
       throw error
     }
@@ -870,7 +870,7 @@ export class ThreatIntelligenceDatabaseCore
       const collections = await taxiiCollection.find({}).toArray()
 
       return collections
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get TAXII collections:', { error })
       throw error
     }
@@ -896,7 +896,7 @@ export class ThreatIntelligenceDatabaseCore
       const objects = await taxiiObjectsCollection.find(query).toArray()
 
       return objects
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get TAXII objects:', { error, collectionId })
       throw error
     }
@@ -935,11 +935,11 @@ export class ThreatIntelligenceDatabaseCore
           processingTime: 0, // Will be calculated by the caller
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to search threats:', { error, query })
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Search failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Search failed',
         metadata: {
           timestamp: new Date(),
           requestId: `search_${Date.now()}`,
@@ -1050,7 +1050,7 @@ export class ThreatIntelligenceDatabaseCore
         responseTime,
         databaseStats: stats,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1063,7 +1063,7 @@ export class ThreatIntelligenceDatabaseCore
     try {
       await this.db.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MongoDB health check failed:', { error })
       return false
     }
@@ -1073,7 +1073,7 @@ export class ThreatIntelligenceDatabaseCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1102,7 +1102,7 @@ export class ThreatIntelligenceDatabaseCore
         totalTAXIIObjects,
         lastUpdate: new Date(),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get database stats:', { error })
       return {
         totalThreats: 0,
@@ -1169,7 +1169,7 @@ export class ThreatIntelligenceDatabaseCore
       // Update statistics
       const stats = await this.getDatabaseStats()
       logger.info('Database maintenance completed', { stats })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Database maintenance failed:', { error })
     }
   }
@@ -1191,7 +1191,7 @@ export class ThreatIntelligenceDatabaseCore
       if (cleanedCount > 0) {
         logger.info(`Cleaned up ${cleanedCount} expired cache entries`)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache cleanup failed:', { error })
     }
   }
@@ -1211,7 +1211,7 @@ export class ThreatIntelligenceDatabaseCore
 
       this.emit('database_shutdown')
       logger.info('Threat Intelligence Database shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

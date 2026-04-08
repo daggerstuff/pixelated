@@ -252,7 +252,7 @@ export class ObjectiveSwitcher {
           toContext: transition.to.contextType,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = performance.now() - startTime
 
       if (this.config.enableTelemetry) {
@@ -268,7 +268,7 @@ export class ObjectiveSwitcher {
           timestamp: Date.now(),
           duration,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         })
       }
 
@@ -297,7 +297,7 @@ export class ObjectiveSwitcher {
         if (this.config.enableTelemetry) {
           this.telemetry.observer_notifications++
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Observer notification failed', { error })
       }
     })

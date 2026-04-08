@@ -238,7 +238,7 @@ export class Auth0ActivityTrackingService {
 
       // Process security events
       await this.processSecurityEvents(logs)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch and store recent activities:', error)
     }
   }
@@ -256,7 +256,7 @@ export class Auth0ActivityTrackingService {
       if (activities.length > 0) {
         await collection.insertMany(activities)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to store activities:', error)
     }
   }
@@ -394,7 +394,7 @@ export class Auth0ActivityTrackingService {
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to process security events:', error)
     }
   }
@@ -447,7 +447,7 @@ export class Auth0ActivityTrackingService {
       // Execute query
       const activities = await collection.find(query, options).toArray()
       return activities
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user activities:', error)
       return []
     }
@@ -502,7 +502,7 @@ export class Auth0ActivityTrackingService {
         activeDays,
         ipAddressCount: ipAddresses.length,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user activity summary:', error)
       return null
     }
@@ -537,7 +537,7 @@ export class Auth0ActivityTrackingService {
         .toArray()
 
       return events
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get security events:', error)
       return []
     }
@@ -560,7 +560,7 @@ export class Auth0ActivityTrackingService {
         .toArray()
 
       return activities
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get real-time activity stream:', error)
       return []
     }
@@ -593,7 +593,7 @@ export class Auth0ActivityTrackingService {
             }
           : undefined,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user sessions:', error)
       return []
     }
@@ -630,7 +630,7 @@ export class Auth0ActivityTrackingService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to terminate user session:', error)
 
       // Log session termination error
@@ -639,7 +639,7 @@ export class Auth0ActivityTrackingService {
         userId,
         {
           sessionId: sessionId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -697,7 +697,7 @@ export class Auth0ActivityTrackingService {
       })
 
       console.log(`Cleaned up ${result.deletedCount} old activity logs`)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to cleanup old logs:', error)
     }
   }
@@ -738,7 +738,7 @@ export class Auth0ActivityTrackingService {
         recentActivity,
         securityEvents,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get activity statistics:', error)
       return {
         totalActivities: 0,
@@ -775,7 +775,7 @@ export class Auth0ActivityTrackingService {
         .toArray()
 
       return activities
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to search activities:', error)
       return []
     }

@@ -140,7 +140,7 @@ export async function initializeAuthSystem(): Promise<void> {
     startTokenCleanupScheduler();
 
     console.log("✅ Authentication system initialized successfully (Auth0-native)");
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("❌ Failed to initialize authentication system:", error);
     throw error;
   }
@@ -168,7 +168,7 @@ export async function getUserById(
       email: user.email,
       name: user.fullName,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Failed to look up Auth0 user:", error);
     return null;
   }

@@ -44,7 +44,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
       status: 'connected',
       uptime: serverStatus.uptime,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     health.services.mongodb = {
       status: 'disconnected',
       error: (error as Error).message,
@@ -62,7 +62,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
       status: 'connected',
       timestamp: result.rows[0].now,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     health.services.postgresql = {
       status: 'disconnected',
       error: (error as Error).message,
@@ -78,7 +78,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
       status: 'connected',
       response: pong,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     health.services.redis = {
       status: 'disconnected',
       error: (error as Error).message,
@@ -116,7 +116,7 @@ router.get('/ready', async (req: Request, res: Response): Promise<Response> => {
       ready: true,
       timestamp: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return res.status(503).json({
       ready: false,
       error: (error as Error).message,

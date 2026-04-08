@@ -803,7 +803,7 @@ export class PerformanceMonitoringService {
           await this.sendAlerts(thresholdCheck.violations)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect performance metrics', { error })
     }
   }

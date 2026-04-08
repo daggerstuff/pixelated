@@ -55,7 +55,7 @@ export class PixelCrisisDetector {
 
       // Convert Pixel response to MentalHealthAnalysis format
       return this.convertToMentalHealthAnalysis(text, pixelResponse)
-    } catch (error) {
+    } catch (error: unknown) {
       if (this.config.fallbackToKeywords) {
         console.warn(
           'Pixel inference failed, falling back to keyword detection:',

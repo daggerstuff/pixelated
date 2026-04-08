@@ -231,7 +231,7 @@ export class Auth0ImpersonationService {
       )
 
       return sessionId
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to request impersonation:', error)
 
       // Log impersonation error
@@ -242,7 +242,7 @@ export class Auth0ImpersonationService {
           targetUserId: request.targetUserId,
           reason: request.reason,
           ipAddress: request.ipAddress,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -319,7 +319,7 @@ export class Auth0ImpersonationService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to end impersonation:', error)
 
       // Log impersonation error
@@ -328,7 +328,7 @@ export class Auth0ImpersonationService {
         adminUserId,
         {
           sessionId: sessionId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -458,7 +458,7 @@ export class Auth0ImpersonationService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to extend impersonation:', error)
 
       // Log impersonation error
@@ -467,7 +467,7 @@ export class Auth0ImpersonationService {
         adminUserId,
         {
           sessionId: sessionId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -519,7 +519,7 @@ export class Auth0ImpersonationService {
       // - Checking if the session is being used from the same IP address
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to validate impersonation session:', error)
       return false
     }

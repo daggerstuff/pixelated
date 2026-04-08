@@ -72,11 +72,11 @@ class BiasDetectionServer {
           version: process.env['npm_package_version'] || '1.0.0',
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Health check failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Health check failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Health check failed',
       })
     }
   }
@@ -127,11 +127,11 @@ class BiasDetectionServer {
           processingTime,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Bias analysis failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Bias analysis failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Bias analysis failed',
       })
     }
   }
@@ -197,11 +197,11 @@ class BiasDetectionServer {
           },
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Batch analysis failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Batch analysis failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Batch analysis failed',
       })
     }
   }
@@ -225,13 +225,13 @@ class BiasDetectionServer {
         success: true,
         data: dashboardData,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Dashboard data retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
           error instanceof Error
-            ? error.message
+            ? (error instanceof Error ? error.message : "Unknown error")
             : 'Dashboard data retrieval failed',
       })
     }
@@ -256,13 +256,13 @@ class BiasDetectionServer {
         success: true,
         data: result,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Session analysis retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
           error instanceof Error
-            ? error.message
+            ? (error instanceof Error ? error.message : "Unknown error")
             : 'Session analysis retrieval failed',
       })
     }
@@ -276,13 +276,13 @@ class BiasDetectionServer {
         success: true,
         data: stats,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Performance stats retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
           error instanceof Error
-            ? error.message
+            ? (error instanceof Error ? error.message : "Unknown error")
             : 'Performance stats retrieval failed',
       })
     }
@@ -366,7 +366,7 @@ class BiasDetectionServer {
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Request handling error:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
@@ -432,7 +432,7 @@ class BiasDetectionServer {
       // Dispose of the engine
       try {
         await this.engine.dispose()
-      } catch (error) {
+      } catch (error: unknown) {
         appLogger.error('Error disposing engine:', error)
       }
 

@@ -191,9 +191,9 @@ router.get('/callback', async (req: Request, res: Response) => {
       tokenType: tokens.token_type,
       expiresIn: tokens.expires_in,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : 'Authentication failed'
+      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Authentication failed'
     res.status(500).json({
       error: errorMessage,
       code: 'AUTH_ERROR',
@@ -336,9 +336,9 @@ router.post('/refresh', async (req: Request, res: Response) => {
       tokenType: tokens.token_type,
       expiresIn: tokens.expires_in,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : 'Token refresh failed'
+      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Token refresh failed'
     res.status(500).json({
       error: errorMessage,
       code: 'REFRESH_ERROR',

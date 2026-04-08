@@ -172,7 +172,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       errorUserId,
       'ai-crisis-detection',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         processingTime: Date.now() - startTime,
       },
       AuditEventStatus.FAILURE,

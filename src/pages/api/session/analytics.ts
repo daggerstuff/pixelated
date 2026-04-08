@@ -123,7 +123,7 @@ export const POST: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -250,7 +250,7 @@ export const GET: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

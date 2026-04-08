@@ -503,7 +503,7 @@ export class TrainingWebSocketServer {
         sessionId,
         defense: gestalt.defense_label_name,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Gestalt analysis failed during websocket broadcast', {
         sessionId,
         error,

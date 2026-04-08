@@ -86,7 +86,7 @@ export const GET: APIRoute = async (context) => {
   // Rate limiting
   try {
     await applyRateLimit(context, 'pixel-ws', { points: 1 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Rate limit exceeded', { error })
     return new Response('Too many connections', { status: 429 })
   }
@@ -154,14 +154,14 @@ export const GET: APIRoute = async (context) => {
         default:
           logger.warn('Unknown message type', { type: message.type })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error processing message', { error })
       sendMessage(socket, {
         type: 'error',
         sessionId: connectionData.sessionId,
         timestamp: Date.now(),
         data: {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         },
       })
     }
@@ -218,7 +218,7 @@ function parseMessage(data: string | ArrayBuffer): StreamMessage {
 function sendMessage(socket: WebSocket, message: StreamResponse) {
   try {
     socket.send(JSON.stringify(message))
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error sending message', { error })
   }
 }
@@ -384,7 +384,7 @@ async function processAudioChunk(
         },
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error processing audio chunk', { error })
 
     sendMessage(socket, {
@@ -420,7 +420,7 @@ async function analyzeText(socket: WebSocket, sessionId: string, text: string) {
         biasScore,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error analyzing text', { error })
 
     sendMessage(socket, {

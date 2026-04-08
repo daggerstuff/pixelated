@@ -186,7 +186,7 @@ export class Auth0UserService {
         token: tokenResponse.access_token,
         refreshToken: tokenResponse.refresh_token,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 sign in error:', error)
       throw new Error('Invalid credentials')
     }
@@ -233,7 +233,7 @@ export class Auth0UserService {
         appMetadata: auth0User.app_metadata,
         userMetadata: auth0User.user_metadata,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 create user error:', error)
       throw new Error('Failed to create user')
     }
@@ -265,7 +265,7 @@ export class Auth0UserService {
         appMetadata: auth0User.app_metadata,
         userMetadata: auth0User.user_metadata,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 get user error:', error)
       return null
     }
@@ -295,7 +295,7 @@ export class Auth0UserService {
         appMetadata: user.app_metadata,
         userMetadata: user.user_metadata,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 get all users error:', error)
       return []
     }
@@ -335,7 +335,7 @@ export class Auth0UserService {
         appMetadata: auth0User.app_metadata,
         userMetadata: auth0User.user_metadata,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 find user error:', error)
       return null
     }
@@ -413,7 +413,7 @@ export class Auth0UserService {
         appMetadata: auth0User.app_metadata,
         userMetadata: auth0User.user_metadata,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 update user error:', error)
       return null
     }
@@ -434,7 +434,7 @@ export class Auth0UserService {
         userId,
         { password: newPassword },
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 change password error:', error)
       throw new Error('Failed to change password')
     }
@@ -454,7 +454,7 @@ export class Auth0UserService {
       await auth0Authentication.oauth.revokeRefreshToken({
         token: refreshToken,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 sign out error:', error)
       // Don't throw error for sign out - it's not critical
     }
@@ -506,7 +506,7 @@ export class Auth0UserService {
         },
         accessToken: tokenResponse.access_token,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 refresh session error:', error)
       throw new Error('Failed to refresh session')
     }
@@ -535,7 +535,7 @@ export class Auth0UserService {
         email: decodedToken.email,
         role: this.extractRoleFromUser(decodedToken),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 verify token error:', error)
       throw new Error('Invalid token')
     }
@@ -561,7 +561,7 @@ export class Auth0UserService {
       const ticket = ticketRes.data
 
       return ticket.ticket ?? null
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')
     }

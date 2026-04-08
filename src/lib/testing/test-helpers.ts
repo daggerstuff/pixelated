@@ -299,7 +299,7 @@ export class PerformanceTestUtils {
           try {
             await testFn()
             return { success: true }
-          } catch (error) {
+          } catch (error: unknown) {
             return { success: false, error }
           }
         }),
@@ -418,7 +418,7 @@ export class SecurityTestUtils {
             )
           }
         }
-      } catch (error) {
+      } catch (error: unknown) {
         // Connection errors are expected for some payloads
       }
     }
@@ -469,7 +469,7 @@ export class IntegrationTestUtils {
           console.log(`${serviceName} is ready`)
           return
         }
-      } catch (error) {
+      } catch (error: unknown) {
         // Service not ready yet
       }
 

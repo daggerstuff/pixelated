@@ -58,11 +58,11 @@ class AuditPersistenceQueue {
         logger.error('CRITICAL: Audit Event Persistence Failed after all retries', {
           auditId: auditEvent.id,
           userId: auditEvent.userId,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         })
         emitVolatileFallback(
           auditEvent,
-          error instanceof Error ? error.message : String(error),
+          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         )
       })
       .finally(() => {
@@ -236,7 +236,7 @@ export class AuditLogger {
         const delay = Math.pow(2, attempt) * 1000 // Exponential backoff
         logger.warn(`Audit Log Persistence Attempt ${attempt} Failed. Retrying in ${delay}ms...`, {
           auditId: auditEvent.id,
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
         })
         
         await new Promise(resolve => setTimeout(resolve, delay))

@@ -80,7 +80,7 @@ export async function updatePhase6AuthenticationProgress(
 
     // For now, just return successfully to not block authentication flows
     return Promise.resolve()
-  } catch (error) {
+  } catch (error: unknown) {
     // Don't throw errors - Phase 6 integration is optional
     console.warn('[Phase6] Failed to update authentication progress:', error)
   }

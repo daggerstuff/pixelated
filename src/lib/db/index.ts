@@ -106,7 +106,7 @@ export async function transaction<T>(
     const result = await callback(client)
     await client.query('COMMIT')
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query('ROLLBACK')
     throw error
   } finally {
@@ -211,7 +211,7 @@ export class DatabaseMigration {
       try {
         await query(sql)
         console.log(`✅ Migration ${name} completed`)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`❌ Migration ${name} failed:`, error)
         throw error
       }

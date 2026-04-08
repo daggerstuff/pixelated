@@ -34,7 +34,7 @@ export async function logAuditEvent(data: AuditData): Promise<void> {
        VALUES ($1, $2, $3, $4, $5, $6)`,
       [userId, action, resource, resourceId, JSON.stringify(changes), timestamp],
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Failed to log audit event:", error);
   }
 }

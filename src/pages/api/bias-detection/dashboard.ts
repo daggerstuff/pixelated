@@ -200,7 +200,7 @@ export const GET = async ({
       JSON.stringify({
         success: false,
         error: 'Dashboard Data Retrieval Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         processingTime,
       }),
       {

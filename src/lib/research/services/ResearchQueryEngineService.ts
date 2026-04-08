@@ -158,7 +158,7 @@ export class ResearchQueryEngineService {
       }
 
       return query
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error translating natural language query:', error)
       throw new Error(
         `Query translation failed: ${error?.message ?? 'Unknown error'}`,
@@ -273,10 +273,10 @@ export class ResearchQueryEngineService {
       this.updatePerformanceMetrics(executionTime, false)
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error executing research query:', error)
       throw new Error(
-        `Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Query execution failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
         { cause: error },
       )
     }

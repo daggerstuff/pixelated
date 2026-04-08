@@ -73,7 +73,7 @@ export function useOfflineManager({
         }
 
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      } catch (error) {
+      } catch (error: unknown) {
         if (!networkState.isOnline) {
           // Queue the request for later
           const priority = isCriticalPath ? 'critical' : 'normal'

@@ -93,7 +93,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('system_initialized')
       logger.info('Edge Threat Detection System initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Edge Threat Detection System:', {
         error,
       })
@@ -107,7 +107,7 @@ export class EdgeThreatDetectionSystemCore
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for edge detection')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -119,7 +119,7 @@ export class EdgeThreatDetectionSystemCore
         await this.loadModel(modelConfig)
       }
       logger.info(`Loaded ${this.config.aiModels.length} AI models`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load AI models:', { error })
       throw error
     }
@@ -153,7 +153,7 @@ export class EdgeThreatDetectionSystemCore
       })
 
       logger.info(`AI model loaded successfully: ${modelConfig.modelId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to load AI model ${modelConfig.modelId}:`, { error })
       throw error
     }
@@ -194,7 +194,7 @@ export class EdgeThreatDetectionSystemCore
       })
 
       return model
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to build TensorFlow model ${modelConfig.modelId}:`, {
         error,
       })
@@ -413,7 +413,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       logger.info(`Initialized ${this.nodeStatus.size} edge nodes`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize edge nodes:', { error })
       throw error
     }
@@ -445,7 +445,7 @@ export class EdgeThreatDetectionSystemCore
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Model monitoring error:', { error })
     }
   }
@@ -514,7 +514,7 @@ export class EdgeThreatDetectionSystemCore
       })
 
       return detectionResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to detect threat at edge:', {
         error,
         threatId: threatData.threatId,
@@ -607,7 +607,7 @@ export class EdgeThreatDetectionSystemCore
       prediction.dispose()
 
       return anomalyScore[0]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Anomaly detection failed:', { error })
       return this.fallbackAnomalyDetection(features)
     }
@@ -657,7 +657,7 @@ export class EdgeThreatDetectionSystemCore
         confidence: probabilities[maxIndex],
         probabilities: Array.from(probabilities),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat classification failed:', { error })
       return this.fallbackClassification(features)
     }
@@ -711,7 +711,7 @@ export class EdgeThreatDetectionSystemCore
       prediction.dispose()
 
       return threatProbability[0]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat prediction failed:', { error })
       return this.fallbackPrediction(features)
     }
@@ -777,7 +777,7 @@ export class EdgeThreatDetectionSystemCore
           combined: severityScore,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to combine detection results:', { error })
       throw error
     }
@@ -944,7 +944,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('model_deployed', { modelId: modelConfig.modelId, nodeIds })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to deploy AI model:', {
         error,
         modelId: modelConfig.modelId,
@@ -976,7 +976,7 @@ export class EdgeThreatDetectionSystemCore
       status.lastHeartbeat = new Date()
 
       logger.info(`Model ${modelId} deployed to node ${nodeId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to deploy model to node ${nodeId}:`, { error })
       throw error
     }
@@ -1003,7 +1003,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('thresholds_updated', { thresholds })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update detection thresholds:', { error })
       return false
     }
@@ -1082,7 +1082,7 @@ export class EdgeThreatDetectionSystemCore
         activeNodes,
         totalNodes,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1095,7 +1095,7 @@ export class EdgeThreatDetectionSystemCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1123,7 +1123,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('system_shutdown')
       logger.info('Edge Threat Detection System shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

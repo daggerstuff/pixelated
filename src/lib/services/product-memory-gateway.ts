@@ -189,10 +189,10 @@ export class ProductMemoryGateway {
   private async withGatewayError<T>(callback: () => Promise<T>): Promise<T> {
     try {
       return await callback()
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof InternalMemoryServiceError) {
         throw new ProductMemoryGatewayError(
-          error.message,
+          (error instanceof Error ? error.message : "Unknown error"),
           error.status,
           error.details,
         )

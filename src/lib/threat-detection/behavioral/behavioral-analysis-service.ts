@@ -48,7 +48,7 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
       this.isInitialized = true
       this.emit('service_initialized')
       logger.info('Behavioral analysis service ready')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize behavioral analysis service', { error })
       throw error
     }
@@ -127,7 +127,7 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
       prediction.dispose()
 
       return Array.from(results)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('ML anomaly detection failed', { error })
       return []
     }

@@ -168,7 +168,7 @@ export class AdvancedCacheStrategy {
           const compressed = Buffer.from(cachedData.substring(3), 'base64')
           const decompressed = await ungzipAsync(compressed)
           cachedData = JSON.parse(decompressed.toString())
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('Failed to decompress cached data', { key, error })
           return null
         }
@@ -180,7 +180,7 @@ export class AdvancedCacheStrategy {
       })
 
       return cachedData as T
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache get operation failed', { key, error })
       return options.fallback ? await options.fallback() : null
     }
@@ -222,7 +222,7 @@ export class AdvancedCacheStrategy {
               (compressed.length / jsonString.length) * 100,
             ),
           })
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('Failed to compress data for caching', { key, error })
           dataToCache = value
         }
@@ -243,7 +243,7 @@ export class AdvancedCacheStrategy {
         }
         await this.invalidation.set(key, value, rule)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache set operation failed', { key, error })
     }
   }
@@ -441,7 +441,7 @@ export class AdvancedCacheStrategy {
       try {
         await this.invalidation.invalidateTag(tag)
         logger.info('Cache invalidated by tag', { tag })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to invalidate cache by tag', { tag, error })
       }
     }
@@ -483,7 +483,7 @@ export class AdvancedCacheStrategy {
     try {
       await this.cache.clear()
       logger.warn('All cache cleared')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to clear all cache', { error })
     }
   }
@@ -518,7 +518,7 @@ export class AdvancedCacheStrategy {
 
       // This would need to be implemented with actual database access
       logger.info('Cache warmup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache warmup failed', { error })
     }
   }
@@ -562,7 +562,7 @@ export class CacheWarmingService {
     try {
       await Promise.all(warmupTasks)
       logger.info('Cache warming completed successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache warming failed', { error })
     }
   }

@@ -25,7 +25,7 @@ export const GET: APIRoute = async ({ params, url, request }) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(JSON.stringify({ error: "Failed to replay artifact history" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

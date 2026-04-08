@@ -128,7 +128,7 @@ async function initializeDatabases() {
     console.log('🔄 Connecting to Redis...')
     redisConnection = await connectRedis()
     console.log('✅ Redis connected')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Database connection failed:', error)
     process.exit(1)
   }
@@ -155,7 +155,7 @@ async function startServer() {
 ╚═══════════════════════════════════════════════════════════╝
       `)
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to start server:', error)
     process.exit(1)
   }

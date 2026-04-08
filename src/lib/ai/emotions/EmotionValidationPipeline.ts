@@ -151,7 +151,7 @@ class EmotionValidationPipeline {
     } catch (error: unknown) {
       this.logger.error('Failed to initialize pipeline', { error })
       throw new Error(
-        `Pipeline initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Pipeline initialization failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
         { cause: error },
       )
     }

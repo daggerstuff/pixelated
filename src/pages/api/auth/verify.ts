@@ -125,7 +125,7 @@ export const GET = async ({
 
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'verify_token_error',
-      error: error.message,
+      error: (error instanceof Error ? error.message : "Unknown error"),
       clientInfo,
     })
     return new Response(

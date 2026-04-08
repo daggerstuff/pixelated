@@ -120,7 +120,7 @@ export const GET = async ({
 
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
-      error: detectAndRedactPHI(error.message),
+      error: detectAndRedactPHI((error instanceof Error ? error.message : "Unknown error")),
       clientInfo,
     })
 
@@ -258,7 +258,7 @@ export const PUT = async ({
       action: 'update_profile',
       success: false,
       error: detectAndRedactPHI(
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       ),
       clientInfo,
     })

@@ -146,7 +146,7 @@ export class CDNEdgeOptimizer {
       })
 
       return optimizedUrl
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to optimize asset URL', { assetPath, error })
       return assetPath // Fallback to original
     }
@@ -232,16 +232,16 @@ export class CDNEdgeOptimizer {
         url: optimizedUrl,
         metadata,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Image optimization failed', {
         imagePath,
         options,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Optimization failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Optimization failed',
       }
     }
   }
@@ -382,10 +382,10 @@ export class CDNEdgeOptimizer {
       // Real implementation would call CDN API to purge cache
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('CDN cache invalidation failed', {
         patterns,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
 
       return false
@@ -411,7 +411,7 @@ export class CDNEdgeOptimizer {
         requestsServed: 0, // Total requests served by CDN
         avgResponseTime: 50, // Average response time in ms
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get CDN metrics', { error })
       return {
         cacheHitRate: 0,
@@ -689,7 +689,7 @@ export async function monitorCDNPerformance(): Promise<{
       metrics,
       recommendations,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('CDN performance monitoring failed', { error })
 
     return {

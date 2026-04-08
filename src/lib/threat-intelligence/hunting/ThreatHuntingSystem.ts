@@ -97,7 +97,7 @@ export class ThreatHuntingSystemCore
 
       this.emit('hunting_system_initialized')
       logger.info('Threat Hunting System initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Hunting System:', { error })
       this.emit('initialization_error', { error })
       throw error
@@ -109,7 +109,7 @@ export class ThreatHuntingSystemCore
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat hunting')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -123,7 +123,7 @@ export class ThreatHuntingSystemCore
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_hunting')
       logger.info('MongoDB connection established for threat hunting')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -139,7 +139,7 @@ export class ThreatHuntingSystemCore
       }
 
       logger.info(`Loaded ${patterns.length} hunt patterns from database`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load hunt patterns:', { error })
     }
   }
@@ -149,7 +149,7 @@ export class ThreatHuntingSystemCore
     setInterval(async () => {
       try {
         await this.checkScheduledHunts()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Scheduled hunt check error:', { error })
       }
     }, 60000)
@@ -160,7 +160,7 @@ export class ThreatHuntingSystemCore
     setInterval(async () => {
       try {
         await this.collectMetrics()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Metrics collection error:', { error })
       }
     }, 600000)
@@ -240,7 +240,7 @@ export class ThreatHuntingSystemCore
       })
 
       return huntResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to execute threat hunt:', {
         error,
         huntId: query.huntId,
@@ -292,7 +292,7 @@ export class ThreatHuntingSystemCore
       }
 
       return validatedQuery
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Hunt query validation failed:', { error })
       throw error
     }
@@ -312,7 +312,7 @@ export class ThreatHuntingSystemCore
       }
 
       return pattern
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to select hunt pattern:', { error })
       throw error
     }
@@ -366,7 +366,7 @@ export class ThreatHuntingSystemCore
       this.activeHunts.set(execution.executionId, execution)
 
       return execution
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to prepare hunt execution:', { error })
       throw error
     }
@@ -455,7 +455,7 @@ export class ThreatHuntingSystemCore
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to execute hunt by pattern:', { error })
       throw error
     }
@@ -489,7 +489,7 @@ export class ThreatHuntingSystemCore
       results.push(...exfilResults)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Network hunt execution failed:', { error })
       throw error
     }
@@ -523,7 +523,7 @@ export class ThreatHuntingSystemCore
       results.push(...persistenceResults)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Endpoint hunt execution failed:', { error })
       throw error
     }
@@ -557,7 +557,7 @@ export class ThreatHuntingSystemCore
       results.push(...compromiseResults)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('User behavior hunt execution failed:', { error })
       throw error
     }
@@ -592,7 +592,7 @@ export class ThreatHuntingSystemCore
       results.push(...c2Results)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Malware hunt execution failed:', { error })
       throw error
     }
@@ -626,7 +626,7 @@ export class ThreatHuntingSystemCore
       results.push(...remoteResults)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Lateral movement hunt execution failed:', { error })
       throw error
     }
@@ -645,7 +645,7 @@ export class ThreatHuntingSystemCore
       const results = await this.executeCustomQuery(execution, pattern.query)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Custom hunt execution failed:', { error })
       throw error
     }
@@ -664,7 +664,7 @@ export class ThreatHuntingSystemCore
       const results = await this.executeBasicSecurityAnalysis(execution)
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Default hunt execution failed:', { error })
       throw error
     }
@@ -707,7 +707,7 @@ export class ThreatHuntingSystemCore
         data: conn,
         timestamp: conn.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Suspicious connections hunt failed:', { error })
       return []
     }
@@ -743,7 +743,7 @@ export class ThreatHuntingSystemCore
         data: query,
         timestamp: query.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unusual DNS queries hunt failed:', { error })
       return []
     }
@@ -798,7 +798,7 @@ export class ThreatHuntingSystemCore
         data: scan,
         timestamp: new Date(scan._id.hour),
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Port scanning hunt failed:', { error })
       return []
     }
@@ -830,7 +830,7 @@ export class ThreatHuntingSystemCore
         data: exfil,
         timestamp: exfil.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Data exfiltration hunt failed:', { error })
       return []
     }
@@ -869,7 +869,7 @@ export class ThreatHuntingSystemCore
         data: proc,
         timestamp: proc.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Suspicious processes hunt failed:', { error })
       return []
     }
@@ -917,7 +917,7 @@ export class ThreatHuntingSystemCore
         data: file,
         timestamp: file.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('File system anomalies hunt failed:', { error })
       return []
     }
@@ -956,7 +956,7 @@ export class ThreatHuntingSystemCore
         data: reg,
         timestamp: reg.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Registry modifications hunt failed:', { error })
       return []
     }
@@ -990,7 +990,7 @@ export class ThreatHuntingSystemCore
         data: persist,
         timestamp: persist.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Persistence mechanisms hunt failed:', { error })
       return []
     }
@@ -1045,7 +1045,7 @@ export class ThreatHuntingSystemCore
         data: login,
         timestamp: new Date(),
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unusual login patterns hunt failed:', { error })
       return []
     }
@@ -1081,7 +1081,7 @@ export class ThreatHuntingSystemCore
         data: escalation,
         timestamp: escalation.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Privilege escalation hunt failed:', { error })
       return []
     }
@@ -1132,7 +1132,7 @@ export class ThreatHuntingSystemCore
         data: access,
         timestamp: new Date(),
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unusual access patterns hunt failed:', { error })
       return []
     }
@@ -1185,7 +1185,7 @@ export class ThreatHuntingSystemCore
         data: account,
         timestamp: new Date(),
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Account compromise hunt failed:', { error })
       return []
     }
@@ -1223,7 +1223,7 @@ export class ThreatHuntingSystemCore
         data: file,
         timestamp: file.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Known malware signatures hunt failed:', { error })
       return []
     }
@@ -1260,7 +1260,7 @@ export class ThreatHuntingSystemCore
         data: file,
         timestamp: file.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Suspicious file hashes hunt failed:', { error })
       return []
     }
@@ -1302,7 +1302,7 @@ export class ThreatHuntingSystemCore
         data: indicator,
         timestamp: indicator.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Malware behavioral indicators hunt failed:', { error })
       return []
     }
@@ -1355,7 +1355,7 @@ export class ThreatHuntingSystemCore
         data: comm,
         timestamp: new Date(),
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('C2 communications hunt failed:', { error })
       return []
     }
@@ -1391,7 +1391,7 @@ export class ThreatHuntingSystemCore
         data: dump,
         timestamp: dump.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Credential dumping hunt failed:', { error })
       return []
     }
@@ -1450,7 +1450,7 @@ export class ThreatHuntingSystemCore
         data: enumeration,
         timestamp: new Date(enumeration._id.hour),
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Network enumeration hunt failed:', { error })
       return []
     }
@@ -1489,7 +1489,7 @@ export class ThreatHuntingSystemCore
         data: exploit,
         timestamp: exploit.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Service exploitation hunt failed:', { error })
       return []
     }
@@ -1531,7 +1531,7 @@ export class ThreatHuntingSystemCore
         data: tool,
         timestamp: tool.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Remote access tools hunt failed:', { error })
       return []
     }
@@ -1562,7 +1562,7 @@ export class ThreatHuntingSystemCore
       ]
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Custom query execution failed:', { error })
       return []
     }
@@ -1594,7 +1594,7 @@ export class ThreatHuntingSystemCore
         data: event,
         timestamp: event.timestamp,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Basic security analysis failed:', { error })
       return []
     }
@@ -1629,7 +1629,7 @@ export class ThreatHuntingSystemCore
       )
 
       return patternAnalyzedResults
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Hunt result analysis failed:', { error })
       return results
     }
@@ -1660,7 +1660,7 @@ export class ThreatHuntingSystemCore
       }
 
       return analyzedResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Individual result analysis failed:', { error })
       return result
     }
@@ -1686,7 +1686,7 @@ export class ThreatHuntingSystemCore
         default:
           return results
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Pattern analysis failed:', { error })
       return results
     }
@@ -1710,7 +1710,7 @@ export class ThreatHuntingSystemCore
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Network results analysis failed:', { error })
       return results
     }
@@ -1747,7 +1747,7 @@ export class ThreatHuntingSystemCore
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Endpoint results analysis failed:', { error })
       return results
     }
@@ -1776,7 +1776,7 @@ export class ThreatHuntingSystemCore
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('User behavior results analysis failed:', { error })
       return results
     }
@@ -1815,7 +1815,7 @@ export class ThreatHuntingSystemCore
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Malware results analysis failed:', { error })
       return results
     }
@@ -1856,7 +1856,7 @@ export class ThreatHuntingSystemCore
       }
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Lateral movement results analysis failed:', { error })
       return results
     }
@@ -1919,7 +1919,7 @@ export class ThreatHuntingSystemCore
       )
 
       return uniqueThreats
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat intelligence generation failed:', { error })
       return []
     }
@@ -1963,7 +1963,7 @@ export class ThreatHuntingSystemCore
       }
 
       return threat
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create threat from result:', { error })
       return null
     }
@@ -2039,7 +2039,7 @@ export class ThreatHuntingSystemCore
       }
 
       return indicators
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to extract indicators from result:', { error })
       return []
     }
@@ -2138,7 +2138,7 @@ export class ThreatHuntingSystemCore
         resultCount: results.length,
         threatCount: threats.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store hunt results:', { error })
       throw error
     }
@@ -2150,7 +2150,7 @@ export class ThreatHuntingSystemCore
       await executionsCollection.insertOne(execution)
 
       this.activeHunts.set(execution.executionId, execution)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store hunt execution:', { error })
       throw error
     }
@@ -2165,7 +2165,7 @@ export class ThreatHuntingSystemCore
       )
 
       this.activeHunts.set(execution.executionId, execution)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update hunt execution:', { error })
       throw error
     }
@@ -2192,7 +2192,7 @@ export class ThreatHuntingSystemCore
           await this.sendStandardNotification(notification)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send threat notifications:', { error })
     }
   }
@@ -2219,7 +2219,7 @@ export class ThreatHuntingSystemCore
       logger.info('Threats integrated with global intelligence', {
         threatCount: threats.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to integrate with global intelligence:', { error })
     }
   }
@@ -2263,7 +2263,7 @@ export class ThreatHuntingSystemCore
       const timeout = setInterval(async () => {
         try {
           await this.executeScheduledHunt(schedule)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Scheduled hunt execution failed:', {
             error,
             scheduleId: schedule.scheduleId,
@@ -2276,7 +2276,7 @@ export class ThreatHuntingSystemCore
       this.emit('hunt_scheduled', { scheduleId: schedule.scheduleId })
 
       return schedule.scheduleId
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to schedule hunt:', { error })
       throw error
     }
@@ -2320,7 +2320,7 @@ export class ThreatHuntingSystemCore
         schedule,
         { upsert: true },
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store hunt schedule:', { error })
       throw error
     }
@@ -2342,7 +2342,7 @@ export class ThreatHuntingSystemCore
       }
 
       await this.executeHunt(huntQuery)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Scheduled hunt execution failed:', {
         error,
         scheduleId: schedule.scheduleId,
@@ -2384,7 +2384,7 @@ export class ThreatHuntingSystemCore
       })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cancel hunt:', { error, huntId })
       return false
     }
@@ -2403,7 +2403,7 @@ export class ThreatHuntingSystemCore
         .toArray()
 
       return results
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get hunt results:', { error, huntId })
       throw error
     }
@@ -2418,7 +2418,7 @@ export class ThreatHuntingSystemCore
         .toArray()
 
       return activeHunts
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get active hunts:', { error })
       throw error
     }
@@ -2444,7 +2444,7 @@ export class ThreatHuntingSystemCore
 
       this.emit('pattern_updated', { patternId: pattern.patternId })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update hunt pattern:', { error })
       return false
     }
@@ -2496,7 +2496,7 @@ export class ThreatHuntingSystemCore
         huntByType: huntsByType,
         huntBySeverity: huntsBySeverity,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get hunt metrics:', { error })
       return {
         totalHunts: 0,
@@ -2536,7 +2536,7 @@ export class ThreatHuntingSystemCore
       }
 
       return totalTime / completedExecutions.length
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate average execution time:', { error })
       return 0
     }
@@ -2553,7 +2553,7 @@ export class ThreatHuntingSystemCore
       })
 
       return falsePositives
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate false positives:', { error })
       return 0
     }
@@ -2575,7 +2575,7 @@ export class ThreatHuntingSystemCore
       }
 
       return huntsByType
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get hunts by type:', { error })
       return {}
     }
@@ -2597,7 +2597,7 @@ export class ThreatHuntingSystemCore
       }
 
       return huntsBySeverity
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get hunts by severity:', { error })
       return {}
     }
@@ -2616,7 +2616,7 @@ export class ThreatHuntingSystemCore
           await this.executeScheduledHunt(schedule)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Scheduled hunt check failed:', { error })
     }
   }
@@ -2638,7 +2638,7 @@ export class ThreatHuntingSystemCore
       const timeSinceLastExecution = now.getTime() - lastExecution.getTime()
 
       return timeSinceLastExecution >= interval
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to check if scheduled hunt should execute:', {
         error,
       })
@@ -2651,7 +2651,7 @@ export class ThreatHuntingSystemCore
       const metrics = await this.getHuntMetrics()
 
       this.emit('metrics_collected', metrics)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Metrics collection failed:', { error })
     }
   }
@@ -2694,7 +2694,7 @@ export class ThreatHuntingSystemCore
         activeHunts: this.activeHunts.size,
         successRate,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -2707,7 +2707,7 @@ export class ThreatHuntingSystemCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -2717,7 +2717,7 @@ export class ThreatHuntingSystemCore
     try {
       await this.db.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MongoDB health check failed:', { error })
       return false
     }
@@ -2748,7 +2748,7 @@ export class ThreatHuntingSystemCore
 
       this.emit('hunting_system_shutdown')
       logger.info('Threat Hunting System shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

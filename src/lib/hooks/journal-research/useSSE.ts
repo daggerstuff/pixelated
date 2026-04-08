@@ -46,7 +46,7 @@ const getAuthToken = () => {
       return null
     }
     return token.startsWith('Bearer ') ? token.slice(7) : token
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Failed to read auth token for SSE connection', error)
     return null
   }
@@ -95,7 +95,7 @@ export const useJournalResearchSSE = ({
         ) {
           onMessage?.(data as WebSocketMessage)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Failed to parse SSE message', error)
         onError?.(error as Error)
       }
@@ -169,7 +169,7 @@ export const useJournalResearchSSE = ({
           onError?.(error)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setConnectionState('error')
       onError?.(error as Error)
     }

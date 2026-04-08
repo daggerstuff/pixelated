@@ -26,7 +26,7 @@ export class BehavioralAnalysisRepository {
       
       // Cache in Redis
       await this.redis.set(`profile:${userId}`, JSON.stringify(profile), 'EX', 14400);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store profile', { error, userId })
       throw error
     }
@@ -46,7 +46,7 @@ export class BehavioralAnalysisRepository {
       }
 
       return profile
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get profile', { error, userId })
       return null
     }
@@ -56,7 +56,7 @@ export class BehavioralAnalysisRepository {
     try {
       const db = this.mongoClient.db('behavioral_analysis')
       await db.collection('events').insertMany(events)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store events', { error, count: events.length })
       throw error
     }
@@ -79,7 +79,7 @@ export class BehavioralAnalysisRepository {
         .sort({ timestamp: -1 })
         .limit(limit)
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent events', { error, userId })
       return []
     }

@@ -160,7 +160,7 @@ export class PixelatedEmpathyAgent {
       } catch (error: unknown) {
         span.setStatus({
           code: SpanStatusCode.ERROR,
-          message: error instanceof Error ? error.message : String(error),
+          message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         })
         console.error('Azure AI Agent error:', error)
         return {
@@ -239,7 +239,7 @@ export class PixelatedEmpathyAgent {
     } catch (error: unknown) {
       span.setStatus({
         code: SpanStatusCode.ERROR,
-        message: error instanceof Error ? error.message : String(error),
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
       console.error('Stream error:', error)
       yield { error: error instanceof Error ? String(error) : 'Stream error' }

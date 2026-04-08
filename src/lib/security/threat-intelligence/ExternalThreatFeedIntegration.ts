@@ -672,8 +672,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       this.emit('feed:added', { feed_id: feedId })
 
       return feedId
-    } catch (error) {
-      logger.error('Failed to add threat feed', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to add threat feed', { error: (error instanceof Error ? error.message : "Unknown error") })
       throw error
     }
   }
@@ -1115,7 +1115,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         relationships: [],
         raw_data: (stixObject as Record<string, unknown>) || {},
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to convert STIX to indicator', {
         error: normalizeError(error).message,
       })
@@ -1247,7 +1247,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         relationships: [],
         raw_data: { attribute, event },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to convert MISP to indicator', {
         error: normalizeError(error).message,
       })
@@ -1367,7 +1367,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         relationships: [],
         raw_data: (data as Record<string, unknown>) ?? {},
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to convert JSON to indicator', {
         error: normalizeError(error).message,
       })

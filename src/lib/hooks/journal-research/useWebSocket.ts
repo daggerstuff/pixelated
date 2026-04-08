@@ -14,7 +14,7 @@ const getAuthToken = () => {
       return null
     }
     return token.startsWith('Bearer ') ? token.slice(7) : token
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Failed to read auth token for WebSocket connection', error)
     return null
   }
@@ -137,7 +137,7 @@ export const useJournalResearchWebSocket = ({
         ) {
           onMessage?.(data as WebSocketMessage)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Failed to parse WebSocket message', error)
         onError?.(error as Error)
       }
@@ -206,7 +206,7 @@ export const useJournalResearchWebSocket = ({
           onError?.(error)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setConnectionState('error')
       onError?.(error as Error)
     }

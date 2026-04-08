@@ -18,7 +18,7 @@ async function incrementRedisCounter(key: string, windowSeconds: number) {
     tx.expire(key, windowSeconds)
     const [count] = (await tx.exec()) as any[]
     return parseInt(count[1] as string, 10)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Rate limiter Redis error:', error)
     redisAvailable = false
     return null

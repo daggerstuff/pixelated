@@ -203,9 +203,9 @@ export class ConfigurationManager extends EventEmitter {
         environments: Object.keys(this.config.environments),
         regions: this.config.deployment.regions.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Configuration Manager', { error })
-      throw new Error(`Initialization failed: ${error.message}`, {
+      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
         cause: error,
       })
     }
@@ -303,7 +303,7 @@ export class ConfigurationManager extends EventEmitter {
 
       // Load secrets from environment variables
       await this.loadSecretsFromEnvironment()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load environment configuration', { error })
       throw error
     }
@@ -442,7 +442,7 @@ export class ConfigurationManager extends EventEmitter {
       }
 
       return envOverrides[environment] || null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load environment overrides', { error })
       return null
     }
@@ -545,7 +545,7 @@ export class ConfigurationManager extends EventEmitter {
       }
 
       logger.info('Secrets loaded from environment variables')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load secrets from environment', { error })
       throw error
     }
@@ -586,7 +586,7 @@ export class ConfigurationManager extends EventEmitter {
           .filter(([, value]) => value)
           .map(([key]) => key),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize feature flags', { error })
       throw error
     }
@@ -607,7 +607,7 @@ export class ConfigurationManager extends EventEmitter {
       this.setupFeatureFlagWatchers()
 
       logger.info('Configuration watchers setup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to setup configuration watchers', { error })
       throw error
     }
@@ -662,7 +662,7 @@ export class ConfigurationManager extends EventEmitter {
         logger.info('Configuration updates detected')
         await this.reloadConfiguration()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking for configuration updates', { error })
     }
   }
@@ -695,7 +695,7 @@ export class ConfigurationManager extends EventEmitter {
       if (hasChanges) {
         await this.reloadConfiguration()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking for environment changes', { error })
     }
   }
@@ -713,7 +713,7 @@ export class ConfigurationManager extends EventEmitter {
         logger.info('Feature flag changes detected')
         await this.reloadFeatureFlags()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking for feature flag changes', { error })
     }
   }
@@ -784,7 +784,7 @@ export class ConfigurationManager extends EventEmitter {
 
       logger.info(`Feature flag updated: ${flag} = ${enabled}`)
       this.emit('feature-flag-updated', { flag, enabled })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update feature flag', { error, flag, enabled })
       throw error
     }
@@ -832,7 +832,7 @@ export class ConfigurationManager extends EventEmitter {
 
       logger.info('Configuration updated successfully')
       this.emit('configuration-updated', { updates: Object.keys(updates) })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update configuration', { error })
       throw error
     }
@@ -902,7 +902,7 @@ export class ConfigurationManager extends EventEmitter {
           components: affectedComponents,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reinitialize affected components', { error })
       throw error
     }
@@ -931,7 +931,7 @@ export class ConfigurationManager extends EventEmitter {
         logger.info('Configuration reloaded successfully')
         this.emit('configuration-reloaded')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reload configuration', { error })
       throw error
     }
@@ -968,7 +968,7 @@ export class ConfigurationManager extends EventEmitter {
 
       logger.info('Feature flags reloaded successfully')
       this.emit('feature-flags-reloaded')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reload feature flags', { error })
       throw error
     }
@@ -1086,7 +1086,7 @@ export class ConfigurationManager extends EventEmitter {
 
       this.isInitialized = false
       logger.info('Configuration Manager cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Configuration Manager cleanup failed', { error })
       throw error
     }

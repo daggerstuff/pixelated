@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ url, redirect }) => {
     })
 
     return redirect(authorizationUrl)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to generate authorization URL:', error)
     return new Response('Internal Server Error', { status: 500 })
   }

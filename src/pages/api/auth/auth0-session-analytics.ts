@@ -180,7 +180,7 @@ export const POST: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error saving session analytics:', error)
 
     // Create audit log for the error
@@ -190,7 +190,7 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'session-analytics',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -366,7 +366,7 @@ export const GET: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching session analytics:', error)
 
     // Create audit log for the error
@@ -376,7 +376,7 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'session-analytics',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )

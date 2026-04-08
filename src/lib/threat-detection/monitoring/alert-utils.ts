@@ -179,7 +179,7 @@ export async function getAlertStatistics(
       },
       avgResolutionTime: parseInt(stats.avgResolutionTime || '0', 10),
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting alert statistics:', error)
     return {
       total: 0,
@@ -336,7 +336,7 @@ export async function updateAlertStatistics(
 
     // Update source counters
     await redis.hIncrBy('alert:statistics', alert.source, 1)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating alert statistics:', error)
   }
 }

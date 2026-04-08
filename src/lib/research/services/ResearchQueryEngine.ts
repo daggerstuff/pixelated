@@ -143,9 +143,9 @@ export class ResearchQueryEngine {
         ...anonymizedResult,
         metadata: { ...anonymizedResult.metadata, ...metrics },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'
       logger.error('Query execution failed', {
         queryId: query.id,
         error: errorMessage,
@@ -200,9 +200,9 @@ export class ResearchQueryEngine {
       })
 
       return query
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'
       logger.error('Natural language parsing failed', { error: errorMessage })
       throw new Error(
         `Failed to parse natural language query: ${errorMessage}`,

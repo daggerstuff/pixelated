@@ -48,7 +48,7 @@ ${searchResults ? `Memories: ${searchResults.results.map((r) => r.memory).join('
     `.trim()
 
     return { context, profile, searchResults }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting Supermemory context:', error)
     return {
       context: '',
@@ -69,7 +69,7 @@ export async function storeConversation(
       content: `user: ${userMessage}\nassistant: ${assistantResponse}`,
       containerTag: userId,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error storing conversation:', error)
   }
 }

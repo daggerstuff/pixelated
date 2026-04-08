@@ -52,7 +52,7 @@ export async function saveSessionProgress(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session progress:', error)
     return false
   }
@@ -76,7 +76,7 @@ export async function saveProgressSnapshots(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving progress snapshots:', error)
     return false
   }
@@ -99,7 +99,7 @@ export async function saveSkillScores(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving skill scores:', error)
     return false
   }
@@ -126,7 +126,7 @@ export async function saveSessionAnalytics(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session analytics:', error)
     return false
   }
@@ -150,7 +150,7 @@ export async function saveSessionMilestones(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session milestones:', error)
     return false
   }
@@ -175,7 +175,7 @@ export async function getTherapistSessionData(
 
     const data = await response.json()
     return data.sessions || []
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching therapist session data:', error)
     return []
   }
@@ -200,7 +200,7 @@ export async function getTherapistSkillProgress(
 
     const data = await response.json()
     return data.skills || []
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching therapist skill data:', error)
     return []
   }
@@ -229,7 +229,7 @@ export async function saveSessionComparison(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session comparison:', error)
     return false
   }
@@ -268,7 +268,7 @@ export async function saveSessionProgressBatch(
     }
 
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session progress batch:', error)
     return false
   }

@@ -69,14 +69,14 @@ export const GET: APIRoute = async ({ request }) => {
         'Cache-Control': 'no-cache',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Rate limit status API error:', { error })
 
     return new Response(
       JSON.stringify({
         status: 'error',
         message: 'Failed to retrieve rate limiting status',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -300,14 +300,14 @@ export const POST: APIRoute = async ({ request }) => {
           { status: 400, headers: { 'Content-Type': 'application/json' } },
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Rate limit POST API error:', { error })
 
     return new Response(
       JSON.stringify({
         status: 'error',
         message: 'Failed to process monitor addition',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

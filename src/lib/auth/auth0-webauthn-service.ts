@@ -185,10 +185,10 @@ export class Auth0WebAuthnService {
       )
 
       return options
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to generate WebAuthn registration options:', error)
       throw new Error(
-        `Failed to generate WebAuthn registration options: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to generate WebAuthn registration options: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -233,18 +233,18 @@ export class Auth0WebAuthnService {
       )
 
       return newCredential
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to verify WebAuthn registration:', error)
 
       // Log failed registration
        logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, {
         userId: userId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to verify WebAuthn registration: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to verify WebAuthn registration: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -291,13 +291,13 @@ export class Auth0WebAuthnService {
       )
 
       return options
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         'Failed to generate WebAuthn authentication options:',
         error,
       )
       throw new Error(
-        `Failed to generate WebAuthn authentication options: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to generate WebAuthn authentication options: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -330,14 +330,14 @@ export class Auth0WebAuthnService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to verify WebAuthn authentication:', error)
 
       // Log failed authentication
        logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, {
         userId: userId,
         credentialId: credential.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -390,7 +390,7 @@ export class Auth0WebAuthnService {
       }
 
       return credentials
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user WebAuthn credentials:', error)
       return []
     }
@@ -420,13 +420,13 @@ export class Auth0WebAuthnService {
         userId,
         `webauthn_credential_deleted_${credentialId}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to delete WebAuthn credential ${credentialId} for user ${userId}:`,
         error,
       )
       throw new Error(
-        `Failed to delete WebAuthn credential: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to delete WebAuthn credential: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -456,13 +456,13 @@ export class Auth0WebAuthnService {
         userId,
         `webauthn_credential_renamed_${credentialId}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to rename WebAuthn credential ${credentialId} for user ${userId}:`,
         error,
       )
       throw new Error(
-        `Failed to rename WebAuthn credential: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to rename WebAuthn credential: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
       )
     }
   }
@@ -523,7 +523,7 @@ export class Auth0WebAuthnService {
       })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to validate WebAuthn credential response:', error)
 
       // Log validation failure
@@ -531,7 +531,7 @@ export class Auth0WebAuthnService {
         SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED,
         {
           userId: userId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )

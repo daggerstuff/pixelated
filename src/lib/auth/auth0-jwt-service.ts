@@ -254,17 +254,17 @@ export async function validateToken(
       expiresAt: payload.exp,
       payload: safePayload,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // Log validation failure
     logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, {
       userId: null,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       tokenType: tokenType,
     })
 
     return {
       valid: false,
-      error: error instanceof Error ? error.message : 'Token validation failed',
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Token validation failed',
     }
   }
 }
@@ -423,7 +423,7 @@ export function startTokenCleanupScheduler(): void {
         console.log(
           `[Auth0-JWT] Cleanup completed: ${result.cleanedTokens} tokens removed`,
         )
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('[Auth0-JWT] Cleanup failed:', error)
       }
     },
@@ -467,7 +467,7 @@ export async function measureTokenOperation<T>(
     }
 
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     const duration = performance.now() - start
     console.error(
       `Token operation ${operationName} failed after ${duration.toFixed(2)}ms:`,

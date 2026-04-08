@@ -128,7 +128,7 @@ export async function verifyAdmin(
 
     // Admin access verified - return null to continue
     return null;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Admin verification error:", error);
     return new Response(
       JSON.stringify({
@@ -687,7 +687,7 @@ export async function authenticateRequest(request: Request): Promise<{
           error: "MFA required",
         };
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn("Failed to perform adaptive MFA check:", error);
     }
   }

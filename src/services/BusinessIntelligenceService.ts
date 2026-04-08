@@ -99,7 +99,7 @@ export class BusinessIntelligenceService {
         marketCap: meta.marketCap,
         timestamp,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching market data:', error)
       // Return demo data if API fails
       return this.getDemoMarketData(symbol)
@@ -112,7 +112,7 @@ export class BusinessIntelligenceService {
       const symbols = this.getIndustrySymbols(industry)
       const promises = symbols.map((symbol) => this.getMarketData(symbol))
       return Promise.all(promises)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching market trends:', error)
       return this.getDemoMarketTrends(industry)
     }
@@ -143,7 +143,7 @@ export class BusinessIntelligenceService {
         weaknesses: row.weaknesses,
         lastUpdated: row.last_updated,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching competitor analysis:', error)
       return this.getDemoCompetitorAnalysis(industry)
     }
@@ -174,7 +174,7 @@ export class BusinessIntelligenceService {
         riskLevel: row.risk_level,
         estimatedROI: row.estimated_roi,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching market opportunities:', error)
       return this.getDemoMarketOpportunities(industry)
     }
@@ -212,7 +212,7 @@ export class BusinessIntelligenceService {
 
       // Return demo data if no real data
       return this.getDemoBusinessMetrics(userId, quarter, year)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching business metrics:', error)
       return this.getDemoBusinessMetrics(userId, quarter, year)
     }
@@ -268,7 +268,7 @@ export class BusinessIntelligenceService {
         isRead: row.is_read,
         actionUrl: row.action_url,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching business alerts:', error)
       return this.getDemoBusinessAlerts(userId, limit)
     }
@@ -318,7 +318,7 @@ export class BusinessIntelligenceService {
 
       // Process and return forecast data
       return this.generateMarketForecast(response.data, days)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating market forecast:', error)
       return this.getDemoMarketForecast(symbol, days)
     }
@@ -352,7 +352,7 @@ export class BusinessIntelligenceService {
         ],
         risks: ['Regulatory changes', 'Market volatility', 'Competition'],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating industry analysis:', error)
       return this.getDemoIndustryAnalysis(industry)
     }

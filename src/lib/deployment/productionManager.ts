@@ -209,7 +209,7 @@ class ProductionManager {
         status: 'success',
         duration,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Deployment to ${environment} failed:`, error)
 
       // Auto-rollback if enabled
@@ -486,12 +486,12 @@ class ProductionManager {
           error: 'Unacceptable response time',
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'fail',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }
     }
   }
@@ -584,13 +584,13 @@ class ProductionManager {
       console.log(`Rollback completed successfully in ${duration}ms`)
 
       return { success: true, duration }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Rollback failed:', error)
       return {
         success: false,
         duration: Date.now() - startTime,
         error:
-          error instanceof Error ? error.message : 'Unknown rollback error',
+          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown rollback error',
       }
     }
   }
@@ -674,7 +674,7 @@ class ProductionManager {
     setTimeout(async () => {
       try {
         await this.deploy(environment, artifact, strategy)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Scheduled deployment failed:', error)
       }
     }, scheduledTime.getTime() - Date.now())

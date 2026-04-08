@@ -91,12 +91,12 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Threat investigation failed:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to start investigation',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -174,12 +174,12 @@ export const GET: APIRoute = async ({ request, url }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get investigation result failed:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to get investigation result',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

@@ -32,7 +32,7 @@ export class UserManagementService extends BaseService {
         [id],
       )
       return result.rows[0] || null
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'getUser')
     }
   }

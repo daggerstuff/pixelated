@@ -173,7 +173,7 @@ export class InternalMemoryServiceClient {
         expectedStatus: 200,
         query: params,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (
         error instanceof InternalMemoryServiceError &&
         error.status === 404

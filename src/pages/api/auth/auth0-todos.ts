@@ -75,7 +75,7 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-todos',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -171,7 +171,7 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-todos',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )

@@ -45,9 +45,9 @@ export async function authMiddleware(
     }
 
     next()
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : 'Authentication failed'
+      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Authentication failed'
     res.status(401).json({
       error: errorMessage,
       code: 'AUTH_ERROR',

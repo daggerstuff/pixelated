@@ -25,7 +25,7 @@ export class RealTimeAnalyzer {
         sessionConsistency: consistency,
         goals: sessionContext.patientProfile.therapeuticGoals || [],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Progress analysis failed:', error)
       throw new Error(`Failed to analyze progress: ${error}`)
     }

@@ -188,7 +188,7 @@ export class ModelServingServer extends EventEmitter {
       await this.modelRegistry.registerModel(modelConfig)
 
       this.emit('model_loaded', { modelId: modelConfig.modelId })
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('model_load_error', { modelId: modelConfig.modelId, error })
       throw error
     }
@@ -248,7 +248,7 @@ export class ModelServingServer extends EventEmitter {
 
       this.emit('prediction_made', prediction)
       return prediction
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('prediction_error', { predictionId, modelId, error })
       throw error
     }
@@ -287,7 +287,7 @@ export class ModelServingServer extends EventEmitter {
 
       this.emit('ensemble_prediction_made', ensemblePrediction)
       return ensemblePrediction
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('ensemble_prediction_error', { predictionId, modelIds, error })
       throw error
     }

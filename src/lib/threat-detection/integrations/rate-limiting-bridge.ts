@@ -132,7 +132,7 @@ export class RateLimitingBridge {
         threatResponse,
         shouldBlock: false,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Rate limit check with threat detection failed:', {
         error,
         identifier,
@@ -185,7 +185,7 @@ export class RateLimitingBridge {
       })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to apply threat-based rate limiting:', {
         error,
         responseId: threatResponse.responseId,
@@ -238,7 +238,7 @@ export class RateLimitingBridge {
       await this.applyThreatBasedRateLimiting(threatResponse, context)
 
       return threatResponse
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to handle rate limit violation:', {
         error,
         identifier,
@@ -286,7 +286,7 @@ export class RateLimitingBridge {
           threatData.threatId,
           threatData,
         )
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Failed to orchestrate high usage response:', {
           error,
           identifier,
@@ -478,7 +478,7 @@ export class RateLimitingBridge {
         orchestratorHealthy,
         recentIntegrations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get integration status:', { error })
       return {
         healthy: false,
@@ -497,7 +497,7 @@ export class RateLimitingBridge {
       // This would typically query a database or analytics system
       // For now, return a placeholder
       return 0
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent integration count:', { error })
       return 0
     }

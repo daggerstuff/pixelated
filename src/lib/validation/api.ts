@@ -20,7 +20,7 @@ export async function validateApiRequest<T extends z.ZodType>(
 ): Promise<z.infer<T>> {
   try {
     return await schema.parseAsync(data)
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {}
       error.issues.forEach((err) => {
@@ -60,7 +60,7 @@ export async function validateApiResponse<T extends z.ZodType>(
 ): Promise<z.infer<T>> {
   try {
     return await schema.parseAsync(data)
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {}
       error.issues.forEach((err) => {
@@ -108,7 +108,7 @@ export function validateQueryParams<T extends z.ZodType>(
     })
 
     return schema.parse(normalized)
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {}
       error.issues.forEach((err) => {

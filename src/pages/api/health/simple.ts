@@ -29,7 +29,7 @@ export const GET: APIRoute = async () => {
       JSON.stringify({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
       }),
       {
         status: 503,

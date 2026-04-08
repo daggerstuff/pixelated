@@ -164,7 +164,7 @@ class RealTimeProcessor {
 
         // Route data to appropriate processors
         this.routeDataToProcessors(session, data)
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('WebSocket message parsing error:', error)
       }
     }
@@ -236,7 +236,7 @@ class RealTimeProcessor {
         session.dataStream = new WebSocket(wsUrl)
         this.setupWebSocketHandlers(session)
       }, 2000) // 2 second delay
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Reconnection failed:', error)
     }
   }
@@ -249,7 +249,7 @@ class RealTimeProcessor {
 
       try {
         await this.processQueue()
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Processing loop error:', error)
       } finally {
         this.isProcessing = false
@@ -326,7 +326,7 @@ class RealTimeProcessor {
 
       // Clear processed data from buffer
       stage.buffer = []
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Processing error for stage ${stage.name}:`, error)
 
       // Update error metrics
@@ -609,7 +609,7 @@ class AudioProcessor implements DataProcessor {
         this.metrics.processedCount
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.errorRate =
         (this.metrics.errorRate * this.metrics.processedCount + 1) /
         (this.metrics.processedCount + 1)
@@ -678,7 +678,7 @@ class TextProcessor implements DataProcessor {
         this.metrics.processedCount
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.errorRate =
         (this.metrics.errorRate * this.metrics.processedCount + 1) /
         (this.metrics.processedCount + 1)
@@ -754,7 +754,7 @@ class EmotionProcessor implements DataProcessor {
         this.metrics.processedCount
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.errorRate =
         (this.metrics.errorRate * this.metrics.processedCount + 1) /
         (this.metrics.processedCount + 1)

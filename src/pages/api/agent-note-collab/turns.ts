@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ url, request }) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(JSON.stringify(formatTurnError(error)), {
       status: 500,
       headers: { "Content-Type": "application/json" },
@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { "Content-Type": "application/json" },
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(JSON.stringify(formatTurnError(error)), {
       status: 500,
       headers: { "Content-Type": "application/json" },

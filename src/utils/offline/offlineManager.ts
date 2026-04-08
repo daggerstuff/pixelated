@@ -44,7 +44,7 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
       }
 
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    } catch (error) {
+    } catch (error: unknown) {
       // If offline or network error, queue the request
       if (enableRequestQueue && !navigator.onLine) {
         const priority = isCriticalPath ? 'critical' : 'normal'
@@ -227,7 +227,7 @@ class OfflineManager {
     try {
       await requestQueue.processQueue(this.config.onRequestProcessed)
       this.emit('syncComplete')
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Sync failed:', error)
     } finally {
       this.config.onSyncComplete()

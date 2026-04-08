@@ -229,7 +229,7 @@ export class ThreatValidationSystem extends EventEmitter {
       logger.info('Threat Validation System initialized successfully')
 
       this.emit('initialized', { timestamp: new Date() })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Validation System', {
         error: (error as Error).message,
       })
@@ -273,7 +273,7 @@ export class ThreatValidationSystem extends EventEmitter {
       ])
 
       logger.info('Database indexes created successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create database indexes', {
         error: (error as Error).message,
       })
@@ -297,7 +297,7 @@ export class ThreatValidationSystem extends EventEmitter {
             validationData.threat_data,
             validationData.validation_types,
           )
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process validation request', {
             error: (error as Error).message,
           })
@@ -309,7 +309,7 @@ export class ThreatValidationSystem extends EventEmitter {
         try {
           const completionData = JSON.parse(message)
           await this.handleValidationCompletion(completionData)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process validation completion', {
             error: (error as Error).message,
           })
@@ -317,7 +317,7 @@ export class ThreatValidationSystem extends EventEmitter {
       })
 
       logger.info('Redis pub/sub setup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to setup Redis pub/sub', {
         error: (error as Error).message,
       })
@@ -372,7 +372,7 @@ export class ThreatValidationSystem extends EventEmitter {
       })
 
       return queueItemId
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to request validation', {
         error: (error as Error).message,
       })
@@ -405,7 +405,7 @@ export class ThreatValidationSystem extends EventEmitter {
       logger.debug('Validation queued for processing', {
         queue_item_id: queueItemId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to queue validation for processing', {
         error: (error as Error).message,
         queue_item_id: queueItemId,
@@ -448,7 +448,7 @@ export class ThreatValidationSystem extends EventEmitter {
       const validationPromises = queueItems.map(async (item) => {
         try {
           return await this.processValidation(item.id)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process validation', {
             error: (error as Error).message,
             queue_item_id: item.id,
@@ -458,7 +458,7 @@ export class ThreatValidationSystem extends EventEmitter {
       })
 
       await Promise.allSettled(validationPromises)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process validation queue', {
         error: (error as Error).message,
       })
@@ -585,7 +585,7 @@ export class ThreatValidationSystem extends EventEmitter {
       })
 
       return validation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process validation', {
         error: (error as Error).message,
         validation_id: validationId,
@@ -837,7 +837,7 @@ export class ThreatValidationSystem extends EventEmitter {
         confidence: 0.9,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during accuracy validation', {
         error: (error as Error).message,
       })
@@ -947,7 +947,7 @@ export class ThreatValidationSystem extends EventEmitter {
         confidence: 0.95,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during completeness validation', {
         error: (error as Error).message,
       })
@@ -1046,7 +1046,7 @@ export class ThreatValidationSystem extends EventEmitter {
         confidence: 0.9,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during timeliness validation', {
         error: (error as Error).message,
       })
@@ -1141,7 +1141,7 @@ export class ThreatValidationSystem extends EventEmitter {
         confidence: 0.85,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during reliability validation', {
         error: (error as Error).message,
       })
@@ -1215,7 +1215,7 @@ export class ThreatValidationSystem extends EventEmitter {
         confidence: 0.9,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during compliance validation', {
         error: (error as Error).message,
       })
@@ -1289,7 +1289,7 @@ export class ThreatValidationSystem extends EventEmitter {
           timestamp: new Date(),
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('AI assistance failed', { error: (error as Error).message })
     }
 
@@ -1525,7 +1525,7 @@ export class ThreatValidationSystem extends EventEmitter {
       for (const validation of overdueValidations) {
         await this.queueValidationForProcessing(validation.id)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process scheduled validations', {
         error: (error as Error).message,
       })
@@ -1546,7 +1546,7 @@ export class ThreatValidationSystem extends EventEmitter {
 
       // Update related systems
       await this.notifyRelatedSystems(completionData)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to handle validation completion', {
         error: (error as Error).message,
       })
@@ -1568,7 +1568,7 @@ export class ThreatValidationSystem extends EventEmitter {
           await this.executeQualityGateAction(validation, gate)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to apply quality gates', {
         error: (error as Error).message,
       })
@@ -1679,7 +1679,7 @@ export class ThreatValidationSystem extends EventEmitter {
   ): Promise<ThreatValidation | null> {
     try {
       return await this.validationsCollection.findOne({ id: validationId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validation by ID', {
         error: (error as Error).message,
         validation_id: validationId,
@@ -1740,7 +1740,7 @@ export class ThreatValidationSystem extends EventEmitter {
         by_validation_type: byValidationType,
         by_status: byStatus,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validation statistics', {
         error: (error as Error).message,
       })
@@ -1764,7 +1764,7 @@ export class ThreatValidationSystem extends EventEmitter {
         .sort({ priority: -1, submitted_at: 1 })
         .limit(limit)
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validation queue', {
         error: (error as Error).message,
       })
@@ -1799,7 +1799,7 @@ export class ThreatValidationSystem extends EventEmitter {
         validation_id: validationId,
         validator_id: validatorId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to assign validator', {
         error: (error as Error).message,
       })
@@ -1860,7 +1860,7 @@ export class ThreatValidationSystem extends EventEmitter {
         validator_id: validatorId,
         status: feedback.status,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to submit human validation', {
         error: (error as Error).message,
       })
@@ -1905,7 +1905,7 @@ export class ThreatValidationSystem extends EventEmitter {
       this.emit('shutdown', { timestamp: new Date() })
 
       logger.info('Threat Validation System shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown', { error: (error as Error).message })
       throw error
     }

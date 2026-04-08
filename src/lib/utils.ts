@@ -264,7 +264,7 @@ export async function retry<T>(
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn()
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error as Error
 
       if (attempt === maxAttempts) {
@@ -840,7 +840,7 @@ export async function safeExecute<T>(
   try {
     const data = await fn()
     return { success: true, data }
-  } catch (error) {
+  } catch (error: unknown) {
     return { success: false, error: error as Error }
   }
 }

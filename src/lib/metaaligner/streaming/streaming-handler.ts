@@ -73,7 +73,7 @@ export class StreamingHandler implements IStreamingHandler {
         }
         onChunk(chunkResponse)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       onError(error as Error)
     }
   }

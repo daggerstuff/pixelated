@@ -79,7 +79,7 @@ class RequestQueue {
 
     try {
       storageManager.set(this.options.storageKey, this.queue)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to save request queue to storage:', error)
     }
   }
@@ -98,7 +98,7 @@ class RequestQueue {
           return Date.now() - req.timestamp < maxAge
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to load request queue from storage:', error)
       this.queue = []
     }
@@ -139,7 +139,7 @@ class RequestQueue {
       this.saveToStorage()
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to add request to queue:', error)
       return false
     }

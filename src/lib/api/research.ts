@@ -96,7 +96,7 @@ export class ResearchAPI {
       })
       clearTimeout(id)
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       clearTimeout(id)
       throw error
     }

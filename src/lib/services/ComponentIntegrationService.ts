@@ -47,7 +47,7 @@ export class ComponentIntegrationService {
         category: params.category,
       })
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching chart data', { error, params })
       throw error
     }
@@ -87,7 +87,7 @@ export class ComponentIntegrationService {
         sessionId: params.sessionId,
       })
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching 3D emotion data', { error, params })
       throw error
     }
@@ -118,7 +118,7 @@ export class ComponentIntegrationService {
       const result = await response.json()
       logger.info('Added emotion point', { emotion: emotionData.emotion })
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error adding emotion point', { error, emotionData })
       throw error
     }
@@ -159,7 +159,7 @@ export class ComponentIntegrationService {
         clientId: params.clientId,
       })
       return plans
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching treatment plans', { error, params })
       throw error
     }
@@ -183,7 +183,7 @@ export class ComponentIntegrationService {
       const result = await response.json()
       logger.info('Saved treatment plan', { planId: result.id })
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error saving treatment plan', { error, planData })
       throw error
     }
@@ -212,7 +212,7 @@ export class ComponentIntegrationService {
       const result = await response.json()
       logger.info('Updated treatment plan', { planId: updates.planId })
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error updating treatment plan', { error, updates })
       throw error
     }
@@ -255,7 +255,7 @@ export class ComponentIntegrationService {
         emotion: params.emotion,
       })
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching particle system', { error, params })
       throw error
     }
@@ -284,7 +284,7 @@ export class ComponentIntegrationService {
       const result = await response.json()
       logger.info('Updated particle system', { emotion: updates.emotion })
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error updating particle system', { error, updates })
       throw error
     }
@@ -325,7 +325,7 @@ export class ComponentIntegrationService {
         audience: params.audience,
       })
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching carousel content', { error, params })
       throw error
     }
@@ -354,7 +354,7 @@ export class ComponentIntegrationService {
         configId: result.configuration?.id,
       })
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error saving carousel configuration', { error, configData })
       throw error
     }
@@ -433,7 +433,7 @@ export class ComponentIntegrationService {
       })
 
       return dashboardData
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error fetching integrated dashboard data', {
         error,
         params,
@@ -471,7 +471,7 @@ export class ComponentIntegrationService {
       }, 5000)
 
       return () => clearInterval(mockUpdates)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error subscribing to real-time updates', { error, params })
       params.onError(error)
       throw error
@@ -530,7 +530,7 @@ export class ComponentIntegrationService {
       })
 
       return health
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking service health', { error })
       throw error
     }

@@ -124,7 +124,7 @@ export class GlobalThreatIntelligenceNetworkCore
       this.isInitialized = true
       this.emit('network_initialized')
       logger.info('Global Threat Intelligence Network initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Global Threat Intelligence Network:', {
         error,
       })
@@ -138,7 +138,7 @@ export class GlobalThreatIntelligenceNetworkCore
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -153,7 +153,7 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('global_threat_intelligence')
       logger.info('MongoDB connection established')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -198,7 +198,7 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.validationSystem.initialize()
 
       logger.info('All subsystems initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize subsystems:', { error })
       throw error
     }
@@ -210,7 +210,7 @@ export class GlobalThreatIntelligenceNetworkCore
     this.healthCheckInterval = setInterval(async () => {
       try {
         await this.performHealthCheck()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Health check failed:', { error })
       }
     }, healthCheckInterval)
@@ -292,7 +292,7 @@ export class GlobalThreatIntelligenceNetworkCore
       })
 
       return globalThreat
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process threat intelligence:', {
         error,
         threatId: threatData.threatId,
@@ -351,7 +351,7 @@ export class GlobalThreatIntelligenceNetworkCore
       }
 
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking existing global threat:', { error })
       return null
     }
@@ -417,7 +417,7 @@ export class GlobalThreatIntelligenceNetworkCore
       )
 
       return existingThreat
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error updating global threat:', { error })
       throw error
     }
@@ -572,7 +572,7 @@ export class GlobalThreatIntelligenceNetworkCore
         threatId: globalThreat.threatId,
         responseId: threatResponse.responseId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to trigger response orchestration:', { error })
     }
   }
@@ -628,7 +628,7 @@ export class GlobalThreatIntelligenceNetworkCore
       })
 
       return correlations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to correlate threats across regions:', { error })
       this.emit('correlation_error', { error })
       throw error
@@ -659,7 +659,7 @@ export class GlobalThreatIntelligenceNetworkCore
       this.emit('intelligence_validated', { intelligenceId, validationStatus })
 
       return validationStatus
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to validate threat intelligence:', { error })
       this.emit('validation_error', { error, intelligenceId })
       throw error
@@ -695,7 +695,7 @@ export class GlobalThreatIntelligenceNetworkCore
         correlationCount,
         validationMetrics,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get global threat summary:', { error })
       throw error
     }
@@ -739,7 +739,7 @@ export class GlobalThreatIntelligenceNetworkCore
         components,
         metrics,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get health status:', { error })
       throw error
     }
@@ -754,7 +754,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Edge detection system error: ${error}`,
@@ -772,7 +772,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Correlation engine error: ${error}`,
@@ -790,7 +790,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Database error: ${error}`,
@@ -808,7 +808,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Orchestration error: ${error}`,
@@ -826,7 +826,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Hunting system error: ${error}`,
@@ -844,7 +844,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Feed integration error: ${error}`,
@@ -862,7 +862,7 @@ export class GlobalThreatIntelligenceNetworkCore
         lastCheck: new Date(),
         responseTime: status.responseTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'unhealthy',
         message: `Validation system error: ${error}`,
@@ -883,7 +883,7 @@ export class GlobalThreatIntelligenceNetworkCore
         activeConnections: 150, // Placeholder
         queueSize: this.threatProcessingQueue.length,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect system metrics:', { error })
       return {
         cpuUsage: 0,
@@ -932,7 +932,7 @@ export class GlobalThreatIntelligenceNetworkCore
       this.isInitialized = false
       this.emit('network_shutdown')
       logger.info('Global Threat Intelligence Network shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

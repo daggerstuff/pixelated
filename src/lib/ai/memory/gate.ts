@@ -57,7 +57,7 @@ export class SocraticGate {
     } catch (error: unknown) {
       appLogger.error('Socratic Gate evaluation failed', {
         memoryId: memory.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       });
 
       return {

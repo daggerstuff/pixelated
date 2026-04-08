@@ -181,9 +181,9 @@ export class EnhancementPipeline {
           enhanced: enhancementResult.enhanced,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Enhancement pipeline failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         action: 'process_error',
       })
 
@@ -212,9 +212,9 @@ export class EnhancementPipeline {
       try {
         const result = await this.process(input)
         results.push(result)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Batch item processing failed', {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           action: 'batch_item_error',
         })
 
@@ -290,10 +290,10 @@ export class EnhancementPipeline {
           // No improvement applied, stop iterations
           break
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Enhancement attempt failed', {
           attempt: attempts,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
           action: 'enhancement_attempt_failed',
         })
 

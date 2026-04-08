@@ -197,7 +197,7 @@ export class PersistentTurnLedger {
             // Ignore lock cleanup races with other processes.
           });
         }
-      } catch (error) {
+      } catch (error: unknown) {
         if (!isLockAcquisitionError(error)) {
           throw error;
         }

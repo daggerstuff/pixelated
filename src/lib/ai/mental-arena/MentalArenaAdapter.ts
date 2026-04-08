@@ -243,7 +243,7 @@ export class MentalArenaAdapter {
     } catch (error: unknown) {
       logger.error('Failed to generate synthetic data', { error, options })
       throw new Error(
-        `Synthetic data generation failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Synthetic data generation failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
         {
           cause: error,
         },

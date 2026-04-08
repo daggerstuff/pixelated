@@ -187,10 +187,10 @@ export class HIPAADataService {
       })
 
       return { encryptedData: encrypted, metadata }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Encryption failed', { error, dataType })
       throw new Error(
-        `Encryption failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Encryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -238,10 +238,10 @@ export class HIPAADataService {
       })
 
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Decryption failed', { error, dataType })
       throw new Error(
-        `Decryption failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -307,7 +307,7 @@ export class HIPAADataService {
         expirationDate,
         restrictions: rolePermissions.restrictions,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Access validation failed', { error })
       return { granted: false }
     }
@@ -440,9 +440,9 @@ export class HIPAADataService {
             const anonymized = await this.anonymizeOldData(dataType, cutoffDate)
             results.anonymized += anonymized
             results.processed += anonymized
-          } catch (error) {
+          } catch (error: unknown) {
             results.errors.push(
-              `Anonymization failed for ${dataType}: ${error.message}`,
+              `Anonymization failed for ${dataType}: ${(error instanceof Error ? error.message : "Unknown error")}`,
             )
           }
         }
@@ -453,9 +453,9 @@ export class HIPAADataService {
             const deleted = await this.deleteOldData(dataType, cutoffDate)
             results.deleted += deleted
             results.processed += deleted
-          } catch (error) {
+          } catch (error: unknown) {
             results.errors.push(
-              `Deletion failed for ${dataType}: ${error.message}`,
+              `Deletion failed for ${dataType}: ${(error instanceof Error ? error.message : "Unknown error")}`,
             )
           }
         }
@@ -467,9 +467,9 @@ export class HIPAADataService {
         timestamp: new Date().toISOString(),
         details: results,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Retention policy application failed', { error })
-      results.errors.push(`Policy application failed: ${error.message}`)
+      results.errors.push(`Policy application failed: ${(error instanceof Error ? error.message : "Unknown error")}`)
     }
 
     return results
@@ -528,9 +528,9 @@ export class HIPAADataService {
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Key rotation failed', { error })
-      results.errors.push(`Key rotation failed: ${error.message}`)
+      results.errors.push(`Key rotation failed: ${(error instanceof Error ? error.message : "Unknown error")}`)
     }
 
     return results

@@ -202,7 +202,7 @@ export class PerformanceBenchmarkRunner {
             failedRequests++
           }
         })
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Batch ${batch} failed:`, error)
         failedRequests += requestsPerBatch
       }
@@ -280,7 +280,7 @@ export class PerformanceBenchmarkRunner {
         success: true,
         responseTime: endTime - startTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const endTime = performance.now()
       return {
         success: false,

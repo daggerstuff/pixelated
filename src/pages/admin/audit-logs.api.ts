@@ -48,7 +48,7 @@ export async function GET(context: APIContext): Promise<Response> {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Authentication error in audit-logs.api.ts:', error)
     return new Response(
       JSON.stringify({ success: false, error: 'Authentication failed' }),

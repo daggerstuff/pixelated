@@ -154,7 +154,7 @@ export const GET: APIRoute = async ({ request }) => {
         if (sessionEmotions.length > 0) {
           emotionProfile = calculateEmotionProfile(sessionEmotions)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to fetch session emotion data, using default', {
           sessionId,
           error,
@@ -235,7 +235,7 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-particles',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -243,7 +243,7 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -361,7 +361,7 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-particles',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -369,7 +369,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

@@ -67,7 +67,7 @@ class StorageManager {
   private serialize(data: any): string {
     try {
       return JSON.stringify(data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to serialize data:', error)
       return '{}'
     }
@@ -76,7 +76,7 @@ class StorageManager {
   private deserialize(data: string): any {
     try {
       return JSON.parse(data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to deserialize data:', error)
       return null
     }
@@ -163,7 +163,7 @@ class StorageManager {
       }
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to set storage item:', error)
       return false
     }
@@ -203,7 +203,7 @@ class StorageManager {
       }
 
       return storageData.value ?? config.defaultValue
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to get storage item:', error)
       return config.defaultValue
     }
@@ -219,7 +219,7 @@ class StorageManager {
       }
       this.memoryStorage.delete(fullKey)
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to remove storage item:', error)
       return false
     }
@@ -241,7 +241,7 @@ class StorageManager {
       }
       this.memoryStorage.clear()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to clear storage:', error)
       return false
     }
@@ -268,7 +268,7 @@ class StorageManager {
       }
 
       return totalSize + this.memoryStorage.size
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to calculate storage size:', error)
       return 0
     }

@@ -125,7 +125,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching evaluations:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -256,7 +256,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (transactionStarted) {
       try {
         await client.query('ROLLBACK')

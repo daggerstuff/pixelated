@@ -103,7 +103,7 @@ async function logAuditEvent(req: Request, res: Response, _requestId: string, _d
         res.statusCode >= 400 ? "error" : "success",
       ],
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Failed to log audit event:", error);
     // Don't throw - audit logging failures shouldn't break the app
   }

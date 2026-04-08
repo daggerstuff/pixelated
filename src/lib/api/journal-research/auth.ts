@@ -30,7 +30,7 @@ export async function getJournalResearchAuthToken(): Promise<string | null> {
       window.localStorage.getItem('authToken') ??
       null
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn('Failed to get auth token from Better Auth', { error })
 
     // Fallback to localStorage

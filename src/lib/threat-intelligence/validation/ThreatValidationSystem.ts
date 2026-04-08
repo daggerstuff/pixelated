@@ -99,7 +99,7 @@ export class ThreatValidationSystemCore
 
       this.emit('validation_system_initialized')
       logger.info('Threat Validation System initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Validation System:', { error })
       this.emit('initialization_error', { error })
       throw error
@@ -111,7 +111,7 @@ export class ThreatValidationSystemCore
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat validation')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -126,7 +126,7 @@ export class ThreatValidationSystemCore
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_validation')
       logger.info('MongoDB connection established for threat validation')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -142,7 +142,7 @@ export class ThreatValidationSystemCore
       }
 
       logger.info(`Loaded ${rules.length} validation rules from database`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load validation rules:', { error })
     }
   }
@@ -152,7 +152,7 @@ export class ThreatValidationSystemCore
     setInterval(async () => {
       try {
         await this.monitorActiveValidations()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Validation monitoring error:', { error })
       }
     }, 30000)
@@ -163,7 +163,7 @@ export class ThreatValidationSystemCore
     setInterval(async () => {
       try {
         await this.collectMetrics()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Metrics collection error:', { error })
       }
     }, 300000)
@@ -247,7 +247,7 @@ export class ThreatValidationSystemCore
       })
 
       return validation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to validate threat:', {
         error,
         threatId: threat.threatId,
@@ -343,14 +343,14 @@ export class ThreatValidationSystemCore
           indicatorCount: threat.indicators?.length || 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat structure validation failed:', { error })
       return {
         ruleId: 'structure_validation',
         ruleName: 'Threat Structure Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + error.message],
+        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
         details: {},
       }
     }
@@ -421,14 +421,14 @@ export class ThreatValidationSystemCore
           indicatorTypes: [...new Set(indicators.map((i) => i.indicatorType))],
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Indicator validation failed:', { error })
       return {
         ruleId: 'indicator_validation',
         ruleName: 'Indicator Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + error.message],
+        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
         details: {},
       }
     }
@@ -455,10 +455,10 @@ export class ThreatValidationSystemCore
         default:
           return { valid: true } // Unknown types are allowed
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         valid: false,
-        error: 'Format validation error: ' + error.message,
+        error: 'Format validation error: ' + (error instanceof Error ? error.message : "Unknown error"),
       }
     }
   }
@@ -619,14 +619,14 @@ export class ThreatValidationSystemCore
           hasCountry: !!attribution.country,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Attribution validation failed:', { error })
       return {
         ruleId: 'attribution_validation',
         ruleName: 'Attribution Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + error.message],
+        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
         details: {},
       }
     }
@@ -686,14 +686,14 @@ export class ThreatValidationSystemCore
           hasTags: !!metadata.tags,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Metadata validation failed:', { error })
       return {
         ruleId: 'metadata_validation',
         ruleName: 'Metadata Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + error.message],
+        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
         details: {},
       }
     }
@@ -708,7 +708,7 @@ export class ThreatValidationSystemCore
       try {
         const result = await this.applyValidationRule(rule, threat)
         results.push(result)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Custom validation rule failed:', {
           error,
           ruleId: rule.ruleId,
@@ -718,7 +718,7 @@ export class ThreatValidationSystemCore
           ruleName: rule.name,
           passed: false,
           score: 0,
-          issues: ['Rule execution error: ' + error.message],
+          issues: ['Rule execution error: ' + (error instanceof Error ? error.message : "Unknown error")],
           details: {},
         })
       }
@@ -759,7 +759,7 @@ export class ThreatValidationSystemCore
           severity: rule.severity,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Validation rule application failed:', {
         error,
         ruleId: rule.ruleId,
@@ -769,7 +769,7 @@ export class ThreatValidationSystemCore
         ruleName: rule.name,
         passed: false,
         score: 0,
-        issues: ['Rule application error: ' + error.message],
+        issues: ['Rule application error: ' + (error instanceof Error ? error.message : "Unknown error")],
         details: {},
       }
     }
@@ -796,10 +796,10 @@ export class ThreatValidationSystemCore
         default:
           return { passed: true, message: 'Unknown condition type' }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         passed: false,
-        message: 'Condition evaluation error: ' + error.message,
+        message: 'Condition evaluation error: ' + (error instanceof Error ? error.message : "Unknown error"),
       }
     }
   }
@@ -989,14 +989,14 @@ export class ThreatValidationSystemCore
           reputationScore,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cross-reference validation failed:', { error })
       return {
         ruleId: 'cross_reference_validation',
         ruleName: 'Cross-Reference Validation',
         passed: false,
         score: 0,
-        issues: ['Cross-reference validation error: ' + error.message],
+        issues: ['Cross-reference validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
         details: {},
       }
     }
@@ -1031,7 +1031,7 @@ export class ThreatValidationSystemCore
       })
 
       return !!patternMatch
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Known false positive check failed:', { error })
       return false
     }
@@ -1053,7 +1053,7 @@ export class ThreatValidationSystemCore
       }
 
       return false
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Whitelisted indicator check failed:', { error })
       return false
     }
@@ -1095,7 +1095,7 @@ export class ThreatValidationSystemCore
       }
 
       return totalSimilarity / similarThreats.length
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat similarity calculation failed:', { error })
       return 0
     }
@@ -1122,7 +1122,7 @@ export class ThreatValidationSystemCore
       }
 
       return reputationCount > 0 ? totalReputation / reputationCount : 0.5 // Default neutral score
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Indicator reputation check failed:', { error })
       return 0.5 // Default neutral score
     }
@@ -1173,7 +1173,7 @@ export class ThreatValidationSystemCore
         3600, // 1 hour expiration
         JSON.stringify(validation),
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store validation result:', { error })
       throw error
     }
@@ -1191,7 +1191,7 @@ export class ThreatValidationSystemCore
         7200, // 2 hours expiration
         JSON.stringify(threat),
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cache validated threat:', { error })
     }
   }
@@ -1220,7 +1220,7 @@ export class ThreatValidationSystemCore
         threatId: validation.threatId,
         score: validation.overallScore,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send validation alert:', { error })
     }
   }
@@ -1238,7 +1238,7 @@ export class ThreatValidationSystemCore
         .toArray()
 
       return validations
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validation history:', { error, threatId })
       throw error
     }
@@ -1263,7 +1263,7 @@ export class ThreatValidationSystemCore
       this.emit('validation_rule_updated', { ruleId: rule.ruleId })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update validation rule:', { error })
       return false
     }
@@ -1316,7 +1316,7 @@ export class ThreatValidationSystemCore
         falsePositives,
         falseNegatives,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validation metrics:', { error })
       return {
         totalValidations: 0,
@@ -1355,7 +1355,7 @@ export class ThreatValidationSystemCore
       }
 
       return totalTime / completedValidations.length
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate average validation time:', { error })
       return 0
     }
@@ -1375,7 +1375,7 @@ export class ThreatValidationSystemCore
       })
 
       return falsePositives
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate false positives:', { error })
       return 0
     }
@@ -1395,7 +1395,7 @@ export class ThreatValidationSystemCore
       })
 
       return falseNegatives
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate false negatives:', { error })
       return 0
     }
@@ -1417,7 +1417,7 @@ export class ThreatValidationSystemCore
       }
 
       return validationsBySeverity
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validations by severity:', { error })
       return {}
     }
@@ -1439,7 +1439,7 @@ export class ThreatValidationSystemCore
       }
 
       return validationsByType
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get validations by type:', { error })
       return {}
     }
@@ -1470,7 +1470,7 @@ export class ThreatValidationSystemCore
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Active validation monitoring failed:', { error })
     }
   }
@@ -1480,7 +1480,7 @@ export class ThreatValidationSystemCore
       const metrics = await this.getValidationMetrics()
 
       this.emit('metrics_collected', metrics)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Metrics collection failed:', { error })
     }
   }
@@ -1523,7 +1523,7 @@ export class ThreatValidationSystemCore
         activeValidations: this.activeValidations.size,
         successRate,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1536,7 +1536,7 @@ export class ThreatValidationSystemCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1546,7 +1546,7 @@ export class ThreatValidationSystemCore
     try {
       await this.db.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MongoDB health check failed:', { error })
       return false
     }
@@ -1571,7 +1571,7 @@ export class ThreatValidationSystemCore
 
       this.emit('validation_system_shutdown')
       logger.info('Threat Validation System shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

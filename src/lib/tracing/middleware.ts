@@ -152,14 +152,14 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       statusText: response.statusText,
       headers: responseHeaders,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     // Calculate duration
     const duration = Date.now() - startTime
 
     // Mark span as error
     span.setStatus({
       code: SpanStatusCode.ERROR,
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
     span.recordException(
       error instanceof Error ? error : new Error(String(error)),
@@ -167,7 +167,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
     span.setAttribute('http.response.duration_ms', duration)
 
     logger.error('Request failed in tracing middleware', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       method,
       pathname: url.pathname,
       duration,

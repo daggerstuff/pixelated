@@ -63,7 +63,7 @@ export function useValidatedForm<T extends FieldValues>({
           Object.keys(errors).forEach((key) => {
             const error = errors[key as keyof typeof errors]
             if (error?.message) {
-              fieldErrorMap[key] = String(error.message)
+              fieldErrorMap[key] = String((error instanceof Error ? error.message : "Unknown error"))
             }
           })
           setFieldErrors(fieldErrorMap)
@@ -73,7 +73,7 @@ export function useValidatedForm<T extends FieldValues>({
 
         const data = form.getValues()
         await onSubmit(data)
-      } catch (error) {
+      } catch (error: unknown) {
         const normalized = normalizeError(error)
         const fieldErrs = getFieldErrors(error) ?? {}
 
@@ -115,7 +115,7 @@ export function getFormFieldError<T extends FieldValues>(
   fieldName: keyof T,
 ): string | undefined {
   const error = form.formState.errors[fieldName]
-  return error?.message ? String(error.message) : undefined
+  return error?.message ? String((error instanceof Error ? error.message : "Unknown error")) : undefined
 }
 
 /**

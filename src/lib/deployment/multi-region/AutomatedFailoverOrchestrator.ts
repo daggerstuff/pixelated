@@ -99,7 +99,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       this.logger.info('AutomatedFailoverOrchestrator initialized successfully')
 
       this.emit('initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to initialize AutomatedFailoverOrchestrator', {
         error,
       })
@@ -148,10 +148,10 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
           status: readiness.ready ? 'healthy' : 'unhealthy',
           message: readiness.message,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Failover readiness check failed: ${error instanceof Error ? error.message : String(error)}`,
+          message: `Failover readiness check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
         }
       }
     })
@@ -172,10 +172,10 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
           status: 'healthy',
           message: `Data sync lag ${maxLag}ms within threshold`,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Data sync lag check failed: ${error instanceof Error ? error.message : String(error)}`,
+          message: `Data sync lag check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
         }
       }
     })
@@ -222,11 +222,11 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       return { ready: true, message: 'All failover readiness checks passed' }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failover readiness check failed', { error })
       return {
         ready: false,
-        message: `Readiness check error: ${error instanceof Error ? error.message : String(error)}`,
+        message: `Readiness check error: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
       }
     }
   }
@@ -270,9 +270,9 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       return { healthy: true }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Backup regions health check failed', { error })
-      return { healthy: false, reason: error instanceof Error ? error.message : String(error) }
+      return { healthy: false, reason: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error) }
     }
   }
 
@@ -289,7 +289,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         const health = await this.healthMonitor.getRegionHealth(region)
         return health.status === 'healthy'
       })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Region health check failed for ${region}`, { error })
       return false
     }
@@ -307,7 +307,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       const lags = await Promise.all(lagPromises)
       return Math.max(...lags)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Data sync lag check failed', { error })
       return Infinity
     }
@@ -322,7 +322,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
     this.healthCheckInterval = setInterval(async () => {
       try {
         await this.performHealthCheck()
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error('Health check failed', { error })
       }
     }, config.healthCheckInterval)
@@ -355,7 +355,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Send health metrics to CloudWatch
       await this.sendHealthMetrics()
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Health check execution failed', { error })
     }
   }
@@ -400,7 +400,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Trigger failover
       await this.triggerFailover(bestBackupRegion, 'Primary region unhealthy')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failover evaluation failed', { error })
     }
   }
@@ -461,7 +461,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       this.logger.info('Backup region scores', { regionScores })
       return regionScores[0].region
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to select best backup region', { error })
       return null
     }
@@ -482,7 +482,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         networkLatency: 50 + Math.random() * 100, // 50-150ms
         activeConnections: Math.floor(Math.random() * 1000),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to get metrics for region ${region}`, { error })
       return null
     }
@@ -562,22 +562,22 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Save failover state
       await this.saveFailoverState()
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failover failed', { error })
 
       this.failoverState.status = 'healthy'
-      this.failoverState.reason = `Failover failed: ${error.message}`
+      this.failoverState.reason = `Failover failed: ${(error instanceof Error ? error.message : "Unknown error")}`
 
       // Send failure notifications
       await this.sendFailoverNotifications(
         'failed',
         backupRegion,
-        error.message,
+        (error instanceof Error ? error.message : "Unknown error"),
       )
 
       this.emit('failoverFailed', {
         targetRegion: backupRegion,
-        error: error.message,
+        error: (error instanceof Error ? error.message : "Unknown error"),
         timestamp: new Date(),
       })
 
@@ -602,7 +602,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.preDeployApplication(region)
 
       this.logger.info('Backup region preparation completed', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to prepare backup region', { region, error })
       throw error
     }
@@ -619,7 +619,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Simulate scaling operation
       await this.invokeLambdaFunction('scale-up-resources', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to scale up region ${region}`, { error })
       throw error
     }
@@ -634,7 +634,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // This would typically warm up CDN caches, application caches, etc.
       await this.invokeLambdaFunction('warm-up-caches', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to warm up caches in ${region}`, { error })
       // Non-critical, continue with failover
     }
@@ -653,7 +653,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       if (!isDeployed) {
         await this.invokeLambdaFunction('deploy-application', { region })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to pre-deploy application in ${region}`, {
         error,
       })
@@ -669,7 +669,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       // This would typically check if the application is running
       // For now, return true (assume deployed)
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to check application deployment in ${region}`, {
         error,
       })
@@ -693,7 +693,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.waitForDataSync(region)
 
       this.logger.info('Data sync completed before failover', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Data sync failed before failover', { region, error })
       throw error
     }
@@ -744,7 +744,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       this.logger.info('DNS routing updated', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update DNS routing', { region, error })
       throw error
     }
@@ -786,7 +786,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.route53Client.send(command)
 
       this.logger.info('Route 53 records updated', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update Route 53 records', { region, error })
       throw error
     }
@@ -810,7 +810,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         region,
         domain: config.domainName,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update Cloudflare records', {
         region,
         error,
@@ -834,7 +834,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       return mockIPs[region] || '127.0.0.1'
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to get IP address for ${region}`, { error })
       throw error
     }
@@ -854,7 +854,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.updateCDNConfiguration(region)
 
       this.logger.info('Load balancer configuration updated', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update load balancer configuration', {
         region,
         error,
@@ -872,7 +872,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // This would typically update ALB target groups, health checks, etc.
       await this.invokeLambdaFunction('update-alb-configuration', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update ALB for ${region}`, { error })
       throw error
     }
@@ -887,7 +887,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // This would typically update CloudFront, Cloudflare, etc.
       await this.invokeLambdaFunction('update-cdn-configuration', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update CDN for ${region}`, { error })
       // Non-critical, continue with failover
     }
@@ -910,7 +910,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.updateCacheConfiguration(region)
 
       this.logger.info('Backup region promoted to primary', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to promote backup region', { region, error })
       throw error
     }
@@ -928,7 +928,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Update configuration in parameter store, secrets manager, etc.
       await this.invokeLambdaFunction('update-region-config', { region, role })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update region config for ${region}`, {
         error,
       })
@@ -945,7 +945,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Update read/write splitting, connection pools, etc.
       await this.invokeLambdaFunction('update-db-connections', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update database connections for ${region}`, {
         error,
       })
@@ -962,7 +962,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Update Redis cluster configuration, cache invalidation, etc.
       await this.invokeLambdaFunction('update-cache-config', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update cache configuration for ${region}`, {
         error,
       })
@@ -984,7 +984,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.updateInfrastructureConfiguration(region)
 
       this.logger.info('Configuration updated', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update configuration', { region, error })
       throw error
     }
@@ -999,7 +999,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Update feature flags, service endpoints, etc.
       await this.invokeLambdaFunction('update-app-config', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update application config for ${region}`, {
         error,
       })
@@ -1018,7 +1018,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Update auto-scaling policies, resource limits, etc.
       await this.invokeLambdaFunction('update-infra-config', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to update infrastructure config for ${region}`,
         { error },
@@ -1051,7 +1051,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       throw new Error(`Failover verification timeout for region ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failover verification failed', { region, error })
       throw error
     }
@@ -1075,7 +1075,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
           await this.attemptRegionRecovery(region)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Backup region monitoring failed', { error })
     }
   }
@@ -1097,7 +1097,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.restartRegionServices(region)
 
       this.logger.info('Region recovery attempt completed', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Region recovery failed', { region, error })
     }
   }
@@ -1117,7 +1117,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       // Clear caches
       await this.invokeLambdaFunction('clear-region-caches', { region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to restart services in ${region}`, { error })
       throw error
     }
@@ -1155,7 +1155,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       })
 
       await this.cloudWatchClient.send(command)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to send health metrics', { error })
     }
   }
@@ -1185,7 +1185,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       await this.sendSQSMessage(message)
 
       this.logger.info('Failover notifications sent', { status, region })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to send failover notifications', { error })
     }
   }
@@ -1205,7 +1205,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       })
 
       await this.snsClient.send(command)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to send SNS notification', { error })
     }
   }
@@ -1228,7 +1228,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       })
 
       await this.sqsClient.send(command)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to send SQS message', { error })
     }
   }
@@ -1258,7 +1258,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to invoke Lambda function ${functionName}`, {
         error,
       })
@@ -1304,7 +1304,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       // This would typically load from DynamoDB, S3, or Parameter Store
       // For now, use in-memory state
       this.logger.info('Failover state loaded (using in-memory state)')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to load failover state', { error })
       // Continue with default state
     }
@@ -1320,7 +1320,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       this.logger.info('Failover state saved (using in-memory state)', {
         state: this.failoverState,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to save failover state', { error })
     }
   }
@@ -1369,7 +1369,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       }
 
       await this.triggerFailover(targetRegion, `Manual failover: ${reason}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Manual failover failed', { error })
       throw error
     }
@@ -1401,7 +1401,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       this.logger.info('AutomatedFailoverOrchestrator shutdown completed')
 
       this.emit('shutdown')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error during shutdown', { error })
       throw error
     }
@@ -1456,7 +1456,7 @@ class CircuitBreaker {
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.recordFailure()
       throw error
     }

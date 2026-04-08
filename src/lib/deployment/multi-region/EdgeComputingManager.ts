@@ -2160,7 +2160,7 @@ export class EdgeComputingManager extends EventEmitter {
       logger.info('Edge Computing Manager initialized successfully')
 
       this.emit('initialized', { locations: this.config.locations.length })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Edge Computing Manager', { error })
       throw new Error(`Initialization failed: ${(error as Error).message}`, {
         cause: error,
@@ -2242,7 +2242,7 @@ export class EdgeComputingManager extends EventEmitter {
 
       this.emit('deployment-complete', { statuses })
       return statuses
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Edge node deployment failed', { error })
       throw new Error(`Deployment failed: ${(error as Error).message}`, {
         cause: error,
@@ -2318,7 +2318,7 @@ export class EdgeComputingManager extends EventEmitter {
 
       this.emit('node-deployed', { location: location.id, status })
       return status
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Edge node deployment failed: ${location.name}`, {
         location: location.id,
         error,
@@ -2372,7 +2372,7 @@ export class EdgeComputingManager extends EventEmitter {
         workerId: `worker-${location.id}`,
         scriptSize: workerScript.length,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Cloudflare Worker deployment failed: ${location.name}`, {
         error,
       })
@@ -2405,7 +2405,7 @@ export class EdgeComputingManager extends EventEmitter {
         functionArn: `arn:aws:lambda:${location.region}:function:edge-${location.id}`,
         version: '1.0',
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`AWS Lambda@Edge deployment failed: ${location.name}`, {
         error,
       })
@@ -2435,7 +2435,7 @@ export class EdgeComputingManager extends EventEmitter {
 
       logger.info(`Azure Edge deployed successfully: ${location.name}`)
       return { functionId: `function-${location.id}`, region: location.region }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Azure Edge deployment failed: ${location.name}`, { error })
       throw new Error(
         `Azure Edge deployment failed: ${(error as Error).message}`,
@@ -2463,7 +2463,7 @@ export class EdgeComputingManager extends EventEmitter {
 
       logger.info(`GCP Edge deployed successfully: ${location.name}`)
       return { functionName: `edge-${location.id}`, region: location.region }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`GCP Edge deployment failed: ${location.name}`, { error })
       throw new Error(
         `GCP Edge deployment failed: ${(error as Error).message}`,
@@ -2548,7 +2548,7 @@ export default {
         score: response.score || 0,
         reason: response.reason || 'No threat detected'
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Threat detection error:', error);
       return { blocked: false, score: 0, reason: 'Detection failed' };
     }
@@ -2572,7 +2572,7 @@ export default {
         score: result.safety_score || 0,
         details: result.categories || []
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Bias detection error:', error);
       return { hasBias: false, score: 0, details: [] };
     }
@@ -2636,7 +2636,7 @@ exports.handler = async (event, context) => {
     }
 
     return addEdgeHeaders(originResponse, location, threatCheck, biasCheck, 'MISS');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Edge processing error:', error);
     return {
       status: '500',
@@ -2658,7 +2658,7 @@ async function detectThreats(userAgent, country) {
       score: threatScore,
       reason: threatScore > 0.8 ? 'Suspicious user agent pattern' : 'Clean'
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Threat detection error:', error);
     return { blocked: false, score: 0, reason: 'Detection failed' };
   }
@@ -2673,7 +2673,7 @@ async function detectBias(userAgent, country) {
       score: biasScore,
       details: biasScore > 0.8 ? ['potential_bias'] : []
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Bias detection error:', error);
     return { hasBias: false, score: 0, details: [] };
   }
@@ -2891,7 +2891,7 @@ functions.http('edgeFunction_${location.id}', async (req, res) => {
     res.set('X-Bias-Score', biasCheck.score.toString());
 
     res.status(200).json(result);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Edge processing error:', error);
     res.status(500).json({ error: 'Edge processing failed' });
   }
@@ -2906,7 +2906,7 @@ async function detectThreats(userAgent, country) {
       score: threatScore,
       reason: threatScore > 0.8 ? 'Suspicious pattern detected' : 'Clean'
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Threat detection error:', error);
     return { blocked: false, score: 0, reason: 'Detection failed' };
   }
@@ -2921,7 +2921,7 @@ async function detectBias(userAgent, country) {
       score: biasScore,
       details: biasScore > 0.8 ? ['potential_bias'] : []
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Bias detection error:', error);
     return { hasBias: false, score: 0, details: [] };
   }
@@ -3047,7 +3047,7 @@ async function processRequest(req, threatCheck, biasCheck) {
       )
 
       await Promise.allSettled(healthCheckPromises)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check cycle failed', { error })
     }
   }
@@ -3110,7 +3110,7 @@ async function processRequest(req, threatCheck, biasCheck) {
       } else if (isHealthy && currentStatus.status !== 'healthy') {
         this.emit('node-recovered', { locationId, responseTime })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Health check failed for location: ${locationId}`, { error })
 
       // Update status to failed
@@ -3158,7 +3158,7 @@ async function processRequest(req, threatCheck, biasCheck) {
       }
 
       return optimalLocation
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to find optimal edge node', { error })
       return null
     }
@@ -3282,7 +3282,7 @@ async function processRequest(req, threatCheck, biasCheck) {
       this.isInitialized = false
 
       logger.info('Edge Computing Manager cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Edge computing cleanup failed', { error })
       throw error
     }

@@ -54,7 +54,7 @@ function getSentry(): SentryShim | null {
     if (typeof window !== 'undefined' && (window as any).Sentry) {
       return (window as any).Sentry as SentryShim
     }
-  } catch (error) {
+  } catch (error: unknown) {
     if (import.meta.env.DEV) {
       console.warn('[Sentry] Failed to access global Sentry object:', error)
     }
@@ -268,7 +268,7 @@ export function countMetric(
     const Sentry = getSentry()
     if (!Sentry) return
     Sentry.metrics.count(name, value, { attributes })
-  } catch (error) {
+  } catch (error: unknown) {
     if (import.meta.env.DEV) {
       console.warn('[Sentry Metrics] Failed to emit count metric:', error)
     }
@@ -301,7 +301,7 @@ export function gaugeMetric(
     const Sentry = getSentry()
     if (!Sentry) return
     Sentry.metrics.gauge(name, value, { attributes, unit })
-  } catch (error) {
+  } catch (error: unknown) {
     if (import.meta.env.DEV) {
       console.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
     }
@@ -347,7 +347,7 @@ export function distributionMetric(
       attributes: options?.attributes,
       unit: options?.unit,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (import.meta.env.DEV) {
       console.warn(
         '[Sentry Metrics] Failed to emit distribution metric:',
@@ -522,7 +522,7 @@ export async function flushMetrics(): Promise<void> {
     if (client && typeof client.flush === 'function') {
       await client.flush()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     if (import.meta.env.DEV) {
       console.warn('[Sentry Metrics] Failed to flush metrics:', error)
     }

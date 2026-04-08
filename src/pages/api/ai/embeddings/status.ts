@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
           headers: { 'Content-Type': 'application/json' },
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof EmbeddingAgentError && error.statusCode === 0) {
         logger.warn('Embedding agent unavailable')
 
@@ -97,13 +97,13 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
       }
       throw error
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Status endpoint error:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -177,14 +177,14 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
           },
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Status POST endpoint error:', error)
 
     if (error instanceof EmbeddingAgentError) {
       return new Response(
         JSON.stringify({
           error: 'Embedding service error',
-          message: error.message,
+          message: (error instanceof Error ? error.message : "Unknown error"),
           statusCode: error.statusCode,
         }),
         {
@@ -197,7 +197,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

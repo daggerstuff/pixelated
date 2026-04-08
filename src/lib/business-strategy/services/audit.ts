@@ -66,7 +66,7 @@ export class AuditService {
       }
 
       await this.auditCollection.insertOne(auditLog)
-    } catch (error) {
+    } catch (error: unknown) {
       // Don't throw on audit failures to avoid breaking main operations
       console.error('Failed to log audit event:', error)
     }

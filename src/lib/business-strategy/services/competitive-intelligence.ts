@@ -30,7 +30,7 @@ export class CompetitiveIntelligenceService extends BaseService {
         .collection<CompetitorProfile>(this.collectionName)
         .find()
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'getCompetitors')
     }
   }
@@ -64,7 +64,7 @@ export class CompetitiveIntelligenceService extends BaseService {
         entityId: id,
         result: 'success',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'updateCompetitor')
     }
   }

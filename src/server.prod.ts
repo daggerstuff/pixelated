@@ -91,7 +91,7 @@ if (isProduction) {
     }
     server = createServer(options, app)
     console.log('🔒 HTTPS server configured')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ SSL certificates not found, falling back to HTTP:', error)
     server = createServer(app)
   }
@@ -125,7 +125,7 @@ app.use(
     console.error('❌ Error:', error)
     res.status(500).json({
       error: 'Internal server error',
-      message: isProduction ? 'Something went wrong' : error.message,
+      message: isProduction ? 'Something went wrong' : (error instanceof Error ? error.message : "Unknown error"),
     })
   },
 )

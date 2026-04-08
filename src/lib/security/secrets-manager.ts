@@ -115,7 +115,7 @@ export class SecretsManager {
         encrypted: Array.from(this.secrets.values()).filter((s) => s.encrypted)
           .length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load secrets', { error })
       throw new Error('Secrets manager initialization failed', { cause: error })
     }
@@ -187,7 +187,7 @@ export class SecretsManager {
               encrypted: false,
             })
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(`Failed to load secret file: ${filename}`, { error })
         }
       }

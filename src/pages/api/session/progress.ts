@@ -61,7 +61,7 @@ export const POST = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session progress:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -126,7 +126,7 @@ export const GET = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching session progress:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

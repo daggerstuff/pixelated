@@ -109,7 +109,7 @@ export class PythonBiasDetectionBridge {
         this.lastHealthCheck = new Date()
 
         logger.warn('Health check failed', {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
           consecutiveFailures: this.consecutiveFailures,
         })
       }
@@ -496,7 +496,7 @@ export class PythonBiasDetectionBridge {
       fallbackMode: true,
       serviceError:
         error instanceof Error
-          ? error.message
+          ? (error instanceof Error ? error.message : "Unknown error")
           : error && typeof error === 'object'
             ? JSON.stringify(error)
             : error
