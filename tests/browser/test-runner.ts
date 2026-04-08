@@ -17,7 +17,7 @@ const testConfig = {
 }
 
 // Ensure directories exist
-mkdirSync(testConfig.outputDir, { recursive: true }).slice()
+mkdirSync(testConfig.outputDir, { recursive: true })
 mkdirSync(testConfig.screenshotsDir, { recursive: true })
 
 // Test results collector
@@ -85,7 +85,7 @@ class TestResultsCollector {
     }, {})
 
     Object.entries(browserCount).forEach(([browser, count]) => {
-      if (count > 5) {
+      if ((count as number) > 5) {
         recommendations.push({
           priority: 'high',
           category: 'browser-compatibility',
@@ -416,7 +416,7 @@ export class ThemeTestRunner {
         test: 'test-execution',
         browser,
         status: 'error',
-        error: error.message,
+        error: (error as Error).message,
       })
     }
 

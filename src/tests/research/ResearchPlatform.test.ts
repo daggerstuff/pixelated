@@ -396,7 +396,7 @@ describe('Research Platform', () => {
       const audit = await platform.getAuditTrail('test-user')
 
       expect(audit.success).toBe(true)
-      expect(audit.data.length).toBeGreaterThan(0)
+      expect((audit.data as unknown[]).length).toBeGreaterThan(0)
     })
   })
 })
