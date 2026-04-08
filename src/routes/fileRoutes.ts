@@ -5,6 +5,23 @@ import { uploadConfig } from "../middleware/upload.js";
 import { DocumentVersioningService } from "../services/DocumentVersioningService.js";
 import { FileStorageService } from "../services/FileStorageService.js";
 
+interface FileMetadata {
+  id: string;
+  originalName: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  url: string;
+  thumbnailUrl?: string;
+  uploadedBy: string;
+  uploadedAt: Date;
+  folderId?: string;
+  version: number;
+  isPublic: boolean;
+  tags: string[];
+  metadata: Record<string, unknown>;
+}
+
 const router = Router();
 
 export function createFileRoutes(db: Pool) {

@@ -20,6 +20,16 @@ export interface UseOfflineDetectionOptions {
  * Hook for detecting online/offline status and network conditions
  * Provides real-time network state and connection quality metrics
  */
+type NetworkInformationLike = {
+  type?: string
+  effectiveType?: string
+  downlink?: number
+  rtt?: number
+  saveData?: boolean
+  addEventListener?: (type: string, listener: () => void) => void
+  removeEventListener?: (type: string, listener: () => void) => void
+}
+
 export function useOfflineDetection({
   onOnline,
   onOffline,
@@ -39,15 +49,6 @@ export function useOfflineDetection({
     if (typeof navigator === 'undefined') return
 
     const isOnline = navigator.onLine
-    type NetworkInformationLike = {
-      type?: string
-      effectiveType?: string
-      downlink?: number
-      rtt?: number
-      saveData?: boolean
-      addEventListener?: (type: string, listener: () => void) => void
-      removeEventListener?: (type: string, listener: () => void) => void
-    }
     const nav = navigator as unknown as {
       connection?: NetworkInformationLike
       mozConnection?: NetworkInformationLike

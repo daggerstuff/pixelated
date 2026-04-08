@@ -1,3 +1,5 @@
+import type { APIRoute } from 'astro'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { getSession } from '../../../lib/auth/session'
