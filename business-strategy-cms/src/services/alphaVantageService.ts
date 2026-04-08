@@ -120,7 +120,7 @@ export class AlphaVantageService {
 
       this.setCache(cacheKey, result)
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch Alpha Vantage quote', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -184,7 +184,7 @@ export class AlphaVantageService {
 
       this.setCache(cacheKey, fundamentals)
       return fundamentals
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch Alpha Vantage fundamentals', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -260,7 +260,7 @@ export class AlphaVantageService {
 
       this.setCache(cacheKey, indicators)
       return indicators.slice(0, 50) // Return last 50 data points
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch technical indicators', {
         symbol,
         indicator,
@@ -311,7 +311,7 @@ export class AlphaVantageService {
 
       this.setCache(cacheKey, indicators)
       return indicators
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch economic indicators', {
         indicator,
         error: error instanceof Error ? error.message : String(error),
@@ -352,7 +352,7 @@ export class AlphaVantageService {
 
       this.setCache(cacheKey, sentiments)
       return sentiments
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch news sentiment', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -388,7 +388,7 @@ export class AlphaVantageService {
 
       this.setCache(cacheKey, earnings)
       return earnings
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to fetch quarterly earnings', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -434,7 +434,7 @@ export class AlphaVantageService {
         technical,
         news,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get comprehensive market analysis', {
         symbols,
         error: error instanceof Error ? error.message : String(error),

@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
       success: true,
       data: result,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(400).json({
       success: false,
       error: {
@@ -33,7 +33,7 @@ router.post('/login', async (req, res) => {
       success: true,
       data: result,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(401).json({
       success: false,
       error: {
@@ -52,7 +52,7 @@ router.post('/refresh', async (req, res) => {
       success: true,
       data: { tokens },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(401).json({
       success: false,
       error: {
@@ -72,7 +72,7 @@ router.post('/logout', async (req, res) => {
       success: true,
       message: 'Logged out successfully',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(400).json({
       success: false,
       error: {

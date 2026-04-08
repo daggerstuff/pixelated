@@ -95,7 +95,7 @@ export class MarketDataService {
       }
 
       return marketData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get comprehensive market data', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -120,7 +120,7 @@ export class MarketDataService {
             result.status === 'fulfilled' && result.value !== null,
         )
         .map((result) => result.value)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get bulk market data', {
         symbols,
         error: error instanceof Error ? error.message : String(error),
@@ -171,7 +171,7 @@ export class MarketDataService {
       }
 
       return analysis
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get technical analysis', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -228,7 +228,7 @@ export class MarketDataService {
       }
 
       return sectorData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get sector performance', {
         error: error instanceof Error ? error.message : String(error),
       })
@@ -264,7 +264,7 @@ export class MarketDataService {
       }
 
       return economicData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get economic indicators', {
         error: error instanceof Error ? error.message : String(error),
       })
@@ -339,7 +339,7 @@ export class MarketDataService {
         technicalScore,
         fundamentalScore,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get market sentiment', {
         symbol,
         error: error instanceof Error ? error.message : String(error),

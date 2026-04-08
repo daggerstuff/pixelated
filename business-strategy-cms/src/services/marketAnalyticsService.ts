@@ -40,7 +40,7 @@ export class MarketAnalyticsService {
       }
 
       return penetrationAnalysis.sort((a, b) => b.opportunity - a.opportunity)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to analyze market penetration', {
         error,
         targetSegments,

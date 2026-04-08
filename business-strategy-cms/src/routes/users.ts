@@ -22,7 +22,7 @@ router.get(
         success: true,
         data: users,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({
         success: false,
         error: {
@@ -53,7 +53,7 @@ router.get(
         success: true,
         data: user,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({
         success: false,
         error: {
@@ -94,7 +94,7 @@ router.put(
         success: true,
         data: user,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({
         success: false,
         error: {
@@ -121,7 +121,7 @@ router.post(
         success: true,
         data: result,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(400).json({
         success: false,
         error: {
@@ -153,7 +153,7 @@ router.put(
         success: true,
         data: user,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({
         success: false,
         error: {
@@ -187,7 +187,7 @@ router.put(
         success: true,
         data: user,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({
         success: false,
         error: {

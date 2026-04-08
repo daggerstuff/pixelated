@@ -129,7 +129,7 @@ const startServer = async () => {
         `Export functionality: ${config.enableExport ? 'enabled' : 'disabled'}`,
       )
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to start server:', error)
     process.exit(1)
   }
@@ -162,7 +162,7 @@ const gracefulShutdown = async (signal: string) => {
       logger.error('Forced shutdown after timeout')
       process.exit(1)
     }, 30000)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error during graceful shutdown:', error)
     process.exit(1)
   }
