@@ -7,7 +7,13 @@ import type {
   ResponseGenerationResult,
   SentimentAnalysisResult,
 } from "./types";
-let mongodb: unknown;
+let mongodb:
+  | {
+      connect: () => Promise<{ getDb: () => any }>
+      getDb: () => any
+    }
+  | null
+  | unknown = null;
 let ObjectId: typeof import("mongodb").ObjectId | undefined;
 
 if (typeof window === "undefined") {
