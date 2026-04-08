@@ -11,6 +11,14 @@ import {
   getAllFeatures,
 } from './feature-detection'
 
+// Type declaration for global logger
+declare const logger: {
+  info: (message: string, ...args: unknown[]) => void
+  debug: (message: string, ...args: unknown[]) => void
+  warn: (message: string, ...args: unknown[]) => void
+  error: (message: string, ...args: unknown[]) => void
+}
+
 /**
  * Setup browser environment
  * Initializes feature detection, loads polyfills, and sets up browser-specific functionality

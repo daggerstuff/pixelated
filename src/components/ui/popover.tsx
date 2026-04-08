@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext } from 'react'
+import React, { useState, useContext, createContext, type FC } from 'react'
 
 interface PopoverContextType {
   isOpen: boolean

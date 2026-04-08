@@ -11,6 +11,15 @@ import { BreachNotificationSystem } from '../lib/security/breach-notification'
 // Load environment variables
 dotenv.config()
 
+// Type declarations for functions defined later in this file
+declare function promptForConfirmation(message: string): Promise<boolean>
+declare function getSeverityColor(
+  severity: 'low' | 'medium' | 'high' | 'critical',
+): (text: string) => string
+declare function getStatusColor(
+  status: 'pending' | 'in_progress' | 'completed',
+): (text: string) => string
+
 const program = new Command()
 
 program
