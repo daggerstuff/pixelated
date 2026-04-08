@@ -2,9 +2,7 @@
 	path = ai
 	url = ../ai
 	branch = staging
-	ignore = all
 
 [submodule "docs"]
 	path = docs
 	url = ../docs
-	ignore = all
