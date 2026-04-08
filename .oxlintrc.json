@@ -1,5 +1,21 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true,
+    "node": true,
+    "vitest": true
+  },
+  "globals": {
+    "expect": "readonly",
+    "it": "readonly",
+    "describe": "readonly",
+    "vi": "readonly",
+    "beforeEach": "readonly",
+    "afterEach": "readonly",
+    "beforeAll": "readonly",
+    "afterAll": "readonly",
+    "test": "readonly"
+  },
   "options": {
     "typeAware": true,
     "typeCheck": true

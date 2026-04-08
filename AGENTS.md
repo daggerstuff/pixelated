@@ -24,7 +24,7 @@ Follow this loop for every task to ensure durability and reliability:
     -   Minimize context window bloat and reduce session latency.
 3.  **Plan**: Draft in `.agent/internal/plans/` (`YYYY-MM-DD-task-name.md`).
 4.  **Act**: Small, atomic chunks. Fix root causes, not symptoms.
-5.  **Verify**: Run `kluster-verify` after *every* edit. Validate with focused tests.
+5.  **Verify**: Validate each change with the smallest focused local checks that cover the behavior.
 6.  **Retain**: Log actions/learnings in Hindsight (`retain`) at task end.
 
 ## 🏗️ Project Structure
@@ -53,7 +53,6 @@ Follow this loop for every task to ensure durability and reliability:
 - **Context**: Use `context7` for provider docs and `exa` for web search.
 
 ## 🔒 Verification & Memory
-- **Kluster AI**: Mandatory verification after *every* file change. Review todos and fix until resolved.
 - **Hindsight**: Always recall context at start and retain learnings at task end.
 - **Hindsight Identity**: In this project, NEVER use Hindsight with `user_id: "default"`. Use `user_id: "vivi"` unless the user explicitly provides a different identity.
 - **Validation**: Smallest relevant test surface; do not skip behavior checks.
