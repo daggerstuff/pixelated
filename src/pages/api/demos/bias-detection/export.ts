@@ -199,7 +199,7 @@ function convertToCSV(exportData: ExportData): string {
     >
     scenarios.forEach((scenario, index) => {
       csvRows.push(
-        `Counterfactual,Scenario ${index + 1},${scenario.expectedBiasReduction},${scenario.change}`,
+        `Counterfactual,Scenario ${index + 1},${scenario.expectedBiasReduction as number},${scenario.change}`,
       )
       csvRows.push(
         `Counterfactual,Likelihood ${index + 1},${scenario.likelihood},${scenario.description}`,
@@ -258,7 +258,7 @@ function convertToText(exportData: ExportData): string {
     >
     scenarios.forEach((scenario, index) => {
       content += `${index + 1}. ${scenario.change}\n`
-      content += `   Expected Reduction: ${(scenario.expectedBiasReduction * 100).toFixed(1)}%\n`
+      content += `   Expected Reduction: ${(scenario.expectedBiasReduction as number * 100).toFixed(1)}%\n`
       content += `   Likelihood: ${scenario.likelihood}\n`
       content += `   Description: ${scenario.description}\n\n`
     })

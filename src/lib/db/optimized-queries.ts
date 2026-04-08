@@ -284,7 +284,7 @@ export class OptimizedBiasQueries {
     const countResult = await executeQuery(countQuery, params.slice(0, -2), {
       name: "getBiasAnalysesCount",
     });
-    const total = parseInt(countResult.rows[0].total);
+    const total = parseInt((countResult.rows[0] as { total: string }).total);
 
     return {
       analyses: result.rows,
@@ -468,13 +468,13 @@ export class OptimizedBiasQueries {
     const cacheResult = await executeQuery(cacheHitQuery, [], {
       name: "getCacheHitRate",
     });
-    const cacheHitRate = cacheResult.rows[0]?.cache_hit_rate || 0;
+    const cacheHitRate = (cacheResult.rows[0] as { cache_hit_rate: string } | {}).cache_hit_rate || 0;
 
     return {
-      total_analyses: parseInt(row.total_analyses),
-      avg_processing_time: parseFloat(row.avg_processing_time),
+      total_analyses: parseInt((row as { total_analyses: string }).total_analyses),
+      avg_processing_time: parseFloat((row as { avg_processing_time: string }).avg_processing_time),
       cache_hit_rate: parseFloat(cacheHitRate),
-      slow_queries: parseInt(row.slow_queries),
+      slow_queries: parseInt((row as { slow_queries: string }).slow_queries),
       error_rate: 0, // Would need error tracking table for real calculation
     };
   }

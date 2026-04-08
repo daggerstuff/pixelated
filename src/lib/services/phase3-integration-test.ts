@@ -282,7 +282,7 @@ export class Phase3IntegrationTester {
         sessionId: 'phase3-cross-test',
         timestamp: Date.now(),
         metadata: {
-          emotionPrimary: emotionResult['primary'],
+          emotionPrimary: (emotionResult as { primary?: unknown })['primary'],
           biasScore: biasResult['biasScore'],
         },
       })
@@ -314,7 +314,7 @@ export class Phase3IntegrationTester {
       return (
         emotionMemory['id'] !== undefined &&
         biasMemory['id'] !== undefined &&
-        emotionResult['primary'] !== undefined &&
+        (emotionResult as { primary?: unknown })['primary'] !== undefined &&
         biasResult['biasScore'] !== undefined &&
         encryptedData !== sessionText
       )

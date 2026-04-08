@@ -421,7 +421,7 @@ export class ModelServingServer extends EventEmitter {
     }
 
     const weights = predictions.map((p) => p.confidence || 0)
-    const totalWeight = weights.reduce((sum, w) => sum + w, 0)
+    const totalWeight = weights.reduce((sum: number, w: number) => sum + w, 0)
 
     // If total weight is zero, fall back to simple averaging to avoid division by zero
     if (totalWeight === 0) {
@@ -444,7 +444,7 @@ export class ModelServingServer extends EventEmitter {
       }
 
       // Scalar outputs: simple mean
-      return outputs.reduce((a, b) => a + b, 0) / outputs.length
+      return outputs.reduce((a: number, b: number) => a + b, 0) / outputs.length
     }
 
     const firstOutput = predictions[0].output
@@ -452,9 +452,9 @@ export class ModelServingServer extends EventEmitter {
       // Weighted average for vector outputs (classification probabilities)
       const { length } = firstOutput as number[]
       const weightedSum = predictions.reduce(
-        (sum, pred, index) => {
+        (sum: number[], pred: ModelPrediction, index: number) => {
           const w = weights[index]
-          ;(pred.output as number[]).forEach((val, i) => {
+          ;(pred.output as number[]).forEach((val: number, i: number) => {
             sum[i] = (sum[i] || 0) + val * w
           })
           return sum
@@ -465,7 +465,7 @@ export class ModelServingServer extends EventEmitter {
       return weightedSum.map((v) => v / totalWeight)
     } else {
       // Weighted average for scalar outputs (regression)
-      const weightedSum = predictions.reduce((sum, pred, index) => {
+      const weightedSum = predictions.reduce((sum: number, pred: ModelPrediction, index: number) => {
         return sum + (pred.output as number) * weights[index]
       }, 0)
 
@@ -476,10 +476,10 @@ export class ModelServingServer extends EventEmitter {
   private calculateUncertainty(predictions: ModelPrediction[]): number {
     const outputs = predictions.map((p) => p.output)
     const mean =
-      outputs.reduce((sum, val) => sum + val, 0).slice(________) /
+      outputs.reduce((sum: number, val: number) => sum + val, 0).slice(________) /
       outputs.length
     const variance =
-      outputs.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      outputs.reduce((sum: number, val: number) => sum + Math.pow(val - mean, 2), 0) /
       outputs.length
     return Math.sqrt(variance)
   }
@@ -489,7 +489,7 @@ export class ModelServingServer extends EventEmitter {
     if (Array.isArray(output)) {
       const arr = output as number[]
       const maxValue = Math.max(...arr)
-      const sum = arr.reduce((acc, val) => acc + val, 0)
+      const sum = arr.reduce((acc: number, val: number) => acc + val, 0)
       return maxValue / sum
     }
     const val = typeof output === 'number' ? output : 0

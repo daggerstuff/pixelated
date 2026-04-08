@@ -101,7 +101,7 @@ test('basic browser compatibility check', async ({ page, browser }) => {
 
   // Parse and validate the content
   try {
-    const featuresJson = JSON.parse(content) as unknown
+    const featuresJson = JSON.parse(content) as { fetch: unknown; promise: unknown; arrayMethods: unknown; css: { flexbox: unknown; grid: unknown; variables: unknown } }
     console.log('Features detected:', featuresJson)
 
     // Verify essential features

@@ -411,7 +411,7 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
 
   const emotionMix: Record<string, number> = {}
   emotionCounts.forEach((stats, emotion) => {
-    const percentage = stats.count / sessionEmotions.length
+    const percentage = (stats.count as number) / sessionEmotions.length
     emotionMix[emotion] = percentage
 
     if (stats.count > maxCount) {
@@ -529,7 +529,7 @@ function generateEmotionParticles(
     const rand = Math.random()
     let cumulative = 0
 
-    for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix)) {
+    for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix) as [string, number][]) {
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

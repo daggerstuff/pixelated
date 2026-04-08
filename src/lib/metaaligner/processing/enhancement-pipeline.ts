@@ -331,7 +331,7 @@ export class EnhancementPipeline {
     // Compare overall score
 
     // Compare individual objective scores
-    for (const [objectiveId, enhancedResult] of Object.entries(
+    for (const [objectiveId, enhancedResult] of Object.entries<(string, { score: number })>(
       enhanced.objectiveResults,
     )) {
       const originalResult = original.objectiveResults[objectiveId]
