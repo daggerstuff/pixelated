@@ -928,7 +928,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
 
       const result = await this.cockroachClient!.query(query);
 
-      for (const log of result.rows) {
+      for (const log of result.rows as Array<{ id: string; [key: string]: unknown }>) {
         try {
           // Retry the failed operation
           await this.retrySyncOperation(log);
@@ -1105,7 +1105,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         AND sync_status = 'completed'
       `;
 
-      const result = await this.cockroachClient!.query(cleanupQuery);
+      const result = (await this.cockroachClient!.query(cleanupQuery);
       this.logger.debug(`Cleaned up ${result.rowCount} old sync logs`);
     } catch (error: unknown) {
       this.logger.error("Failed to cleanup old data", { error });
@@ -1231,7 +1231,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         AND sync_status = 'completed'
       `;
 
-      const result = await this.cockroachClient!.query(query, [region]);
+      const result = (await this.cockroachClient!.query(query, [region]);
 
       if (result.rows.length > 0 && result.rows[0].lag_seconds !== null) {
         return parseFloat(result.rows[0].lag_seconds);
