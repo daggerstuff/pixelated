@@ -17,6 +17,9 @@ export interface AuthUser {
   userMetadata?: Record<string, unknown>
 }
 
+// User type alias for compatibility with various imports
+export type User = AuthUser
+
 export interface SessionData {
   sessionId: string
   userId: string
