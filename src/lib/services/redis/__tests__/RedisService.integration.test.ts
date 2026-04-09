@@ -7,7 +7,7 @@ expect.extend({
   toBeRedisError(
     received: unknown,
     code: RedisErrorCode,
-  ): jest.CustomMatcherResult {
+  ): vi.CustomMatcherResult {
     const error = received as { code?: RedisErrorCode }
     const pass = error?.code === code
     return {
