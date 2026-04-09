@@ -167,11 +167,12 @@ export class BackupVerificationService extends EventEmitter {
 
   private isValidBackupStructure(backup: unknown): boolean {
     return (
+      backup !== null &&
       typeof backup === "object" &&
-      typeof backup.timestamp === "number" &&
-      typeof backup.version === "string" &&
-      typeof backup.environment === "string" &&
-      typeof backup.data === "object"
+      typeof (backup as Record<string, unknown>).timestamp === "number" &&
+      typeof (backup as Record<string, unknown>).version === "string" &&
+      typeof (backup as Record<string, unknown>).environment === "string" &&
+      typeof (backup as Record<string, unknown>).data === "object"
     );
   }
 
@@ -237,9 +238,10 @@ export class BackupVerificationService extends EventEmitter {
 
   private verifyConfigData(data: unknown): boolean {
     return (
+      data !== null &&
       typeof data === "object" &&
-      typeof data.version === "string" &&
-      typeof data.environment === "string"
+      typeof (data as Record<string, unknown>).version === "string" &&
+      typeof (data as Record<string, unknown>).environment === "string"
     );
   }
 
