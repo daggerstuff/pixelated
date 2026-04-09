@@ -172,12 +172,12 @@ export interface HuntTemplate {
 }
 
 export class ThreatHuntingSystem extends EventEmitter {
-  private mongoClient: MongoClient
-  private db: Db
-  private huntsCollection: Collection<ThreatHunt>
-  private resultsCollection: Collection<HuntResult>
-  private falsePositivesCollection: Collection<FalsePositive>
-  private redis: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private huntsCollection!: Collection<ThreatHunt>
+  private resultsCollection!: Collection<HuntResult>
+  private falsePositivesCollection!: Collection<FalsePositive>
+  private redis!: Redis
   private isInitialized = false
   private huntQueue: string[] = []
   private isProcessing = false
