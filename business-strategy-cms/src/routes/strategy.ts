@@ -110,25 +110,37 @@ router.get('/sources', (_req, res) => {
 router.post('/refresh-analysis', async (_req, res) => {
   try {
     const documents = await DocumentModelMongoose.find({})
-    let updatedCount = 0
 
-    for (const doc of documents) {
-      const review = await AIStrategyReviewService.reviewDocument(
-        doc._id.toString(),
-      )
-      const mapping = await EdgeCaseMappingService.mapStrategyToEdgeCases(
-        doc._id.toString(),
-      )
+    // ⚡ Bolt: Use Promise.all to fetch AI reviews and edge case mappings concurrently,
+    // and replace sequential findByIdAndUpdate calls with a single bulkWrite operation to reduce N+1 queries.
+    const bulkOps = await Promise.all(
+      documents.map(async (doc) => {
+        const idStr = doc._id.toString()
+        const [review, mapping] = await Promise.all([
+          AIStrategyReviewService.reviewDocument(idStr),
+          EdgeCaseMappingService.mapStrategyToEdgeCases(idStr)
+        ])
 
-      await DocumentModelMongoose.findByIdAndUpdate(doc._id, {
-        $set: {
-          'metadata.reviewScore': review.overallScore,
-          'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
-          'metadata.aiReview': review,
-        },
+        return {
+          updateOne: {
+            filter: { _id: doc._id },
+            update: {
+              $set: {
+                'metadata.reviewScore': review.overallScore,
+                'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
+                'metadata.aiReview': review,
+              },
+            },
+          },
+        }
       })
-      updatedCount++
+    )
+
+    if (bulkOps.length > 0) {
+      await DocumentModelMongoose.bulkWrite(bulkOps as any)
     }
+
+    const updatedCount = bulkOps.length
     res.json({
       message: `Successfully refreshed analysis for ${updatedCount} documents.`,
     })
