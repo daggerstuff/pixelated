@@ -52,7 +52,7 @@ export class TherapeuticResponseGenerator {
       return 'crisis'
     }
 
-    const hasThoughtPatterns = analysis.indicators.some(
+    const hasThoughtPatterns = analysis.indicators?.some(
       (i) =>
         i.type === 'depression' &&
         i.evidence.some(
@@ -63,7 +63,7 @@ export class TherapeuticResponseGenerator {
         ),
     )
 
-    const hasBehavioralIssues = analysis.indicators.some(
+    const hasBehavioralIssues = analysis.indicators?.some(
       (i) =>
         i.type === 'isolation' ||
         (i.type === 'depression' &&
@@ -108,7 +108,7 @@ export class TherapeuticResponseGenerator {
         Math.floor(Math.random() * this.crisisResponses.length)
       ]
 
-    const crisisIndicator = analysis.indicators.find((i) => i.type === 'crisis')
+    const crisisIndicator = analysis.indicators?.find((i) => i.type === 'crisis')
     if (
       crisisIndicator &&
       crisisIndicator.evidence.some(
@@ -308,7 +308,7 @@ export class TherapeuticResponseGenerator {
     }
 
     // Crisis indicators take priority
-    const crisisIndicator = analysis.indicators.find((i) => i.type === 'crisis')
+    const crisisIndicator = analysis.indicators?.find((i) => i.type === 'crisis')
     if (crisisIndicator) {
       return crisisIndicator
     }
