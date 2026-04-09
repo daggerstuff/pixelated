@@ -4,6 +4,7 @@ import process from 'node:process'
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
 import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
@@ -26,7 +27,30 @@ const isBuildCommand =
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN =
   !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+const sentryRelease =
+  process.env.SENTRY_RELEASE || process.env.npm_package_version || undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+
+function createScopedSentryVitePlugins({ ssr, assets, filesToDeleteAfterUpload }) {
+  return sentryVitePlugin({
+    org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT || 'pixel-astro',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    telemetry: false,
+    release: sentryRelease ? { name: sentryRelease } : undefined,
+    sourcemaps: {
+      assets,
+      ignore: ['**/node_modules/**'],
+      filesToDeleteAfterUpload,
+    },
+  }).map((plugin) => ({
+    ...plugin,
+    apply(config, env) {
+      return env.command === 'build' && Boolean(config.build?.ssr) === ssr
+    },
+  }))
+}
+
 const preferredPort = (() => {
   const candidates = [
     process.env.PORT,
@@ -225,6 +249,23 @@ export default defineConfig({
       },
     },
     plugins: [
+      ...(hasSentryDSN
+        ? [
+            ...createScopedSentryVitePlugins({
+              ssr: false,
+              assets: [
+                './dist/client/_astro/**/*.js',
+                './dist/client/_astro/**/*.js.map',
+              ],
+              filesToDeleteAfterUpload: ['./dist/client/_astro/**/*.map'],
+            }),
+            ...createScopedSentryVitePlugins({
+              ssr: true,
+              assets: ['./dist/server/**/*.mjs', './dist/server/**/*.mjs.map'],
+              filesToDeleteAfterUpload: ['./dist/server/**/*.map'],
+            }),
+          ]
+        : []),
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
         visualizer({
@@ -374,26 +415,11 @@ export default defineConfig({
       ...(hasSentryDSN
         ? [
             sentry({
-              sourceMapsUploadOptions: {
-                org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-                project: process.env.SENTRY_PROJECT || 'pixel-astro',
-                authToken: process.env.SENTRY_AUTH_TOKEN,
-                // Include release for proper stack trace linking and code mapping
-                release:
-                  process.env.SENTRY_RELEASE ||
-                  process.env.npm_package_version ||
-                  undefined,
-                telemetry: false,
-                sourcemaps: {
-                  assets: [
-                    './.astro/dist/**/*.js',
-                    './.astro/dist/**/*.mjs',
-                    './dist/**/*.js',
-                    './dist/**/*.mjs',
-                  ],
-                  ignore: ['**/node_modules/**'],
-                  filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
-                },
+              telemetry: false,
+              // Upload sourcemaps through the Vite plugin so each Astro build
+              // phase only uploads the files it actually emitted.
+              sourcemaps: {
+                disable: true,
               },
             }),
             // Temporarily disable SpotlightJS due to build issues

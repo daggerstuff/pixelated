@@ -91,7 +91,7 @@ function convertAnalysisToLegacyFormat(
     const evidence: Record<string, string[]> = {}
 
     // Convert indicators to scores and evidence
-    (mhAnalysis.indicators ?? []).forEach(((indicator) => {
+    ;(mhAnalysis.indicators ?? []).forEach((indicator) => {
       scores[indicator.type] = indicator.severity
       evidence[indicator.type] = indicator.evidence
     })
@@ -100,7 +100,9 @@ function convertAnalysisToLegacyFormat(
       id: mhAnalysis.id,
       timestamp: mhAnalysis.timestamp,
       category: (mhAnalysis.categories ?? [])[0]?.name || 'general',
-      explanation: (mhAnalysis.indicators ?? []).map(((i) => i.description).join('; '),
+      explanation: (mhAnalysis.indicators ?? [])
+        .map((indicator) => indicator.description)
+        .join('; '),
       expertGuided: false,
       scores: {
         depression: scores['depression'] || 0,

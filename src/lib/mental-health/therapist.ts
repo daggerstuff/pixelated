@@ -223,7 +223,7 @@ export class TherapeuticResponseGenerator {
     }
 
     // Add specific techniques based on indicators
-    analysis.indicators?.[]forEach((indicator) => {
+    analysis.indicators?.forEach((indicator) => {
       switch (indicator.type) {
         case 'anxiety':
           techniques.push('Breathing exercises', 'Grounding techniques')
@@ -303,7 +303,7 @@ export class TherapeuticResponseGenerator {
   private getPrimaryIndicator(
     analysis: MentalHealthAnalysis,
   ): HealthIndicator | undefined {
-    if (analysis.indicators?.[]length === 0) {
+    if (!analysis.indicators?.length) {
       return undefined
     }
 
@@ -314,7 +314,7 @@ export class TherapeuticResponseGenerator {
     }
 
     // Otherwise, return the indicator with highest severity
-    return analysis.indicators?.[]reduce((prev, current) =>
+    return analysis.indicators?.reduce((prev, current) =>
       current.severity > prev.severity ? current : prev,
     )
   }

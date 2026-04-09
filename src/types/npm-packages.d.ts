@@ -1,42 +1,29 @@
 // Additional type declarations for npm packages
 
-// Mongoose
-declare module 'mongoose' {
-  import * as mongodb from 'mongodb'
+// Mongoose - using actual mongoose types
+// Type augmentation for mongoose models
+import 'mongoose'
 
-  export interface Schema<T = unknown> {
-    new (definition?: T): Schema<T>
+declare module 'mongoose' {
+  interface SchemaOptions {
+    timestamps?: boolean
+    strict?: boolean
+    collection?: string
   }
-  export interface Model<T> {
-    new (doc?: T): Document<T>
-    find(filter?: unknown): Query<T[]>
-    findById(id: string): Query<T | null>
-    create(doc: T): Promise<Document<T>>
-    save(doc: Document<T>): Promise<Document<T>>
+
+  interface SchemaDefinition {
+    [key: string]: SchemaDefinitionProperty | SchemaDefinition
   }
-  export interface Document<T = unknown> {
-    _id: string
-    __v?: number
-    toJSON(): T
-    toObject(): T
-    save(): Promise<this>
-  }
-  export interface Query<T> {
-    find(filter?: unknown): Query<T>
-    findById(id: string): Query<T | null>
-    exec(): Promise<T>
-    lean(): Query<T>
-  }
-  export function model<T>(
-    name: string,
-    schema?: Schema<T>
-  ): Model<T>
-  export function connect(uri: string, options?: unknown): Promise<void>
-  export function disconnect(): Promise<void>
-  export types: {
-    Document: typeof Document
-    Model: typeof Model
-    Schema: typeof Schema
+
+  interface SchemaDefinitionProperty {
+    type?: any
+    required?: boolean
+    unique?: boolean
+    index?: boolean
+    enum?: string[]
+    default?: any
+    ref?: string
+    lowercase?: boolean
   }
 }
 

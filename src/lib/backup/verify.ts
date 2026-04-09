@@ -256,7 +256,7 @@ export class BackupVerificationService extends EventEmitter {
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        this.verifyDataIntegrity(((backup as Record<string, unknown>).data);
+        this.verifyDataIntegrity((backup as Record<string, unknown>).data);
       }
 
       // Verify restoration capability
@@ -281,7 +281,7 @@ export class BackupVerificationService extends EventEmitter {
       await testRedis.connect();
 
       // Test restore a small subset of data
-      const testData = this.extractTestData(((backup as Record<string, unknown>).data);
+      const testData = this.extractTestData((backup as Record<string, unknown>).data);
       await this.restoreTestData(testRedis, testData);
 
       // Verify restored data

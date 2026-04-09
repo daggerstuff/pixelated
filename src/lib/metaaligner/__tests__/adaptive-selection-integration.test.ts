@@ -30,7 +30,7 @@ import { ObjectiveSwitcher } from '../prioritization/objective-switcher'
 // Mock AI Service
 const createMockAIService = (): AIService => {
   return {
-    getModelInfo: vi.fn<() => { id: string; name: string; provider: string; capabilities: string[]; contextWindow: number; maxTokens: number }>>().mockReturnValue({
+    getModelInfo: vi.fn<() => { id: string; name: string; provider: string; capabilities: string[]; contextWindow: number; maxTokens: number }>().mockReturnValue({
       id: 'test-model',
       name: 'Test Model',
       provider: 'test',

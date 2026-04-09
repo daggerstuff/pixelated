@@ -48,5 +48,5 @@
 ## Nvidia NIM Models
 
 Configured via `modelProviders` in `.qwen/settings.json`. Switch with `/model`.
-Primary: `qwen/qwen3.5-122b-a10b`. Fast: `nvidia/llama-3.1-nemotron-nano-8b-v1`.
+Primary: `z-ai/glm5`. Fast: `nvidia/llama-3.1-nemotron-nano-8b-v1`.
 Requires `NVIDIA_API_KEY` env var.

@@ -4,6 +4,7 @@
  */
 
 import { authClient } from '@/lib/auth-client'
+import storageManager from '@/utils/storage/storageManager'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('journal-research-auth')
@@ -26,8 +27,8 @@ export async function getJournalResearchAuthToken(): Promise<string | null> {
 
     // Fallback to localStorage for backward compatibility
     return (
-      window.localStorage.getItem('auth_token') ??
-      window.localStorage.getItem('authToken') ??
+      storageManager.get('auth_token') ??
+      storageManager.get('authToken') ??
       null
     )
   } catch (error: unknown) {
@@ -36,8 +37,8 @@ export async function getJournalResearchAuthToken(): Promise<string | null> {
     // Fallback to localStorage
     try {
       return (
-        window.localStorage.getItem('auth_token') ??
-        window.localStorage.getItem('authToken') ??
+        storageManager.get('auth_token') ??
+        storageManager.get('authToken') ??
         null
       )
     } catch (localStorageError) {
