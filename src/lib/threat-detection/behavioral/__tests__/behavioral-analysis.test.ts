@@ -35,7 +35,7 @@ const mockRedisInstance = {
 }
 
 const mockDb = {
-  collection: vi.fn(() => ({
+  collection: vi.fn<any>(() => ({
     replaceOne: vi.fn<any>().mockResolvedValue({}),
     insertMany: vi.fn<any>().mockResolvedValue({}),
     insertOne: vi.fn<any>().mockResolvedValue({}),
@@ -44,14 +44,14 @@ const mockDb = {
 
 const mockMongoClientInstance = {
   connect: vi.fn<any>().mockResolvedValue(undefined),
-  db: vi.fn(() => mockDb),
+  db: vi.fn<any>(() => mockDb),
   close: vi.fn<any>().mockResolvedValue(undefined),
 }
 
 // Mock external modules
 vi.mock('ioredis', () => {
   return {
-    Redis: vi.fn(function () {
+    Redis: vi.fn<any>(function () {
       return mockRedisInstance
     }),
   }
@@ -59,7 +59,7 @@ vi.mock('ioredis', () => {
 
 vi.mock('mongodb', () => {
   return {
-    MongoClient: vi.fn(function () {
+    MongoClient: vi.fn<any>(function () {
       return mockMongoClientInstance
     }),
   }
@@ -69,14 +69,14 @@ vi.mock('@tensorflow/tfjs', () => {
   const mockModel = {
     add: vi.fn<any>(),
     compile: vi.fn<any>(),
-    predict: vi.fn(() => ({
+    predict: vi.fn<any>(() => ({
       dataSync: () => [0.1],
       dispose: vi.fn<any>(),
     })),
   }
 
   return {
-    sequential: vi.fn(() => mockModel),
+    sequential: vi.fn<any>(() => mockModel),
     layers: {
       dense: vi.fn<any>(),
       dropout: vi.fn<any>(),
@@ -84,9 +84,9 @@ vi.mock('@tensorflow/tfjs', () => {
     train: {
       adam: vi.fn<any>(),
     },
-    tidy: vi.fn((fn: any) => fn()),
+    tidy: vi.fn<any>((fn: any) => fn()),
     tensor2d: vi.fn<any>(),
-    mean: vi.fn(() => ({ dataSync: () => [0.1] })),
+    mean: vi.fn<any>(() => ({ dataSync: () => [0.1] })),
     abs: vi.fn<any>(),
     sub: vi.fn<any>(),
   }
