@@ -926,7 +926,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         LIMIT 50
       `;
 
-      const result = await this.cockroachClient!.query(query);
+      const result = await this.cockroachClient!.query(query) as { rows: Array<{ id: string; [key: string]: unknown }> };
 
       for (const log of result.rows as Array<{ id: string; [key: string]: unknown }>) {
         try {
@@ -1105,7 +1105,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         AND sync_status = 'completed'
       `;
 
-      const result = (await this.cockroachClient!.query(cleanupQuery);
+      const result = await this.cockroachClient!.query(cleanupQuery) as { rows: Array<{ id: string; [key: string]: unknown }> };
       this.logger.debug(`Cleaned up ${result.rowCount} old sync logs`);
     } catch (error: unknown) {
       this.logger.error("Failed to cleanup old data", { error });
@@ -1125,7 +1125,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         AND retry_count >= 3
       `;
 
-      const result = await this.cockroachClient!.query(query);
+      const result = await this.cockroachClient!.query(query) as { rows: Array<{ id: string; [key: string]: unknown }> };
       this.logger.debug(`Cleaned up ${result.rowCount} old sync log entries`);
     } catch (error: unknown) {
       this.logger.error("Failed to cleanup sync logs", { error });
@@ -1157,7 +1157,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         ORDER BY region
       `;
 
-      const result = await this.cockroachClient!.query(query);
+      const result = await this.cockroachClient!.query(query) as { rows: Array<{ id: string; [key: string]: unknown }> };
 
       const distribution: DataDistribution = {
         totalRecords: 0,
@@ -1231,7 +1231,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         AND sync_status = 'completed'
       `;
 
-      const result = (await this.cockroachClient!.query(query, [region]);
+      const result = await this.cockroachClient!.query(query, [region]) as { rows: Array<{ id: string; [key: string]: unknown }> };
 
       if (result.rows.length > 0 && result.rows[0].lag_seconds !== null) {
         return parseFloat(result.rows[0].lag_seconds);

@@ -331,7 +331,7 @@ export class AIMonitoringService extends EventEmitter {
       })
 
       const insights =
-        response.choices[0]?.message?.content || 'No insights generated'
+        (response as { choices: Array<{ message?: { content?: string } }> }).choices[0]?.message?.content || 'No insights generated'
 
       // Update alerts with AI insights
       for (const alert of recentAlerts) {
