@@ -631,7 +631,7 @@ export function MemoryDashboard({
                 </CardHeader>
                 <CardContent>
                   <div className='text-2xl font-bold'>
-                    {memory.stats.recentActivity.length}
+                    {memory.stats.recentActivity?.length ?? 0}
                   </div>
                 </CardContent>
               </Card>

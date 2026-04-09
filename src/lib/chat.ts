@@ -120,7 +120,7 @@ function convertAnalysisToLegacyFormat(
         socialIsolation: evidence['isolation'] || [],
         ...evidence,
       },
-      summary: mhAnalysis.recommendations.join('. '),
+      summary: mhAnalysis.recommendations?.join('. '),
       riskLevel:
         mhAnalysis.riskLevel === 'critical'
           ? 'high'

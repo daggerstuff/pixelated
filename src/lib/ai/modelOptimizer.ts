@@ -310,11 +310,11 @@ class ModelOptimizer {
     });
 
     // Strategy-specific recommendations
-    if (strategy.name.includes("Quantization") && improvements.inferenceTime > 0.3) {
+    if (strategy.name.includes("Quantization") && (improvements.inferenceTime ?? 0) > 0.3) {
       recommendations.push("Quantization successful - consider applying to production models");
     }
 
-    if (strategy.name.includes("Compression") && improvements.memoryUsage > 0.5) {
+    if (strategy.name.includes("Compression") && (improvements.memoryUsage ?? 0) > 0.5) {
       recommendations.push("Compression effective - update deployment configurations");
     }
 
