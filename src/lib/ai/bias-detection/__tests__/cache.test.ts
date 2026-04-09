@@ -483,7 +483,7 @@ describe('BiasAnalysisCache', () => {
         typeof retrieved!.timestamp === 'string'
           ? new Date(retrieved!.timestamp)
           : retrieved!.timestamp
-      expect(retrievedTimestamp.getTime()).toBe(mockSession.timestamp.getTime())
+      expect(retrievedTimestamp?.getTime()).toBe(mockSession.timestamp?.getTime())
     })
 
     it('should return null for non-existent sessions', async () => {
@@ -717,23 +717,23 @@ describe('ReportCache', () => {
         typeof retrieved!.generatedAt === 'string'
           ? new Date(retrieved!.generatedAt)
           : retrieved!.generatedAt
-      expect(retrievedGeneratedAt.getTime()).toBe(
-        mockReport.generatedAt.getTime(),
+      expect(retrievedGeneratedAt?.getTime()).toBe(
+        mockReport.generatedAt?.getTime(),
       )
 
       const retrievedStart =
         typeof retrieved!.timeRange.start === 'string'
           ? new Date(retrieved!.timeRange.start)
           : retrieved!.timeRange.start
-      expect(retrievedStart.getTime()).toBe(
-        mockReport.timeRange.start.getTime(),
+      expect(retrievedStart?.getTime()).toBe(
+        mockReport.timeRange?.start?.getTime(),
       )
 
       const retrievedEnd =
         typeof retrieved!.timeRange.end === 'string'
           ? new Date(retrieved!.timeRange.end)
           : retrieved!.timeRange.end
-      expect(retrievedEnd.getTime()).toBe(mockReport.timeRange.end.getTime())
+      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime())
     })
 
     it('should return null for non-existent reports', async () => {
@@ -940,23 +940,23 @@ describe('Convenience Functions', () => {
         typeof retrieved!.generatedAt === 'string'
           ? new Date(retrieved!.generatedAt)
           : retrieved!.generatedAt
-      expect(retrievedGeneratedAt.getTime()).toBe(
-        mockReport.generatedAt.getTime(),
+      expect(retrievedGeneratedAt?.getTime()).toBe(
+        mockReport.generatedAt?.getTime(),
       )
 
       const retrievedStart =
         typeof retrieved!.timeRange.start === 'string'
           ? new Date(retrieved!.timeRange.start)
           : retrieved!.timeRange.start
-      expect(retrievedStart.getTime()).toBe(
-        mockReport.timeRange.start.getTime(),
+      expect(retrievedStart?.getTime()).toBe(
+        mockReport.timeRange?.start?.getTime(),
       )
 
       const retrievedEnd =
         typeof retrieved!.timeRange.end === 'string'
           ? new Date(retrieved!.timeRange.end)
           : retrieved!.timeRange.end
-      expect(retrievedEnd.getTime()).toBe(mockReport.timeRange.end.getTime())
+      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime())
     })
 
     it('should return null for non-existent reports', async () => {
