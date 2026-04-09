@@ -90,16 +90,16 @@ export class GlobalThreatIntelligenceNetworkCore
 
   constructor(
     private config: GlobalThreatIntelligenceNetworkConfig,
-    existingServices: {
+    existingServices?: {
       responseOrchestrator: AdvancedResponseOrchestrator
       intelligenceService: ExternalThreatIntelligenceService
       predictiveService: AdvancedPredictiveThreatIntelligence
     },
   ) {
     super()
-    this.existingResponseOrchestrator = existingServices.responseOrchestrator
-    this.existingIntelligenceService = existingServices.intelligenceService
-    this.existingPredictiveService = existingServices.predictiveService
+    this.existingResponseOrchestrator = existingServices?.responseOrchestrator
+    this.existingIntelligenceService = existingServices?.intelligenceService
+    this.existingPredictiveService = existingServices?.predictiveService
   }
 
   async initialize(): Promise<void> {
