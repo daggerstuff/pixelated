@@ -154,7 +154,7 @@ select_submodule_url() {
 
     if ! is_allowed_override_url "${name}" "${override_url}"; then
       echo "##[error]Rejected unsafe override URL for submodule '${name}': ${override_url}" >&2
-      process.exit(1)
+      exit 1
     fi
 
     printf '%s' "${override_url}"
