@@ -16,8 +16,8 @@ import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
   () => {
     const mockPythonBridge = {
-      initialize: vi.fn().mockResolvedValue(undefined),
-      runPreprocessingAnalysis: vi.fn().mockImplementation(async () => {
+      initialize: vi.fn<any>().mockResolvedValue(undefined),
+      runPreprocessingAnalysis: vi.fn<any>().mockImplementation(async () => {
         // Simulate realistic processing time
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 50 + 10),
@@ -28,7 +28,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.8 + Math.random() * 0.2,
         }
       }),
-      runModelLevelAnalysis: vi.fn().mockImplementation(async () => {
+      runModelLevelAnalysis: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 100 + 20),
         )
@@ -41,7 +41,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.85 + Math.random() * 0.15,
         }
       }),
-      runInteractiveAnalysis: vi.fn().mockImplementation(async () => {
+      runInteractiveAnalysis: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 75 + 15),
         )
@@ -54,7 +54,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.8 + Math.random() * 0.2,
         }
       }),
-      runEvaluationAnalysis: vi.fn().mockImplementation(async () => {
+      runEvaluationAnalysis: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 60 + 25),
         )
@@ -68,7 +68,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
         }
       }),
       analyze_session: vi
-        .fn()
+        .fn<any>()
         .mockImplementation(async (session: TherapeuticSession) => {
           await new Promise((resolve) =>
             setTimeout(resolve, Math.random() * 200 + 50),
@@ -91,21 +91,21 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
             confidence: 0.8 + Math.random() * 0.2,
           }
         }),
-      healthCheck: vi.fn().mockResolvedValue({
+      healthCheck: vi.fn<any>().mockResolvedValue({
         status: 'healthy',
         latency: Math.random() * 50 + 10,
       }),
-      dispose: vi.fn().mockResolvedValue(undefined),
+      dispose: vi.fn<any>().mockResolvedValue(undefined),
     }
 
     const mockMetricsCollector = {
-      initialize: vi.fn().mockResolvedValue(undefined),
-      recordAnalysis: vi.fn().mockImplementation(async () => {
+      initialize: vi.fn<any>().mockResolvedValue(undefined),
+      recordAnalysis: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 20 + 5),
         )
       }),
-      getMetrics: vi.fn().mockImplementation(async () => {
+      getMetrics: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 30 + 10),
         )
@@ -125,11 +125,11 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           },
         }
       }),
-      dispose: vi.fn().mockResolvedValue(undefined),
+      dispose: vi.fn<any>().mockResolvedValue(undefined),
     }
 
     const mockAlertSystem = {
-      initialize: vi.fn().mockResolvedValue(undefined),
+      initialize: vi.fn<any>().mockResolvedValue(undefined),
       checkAlerts: vi.fn().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 15 + 5),
@@ -141,7 +141,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
         )
         return []
       }),
-      dispose: vi.fn().mockResolvedValue(undefined),
+      dispose: vi.fn<any>().mockResolvedValue(undefined),
     }
 
     return { mockPythonBridge, mockMetricsCollector, mockAlertSystem }
