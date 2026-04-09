@@ -68,7 +68,7 @@ function sortTurns(turns: NoteTurn[], sort: SortOrder): NoteTurn[] {
 }
 
 function clampLimit(limit?: number): number {
-  if (!Number.isFinite(limit) || limit <= 0) return Number.MAX_SAFE_INTEGER;
+  if (limit === undefined || !Number.isFinite(limit) || limit <= 0) return Number.MAX_SAFE_INTEGER;
   return Math.floor(limit);
 }
 

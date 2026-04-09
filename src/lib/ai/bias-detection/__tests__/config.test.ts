@@ -113,7 +113,7 @@ describe('BiasDetectionConfigManager', () => {
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       // Should fall back to defaults for invalid values
-      expect(config.thresholds.warning).toBe(0.3)
+      expect(config.thresholds?.warning).toBe(0.3)
       expect(config.pythonServiceUrl).toBeDefined() // Should use default URL
       expect(config.cacheConfig?.enabled).toBe(true) // Should default to true
     })
@@ -393,7 +393,7 @@ describe('BiasDetectionConfigManager', () => {
 
     it('should reload configuration from environment variables', () => {
       const originalConfig = configManager.getConfig()
-      expect(originalConfig.thresholds.warning).toBe(0.3)
+      expect(originalConfig.thresholds?.warning).toBe(0.3)
 
       // Change environment variable
       process.env.BIAS_WARNING_THRESHOLD = '0.5'
@@ -401,7 +401,7 @@ describe('BiasDetectionConfigManager', () => {
       // Reload configuration
       const reloadedConfig = configManager.reloadConfiguration()
 
-      expect(reloadedConfig.thresholds.warning).toBe(0.5)
+      expect(reloadedConfig.thresholds?.warning).toBe(0.5)
     })
   })
 
@@ -459,7 +459,7 @@ describe('BiasDetectionConfigManager', () => {
       ;(BiasDetectionConfigManager as unknown as { instance?: unknown }).instance = undefined
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
-      expect(config.thresholds.warning).toBe(0.35)
+      expect(config.thresholds?.warning).toBe(0.35)
       expect(config.layerWeights.preprocessing).toBe(0.3)
     })
   })
