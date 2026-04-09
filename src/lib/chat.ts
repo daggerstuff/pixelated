@@ -99,7 +99,7 @@ function convertAnalysisToLegacyFormat(
     return {
       id: mhAnalysis.id,
       timestamp: mhAnalysis.timestamp,
-      category: mhAnalysis.categories[0]?.name || 'general',
+      category: (mhAnalysis.categories && mhAnalysis.categories[0]?.name) || 'general',
       explanation: mhAnalysis.indicators.map((i) => i.description).join('; '),
       expertGuided: false,
       scores: {
