@@ -41,9 +41,9 @@ export function isTrendItem(v: unknown): v is TrendItem {
   return (
     isObject(v) &&
     typeof v['date'] === 'string' &&
-    typeof v.biasScore === 'number' &&
-    typeof v.sessionCount === 'number' &&
-    typeof v.alertCount === 'number'
+    typeof v['biasScore'] === 'number' &&
+    typeof v['sessionCount'] === 'number' &&
+    typeof v['alertCount'] === 'number'
   )
 }
 
