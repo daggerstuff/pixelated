@@ -1,29 +1,29 @@
 export const introContent = {
-  label: 'Why standard roleplay stops helping',
+  label: 'Why coaching gets vague',
   title:
-    'Roleplay falls apart when nobody can point to the turn that changed the room.',
+    'Most supervision loses the useful moment right after the session ends.',
   paragraphs: [
-    'Once the roleplay ends, the exchange usually collapses into recollection, side notes, and disagreement about what actually shifted the room.',
-    'This product keeps the case, the transcript, and the review in one surface long enough for a supervisor to coach a specific retry.',
+    'Teams usually know a session went sideways. What they do not keep is the exact exchange that caused it.',
+    'Pixelated Empathy preserves the case, transcript, and review path long enough for a supervisor to coach one concrete next move.',
   ],
-  panelLabel: 'Where the old process breaks',
+  panelLabel: 'What breaks in the usual workflow',
   panelItems: [
     {
-      label: 'No durable record',
-      body: 'A difficult conversation runs once, then turns into opinion and partial recall.',
+      label: 'No durable evidence',
+      body: 'A hard conversation runs once, then turns into opinion, shorthand notes, and partial recall.',
     },
     {
-      label: 'Vague coaching',
-      body: 'The team can feel the shift, but cannot point to the exact intervention that should change next.',
+      label: 'Feedback gets fuzzy',
+      body: 'The team can feel the shift, but cannot name the exact intervention that should change next.',
     },
     {
-      label: 'Uneven comparison',
+      label: 'Comparison disappears',
       body: 'When each trainee gets a different case, supervision stops comparing judgment against the same moment.',
     },
   ],
   evidenceCards: [
     {
-      title: 'Without a reviewable record',
+      title: 'What teams are usually stuck with',
       items: [
         'The useful part of the conversation disappears after the roleplay ends.',
         'Supervisors coach from recollection instead of a visible intervention.',
@@ -31,9 +31,9 @@ export const introContent = {
       ],
     },
     {
-      title: 'When the record stays attached',
+      title: 'What your team gets instead',
       items: [
-        'The transcript, notes, and retry logic stay tied to one run.',
+        'The transcript, notes, and coaching lane stay tied to one run.',
         'Supervisors can point at the exact turn that needs work.',
         'The team can coach multiple clinicians against the same case.',
       ],

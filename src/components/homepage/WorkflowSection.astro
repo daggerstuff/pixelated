@@ -6,6 +6,9 @@ export interface Props {
     label: string
     title: string
     steps: readonly { number: string; title: string; body: string }[]
+    bandLabel: string
+    bandTitle: string
+    bandBody: string
     outputs: readonly { label: string; value: string }[]
   }
 }
@@ -38,9 +41,9 @@ const { content } = Astro.props
 
     <InfoStrip
       className="home-outputs home-outputs--spaced"
-      label="What comes out of one run"
-      title="A session record, a review surface, and a cleaner next attempt."
-      body="The workflow matters because the practice run does not disappear at the end of the conversation. It stays intact long enough for a supervisor to coach from it."
+      label={content.bandLabel}
+      title={content.bandTitle}
+      body={content.bandBody}
       items={content.outputs}
       theme="dark"
     />
@@ -58,7 +61,7 @@ const { content } = Astro.props
   .home-split {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 4rem;
     max-width: 55rem;
     margin: 0 auto;
@@ -81,10 +84,10 @@ const { content } = Astro.props
     border: 1px dotted rgba(255, 255, 255, 0.1);
     background: rgba(48, 44, 44, 0.3);
     border-radius: 4px;
-    text-align: center;
+    text-align: left;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
 
   .home-step-number {

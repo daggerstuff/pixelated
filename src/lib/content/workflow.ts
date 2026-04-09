@@ -1,11 +1,11 @@
 export const workflowContent = {
-  label: 'What a single session leaves behind',
-  title: 'One run should leave behind something the whole team can review.',
+  label: 'How the coaching loop tightens',
+  title: 'Three steps from tough case to specific feedback.',
   steps: [
     {
       number: '01',
-      title: 'Pick the difficult case',
-      body: 'Start with the conversation your team already struggles to coach under pressure.',
+      title: 'Bring the hard case',
+      body: 'Start with the conversation your team already finds difficult to coach under pressure.',
     },
     {
       number: '02',
@@ -14,22 +14,26 @@ export const workflowContent = {
     },
     {
       number: '03',
-      title: 'Review the record and direct the retry',
+      title: 'Coach the turning point',
       body: 'Use the transcript and notes to point at the intervention, miss, or repair that should change on the next attempt.',
     },
   ],
+  bandLabel: 'What one run should leave behind',
+  bandTitle: 'A saved record, a coaching moment, and a clearer next attempt.',
+  bandBody:
+    'The practice run should not disappear when the session ends. It should leave behind something the whole team can review.',
   outputs: [
     {
-      label: 'Session record',
+      label: 'Coaching artifact',
       value: 'A saved transcript and notes lane the team can return to.',
     },
     {
-      label: 'Review signal',
-      value: 'A concrete read on where the room shifted and what changed it.',
+      label: 'Specific next move',
+      value: 'A concrete read on where the room shifted and what should change.',
     },
     {
-      label: 'Next attempt',
-      value: 'A sharper retry based on a visible decision.',
+      label: 'Shared standard',
+      value: 'One case the team can use to compare judgment across clinicians.',
     },
   ],
 } as const
