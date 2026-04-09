@@ -18,7 +18,7 @@ describe('PatientProfileService', () => {
   const profilePrefix = 'profile_'
 
   beforeEach(() => {
-    mockKvStore = new KVStore('test_profiles', false) as jest.Mocked<KVStore>
+    mockKvStore = new KVStore('test_profiles', false) as vi.Mocked<KVStore>
     patientProfileService = new PatientProfileService(mockKvStore)
 
     const initialTherapeuticProgress: TherapeuticProgress = {
