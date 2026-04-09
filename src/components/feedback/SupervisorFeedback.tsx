@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardFooter,
 } from '@/components/ui/card'
-import { TherapeuticTechnique } from '@/simulator/types'
+import { TherapeuticTechnique } from '@/simulator/types/index'
 import { analyzeTherapeuticTechniques } from '@/simulator/utils/speechRecognition'
 
 interface DetectedTechnique {
