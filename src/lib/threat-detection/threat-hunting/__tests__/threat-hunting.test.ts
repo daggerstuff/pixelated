@@ -240,11 +240,11 @@ describe("Threat Hunting Service", () => {
 
       const closedInvestigation = await service.closeInvestigation(investigationId, resolutionData);
 
-      expect(closedInvestigation.status).toBe("resolved");
-      expect(closedInvestigation.resolution).toBe(resolutionData.resolution);
-      expect(closedInvestigation.resolvedBy).toBe(resolutionData.resolvedBy);
-      expect(closedInvestigation.resolutionNotes).toBe(resolutionData.resolutionNotes);
-      expect(closedInvestigation.lessonsLearned).toBe(resolutionData.lessonsLearned);
+      expect(closedInvestigation?.status).toBe("resolved");
+      expect(closedInvestigation?.resolution).toBe(resolutionData.resolution);
+      expect(closedInvestigation?.resolvedBy).toBe(resolutionData.resolvedBy);
+      expect(closedInvestigation?.resolutionNotes).toBe(resolutionData.resolutionNotes);
+      expect(closedInvestigation?.lessonsLearned).toBe(resolutionData.lessonsLearned);
       expect(mockRedis.set).toHaveBeenCalled();
     });
 
@@ -418,9 +418,9 @@ describe("Threat Hunting Service", () => {
         resolutionData,
       );
 
-      expect(closedInvestigation.status).toBe("resolved");
-      expect(closedInvestigation.resolution).toBe(resolutionData.resolution);
-      expect(closedInvestigation.resolvedBy).toBe(resolutionData.resolvedBy);
+      expect(closedInvestigation?.status).toBe("resolved");
+      expect(closedInvestigation?.resolution).toBe(resolutionData.resolution);
+      expect(closedInvestigation?.resolvedBy).toBe(resolutionData.resolvedBy);
       expect(closedInvestigation.resolvedAt).toBeDefined();
     });
 
