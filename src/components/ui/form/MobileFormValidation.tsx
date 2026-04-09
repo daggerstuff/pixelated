@@ -333,8 +333,8 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
       const validationProps: FormFieldValidationProps = {
         name,
         'aria-required': true,
-        onChange: handleChange as React.ChangeEventHandler,
-        onBlur: handleBlur as React.FocusEventHandler,
+        onChange: handleChange as unknown as React.ChangeEventHandler,
+        onBlur: handleBlur as unknown as React.FocusEventHandler,
       }
 
       Object.entries(validationProps).forEach(([key, value]) => {
