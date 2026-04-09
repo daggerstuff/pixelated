@@ -41,7 +41,7 @@ class Anonymizer {
 }
 
 // Mock implementation of memoize since the original is not accessible
-function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
+function memoize<T extends (...args: any[]) => any>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>()
 
   return ((...args: Parameters<T>): ReturnType<T> => {
@@ -51,7 +51,7 @@ function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
       return cache.get(key) as ReturnType<T>
     }
 
-    // Call the function with unknown args and assert the return type
+    // Call the function with args and return the result
     const result = fn(...(args as unknown[])) as ReturnType<T>
     cache.set(key, result)
     return result
@@ -460,7 +460,7 @@ export function detectAndRedactPHI(text: string): string {
   try {
     // For simplicity, we'll fall back to regex-based detection in the sync version
     const detector = PresidioPHIDetector.getInstance()
-    const entities = detector['fallbackDetection'](text)
+    const entities = (detector['fallbackDetection'] as (text: string) => PHIEntity[])(text)
 
     if (entities.length === 0) {
       return text

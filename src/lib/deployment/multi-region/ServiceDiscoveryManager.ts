@@ -760,7 +760,11 @@ export class ServiceDiscoveryManager extends EventEmitter {
     serviceName: string,
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
-    const services = await consul.health.service(serviceName)
+    const services = (await consul.health.service(serviceName)) as Array<{
+      Service: { ID: string; Service: string; Address?: string; Port: number; Tags?: string[]; Meta?: Record<string, string> }
+      Node: { Datacenter: string; Address: string }
+      Checks?: Array<{ Status: string }>
+    }>
 
     return services.map((service) => ({
       id: service.Service.ID,
