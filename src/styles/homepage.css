@@ -1,15 +1,15 @@
 .pe-page-shell {
   width: 100%;
-  max-width: 88rem;
+  max-width: 55rem; /* 880px as per DESIGN.md */
   margin: 0 auto;
   padding: 0 var(--spacing-6);
 }
 
 .pe-page-section {
   position: relative;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  padding-top: clamp(6.4rem, 8.5vw, 9rem);
-  padding-bottom: clamp(6.8rem, 9.5vw, 9.8rem);
+  border-top: 1px dotted rgba(253, 252, 252, 0.1); /* Dotted as per DESIGN.md */
+  padding-top: clamp(4rem, 8vw, 6rem);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
   overflow: hidden;
 }
 
@@ -18,7 +18,7 @@
   position: absolute;
   top: 0;
   left: 50%;
-  width: min(100% - 4rem, 78rem);
+  width: min(100% - 4rem, 55rem);
   height: 1px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.08);
@@ -31,18 +31,19 @@
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   color: var(--accent-primary);
-  opacity: 0.78;
+  opacity: 0.9;
+  margin-bottom: var(--spacing-4);
 }
 
 .pe-page-label::before {
   content: '';
-  width: 2rem;
+  width: 1.5rem;
   height: 1px;
   background: currentColor;
-  opacity: 0.52;
+  opacity: 0.5;
 }
 
 .pe-page-panel-label {
@@ -51,23 +52,34 @@
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: none;
+  text-transform: uppercase;
   color: var(--accent-primary);
   margin-bottom: var(--spacing-3);
-  opacity: 0.76;
+  opacity: 0.8;
 }
 
 .pe-page-heading {
   margin-top: var(--spacing-4);
-  max-width: 15ch;
+  max-width: 20ch;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 1.78rem + 0.9vw, 2.9rem);
+  font-size: clamp(2.2rem, 10vw, 2.625rem); /* 42px target */
   font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.045em;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
   text-wrap: balance;
   margin-inline: auto;
   text-align: center;
+  color: var(--text-primary);
+}
+
+.pe-page-copy {
+  max-width: 52ch;
+  margin: 1.5rem auto 0;
+  font-size: 1.06rem;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--text-secondary);
+  text-wrap: pretty;
 }
 
 @media (min-width: 768px) {
@@ -76,8 +88,3 @@
   }
 }
 
-@media (min-width: 1024px) {
-  .pe-page-shell {
-    padding: 0 clamp(2.5rem, 3vw, 3.5rem);
-  }
-}

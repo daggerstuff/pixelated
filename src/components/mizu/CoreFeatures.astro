@@ -62,7 +62,12 @@ const getCardClasses = (index: number) => ({
           cards.map((feature, index) => (
             <div class:list={getCardClasses(index)} data-index={index}>
               <div class="core-feature-card__row">
-                <FeatureIcon icon={feature.icon} />
+                <div class="core-feature-card__image-wrap">
+                  {feature.image && (
+                    <img src={feature.image} alt={feature.title} class="core-feature-card__image" />
+                  )}
+                  {!feature.image && <FeatureIcon icon={feature.icon} />}
+                </div>
                 <div class="core-feature-card__copy">
                   <span class="core-feature-card__eyebrow">
                     Capability {String(index + 1).padStart(2, '0')}
@@ -77,6 +82,7 @@ const getCardClasses = (index: number) => ({
           ))
         }
       </div>
+
     </div>
 
     {
@@ -111,52 +117,30 @@ const getCardClasses = (index: number) => ({
   .core-features-shell {
     position: relative;
     z-index: 1;
-    max-width: 80rem;
+    max-width: 55rem;
   }
 
   .core-features-section {
     position: relative;
-    background:
-      radial-gradient(
-        circle at top left,
-        rgba(143, 184, 162, 0.1),
-        transparent 28%
-      ),
-      linear-gradient(180deg, #101514 0%, #121817 100%);
+    background: #121817;
     color: var(--text-primary);
-  }
-
-  .core-features-section :is(h2, h3, p, strong) {
-    color: inherit;
   }
 
   .core-features-intro {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    align-items: start;
-    margin-bottom: clamp(2.2rem, 3vw, 3.4rem);
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: clamp(3rem, 6vw, 5rem);
     position: relative;
-    justify-items: center;
     text-align: center;
   }
 
-  .core-features-intro::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -2rem;
-    width: min(18rem, 28vw);
-    height: 1px;
-    background: linear-gradient(90deg, rgba(125, 211, 168, 0.55), transparent);
-    transform: translateX(-50%);
-  }
-
   .core-features-copy {
-    font-size: clamp(0.98rem, 0.94rem + 0.12vw, 1.04rem);
-    line-height: 1.78;
-    color: #cbd5e1;
-    max-width: 40rem;
+    font-size: 1.06rem;
+    line-height: 1.68;
+    color: var(--text-secondary);
+    max-width: 48ch;
     text-wrap: pretty;
     margin: 0 auto;
   }
@@ -164,240 +148,177 @@ const getCardClasses = (index: number) => ({
   .core-features-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(1.75rem, 2.8vw, 3rem);
-    margin-bottom: clamp(2.6rem, 3.8vw, 3.8rem);
+    gap: 2rem;
+    margin-bottom: 4rem;
   }
 
   .core-features-proof {
     display: grid;
     align-content: start;
-    gap: 0.9rem;
-    padding: clamp(1.4rem, 2vw, 1.9rem);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 0.96rem;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(143, 184, 162, 0.05),
-        rgba(143, 184, 162, 0)
-      ),
-      rgba(10, 14, 15, 0.92);
-    box-shadow: 0 20px 48px rgba(2, 8, 9, 0.22);
-    position: relative;
-  }
-
-  .core-features-proof::before {
-    display: none;
+    gap: 1.2rem;
+    padding: 2rem;
+    border: 1px dotted var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: rgba(48, 44, 44, 0.4);
+    backdrop-filter: blur(8px);
+    text-align: center;
   }
 
   .core-features-proof-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.9rem;
-    padding-left: 0;
-    color: #cbd5e1;
-    line-height: 1.7;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0;
     list-style: none;
     margin: 0;
   }
 
   .core-features-proof-list li {
-    min-width: 0;
-    padding: 0.95rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 0.8rem;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
     background: rgba(255, 255, 255, 0.03);
+    font-size: 0.88rem;
+    font-family: var(--font-mono);
   }
 
   .core-feature-card__row {
     display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-4);
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
   }
 
   .core-feature-card__copy {
-    min-width: 0;
+    width: 100%;
   }
 
   .core-feature-card__title {
-    margin-bottom: var(--spacing-2);
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
   }
 
   .core-feature-card__eyebrow {
-    display: inline-flex;
-    margin-bottom: 0.7rem;
+    display: block;
+    margin-bottom: 1rem;
     font-family: var(--font-mono);
-    font-size: 0.6rem;
+    font-size: 0.68rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: none;
-    color: rgba(255, 255, 255, 0.48);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
   }
 
   .core-feature-card__description {
-    color: #cbd5e1;
-    line-height: 1.72;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 42ch;
+    margin: 0 auto;
     text-wrap: pretty;
   }
 
   .core-features-comparison {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: clamp(2rem, 3vw, 3.5rem);
+    grid-template-columns: 1fr;
+    gap: 3rem;
     align-items: start;
-    padding-top: clamp(2rem, 3vw, 2.8rem);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 4rem;
+    border-top: 1px dotted rgba(255, 255, 255, 0.1);
+    text-align: center;
   }
 
   .core-features-comparison__lead {
     display: grid;
-    gap: var(--spacing-4);
+    gap: 1rem;
+    justify-items: center;
   }
 
   .core-features-comparison__lead h3 {
-    font-size: clamp(1.35rem, 1.18rem + 0.55vw, 1.9rem);
-    line-height: 1.06;
+    font-size: 2rem;
   }
 
   .core-features-comparison__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 55rem;
+    margin: 0 auto;
   }
 
   .core-features-comparison__item {
     display: grid;
-    grid-template-columns: 1fr;
-    align-items: start;
     gap: 0.5rem;
-    min-width: 0;
-    padding: 1rem 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 0.68rem;
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .core-features-comparison__item--accent {
-    background: rgba(143, 184, 162, 0.1);
-  }
-
-  @media (max-width: 640px) {
-    .core-features-comparison__item {
-      grid-template-columns: 1fr;
-      gap: 0.3rem;
-      padding: 0.75rem 0.85rem;
-    }
-
-    .core-features-comparison__item span {
-      font-size: 0.72rem;
-    }
-  }
-
-  .core-features-comparison__item span {
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.56);
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
   }
 
   .core-features-comparison__item strong {
-    font-size: clamp(1rem, 0.96rem + 0.14vw, 1.08rem);
-    line-height: 1.45;
-    color: #f4f6f5;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+
+  .core-feature-card__image-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+    background: #000;
+  }
+
+  .core-feature-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+  }
+
+  .core-feature-card:hover .core-feature-card__image {
+    transform: scale(1.05);
+    opacity: 1;
   }
 
   .core-features-list {
+
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
 
   .core-feature-card {
-    grid-column: span 4;
-    min-width: 0;
-    padding: clamp(1.3rem, 1.8vw, 1.75rem);
+    grid-column: span 1;
+    padding: 2.5rem 2rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.96rem;
-    background: rgba(255, 255, 255, 0.04);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 22px 54px rgba(2, 8, 9, 0.2);
-    transition:
-      border-color var(--duration-fast) var(--ease-out),
-      background var(--duration-fast) var(--ease-out);
-  }
-
-  .core-feature-card:hover {
-    border-color: rgba(143, 184, 162, 0.25);
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .core-feature-card::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), transparent 78%);
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .core-feature-card:hover::after {
-    opacity: 0.8;
-  }
-
-  .core-feature-card--lead::after {
-    opacity: 0.6;
-    height: 4px;
+    background: rgba(48, 44, 44, 0.3);
+    backdrop-filter: blur(12px);
+    border-radius: 4px;
+    transition: all 0.3s ease;
   }
 
   .core-feature-card--lead {
-    grid-column: span 8;
-    padding: clamp(1.6rem, 2.2vw, 2rem);
-    border-color: rgba(143, 184, 162, 0.16);
-    background:
-      linear-gradient(
-        135deg,
-        rgba(143, 184, 162, 0.18),
-        rgba(143, 184, 162, 0.05) 36%,
-        rgba(255, 255, 255, 0.04) 100%
-      ),
-      rgba(255, 255, 255, 0.06);
-    box-shadow: var(--shadow-floating);
-  }
-
-  .core-feature-card:not(.core-feature-card--lead) {
-    border-color: rgba(255, 255, 255, 0.06);
-  }
-
-  .core-feature-card:not(.core-feature-card--lead):hover {
-    border-color: rgba(143, 184, 162, 0.2);
-  }
-
-  .core-feature-card:nth-child(2) {
-    grid-column: span 1;
-  }
-
-  .core-feature-card:nth-child(3) {
-    grid-column: span 1;
-    margin-top: 0;
-  }
-
-  .core-feature-card--lead h3 {
-    font-size: clamp(1.35rem, 1.15rem + 0.65vw, 1.8rem);
+    grid-column: span 2;
+    padding: 4rem 3rem;
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.05), rgba(0, 0, 0, 0));
   }
 
   .feature-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.72rem;
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--accent-primary);
+    border-radius: 50%;
     color: var(--accent-primary);
-    flex-shrink: 0;
-    background: rgba(10, 17, 17, 0.38);
+    background: rgba(255, 107, 0, 0.1);
   }
+
 
   .core-feature-card:hover .feature-icon {
     border-color: var(--accent-primary);

@@ -1,67 +1,59 @@
 {
   "mcpServers": {
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-context7"],
-      "env": {},
+      "command": "pnpm",
+      "args": ["dlx", "@upstash/context7-mcp"],
       "timeout": 30000
     },
     "rube": {
-      "httpUrl": "https://rube.app/mcp",
+      "type": "http",
+      "url": "https://rube.app/mcp",
+      "headers": {
+        "Authorization": "Bearer ${RUBE_API_KEY}"
+      },
+      "tools": ["*"],
       "timeout": 60000
     },
     "linear": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-linear"],
+      "command": "pnpm",
+      "args": ["dlx", "@mseep/linear-mcp"],
       "timeout": 30000
     },
     "hindsight": {
-      "command": "npx",
-      "args": ["-y", "hindsight-mcp"],
+      "command": "pnpm",
+      "args": ["dlx", "hindsight-mcp"],
       "env": {
         "HINDSIGHT_DB_PATH": ".copilot/hindsight.db"
       },
       "timeout": 30000
     },
     "brave-search": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-brave-search"],
+      "command": "pnpm",
+      "args": ["dlx", "@brave/brave-search-mcp-server"],
       "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" },
       "timeout": 30000
     },
     "firecrawl": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-firecrawl"],
+      "command": "pnpm",
+      "args": ["dlx", "firecrawl-mcp"],
       "env": { "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}" },
       "timeout": 60000
     },
     "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-sequential-thinking"],
+      "command": "pnpm",
+      "args": ["dlx", "@gotza02/seq-thinking"],
       "timeout": 30000
     },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-github"],
-      "env": { "GITHUB_ACCESS_TOKEN": "${GH_TOKEN}" },
-      "timeout": 60000
-    },
     "playwright": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-playwright"],
+      "command": "pnpm",
+      "args": ["dlx", "@playwright/mcp"],
       "timeout": 60000
     },
     "sentry": {
-      "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-server-sentry"],
+      "command": "pnpm",
+      "args": ["dlx", "@sentry/mcp-server"],
       "env": { "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}" },
       "timeout": 30000
-    },
-    "e2b-sandbox": {
-      "command": "npx",
-      "args": ["-y", "@e2b/mcp"],
-      "env": { "E2B_API_KEY": "${E2B_API_KEY}" },
-      "timeout": 60000
     }
   }
 }
