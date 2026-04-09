@@ -1,6 +1,6 @@
 ---
 name: Full-Stack Engineer
-model: claude-sonnet-4-6
+model: nvidia/llama-3.1-nemotron-ultra-253b-v1
 tools:
   - read
   - write
