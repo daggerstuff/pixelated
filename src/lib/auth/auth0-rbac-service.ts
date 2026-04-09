@@ -508,7 +508,7 @@ export async function assignRoleToUser(
     await auth0Management.assignRolestoUser({ id: userId }, { roles: [roleId] })
 
     // Log role assignment
-    logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, {
+    logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, null, {
       userId: userId,
       role: roleName,
       assignedBy: 'system',
@@ -552,7 +552,7 @@ export async function removeRoleFromUser(
     )
 
     // Log role removal
-    logSecurityEvent(SecurityEventType.ROLE_REMOVED, {
+    logSecurityEvent(SecurityEventType.ROLE_REMOVED, null, {
       userId: userId,
       role: roleName,
       removedBy: 'system',
