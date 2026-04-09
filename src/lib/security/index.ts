@@ -61,6 +61,7 @@ export function getSecurityMonitoring(): SecurityMonitoringService {
  */
 export function logSecurityEvent(
   type: string,
+  _userId: string | null,
   metadata: Record<string, unknown>,
 ): void {
   if (!securityMonitoringService) {

@@ -229,7 +229,7 @@ export class Auth0MFAService {
       }
 
       // Log enrollment start event
-      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, {
+      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, null, {
         userId: userId,
         factorType: factor.factorType,
         timestamp: new Date().toISOString(),
@@ -273,7 +273,7 @@ export class Auth0MFAService {
       }
 
       // Log enrollment completion event
-      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, {
+      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, null, {
         userId: userId,
         factorType: verification.challengeType,
         factorId: enrolledFactor.id,
@@ -336,7 +336,7 @@ export class Auth0MFAService {
       await auth0Management.deleteGuardianEnrollment({ id: factorId })
 
       // Log factor deletion event
-      logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {
+      logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, null, {
         userId: userId,
         factorId: factorId,
         timestamp: new Date().toISOString(),
@@ -380,7 +380,7 @@ export class Auth0MFAService {
       }
 
       // Log challenge event
-      logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, {
+      logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, null, {
         userId: userId,
         factorType: factorType,
         challengeId: challenge.oobCode,
@@ -418,7 +418,7 @@ export class Auth0MFAService {
       // For now, we'll simulate successful verification
 
       // Log verification event
-      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, {
+      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, null, {
         userId: userId,
         challengeType: verification.challengeType,
         success: true,
@@ -436,7 +436,7 @@ export class Auth0MFAService {
       console.error('Failed to verify MFA challenge:', error)
 
       // Log failed verification event
-      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, {
+      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, null, {
         userId: userId,
         challengeType: verification.challengeType,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
@@ -472,7 +472,7 @@ export class Auth0MFAService {
   ): Promise<void> {
     // In a real implementation, this would update the user's preferred factor in Auth0
     // For now, we'll just log the event
-    logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, {
+    logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, null, {
       userId: userId,
       factorId: factorId,
       timestamp: new Date().toISOString(),
