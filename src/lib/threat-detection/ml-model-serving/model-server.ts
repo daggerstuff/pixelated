@@ -370,13 +370,13 @@ export class ModelServingServer extends EventEmitter {
     data: unknown,
     config: PreprocessingConfig['normalization'],
   ): unknown {
-    switch (config.method) {
+    switch (config?.method) {
       case 'min-max':
-        return this.minMaxNormalize(data, config.parameters)
+        return this.minMaxNormalize(data, config?.parameters)
       case 'z-score':
-        return this.zScoreNormalize(data, config.parameters)
+        return this.zScoreNormalize(data, config?.parameters)
       case 'robust':
-        return this.robustNormalize(data, config.parameters)
+        return this.robustNormalize(data, config?.parameters)
       default:
         return data
     }
@@ -394,7 +394,7 @@ export class ModelServingServer extends EventEmitter {
         case 'polynomial':
           engineered = this.createPolynomialFeatures(
             engineered,
-            config.parameters.degree,
+            config?.parameters.degree,
           )
           break
         case 'interaction':
@@ -403,7 +403,7 @@ export class ModelServingServer extends EventEmitter {
         case 'binning':
           engineered = this.createBinnedFeatures(
             engineered,
-            config.parameters.bins,
+            config?.parameters.bins,
           )
           break
         default:
