@@ -256,7 +256,7 @@ export class Auth0AdaptiveMFAService {
       }
 
       // Log risk assessment
-       logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, {
+       logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, null, {
         userId: context.userId,
         riskScore: normalizedScore,
         factors: factors.map((f) => ({ name: f.name, triggered: f.triggered })),
@@ -573,7 +573,7 @@ export class Auth0AdaptiveMFAService {
     this.config = { ...this.config, ...newConfig }
 
     // Log configuration update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'adaptive_mfa',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString(),
@@ -597,7 +597,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.push(ipAddress)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'add',
         ipAddress,
@@ -615,7 +615,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.splice(index, 1)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'remove',
         ipAddress,
@@ -632,7 +632,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.push(countryCode)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'add',
         countryCode,
@@ -650,7 +650,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.splice(index, 1)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'remove',
         countryCode,
@@ -666,7 +666,7 @@ export class Auth0AdaptiveMFAService {
     this.config.allowedTimeWindows.push(window)
 
     // Log time window update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'time_windows',
       action: 'add',
       window,
@@ -689,7 +689,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedTimeWindows.splice(index, 1)
 
       // Log time window update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'time_windows',
         action: 'remove',
         window,

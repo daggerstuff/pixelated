@@ -219,7 +219,7 @@ export async function requestRoleTransition(
 
     return transitionRequest
   } catch (error: unknown) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED, {
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED, null, {
       userId: userId,
       error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       requestedRole,
@@ -351,7 +351,7 @@ export async function processRoleTransitionApproval(
 
     return request
   } catch (error: unknown) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED, {
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED, null, {
       userId: approverId,
       error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       requestId,
@@ -420,7 +420,7 @@ async function executeRoleTransition(
       'role_transition_completed',
     )
   } catch (error: unknown) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED, {
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED, null, {
       userId: request.userId,
       error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       requestId: request.id,
@@ -758,7 +758,7 @@ async function logRoleTransitionAudit(
     )
 
     // Log security event
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_AUDIT, {
+    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_AUDIT, null, {
       userId: auditLog.userId,
       action: auditLog.action,
       roleFrom: auditLog.roleFrom,

@@ -172,7 +172,7 @@ export class Auth0WebAuthnService {
       }
 
       // Log registration options generation
-       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_STARTED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_STARTED, null, {
         userId: registrationOptions.userId,
         optionsGenerated: true,
         timestamp: new Date().toISOString(),
@@ -237,7 +237,7 @@ export class Auth0WebAuthnService {
       console.error('Failed to verify WebAuthn registration:', error)
 
       // Log failed registration
-       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, null, {
         userId: userId,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
         timestamp: new Date().toISOString(),
@@ -334,7 +334,7 @@ export class Auth0WebAuthnService {
       console.error('Failed to verify WebAuthn authentication:', error)
 
       // Log failed authentication
-       logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, null, {
         userId: userId,
         credentialId: credential.id,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
@@ -409,7 +409,7 @@ export class Auth0WebAuthnService {
       // For now, we'll just log the deletion
 
       // Log credential deletion
-       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, null, {
         userId: userId,
         credentialId: credentialId,
         timestamp: new Date().toISOString(),
@@ -444,7 +444,7 @@ export class Auth0WebAuthnService {
       // For now, we'll just log the rename operation
 
       // Log credential rename
-       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, null, {
         userId: userId,
         credentialId: credentialId,
         newName: newName,
@@ -516,7 +516,7 @@ export class Auth0WebAuthnService {
       // For now, we'll simulate validation
 
       // Log validation
-       logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, {
+       logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, null, {
         userId: userId,
         responseValid: true,
         timestamp: new Date().toISOString(),

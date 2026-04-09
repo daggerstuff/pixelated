@@ -305,7 +305,7 @@ export class Auth0SocialAuthService {
     const user = await this.getUserInfo(tokens.accessToken)
 
     // Log authentication event
-    logSecurityEvent(SecurityEventType.LOGIN, {
+    logSecurityEvent(SecurityEventType.LOGIN, null, {
       userId: user.id,
       email: user.email,
       provider: user.provider,
@@ -351,7 +351,7 @@ export class Auth0SocialAuthService {
       )
 
       // Log the linking event
-      logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, {
+      logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, null, {
         userId: userId,
         provider: connection,
         linkedAt: new Date().toISOString(),
@@ -396,7 +396,7 @@ export class Auth0SocialAuthService {
       )
 
       // Log the unlinking event
-      logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, {
+      logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, null, {
         userId: userId,
         provider: connection,
         unlinkedAt: new Date().toISOString(),

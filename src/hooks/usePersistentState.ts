@@ -14,13 +14,35 @@ interface UsePersistentStateOptions<T> extends Partial<StorageConfig> {
  * React hook for persistent state management with localStorage/sessionStorage
  * Features automatic serialization, debouncing, and cross-tab synchronization
  */
-export function usePersistentState<T>({
-  key,
-  defaultValue,
-  debounceMs = 300,
-  syncAcrossTabs = false,
-  ...storageOptions
-}: UsePersistentStateOptions<T>) {
+
+// Overload for object-style options
+export function usePersistentState<T>(
+  options: UsePersistentStateOptions<T>
+): [T, (value: T | ((prev: T) => T)) => void, boolean]
+
+// Overload for positional arguments (key, defaultValue)
+export function usePersistentState<T>(
+  key: string,
+  defaultValue: T
+): [T, (value: T | ((prev: T) => T)) => void, boolean]
+
+// Implementation
+export function usePersistentState<T>(
+  arg1: UsePersistentStateOptions<T> | string,
+  arg2?: T
+): [T, (value: T | ((prev: T) => T)) => void, boolean] {
+  // Normalize arguments
+  const options = typeof arg1 === 'string'
+    ? { key: arg1, defaultValue: arg2 as T }
+    : arg1
+
+  const {
+    key,
+    defaultValue,
+    debounceMs = 300,
+    syncAcrossTabs = false,
+    ...storageOptions
+  } = options
   const [state, setState] = useState<T>(defaultValue)
   const [isLoaded, setIsLoaded] = useState(false)
   const debounceRef = useRef<NodeJS.Timeout>()

@@ -244,7 +244,7 @@ export class Auth0UserService {
       }
 
       // Log security event
-      logSecurityEvent(SecurityEventType.LOGIN, {
+      logSecurityEvent(SecurityEventType.LOGIN, null, {
         userId: userResponse.user_id,
         email: userResponse.email,
         method: 'password',
