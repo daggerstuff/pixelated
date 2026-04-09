@@ -240,7 +240,7 @@ export async function validateToken(
     const sessionId = payload.sid as string | undefined
 
     // Log successful validation
-    logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, {
+    logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, null, {
       userId: userId,
       tokenId: tokenId,
       tokenType: tokenType,
@@ -270,7 +270,7 @@ export async function validateToken(
     }
   } catch (error: unknown) {
     // Log validation failure
-    logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, {
+    logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
       userId: null,
       error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       tokenType: tokenType,
@@ -312,7 +312,7 @@ export async function refreshAccessToken(
     const role = extractRoleFromPayload(userResponse)
 
     // Log token refresh event
-    logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, {
+    logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, null, {
       userId: userId,
       oldTokenId: 'unknown', // We don't have the old token ID
       newAccessTokenId: userResponse.jti || '',
@@ -388,7 +388,7 @@ export async function revokeToken(
   )
 
   // Log revocation event
-  logSecurityEvent(SecurityEventType.TOKEN_REVOKED, {
+  logSecurityEvent(SecurityEventType.TOKEN_REVOKED, null, {
     userId: null, // We don't have user ID here
     tokenId: tokenId,
     reason: reason,
