@@ -88,6 +88,7 @@ export interface TherapeuticResponse {
   techniques?: string[]
   riskLevel?: 'low' | 'medium' | 'high' | 'critical'
   suggestedFollowup?: string
+  approach?: string
 }
 
 // Analysis configuration
@@ -97,6 +98,7 @@ export interface AnalysisConfig {
   includeTechniqueRecognition: boolean
   sensitivity: 'low' | 'medium' | 'high'
   maxContextLength: number
+  enableAnalysis?: boolean
 }
 
 // Enhanced mental health analysis

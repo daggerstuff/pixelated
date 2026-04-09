@@ -26,4 +26,5 @@ export interface ProgressionAnalysis {
     factors: string[]
   }
   recommendations: string[]
+  overallImprovement?: number
 }
