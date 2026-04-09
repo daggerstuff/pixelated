@@ -16,32 +16,32 @@ export enum UserRole {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id!: string
 
   @Column({ unique: true })
-  email: string
+  email!: string
 
   @Column()
-  password: string
+  password!: string
 
   @Column({ nullable: true })
-  firstName: string
+  firstName!: string
 
   @Column({ nullable: true })
-  lastName: string
+  lastName!: string
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  role: UserRole
+  role!: UserRole
 
   @Column({ default: true })
-  isActive: boolean
+  isActive!: boolean
 
   @Column({ nullable: true })
-  lastLoginAt: Date
+  lastLoginAt!: Date
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt!: Date
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt!: Date
 }
