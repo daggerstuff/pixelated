@@ -201,6 +201,21 @@ OpenCode/OhMyOpenAgent auto-imports from `~/.claude/` (MCP servers, plugins, ski
 
 Every flag defaults to `true` if the block is missing. All six **must** be set to `false` (issue #2037).
 
+### External Import Hard Kill
+
+The config flags above are the normal guardrails, but the plugin also exposes a stronger loader-level kill switch:
+
+```bash
+export OPENCODE_DISABLE_CLAUDE_CODE=true
+export OPENCODE_DISABLE_CLAUDE_CODE_PLUGINS=true
+```
+
+These disable the external Claude plugin bridge before command/skill/agent/MCP plugin payloads are loaded at all.
+
+Per the current OpenCode docs, OpenCode auto-loads plugins only from `.opencode/plugins/` and `~/.config/opencode/plugins/`, and skills only from `.opencode/skills/`, `~/.config/opencode/skills/`, plus Claude/Agents-compatible skill directories. Per the Gemini CLI extension docs, Gemini loads extensions from `~/.gemini/extensions/` and merges their `gemini-extension.json` config only inside Gemini CLI.
+
+That means a Gemini extension repo can carry an `.opencode/` payload, but OpenCode will not ingest it just because it exists under `~/.gemini/extensions/`. It only becomes active after being copied, symlinked, or otherwise installed into an OpenCode load path.
+
 ### Dynamic Context Pruning (DCP)
 
 The `@tarquinen/opencode-dcp` plugin is installed globally. It:

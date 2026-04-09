@@ -204,10 +204,10 @@ export class AuditService {
     if (options?.startDate || options?.endDate) {
       filter.timestamp = {}
       if (options.startDate) {
-        filter.timestamp.$gte = options.startDate
+        ;(filter.timestamp as Record<string, Date>).$gte = options.startDate
       }
       if (options.endDate) {
-        filter.timestamp.$lte = options.endDate
+        ;(filter.timestamp as Record<string, Date>).$lte = options.endDate
       }
     }
 
@@ -248,10 +248,10 @@ export class AuditService {
     if (options?.startDate || options?.endDate) {
       filter.timestamp = {}
       if (options.startDate) {
-        filter.timestamp.$gte = options.startDate
+        ;(filter.timestamp as Record<string, Date>).$gte = options.startDate
       }
       if (options.endDate) {
-        filter.timestamp.$lte = options.endDate
+        ;(filter.timestamp as Record<string, Date>).$lte = options.endDate
       }
     }
 
@@ -285,10 +285,10 @@ export class AuditService {
     if (options?.startDate || options?.endDate) {
       filter.timestamp = {}
       if (options.startDate) {
-        filter.timestamp.$gte = options.startDate
+        ;(filter.timestamp as Record<string, Date>).$gte = options.startDate
       }
       if (options.endDate) {
-        filter.timestamp.$lte = options.endDate
+        ;(filter.timestamp as Record<string, Date>).$lte = options.endDate
       }
     }
 

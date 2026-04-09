@@ -174,7 +174,7 @@ class ErrorLoggingService {
 
     entries.forEach((entry) => {
       // Recreate AppError from formatted error
-      const error = new AppError(entry.(error instanceof Error ? error.message : "Unknown error"), {
+      const error = new AppError(entry.error instanceof Error ? entry.error.message : "Unknown error", {
         code: entry.error.code,
         severity: entry.error.severity,
         category: entry.error.category,
