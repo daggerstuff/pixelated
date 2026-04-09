@@ -1,4 +1,5 @@
 ---
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const organizationSchema = {
@@ -17,270 +18,189 @@ const organizationSchema = {
 
 <BaseLayout
   title="Contact | Pixelated Empathy"
-  description="Get in touch with our team. Schedule demos, discuss partnerships, or ask questions."
+  description="Get in touch with our team. Schedule demos, discuss pilots, or ask security and rollout questions."
 >
   <script
     type="application/ld+json"
     set:html={JSON.stringify(organizationSchema)}
   />
-  <!-- Section 01 / Contact -->
-  <section
-    class="section-container section-spacing-lg"
-    style="counter-reset: section-counter;"
-  >
-    <div class="container-refined">
-      <!-- Numbered Section Header -->
-      <div class="section-number">Contact</div>
 
-      <div
-        class="grid grid-responsive gap-12 lg:grid-cols-2"
-        style="gap: var(--spacing-12);"
-      >
-        <!-- Left: Contact Info -->
-        <div class="space-y-8">
-          <div>
-            <h1 class="display-heading mb-6">Talk to the Team</h1>
-            <p class="lede-text">
-              Reach out if you want to evaluate the platform, discuss a pilot,
-              ask security questions, or figure out whether the workflow fits
-              your training program.
-            </p>
-          </div>
+  <MarketingPageHero
+    eyebrow="Contact"
+    title="Bring the pilot question, the hard case, or the trust review."
+    lede="Reach out if you want to evaluate the platform, talk through a pilot, ask security questions, or figure out whether the workflow fits your training program."
+    note="The fastest conversations start with the actual supervision problem."
+    trustLine={['Founder-led replies', 'Response target: two business days', 'United States']}
+    primaryCTA={{ text: 'Email the team', href: 'mailto:info@pixelatedempathy.com' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    stats={[
+      { label: 'Best for', value: 'Pilots + trust review', detail: 'Bring rollout, privacy, or supervision questions' },
+      { label: 'Email', value: 'info@pixelatedempathy.com', detail: 'For demos, partnerships, and evaluation' },
+      { label: 'Company', value: 'Founder-led', detail: 'Built in the United States' },
+    ]}
+  />
 
-          <!-- Contact Methods -->
-          <div class="space-y-6">
-            <div class="card-elegant">
-              <div class="eyebrow-text mb-2">Best For</div>
-              <ul
-                class="space-y-2 text-sm"
-                style="color: var(--text-secondary);"
-              >
-                <li>Pilot programs and training rollouts</li>
-                <li>Supervisor and cohort workflows</li>
-                <li>Security, privacy, and deployment questions</li>
-              </ul>
-            </div>
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2 contact-grid">
+        <div class="contact-grid__details">
+          <article class="marketing-card">
+            <span class="marketing-card__label">Best first message</span>
+            <ul class="marketing-list">
+              <li>The case or supervision workflow you want to improve</li>
+              <li>Whether you want a demo, pilot discussion, or security review</li>
+              <li>Any rollout, retention, or deployment constraints that matter early</li>
+            </ul>
+          </article>
 
-            <div class="card-elegant">
-              <div class="eyebrow-text mb-2">Email</div>
-              <a
-                href="mailto:info@pixelatedempathy.com"
-                class="text-gradient-primary hover:opacity-80 transition-opacity"
-                style="font-size: var(--text-lg); font-weight: 600;"
-              >
-                info@pixelatedempathy.com
-              </a>
-            </div>
+          <article class="marketing-card marketing-card--accent">
+            <span class="marketing-card__label">Direct contact</span>
+            <p><a class="marketing-inline-link" href="mailto:info@pixelatedempathy.com">info@pixelatedempathy.com</a></p>
+            <p>United States</p>
+            <p>Founded 2025 • Founder-led</p>
+          </article>
 
-            <div class="card-elegant">
-              <div class="eyebrow-text mb-2">Location</div>
-              <p
-                style="color: var(--text-secondary); font-size: var(--text-base);"
-              >
-                United States
-              </p>
-              <p
-                style="color: var(--text-muted); font-size: var(--text-sm); margin-top: 0.5rem;"
-              >
-                Serving clients globally
-              </p>
+          <article class="marketing-card">
+            <span class="marketing-card__label">Elsewhere</span>
+            <div class="marketing-inline-links">
+              <a href="https://twitter.com/pixelatedempathy" class="marketing-inline-link" target="_blank" rel="noopener noreferrer">Twitter</a>
+              <a href="https://github.com/nochadisfaction/pixelated" class="marketing-inline-link" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>
-            <div class="card-elegant">
-              <div class="eyebrow-text mb-2">Company</div>
-              <p
-                style="color: var(--text-secondary); font-size: var(--text-base);"
-              >
-                Pixelated Empathy
-              </p>
-              <p
-                style="color: var(--text-muted); font-size: var(--text-sm); margin-top: 0.5rem;"
-              >
-                Founded 2025 • Founder-led
-              </p>
-            </div>
-
-            <div class="card-elegant">
-              <div class="eyebrow-text mb-2">Connect</div>
-              <div class="flex gap-4 mt-3">
-                <a
-                  href="https://twitter.com/pixelatedempathy"
-                  class="nav-link-refined"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Twitter
-                </a>
-                <a
-                  href="https://github.com/nochadisfaction/pixelated"
-                  class="nav-link-refined"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </div>
+          </article>
         </div>
 
-        <!-- Right: Contact Form -->
-        <div>
-          <div class="card-elegant">
-            <h2
-              class="brutalist-heading mb-6"
-              style="font-size: var(--text-2xl);"
+        <div class="marketing-card contact-form-card">
+          <span class="marketing-card__label">Send a message</span>
+
+          <form id="contact-form" class="space-y-6" novalidate>
+            <div
+              id="error-message"
+              class="hidden rounded-lg p-4"
+              style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;"
+              role="alert"
             >
-              Send a Message
-            </h2>
+              <p id="error-text"></p>
+            </div>
 
-            <form id="contact-form" class="space-y-6" novalidate>
-              <!-- Error message -->
-              <div
-                id="error-message"
-                class="hidden p-4 rounded-lg"
-                style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;"
-                role="alert"
-              >
-                <p id="error-text"></p>
-              </div>
-
-              <!-- Name & Email Row -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label for="name" class="eyebrow-text block mb-2">
-                    Name <span style="color: var(--accent-primary);">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    maxlength="100"
-                    class="brutalist-input"
-                    placeholder="Your name"
-                  />
-                  <div class="text-xs mt-1 hidden text-red-400" id="name-error">
-                  </div>
-                </div>
-                <div>
-                  <label for="email" class="eyebrow-text block mb-2">
-                    Email <span style="color: var(--accent-primary);">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    maxlength="100"
-                    class="brutalist-input"
-                    placeholder="you@example.com"
-                  />
-                  <div
-                    class="text-xs mt-1 hidden text-red-400"
-                    id="email-error"
-                  >
-                  </div>
-                </div>
-              </div>
-
-              <!-- Subject -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label for="subject" class="eyebrow-text block mb-2">
-                  Subject <span style="color: var(--accent-primary);">*</span>
+                <label for="name" class="eyebrow-text mb-2 block">
+                  Name <span style="color: var(--accent-primary);">*</span>
                 </label>
                 <input
                   type="text"
-                  id="subject"
-                  name="subject"
+                  id="name"
+                  name="name"
                   required
-                  maxlength="200"
+                  maxlength="100"
                   class="brutalist-input"
-                  placeholder="What is this about?"
+                  placeholder="Your name"
                 />
-                <div
-                  class="text-xs mt-1 hidden text-red-400"
-                  id="subject-error"
-                >
-                </div>
+                <div class="mt-1 hidden text-xs text-red-400" id="name-error"></div>
               </div>
 
-              <!-- Message -->
               <div>
-                <label for="message" class="eyebrow-text block mb-2">
-                  Message <span style="color: var(--accent-primary);">*</span>
+                <label for="email" class="eyebrow-text mb-2 block">
+                  Email <span style="color: var(--accent-primary);">*</span>
                 </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="6"
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
                   required
-                  maxlength="2000"
-                  class="brutalist-input resize-none"
-                  placeholder="Tell us more about your inquiry..."></textarea>
-                <div class="flex justify-between items-center mt-1">
-                  <div class="text-xs hidden text-red-400" id="message-error">
-                  </div>
-                  <div class="text-xs" style="color: var(--text-muted);">
-                    <span id="message-count">0</span>/2000
-                  </div>
+                  maxlength="100"
+                  class="brutalist-input"
+                  placeholder="you@example.com"
+                />
+                <div class="mt-1 hidden text-xs text-red-400" id="email-error"></div>
+              </div>
+            </div>
+
+            <div>
+              <label for="subject" class="eyebrow-text mb-2 block">
+                Subject <span style="color: var(--accent-primary);">*</span>
+              </label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                required
+                maxlength="200"
+                class="brutalist-input"
+                placeholder="Pilot, demo, trust review, or something else"
+              />
+              <div class="mt-1 hidden text-xs text-red-400" id="subject-error"></div>
+            </div>
+
+            <div>
+              <label for="message" class="eyebrow-text mb-2 block">
+                Message <span style="color: var(--accent-primary);">*</span>
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows="6"
+                required
+                maxlength="2000"
+                class="brutalist-input resize-none"
+                placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."></textarea>
+              <div class="mt-1 flex items-center justify-between">
+                <div class="hidden text-xs text-red-400" id="message-error"></div>
+                <div class="text-xs" style="color: var(--text-muted);">
+                  <span id="message-count">0</span>/2000
                 </div>
               </div>
-
-              <!-- Submit Button -->
-              <div class="flex items-center justify-between pt-2">
-                <button
-                  type="submit"
-                  id="submit-button"
-                  class="btn-brutalist btn-brutalist--primary"
-                >
-                  <span id="submit-text">Send Message</span>
-                  <svg
-                    id="loading-spinner"
-                    class="hidden animate-spin ml-2 h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      class="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      stroke-width="4"></circle>
-                    <path
-                      class="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                </button>
-                <span class="text-xs" style="color: var(--text-muted);">
-                  * Required
-                </span>
-              </div>
-            </form>
-
-            <!-- Success message -->
-            <div
-              id="success-message"
-              class="hidden mt-6 p-6 rounded-lg"
-              style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);"
-              role="alert"
-            >
-              <h3
-                class="font-semibold mb-2"
-                style="color: var(--accent-primary);"
-              >
-                Message sent successfully!
-              </h3>
-              <p
-                class="text-sm"
-                style="color: var(--text-secondary);"
-                id="success-text"
-              >
-              </p>
             </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <button
+                type="submit"
+                id="submit-button"
+                class="btn-brutalist btn-brutalist--primary"
+              >
+                <span id="submit-text">Send Message</span>
+                <svg
+                  id="loading-spinner"
+                  class="ml-2 hidden h-4 w-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </button>
+              <span class="text-xs" style="color: var(--text-muted);">
+                * Required
+              </span>
+            </div>
+          </form>
+
+          <div
+            id="success-message"
+            class="mt-6 hidden rounded-lg p-6"
+            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);"
+            role="alert"
+          >
+            <h3 class="mb-2 font-semibold" style="color: var(--accent-primary);">
+              Message sent successfully!
+            </h3>
+            <p
+              class="text-sm"
+              style="color: var(--text-secondary);"
+              id="success-text"
+            >
+            </p>
           </div>
         </div>
       </div>
@@ -288,7 +208,6 @@ const organizationSchema = {
   </section>
 
   <script>
-    // Form elements
     const form = document.getElementById('contact-form')!
     const submitButton = document.getElementById('submit-button')!
     const submitText = document.getElementById('submit-text')
@@ -297,7 +216,6 @@ const organizationSchema = {
     const errorMessage = document.getElementById('error-message')!
     const errorText = document.getElementById('error-text')!
 
-    // Form inputs
     const nameInput = document.getElementById('name')! as HTMLInputElement
     const emailInput = document.getElementById('email')! as HTMLInputElement
     const subjectInput = document.getElementById('subject')! as HTMLInputElement
@@ -306,19 +224,16 @@ const organizationSchema = {
     )! as HTMLTextAreaElement
     const messageCount = document.getElementById('message-count')!
 
-    // Error displays
     const nameError = document.getElementById('name-error')!
     const emailError = document.getElementById('email-error')!
     const subjectError = document.getElementById('subject-error')!
     const messageError = document.getElementById('message-error')!
 
-    // Character counter
     messageInput?.addEventListener('input', () => {
       const length = messageInput.value.length
       messageCount.textContent = length.toString()
     })
 
-    // Validation functions
     function validateName(name: string): string | null {
       if (!name.trim()) return 'Name is required'
       if (name.length < 2) return 'Name must be at least 2 characters'
@@ -349,7 +264,6 @@ const organizationSchema = {
       return null
     }
 
-    // Show field error
     function showFieldError(
       input: HTMLElement,
       errorElement: HTMLElement,
@@ -360,26 +274,22 @@ const organizationSchema = {
       errorElement.classList.remove('hidden')
     }
 
-    // Clear field error
     function clearFieldError(input: HTMLElement, errorElement: HTMLElement) {
       input.style.borderColor = ''
       errorElement.classList.add('hidden')
     }
 
-    // Show general error
     function showError(message: string) {
       errorText.textContent = message
       errorMessage.classList.remove('hidden')
       errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
-    // Hide messages
     function hideMessages() {
       errorMessage.classList.add('hidden')
       successMessage.classList.add('hidden')
     }
 
-    // Set loading state
     function setLoading(loading: boolean) {
       if (loading) {
         submitButton.disabled = true
@@ -392,24 +302,20 @@ const organizationSchema = {
       }
     }
 
-    // Form submission
     form?.addEventListener('submit', async (e) => {
       e.preventDefault()
       hideMessages()
 
-      // Validate all fields
       const nameValidation = validateName(nameInput.value)
       const emailValidation = validateEmail(emailInput.value)
       const subjectValidation = validateSubject(subjectInput.value)
       const messageValidation = validateMessage(messageInput.value)
 
-      // Clear previous errors
       clearFieldError(nameInput, nameError)
       clearFieldError(emailInput, emailError)
       clearFieldError(subjectInput, subjectError)
       clearFieldError(messageInput, messageError)
 
-      // Show field errors
       let hasErrors = false
       if (nameValidation) {
         showFieldError(nameInput, nameError, nameValidation)
@@ -433,7 +339,6 @@ const organizationSchema = {
         return
       }
 
-      // Submit form
       setLoading(true)
 
       try {
@@ -473,7 +378,6 @@ const organizationSchema = {
       }
     })
 
-    // Real-time validation
     nameInput?.addEventListener('blur', () => {
       const error = validateName(nameInput.value)
       if (error) {
@@ -510,4 +414,19 @@ const organizationSchema = {
       }
     })
   </script>
+
+  <style>
+    .contact-grid {
+      align-items: start;
+    }
+
+    .contact-grid__details {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .contact-form-card {
+      padding: 1.5rem;
+    }
+  </style>
 </BaseLayout>

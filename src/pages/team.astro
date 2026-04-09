@@ -1,5 +1,7 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const founder = {
   name: 'Chad',
@@ -8,111 +10,91 @@ const founder = {
   expertise:
     'Product engineering, platform architecture, and AI workflow design',
 }
+
+const futureRoles = [
+  {
+    label: 'Clinical guidance',
+    body: 'Advisors who can pressure-test scenarios, feedback language, and training use cases against real clinical workflows.',
+  },
+  {
+    label: 'Design and UX',
+    body: 'Product design support that makes difficult workflows readable, teachable, and trustworthy for care teams.',
+  },
+  {
+    label: 'Platform engineering',
+    body: 'Engineering depth around privacy, analytics, and scalable simulation workflows.',
+  },
+]
 ---
 
 <BaseLayout
   title="Team - Pixelated Empathy"
   description="Learn who is currently building Pixelated Empathy and how the company is structured today."
 >
-  <main class="flex-1 pt-14">
-    <section class="brutalist-section py-20">
-      <div class="site-shell site-shell--narrow text-center">
-        <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">Team</h1>
-        <p class="text-xl text-gray-300 leading-relaxed">
-          This page is meant to be accurate about the company’s current shape.
-          Pixelated Empathy is founder-led today, with future growth likely
-          centered on clinical advisors, design collaborators, and engineering.
-        </p>
-      </div>
-    </section>
+  <MarketingPageHero
+    eyebrow="Team"
+    title="A founder-led build shaped close to the workflow."
+    lede="This page is meant to be accurate about the company’s current shape. Pixelated Empathy is founder-led today, with future growth centered on clinical quality, trustworthy UX, and privacy-aware platform depth."
+    note="Current team structure as of April 9, 2026"
+    trustLine={['Founder-led', 'United States', 'Clinical workflow focus']}
+    primaryCTA={{ text: 'Talk to the founder', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    stats={[
+      { label: 'Current structure', value: 'Founder-led', detail: 'Product, engineering, and customer conversations stay close together' },
+      { label: 'Founded', value: '2025', detail: 'Company stage is still early and deliberate' },
+      { label: 'Hiring direction', value: 'Quality first', detail: 'Future roles should strengthen training quality and trust' },
+    ]}
+  />
 
-    <section class="brutalist-section py-20 bg-gray-900">
-      <div class="site-shell">
-        <div class="max-w-3xl mx-auto glass-card p-8 text-center">
-          <div
-            class="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center"
-          >
-            <span class="text-2xl font-bold text-white">C</span>
-          </div>
-          <h2 class="text-3xl font-bold text-white mb-2">{founder.name}</h2>
-          <p class="text-teal-400 font-medium mb-5">{founder.role}</p>
-          <p class="text-gray-300 leading-relaxed mb-5">{founder.bio}</p>
-          <p class="text-sm text-gray-400">
-            <strong>Focus:</strong>
-            {founder.expertise}
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2">
+        <article class="marketing-card marketing-card--accent">
+          <span class="marketing-card__label">{founder.role}</span>
+          <h2 class="marketing-title marketing-title--medium">{founder.name}</h2>
+          <p>{founder.bio}</p>
+          <p><strong>Focus:</strong> {founder.expertise}</p>
+        </article>
+
+        <article class="marketing-card">
+          <span class="marketing-card__label">Why stay close to the work</span>
+          <p>
+            The product is still being shaped around how supervisors, educators, and training teams actually evaluate a difficult case. Keeping product, implementation, and conversations close together reduces drift.
           </p>
-        </div>
+        </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="brutalist-section py-20 bg-black">
-      <div class="site-shell">
-        <div class="text-center mb-12">
-          <h2 class="text-4xl font-bold text-white mb-4">
-            How the team will grow
-          </h2>
-          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            The next additions should strengthen training quality, privacy, and
-            supervisor workflows rather than add generic headcount.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="glass-card p-6 text-center">
-            <h3 class="text-lg font-bold text-white mb-2">Clinical Guidance</h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Advisors who can pressure-test scenarios, feedback language, and
-              training use cases against real clinical workflows.
-            </p>
-          </div>
-          <div class="glass-card p-6 text-center">
-            <h3 class="text-lg font-bold text-white mb-2">Design and UX</h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Product design support that makes difficult workflows readable,
-              teachable, and trustworthy for care teams.
-            </p>
-          </div>
-          <div class="glass-card p-6 text-center">
-            <h3 class="text-lg font-bold text-white mb-2">
-              Platform Engineering
-            </h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Engineering depth around privacy, analytics, and scalable
-              simulation workflows.
-            </p>
-          </div>
-        </div>
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-section-header">
+        <span class="marketing-eyebrow">How the team should grow</span>
+        <h2 class="marketing-title marketing-title--medium">The next additions should sharpen quality, not add noise.</h2>
       </div>
-    </section>
 
-    <section class="brutalist-section py-20 bg-gray-900">
-      <div class="site-shell">
-        <div class="text-center mb-12">
-          <h2 class="text-4xl font-bold text-white mb-4">Operating Snapshot</h2>
-          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            A short, accurate view of how the company is structured today.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-4 gap-8">
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">1</div>
-            <p class="text-gray-300">Founder leading build and product</p>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">2025</div>
-            <p class="text-gray-300">Company founded</p>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">US</div>
-            <p class="text-gray-300">Operating location</p>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">AI</div>
-            <p class="text-gray-300">Roleplay and simulation focus</p>
-          </div>
-        </div>
+      <div class="marketing-grid marketing-grid--3">
+        {futureRoles.map((role) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{role.label}</span>
+            <p>{role.body}</p>
+          </article>
+        ))}
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
+
+  <MarketingCTA
+    eyebrow="Talk to the person building it"
+    title="If you are evaluating the workflow, bring the actual supervision problem."
+    body="The fastest way to understand whether Pixelated Empathy fits your team is to discuss the case type, coaching challenge, or trust requirement you are trying to solve first."
+    checklist={[
+      'The training scenario or supervision problem you want to improve',
+      'What a successful pilot would need to prove for your team',
+      'Any trust, privacy, or rollout constraints that matter early',
+    ]}
+    primaryCTA={{ text: 'Talk to the founder', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    note="Clarity around the problem matters more than a perfect org chart."
+  />
 </BaseLayout>
