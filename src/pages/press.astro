@@ -1,76 +1,94 @@
 ---
-import MizuLayout from '@/layouts/MizuLayout.astro'
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const quickFacts = [
+  {
+    label: 'What the company does',
+    value: 'Builds clinical simulation and transcript-backed review tools for therapist training teams.',
+  },
+  {
+    label: 'Who it serves',
+    value: 'Therapists, supervisors, training programs, and care teams rehearsing difficult conversations.',
+  },
+  {
+    label: 'How to describe it',
+    value: 'A founder-led software company focused on clearer supervision for hard therapy sessions.',
+  },
+]
+
+const coverageTopics = [
+  'Simulation-based therapist training',
+  'AI roleplay and transcript review',
+  'Supervisor workflows and cohort comparison',
+  'Privacy and deployment expectations for training tools',
+]
 ---
 
-<MizuLayout
+<BaseLayout
   title="Press & Media | Pixelated Empathy"
   description="Press information and company background for Pixelated Empathy."
 >
-  <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
-    <div class="site-shell site-shell--narrow relative z-10">
-      <div class="text-center mb-16">
-        <h1
-          class="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-white"
-        >
-          Press & Media
-        </h1>
-        <p
-          class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
-        >
-          Pixelated Empathy builds AI roleplay and simulation tools for
-          therapist training. If you are covering mental health technology,
-          supervision workflows, or practice-based training, contact us for
-          accurate background information.
-        </p>
-      </div>
+  <MarketingPageHero
+    eyebrow="Press"
+    title="Company facts for reporters, partners, and evaluators."
+    lede="Pixelated Empathy builds AI roleplay and simulation tools for therapist training. If you are covering mental health technology, supervision workflows, or practice-based training, this page is the fast orientation."
+    note="Media contact: info@pixelatedempathy.com"
+    trustLine={['Founder-led company', 'United States', 'Response goal: two business days']}
+    primaryCTA={{ text: 'Email media contact', href: 'mailto:info@pixelatedempathy.com' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    stats={[
+      { label: 'Media email', value: 'info@pixelatedempathy.com', detail: 'For background, company facts, and interview coordination' },
+      { label: 'Response window', value: 'Two business days', detail: 'Typical reply target for press inquiries' },
+      { label: 'Coverage fit', value: 'Mental health tech', detail: 'Training workflows, supervision, and AI simulation' },
+    ]}
+  />
 
-      <div
-        class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-12 mb-12"
-      >
-        <h2 class="text-3xl font-bold text-white mb-6">Media contact</h2>
-        <div class="space-y-4 text-slate-300">
-          <div>
-            <div class="text-sm text-slate-500 mb-1">Email</div>
-            <a
-              href="mailto:info@pixelatedempathy.com"
-              class="text-primary-400 hover:text-primary-300 text-lg font-medium"
-            >
-              info@pixelatedempathy.com
-            </a>
-          </div>
-          <div>
-            <div class="text-sm text-slate-500 mb-1">Response window</div>
-            <p>We aim to respond within two business days.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid gap-6 md:grid-cols-2">
-        <div
-          class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8"
-        >
-          <h2 class="text-2xl font-bold text-white mb-4">
-            Short company description
-          </h2>
-          <p class="text-slate-400 leading-relaxed">
-            Pixelated Empathy is a founder-led company building AI simulation
-            tools that help therapists, supervisors, and training programs
-            practice difficult mental health conversations before they happen in
-            the real world.
-          </p>
-        </div>
-        <div
-          class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8"
-        >
-          <h2 class="text-2xl font-bold text-white mb-4">Useful topics</h2>
-          <ul class="space-y-3 text-slate-400">
-            <li>Simulation-based therapist training</li>
-            <li>AI roleplay and transcript review</li>
-            <li>Supervisor workflows and cohort practice</li>
-            <li>Privacy and deployment expectations for training tools</li>
-          </ul>
-        </div>
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--3">
+        {quickFacts.map((fact) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{fact.label}</span>
+            <p>{fact.value}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
-</MizuLayout>
+
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2">
+        <article class="marketing-card marketing-card--accent">
+          <span class="marketing-card__label">Boilerplate</span>
+          <p>
+            Pixelated Empathy is a founder-led company building AI simulation tools that help therapists, supervisors, and training programs practice difficult mental health conversations before they happen in the real world.
+          </p>
+        </article>
+
+        <article class="marketing-card">
+          <span class="marketing-card__label">Useful topics</span>
+          <ul class="marketing-list">
+            {coverageTopics.map((topic) => <li>{topic}</li>)}
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <MarketingCTA
+    eyebrow="Need a clean backgrounder?"
+    title="Use the company facts, then reach out for specifics."
+    body="If you need background for a story, interview context, or a product briefing, contact the team directly. The goal is to give you accurate information quickly, not marketing filler."
+    checklist={[
+      'Publication, outlet, or project name',
+      'What you are covering or evaluating',
+      'Your ideal response window',
+    ]}
+    primaryCTA={{ text: 'Email media contact', href: 'mailto:info@pixelatedempathy.com' }}
+    secondaryCTA={{ text: 'Talk to the team', href: '/contact' }}
+    note="If you are evaluating the product rather than covering it, use the contact page instead."
+  />
+</BaseLayout>
