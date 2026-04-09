@@ -398,7 +398,7 @@ export class MentalLLaMAAdapter {
           if (
             parsedLlmResponse.mentalHealthCategory &&
             parsedLlmResponse.mentalHealthCategory !== routingDecisionStore.targetAnalyzer &&
-            parsedLlmResponse.confidence > routingDecisionStore.confidence
+            (parsedLlmResponse.confidence ?? 0) > routingDecisionStore.confidence
           ) {
             logger.info(
               `LLM analysis refined category from ${routingDecisionStore.targetAnalyzer} to ${parsedLlmResponse.mentalHealthCategory}`,
