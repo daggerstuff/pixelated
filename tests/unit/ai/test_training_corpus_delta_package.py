@@ -36,13 +36,21 @@ def _direct_record(prompt: str, response: str, *, lane: str | None = None) -> di
 
 
 def test_release_candidate_delta_source_limits_strip_wave1_overlay() -> None:
-    report = {"families": {"I": {"winner": {"variant_id": "I1.3"}}}}
+    report = {
+        "families": {
+            "I": {"winner": {"variant_id": "I1.3"}},
+            "L": {"winner": {"variant_id": "L1.3"}},
+        }
+    }
 
     source_limits = release_candidate_delta_source_limits_from_report(report)
 
     assert "wave1_seed_simulation" not in source_limits
     assert "wave1_seed_evaluator" not in source_limits
     assert "wave1_seed_benchmark" not in source_limits
+    assert "wave4_seed_simulation" not in source_limits
+    assert "wave4_seed_evaluator" not in source_limits
+    assert "wave4_seed_benchmark" not in source_limits
     assert source_limits["foundation_amod"] == 80
     assert source_limits["evaluator_psychology"] == 60
 
