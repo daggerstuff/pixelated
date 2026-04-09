@@ -1,23 +1,9 @@
 {
-  // Factory Droid — Project Settings
-  // File: .factory/settings.json
-
-  // Default droid to use for this project
   "default_droid": "fullstack-engineer",
-
-  // Where spec documentation is saved
   "docs_dir": ".factory/docs",
-
-  // Auto mode: "low" (manual approval), "medium", "high" (auto-apply)
   "default_auto_mode": "low",
-
-  // Session management
   "session_timeout_minutes": 120,
   "max_session_turns": 100,
-
-  // Tool permissions — auto-approve safe operations
   "allowed_tools": ["read", "glob", "grep"],
-
-  // Excluded tools — never allow these
   "excluded_tools": []
 }
