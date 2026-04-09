@@ -277,11 +277,11 @@ export const PATCH: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         data: {
-          id: updatedUser.id,
-          email: updatedUser.email,
-          role: updatedUser.role,
-          fullName: updatedUser.fullName,
-          updatedAt: updatedUser.updatedAt,
+          id: updatedUser?.id,
+          email: updatedUser?.email,
+          role: updatedUser?.role,
+          fullName: updatedUser?.fullName,
+          updatedAt: updatedUser?.updatedAt,
         },
         message: 'User updated successfully',
       }),
