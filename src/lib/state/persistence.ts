@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger'
+import storageManager from '@/utils/storage/storageManager'
 
 interface StorageOptions {
   storage?: Storage
@@ -19,7 +20,7 @@ interface PersistenceConfig {
 
 const defaultOptions: Required<StorageOptions> = {
   storage:
-    typeof window !== 'undefined' ? window.localStorage : ({} as Storage),
+    typeof window !== 'undefined' ? storageManager.getStorage() : ({} as Storage),
   prefix: 'app_state_',
   encrypt: false,
   compress: false,
