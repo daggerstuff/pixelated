@@ -165,6 +165,26 @@ select_submodule_url() {
   local original_url
   original_url="$(git config -f .gitmodules --get "submodule.${name}.url")"
 
+  # 2.5 GitHub Actions Logic
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    if is_relative_submodule_url "${original_url}"; then
+      local github_url
+      github_url="$(canonical_public_submodule_url "${name}")"
+      printf '%s' "${github_url}"
+      return 0
+    fi
+  fi
+
+  # 2.5 GitHub Actions Logic
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    if is_relative_submodule_url "${original_url}"; then
+      local github_url
+      github_url="$(canonical_public_submodule_url "${name}")"
+      printf '%s' "${github_url}"
+      return 0
+    fi
+  fi
+
   # 3. Azure Environment Logic
   if is_azure_environment; then
     local azure_url
