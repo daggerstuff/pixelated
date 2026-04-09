@@ -376,3 +376,5 @@ function getTechniqueDescription(technique: TherapeuticTechnique): string {
 
   return descriptions[technique] || technique.replace(/_/g, ' ')
 }
+
+export default SimulationContainer

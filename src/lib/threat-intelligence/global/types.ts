@@ -761,3 +761,40 @@ export interface SystemMetrics {
   activeConnections: number
   queueSize: number
 }
+
+// Additional types for hunting and response
+export interface HuntingConfig {
+  enabled: boolean
+  maxHunts: number
+  defaultTimeout: number
+  autoEscalate: boolean
+}
+
+export interface HuntPattern {
+  patternId: string
+  name: string
+  description: string
+  type: 'behavioral' | 'signature' | 'anomaly'
+  query: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+}
+
+export interface ThreatResponse {
+  responseId: string
+  threatId: string
+  responseType: 'block' | 'isolate' | 'alert' | 'mitigate'
+  status: 'pending' | 'executing' | 'completed' | 'failed'
+  actions: ResponseAction[]
+  timestamp: Date
+  metadata?: Record<string, unknown>
+}
+
+// Threat context for context field
+export interface ThreatContext {
+  geographicLocation?: string
+  affectedSystems?: string[]
+  industrySector?: string
+  timeWindow?: TimeWindow
+  threatActor?: string
+  campaign?: string
+}

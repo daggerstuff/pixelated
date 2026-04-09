@@ -5,7 +5,89 @@
  * previous MongoDB-based authentication system.
  */
 
-import { ManagementClient, AuthenticationClient, UserInfoClient } from 'auth0'
+import {
+  ManagementClient,
+  AuthenticationClient,
+  UserInfoClient,
+  type AuthenticationClientOptions,
+} from 'auth0'
+
+// Type alias for auth0 v5+ compatibility
+// ManagementClientOptionsWithClientCredentials was removed in v5
+// Use the constructor options type instead
+export type ManagementClientOptionsWithClientCredentials = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience?: string
+}
+
+// Extend ManagementClient to include methods that may not be in the TypeScript definitions
+interface ExtendedManagementClient extends ManagementClient {
+  // Users
+  users: ManagementClient['users'] & {
+    create: (params: any) => Promise<any>
+    get: (params: { id: string }) => Promise<any>
+    list: (params: any) => Promise<any>
+    update: (params: { id: string }, data: any) => Promise<any>
+    delete: (params: { id: string }) => Promise<void>
+    listUsersByEmail: (params: { email: string }) => Promise<any>
+    getLogs: (params: { per_page: number; q: string }) => Promise<any>
+    getGuardianEnrollments: (params: { id: string }) => Promise<any>
+  }
+  // Roles
+  getRoles: (params: { per_page?: number; page?: number }) => Promise<any>
+  createRole: (params: {
+    name: string
+    description?: string
+  }) => Promise<any>
+  updateRole: (params: {
+    id: string
+    name?: string
+    description?: string
+  }) => Promise<any>
+  deleteRole: (params: { id: string }) => Promise<void>
+  getRoleUsers: (params: { id: string }) => Promise<any>
+  assignRolestoUser: (params: {
+    id: string
+    roles: string[]
+  }) => Promise<void>
+  removeRolesFromUser: (params: {
+    id: string
+    roles: string[]
+  }) => Promise<void>
+  getUserRoles: (params: { id: string }) => Promise<any>
+  // Guardian
+  getGuardianFactors: () => Promise<any>
+  createGuardianEnrollmentTicket: (params: {
+    user_id: string
+    send_mail: boolean
+  }) => Promise<any>
+  deleteGuardianEnrollment: (params: { id: string }) => Promise<void>
+  // Logs
+  getLogs: (params: { per_page: number; q: string }) => Promise<any>
+  // Tickets
+  tickets: ManagementClient['tickets'] & {
+    changePassword: (params: any) => Promise<any>
+  }
+}
+
+// Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
+interface ExtendedAuthenticationClient extends AuthenticationClient {
+  oauth: AuthenticationClient['oauth'] & {
+    passwordGrant: (params: any) => Promise<any>
+    refreshTokenGrant: (params: any) => Promise<any>
+    revokeRefreshToken: (params: any) => Promise<any>
+    refreshToken: (params: any) => Promise<any>
+  }
+  refreshToken: (params: any) => Promise<any>
+  getProfile: (token: string) => Promise<any>
+}
+
+// Extend UserInfoClient
+interface ExtendedUserInfoClient extends UserInfoClient {
+  getUserInfo: (token: string) => Promise<any>
+}
 import type { Db } from 'mongodb'
 
 import { mongodb } from '../config/mongodb.config'
@@ -24,9 +106,9 @@ import type {
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
 // Initialize Auth0 clients
-let auth0Management: ManagementClient | null = null
-let auth0Authentication: AuthenticationClient | null = null
-let auth0UserInfo: UserInfoClient | null = null
+let auth0Management: ExtendedManagementClient | null = null
+let auth0Authentication: ExtendedAuthenticationClient | null = null
+let auth0UserInfo: ExtendedUserInfoClient | null = null
 
 /**
  * Initialize Auth0 clients

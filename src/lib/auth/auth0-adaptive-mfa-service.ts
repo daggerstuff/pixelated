@@ -5,14 +5,47 @@
 
 import { ManagementClient } from 'auth0'
 
+// Type alias for auth0 v5+ compatibility
+export type ManagementClientOptionsWithClientCredentials = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience?: string
+}
+
 import { auth0UserService } from '../../services/auth0.service'
+
+// Extend ManagementClient to include methods that may not be in the TypeScript definitions
+interface ExtendedManagementClient extends ManagementClient {
+  // Logs
+  getLogs(params: { per_page: number; q: string }): Promise<any>
+  // Guardian methods
+  getGuardianEnrollments(params: { id: string }): Promise<any>
+  getGuardianFactors(): Promise<any>
+  createGuardianEnrollmentTicket(params: {
+    user_id: string
+    send_mail: boolean
+  }): Promise<any>
+  deleteGuardianEnrollment(params: { id: string }): Promise<void>
+  // Roles
+  getRoles(params: { per_page?: number; page?: number }): Promise<any>
+  assignRolestoUser(params: {
+    id: string
+    roles: string[]
+  }): Promise<void>
+  removeRolesFromUser(params: {
+    id: string
+    roles: string[]
+  }): Promise<void>
+  getUserRoles(params: { id: string }): Promise<any>
+}
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
 // Initialize Auth0 management client
-let auth0Management: ManagementClient | null = null
+let auth0Management: ExtendedManagementClient | null = null
 
 /**
  * Initialize Auth0 management client

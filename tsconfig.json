@@ -92,7 +92,10 @@
     "./api/**/*.ts",
     "./plugins/**/*.ts",
     "./types/**/*.d.ts",
-    "./.astro-env.d.ts"
+    "./.astro-env.d.ts",
+    "./src/types/declarations.d.ts",
+    "./src/types/astro-components.d.ts",
+    "./src/types/npm-packages.d.ts"
   ],
   "exclude": [
     "./dist",

@@ -1,5 +1,14 @@
 import type { APIContext, MiddlewareHandler, MiddlewareNext } from 'astro'
 
+// User role enum for authorization
+export enum UserRole {
+  ADMIN = 'admin',
+  CLINICIAN = 'clinician',
+  RESEARCHER = 'researcher',
+  PATIENT = 'patient',
+  GUEST = 'guest',
+}
+
 export interface ExtendedMiddleware extends MiddlewareHandler {
   (context: APIContext, next: MiddlewareNext): Promise<Response | undefined>
 }

@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import { Repository } from 'typeorm'
 
-import { User } from '../entities/user.entity'
+import type { User } from '../entities/user.entity'
 import { RegisterDto } from '../validation/register-schema'
 
 @Injectable()

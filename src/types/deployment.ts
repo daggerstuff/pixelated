@@ -41,3 +41,22 @@ export interface ServiceInstance {
   healthy: boolean
   registeredAt: Date
 }
+
+// Rollback plan for deployments
+export interface RollbackPlan {
+  id: string
+  deploymentId: string
+  version: string
+  previousVersion: string
+  reason: string
+  steps: Array<{
+    order: number
+    action: string
+    target: string
+    estimatedTime: number
+  }>
+  created: Date
+  status: 'ready' | 'executing' | 'completed' | 'failed'
+  executedAt?: Date
+  executedBy?: string
+}

@@ -1,5 +1,7 @@
-// Simulator types for load testing and simulation
+// Simulator types - re-export all types from the types subdirectory
+export * from './types/index'
 
+// Load testing and simulation types (legacy compatibility)
 export interface SimulationConfig {
   mode: 'load_test' | 'stress_test' | 'soak_test'
   userCount: number

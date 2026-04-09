@@ -730,3 +730,57 @@ export interface BiasDetectionEvent {
   payload: any
   timestamp: Date
 }
+
+// WebSocket message types for real-time bias detection
+export interface WebSocketMessage {
+  type: string
+  timestamp: Date
+  sessionId?: string
+  data: unknown
+}
+
+export interface BiasAlertWebSocketEvent extends WebSocketMessage {
+  type: 'bias-alert'
+  data: {
+    alert: BiasAlert
+    analysisResult: BiasAnalysisResult
+    requiresImmediateAction: boolean
+  }
+}
+
+export interface DashboardUpdateWebSocketEvent extends WebSocketMessage {
+  type: 'dashboard-update'
+  data: {
+    summary: BiasDashboardSummary
+    newAlerts: BiasAlert[]
+    updatedTrends: BiasTrendData[]
+  }
+}
+
+export interface SystemStatusWebSocketEvent extends WebSocketMessage {
+  type: 'system-status'
+  data: {
+    status: 'healthy' | 'degraded' | 'unhealthy' | 'error' | 'authenticated' | 'authentication_failed' | 'heartbeat'
+    timestamp: Date
+    services?: {
+      pythonService: { status: 'up' | 'down'; lastCheck: Date }
+      database: { status: 'up' | 'down'; lastCheck: Date }
+      cache: { status: 'up' | 'down'; lastCheck: Date }
+      alertSystem: { status: 'up' | 'down'; lastCheck: Date }
+    }
+    version?: string
+    uptime?: number
+    error?: string
+    userId?: string
+    permissions?: string[]
+  }
+}
+
+export interface AnalysisCompleteWebSocketEvent extends WebSocketMessage {
+  type: 'analysis-complete'
+  data: {
+    sessionId: string
+    result: BiasAnalysisResult
+    processingTime: number
+  }
+}

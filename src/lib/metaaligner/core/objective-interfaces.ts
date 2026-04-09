@@ -604,3 +604,16 @@ StandardObjectiveBuilder.prototype.addCriterion = function (
   }
   return this
 }
+
+// Alignment metrics for objective evaluation
+export interface AlignmentMetrics {
+  overallScore: number
+  dimensionScores: Record<string, number>
+  confidence: number
+  timestamp: Date
+  metadata?: {
+    evaluationTime: number
+    modelUsed?: string
+    contextFactors: string[]
+  }
+}

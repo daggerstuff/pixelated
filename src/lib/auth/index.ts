@@ -15,6 +15,9 @@ export type { SessionData } from "./session";
 // Re-export session for compatibility
 export { getSession } from "./session";
 
+// Re-export User type for compatibility
+export type { User, AuthUser } from "./types";
+
 /**
  * Get the current user from the request or cookies
  */

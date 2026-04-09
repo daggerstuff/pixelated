@@ -269,3 +269,14 @@ export class ThreatHuntingService extends EventEmitter {
   }
 }
 
+// Re-export types for convenience
+export type {
+  InvestigationFinding,
+  InvestigationTemplate,
+  ThreatHuntingConfig,
+  HuntingRule,
+  HuntResult,
+  HuntFinding,
+  Investigation,
+} from './types'
+
