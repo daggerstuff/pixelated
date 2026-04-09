@@ -136,10 +136,10 @@ export interface EscalationRule {
 }
 
 export class AutomatedThreatResponseOrchestrator extends EventEmitter {
-  private mongoClient: MongoClient
-  private db: Db
-  private responsesCollection: Collection<ThreatResponse>
-  private redis: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private responsesCollection!: Collection<ThreatResponse>
+  private redis!: Redis
   private isInitialized = false
   private executionQueue: string[] = []
   private isProcessing = false

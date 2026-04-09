@@ -91,11 +91,11 @@ export interface GlobalThreatNetworkConfig {
 }
 
 export class GlobalThreatIntelligenceNetwork extends EventEmitter {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
-  private threatsCollection: Collection<ThreatIntelligence>
-  private sharingCollection: Collection<any>
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private threatsCollection!: Collection<ThreatIntelligence>
+  private sharingCollection!: Collection<any>
   private config: GlobalThreatNetworkConfig
   private isInitialized = false
   private propagationInterval: NodeJS.Timeout | null = null

@@ -218,11 +218,11 @@ export interface DistanceCoordinates {
 
 export class ThreatCorrelationEngine extends EventEmitter {
   private config: CorrelationEngineConfig
-  private mongoClient: MongoClient
-  private db: Db
-  private threatsCollection: Collection<ThreatData>
-  private correlationsCollection: Collection<ThreatCorrelation>
-  private redis: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private threatsCollection!: Collection<ThreatData>
+  private correlationsCollection!: Collection<ThreatCorrelation>
+  private redis!: Redis
   private isInitialized = false
   private processingInterval: NodeJS.Timeout | null = null
   private correlationQueue: string[] = []

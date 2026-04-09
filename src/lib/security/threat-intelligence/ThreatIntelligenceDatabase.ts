@@ -161,12 +161,12 @@ export interface DatabaseCollection {
 }
 
 export class ThreatIntelligenceDatabase extends EventEmitter {
-  private mongoClient: MongoClient
-  private db: Db
-  private stixCollection: Collection<DatabaseThreatIntelligence>
-  private collectionsCollection: Collection<DatabaseCollection>
+  private mongoClient!: MongoClient
+  private db!: Db
+  private stixCollection!: Collection<DatabaseThreatIntelligence>
+  private collectionsCollection!: Collection<DatabaseCollection>
   private manifestCollection: Collection<TAXIIManifestEntry>
-  private redis: Redis
+  private redis!: Redis
   private isInitialized = false
   private indexingInterval: NodeJS.Timeout | null = null
 
