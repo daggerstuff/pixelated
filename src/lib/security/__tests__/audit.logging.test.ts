@@ -53,7 +53,7 @@ describe('auditLoggingService', () => {
       expect(mockLogger.info).toHaveBeenCalled()
       const loggedEntry = JSON.parse(
         mockLogger.info.mock.calls[0][0],
-      ) as unknown
+      ) as { details: { password: string } }
       expect(loggedEntry.details.password).toBe('[REDACTED]')
     })
 
