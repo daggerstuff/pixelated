@@ -148,8 +148,8 @@ export function TabsList({ children, className = '' }: TabsListProps) {
     }
 
     e.preventDefault()
-    tabs[nextIndex].focus()
-    tabs[nextIndex].click()
+    (tabs[nextIndex] as HTMLElement).focus()
+    (tabs[nextIndex] as HTMLElement).click()
   }
 
   return (
