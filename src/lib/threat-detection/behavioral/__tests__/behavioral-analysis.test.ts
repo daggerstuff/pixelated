@@ -36,16 +36,16 @@ const mockRedisInstance = {
 
 const mockDb = {
   collection: vi.fn(() => ({
-    replaceOne: vi.fn().mockResolvedValue({}),
-    insertMany: vi.fn().mockResolvedValue({}),
-    insertOne: vi.fn().mockResolvedValue({}),
+    replaceOne: vi.fn<any>().mockResolvedValue({}),
+    insertMany: vi.fn<any>().mockResolvedValue({}),
+    insertOne: vi.fn<any>().mockResolvedValue({}),
   })),
 }
 
 const mockMongoClientInstance = {
-  connect: vi.fn().mockResolvedValue(undefined),
+  connect: vi.fn<any>().mockResolvedValue(undefined),
   db: vi.fn(() => mockDb),
-  close: vi.fn().mockResolvedValue(undefined),
+  close: vi.fn<any>().mockResolvedValue(undefined),
 }
 
 // Mock external modules
