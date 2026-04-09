@@ -1,11 +1,11 @@
 export const ctaContent = {
   label: 'Test it on one difficult case',
   title:
-    'Pilot one case. Judge the record. Keep it only if it sharpens supervision.',
+    'See the demo, then test one case with your team.',
   intro:
-    'Pick one difficult conversation your team already finds hard to coach. Run it once, review it together, and decide from the record instead of the pitch.',
+    'You do not need a program-wide rollout to know whether this helps. Bring one hard conversation, run it once, and judge whether the review became more precise.',
   verdictCopy:
-    'The bar is simple: the review should make the next supervision conversation more specific and the next attempt more deliberate.',
+    'If supervisors can point to the exact moment to revisit and the next attempt gets clearer, the pilot worked. If not, stop.',
   proofItems: [
     {
       label: 'Step one',
@@ -19,16 +19,17 @@ export const ctaContent = {
     {
       label: 'Step three',
       value:
-        'Decide whether you want the next supervision cycle to run this way.',
+        'Decide from the evidence, not from a long sales process.',
     },
   ],
   decisionTitle:
-    'Keep it if the review gets more specific. Stop if it does not.',
+    'Keep it only if the coaching gets sharper.',
   rubric: [
     'Would you bring this transcript into next week’s supervision?',
-    'Did the review reveal one intervention worth changing on the retry?',
+    'Did the review reveal one intervention worth changing on the next pass?',
+    'Could your team compare two clinicians against the same difficult moment?',
   ],
-  primaryCTA: { text: 'Start a pilot', href: '/signup' },
-  secondaryCTA: { text: 'Talk to Us', href: '/contact' },
-  meta: 'One case is enough to tell whether the product makes supervision more concrete.',
+  primaryCTA: { text: 'Book a pilot review', href: '/contact' },
+  secondaryCTA: { text: 'See the product demo', href: '/demo-hub' },
+  meta: 'No long rollout required. One difficult case should tell you whether the workflow is clearer.',
 } as const

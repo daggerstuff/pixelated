@@ -3,6 +3,7 @@ export interface Props {
   kicker?: string
   title?: string
   subtitle?: string
+  helperText?: string
   proofPoints?: readonly { label: string; text: string }[]
   primaryCTA?: { text: string; href: string }
   secondaryCTA?: { text: string; href: string }
@@ -12,6 +13,7 @@ const {
   kicker,
   title,
   subtitle,
+  helperText,
   proofPoints = [],
   primaryCTA,
   secondaryCTA,
@@ -74,6 +76,8 @@ const {
         </a>
       )}
     </div>
+
+    {helperText && <p class="hero-helper">{helperText}</p>}
   </div>
 </div>
 
@@ -141,12 +145,12 @@ const {
 
 
   .hero-title {
-    max-width: 28ch;
+    max-width: 22ch;
     margin: 0 auto;
     font-family: var(--font-display);
-    font-size: clamp(1.75rem, 1.45rem + 1.5vw, 2.75rem);
+    font-size: clamp(2.25rem, 1.65rem + 2.2vw, 4rem);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.02;
     letter-spacing: -0.025em;
     color: var(--text-primary);
     text-wrap: balance;
@@ -165,22 +169,25 @@ const {
 
   .hero-proof-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     gap: 0.95rem;
     margin: 0;
     padding: 0;
     list-style: none;
-    max-width: 52rem;
+    width: 100%;
+    max-width: 56rem;
   }
 
   .hero-proof-card {
     display: grid;
     gap: 0.45rem;
     min-width: 0;
-    padding: 0.96rem 1rem 1.02rem;
+    padding: 1rem 1rem 1.08rem;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-subtle);
-    background: var(--bg-secondary);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+      var(--bg-secondary);
     transition:
       border-color var(--duration-fast) var(--ease-out),
       background var(--duration-fast) var(--ease-out);
@@ -229,9 +236,18 @@ const {
     margin-top: 0.35rem;
   }
 
+  .hero-helper {
+    margin: 0;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
   .btn-premium {
     position: relative;
-    padding: 0.86rem 1.5rem;
+    padding: 0.92rem 1.5rem;
     background: var(--accent-primary);
     border: 1px solid var(--accent-primary);
     border-radius: var(--radius-sm);
@@ -408,6 +424,27 @@ const {
     .hero-secondary-link {
       justify-content: center;
       text-align: center;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .hero-copy-wrap {
+      justify-content: flex-start;
+    }
+
+    .hero-copy {
+      justify-items: start;
+      text-align: left;
+    }
+
+    .hero-title,
+    .hero-subtitle {
+      margin-inline: 0;
+      text-align: left;
+    }
+
+    .hero-actions {
+      justify-content: flex-start;
     }
   }
 </style>

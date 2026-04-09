@@ -181,7 +181,7 @@ export function SessionForm({
                 value={(formData as CreateSessionPayload).sessionId ?? ''}
                 onChange={(e) => {
                   setFormData({ ...formData, sessionId: e.target.value })
-                  if (touched.sessionId) {
+                  if (touched['sessionId']) {
                     validateField('sessionId', e.target.value)
                   }
                 }}
@@ -194,22 +194,22 @@ export function SessionForm({
                 }}
                 className={cn(
                   'w-full rounded-md border bg-background px-3 py-2 text-sm',
-                  errors.sessionId && touched.sessionId
+                  errors['sessionId'] && touched['sessionId']
                     ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                     : 'border-input',
                 )}
                 placeholder='Leave empty for auto-generated ID'
-                aria-invalid={!!errors.sessionId && touched.sessionId}
+                aria-invalid={!!errors['sessionId'] && touched['sessionId']}
                 aria-describedby={
-                  errors.sessionId && touched.sessionId
+                  errors['sessionId'] && touched['sessionId']
                     ? 'sessionId-error'
                     : undefined
                 }
               />
               <FieldError
                 error={
-                  errors.sessionId && touched.sessionId
-                    ? errors.sessionId
+                  errors['sessionId'] && touched['sessionId']
+                    ? errors['sessionId']
                     : undefined
                 }
               />

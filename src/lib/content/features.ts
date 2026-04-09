@@ -1,31 +1,31 @@
 export const featuresContent = {
-  label: 'What the platform adds',
+  label: 'What the platform makes possible',
   title:
-    'Keep the room believable, then hand supervisors a record worth coaching.',
-  copy: 'The product has two jobs: hold the clinician inside a believable conversation, then preserve the specific turn a supervisor needs to coach next.',
-  proofLabel: 'What the team gets',
+    'Give supervisors the exact coaching moment, not a vague impression.',
+  copy: 'Every feature serves the same outcome: keep the conversation believable, then make the next supervision meeting faster, clearer, and more specific.',
+  proofLabel: 'What teams feel in week one',
   proofItems: [
-    'A training surface that behaves more like a room than a script.',
-    'A review path that preserves pacing, disclosure, and intervention turns.',
-    'A shared case teams can use to compare judgment across clinicians.',
+    'Less time reconstructing what happened from memory.',
+    'More confidence pointing to the line, question, or miss that mattered.',
+    'One shared case the whole team can learn from instead of five unrelated roleplays.',
   ],
   cards: [
     {
-      title: 'Keep the clinician in the room',
+      title: 'Keep the conversation believable',
       description:
-        'The practice surface should feel like a conversation to navigate, not a branching script to memorize.',
+        'The practice surface should feel like a room to navigate, not a branching script to memorize.',
       icon: 'chat',
       image: '/images/features/clinician-in-room.png',
     },
     {
-      title: 'Show the supervisor what changed it',
+      title: 'Pinpoint the turn worth coaching',
       description:
-        'The review needs to preserve the moment that changed the room, not just the clinician memory of it.',
+        'The review preserves the moment that changed the room instead of relying on what the clinician remembers after the fact.',
       icon: 'chart',
       image: '/images/features/supervisor-trace.png',
     },
     {
-      title: 'Compare one case across people',
+      title: 'Compare one case across a cohort',
       description:
         'Shared cases turn vague supervision into side-by-side coaching because everyone is working against the same difficult moment.',
       icon: 'shield',
@@ -35,29 +35,28 @@ export const featuresContent = {
 
 
   comparison: {
-    label: 'What supervision becomes',
-    title: 'Move from vague impressions to visible intervention decisions.',
-    body: 'The point is not novelty. The point is that a supervisor can point to a turn in the exchange and explain what should change next time.',
+    label: 'What clearer supervision sounds like',
+    title: 'The difference is whether your team can name the moment.',
+    body: 'These are the kinds of before-and-after coaching conversations the product is designed to create.',
     items: [
       {
-        label: 'Without a reviewable artifact',
-        value: '“I think they got rushed here.”',
+        label: 'Before',
+        value: '“I think they rushed it somewhere around the disclosure.”',
       },
       {
-        label: 'With Pixelated Empathy',
+        label: 'After',
         value:
-          '“At the disclosure, they moved to reassurance before checking immediacy.”',
+          '“At the disclosure, they reassured before checking immediacy.”',
         accent: true,
       },
       {
-        label: 'Without a shared case',
-        value:
-          'Each trainee gets a different difficulty curve, so coaching stays fuzzy.',
+        label: 'Before',
+        value: 'Each trainee gets a different difficulty curve, so the feedback never lines up.',
       },
       {
-        label: 'With a replayable case',
+        label: 'After',
         value:
-          'The team compares how multiple clinicians handled the same rupture.',
+          'The team compares how multiple clinicians handled the same rupture and why.',
         accent: true,
       },
     ],
