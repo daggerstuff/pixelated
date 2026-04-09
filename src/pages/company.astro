@@ -1,100 +1,100 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const operatingProfile = [
+  {
+    label: 'Company stage',
+    title: 'Founder-led build',
+    body: 'Product, implementation, and customer conversations are still tightly connected so the workflow stays grounded in real evaluation questions.',
+  },
+  {
+    label: 'Best fit',
+    title: 'Teams that need repeatable supervision',
+    body: 'Clinical educators, supervisors, and training leads who want to compare judgment against the same difficult case.',
+  },
+  {
+    label: 'Rollout style',
+    title: 'Start small, judge fast',
+    body: 'The intended path is a focused pilot, not a long procurement maze built on promises alone.',
+  },
+]
+
+const facts = [
+  { label: 'Founded', value: '2025', detail: 'Operating from the United States' },
+  { label: 'Focus', value: 'Clinical simulation', detail: 'Therapist training, supervision, and review' },
+  { label: 'Primary ask', value: 'One hard case', detail: 'Enough to prove whether coaching gets clearer' },
+]
 ---
 
 <BaseLayout
   title="Company Overview - Pixelated Empathy"
-  description="Learn how Pixelated Empathy helps therapists, supervisors, and training programs practice difficult mental health conversations with AI simulation and structured feedback."
+  description="Company overview for Pixelated Empathy, including operating profile, focus, and who the product is built for."
 >
-  <main class="flex-1 pt-14">
-    <section class="brutalist-section py-20">
-      <div class="site-shell site-shell--narrow text-center">
-        <span class="eyebrow-text">Company</span>
-        <h1 class="text-5xl md:text-6xl font-bold text-white mt-4 mb-6">
-          Company Overview
-        </h1>
-        <p class="text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
-          Pixelated Empathy is a founder-led software company building AI
-          roleplay and simulation tools for therapist training, supervision, and
-          clinical rehearsal.
-        </p>
-      </div>
-    </section>
+  <MarketingPageHero
+    eyebrow="Company"
+    title="A founder-led company building clearer supervision tools."
+    lede="Pixelated Empathy is focused on one problem: helping training teams run difficult therapy cases in a way that leaves behind better evidence for coaching."
+    note="Built for training teams first, not generic wellness traffic"
+    trustLine={['United States', 'Founder-led', 'Sensitive-workflow focus']}
+    primaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    secondaryCTA={{ text: 'Talk to the team', href: '/contact' }}
+    stats={facts}
+  />
 
-    <section class="brutalist-section py-16 bg-gray-900/60">
-      <div class="site-shell">
-        <div class="grid gap-8 lg:grid-cols-2">
-          <div class="glass-card p-8">
-            <h2 class="text-2xl font-bold text-white mb-4">What we provide</h2>
-            <p class="text-gray-300 leading-relaxed">
-              The product helps teams rehearse crisis assessment, rupture
-              repair, trauma disclosure, resistance, and other sessions that are
-              hard to stage consistently in live training.
-            </p>
-          </div>
-          <div class="glass-card p-8">
-            <h2 class="text-2xl font-bold text-white mb-4">How teams use it</h2>
-            <p class="text-gray-300 leading-relaxed">
-              Programs can assign the same scenario to multiple trainees, run
-              sessions repeatedly, compare decisions, and coach from transcripts
-              and structured feedback rather than vague recollection alone.
-            </p>
-          </div>
-        </div>
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-section-header">
+        <span class="marketing-eyebrow">Operating profile</span>
+        <h2 class="marketing-title marketing-title--medium">The company is set up to stay close to the workflow.</h2>
       </div>
-    </section>
 
-    <section class="brutalist-section py-16">
-      <div class="site-shell">
-        <div class="grid gap-6 md:grid-cols-3">
-          <div class="glass-card p-6">
-            <div class="text-sm text-gray-500 mb-2">Who it serves</div>
-            <div class="text-lg font-semibold text-white">
-              Therapists, supervisors, and training programs
-            </div>
-          </div>
-          <div class="glass-card p-6">
-            <div class="text-sm text-gray-500 mb-2">Company stage</div>
-            <div class="text-lg font-semibold text-white">
-              Founder-led product build
-            </div>
-          </div>
-          <div class="glass-card p-6">
-            <div class="text-sm text-gray-500 mb-2">Founded</div>
-            <div class="text-lg font-semibold text-white">2025</div>
-          </div>
-        </div>
+      <div class="marketing-grid marketing-grid--3">
+        {operatingProfile.map((item) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{item.label}</span>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="brutalist-section py-16 bg-gray-900/60">
-      <div class="site-shell site-shell--narrow">
-        <div class="glass-card p-8 md:p-10">
-          <h2 class="text-3xl font-bold text-white mb-4">Operating profile</h2>
-          <div class="grid gap-5 md:grid-cols-2 text-gray-300">
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Legal Entity</div>
-              <div class="text-white font-medium">Pixelated Empathy</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Location</div>
-              <div class="text-white font-medium">United States</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Current focus</div>
-              <div class="text-white font-medium">
-                AI simulation for clinical practice and supervision
-              </div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Best fit</div>
-              <div class="text-white font-medium">
-                Teams that need repeatable, reviewable training
-              </div>
-            </div>
-          </div>
-        </div>
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2">
+        <article class="marketing-card">
+          <span class="marketing-card__label">What we provide</span>
+          <h2 class="marketing-title marketing-title--medium">A training environment teams can actually review.</h2>
+          <p>
+            The product helps teams rehearse crisis assessment, rupture repair, trauma disclosure, resistance, and other sessions that are hard to stage consistently in live training.
+          </p>
+        </article>
+
+        <article class="marketing-card marketing-card--accent">
+          <span class="marketing-card__label">How teams use it</span>
+          <h2 class="marketing-title marketing-title--medium">Run, compare, and coach from one shared case.</h2>
+          <p>
+            Programs can assign the same scenario to multiple trainees, compare how the room shifted, and coach from transcripts and structured review instead of vague recollection alone.
+          </p>
+        </article>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
+
+  <MarketingCTA
+    eyebrow="Bring a real evaluation question"
+    title="The fastest way to understand the company is to look at the workflow."
+    body="If you want to know whether Pixelated Empathy fits your training program, start with the demo and bring the supervision problem you are actually trying to solve."
+    checklist={[
+      'A difficult therapy conversation your team already uses for training',
+      'The review or supervision pain point you want to improve first',
+      'Any privacy, retention, or rollout constraints you need addressed early',
+    ]}
+    primaryCTA={{ text: 'Talk to the team', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    note="The intended decision path is practical: see it, pressure-test it, then decide."
+  />
 </BaseLayout>

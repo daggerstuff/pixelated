@@ -1,61 +1,111 @@
 ---
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const trustAreas = [
+  {
+    label: 'Privacy',
+    title: 'Retention and transcript handling are product choices.',
+    items: [
+      'Training records, export paths, and deletion workflows should be visible and explainable.',
+      'Teams evaluating the product should know what stays attached to a session and for how long.',
+    ],
+  },
+  {
+    label: 'Security',
+    title: 'Sensitive workflows need more than a generic security page.',
+    items: [
+      'Encryption, access control, and auditability are part of the review workflow, not just the infrastructure diagram.',
+      'Security questions should be addressed in the same practical terms teams use to evaluate rollout risk.',
+    ],
+  },
+  {
+    label: 'Deployment',
+    title: 'Operational fit matters before a broader rollout.',
+    items: [
+      'Teams can discuss deployment expectations, documentation needs, and the controls required for their environment.',
+      'The intended path is a focused review of constraints before expanding usage.',
+    ],
+  },
+]
+
+const evaluationChecklist = [
+  'Transcript retention, export, and deletion expectations',
+  'Access control for supervisors, trainees, and administrators',
+  'Documentation needs for internal review or procurement',
+]
 ---
 
 <BaseLayout
   title="Trust Center"
   description="Security, privacy, and operational overview for Pixelated Empathy."
 >
-  <section class="brutalist-section py-20">
-    <div class="site-shell site-shell--narrow">
-      <h1 class="brutalist-heading text-4xl md:text-6xl mb-6">Trust Center</h1>
-      <p class="text-gray-300 max-w-3xl mb-10">
-        Pixelated Empathy is being built for sensitive training workflows. This
-        page describes the areas we focus on most when teams ask about security,
-        privacy, and operational controls.
-      </p>
+  <MarketingPageHero
+    eyebrow="Trust center"
+    title="Trust built for sensitive training workflows."
+    lede="Pixelated Empathy is being built for teams that need to pressure-test privacy, security, and operational controls before they put a product into supervision or training."
+    note="Security review on request"
+    trustLine={['Privacy-aware design', 'Sensitive-workflow evaluation', 'Founder-led conversations']}
+    primaryCTA={{ text: 'Request security information', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    stats={[
+      { label: 'Review focus', value: 'Security + privacy', detail: 'Discuss operational fit before rollout' },
+      { label: 'Primary users', value: 'Supervisors + educators', detail: 'Controls should match the actual workflow' },
+      { label: 'Evaluation mode', value: 'Practical', detail: 'Bring the requirements your team already uses' },
+    ]}
+  />
 
-      <div class="grid gap-6 md:grid-cols-3">
-        <div class="brutalist-card">
-          <h3 class="brutalist-subheading mb-3">Privacy</h3>
-          <p class="text-sm text-gray-400">
-            Transcript handling, retention choices, and review workflows are
-            product decisions, not just policy footnotes.
-          </p>
-        </div>
-        <div class="brutalist-card">
-          <h3 class="brutalist-subheading mb-3">Security</h3>
-          <p class="text-sm text-gray-400">
-            We design around encryption, access control, auditability, and
-            deployment choices that fit more sensitive environments.
-          </p>
-        </div>
-        <div class="brutalist-card">
-          <h3 class="brutalist-subheading mb-3">Operational Review</h3>
-          <p class="text-sm text-gray-400">
-            Teams evaluating the platform can ask for documentation and discuss
-            the controls they need before rollout.
-          </p>
-        </div>
-      </div>
-
-      <div class="brutalist-card mt-8">
-        <h2 class="text-2xl font-semibold text-white mb-4">
-          Common evaluation topics
-        </h2>
-        <ul class="space-y-3 text-gray-300">
-          <li>Encryption and key management expectations</li>
-          <li>Retention, export, and deletion workflows</li>
-          <li>Access control for supervisors, trainees, and administrators</li>
-          <li>Deployment requirements for more regulated environments</li>
-        </ul>
-        <a
-          href="/contact"
-          class="inline-flex mt-6 brutalist-button brutalist-button--primary"
-        >
-          Request security information
-        </a>
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--3">
+        {trustAreas.map((area) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{area.label}</span>
+            <h2 class="marketing-title marketing-title--medium">{area.title}</h2>
+            <ul class="marketing-list">
+              {area.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
       </div>
     </div>
   </section>
+
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-proof-band">
+        <div>
+          <span class="marketing-eyebrow">Common review topics</span>
+          <h2 class="marketing-title marketing-title--medium">Most teams come in with the same three questions.</h2>
+          <p class="marketing-section-copy">
+            If you are evaluating the platform, these are the areas we expect to discuss early so nobody is guessing about operational fit.
+          </p>
+        </div>
+
+        <div class="marketing-proof-band__items">
+          {evaluationChecklist.map((item, index) => (
+            <div class="marketing-proof-item">
+              <span>Topic {String(index + 1).padStart(2, '0')}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <MarketingCTA
+    eyebrow="Bring the real checklist"
+    title="Use your own trust review to pressure-test the product."
+    body="The goal is not to dodge operational questions. It is to answer them in the context of the workflow your team is actually evaluating."
+    checklist={[
+      'Retention and deletion expectations',
+      'Required security documentation or procurement questions',
+      'Any deployment, access, or environment constraints',
+    ]}
+    primaryCTA={{ text: 'Request security information', href: '/contact' }}
+    secondaryCTA={{ text: 'Talk through a pilot', href: '/contact' }}
+    note="A trust review should clarify rollout risk, not introduce more ambiguity."
+  />
 </BaseLayout>
