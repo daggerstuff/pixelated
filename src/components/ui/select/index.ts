@@ -7,7 +7,7 @@ export {
   SelectLabel,
   SelectValue,
   SimpleSelect,
-} from './select'
+} from '../select'
 
 export type {
   SelectProps,
@@ -18,4 +18,4 @@ export type {
   SelectLabelProps,
   SimpleSelectProps,
   SelectValueProps,
-} from './select'
+} from '../select'

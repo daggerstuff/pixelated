@@ -359,7 +359,7 @@ export function TrainingSessionComponent() {
       if (history && history.length > 0) {
         setConversation(
           history.map((m) => ({
-            id: `msg-${m.timestamp || ''}-${m.id || m.content}`,
+            id: `msg-${m.timestamp?.toString() || ''}-${m.id || m.content}`,
             role: (m.metadata?.role || 'client') as 'client' | 'therapist',
             message: m.content,
           })),

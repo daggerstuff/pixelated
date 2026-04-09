@@ -9,9 +9,15 @@ export interface UserMenuProps {
 }
 
 export function UserMenu({ className = '' }: UserMenuProps) {
-  const { data: user, isPending } = authClient.useSession()
+  const { data: sessionData, isPending } = authClient.useSession()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Type assertion for auth0 session data
+  const user = sessionData as {
+    user_metadata?: { avatar_url?: string; full_name?: string }
+    email?: string
+  } | null
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
