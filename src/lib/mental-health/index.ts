@@ -9,4 +9,7 @@ export type {
   ChatMessage,
   TherapeuticResponse,
   AnalysisConfig,
+  HealthIndicator,
+  SentimentScore,
+  MentalHealthCategory,
 } from './types'

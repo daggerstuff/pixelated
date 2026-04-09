@@ -547,3 +547,31 @@ export function getDefaultObjectiveWeights(): Record<string, number> {
     {} as Record<string, number>,
   )
 }
+
+// Re-export alignment metrics types
+export interface AlignmentMetrics {
+  overallScore: number
+  dimensionScores: Record<string, number>
+  confidence: number
+  timestamp: Date
+  metadata?: {
+    evaluationTime: number
+    modelUsed?: string
+    contextFactors: string[]
+  }
+}
+
+export interface AlignmentEvaluationResult {
+  overallScore: number
+  objectiveResults: Record<string, {
+    objectiveId: string
+    score: number
+    criteriaScores: Record<string, number>
+    confidence: number
+    explanation?: string
+  }>
+  weights: Record<string, number>
+  normalizedScores: Record<string, number>
+  evaluationContext: AlignmentContext
+  timestamp: Date
+}

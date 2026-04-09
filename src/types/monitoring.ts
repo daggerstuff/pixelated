@@ -33,3 +33,29 @@ export interface LogEntry {
   message: string
   context?: Record<string, unknown>
 }
+
+// Performance metrics for monitoring
+export interface PerformanceMetrics {
+  timestamp: Date
+  cpuUsage: number
+  memoryUsage: number
+  diskUsage: number
+  networkLatency: number
+  requestCount: number
+  errorRate: number
+  throughput: number
+  responseTime: number
+}
+
+// Optimization recommendation
+export interface OptimizationRecommendation {
+  id: string
+  type: 'scale_up' | 'scale_down' | 'cache' | 'optimize' | 'migrate'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  title: string
+  description: string
+  impact: string
+  estimatedSavings?: number
+  implemented: boolean
+  createdAt: Date
+}

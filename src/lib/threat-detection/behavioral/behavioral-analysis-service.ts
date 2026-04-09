@@ -151,3 +151,108 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
     }))
   }
 }
+
+// Re-export types for convenience
+export type { BehavioralConfig, BehavioralProfile, AnomalyRecord, ActivityEvent } from './types'
+
+// Additional types needed by analyzers
+export interface Anomaly {
+  type: 'unusual_ip' | 'unusual_time' | 'unusual_behavior' | 'ml_anomaly'
+  detail: string | number
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  timestamp: Date
+}
+
+export interface BehaviorProfile {
+  userId: string
+  eventCount: number
+  updatedAt: Date
+  typicalIPs: string[]
+  typicalLoginHours: number[]
+  riskScore?: number
+}
+
+export interface BehavioralFeatures {
+  timeFeatures: number[]
+  ipFeatures: number[]
+  actionFeatures: number[]
+  metadataFeatures: number[]
+}
+
+export interface AnomalyDetector {
+  detectAnomalies(profile: BehaviorProfile, features: BehavioralFeatures): Promise<Anomaly[]>
+}
+
+export interface BehavioralPattern {
+  patternId: string
+  type: 'sequential' | 'periodic' | 'anomalous'
+  events: string[]
+  frequency: number
+  firstSeen: Date
+  lastSeen: Date
+}
+
+export interface BehavioralSequence {
+  sequenceId: string
+  events: SecurityEvent[]
+  startTime: Date
+  endTime: Date
+  pattern?: BehavioralPattern
+}
+
+export interface SecurityEvent {
+  eventId: string
+  userId: string
+  timestamp: Date
+  eventType: string
+  source: string
+  details: Record<string, unknown>
+}
+
+export interface PatternMiner {
+  minePatterns(events: SecurityEvent[]): Promise<BehavioralPattern[]>
+}
+
+export interface BehaviorGraph {
+  graphId: string
+  nodes: BehaviorNode[]
+  edges: BehaviorEdge[]
+  properties: {
+    centrality: Record<string, number>
+    communities: string[][]
+    clusters: Cluster[]
+    anomalyScore: number
+  }
+  timestamp: Date
+}
+
+export interface BehaviorNode {
+  nodeId: string
+  type: 'event' | 'entity' | 'action'
+  label: string
+  properties: Record<string, unknown>
+}
+
+export interface BehaviorEdge {
+  edgeId: string
+  source: string
+  target: string
+  type: 'follows' | 'relates_to' | 'triggers'
+  weight: number
+}
+
+export interface Cluster {
+  clusterId: string
+  nodes: string[]
+  centroid?: number[]
+  anomalyScore?: number
+}
+
+export interface GraphAnalyzer {
+  buildGraph(events: SecurityEvent[]): Promise<BehaviorGraph>
+  calculateCentrality(graph: BehaviorGraph): Promise<Record<string, number>>
+  detectCommunities(graph: BehaviorGraph): Promise<string[][]>
+  detectGraphAnomalies(graph: BehaviorGraph): Promise<{ anomalyScore: number }>
+  identifyBehavioralClusters(graph: BehaviorGraph): Promise<Cluster[]>
+}

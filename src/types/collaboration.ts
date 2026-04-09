@@ -32,3 +32,29 @@ export interface CollaborationMessage {
   content: unknown
   timestamp: Date
 }
+
+// User profile for collaboration
+export interface UserProfile {
+  id: string
+  name: string
+  email: string
+  avatar?: string
+  role?: string
+  department?: string
+  createdAt?: Date
+  updatedAt?: Date
+  preferences?: Record<string, unknown>
+}
+
+// Notification for collaboration
+export interface Notification {
+  id: string
+  userId: string
+  type: 'mention' | 'assignment' | 'comment' | 'update' | 'alert'
+  title: string
+  message: string
+  read: boolean
+  timestamp: Date
+  link?: string
+  metadata?: Record<string, unknown>
+}
