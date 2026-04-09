@@ -2,198 +2,188 @@
 const currentYear = new Date().getFullYear()
 ---
 
-<footer class="bg-black/20 border-t border-white/5 pt-20 pb-10">
-  <div class="container px-4">
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
-
-      <div class="col-span-2 lg:col-span-2">
-        <div class="flex items-center gap-2 mb-6">
-          <div class="w-8 h-8 rounded-[4px] overflow-hidden">
-            <img
-              src="/favicon.svg"
-              alt="Pixelated Empathy"
-
-              class="w-full h-full object-contain"
-            />
-          </div>
-          <span class="font-bold text-base tracking-tight text-white"
-            >Pixelated Empathy</span
-          >
-        </div>
-        <p class="text-slate-400 mb-8 max-w-sm">
-          AI roleplay and simulation training for therapists, supervisors, and
-          care teams practicing high-stakes conversations safely.
+<footer class="marketing-footer">
+  <div class="marketing-shell">
+    <div class="marketing-footer__cta">
+      <div>
+        <span class="marketing-eyebrow">See the workflow first</span>
+        <h2 class="marketing-title marketing-title--medium">
+          Bring one hard case. Leave with something specific to coach.
+        </h2>
+        <p class="marketing-lede">
+          Pixelated Empathy is for training teams that want clearer supervision,
+          not another abstract AI promise. Start with the demo, then use one
+          difficult case to decide whether the review gets sharper.
         </p>
-        <div class="flex gap-4">
-          <!-- Social Icons -->
-          <a
-            href="https://twitter.com/pixelatedempathy"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-slate-400 hover:text-white transition-colors"
-            aria-label="Follow us on Twitter"
-          >
-            <span class="sr-only">Twitter</span>
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
-              ><path
-                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
-              ></path></svg
-            >
-          </a>
-          <a
-            href="https://github.com/nochadisfaction/pixelated"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-slate-400 hover:text-white transition-colors"
-            aria-label="View our GitHub repository"
-          >
-            <span class="sr-only">GitHub</span>
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"
-              ><path
-                fill-rule="evenodd"
-                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                clip-rule="evenodd"></path></svg
-            >
-          </a>
+      </div>
+      <div class="marketing-footer__cta-actions">
+        <a class="marketing-button marketing-button--primary" href="/demo-hub">See the demo</a>
+        <a class="marketing-button marketing-button--secondary" href="/contact">Plan a pilot</a>
+        <p class="marketing-note">Founder-led • United States • Sensitive-workflow review on request</p>
+      </div>
+    </div>
+
+    <div class="marketing-footer__grid">
+      <div class="marketing-footer__brand">
+        <div class="marketing-footer__brand-row">
+          <div class="marketing-footer__logo">
+            <img src="/favicon.svg" alt="Pixelated Empathy" class="h-full w-full object-contain" />
+          </div>
+          <div>
+            <strong>Pixelated Empathy</strong>
+            <p>Clinical simulation and transcript-backed coaching for therapist training teams.</p>
+          </div>
         </div>
-        <div class="mt-6 text-slate-500 text-sm">
-          <p>Founded 2025</p>
-          <p class="mt-1">United States</p>
+
+        <div class="marketing-inline-links">
+          <a href="https://twitter.com/pixelatedempathy" target="_blank" rel="noopener noreferrer" class="marketing-inline-link">Twitter</a>
+          <a href="https://github.com/nochadisfaction/pixelated" target="_blank" rel="noopener noreferrer" class="marketing-inline-link">GitHub</a>
+          <a href="mailto:info@pixelatedempathy.com" class="marketing-inline-link">info@pixelatedempathy.com</a>
         </div>
       </div>
 
       <div>
-        <h4 class="font-bold text-white mb-6">Product</h4>
-        <ul class="space-y-4">
-          <li>
-            <a
-              href="/features"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Features</a
-            >
-          </li>
-          <li>
-            <a
-              href="/trust"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Security</a
-            >
-          </li>
-          <li>
-            <a
-              href="/demo-hub"
-              class="text-slate-400 hover:text-white transition-colors">Demos</a
-            >
-          </li>
-          <li>
-            <a
-              href="/training"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Training</a
-            >
-          </li>
+        <span class="marketing-list-label">Product</span>
+        <ul class="marketing-footer__list">
+          <li><a href="/features">Features</a></li>
+          <li><a href="/demo-hub">Demo hub</a></li>
+          <li><a href="/trust">Trust center</a></li>
+          <li><a href="/training">Training</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold text-white mb-6">Company</h4>
-        <ul class="space-y-4">
-          <li>
-            <a
-              href="/about"
-              class="text-slate-400 hover:text-white transition-colors">About</a
-            >
-          </li>
-          <li>
-            <a
-              href="/company"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Company</a
-            >
-          </li>
-          <li>
-            <a
-              href="/team"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Founder</a
-            >
-          </li>
-          <li>
-            <a
-              href="/careers"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Careers</a
-            >
-          </li>
-          <li>
-            <a
-              href="/blog"
-              class="text-slate-400 hover:text-white transition-colors">Blog</a
-            >
-          </li>
-          <li>
-            <a
-              href="/contact"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Contact</a
-            >
-          </li>
+        <span class="marketing-list-label">Company</span>
+        <ul class="marketing-footer__list">
+          <li><a href="/about">About</a></li>
+          <li><a href="/company">Company</a></li>
+          <li><a href="/team">Founder</a></li>
+          <li><a href="/press">Press</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold text-white mb-6">Legal</h4>
-        <ul class="space-y-4">
-          <li>
-            <a
-              href="/privacy"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Privacy Policy</a
-            >
-          </li>
-          <li>
-            <a
-              href="/terms"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Terms of Service</a
-            >
-          </li>
-          <li>
-            <a
-              href="/cookie-policy"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Cookie Policy</a
-            >
-          </li>
-          <li>
-            <a
-              href="/trust"
-              class="text-slate-400 hover:text-white transition-colors"
-              >Trust Center</a
-            >
-          </li>
+        <span class="marketing-list-label">Policies</span>
+        <ul class="marketing-footer__list">
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/cookie-policy">Cookies</a></li>
+          <li><a href="/accessibility">Accessibility</a></li>
         </ul>
       </div>
     </div>
 
-    <div
-      class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
-    >
-      <p class="text-slate-500 text-sm">
-        &copy; {currentYear} Pixelated Empathy. All rights reserved.
-      </p>
-      <div class="flex gap-6">
-        <a
-          href="/privacy"
-          class="text-slate-500 hover:text-white text-sm transition-colors"
-          >Privacy Policy</a
-        >
-        <a
-          href="/terms"
-          class="text-slate-500 hover:text-white text-sm transition-colors"
-          >Terms of Service</a
-        >
-      </div>
+    <div class="marketing-footer__bottom">
+      <p>&copy; {currentYear} Pixelated Empathy. All rights reserved.</p>
+      <p>Clearer supervision for difficult sessions.</p>
     </div>
   </div>
 </footer>
+
+<style>
+  .marketing-footer {
+    width: 100%;
+    padding: 5rem 0 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0)),
+      rgba(0, 0, 0, 0.14);
+  }
+
+  .marketing-footer__cta {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+    gap: 1.2rem;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px dotted var(--divider-dotted);
+  }
+
+  .marketing-footer__cta-actions {
+    display: grid;
+    gap: 0.85rem;
+    align-content: start;
+    padding: 1.25rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .marketing-footer__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .marketing-footer__brand {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 26rem;
+  }
+
+  .marketing-footer__brand-row {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .marketing-footer__logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    padding: 0.3rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .marketing-footer__brand strong {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: var(--text-primary);
+  }
+
+  .marketing-footer__brand p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .marketing-footer__list {
+    display: grid;
+    gap: 0.7rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .marketing-footer__list a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .marketing-footer__list a:hover {
+    color: var(--text-primary);
+  }
+
+  .marketing-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  @media (max-width: 960px) {
+    .marketing-footer__cta,
+    .marketing-footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

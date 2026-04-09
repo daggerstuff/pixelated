@@ -49,51 +49,51 @@ export function ProgressTracker({
     return {
       sourcesIdentified: {
         current: currentMetrics.sourcesIdentified,
-        target: targets.sources_identified ?? 0,
+        target: targets['sources_identified'] ?? 0,
         percentage:
-          (targets.sources_identified ?? 0) > 0
+          (targets['sources_identified'] ?? 0) > 0
             ? Math.min(
                 100,
                 (currentMetrics.sourcesIdentified /
-                  (targets.sources_identified ?? 1)) *
+                  (targets['sources_identified'] ?? 1)) *
                   100,
               )
             : 0,
       },
       datasetsEvaluated: {
         current: currentMetrics.datasetsEvaluated,
-        target: targets.datasets_evaluated ?? 0,
+        target: targets['datasets_evaluated'] ?? 0,
         percentage:
-          (targets.datasets_evaluated ?? 0) > 0
+          (targets['datasets_evaluated'] ?? 0) > 0
             ? Math.min(
                 100,
                 (currentMetrics.datasetsEvaluated /
-                  (targets.datasets_evaluated ?? 1)) *
+                  (targets['datasets_evaluated'] ?? 1)) *
                   100,
               )
             : 0,
       },
       datasetsAcquired: {
         current: currentMetrics.datasetsAcquired,
-        target: targets.datasets_acquired ?? 0,
+        target: targets['datasets_acquired'] ?? 0,
         percentage:
-          (targets.datasets_acquired ?? 0) > 0
+          (targets['datasets_acquired'] ?? 0) > 0
             ? Math.min(
                 100,
-                (currentMetrics.datasetsAcquired / (targets.datasets_acquired ?? 1)) *
+                (currentMetrics.datasetsAcquired / (targets['datasets_acquired'] ?? 1)) *
                   100,
               )
             : 0,
       },
       integrationPlansCreated: {
         current: currentMetrics.integrationPlansCreated,
-        target: targets.integration_plans_created ?? 0,
+        target: targets['integration_plans_created'] ?? 0,
         percentage:
-          (targets.integration_plans_created ?? 0) > 0
+          (targets['integration_plans_created'] ?? 0) > 0
             ? Math.min(
                 100,
                 (currentMetrics.integrationPlansCreated /
-                  (targets.integration_plans_created ?? 1)) *
+                  (targets['integration_plans_created'] ?? 1)) *
                   100,
               )
             : 0,

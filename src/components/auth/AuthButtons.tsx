@@ -33,6 +33,12 @@ const AuthButtonsInner = () => {
         >
           Log out
         </button>
+        <a
+          href='/dashboard'
+          className='rounded-[4px] border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-white/25 hover:bg-white/5'
+        >
+          Dashboard
+        </a>
       </div>
     )
   }
@@ -46,10 +52,10 @@ const AuthButtonsInner = () => {
         Log in
       </a>
       <a
-        href='/api/auth/login?connection=google-oauth2'
-        className='bg-white text-slate-950 hover:bg-slate-200 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors'
+        href='/demo-hub'
+        className='rounded-[4px] bg-[var(--accent-primary)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--bg-primary)] transition-all hover:-translate-y-px hover:brightness-110'
       >
-        Get Started
+        See Demo
       </a>
     </div>
   )

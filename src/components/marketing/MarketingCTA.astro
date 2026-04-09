@@ -1,0 +1,55 @@
+---
+export interface Props {
+  eyebrow: string
+  title: string
+  body: string
+  checklist?: readonly string[]
+  primaryCTA: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
+  note?: string
+}
+
+const {
+  eyebrow,
+  title,
+  body,
+  checklist = [],
+  primaryCTA,
+  secondaryCTA,
+  note = '',
+} = Astro.props
+---
+
+<section class="marketing-section marketing-section--emphasis">
+  <div class="marketing-shell">
+    <div class="marketing-cta-band">
+      <div>
+        <span class="marketing-eyebrow">{eyebrow}</span>
+        <h2 class="marketing-title marketing-title--medium">{title}</h2>
+        <p class="marketing-lede">{body}</p>
+        <div class="marketing-actions">
+          <a class="marketing-button marketing-button--primary" href={primaryCTA.href}>
+            {primaryCTA.text}
+          </a>
+          {secondaryCTA && (
+            <a class="marketing-button marketing-button--secondary" href={secondaryCTA.href}>
+              {secondaryCTA.text}
+            </a>
+          )}
+        </div>
+        {note && <p class="marketing-note">{note}</p>}
+      </div>
+
+      {
+        checklist.length > 0 && (
+          <aside class="marketing-cta-band__aside">
+            <span class="marketing-list-label">What to bring into the conversation</span>
+            <ul>
+              {checklist.map((item) => <li>{item}</li>)}
+            </ul>
+          </aside>
+        )
+      }
+    </div>
+  </div>
+</section>

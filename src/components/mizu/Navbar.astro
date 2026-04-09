@@ -4,54 +4,46 @@ import { AuthButtons } from '@/components/auth/AuthButtons'
 const currentPath = Astro.url.pathname
 
 const links = [
-  { text: 'Home', href: '/', isAnchor: false },
   { text: 'Features', href: '/features', isAnchor: false },
-  { text: 'About', href: '/about', isAnchor: false },
   { text: 'Trust', href: '/trust', isAnchor: false },
+  { text: 'Company', href: '/company', isAnchor: false },
   { text: 'Contact', href: '/contact', isAnchor: false },
 ]
 ---
 
 <header
-  class="fixed top-0 w-full z-50 glass-panel border-b border-white/5"
+  class="marketing-nav fixed top-4 left-4 right-4 z-50"
 >
-  <div class="container px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-20">
+  <div class="marketing-nav__shell">
+    <div class="marketing-nav__row">
 
-      <div class="flex-shrink-0 flex items-center gap-3">
-        <!-- Logo Icon -->
-        <div
-          class="w-8 h-8 rounded-[4px] overflow-hidden"
-        >
+      <a href="/" class="marketing-nav__brand" aria-label="Pixelated Empathy home">
+        <div class="marketing-nav__logo">
           <img
             src="/favicon.svg"
             alt="Pixelated Empathy"
-            class="w-full h-full object-contain"
+            class="h-full w-full object-contain"
           />
         </div>
 
-        <div class="leading-tight">
-          <span class="block font-bold text-base tracking-tight text-white"
-            >Pixelated Empathy</span
-          >
-          <span
-            class="hidden lg:block text-[11px] uppercase tracking-[0.18em] text-slate-500"
-          >
-            AI roleplay for therapist training
+        <div class="marketing-nav__title">
+          <span class="marketing-nav__name">Pixelated Empathy</span>
+          <span class="marketing-nav__tag">
+            Clearer coaching for hard therapy sessions
           </span>
         </div>
-      </div>
+      </a>
 
-      <nav class="hidden md:flex space-x-8" aria-label="Main navigation">
+      <nav class="marketing-nav__links" aria-label="Main navigation">
         {
           links.map((link) => (
             <a
               href={link.href}
               class:list={[
-                'transition-colors text-sm font-medium uppercase tracking-[0.1em]',
+                'marketing-nav__link',
                 currentPath === link.href
-                  ? 'text-white'
-                  : 'text-slate-400 hover:text-white',
+                  ? 'marketing-nav__link--active'
+                  : '',
               ]}
               aria-current={currentPath === link.href ? 'page' : undefined}
             >
@@ -62,14 +54,14 @@ const links = [
         }
       </nav>
 
-      <div class="hidden md:flex items-center gap-4">
+      <div class="marketing-nav__actions">
+        <a href="/contact" class="marketing-nav__pilot">Plan a pilot</a>
         <AuthButtons client:only="react" />
       </div>
 
-      <!-- Mobile menu button -->
       <button
         id="mobile-menu-button"
-        class="md:hidden text-slate-300 hover:text-white transition-colors"
+        class="marketing-nav__toggle"
         aria-label="Toggle mobile menu"
         aria-expanded="false"
       >
@@ -88,41 +80,214 @@ const links = [
       </button>
     </div>
 
-    <!-- Mobile menu -->
     <div
       id="mobile-menu"
-      class="md:hidden hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-md"
+      class="marketing-mobile-menu hidden"
     >
-      <nav class="px-4 py-6 space-y-4" aria-label="Mobile navigation">
+      <nav class="marketing-mobile-menu__content" aria-label="Mobile navigation">
         {
           links.map((link) => (
             <a
               href={link.href}
-              class="block text-slate-300 hover:text-white transition-colors text-sm font-medium py-2"
+              class="marketing-mobile-menu__link"
             >
               {link.text}
             </a>
           ))
         }
-        <div class="pt-4 border-t border-white/10 space-y-3">
+        <div class="marketing-mobile-menu__actions">
+          <a
+            href="/contact"
+            class="marketing-button marketing-button--secondary"
+          >
+            Plan a pilot
+          </a>
+          <a
+            href="/demo-hub"
+            class="marketing-button marketing-button--primary"
+          >
+            See demo
+          </a>
           <a
             href="/login"
-            class="block text-slate-400 hover:text-white transition-colors text-sm font-medium py-2 uppercase tracking-wider"
+            class="marketing-mobile-menu__link marketing-mobile-menu__link--muted"
           >
             Log in
           </a>
-          <a
-            href="/signup"
-            class="button button-primary w-full"
-          >
-            Get Started
-          </a>
-
         </div>
       </nav>
     </div>
   </div>
 </header>
+
+<style>
+  .marketing-nav__shell {
+    margin: 0 auto;
+    width: min(78rem, calc(100vw - 2rem));
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: rgba(32, 29, 29, 0.78);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  }
+
+  .marketing-nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4.8rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .marketing-nav__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+    text-decoration: none;
+  }
+
+  .marketing-nav__logo {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .marketing-nav__title {
+    display: grid;
+    min-width: 0;
+  }
+
+  .marketing-nav__name {
+    color: var(--text-primary);
+    font-size: 0.96rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .marketing-nav__tag {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .marketing-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+  }
+
+  .marketing-nav__link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .marketing-nav__link:hover,
+  .marketing-nav__link--active {
+    color: var(--text-primary);
+  }
+
+  .marketing-nav__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .marketing-nav__pilot {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .marketing-nav__pilot:hover {
+    color: var(--accent-primary);
+  }
+
+  .marketing-nav__toggle {
+    display: none;
+    color: var(--text-primary);
+    background: transparent;
+    border: 0;
+    padding: 0.45rem;
+    cursor: pointer;
+  }
+
+  .marketing-mobile-menu {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .marketing-mobile-menu__content {
+    display: grid;
+    gap: 0.65rem;
+    padding: 1rem;
+  }
+
+  .marketing-mobile-menu__link {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.5rem 0;
+  }
+
+  .marketing-mobile-menu__link--muted {
+    color: var(--text-secondary);
+  }
+
+  .marketing-mobile-menu__actions {
+    display: grid;
+    gap: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (max-width: 1024px) {
+    .marketing-nav__tag,
+    .marketing-nav__pilot {
+      display: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .marketing-nav {
+      left: 0.75rem;
+      right: 0.75rem;
+      top: 0.75rem;
+    }
+
+    .marketing-nav__links,
+    .marketing-nav__actions {
+      display: none;
+    }
+
+    .marketing-nav__toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+</style>
 
 <script>
   const mobileMenuButton = document.getElementById('mobile-menu-button')
