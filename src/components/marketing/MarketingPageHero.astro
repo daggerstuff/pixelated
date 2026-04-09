@@ -1,0 +1,76 @@
+---
+export interface Props {
+  eyebrow: string
+  title: string
+  lede: string
+  note?: string
+  trustLine?: readonly string[]
+  stats?: readonly { label: string; value: string; detail?: string }[]
+  primaryCTA?: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
+}
+
+const {
+  eyebrow,
+  title,
+  lede,
+  note = '',
+  trustLine = [],
+  stats = [],
+  primaryCTA,
+  secondaryCTA,
+} = Astro.props
+---
+
+<section class="marketing-hero marketing-section--tight">
+  <div class="marketing-shell">
+    <div class="marketing-hero__panel">
+      <div class="marketing-hero__content">
+        <span class="marketing-eyebrow">{eyebrow}</span>
+        <h1 class="marketing-title">{title}</h1>
+        <p class="marketing-lede">{lede}</p>
+
+        {
+          (primaryCTA || secondaryCTA) && (
+            <div class="marketing-actions">
+              {primaryCTA && (
+                <a class="marketing-button marketing-button--primary" href={primaryCTA.href}>
+                  {primaryCTA.text}
+                </a>
+              )}
+              {secondaryCTA && (
+                <a class="marketing-button marketing-button--secondary" href={secondaryCTA.href}>
+                  {secondaryCTA.text}
+                </a>
+              )}
+            </div>
+          )
+        }
+
+        {note && <p class="marketing-note">{note}</p>}
+
+        {
+          trustLine.length > 0 && (
+            <div class="marketing-hero__trustline">
+              {trustLine.map((item) => <span>{item}</span>)}
+            </div>
+          )
+        }
+      </div>
+
+      {
+        stats.length > 0 && (
+          <div class="marketing-stat-grid">
+            {stats.map((item) => (
+              <div class="marketing-stat-card">
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+                {item.detail && <p>{item.detail}</p>}
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
