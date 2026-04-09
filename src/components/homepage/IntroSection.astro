@@ -111,7 +111,7 @@ const { content } = Astro.props
     border: 1px dotted rgba(253, 252, 252, 0.2);
     background: rgba(48, 44, 44, 0.4);
     backdrop-filter: blur(8px);
-    text-align: center;
+    text-align: left;
   }
 
   .home-proof-stack {
@@ -199,6 +199,28 @@ const { content } = Astro.props
     
     .home-evidence-grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (min-width: 980px) {
+    .home-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.92fr);
+      align-items: start;
+      max-width: 70rem;
+    }
+
+    .home-intro__lead {
+      text-align: left;
+    }
+
+    .home-copy {
+      margin-inline: 0;
+      text-align: left;
+    }
+
+    .home-evidence-grid {
+      max-width: 70rem;
     }
   }
 </style>
