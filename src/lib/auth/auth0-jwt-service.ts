@@ -3,7 +3,21 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient } from 'auth0'
+import {
+  AuthenticationClient,
+  type AuthenticationClientOptions,
+} from 'auth0'
+
+// Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
+interface ExtendedAuthenticationClient extends AuthenticationClient {
+  getProfile(token: string): Promise<any>
+  refreshToken(params: { refresh_token: string }): Promise<any>
+  oauth: AuthenticationClient['oauth'] & {
+    passwordGrant: (params: any) => Promise<any>
+    refreshTokenGrant: (params: any) => Promise<any>
+    revokeRefreshToken: (params: any) => Promise<any>
+  }
+}
 import * as jwt from 'jsonwebtoken'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -12,7 +26,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config, isAuth0Configured } from './auth0-config'
 
 // Initialize Auth0 authentication client
-let auth0Authentication: AuthenticationClient | null = null
+let auth0Authentication: ExtendedAuthenticationClient | null = null
 
 /**
  * Initialize Auth0 authentication client

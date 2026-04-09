@@ -117,3 +117,18 @@ export interface Emotion {
   timestamp: string
   context?: string
 }
+
+// Therapy session for emotion tracking
+export interface TherapySession {
+  id: string
+  patientId: string
+  therapistId: string
+  startTime: Date
+  endTime?: Date
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+  type: 'individual' | 'group' | 'family'
+  emotions?: EmotionAnalysis[]
+  notes?: string[]
+  goals?: string[]
+  outcomes?: string[]
+}

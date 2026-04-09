@@ -266,3 +266,47 @@ export interface SeverityStyle {
 export interface SeverityStyles {
   [key: string]: SeverityStyle
 }
+
+// Test result for testing module
+export interface TestResult {
+  id: string
+  testName: string
+  status: 'passed' | 'failed' | 'skipped'
+  duration: number
+  timestamp: Date
+  message?: string
+  stackTrace?: string
+  metadata?: Record<string, unknown>
+}
+
+// Coverage report
+export interface CoverageReport {
+  id: string
+  timestamp: Date
+  lines: {
+    total: number
+    covered: number
+    percentage: number
+  }
+  branches: {
+    total: number
+    covered: number
+    percentage: number
+  }
+  functions: {
+    total: number
+    covered: number
+    percentage: number
+  }
+  statements: {
+    total: number
+    covered: number
+    percentage: number
+  }
+  files: Array<{
+    path: string
+    lines: { total: number; covered: number; percentage: number }
+    branches: { total: number; covered: number; percentage: number }
+    functions: { total: number; covered: number; percentage: number }
+  }>
+}

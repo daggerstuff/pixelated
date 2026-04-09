@@ -210,3 +210,5 @@ function ScenarioCard({
     </div>
   )
 }
+
+export default ScenarioSelector
