@@ -56,6 +56,9 @@ export interface ModelMetrics {
   loss?: number
   epoch?: number
   timestamp: Date
+  inferenceTime?: number
+  memoryUsage?: number
+  privacyScore?: number
 }
 
 // Training configuration

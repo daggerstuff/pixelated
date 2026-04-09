@@ -299,6 +299,7 @@ export interface MentalHealthAnalysisResult {
   _routingDecision?: RoutingDecision // Optional: The routing decision that led to this analysis
   _rawModelOutput?: RawModelOutput // Optional: Raw output from the underlying LLM for debugging/logging
   _failures?: AnalysisFailure[] // Optional: Any failures that occurred during analysis
+  stressLevel?: number // Optional: stress level metric
 }
 
 /**
