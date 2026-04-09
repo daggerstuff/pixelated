@@ -130,12 +130,12 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
 
     const mockAlertSystem = {
       initialize: vi.fn<any>().mockResolvedValue(undefined),
-      checkAlerts: vi.fn().mockImplementation(async () => {
+      checkAlerts: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 15 + 5),
         )
       }),
-      getActiveAlerts: vi.fn().mockImplementation(async () => {
+      getActiveAlerts: vi.fn<any>().mockImplementation(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 25 + 5),
         )
@@ -151,21 +151,21 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
 // Mock the Python bridge to avoid network calls
 // Use regular function to allow 'new' usage
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
+  PythonBiasDetectionBridge: vi.fn<any>().mockImplementation(function () {
     return mockPythonBridge
   }),
 }))
 
 // Mock the metrics collector
 vi.mock('../metrics-collector', () => ({
-  BiasMetricsCollector: vi.fn().mockImplementation(function () {
+  BiasMetricsCollector: vi.fn<any>().mockImplementation(function () {
     return mockMetricsCollector
   }),
 }))
 
 // Mock the alert system
 vi.mock('../alerts-system', () => ({
-  BiasAlertSystem: vi.fn().mockImplementation(function () {
+  BiasAlertSystem: vi.fn<any>().mockImplementation(function () {
     return mockAlertSystem
   }),
 }))
@@ -321,19 +321,19 @@ const PerformanceBenchmark = {
 
 // Mock the Python service classes
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
+  PythonBiasDetectionBridge: vi.fn<any>().mockImplementation(function () {
     return mockPythonBridge
   }),
 }))
 
 vi.mock('../BiasMetricsCollector', () => ({
-  BiasMetricsCollector: vi.fn().mockImplementation(function () {
+  BiasMetricsCollector: vi.fn<any>().mockImplementation(function () {
     return mockMetricsCollector
   }),
 }))
 
 vi.mock('../BiasAlertSystem', () => ({
-  BiasAlertSystem: vi.fn().mockImplementation(function () {
+  BiasAlertSystem: vi.fn<any>().mockImplementation(function () {
     return mockAlertSystem
   }),
 }))
