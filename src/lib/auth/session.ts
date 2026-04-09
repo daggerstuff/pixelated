@@ -25,15 +25,6 @@ export interface Session {
 
 // Type alias for SessionData - compatibility with various imports
 export type SessionData = Session
-  user: {
-    id: string
-    email?: string
-    role: string
-    name?: string
-  }
-  /** ISO-8601 timestamp when the session expires */
-  expires: string
-}
 
 /**
  * Short-lived in-process cache for validated Auth0 tokens.

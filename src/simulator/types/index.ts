@@ -38,7 +38,7 @@ export {
   ScenarioDifficulty,
   TherapeuticTechnique,
   FeedbackType,
-} from '../types'
+} from '../../types/index'
 
 export type {
   Scenario,
@@ -68,4 +68,4 @@ export type {
   SimulatorState,
   AudioProcessorConfig,
   EmotionDetectionConfig,
-} from '../types'
+} from '../../types/index'
