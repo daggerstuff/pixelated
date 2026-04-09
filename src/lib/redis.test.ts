@@ -52,7 +52,7 @@ vi.mock("ioredis", () => {
 
 describe("Redis Module", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset environment variables
     delete process.env.REDIS_URL;
     delete process.env.UPSTASH_REDIS_REST_URL;

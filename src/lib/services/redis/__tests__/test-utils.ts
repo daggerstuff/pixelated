@@ -193,7 +193,7 @@ export const customMatchers = {
   toBeRedisError(
     received: unknown,
     expectedCode: RedisErrorCode,
-  ): jest.CustomMatcherResult {
+  ): vi.CustomMatcherResult {
     const pass =
       received instanceof RedisServiceError && received.code === expectedCode
 
@@ -207,7 +207,7 @@ export const customMatchers = {
   async toBeInRedis(
     key: string,
     expectedValue: unknown,
-  ): Promise<jest.CustomMatcherResult> {
+  ): Promise<vi.CustomMatcherResult> {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
@@ -233,7 +233,7 @@ export const customMatchers = {
     }
   },
 
-  async toExistInRedis(key: string): Promise<jest.CustomMatcherResult> {
+  async toExistInRedis(key: string): Promise<vi.CustomMatcherResult> {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
@@ -262,7 +262,7 @@ export const customMatchers = {
   async toHaveTTL(
     key: string,
     expectedTTL: number,
-  ): Promise<jest.CustomMatcherResult> {
+  ): Promise<vi.CustomMatcherResult> {
     const redis = new Redis(process.env['REDIS_URL']!)
 
     try {
