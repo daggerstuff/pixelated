@@ -165,6 +165,14 @@ select_submodule_url() {
   local original_url
   original_url="$(git config -f .gitmodules --get "submodule.${name}.url")"
 
+  # Priority: GitHub Actions CI override to ensure valid absolute URLs
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    local github_url
+    github_url="$(canonical_public_submodule_url "${name}")"
+    printf '%s' "${github_url}"
+    return 0
+  fi
+
   # 3. Azure Environment Logic
   if is_azure_environment; then
     local azure_url
