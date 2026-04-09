@@ -218,12 +218,12 @@ export type CertificateAgent =
   | { cert?: string; key?: string; ca?: string }
 
 export class ExternalThreatFeedIntegration extends EventEmitter {
-  private mongoClient: MongoClient
-  private db: Db
-  private feedsCollection: Collection<ThreatFeed>
-  private indicatorsCollection: Collection<ThreatIndicator>
-  private syncResultsCollection: Collection<FeedSyncResult>
-  private redis: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private feedsCollection!: Collection<ThreatFeed>
+  private indicatorsCollection!: Collection<ThreatIndicator>
+  private syncResultsCollection!: Collection<FeedSyncResult>
+  private redis!: Redis
   private isInitialized = false
   private feedClients = new Map<string, AxiosInstance>()
   private syncQueue: string[] = []
