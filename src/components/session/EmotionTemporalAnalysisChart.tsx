@@ -180,7 +180,7 @@ export default function EmotionTemporalAnalysisChart({
         .dimensionalRelationships,
     )
       ? (
-          data as { dimensionalRelationships: unknown[] }
+          data as unknown as { dimensionalRelationships: unknown[] }
         ).dimensionalRelationships
           .map((rel) => {
             if (
@@ -230,10 +230,10 @@ export default function EmotionTemporalAnalysisChart({
     !data ||
     (Object.keys(data.trendlines || {}).length === 0 &&
       (Array.isArray((data as { criticalPoints?: unknown[] }).criticalPoints)
-        ? (data as { criticalPoints: unknown[] }).criticalPoints.length
+        ? (data as unknown as { criticalPoints: unknown[] }).criticalPoints.length
         : 0) === 0 &&
       (Array.isArray((data as { transitions?: unknown[] }).transitions)
-        ? (data as { transitions: unknown[] }).transitions.length
+        ? (data as unknown as { transitions: unknown[] }).transitions.length
         : 0) === 0)
   ) {
     return (
