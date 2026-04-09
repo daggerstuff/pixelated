@@ -10,6 +10,12 @@ interface RateLimitStore {
 const store: RateLimitStore = {}
 let redisAvailable = true
 
+/**
+ * Atomically increments the Redis counter and sets an expiration TTL.
+ * We use a Redis transaction (multi/exec) here to prevent a race condition
+ * where the INCR succeeds but the EXPIRE fails, which would leave the key
+ * stuck in memory forever without a TTL.
+ */
 async function incrementRedisCounter(key: string, windowSeconds: number) {
   try {
     const redis = getRedisClient()
