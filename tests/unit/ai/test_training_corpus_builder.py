@@ -10,21 +10,51 @@ from ai.training_corpus import (
     DEFAULT_WAVE1_REGISTRY_PATH,
     DEFAULT_WAVE1_SEED_PACK_PATH,
     DEFAULT_WAVE1_SOURCE_PATHS,
+    DEFAULT_WAVE2_MANIFEST_PATH,
+    DEFAULT_WAVE2_REGISTRY_PATH,
+    DEFAULT_WAVE2_SEED_PACK_PATH,
+    DEFAULT_WAVE2_SOURCE_PATHS,
+    DEFAULT_WAVE3_MANIFEST_PATH,
+    DEFAULT_WAVE3_REGISTRY_PATH,
+    DEFAULT_WAVE3_SEED_PACK_PATH,
+    DEFAULT_WAVE3_SOURCE_PATHS,
+    DEFAULT_WAVE4_MANIFEST_PATH,
+    DEFAULT_WAVE4_REGISTRY_PATH,
+    DEFAULT_WAVE4_SEED_PACK_PATH,
+    DEFAULT_WAVE4_SOURCE_PATHS,
     CorpusBuildConfig,
     CorpusBuilder,
+    build_seed_corpus,
     build_seed_pack_records,
     build_source_inventory,
     build_synthesis_attributes,
     build_wave1_seed_registry,
+    build_wave2_seed_registry,
+    build_wave3_seed_registry,
+    build_wave4_seed_registry,
     ensure_wave1_seed_registry_materialized,
     ensure_wave1_seed_sources_materialized,
+    ensure_wave2_seed_registry_materialized,
+    ensure_wave2_seed_sources_materialized,
+    ensure_wave3_seed_registry_materialized,
+    ensure_wave3_seed_sources_materialized,
+    ensure_wave4_seed_registry_materialized,
+    ensure_wave4_seed_sources_materialized,
     load_synthesis_seed_pack,
     materialize_seed_pack_records,
 )
-from ai.training_corpus.experiments import _wave1_seed_sources
+from ai.training_corpus.experiments import (
+    _wave1_seed_sources,
+    _wave2_seed_sources,
+    _wave3_seed_sources,
+    _wave4_seed_sources,
+)
 from ai.training_corpus.model import CorpusSource
 from ai.training_corpus.normalize import assign_split, make_entry
 from ai.training_corpus.wave1_package import build_wave1_seed_corpus
+from ai.training_corpus.wave2_package import build_wave2_seed_corpus
+from ai.training_corpus.wave3_package import build_wave3_seed_corpus
+from ai.training_corpus.wave4_package import build_wave4_seed_corpus
 
 
 def test_assign_split_is_deterministic() -> None:
@@ -201,6 +231,36 @@ def test_load_synthesis_seed_pack_reads_wave_one_artifact() -> None:
     assert len(payload["benchmark_specs"]) == 10
 
 
+def test_load_synthesis_seed_pack_reads_wave_two_artifact() -> None:
+    payload = load_synthesis_seed_pack(DEFAULT_WAVE2_SEED_PACK_PATH)
+
+    assert payload["version"] == "2026-04-09-wave2"
+    assert len(payload["scenario_archetypes"]) == 9
+    assert len(payload["client_state_profiles"]) == 9
+    assert len(payload["therapist_move_inventory"]) == 10
+    assert len(payload["benchmark_specs"]) == 10
+
+
+def test_load_synthesis_seed_pack_reads_wave_three_artifact() -> None:
+    payload = load_synthesis_seed_pack(DEFAULT_WAVE3_SEED_PACK_PATH)
+
+    assert payload["version"] == "2026-04-09-wave3"
+    assert len(payload["scenario_archetypes"]) == 6
+    assert len(payload["client_state_profiles"]) == 6
+    assert len(payload["therapist_move_inventory"]) == 8
+    assert len(payload["benchmark_specs"]) == 8
+
+
+def test_load_synthesis_seed_pack_reads_wave_four_artifact() -> None:
+    payload = load_synthesis_seed_pack(DEFAULT_WAVE4_SEED_PACK_PATH)
+
+    assert payload["version"] == "2026-04-09-wave4"
+    assert len(payload["scenario_archetypes"]) == 8
+    assert len(payload["client_state_profiles"]) == 8
+    assert len(payload["therapist_move_inventory"]) == 10
+    assert len(payload["benchmark_specs"]) == 10
+
+
 def test_build_seed_pack_records_emits_lane_ready_rows() -> None:
     payload = load_synthesis_seed_pack(DEFAULT_WAVE1_SEED_PACK_PATH)
     records = build_seed_pack_records(payload)
@@ -263,6 +323,81 @@ def test_ensure_wave1_seed_sources_materialized_is_idempotent(tmp_path: Path) ->
     before = output_paths["simulation"].read_text(encoding="utf-8")
     second = ensure_wave1_seed_sources_materialized(
         seed_pack_path=DEFAULT_WAVE1_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+    )
+
+    assert first == second == output_paths
+    assert before == output_paths["simulation"].read_text(encoding="utf-8")
+    assert manifest_path.exists()
+
+
+def test_ensure_wave2_seed_sources_materialized_is_idempotent(tmp_path: Path) -> None:
+    output_paths = {
+        "simulation": tmp_path / "wave2_seed_simulation.jsonl",
+        "evaluator": tmp_path / "wave2_seed_evaluator.jsonl",
+        "benchmark": tmp_path / "wave2_seed_benchmark.jsonl",
+    }
+    manifest_path = tmp_path / "wave2_seed_manifest.json"
+
+    first = ensure_wave2_seed_sources_materialized(
+        seed_pack_path=DEFAULT_WAVE2_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+    )
+    before = output_paths["simulation"].read_text(encoding="utf-8")
+    second = ensure_wave2_seed_sources_materialized(
+        seed_pack_path=DEFAULT_WAVE2_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+    )
+
+    assert first == second == output_paths
+    assert before == output_paths["simulation"].read_text(encoding="utf-8")
+    assert manifest_path.exists()
+
+
+def test_ensure_wave3_seed_sources_materialized_is_idempotent(tmp_path: Path) -> None:
+    output_paths = {
+        "simulation": tmp_path / "wave3_seed_simulation.jsonl",
+        "evaluator": tmp_path / "wave3_seed_evaluator.jsonl",
+        "benchmark": tmp_path / "wave3_seed_benchmark.jsonl",
+    }
+    manifest_path = tmp_path / "wave3_seed_manifest.json"
+
+    first = ensure_wave3_seed_sources_materialized(
+        seed_pack_path=DEFAULT_WAVE3_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+    )
+    before = output_paths["simulation"].read_text(encoding="utf-8")
+    second = ensure_wave3_seed_sources_materialized(
+        seed_pack_path=DEFAULT_WAVE3_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+    )
+
+    assert first == second == output_paths
+    assert before == output_paths["simulation"].read_text(encoding="utf-8")
+    assert manifest_path.exists()
+
+
+def test_ensure_wave4_seed_sources_materialized_is_idempotent(tmp_path: Path) -> None:
+    output_paths = {
+        "simulation": tmp_path / "wave4_seed_simulation.jsonl",
+        "evaluator": tmp_path / "wave4_seed_evaluator.jsonl",
+        "benchmark": tmp_path / "wave4_seed_benchmark.jsonl",
+    }
+    manifest_path = tmp_path / "wave4_seed_manifest.json"
+
+    first = ensure_wave4_seed_sources_materialized(
+        seed_pack_path=DEFAULT_WAVE4_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+    )
+    before = output_paths["simulation"].read_text(encoding="utf-8")
+    second = ensure_wave4_seed_sources_materialized(
+        seed_pack_path=DEFAULT_WAVE4_SEED_PACK_PATH,
         output_paths=output_paths,
         manifest_path=manifest_path,
     )
@@ -373,6 +508,57 @@ def test_wave1_seed_sources_provide_prepared_catalog_entries() -> None:
     assert len(catalog["wave1_seed_benchmark"].records) == 10
 
 
+def test_wave2_seed_sources_provide_prepared_catalog_entries() -> None:
+    catalog = _wave2_seed_sources(DEFAULT_WAVE2_SEED_PACK_PATH)
+
+    assert set(catalog) == {
+        "wave2_seed_simulation",
+        "wave2_seed_evaluator",
+        "wave2_seed_benchmark",
+    }
+    assert catalog["wave2_seed_simulation"].group == "professional_therapeutic"
+    assert catalog["wave2_seed_simulation"].stage == "stage1_foundation"
+    assert len(catalog["wave2_seed_simulation"].records) == 9
+    assert catalog["wave2_seed_evaluator"].group == "supplementary"
+    assert len(catalog["wave2_seed_evaluator"].records) == 9
+    assert catalog["wave2_seed_benchmark"].group == "edge_case_sources"
+    assert len(catalog["wave2_seed_benchmark"].records) == 10
+
+
+def test_wave3_seed_sources_provide_prepared_catalog_entries() -> None:
+    catalog = _wave3_seed_sources(DEFAULT_WAVE3_SEED_PACK_PATH)
+
+    assert set(catalog) == {
+        "wave3_seed_simulation",
+        "wave3_seed_evaluator",
+        "wave3_seed_benchmark",
+    }
+    assert catalog["wave3_seed_simulation"].group == "professional_therapeutic"
+    assert catalog["wave3_seed_simulation"].stage == "stage1_foundation"
+    assert len(catalog["wave3_seed_simulation"].records) == 6
+    assert catalog["wave3_seed_evaluator"].group == "supplementary"
+    assert len(catalog["wave3_seed_evaluator"].records) == 6
+    assert catalog["wave3_seed_benchmark"].group == "edge_case_sources"
+    assert len(catalog["wave3_seed_benchmark"].records) == 8
+
+
+def test_wave4_seed_sources_provide_prepared_catalog_entries() -> None:
+    catalog = _wave4_seed_sources(DEFAULT_WAVE4_SEED_PACK_PATH)
+
+    assert set(catalog) == {
+        "wave4_seed_simulation",
+        "wave4_seed_evaluator",
+        "wave4_seed_benchmark",
+    }
+    assert catalog["wave4_seed_simulation"].group == "professional_therapeutic"
+    assert catalog["wave4_seed_simulation"].stage == "stage1_foundation"
+    assert len(catalog["wave4_seed_simulation"].records) == 8
+    assert catalog["wave4_seed_evaluator"].group == "supplementary"
+    assert len(catalog["wave4_seed_evaluator"].records) == 8
+    assert catalog["wave4_seed_benchmark"].group == "edge_case_sources"
+    assert len(catalog["wave4_seed_benchmark"].records) == 10
+
+
 def test_default_wave1_materialized_sources_exist_and_match_expected_counts() -> None:
     assert DEFAULT_WAVE1_MANIFEST_PATH.exists()
     for path in DEFAULT_WAVE1_SOURCE_PATHS.values():
@@ -383,6 +569,36 @@ def test_default_wave1_materialized_sources_exist_and_match_expected_counts() ->
     assert DEFAULT_WAVE1_SOURCE_PATHS["simulation"] == Path(manifest["outputs"]["simulation"])
 
 
+def test_default_wave2_materialized_sources_exist_and_match_expected_counts() -> None:
+    assert DEFAULT_WAVE2_MANIFEST_PATH.exists()
+    for path in DEFAULT_WAVE2_SOURCE_PATHS.values():
+        assert path.exists()
+
+    manifest = json.loads(DEFAULT_WAVE2_MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert manifest["record_counts"] == {"simulation": 9, "evaluator": 9, "benchmark": 10}
+    assert DEFAULT_WAVE2_SOURCE_PATHS["simulation"] == Path(manifest["outputs"]["simulation"])
+
+
+def test_default_wave3_materialized_sources_exist_and_match_expected_counts() -> None:
+    assert DEFAULT_WAVE3_MANIFEST_PATH.exists()
+    for path in DEFAULT_WAVE3_SOURCE_PATHS.values():
+        assert path.exists()
+
+    manifest = json.loads(DEFAULT_WAVE3_MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert manifest["record_counts"] == {"simulation": 6, "evaluator": 6, "benchmark": 8}
+    assert DEFAULT_WAVE3_SOURCE_PATHS["simulation"] == Path(manifest["outputs"]["simulation"])
+
+
+def test_default_wave4_materialized_sources_exist_and_match_expected_counts() -> None:
+    assert DEFAULT_WAVE4_MANIFEST_PATH.exists()
+    for path in DEFAULT_WAVE4_SOURCE_PATHS.values():
+        assert path.exists()
+
+    manifest = json.loads(DEFAULT_WAVE4_MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert manifest["record_counts"] == {"simulation": 8, "evaluator": 8, "benchmark": 10}
+    assert DEFAULT_WAVE4_SOURCE_PATHS["simulation"] == Path(manifest["outputs"]["simulation"])
+
+
 def test_build_wave1_seed_registry_returns_lane_specific_entries() -> None:
     registry = build_wave1_seed_registry(DEFAULT_WAVE1_SOURCE_PATHS)
 
@@ -391,6 +607,36 @@ def test_build_wave1_seed_registry_returns_lane_specific_entries() -> None:
     }
     assert registry["supplementary"]["wave1_seed_evaluator"]["type"] == "knowledge_base"
     assert registry["edge_case_sources"]["wave1_seed_benchmark"]["focus"] == "benchmark"
+
+
+def test_build_wave2_seed_registry_returns_lane_specific_entries() -> None:
+    registry = build_wave2_seed_registry(DEFAULT_WAVE2_SOURCE_PATHS)
+
+    assert registry["datasets"]["professional_therapeutic"]["wave2_seed_simulation"]["fallback_paths"] == {
+        "local": str(DEFAULT_WAVE2_SOURCE_PATHS["simulation"])
+    }
+    assert registry["supplementary"]["wave2_seed_evaluator"]["type"] == "knowledge_base"
+    assert registry["edge_case_sources"]["wave2_seed_benchmark"]["focus"] == "benchmark"
+
+
+def test_build_wave3_seed_registry_returns_lane_specific_entries() -> None:
+    registry = build_wave3_seed_registry(DEFAULT_WAVE3_SOURCE_PATHS)
+
+    assert registry["datasets"]["professional_therapeutic"]["wave3_seed_simulation"]["fallback_paths"] == {
+        "local": str(DEFAULT_WAVE3_SOURCE_PATHS["simulation"])
+    }
+    assert registry["supplementary"]["wave3_seed_evaluator"]["type"] == "knowledge_base"
+    assert registry["edge_case_sources"]["wave3_seed_benchmark"]["focus"] == "benchmark"
+
+
+def test_build_wave4_seed_registry_returns_lane_specific_entries() -> None:
+    registry = build_wave4_seed_registry(DEFAULT_WAVE4_SOURCE_PATHS)
+
+    assert registry["datasets"]["professional_therapeutic"]["wave4_seed_simulation"]["fallback_paths"] == {
+        "local": str(DEFAULT_WAVE4_SOURCE_PATHS["simulation"])
+    }
+    assert registry["supplementary"]["wave4_seed_evaluator"]["type"] == "knowledge_base"
+    assert registry["edge_case_sources"]["wave4_seed_benchmark"]["focus"] == "benchmark"
 
 
 def test_ensure_wave1_seed_registry_materialized_writes_registry_asset(tmp_path: Path) -> None:
@@ -430,6 +676,117 @@ def test_default_wave1_registry_asset_exists() -> None:
     }
 
 
+def test_ensure_wave2_seed_registry_materialized_writes_registry_asset(tmp_path: Path) -> None:
+    output_paths = {
+        "simulation": tmp_path / "wave2_seed_simulation.jsonl",
+        "evaluator": tmp_path / "wave2_seed_evaluator.jsonl",
+        "benchmark": tmp_path / "wave2_seed_benchmark.jsonl",
+    }
+    manifest_path = tmp_path / "wave2_seed_manifest.json"
+    registry_path = tmp_path / "wave2_seed_registry.json"
+
+    written = ensure_wave2_seed_registry_materialized(
+        seed_pack_path=DEFAULT_WAVE2_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+        registry_path=registry_path,
+    )
+
+    assert written == registry_path
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload["datasets"]["professional_therapeutic"]["wave2_seed_simulation"]["fallback_paths"] == {
+        "local": str(output_paths["simulation"])
+    }
+    assert payload["supplementary"]["wave2_seed_evaluator"]["fallback_paths"] == {
+        "local": str(output_paths["evaluator"])
+    }
+    assert payload["edge_case_sources"]["wave2_seed_benchmark"]["fallback_paths"] == {
+        "local": str(output_paths["benchmark"])
+    }
+
+
+def test_default_wave2_registry_asset_exists() -> None:
+    assert DEFAULT_WAVE2_REGISTRY_PATH.exists()
+    payload = json.loads(DEFAULT_WAVE2_REGISTRY_PATH.read_text(encoding="utf-8"))
+    assert payload["datasets"]["professional_therapeutic"]["wave2_seed_simulation"]["fallback_paths"] == {
+        "local": str(DEFAULT_WAVE2_SOURCE_PATHS["simulation"])
+    }
+
+
+def test_ensure_wave3_seed_registry_materialized_writes_registry_asset(tmp_path: Path) -> None:
+    output_paths = {
+        "simulation": tmp_path / "wave3_seed_simulation.jsonl",
+        "evaluator": tmp_path / "wave3_seed_evaluator.jsonl",
+        "benchmark": tmp_path / "wave3_seed_benchmark.jsonl",
+    }
+    manifest_path = tmp_path / "wave3_seed_manifest.json"
+    registry_path = tmp_path / "wave3_seed_registry.json"
+
+    written = ensure_wave3_seed_registry_materialized(
+        seed_pack_path=DEFAULT_WAVE3_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+        registry_path=registry_path,
+    )
+
+    assert written == registry_path
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload["datasets"]["professional_therapeutic"]["wave3_seed_simulation"]["fallback_paths"] == {
+        "local": str(output_paths["simulation"])
+    }
+    assert payload["supplementary"]["wave3_seed_evaluator"]["fallback_paths"] == {
+        "local": str(output_paths["evaluator"])
+    }
+    assert payload["edge_case_sources"]["wave3_seed_benchmark"]["fallback_paths"] == {
+        "local": str(output_paths["benchmark"])
+    }
+
+
+def test_default_wave3_registry_asset_exists() -> None:
+    assert DEFAULT_WAVE3_REGISTRY_PATH.exists()
+    payload = json.loads(DEFAULT_WAVE3_REGISTRY_PATH.read_text(encoding="utf-8"))
+    assert payload["datasets"]["professional_therapeutic"]["wave3_seed_simulation"]["fallback_paths"] == {
+        "local": str(DEFAULT_WAVE3_SOURCE_PATHS["simulation"])
+    }
+
+
+def test_ensure_wave4_seed_registry_materialized_writes_registry_asset(tmp_path: Path) -> None:
+    output_paths = {
+        "simulation": tmp_path / "wave4_seed_simulation.jsonl",
+        "evaluator": tmp_path / "wave4_seed_evaluator.jsonl",
+        "benchmark": tmp_path / "wave4_seed_benchmark.jsonl",
+    }
+    manifest_path = tmp_path / "wave4_seed_manifest.json"
+    registry_path = tmp_path / "wave4_seed_registry.json"
+
+    written = ensure_wave4_seed_registry_materialized(
+        seed_pack_path=DEFAULT_WAVE4_SEED_PACK_PATH,
+        output_paths=output_paths,
+        manifest_path=manifest_path,
+        registry_path=registry_path,
+    )
+
+    assert written == registry_path
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload["datasets"]["professional_therapeutic"]["wave4_seed_simulation"]["fallback_paths"] == {
+        "local": str(output_paths["simulation"])
+    }
+    assert payload["supplementary"]["wave4_seed_evaluator"]["fallback_paths"] == {
+        "local": str(output_paths["evaluator"])
+    }
+    assert payload["edge_case_sources"]["wave4_seed_benchmark"]["fallback_paths"] == {
+        "local": str(output_paths["benchmark"])
+    }
+
+
+def test_default_wave4_registry_asset_exists() -> None:
+    assert DEFAULT_WAVE4_REGISTRY_PATH.exists()
+    payload = json.loads(DEFAULT_WAVE4_REGISTRY_PATH.read_text(encoding="utf-8"))
+    assert payload["datasets"]["professional_therapeutic"]["wave4_seed_simulation"]["fallback_paths"] == {
+        "local": str(DEFAULT_WAVE4_SOURCE_PATHS["simulation"])
+    }
+
+
 def test_build_wave1_seed_corpus_produces_package(tmp_path: Path) -> None:
     result = build_wave1_seed_corpus(
         tmp_path / "wave1-build",
@@ -441,6 +798,60 @@ def test_build_wave1_seed_corpus_produces_package(tmp_path: Path) -> None:
     assert result.manifest.by_lane == {"simulation": 6, "evaluator": 6, "benchmark": 10}
     assert result.artifacts["reproducibility_report"].exists()
     release_checklist = json.loads((tmp_path / "wave1-build" / "release_checklist.json").read_text(encoding="utf-8"))
+    continuity_check = next(
+        check for check in release_checklist["checks"] if check["name"] == "continuity_checks_passed"
+    )
+    assert release_checklist["passed"] is True
+    assert continuity_check["passed"] is True
+
+
+def test_build_wave2_seed_corpus_produces_package(tmp_path: Path) -> None:
+    result = build_wave2_seed_corpus(
+        tmp_path / "wave2-build",
+        registry_path=tmp_path / "wave2-registry.json",
+        version="test-wave2",
+    )
+
+    assert result.manifest.total_entries == 28
+    assert result.manifest.by_lane == {"simulation": 9, "evaluator": 9, "benchmark": 10}
+    assert result.artifacts["reproducibility_report"].exists()
+    release_checklist = json.loads((tmp_path / "wave2-build" / "release_checklist.json").read_text(encoding="utf-8"))
+    continuity_check = next(
+        check for check in release_checklist["checks"] if check["name"] == "continuity_checks_passed"
+    )
+    assert release_checklist["passed"] is True
+    assert continuity_check["passed"] is True
+
+
+def test_build_wave3_seed_corpus_produces_package(tmp_path: Path) -> None:
+    result = build_wave3_seed_corpus(
+        tmp_path / "wave3-build",
+        registry_path=tmp_path / "wave3-registry.json",
+        version="test-wave3",
+    )
+
+    assert result.manifest.total_entries == 20
+    assert result.manifest.by_lane == {"simulation": 6, "evaluator": 6, "benchmark": 8}
+    assert result.artifacts["reproducibility_report"].exists()
+    release_checklist = json.loads((tmp_path / "wave3-build" / "release_checklist.json").read_text(encoding="utf-8"))
+    continuity_check = next(
+        check for check in release_checklist["checks"] if check["name"] == "continuity_checks_passed"
+    )
+    assert release_checklist["passed"] is True
+    assert continuity_check["passed"] is True
+
+
+def test_build_wave4_seed_corpus_produces_package(tmp_path: Path) -> None:
+    result = build_wave4_seed_corpus(
+        tmp_path / "wave4-build",
+        registry_path=tmp_path / "wave4-registry.json",
+        version="test-wave4",
+    )
+
+    assert result.manifest.total_entries == 26
+    assert result.manifest.by_lane == {"simulation": 8, "evaluator": 8, "benchmark": 10}
+    assert result.artifacts["reproducibility_report"].exists()
+    release_checklist = json.loads((tmp_path / "wave4-build" / "release_checklist.json").read_text(encoding="utf-8"))
     continuity_check = next(
         check for check in release_checklist["checks"] if check["name"] == "continuity_checks_passed"
     )
@@ -516,6 +927,216 @@ def test_build_source_inventory_keeps_wave1_seed_evaluator_and_benchmark(tmp_pat
     assert inventory["edge_case_sources.wave1_seed_benchmark"].inventory_decision == "keep"
     assert inventory["edge_case_sources.wave1_seed_benchmark"].default_lane == "benchmark"
     assert inventory["edge_case_sources.wave1_seed_benchmark"].allowed_lanes == ("benchmark",)
+
+
+def test_build_source_inventory_keeps_wave2_seed_evaluator_and_benchmark(tmp_path: Path) -> None:
+    payload = load_synthesis_seed_pack(DEFAULT_WAVE2_SEED_PACK_PATH)
+    records = build_seed_pack_records(payload)
+    simulation_path = tmp_path / "wave2-simulation.jsonl"
+    evaluator_path = tmp_path / "wave2-evaluator.jsonl"
+    benchmark_path = tmp_path / "wave2-benchmark.jsonl"
+    simulation_path.write_text(
+        "\n".join(json.dumps(row) for row in records["simulation"]) + "\n",
+        encoding="utf-8",
+    )
+    evaluator_path.write_text(
+        "\n".join(json.dumps(row) for row in records["evaluator"]) + "\n",
+        encoding="utf-8",
+    )
+    benchmark_path.write_text(
+        "\n".join(json.dumps(row) for row in records["benchmark"]) + "\n",
+        encoding="utf-8",
+    )
+    registry_path = tmp_path / "wave2-registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "datasets": {
+                    "professional_therapeutic": {
+                        "wave2_seed_simulation": {
+                            "path": "s3://pixelated/wave2-simulation.jsonl",
+                            "stage": "stage1_foundation",
+                            "type": "conversation",
+                            "quality_profile": "wave2_seed",
+                            "focus": "simulation",
+                            "fallback_paths": {"local": str(simulation_path)},
+                        }
+                    }
+                },
+                "supplementary": {
+                    "wave2_seed_evaluator": {
+                        "path": "s3://pixelated/wave2-evaluator.jsonl",
+                        "stage": "stage2_therapeutic_expertise",
+                        "type": "knowledge_base",
+                        "quality_profile": "wave2_seed",
+                        "focus": "evaluator",
+                        "fallback_paths": {"local": str(evaluator_path)},
+                    }
+                },
+                "edge_case_sources": {
+                    "wave2_seed_benchmark": {
+                        "path": "s3://pixelated/wave2-benchmark.jsonl",
+                        "stage": "stage3_edge_stress_test",
+                        "type": "synthetic_edge",
+                        "quality_profile": "wave2_seed",
+                        "focus": "benchmark",
+                        "fallback_paths": {"local": str(benchmark_path)},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    inventory = {source.source_id: source for source in build_source_inventory(registry_path)}
+
+    assert inventory["professional_therapeutic.wave2_seed_simulation"].inventory_decision == "keep"
+    assert inventory["supplementary.wave2_seed_evaluator"].inventory_decision == "keep"
+    assert inventory["supplementary.wave2_seed_evaluator"].default_lane == "evaluator"
+    assert inventory["supplementary.wave2_seed_evaluator"].allowed_lanes == ("evaluator", "benchmark")
+    assert inventory["edge_case_sources.wave2_seed_benchmark"].inventory_decision == "keep"
+    assert inventory["edge_case_sources.wave2_seed_benchmark"].default_lane == "benchmark"
+    assert inventory["edge_case_sources.wave2_seed_benchmark"].allowed_lanes == ("benchmark",)
+
+
+def test_build_source_inventory_keeps_wave3_seed_evaluator_and_benchmark(tmp_path: Path) -> None:
+    payload = load_synthesis_seed_pack(DEFAULT_WAVE3_SEED_PACK_PATH)
+    records = build_seed_pack_records(payload)
+    simulation_path = tmp_path / "wave3-simulation.jsonl"
+    evaluator_path = tmp_path / "wave3-evaluator.jsonl"
+    benchmark_path = tmp_path / "wave3-benchmark.jsonl"
+    simulation_path.write_text(
+        "\n".join(json.dumps(row) for row in records["simulation"]) + "\n",
+        encoding="utf-8",
+    )
+    evaluator_path.write_text(
+        "\n".join(json.dumps(row) for row in records["evaluator"]) + "\n",
+        encoding="utf-8",
+    )
+    benchmark_path.write_text(
+        "\n".join(json.dumps(row) for row in records["benchmark"]) + "\n",
+        encoding="utf-8",
+    )
+    registry_path = tmp_path / "wave3-registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "datasets": {
+                    "professional_therapeutic": {
+                        "wave3_seed_simulation": {
+                            "path": "s3://pixelated/wave3-simulation.jsonl",
+                            "stage": "stage1_foundation",
+                            "type": "conversation",
+                            "quality_profile": "wave3_seed",
+                            "focus": "simulation",
+                            "fallback_paths": {"local": str(simulation_path)},
+                        }
+                    }
+                },
+                "supplementary": {
+                    "wave3_seed_evaluator": {
+                        "path": "s3://pixelated/wave3-evaluator.jsonl",
+                        "stage": "stage2_therapeutic_expertise",
+                        "type": "knowledge_base",
+                        "quality_profile": "wave3_seed",
+                        "focus": "evaluator",
+                        "fallback_paths": {"local": str(evaluator_path)},
+                    }
+                },
+                "edge_case_sources": {
+                    "wave3_seed_benchmark": {
+                        "path": "s3://pixelated/wave3-benchmark.jsonl",
+                        "stage": "stage3_edge_stress_test",
+                        "type": "synthetic_edge",
+                        "quality_profile": "wave3_seed",
+                        "focus": "benchmark",
+                        "fallback_paths": {"local": str(benchmark_path)},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    inventory = {source.source_id: source for source in build_source_inventory(registry_path)}
+
+    assert inventory["professional_therapeutic.wave3_seed_simulation"].inventory_decision == "keep"
+    assert inventory["supplementary.wave3_seed_evaluator"].inventory_decision == "keep"
+    assert inventory["supplementary.wave3_seed_evaluator"].default_lane == "evaluator"
+    assert inventory["supplementary.wave3_seed_evaluator"].allowed_lanes == ("evaluator", "benchmark")
+    assert inventory["edge_case_sources.wave3_seed_benchmark"].inventory_decision == "keep"
+    assert inventory["edge_case_sources.wave3_seed_benchmark"].default_lane == "benchmark"
+    assert inventory["edge_case_sources.wave3_seed_benchmark"].allowed_lanes == ("benchmark",)
+
+
+def test_build_source_inventory_keeps_wave4_seed_evaluator_and_benchmark(tmp_path: Path) -> None:
+    payload = load_synthesis_seed_pack(DEFAULT_WAVE4_SEED_PACK_PATH)
+    records = build_seed_pack_records(payload)
+    simulation_path = tmp_path / "wave4-simulation.jsonl"
+    evaluator_path = tmp_path / "wave4-evaluator.jsonl"
+    benchmark_path = tmp_path / "wave4-benchmark.jsonl"
+    simulation_path.write_text(
+        "\n".join(json.dumps(row) for row in records["simulation"]) + "\n",
+        encoding="utf-8",
+    )
+    evaluator_path.write_text(
+        "\n".join(json.dumps(row) for row in records["evaluator"]) + "\n",
+        encoding="utf-8",
+    )
+    benchmark_path.write_text(
+        "\n".join(json.dumps(row) for row in records["benchmark"]) + "\n",
+        encoding="utf-8",
+    )
+    registry_path = tmp_path / "wave4-registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "datasets": {
+                    "professional_therapeutic": {
+                        "wave4_seed_simulation": {
+                            "path": "s3://pixelated/wave4-simulation.jsonl",
+                            "stage": "stage1_foundation",
+                            "type": "conversation",
+                            "quality_profile": "wave4_seed",
+                            "focus": "simulation",
+                            "fallback_paths": {"local": str(simulation_path)},
+                        }
+                    }
+                },
+                "supplementary": {
+                    "wave4_seed_evaluator": {
+                        "path": "s3://pixelated/wave4-evaluator.jsonl",
+                        "stage": "stage2_therapeutic_expertise",
+                        "type": "knowledge_base",
+                        "quality_profile": "wave4_seed",
+                        "focus": "evaluator",
+                        "fallback_paths": {"local": str(evaluator_path)},
+                    }
+                },
+                "edge_case_sources": {
+                    "wave4_seed_benchmark": {
+                        "path": "s3://pixelated/wave4-benchmark.jsonl",
+                        "stage": "stage3_edge_stress_test",
+                        "type": "synthetic_edge",
+                        "quality_profile": "wave4_seed",
+                        "focus": "benchmark",
+                        "fallback_paths": {"local": str(benchmark_path)},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    inventory = {source.source_id: source for source in build_source_inventory(registry_path)}
+
+    assert inventory["professional_therapeutic.wave4_seed_simulation"].inventory_decision == "keep"
+    assert inventory["supplementary.wave4_seed_evaluator"].inventory_decision == "keep"
+    assert inventory["supplementary.wave4_seed_evaluator"].default_lane == "evaluator"
+    assert inventory["supplementary.wave4_seed_evaluator"].allowed_lanes == ("evaluator", "benchmark")
+    assert inventory["edge_case_sources.wave4_seed_benchmark"].inventory_decision == "keep"
+    assert inventory["edge_case_sources.wave4_seed_benchmark"].default_lane == "benchmark"
+    assert inventory["edge_case_sources.wave4_seed_benchmark"].allowed_lanes == ("benchmark",)
 
 
 def test_corpus_builder_writes_fresh_artifacts(tmp_path: Path) -> None:
@@ -1078,3 +1699,90 @@ def test_corpus_builder_blocks_privacy_violations(tmp_path: Path) -> None:
                 destination=destination,
             )
         ).build()
+
+
+def test_build_seed_corpus_supports_arbitrary_pack_ids(tmp_path: Path) -> None:
+    assets_dir = tmp_path / "assets"
+    output_dir = tmp_path / "build"
+
+    result = build_seed_corpus(
+        output_dir,
+        pack_id="wave4",
+        seed_pack_path=DEFAULT_WAVE4_SEED_PACK_PATH,
+        output_dir_for_assets=assets_dir,
+        verify_reproducibility=True,
+    )
+
+    assert result.manifest.total_entries == 26
+    assert (assets_dir / "wave4_seed_registry.json").exists()
+    assert (assets_dir / "wave4_seed_manifest.json").exists()
+    assert (output_dir / "reproducibility_report.json").exists()
+
+
+def test_source_inventory_keeps_generic_seed_suffix_entries(tmp_path: Path) -> None:
+    simulation_path = tmp_path / "wave5_seed_simulation.jsonl"
+    evaluator_path = tmp_path / "wave5_seed_evaluator.jsonl"
+    benchmark_path = tmp_path / "wave5_seed_benchmark.jsonl"
+    for path in (simulation_path, evaluator_path, benchmark_path):
+        path.write_text(
+            json.dumps(
+                {
+                    "input": "Prompt",
+                    "output": "Response",
+                    "metadata": {"quality_score": 0.95, "safety_score": 0.95},
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+    registry_path = tmp_path / "wave5_registry.json"
+    registry_path.write_text(
+        json.dumps(
+            {
+                "datasets": {
+                    "professional_therapeutic": {
+                        "wave5_seed_simulation": {
+                            "path": "s3://pixel-data/training-corpus/wave5_seed/wave5_seed_simulation.jsonl",
+                            "stage": "stage1_foundation",
+                            "type": "conversation",
+                            "quality_profile": "wave5_seed",
+                            "focus": "simulation",
+                            "fallback_paths": {"local": str(simulation_path)},
+                            "legacy_paths": [],
+                        }
+                    }
+                },
+                "supplementary": {
+                    "wave5_seed_evaluator": {
+                        "path": "s3://pixel-data/training-corpus/wave5_seed/wave5_seed_evaluator.jsonl",
+                        "stage": "stage2_therapeutic_expertise",
+                        "type": "knowledge_base",
+                        "quality_profile": "wave5_seed",
+                        "focus": "evaluator",
+                        "fallback_paths": {"local": str(evaluator_path)},
+                        "legacy_paths": [],
+                    }
+                },
+                "edge_case_sources": {
+                    "wave5_seed_benchmark": {
+                        "path": "s3://pixel-data/training-corpus/wave5_seed/wave5_seed_benchmark.jsonl",
+                        "stage": "stage3_edge_stress_test",
+                        "type": "synthetic_edge",
+                        "quality_profile": "wave5_seed",
+                        "focus": "benchmark",
+                        "fallback_paths": {"local": str(benchmark_path)},
+                        "legacy_paths": [],
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    inventory = build_source_inventory(registry_path)
+    by_id = {source.source_id: source for source in inventory}
+
+    assert by_id["professional_therapeutic.wave5_seed_simulation"].inventory_decision == "keep"
+    assert by_id["supplementary.wave5_seed_evaluator"].allowed_lanes == ("evaluator", "benchmark")
+    assert by_id["edge_case_sources.wave5_seed_benchmark"].default_lane == "benchmark"
