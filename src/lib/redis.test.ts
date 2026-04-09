@@ -10,44 +10,44 @@ import {
 
 // Mock Redis client
 const mockRedis = {
-  get: jest.fn(),
-  set: jest.fn(),
-  del: jest.fn(),
-  exists: jest.fn(),
-  expire: jest.fn(),
-  setex: jest.fn(),
-  hincrby: jest.fn(),
-  hgetall: jest.fn(),
-  hset: jest.fn(),
-  pipeline: jest.fn(() => ({
-    setex: jest.fn().mockReturnThis(),
-    hincrby: jest.fn().mockReturnThis(),
-    incr: jest.fn().mockReturnThis(),
-    expire: jest.fn().mockReturnThis(),
-    hset: jest.fn().mockReturnThis(),
-    exec: jest.fn().mockResolvedValue([["OK"], [1]]),
+  get: vi.fn(),
+  set: vi.fn(),
+  del: vi.fn(),
+  exists: vi.fn(),
+  expire: vi.fn(),
+  setex: vi.fn(),
+  hincrby: vi.fn(),
+  hgetall: vi.fn(),
+  hset: vi.fn(),
+  pipeline: vi.fn(() => ({
+    setex: vi.fn().mockReturnThis(),
+    hincrby: vi.fn().mockReturnThis(),
+    incr: vi.fn().mockReturnThis(),
+    expire: vi.fn().mockReturnThis(),
+    hset: vi.fn().mockReturnThis(),
+    exec: vi.fn().mockResolvedValue([["OK"], [1]]),
   })),
-  ping: jest.fn(),
-  quit: jest.fn(),
-  disconnect: jest.fn(),
+  ping: vi.fn(),
+  quit: vi.fn(),
+  disconnect: vi.fn(),
   status: "ready",
-  lpush: jest.fn(),
-  lRange: jest.fn(),
-  lrem: jest.fn(),
-  zadd: jest.fn(),
-  zrangebyscore: jest.fn(),
-  zremrangebyscore: jest.fn(),
-  keys: jest.fn(),
-  flushall: jest.fn(),
-  ttl: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
-  emit: jest.fn(),
+  lpush: vi.fn(),
+  lRange: vi.fn(),
+  lrem: vi.fn(),
+  zadd: vi.fn(),
+  zrangebyscore: vi.fn(),
+  zremrangebyscore: vi.fn(),
+  keys: vi.fn(),
+  flushall: vi.fn(),
+  ttl: vi.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
+  emit: vi.fn(),
 };
 
 // Mock ioredis
-jest.mock("ioredis", () => {
-  return jest.fn().mockImplementation(() => mockRedis);
+vi.mock("ioredis", () => {
+  return vi.fn().mockImplementation(() => mockRedis);
 });
 
 describe("Redis Module", () => {
