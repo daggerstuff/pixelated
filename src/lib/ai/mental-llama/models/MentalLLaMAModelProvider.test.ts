@@ -105,7 +105,7 @@ describe('MentalLLaMAModelProvider', () => {
       const mockResponse = {
         choices: [{ message: { content: 'Hi there!' } }],
       }
-      ;(fetch as unknown).mockResolvedValue({
+      ;(fetch as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       })
@@ -129,7 +129,7 @@ describe('MentalLLaMAModelProvider', () => {
 
     it('should throw an error if API request fails (response not ok)', async () => {
       const provider = new MentalLLaMAModelProvider()
-      ;(fetch as unknown).mockResolvedValue({
+      ;(fetch as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
         ok: false,
         status: 500,
         text: async () => 'Internal Server Error',
@@ -142,7 +142,7 @@ describe('MentalLLaMAModelProvider', () => {
 
     it('should throw an error if API response has invalid structure', async () => {
       const provider = new MentalLLaMAModelProvider()
-      ;(fetch as unknown).mockResolvedValue({
+      ;(fetch as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
         ok: true,
         json: async () => ({}), // Invalid structure
       })
@@ -154,7 +154,7 @@ describe('MentalLLaMAModelProvider', () => {
 
     it('should throw an error if fetch itself fails (network error)', async () => {
       const provider = new MentalLLaMAModelProvider()
-      ;(fetch as unknown).mockRejectedValue(
+      ;(fetch as unknown as { mockRejectedValue: (v: Error) => Promise<unknown> }).mockRejectedValue(
         new Error('Network connection failed'),
       )
 
