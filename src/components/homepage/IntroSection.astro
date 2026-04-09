@@ -73,86 +73,58 @@ const { content } = Astro.props
 
 <style>
   .home-section--intro {
-    background: var(--bg-primary);
+    background: #201d1d;
     color: var(--text-primary);
-    padding: var(--section-padding-y) 0;
+    padding: 6rem 0;
     position: relative;
     overflow: hidden;
   }
 
-  /* Grid overlay for terminal feel */
-  .home-section--intro::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--grid-pattern);
-    background-size: 40px 40px;
-    mask-image: radial-gradient(circle at 50% 0%, black, transparent 70%);
-    pointer-events: none;
-    opacity: 0.12;
-  }
-
   .home-copy {
     max-width: 48ch;
-    font-size: 1.06rem;
-    line-height: 1.68;
-    margin-left: auto;
-    margin-right: auto;
-    opacity: 0.88;
-  }
-
-  .home-copy--first {
-    margin-top: var(--spacing-6);
-  }
-
-  .home-copy--subsequent {
-    margin-top: var(--spacing-4);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 1.5rem auto 0;
+    text-align: center;
+    color: var(--text-secondary);
   }
 
   .home-intro {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(3rem, 5vw, 4.5rem);
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
     position: relative;
     z-index: 1;
+    max-width: 55rem;
+    margin: 0 auto;
   }
 
   .home-intro__lead {
     text-align: center;
-    max-width: 60rem;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .home-intro__panel {
-    position: relative;
-    padding: var(--spacing-6);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Structural top line */
-  .home-intro__panel::after {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: var(--spacing-6);
-    right: var(--spacing-6);
-    height: 1px;
-    background: linear-gradient(90deg, var(--accent-primary), transparent);
-    opacity: 0.5;
+    width: 100%;
+    padding: 3rem 2rem;
+    border: 1px dotted rgba(253, 252, 252, 0.2);
+    background: rgba(48, 44, 44, 0.4);
+    backdrop-filter: blur(8px);
+    text-align: center;
   }
 
   .home-proof-stack {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-4);
-    margin-top: var(--spacing-6);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.5rem;
   }
 
   .home-proof-item {
-    padding: var(--spacing-4);
-    border: 1px solid var(--divider-subtle);
-    background: var(--bg-ghost);
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
     border-radius: 2px;
   }
 
@@ -162,54 +134,53 @@ const { content } = Astro.props
     font-size: 0.75rem;
     color: var(--accent-primary);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: var(--spacing-2);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
   }
 
   .home-proof-item p {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     line-height: 1.5;
-    opacity: 0.7;
+    color: var(--text-secondary);
     margin: 0;
   }
 
   .home-evidence-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-6);
-    margin-top: clamp(4rem, 8vw, 6rem);
-    position: relative;
-    z-index: 1;
+    gap: 2rem;
+    margin-top: 5rem;
+    width: 100%;
+    max-width: 55rem;
+    margin-inline: auto;
   }
 
   .home-evidence-card {
-    padding: var(--spacing-8);
-    transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+    padding: 3rem 2rem;
+    border: 1px dotted rgba(255, 255, 255, 0.1);
+    background: rgba(48, 44, 44, 0.2);
+    transition: all 0.3s ease;
   }
 
   .home-evidence-card:hover {
-    border-color: rgba(var(--accent-primary-rgb), 0.3);
-    transform: translateY(-2px);
-  }
-
-  .home-evidence-card--light {
-    background: rgba(var(--accent-primary-rgb), 0.03);
-    border-color: rgba(var(--accent-primary-rgb), 0.15);
+    border-color: var(--accent-primary);
+    background: rgba(255, 107, 0, 0.05);
   }
 
   .home-evidence-list {
-    margin: var(--spacing-6) 0 0;
+    margin: 2rem 0 0;
     padding: 0;
     list-style: none;
     display: grid;
-    gap: var(--spacing-3);
+    gap: 1rem;
+    text-align: left; /* Keep lists left-aligned for readability within centered cards */
   }
 
   .home-evidence-list li {
     font-size: 0.95rem;
-    padding-left: var(--spacing-5);
+    padding-left: 1.5rem;
     position: relative;
-    opacity: 0.8;
+    color: var(--text-secondary);
   }
 
   .home-evidence-list li::before {
@@ -218,9 +189,8 @@ const { content } = Astro.props
     left: 0;
     color: var(--accent-primary);
     font-family: var(--font-mono);
-    font-weight: bold;
-    opacity: 0.7;
   }
+
 
   @media (max-width: 880px) {
     .home-proof-stack {

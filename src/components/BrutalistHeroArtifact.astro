@@ -148,15 +148,17 @@ const { artifact } = Astro.props
 
   .hero-artifact__header {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 1.1rem;
+    width: 100%;
   }
 
   .hero-artifact__heading {
     display: grid;
     gap: 0.45rem;
-    max-width: 25rem;
+    max-width: 100%;
   }
 
   .hero-artifact__eyebrow,
@@ -169,7 +171,7 @@ const { artifact } = Astro.props
   .hero-artifact__header-meta {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 0.45rem;
   }
 

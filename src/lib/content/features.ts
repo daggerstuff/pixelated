@@ -15,20 +15,25 @@ export const featuresContent = {
       description:
         'The practice surface should feel like a conversation to navigate, not a branching script to memorize.',
       icon: 'chat',
+      image: '/images/features/clinician-in-room.png',
     },
     {
       title: 'Show the supervisor what changed it',
       description:
         'The review needs to preserve the moment that changed the room, not just the clinician memory of it.',
       icon: 'chart',
+      image: '/images/features/supervisor-trace.png',
     },
     {
       title: 'Compare one case across people',
       description:
         'Shared cases turn vague supervision into side-by-side coaching because everyone is working against the same difficult moment.',
       icon: 'shield',
+      image: '/images/features/shared-case-comparison.png',
     },
   ],
+
+
   comparison: {
     label: 'What supervision becomes',
     title: 'Move from vague impressions to visible intervention decisions.',

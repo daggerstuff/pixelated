@@ -49,39 +49,42 @@ const { content } = Astro.props
 
 <style>
   .home-section--how {
-    background: var(--bg-primary);
+    background: #121817;
     color: var(--text-primary);
-    padding: var(--section-padding-y) 0;
+    padding: 6rem 0;
     position: relative;
   }
 
   .home-split {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-12);
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+    max-width: 55rem;
+    margin: 0 auto;
   }
 
   .home-split__intro {
     text-align: center;
-    max-width: 58rem;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .home-steps {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-6);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
   }
 
   .home-step {
-    padding: var(--spacing-6);
-    transition: transform 0.2s ease;
-  }
-
-  .home-step:hover {
-    transform: translateY(-2px);
-    border-color: rgba(var(--accent-primary-rgb), 0.2);
+    padding: 2rem;
+    border: 1px dotted rgba(255, 255, 255, 0.1);
+    background: rgba(48, 44, 44, 0.3);
+    border-radius: 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .home-step-number {
@@ -89,24 +92,22 @@ const { content } = Astro.props
     font-size: 0.75rem;
     color: var(--accent-primary);
     display: block;
-    margin-bottom: var(--spacing-4);
-    opacity: 0.8;
+    margin-bottom: 1rem;
+    letter-spacing: 0.15em;
   }
 
   .home-step p {
     font-size: 0.95rem;
     line-height: 1.6;
-    opacity: 0.75;
+    color: var(--text-secondary);
     margin: 0;
   }
 
   .home-outputs {
-    margin-top: clamp(4rem, 8vw, 6rem);
+    margin-top: 5rem;
+    width: 100%;
+    max-width: 55rem;
+    margin-inline: auto;
   }
 
-  @media (max-width: 880px) {
-    .home-steps {
-      grid-template-columns: 1fr;
-    }
-  }
 </style>

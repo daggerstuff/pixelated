@@ -1,6 +1,6 @@
 ---
 name: AI/ML Engineer
-model: claude-opus-4-6
+model: qwen/qwen3-coder-480b-a35b-instruct
 tools:
   - read
   - write
