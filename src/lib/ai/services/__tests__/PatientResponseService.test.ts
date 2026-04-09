@@ -29,12 +29,12 @@ describe('PatientResponseService', () => {
     // We are mocking the service classes, so we don't need their actual instances for these tests,
     // but rather their mocked constructor or instances.
     // However, if methods of these services are called by PatientResponseService, they need to be mocked on the instances.
-    mockPatientProfileService = new (PatientProfileService as unknown)() // Keep as is if only used for constructor typing
-    mockBeliefConsistencyService = new (BeliefConsistencyService as unknown)()
+    mockPatientProfileService = new (PatientProfileService as unknown as new () => PatientProfileService)() // Keep as is if only used for constructor typing
+    mockBeliefConsistencyService = new (BeliefConsistencyService as unknown as new () => BeliefConsistencyService)()
 
     // Create a mocked instance of EmotionSynthesizer
     mockEmotionSynthesizer =
-      new (EmotionSynthesizer as unknown)() as vi.Mocked<EmotionSynthesizer>
+      new (EmotionSynthesizer as unknown as new () => EmotionSynthesizer)() as vi.Mocked<EmotionSynthesizer>
 
     // Setup default mock implementations for EmotionSynthesizer methods if needed globally
     // For example, if every call to generatePatientPrompt will invoke synthesizeEmotion:
