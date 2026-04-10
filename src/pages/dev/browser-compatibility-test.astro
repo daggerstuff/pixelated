@@ -43,7 +43,7 @@ const TEST_SECTIONS: TestSections = {
 ---
 
 <ChatLayout title="Browser Compatibility Testing">
-  <div class="container">
+  <div class="browser-compat-page container">
     <h1>Browser Compatibility Testing Dashboard</h1>
     <p>
       This page tests critical AI components across different browsers to ensure
@@ -157,7 +157,7 @@ const TEST_SECTIONS: TestSections = {
   </div>
 
   <style>
-    :root {
+    .browser-compat-page {
       --border-color: #e2e8f0;
       --input-border: #cbd5e1;
       --primary: #3b82f6;
@@ -167,27 +167,27 @@ const TEST_SECTIONS: TestSections = {
       --bg-hover: #f8fafc;
     }
 
-    .container {
+    .browser-compat-page.container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
       color: var(--text-primary);
     }
 
-    h1,
-    h2,
-    h3,
-    h4 {
+    .browser-compat-page h1,
+    .browser-compat-page h2,
+    .browser-compat-page h3,
+    .browser-compat-page h4 {
       color: var(--text-primary);
       margin-bottom: 1rem;
     }
 
-    p {
+    .browser-compat-page p {
       color: var(--text-secondary);
       line-height: 1.5;
     }
 
-    .test-section {
+    .browser-compat-page .test-section {
       margin-bottom: 40px;
       padding: 20px;
       border: 1px solid var(--border-color);
@@ -195,25 +195,25 @@ const TEST_SECTIONS: TestSections = {
       background-color: white;
     }
 
-    .component-test {
+    .browser-compat-page .component-test {
       margin-top: 20px;
     }
 
-    .component-container {
+    .browser-compat-page .component-container {
       margin-top: 20px;
       border: 1px solid var(--border-color);
       border-radius: 4px;
       padding: 15px;
     }
 
-    .loading-indicators-test {
+    .browser-compat-page .loading-indicators-test {
       display: flex;
       gap: 20px;
       flex-wrap: wrap;
       margin-top: 1rem;
     }
 
-    .loading-skeleton {
+    .browser-compat-page .loading-skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: loading 1.5s infinite;

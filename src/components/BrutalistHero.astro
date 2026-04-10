@@ -50,20 +50,22 @@ const {
     <HeroStage>
       <div class="hero-layout">
         <HeroContent
-          kicker={kicker}
-          title={title}
-          subtitle={subtitle}
-          helperText={helperText}
-          proofPoints={proofPoints}
-          primaryCTA={primaryCTA}
-          secondaryCTA={secondaryCTA}
+          {kicker}
+          {title}
+          {subtitle}
+          {helperText}
+          {proofPoints}
+          {primaryCTA}
+          {secondaryCTA}
         />
 
-        {artifact && (
-          <div class="hero-artifact-shell">
-            <BrutalistHeroArtifact artifact={artifact} />
-          </div>
-        )}
+        {
+          artifact && (
+            <div class="hero-artifact-shell">
+              <BrutalistHeroArtifact artifact={artifact} />
+            </div>
+          )
+        }
       </div>
     </HeroStage>
   </div>
@@ -77,8 +79,8 @@ const {
     display: flex;
     align-items: flex-start;
     overflow: hidden;
-    min-height: min(100dvh, 54rem);
-    padding: clamp(7.2rem, 10vh, 9.6rem) 0 clamp(5.6rem, 8vh, 7rem);
+    min-height: min(100dvh, 46rem);
+    padding: clamp(5.6rem, 9vh, 7.6rem) 0 clamp(3.8rem, 6vh, 4.8rem);
     background: var(--bg-primary);
   }
 
@@ -103,9 +105,8 @@ const {
   .hero-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(2.2rem, 4vw, 3.8rem);
-    align-items: start;
-    justify-items: center;
+    gap: clamp(1.8rem, 3vw, 3rem);
+    align-items: center;
     position: relative;
     z-index: 1;
   }
@@ -119,7 +120,7 @@ const {
     min-width: 0;
     isolation: isolate;
     width: 100%;
-    max-width: 42rem;
+    max-width: 40rem;
   }
 
   .hero-fadeout {
@@ -131,11 +132,22 @@ const {
     background: linear-gradient(to top, var(--bg-primary), transparent);
   }
 
+  @media (min-width: 1040px) {
+    .hero-layout {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: clamp(2.25rem, 4vw, 4rem);
+    }
+
+    .hero-artifact-shell {
+      justify-content: flex-end;
+    }
+  }
+
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 5.2rem;
-      padding-bottom: 4rem;
+      padding-top: 4.25rem;
+      padding-bottom: 3rem;
     }
 
     .hero-shell {
@@ -153,8 +165,8 @@ const {
 
   @media (max-width: 480px) {
     .hero {
-      padding-top: 4.7rem;
-      padding-bottom: 3rem;
+      padding-top: 4.55rem;
+      padding-bottom: 2.8rem;
     }
   }
 </style>
