@@ -148,13 +148,14 @@ export default function ExportPanel({
             <legend className="text-slate-300 mb-3 block text-sm font-medium">
               {TEXT.formatLegend}
             </legend>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label={TEXT.formatLegend}>
               {(["json", "csv", "bibtex", "ris"] as const).map((f) => (
                 <button
                   type="button"
                   key={f}
+                  role="radio"
                   onClick={() => setFormat(f)}
-                  aria-pressed={format === f}
+                  aria-checked={format === f}
                   className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-pink-500 ${
                     format === f
                       ? "bg-pink-600/20 border-pink-500 text-pink-300"
