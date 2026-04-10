@@ -1,0 +1,11 @@
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/name: pixelated-empathy
+      app.kubernetes.io/part-of: pixelated-empathy
