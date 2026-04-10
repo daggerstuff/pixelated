@@ -20,8 +20,8 @@ vi.mock('../python-bridge', () => ({
     dispose: ReturnType<typeof vi.fn>
 
     constructor() {
-      this.initialize = vi.fn().mockResolvedValue(undefined)
-      this.analyzeSession = vi.fn().mockImplementation(async () => {
+      this.initialize = vi.fn<any>().mockResolvedValue(undefined)
+      this.analyzeSession = vi.fn<any>().mockImplementation(async () => {
         // Simulate realistic API response time (50-150ms)
         const delay = 50 + Math.random() * 100
         await new Promise((resolve) => setTimeout(resolve, delay))
@@ -37,28 +37,28 @@ vi.mock('../python-bridge', () => ({
           },
         }
       })
-      this.runPreprocessingAnalysis = vi.fn().mockImplementation(async () => {
+      this.runPreprocessingAnalysis = vi.fn<any>().mockImplementation(async () => {
         const delay = 30 + Math.random() * 50
         await new Promise((resolve) => setTimeout(resolve, delay))
         return { biasScore: 0.2 + Math.random() * 0.3 }
       })
-      this.runModelLevelAnalysis = vi.fn().mockImplementation(async () => {
+      this.runModelLevelAnalysis = vi.fn<any>().mockImplementation(async () => {
         const delay = 40 + Math.random() * 60
         await new Promise((resolve) => setTimeout(resolve, delay))
         return { biasScore: 0.3 + Math.random() * 0.3 }
       })
-      this.runInteractiveAnalysis = vi.fn().mockImplementation(async () => {
+      this.runInteractiveAnalysis = vi.fn<any>().mockImplementation(async () => {
         const delay = 35 + Math.random() * 55
         await new Promise((resolve) => setTimeout(resolve, delay))
         return { biasScore: 0.4 + Math.random() * 0.3 }
       })
-      this.runEvaluationAnalysis = vi.fn().mockImplementation(async () => {
+      this.runEvaluationAnalysis = vi.fn<any>().mockImplementation(async () => {
         const delay = 45 + Math.random() * 65
         await new Promise((resolve) => setTimeout(resolve, delay))
         return { biasScore: 0.3 + Math.random() * 0.3 }
       })
-      this.checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
-      this.dispose = vi.fn().mockResolvedValue(undefined)
+      this.checkHealth = vi.fn<any>().mockResolvedValue({ status: 'healthy' })
+      this.dispose = vi.fn<any>().mockResolvedValue(undefined)
     }
   },
 }))
@@ -74,12 +74,12 @@ vi.mock('../metrics-collector', () => ({
     dispose: ReturnType<typeof vi.fn>
 
     constructor() {
-      this.initialize = vi.fn().mockResolvedValue(undefined)
-      this.storeAnalysisResult = vi.fn().mockImplementation(async () => {
+      this.initialize = vi.fn<any>().mockResolvedValue(undefined)
+      this.storeAnalysisResult = vi.fn<any>().mockImplementation(async () => {
         const delay = 10 + Math.random() * 20
         await new Promise((resolve) => setTimeout(resolve, delay))
       })
-      this.getMetrics = vi.fn().mockImplementation(async () => {
+      this.getMetrics = vi.fn<any>().mockImplementation(async () => {
         const delay = 20 + Math.random() * 30
         await new Promise((resolve) => setTimeout(resolve, delay))
         return {
@@ -95,7 +95,7 @@ vi.mock('../metrics-collector', () => ({
           },
         }
       })
-      this.getDashboardData = vi.fn().mockImplementation(async () => {
+      this.getDashboardData = vi.fn<any>().mockImplementation(async () => {
         const delay = 30 + Math.random() * 40
         await new Promise((resolve) => setTimeout(resolve, delay))
         return {
@@ -104,7 +104,7 @@ vi.mock('../metrics-collector', () => ({
           alerts: [],
         }
       })
-      this.dispose = vi.fn().mockResolvedValue(undefined)
+      this.dispose = vi.fn<any>().mockResolvedValue(undefined)
     }
   },
 }))
@@ -120,12 +120,12 @@ vi.mock('../alerts-system', () => ({
     dispose: ReturnType<typeof vi.fn>
 
     constructor() {
-      this.initialize = vi.fn().mockResolvedValue(undefined)
-      this.processAlert = vi.fn().mockImplementation(async () => {
+      this.initialize = vi.fn<any>().mockResolvedValue(undefined)
+      this.processAlert = vi.fn<any>().mockImplementation(async () => {
         const delay = 15 + Math.random() * 25
         await new Promise((resolve) => setTimeout(resolve, delay))
       })
-      this.getAlertStatistics = vi.fn().mockImplementation(async () => {
+      this.getAlertStatistics = vi.fn<any>().mockImplementation(async () => {
         const delay = 25 + Math.random() * 35
         await new Promise((resolve) => setTimeout(resolve, delay))
         return {
@@ -134,12 +134,12 @@ vi.mock('../alerts-system', () => ({
           resolvedAlerts: 45,
         }
       })
-      this.getAlertHistory = vi.fn().mockImplementation(async () => {
+      this.getAlertHistory = vi.fn<any>().mockImplementation(async () => {
         const delay = 40 + Math.random() * 60
         await new Promise((resolve) => setTimeout(resolve, delay))
         return []
       })
-      this.dispose = vi.fn().mockResolvedValue(undefined)
+      this.dispose = vi.fn<any>().mockResolvedValue(undefined)
     }
   },
 }))
@@ -152,8 +152,8 @@ vi.mock('../connection-pool', () => ({
     close: ReturnType<typeof vi.fn>
 
     constructor() {
-      this.getConnection = vi.fn().mockResolvedValue({
-        request: vi.fn().mockImplementation(async () => {
+      this.getConnection = vi.fn<any>().mockResolvedValue({
+        request: vi.fn<any>().mockImplementation(async () => {
           // Simulate realistic API response time (50-150ms)
           const delay = 50 + Math.random() * 100
           await new Promise((resolve) => setTimeout(resolve, delay))
@@ -167,17 +167,17 @@ vi.mock('../connection-pool', () => ({
             },
           }
         }),
-        release: vi.fn(),
+        release: vi.fn<any>(),
       })
-      this.close = vi.fn()
+      this.close = vi.fn<any>()
     }
   },
 }))
 
 vi.mock('../performance-monitor', () => ({
   performanceMonitor: {
-    recordMetric: vi.fn(),
-    recordAlert: vi.fn(),
+    recordMetric: vi.fn<any>(),
+    recordAlert: vi.fn<any>(),
   },
 }))
 
