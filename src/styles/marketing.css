@@ -4,9 +4,9 @@
    ================================================ */
 
 :root {
-  --marketing-shell: min(55rem, calc(100vw - 2rem));
-  --marketing-narrow: min(42rem, calc(100vw - 2rem));
-  --marketing-section-space: clamp(4rem, 10vh, 7.5rem);
+  --marketing-shell: min(78rem, calc(100vw - 2.5rem));
+  --marketing-narrow: min(60rem, calc(100vw - 2.5rem));
+  --marketing-section-space: clamp(5.5rem, 11vh, 8.75rem);
 }
 
 .marketing-shell,
@@ -58,9 +58,9 @@
   gap: 0.75rem;
   margin-bottom: 1.2rem;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--accent-primary);
 }
@@ -76,19 +76,20 @@
 .marketing-hero {
   position: relative;
   width: 100%;
-  padding: clamp(6rem, 10vw, 8.5rem) 0 clamp(3.5rem, 8vw, 5.5rem);
+  padding: clamp(7rem, 11vw, 9.5rem) 0 clamp(4.5rem, 8vw, 6rem);
 }
 
 .marketing-hero__panel {
   position: relative;
   overflow: hidden;
-  padding: clamp(2rem, 3vw, 3rem);
+  padding: clamp(2.35rem, 3.8vw, 3.7rem);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background:
-    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.04), rgba(var(--accent-primary-rgb), 0.02)),
+    radial-gradient(circle at top right, rgba(var(--accent-primary-rgb), 0.09), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
     var(--bg-glass);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
 }
 
 .marketing-hero__panel::after {
@@ -106,28 +107,31 @@
 .marketing-hero__content {
   position: relative;
   z-index: 1;
-  max-width: 48rem;
+  max-width: 52rem;
 }
 
 .marketing-title {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 2.625rem;
-  line-height: 1.4;
-  letter-spacing: -0.02em;
+  max-width: 14ch;
+  font-size: clamp(2.1rem, 3.2vw, 3.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
   color: var(--text-primary);
   text-wrap: balance;
 }
 
 .marketing-title--medium {
-  font-size: 1.75rem;
+  max-width: 16ch;
+  font-size: clamp(1.45rem, 2.2vw, 2.15rem);
+  line-height: 1.14;
 }
 
 .marketing-lede {
-  max-width: 56ch;
-  margin: 1.35rem 0 0;
-  font-size: clamp(1rem, 1.3vw, 1.15rem);
-  line-height: 1.72;
+  max-width: 58ch;
+  margin: 1.45rem 0 0;
+  font-size: clamp(0.94rem, 1vw, 1.06rem);
+  line-height: 1.74;
   color: var(--text-secondary);
   text-wrap: pretty;
 }
@@ -136,22 +140,22 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.9rem 1rem;
-  margin-top: 2rem;
+  gap: 0.95rem 1rem;
+  margin-top: 2.1rem;
 }
 
 .marketing-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 3.25rem;
-  padding: 0.85rem 1.3rem;
+  min-height: 3.35rem;
+  padding: 0.92rem 1.4rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
@@ -173,8 +177,9 @@
 }
 
 .marketing-button--secondary {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.02);
+  color: rgba(253, 252, 252, 0.9);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(253, 252, 252, 0.14);
 }
 
 .marketing-button--secondary:hover {
@@ -185,10 +190,10 @@
 .marketing-note {
   margin-top: 1rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgba(253, 252, 252, 0.5);
 }
 
 .marketing-stat-grid {
@@ -196,18 +201,18 @@
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.9rem;
-  margin-top: 2.5rem;
+  gap: 1rem;
+  margin-top: 2.75rem;
 }
 
 .marketing-stat-card {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.55rem;
   min-width: 0;
-  padding: 1rem;
+  padding: 1.15rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
 }
 
 .marketing-stat-card span,
@@ -236,8 +241,8 @@
 }
 
 .marketing-section-header {
-  max-width: 48rem;
-  margin: 0 auto 2.4rem;
+  max-width: 54rem;
+  margin: 0 auto 3rem;
   text-align: center;
 }
 
@@ -251,7 +256,7 @@
 
 .marketing-grid {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .marketing-grid--2 {
@@ -265,11 +270,11 @@
 .marketing-card {
   display: grid;
   gap: 1rem;
-  padding: 1.5rem;
+  padding: clamp(1.35rem, 2vw, 1.75rem);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(48, 44, 44, 0.6);
-  backdrop-filter: blur(12px);
+  background: linear-gradient(180deg, rgba(48, 44, 44, 0.6), rgba(39, 35, 35, 0.44));
+  backdrop-filter: blur(10px);
 }
 
 .marketing-card--accent {
@@ -285,8 +290,8 @@
 
 .marketing-card p,
 .marketing-card li {
-  color: var(--text-secondary);
-  line-height: 1.65;
+  color: rgba(253, 252, 252, 0.76);
+  line-height: 1.72;
 }
 
 .marketing-list {
@@ -316,12 +321,12 @@
 .marketing-proof-band {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-  gap: 1rem;
+  gap: 1.25rem;
   align-items: start;
-  padding: 1.4rem 1.5rem;
-  border: 1px dotted var(--divider-dotted);
+  padding: 1.5rem 1.65rem;
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: linear-gradient(180deg, rgba(48, 44, 44, 0.52), rgba(39, 35, 35, 0.34));
 }
 
 .marketing-proof-band__items {
@@ -331,7 +336,7 @@
 }
 
 .marketing-proof-item {
-  padding: 0.95rem;
+  padding: 1rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.02);
@@ -361,10 +366,10 @@
 .marketing-quote-card {
   display: grid;
   gap: 0.7rem;
-  padding: 1.5rem;
+  padding: 1.55rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: linear-gradient(180deg, rgba(48, 44, 44, 0.52), rgba(39, 35, 35, 0.36));
 }
 
 .marketing-quote-card blockquote {
@@ -382,8 +387,8 @@
 .marketing-cta-band {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 0.8fr);
-  gap: 1.2rem;
-  padding: clamp(1.5rem, 2.8vw, 2.5rem);
+  gap: 1.35rem;
+  padding: clamp(1.65rem, 2.8vw, 2.8rem);
   border: 1px solid rgba(var(--accent-primary-rgb), 0.28);
   border-radius: var(--radius-sm);
   background:
@@ -396,7 +401,7 @@
   display: grid;
   gap: 1rem;
   align-content: start;
-  padding: 1.25rem;
+  padding: 1.3rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.02);
@@ -431,7 +436,7 @@
 }
 
 .marketing-inline-link {
-  color: var(--text-primary);
+  color: rgba(253, 252, 252, 0.88);
   text-decoration: none;
   border-bottom: 1px dotted rgba(255, 255, 255, 0.28);
   transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
@@ -445,10 +450,10 @@
 .marketing-hero__trustline {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.9rem;
-  margin-top: 1.2rem;
-  color: var(--text-muted);
-  font-size: 0.88rem;
+  gap: 0.95rem;
+  margin-top: 1.35rem;
+  color: rgba(253, 252, 252, 0.56);
+  font-size: 0.9rem;
 }
 
 .marketing-hero__trustline span {
@@ -485,14 +490,15 @@
   }
 
   .marketing-hero {
-    padding-top: 5.25rem;
+    padding-top: 6rem;
   }
 
   .marketing-hero__panel {
-    padding: 1.4rem;
+    padding: 1.55rem;
   }
 
   .marketing-title {
-    font-size: clamp(2rem, 8vw, 3rem);
+    max-width: 12ch;
+    font-size: clamp(2.35rem, 8vw, 3.6rem);
   }
 }

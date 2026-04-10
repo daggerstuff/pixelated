@@ -1,6 +1,6 @@
 export const ctaContent = {
   label: 'Run one hard case',
-  title: 'Use one difficult session to decide whether this is worth keeping.',
+  title: 'Bring one hard case. Decide fast whether the coaching gets sharper.',
   intro:
     'You do not need a long rollout to know whether the workflow helps. Bring one hard conversation, run it once, and judge whether the review got more precise.',
   verdictCopy:
@@ -27,7 +27,7 @@ export const ctaContent = {
     'Did the review reveal one intervention worth changing on the next pass?',
     'Could your team compare two clinicians against the same difficult moment?',
   ],
-  primaryCTA: { text: 'Book a pilot review', href: '/contact' },
-  secondaryCTA: { text: 'See the product demo', href: '/demo-hub' },
+  primaryCTA: { text: 'Book a pilot', href: '/contact' },
+  secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
   meta: 'No long rollout required. One difficult case should tell you whether the workflow is clearer.',
 } as const

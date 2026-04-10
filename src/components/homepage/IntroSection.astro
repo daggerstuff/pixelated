@@ -36,31 +36,33 @@ const { content } = Astro.props
           </div>
         </div>
 
-        <div class="home-intro__issues">
-          <span class="pe-page-panel-label">{content.panelLabel}</span>
-          <div class="home-intro__issue-stack pe-home-stack">
+        <div class="home-intro__diagnostic">
+          <div class="home-intro__issues">
+            <span class="pe-page-panel-label">{content.panelLabel}</span>
+            <div class="home-intro__issue-stack pe-home-stack">
+              {
+                content.panelItems.map((item) => (
+                  <div class="home-intro__issue">
+                    <span class="home-intro__issue-label">{item.label}</span>
+                    <p>{item.body}</p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="home-intro__evidence-board">
             {
-              content.panelItems.map((item) => (
-                <div class="home-intro__issue">
-                  <span class="home-intro__issue-label">{item.label}</span>
-                  <p>{item.body}</p>
-                </div>
+              content.evidenceCards.map((card) => (
+                <section class="home-intro__evidence-column">
+                  <h3 class="pe-heading-s">{card.title}</h3>
+                  <ul class="home-intro__evidence-list pe-home-stack">
+                    {card.items.map((item) => <li>{item}</li>)}
+                  </ul>
+                </section>
               ))
             }
           </div>
-        </div>
-
-        <div class="home-intro__evidence-board">
-          {
-            content.evidenceCards.map((card) => (
-              <section class="home-intro__evidence-column">
-                <h3 class="pe-heading-s">{card.title}</h3>
-                <ul class="home-intro__evidence-list pe-home-stack">
-                  {card.items.map((item) => <li>{item}</li>)}
-                </ul>
-              </section>
-            ))
-          }
         </div>
       </div>
     </div>
@@ -79,23 +81,39 @@ const { content } = Astro.props
 
   .home-intro__body {
     display: grid;
-    gap: 2rem;
+    gap: 2.6rem;
   }
 
   .home-intro__header {
     display: grid;
     gap: 1.15rem;
+    justify-items: center;
+    text-align: center;
   }
 
   .home-intro__prose {
     display: grid;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    max-width: 44rem;
+    justify-items: center;
+  }
+
+  .home-intro__diagnostic {
+    display: grid;
+    gap: 1.2rem;
+    align-items: start;
   }
 
   .home-intro__issues {
     display: grid;
     gap: 0.95rem;
-    padding-top: 0.25rem;
+    padding: 1.25rem 1.35rem;
+    border: 1px solid rgba(253, 252, 252, 0.08);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(48, 44, 44, 0.54), rgba(39, 35, 35, 0.36));
+    backdrop-filter: blur(12px);
+    justify-items: center;
+    text-align: center;
   }
 
   .home-intro__issue-stack {
@@ -105,7 +123,7 @@ const { content } = Astro.props
   .home-intro__issue {
     display: grid;
     gap: 0.55rem;
-    padding: 1rem 0;
+    padding: 1.05rem 0;
   }
 
   .home-intro__issue-label {
@@ -122,9 +140,9 @@ const { content } = Astro.props
     margin: 0;
     max-width: 42ch;
     font-family: var(--font-mono);
-    font-size: 0.88rem;
-    line-height: 1.72;
-    color: rgba(253, 252, 252, 0.74);
+    font-size: 0.92rem;
+    line-height: 1.76;
+    color: rgba(253, 252, 252, 0.8);
   }
 
   .home-intro__evidence-board {
@@ -135,8 +153,11 @@ const { content } = Astro.props
   .home-intro__evidence-column {
     display: grid;
     gap: 0.95rem;
-    padding-top: 1rem;
-    border-top: 1px dotted rgba(253, 252, 252, 0.12);
+    padding: 1.2rem 1.25rem;
+    border: 1px dotted rgba(253, 252, 252, 0.12);
+    border-radius: 4px;
+    background: rgba(253, 252, 252, 0.015);
+    text-align: center;
   }
 
   .home-intro__evidence-list {
@@ -151,6 +172,24 @@ const { content } = Astro.props
   }
 
   @media (min-width: 980px) {
+    .home-intro__diagnostic {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    }
+
+    .home-intro__issue-stack {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+      border-top: 0;
+    }
+
+    .home-intro__issue {
+      padding: 1rem 1rem 1.05rem;
+      border: 1px solid rgba(253, 252, 252, 0.08);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
     .home-intro__evidence-board {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }

@@ -77,8 +77,8 @@ const {
     display: flex;
     align-items: flex-start;
     overflow: hidden;
-    min-height: min(100dvh, 58rem);
-    padding: clamp(6.7rem, 10vh, 9.2rem) 0 clamp(5rem, 8vh, 6.4rem);
+    min-height: min(100dvh, 54rem);
+    padding: clamp(7.2rem, 10vh, 9.6rem) 0 clamp(5.6rem, 8vh, 7rem);
     background: var(--bg-primary);
   }
 
@@ -95,17 +95,17 @@ const {
   .hero-shell {
     position: relative;
     z-index: 1;
-    width: min(100%, 55rem);
+    width: min(100%, var(--max-content-width));
     margin: 0 auto;
-    padding: 0 clamp(1.25rem, 2.6vw, 2rem);
+    padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
   }
 
   .hero-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(2.6rem, 5vw, 3.6rem);
+    gap: clamp(2.2rem, 4vw, 3.8rem);
     align-items: start;
-    justify-items: stretch;
+    justify-items: center;
     position: relative;
     z-index: 1;
   }
@@ -119,7 +119,7 @@ const {
     min-width: 0;
     isolation: isolate;
     width: 100%;
-    max-width: 31.5rem;
+    max-width: 42rem;
   }
 
   .hero-fadeout {
@@ -129,13 +129,6 @@ const {
     left: 0;
     height: 7rem;
     background: linear-gradient(to top, var(--bg-primary), transparent);
-  }
-
-  @media (min-width: 1181px) {
-    .hero-layout {
-      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-      align-items: center;
-    }
   }
 
   @media (max-width: 768px) {

@@ -7,10 +7,10 @@
   /* === THE CANVAS (Warm Terminal) === */
   --bg-primary: #201d1d;          /* Warm Near-Black */
   --bg-secondary: #302c2c;        /* Elevated Dark Surface */
-  --bg-glass: rgba(48, 44, 44, 0.6); /* Glassmorphic Base */
-  --text-primary: #fdfcfc;        /* Warm Off-White */
-  --text-secondary: #9a9898;      /* Mid Gray */
-  --text-muted: #6e6e73;          /* Muted labels */
+  --bg-glass: rgba(48, 44, 44, 0.74); /* Glassmorphic Base */
+  --text-primary: #f7f3eb;        /* Warm Off-White */
+  --text-secondary: #c7bfb7;      /* Editorial secondary copy */
+  --text-muted: #a1958b;          /* Muted labels */
   
   /* === VIVID ACCENTS === */
   --accent-primary: #FF6B00;      /* Vivid Mizu Orange */
@@ -46,7 +46,8 @@
   --transition-spring: var(--duration-normal) var(--ease-spring);
   
   /* === LAYOUT === */
-  --max-content-width: 880px;
+  --max-content-width: 76rem;
+  --max-editorial-width: 55rem;
   --grid-unit: 8px;
   --section-padding-y: 5rem; /* Mapping to var(--spacing-20) / 80px */
   
@@ -61,4 +62,3 @@
   --z-overlay: 200;
   --z-modal: 300;
 }
-

@@ -1,6 +1,6 @@
 export const featuresContent = {
   label: 'What the platform makes possible',
-  title: 'The product only matters if it makes the next coaching move obvious.',
+  title: 'The product only earns its place when the next move becomes obvious.',
   copy: 'Each part of the workflow exists to preserve the difficult turn, surface the coaching decision, and make the next review more concrete than memory ever could.',
   proofLabel: 'What a useful first week looks like',
   proofItems: [
