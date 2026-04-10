@@ -19,23 +19,23 @@ import {
 
 // Define mock instances to capture calls
 const mockRedisInstance = {
-  get: vi.fn<any>(),
-  set: vi.fn<any>(),
-  setex: vi.fn<any>(),
-  del: vi.fn<any>(),
-  exists: vi.fn<any>(),
-  incr: vi.fn<any>(),
-  expire: vi.fn<any>(),
-  hget: vi.fn<any>(),
-  hset: vi.fn<any>(),
-  hgetall: vi.fn<any>(),
-  hdel: vi.fn<any>(),
-  hincrby: vi.fn<any>(),
-  quit: vi.fn<any>(),
+  get: vi.fn(),
+  set: vi.fn(),
+  setex: vi.fn(),
+  del: vi.fn(),
+  exists: vi.fn(),
+  incr: vi.fn(),
+  expire: vi.fn(),
+  hget: vi.fn(),
+  hset: vi.fn(),
+  hgetall: vi.fn(),
+  hdel: vi.fn(),
+  hincrby: vi.fn(),
+  quit: vi.fn(),
 }
 
 const mockDb = {
-  collection: vi.fn<any>(() => ({
+  collection: vi.fn(() => ({
     replaceOne: vi.fn<any>().mockResolvedValue<any>({}),
     insertMany: vi.fn<any>().mockResolvedValue<any>({}),
     insertOne: vi.fn<any>().mockResolvedValue<any>({}),
@@ -44,14 +44,14 @@ const mockDb = {
 
 const mockMongoClientInstance = {
   connect: vi.fn<any>().mockResolvedValue<any>(undefined),
-  db: vi.fn<any>(() => mockDb),
+  db: vi.fn(() => mockDb),
   close: vi.fn<any>().mockResolvedValue<any>(undefined),
 }
 
 // Mock external modules
 vi.mock('ioredis', () => {
   return {
-    Redis: vi.fn<any>(function () {
+    Redis: vi.fn(function () {
       return mockRedisInstance
     }),
   }
@@ -59,7 +59,7 @@ vi.mock('ioredis', () => {
 
 vi.mock('mongodb', () => {
   return {
-    MongoClient: vi.fn<any>(function () {
+    MongoClient: vi.fn(function () {
       return mockMongoClientInstance
     }),
   }
@@ -67,28 +67,28 @@ vi.mock('mongodb', () => {
 
 vi.mock('@tensorflow/tfjs', () => {
   const mockModel = {
-    add: vi.fn<any>(),
-    compile: vi.fn<any>(),
-    predict: vi.fn<any>(() => ({
+    add: vi.fn(),
+    compile: vi.fn(),
+    predict: vi.fn(() => ({
       dataSync: () => [0.1],
-      dispose: vi.fn<any>(),
+      dispose: vi.fn(),
     })),
   }
 
   return {
-    sequential: vi.fn<any>(() => mockModel),
+    sequential: vi.fn(() => mockModel),
     layers: {
-      dense: vi.fn<any>(),
-      dropout: vi.fn<any>(),
+      dense: vi.fn(),
+      dropout: vi.fn(),
     },
     train: {
-      adam: vi.fn<any>(),
+      adam: vi.fn(),
     },
-    tidy: vi.fn<any>((fn: any) => fn()),
-    tensor2d: vi.fn<any>(),
-    mean: vi.fn<any>(() => ({ dataSync: () => [0.1] })),
-    abs: vi.fn<any>(),
-    sub: vi.fn<any>(),
+    tidy: vi.fn((fn: any) => fn()),
+    tensor2d: vi.fn(),
+    mean: vi.fn(() => ({ dataSync: () => [0.1] })),
+    abs: vi.fn(),
+    sub: vi.fn(),
   }
 })
 

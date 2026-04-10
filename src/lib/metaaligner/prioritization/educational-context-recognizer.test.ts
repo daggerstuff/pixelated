@@ -19,9 +19,9 @@ import type {
 
 // Mock dependencies
 const mockAIService: AIService = {
-  getModelInfo: vi.fn<any>(),
-  createChatCompletion: vi.fn<any>(),
-  createChatStream: vi.fn<any>(),
+  getModelInfo: vi.fn(),
+  createChatCompletion: vi.fn(),
+  createChatStream: vi.fn(),
 }
 
 describe('EducationalContextRecognizer', () => {
