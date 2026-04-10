@@ -171,6 +171,7 @@ export const TherapistDashboard: FC = () => {
                 }
               }}
               selectedPatients={selectedPatients}
+				timeRange={timeRange}
             />
           )}
 
@@ -187,6 +188,7 @@ export const TherapistDashboard: FC = () => {
                 }
               }}
               selectedPatients={selectedPatients}
+				timeRange={timeRange}
             />
           )}
 
@@ -209,7 +211,8 @@ const OverviewTab: FC<{
   metrics: SessionMetrics
   onPatientSelect: (patientId: string) => void
   selectedPatients: string[]
-}> = ({ patients, metrics, onPatientSelect, selectedPatients }) => {
+  timeRange: 'week' | 'month' | 'quarter' | 'year'
+}> = ({ patients, metrics, onPatientSelect, selectedPatients, timeRange }) => {
   const urgentPatients = patients.filter(
     (p) => p.riskLevel === 'high' || p.riskLevel === 'critical',
   )
@@ -698,4 +701,12 @@ function getRiskColor(risk: string) {
   return colors[risk as keyof typeof colors] || colors.low
 }
 
+
+function getProgressColor(progress: number) {
+	if (progress >= 80) return 'bg-green-500'
+	if (progress >= 60) return 'bg-blue-500'
+	if (progress >= 40) return 'bg-yellow-500'
+	if (progress >= 20) return 'bg-orange-500'
+	return 'bg-red-500'
+}
 export default TherapistDashboard

@@ -49,7 +49,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       const newSessionData: SessionData = {
         ...data,
         sessionId,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
       }
       setSessionData(newSessionData)
 
@@ -70,7 +70,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       // Generate comprehensive results
       const results: BiasAnalysisResults = {
         sessionId,
-        overallScore: Math.max(60, 100 - Math.random() * 10),
+        overallBiasScore: Math.max(60, 100 - Math.random() * 10),
         biasFactors: {
           demographic: Math.random() * 0.3,
           cultural: Math.random() * 0.25,
@@ -97,23 +97,10 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
           },
         ],
         recommendations: [
-          {
-            priority: 'high',
-            category: 'language',
-            description: 'Use person-first language',
-            example:
-              'Instead of "elderly patient", use "patient who is elderly"',
-            impact: 'Reduces age-based assumptions',
-          },
-          {
-            priority: 'medium',
-            category: 'cultural',
-            description: 'Avoid cultural generalizations',
-            example: 'Replace "in your culture" with "in your experience"',
-            impact: 'Promotes individual-centered care',
-          },
-        ],
-        timestamp: new Date().toISOString(),
+				'Use person-first language',
+				'Avoid cultural generalizations',
+			],
+        timestamp: new Date(),
       }
 
       setAnalysisResults(results)
@@ -255,12 +242,12 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
                 <div className='text-blue-800 space-y-2 text-sm'>
                   <p>
                     • Analysis completed with{' '}
-                    {analysisResults.detectedPatterns.length} bias patterns
+                    {analysisResults.recommendations.length} bias patterns
                     identified
                   </p>
                   <p>
                     • Overall bias score:{' '}
-                    {Math.round(analysisResults.overallScore)}/100
+                    {Math.round(analysisResults.overallBiasScore)}/100
                   </p>
                   <p>
                     • {analysisResults.recommendations.length} actionable

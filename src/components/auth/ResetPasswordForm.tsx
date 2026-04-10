@@ -38,12 +38,12 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         email,
       })
 
-      if (!response.error) {
+      if (!('error' in response && response.error)) {
         // Dispatch custom event that the parent page is listening for
         const event = new CustomEvent('password-reset-success')
         document.dispatchEvent(event)
       } else {
-        throw new Error(response.error.message || 'Password reset failed')
+        throw new Error((response as { error?: { message?: string } }).error?.message || 'Password reset failed')
       }
     } catch (err: unknown) {
       const message =
