@@ -207,17 +207,7 @@ select_submodule_url() {
     return 0
   fi
 
-  # 4. GHA fallback for relative paths
-  if [[ -n "${GITHUB_ACTIONS:-}" && "${GITHUB_ACTIONS:-}" == "true" ]]; then
-    if is_relative_submodule_url "${original_url}"; then
-      local github_url
-      github_url="$(canonical_public_submodule_url "${name}")"
-      printf '%s' "${github_url}"
-      return 0
-    fi
-  fi
-
-  # 5. Default: Use original
+  # 4. Default: Use original
   printf '%s' "${original_url}"
 }
 
@@ -282,7 +272,7 @@ done
 
 # 3. Update (fetch and checkout)
 echo "📥 Updating submodules (depth=1)..."
-if ! git_with_auth submodule update --recursive --force; then
+if ! git_with_auth submodule update --recursive --force --depth 1; then
   echo "##[warning]Shallow submodule update failed. Retrying with full history for pinned commit checkout..."
   git_with_auth submodule update --recursive --force
 fi
