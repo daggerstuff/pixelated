@@ -484,7 +484,8 @@ export function getNestedProperty<T>(
   const keys = path.split('.')
   let result: unknown = obj
 
-  for (const key of keys) {
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
     if (
       !isNonNullObject(result) ||
       !(key in (result))

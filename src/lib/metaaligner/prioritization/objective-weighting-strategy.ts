@@ -9,10 +9,12 @@ export interface WeightingParams {
   customFactors?: Record<string, number>
 }
 
-export type ObjectiveWeightingStrategy = (
-  objectives: ObjectivePriority[],
-  params: WeightingParams,
-) => ObjectivePriority[];
+export interface ObjectiveWeightingStrategy {
+  (
+    objectives: ObjectivePriority[],
+    params: WeightingParams,
+  ): ObjectivePriority[]
+}
 
 /**
  * Default dynamic weighting algorithm.

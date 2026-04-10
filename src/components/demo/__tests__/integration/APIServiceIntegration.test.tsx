@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 // Mock fetch for API calls
-const mockFetch = vi.fn<any>()
+const mockFetch = vi.fn()
 global.fetch = mockFetch
 
 // SSRF protection: Centralized URL validation utility
@@ -438,15 +438,15 @@ describe('APIService Integration Tests', () => {
   describe('Real-time WebSocket Connections', () => {
     it('establishes WebSocket connection for real-time updates', async () => {
       const mockWebSocket = {
-        send: vi.fn<any>(),
-        close: vi.fn<any>(),
-        addEventListener: vi.fn<any>(),
-        removeEventListener: vi.fn<any>(),
+        send: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
         readyState: 1, // OPEN
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn<any>(function () {
+      global.WebSocket = vi.fn(function () {
         return mockWebSocket
       }) as any
 
@@ -460,21 +460,21 @@ describe('APIService Integration Tests', () => {
 
     it('handles WebSocket message for category updates', async () => {
       const mockWebSocket = {
-        send: vi.fn<any>(),
-        close: vi.fn<any>(),
-        addEventListener: vi.fn<any>(),
-        removeEventListener: vi.fn<any>(),
+        send: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn<any>(function () {
+      global.WebSocket = vi.fn(function () {
         return mockWebSocket
       }) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
       // Simulate message handler registration
-      const messageHandler = vi.fn<any>()
+      const messageHandler = vi.fn()
       ws.addEventListener('message', messageHandler)
 
       expect((ws as any).addEventListener).toHaveBeenCalledWith(

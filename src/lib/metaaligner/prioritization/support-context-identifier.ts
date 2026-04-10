@@ -1186,7 +1186,8 @@ Consider this context in your assessment.`
       intensity += 0.18
     }
     let consecutiveCaps = 0
-    for (const char of query) {
+    for (let i = 0; i < query.length; i++) {
+      const char = query[i]
       if (typeof char === 'string' && char >= 'A' && char <= 'Z') {
         consecutiveCaps++
         if (consecutiveCaps >= 3) {
