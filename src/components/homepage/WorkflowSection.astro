@@ -14,33 +14,47 @@ export interface Props {
 }
 
 const { content } = Astro.props
+const [leadStep, ...restSteps] = content.steps
 ---
 
-<section class="home-section home-section--how">
-  <div class="container">
-    <div class="home-split">
-      <div class="home-split__intro">
+<section class="pe-home-section home-section--how">
+  <div class="pe-home-shell">
+    <div class="pe-home-grid home-how">
+      <div class="pe-home-rail">
         <span class="pe-meta-label">{content.label}</span>
-        <h2 class="pe-heading-l">{content.title}</h2>
+        <div class="pe-home-rail__line"></div>
+        <p class="pe-home-kicker-note">
+          One case should move from live room to review lane without becoming opinion or shorthand.
+        </p>
       </div>
 
-      <div class="home-steps">
-        {
-          content.steps.map((step) => (
-            <div class="home-step glass-panel">
-              <span class="home-step-number">{step.number}</span>
-              <div>
-                <h3 class="pe-heading-s">{step.title}</h3>
-                <p>{step.body}</p>
-              </div>
-            </div>
-          ))
-        }
+      <div class="home-how__body">
+        <h2 class="pe-heading-l">{content.title}</h2>
+
+        <div class="home-how__steps">
+          <article class="home-how__step home-how__step--lead pe-home-panel">
+            <span class="home-how__number">{leadStep.number}</span>
+            <h3 class="pe-heading-s">{leadStep.title}</h3>
+            <p>{leadStep.body}</p>
+          </article>
+
+          <div class="home-how__step-stack">
+            {
+              restSteps.map((step) => (
+                <article class="home-how__step pe-home-panel">
+                  <span class="home-how__number">{step.number}</span>
+                  <h3 class="pe-heading-s">{step.title}</h3>
+                  <p>{step.body}</p>
+                </article>
+              ))
+            }
+          </div>
+        </div>
       </div>
     </div>
 
     <InfoStrip
-      className="home-outputs home-outputs--spaced"
+      className="home-how__outputs"
       label={content.bandLabel}
       title={content.bandTitle}
       body={content.bandBody}
@@ -52,65 +66,74 @@ const { content } = Astro.props
 
 <style>
   .home-section--how {
-    background: #121817;
+    background: transparent;
     color: var(--text-primary);
-    padding: 6rem 0;
-    position: relative;
   }
 
-  .home-split {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4rem;
-    max-width: 55rem;
-    margin: 0 auto;
-  }
-
-  .home-split__intro {
-    text-align: center;
-    width: 100%;
-  }
-
-  .home-steps {
+  .home-how__body {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
-    width: 100%;
   }
 
-  .home-step {
-    padding: 2rem;
-    border: 1px dotted rgba(255, 255, 255, 0.1);
-    background: rgba(48, 44, 44, 0.3);
-    border-radius: 4px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  .home-how__steps {
+    display: grid;
+    gap: 1rem;
   }
 
-  .home-step-number {
+  .home-how__step {
+    display: grid;
+    gap: 0.8rem;
+    padding: clamp(1.1rem, 2vw, 1.5rem);
+  }
+
+  .home-how__step--lead {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-how__step--lead::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    width: 6rem;
+    height: 6rem;
+    border-right: 1px dotted rgba(var(--accent-primary-rgb), 0.35);
+    border-bottom: 1px dotted rgba(var(--accent-primary-rgb), 0.35);
+    opacity: 0.7;
+  }
+
+  .home-how__number {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent-primary);
-    display: block;
-    margin-bottom: 1rem;
+    font-size: 0.68rem;
+    font-weight: 700;
     letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
   }
 
-  .home-step p {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--text-secondary);
+  .home-how__step p {
     margin: 0;
+    max-width: 34ch;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(253, 252, 252, 0.72);
   }
 
-  .home-outputs {
-    margin-top: 5rem;
-    width: 100%;
-    max-width: 55rem;
-    margin-inline: auto;
+  .home-how__step-stack {
+    display: grid;
+    gap: 1rem;
   }
 
+  .home-how__outputs {
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 980px) {
+    .home-how__steps {
+      grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+      align-items: stretch;
+    }
+  }
 </style>

@@ -6,12 +6,10 @@
       "timeout": 30000
     },
     "rube": {
-      "type": "http",
-      "url": "https://rube.app/mcp",
+      "httpUrl": "https://rube.app/mcp",
       "headers": {
         "Authorization": "Bearer ${RUBE_API_KEY}"
       },
-      "tools": ["*"],
       "timeout": 60000
     },
     "linear": {
@@ -48,6 +46,12 @@
       "command": "pnpm",
       "args": ["dlx", "@playwright/mcp"],
       "timeout": 60000
+    },
+    "stitch": {
+      "command": "npx",
+      "args": ["-y", "@_davideast/stitch-mcp", "proxy"],
+      "env": { "GOOGLE_CLOUD_PROJECT": "${GOOGLE_CLOUD_PROJECT}" },
+      "timeout": 30000
     },
     "sentry": {
       "command": "pnpm",

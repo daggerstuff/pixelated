@@ -191,6 +191,67 @@ def test_write_authoring_target_report_materializes_source_bundle(tmp_path: Path
     assert (tmp_path / "target_bundle" / "authoring_target.md").exists()
 
 
+def test_write_authoring_ledger_report_preserves_existing_applied_ledger(tmp_path: Path) -> None:
+    ledger_path = tmp_path / "wave5_authoring_ledger.json"
+    existing_ledger = {
+        "version": "demo-ledger",
+        "draft_pack_version": "demo-pack",
+        "ledger_entry_count": 1,
+        "total_target_rows": 8,
+        "entries": [
+            {
+                "ledger_entry_id": "wave5::demo::scenario_archetypes",
+                "source_key": "demo_source",
+                "source_title": "Demo Source",
+                "priority": "P0",
+                "artifact_type": "scenario_archetypes",
+                "target_count": 8,
+                "lane_targets": ["simulation"],
+                "required_fields": ["scenario_id", "title"],
+                "progress": {
+                    "drafted_count": 3,
+                    "reviewed_count": 0,
+                    "promoted_count": 0,
+                    "remaining_count": 5,
+                },
+                "draft_rows": [
+                    {"scenario_id": "demo_scenario_001", "title": "Demo row 1"},
+                    {"scenario_id": "demo_scenario_002", "title": "Demo row 2"},
+                    {"scenario_id": "demo_scenario_003", "title": "Demo row 3"},
+                ],
+            }
+        ],
+        "progress_summary": {
+            "drafted_rows": 3,
+            "remaining_rows": 5,
+            "by_source_key": {
+                "demo_source": {
+                    "entry_count": 1,
+                    "target_rows": 8,
+                    "drafted_rows": 3,
+                    "remaining_rows": 5,
+                }
+            },
+            "by_artifact_type": {
+                "scenario_archetypes": {
+                    "entry_count": 1,
+                    "target_rows": 8,
+                    "drafted_rows": 3,
+                    "remaining_rows": 5,
+                }
+            },
+        },
+    }
+    ledger_path.write_text(json.dumps(existing_ledger, indent=2) + "\n", encoding="utf-8")
+
+    report = write_authoring_ledger_report(tmp_path / "report", ledger_path=ledger_path)
+
+    assert report["progress_summary"]["drafted_rows"] == 3
+    persisted = json.loads(ledger_path.read_text(encoding="utf-8"))
+    assert persisted["entries"][0]["progress"]["drafted_count"] == 3
+    assert len(persisted["entries"][0]["draft_rows"]) == 3
+
+
 def test_apply_authored_batch_updates_rows_and_progress() -> None:
     ledger = {
         "version": "demo-ledger",

@@ -1,12 +1,13 @@
 ---
 /**
  * Brutalist Hero Component
- * Balanced product-first homepage entry for the supervision workflow.
+ * Product-first homepage entry built around one coaching artifact.
  */
 import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
 import HeroContent from '@/components/homepage/HeroContent.astro'
 import HeroStage from '@/components/homepage/HeroStage.astro'
+
 export interface Props {
   kicker?: string
   title?: string
@@ -45,9 +46,7 @@ const {
     <HeroAtmosphere />
   </div>
 
-
   <div class="container hero-shell">
-
     <HeroStage>
       <div class="hero-layout">
         <HeroContent
@@ -78,11 +77,10 @@ const {
     display: flex;
     align-items: flex-start;
     overflow: hidden;
-    min-height: 80dvh;
-    padding: clamp(6.2rem, 9vh, 8.6rem) 0 clamp(4.75rem, 7vh, 6.25rem);
+    min-height: min(100dvh, 58rem);
+    padding: clamp(6.2rem, 9vh, 8.4rem) 0 clamp(4.25rem, 7vh, 5.8rem);
     background: var(--bg-primary);
   }
-
 
   .hero-section {
     border-top: 0;
@@ -94,36 +92,20 @@ const {
     z-index: 0;
   }
 
-
-
-
-
-
   .hero-shell {
     position: relative;
     z-index: 1;
   }
 
-
   .hero-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(1.9rem, 3vw, 3rem);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
     align-items: start;
-    justify-items: center;
+    justify-items: stretch;
     position: relative;
     z-index: 1;
   }
-
-  @media (min-width: 1181px) {
-    .hero-layout {
-      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-      align-items: center;
-      justify-items: stretch;
-    }
-  }
-
-
 
   .hero-artifact-shell {
     position: relative;
@@ -133,10 +115,8 @@ const {
     justify-content: center;
     min-width: 0;
     isolation: isolate;
-    margin-top: 0;
-    transform: none;
     width: 100%;
-    max-width: 64rem;
+    max-width: 42rem;
   }
 
   .hero-fadeout {
@@ -148,22 +128,17 @@ const {
     background: linear-gradient(to top, var(--bg-primary), transparent);
   }
 
-  @media (max-width: 1180px) {
+  @media (min-width: 1181px) {
     .hero-layout {
-      grid-template-columns: 1fr;
-      gap: 1.75rem;
-    }
-
-    .hero-artifact-shell {
-      margin-top: 0;
-      transform: none;
+      grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+      align-items: center;
     }
   }
 
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 5rem;
+      padding-top: 5.4rem;
       padding-bottom: 4rem;
     }
 
@@ -172,19 +147,7 @@ const {
     }
 
     .hero-artifact-shell {
-      margin-top: 0.2rem;
-      max-height: none;
-      overflow: visible;
-    }
-
-    .hero-artifact {
-      max-height: none;
-      overflow: visible;
-    }
-
-    .hero-artifact__image {
-      max-height: 20rem;
-      object-fit: contain;
+      max-width: 100%;
     }
 
     .hero-background {
@@ -194,8 +157,8 @@ const {
 
   @media (max-width: 480px) {
     .hero {
-      padding-top: 4.2rem;
-      padding-bottom: 2.8rem;
+      padding-top: 4.8rem;
+      padding-bottom: 3rem;
     }
   }
 </style>
