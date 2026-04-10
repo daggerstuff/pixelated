@@ -1,18 +1,12 @@
 ---
-/**
- * Homepage - Pixelated Brutalism Design
- * Modern + Minimalist + Brutalist aesthetic
- */
 import Layout from '@/layouts/Layout.astro'
 import BrutalistHero from '@/components/BrutalistHero.astro'
-import InfoStrip from '@/components/homepage/InfoStrip.astro'
 import IntroSection from '@/components/homepage/IntroSection.astro'
 import WorkflowSection from '@/components/homepage/WorkflowSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
 import { homepageContent } from '@/lib/content'
 import '@/styles/homepage.css'
-
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -60,32 +54,6 @@ const organizationSchema = {
       artifact={homepageContent.hero.artifact}
     />
 
-    <section class="trust-band-section pe-home-section pe-home-section--compact">
-      <div class="pe-home-shell trust-band-shell">
-        <InfoStrip
-          className="trust-band"
-          label="Why teams move on this quickly"
-          title="One difficult case can tell you whether supervision gets sharper."
-          body="The page needs to prove three things fast: the case stays reviewable, the coaching moment stays visible, and the next move becomes easier to name."
-          items={[
-            {
-              label: 'Who it is for',
-              value: 'Clinical educators, supervisors, and training leads who need one shared coaching surface.',
-            },
-            {
-              label: 'What stays attached',
-              value: 'Transcript, intervention notes, and decisions stay tied to the same difficult session.',
-            },
-            {
-              label: 'What to do next',
-              value: 'See the product demo, then bring one hard case into a pilot review.',
-            },
-          ]}
-          theme="dark"
-        />
-      </div>
-    </section>
-
     <IntroSection content={homepageContent.intro} />
     <WorkflowSection content={homepageContent.how} />
 
@@ -113,11 +81,3 @@ const organizationSchema = {
     />
   </div>
 </Layout>
-
-
-<style>
-  .trust-band-shell {
-    position: relative;
-    z-index: 1;
-  }
-</style>

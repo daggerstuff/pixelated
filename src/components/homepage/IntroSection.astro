@@ -36,41 +36,33 @@ const { content } = Astro.props
           </div>
         </div>
 
-        <div class="home-intro__panel pe-home-panel">
+        <div class="home-intro__issues">
           <span class="pe-page-panel-label">{content.panelLabel}</span>
-          <div class="home-proof-stack pe-home-stack">
+          <div class="home-intro__issue-stack pe-home-stack">
             {
               content.panelItems.map((item) => (
-                <div class="home-proof-item">
-                  <span class="home-proof-item__label">{item.label}</span>
+                <div class="home-intro__issue">
+                  <span class="home-intro__issue-label">{item.label}</span>
                   <p>{item.body}</p>
                 </div>
               ))
             }
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="home-evidence-grid">
-      {
-        content.evidenceCards.map((card, index) => (
-          <article
-            class:list={[
-              'home-evidence-card',
-              'pe-home-panel',
-              index === 0 && 'home-evidence-card--lead',
-            ]}
-          >
-            <span class="pe-page-panel-label">{card.title}</span>
-            <ul class="home-evidence-list">
-              {card.items.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          </article>
-        ))
-      }
+        <div class="home-intro__evidence-board">
+          {
+            content.evidenceCards.map((card) => (
+              <section class="home-intro__evidence-column">
+                <h3 class="pe-heading-s">{card.title}</h3>
+                <ul class="home-intro__evidence-list pe-home-stack">
+                  {card.items.map((item) => <li>{item}</li>)}
+                </ul>
+              </section>
+            ))
+          }
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -87,7 +79,7 @@ const { content } = Astro.props
 
   .home-intro__body {
     display: grid;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
   .home-intro__header {
@@ -97,25 +89,26 @@ const { content } = Astro.props
 
   .home-intro__prose {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
-  .home-intro__panel {
-    padding: clamp(1.15rem, 2vw, 1.5rem);
+  .home-intro__issues {
+    display: grid;
+    gap: 0.95rem;
+    padding-top: 0.25rem;
   }
 
-  .home-proof-stack {
-    margin-top: 1rem;
+  .home-intro__issue-stack {
     border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
-  .home-proof-item {
+  .home-intro__issue {
     display: grid;
     gap: 0.55rem;
     padding: 1rem 0;
   }
 
-  .home-proof-item__label {
+  .home-intro__issue-label {
     font-family: var(--font-mono);
     font-size: 0.68rem;
     font-weight: 700;
@@ -124,58 +117,42 @@ const { content } = Astro.props
     color: var(--accent-primary);
   }
 
-  .home-proof-item p {
+  .home-intro__issue p,
+  .home-intro__evidence-list li {
     margin: 0;
-    max-width: 44ch;
+    max-width: 42ch;
     font-family: var(--font-mono);
     font-size: 0.88rem;
-    line-height: 1.68;
-    color: rgba(253, 252, 252, 0.72);
+    line-height: 1.72;
+    color: rgba(253, 252, 252, 0.74);
   }
 
-  .home-evidence-grid {
+  .home-intro__evidence-board {
     display: grid;
     gap: 1rem;
-    margin-top: 2rem;
   }
 
-  .home-evidence-card {
-    padding: clamp(1.15rem, 2vw, 1.5rem);
-  }
-
-  .home-evidence-list {
+  .home-intro__evidence-column {
     display: grid;
-    gap: 0;
-    margin: 1rem 0 0;
+    gap: 0.95rem;
+    padding-top: 1rem;
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
+  }
+
+  .home-intro__evidence-list {
+    margin: 0;
     padding: 0;
     list-style: none;
     border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
-  .home-evidence-list li {
-    position: relative;
-    padding: 0.9rem 0 0.9rem 1.35rem;
-    font-family: var(--font-mono);
-    font-size: 0.84rem;
-    line-height: 1.68;
-    color: rgba(253, 252, 252, 0.72);
-    border-bottom: 1px dotted rgba(253, 252, 252, 0.12);
-  }
-
-  .home-evidence-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 1.25rem;
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 999px;
-    background: var(--accent-primary);
+  .home-intro__evidence-list li {
+    padding: 0.9rem 0;
   }
 
   @media (min-width: 980px) {
-    .home-evidence-grid {
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    .home-intro__evidence-board {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>
