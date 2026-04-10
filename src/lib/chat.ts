@@ -102,6 +102,7 @@ function convertAnalysisToLegacyFormat(
       category: mhAnalysis.categories[0]?.name || 'general',
       explanation: mhAnalysis.indicators.map((i) => i.description).join('; '),
       expertGuided: false,
+
       scores: {
         depression: scores['depression'] || 0,
         anxiety: scores['anxiety'] || 0,
