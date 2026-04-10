@@ -356,7 +356,7 @@
     "globby": "^16.2.0",
     "gray-matter": "^4.0.3",
     "hastscript": "^9.0.1",
-    "hono": "^4.12.10",
+    "hono": "^4.12.12",
     "html-entities": "^2.6.0",
     "ioredis-mock": "^8.13.1",
     "js-base64": "^3.7.8",
