@@ -18,24 +18,24 @@ const { content } = Astro.props
 
 <section class="pe-home-section home-section--how">
   <div class="pe-home-shell">
-    <div class="home-how__intro">
-      <span class="pe-meta-label">{content.label}</span>
-      <h2 class="pe-heading-l">{content.title}</h2>
-      <p class="pe-home-copy">
-        One case should move from live room to review lane without becoming opinion, shorthand, or memory repair.
-      </p>
-    </div>
+    <div class="home-how">
+      <div class="home-how__intro">
+        <span class="pe-meta-label">{content.label}</span>
+        <h2 class="pe-heading-l">{content.title}</h2>
+        <p class="pe-home-copy">
+          One case should move from live room to review lane without becoming opinion, shorthand, or memory repair.
+        </p>
+      </div>
 
-    <div class="home-how__steps">
-      {
-        content.steps.map((step, index) => (
+      <div class="home-how__steps">
+        {content.steps.map((step, index) => (
           <article class:list={['home-how__step', index === 0 && 'home-how__step--lead']}>
             <span class="home-how__number">{step.number}</span>
             <h3 class="pe-heading-s">{step.title}</h3>
             <p>{step.body}</p>
           </article>
-        ))
-      }
+        ))}
+      </div>
     </div>
 
     <InfoStrip
@@ -55,35 +55,31 @@ const { content } = Astro.props
     color: var(--text-primary);
   }
 
+  .home-how {
+    display: grid;
+    gap: clamp(1.8rem, 4vw, 3.2rem);
+  }
+
   .home-how__intro {
     display: grid;
-    gap: 1.1rem;
-    max-width: 46rem;
-    margin-inline: auto;
-    justify-items: center;
-    text-align: center;
+    gap: 1rem;
+    max-width: 36rem;
   }
 
   .home-how__steps {
     display: grid;
-    gap: 1rem;
-    margin-top: 2.6rem;
+    gap: 0.85rem;
   }
 
   .home-how__step {
     display: grid;
-    gap: 0.9rem;
-    padding: 1.3rem 1.35rem;
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.02);
+    gap: 0.75rem;
+    padding: 1.1rem 0 0;
+    border-top: 1px dotted rgba(253, 252, 252, 0.14);
   }
 
   .home-how__step--lead {
-    background:
-      radial-gradient(circle at top left, rgba(var(--accent-primary-rgb), 0.08), transparent 40%),
-      linear-gradient(180deg, rgba(48, 44, 44, 0.7), rgba(39, 35, 35, 0.52));
-    backdrop-filter: blur(12px);
+    padding-top: 1.1rem;
   }
 
   .home-how__number {
@@ -97,25 +93,30 @@ const { content } = Astro.props
 
   .home-how__step p {
     margin: 0;
-    max-width: 36ch;
+    max-width: 34ch;
     font-family: var(--font-mono);
     font-size: 0.95rem;
-    line-height: 1.8;
+    line-height: 1.76;
     color: rgba(253, 252, 252, 0.8);
   }
 
   .home-how__outputs {
-    margin-top: 2.8rem;
+    margin-top: 2rem;
   }
 
   .home-how__outputs :global(.info-strip) {
-    background: linear-gradient(180deg, rgba(48, 44, 44, 0.66), rgba(39, 35, 35, 0.5));
+    background: linear-gradient(180deg, rgba(48, 44, 44, 0.52), rgba(39, 35, 35, 0.34));
   }
 
   @media (min-width: 980px) {
+    .home-how {
+      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+      align-items: start;
+    }
+
     .home-how__steps {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.2rem;
+      gap: 1rem;
     }
   }
 </style>

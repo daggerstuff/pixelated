@@ -236,7 +236,7 @@ function ProfessionalTherapistWorkspace() {
                 ? 'preventive'
                 : 'supportive',
           requiresExpert: riskAssessment.requiresExpert,
-          emotions,
+          emotions: emotions.primaryEmotion ? [emotions.primaryEmotion, ...emotions.secondaryEmotions] : [],
           riskFactors: riskAssessment.factors,
         }
 

@@ -4,6 +4,7 @@
  */
 
 // Re-export from InterventionAnalysisService for consistency
+import type { InterventionEffectivenessResult, InterventionContext, PatientResponse } from '../services/InterventionAnalysisService'
 export type {
   InterventionEffectivenessResult,
   InterventionContext,
