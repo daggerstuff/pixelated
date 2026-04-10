@@ -1,35 +1,35 @@
 export const workflowContent = {
   label: 'How the coaching loop tightens',
-  title: 'Three steps from tough case to specific feedback.',
+  title: 'One hard case in. One specific coaching decision out.',
   steps: [
     {
       number: '01',
-      title: 'Bring the hard case',
-      body: 'Start with the conversation your team already finds difficult to coach under pressure.',
+      title: 'Bring the session your team already struggles to coach',
+      body: 'Start with the conversation that keeps turning into vague feedback under pressure.',
     },
     {
       number: '02',
-      title: 'Run it live',
-      body: 'The clinician responds as the room shifts instead of rehearsing a memorized script.',
+      title: 'Run it once without flattening the room into a script',
+      body: 'The clinician still has to respond live while the system keeps the transcript and coaching lane attached.',
     },
     {
       number: '03',
-      title: 'Coach the turning point',
-      body: 'Use the transcript and notes to point at the intervention, miss, or repair that should change on the next attempt.',
+      title: 'Use the record to name the next move clearly',
+      body: 'Review the turning point together and decide what should change on the next attempt.',
     },
   ],
   bandLabel: 'What one run should leave behind',
-  bandTitle: 'A saved record, a coaching moment, and a clearer next attempt.',
+  bandTitle: 'A saved record, a coaching moment, and a cleaner retry.',
   bandBody:
-    'The practice run should not disappear when the session ends. It should leave behind something the whole team can review.',
+    'The practice run should not disappear when the session ends. It should leave behind something the whole team can return to next week.',
   outputs: [
     {
-      label: 'Coaching artifact',
-      value: 'A saved transcript and notes lane the team can return to.',
+      label: 'Durable record',
+      value: 'A saved transcript and notes lane the team can reopen without guesswork.',
     },
     {
-      label: 'Specific next move',
-      value: 'A concrete read on where the room shifted and what should change.',
+      label: 'Specific feedback',
+      value: 'A concrete read on where the room shifted and what should change next.',
     },
     {
       label: 'Shared standard',
