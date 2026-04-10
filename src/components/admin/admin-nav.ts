@@ -15,6 +15,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     icon: 'stats',
   },
   {
+    id: 'ai-evidence-assistant',
+    label: 'AI Evidence Assistant',
+    href: '/admin/ai/evidence-assistant',
+    icon: 'document',
+  },
+  {
     id: 'security',
     label: 'Security',
     href: '/admin/security-dashboard',

@@ -4,7 +4,6 @@ export const featuresContent = {
   copy: 'Each part of the workflow exists to preserve the difficult turn, surface the coaching decision, and make the next review more concrete than memory ever could.',
   proofLabel: 'What a useful first week looks like',
   proofItems: [
-    'Less time reconstructing what happened from memory.',
     'More confidence pointing to the line, question, or miss that mattered.',
     'One shared case the whole team can learn from instead of five unrelated roleplays.',
   ],
@@ -39,18 +38,7 @@ export const featuresContent = {
       },
       {
         label: 'After',
-        value:
-          '“At the disclosure, they reassured before checking immediacy.”',
-        accent: true,
-      },
-      {
-        label: 'Before',
-        value: 'Each trainee gets a different difficulty curve, so the feedback never lines up.',
-      },
-      {
-        label: 'After',
-        value:
-          'The team compares how multiple clinicians handled the same rupture and why.',
+        value: '“At the disclosure, they reassured before checking immediacy.”',
         accent: true,
       },
     ],

@@ -235,11 +235,13 @@ const {
     }
 
     .core-feature-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1.1fr repeat(2, minmax(0, 1fr));
+      align-items: start;
     }
 
     .core-feature-comparison__grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
     }
   }
 </style>

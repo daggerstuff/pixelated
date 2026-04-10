@@ -7,25 +7,20 @@ export const ctaContent = {
     'Keep it only if supervisors can point to the exact moment to revisit and the next attempt gets cleaner.',
   proofItems: [
     {
-      label: 'Step one',
-      value: 'Choose one conversation your team already struggles to coach clearly.',
+      label: 'Bring one case',
+      value:
+        'Choose one conversation your team already struggles to coach clearly.',
     },
     {
-      label: 'Step two',
+      label: 'Decide from the evidence',
       value:
-        'Review one run together and judge whether the feedback got more specific.',
-    },
-    {
-      label: 'Step three',
-      value:
-        'Decide from the evidence, not from a long sales process or a polished demo.',
+        'Review one run together and keep it only if the feedback got more specific.',
     },
   ],
   decisionTitle: 'Keep it only if the coaching gets sharper.',
   rubric: [
     'Would you bring this transcript into next week’s supervision?',
     'Did the review reveal one intervention worth changing on the next pass?',
-    'Could your team compare two clinicians against the same difficult moment?',
   ],
   primaryCTA: { text: 'Book a pilot', href: '/contact' },
   secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },

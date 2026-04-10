@@ -258,7 +258,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
 
         this.logger.info(`MongoDB connection established for region: ${region}`);
       } catch (error: unknown) {
-        this.logger.error(`Failed to initialize MongoDB for region: ${region}`, { error });
+        this.logger.error(`Failed to process sync logs`, { error });
         throw error;
       }
     }
@@ -951,7 +951,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         }
       }
     } catch (error: unknown) {
-      this.logger.error(`Failed to initialize MongoDB for region: ${region}`, {
+      this.logger.error(`Failed to process sync logs`, {
         error,
       });
       throw error;

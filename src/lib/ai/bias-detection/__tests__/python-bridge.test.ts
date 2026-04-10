@@ -1,3 +1,4 @@
+import type { TherapeuticSession } from '../../types/session-types'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { PythonBiasDetectionBridge } from '../python-bridge'

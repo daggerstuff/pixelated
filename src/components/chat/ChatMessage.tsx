@@ -95,7 +95,7 @@ export function ChatMessage({
         <div className='absolute -top-3 left-3'>
           <div
             className={cn(
-              'rounded-full px-2 py-1 text-xs',
+              'rounded-[4px] px-2 py-1 text-xs',
               isUser
                 ? isDark
                   ? 'bg-blue-900 text-blue-100'
