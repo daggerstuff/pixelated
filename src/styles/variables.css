@@ -46,7 +46,7 @@
   --transition-spring: var(--duration-normal) var(--ease-spring);
   
   /* === LAYOUT === */
-  --max-content-width: 1200px;
+  --max-content-width: 880px;
   --grid-unit: 8px;
   --section-padding-y: 5rem; /* Mapping to var(--spacing-20) / 80px */
   

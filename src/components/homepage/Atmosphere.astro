@@ -56,7 +56,7 @@ const { variant = 'section' } = Astro.props
     left: -8%;
     width: min(48rem, 66vw);
     height: min(34rem, 52vw);
-    background: linear-gradient(140deg, rgba(255, 255, 255, 0.03), transparent);
+    background: linear-gradient(140deg, rgba(var(--accent-primary-rgb), 0.03), transparent);
     opacity: 0.4;
   }
 
@@ -108,8 +108,8 @@ const { variant = 'section' } = Astro.props
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(var(--accent-primary-rgb), 0.2) 48%,
-      rgba(255, 255, 255, 0.1) 100%
+      rgba(var(--accent-primary-rgb), 0.3) 50%,
+      transparent 100%
     );
     opacity: 0.3;
   }
@@ -159,7 +159,7 @@ const { variant = 'section' } = Astro.props
     height: min(34rem, 48vw);
     background: radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.05) 0%,
+      rgba(var(--accent-primary-rgb), 0.05) 0%,
       transparent 70%
     );
   }
