@@ -16,8 +16,8 @@ import type { BiasDetectionConfig, TherapeuticSession } from '../types'
 const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
   () => {
     const mockPythonBridge = {
-      initialize: vi.fn().mockResolvedValue(undefined),
-      runPreprocessingAnalysis: vi.fn().mockImplementation(async () => {
+      initialize: vi.fn<any>().mockResolvedValue<any>(undefined),
+      runPreprocessingAnalysis: vi.fn<any>().mockImplementation<any>(async () => {
         // Simulate realistic processing time
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 50 + 10),
@@ -28,7 +28,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.8 + Math.random() * 0.2,
         }
       }),
-      runModelLevelAnalysis: vi.fn().mockImplementation(async () => {
+      runModelLevelAnalysis: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 100 + 20),
         )
@@ -41,7 +41,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.85 + Math.random() * 0.15,
         }
       }),
-      runInteractiveAnalysis: vi.fn().mockImplementation(async () => {
+      runInteractiveAnalysis: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 75 + 15),
         )
@@ -54,7 +54,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.8 + Math.random() * 0.2,
         }
       }),
-      runEvaluationAnalysis: vi.fn().mockImplementation(async () => {
+      runEvaluationAnalysis: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 60 + 25),
         )
@@ -68,8 +68,8 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
         }
       }),
       analyze_session: vi
-        .fn()
-        .mockImplementation(async (session: TherapeuticSession) => {
+        .fn<any>()
+        .mockImplementation<any>(async (session: TherapeuticSession) => {
           await new Promise((resolve) =>
             setTimeout(resolve, Math.random() * 200 + 50),
           )
@@ -91,21 +91,21 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
             confidence: 0.8 + Math.random() * 0.2,
           }
         }),
-      healthCheck: vi.fn().mockResolvedValue({
+      healthCheck: vi.fn<any>().mockResolvedValue<any>({
         status: 'healthy',
         latency: Math.random() * 50 + 10,
       }),
-      dispose: vi.fn().mockResolvedValue(undefined),
+      dispose: vi.fn<any>().mockResolvedValue<any>(undefined),
     }
 
     const mockMetricsCollector = {
-      initialize: vi.fn().mockResolvedValue(undefined),
-      recordAnalysis: vi.fn().mockImplementation(async () => {
+      initialize: vi.fn<any>().mockResolvedValue<any>(undefined),
+      recordAnalysis: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 20 + 5),
         )
       }),
-      getMetrics: vi.fn().mockImplementation(async () => {
+      getMetrics: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 30 + 10),
         )
@@ -125,23 +125,23 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           },
         }
       }),
-      dispose: vi.fn().mockResolvedValue(undefined),
+      dispose: vi.fn<any>().mockResolvedValue<any>(undefined),
     }
 
     const mockAlertSystem = {
-      initialize: vi.fn().mockResolvedValue(undefined),
-      checkAlerts: vi.fn().mockImplementation(async () => {
+      initialize: vi.fn<any>().mockResolvedValue<any>(undefined),
+      checkAlerts: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 15 + 5),
         )
       }),
-      getActiveAlerts: vi.fn().mockImplementation(async () => {
+      getActiveAlerts: vi.fn<any>().mockImplementation<any>(async () => {
         await new Promise((resolve) =>
           setTimeout(resolve, Math.random() * 25 + 5),
         )
         return []
       }),
-      dispose: vi.fn().mockResolvedValue(undefined),
+      dispose: vi.fn<any>().mockResolvedValue<any>(undefined),
     }
 
     return { mockPythonBridge, mockMetricsCollector, mockAlertSystem }
@@ -151,21 +151,21 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
 // Mock the Python bridge to avoid network calls
 // Use regular function to allow 'new' usage
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
+  PythonBiasDetectionBridge: vi.fn<any>().mockImplementation<any>(function () {
     return mockPythonBridge
   }),
 }))
 
 // Mock the metrics collector
 vi.mock('../metrics-collector', () => ({
-  BiasMetricsCollector: vi.fn().mockImplementation(function () {
+  BiasMetricsCollector: vi.fn<any>().mockImplementation<any>(function () {
     return mockMetricsCollector
   }),
 }))
 
 // Mock the alert system
 vi.mock('../alerts-system', () => ({
-  BiasAlertSystem: vi.fn().mockImplementation(function () {
+  BiasAlertSystem: vi.fn<any>().mockImplementation<any>(function () {
     return mockAlertSystem
   }),
 }))
@@ -321,19 +321,19 @@ const PerformanceBenchmark = {
 
 // Mock the Python service classes
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
+  PythonBiasDetectionBridge: vi.fn<any>().mockImplementation<any>(function () {
     return mockPythonBridge
   }),
 }))
 
 vi.mock('../BiasMetricsCollector', () => ({
-  BiasMetricsCollector: vi.fn().mockImplementation(function () {
+  BiasMetricsCollector: vi.fn<any>().mockImplementation<any>(function () {
     return mockMetricsCollector
   }),
 }))
 
 vi.mock('../BiasAlertSystem', () => ({
-  BiasAlertSystem: vi.fn().mockImplementation(function () {
+  BiasAlertSystem: vi.fn<any>().mockImplementation<any>(function () {
     return mockAlertSystem
   }),
 }))

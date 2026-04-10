@@ -170,7 +170,13 @@ select_submodule_url() {
 
   # 2. Get original from .gitmodules
   local original_url
-  original_url="$(git config -f .gitmodules --get "submodule.${name}.url")"
+  original_url="$(git config -f .gitmodules --get "submodule.${name}.url" || echo "")"
+
+  # 2.5 GitHub Actions explicit map
+  if [[ -n "${GITHUB_ACTIONS:-}" ]] && is_relative_submodule_url "${original_url}"; then
+    printf "%s" "$(canonical_public_submodule_url "${name}")"
+    return 0
+  fi
 
   # 2.5 GitHub Actions Logic
   if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
