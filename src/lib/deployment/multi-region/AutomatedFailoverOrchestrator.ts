@@ -1255,7 +1255,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       if (response.Payload) {
         const decodedPayload = new TextDecoder().decode(response.Payload)
-      return JSON.parse(decodedPayload) as T
+      return JSON.parse(decodedPayload)
       }
 
       return null
