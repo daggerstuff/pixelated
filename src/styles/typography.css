@@ -5,11 +5,9 @@
 
 :root {
   /* === TYPOGRAPHY SYSTEM - ANTFU ELEGANCE === */
-  --font-sans:
-    'Geist Sans', 'Inter Variable', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
-  --font-display: 'Geist Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  --font-mono: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  --font-display: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
@@ -50,10 +48,11 @@ html {
 body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
-  line-height: var(--leading-normal);
+  line-height: 1.72;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  color: var(--text-primary);
 }
 
 h1,
@@ -63,9 +62,9 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
   color: var(--text-primary);
   margin: 0;
 }
@@ -91,8 +90,8 @@ h6 {
 
 p {
   font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  color: var(--text-secondary);
+  line-height: 1.72;
+  color: rgba(253, 252, 252, 0.78);
   margin: 0;
 }
 

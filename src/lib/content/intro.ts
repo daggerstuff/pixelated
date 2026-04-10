@@ -2,8 +2,8 @@ export const introContent = {
   label: 'Why coaching gets fuzzy',
   title: 'Most supervision loses the useful turn as soon as the room settles.',
   paragraphs: [
-    'Teams can usually tell that a session drifted, tightened, or ruptured. What they do not keep is the exact exchange that made it happen.',
-    'Pixelated Empathy keeps the case, transcript, and coaching lane attached long enough for a supervisor to name one concrete next move.',
+    'Teams usually know a session drifted, tightened, or ruptured. What they lose is the exact exchange that made it happen.',
+    'Pixelated Empathy keeps the case, transcript, and review lane attached long enough for a supervisor to name one concrete next move.',
   ],
   panelLabel: 'What breaks in the usual workflow',
   panelItems: [

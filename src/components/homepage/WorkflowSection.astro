@@ -58,28 +58,31 @@ const { content } = Astro.props
   .home-how__intro {
     display: grid;
     gap: 1.1rem;
-    max-width: 42rem;
+    max-width: 46rem;
+    margin-inline: auto;
+    justify-items: center;
+    text-align: center;
   }
 
   .home-how__steps {
     display: grid;
     gap: 1rem;
-    margin-top: 2.2rem;
+    margin-top: 2.6rem;
   }
 
   .home-how__step {
     display: grid;
-    gap: 0.8rem;
-    padding: 1rem 0 0;
-    border-top: 1px dotted rgba(253, 252, 252, 0.14);
+    gap: 0.9rem;
+    padding: 1.3rem 1.35rem;
+    border: 1px solid rgba(253, 252, 252, 0.08);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.02);
   }
 
   .home-how__step--lead {
-    padding: clamp(1rem, 2vw, 1.25rem);
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-top: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 4px;
-    background: linear-gradient(180deg, rgba(48, 44, 44, 0.62), rgba(39, 35, 35, 0.48));
+    background:
+      radial-gradient(circle at top left, rgba(var(--accent-primary-rgb), 0.08), transparent 40%),
+      linear-gradient(180deg, rgba(48, 44, 44, 0.7), rgba(39, 35, 35, 0.52));
     backdrop-filter: blur(12px);
   }
 
@@ -96,13 +99,13 @@ const { content } = Astro.props
     margin: 0;
     max-width: 36ch;
     font-family: var(--font-mono);
-    font-size: 0.92rem;
-    line-height: 1.76;
-    color: rgba(253, 252, 252, 0.74);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(253, 252, 252, 0.8);
   }
 
   .home-how__outputs {
-    margin-top: 2.2rem;
+    margin-top: 2.8rem;
   }
 
   .home-how__outputs :global(.info-strip) {
@@ -113,10 +116,6 @@ const { content } = Astro.props
     .home-how__steps {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.2rem;
-    }
-
-    .home-how__step--lead {
-      grid-column: span 2;
     }
   }
 </style>

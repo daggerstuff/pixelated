@@ -1,6 +1,6 @@
 export const workflowContent = {
   label: 'How the coaching loop tightens',
-  title: 'One hard case in. One specific coaching decision out.',
+  title: 'One difficult case in. One clear coaching move out.',
   steps: [
     {
       number: '01',
@@ -10,7 +10,7 @@ export const workflowContent = {
     {
       number: '02',
       title: 'Run it once without flattening the room into a script',
-      body: 'The clinician still has to respond live while the system keeps the transcript and coaching lane attached.',
+      body: 'The clinician still has to respond live while the system keeps the transcript and review lane attached.',
     },
     {
       number: '03',
