@@ -148,6 +148,13 @@ select_submodule_url() {
   local name="$1"
   local env_override_key="$(printf '%s_SUBMODULE_URL' "$(printf '%s' "${name}" | tr '[:lower:]' '[:upper:]')")"
 
+  # Fix for GitHub Actions CI issue where relative submodule URLs fail
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    printf '%s' "$(canonical_public_submodule_url "${name}")"
+    return 0
+  fi
+
+
   # 1. Priority: Environment Override
   if [[ -n "${!env_override_key:-}" ]]; then
     local override_url="${!env_override_key}"
