@@ -14,43 +14,28 @@ export interface Props {
 }
 
 const { content } = Astro.props
-const [leadStep, ...restSteps] = content.steps
 ---
 
 <section class="pe-home-section home-section--how">
   <div class="pe-home-shell">
-    <div class="pe-home-grid home-how">
-      <div class="pe-home-rail">
-        <span class="pe-meta-label">{content.label}</span>
-        <div class="pe-home-rail__line"></div>
-        <p class="pe-home-kicker-note">
-          One case should move from live room to review lane without becoming opinion or shorthand.
-        </p>
-      </div>
+    <div class="home-how__intro">
+      <span class="pe-meta-label">{content.label}</span>
+      <h2 class="pe-heading-l">{content.title}</h2>
+      <p class="pe-home-copy">
+        One case should move from live room to review lane without becoming opinion, shorthand, or memory repair.
+      </p>
+    </div>
 
-      <div class="home-how__body">
-        <h2 class="pe-heading-l">{content.title}</h2>
-
-        <div class="home-how__steps">
-          <article class="home-how__step home-how__step--lead pe-home-panel">
-            <span class="home-how__number">{leadStep.number}</span>
-            <h3 class="pe-heading-s">{leadStep.title}</h3>
-            <p>{leadStep.body}</p>
+    <div class="home-how__steps">
+      {
+        content.steps.map((step, index) => (
+          <article class:list={['home-how__step', index === 0 && 'home-how__step--lead']}>
+            <span class="home-how__number">{step.number}</span>
+            <h3 class="pe-heading-s">{step.title}</h3>
+            <p>{step.body}</p>
           </article>
-
-          <div class="home-how__step-stack">
-            {
-              restSteps.map((step) => (
-                <article class="home-how__step pe-home-panel">
-                  <span class="home-how__number">{step.number}</span>
-                  <h3 class="pe-heading-s">{step.title}</h3>
-                  <p>{step.body}</p>
-                </article>
-              ))
-            }
-          </div>
-        </div>
-      </div>
+        ))
+      }
     </div>
 
     <InfoStrip
@@ -70,70 +55,68 @@ const [leadStep, ...restSteps] = content.steps
     color: var(--text-primary);
   }
 
-  .home-how__body {
+  .home-how__intro {
     display: grid;
-    gap: 1.5rem;
+    gap: 1.1rem;
+    max-width: 42rem;
   }
 
   .home-how__steps {
     display: grid;
     gap: 1rem;
+    margin-top: 2.2rem;
   }
 
   .home-how__step {
     display: grid;
     gap: 0.8rem;
-    padding: clamp(1.1rem, 2vw, 1.5rem);
+    padding: 1rem 0 0;
+    border-top: 1px dotted rgba(253, 252, 252, 0.14);
   }
 
   .home-how__step--lead {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .home-how__step--lead::after {
-    content: '';
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-    width: 6rem;
-    height: 6rem;
-    border-right: 1px dotted rgba(var(--accent-primary-rgb), 0.35);
-    border-bottom: 1px dotted rgba(var(--accent-primary-rgb), 0.35);
-    opacity: 0.7;
+    padding: clamp(1rem, 2vw, 1.25rem);
+    border: 1px solid rgba(253, 252, 252, 0.08);
+    border-top: 1px solid rgba(253, 252, 252, 0.08);
+    border-radius: 4px;
+    background: linear-gradient(180deg, rgba(48, 44, 44, 0.62), rgba(39, 35, 35, 0.48));
+    backdrop-filter: blur(12px);
   }
 
   .home-how__number {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--accent-primary);
   }
 
   .home-how__step p {
     margin: 0;
-    max-width: 34ch;
+    max-width: 36ch;
     font-family: var(--font-mono);
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: rgba(253, 252, 252, 0.72);
-  }
-
-  .home-how__step-stack {
-    display: grid;
-    gap: 1rem;
+    font-size: 0.92rem;
+    line-height: 1.76;
+    color: rgba(253, 252, 252, 0.74);
   }
 
   .home-how__outputs {
-    margin-top: 2rem;
+    margin-top: 2.2rem;
+  }
+
+  .home-how__outputs :global(.info-strip) {
+    background: linear-gradient(180deg, rgba(48, 44, 44, 0.66), rgba(39, 35, 35, 0.5));
   }
 
   @media (min-width: 980px) {
     .home-how__steps {
-      grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
-      align-items: stretch;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.2rem;
+    }
+
+    .home-how__step--lead {
+      grid-column: span 2;
     }
   }
 </style>

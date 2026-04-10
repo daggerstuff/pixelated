@@ -1,15 +1,14 @@
 export const ctaContent = {
-  label: 'Test it on one difficult case',
-  title:
-    'See the demo, then test one case with your team.',
+  label: 'Run one hard case',
+  title: 'Use one difficult session to decide whether this is worth keeping.',
   intro:
-    'You do not need a program-wide rollout to know whether this helps. Bring one hard conversation, run it once, and judge whether the review became more precise.',
+    'You do not need a long rollout to know whether the workflow helps. Bring one hard conversation, run it once, and judge whether the review got more precise.',
   verdictCopy:
-    'If supervisors can point to the exact moment to revisit and the next attempt gets clearer, the pilot worked. If not, stop.',
+    'Keep it only if supervisors can point to the exact moment to revisit and the next attempt gets cleaner.',
   proofItems: [
     {
       label: 'Step one',
-      value: 'Choose one conversation your team already struggles to coach.',
+      value: 'Choose one conversation your team already struggles to coach clearly.',
     },
     {
       label: 'Step two',
@@ -19,11 +18,10 @@ export const ctaContent = {
     {
       label: 'Step three',
       value:
-        'Decide from the evidence, not from a long sales process.',
+        'Decide from the evidence, not from a long sales process or a polished demo.',
     },
   ],
-  decisionTitle:
-    'Keep it only if the coaching gets sharper.',
+  decisionTitle: 'Keep it only if the coaching gets sharper.',
   rubric: [
     'Would you bring this transcript into next week’s supervision?',
     'Did the review reveal one intervention worth changing on the next pass?',

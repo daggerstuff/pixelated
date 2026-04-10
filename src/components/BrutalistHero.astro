@@ -78,7 +78,7 @@ const {
     align-items: flex-start;
     overflow: hidden;
     min-height: min(100dvh, 58rem);
-    padding: clamp(6.2rem, 9vh, 8.4rem) 0 clamp(4.25rem, 7vh, 5.8rem);
+    padding: clamp(6.7rem, 10vh, 9.2rem) 0 clamp(5rem, 8vh, 6.4rem);
     background: var(--bg-primary);
   }
 
@@ -95,12 +95,15 @@ const {
   .hero-shell {
     position: relative;
     z-index: 1;
+    width: min(100%, 55rem);
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 2.6vw, 2rem);
   }
 
   .hero-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
+    gap: clamp(2.6rem, 5vw, 3.6rem);
     align-items: start;
     justify-items: stretch;
     position: relative;
@@ -116,7 +119,7 @@ const {
     min-width: 0;
     isolation: isolate;
     width: 100%;
-    max-width: 42rem;
+    max-width: 31.5rem;
   }
 
   .hero-fadeout {
@@ -130,7 +133,7 @@ const {
 
   @media (min-width: 1181px) {
     .hero-layout {
-      grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
       align-items: center;
     }
   }
@@ -138,7 +141,7 @@ const {
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 5.4rem;
+      padding-top: 5.2rem;
       padding-bottom: 4rem;
     }
 
@@ -157,7 +160,7 @@ const {
 
   @media (max-width: 480px) {
     .hero {
-      padding-top: 4.8rem;
+      padding-top: 4.7rem;
       padding-bottom: 3rem;
     }
   }
