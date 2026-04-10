@@ -230,7 +230,13 @@ select_submodule_url() {
     return 0
   fi
 
-  # 4. Default: Use original
+  # 4. GitHub Actions Logic
+  if [[ -n "${GITHUB_ACTIONS:-}" ]] && is_relative_submodule_url "${original_url}"; then
+    printf "%s" "$(canonical_public_submodule_url "${name}")"
+    return 0
+  fi
+
+  # 5. Default: Use original
   printf '%s' "${original_url}"
 }
 
