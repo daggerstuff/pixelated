@@ -288,7 +288,7 @@ export const CrisisMonitoringDashboard: React.FC<
           {/* Critical Alerts Section */}
           {alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
             .length > 0 && (
-            <Alert variant='destructive'>
+            <Alert variant='error'>
               <AlertTriangle className='h-4 w-4' />
               <div>
                 <strong>Critical Alerts Requiring Immediate Attention</strong>
@@ -413,7 +413,7 @@ export const CrisisMonitoringDashboard: React.FC<
                       <Badge
                         variant={
                           alert.severity === 'critical'
-                            ? 'destructive'
+                            ? 'error'
                             : 'secondary'
                         }
                       >
@@ -536,7 +536,7 @@ export const CrisisMonitoringDashboard: React.FC<
                         <Badge
                           variant={
                             patient.escalationStatus === 'active'
-                              ? 'destructive'
+                              ? 'error'
                               : patient.escalationStatus === 'monitoring'
                                 ? 'secondary'
                                 : 'outline'

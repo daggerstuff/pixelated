@@ -188,7 +188,6 @@ export const TherapistDashboard: FC = () => {
                 }
               }}
               selectedPatients={selectedPatients}
-				timeRange={timeRange}
             />
           )}
 
