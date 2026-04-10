@@ -4,9 +4,9 @@
    ================================================ */
 
 :root {
-  --marketing-shell: min(72rem, calc(100vw - 2rem));
-  --marketing-narrow: min(52rem, calc(100vw - 2rem));
-  --marketing-section-space: clamp(4.5rem, 9vw, 7rem);
+  --marketing-shell: min(55rem, calc(100vw - 2rem));
+  --marketing-narrow: min(42rem, calc(100vw - 2rem));
+  --marketing-section-space: clamp(4rem, 10vh, 7.5rem);
 }
 
 .marketing-shell,
@@ -36,13 +36,13 @@
 .marketing-section--soft {
   background:
     radial-gradient(circle at top right, rgba(var(--accent-primary-rgb), 0.12), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 100%);
+    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.015), transparent 100%);
 }
 
 .marketing-section--emphasis {
   background:
     radial-gradient(circle at top left, rgba(var(--accent-primary-rgb), 0.16), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.02), transparent);
 }
 
 .marketing-rule {
@@ -86,7 +86,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.04), rgba(var(--accent-primary-rgb), 0.02)),
     var(--bg-glass);
   backdrop-filter: blur(12px);
 }
@@ -112,15 +112,15 @@
 .marketing-title {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: clamp(2.35rem, 4vw, 4.1rem);
-  line-height: 1.05;
-  letter-spacing: -0.05em;
+  font-size: 2.625rem;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   text-wrap: balance;
 }
 
 .marketing-title--medium {
-  font-size: clamp(2rem, 3vw, 3.15rem);
+  font-size: 1.75rem;
 }
 
 .marketing-lede {
@@ -169,7 +169,7 @@
 .marketing-button--primary {
   color: var(--bg-primary);
   background: var(--accent-primary);
-  border-color: color-mix(in srgb, var(--accent-primary) 70%, white);
+  border: 1px solid rgba(var(--accent-primary-rgb), 0.45);
 }
 
 .marketing-button--secondary {
@@ -268,17 +268,13 @@
   padding: 1.5rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
-    rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(10px);
+  background: rgba(48, 44, 44, 0.6);
+  backdrop-filter: blur(12px);
 }
 
 .marketing-card--accent {
   border-color: rgba(var(--accent-primary-rgb), 0.35);
-  background:
-    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.14), rgba(var(--accent-primary-rgb), 0.05)),
-    rgba(255, 255, 255, 0.015);
+  background: rgba(var(--accent-primary-rgb), 0.08);
 }
 
 .marketing-card h2,
