@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-
 import { type BookMetadata } from '@/lib/api/research'
 
 interface ExportPanelProps {
@@ -44,7 +43,10 @@ export default function ExportPanel({
     let extension = "txt"
 
     if (format === "json") {
-      content = JSON.stringify(results, null, 2)
+      const jsonResults = includeAbstract
+        ? results
+        : results.map(({ abstract, ...rest }) => rest)
+      content = JSON.stringify(jsonResults, null, 2)
       mimeType = "application/json"
       extension = "json"
     } else if (format === "csv") {
@@ -57,6 +59,7 @@ export default function ExportPanel({
         "Source",
         "DOI",
         "Score",
+        ...(includeAbstract ? ["Abstract"] : []),
       ]
       const rows = results.map((r) => [
         `"${r.title.replace(/"/g, '""')}"`,
@@ -66,6 +69,7 @@ export default function ExportPanel({
         r.source || "",
         r.doi || "",
         r.therapeutic_relevance_score || "",
+        ...(includeAbstract && r.abstract ? [`"${r.abstract.replace(/"/g, '""')}"`] : []),
       ])
       content = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
       mimeType = "text/csv"
@@ -74,18 +78,40 @@ export default function ExportPanel({
       content = results
         .map((r, i) => {
           const key = `${r.authors[0]?.split(" ").pop() || "Unknown"}${r.publication_year || "0000"}${i}`
+          const abstractField = includeAbstract && r.abstract ? `abstract = {${r.abstract}},` : ""
           return `@book{${key},
   title = {${r.title}},
   author = {${r.authors.join(" and ")}},
   year = {${r.publication_year || ""}},
   publisher = {${r.publisher || ""}},
   doi = {${r.doi || ""}},
-  url = {${r.url || ""}}
+  url = {${r.url || ""}},
+  ${abstractField}
 }`
         })
         .join("\n\n")
       mimeType = "application/x-bibtex"
       extension = "bib"
+    } else if (format === "ris") {
+      content = results
+        .map((r) => {
+          const lines = [
+            "TY  - EBOOK",
+            `TI  - ${r.title}`,
+            ...r.authors.map((author) => `AU  - ${author}`),
+            r.publication_year ? `PY  - ${r.publication_year}` : "",
+            r.publisher ? `PB  - ${r.publisher}` : "",
+            r.source ? `JO  - ${r.source}` : "",
+            r.doi ? `DO  - ${r.doi}` : "",
+            r.url ? `UR  - ${r.url}` : "",
+            includeAbstract && r.abstract ? `AB  - ${r.abstract}` : "",
+            "ER  - ",
+          ]
+          return lines.filter(Boolean).join("\n")
+        })
+        .join("\n\n")
+      mimeType = "application/x-research-info-systems"
+      extension = "ris"
     }
 
     // Trigger download
@@ -120,18 +146,8 @@ export default function ExportPanel({
             className="text-slate-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-md"
             aria-label={TEXT.closeAriaLabel}
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -221,18 +237,8 @@ export default function ExportPanel({
             onClick={handleExport}
             className="bg-pink-600 hover:bg-pink-700 text-white focus:ring-pink-500 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             {TEXT.downloadButton}
           </button>
