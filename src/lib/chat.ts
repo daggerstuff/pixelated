@@ -111,7 +111,6 @@ function convertAnalysisToLegacyFormat(
         stress: scores['stress'] || 0,
         anger: scores['anger'] || 0,
         socialIsolation: scores['isolation'] || 0,
-        ...scores,
       },
       evidence: {
         depression: evidence['depression'] || [],
