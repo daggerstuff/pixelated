@@ -1,279 +1,196 @@
-import { motion, AnimatePresence } from 'framer-motion'
-// Enhanced Bias Detection Interface with improved UX
-import React, { useState, useCallback } from 'react'
-import { Target } from 'lucide-react'
-
-import type {
-  SessionData,
-  BiasAnalysisResults,
-} from '../../../lib/types/bias-detection'
-import { AccessibleLoadingState } from './AccessibleLoadingState'
-import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
-import { SessionInputForm } from './SessionInputForm'
+import { useState, useCallback } from 'react'
+import { BiasAnalysisResults, SessionData, Demographics } from '@/lib/types/bias-detection'
 
 interface ImprovedBiasInterfaceProps {
-  className?: string
+	className?: string
 }
 
 type AnalysisStep = 'input' | 'analyzing' | 'results'
 
-export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
-  className = '',
-}) => {
-  // Enhanced state management
-  const [currentStep, setCurrentStep] = useState<AnalysisStep>('input')
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisProgress, setAnalysisProgress] = useState(0)
-  const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
-  const [sessionData, setSessionData] = useState<SessionData | null>(null)
-  const [analysisResults, setAnalysisResults] =
-    useState<BiasAnalysisResults | null>(null)
+const analysisSteps = [
+	'Preprocessing text data',
+	'Analyzing demographic patterns',
+	'Detecting cultural biases',
+	'Evaluating linguistic fairness',
+	'Generating recommendations',
+]
 
-  const analysisSteps = [
-    'Processing content structure',
-    'Analyzing demographic patterns',
-    'Checking cultural assumptions',
-    'Evaluating language bias',
-    'Generating recommendations',
-  ]
+export function ImprovedBiasInterface({ className = '' }: ImprovedBiasInterfaceProps) {
+	const [currentStep, setCurrentStep] = useState<AnalysisStep>('input')
+	const [_sessionData, setSessionData] = useState<SessionData | null>(null)
+	const [analysisResults, setAnalysisResults] = useState<BiasAnalysisResults | null>(null)
+	const [analysisProgress, setAnalysisProgress] = useState(0)
+	const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
+	const [isAnalyzing, setIsAnalyzing] = useState(false)
 
-  // Enhanced analysis simulation with better UX
-  const runAnalysis = useCallback(
-    async (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => {
-      setIsAnalyzing(true)
-      setCurrentStep('analyzing')
-      setAnalysisProgress(0)
-      setAnalysisStepIndex(0)
+	// Start analysis with session data
+	const startAnalysis = useCallback(
+		async (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => {
+			setCurrentStep('analyzing')
+			setIsAnalyzing(true)
+			setAnalysisProgress(0)
+			setAnalysisStepIndex(0)
 
-      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      const newSessionData: SessionData = {
-        ...data,
-        sessionId,
-        timestamp: new Date(),
-      }
-      setSessionData(newSessionData)
+			const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+			const newSessionData: SessionData = {
+				...data,
+				sessionId,
+				timestamp: new Date(),
+			}
+			setSessionData(newSessionData)
 
-      // Simulate progressive analysis with realistic timing
-      for (let i = 0; i < analysisSteps.length; i++) {
-        setAnalysisStepIndex(i)
-        setAnalysisProgress((i / analysisSteps.length) * 100)
+			// Simulate progressive analysis with realistic timing
+			for (let i = 0; i < analysisSteps.length; i++) {
+				setAnalysisStepIndex(i)
+				setAnalysisProgress((i / analysisSteps.length) * 100)
 
-        // Realistic timing for each step
-        const stepDuration =
-          i === 0 ? 800 : i === analysisSteps.length - 1 ? 1200 : 1000
-        await new Promise((resolve) => setTimeout(resolve, stepDuration))
-      }
+				const stepDuration =
+					i === 0 ? 800 : i === analysisSteps.length - 1 ? 1200 : 1000
+				await new Promise((resolve) => setTimeout(resolve, stepDuration))
+			}
 
-      // Complete analysis
-      setAnalysisProgress(100)
+			// Complete analysis
+			setAnalysisProgress(100)
 
-      // Generate comprehensive results
-      const results: BiasAnalysisResults = {
-        sessionId,
-        overallBiasScore: Math.max(60, 100 - Math.random() * 10),
-        layerResults: {
-          demographic: Math.random() * 0.3,
-          cultural: Math.random() * 0.25,
-          linguistic: Math.random() * 0.2,
-          gender: Math.random() * 0.25,
-          age: Math.random() * 0.15,
-        },
-        detectedPatterns: [
-          {
-            type: 'demographic',
-            severity: 'medium',
-            confidence: 0.75,
-            description: 'Potential demographic assumptions detected',
-            evidence: ['Uses generalized age-related terms'],
-            recommendations: ['Use more individualized language'],
-          },
-          {
-            type: 'cultural',
-            severity: 'low',
-            confidence: 0.65,
-            description: 'Minor cultural bias indicators found',
-            evidence: ['Cultural background references'],
-            recommendations: ['Focus on individual experiences'],
-          },
-        ],
-        recommendations: [
-				'Use person-first language',
-				'Avoid cultural generalizations',
-			],
-        timestamp: new Date(),
-      }
+			// Generate comprehensive results matching BiasAnalysisResults interface
+			const results: BiasAnalysisResults = {
+				sessionId,
+				overallBiasScore: Math.max(60, 100 - Math.random() * 10),
+				alertLevel: 'medium',
+				confidence: 0.85,
+				layerResults: {
+					preprocessing: {
+						biasScore: Math.random() * 0.3,
+						linguisticBias: {
+							genderBiasScore: Math.random() * 0.2,
+							racialBiasScore: Math.random() * 0.15,
+							ageBiasScore: Math.random() * 0.1,
+							culturalBiasScore: Math.random() * 0.25,
+						},
+						representationAnalysis: {
+							diversityIndex: 0.75,
+							underrepresentedGroups: ['elderly', 'non-binary'],
+						},
+					},
+					modelLevel: {
+						biasScore: Math.random() * 0.2,
+						fairnessMetrics: {
+							demographicParity: 0.8,
+							equalizedOdds: 0.75,
+							calibration: 0.85,
+						},
+					},
+					interactive: {
+						biasScore: Math.random() * 0.15,
+						counterfactualAnalysis: {
+							scenariosAnalyzed: 5,
+							biasDetected: true,
+							consistencyScore: 0.8,
+						},
+					},
+					evaluation: {
+						biasScore: Math.random() * 0.1,
+						huggingFaceMetrics: {
+							bias: 0.15,
+							stereotype: 0.1,
+							regard: { positive: 0.7, negative: 0.3 },
+						},
+					},
+				},
+				recommendations: [
+					'Use person-first language',
+					'Avoid cultural generalizations',
+				],
+				demographics: {
+					age: 'mixed',
+					gender: 'diverse',
+					ethnicity: 'varied',
+					primaryLanguage: 'English',
+				} as Demographics,
+				timestamp: new Date(),
+			}
 
-      setAnalysisResults(results)
+			setAnalysisResults(results)
 
-      // Transition to results with a slight delay for better UX
-      setTimeout(() => {
-        setCurrentStep('results')
-        setIsAnalyzing(false)
-      }, 500)
-    },
-    [analysisSteps.length],
-  )
+			// Transition to results with a slight delay for better UX
+			setTimeout(() => {
+				setCurrentStep('results')
+				setIsAnalyzing(false)
+			}, 500)
+		},
+		[],
+	)
 
-  // Reset to input form
-  const resetAnalysis = useCallback(() => {
-    setCurrentStep('input')
-    setSessionData(null)
-    setAnalysisResults(null)
-    setAnalysisProgress(0)
-    setAnalysisStepIndex(0)
-  }, [])
+	// Reset to input form
+	const resetAnalysis = useCallback(() => {
+		setCurrentStep('input')
+		setSessionData(null)
+		setAnalysisResults(null)
+		setAnalysisProgress(0)
+		setAnalysisStepIndex(0)
+		setIsAnalyzing(false)
+	}, [])
 
-  return (
-    <div className={`improved-bias-interface ${className}`}>
-      <div className='mx-auto max-w-6xl'>
-        {/* Header with progress indicator */}
-        <div className='mb-8'>
-          <div className='mb-4 flex items-center justify-between'>
-            <div>
-              <h2 className='text-gray-900 text-2xl font-bold'>
-                Enhanced Bias Detection Analysis
-              </h2>
-              <p className='text-gray-600 mt-1'>
-                Real-time bias analysis with comprehensive feedback
-              </p>
-            </div>
+	return (
+		<div className={`improved-bias-interface ${className}`}>
+			{/* Analysis progress indicator */}
+			{currentStep === 'analyzing' && (
+				<div className="analysis-progress">
+					<div className="progress-bar" style={{ width: `${analysisProgress}%` }} />
+					<p className="progress-text">
+						{analysisSteps[analysisStepIndex]}
+					</p>
+				</div>
+			)}
 
-            {currentStep !== 'input' && (
-              <button
-                onClick={resetAnalysis}
-                className='text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-blue-500 rounded-md border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
-              >
-                New Analysis
-              </button>
-            )}
-          </div>
+			{/* Results display */}
+			{currentStep === 'results' && analysisResults && (
+				<div className="analysis-results">
+					<h3>Analysis Complete</h3>
+					<p>Overall Bias Score: {Math.round(analysisResults.overallBiasScore)}/100</p>
+					<p>Alert Level: {analysisResults.alertLevel}</p>
+					<div className="recommendations">
+						<h4>Recommendations:</h4>
+						<ul>
+							{analysisResults.recommendations.map((rec, i) => (
+								<li key={i}>{rec}</li>
+							))}
+						</ul>
+					</div>
+					<button onClick={resetAnalysis} disabled={isAnalyzing}>Start New Analysis</button>
+				</div>
+			)}
 
-          {/* Step indicator */}
-          <div className='mb-6 flex items-center space-x-4'>
-            {['Input', 'Analysis', 'Results'].map((step, index) => (
-              <div key={step} className='flex items-center'>
-                <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
-                    currentStep === ['input', 'analyzing', 'results'][index]
-                      ? 'bg-blue-600 text-white'
-                      : index <
-                          ['input', 'analyzing', 'results'].indexOf(currentStep)
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-200 text-gray-600'
-                  }`}
-                >
-                  {index <
-                  ['input', 'analyzing', 'results'].indexOf(currentStep)
-                    ? '✓'
-                    : index + 1}
-                </div>
-                <span
-                  className={`ml-2 text-sm font-medium ${
-                    currentStep === ['input', 'analyzing', 'results'][index]
-                      ? 'text-blue-600'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  {step}
-                </span>
-                {index < 2 && (
-                  <div
-                    className={`mx-4 h-0.5 w-12 ${
-                      index <
-                      ['input', 'analyzing', 'results'].indexOf(currentStep)
-                        ? 'bg-green-600'
-                        : 'bg-gray-200'
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Content based on current step */}
-        <AnimatePresence mode='wait'>
-          {currentStep === 'input' && (
-            <motion.div
-              key='input'
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className='space-y-6'
-            >
-              <SessionInputForm onSubmit={runAnalysis} disabled={isAnalyzing} />
-            </motion.div>
-          )}
-
-          {currentStep === 'analyzing' && (
-            <motion.div
-              key='analyzing'
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-            >
-              <AccessibleLoadingState
-                message='Analyzing content for bias patterns...'
-                progress={analysisProgress}
-                steps={analysisSteps}
-                currentStep={analysisStepIndex}
-              />
-            </motion.div>
-          )}
-
-          {currentStep === 'results' && analysisResults && (
-            <motion.div
-              key='results'
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className='space-y-6'
-            >
-              <BiasAnalysisDisplay
-                results={analysisResults}
-                sessionData={sessionData}
-              />
-
-              {/* Additional insights section */}
-              <div className='bg-blue-50 border-blue-200 rounded-lg border p-6'>
-                <h3 className='text-blue-900 mb-2 text-lg font-medium'>
-                  <Target className="w-5 h-5" /> Key Insights
-                </h3>
-                <div className='text-blue-800 space-y-2 text-sm'>
-                  <p>
-                    • Analysis completed with{' '}
-                    {analysisResults.recommendations.length} bias patterns
-                    identified
-                  </p>
-                  <p>
-                    • Overall bias score:{' '}
-                    {Math.round(analysisResults.overallBiasScore)}/100
-                  </p>
-                  <p>
-                    • {analysisResults.recommendations.length} actionable
-                    recommendations provided
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Footer with accessibility info */}
-        <div className='border-gray-200 mt-12 border-t pt-6'>
-          <div className='text-gray-500 text-center text-sm'>
-            <p>
-              This tool provides bias analysis to support inclusive therapeutic
-              practices.
-            </p>
-            <p className='mt-1'>
-              Results should be reviewed by qualified professionals.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+			{/* Input form */}
+			{currentStep === 'input' && (
+				<div className="analysis-input">
+					<h2>Bias Analysis</h2>
+					<p>Enter content to analyze for potential biases</p>
+					<textarea
+						placeholder="Enter text to analyze..."
+						rows={5}
+						className="w-full rounded border p-2"
+					/>
+					<button
+						onClick={() => startAnalysis({
+							scenario: 'general',
+							demographics: {
+								age: 'mixed',
+								gender: 'diverse',
+								ethnicity: 'varied',
+								primaryLanguage: 'English',
+							},
+							content: 'Sample content for analysis',
+						})}
+						className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
+						disabled={isAnalyzing}
+					>
+						Start Analysis
+					</button>
+				</div>
+			)}
+		</div>
+	)
 }
 
 export default ImprovedBiasInterface
