@@ -127,7 +127,13 @@ export default function AIChatReact({
         )}
 
         {isLoading && (
-          <div className='flex justify-start'>
+          <div
+            className='flex justify-start'
+            role='status'
+            aria-label='AI is typing'
+            aria-live='polite'
+            aria-atomic='true'
+          >
             <div className='bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 max-w-[80%] rounded-lg rounded-bl-none px-4 py-2'>
               <div className='flex space-x-2'>
                 <div className='bg-gray-500 h-2 w-2 animate-bounce rounded-full'></div>
@@ -158,12 +164,14 @@ export default function AIChatReact({
           className='border-gray-300 dark:border-gray-600 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex-1 rounded-l-lg border px-4 py-2 focus:outline-none focus:ring-2'
           placeholder='Type your message...'
           disabled={isLoading}
+          aria-label='Type a message to the AI assistant'
         />
 
         <button
           type='submit'
           disabled={isLoading || !inputValue.trim()}
           className='bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500 disabled:bg-blue-300 dark:disabled:bg-blue-800 rounded-r-lg px-4 py-2 focus:outline-none focus:ring-2'
+          aria-label={isLoading ? 'Sending message...' : 'Send message'}
         >
           Send
         </button>
