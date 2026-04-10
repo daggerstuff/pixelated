@@ -32,6 +32,7 @@ interface Props {
   showNavBar?: boolean
   showFooter?: boolean
   showBackLink?: boolean
+  fullWidthMain?: boolean
 }
 
 const {
@@ -45,6 +46,7 @@ const {
   showNavBar = true,
   showFooter = true,
   showBackLink = true,
+  fullWidthMain = false,
 } = Astro.props
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
@@ -68,9 +70,13 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
 ---
 
 <!doctype html>
-<html lang={SITE.lang} class="dark scroll-smooth">
+<html
+  lang={SITE.lang}
+  class="dark scroll-smooth"
+  style="--bg-primary:#201d1d; --bg-secondary:#302c2c; --bg-glass:rgba(48,44,44,0.74); --text-primary:#f7f3eb; --text-secondary:#c7bfb7; --text-muted:#a1958b; --accent-primary:#ff6b00; --accent-primary-rgb:255,107,0; --accent-secondary:#007aff; --border-subtle:rgba(253,252,252,0.08); --divider-dotted:rgba(253,252,252,0.11); --divider-weak:rgba(253,252,252,0.05); --bg-surface-ghost:rgba(253,252,252,0.02); --radius-sm:4px; --radius-md:6px;"
+>
   <head>
-        <Head {title} {description} {ogImage} {pubDate} {lastModDate} {cspNonce} />
+    <Head {title} {description} {ogImage} {pubDate} {lastModDate} {cspNonce} />
 
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#201D1D" />
@@ -85,7 +91,6 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     style={Object.keys(style).length !== 0 ? style : undefined}
     data-no-sliding={enableSlideEnterAnim ? undefined : ''}
   >
-
     <!-- Background -->
     {bgType && <Background type={bgType} />}
 
@@ -101,7 +106,13 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     {showNavBar && <Navbar />}
 
     <!-- Main -->
-    <main id="main" class="flex-grow w-full pt-24">
+    <main
+      id="main"
+      class:list={[
+        'flex-grow w-full pt-24',
+        fullWidthMain && 'main--full-width',
+      ]}
+    >
       <!-- Content -->
       <slot />
       <!-- Share -->
@@ -122,7 +133,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     {
       showFooter && (
         <>
-          <Footer />
+          <Footer showTopCTA={currentPathname !== withBasePath('/')} />
           <ToTopButton />
         </>
       )
