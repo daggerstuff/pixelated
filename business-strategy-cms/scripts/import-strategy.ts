@@ -153,29 +153,34 @@ async function persistDocument(
 }
 
 /** Phase 4: Run post-import AI analysis on all documents and update metadata. */
+// ⚡ Bolt: Optimizing N+1 queries by batching documents into chunks and executing AI review and edge case mapping in parallel via Promise.all within each chunk.
 async function runPostImportAnalysis(): Promise<void> {
   console.log('Starting Post-Import AI Analysis...')
   const allDocs = await DocumentModelMongoose.find({})
-  for (const doc of allDocs) {
-    const review = await AIStrategyReviewService.reviewDocument(
-      doc._id.toString(),
-    )
-    const mapping = await EdgeCaseMappingService.mapStrategyToEdgeCases(
-      doc._id.toString(),
-    )
 
-    console.log(`- Reviewed: ${doc.title} (Score: ${review.overallScore})`)
-    console.log(
-      `  - Mapped to ${mapping.mappedEdgeCases.length} technical edge cases.`,
-    )
+  const CHUNK_SIZE = 10;
+  for (let i = 0; i < allDocs.length; i += CHUNK_SIZE) {
+    const chunk = allDocs.slice(i, i + CHUNK_SIZE);
 
-    await DocumentModelMongoose.findByIdAndUpdate(doc._id, {
-      $set: {
-        'metadata.reviewScore': review.overallScore,
-        'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
-        'metadata.aiReview': review,
-      },
-    })
+    await Promise.all(chunk.map(async (doc) => {
+      const docId = doc._id.toString();
+
+      const [review, mapping] = await Promise.all([
+        AIStrategyReviewService.reviewDocument(docId),
+        EdgeCaseMappingService.mapStrategyToEdgeCases(docId)
+      ]);
+
+      console.log(`- Reviewed: ${doc.title} (Score: ${review.overallScore})`);
+      console.log(`  - Mapped to ${mapping.mappedEdgeCases.length} technical edge cases.`);
+
+      await DocumentModelMongoose.findByIdAndUpdate(doc._id, {
+        $set: {
+          'metadata.reviewScore': review.overallScore,
+          'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
+          'metadata.aiReview': review,
+        },
+      });
+    }));
   }
   console.log('Post-Import Analysis Completed.')
 }
