@@ -1,0 +1,27 @@
+project_id = "your-gcp-project-id"
+environment = "production"
+app_name = "pixelated-empathy"
+gcp_region = "us-west1"
+gcp_location = "us-west1"
+
+gke_cluster_name = "pixelated-empathy-production"
+gke_deletion_protection = false
+enable_deletion_protection = false
+
+network_cidr = "10.1.0.0/16"
+pods_secondary_cidr = "10.6.0.0/19"
+services_secondary_cidr = "10.6.32.0/20"
+
+postgres_version = "POSTGRES_15"
+postgres_tier = "db-f1-micro"
+postgres_disk_size_gb = 30
+postgres_db_name = "pixelated_empathy_production"
+postgres_username = "pixelated_user"
+postgres_password = "REPLACE_ME_DB_PASSWORD_PROD"
+postgres_backup_start_time = "03:00"
+postgres_retained_backups = 14
+postgres_max_connections = 250
+postgres_authorized_networks = []
+
+redis_tier = "BASIC"
+redis_memory_gb = 1

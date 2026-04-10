@@ -1,0 +1,6 @@
+- op: replace
+  path: /data/APP_ENV
+  value: "staging"
+- op: replace
+  path: /data/LOG_LEVEL
+  value: "INFO"

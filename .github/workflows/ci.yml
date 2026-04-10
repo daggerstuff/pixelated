@@ -1,0 +1,120 @@
+name: CI
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  push:
+    branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'ai/**'
+      - 'docker/**'
+      - 'k8s/**'
+      - 'terraform/**'
+      - 'scripts/render-k8s-secrets.sh'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/deploy-staging.yml'
+      - '.github/workflows/deploy-production.yml'
+  pull_request:
+    branches: [main, master, staging]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ARTIFACT_REGISTRY_LOCATION: us-west1
+      ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: Enable pnpm via Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Build Docker image
+        id: build-image
+        run: |
+          IMAGE_TAG="${GITHUB_SHA::7}"
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          docker build -f docker/Dockerfile.production -t "pixelatedempathy/api:$IMAGE_TAG" .
+
+      - name: Security scan
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trivy Scan Results
+          path: trivy-results.sarif
+          retention-days: 30
+
+      - name: Authenticate to Google Cloud (OIDC)
+        if: github.event_name == 'push'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Configure Google Cloud SDK
+        if: github.event_name == 'push'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Authenticate Docker to Artifact Registry
+        if: github.event_name == 'push'
+        run: |
+          [[ -n "${{ secrets['GCP_PROJECT_ID'] }}" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
+          [[ -n "${{ secrets['GCP_WIF_PROVIDER'] }}" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
+          [[ -n "${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
+          gcloud auth configure-docker "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev" --quiet
+
+      - name: Push Docker image to Google Artifact Registry
+        if: github.event_name == 'push'
+        env:
+          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
+        run: |
+          IMAGE_URI_BASE="${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/api"
+          docker tag pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }} "${IMAGE_URI_BASE}:${{ steps.build-image.outputs.image_tag }}"
+          docker tag pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }} "${IMAGE_URI_BASE}:latest"
+          docker push "${IMAGE_URI_BASE}:${{ steps.build-image.outputs.image_tag }}"
+          docker push "${IMAGE_URI_BASE}:latest"
