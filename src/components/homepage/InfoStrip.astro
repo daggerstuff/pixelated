@@ -41,8 +41,7 @@ const {
   .info-strip {
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.25rem);
-    padding: clamp(1.25rem, 2vw, 1.75rem);
-    border-radius: 4px;
+    padding: clamp(1rem, 1.8vw, 1.5rem) 0 0;
     position: relative;
     overflow: hidden;
   }
@@ -94,9 +93,7 @@ const {
   }
 
   .info-strip--dark {
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    background: rgba(48, 44, 44, 0.6);
-    backdrop-filter: blur(12px);
+    border-top: 1px dotted rgba(253, 252, 252, 0.16);
     color: var(--text-primary);
   }
 

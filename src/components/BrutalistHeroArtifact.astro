@@ -25,24 +25,25 @@ const artifactHighlights = artifact.context.slice(0, 2)
         <span class="hero-artifact__eyebrow">{artifact.eyebrow}</span>
         <span class="hero-artifact__mode">{artifact.mode}</span>
       </div>
-      <h2 class="hero-artifact__title" style="color: var(--text-primary, #f7f3eb); -webkit-text-fill-color: var(--text-primary, #f7f3eb);">{artifact.status}</h2>
-      <p class="hero-artifact__summary" style="color: rgba(253, 252, 252, 0.76); -webkit-text-fill-color: rgba(253, 252, 252, 0.76);">
-        Transcript, coaching lane, and next-step evidence stay attached to one difficult session.
+      <h2 class="hero-artifact__title">{artifact.status}</h2>
+      <p class="hero-artifact__summary">
+        Transcript, coaching lane, and next-step evidence stay attached to one
+        difficult session.
       </p>
     </div>
 
-    {artifactReadout.length > 0 && (
-      <div class="hero-artifact__readout">
-        {
-          artifactReadout.map((item) => (
+    {
+      artifactReadout.length > 0 && (
+        <div class="hero-artifact__readout">
+          {artifactReadout.map((item) => (
             <div class="hero-artifact__readout-item">
-              <span style="-webkit-text-fill-color: rgba(253, 252, 252, 0.5);">{item.label}</span>
-              <strong style="-webkit-text-fill-color: var(--text-primary, #f7f3eb);">{item.value}</strong>
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
             </div>
-          ))
-        }
-      </div>
-    )}
+          ))}
+        </div>
+      )
+    }
 
     {
       artifact.image ? (
@@ -65,8 +66,8 @@ const artifactHighlights = artifact.context.slice(0, 2)
       {
         artifactHighlights.map((item) => (
           <div class="hero-artifact__highlight">
-            <span style="-webkit-text-fill-color: var(--accent-primary, #ff6b00);">{item.label}</span>
-            <strong style="-webkit-text-fill-color: rgba(253, 252, 252, 0.8);">{item.value}</strong>
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
           </div>
         ))
       }
@@ -81,8 +82,12 @@ const artifactHighlights = artifact.context.slice(0, 2)
     border: 1px solid rgba(253, 252, 252, 0.08);
     border-radius: 4px;
     background:
-      radial-gradient(circle at top right, rgba(var(--accent-primary-rgb), 0.08), transparent 34%),
-      linear-gradient(180deg, rgba(48, 44, 44, 0.78), rgba(39, 35, 35, 0.58));
+      radial-gradient(
+        circle at top right,
+        rgba(var(--accent-primary-rgb), 0.08),
+        transparent 34%
+      ),
+      linear-gradient(180deg, rgba(48, 44, 44, 0.82), rgba(35, 33, 33, 0.72));
     overflow: hidden;
     backdrop-filter: blur(14px);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -90,14 +95,13 @@ const artifactHighlights = artifact.context.slice(0, 2)
 
   .hero-artifact__body {
     display: grid;
-    gap: 1.1rem;
+    gap: 1rem;
     padding: clamp(1.2rem, 2vw, 1.5rem);
   }
 
   .hero-artifact__header {
     display: grid;
-    gap: 0.65rem;
-    text-align: center;
+    gap: 0.7rem;
   }
 
   .hero-artifact__meta {
@@ -105,7 +109,6 @@ const artifactHighlights = artifact.context.slice(0, 2)
     align-items: center;
     gap: 0.65rem;
     flex-wrap: wrap;
-    justify-content: center;
   }
 
   .hero-artifact__eyebrow,
@@ -128,13 +131,12 @@ const artifactHighlights = artifact.context.slice(0, 2)
 
   .hero-artifact__title {
     margin: 0;
-    max-width: 14ch;
+    max-width: 16ch;
     font-family: var(--font-mono);
-    font-size: clamp(1.2rem, 0.95rem + 0.6vw, 1.85rem);
-    line-height: 1.08;
+    font-size: clamp(1.2rem, 0.95rem + 0.7vw, 1.95rem);
+    line-height: 1.12;
     letter-spacing: -0.045em;
-    color: var(--text-primary, #f7f3eb) !important;
-    -webkit-text-fill-color: var(--text-primary, #f7f3eb) !important;
+    color: var(--text-primary);
     text-wrap: balance;
   }
 
@@ -144,8 +146,7 @@ const artifactHighlights = artifact.context.slice(0, 2)
     font-family: var(--font-mono);
     font-size: 0.88rem;
     line-height: 1.68;
-    color: rgba(253, 252, 252, 0.76) !important;
-    -webkit-text-fill-color: rgba(253, 252, 252, 0.76) !important;
+    color: rgba(253, 252, 252, 0.78);
   }
 
   .hero-artifact__readout {
@@ -161,7 +162,8 @@ const artifactHighlights = artifact.context.slice(0, 2)
     padding: 0.75rem 0.8rem;
     border: 1px solid rgba(253, 252, 252, 0.08);
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
+    text-align: left;
   }
 
   .hero-artifact__readout-item span {
@@ -177,7 +179,7 @@ const artifactHighlights = artifact.context.slice(0, 2)
     font-family: var(--font-mono);
     font-size: 0.82rem;
     line-height: 1.45;
-    color: var(--text-primary, #f7f3eb);
+    color: var(--text-primary);
   }
 
   .hero-artifact__figure {
@@ -197,7 +199,6 @@ const artifactHighlights = artifact.context.slice(0, 2)
     object-position: top;
   }
 
-
   .hero-artifact__highlights {
     display: grid;
     gap: 0.8rem;
@@ -208,10 +209,8 @@ const artifactHighlights = artifact.context.slice(0, 2)
   .hero-artifact__highlight {
     display: grid;
     gap: 0.45rem;
-    padding: 0.95rem 1rem;
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.02);
+    padding: 0.75rem 0 0;
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
   .hero-artifact__highlight span {
@@ -232,8 +231,18 @@ const artifactHighlights = artifact.context.slice(0, 2)
   }
 
   @media (max-width: 720px) {
+    .hero-artifact__header,
+    .hero-artifact__meta {
+      justify-content: center;
+      text-align: center;
+    }
+
     .hero-artifact__readout {
       grid-template-columns: 1fr;
+    }
+
+    .hero-artifact__readout-item {
+      text-align: center;
     }
   }
 </style>

@@ -1,44 +1,85 @@
 ---
+export interface Props {
+  showTopCTA?: boolean
+}
+
 const currentYear = new Date().getFullYear()
+const { showTopCTA = true } = Astro.props
 ---
 
 <footer class="marketing-footer">
   <div class="marketing-shell">
-    <div class="marketing-footer__cta">
-      <div>
-        <span class="marketing-eyebrow">See the workflow first</span>
-        <h2 class="marketing-title marketing-title--medium">
-          Bring one hard case. Leave with something specific to coach.
-        </h2>
-        <p class="marketing-lede">
-          Pixelated Empathy is for training teams that want clearer supervision,
-          not another abstract AI promise. Start with the demo, then use one
-          difficult case to decide whether the review actually gets sharper.
-        </p>
-      </div>
-      <div class="marketing-footer__cta-actions">
-        <a class="marketing-button marketing-button--primary" href="/demo-hub">Watch the demo</a>
-        <a class="marketing-button marketing-button--secondary" href="/contact">Book a pilot</a>
-        <p class="marketing-note">Founder-led • United States • Sensitive-workflow review on request</p>
-      </div>
-    </div>
+    {
+      showTopCTA && (
+        <div class="marketing-footer__cta">
+          <div>
+            <span class="marketing-eyebrow">Bring one hard case</span>
+            <h2 class="marketing-title marketing-title--medium">
+              Bring one hard case. Leave with something specific to coach.
+            </h2>
+            <p class="marketing-lede">
+              Pixelated Empathy is for training teams that want clearer
+              supervision, not another abstract AI promise. Bring one difficult
+              case and decide whether the review actually gets sharper.
+            </p>
+          </div>
+          <div class="marketing-footer__cta-actions">
+            <a
+              class="marketing-button marketing-button--primary"
+              href="/contact"
+            >
+              Book a pilot
+            </a>
+            <a
+              class="marketing-button marketing-button--secondary"
+              href="/demo-hub"
+            >
+              Watch the demo
+            </a>
+            <p class="marketing-note">
+              Founder-led • United States • Sensitive-workflow review on request
+            </p>
+          </div>
+        </div>
+      )
+    }
 
     <div class="marketing-footer__grid">
       <div class="marketing-footer__brand">
         <div class="marketing-footer__brand-row">
           <div class="marketing-footer__logo">
-            <img src="/favicon.svg" alt="Pixelated Empathy" class="h-full w-full object-contain" />
+            <img
+              src="/favicon.svg"
+              alt="Pixelated Empathy"
+              class="h-full w-full object-contain"
+            />
           </div>
           <div>
             <strong>Pixelated Empathy</strong>
-            <p>Clinical simulation and transcript-backed coaching for therapist training teams.</p>
+            <p>
+              Clinical simulation and transcript-backed coaching for therapist
+              training teams.
+            </p>
           </div>
         </div>
 
         <div class="marketing-inline-links">
-          <a href="https://twitter.com/pixelatedempathy" target="_blank" rel="noopener noreferrer" class="marketing-inline-link">Twitter</a>
-          <a href="https://github.com/nochadisfaction/pixelated" target="_blank" rel="noopener noreferrer" class="marketing-inline-link">GitHub</a>
-          <a href="mailto:info@pixelatedempathy.com" class="marketing-inline-link">info@pixelatedempathy.com</a>
+          <a
+            href="https://twitter.com/pixelatedempathy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="marketing-inline-link">Twitter</a
+          >
+          <a
+            href="https://github.com/nochadisfaction/pixelated"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="marketing-inline-link">GitHub</a
+          >
+          <a
+            href="mailto:info@pixelatedempathy.com"
+            class="marketing-inline-link">info@pixelatedempathy.com</a
+          >
         </div>
       </div>
 
@@ -84,19 +125,23 @@ const currentYear = new Date().getFullYear()
 <style>
   .marketing-footer {
     width: 100%;
-    padding: 5.75rem 0 2.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 4.75rem 0 2.25rem;
+    border-top: 1px dotted rgba(255, 255, 255, 0.08);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0)),
-      rgba(0, 0, 0, 0.14);
+      radial-gradient(
+        circle at top right,
+        rgba(var(--accent-primary-rgb), 0.08),
+        transparent 32%
+      ),
+      linear-gradient(180deg, rgba(48, 44, 44, 0.62), rgba(32, 29, 29, 0.92));
   }
 
   .marketing-footer__cta {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
-    gap: 1.5rem;
-    padding-bottom: 2.3rem;
-    margin-bottom: 2.3rem;
+    gap: 1.3rem;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
     border-bottom: 1px dotted var(--divider-dotted);
   }
 
@@ -104,16 +149,28 @@ const currentYear = new Date().getFullYear()
     display: grid;
     gap: 0.95rem;
     align-content: start;
-    padding: 1.35rem;
+    padding: 1.2rem;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
-    background: linear-gradient(180deg, rgba(48, 44, 44, 0.6), rgba(39, 35, 35, 0.4));
+    background: linear-gradient(
+      180deg,
+      rgba(48, 44, 44, 0.55),
+      rgba(39, 35, 35, 0.36)
+    );
+  }
+
+  .marketing-note {
+    display: block;
+    margin-top: 0.1rem;
+    color: rgba(253, 252, 252, 0.56);
+    text-transform: none;
+    letter-spacing: 0.04em;
   }
 
   .marketing-footer__grid {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
-    gap: 1.75rem;
+    gap: 1.5rem;
   }
 
   .marketing-footer__brand {
@@ -173,7 +230,7 @@ const currentYear = new Date().getFullYear()
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 0.8rem;
-    margin-top: 2rem;
+    margin-top: 1.75rem;
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.04);
     color: var(--text-muted);
@@ -187,12 +244,12 @@ const currentYear = new Date().getFullYear()
     }
 
     .marketing-footer__cta {
-      text-align: center;
+      text-align: left;
     }
 
     .marketing-footer__cta > div,
     .marketing-footer__cta-actions {
-      justify-items: center;
+      justify-items: start;
     }
   }
 </style>
