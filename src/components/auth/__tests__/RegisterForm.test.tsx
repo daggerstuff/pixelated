@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi } from 'vitest'
+import { vi, type Mock } from 'vitest'
 
 import { authClient } from '@/lib/auth-client'
 
@@ -25,11 +25,11 @@ describe('RegisterForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(authClient.signUp.email as vi.Mock).mockImplementation(mockSignUp)
-    ;(authClient.signIn.social as vi.Mock).mockImplementation(
+    ;(authClient.signUp.email as unknown as Mock).mockImplementation(mockSignUp)
+    ;(authClient.signIn.social as unknown as Mock).mockImplementation(
       mockSignInWithOAuth,
     )
-    ;(authClient.useSession as vi.Mock).mockImplementation(() => ({
+    ;(authClient.useSession as unknown as Mock).mockImplementation(() => ({
       data: null,
     }))
   })

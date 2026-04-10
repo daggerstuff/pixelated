@@ -32,7 +32,7 @@ describe("Authentication Middleware", () => {
 
     mockRequest = {
       protocol: "http",
-      get: vi.fn(getHeader),
+      get: getHeader,
       originalUrl: "/api/users",
       method: "GET",
       headers: {

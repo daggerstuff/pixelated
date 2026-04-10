@@ -2,15 +2,18 @@ import { render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
 
 import { ComparativeProgressDisplay } from '../ComparativeProgressDisplay'
+import type { useComparativeProgress } from '../../../hooks/useComparativeProgress'
 
 // Mock the useComparativeProgress hook
 vi.mock('../../../hooks/useComparativeProgress', () => ({
-  useComparativeProgress: vi.fn(() => ({
-    data: null,
-    loading: false,
-    error: 'Invalid user ID: must be a non-empty string',
-    refetch: vi.fn(),
-  })),
+  useComparativeProgress: vi.fn<() => ReturnType<typeof useComparativeProgress>>(
+    () => ({
+      data: null,
+      loading: false,
+      error: 'Invalid user ID: must be a non-empty string',
+      refetch: vi.fn<() => Promise<void>>(),
+    }),
+  ),
 }))
 
 describe('ComparativeProgressDisplay', () => {
