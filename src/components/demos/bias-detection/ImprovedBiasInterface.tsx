@@ -71,7 +71,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
       const results: BiasAnalysisResults = {
         sessionId,
         overallBiasScore: Math.max(60, 100 - Math.random() * 10),
-        biasFactors: {
+        layerResults: {
           demographic: Math.random() * 0.3,
           cultural: Math.random() * 0.25,
           linguistic: Math.random() * 0.2,
