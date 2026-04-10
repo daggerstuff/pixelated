@@ -1,9 +1,8 @@
 export const featuresContent = {
   label: 'What the platform makes possible',
-  title:
-    'Give supervisors the exact coaching moment, not a vague impression.',
-  copy: 'Every feature serves the same outcome: keep the conversation believable, then make the next supervision meeting faster, clearer, and more specific.',
-  proofLabel: 'What teams feel in week one',
+  title: 'The product only matters if it makes the next coaching move obvious.',
+  copy: 'Each part of the workflow exists to preserve the difficult turn, surface the coaching decision, and make the next review more concrete than memory ever could.',
+  proofLabel: 'What a useful first week looks like',
   proofItems: [
     'Less time reconstructing what happened from memory.',
     'More confidence pointing to the line, question, or miss that mattered.',
@@ -11,33 +10,28 @@ export const featuresContent = {
   ],
   cards: [
     {
-      title: 'Keep the conversation believable',
+      title: 'Keep the practice surface believable',
       description:
-        'The practice surface should feel like a room to navigate, not a branching script to memorize.',
+        'The experience stays close to a live room so the clinician responds to the case instead of gaming a script.',
       icon: 'chat',
-      image: '/images/features/clinician-in-room.png',
     },
     {
       title: 'Pinpoint the turn worth coaching',
       description:
-        'The review preserves the moment that changed the room instead of relying on what the clinician remembers after the fact.',
+        'The review keeps the exact exchange that changed the room, so supervision can focus on one concrete next move.',
       icon: 'chart',
-      image: '/images/features/supervisor-trace.png',
     },
     {
-      title: 'Compare one case across a cohort',
+      title: 'Compare judgment across the same case',
       description:
-        'Shared cases turn vague supervision into side-by-side coaching because everyone is working against the same difficult moment.',
+        'Shared cases turn fuzzy supervision into side-by-side coaching because everyone is working against the same difficult moment.',
       icon: 'shield',
-      image: '/images/features/shared-case-comparison.png',
     },
   ],
-
-
   comparison: {
     label: 'What clearer supervision sounds like',
     title: 'The difference is whether your team can name the moment.',
-    body: 'These are the kinds of before-and-after coaching conversations the product is designed to create.',
+    body: 'Weak supervision circles around the session. Strong supervision points to the exact turn that changes the next attempt.',
     items: [
       {
         label: 'Before',

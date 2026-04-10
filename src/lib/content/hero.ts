@@ -1,29 +1,25 @@
 export const heroContent = {
-  title: 'Turn your hardest therapy sessions into sharper supervision.',
+  title: 'Turn one hard therapy session into review-ready coaching evidence.',
   subtitle:
-    'Run one realistic case, capture the exact moment the room shifts, and coach from a transcript your team can point to together.',
+    'Run the case once, keep the transcript and coaching lane attached, and show supervisors the exact turn to revisit next week.',
   helperText:
-    'See the product demo first. Bring one difficult case only when the workflow feels right.',
-  kicker: 'For therapist training teams that need clearer feedback fast',
+    'Start with the demo. Bring one difficult case only if the review gets more precise.',
+  kicker: 'For therapist training teams that need sharper supervision',
   proofPoints: [
     {
-      label: 'Catch the moment',
-      text: 'Save the intervention, miss, or repair that changed the room.',
+      label: 'Keep the turning point',
+      text: 'Save the intervention, miss, or repair that changed the room instead of rebuilding it from memory.',
     },
     {
       label: 'Coach from evidence',
-      text: 'Review transcript, notes, and decision points instead of memory.',
-    },
-    {
-      label: 'Compare judgment',
-      text: 'Put multiple clinicians through the same hard case and see what changed.',
+      text: 'Review transcript, notes, and coaching rationale in one place so the next move is obvious.',
     },
   ],
   primaryCTA: { text: 'Book a pilot review', href: '/contact' },
   secondaryCTA: { text: 'See the product demo', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Product proof',
-    status: 'A review-ready session record your team can coach from this week.',
+    status: 'A session record your team can coach from this week.',
     chip: 'Actual product surface',
     mode: 'Proof before pitch',
     image: '/images/homepage/training-session-proof.png',
@@ -31,34 +27,33 @@ export const heroContent = {
       'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
       {
-        label: 'What your team sees',
+        label: 'What stays attached',
         value:
-          'The live conversation, saved transcript, and coaching lane stay attached in one surface.',
+          'The live conversation, saved transcript, and coaching lane remain tied to the same case.',
       },
       {
-        label: 'Why it lands',
+        label: 'Why it matters',
         value:
-          'A supervisor can point to the exact turn that needs work instead of rebuilding the session from memory.',
+          'A supervisor can point to the exact turn that needs work instead of reconstructing the room from memory.',
       },
     ],
     outputs: [
       {
-        label: 'Specific feedback',
-        value: 'Supervisors can coach the exact intervention to revisit next.',
+        label: 'Specific next move',
+        value: 'Point to the intervention worth revisiting next, not a vague impression.',
       },
       {
-        label: 'Shared reference',
-        value: 'Transcript and notes stay attached to the same difficult case.',
+        label: 'Shared review surface',
+        value: 'Keep transcript and notes attached to one difficult case the whole team can study.',
       },
       {
-        label: 'Cleaner next attempt',
-        value:
-          'The retry starts from a visible decision, not a vague impression.',
+        label: 'Cleaner retry',
+        value: 'Start the next attempt from a visible decision instead of a fuzzy recap.',
       },
     ],
     readout: [
       { label: 'Who it is for', value: 'Clinical training teams' },
-      { label: 'What stays', value: 'Transcript + coaching notes' },
+      { label: 'What stays', value: 'Transcript + coaching lane' },
       { label: 'What changes', value: 'Sharper supervision' },
     ],
   },

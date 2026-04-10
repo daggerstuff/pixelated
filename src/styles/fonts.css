@@ -4,8 +4,8 @@
    ================================================ */
 
 @font-face {
-  font-family: 'Berkeley Mono';
-  src: local('Berkeley Mono'), local('IBM Plex Mono'), local('Menlo'), local('Monaco'), local('Courier New'), monospace;
+  font-family: 'JetBrains Mono Fallback';
+  src: url('/fonts/jetbrains-mono-400.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -13,7 +13,15 @@
 
 @font-face {
   font-family: 'Berkeley Mono';
-  src: local('Berkeley Mono Bold'), local('IBM Plex Mono Bold'), local('Menlo Bold'), local('Monaco Bold'), local('Courier New Bold'), monospace;
+  src: local('Berkeley Mono'), local('IBM Plex Mono'), local('Menlo'), local('Monaco'), local('Courier New'), url('/fonts/jetbrains-mono-400.ttf') format('truetype'), monospace;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: local('Berkeley Mono Bold'), local('IBM Plex Mono Bold'), local('Menlo Bold'), local('Monaco Bold'), local('Courier New Bold'), url('/fonts/jetbrains-mono-700.ttf') format('truetype'), monospace;
   font-weight: 700;
   font-style: normal;
   font-display: swap;

@@ -26,7 +26,7 @@
 
   /* === TYPOGRAPHY SYSTEM === */
   --font-family-mono: 'Berkeley Mono', monospace;
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-sans: 'Berkeley Mono', monospace;
   
   --font-mono: var(--font-family-mono);
   --font-sans: var(--font-family-sans);
