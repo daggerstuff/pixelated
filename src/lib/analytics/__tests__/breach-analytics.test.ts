@@ -128,7 +128,7 @@ describe('breachAnalytics', () => {
         complianceRate: 0.99,
       },
     })
-    ;(NotificationEffectiveness.calculateDaily as unknown).mockResolvedValue({
+    ;(NotificationEffectiveness.calculateDaily as jest.Mock).mockResolvedValue({
       overall: 0.92,
       delivery: 0.95,
       timing: 0.88,

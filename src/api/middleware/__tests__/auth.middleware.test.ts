@@ -21,15 +21,18 @@ describe("Authentication Middleware", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    const getHeader: Request["get"] = ((header: string) => {
+      const normalizedHeader = header.toLowerCase();
+      const headers: Record<string, string> = {
+        host: "localhost:3000",
+        authorization: "Bearer test-token",
+      };
+      return headers[normalizedHeader] ?? undefined;
+    }) as Request["get"];
+
     mockRequest = {
       protocol: "http",
-      get: vi.fn((header: string) => {
-        const headers: Record<string, string> = {
-          host: "localhost:3000",
-          authorization: "Bearer test-token",
-        };
-        return headers[header] || undefined;
-      }),
+      get: vi.fn(getHeader),
       originalUrl: "/api/users",
       method: "GET",
       headers: {

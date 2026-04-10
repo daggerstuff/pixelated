@@ -1,9 +1,0 @@
-{
-  "default_droid": "fullstack-engineer",
-  "docs_dir": ".factory/docs",
-  "default_auto_mode": "low",
-  "session_timeout_minutes": 120,
-  "max_session_turns": 100,
-  "allowed_tools": ["read", "glob", "grep"],
-  "excluded_tools": []
-}

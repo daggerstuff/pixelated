@@ -13,52 +13,56 @@ export interface Props {
 const { content } = Astro.props
 ---
 
-<section class="home-section home-section--intro">
-  <div class="container">
-    <div class="home-intro">
-      <div class="home-intro__lead">
+<section class="pe-home-section home-section--intro">
+  <div class="pe-home-shell">
+    <div class="pe-home-grid home-intro">
+      <div class="pe-home-rail">
         <span class="pe-meta-label">{content.label}</span>
-        <h2 class="pe-heading-l">{content.title}</h2>
-        {
-          content.paragraphs.map((paragraph, index) => (
-            <p
-              class:list={[
-                'home-copy',
-                index === 0 ? 'home-copy--first' : 'home-copy--subsequent',
-              ]}
-            >
-              {paragraph}
-            </p>
-          ))
-        }
+        <div class="pe-home-rail__line"></div>
+        <p class="pe-home-kicker-note">
+          Useful supervision usually disappears right after the room settles. This section makes that failure visible.
+        </p>
       </div>
 
-      <div class="home-intro__panel glass-panel">
-        <span class="pe-meta-label">{content.panelLabel}</span>
-        <div class="home-proof-stack">
-          {
-            content.panelItems.map((item) => (
-              <div class="home-proof-item">
-                <span class="home-proof-item__label">{item.label}</span>
-                <p>{item.body}</p>
-              </div>
-            ))
-          }
+      <div class="home-intro__body">
+        <div class="home-intro__header">
+          <h2 class="pe-heading-l">{content.title}</h2>
+          <div class="home-intro__prose">
+            {
+              content.paragraphs.map((paragraph) => (
+                <p class="pe-home-copy">{paragraph}</p>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="home-intro__panel pe-home-panel">
+          <span class="pe-page-panel-label">{content.panelLabel}</span>
+          <div class="home-proof-stack pe-home-stack">
+            {
+              content.panelItems.map((item) => (
+                <div class="home-proof-item">
+                  <span class="home-proof-item__label">{item.label}</span>
+                  <p>{item.body}</p>
+                </div>
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="home-evidence-grid home-evidence-grid--spaced">
+    <div class="home-evidence-grid">
       {
         content.evidenceCards.map((card, index) => (
           <article
             class:list={[
               'home-evidence-card',
-              'glass-panel',
-              index === 0 && 'home-evidence-card--light',
+              'pe-home-panel',
+              index === 0 && 'home-evidence-card--lead',
             ]}
           >
-            <span class="pe-meta-label">{card.title}</span>
+            <span class="pe-page-panel-label">{card.title}</span>
             <ul class="home-evidence-list">
               {card.items.map((item) => (
                 <li>{item}</li>
@@ -73,154 +77,105 @@ const { content } = Astro.props
 
 <style>
   .home-section--intro {
-    background: #201d1d;
+    background: transparent;
     color: var(--text-primary);
-    padding: 6rem 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .home-copy {
-    max-width: 48ch;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin: 1.5rem auto 0;
-    text-align: center;
-    color: var(--text-secondary);
   }
 
   .home-intro {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4rem;
-    position: relative;
-    z-index: 1;
-    max-width: 55rem;
-    margin: 0 auto;
+    align-items: start;
   }
 
-  .home-intro__lead {
-    text-align: center;
-    width: 100%;
+  .home-intro__body {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .home-intro__header {
+    display: grid;
+    gap: 1.15rem;
+  }
+
+  .home-intro__prose {
+    display: grid;
+    gap: 1rem;
   }
 
   .home-intro__panel {
-    width: 100%;
-    padding: 3rem 2rem;
-    border: 1px dotted rgba(253, 252, 252, 0.2);
-    background: rgba(48, 44, 44, 0.4);
-    backdrop-filter: blur(8px);
-    text-align: left;
+    padding: clamp(1.15rem, 2vw, 1.5rem);
   }
 
   .home-proof-stack {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2.5rem;
+    margin-top: 1rem;
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
   .home-proof-item {
-    padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 2px;
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem 0;
   }
 
   .home-proof-item__label {
-    display: block;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent-primary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 0.75rem;
+    color: var(--accent-primary);
   }
 
   .home-proof-item p {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: var(--text-secondary);
     margin: 0;
+    max-width: 44ch;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    line-height: 1.68;
+    color: rgba(253, 252, 252, 0.72);
   }
 
   .home-evidence-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    margin-top: 5rem;
-    width: 100%;
-    max-width: 55rem;
-    margin-inline: auto;
+    gap: 1rem;
+    margin-top: 2rem;
   }
 
   .home-evidence-card {
-    padding: 3rem 2rem;
-    border: 1px dotted rgba(255, 255, 255, 0.1);
-    background: rgba(48, 44, 44, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .home-evidence-card:hover {
-    border-color: var(--accent-primary);
-    background: rgba(255, 107, 0, 0.05);
+    padding: clamp(1.15rem, 2vw, 1.5rem);
   }
 
   .home-evidence-list {
-    margin: 2rem 0 0;
+    display: grid;
+    gap: 0;
+    margin: 1rem 0 0;
     padding: 0;
     list-style: none;
-    display: grid;
-    gap: 1rem;
-    text-align: left; /* Keep lists left-aligned for readability within centered cards */
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
   .home-evidence-list li {
-    font-size: 0.95rem;
-    padding-left: 1.5rem;
     position: relative;
-    color: var(--text-secondary);
+    padding: 0.9rem 0 0.9rem 1.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    line-height: 1.68;
+    color: rgba(253, 252, 252, 0.72);
+    border-bottom: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
   .home-evidence-list li::before {
-    content: '→';
+    content: '';
     position: absolute;
     left: 0;
-    color: var(--accent-primary);
-    font-family: var(--font-mono);
-  }
-
-
-  @media (max-width: 880px) {
-    .home-proof-stack {
-      grid-template-columns: 1fr;
-    }
-    
-    .home-evidence-grid {
-      grid-template-columns: 1fr;
-    }
+    top: 1.25rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
   }
 
   @media (min-width: 980px) {
-    .home-intro {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.92fr);
-      align-items: start;
-      max-width: 70rem;
-    }
-
-    .home-intro__lead {
-      text-align: left;
-    }
-
-    .home-copy {
-      margin-inline: 0;
-      text-align: left;
-    }
-
     .home-evidence-grid {
-      max-width: 70rem;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     }
   }
 </style>

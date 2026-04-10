@@ -35,7 +35,7 @@ describe('Health Endpoints', () => {
     const express = require('express')
     app = express()
     app.use(express.json())
-    app.use('/', healthRoutes())
+    app.use('/', healthRoutes)
   })
 
   describe('GET /', () => {
