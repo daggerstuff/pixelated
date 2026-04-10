@@ -90,7 +90,8 @@ export function TrainingSessionComponent() {
   
   // Computed helpers (Review suggestion: extract isObserver and config)
   const isObserver = role === 'observer'
-  const textConfig = isObserver ? ROLE_TEXT_CONFIG.observer : ROLE_TEXT_CONFIG.trainee
+  // ⚡ Bolt: memoize textConfig to prevent unnecessary re-evaluations during renders
+  const textConfig = useMemo(() => (isObserver ? ROLE_TEXT_CONFIG.observer : ROLE_TEXT_CONFIG.trainee), [isObserver])
 
   const ws = useRef<WebSocket | null>(null)
   // Use refs to avoid stale closures in WebSocket handlers
