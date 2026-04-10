@@ -3,7 +3,7 @@ export const heroContent = {
   subtitle:
     'Run one realistic case, capture the exact moment the room shifts, and coach from a transcript your team can point to together.',
   helperText:
-    'Start with the demo. Bring one difficult case only when the workflow feels right.',
+    'See the product demo first. Bring one difficult case only when the workflow feels right.',
   kicker: 'For therapist training teams that need clearer feedback fast',
   proofPoints: [
     {
@@ -19,8 +19,8 @@ export const heroContent = {
       text: 'Put multiple clinicians through the same hard case and see what changed.',
     },
   ],
-  primaryCTA: { text: 'See the product demo', href: '/demo-hub' },
-  secondaryCTA: { text: 'Plan a pilot review', href: '/contact' },
+  primaryCTA: { text: 'Book a pilot review', href: '/contact' },
+  secondaryCTA: { text: 'See the product demo', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Product proof',
     status: 'A review-ready session record your team can coach from this week.',

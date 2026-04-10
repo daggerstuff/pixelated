@@ -19,4 +19,4 @@ export const server = {
 }
 
 // Simple handlers export
-export const handlers: unknown[] = []
+export const handlers: Function[] = []
