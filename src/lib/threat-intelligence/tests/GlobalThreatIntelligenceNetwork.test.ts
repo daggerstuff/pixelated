@@ -9,50 +9,50 @@ import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntel
 
 // Mock dependencies
 vi.mock('../../logging/build-safe-logger', () => ({
-  createBuildSafeLogger: vi.fn(() => ({
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
+  createBuildSafeLogger: vi.fn<any>(() => ({
+    info: vi.fn<any>(),
+    error: vi.fn<any>(),
+    warn: vi.fn<any>(),
+    debug: vi.fn<any>(),
   })),
 }))
 
 vi.mock('ioredis', () => {
   return {
-    Redis: vi.fn().mockImplementation(() => ({
-      ping: vi.fn().mockResolvedValue('PONG'),
-      setex: vi.fn().mockResolvedValue('OK'),
-      get: vi.fn().mockResolvedValue(null),
-      del: vi.fn().mockResolvedValue(1),
-      publish: vi.fn().mockResolvedValue(1),
-      quit: vi.fn().mockResolvedValue('OK'),
+    Redis: vi.fn<any>().mockImplementation(() => ({
+      ping: vi.fn<any>().mockResolvedValue('PONG'),
+      setex: vi.fn<any>().mockResolvedValue('OK'),
+      get: vi.fn<any>().mockResolvedValue(null),
+      del: vi.fn<any>().mockResolvedValue(1),
+      publish: vi.fn<any>().mockResolvedValue(1),
+      quit: vi.fn<any>().mockResolvedValue('OK'),
     })),
   }
 })
 
 vi.mock('mongodb', () => {
   return {
-    MongoClient: vi.fn().mockImplementation(() => ({
-      connect: vi.fn().mockResolvedValue(undefined),
-      db: vi.fn().mockReturnValue({
-        collection: vi.fn().mockReturnValue({
-          insertOne: vi.fn().mockResolvedValue({ insertedId: 'test-id' }),
-          updateOne: vi.fn().mockResolvedValue({ modifiedCount: 1 }),
-          findOne: vi.fn().mockResolvedValue(null),
-          find: vi.fn().mockReturnValue({
-            toArray: vi.fn().mockResolvedValue([]),
-            sort: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockReturnThis(),
+    MongoClient: vi.fn<any>().mockImplementation(() => ({
+      connect: vi.fn<any>().mockResolvedValue(undefined),
+      db: vi.fn<any>().mockReturnValue({
+        collection: vi.fn<any>().mockReturnValue({
+          insertOne: vi.fn<any>().mockResolvedValue({ insertedId: 'test-id' }),
+          updateOne: vi.fn<any>().mockResolvedValue({ modifiedCount: 1 }),
+          findOne: vi.fn<any>().mockResolvedValue(null),
+          find: vi.fn<any>().mockReturnValue({
+            toArray: vi.fn<any>().mockResolvedValue([]),
+            sort: vi.fn<any>().mockReturnThis(),
+            limit: vi.fn<any>().mockReturnThis(),
           }),
-          aggregate: vi.fn().mockReturnValue({
-            toArray: vi.fn().mockResolvedValue([]),
+          aggregate: vi.fn<any>().mockReturnValue({
+            toArray: vi.fn<any>().mockResolvedValue([]),
           }),
         }),
-        admin: vi.fn().mockReturnValue({
-          ping: vi.fn().mockResolvedValue(true),
+        admin: vi.fn<any>().mockReturnValue({
+          ping: vi.fn<any>().mockResolvedValue(true),
         }),
       }),
-      close: vi.fn().mockResolvedValue(undefined),
+      close: vi.fn<any>().mockResolvedValue(undefined),
     })),
   }
 })
@@ -101,8 +101,8 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
     })
 
     it('should handle initialization errors gracefully', async () => {
-      const Redis = vi.fn().mockImplementation(() => ({
-        ping: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
+      const Redis = vi.fn<any>().mockImplementation(() => ({
+        ping: vi.fn<any>().mockRejectedValue(new Error('Redis connection failed')),
       }))
 
       vi.doMock('ioredis', () => ({ Redis }))
@@ -461,7 +461,7 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
     })
 
     it('should emit events for threat processing', async () => {
-      const eventHandler = vi.fn()
+      const eventHandler = vi.fn<any>()
       network.on('threat_processed', eventHandler)
 
       const threatData = {
@@ -493,7 +493,7 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
     })
 
     it('should emit events for synchronization', async () => {
-      const eventHandler = vi.fn()
+      const eventHandler = vi.fn<any>()
       network.on('threat_synchronized', eventHandler)
 
       const threatData = {
