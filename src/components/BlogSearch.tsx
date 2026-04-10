@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 import { cn } from '../lib/utils.js'
 import { Button } from './ui/button/index.js'
@@ -37,6 +37,28 @@ export function BlogSearch() {
     }
   }
 
+  // ⚡ Bolt: Memoize search results to prevent unnecessary re-renders of the list while user types the query
+  const renderedResults = useMemo(() => {
+    if (results.length === 0) return null;
+    return (
+      <div className='mt-4 space-y-4'>
+        {results.map((result) => (
+          <article key={result.id} className='bg-muted/50 rounded-lg p-4'>
+            <h3 className='mb-2 text-lg font-semibold'>
+              <a
+                href={`/blog/${result.slug}`}
+                className='hover:text-primary transition-colors'
+              >
+                {result.title}
+              </a>
+            </h3>
+            <p className='text-muted-foreground'>{result.description}</p>
+          </article>
+        ))}
+      </div>
+    );
+  }, [results]);
+
   return (
     <div className='mx-auto w-full max-w-2xl'>
       <form onSubmit={handleSearch} className='relative' role='search'>
@@ -69,23 +91,7 @@ export function BlogSearch() {
         </Button>
       </form>
 
-      {results.length > 0 && (
-        <div className='mt-4 space-y-4'>
-          {results.map((result) => (
-            <article key={result.id} className='bg-muted/50 rounded-lg p-4'>
-              <h3 className='mb-2 text-lg font-semibold'>
-                <a
-                  href={`/blog/${result.slug}`}
-                  className='hover:text-primary transition-colors'
-                >
-                  {result.title}
-                </a>
-              </h3>
-              <p className='text-muted-foreground'>{result.description}</p>
-            </article>
-          ))}
-        </div>
-      )}
+      {renderedResults}
     </div>
   )
 }
