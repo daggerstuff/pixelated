@@ -316,3 +316,16 @@ memory.db-wal
 
 # === COPILOT CLI ===
 .github/copilot/settings.local.json
+.omx/
+.opencode/oh-my-openagent.jsonc
+.github/mcp.json
+.opencode/oh-my-openagent.json
+
+.copilot
+.factory
+.moderne
+.qlty
+.shared
+DESIGN.md
+QWEN.md
+skills-lock.json

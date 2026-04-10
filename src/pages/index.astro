@@ -43,89 +43,81 @@ const organizationSchema = {
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
 >
+  <div class="pe-homepage">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+    />
 
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema)}
-  />
+    <BrutalistHero
+      kicker={homepageContent.hero.kicker}
+      title={homepageContent.hero.title}
+      subtitle={homepageContent.hero.subtitle}
+      helperText={homepageContent.hero.helperText}
+      proofPoints={homepageContent.hero.proofPoints}
+      primaryCTA={homepageContent.hero.primaryCTA}
+      secondaryCTA={homepageContent.hero.secondaryCTA}
+      artifact={homepageContent.hero.artifact}
+    />
 
-  <BrutalistHero
-    kicker={homepageContent.hero.kicker}
-    title={homepageContent.hero.title}
-    subtitle={homepageContent.hero.subtitle}
-    helperText={homepageContent.hero.helperText}
-    proofPoints={homepageContent.hero.proofPoints}
-    primaryCTA={homepageContent.hero.primaryCTA}
-    secondaryCTA={homepageContent.hero.secondaryCTA}
-    artifact={homepageContent.hero.artifact}
-  />
+    <section class="trust-band-section pe-home-section pe-home-section--compact">
+      <div class="pe-home-shell trust-band-shell">
+        <InfoStrip
+          className="trust-band"
+          label="Why teams move on this quickly"
+          title="One difficult case can tell you whether supervision gets sharper."
+          body="The page needs to prove three things fast: the case stays reviewable, the coaching moment stays visible, and the next move becomes easier to name."
+          items={[
+            {
+              label: 'Who it is for',
+              value: 'Clinical educators, supervisors, and training leads who need one shared coaching surface.',
+            },
+            {
+              label: 'What stays attached',
+              value: 'Transcript, intervention notes, and decisions stay tied to the same difficult session.',
+            },
+            {
+              label: 'What to do next',
+              value: 'See the product demo, then bring one hard case into a pilot review.',
+            },
+          ]}
+          theme="dark"
+        />
+      </div>
+    </section>
 
-  <section class="trust-band-section border-y border-white/5 bg-black/10">
-    <div class="container trust-band-shell">
+    <IntroSection content={homepageContent.intro} />
+    <WorkflowSection content={homepageContent.how} />
 
-      <InfoStrip
-        className="trust-band"
-        label="Why teams stay on the page"
-        items={[
-          {
-            label: 'Who it is for',
-            value: 'Clinical educators, supervisors, and training leads',
-          },
-          {
-            label: 'What you actually keep',
-            value: 'Transcript, decisions, and coaching notes in one record',
-          },
-          {
-            label: 'Best first move',
-            value: 'See the demo, then bring one hard case to a pilot review',
-          },
-        ]}
-        theme="dark"
-      />
-    </div>
-  </section>
+    <CoreFeatures
+      label={homepageContent.features.label}
+      title={homepageContent.features.title}
+      copy={homepageContent.features.copy}
+      proofLabel={homepageContent.features.proofLabel}
+      proofItems={homepageContent.features.proofItems}
+      cards={homepageContent.features.cards}
+      comparison={homepageContent.features.comparison}
+    />
 
-  <IntroSection content={homepageContent.intro} />
-  <WorkflowSection content={homepageContent.how} />
-
-  <CoreFeatures
-    label={homepageContent.features.label}
-    title={homepageContent.features.title}
-    copy={homepageContent.features.copy}
-    proofLabel={homepageContent.features.proofLabel}
-    proofItems={homepageContent.features.proofItems}
-    cards={homepageContent.features.cards}
-    comparison={homepageContent.features.comparison}
-  />
-
-  <CTA
-    label={homepageContent.cta.label}
-    title={homepageContent.cta.title}
-    intro={homepageContent.cta.intro}
-    verdictCopy={homepageContent.cta.verdictCopy}
-    proofItems={homepageContent.cta.proofItems}
-    decisionTitle={homepageContent.cta.decisionTitle}
-    rubric={homepageContent.cta.rubric}
-    primaryCTA={homepageContent.cta.primaryCTA}
-    secondaryCTA={homepageContent.cta.secondaryCTA}
-    meta={homepageContent.cta.meta}
-  />
+    <CTA
+      label={homepageContent.cta.label}
+      title={homepageContent.cta.title}
+      intro={homepageContent.cta.intro}
+      verdictCopy={homepageContent.cta.verdictCopy}
+      proofItems={homepageContent.cta.proofItems}
+      decisionTitle={homepageContent.cta.decisionTitle}
+      rubric={homepageContent.cta.rubric}
+      primaryCTA={homepageContent.cta.primaryCTA}
+      secondaryCTA={homepageContent.cta.secondaryCTA}
+      meta={homepageContent.cta.meta}
+    />
+  </div>
 </Layout>
 
 
 <style>
-  .trust-band-section {
-    position: relative;
-    padding: 1.5rem 0;
-  }
-
   .trust-band-shell {
     position: relative;
     z-index: 1;
   }
-
-  .trust-band {
-    width: 100%;
-  }
-
 </style>

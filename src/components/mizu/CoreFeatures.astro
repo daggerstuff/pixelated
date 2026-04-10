@@ -1,9 +1,5 @@
 ---
-/**
- * CoreFeatures Component - Brutalist Style
- */
 import SectionAtmosphere from '@/components/homepage/SectionAtmosphere.astro'
-import FeatureIcon from '@/components/mizu/FeatureIcon.astro'
 
 export interface Props {
   label?: string
@@ -11,7 +7,7 @@ export interface Props {
   copy?: string
   proofLabel?: string
   proofItems?: readonly string[]
-  cards?: readonly { title: string; description: string; icon: string }[]
+  cards?: readonly { title: string; description: string; icon: string; image?: string }[]
   comparison?: {
     label: string
     title: string
@@ -30,82 +26,98 @@ const {
   comparison,
 } = Astro.props
 
-const getCardClasses = (index: number) => ({
-  'core-feature-card': true,
-  'core-feature-card--lead': index === 0,
-})
+const [leadCard, ...supportCards] = cards
+const beforeItems = comparison?.items.filter((item) => item.label === 'Before') ?? []
+const afterItems = comparison?.items.filter((item) => item.label === 'After') ?? []
 ---
 
-<section class="pe-page-section core-features-section">
+<section class="pe-home-section core-features-section">
   <SectionAtmosphere variant="section" />
-  <div class="pe-page-shell core-features-shell">
-    <div class="core-features-intro">
-      <div>
-        <span class="pe-page-label">{label}</span>
-        <h2 class="pe-page-heading">{title}</h2>
+  <div class="pe-home-shell">
+    <div class="pe-home-grid core-features-intro">
+      <div class="pe-home-rail">
+        <span class="pe-meta-label">{label}</span>
+        <div class="pe-home-rail__line"></div>
+        <p class="pe-home-kicker-note">
+          The page should prove one thing repeatedly: the review gets concrete enough for a supervisor to act on.
+        </p>
       </div>
-      <p class="core-features-copy">
-        {copy}
-      </p>
+
+      <div class="core-features-intro__body">
+        <h2 class="pe-heading-l">{title}</h2>
+        <p class="pe-home-copy">{copy}</p>
+      </div>
     </div>
 
-    <div class="core-features-grid">
-      <aside class="core-features-proof">
-        <span class="pe-page-panel-label">{proofLabel}</span>
-        <ul class="core-features-proof-list">
-          {proofItems.map((item) => <li>{item}</li>)}
-        </ul>
-      </aside>
+    {leadCard && (
+      <article class="core-feature-lead pe-home-panel">
+        <div class="core-feature-lead__media">
+          {leadCard.image ? <img src={leadCard.image} alt={leadCard.title} class="core-feature-lead__image" /> : null}
+          <span class="core-feature-lead__caption">Capability 01</span>
+        </div>
 
-      <div class="core-features-list">
-        {
-          cards.map((feature, index) => (
-            <div class:list={getCardClasses(index)} data-index={index}>
-              <div class="core-feature-card__row">
-                <div class="core-feature-card__image-wrap">
-                  {feature.image && (
-                    <img src={feature.image} alt={feature.title} class="core-feature-card__image" />
-                  )}
-                  {!feature.image && <FeatureIcon icon={feature.icon} />}
-                </div>
-                <div class="core-feature-card__copy">
-                  <span class="core-feature-card__eyebrow">
-                    Capability {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <h3 class="core-feature-card__title">{feature.title}</h3>
-                  <p class="core-feature-card__description">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
+        <div class="core-feature-lead__copy">
+          <span class="pe-page-panel-label">{proofLabel}</span>
+          <h3 class="pe-heading-s">{leadCard.title}</h3>
+          <p>{leadCard.description}</p>
+
+          <ul class="core-feature-proof pe-home-stack">
+            {proofItems.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    )}
+
+    <div class="core-feature-support">
+      {
+        supportCards.map((feature, index) => (
+          <article class="core-feature-card pe-home-panel">
+            <div class="core-feature-card__media">
+              {feature.image ? <img src={feature.image} alt={feature.title} class="core-feature-card__image" /> : null}
+              <span class="core-feature-card__caption">Capability {String(index + 2).padStart(2, '0')}</span>
             </div>
-          ))
-        }
-      </div>
-
+            <div class="core-feature-card__copy">
+              <h3 class="pe-heading-s">{feature.title}</h3>
+              <p>{feature.description}</p>
+            </div>
+          </article>
+        ))
+      }
     </div>
 
     {
       comparison && (
         <div class="core-features-comparison">
-          <div class="core-features-comparison__lead">
-            <span class="pe-page-panel-label">{comparison.label}</span>
-            <h3>{comparison.title}</h3>
-            <p>{comparison.body}</p>
+          <div class="core-features-comparison__header">
+            <span class="pe-meta-label">{comparison.label}</span>
+            <h3 class="pe-heading-l core-features-comparison__title">{comparison.title}</h3>
+            <p class="pe-home-copy">{comparison.body}</p>
           </div>
 
           <div class="core-features-comparison__grid">
-            {comparison.items.map((item) => (
-              <div
-                class:list={[
-                  'core-features-comparison__item',
-                  item.accent && 'core-features-comparison__item--accent',
-                ]}
-              >
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
+            <section class="core-features-comparison__column pe-home-panel">
+              <span class="core-features-comparison__label">Before</span>
+              <div class="core-features-comparison__stack pe-home-stack">
+                {beforeItems.map((item) => (
+                  <blockquote class="core-features-comparison__item">
+                    <p>{item.value}</p>
+                  </blockquote>
+                ))}
               </div>
-            ))}
+            </section>
+
+            <section class="core-features-comparison__column pe-home-panel core-features-comparison__column--accent">
+              <span class="core-features-comparison__label">After</span>
+              <div class="core-features-comparison__stack pe-home-stack">
+                {afterItems.map((item) => (
+                  <blockquote class="core-features-comparison__item">
+                    <p>{item.value}</p>
+                  </blockquote>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       )
@@ -114,292 +126,146 @@ const getCardClasses = (index: number) => ({
 </section>
 
 <style>
-  .core-features-shell {
-    position: relative;
-    z-index: 1;
-    max-width: 55rem;
-  }
-
   .core-features-section {
-    position: relative;
-    background: #121817;
+    background: transparent;
     color: var(--text-primary);
   }
 
   .core-features-intro {
+    align-items: start;
+  }
+
+  .core-features-intro__body {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    align-items: center;
-    margin-bottom: clamp(3rem, 6vw, 5rem);
-    position: relative;
-    text-align: center;
+    gap: 1rem;
   }
 
-  .core-features-copy {
-    font-size: 1.06rem;
-    line-height: 1.68;
-    color: var(--text-secondary);
-    max-width: 48ch;
-    text-wrap: pretty;
-    margin: 0 auto;
-  }
-
-  .core-features-grid {
+  .core-feature-lead,
+  .core-feature-card {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-bottom: 4rem;
+    gap: 1.1rem;
+    padding: clamp(1.1rem, 2vw, 1.5rem);
   }
 
-  .core-features-proof {
+  .core-feature-lead {
+    margin-top: 1.75rem;
+  }
+
+  .core-feature-lead__media,
+  .core-feature-card__media {
     display: grid;
-    align-content: start;
-    gap: 1.2rem;
-    padding: 2rem;
-    border: 1px dotted var(--border-subtle);
-    border-radius: var(--radius-sm);
-    background: rgba(48, 44, 44, 0.4);
-    backdrop-filter: blur(8px);
-    text-align: left;
+    gap: 0.75rem;
   }
 
-  .core-features-proof-list {
-    display: grid;
-    gap: 0.9rem;
-    padding: 0;
-    list-style: none;
-    margin: 0;
-  }
-
-  .core-features-proof-list li {
-    position: relative;
-    padding: 0.95rem 1rem 0.95rem 1.2rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.03);
-    font-size: 0.9rem;
-  }
-
-  .core-features-proof-list li::before {
-    content: '';
-    position: absolute;
-    top: 1.25rem;
-    left: 0.65rem;
-    width: 0.35rem;
-    height: 0.35rem;
-    border-radius: 999px;
-    background: var(--accent-primary);
-  }
-
-  .core-feature-card__row {
-    display: grid;
-    grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
-    gap: 1.5rem;
-    align-items: center;
-  }
-
-  .core-feature-card__copy {
+  .core-feature-lead__image,
+  .core-feature-card__image {
     width: 100%;
-    text-align: left;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
-  .core-feature-card__title {
-    margin-bottom: 0.75rem;
-    font-size: 1.5rem;
-  }
-
-  .core-feature-card__eyebrow {
-    display: block;
-    margin-bottom: 1rem;
+  .core-feature-lead__caption,
+  .core-feature-card__caption,
+  .core-features-comparison__label {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.15em;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--accent-primary);
   }
 
-  .core-feature-card__description {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    max-width: 42ch;
+  .core-feature-lead__copy,
+  .core-feature-card__copy {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .core-feature-lead__copy p,
+  .core-feature-card__copy p,
+  .core-features-comparison__item p {
     margin: 0;
-    text-wrap: pretty;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.72;
+    color: rgba(253, 252, 252, 0.72);
+  }
+
+  .core-feature-proof {
+    margin: 0.1rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
+  }
+
+  .core-feature-proof li {
+    padding: 0.9rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.68;
+    color: rgba(253, 252, 252, 0.72);
+    border-bottom: 1px dotted rgba(253, 252, 252, 0.12);
+  }
+
+  .core-feature-support {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
   }
 
   .core-features-comparison {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-    align-items: start;
-    padding-top: 4rem;
-    border-top: 1px dotted rgba(255, 255, 255, 0.1);
-    text-align: center;
+    gap: 1.25rem;
+    margin-top: 2rem;
   }
 
-  .core-features-comparison__lead {
+  .core-features-comparison__header {
     display: grid;
     gap: 1rem;
-    justify-items: center;
   }
 
-  .core-features-comparison__lead h3 {
-    font-size: 2rem;
+  .core-features-comparison__title {
+    max-width: 18ch;
   }
 
   .core-features-comparison__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
-    max-width: 55rem;
-    margin: 0 auto;
+  }
+
+  .core-features-comparison__column {
+    display: grid;
+    gap: 0.9rem;
+    padding: clamp(1.1rem, 2vw, 1.5rem);
+  }
+
+  .core-features-comparison__column--accent {
+    background: rgba(var(--accent-primary-rgb), 0.06);
+  }
+
+  .core-features-comparison__stack {
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
   .core-features-comparison__item {
-    display: grid;
-    gap: 0.5rem;
-    padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 4px;
+    margin: 0;
+    padding: 1rem 0;
   }
 
-  .core-features-comparison__item strong {
-    font-size: 1.1rem;
-    color: var(--text-primary);
-    line-height: 1.45;
-  }
-
-  .core-features-comparison__item--accent {
-    border-color: rgba(var(--accent-primary-rgb), 0.35);
-    background: rgba(var(--accent-primary-rgb), 0.08);
-  }
-
-  .core-feature-card__image-wrap {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 2rem;
-    background: #000;
-  }
-
-  .core-feature-card__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.85;
-    transition: transform 0.6s ease, opacity 0.6s ease;
-  }
-
-  .core-feature-card:hover .core-feature-card__image {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-
-  .core-features-list {
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-
-  .core-feature-card {
-    grid-column: span 1;
-    padding: 2.5rem 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(48, 44, 44, 0.3);
-    backdrop-filter: blur(12px);
-    border-radius: 4px;
-    transition: all 0.3s ease;
-  }
-
-  .core-feature-card--lead {
-    grid-column: span 2;
-    padding: 4rem 3rem;
-    background: linear-gradient(135deg, rgba(255, 107, 0, 0.05), rgba(0, 0, 0, 0));
-  }
-
-  .feature-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    border: 1px solid var(--accent-primary);
-    border-radius: 50%;
-    color: var(--accent-primary);
-    background: rgba(255, 107, 0, 0.1);
-  }
-
-
-  .core-feature-card:hover .feature-icon {
-    border-color: var(--accent-primary);
-  }
-
-  .core-feature-card h3 {
-    font-size: clamp(1.1rem, 1.02rem + 0.26vw, 1.35rem);
-    line-height: 1.12;
-  }
-
-  @media (max-width: 1024px) {
-    .core-features-intro,
-    .core-features-grid,
-    .core-features-comparison {
-      grid-template-columns: 1fr;
+  @media (min-width: 980px) {
+    .core-feature-lead {
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      align-items: start;
     }
 
-    .core-features-proof {
-      position: static;
-      top: auto;
+    .core-feature-support {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .core-features-proof-list,
     .core-features-comparison__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .core-features-list {
-      grid-template-columns: 1fr;
-    }
-
-    .core-features-proof {
-      text-align: center;
-    }
-
-    .core-feature-card__row {
-      grid-template-columns: 1fr;
-    }
-
-    .core-feature-card__copy {
-      text-align: center;
-    }
-
-    .core-feature-card__description {
-      margin: 0 auto;
-    }
-
-    .core-feature-card,
-    .core-feature-card--lead,
-    .core-feature-card:nth-child(2),
-    .core-feature-card:nth-child(3) {
-      grid-column: auto;
-      margin-top: 0;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .core-features-copy {
-      font-size: var(--text-base);
-    }
-
-    .core-features-proof-list li:last-child,
-    .core-features-comparison__item:last-child {
-      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>
