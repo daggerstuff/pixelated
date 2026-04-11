@@ -1,7 +1,9 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 // Mock fetch for API calls
-const mockFetch = vi.fn()
+const mockFetch = vi.fn<
+  (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+>()
 global.fetch = mockFetch
 
 // SSRF protection: Centralized URL validation utility
@@ -438,15 +440,17 @@ describe('APIService Integration Tests', () => {
   describe('Real-time WebSocket Connections', () => {
     it('establishes WebSocket connection for real-time updates', async () => {
       const mockWebSocket = {
-        send: vi.fn(),
-        close: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
+        send: vi.fn<(data: unknown) => void>(),
+        close: vi.fn<() => void>(),
+        addEventListener: vi.fn<(type: string, listener: EventListener) => void>(),
+        removeEventListener: vi.fn<
+          (type: string, listener: EventListener) => void
+        >(),
         readyState: 1, // OPEN
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(function () {
+      global.WebSocket = vi.fn<[], typeof mockWebSocket>(function () {
         return mockWebSocket
       }) as any
 
@@ -460,21 +464,23 @@ describe('APIService Integration Tests', () => {
 
     it('handles WebSocket message for category updates', async () => {
       const mockWebSocket = {
-        send: vi.fn(),
-        close: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
+        send: vi.fn<(data: unknown) => void>(),
+        close: vi.fn<() => void>(),
+        addEventListener: vi.fn<(type: string, listener: EventListener) => void>(),
+        removeEventListener: vi.fn<
+          (type: string, listener: EventListener) => void
+        >(),
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(function () {
+      global.WebSocket = vi.fn<[], typeof mockWebSocket>(function () {
         return mockWebSocket
       }) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
       // Simulate message handler registration
-      const messageHandler = vi.fn()
+      const messageHandler = vi.fn<(event: MessageEvent) => void>()
       ws.addEventListener('message', messageHandler)
 
       expect((ws as any).addEventListener).toHaveBeenCalledWith(

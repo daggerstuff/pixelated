@@ -20,9 +20,10 @@ export interface RedisInfo {
   blocked_clients?: number
 }
 
-export interface RedisEventHandler {
-  (event: string, callback: (...args: unknown[]) => void): Redis
-}
+export type RedisEventHandler = (
+  event: string,
+  callback: (...args: unknown[]) => void,
+) => Redis
 
 export interface RedisMockClient {
   get(key: string): Promise<string | null>
