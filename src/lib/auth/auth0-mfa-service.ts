@@ -6,7 +6,6 @@
 import {
   ManagementClient,
   AuthenticationClient,
-  type AuthenticationClientOptions,
 } from 'auth0'
 
 // Type alias for auth0 v5+ compatibility
@@ -35,6 +34,8 @@ interface ExtendedManagementClient extends ManagementClient {
   removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
   getUserRoles(params: { id: string }): Promise<any>
 }
+
+type ExtendedAuthenticationClient = AuthenticationClient
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
@@ -75,9 +76,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:users update:users create:users read:guardian_factors update:guardian_factors',
-    })
+    }) as ExtendedManagementClient
   }
 }
 

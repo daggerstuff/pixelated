@@ -69,7 +69,6 @@ function initializeAuth0Clients() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users create:users',
     })
   }
 }

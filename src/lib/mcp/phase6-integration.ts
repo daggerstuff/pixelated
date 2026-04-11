@@ -50,6 +50,12 @@ export type AuthenticationEvent =
   | `mfa_verification_completed_${string}`
   | `mfa_factor_deleted_${string}`
   | `mfa_preferred_factor_set_${string}`
+  | 'webauthn_registration_options_generated'
+  | 'webauthn_authentication_options_generated'
+  | `webauthn_registration_completed_${string}`
+  | `webauthn_authentication_completed_${string}`
+  | `webauthn_credential_deleted_${string}`
+  | `webauthn_credential_renamed_${string}`
 
 /**
  * Update Phase 6 authentication progress
