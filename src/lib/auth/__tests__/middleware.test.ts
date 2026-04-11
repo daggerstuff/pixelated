@@ -46,6 +46,12 @@ vi.mock('../../mcp/phase6-integration', () => ({
   updatePhase6AuthenticationProgress: vi.fn(),
 }))
 
+vi.mock('../auth0-adaptive-mfa-service', () => ({
+  auth0AdaptiveMFAService: {
+    shouldRequireMFA: vi.fn(),
+  },
+}))
+
 vi.mock('../../redis', () => ({
   redis: {
     get: vi.fn(),
@@ -64,6 +70,7 @@ vi.mock('../user-identity', () => ({
 }))
 
 import { resolveIdentity } from '../user-identity'
+import { auth0AdaptiveMFAService } from '../auth0-adaptive-mfa-service'
 
 describe('Authentication Middleware', () => {
   let mockRequest: Request
@@ -71,6 +78,7 @@ describe('Authentication Middleware', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(auth0AdaptiveMFAService.shouldRequireMFA).mockResolvedValue(false)
 
     // Create mock request
     mockRequest = new Request('https://example.com/api/test', {
