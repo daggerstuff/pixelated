@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  public override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to error reporting service
     console.error('Error caught by boundary:', error, errorInfo)
 
@@ -40,7 +40,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo)
   }
 
-  render() {
+  public override render() {
     if (this.state.hasError) {
       // Render fallback UI if provided, otherwise render default error UI
       if (this.props.fallback) {
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<Props, State> {
             Something went wrong
           </h2>
           <p className='text-red-600 dark:text-red-300 mb-4 text-sm'>
-            {this.state.error?.message || 'An unexpected error occurred'}
+            {this.state.error?.message ?? 'An unexpected error occurred'}
           </p>
           <button
             onClick={() => {

@@ -11,8 +11,8 @@ import {
   logError,
   formatErrorForUser,
   createErrorContext,
-  type ErrorContext,
 } from './utils'
+import { type ErrorContext } from './types'
 
 interface Props {
   children: ReactNode
@@ -46,7 +46,24 @@ interface State {
 const MAX_RETRY_COUNT = 3
 
 export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+  private getSentryClient(): {
+    captureException: (error: Error, context?: Record<string, unknown>) => void
+  } | undefined {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    return (window as Window & {
+      Sentry?: {
+        captureException: (
+          error: Error,
+          context?: Record<string, unknown>,
+        ) => void
+      }
+    }).Sentry
+  }
+
+  public override state: State = {
     hasError: false,
     error: null,
     errorInfo: null,
@@ -57,7 +74,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const context: ErrorContext = createErrorContext({
       componentName: this.props.componentName,
       metadata: {
@@ -77,21 +94,17 @@ export class ErrorBoundary extends Component<Props, State> {
     // Log to monitoring service if enabled
     if (this.props.logToMonitoring !== false) {
       // Integration point for monitoring services (Sentry, etc.)
-      if (
-        typeof window !== 'undefined' &&
-        (window as { Sentry?: unknown }).Sentry
-      ) {
+      const sentry = this.getSentryClient()
+      if (sentry) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const Sentry = (window as any).Sentry
-          Sentry.captureException(error, {
+          sentry.captureException(error, {
             contexts: {
               react: {
                 componentStack: errorInfo.componentStack,
               },
             },
             tags: {
-              component: this.props.componentName || 'Unknown',
+              component: this.props.componentName ?? 'Unknown',
             },
           })
         } catch (monitoringError) {
@@ -136,7 +149,7 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.reload()
   }
 
-  public render() {
+  public override render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback
