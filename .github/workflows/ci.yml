@@ -62,8 +62,8 @@ jobs:
       - name: Format check
         run: pnpm format
 
-      - name: Run unit tests
-        run: pnpm test
+      - name: Run blocking test suite
+        run: pnpm test:blocking
 
       - name: Build Docker image
         id: build-image

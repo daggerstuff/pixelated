@@ -1,0 +1,62 @@
+name: Advisory Tests
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'ai/**'
+      - 'tests/**'
+      - 'config/vitest.config.ts'
+      - 'scripts/testing/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/advisory-tests.yml'
+  pull_request:
+    branches: [main, master, staging]
+
+jobs:
+  advisory-test-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5.0.0
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.3.0
+        with:
+          node-version: '24.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run advisory suite
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm test:advisory 2>&1 | tee advisory-test.log
+
+      - name: Upload advisory test log
+        if: always() && hashFiles('advisory-test.log') != ''
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: advisory-test-log
+          path: advisory-test.log
+          retention-days: 14
