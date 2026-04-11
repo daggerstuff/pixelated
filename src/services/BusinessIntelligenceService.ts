@@ -60,6 +60,16 @@ export interface BusinessAlert {
   actionUrl?: string
 }
 
+type MarketForecast = {
+  predictions: Array<{
+    date: Date
+    predictedPrice: number
+    confidence: number
+  }>
+  trend: 'up' | 'down' | 'stable'
+  confidence: number
+}
+
 export class BusinessIntelligenceService {
   private db: Pool
   private alphaVantageApiKey: string
@@ -69,7 +79,8 @@ export class BusinessIntelligenceService {
 
   constructor(db: Pool) {
     this.db = db
-    this.alphaVantageApiKey = process.env.ALPHA_VANTAGE_API_KEY || 'demo'
+    this.alphaVantageApiKey =
+      process.env.ALPHA_VANTAGE_API_KEY ?? 'demo'
   }
 
   async getMarketData(symbol: string): Promise<MarketData> {
@@ -205,8 +216,8 @@ export class BusinessIntelligenceService {
           netPromoterScore: row.net_promoter_score,
           marketShare: row.market_share,
           employeeCount: row.employee_count,
-          quarter: row.quarter,
-          year: row.year,
+          quarter: this.toStringOrUndefined(row.quarter) ?? '',
+          year: this.toNumberOrUndefined(row.year) ?? 0,
         }))
       }
 
@@ -216,6 +227,14 @@ export class BusinessIntelligenceService {
       console.error('Error fetching business metrics:', error)
       return this.getDemoBusinessMetrics(userId, quarter, year)
     }
+  }
+
+  private toStringOrUndefined(value: unknown): string | undefined {
+    return typeof value === 'string' ? value : undefined
+  }
+
+  private toNumberOrUndefined(value: unknown): number | undefined {
+    return typeof value === 'number' ? value : undefined
   }
 
   async addBusinessMetric(
@@ -295,15 +314,7 @@ export class BusinessIntelligenceService {
   async getMarketForecast(
     symbol: string,
     days: number = 30,
-  ): Promise<{
-    predictions: Array<{
-      date: Date
-      predictedPrice: number
-      confidence: number
-    }>
-    trend: 'up' | 'down' | 'stable'
-    confidence: number
-  }> {
+  ): Promise<MarketForecast> {
     try {
       // Use Alpha Vantage for technical analysis
       const response = await axios.get(this.alphaVantageBaseUrl, {
@@ -450,10 +461,10 @@ export class BusinessIntelligenceService {
   }
 
   private getDemoBusinessAlerts(
-    userId: string,
+    _userId: string,
     limit: number,
   ): BusinessAlert[] {
-    return [
+    const alerts: BusinessAlert[] = [
       {
         id: '1',
         type: 'market_change',
@@ -478,11 +489,20 @@ export class BusinessIntelligenceService {
         isRead: false,
         actionUrl: '/opportunities/new',
       },
-    ].slice(0, limit)
+    ]
+
+    return alerts.slice(0, limit)
   }
 
-  private getDemoMarketForecast(symbol: string, days: number) {
-    const predictions = []
+  private getDemoMarketForecast(
+    _symbol: string,
+    days: number,
+  ): MarketForecast {
+    const predictions: {
+      date: Date
+      predictedPrice: number
+      confidence: number
+    }[] = []
     for (let i = 0; i < days; i++) {
       predictions.push({
         date: new Date(Date.now() + i * 86400000),
@@ -538,7 +558,7 @@ export class BusinessIntelligenceService {
     return []
   }
 
-  private async generateMarketForecast(data: any, days: number) {
+  private async generateMarketForecast(data: any, days: number): Promise<MarketForecast> {
     // This would process real market data for forecasts
     // For now, return demo data
     return this.getDemoMarketForecast('SPY', days)
