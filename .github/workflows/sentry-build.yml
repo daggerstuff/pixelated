@@ -5,11 +5,11 @@ permissions:
   packages: write
 
 env:
-  FORCE_JS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main, master, staging]
   workflow_dispatch:
 
 jobs:
@@ -38,6 +38,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
 
       - name: Build (with Sentry envs if provided)
         env:
