@@ -8,17 +8,6 @@ const baseURL =
   process.env['BASE_URL'] ||
   (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
 
-// Optional Cloudflare Access service token support for staging/prod runs
-const cfAccessClientId = process.env['CF_ACCESS_CLIENT_ID']
-const cfAccessClientSecret = process.env['CF_ACCESS_CLIENT_SECRET']
-const extraHTTPHeaders =
-  cfAccessClientId && cfAccessClientSecret
-    ? {
-        'CF-Access-Client-Id': cfAccessClientId,
-        'CF-Access-Client-Secret': cfAccessClientSecret,
-      }
-    : undefined
-
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
 let webServerPort: number | undefined
@@ -64,6 +53,19 @@ try {
   webServerUrl = undefined
   webServerPort = undefined
 }
+
+// Optional Cloudflare Access service token support for staging/prod runs
+// Keep localhost preview traffic free of Cloudflare-only headers to avoid
+// CORS noise in browser tests.
+const cfAccessClientId = process.env['CF_ACCESS_CLIENT_ID']
+const cfAccessClientSecret = process.env['CF_ACCESS_CLIENT_SECRET']
+const extraHTTPHeaders =
+  isRemoteUrl && cfAccessClientId && cfAccessClientSecret
+    ? {
+        'CF-Access-Client-Id': cfAccessClientId,
+        'CF-Access-Client-Secret': cfAccessClientSecret,
+      }
+    : undefined
 
 /**
  * Playwright configuration for Pixelated Empathy AI E2E tests

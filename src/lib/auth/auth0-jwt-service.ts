@@ -19,14 +19,6 @@ interface JwtPayload {
   sid?: string
 }
 
-// Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
-interface ExtendedAuthenticationClient extends AuthenticationClient {
-  oauth: AuthenticationClient['oauth'] & {
-    passwordGrant: (params: Record<string, unknown>) => Promise<{ data: unknown }>
-    refreshTokenGrant: (params: Record<string, unknown>) => Promise<{ data: unknown }>
-    revokeRefreshToken: (params: Record<string, unknown>) => Promise<unknown>
-  }
-}
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
@@ -34,7 +26,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config, isAuth0Configured } from './auth0-config'
 
 // Initialize Auth0 authentication client
-let auth0Authentication: ExtendedAuthenticationClient | null = null
+let auth0Authentication: AuthenticationClient | null = null
 let auth0UserInfo: UserInfoClient | null = null
 
 /**
@@ -46,12 +38,11 @@ function initializeAuth0Client() {
     return
   }
 
-  auth0Authentication ??=
-    new AuthenticationClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret,
-    }) as ExtendedAuthenticationClient
+  auth0Authentication ??= new AuthenticationClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.clientId,
+    clientSecret: auth0Config.clientSecret,
+  })
   auth0UserInfo ??= new UserInfoClient({ domain: auth0Config.domain })
 }
 
@@ -110,10 +101,6 @@ type Auth0TokenResponse = {
   expires_in?: unknown
   id_token?: unknown
   token_type?: unknown
-}
-
-function isRecord(value: unknown): value is UnknownRecord {
-  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 function toAuth0TokenResponse(value: unknown): Auth0TokenResponse | null {
@@ -262,10 +249,11 @@ function isUserRole(value: string | undefined | null): value is UserRole {
 function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
   // Try to get role from app_metadata first
   const appMetadataRoles = payload['https://pixelated.empathy/app_metadata']?.roles
-  if (Array.isArray(appMetadataRoles) && appMetadataRoles.length > 0) {
-    const appRole = appMetadataRoles[0]
-    if (typeof appRole === 'string' && isUserRole(appRole)) {
-      return appRole
+  if (Array.isArray(appMetadataRoles)) {
+    for (const appRole of appMetadataRoles) {
+      if (typeof appRole === 'string' && isUserRole(appRole)) {
+        return appRole
+      }
     }
   }
 
@@ -369,9 +357,16 @@ export async function validateToken(
 
     // Extract user information
     const userInfoData = toStringRecord(userInfo.data)
-    const tokenPayload = isAuth0TokenClaims(userInfoData) ? userInfoData : payload
-    const userId = tokenPayload.sub ?? payload.sub ?? ''
-    if (!userId) {
+  const tokenPayload: Auth0TokenClaims = isAuth0TokenClaims(userInfoData)
+    ? userInfoData
+    : payload
+  const userId =
+    typeof tokenPayload.sub === 'string'
+      ? tokenPayload.sub
+      : typeof payload.sub === 'string'
+        ? payload.sub
+        : ''
+  if (userId.length === 0) {
       throw new AuthenticationError('Token missing subject claim')
     }
     const role = extractRoleFromPayload(tokenPayload)
@@ -466,14 +461,19 @@ export async function refreshAccessToken(
       throw new AuthenticationError('Invalid user payload')
     }
     const userPayload = userResponseData
-    const userId = userPayload.sub ?? ''
+    const userId =
+      typeof userPayload.sub === 'string'
+        ? userPayload.sub
+        : ''
+    const accessTokenId =
+      typeof userPayload.jti === 'string' ? userPayload.jti : undefined
     const role = extractRoleFromPayload(userPayload)
 
     // Log token refresh event
     logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, null, {
       userId: userId,
       oldTokenId: 'unknown', // We don't have the old token ID
-      newAccessTokenId: userPayload.jti ?? '',
+      newAccessTokenId: accessTokenId ?? '',
       newRefreshTokenId: tokenResponseData?.refresh_token
         ? 'present'
         : 'not_provided',
@@ -493,10 +493,7 @@ export async function refreshAccessToken(
         typeof tokenResponseData?.expires_in === 'number'
           ? tokenResponseData.expires_in
           : 3600,
-      user: {
-        id: userId,
-        role: role,
-      },
+      user: { id: userId, role: role },
     }
   } catch {
     throw new AuthenticationError('Invalid refresh token')

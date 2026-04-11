@@ -1080,4 +1080,71 @@ export class AIRepository {
       dailyTrends: [],
     };
   }
+
+
+  /**
+   * Get emotion data for sessions
+   */
+  async getEmotionData(sessionIds: string[]): Promise<EmotionAnalysis[]> {
+    const db = await this.getDatabase();
+    const results = await db
+      .collection('emotion_analysis')
+      .find({ sessionId: { $in: sessionIds } })
+      .toArray();
+    return results;
+  }
+
+  /**
+   * Get critical emotions for a client
+   */
+  async getCriticalEmotions(
+    clientId: string,
+    emotionTypes?: string[]
+  ): Promise<EmotionAnalysis[]> {
+    const db = await this.getDatabase();
+    const query: Record<string, unknown> = { clientId, riskLevel: 'critical' };
+    if (emotionTypes && emotionTypes.length > 0) {
+      query['emotionType'] = { $in: emotionTypes };
+    }
+    const results = await db.collection('emotion_analysis').find(query).toArray();
+    return results;
+  }
+
+  /**
+   * Get emotion data by date range
+   */
+  async getEmotionDataByDateRange(
+    clientId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<EmotionAnalysis[]> {
+    const db = await this.getDatabase();
+    const results = await db
+      .collection('emotion_analysis')
+      .find({
+        clientId,
+        timestamp: { $gte: startDate, $lte: endDate },
+      })
+      .toArray();
+    return results;
+  }
+
+  /**
+   * Get emotion correlations
+   */
+  async getEmotionCorrelations(
+    clientId: string,
+    options?: { startDate?: Date; endDate?: Date }
+  ): Promise<{ emotion1: string; emotion2: string; correlation: number }[]> {
+    const db = await this.getDatabase();
+    const query: Record<string, unknown> = { clientId };
+    if (options?.startDate || options?.endDate) {
+      const timestampQuery: Record<string, Date> = {};
+      if (options.startDate) timestampQuery['$gte'] = options.startDate;
+      if (options.endDate) timestampQuery['$lte'] = options.endDate;
+      query['timestamp'] = timestampQuery;
+    }
+    const results = await db.collection('emotion_correlations').find(query).toArray();
+    return results;
+  }
 }

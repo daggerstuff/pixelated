@@ -13,54 +13,50 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-// Extend ManagementClient to include methods that may not be in the TypeScript definitions
-interface ExtendedManagementClient extends ManagementClient {
-  // Roles
-  getRoles(params: {
-    per_page?: number
-    page?: number
-    name_filter?: string
-  }): Promise<unknown[]>
-  createRole(params: { name: string; description?: string }): Promise<unknown>
-  updateRole(params: {
-    id: string
-    name?: string
-    description?: string
-  }): Promise<unknown>
-  deleteRole(params: { id: string }): Promise<void>
-  getRoleUsers(params: { id: string }): Promise<unknown>
-  getRolePermissions(params: { id: string }): Promise<unknown>
-  assignPermissionsToRole(params: {
-    id: string
-    permissions: { value: string }[]
-  }): Promise<unknown>
-  removePermissionsFromRole(params: {
-    id: string
-    permissions: { value: string }[]
-  }): Promise<void>
-  // Users
-  assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
-  removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
-  getUserRoles(params: { id: string }): Promise<unknown[]>
-  // Permissions
-  getPermissions(params: { per_page?: number; page?: number }): Promise<unknown[]>
-  createPermission(params: {
-    name: string
-    description: string
-    audience: string
-  }): Promise<unknown>
-  updatePermission(params: { id: string; description?: string }): Promise<unknown>
-  deletePermission(params: { id: string }): Promise<void>
-  // Logs
-  getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
-  // Guardian
-  getGuardianEnrollments(params: { id: string }): Promise<unknown>
-  getGuardianFactors(): Promise<unknown>
-  createGuardianEnrollmentTicket(params: {
-    user_id: string
-    send_mail: boolean
-  }): Promise<unknown>
-  deleteGuardianEnrollment(params: { id: string }): Promise<void>
+declare module 'auth0' {
+  interface ManagementClient {
+    getRoles(params: {
+      per_page?: number
+      page?: number
+      name_filter?: string
+    }): Promise<unknown[]>
+    createRole(params: { name: string; description?: string }): Promise<unknown>
+    updateRole(params: {
+      id: string
+      name?: string
+      description?: string
+    }): Promise<unknown>
+    deleteRole(params: { id: string }): Promise<void>
+    getRoleUsers(params: { id: string }): Promise<unknown>
+    getRolePermissions(params: { id: string }): Promise<unknown>
+    assignPermissionsToRole(params: {
+      id: string
+      permissions: { value: string }[]
+    }): Promise<unknown>
+    removePermissionsFromRole(params: {
+      id: string
+      permissions: { value: string }[]
+    }): Promise<void>
+    assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+    removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
+    getUserRoles(params: { id: string }): Promise<unknown[]>
+    getPermissions(params: { per_page?: number; page?: number }): Promise<unknown[]>
+    createPermission(params: {
+      name: string
+      description: string
+      audience: string
+    }): Promise<unknown>
+    updatePermission(params: { id: string; description?: string }): Promise<unknown>
+    deletePermission(params: { id: string }): Promise<void>
+    getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
+    getGuardianEnrollments(params: { id: string }): Promise<unknown>
+    getGuardianFactors(): Promise<unknown>
+    createGuardianEnrollmentTicket(params: {
+      user_id: string
+      send_mail: boolean
+    }): Promise<unknown>
+    deleteGuardianEnrollment(params: { id: string }): Promise<void>
+  }
 }
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -138,7 +134,7 @@ function getPermissionDefinition(permission: string): Permission | undefined {
 }
 
 // Initialize Auth0 management client
-let auth0Management: ExtendedManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 
 /**
  * Initialize Auth0 management client
@@ -160,7 +156,7 @@ function initializeAuth0Management() {
     clientId: auth0Config.managementClientId,
     clientSecret: auth0Config.managementClientSecret,
     audience: `https://${auth0Config.domain}/api/v2/`,
-  }) as ExtendedManagementClient
+    })
 }
 
 // Initialize the management client

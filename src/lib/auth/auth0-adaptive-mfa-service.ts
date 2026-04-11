@@ -15,23 +15,21 @@ export type ManagementClientOptionsWithClientCredentials = {
 
 import { auth0UserService } from '../../services/auth0.service'
 
-// Extend ManagementClient to include methods that may not be in the TypeScript definitions
-interface ExtendedManagementClient extends ManagementClient {
-  // Logs
-  getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
-  // Guardian methods
-  getGuardianEnrollments(params: { id: string }): Promise<unknown>
-  getGuardianFactors(): Promise<unknown>
-  createGuardianEnrollmentTicket(params: {
-    user_id: string
-    send_mail: boolean
-  }): Promise<unknown>
-  deleteGuardianEnrollment(params: { id: string }): Promise<void>
-  // Roles
-  getRoles(params: { per_page?: number; page?: number }): Promise<unknown[]>
-  assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
-  removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
-  getUserRoles(params: { id: string }): Promise<unknown[]>
+declare module 'auth0' {
+  interface ManagementClient {
+    getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
+    getGuardianEnrollments(params: { id: string }): Promise<unknown>
+    getGuardianFactors(): Promise<unknown>
+    createGuardianEnrollmentTicket(params: {
+      user_id: string
+      send_mail: boolean
+    }): Promise<unknown>
+    deleteGuardianEnrollment(params: { id: string }): Promise<void>
+    getRoles(params: { per_page?: number; page?: number }): Promise<unknown[]>
+    assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+    removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
+    getUserRoles(params: { id: string }): Promise<unknown[]>
+  }
 }
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
@@ -39,7 +37,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
 // Initialize Auth0 management client
-let auth0Management: ExtendedManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 
 /**
  * Initialize Auth0 management client
@@ -59,7 +57,7 @@ function initializeAuth0Management() {
     clientId: auth0Config.managementClientId,
     clientSecret: auth0Config.managementClientSecret,
     audience: `https://${auth0Config.domain}/api/v2/`,
-  }) as ExtendedManagementClient
+    })
 }
 
 // Initialize the management client
@@ -471,7 +469,7 @@ export class Auth0AdaptiveMFAService {
 
         // Check for unusual login patterns (simulated)
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin) {
+        if (user?.lastLogin) {
           const lastLoginTime = new Date(user.lastLogin)
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
 
