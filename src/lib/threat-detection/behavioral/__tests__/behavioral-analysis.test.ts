@@ -19,17 +19,17 @@ import {
 
 // Define mock instances to capture calls
 const mockRedisInstance = {
-  get: vi.fn(),
-  set: vi.fn(),
-  setex: vi.fn(),
-  del: vi.fn(),
-  exists: vi.fn(),
-  incr: vi.fn(),
-  expire: vi.fn(),
-  hget: vi.fn(),
-  hset: vi.fn(),
-  hgetall: vi.fn(),
-  hdel: vi.fn(),
+  get: vi.fn<(...args: unknown[]) => unknown>(),
+  set: vi.fn<(...args: unknown[]) => unknown>(),
+  setex: vi.fn<(...args: unknown[]) => unknown>(),
+  del: vi.fn<(...args: unknown[]) => unknown>(),
+  exists: vi.fn<(...args: unknown[]) => unknown>(),
+  incr: vi.fn<(...args: unknown[]) => unknown>(),
+  expire: vi.fn<(...args: unknown[]) => unknown>(),
+  hget: vi.fn<(...args: unknown[]) => unknown>(),
+  hset: vi.fn<(...args: unknown[]) => unknown>(),
+  hgetall: vi.fn<(...args: unknown[]) => unknown>(),
+  hdel: vi.fn<(...args: unknown[]) => unknown>(),
   hincrby: vi.fn(),
   quit: vi.fn(),
 }

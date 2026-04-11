@@ -352,8 +352,7 @@ async function validateJSONDataset(filePath: string, errors: string[]): Promise<
 
     const recordLine = trimmed.startsWith(",") ? trimmed.slice(1).trim() : trimmed;
 
-    for (let i = 0; i < recordLine.length; i++) {
-      const char = recordLine[i];
+    for (const char of recordLine) {
 
       if (escapeNext) {
         currentRecord += char;
