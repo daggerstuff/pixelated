@@ -4,8 +4,8 @@ FROM node:24-slim AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@10.30.3
-RUN npm install -g npm@11.11.1
+RUN npm install -g pnpm@10.33.0
+RUN npm install -g npm@11.12.1
 
 # Build dependencies stage (has build tools)
 FROM node:24-slim AS build-base
@@ -13,8 +13,8 @@ WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=1
-RUN npm install -g pnpm@10.30.3
-RUN npm install -g npm@11.11.1
+RUN npm install -g pnpm@10.33.0
+RUN npm install -g npm@11.12.1
 RUN apt-get update && apt-get install --no-install-recommends -y python3=3.11.2-1+b1 make=4.3-4.1 g++=4:12.2.0-3 libvips-dev=8.14.1-3+deb12u2 curl=7.88.1-10+deb12u14 git && rm -rf /var/lib/apt/lists/*
 
 # Runtime base stage (no build toolchain)
@@ -22,8 +22,6 @@ FROM node:24-slim AS runtime
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@10.30.3
-RUN npm install -g npm@11.11.1
 RUN apt-get update && apt-get install --no-install-recommends -y curl=7.88.1-10+deb12u14 && rm -rf /var/lib/apt/lists/*
 
 # Production dependencies stage
@@ -46,6 +44,13 @@ RUN pnpm run build
 # Final runner stage
 FROM runtime AS runner
 WORKDIR /app
+
+# The final runtime image only needs `node`; remove package-manager tooling
+# so Trivy does not flag bundled npm/pnpm libraries we never use in prod.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+  && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+  && rm -rf /usr/local/lib/node_modules/pnpm \
+  && rm -f /usr/local/bin/pnpm /usr/local/bin/pnpx
 
 # Create user
 RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -s /bin/sh -m pixelated
