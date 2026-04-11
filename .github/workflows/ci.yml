@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       ARTIFACT_REGISTRY_LOCATION: us-west1
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
 
@@ -75,12 +74,15 @@ jobs:
       - name: Security scan
         uses: aquasecurity/trivy-action@v0.35.0
         with:
+          cache: 'false'
           image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
+          # trivy-action clears TRIVY_SEVERITY for SARIF unless this is enabled.
+          limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results
         if: always() && hashFiles('trivy-results.sarif') != ''

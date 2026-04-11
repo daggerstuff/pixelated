@@ -55,8 +55,8 @@ export function isAlertItem(v: unknown): v is AlertItem {
   return (
     isObject(v) &&
     typeof v['alertId'] === 'string' &&
-    typeof v.message === 'string' &&
-    typeof v.level === 'string' &&
+    typeof v['message'] === 'string' &&
+    typeof v['level'] === 'string' &&
     (typeof v['timestamp'] === 'string' || v['timestamp'] instanceof Date)
   )
 }
@@ -113,8 +113,8 @@ export function isPartialBiasDashboardSummary(
 export function isBiasAnalysisItem(v: unknown): v is BiasAnalysisItem {
   return (
     isObject(v) &&
-    typeof v.sessionId === 'string' &&
-    typeof v.overallBiasScore === 'number'
+    typeof v['sessionId'] === 'string' &&
+    typeof v['overallBiasScore'] === 'number'
   )
 }
 
