@@ -19,10 +19,10 @@ interface MongoConfig {
 }
 
 class MongoDB {
-  private static instance: MongoDB
+  private static instance: MongoDB | null = null
   private client: MongoClient | null = null
   private db: Db | null = null
-  private config: MongoConfig
+  private readonly config: MongoConfig
 
   private constructor() {
     // Build MongoDB URI from environment variables
@@ -30,7 +30,7 @@ class MongoDB {
 
     this.config = {
       uri: mongoUri,
-      dbName: process.env['MONGODB_DB_NAME'] || 'pixelated_empathy',
+      dbName: process.env['MONGODB_DB_NAME'] ?? 'pixelated_empathy',
       options: {
         // Connection pool settings
         maxPoolSize: 10,
@@ -57,7 +57,12 @@ class MongoDB {
    * Build MongoDB URI from environment variables
    */
   private buildMongoDBUri(): string {
-    const mongoUri = process.env['MONGODB_URI'] || import.meta.env.MONGODB_URI
+    const metaEnv =
+      typeof import.meta === 'object' && typeof import.meta.env === 'object'
+        ? (import.meta.env as { MONGODB_URI?: string }).MONGODB_URI
+        : undefined
+
+    const mongoUri = process.env['MONGODB_URI'] ?? metaEnv
 
     if (mongoUri) {
       return mongoUri
@@ -77,7 +82,7 @@ class MongoDB {
   }
 
   public static getInstance(): MongoDB {
-    if (!MongoDB.instance) {
+    if (MongoDB.instance === null) {
       MongoDB.instance = new MongoDB()
     }
     return MongoDB.instance
