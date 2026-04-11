@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Production Deployment Script for Business Strategy CMS
-# Supports multiple cloud platforms: Vercel, AWS, DigitalOcean
+# Supports multiple cloud platforms: Vercel, AWS, Legacy DigitalOcean, Hetzner AI
 
 set -e
 
@@ -68,9 +68,9 @@ deploy_aws() {
     echo -e "${GREEN}✅ Successfully deployed to AWS ECS!${NC}"
 }
 
-# Function to deploy to DigitalOcean
+# Function to deploy to DigitalOcean (legacy)
 deploy_digitalocean() {
-    echo -e "${YELLOW}🎯 Deploying to DigitalOcean App Platform...${NC}"
+    echo -e "${YELLOW}🎯 Deploying to DigitalOcean App Platform (legacy flow)...${NC}"
     
     # Check if doctl is installed
     if ! command -v doctl &> /dev/null; then
@@ -118,7 +118,7 @@ services:
 EOF
     
     doctl apps create --spec app.yaml
-    echo -e "${GREEN}✅ Successfully deployed to DigitalOcean!${NC}"
+    echo -e "${GREEN}✅ Successfully deployed to DigitalOcean (legacy flow)!${NC}"
 }
 
 # Function to run production tests
@@ -143,7 +143,7 @@ main() {
     echo "Select deployment platform:"
     echo "1) Vercel (Recommended for serverless)"
     echo "2) AWS ECS (Scalable containers)"
-    echo "3) DigitalOcean (Simple and cost-effective)"
+    echo "3) DigitalOcean (legacy flow)"
     echo "4) Run tests only"
     echo ""
     

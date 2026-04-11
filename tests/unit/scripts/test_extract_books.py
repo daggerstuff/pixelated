@@ -518,8 +518,8 @@ class TestS3Upload:
             file_path = Path(f.name)
 
         with patch.dict("os.environ", {
-            "OVH_S3_ACCESS_KEY": "test_key",
-            "OVH_S3_SECRET_KEY": "test_secret",
+            "HETZNER_S3_ACCESS_KEY": "test_key",
+            "HETZNER_S3_SECRET_KEY": "test_secret",
         }):
             with patch("boto3.client") as mock_client:
                 mock_s3 = MagicMock()

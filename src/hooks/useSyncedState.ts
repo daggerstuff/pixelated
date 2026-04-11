@@ -52,7 +52,7 @@ class SyncLifecycleManager<T> {
   private onConflict?: (key: string, localValue: T, remoteValue: T) => T
 
   private onStateChange: (value: T) => void
-  private onStatusChange: (status: 'synced' | 'offline') => void
+  private onStatusChange: (status: 'synced' | 'syncing' | 'conflict' | 'offline') => void
 
   private lastSyncValue: T
   private debounceRef: NodeJS.Timeout | null = null
@@ -65,7 +65,7 @@ class SyncLifecycleManager<T> {
     options: UseSyncedStateOptions<T>,
     storageOptions: Record<string, any>,
     onStateChange: (value: T) => void,
-    onStatusChange: (status: 'synced' | 'offline') => void,
+    onStatusChange: (status: 'synced' | 'syncing' | 'conflict' | 'offline') => void,
   ) {
     this.syncManager = syncManager
     this.instanceId = instanceId
@@ -221,7 +221,7 @@ export function useSyncedState<T>({
   const syncManager = useSyncManager()
   const [state, setState] = useState<T>(defaultValue)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [syncStatus, setSyncStatus] = useState<'synced' | 'offline'>('synced')
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'conflict' | 'offline'>('synced')
   const instanceId = useRef<string>()
   if (instanceId.current === undefined) {
     // Use crypto.randomUUID() for unique, collision-resistant instance IDs
@@ -235,7 +235,7 @@ export function useSyncedState<T>({
     setState(value)
   }, [])
 
-  const handleStatusChange = useCallback((status: 'synced' | 'offline') => {
+  const handleStatusChange = useCallback((status: 'synced' | 'syncing' | 'conflict' | 'offline') => {
     setSyncStatus(status)
   }, [])
 

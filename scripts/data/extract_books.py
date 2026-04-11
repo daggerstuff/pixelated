@@ -603,22 +603,22 @@ class BooksExtractor:
     def upload_to_s3(self, file_path: Path, s3_key: str) -> bool:
         """Upload file to S3 bucket.
 
-        Requires OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY environment variables.
+        Requires HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY environment variables.
         """
         try:
             import boto3
             from botocore.exceptions import ClientError
 
             # Get S3 credentials from environment
-            endpoint_url = os.getenv("OVH_S3_ENDPOINT", "https://s3.us-east-va.io.cloud.ovh.us")
-            access_key = os.getenv("OVH_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
-            secret_key = os.getenv("OVH_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
-            region = os.getenv("OVH_S3_REGION", "us-east-va")
-            bucket = os.getenv("OVH_S3_BUCKET", "pixel-data")
+            endpoint_url = os.getenv("HETZNER_S3_ENDPOINT", "https://hel1.your-objectstorage.com")
+            access_key = os.getenv("HETZNER_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
+            secret_key = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
+            region = os.getenv("HETZNER_S3_REGION", "hel1")
+            bucket = os.getenv("HETZNER_S3_BUCKET", "pixel-data")
 
             if not access_key or not secret_key:
                 logger.error(
-                    "❌ S3 credentials not found. Set OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY"
+                    "❌ S3 credentials not found. Set HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY"
                 )
                 return False
 
@@ -681,7 +681,7 @@ def main():
     parser.add_argument(
         "--upload-s3",
         action="store_true",
-        help="Upload output to S3 bucket (requires OVH_S3 credentials)",
+        help="Upload output to S3 bucket (requires HETZNER_S3 credentials)",
     )
     parser.add_argument(
         "--s3-prefix",

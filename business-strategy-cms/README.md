@@ -39,7 +39,7 @@ After a successful run, the script writes `.last-strategy-import.json` (sources
 and timestamp). The API exposes `GET /strategy/sources` and the strategy
 dashboard includes `source_file` per document for editor reference.
 
-## OVHCloud storage
+## Hetzner storage
 
-See [OVHCloud-Setup.md](OVHCloud-Setup.md) for Object Storage (S3-compatible)
+See [Hetzner-Setup.md](Hetzner-Setup.md) for Object Storage (S3-compatible)
 configuration.

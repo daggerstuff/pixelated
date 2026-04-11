@@ -85,9 +85,9 @@ describe('FHE Multi-tenant Isolation', () => {
   })
 
   it('generates tenant-specific key prefixes', () => {
-    expect(
-      tenantManager.getTenantKeyPrefix(tenant1.tenantId, 'key_'),
-    ).toBe('key__tenant_test-tenant-1_')
+    expect(tenantManager.getTenantKeyPrefix(tenant1.tenantId, 'key_')).toBe(
+      'key__tenant_test-tenant-1_',
+    )
   })
 
   it('enhances operation parameters with tenant information', () => {

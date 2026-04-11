@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OVH_REGION="${OVH_REGION:-US-EAST-VA}"
+HETZNER_REGION="${HETZNER_REGION:-hel1}"
 APP_NAME="${APP_NAME:-pixelated-ollama}"
 GPU_MODEL="${GPU_MODEL:-L4}"
 GPU_COUNT="${GPU_COUNT:-1}"
@@ -10,9 +10,9 @@ MEMORY_SIZE="${MEMORY_SIZE:-16Gi}"
 PORT="${PORT:-11434}"
 REPLICAS="${REPLICAS:-1}"
 PRELOAD_MODELS="${PRELOAD_MODELS:-kimi:k2,qwen3-coder:14b,glm-4:9b}"
-VOLUME_REF="${OLLAMA_VOLUME:-pixelated-ollama-cache@$OVH_REGION:/models:rw}"
+VOLUME_REF="${OLLAMA_VOLUME:-pixelated-ollama-cache@$HETZNER_REGION:/models:rw}"
 
-# Map GPU model names to OVH flavor IDs
+# Map GPU model names to cloud flavor IDs
 get_flavor() {
   case "${GPU_MODEL,,}" in
     l4) echo "l4-1-gpu" ;;
@@ -30,7 +30,7 @@ find_app_id() {
 IMAGE_TAG="${IMAGE_TAG:-pixelated-ollama:latest}"
 # Note: CI/CD builds with both Build.BuildNumber and 'latest' tags
 # Default to 'latest' for convenience, override with IMAGE_TAG if needed
-DOCKERFILE="${DOCKERFILE:-ai/ovh/Dockerfile.ollama}"
+DOCKERFILE="${DOCKERFILE:-ai/hetzner/Dockerfile.ollama}"
 
 log() {
   printf '[ollama-cli] %s\n' "$1"
@@ -58,7 +58,7 @@ registry_url() {
 # This function is kept for reference but requires docker locally
 build_image() {
   echo "Error: Local Docker builds are not supported." >&2
-  echo "Build the image via CI/CD (Azure Pipelines) or OVH's remote build service." >&2
+  echo "Build the image via CI/CD (Azure Pipelines) or the cloud provider's remote build service." >&2
   echo "Then provide the full image URL to 'deploy' command." >&2
   exit 1
 }
@@ -74,7 +74,7 @@ deploy_app() {
       log "No image URL provided, using: $image"
     else
       echo "Error: Image URL required and unable to determine registry." >&2
-      echo "Example: scripts/ovh/ollama-app.sh deploy <registry-url>/pixelated-ollama:latest" >&2
+      echo "Example: scripts/devops/ollama-app.sh deploy <registry-url>/pixelated-ollama:latest" >&2
       exit 1
     fi
   elif [[ "$image" != *"/"* ]]; then
@@ -98,7 +98,7 @@ deploy_app() {
   fi
 
   local flavor="$(get_flavor)"
-  log "Creating app ${APP_NAME} in ${OVH_REGION}"
+  log "Creating app ${APP_NAME} in ${HETZNER_REGION}"
   log "  Image: $image"
   log "  Flavor: $flavor (GPU: $GPU_COUNT)"
   log "  Replicas: $REPLICAS"
@@ -172,11 +172,11 @@ show_registry() {
 
 usage() {
   cat <<EOF
-Manage the Pixelated Ollama OVH app.
+Manage the Pixelated Ollama deployment.
 
 Commands:
-  registry            Show your OVH registry URL
-  deploy [image-url]  Deploy or redeploy the OVH app (image must be pre-built via CI/CD)
+  registry            Show your registry URL
+  deploy [image-url]  Deploy or redeploy the app (image must be pre-built via CI/CD)
                       If no URL provided, auto-constructs from registry + pixelated-ollama:latest
   start               Start the existing app
   stop                Stop the app to save credits
@@ -188,12 +188,12 @@ Note: Docker images are built via CI/CD (Azure Pipelines), not locally.
 
 Environment overrides:
   APP_NAME, GPU_MODEL, GPU_COUNT, CPU_COUNT, MEMORY_SIZE, REPLICAS
-  PRELOAD_MODELS, OLLAMA_VOLUME, IMAGE_TAG, OVH_REGION
+  PRELOAD_MODELS, OLLAMA_VOLUME, IMAGE_TAG, HETZNER_REGION
 
 Examples:
-  scripts/ovh/ollama-app.sh deploy                    # Uses registry + pixelated-ollama:latest
-  scripts/ovh/ollama-app.sh deploy pixelated-ollama:latest  # Auto-adds registry
-  scripts/ovh/ollama-app.sh deploy <full-registry-url>/pixelated-ollama:latest
+  scripts/devops/ollama-app.sh deploy                    # Uses registry + pixelated-ollama:latest
+  scripts/devops/ollama-app.sh deploy pixelated-ollama:latest  # Auto-adds registry
+  scripts/devops/ollama-app.sh deploy <full-registry-url>/pixelated-ollama:latest
 EOF
 }
 

@@ -106,7 +106,7 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Auto-refresh effect
   useEffect(() => {
-return undefined
+    return undefined
     void fetchDashboardData()
 
     if (autoRefresh) {

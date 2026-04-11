@@ -84,12 +84,15 @@ describe('useIntegration hooks', () => {
       toggleComparePlanId: vi.fn<(id: string) => void>(),
       clearCompare: vi.fn<() => void>(),
     }
-    useIntegrationStore.mockImplementation((selector?: (state: typeof storeState) => unknown) =>
-      typeof selector === 'function' ? selector(storeState) : storeState,
+    useIntegrationStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
     )
-    ;(useIntegrationStore as typeof useIntegrationStore & {
-      getState?: () => typeof storeState
-    }).getState = () => storeState
+    ;(
+      useIntegrationStore as typeof useIntegrationStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
   })
 
   describe('useIntegrationPlanListQuery', () => {
@@ -129,16 +132,16 @@ describe('useIntegration hooks', () => {
         },
       }
       useIntegrationStore.mockImplementation(
-        (
-          selector?: (state: typeof filteredStoreState) => unknown,
-        ) =>
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
           typeof selector === 'function'
             ? selector(filteredStoreState)
             : filteredStoreState,
       )
-      ;(useIntegrationStore as typeof useIntegrationStore & {
-        getState?: () => typeof filteredStoreState
-      }).getState = () => filteredStoreState
+      ;(
+        useIntegrationStore as typeof useIntegrationStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(
         () => useIntegrationPlanListQuery('session-1'),
@@ -237,9 +240,11 @@ describe('useIntegration hooks', () => {
       vi.mocked(api.initiateIntegration).mockResolvedValue(mockIntegrationPlan)
       const setSelectedPlanId = vi.fn<(id: string) => void>()
 
-      ;(useIntegrationStore as typeof useIntegrationStore & {
-        getState?: () => { setSelectedPlanId: typeof setSelectedPlanId }
-      }).getState = () => ({
+      ;(
+        useIntegrationStore as typeof useIntegrationStore & {
+          getState?: () => { setSelectedPlanId: typeof setSelectedPlanId }
+        }
+      ).getState = () => ({
         setSelectedPlanId,
       })
 

@@ -154,7 +154,7 @@ backup_cloud_clis() {
     # Azure
     [[ -d "${user_home}/.azure" ]] && cp -r "${user_home}/.azure" "${dest}/" && success "Azure config backed up"
     
-    # DigitalOcean
+    # DigitalOcean doctl (legacy cloud provider config)
     [[ -d "${user_home}/.config/doctl" ]] && cp -r "${user_home}/.config/doctl" "${dest}/doctl" && success "doctl config backed up"
     
     # Oracle Cloud
