@@ -134,6 +134,7 @@ export const AdminDashboard: FC = () => {
               <div className='flex items-center gap-4'>
                 <OfflineIndicator position='inline' />
                 <select
+                  aria-label="Select time range"
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value as any)}
                   className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
@@ -331,6 +332,7 @@ const OverviewTab: FC<{
               >
                 <input
                   type='checkbox'
+                  aria-label={`Select therapist ${therapist.name}`}
                   checked={selectedTherapists.includes(therapist.id)}
                   onChange={() => onTherapistSelect(therapist.id)}
                   className='text-blue-600 h-4 w-4 rounded'
@@ -537,10 +539,11 @@ const TherapistsTab: FC<{
           <div className='flex items-center gap-4'>
             <input
               type='text'
+              aria-label='Search therapists'
               placeholder='Search therapists...'
               className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded-lg border px-3 py-2 text-sm'
             />
-            <select className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'>
+            <select aria-label="Filter by performance level" className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'>
               <option>All Performance Levels</option>
               <option>High Performers</option>
               <option>Needs Support</option>
@@ -558,6 +561,7 @@ const TherapistsTab: FC<{
               <div className='flex items-center gap-4'>
                 <input
                   type='checkbox'
+                  aria-label={`Select therapist ${therapist.name}`}
                   checked={selectedTherapists.includes(therapist.id)}
                   onChange={() => onTherapistSelect(therapist.id)}
                   className='text-blue-600 h-4 w-4 rounded'
