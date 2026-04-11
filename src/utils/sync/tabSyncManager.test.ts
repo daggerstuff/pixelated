@@ -1,6 +1,39 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { MessagingTransport } from './tabSyncManager'
+import { MessagingTransport, TabSyncManager } from './tabSyncManager'
+
+describe('TabSyncManager', () => {
+  const OriginalBroadcastChannel = global.BroadcastChannel
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.BroadcastChannel = OriginalBroadcastChannel
+  })
+
+  afterEach(() => {
+    global.BroadcastChannel = OriginalBroadcastChannel
+    vi.restoreAllMocks()
+  })
+
+  it('should remain uninitialized if transport initialization fails', () => {
+    class MockBroadcastChannel {
+      constructor() {
+        throw new Error('Simulated BroadcastChannel failure')
+      }
+    }
+    global.BroadcastChannel = MockBroadcastChannel as any
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const manager = new TabSyncManager()
+    manager.init()
+
+    expect(manager.isAvailable()).toBe(false)
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'MessagingTransport: Failed to initialize',
+      expect.any(Error)
+    )
+  })
+})
 
 describe('MessagingTransport', () => {
   const OriginalBroadcastChannel = global.BroadcastChannel
