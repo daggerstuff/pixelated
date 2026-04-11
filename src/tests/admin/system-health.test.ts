@@ -1,10 +1,21 @@
+// @vitest-environment jsdom
 import { screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Create a mock fetch function that can be modified per test
 const mockFetch = vi.fn()
 
 // Helper function to render mock Astro component HTML
-async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
+async function renderMockComponent(options?: {
+  apiStatus?: string
+  databaseStatus?: string
+  details?: string
+}): Promise<{ container: HTMLDivElement }> {
+  const {
+    apiStatus = 'healthy',
+    databaseStatus = 'healthy',
+    details = '',
+  } = options ?? {}
   const mockHtml = `
     <div>
       <h1>System Health Dashboard</h1>
@@ -15,7 +26,9 @@ async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
       <div>System Information</div>
       <div>Raw Health Check Response</div>
       <button>Refresh</button>
-      <div>API status: healthy</div>
+      <div>API status: ${apiStatus}</div>
+      <div>Database status: ${databaseStatus}</div>
+      ${details ? `<div>Details: ${details}</div>` : ''}
       <div>50%</div>
       <div>CPU: Intel(R) Core(TM) i7-10700K (8 cores)</div>
       <div>Load Average: 1.50 (1m), 1.20 (5m), 0.90 (15m)</div>
@@ -99,7 +112,11 @@ describe('System Health Dashboard Page', () => {
   })
 
   it('renders the page title', async () => {
-    await renderMockComponent()
+    await renderMockComponent({
+      apiStatus: 'healthy',
+      databaseStatus: 'unhealthy',
+      details: 'Database connection failed',
+    })
 
     // Use Vitest's built-in assertions
     expect(screen.getByText('System Health Dashboard')).toBeTruthy()
@@ -117,7 +134,11 @@ describe('System Health Dashboard Page', () => {
   })
 
   it('fetches and displays health data', async () => {
-    await renderMockComponent()
+    await renderMockComponent({
+      apiStatus: 'healthy',
+      databaseStatus: 'unhealthy',
+      details: 'Database connection failed',
+    })
 
     // Wait for data to load
     await waitFor(() => {
@@ -203,7 +224,11 @@ describe('System Health Dashboard Page', () => {
         }),
     } as Response)
 
-    await renderMockComponent()
+    await renderMockComponent({
+      apiStatus: 'healthy',
+      databaseStatus: 'unhealthy',
+      details: 'Database connection failed',
+    })
 
     // Wait for data to load
     await waitFor(() => {
