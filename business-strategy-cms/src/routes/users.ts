@@ -10,6 +10,12 @@ import { UserRole } from '@/types/user'
 
 const router: ExpressRouter = Router()
 
+const userRoles = new Set<string>(Object.values(UserRole))
+
+const isUserRole = (value: string): value is UserRole => {
+  return userRoles.has(value)
+}
+
 type UpdateRoleBody = {
   role?: unknown
 }
@@ -32,16 +38,11 @@ const parseUserRole = (value: unknown): UserRole | undefined => {
     return undefined
   }
 
-  if (
-    value === UserRole.ADMINISTRATOR ||
-    value === UserRole.CONTENT_CREATOR ||
-    value === UserRole.EDITOR ||
-    value === UserRole.VIEWER
-  ) {
-    return value
+  if (!isUserRole(value)) {
+    return undefined
   }
 
-  return undefined
+  return value
 }
 
 // Get all users (Admin only)
