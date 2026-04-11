@@ -28,16 +28,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y curl=7.88.1-10+
 FROM build-base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
 COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
-RUN pnpm install --prod
-
-# Build dependencies stage
-FROM build-base AS build-deps
-COPY package.json pnpm-lock.yaml ./
-COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
 RUN pnpm install --frozen-lockfile
 
 # Build stage
-FROM build-deps AS build
+FROM prod-deps AS build
 COPY . .
 RUN pnpm run build
 
@@ -55,7 +49,9 @@ RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack 
 # Create user
 RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -s /bin/sh -m pixelated
 
-# Copy necessary files from previous stages
+# Copy necessary files from previous stages.
+# Use the full dependency graph from the production dependency stage to avoid runtime failures from
+# production pruning of packages that still resolve at runtime in SSR output.
 COPY --from=prod-deps --chown=pixelated:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=pixelated:nodejs /app/dist ./dist
 COPY --chown=pixelated:nodejs package.json ./
