@@ -69,7 +69,7 @@ const ARCHETYPES = {
   },
 }
 
-export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
+export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   analysis,
   isAnalyzing = false,
   className = '',
@@ -275,7 +275,7 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className='space-y-3'>
-                {analysis.insights?.map((insight) => (
+                {analysis.insights?.map((insight: any) => (
                   <div
                     key={insight}
                     className='bg-blue-50 flex items-start space-x-3 rounded-lg p-3'
@@ -303,7 +303,7 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className='space-y-3'>
-                {analysis.recommendations?.map((rec) => (
+                {analysis.recommendations?.map((rec: any) => (
                   <div
                     key={rec}
                     className='bg-green-50 flex items-start space-x-3 rounded-lg p-3'
