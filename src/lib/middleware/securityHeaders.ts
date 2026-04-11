@@ -11,13 +11,20 @@ export const securityHeaders = async (
   const response = await next()
 
   const nonce = context.locals['cspNonce'] as string | undefined
+  const scriptSourceList = [
+    "'self'",
+    "'unsafe-inline'",
+    nonce ? `'nonce-${nonce}'` : null,
+    'https://*.sentry.io',
+    'https://cdn.jsdelivr.net',
+    'https://giscus.app',
+    'https://app.rybbit.io',
+  ].filter(Boolean)
 
   let csp = [
     // Core restrictions
     "default-src 'self'",
-    nonce
-      ? `script-src 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io`
-      : "script-src 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
+    `script-src ${scriptSourceList.join(' ')}`,
     // Keep inline styles only if necessary; replace with nonce/hashes when possible
     "object-src 'none'",
     // Do not allow this site to be embedded in frames
@@ -27,6 +34,8 @@ export const securityHeaders = async (
     "form-action 'self'",
     // Network endpoints allowed (XHR/fetch/WebSocket if needed)
     "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net https://app.rybbit.io",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
     // Mixed content protections
     'block-all-mixed-content',
     // Additional CSP3 hardening (widely supported)
@@ -55,9 +64,7 @@ export const securityHeaders = async (
   } else {
     // Production CSP
     csp.push(
-      nonce
-        ? `script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io`
-        : "script-src-elem 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
+      `script-src-elem ${scriptSourceList.join(' ')}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "frame-src 'self' https://giscus.app",
       "worker-src 'self' blob:",

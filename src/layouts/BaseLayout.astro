@@ -142,19 +142,6 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <!-- Panel Backdrop (on mobile) -->
     <Backdrop />
 
-    <!-- Progress Bar -->
-    <script type="module" nonce={cspNonce}>
-      import nprogress from 'nprogress'
-
-      document.addEventListener('astro:before-preparation', () => {
-        nprogress.start()
-      })
-
-      document.addEventListener('astro:page-load', () => {
-        nprogress.done()
-      })
-    </script>
-
     <!-- Vercel Speed Insights and Analytics -->
     <SpeedInsights />
     <Analytics />
