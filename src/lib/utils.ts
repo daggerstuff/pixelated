@@ -68,8 +68,11 @@ function isNodeEnvironment(): boolean {
 }
 
 // Use Node crypto via guarded require when available; fallback to runtime checks for browsers
-const nodeCrypto: typeof import('crypto') | undefined =
-  tryRequireNode('crypto') || undefined
+const nodeCrypto = tryRequireNode('crypto') as
+  | (typeof import('crypto') & {
+      randomBytes: (size: number) => Uint8Array
+    })
+  | undefined
 
 /**
  * Type guard for checking if value is a non-null object

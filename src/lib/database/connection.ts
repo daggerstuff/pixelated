@@ -3,7 +3,7 @@
 
 import Redis from 'ioredis'
 import mongoose from 'mongoose'
-import { Pool, Client } from 'pg'
+import { Pool, PoolClient } from 'pg'
 
 // ============================================================================
 // CONNECTION INSTANCES
@@ -207,7 +207,7 @@ export async function disconnectAll() {
 // ============================================================================
 
 export async function withPostgresTransaction<T>(
-  callback: (client: Client) => Promise<T>,
+  callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   const pool = getPostgresPool()
   const client = await pool.connect()
