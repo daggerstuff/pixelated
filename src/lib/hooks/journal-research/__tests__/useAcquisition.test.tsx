@@ -82,12 +82,15 @@ describe('useAcquisition hooks', () => {
       expandRow: vi.fn<(id: string) => void>(),
       collapseRow: vi.fn<(id: string) => void>(),
     }
-    useAcquisitionStore.mockImplementation((selector?: (state: typeof storeState) => unknown) =>
-      typeof selector === 'function' ? selector(storeState) : storeState,
+    useAcquisitionStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
     )
-    ;(useAcquisitionStore as typeof useAcquisitionStore & {
-      getState?: () => typeof storeState
-    }).getState = () => storeState
+    ;(
+      useAcquisitionStore as typeof useAcquisitionStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
   })
 
   describe('useAcquisitionListQuery', () => {
@@ -122,16 +125,16 @@ describe('useAcquisition hooks', () => {
         },
       }
       useAcquisitionStore.mockImplementation(
-        (
-          selector?: (state: typeof filteredStoreState) => unknown,
-        ) =>
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
           typeof selector === 'function'
             ? selector(filteredStoreState)
             : filteredStoreState,
       )
-      ;(useAcquisitionStore as typeof useAcquisitionStore & {
-        getState?: () => typeof filteredStoreState
-      }).getState = () => filteredStoreState
+      ;(
+        useAcquisitionStore as typeof useAcquisitionStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(
         () => useAcquisitionListQuery('session-1'),
@@ -227,9 +230,13 @@ describe('useAcquisition hooks', () => {
       vi.mocked(api.initiateAcquisition).mockResolvedValue(mockAcquisition)
       const setSelectedAcquisitionId = vi.fn<(id: string) => void>()
 
-      ;(useAcquisitionStore as typeof useAcquisitionStore & {
-        getState?: () => { setSelectedAcquisitionId: typeof setSelectedAcquisitionId }
-      }).getState = () => ({
+      ;(
+        useAcquisitionStore as typeof useAcquisitionStore & {
+          getState?: () => {
+            setSelectedAcquisitionId: typeof setSelectedAcquisitionId
+          }
+        }
+      ).getState = () => ({
         setSelectedAcquisitionId,
       })
 

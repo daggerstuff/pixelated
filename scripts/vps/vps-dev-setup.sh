@@ -679,7 +679,7 @@ setup_cloud_clis() {
         curl -fsSL https://aka.ms/install-azd.sh | bash
     fi
     
-    # DigitalOcean doctl (via brew)
+    # DigitalOcean doctl (legacy/optional for legacy workflows)
     if ! command_exists doctl; then
         sudo -u "${username}" brew install doctl 2>/dev/null || true
     fi
@@ -728,7 +728,7 @@ setup_cloud_cli_auth() {
         chown -R "${username}:${username}" "${user_home}/.config/Azure"
     fi
     
-    # DigitalOcean
+    # DigitalOcean / doctl (legacy backup restore)
     if [[ -f "${backup_config}/doctl/config.yaml" ]]; then
         mkdir -p "${user_home}/.config/doctl"
         cp "${backup_config}/doctl/config.yaml" "${user_home}/.config/doctl/"
@@ -1179,7 +1179,7 @@ print_summary() {
     echo "  AWS CLI:     $(command -v aws 2>/dev/null || echo 'not found')"
     echo "  Azure CLI:   $(command -v az 2>/dev/null || echo 'not found')"
     echo "  Azure Dev:   $(command -v azd 2>/dev/null || echo 'not found')"
-    echo "  DigitalOcean: $(command -v doctl 2>/dev/null || echo 'not found')"
+    echo "  DigitalOcean (legacy doctl): $(command -v doctl 2>/dev/null || echo 'not found')"
     echo "  Oracle:      $(command -v acli 2>/dev/null || echo 'not found')"
     echo "  GitHub:      $(command -v gh 2>/dev/null || echo 'not found')"
     echo "  GitLab:      $(command -v glab 2>/dev/null || echo 'not found')"
@@ -1212,7 +1212,7 @@ print_summary() {
     echo -e "${BLUE}Next Steps:${NC}"
     echo "  1. SSH in:     ssh -p ${CONFIG[ssh_port]} vivi@$(hostname -I | awk '{print $1}')"
     echo "  2. Upgrade:    sudo do-release-upgrade  (if Ubuntu 22/24)"
-    echo "  3. Auth:       aws configure, az login, doctl auth init, etc."
+    echo "  3. Auth:       aws configure, az login, doctl auth init (legacy), etc."
     echo "  4. Configure:  rclone config (if not restored)"
     echo "  5. Restore:    rclone copy drive:vivi-home-backups/pixelated/ ${CONFIG[workspace_dir]}/"
     echo "  6. View logs:  tail -f ${LOG_FILE}"

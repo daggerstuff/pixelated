@@ -10,7 +10,7 @@ if [[ ! -f "${LIB_DIR}/persona-regeneration-helpers.sh" ]]; then
 fi
 
 source "${LIB_DIR}/persona-regeneration-helpers.sh"
-source "${LIB_DIR}/runners/ovh-persona-runner.sh"
+source "${LIB_DIR}/runners/hetzner-persona-runner.sh"
 
 RUN_MODE="${RUN_MODE:-manual}"
 AUTOMATION_MODE="${AUTOMATION_MODE:-0}"
@@ -72,7 +72,7 @@ parse_runtime_overrides() {
         ;;
       --help|-h)
         cat <<'USAGE'
-Usage: scripts/ovh/run-persona-regeneration-ovh.sh [options]
+Usage: scripts/hetzner/run-persona-regeneration-hetzner.sh [options]
   --job-name <name>
   --output-key <s3 key>
   --max-records <n>
@@ -109,13 +109,13 @@ if [[ "${RUN_MODE}" == "scheduler" || "${AUTOMATION_MODE}" == "1" ]]; then
   SEND_STARTUP_NOTIFICATION="0"
 fi
 
-TARGET_HOST="${TARGET_HOST:-${TRAINING_HOST:-ovh}}"
+TARGET_HOST="${TARGET_HOST:-${TRAINING_HOST:-hetzner}}"
 TARGET_HOST_LOWER="$(echo "${TARGET_HOST}" | tr '[:upper:]' '[:lower:]')"
 case "${TARGET_HOST_LOWER}" in
-  ovh)
+  hetzner)
     ;;
   *)
-    echo "ERROR: TARGET_HOST for this script must be: ovh." >&2
+    echo "ERROR: TARGET_HOST for this script must be: hetzner." >&2
     exit 1
     ;;
 esac
@@ -126,7 +126,7 @@ if ! command -v docker >/dev/null; then
 fi
 
 if ! command -v ovhai >/dev/null; then
-  echo "ERROR: ovhai CLI is required for OVH target and was not found in PATH." >&2
+  echo "ERROR: ovhai CLI is required for Hetzner target and was not found in PATH." >&2
   exit 1
 fi
 
@@ -136,27 +136,27 @@ export DOCKER_BUILDKIT
 log_info "🔎 Running Persona Re-Generation launcher preflight checks."
 log_info "Using legacy Docker builder setting: DOCKER_BUILDKIT=${DOCKER_BUILDKIT}"
 
-if [[ -z "${OVH_AI_REGISTRY:-}" ]]; then
+if [[ -z "${HETZNER_AI_REGISTRY:-}" ]]; then
   # Default to docker.io if not set, but warn
-  echo "WARNING: OVH_AI_REGISTRY not set. Defaulting to docker.io/pixelatedempathy/"
-  export OVH_AI_REGISTRY="docker.io/pixelatedempathy/"
+  echo "WARNING: HETZNER_AI_REGISTRY not set. Defaulting to docker.io/pixelatedempathy/"
+  export HETZNER_AI_REGISTRY="docker.io/pixelatedempathy/"
 fi
 
 load_env_file
 
-if [[ -z "${OVH_S3_ACCESS_KEY:-}" || -z "${OVH_S3_SECRET_KEY:-}" ]]; then
-  echo "ERROR: OVH_S3_ACCESS_KEY / OVH_S3_SECRET_KEY must be set." >&2
+if [[ -z "${HETZNER_S3_ACCESS_KEY:-}" || -z "${HETZNER_S3_SECRET_KEY:-}" ]]; then
+  echo "ERROR: HETZNER_S3_ACCESS_KEY / HETZNER_S3_SECRET_KEY must be set." >&2
   exit 1
 fi
 
-if [[ -n "${OVH_AI_TOKEN:-}" ]]; then
-  if ovhai --token "${OVH_AI_TOKEN}" me >/tmp/ovhai_preflight.log 2>&1; then
-    log_info "ovhai authentication preflight check passed using OVH_AI_TOKEN."
+if [[ -n "${HETZNER_AI_TOKEN:-}" ]]; then
+  if ovhai --token "${HETZNER_AI_TOKEN}" me >/tmp/ovhai_preflight.log 2>&1; then
+    log_info "ovhai authentication preflight check passed using HETZNER_AI_TOKEN."
   elif ! ovhai me >/tmp/ovhai_preflight.log 2>&1; then
     echo "ERROR: ovhai authentication is not valid. Run: ovhai login" >&2
-    echo "----- begin ovh_ai preflight output -----"
+    echo "----- begin hetzner_ai preflight output -----"
     cat /tmp/ovhai_preflight.log
-    echo "----- end ovh_ai preflight output -----"
+    echo "----- end hetzner_ai preflight output -----"
     exit 1
   else
     log_info "ovhai authentication preflight check passed using active session."
@@ -164,9 +164,9 @@ if [[ -n "${OVH_AI_TOKEN:-}" ]]; then
 else
   if ! ovhai me >/tmp/ovhai_preflight.log 2>&1; then
     echo "ERROR: ovhai authentication is not valid. Run: ovhai login" >&2
-    echo "----- begin ovh_ai preflight output -----"
+    echo "----- begin hetzner_ai preflight output -----"
     cat /tmp/ovhai_preflight.log
-    echo "----- end ovh_ai preflight output -----"
+    echo "----- end hetzner_ai preflight output -----"
     exit 1
   fi
   log_info "ovhai authentication preflight check passed."
@@ -178,7 +178,7 @@ DEFENSE_MODEL_PATH="${DEFENSE_MODEL_PATH:-/app/tmp/model.ckpt}"
 
 VERSION_TAG="v$(date +%s)"
 IMAGE_NAME="training-node"
-FULL_IMAGE_NAME="${OVH_AI_REGISTRY}${IMAGE_NAME}:${VERSION_TAG}"
+FULL_IMAGE_NAME="${HETZNER_AI_REGISTRY}${IMAGE_NAME}:${VERSION_TAG}"
 
 echo "🔨 Building image: ${FULL_IMAGE_NAME}"
 docker build --target production -t "${FULL_IMAGE_NAME}" ./ai
@@ -205,17 +205,17 @@ INPUT_PREFIX="${INPUT_PREFIX:-final_dataset/shards/curriculum/stage2/}"
 OUTPUT_KEY="${OUTPUT_KEY:-final_dataset/shards/curriculum/stage2/synthetic_persona_batch_5k.jsonl}"
 MAX_RECORDS="${MAX_RECORDS:-5000}"
 
-S3_BUCKET="${OVH_S3_BUCKET:-pixel-data}"
-S3_ENDPOINT="${OVH_S3_ENDPOINT:-https://s3.us-east-va.io.cloud.ovh.us}"
-S3_REGION="${OVH_S3_REGION:-us-east-va}"
-S3_CA_BUNDLE="${OVH_S3_CA_BUNDLE:-false}"
+S3_BUCKET="${HETZNER_S3_BUCKET:-pixel-data}"
+S3_ENDPOINT="${HETZNER_S3_ENDPOINT:-https://hel1.your-objectstorage.com}"
+S3_REGION="${HETZNER_S3_REGION:-hel1}"
+S3_CA_BUNDLE="${HETZNER_S3_CA_BUNDLE:-false}"
 
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 BATCH_SCRIPT="${LIGHTNING_BATCH_SCRIPT:-${PROJECT_ROOT}/ai/training/scripts/batch_regenerate.py}"
 SLACK_NOTIFY_CONTEXT="${SLACK_NOTIFY_CONTEXT:-Persona Re-Generation}"
 
 cat <<MSG
-🚀 Launching Persona Re-Generation job (OVH)
+🚀 Launching Persona Re-Generation job (Hetzner)
 - Job Name: ${JOB_NAME}
 - Image: ${FULL_IMAGE_NAME}
 - GPU: ${GPU_COUNT} (${GPU_FLAVOR})
@@ -231,12 +231,12 @@ fi
 BATCH_PYTHON="${LIGHTNING_PYTHON_BIN:-/app/.venv/bin/python}"
 BATCH_RUNNER_MODE="python"
 if [[ -z "${BATCH_PYTHON}" || ! -x "${BATCH_PYTHON}" ]]; then
-  echo "ERROR: no usable python executable found for OVH host." >&2
+  echo "ERROR: no usable python executable found for Hetzner host." >&2
   exit 1
 fi
 
-run_ovh_persona_job
-echo "✅ Job submitted with UUID recorded in OVH dashboard."
+run_hetzner_persona_job
+echo "✅ Job submitted with UUID recorded in Hetzner dashboard."
 send_conditional_slack \
   "⚪ ${SLACK_NOTIFY_CONTEXT} Submitted" \
   "Target=${TARGET_HOST_LOWER}; Job=${JOB_NAME}; Output=s3://${S3_BUCKET}/${OUTPUT_KEY}; Checkpoint=${CHECKPOINT_S3_KEY}; Max records=${MAX_RECORDS}"

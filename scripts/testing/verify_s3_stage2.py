@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify Stage 2 persona artifact exists in OVH S3. Loads .env only; prints S3_VERIFY_OK or S3_VERIFY_MISSING."""
+"""Verify Stage 2 persona artifact exists in Hetzner S3. Loads .env only; prints S3_VERIFY_OK or S3_VERIFY_MISSING."""
 import os
 from pathlib import Path
 
@@ -13,13 +13,13 @@ _repo_root = Path(__file__).resolve().parent.parent
 load_dotenv(_repo_root / ".env")
 
 BUCKET = "pixel-data"
-ENDPOINT = "https://s3.us-east-va.io.cloud.ovh.us"
-REGION = "us-east-va"
+ENDPOINT = "https://hel1.your-objectstorage.com"
+REGION = "hel1"
 KEY = "final_dataset/shards/curriculum/stage2/synthetic_persona_batch_10000.jsonl"
 
 def main() -> None:
-    ak = os.environ.get("OVH_S3_ACCESS_KEY")
-    sk = os.environ.get("OVH_S3_SECRET_KEY")
+    ak = os.environ.get("HETZNER_S3_ACCESS_KEY")
+    sk = os.environ.get("HETZNER_S3_SECRET_KEY")
     if not ak or not sk:
         print("S3_VERIFY_MISSING")
         return

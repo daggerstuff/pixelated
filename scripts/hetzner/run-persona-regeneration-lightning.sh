@@ -72,7 +72,7 @@ parse_runtime_overrides() {
         ;;
       --help|-h)
         cat <<'USAGE'
-Usage: scripts/ovh/run-persona-regeneration-lightning.sh [options]
+Usage: scripts/hetzner/run-persona-regeneration-lightning.sh [options]
   --job-name <name>
   --output-key <s3 key>
   --max-records <n>
@@ -142,8 +142,8 @@ log_info "🔎 Running Persona Re-Generation launcher preflight checks."
 
 load_env_file
 
-if [[ -z "${OVH_S3_ACCESS_KEY:-}" || -z "${OVH_S3_SECRET_KEY:-}" ]]; then
-  echo "ERROR: OVH_S3_ACCESS_KEY / OVH_S3_SECRET_KEY must be set." >&2
+if [[ -z "${HETZNER_S3_ACCESS_KEY:-}" || -z "${HETZNER_S3_SECRET_KEY:-}" ]]; then
+  echo "ERROR: HETZNER_S3_ACCESS_KEY / HETZNER_S3_SECRET_KEY must be set." >&2
   exit 1
 fi
 
@@ -159,9 +159,9 @@ CHECKPOINT_S3_KEY="${CHECKPOINT_S3_KEY:-${CHECKPOINT_PREFIX%/}/${CHECKPOINT_JOB_
 CHECKPOINT_FREQUENCY="${CHECKPOINT_FREQUENCY:-250}"
 INPUT_PREFIX="${INPUT_PREFIX:-final_dataset/shards/curriculum/stage2/}"
 MAX_RECORDS="${MAX_RECORDS:-10000}"
-S3_BUCKET="${OVH_S3_BUCKET:-pixel-data}"
-S3_ENDPOINT="${OVH_S3_ENDPOINT:-https://s3.us-east-va.io.cloud.ovh.us}"
-S3_REGION="${OVH_S3_REGION:-us-east-va}"
+S3_BUCKET="${HETZNER_S3_BUCKET:-pixel-data}"
+S3_ENDPOINT="${HETZNER_S3_ENDPOINT:-https://hel1.your-objectstorage.com}"
+S3_REGION="${HETZNER_S3_REGION:-hel1}"
 
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 BATCH_SCRIPT="${LIGHTNING_BATCH_SCRIPT:-${PROJECT_ROOT}/ai/training/scripts/batch_regenerate.py}"

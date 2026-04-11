@@ -11,9 +11,7 @@ const fallbackAct = async (callback) => {
 }
 
 export const act =
-  typeof React.act === 'function'
-    ? React.act.bind(React)
-    : fallbackAct
+  typeof React.act === 'function' ? React.act.bind(React) : fallbackAct
 
 export default {
   act,

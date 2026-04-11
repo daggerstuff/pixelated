@@ -11,6 +11,9 @@ TARGET_USER="${TARGET_USER:-${SUDO_USER:-${USER}}}"
 TARGET_GROUP="${TARGET_GROUP:-${TARGET_USER}}"
 ENV_FILE="${ENV_FILE:-/etc/pixelated/pixelated-memory.env}"
 INSTALL_PATH="${INSTALL_PATH:-/etc/systemd/system/${SERVICE_NAME}}"
+MEMORY_MAX="${PIXELATED_MEMORY_SERVICE_MEMORY_MAX:-8G}"
+MEMORY_HIGH="${PIXELATED_MEMORY_SERVICE_MEMORY_HIGH:-6G}"
+MEMORY_SWAP_MAX="${PIXELATED_MEMORY_SERVICE_MEMORY_SWAP_MAX:-2G}"
 
 read_env_value() {
     local env_file="$1"
@@ -71,6 +74,9 @@ sed \
     -e "s|__WORKDIR__|${REPO_ROOT}|g" \
     -e "s|__ENV_FILE__|${ENV_FILE}|g" \
     -e "s|__START_SCRIPT__|${REPO_ROOT}/scripts/memory/run-shared-memory-service.sh|g" \
+    -e "s|__MEMORY_MAX__|${MEMORY_MAX}|g" \
+    -e "s|__MEMORY_HIGH__|${MEMORY_HIGH}|g" \
+    -e "s|__MEMORY_SWAP_MAX__|${MEMORY_SWAP_MAX}|g" \
     "${TEMPLATE_PATH}" | sudo tee "${INSTALL_PATH}" >/dev/null
 
 sudo systemctl daemon-reload
@@ -78,3 +84,7 @@ echo "Installed ${INSTALL_PATH}"
 echo "Next steps:"
 echo "  1. Copy ai/config/staging/memory-service.env.example to ${ENV_FILE} and set real secrets."
 echo "  2. sudo systemctl enable --now ${SERVICE_NAME}"
+echo "  3. Optional: tune service memory limits with environment variables:"
+echo "     - PIXELATED_MEMORY_SERVICE_MEMORY_MAX (${MEMORY_MAX})"
+echo "     - PIXELATED_MEMORY_SERVICE_MEMORY_HIGH (${MEMORY_HIGH})"
+echo "     - PIXELATED_MEMORY_SERVICE_MEMORY_SWAP_MAX (${MEMORY_SWAP_MAX})"
