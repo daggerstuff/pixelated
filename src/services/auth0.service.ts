@@ -11,6 +11,7 @@ import {
   UserInfoClient,
   type AuthenticationClientOptions,
 } from 'auth0'
+import type { AuthRole } from '../config/auth.config'
 
 // Type alias for auth0 v5+ compatibility
 // ManagementClientOptionsWithClientCredentials was removed in v5
@@ -26,61 +27,113 @@ export type ManagementClientOptionsWithClientCredentials = {
 interface ExtendedManagementClient extends ManagementClient {
   // Users
   users: ManagementClient['users'] & {
-    create: (params: any) => Promise<any>
-    get: (params: { id: string }) => Promise<any>
-    list: (params: any) => Promise<any>
-    update: (params: { id: string }, data: any) => Promise<any>
+    create: (params: {
+      email: string
+      password: string
+      connection: string
+      email_verified: boolean
+      app_metadata: Record<string, unknown>
+      user_metadata: Record<string, unknown>
+    }) => Promise<{ data: unknown }>
+    get: (params: { id: string }) => Promise<{ data: unknown }>
+    list: (params: { [key: string]: unknown }) => Promise<{ data: unknown[] }>
+    update: (
+      userId: string,
+      data: Record<string, unknown>,
+    ) => Promise<{ data: unknown }>
     delete: (params: { id: string }) => Promise<void>
-    listUsersByEmail: (params: { email: string }) => Promise<any>
-    getLogs: (params: { per_page: number; q: string }) => Promise<any>
-    getGuardianEnrollments: (params: { id: string }) => Promise<any>
+    listUsersByEmail: (params: { email: string }) => Promise<{ data: unknown[] }>
+    getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
+    getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
   }
   // Roles
-  getRoles: (params: { per_page?: number; page?: number }) => Promise<any>
-  createRole: (params: { name: string; description?: string }) => Promise<any>
+  getRoles: (params: {
+    per_page?: number
+    page?: number
+    name_filter?: string
+  }) => Promise<unknown[]>
+  createRole: (params: { name: string; description?: string }) => Promise<unknown>
   updateRole: (params: {
     id: string
     name?: string
     description?: string
-  }) => Promise<any>
+  }) => Promise<unknown>
   deleteRole: (params: { id: string }) => Promise<void>
-  getRoleUsers: (params: { id: string }) => Promise<any>
+  getRoleUsers: (params: { id: string }) => Promise<unknown>
   assignRolestoUser: (params: { id: string; roles: string[] }) => Promise<void>
   removeRolesFromUser: (params: {
     id: string
     roles: string[]
   }) => Promise<void>
-  getUserRoles: (params: { id: string }) => Promise<any>
+  getUserRoles: (params: { id: string }) => Promise<unknown[]>
   // Guardian
-  getGuardianFactors: () => Promise<any>
+  getGuardianFactors: () => Promise<unknown>
   createGuardianEnrollmentTicket: (params: {
     user_id: string
     send_mail: boolean
-  }) => Promise<any>
+  }) => Promise<unknown>
   deleteGuardianEnrollment: (params: { id: string }) => Promise<void>
   // Logs
-  getLogs: (params: { per_page: number; q: string }) => Promise<any>
+  getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
   // Tickets
   tickets: ManagementClient['tickets'] & {
-    changePassword: (params: any) => Promise<any>
+    changePassword: (params: {
+      user_id: string
+      result_url?: string
+      ttl_sec?: number
+      mark_email_as_verified?: boolean
+      includeEmailInRedirect?: boolean
+    }) => Promise<{ data: unknown }>
   }
 }
 
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 interface ExtendedAuthenticationClient extends AuthenticationClient {
   oauth: AuthenticationClient['oauth'] & {
-    passwordGrant: (params: any) => Promise<any>
-    refreshTokenGrant: (params: any) => Promise<any>
-    revokeRefreshToken: (params: any) => Promise<any>
-    refreshToken: (params: any) => Promise<any>
+    passwordGrant: (params: {
+      username: string
+      password: string
+      realm: string
+      scope: string
+      audience: string
+    }) => Promise<{
+      data: {
+        access_token: string
+        refresh_token?: string
+        expires_in: number
+      }
+    }>
+    refreshTokenGrant: (params: {
+      refresh_token: string
+    }) => Promise<{
+      data: {
+        access_token: string
+        refresh_token?: string
+        expires_in: number
+      }
+    }>
+    revokeRefreshToken: (params: { token: string }) => Promise<void>
+    refreshToken: (params: { [key: string]: unknown }) => Promise<{
+      data: {
+        access_token: string
+        refresh_token?: string
+        expires_in: number
+      }
+    }>
   }
-  refreshToken: (params: any) => Promise<any>
-  getProfile: (token: string) => Promise<any>
+  refreshToken: (params: { [key: string]: unknown }) => Promise<{
+    data: {
+      access_token: string
+      refresh_token?: string
+      expires_in: number
+    }
+  }>
+  getProfile: (token: string) => Promise<{ data: unknown }>
 }
 
 // Extend UserInfoClient
 interface ExtendedUserInfoClient extends UserInfoClient {
-  getUserInfo: (token: string) => Promise<any>
+  getUserInfo: (token: string) => Promise<{ data: unknown }>
 }
 import type { Db } from 'mongodb'
 
@@ -89,6 +142,7 @@ import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import type {
   MFAFactor,
   MFAEnrollment,
+  MFAChallenge,
   MFAVerification,
 } from '../lib/auth/auth0-mfa-service'
 import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
@@ -96,6 +150,8 @@ import type {
   WebAuthnCredential,
   WebAuthnRegistrationOptions,
   WebAuthnAuthenticationOptions,
+  WebAuthnCredentialCreationOptions,
+  WebAuthnCredentialRequestOptions,
 } from '../lib/auth/auth0-webauthn-service'
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
@@ -110,6 +166,48 @@ interface Auth0ServiceConfig {
   audience?: string
   managementClientId?: string
   managementClientSecret?: string
+}
+
+type UnknownRecord = Record<string, unknown>
+
+type Auth0UserRecord = {
+  user_id?: unknown
+  email?: unknown
+  email_verified?: unknown
+  name?: unknown
+  picture?: unknown
+  created_at?: unknown
+  last_login?: unknown
+  app_metadata?: unknown
+  user_metadata?: unknown
+  'https://pixelated-empathy.com/app_metadata'?: unknown
+  'https://pixelated-empathy.com/user_metadata'?: unknown
+}
+
+interface Auth0RoleClaim extends UnknownRecord {
+  roles?: unknown
+}
+
+type AuthenticatedUser = {
+  id: string
+  email: string
+  emailVerified: boolean
+  role: AuthRole
+  name?: string
+  fullName?: string
+  avatarUrl?: string
+  createdAt?: string
+  updatedAt?: string
+  lastLogin?: string
+  appMetadata?: Record<string, unknown>
+  userMetadata?: Record<string, unknown>
+}
+
+type Auth0PasswordGrantResponse = {
+  access_token: string
+  refresh_token?: string
+  expires_in: unknown
+  id_token?: string
 }
 
 // Initialize Auth0 clients
@@ -137,8 +235,8 @@ function initializeAuth0Clients() {
     config.managementClientId &&
     config.managementClientSecret
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     auth0Management ??=
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       new ManagementClient({
         domain: config.domain,
         clientId: config.managementClientId,
@@ -152,15 +250,15 @@ function initializeAuth0Clients() {
 
   // Initialize Authentication Client if config is available
   if (config.domain && config.clientId && config.clientSecret) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     auth0Authentication ??=
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       new AuthenticationClient({
         domain: config.domain,
         clientId: config.clientId,
         clientSecret: config.clientSecret,
       }) as unknown as ExtendedAuthenticationClient
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     auth0UserInfo ??=
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       new UserInfoClient({ domain: config.domain }) as ExtendedUserInfoClient
   } else {
     console.warn(
@@ -186,9 +284,7 @@ export class Auth0UserService {
    * Connect to MongoDB for additional user data
    */
   private async connectToDatabase(): Promise<Db> {
-    if (!this.db) {
-      this.db = await mongodb.connect()
-    }
+    this.db ??= await mongodb.connect()
     return this.db
   }
 
@@ -210,28 +306,26 @@ export class Auth0UserService {
         password: password,
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: process.env.AUTH0_AUDIENCE || '',
+        audience: process.env.AUTH0_AUDIENCE ?? '',
       })
-      const tokenResponse = response.data
-
-      // Get user info using UserInfoClient if possible, or decode token
-      // Since we don't have userInfoClient handy in this scope (it's initialized in constructor but not saved to the global var in this file properly yet? - Need to check initialization)
-      // Wait, initializeAuth0Clients returns config, but vars are module-level.
-      // We need to make sure auth0UserInfo is initialized in initializeAuth0Clients in this file too.
+      const tokenResponse = response.data as Auth0PasswordGrantResponse
 
       if (!auth0UserInfo) {
         throw new Error('Auth0 UserInfo client not initialized')
       }
 
-      let userResponse: any
+      let userResponse: Auth0UserRecord
       try {
         // In v5, getUserInfo takes the access token
         const userInfoRes = await auth0UserInfo.getUserInfo(
           tokenResponse.access_token,
         )
-        userResponse = userInfoRes.data
+        userResponse = userInfoRes.data as Auth0UserRecord
         // normalized to match old structure expected below
-        userResponse.user_id = userResponse.sub
+        userResponse = {
+          ...userResponse,
+          user_id: userResponse.user_id ?? userResponse.sub,
+        }
       } catch (e) {
         console.warn(
           'Failed to fetch user info, falling back to token decode if possible or error',
@@ -242,26 +336,14 @@ export class Auth0UserService {
 
       // Log security event
       logSecurityEvent(SecurityEventType.LOGIN, null, {
-        userId: userResponse.user_id,
-        email: userResponse.email,
+        userId: this.toStringOrUndefined(userResponse.user_id),
+        email: this.toStringOrUndefined(userResponse.email),
         method: 'password',
       })
 
+      const authenticatedUser = this.toAuthenticatedUser(userResponse)
       return {
-        user: {
-          id: userResponse.user_id,
-          email: userResponse.email,
-          emailVerified: userResponse.email_verified,
-          role: this.extractRoleFromUser(userResponse),
-          fullName: userResponse.name,
-          avatarUrl: userResponse.picture,
-          createdAt: userResponse.created_at || new Date().toISOString(),
-          lastLogin: new Date().toISOString(), // userResponse.last_login might not be in OIDC profile
-          appMetadata:
-            userResponse['https://pixelated-empathy.com/app_metadata'] || {}, // Custom claim often used
-          userMetadata:
-            userResponse['https://pixelated-empathy.com/user_metadata'] || {},
-        },
+        user: authenticatedUser,
         token: tokenResponse.access_token,
         refreshToken: tokenResponse.refresh_token,
       }
@@ -299,19 +381,9 @@ export class Auth0UserService {
           created_at: new Date().toISOString(),
         },
       })
-      const auth0User = createRes.data
+      const auth0User = createRes.data as Auth0UserRecord
 
-      return {
-        id: auth0User.user_id,
-        email: auth0User.email,
-        emailVerified: auth0User.email_verified,
-        role,
-        fullName: auth0User.name,
-        avatarUrl: auth0User.picture,
-        createdAt: auth0User.created_at,
-        appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata,
-      }
+      return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
       console.error('Auth0 create user error:', error)
       throw new Error('Failed to create user')
@@ -329,21 +401,10 @@ export class Auth0UserService {
     }
 
     try {
-      const getUserRes = await auth0Management.users.get(userId)
-      const auth0User = getUserRes.data
+      const getUserRes = await auth0Management.users.get({ id: userId })
+      const auth0User = getUserRes.data as Auth0UserRecord
 
-      return {
-        id: auth0User.user_id,
-        email: auth0User.email,
-        emailVerified: auth0User.email_verified,
-        role: this.extractRoleFromUser(auth0User),
-        fullName: auth0User.name,
-        avatarUrl: auth0User.picture,
-        createdAt: auth0User.created_at,
-        lastLogin: auth0User.last_login,
-        appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata,
-      }
+      return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
       console.error('Auth0 get user error:', error)
       return null
@@ -354,26 +415,17 @@ export class Auth0UserService {
    * Get all users (admin only)
    * @returns Array of user objects
    */
-  async getAllUsers(): Promise<any[]> {
+  async getAllUsers(): Promise<AuthenticatedUser[]> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
 
     try {
       const usersPage = await auth0Management.users.list({})
-      const users = usersPage.data
-      return users.map((user) => ({
-        id: user.user_id,
-        email: user.email,
-        emailVerified: user.email_verified,
-        role: this.extractRoleFromUser(user),
-        fullName: user.name,
-        avatarUrl: user.picture,
-        createdAt: user.created_at,
-        lastLogin: user.last_login,
-        appMetadata: user.app_metadata,
-        userMetadata: user.user_metadata,
-      }))
+      const users = usersPage.data as Auth0UserRecord[]
+      return users
+        .map((user) => this.toAuthenticatedUser(user))
+        .filter((user) => Boolean(user.id))
     } catch (error: unknown) {
       console.error('Auth0 get all users error:', error)
       return []
@@ -394,26 +446,14 @@ export class Auth0UserService {
       const usersRes = await auth0Management.users.listUsersByEmail({
         email,
       })
-      const users = (usersRes as unknown as { data: any[] }).data ?? []
+      const users = (usersRes.data as Auth0UserRecord[]) ?? []
 
       if (users.length === 0) {
         return null
       }
 
       const auth0User = users[0]
-
-      return {
-        id: auth0User.user_id,
-        email: auth0User.email,
-        emailVerified: auth0User.email_verified,
-        role: this.extractRoleFromUser(auth0User),
-        fullName: auth0User.name,
-        avatarUrl: auth0User.picture,
-        createdAt: auth0User.created_at,
-        lastLogin: auth0User.last_login,
-        appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata,
-      }
+      return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
       console.error('Auth0 find user error:', error)
       return null
@@ -460,7 +500,7 @@ export class Auth0UserService {
       }
 
       // Update user in Auth0
-      const updateParams: any = {}
+      const updateParams: Record<string, unknown> = {}
 
       if (Object.keys(userUpdates).length > 0) {
         Object.assign(updateParams, userUpdates)
@@ -475,20 +515,9 @@ export class Auth0UserService {
       }
 
       const updateRes = await auth0Management.users.update(userId, updateParams)
-      const auth0User = updateRes.data
+      const auth0User = updateRes.data as Auth0UserRecord
 
-      return {
-        id: auth0User.user_id,
-        email: auth0User.email,
-        emailVerified: auth0User.email_verified,
-        role: this.extractRoleFromUser(auth0User),
-        fullName: auth0User.name,
-        avatarUrl: auth0User.picture,
-        createdAt: auth0User.created_at,
-        lastLogin: auth0User.last_login,
-        appMetadata: auth0User.app_metadata,
-        userMetadata: auth0User.user_metadata,
-      }
+      return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
       console.error('Auth0 update user error:', error)
       return null
@@ -548,7 +577,7 @@ export class Auth0UserService {
       const tokenRes = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken,
       })
-      const tokenResponse = tokenRes.data
+      const tokenResponse = tokenRes.data as Auth0PasswordGrantResponse
 
       // Get user info
       if (!auth0UserInfo) {
@@ -557,28 +586,20 @@ export class Auth0UserService {
       const userInfoRes = await auth0UserInfo.getUserInfo(
         tokenResponse.access_token,
       )
-      const userResponse: any = {
-        ...userInfoRes.data,
-        user_id: userInfoRes.data.sub,
+      const userResponse = {
+        ...(userInfoRes.data as Auth0UserRecord),
+        user_id: (userInfoRes.data as Auth0UserRecord).sub,
       }
+      const auth0User = this.toAuthenticatedUser(userResponse)
+      const expiresIn =
+        this.normalizeNumber(tokenResponse.expires_in, 3600) * 1000
 
       return {
-        user: {
-          id: userResponse.user_id,
-          email: userResponse.email,
-          emailVerified: userResponse.email_verified,
-          role: this.extractRoleFromUser(userResponse),
-          fullName: userResponse.name,
-          avatarUrl: userResponse.picture,
-          createdAt: userResponse.created_at,
-          lastLogin: userResponse.last_login,
-          appMetadata: userResponse.app_metadata,
-          userMetadata: userResponse.user_metadata,
-        },
+        user: auth0User,
         session: {
           accessToken: tokenResponse.access_token,
           refreshToken: tokenResponse.refresh_token,
-          expiresAt: new Date(Date.now() + tokenResponse.expires_in * 1000),
+          expiresAt: new Date(Date.now() + expiresIn),
         },
         accessToken: tokenResponse.access_token,
       }
@@ -604,14 +625,14 @@ export class Auth0UserService {
         throw new Error('Auth0 UserInfo client not initialized')
       }
       const userInfoRes = await auth0UserInfo.getUserInfo(token)
-      const decodedToken: any = {
-        ...userInfoRes.data,
-        user_id: userInfoRes.data.sub,
+      const decodedToken = {
+        ...(userInfoRes.data as Auth0UserRecord),
+        user_id: (userInfoRes.data as Auth0UserRecord).sub,
       }
 
       return {
-        userId: decodedToken.user_id,
-        email: decodedToken.email,
+        userId: this.toStringOrUndefined(decodedToken.user_id),
+        email: this.toStringOrUndefined(decodedToken.email),
         role: this.extractRoleFromUser(decodedToken),
       }
     } catch (error: unknown) {
@@ -637,9 +658,8 @@ export class Auth0UserService {
         result_url: returnUrl,
         ttl_sec: 3600, // 1 hour
       })
-      const ticket = ticketRes.data
-
-      return ticket.ticket ?? null
+      const ticket = ticketRes.data as Record<string, unknown>
+      return this.toStringOrUndefined(ticket.ticket) ?? null
     } catch (error: unknown) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')
@@ -664,7 +684,7 @@ export class Auth0UserService {
   async startMFAEnrollment(
     userId: string,
     factor: MFAEnrollment,
-  ): Promise<any> {
+  ): Promise<MFAChallenge> {
     return await auth0MFAService.startEnrollment(userId, factor)
   }
 
@@ -705,7 +725,10 @@ export class Auth0UserService {
    * @param factorType Type of factor to challenge
    * @returns MFA challenge information
    */
-  async challengeUserForMFA(userId: string, factorType: string): Promise<any> {
+  async challengeUserForMFA(
+    userId: string,
+    factorType: string,
+  ): Promise<MFAChallenge> {
     return await auth0MFAService.challengeUser(userId, factorType)
   }
 
@@ -759,7 +782,7 @@ export class Auth0UserService {
    */
   async getWebAuthnRegistrationOptions(
     registrationOptions: WebAuthnRegistrationOptions,
-  ): Promise<any> {
+  ): Promise<WebAuthnCredentialCreationOptions> {
     return await auth0WebAuthnService.getRegistrationOptions(
       registrationOptions,
     )
@@ -773,7 +796,7 @@ export class Auth0UserService {
    */
   async verifyWebAuthnRegistration(
     userId: string,
-    credential: any,
+    credential: Record<string, unknown>,
   ): Promise<WebAuthnCredential> {
     return await auth0WebAuthnService.verifyRegistration(userId, credential)
   }
@@ -785,7 +808,7 @@ export class Auth0UserService {
    */
   async getWebAuthnAuthenticationOptions(
     authenticationOptions: WebAuthnAuthenticationOptions,
-  ): Promise<any> {
+  ): Promise<WebAuthnCredentialRequestOptions> {
     return await auth0WebAuthnService.getAuthenticationOptions(
       authenticationOptions,
     )
@@ -799,7 +822,7 @@ export class Auth0UserService {
    */
   async verifyWebAuthnAuthentication(
     userId: string,
-    credential: any,
+    credential: Record<string, unknown>,
   ): Promise<boolean> {
     return await auth0WebAuthnService.verifyAuthentication(userId, credential)
   }
@@ -866,48 +889,30 @@ export class Auth0UserService {
    * @param user Auth0 user object
    * @returns User role
    */
-  private extractRoleFromUser(user: any): string {
-    // Try to get role from app_metadata first
-    if (user.app_metadata?.roles?.length > 0) {
-      const role = user.app_metadata.roles[0]
-      return this.mapAuth0RoleToRole(role)
+  private extractRoleFromUser(user: Auth0UserRecord): AuthRole {
+    const appMetadata = this.toRecord(
+      user.app_metadata ??
+        user['https://pixelated-empathy.com/app_metadata'],
+    )
+    const appMetadataRoles = appMetadata?.roles
+    if (this.isStringArray(appMetadataRoles) && appMetadataRoles.length > 0) {
+      return this.mapAuth0RoleToRole(appMetadataRoles[0])
     }
 
-    // Try user_metadata
-    if (user.user_metadata?.role) {
-      return user.user_metadata.role
-    }
-
-    // Default to user role
-    return 'user'
+    const userMetadata = this.toRecord(
+      user.user_metadata ??
+        user['https://pixelated-empathy.com/user_metadata'],
+    )
+    const metadataRole = this.toStringOrUndefined(userMetadata?.role)
+    return this.normalizeRole(metadataRole)
   }
 
-  /**
-   * Map internal role to Auth0 role
-   * @param role Internal role
-   * @returns Auth0 role
-   */
-  private mapRoleToAuth0Role(role: string): string {
-    switch (role) {
-      case 'admin':
-        return 'Admin'
-      case 'therapist':
-        return 'Therapist'
-      case 'user':
-      default:
-        return 'User'
-    }
-  }
-
-  /**
-   * Map Auth0 role to internal role
-   * @param auth0Role Auth0 role
-   * @returns Internal role
-   */
-  private mapAuth0RoleToRole(auth0Role: string): string {
+  private mapAuth0RoleToRole(auth0Role: string): AuthRole {
     switch (auth0Role) {
       case 'Admin':
         return 'admin'
+      case 'Staff':
+        return 'staff'
       case 'Therapist':
         return 'therapist'
       case 'User':
@@ -915,6 +920,81 @@ export class Auth0UserService {
         return 'user'
     }
   }
+
+  private normalizeRole(role: string | undefined): AuthRole {
+    if (role === 'admin' || role === 'staff' || role === 'therapist' || role === 'user' || role === 'guest') {
+      return role
+    }
+
+    return 'user'
+  }
+
+  private mapRoleToAuth0Role(role: string): string {
+    switch (role) {
+      case 'admin':
+        return 'Admin'
+      case 'staff':
+        return 'Staff'
+      case 'therapist':
+        return 'Therapist'
+      case 'guest':
+      case 'user':
+      default:
+        return 'User'
+    }
+  }
+
+  private toAuthenticatedUser(user: Auth0UserRecord): AuthenticatedUser {
+    return {
+      id: this.toStringOrUndefined(user.user_id ?? user.sub) ?? '',
+      email: this.toStringOrUndefined(user.email) ?? '',
+      emailVerified: this.toBoolean(user.email_verified),
+      role: this.extractRoleFromUser(user),
+      fullName: this.toStringOrUndefined(user.name),
+      avatarUrl: this.toStringOrUndefined(user.picture),
+      createdAt: this.toStringOrUndefined(user.created_at),
+      lastLogin: this.toStringOrUndefined(user.last_login),
+      appMetadata: this.toRecord(
+        user.app_metadata ??
+          user['https://pixelated-empathy.com/app_metadata'],
+      ),
+      userMetadata: this.toRecord(
+        user.user_metadata ??
+          user['https://pixelated-empathy.com/user_metadata'],
+      ),
+    }
+  }
+
+  private isStringArray(value: unknown): value is string[] {
+    return (
+      Array.isArray(value) &&
+      value.every((entry): entry is string => typeof entry === 'string')
+    )
+  }
+
+  private toStringOrUndefined(value: unknown): string | undefined {
+    return typeof value === 'string' ? value : undefined
+  }
+
+  private toBoolean(value: unknown): boolean {
+    return typeof value === 'boolean' ? value : false
+  }
+
+  private toRecord(value: unknown): Record<string, unknown> | undefined {
+    if (
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      return value as Record<string, unknown>
+    }
+    return undefined
+  }
+
+  private normalizeNumber(value: unknown, fallback = 0): number {
+    return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+  }
+
 }
 
 // Export singleton instance
@@ -973,11 +1053,14 @@ export async function getAvailableMFAFactors(userId: string) {
   return await auth0UserService.getAvailableMFAFactors(userId)
 }
 
-export async function startMFAEnrollment(userId: string, factor: any) {
+export async function startMFAEnrollment(userId: string, factor: MFAEnrollment) {
   return await auth0UserService.startMFAEnrollment(userId, factor)
 }
 
-export async function completeMFAEnrollment(userId: string, verification: any) {
+export async function completeMFAEnrollment(
+  userId: string,
+  verification: MFAVerification,
+) {
   return await auth0UserService.completeMFAEnrollment(userId, verification)
 }
 
@@ -993,7 +1076,10 @@ export async function challengeUserForMFA(userId: string, factorType: string) {
   return await auth0UserService.challengeUserForMFA(userId, factorType)
 }
 
-export async function verifyMFAChallenge(userId: string, verification: any) {
+export async function verifyMFAChallenge(
+  userId: string,
+  verification: MFAVerification,
+) {
   return await auth0UserService.verifyMFAChallenge(userId, verification)
 }
 
@@ -1013,7 +1099,9 @@ export async function setUserPreferredMFAFactor(
 }
 
 // WebAuthn functions
-export async function getWebAuthnRegistrationOptions(registrationOptions: any) {
+export async function getWebAuthnRegistrationOptions(
+  registrationOptions: WebAuthnRegistrationOptions,
+) {
   return await auth0UserService.getWebAuthnRegistrationOptions(
     registrationOptions,
   )
@@ -1021,13 +1109,13 @@ export async function getWebAuthnRegistrationOptions(registrationOptions: any) {
 
 export async function verifyWebAuthnRegistration(
   userId: string,
-  credential: any,
+  credential: Record<string, unknown>,
 ) {
   return await auth0UserService.verifyWebAuthnRegistration(userId, credential)
 }
 
 export async function getWebAuthnAuthenticationOptions(
-  authenticationOptions: any,
+  authenticationOptions: WebAuthnAuthenticationOptions,
 ) {
   return await auth0UserService.getWebAuthnAuthenticationOptions(
     authenticationOptions,
@@ -1036,7 +1124,7 @@ export async function getWebAuthnAuthenticationOptions(
 
 export async function verifyWebAuthnAuthentication(
   userId: string,
-  credential: any,
+  credential: Record<string, unknown>,
 ) {
   return await auth0UserService.verifyWebAuthnAuthentication(userId, credential)
 }

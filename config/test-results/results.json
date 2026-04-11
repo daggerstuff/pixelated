@@ -1,1 +1,844 @@
-{}
+{
+  "config": {
+    "configFile": "/home/vivi/pixelated/config/playwright.config.ts",
+    "rootDir": "/home/vivi/pixelated/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 10,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "msedge",
+        "name": "msedge",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Tablet Chrome",
+        "name": "Tablet Chrome",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Tablet Safari",
+        "name": "Tablet Safari",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "theme-compatibility",
+        "name": "theme-compatibility",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/theme-compatibility.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": {
+      "command": "ASTRO_PORT=4323 pnpm dev --port 4323",
+      "url": "http://127.0.0.1:4323",
+      "reuseExistingServer": true,
+      "timeout": 180000
+    }
+  },
+  "suites": [
+    {
+      "title": "browser/auth.spec.ts",
+      "file": "browser/auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "login page has correct form elements",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1059,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:52:52.461Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-65d8d64253a59930a3c5",
+          "file": "browser/auth.spec.ts",
+          "line": 4,
+          "column": 1
+        },
+        {
+          "title": "login form shows validation errors",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 31123,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
+                        "column": 14,
+                        "line": 68
+                      },
+                      "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  66 |   // Wait for React to flush state updates - wait for error text content to appear\n  67 |   // Use a more explicit wait that checks for actual text content\n> 68 |   await page.waitForFunction(\n     |              ^\n  69 |     () => {\n  70 |       const emailErrorEl = document.getElementById('email-error')\n  71 |       const passwordErrorEl = document.getElementById('password-error')\n    at /home/vivi/pixelated/tests/browser/auth.spec.ts:68:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:52:53.893Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/home/vivi/pixelated/test-results/browser-auth-login-form-shows-validation-errors-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/home/vivi/pixelated/test-results/browser-auth-login-form-shows-validation-errors-chromium/video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/vivi/pixelated/test-results/browser-auth-login-form-shows-validation-errors-chromium/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-a7de8e1a0acb82c0870e",
+          "file": "browser/auth.spec.ts",
+          "line": 21,
+          "column": 1
+        },
+        {
+          "title": "login form is properly visible on mobile viewport",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "This test is mobile-only",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
+                    "line": 111,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 174,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:53:25.703Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "This test is mobile-only",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
+                        "line": 111,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-10a58190e4df691a302b",
+          "file": "browser/auth.spec.ts",
+          "line": 106,
+          "column": 1
+        },
+        {
+          "title": "login page has proper transitions",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 31159,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
+                        "column": 14,
+                        "line": 163
+                      },
+                      "message": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n  161 |   // Wait for React to process the state update and render the reset password heading\n  162 |   // Use waitForFunction to explicitly wait for the heading element to appear in the DOM\n> 163 |   await page.waitForFunction(\n      |              ^\n  164 |     () => {\n  165 |       const heading = document.querySelector(\n  166 |         '[data-testid=\"reset-password-heading\"]',\n    at /home/vivi/pixelated/tests/browser/auth.spec.ts:163:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:53:25.987Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/home/vivi/pixelated/test-results/browser-auth-login-page-has-proper-transitions-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/home/vivi/pixelated/test-results/browser-auth-login-page-has-proper-transitions-chromium/video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/vivi/pixelated/test-results/browser-auth-login-page-has-proper-transitions-chromium/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-4246a0e449a9db00beea",
+          "file": "browser/auth.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "login page visual comparison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3340,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:53:57.816Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-12e6036596c5b0fd1d07",
+          "file": "browser/auth.spec.ts",
+          "line": 197,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "browser/browser-compatibility.spec.ts",
+      "file": "browser/browser-compatibility.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Home page should work in all browsers",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "line": 26,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2258,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73",
+                    "location": {
+                      "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                      "column": 73,
+                      "line": 83
+                    },
+                    "snippet": "  81 |\n  82 |     // Verify there are no console errors (except for known ones)\n> 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(\n     |                                                                         ^\n  84 |       [],\n  85 |     )\n  86 |   })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "column": 73,
+                        "line": 83
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  81 |\n  82 |     // Verify there are no console errors (except for known ones)\n> 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(\n     |                                                                         ^\n  84 |       [],\n  85 |     )\n  86 |   })\n    at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "Testing Home page in chromium\n"
+                    },
+                    {
+                      "text": "Going to /\n"
+                    },
+                    {
+                      "text": "Page title: Pixelated Empathy | Clinical simulation for therapist training and supervision - Pixelated Empathy\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:54:01.287Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "column": 73,
+                    "line": 83
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-7d1e83e15eabbb9874a9",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "title": "Blog page should work in all browsers",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "line": 26,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2342,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73",
+                    "location": {
+                      "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                      "column": 73,
+                      "line": 83
+                    },
+                    "snippet": "  81 |\n  82 |     // Verify there are no console errors (except for known ones)\n> 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(\n     |                                                                         ^\n  84 |       [],\n  85 |     )\n  86 |   })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "column": 73,
+                        "line": 83
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  81 |\n  82 |     // Verify there are no console errors (except for known ones)\n> 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(\n     |                                                                         ^\n  84 |       [],\n  85 |     )\n  86 |   })\n    at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "Testing Blog page in chromium\n"
+                    },
+                    {
+                      "text": "Going to /blog\n"
+                    },
+                    {
+                      "text": "Page title: Blog - Pixelated Empathy\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:54:04.244Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "column": 73,
+                    "line": 83
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-5b70280cee3e46a33a57",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "title": "Documentation page should work in all browsers",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "line": 26,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2281,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73",
+                    "location": {
+                      "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                      "column": 73,
+                      "line": 83
+                    },
+                    "snippet": "  81 |\n  82 |     // Verify there are no console errors (except for known ones)\n> 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(\n     |                                                                         ^\n  84 |       [],\n  85 |     )\n  86 |   })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "column": 73,
+                        "line": 83
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.\",\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  81 |\n  82 |     // Verify there are no console errors (except for known ones)\n> 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(\n     |                                                                         ^\n  84 |       [],\n  85 |     )\n  86 |   })\n    at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "Testing Documentation page in chromium\n"
+                    },
+                    {
+                      "text": "Going to /docs\n"
+                    },
+                    {
+                      "text": "Page title: Getting Started with Pixelated Empathy - Pixelated Empathy\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:54:07.412Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/vivi/pixelated/test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "column": 73,
+                    "line": 83
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-0a9b229c15cc7eeb965f",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "title": "CSS feature support check",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1061,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "CSS features support in chromium: {\n  flexbox: \u001b[33mtrue\u001b[39m,\n  grid: \u001b[33mtrue\u001b[39m,\n  variables: \u001b[33mtrue\u001b[39m,\n  sticky: \u001b[33mtrue\u001b[39m,\n  animations: \u001b[33mtrue\u001b[39m,\n  filters: \u001b[33mtrue\u001b[39m,\n  aspectRatio: \u001b[33mtrue\u001b[39m\n}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T20:54:10.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-b65c4847fe42742ccda2",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 90,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-11T20:52:51.757Z",
+    "duration": 79925.599,
+    "expected": 3,
+    "skipped": 1,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

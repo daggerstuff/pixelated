@@ -18,20 +18,20 @@ import { auth0UserService } from '../../services/auth0.service'
 // Extend ManagementClient to include methods that may not be in the TypeScript definitions
 interface ExtendedManagementClient extends ManagementClient {
   // Logs
-  getLogs(params: { per_page: number; q: string }): Promise<any>
+  getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
   // Guardian methods
-  getGuardianEnrollments(params: { id: string }): Promise<any>
-  getGuardianFactors(): Promise<any>
+  getGuardianEnrollments(params: { id: string }): Promise<unknown>
+  getGuardianFactors(): Promise<unknown>
   createGuardianEnrollmentTicket(params: {
     user_id: string
     send_mail: boolean
-  }): Promise<any>
+  }): Promise<unknown>
   deleteGuardianEnrollment(params: { id: string }): Promise<void>
   // Roles
-  getRoles(params: { per_page?: number; page?: number }): Promise<any>
+  getRoles(params: { per_page?: number; page?: number }): Promise<unknown[]>
   assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
   removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
-  getUserRoles(params: { id: string }): Promise<any>
+  getUserRoles(params: { id: string }): Promise<unknown[]>
 }
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
@@ -54,14 +54,12 @@ function initializeAuth0Management() {
     return
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  auth0Management ??=
-    new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-    }) as ExtendedManagementClient
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  }) as ExtendedManagementClient
 }
 
 // Initialize the management client
@@ -92,11 +90,13 @@ export interface RiskScore {
   recommendedAction: 'allow' | 'challenge' | 'deny'
 }
 
+type RiskFactorValue = Record<string, unknown>
+
 export interface RiskFactor {
   name: string
   weight: number // 0-100
   description: string
-  value: any
+  value: RiskFactorValue
   triggered: boolean
 }
 
@@ -291,7 +291,7 @@ export class Auth0AdaptiveMFAService {
     let weight = 25 // Base weight
     let triggered = false
     let description = `IP address analysis for ${ipAddress}`
-    let value: any = ipAddress
+    let value: RiskFactorValue = { ipAddress }
 
     try {
       // Check if IP is in whitelist
@@ -318,7 +318,7 @@ export class Auth0AdaptiveMFAService {
 
         // Check if this is a new IP for the user
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin && Math.random() < 0.1) {
+        if (user?.lastLogin && Math.random() < 0.1) {
           triggered = true
           description = `New or unusual IP address for user`
         }
@@ -346,7 +346,7 @@ export class Auth0AdaptiveMFAService {
     let weight = 20 // Base weight
     let triggered = false
     let description = 'Geolocation analysis'
-    let value: any = location
+    let value: RiskFactorValue = { ...location }
 
     try {
       if (this.config.enableGeofencing && location.country) {
@@ -391,7 +391,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 15 // Base weight
     let triggered = false
     let description = 'Time-based analysis'
-    const value: any = {
+    const value: RiskFactorValue = {
       hour: timestamp.getUTCHours(),
       dayOfWeek: timestamp.getUTCDay(),
       timestamp: timestamp.toISOString(),
@@ -447,7 +447,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 20 // Base weight
     let triggered = false
     let description = 'Behavioral analysis'
-    let value: any = { userId, timestamp: timestamp.toISOString() }
+    let value: RiskFactorValue = { userId, timestamp: timestamp.toISOString() }
 
     try {
       if (this.config.enableBehavioralAnalysis) {
@@ -505,7 +505,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 10 // Base weight
     let triggered = false
     let description = 'Device analysis'
-    const value: any = { userAgent }
+    const value: RiskFactorValue = { userAgent }
 
     try {
       if (this.config.enableDeviceProfiling) {
