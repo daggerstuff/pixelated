@@ -1,44 +1,8 @@
-<testsuites id="" name="" tests="9" failures="3" skipped="1" errors="2" time="79.925599">
-<testsuite name="browser/auth.spec.ts" timestamp="2026-04-11T20:52:51.942Z" hostname="chromium" tests="5" failures="0" skipped="1" time="66.855" errors="2">
-<testcase name="login page has correct form elements" classname="browser/auth.spec.ts" time="1.059">
+<testsuites id="" name="" tests="9" failures="0" skipped="1" errors="0" time="18.331113000000002">
+<testsuite name="browser/auth.spec.ts" timestamp="2026-04-11T21:17:35.162Z" hostname="chromium" tests="5" failures="0" skipped="1" time="9.901" errors="0">
+<testcase name="login page has correct form elements" classname="browser/auth.spec.ts" time="0.725">
 </testcase>
-<testcase name="login form shows validation errors" classname="browser/auth.spec.ts" time="31.123">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../../test-results/browser-auth-login-form-shows-validation-errors-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../../test-results/browser-auth-login-form-shows-validation-errors-chromium/video.webm]]
-
-[[ATTACHMENT|../../test-results/browser-auth-login-form-shows-validation-errors-chromium/error-context.md]]
-]]>
-</system-out>
-<error message="Test timeout of 30000ms exceeded." type="Error">
-<![CDATA[  [chromium] › browser/auth.spec.ts:21:1 › login form shows validation errors ──────────────────────
-
-    Test timeout of 30000ms exceeded.
-
-    Error: page.waitForFunction: Test timeout of 30000ms exceeded.
-
-      66 |   // Wait for React to flush state updates - wait for error text content to appear
-      67 |   // Use a more explicit wait that checks for actual text content
-    > 68 |   await page.waitForFunction(
-         |              ^
-      69 |     () => {
-      70 |       const emailErrorEl = document.getElementById('email-error')
-      71 |       const passwordErrorEl = document.getElementById('password-error')
-        at /home/vivi/pixelated/tests/browser/auth.spec.ts:68:14
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/browser-auth-login-form-shows-validation-errors-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/browser-auth-login-form-shows-validation-errors-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/browser-auth-login-form-shows-validation-errors-chromium/error-context.md
-]]>
-</error>
+<testcase name="login form shows validation errors" classname="browser/auth.spec.ts" time="3.181">
 </testcase>
 <testcase name="login form is properly visible on mobile viewport" classname="browser/auth.spec.ts">
 <properties>
@@ -48,49 +12,13 @@
 <skipped>
 </skipped>
 </testcase>
-<testcase name="login page has proper transitions" classname="browser/auth.spec.ts" time="31.159">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../../test-results/browser-auth-login-page-has-proper-transitions-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../../test-results/browser-auth-login-page-has-proper-transitions-chromium/video.webm]]
-
-[[ATTACHMENT|../../test-results/browser-auth-login-page-has-proper-transitions-chromium/error-context.md]]
-]]>
-</system-out>
-<error message="Test timeout of 30000ms exceeded." type="Error">
-<![CDATA[  [chromium] › browser/auth.spec.ts:130:1 › login page has proper transitions ──────────────────────
-
-    Test timeout of 30000ms exceeded.
-
-    Error: page.waitForFunction: Test timeout of 30000ms exceeded.
-
-      161 |   // Wait for React to process the state update and render the reset password heading
-      162 |   // Use waitForFunction to explicitly wait for the heading element to appear in the DOM
-    > 163 |   await page.waitForFunction(
-          |              ^
-      164 |     () => {
-      165 |       const heading = document.querySelector(
-      166 |         '[data-testid="reset-password-heading"]',
-        at /home/vivi/pixelated/tests/browser/auth.spec.ts:163:14
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/browser-auth-login-page-has-proper-transitions-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/browser-auth-login-page-has-proper-transitions-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/browser-auth-login-page-has-proper-transitions-chromium/error-context.md
-]]>
-</error>
+<testcase name="login page has proper transitions" classname="browser/auth.spec.ts" time="2.478">
 </testcase>
-<testcase name="login page visual comparison" classname="browser/auth.spec.ts" time="3.34">
+<testcase name="login page visual comparison" classname="browser/auth.spec.ts" time="3.301">
 </testcase>
 </testsuite>
-<testsuite name="browser/browser-compatibility.spec.ts" timestamp="2026-04-11T20:52:51.942Z" hostname="chromium" tests="4" failures="3" skipped="0" time="7.942" errors="0">
-<testcase name="Home page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.258">
+<testsuite name="browser/browser-compatibility.spec.ts" timestamp="2026-04-11T21:17:35.162Z" hostname="chromium" tests="4" failures="0" skipped="0" time="7.38" errors="0">
+<testcase name="Home page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.182">
 <properties>
 <property name="slow" value="">
 </property>
@@ -99,50 +27,10 @@
 <![CDATA[Testing Home page in chromium
 Going to /
 Page title: Pixelated Empathy | Clinical simulation for therapist training and supervision - Pixelated Empathy
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/video.webm]]
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/error-context.md]]
 ]]>
 </system-out>
-<failure message="expect(received).toEqual(expected) // deep equality" type="expect.toEqual">
-<![CDATA[  [chromium] › browser/browser-compatibility.spec.ts:21:3 › Home page should work in all browsers ──
-
-    Error: expect(received).toEqual(expected) // deep equality
-
-    - Expected  - 1
-    + Received  + 4
-
-    - Array []
-    + Array [
-    +   "Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.",
-    +   "Failed to load resource: net::ERR_FAILED",
-    + ]
-
-      81 |
-      82 |     // Verify there are no console errors (except for known ones)
-    > 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(
-         |                                                                         ^
-      84 |       [],
-      85 |     )
-      86 |   })
-        at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/browser-browser-compatibil-8fd92-should-work-in-all-browsers-chromium/error-context.md
-]]>
-</failure>
 </testcase>
-<testcase name="Blog page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.342">
+<testcase name="Blog page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.074">
 <properties>
 <property name="slow" value="">
 </property>
@@ -151,50 +39,10 @@ Page title: Pixelated Empathy | Clinical simulation for therapist training and s
 <![CDATA[Testing Blog page in chromium
 Going to /blog
 Page title: Blog - Pixelated Empathy
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/video.webm]]
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/error-context.md]]
 ]]>
 </system-out>
-<failure message="expect(received).toEqual(expected) // deep equality" type="expect.toEqual">
-<![CDATA[  [chromium] › browser/browser-compatibility.spec.ts:21:3 › Blog page should work in all browsers ──
-
-    Error: expect(received).toEqual(expected) // deep equality
-
-    - Expected  - 1
-    + Received  + 4
-
-    - Array []
-    + Array [
-    +   "Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.",
-    +   "Failed to load resource: net::ERR_FAILED",
-    + ]
-
-      81 |
-      82 |     // Verify there are no console errors (except for known ones)
-    > 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(
-         |                                                                         ^
-      84 |       [],
-      85 |     )
-      86 |   })
-        at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/browser-browser-compatibil-4a519-should-work-in-all-browsers-chromium/error-context.md
-]]>
-</failure>
 </testcase>
-<testcase name="Documentation page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.281">
+<testcase name="Documentation page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.042">
 <properties>
 <property name="slow" value="">
 </property>
@@ -203,50 +51,10 @@ Page title: Blog - Pixelated Empathy
 <![CDATA[Testing Documentation page in chromium
 Going to /docs
 Page title: Getting Started with Pixelated Empathy - Pixelated Empathy
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/video.webm]]
-
-[[ATTACHMENT|../../test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/error-context.md]]
 ]]>
 </system-out>
-<failure message="expect(received).toEqual(expected) // deep equality" type="expect.toEqual">
-<![CDATA[  [chromium] › browser/browser-compatibility.spec.ts:21:3 › Documentation page should work in all browsers 
-
-    Error: expect(received).toEqual(expected) // deep equality
-
-    - Expected  - 1
-    + Received  + 4
-
-    - Array []
-    + Array [
-    +   "Access to fetch at 'https://o4509483611979776.ingest.us.sentry.io/api/4510990116192256/envelope/?sentry_version=7&sentry_key=71a4e2cb3144ab66a823f8cfc7d9959d&sentry_client=sentry.javascript.astro%2F10.48.0' from origin 'http://127.0.0.1:4323' has been blocked by CORS policy: Request header field cf-access-client-id is not allowed by Access-Control-Allow-Headers in preflight response.",
-    +   "Failed to load resource: net::ERR_FAILED",
-    + ]
-
-      81 |
-      82 |     // Verify there are no console errors (except for known ones)
-    > 83 |     expect(errors.filter((e) => !e.includes('process is not defined'))).toEqual(
-         |                                                                         ^
-      84 |       [],
-      85 |     )
-      86 |   })
-        at /home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts:83:73
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/browser-browser-compatibil-3a768-should-work-in-all-browsers-chromium/error-context.md
-]]>
-</failure>
 </testcase>
-<testcase name="CSS feature support check" classname="browser/browser-compatibility.spec.ts" time="1.061">
+<testcase name="CSS feature support check" classname="browser/browser-compatibility.spec.ts" time="1.082">
 <system-out>
 <![CDATA[CSS features support in chromium: {
   flexbox: [33mtrue[39m,
