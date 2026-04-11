@@ -3,10 +3,7 @@
  * Handles MFA enrollment, challenge, and management using Auth0 Guardian
  */
 
-import {
-  ManagementClient,
-  AuthenticationClient,
-} from 'auth0'
+import { ManagementClient, AuthenticationClient } from 'auth0'
 
 // Type alias for auth0 v5+ compatibility
 export type ManagementClientOptionsWithClientCredentials = {

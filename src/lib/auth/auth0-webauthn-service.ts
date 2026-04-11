@@ -547,10 +547,10 @@ export class Auth0WebAuthnService {
           userId: userId,
           error:
             error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
