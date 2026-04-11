@@ -124,7 +124,7 @@ export class RealFHEService implements FHEService {
       )
     } finally {
       // Ensure all resources are released
-      scope.releaseAll()
+      scope.close()
     }
   }
 
@@ -165,7 +165,7 @@ export class RealFHEService implements FHEService {
       )
     } finally {
       // Ensure all resources are released
-      scope.releaseAll()
+      scope.close()
     }
   }
 

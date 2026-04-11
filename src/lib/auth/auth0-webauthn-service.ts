@@ -45,9 +45,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:users update:users create:users read:guardian_factors update:guardian_factors',
-    })
+    }) as ManagementClient
   }
 }
 
@@ -182,6 +180,7 @@ export class Auth0WebAuthnService {
       await updatePhase6AuthenticationProgress(
         registrationOptions.userId,
         'webauthn_registration_options_generated',
+        { method: 'webauthn' },
       )
 
       return options
@@ -216,12 +215,16 @@ export class Auth0WebAuthnService {
       }
 
       // Log successful registration
-      logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED, {
-        userId: userId,
-        credentialId: newCredential.id,
-        type: newCredential.type,
-        timestamp: new Date().toISOString(),
-      })
+      logSecurityEvent(
+        SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED,
+        userId,
+        {
+          userId: userId,
+          credentialId: newCredential.id,
+          type: newCredential.type,
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       // Update Phase 6 MCP server with registration completion
       await updatePhase6AuthenticationProgress(
@@ -276,17 +279,22 @@ export class Auth0WebAuthnService {
       }
 
       // Log authentication options generation
-      logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_STARTED, {
-        userId: authenticationOptions.userId,
-        credentialsCount: credentials.length,
-        optionsGenerated: true,
-        timestamp: new Date().toISOString(),
-      })
+      logSecurityEvent(
+        SecurityEventType.WEBAUTHN_AUTHENTICATION_STARTED,
+        authenticationOptions.userId,
+        {
+          userId: authenticationOptions.userId,
+          credentialsCount: credentials.length,
+          optionsGenerated: true,
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       // Update Phase 6 MCP server with authentication progress
       await updatePhase6AuthenticationProgress(
         authenticationOptions.userId,
         'webauthn_authentication_options_generated',
+        { credentialsCount: credentials.length },
       )
 
       return options
@@ -313,11 +321,15 @@ export class Auth0WebAuthnService {
       // For now, we'll simulate the verification
 
       // Log successful authentication
-      logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED, {
-        userId: userId,
-        credentialId: credential.id,
-        timestamp: new Date().toISOString(),
-      })
+      logSecurityEvent(
+        SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED,
+        userId,
+        {
+          userId: userId,
+          credentialId: credential.id,
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       // Update Phase 6 MCP server with authentication completion
       await updatePhase6AuthenticationProgress(
@@ -528,16 +540,20 @@ export class Auth0WebAuthnService {
       console.error('Failed to validate WebAuthn credential response:', error)
 
       // Log validation failure
-      logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED, {
-        userId: userId,
-        error:
-          error instanceof Error
+      logSecurityEvent(
+        SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED,
+        userId,
+        {
+          userId: userId,
+          error:
+            error instanceof Error
             ? error instanceof Error
               ? error.message
               : 'Unknown error'
             : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      })
+          timestamp: new Date().toISOString(),
+        },
+      )
 
       return false
     }

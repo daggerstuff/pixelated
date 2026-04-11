@@ -60,9 +60,7 @@ function initializeAuth0Management() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:users read:logs read:attack-protection update:attack-protection',
-    })
+    }) as ExtendedManagementClient
   }
 }
 

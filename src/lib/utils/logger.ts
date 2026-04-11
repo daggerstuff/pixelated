@@ -40,7 +40,9 @@ class Logger {
       return obj
     }
 
-    const newObj = { ...(obj as Record<string, unknown>) }
+    const newObj = Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, value]),
+    )
     for (const key of keys) {
       if (key in newObj) {
         newObj[key] = '[REDACTED]'
