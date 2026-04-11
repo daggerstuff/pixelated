@@ -171,6 +171,7 @@ interface Auth0ServiceConfig {
 type UnknownRecord = Record<string, unknown>
 
 type Auth0UserRecord = {
+ sub?: unknown
   user_id?: unknown
   email?: unknown
   email_verified?: unknown

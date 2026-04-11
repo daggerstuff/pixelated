@@ -1,5 +1,5 @@
 // Conditional module export for Python bridge
-export async function createMentalLLaMAPythonBridge(scriptPath?: string): void {
+export async function createMentalLLaMAPythonBridge(scriptPath?: string): Promise<{ initialize(): Promise<void>; isReady(): boolean }> {
   // Only import server implementation when actually in a Node.js environment
   if (
     typeof process !== 'undefined' &&

@@ -84,12 +84,6 @@ export interface BiasDetectionConfig {
     timeoutMs?: number
     retries?: number
   }
-  mlToolkitConfig?: {
-    enabled?: boolean
-    framework?: 'tensorflow' | 'pytorch' | 'scikit-learn'
-    version?: string
-    tensorflow?: { enabled?: boolean }
-  }
 }
 
 export interface BiasMetricsConfig {
@@ -341,7 +335,7 @@ export interface PreprocessingLayerResult {
   }
   dataQualityMetrics: DataQualityMetrics
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -352,7 +346,7 @@ export interface ModelLevelLayerResult {
   performanceMetrics: ModelPerformanceMetrics
   groupPerformanceComparison: GroupPerformanceComparison[]
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -368,7 +362,7 @@ export interface InteractiveLayerResult {
   featureImportance: any[]
   whatIfScenarios: any[]
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -395,7 +389,7 @@ export interface EvaluationLayerResult {
     interventionEffectiveness: any[]
   }
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
