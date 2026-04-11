@@ -21,8 +21,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    if:
-      github.event_name == 'workflow_dispatch' || (github.event_name ==
+    if: github.event_name == 'workflow_dispatch' || (github.event_name ==
       'workflow_run' && github.event.workflow_run.conclusion == 'success')
     env:
       ARTIFACT_REGISTRY_LOCATION: us-west1
@@ -34,8 +33,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           submodules: false
-          ref:
-            ${{ github.event_name == 'workflow_run' &&
+          ref: ${{ github.event_name == 'workflow_run' &&
             github.event.workflow_run.head_sha || github.sha }}
 
       - name: Normalize Google workload identity settings
@@ -46,12 +44,15 @@ jobs:
           [[ -n "$GCP_WIF_PROVIDER_RAW" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
           PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
           PROVIDER="${PROVIDER#//iam.googleapis.com/}"
+          [[ -n "$PROVIDER" ]] || { echo "Normalized provider was empty"; exit 1; }
           echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
+          echo "audience=$PROVIDER" >> "$GITHUB_OUTPUT"
 
       - name: Authenticate to Google Cloud (OIDC)
         uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ steps.gcp-auth.outputs.provider }}
+          audience: ${{ steps.gcp-auth.outputs.audience }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
@@ -64,8 +65,7 @@ jobs:
       - name: Authenticate to GKE
         uses: google-github-actions/get-gke-credentials@v2
         with:
-          cluster_name:
-            ${{ secrets['GKE_CLUSTER_NAME_PROD'] ||
+          cluster_name: ${{ secrets['GKE_CLUSTER_NAME_PROD'] ||
             'pixelated-empathy-production' }}
           location: ${{ secrets['GKE_CLUSTER_LOCATION_PROD'] || 'us-west1' }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
@@ -109,8 +109,7 @@ jobs:
         run: kubectl apply -k k8s/overlays/production
 
       - name: Update k8s deployment image (production)
-        run:
-          kubectl set image deployment/pixelated-empathy-api
+        run: kubectl set image deployment/pixelated-empathy-api
           "pixelated-empathy-api=$IMAGE_URI" -n pixelated-empathy
 
       - name: Render and apply runtime secrets
@@ -119,13 +118,11 @@ jobs:
           DATABASE_URL="${{ secrets['DATABASE_URL'] }}"                   REDIS_URL="${{ secrets['REDIS_URL'] }}"                   JWT_SECRET="${{ secrets['JWT_SECRET'] }}"                   API_KEY="${{ secrets['API_KEY'] }}"                   ./scripts/render-k8s-secrets.sh
 
       - name: Restart to apply updated runtime secrets
-        run:
-          kubectl rollout restart deployment/pixelated-empathy-api -n
+        run: kubectl rollout restart deployment/pixelated-empathy-api -n
           pixelated-empathy
 
       - name: Wait for rollout
-        run:
-          kubectl rollout status deployment/pixelated-empathy-api -n
+        run: kubectl rollout status deployment/pixelated-empathy-api -n
           pixelated-empathy --timeout=180s
 
       - name: Verify deployment
