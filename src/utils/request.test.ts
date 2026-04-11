@@ -49,8 +49,15 @@ describe("request utilities", () => {
 
   describe("getBrowserLanguage", () => {
     it("should return en-US in SSR environment", () => {
-      vi.stubGlobal("window", undefined)
-      expect(getBrowserLanguage()).toBe("en-US")
+      const originalWindow = global.window;
+      // @ts-ignore
+      delete global.window;
+
+      expect(getBrowserLanguage()).toBe("en-US");
+
+      if (originalWindow) {
+        global.window = originalWindow;
+      }
     })
 
     it("should return the browser language", () => {
