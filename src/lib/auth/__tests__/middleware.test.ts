@@ -69,8 +69,8 @@ vi.mock('../user-identity', () => ({
   resolveIdentity: vi.fn(),
 }))
 
-import { resolveIdentity } from '../user-identity'
 import { auth0AdaptiveMFAService } from '../auth0-adaptive-mfa-service'
+import { resolveIdentity } from '../user-identity'
 
 describe('Authentication Middleware', () => {
   let mockRequest: Request

@@ -58,10 +58,11 @@ class MongoDB {
    */
   private buildMongoDBUri(): string {
     const metaEnv =
-      typeof import.meta === 'object' && typeof import.meta.env === 'object'
-        && import.meta.env !== null
-        && 'MONGODB_URI' in import.meta.env
-        && typeof import.meta.env['MONGODB_URI'] === 'string'
+      typeof import.meta === 'object' &&
+      typeof import.meta.env === 'object' &&
+      import.meta.env !== null &&
+      'MONGODB_URI' in import.meta.env &&
+      typeof import.meta.env['MONGODB_URI'] === 'string'
         ? import.meta.env['MONGODB_URI']
         : undefined
 
