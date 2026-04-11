@@ -44,7 +44,9 @@ export function withAuth(
         const guestSession: Session = {
           user: { id: 'guest', role: 'guest' },
           // Future expiration ensures validity throughout the request lifecycle
-          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          expires: new Date(
+            Date.now() + 365 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
         }
         return handler(request, guestSession)
       }

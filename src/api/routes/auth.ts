@@ -76,20 +76,17 @@ router.get('/callback', async (req: Request, res: Response) => {
   try {
     // ── Step 1: Exchange auth code for tokens ─────────────────────────────
 
-    const tokenEndpointRes = await fetch(
-      `https://${auth0Domain}/oauth/token`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          client_id: clientId,
-          client_secret: clientSecret,
-          code,
-          redirect_uri: redirectUri,
-        }),
-      },
-    )
+    const tokenEndpointRes = await fetch(`https://${auth0Domain}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        redirect_uri: redirectUri,
+      }),
+    })
 
     if (!tokenEndpointRes.ok) {
       const errorBody = await tokenEndpointRes.json().catch(() => ({}))
@@ -193,7 +190,11 @@ router.get('/callback', async (req: Request, res: Response) => {
     })
   } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Authentication failed'
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Authentication failed'
     res.status(500).json({
       error: errorMessage,
       code: 'AUTH_ERROR',
@@ -296,19 +297,16 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 
   try {
-    const tokenEndpointRes = await fetch(
-      `https://${auth0Domain}/oauth/token`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          client_id: clientId,
-          client_secret: clientSecret,
-          refresh_token: refreshToken,
-        }),
-      },
-    )
+    const tokenEndpointRes = await fetch(`https://${auth0Domain}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+      }),
+    })
 
     if (!tokenEndpointRes.ok) {
       const errorBody = await tokenEndpointRes.json().catch(() => ({}))
@@ -338,7 +336,11 @@ router.post('/refresh', async (req: Request, res: Response) => {
     })
   } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Token refresh failed'
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Token refresh failed'
     res.status(500).json({
       error: errorMessage,
       code: 'REFRESH_ERROR',

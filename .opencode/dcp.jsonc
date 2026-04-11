@@ -17,22 +17,22 @@
 
   "commands": {
     "enabled": true,
-    "protectedTools": ["compress", "batch"]
+    "protectedTools": ["compress", "batch"],
   },
 
   "manualMode": {
     "enabled": false,
-    "automaticStrategies": true
+    "automaticStrategies": true,
   },
 
   "turnProtection": {
     "enabled": true,
-    "turns": 2
+    "turns": 2,
   },
 
   "experimental": {
     "allowSubAgents": true,
-    "customPrompts": false
+    "customPrompts": false,
   },
 
   // Protect important files from being pruned during compression
@@ -42,7 +42,7 @@
     "*.key",
     "*.pem",
     "package-lock.json",
-    "pnpm-lock.yaml"
+    "pnpm-lock.yaml",
   ],
 
   // ============================================================================
@@ -63,7 +63,14 @@
     "iterationNudgeThreshold": 10,
     "nudgeForce": "strong",
 
-    "protectedTools": ["task", "skill", "todowrite", "todoread", "compress", "batch"],
+    "protectedTools": [
+      "task",
+      "skill",
+      "todowrite",
+      "todoread",
+      "compress",
+      "batch",
+    ],
 
     // ============================================================================
     // MODEL-SPECIFIC CONTEXT LIMITS
@@ -130,7 +137,7 @@
       "meta/llama-3.3-70b-instruct": 95000,
 
       // Default fallback for any unlisted model
-      "default": 90000
+      "default": 90000,
     },
 
     "modelMinLimits": {
@@ -156,8 +163,8 @@
       "moonshotai/kimi-k2-thinking": 100000,
       "google/gemma-4-31b-it": 45000,
       "meta/llama-3.3-70b-instruct": 45000,
-      "default": 40000
-    }
+      "default": 40000,
+    },
   },
 
   // ============================================================================
@@ -166,12 +173,12 @@
   "strategies": {
     "deduplication": {
       "enabled": true,
-      "protectedTools": ["edit", "write"]
+      "protectedTools": ["edit", "write"],
     },
     "purgeErrors": {
       "enabled": true,
       "turns": 4,
-      "protectedTools": ["edit", "write"]
-    }
-  }
+      "protectedTools": ["edit", "write"],
+    },
+  },
 }

@@ -37,10 +37,7 @@ interface ExtendedManagementClient extends ManagementClient {
   }
   // Roles
   getRoles: (params: { per_page?: number; page?: number }) => Promise<any>
-  createRole: (params: {
-    name: string
-    description?: string
-  }) => Promise<any>
+  createRole: (params: { name: string; description?: string }) => Promise<any>
   updateRole: (params: {
     id: string
     name?: string
@@ -48,10 +45,7 @@ interface ExtendedManagementClient extends ManagementClient {
   }) => Promise<any>
   deleteRole: (params: { id: string }) => Promise<void>
   getRoleUsers: (params: { id: string }) => Promise<any>
-  assignRolestoUser: (params: {
-    id: string
-    roles: string[]
-  }) => Promise<void>
+  assignRolestoUser: (params: { id: string; roles: string[] }) => Promise<void>
   removeRolesFromUser: (params: {
     id: string
     roles: string[]
@@ -477,10 +471,7 @@ export class Auth0UserService {
         updateParams.app_metadata = appMetadataUpdates
       }
 
-      const updateRes = await auth0Management.users.update(
-        userId,
-        updateParams,
-      )
+      const updateRes = await auth0Management.users.update(userId, updateParams)
       const auth0User = updateRes.data
 
       return {
@@ -512,10 +503,7 @@ export class Auth0UserService {
     }
 
     try {
-      await auth0Management.users.update(
-        userId,
-        { password: newPassword },
-      )
+      await auth0Management.users.update(userId, { password: newPassword })
     } catch (error: unknown) {
       console.error('Auth0 change password error:', error)
       throw new Error('Failed to change password')
@@ -566,7 +554,10 @@ export class Auth0UserService {
       const userInfoRes = await auth0UserInfo.getUserInfo(
         tokenResponse.access_token,
       )
-      const userResponse: any = { ...userInfoRes.data, user_id: userInfoRes.data.sub }
+      const userResponse: any = {
+        ...userInfoRes.data,
+        user_id: userInfoRes.data.sub,
+      }
 
       return {
         user: {
@@ -610,7 +601,10 @@ export class Auth0UserService {
         throw new Error('Auth0 UserInfo client not initialized')
       }
       const userInfoRes = await auth0UserInfo.getUserInfo(token)
-      const decodedToken: any = { ...userInfoRes.data, user_id: userInfoRes.data.sub }
+      const decodedToken: any = {
+        ...userInfoRes.data,
+        user_id: userInfoRes.data.sub,
+      }
 
       return {
         userId: decodedToken.user_id,

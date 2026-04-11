@@ -1,4 +1,5 @@
 import React, { FC, memo } from 'react'
+
 import { SlideUp } from '@/components/layout/AdvancedAnimations'
 
 interface Milestone {
@@ -33,7 +34,7 @@ const MILESTONES: Milestone[] = [
 const UpcomingMilestones: FC = memo(() => {
   return (
     <SlideUp>
-      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6 h-full'>
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full rounded-lg border p-6'>
         <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
           <span>📋</span>
           Upcoming Milestones

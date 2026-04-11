@@ -122,7 +122,9 @@ const TreatmentPlanManager: FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(createEmptyNewPlanData())
+  const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
+    createEmptyNewPlanData(),
+  )
 
   const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -144,7 +146,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'An unknown error occurred'
       setError(errorMessage)
       toast.error(`Failed to load plans: ${errorMessage}`)
@@ -169,9 +171,7 @@ const TreatmentPlanManager: FC = () => {
       | HTMLSelectElement
     const { name, value } = target
     if (isEdit) {
-      setEditingPlanData((prev) =>
-        prev ? { ...prev, [name]: value } : null,
-      )
+      setEditingPlanData((prev) => (prev ? { ...prev, [name]: value } : null))
     } else {
       setNewPlanData((prev) => ({ ...prev, [name]: value }))
     }
@@ -179,9 +179,7 @@ const TreatmentPlanManager: FC = () => {
 
   const handleSelectChange = (name: string, value: string, isEdit = false) => {
     if (isEdit) {
-      setEditingPlanData((prev) =>
-        prev ? { ...prev, [name]: value } : null,
-      )
+      setEditingPlanData((prev) => (prev ? { ...prev, [name]: value } : null))
     } else {
       setNewPlanData((prev) => ({ ...prev, [name]: value }))
     }
@@ -284,10 +282,7 @@ const TreatmentPlanManager: FC = () => {
         if (updatedGoals[goalIndex]) {
           updatedGoals[goalIndex] = {
             ...updatedGoals[goalIndex],
-            objectives: [
-              ...updatedGoals[goalIndex].objectives,
-              newObjective,
-            ],
+            objectives: [...updatedGoals[goalIndex].objectives, newObjective],
           }
           return { ...prev, goals: updatedGoals }
         }
@@ -416,7 +411,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'An unknown error occurred'
       toast.error(`Failed to create plan: ${errorMessage}`)
     } finally {
@@ -443,7 +438,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'An unknown error occurred'
       toast.error(`Failed to delete plan: ${errorMessage}`)
     } finally {
@@ -487,7 +482,7 @@ const TreatmentPlanManager: FC = () => {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'An unknown error occurred'
       toast.error(`Failed to update plan: ${errorMessage}`)
     } finally {
@@ -506,7 +501,7 @@ const TreatmentPlanManager: FC = () => {
         ? plan.goals.map((g) => ({
             ...g,
             // Deep copy objectives to avoid reference leaks (Review suggestion)
-            objectives: g.objectives ? g.objectives.map(o => ({ ...o })) : [],
+            objectives: g.objectives ? g.objectives.map((o) => ({ ...o })) : [],
           }))
         : [],
     } as FormUpdatePlanData)

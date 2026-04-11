@@ -53,7 +53,7 @@ export function ChatContainer({
     let ticking = false
     const handleScroll = () => {
       if (ticking) return
-      
+
       ticking = true
       frameId.current = window.requestAnimationFrame(() => {
         if (containerRef.current) {

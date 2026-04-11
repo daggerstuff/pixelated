@@ -83,13 +83,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
       await logSecurityEvent('token_validation_failed', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         clientInfo,
         timestamp: Date.now(),
       })
 
       return new Response(
-        JSON.stringify({ error: (error instanceof Error ? error.message : "Unknown error"), details: error.details || {} }),
+        JSON.stringify({
+          error: error instanceof Error ? error.message : 'Unknown error',
+          details: error.details || {},
+        }),
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
@@ -101,7 +104,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     console.error('Token refresh error:', err)
 
     await logSecurityEvent('error', {
-      error: (error instanceof Error ? error.message : "Unknown error") || String(err),
+      error:
+        (error instanceof Error ? error.message : 'Unknown error') ||
+        String(err),
       clientInfo,
       timestamp: Date.now(),
     })

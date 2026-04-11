@@ -1,7 +1,7 @@
-import React, { useState, forwardRef, useEffect } from 'react'
-import { usePasswordStrength } from '../../hooks/usePasswordStrength'
 import { Eye, EyeOff } from 'lucide-react'
+import React, { useState, forwardRef, useEffect } from 'react'
 
+import { usePasswordStrength } from '../../hooks/usePasswordStrength'
 
 interface PasswordInputWithStrengthProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string
@@ -161,21 +161,23 @@ export const PasswordInputWithStrength = forwardRef<
               </button>
             )}
 
-            {isShowingError && <div className="error-label md:hidden">{error}</div>}
+            {isShowingError && (
+              <div className='error-label md:hidden'>{error}</div>
+            )}
           </div>
 
           {isShowingError && (
             <div
               id={`${name}-error`}
-              className={`${isFocused ? 'hidden md:block' : ''} text-red-500 text-sm mt-1`}
-              role="alert"
+              className={`${isFocused ? 'hidden md:block' : ''} text-red-500 mt-1 text-sm`}
+              role='alert'
             >
               {error}
             </div>
           )}
 
           {helperText && (
-            <div id={`${name}-helper`} className="text-gray-500 text-xs mt-1">
+            <div id={`${name}-helper`} className='text-gray-500 mt-1 text-xs'>
               {helperText}
             </div>
           )}
@@ -199,7 +201,7 @@ export const PasswordInputWithStrength = forwardRef<
                 }
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label="Password strength"
+                aria-label='Password strength'
                 aria-valuetext={strength}
               >
                 <div
@@ -224,9 +226,9 @@ export const PasswordInputWithStrength = forwardRef<
                 <div
                   className='password-feedback mt-1 text-xs'
                   style={{ color }}
-                  aria-live="polite"
-                  aria-atomic="true"
-                  role="status"
+                  aria-live='polite'
+                  aria-atomic='true'
+                  role='status'
                 >
                   {debouncedFeedback}
                 </div>

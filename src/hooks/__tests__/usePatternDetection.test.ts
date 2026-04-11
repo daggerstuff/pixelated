@@ -1,153 +1,157 @@
-import { renderHook } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import type { Message } from "@/types/chat";
+import type { Message } from '@/types/chat'
 
-import { useAIService } from "../useAIService";
-import { usePatternDetection } from "../usePatternDetection";
+import { useAIService } from '../useAIService'
+import { usePatternDetection } from '../usePatternDetection'
 
 // Mock the useAIService hook
-vi.mock("../useAIService", () => ({
+vi.mock('../useAIService', () => ({
   __esModule: true,
   useAIService: vi.fn<() => { getAIResponse: ReturnType<typeof vi.fn> }>(),
   default: vi.fn<() => unknown>(),
-}));
+}))
 
-describe("usePatternDetection", () => {
+describe('usePatternDetection', () => {
   const mockMessages: Message[] = [
     {
-      role: "user",
-      content: "I feel anxious every morning",
-      name: "",
+      role: 'user',
+      content: 'I feel anxious every morning',
+      name: '',
       timestamp: new Date(Date.now() - 1000).toISOString(),
     },
     {
-      role: "assistant",
+      role: 'assistant',
       content:
-        "I understand that must be difficult. Can you tell me more about your morning anxiety?",
-      name: "",
+        'I understand that must be difficult. Can you tell me more about your morning anxiety?',
+      name: '',
       timestamp: new Date().toISOString(),
     },
-  ];
+  ]
 
   const mockPatternResponse = [
     {
-      patternType: "anxiety_pattern",
-      description: "Regular morning anxiety reported",
+      patternType: 'anxiety_pattern',
+      description: 'Regular morning anxiety reported',
       frequency: 0.8,
       significance: 0.7,
-      suggestedResponse: "Explore morning routine and anxiety triggers",
+      suggestedResponse: 'Explore morning routine and anxiety triggers',
       confidence: 0.9,
     },
-  ];
+  ]
 
   const mockStreamResponse = new ReadableStream({
     start(controller): void {
-      controller.enqueue(new TextEncoder().encode(JSON.stringify(mockPatternResponse)));
-      controller.close();
+      controller.enqueue(
+        new TextEncoder().encode(JSON.stringify(mockPatternResponse)),
+      )
+      controller.close()
     },
-  });
+  })
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.clearAllMocks()
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: vi.fn<() => Promise<unknown>>(),
-    });
-  });
+    })
+  })
 
-  it("should detect patterns from conversation history", async () => {
-    const mockGetAIResponse = vi.fn<() => Promise<{ content: string }>>().mockResolvedValue({
-      content: JSON.stringify(mockPatternResponse),
-    });
-    vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: mockGetAIResponse,
-    });
-
-    const { result } = renderHook(() => usePatternDetection());
-    const patterns = await result.current.detectPatterns(mockMessages);
-    expect(patterns).toEqual(mockPatternResponse);
-  });
-
-  it("should handle streaming responses", async () => {
-    const mockGetAIResponse = vi
-      .fn<() => Promise<ReadableStream>>()
-      .mockResolvedValue(mockStreamResponse);
-    vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: mockGetAIResponse,
-    });
-
-    const { result } = renderHook(() => usePatternDetection());
-    const patterns = await result.current.detectPatterns(mockMessages);
-
-    expect(patterns).toEqual(mockPatternResponse);
-  });
-
-  it("should return error pattern on API failure", async () => {
-    const mockGetAIResponse = vi
-      .fn<() => Promise<never>>()
-      .mockRejectedValue(new Error("API Error"));
-    vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: mockGetAIResponse,
-    });
-
-    const { result } = renderHook(() => usePatternDetection());
-    const patterns = await result.current.detectPatterns(mockMessages);
-
-    expect(patterns).toEqual([
-      {
-        patternType: "error",
-        description: "Unable to analyze patterns",
-        frequency: 0,
-        significance: 0,
-        confidence: 0,
-      },
-    ]);
-  });
-
-  it("should handle malformed JSON responses", async () => {
+  it('should detect patterns from conversation history', async () => {
     const mockGetAIResponse = vi
       .fn<() => Promise<{ content: string }>>()
-      .mockResolvedValue({ content: "invalid json" });
+      .mockResolvedValue({
+        content: JSON.stringify(mockPatternResponse),
+      })
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
-    });
+    })
 
-    const { result } = renderHook(() => usePatternDetection());
-    const patterns = await result.current.detectPatterns(mockMessages);
+    const { result } = renderHook(() => usePatternDetection())
+    const patterns = await result.current.detectPatterns(mockMessages)
+    expect(patterns).toEqual(mockPatternResponse)
+  })
+
+  it('should handle streaming responses', async () => {
+    const mockGetAIResponse = vi
+      .fn<() => Promise<ReadableStream>>()
+      .mockResolvedValue(mockStreamResponse)
+    vi.mocked(useAIService).mockReturnValue({
+      getAIResponse: mockGetAIResponse,
+    })
+
+    const { result } = renderHook(() => usePatternDetection())
+    const patterns = await result.current.detectPatterns(mockMessages)
+
+    expect(patterns).toEqual(mockPatternResponse)
+  })
+
+  it('should return error pattern on API failure', async () => {
+    const mockGetAIResponse = vi
+      .fn<() => Promise<never>>()
+      .mockRejectedValue(new Error('API Error'))
+    vi.mocked(useAIService).mockReturnValue({
+      getAIResponse: mockGetAIResponse,
+    })
+
+    const { result } = renderHook(() => usePatternDetection())
+    const patterns = await result.current.detectPatterns(mockMessages)
 
     expect(patterns).toEqual([
       {
-        patternType: "error",
-        description: "Unable to analyze patterns",
+        patternType: 'error',
+        description: 'Unable to analyze patterns',
         frequency: 0,
         significance: 0,
         confidence: 0,
       },
-    ]);
-  });
+    ])
+  })
 
-  it("should handle empty message array", async () => {
+  it('should handle malformed JSON responses', async () => {
+    const mockGetAIResponse = vi
+      .fn<() => Promise<{ content: string }>>()
+      .mockResolvedValue({ content: 'invalid json' })
+    vi.mocked(useAIService).mockReturnValue({
+      getAIResponse: mockGetAIResponse,
+    })
+
+    const { result } = renderHook(() => usePatternDetection())
+    const patterns = await result.current.detectPatterns(mockMessages)
+
+    expect(patterns).toEqual([
+      {
+        patternType: 'error',
+        description: 'Unable to analyze patterns',
+        frequency: 0,
+        significance: 0,
+        confidence: 0,
+      },
+    ])
+  })
+
+  it('should handle empty message array', async () => {
     // No mock needed or verify default behavior
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: vi.fn<() => Promise<unknown>>(),
-    });
-    const { result } = renderHook(() => usePatternDetection());
-    const patterns = await result.current.detectPatterns([]);
+    })
+    const { result } = renderHook(() => usePatternDetection())
+    const patterns = await result.current.detectPatterns([])
 
-    expect(patterns).toEqual([]);
-  });
+    expect(patterns).toEqual([])
+  })
 
-  it("should handle non-array responses", async () => {
+  it('should handle non-array responses', async () => {
     const mockGetAIResponse = vi
       .fn<() => Promise<{ content: string }>>()
-      .mockResolvedValue({ content: JSON.stringify({}) });
+      .mockResolvedValue({ content: JSON.stringify({}) })
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
-    });
+    })
 
-    const { result } = renderHook(() => usePatternDetection());
-    const patterns = await result.current.detectPatterns(mockMessages);
+    const { result } = renderHook(() => usePatternDetection())
+    const patterns = await result.current.detectPatterns(mockMessages)
 
-    expect(patterns).toEqual([]);
-  });
-});
+    expect(patterns).toEqual([])
+  })
+})

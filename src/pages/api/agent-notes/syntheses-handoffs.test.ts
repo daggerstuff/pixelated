@@ -1,7 +1,8 @@
 import { mkdtempSync, rmSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { describe, expect, it, vi } from 'vitest'
 import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+
+import { describe, expect, it, vi } from 'vitest'
 
 const makeTempPath = () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'agent-note-collab-syn-'))

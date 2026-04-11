@@ -130,7 +130,7 @@ export class CloudProviderManager {
     } catch (error: any) {
       logger.error('Failed to initialize cloud provider connections', { error })
       throw new Error(
-        `Cloud provider initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`,
+        `Cloud provider initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -301,9 +301,12 @@ export class CloudProviderManager {
         `Failed to deploy infrastructure to region: ${region.name}`,
         { error },
       )
-      throw new Error(`Region deployment failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Region deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 

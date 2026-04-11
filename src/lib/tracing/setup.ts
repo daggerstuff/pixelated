@@ -123,7 +123,12 @@ export function initializeTracing(): void {
     logger.info('OpenTelemetry tracing initialized successfully')
   } catch (error: unknown) {
     logger.error('Failed to initialize tracing', {
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
       stack: error instanceof Error ? error.stack : undefined,
     })
     // Don't throw - allow application to continue without tracing
@@ -149,7 +154,12 @@ export async function shutdownTracing(): Promise<void> {
     logger.info('Tracing shutdown complete')
   } catch (error: unknown) {
     logger.error('Error during tracing shutdown', {
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
     })
   }
 }

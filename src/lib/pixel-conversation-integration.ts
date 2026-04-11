@@ -236,7 +236,12 @@ export class PixelConversationIntegration {
 
       return response
     } catch (error: unknown) {
-      const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'
+      const message =
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Unknown error'
       this.state.error = message
       throw error
     } finally {

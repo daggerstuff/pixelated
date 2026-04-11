@@ -16,7 +16,10 @@ let redisAvailable = true
  * where the INCR succeeds but the EXPIRE fails, which would leave the key
  * stuck in memory forever without a TTL.
  */
-export async function incrementRedisCounter(key: string, windowSeconds: number) {
+export async function incrementRedisCounter(
+  key: string,
+  windowSeconds: number,
+) {
   try {
     const redis = getRedisClient()
     const tx = redis.multi()

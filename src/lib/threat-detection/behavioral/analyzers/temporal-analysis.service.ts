@@ -3,14 +3,16 @@
  * Handles time-based pattern analysis and temporal anomaly detection
  */
 
-import type { SecurityEvent, TemporalFeatures } from './types'
 import { calculateTimeIntervals, generateAnomalyId } from './analyzer-utils'
+import type { SecurityEvent, TemporalFeatures } from './types'
 
 export class TemporalAnalysisService {
   /**
    * Extract temporal features from security events
    */
-  async extractTemporalFeatures(events: SecurityEvent[]): Promise<TemporalFeatures> {
+  async extractTemporalFeatures(
+    events: SecurityEvent[],
+  ): Promise<TemporalFeatures> {
     const timestamps = events.map((e) => e.timestamp.getTime())
     const intervals = this.calculateTimeIntervals(timestamps)
 
@@ -58,8 +60,7 @@ export class TemporalAnalysisService {
     const temporalFeatures = await this.extractTemporalFeatures(events)
 
     if (
-      temporalFeatures.timeOfDayPreference >
-      baselineMetrics.timeOfDayThreshold
+      temporalFeatures.timeOfDayPreference > baselineMetrics.timeOfDayThreshold
     ) {
       anomalies.push({
         anomalyId: this.generateAnomalyId(),

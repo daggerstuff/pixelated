@@ -268,7 +268,12 @@ export class ObjectiveSwitcher {
           timestamp: Date.now(),
           duration,
           success: false,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
         })
       }
 

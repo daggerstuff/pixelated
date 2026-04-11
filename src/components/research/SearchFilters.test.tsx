@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import { describe, expect, it, afterEach, vi } from 'vitest'
-import '@testing-library/jest-dom/vitest'
 
 import SearchFilters, { type SearchFiltersState } from './SearchFilters'
+
+import '@testing-library/jest-dom/vitest'
 
 const defaultFilters: SearchFiltersState = {
   topics: [],
@@ -20,7 +21,13 @@ describe('SearchFilters', () => {
 
   it('renders with default values', () => {
     const mockOnChange = vi.fn()
-    render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} onClose={vi.fn()} />)
+    render(
+      <SearchFilters
+        filters={defaultFilters}
+        onChange={mockOnChange}
+        onClose={vi.fn()}
+      />,
+    )
 
     // Restore high-level matchers for better readability (Review suggestion)
     expect(screen.getByText(/Topics/i)).toBeInTheDocument()
@@ -30,19 +37,33 @@ describe('SearchFilters', () => {
 
   it('calls onChange when sort order changes', () => {
     const mockOnChange = vi.fn()
-    render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} onClose={vi.fn()} />)
+    render(
+      <SearchFilters
+        filters={defaultFilters}
+        onChange={mockOnChange}
+        onClose={vi.fn()}
+      />,
+    )
 
     const newestButton = screen.getByText(/Newest/i)
     fireEvent.click(newestButton)
 
-    expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
-      sortBy: 'year'
-    }))
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortBy: 'year',
+      }),
+    )
   })
 
   it('reflects active sort state via aria-pressed', () => {
     const mockOnChange = vi.fn()
-    render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} onClose={vi.fn()} />)
+    render(
+      <SearchFilters
+        filters={defaultFilters}
+        onChange={mockOnChange}
+        onClose={vi.fn()}
+      />,
+    )
 
     const relevanceButton = screen.getByText(/Relevance/i)
     // Use toHaveAttribute matcher again (Review suggestion)

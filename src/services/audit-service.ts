@@ -12,18 +12,18 @@ export interface AuditEvent extends AuditEventData {
 
 /**
  * Service responsible for managing the creation and lifecycle of audit events.
- * 
- * Provides a standardized foundation for tracking security-sensitive actions and 
- * maintaining an audit trail. While the service handles event generation and metadata 
- * consistency, full compliance guarantees (such as encrypted persistence, immutability, 
- * and retention policies) are managed by the underlying storage implementation 
+ *
+ * Provides a standardized foundation for tracking security-sensitive actions and
+ * maintaining an audit trail. While the service handles event generation and metadata
+ * consistency, full compliance guarantees (such as encrypted persistence, immutability,
+ * and retention policies) are managed by the underlying storage implementation
  * in the `storeEvent` hook.
  */
 export class AuditService {
   /**
    * Generates a new audit event from the provided data.
    * Ensures consistent timestamping and unique identifier generation.
-   * 
+   *
    * @param eventData The raw event data to be audited
    * @returns The fully constructed AuditEvent
    */
@@ -40,11 +40,11 @@ export class AuditService {
 
   /**
    * Delegates event persistence to the storage layer.
-   * 
+   *
    * @remarks
-   * Current implementation is a placeholder. Future storage adapters will handle 
+   * Current implementation is a placeholder. Future storage adapters will handle
    * encrypted storage and regulatory retention requirements.
-   * 
+   *
    * @param _event The event to be persisted
    * @private
    */

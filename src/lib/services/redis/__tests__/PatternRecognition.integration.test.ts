@@ -124,7 +124,7 @@ const mockRedisService: IRedisService = {
     _key: string,
     _start: number,
     _stop: number,
-    _withScores?: string  ,
+    _withScores?: string,
   ): Promise<string[] | import('../redis-operation-types').RedisZSetMember[]> {
     throw new Error('Function not implemented.')
   },

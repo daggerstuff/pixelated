@@ -74,7 +74,7 @@ export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
  * @returns boolean indicating if we're in SSR mode
  */
 export function isSSR(): boolean {
-  return  import.meta.env.SSR
+  return import.meta.env.SSR
 }
 
 /**

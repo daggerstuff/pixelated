@@ -268,7 +268,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Service discovery check failed: ${(error instanceof Error ? error.message : "Unknown error")}`,
+          message: `Service discovery check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         }
       }
     })
@@ -363,7 +363,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         } catch (error: unknown) {
           return {
             status: 'unhealthy',
-            message: `Service health check failed for ${serviceName}: ${(error instanceof Error ? error.message : "Unknown error")}`,
+            message: `Service health check failed for ${serviceName}: ${error instanceof Error ? error.message : 'Unknown error'}`,
           }
         }
       })
@@ -761,7 +761,14 @@ export class ServiceDiscoveryManager extends EventEmitter {
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const services = (await consul.health.service(serviceName)) as Array<{
-      Service: { ID: string; Service: string; Address?: string; Port: number; Tags?: string[]; Meta?: Record<string, string> }
+      Service: {
+        ID: string
+        Service: string
+        Address?: string
+        Port: number
+        Tags?: string[]
+        Meta?: Record<string, string>
+      }
       Node: { Datacenter: string; Address: string }
       Checks?: Array<{ Status: string }>
     }>

@@ -83,7 +83,12 @@ export const POST: APIRoute = async ({ request }) => {
         'auth-pattern-risk',
         {
           error: 'Failed to parse request body',
-          details: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+          details:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : String(error),
         },
       )
 
@@ -233,7 +238,12 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-pattern-risk',
       {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )

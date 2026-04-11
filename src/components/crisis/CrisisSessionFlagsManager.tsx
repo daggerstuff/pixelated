@@ -50,7 +50,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'Failed to load crisis flags',
       )
     } finally {
@@ -100,7 +100,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'Failed to update flag',
       )
     } finally {

@@ -178,7 +178,14 @@ export default function AnalyticsDashboard({
 
       // Get analytics data
       const results = await fheAnalytics.createAnalyticsDashboard(
-        messages.map((msg) => ({ id: generateId(), role: msg.role, content: msg.content, timestamp: msg.timestamp ? new Date(msg.timestamp).getTime() : Date.now(), })),
+        messages.map((msg) => ({
+          id: generateId(),
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp
+            ? new Date(msg.timestamp).getTime()
+            : Date.now(),
+        })),
         config,
       )
 
@@ -335,7 +342,7 @@ export default function AnalyticsDashboard({
 
     // Sort topics for display
     const sortedTopics = Object.entries(mockTopics)
-      .sort(([, a], [, b]) => (b) - (a))
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
 
     return (
@@ -354,13 +361,13 @@ export default function AnalyticsDashboard({
                 <div className='mb-1 flex justify-between'>
                   <span className='text-sm capitalize'>{topic}</span>
                   <span className='text-gray-400 text-sm'>
-                    {Math.round((value) * 100)}%
+                    {Math.round(value * 100)}%
                   </span>
                 </div>
                 <div className='bg-gray-800 h-2.5 w-full rounded-full'>
                   <div
                     className='bg-indigo-600 h-2.5 rounded-full'
-                    style={{ width: `${Math.round((value) * 100)}%` }}
+                    style={{ width: `${Math.round(value * 100)}%` }}
                   ></div>
                 </div>
               </div>

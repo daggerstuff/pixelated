@@ -1,9 +1,11 @@
 import { EventEmitter } from 'events'
+
 import * as tf from '@tensorflow/tfjs'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { BehavioralConfig } from './types'
 import { IMongoClient, IRedisClient } from '../threat-hunting/types'
 import { BehavioralAnalysisRepository } from './behavioral-analysis-repository'
+import { BehavioralConfig } from './types'
 
 const logger = createBuildSafeLogger('behavioral-analysis-service')
 
@@ -49,7 +51,9 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
       this.emit('service_initialized')
       logger.info('Behavioral analysis service ready')
     } catch (error: unknown) {
-      logger.error('Failed to initialize behavioral analysis service', { error })
+      logger.error('Failed to initialize behavioral analysis service', {
+        error,
+      })
       throw error
     }
   }
@@ -65,16 +69,25 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
   /**
    * Create or update a user's behavioral profile
    */
-  async createBehaviorProfile(userId: string, timeframe?: string): Promise<void> {
+  async createBehaviorProfile(
+    userId: string,
+    timeframe?: string,
+  ): Promise<void> {
     this.checkInitialized()
-    const events = await this.repository!.getRecentEvents(userId, 500, timeframe)
+    const events = await this.repository!.getRecentEvents(
+      userId,
+      500,
+      timeframe,
+    )
 
     const profile = {
       userId,
       eventCount: events.length,
       updatedAt: new Date(),
-      typicalIPs: Array.from(new Set(events.map(e => e.ip).filter(Boolean))),
-      typicalLoginHours: Array.from(new Set(events.map(e => new Date(e.timestamp).getHours()))),
+      typicalIPs: Array.from(new Set(events.map((e) => e.ip).filter(Boolean))),
+      typicalLoginHours: Array.from(
+        new Set(events.map((e) => new Date(e.timestamp).getHours())),
+      ),
     }
 
     await this.repository!.storeProfile(userId, profile)
@@ -84,7 +97,11 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
   /**
    * Detect anomalies in current activity
    */
-  async detectAnomalies(userId: string, currentActivity: any, timeframe?: string): Promise<any[]> {
+  async detectAnomalies(
+    userId: string,
+    currentActivity: any,
+    timeframe?: string,
+  ): Promise<any[]> {
     this.checkInitialized()
     const profile = await this.repository!.getProfile(userId)
     if (!profile) return []
@@ -92,13 +109,20 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
     const anomalies: any[] = []
 
     // Check IP Anomaly
-    if (currentActivity.ip && profile.typicalIPs && !profile.typicalIPs.includes(currentActivity.ip)) {
+    if (
+      currentActivity.ip &&
+      profile.typicalIPs &&
+      !profile.typicalIPs.includes(currentActivity.ip)
+    ) {
       anomalies.push({ type: 'unusual_ip', detail: currentActivity.ip })
     }
 
     // Check Time Anomaly
     const hour = new Date(currentActivity.timestamp).getHours()
-    if (profile.typicalLoginHours && !profile.typicalLoginHours.includes(hour)) {
+    if (
+      profile.typicalLoginHours &&
+      !profile.typicalLoginHours.includes(hour)
+    ) {
       anomalies.push({ type: 'unusual_time', detail: hour })
     }
 
@@ -138,22 +162,31 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
    */
   async analyzeUserBehavior(userId: string, timeframe: string): Promise<any[]> {
     this.checkInitialized()
-    const anomalies = await this.detectAnomalies(userId, {
-      timestamp: new Date().toISOString(),
-      ip: 'unknown', // Default for background analysis
-    }, timeframe)
+    const anomalies = await this.detectAnomalies(
+      userId,
+      {
+        timestamp: new Date().toISOString(),
+        ip: 'unknown', // Default for background analysis
+      },
+      timeframe,
+    )
 
-    return anomalies.map(a => ({
+    return anomalies.map((a) => ({
       ...a,
       severity: 'medium',
       confidence: 0.7,
-      timestamp: new Date()
+      timestamp: new Date(),
     }))
   }
 }
 
 // Re-export types for convenience
-export type { BehavioralConfig, BehavioralProfile, AnomalyRecord, ActivityEvent } from './types'
+export type {
+  BehavioralConfig,
+  BehavioralProfile,
+  AnomalyRecord,
+  ActivityEvent,
+} from './types'
 
 // Additional types needed by analyzers
 export interface Anomaly {
@@ -181,7 +214,10 @@ export interface BehavioralFeatures {
 }
 
 export interface AnomalyDetector {
-  detectAnomalies(profile: BehaviorProfile, features: BehavioralFeatures): Promise<Anomaly[]>
+  detectAnomalies(
+    profile: BehaviorProfile,
+    features: BehavioralFeatures,
+  ): Promise<Anomaly[]>
 }
 
 export interface BehavioralPattern {

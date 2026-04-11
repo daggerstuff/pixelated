@@ -3,10 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import {
-  AuthenticationClient,
-  type AuthenticationClientOptions,
-} from 'auth0'
+import { AuthenticationClient, type AuthenticationClientOptions } from 'auth0'
 
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 interface ExtendedAuthenticationClient extends AuthenticationClient {
@@ -272,13 +269,23 @@ export async function validateToken(
     // Log validation failure
     logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
       userId: null,
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Unknown error',
       tokenType: tokenType,
     })
 
     return {
       valid: false,
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Token validation failed',
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Token validation failed',
     }
   }
 }

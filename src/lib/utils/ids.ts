@@ -14,7 +14,7 @@ export function generateId(length: number = 16): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   const bytes = new Uint8Array(length)
   crypto.getRandomValues(bytes)
-  
+
   let id = ''
   for (let i = 0; i < length; i++) {
     id += chars.charAt(bytes[i] % chars.length)
@@ -31,14 +31,20 @@ export function generateId(length: number = 16): string {
  * @returns A UUID v4 string
  */
 export function generateUUID(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+  if (
+    typeof crypto !== 'undefined' &&
+    typeof crypto.randomUUID === 'function'
+  ) {
     return crypto.randomUUID()
   }
-  
+
   // Fallback for environments where randomUUID is not available (e.g. non-secure contexts)
   // Simple UUID v4 implementation using getRandomValues
   return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c: any) =>
-    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16),
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16),
   )
 }
 

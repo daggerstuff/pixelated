@@ -272,7 +272,7 @@ export default function BackupLocationTab() {
                   </td>
                   <td className='text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm'>
                     {location.isDefault ? (
-                      <span className='font-medium text-primary-600 dark:text-primary-400'>
+                      <span className='dark:text-primary-400 font-medium text-primary-600'>
                         Default
                       </span>
                     ) : (
@@ -280,7 +280,7 @@ export default function BackupLocationTab() {
                         onClick={function () {
                           return setDefaultLocation(location.id)
                         }}
-                        className='text-gray-600 dark:text-gray-400 font-medium hover:text-primary-600 dark:hover:text-primary-400'
+                        className='text-gray-600 dark:text-gray-400 dark:hover:text-primary-400 font-medium hover:text-primary-600'
                       >
                         Set as default
                       </button>

@@ -1,12 +1,12 @@
 // import type { APIRoute } from 'astro'
-import fs from "node:fs";
+import fs from 'node:fs'
 
 import {
   safeJoin,
   ALLOWED_DIRECTORIES,
   validatePath,
   sanitizeFilename,
-} from "../../../utils/path-security";
+} from '../../../utils/path-security'
 
 /**
  * API endpoint to fetch browser compatibility data from reports
@@ -22,112 +22,118 @@ import {
  */
 export const GET = async ({ request }) => {
   try {
-    const url = new URL(request.url);
-    const latestOnly = url.searchParams.get("latest") === "true";
-    const days = parseInt(url.searchParams.get("days") || "30");
-    const browsers = url.searchParams.get("browsers")?.split(",") || [];
-    const since = url.searchParams.get("since") || null;
+    const url = new URL(request.url)
+    const latestOnly = url.searchParams.get('latest') === 'true'
+    const days = parseInt(url.searchParams.get('days') || '30')
+    const browsers = url.searchParams.get('browsers')?.split(',') || []
+    const since = url.searchParams.get('since') || null
 
     // Get report files
     const reportsDir = safeJoin(
       ALLOWED_DIRECTORIES.PROJECT_ROOT,
-      "browser-compatibility",
-      "reports",
-    );
+      'browser-compatibility',
+      'reports',
+    )
     if (!fs.existsSync(reportsDir)) {
       return new Response(
         JSON.stringify({
-          error: "No compatibility reports found",
+          error: 'No compatibility reports found',
         }),
         {
           status: 404,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Read report files
     const reportFiles = fs
       .readdirSync(reportsDir)
-      .filter((file) => file.endsWith(".json") && file.startsWith("compatibility-"))
+      .filter(
+        (file) => file.endsWith('.json') && file.startsWith('compatibility-'),
+      )
       .sort()
-      .reverse(); // Get most recent first
+      .reverse() // Get most recent first
 
     if (reportFiles.length === 0) {
       return new Response(
         JSON.stringify({
-          error: "No compatibility reports found",
+          error: 'No compatibility reports found',
         }),
         {
           status: 404,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Calculate date threshold for filtering by days
-    const now = new Date();
-    const threshold = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    const now = new Date()
+    const threshold = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
 
     // Parse the since timestamp if provided
-    const sinceDate = since ? new Date(since) : null;
+    const sinceDate = since ? new Date(since) : null
 
     // Process reports
-    let reports = [];
-    const filesToProcess = latestOnly ? [reportFiles[0]] : reportFiles;
+    let reports = []
+    const filesToProcess = latestOnly ? [reportFiles[0]] : reportFiles
 
     for (const file of filesToProcess) {
-      const sanitizedFile = sanitizeFilename(file);
-      const reportPath = validatePath(sanitizedFile, reportsDir);
-      const fileContent = fs.readFileSync(reportPath, "utf8");
+      const sanitizedFile = sanitizeFilename(file)
+      const reportPath = validatePath(sanitizedFile, reportsDir)
+      const fileContent = fs.readFileSync(reportPath, 'utf8')
       const report = JSON.parse(fileContent) as {
-        timestamp: string;
-        browsers?: Record<string, unknown>;
-        issues?: Array<{ browser: string }>;
-        tests?: unknown;
-      };
+        timestamp: string
+        browsers?: Record<string, unknown>
+        issues?: Array<{ browser: string }>
+        tests?: unknown
+      }
 
       // Skip reports older than the threshold
-      const reportDate = new Date(report.timestamp);
+      const reportDate = new Date(report.timestamp)
       if (reportDate < threshold) {
-        continue;
+        continue
       }
 
       // Filter by browsers if specified
       if (browsers.length > 0) {
         // Filter report issues and test results by selected browsers
         const filteredBrowsers = Object.fromEntries(
-          Object.entries(report.browsers || {}).filter(([key]) => browsers.includes(key)),
-        );
+          Object.entries(report.browsers || {}).filter(([key]) =>
+            browsers.includes(key),
+          ),
+        )
 
-        report.browsers = filteredBrowsers;
+        report.browsers = filteredBrowsers
 
         if (report.issues) {
           report.issues = report.issues.filter((issue: { browser: string }) =>
             browsers.includes(issue.browser),
-          );
+          )
         }
 
         if (report.tests) {
           report.tests = report.tests.filter((test: { browser: string }) =>
             browsers.includes(test.browser),
-          );
+          )
         }
       }
 
       // Filter issues by timestamp if 'since' parameter was provided
       if (sinceDate && report.issues) {
-        report.issues = report.issues.filter((issue: { timestamp?: string }) => {
-          if (!issue.timestamp) {
-            return false;
-          }
-          const issueDate = new Date(issue.timestamp);
-          return issueDate >= sinceDate;
-        });
+        report.issues = report.issues.filter(
+          (issue: { timestamp?: string }) => {
+            if (!issue.timestamp) {
+              return false
+            }
+            const issueDate = new Date(issue.timestamp)
+            return issueDate >= sinceDate
+          },
+        )
       }
 
       reports.push({
@@ -137,7 +143,7 @@ export const GET = async ({ request }) => {
         browsers: report.browsers || {},
         tests: report.tests || [],
         screenshots: report.screenshots || [],
-      });
+      })
     }
 
     // Prepare response data
@@ -146,30 +152,32 @@ export const GET = async ({ request }) => {
       meta: {
         total: reports.length,
         latest: reports.length > 0 ? reports[0].timestamp : null,
-        hasNewIssues: reports.some((report) => report.issues && report.issues.length > 0),
+        hasNewIssues: reports.some(
+          (report) => report.issues && report.issues.length > 0,
+        ),
       },
-    };
+    }
 
     // Return the response
     return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-    });
+    })
   } catch (error: unknown) {
-    console.error("Error fetching compatibility data:", error);
+    console.error('Error fetching compatibility data:', error)
     return new Response(
       JSON.stringify({
-        error: "Internal server error",
+        error: 'Internal server error',
         message: error instanceof Error ? String(error) : String(error),
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   }
-};
+}

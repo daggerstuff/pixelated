@@ -1483,13 +1483,19 @@ export class ThreatIntelligenceConfigManager {
       try {
         await this.redis.ping()
       } catch (error: unknown) {
-        issues.push('Redis connection failed: ' + (error instanceof Error ? error.message : "Unknown error"))
+        issues.push(
+          'Redis connection failed: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        )
       }
 
       try {
         await this.mongoClient.db().admin().ping()
       } catch (error: unknown) {
-        issues.push('MongoDB connection failed: ' + (error instanceof Error ? error.message : "Unknown error"))
+        issues.push(
+          'MongoDB connection failed: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        )
       }
 
       return {
@@ -1498,7 +1504,10 @@ export class ThreatIntelligenceConfigManager {
         issues,
       }
     } catch (error: unknown) {
-      issues.push('Environment validation error: ' + (error instanceof Error ? error.message : "Unknown error"))
+      issues.push(
+        'Environment validation error: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
+      )
       return { valid: false, issues }
     }
   }

@@ -391,13 +391,17 @@ function assessRisk(
   const lowerSafeMessage = safeMessage.toLowerCase()
 
   // Check for suicidal ideation (ReDoS-safe: use includes)
-  if (CRISIS_PATTERNS.suicidal.some((pattern) => pattern.test(lowerSafeMessage))) {
+  if (
+    CRISIS_PATTERNS.suicidal.some((pattern) => pattern.test(lowerSafeMessage))
+  ) {
     suicidalIdeation = true
     crisisLevel = 'high'
   }
 
   // Check for self-harm indicators (ReDoS-safe: use includes)
-  if (CRISIS_PATTERNS.selfHarm.some((pattern) => pattern.test(lowerSafeMessage))) {
+  if (
+    CRISIS_PATTERNS.selfHarm.some((pattern) => pattern.test(lowerSafeMessage))
+  ) {
     selfHarmIndicators = true
     if (crisisLevel === 'none') {
       crisisLevel = 'moderate'
@@ -406,7 +410,9 @@ function assessRisk(
 
   // Check for immediate intent (ReDoS-safe: use includes)
   if (
-    CRISIS_PATTERNS.immediate.some((pattern) => pattern.test(lowerSafeMessage)) &&
+    CRISIS_PATTERNS.immediate.some((pattern) =>
+      pattern.test(lowerSafeMessage),
+    ) &&
     (suicidalIdeation || selfHarmIndicators)
   ) {
     crisisLevel = 'imminent'

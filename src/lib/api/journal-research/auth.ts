@@ -4,8 +4,8 @@
  */
 
 import { authClient } from '@/lib/auth-client'
-import storageManager from '@/utils/storage/storageManager'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import storageManager from '@/utils/storage/storageManager'
 
 const logger = createBuildSafeLogger('journal-research-auth')
 

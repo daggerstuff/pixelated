@@ -86,13 +86,8 @@ const techniques = defineCollection({
 })
 
 const pagesSchema = () => pageSchema
-const i18nSchema = ({
-  extend = z.object({}),
-} = {}) =>
-  z
-    .object({})
-    .passthrough()
-    .merge(extend)
+const i18nSchema = ({ extend = z.object({}) } = {}) =>
+  z.object({}).passthrough().merge(extend)
 
 // Content collection schema setup (using local content-store data).
 const pages = defineCollection({
