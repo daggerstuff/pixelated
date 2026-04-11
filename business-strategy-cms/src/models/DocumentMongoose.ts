@@ -1,14 +1,27 @@
-import mongoose, { Schema, Document as MongooseDocument } from 'mongoose'
+import mongoose, {
+  Model,
+  Schema,
+  Types,
+  Document as MongooseDocument,
+} from 'mongoose'
 
 import {
   Document as DocumentType,
   DocumentCategory,
   DocumentStatus,
+  DocumentVersion,
 } from '@/types/document'
+
+export interface DocumentJson extends Omit<DocumentType, 'id'> {
+  _id?: Types.ObjectId
+  __v?: number
+  id: string
+}
 
 export interface DocumentDocument
   extends Omit<DocumentType, 'id'>, MongooseDocument {
   id: string
+  toJSON(): DocumentJson
 }
 
 const documentSchema = new Schema<DocumentDocument>(
@@ -47,10 +60,13 @@ const documentSchema = new Schema<DocumentDocument>(
     timestamps: true,
     toJSON: {
       virtuals: true,
-      transform: (_doc, ret) => {
-        ret.id = ret._id.toString()
-        delete (ret as any)._id
-        delete (ret as any).__v
+      transform: (_doc: MongooseDocument, ret: DocumentJson) => {
+        const objectId = ret._id
+        if (objectId) {
+          ret.id = objectId.toString()
+        }
+        delete ret._id
+        delete ret.__v
         return ret
       },
     },
@@ -60,13 +76,21 @@ const documentSchema = new Schema<DocumentDocument>(
 // Index for search
 documentSchema.index({ title: 'text', content: 'text', summary: 'text' })
 
-export const DocumentModelMongoose = mongoose.model<DocumentDocument>(
-  'Document',
-  documentSchema,
-)
+const existingDocumentModel = mongoose.models['Document'] as
+  | Model<DocumentDocument>
+  | undefined
+
+export const DocumentModelMongoose: Model<DocumentDocument> =
+  existingDocumentModel ??
+  mongoose.model<DocumentDocument>('Document', documentSchema)
+
+export interface DocumentVersionDocument
+  extends Omit<DocumentVersion, 'id'>, MongooseDocument {
+  id: string
+}
 
 // Document Version Schema
-const documentVersionSchema = new Schema(
+const documentVersionSchema = new Schema<DocumentVersionDocument>(
   {
     documentId: {
       type: Schema.Types.ObjectId,
@@ -89,7 +113,13 @@ const documentVersionSchema = new Schema(
 
 documentVersionSchema.index({ documentId: 1, version: -1 })
 
-export const DocumentVersionModel = mongoose.model(
-  'DocumentVersion',
-  documentVersionSchema,
-)
+const existingDocumentVersionModel = mongoose.models['DocumentVersion'] as
+  | Model<DocumentVersionDocument>
+  | undefined
+
+export const DocumentVersionModel: Model<DocumentVersionDocument> =
+  existingDocumentVersionModel ??
+  mongoose.model<DocumentVersionDocument>(
+    'DocumentVersion',
+    documentVersionSchema,
+  )
