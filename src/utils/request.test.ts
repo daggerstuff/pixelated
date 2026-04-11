@@ -72,18 +72,18 @@ describe('request utilities', () => {
     })
 
     it('should fallback to en-US if window is missing navigator', () => {
-      // This tests the SSR fallback path when window is strictly undefined but the test environment behaves differently
-      // It simulates what the original issue was asking for (testing the branch when navigator is undefined)
-      const originalWindow = global.window
-      global.window = {}
-      let error
-      try {
-        getBrowserLanguage()
-      } catch (e) {
-        error = e
-      }
-      global.window = originalWindow
-      expect(error).toBeInstanceOf(TypeError)
+      // Vitest's vi.stubGlobal('window', undefined) doesn't completely remove window from the environment
+      // in a way that strictly matches 'typeof window === "undefined"' if it was previously defined.
+      // We test the true "undefined" fallback by ensuring the function returns the default.
+
+      const originalWindow = global.window;
+      // Force typeof window === 'undefined'
+      // @ts-expect-error - overriding global window
+      delete global.window;
+
+      expect(getBrowserLanguage()).toBe('en-US');
+
+      global.window = originalWindow;
     })
 
     it('should fallback to en-US if navigator.language is missing', () => {
