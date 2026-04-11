@@ -162,7 +162,9 @@ export function PixelMultimodalChat({
           />
           <div className='text-slate-500 flex flex-wrap items-center gap-3 text-xs'>
             <span>Session: {sessionId}</span>
-            <span className='hidden md:inline'>Context: {defaultContextType}</span>
+            <span className='hidden md:inline'>
+              Context: {defaultContextType}
+            </span>
           </div>
         </div>
 
@@ -358,8 +360,7 @@ export function PixelMultimodalChat({
             </div>
             {behavioralPatternConfidence !== null ? (
               <div className='text-slate-600 mt-1 text-xs'>
-                {(behavioralPatternConfidence * 100).toFixed(0)}%
-                confidence
+                {(behavioralPatternConfidence * 100).toFixed(0)}% confidence
               </div>
             ) : null}
           </div>

@@ -49,7 +49,9 @@ export async function monitoringMiddleware(
       ?.split('=')[1]
 
     if (sessionCookie) {
-      const session = JSON.parse(decodeURIComponent(sessionCookie)) as { userId?: string }
+      const session = JSON.parse(decodeURIComponent(sessionCookie)) as {
+        userId?: string
+      }
       userId = session.userId
     }
   } catch {
@@ -262,7 +264,7 @@ export async function monitoringMiddleware(
       pathname: url.pathname,
       duration,
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
       userId: userId || 'anonymous',
       ip,
     })

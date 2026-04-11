@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from '@testing-library/react'
 import { describe, expect, it, afterEach } from 'vitest'
-import '@testing-library/jest-dom/vitest'
 
 import { PasswordInputWithStrength } from '../PasswordInputWithStrength'
+
+import '@testing-library/jest-dom/vitest'
 
 describe('PasswordInputWithStrength', () => {
   afterEach(() => cleanup())
@@ -17,7 +18,7 @@ describe('PasswordInputWithStrength', () => {
   it('updates strength meter on input change', () => {
     render(<PasswordInputWithStrength />)
     const input = screen.getByPlaceholderText(/password/i)
-    
+
     // Test with weak password
     const weakValue = '123'
     // Manual event firing if direct value change doesn't trigger effect

@@ -123,7 +123,11 @@ export class EvidenceGenerationService {
     } catch (error: unknown) {
       logger.error('Evidence generation failed', { error })
       const errorMessage =
-        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Unknown error'
       throw new Error(`Evidence generation failed: ${errorMessage}`, {
         cause: error,
       })

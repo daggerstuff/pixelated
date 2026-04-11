@@ -41,50 +41,80 @@ export function normalizeError(
   }
 
   if (error instanceof TypeError || error instanceof ReferenceError) {
-    return new AppError((error instanceof Error ? error.message : "Unknown error"), {
-      code: 'runtime.error',
-      severity: ErrorSeverity.HIGH,
-      category: ErrorCategory.UNKNOWN,
-      context,
-      recoverable: false,
-    })
+    return new AppError(
+      error instanceof Error ? error.message : 'Unknown error',
+      {
+        code: 'runtime.error',
+        severity: ErrorSeverity.HIGH,
+        category: ErrorCategory.UNKNOWN,
+        context,
+        recoverable: false,
+      },
+    )
   }
 
   if (error instanceof Error) {
     // Check for network-related errors
     if (
-      (error instanceof Error ? error.message : "Unknown error").includes('fetch') ||
-      (error instanceof Error ? error.message : "Unknown error").includes('network') ||
-      (error instanceof Error ? error.message : "Unknown error").includes('timeout')
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'fetch',
+      ) ||
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'network',
+      ) ||
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'timeout',
+      )
     ) {
-      return new NetworkError((error instanceof Error ? error.message : "Unknown error"), undefined, context)
+      return new NetworkError(
+        error instanceof Error ? error.message : 'Unknown error',
+        undefined,
+        context,
+      )
     }
 
     // Check for authentication errors
     if (
-      (error instanceof Error ? error.message : "Unknown error").includes('unauthorized') ||
-      (error instanceof Error ? error.message : "Unknown error").includes('authentication') ||
-      (error instanceof Error ? error.message : "Unknown error").includes('401')
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'unauthorized',
+      ) ||
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'authentication',
+      ) ||
+      (error instanceof Error ? error.message : 'Unknown error').includes('401')
     ) {
-      return new AuthenticationError((error instanceof Error ? error.message : "Unknown error"), context)
+      return new AuthenticationError(
+        error instanceof Error ? error.message : 'Unknown error',
+        context,
+      )
     }
 
     // Check for authorization errors
     if (
-      (error instanceof Error ? error.message : "Unknown error").includes('forbidden') ||
-      (error instanceof Error ? error.message : "Unknown error").includes('authorization') ||
-      (error instanceof Error ? error.message : "Unknown error").includes('403')
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'forbidden',
+      ) ||
+      (error instanceof Error ? error.message : 'Unknown error').includes(
+        'authorization',
+      ) ||
+      (error instanceof Error ? error.message : 'Unknown error').includes('403')
     ) {
-      return new AuthorizationError((error instanceof Error ? error.message : "Unknown error"), context)
+      return new AuthorizationError(
+        error instanceof Error ? error.message : 'Unknown error',
+        context,
+      )
     }
 
-    return new AppError((error instanceof Error ? error.message : "Unknown error"), {
-      code: 'unknown.error',
-      severity: ErrorSeverity.MEDIUM,
-      category: ErrorCategory.UNKNOWN,
-      context,
-      recoverable: true,
-    })
+    return new AppError(
+      error instanceof Error ? error.message : 'Unknown error',
+      {
+        code: 'unknown.error',
+        severity: ErrorSeverity.MEDIUM,
+        category: ErrorCategory.UNKNOWN,
+        context,
+        recoverable: true,
+      },
+    )
   }
 
   // Handle non-Error objects
@@ -117,7 +147,10 @@ export function formatErrorForUser(error: AppError): string {
     case ErrorCategory.AUTHORIZATION:
       return "You don't have permission to perform this action."
     case ErrorCategory.VALIDATION:
-      return (error instanceof Error ? error.message : "Unknown error") || 'Please check your input and try again.'
+      return (
+        (error instanceof Error ? error.message : 'Unknown error') ||
+        'Please check your input and try again.'
+      )
     default:
       return 'Something went wrong. Please try again later.'
   }

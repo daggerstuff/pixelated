@@ -20,6 +20,7 @@ import React, {
 
 import { logger } from '@/lib/logger'
 import { persistenceManager } from '@/lib/state/jotai-persistence'
+
 import { SyncProvider } from './SyncContext'
 
 // ============================================================================
@@ -364,7 +365,10 @@ export function StatePersistenceDebugger() {
     const reader = new FileReader()
     reader.onload = async (e) => {
       try {
-        const state = JSON.parse(e.target?.result as string) as Record<string, unknown>
+        const state = JSON.parse(e.target?.result as string) as Record<
+          string,
+          unknown
+        >
         await importState(state)
         alert('State imported successfully!')
       } catch (error: unknown) {

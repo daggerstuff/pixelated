@@ -216,9 +216,7 @@ export function useCognitiveDistortionDetection({
         return data
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error
-            ? err.message
-            : 'An unknown error occurred'
+          err instanceof Error ? err.message : 'An unknown error occurred'
         setError(errorMessage)
 
         // Call onError callback
@@ -281,7 +279,7 @@ export function useCognitiveDistortionDetection({
           const errorData = await response.json()
           throw new Error(
             errorData.error ||
-            'Failed to detect cognitive distortions in batch',
+              'Failed to detect cognitive distortions in batch',
           )
         }
 
@@ -297,9 +295,7 @@ export function useCognitiveDistortionDetection({
         return data
       } catch (err: unknown) {
         const errorMessage =
-          err instanceof Error
-            ? err.message
-            : 'An unknown error occurred'
+          err instanceof Error ? err.message : 'An unknown error occurred'
         setError(errorMessage)
 
         // Call onError callback

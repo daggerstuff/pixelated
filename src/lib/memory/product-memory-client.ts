@@ -25,7 +25,10 @@ export class ProductMemoryClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
-      throw new Error((error instanceof Error ? error.message : "Unknown error") || `Failed to add memory: ${response.statusText}`)
+      throw new Error(
+        (error instanceof Error ? error.message : 'Unknown error') ||
+          `Failed to add memory: ${response.statusText}`,
+      )
     }
 
     const data = await response.json()
@@ -37,7 +40,15 @@ export class ProductMemoryClient {
     return memoryId
   }
 
-  async listMemories(userId?: string, options: { limit?: number; offset?: number; category?: string; tags?: string[] } = {}): Promise<MemoryEntry[]> {
+  async listMemories(
+    userId?: string,
+    options: {
+      limit?: number
+      offset?: number
+      category?: string
+      tags?: string[]
+    } = {},
+  ): Promise<MemoryEntry[]> {
     const resolvedUserId = requireUserId(userId)
     const params = new URLSearchParams()
     params.set('userId', resolvedUserId)
@@ -45,7 +56,7 @@ export class ProductMemoryClient {
     if (options.offset) params.set('offset', String(options.offset))
     if (options.category) params.set('category', options.category)
     if (options.tags) {
-      options.tags.forEach(tag => params.append('tag', tag))
+      options.tags.forEach((tag) => params.append('tag', tag))
     }
 
     const response = await fetch(`/api/memory/list?${params.toString()}`)
@@ -79,7 +90,11 @@ export class ProductMemoryClient {
     return mapMemoryEntries(data.memories)
   }
 
-  async updateMemory(memoryId: string, content: string, userId?: string): Promise<void> {
+  async updateMemory(
+    memoryId: string,
+    content: string,
+    userId?: string,
+  ): Promise<void> {
     const resolvedUserId = requireUserId(userId)
     const response = await fetch('/api/memory/update', {
       method: 'PATCH',
@@ -114,7 +129,9 @@ export class ProductMemoryClient {
 
   async getStats(userId?: string): Promise<MemoryStats> {
     const resolvedUserId = requireUserId(userId)
-    const response = await fetch(`/api/memory/stats?userId=${encodeURIComponent(resolvedUserId)}`)
+    const response = await fetch(
+      `/api/memory/stats?userId=${encodeURIComponent(resolvedUserId)}`,
+    )
 
     if (!response.ok) {
       throw new Error(`Failed to fetch memory stats: ${response.statusText}`)
@@ -137,7 +154,10 @@ export class ProductMemoryClient {
     return this.getStats(userId)
   }
 
-  async searchByCategory(category: string, userId?: string): Promise<MemoryEntry[]> {
+  async searchByCategory(
+    category: string,
+    userId?: string,
+  ): Promise<MemoryEntry[]> {
     return this.listMemories(userId, { category })
   }
 

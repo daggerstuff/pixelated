@@ -123,10 +123,7 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
         input.setAttribute('aria-invalid', error ? 'true' : 'false')
 
         if (onValidationChange) {
-          onValidationChange(
-            formState.isValid,
-            formState.errors,
-          )
+          onValidationChange(formState.isValid, formState.errors)
         }
       }
     },
@@ -458,9 +455,7 @@ function createCustomRule<T>(
 // Export validation rules with proper typing
 export const ValidationRules = {
   required: createRequiredRule,
-  email: (
-    message = 'Please enter a valid email address',
-  ): ValidationRule => ({
+  email: (message = 'Please enter a valid email address'): ValidationRule => ({
     test: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     message,
   }),

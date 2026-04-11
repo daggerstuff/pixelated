@@ -29,15 +29,19 @@ export const ShowOnDesktop: FC<{ children: ReactNode }> = ({ children }) => (
 )
 
 // Responsive spacing utilities
-export const ResponsivePadding: FC<{ children: ReactNode; className?: string }> = ({
-  children,
-  className = '',
-}) => <div className={`p-4 sm:p-6 lg:p-8 ${className}`}>{children}</div>
+export const ResponsivePadding: FC<{
+  children: ReactNode
+  className?: string
+}> = ({ children, className = '' }) => (
+  <div className={`p-4 sm:p-6 lg:p-8 ${className}`}>{children}</div>
+)
 
-export const ResponsiveMargin: FC<{ children: ReactNode; className?: string }> = ({
-  children,
-  className = '',
-}) => <div className={`m-2 sm:m-4 lg:m-6 ${className}`}>{children}</div>
+export const ResponsiveMargin: FC<{
+  children: ReactNode
+  className?: string
+}> = ({ children, className = '' }) => (
+  <div className={`m-2 sm:m-4 lg:m-6 ${className}`}>{children}</div>
+)
 
 // Responsive container with max-width constraints
 export const ResponsiveContainer: FC<{
@@ -59,7 +63,9 @@ export const TouchTarget: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className = '',
 }) => (
-  <div className={`flex min-h-[44px] min-w-[44px] items-center justify-center ${className}`}>
+  <div
+    className={`flex min-h-[44px] min-w-[44px] items-center justify-center ${className}`}
+  >
     {children}
   </div>
 )

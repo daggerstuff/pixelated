@@ -172,7 +172,7 @@ export class Auth0WebAuthnService {
       }
 
       // Log registration options generation
-       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_STARTED, null, {
+      logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_STARTED, null, {
         userId: registrationOptions.userId,
         optionsGenerated: true,
         timestamp: new Date().toISOString(),
@@ -188,7 +188,7 @@ export class Auth0WebAuthnService {
     } catch (error: unknown) {
       console.error('Failed to generate WebAuthn registration options:', error)
       throw new Error(
-        `Failed to generate WebAuthn registration options: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to generate WebAuthn registration options: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -216,15 +216,12 @@ export class Auth0WebAuthnService {
       }
 
       // Log successful registration
-       logSecurityEvent(
-        SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED,
-        {
-          userId: userId,
-          credentialId: newCredential.id,
-          type: newCredential.type,
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED, {
+        userId: userId,
+        credentialId: newCredential.id,
+        type: newCredential.type,
+        timestamp: new Date().toISOString(),
+      })
 
       // Update Phase 6 MCP server with registration completion
       await updatePhase6AuthenticationProgress(
@@ -237,14 +234,19 @@ export class Auth0WebAuthnService {
       console.error('Failed to verify WebAuthn registration:', error)
 
       // Log failed registration
-       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, null, {
+      logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, null, {
         userId: userId,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to verify WebAuthn registration: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to verify WebAuthn registration: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -274,15 +276,12 @@ export class Auth0WebAuthnService {
       }
 
       // Log authentication options generation
-       logSecurityEvent(
-        SecurityEventType.WEBAUTHN_AUTHENTICATION_STARTED,
-        {
-          userId: authenticationOptions.userId,
-          credentialsCount: credentials.length,
-          optionsGenerated: true,
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_STARTED, {
+        userId: authenticationOptions.userId,
+        credentialsCount: credentials.length,
+        optionsGenerated: true,
+        timestamp: new Date().toISOString(),
+      })
 
       // Update Phase 6 MCP server with authentication progress
       await updatePhase6AuthenticationProgress(
@@ -297,7 +296,7 @@ export class Auth0WebAuthnService {
         error,
       )
       throw new Error(
-        `Failed to generate WebAuthn authentication options: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to generate WebAuthn authentication options: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -314,14 +313,11 @@ export class Auth0WebAuthnService {
       // For now, we'll simulate the verification
 
       // Log successful authentication
-       logSecurityEvent(
-        SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED,
-        {
-          userId: userId,
-          credentialId: credential.id,
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED, {
+        userId: userId,
+        credentialId: credential.id,
+        timestamp: new Date().toISOString(),
+      })
 
       // Update Phase 6 MCP server with authentication completion
       await updatePhase6AuthenticationProgress(
@@ -334,10 +330,15 @@ export class Auth0WebAuthnService {
       console.error('Failed to verify WebAuthn authentication:', error)
 
       // Log failed authentication
-       logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, null, {
+      logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, null, {
         userId: userId,
         credentialId: credential.id,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -409,7 +410,7 @@ export class Auth0WebAuthnService {
       // For now, we'll just log the deletion
 
       // Log credential deletion
-       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, null, {
+      logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, null, {
         userId: userId,
         credentialId: credentialId,
         timestamp: new Date().toISOString(),
@@ -426,7 +427,7 @@ export class Auth0WebAuthnService {
         error,
       )
       throw new Error(
-        `Failed to delete WebAuthn credential: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to delete WebAuthn credential: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -444,7 +445,7 @@ export class Auth0WebAuthnService {
       // For now, we'll just log the rename operation
 
       // Log credential rename
-       logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, null, {
+      logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, null, {
         userId: userId,
         credentialId: credentialId,
         newName: newName,
@@ -462,7 +463,7 @@ export class Auth0WebAuthnService {
         error,
       )
       throw new Error(
-        `Failed to rename WebAuthn credential: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to rename WebAuthn credential: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -516,7 +517,7 @@ export class Auth0WebAuthnService {
       // For now, we'll simulate validation
 
       // Log validation
-       logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, null, {
+      logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, null, {
         userId: userId,
         responseValid: true,
         timestamp: new Date().toISOString(),
@@ -527,14 +528,16 @@ export class Auth0WebAuthnService {
       console.error('Failed to validate WebAuthn credential response:', error)
 
       // Log validation failure
-       logSecurityEvent(
-        SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED,
-        {
-          userId: userId,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATION_FAILED, {
+        userId: userId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
 
       return false
     }

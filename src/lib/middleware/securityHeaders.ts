@@ -28,7 +28,7 @@ export const securityHeaders = async (
     // Network endpoints allowed (XHR/fetch/WebSocket if needed)
     "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net https://app.rybbit.io",
     // Mixed content protections
-    "block-all-mixed-content",
+    'block-all-mixed-content',
     // Additional CSP3 hardening (widely supported)
     "script-src-attr 'none'",
     "style-src-attr 'unsafe-inline'",
@@ -43,9 +43,12 @@ export const securityHeaders = async (
   if (process.env.NODE_ENV === 'development') {
     // In development, we need 'unsafe-inline' and 'unsafe-eval' for Vite/Astro to work.
     csp = [
-      ...csp.filter((rule) => !rule.startsWith('default-src') && !rule.startsWith('connect-src')),
+      ...csp.filter(
+        (rule) =>
+          !rule.startsWith('default-src') && !rule.startsWith('connect-src'),
+      ),
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "connect-src *", // Allow any connection in dev
+      'connect-src *', // Allow any connection in dev
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
     ]
@@ -70,10 +73,13 @@ export const securityHeaders = async (
 
   // Only set HSTS header in production and if not explicitly disabled
   // disabling HSTS is necessary to avoid loops during development or when using proxies like Cloudflare Flexible SSL
-  if (process.env.NODE_ENV === 'production' && process.env.DISABLE_HSTS !== 'true') {
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.DISABLE_HSTS !== 'true'
+  ) {
     response.headers.set(
       'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload'
+      'max-age=31536000; includeSubDomains; preload',
     )
   }
 

@@ -1,11 +1,11 @@
 import {
-  MemoryServiceRequestSigner,
-  type InternalMemoryServiceClientConfig,
-} from '@/lib/server/internal-memory-service-auth'
-import {
   buildScopePayload,
   buildScopeQuery,
 } from '@/lib/server/internal-memory-scope'
+import {
+  MemoryServiceRequestSigner,
+  type InternalMemoryServiceClientConfig,
+} from '@/lib/server/internal-memory-service-auth'
 
 type JsonPrimitive = string | number | boolean | null
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue }
@@ -107,7 +107,10 @@ export class InternalMemoryServiceClient {
   async searchMemories(
     input: SearchInput,
   ): Promise<{ memories: InternalMemoryRecord[]; count: number }> {
-    return this.requestJson<{ memories: InternalMemoryRecord[]; count: number }>({
+    return this.requestJson<{
+      memories: InternalMemoryRecord[]
+      count: number
+    }>({
       method: 'POST',
       path: '/api/memory/search',
       userId: input.userId,
@@ -139,7 +142,10 @@ export class InternalMemoryServiceClient {
       params.append('tag', tag)
     }
 
-    return this.requestJson<{ memories: InternalMemoryRecord[]; count: number }>({
+    return this.requestJson<{
+      memories: InternalMemoryRecord[]
+      count: number
+    }>({
       method: 'GET',
       path: `/api/memory/all/${encodeURIComponent(input.userId)}`,
       userId: input.userId,
@@ -150,9 +156,15 @@ export class InternalMemoryServiceClient {
 
   async getMemoryStats(
     input: InternalMemoryScopeInput,
-  ): Promise<{ totalMemories: number; categoryCounts: Record<string, number> }> {
+  ): Promise<{
+    totalMemories: number
+    categoryCounts: Record<string, number>
+  }> {
     const params = buildScopeQuery(input)
-    return this.requestJson<{ totalMemories: number; categoryCounts: Record<string, number> }>({
+    return this.requestJson<{
+      totalMemories: number
+      categoryCounts: Record<string, number>
+    }>({
       method: 'GET',
       path: `/api/memory/stats/${encodeURIComponent(input.userId)}`,
       userId: input.userId,
@@ -161,9 +173,7 @@ export class InternalMemoryServiceClient {
     })
   }
 
-  async getMemory(
-    input: GetInput,
-  ): Promise<InternalMemoryRecord | null> {
+  async getMemory(input: GetInput): Promise<InternalMemoryRecord | null> {
     const params = buildScopeQuery(input)
     try {
       return await this.requestJson<InternalMemoryRecord>({
@@ -174,10 +184,7 @@ export class InternalMemoryServiceClient {
         query: params,
       })
     } catch (error: unknown) {
-      if (
-        error instanceof InternalMemoryServiceError &&
-        error.status === 404
-      ) {
+      if (error instanceof InternalMemoryServiceError && error.status === 404) {
         return null
       }
       throw error
@@ -252,11 +259,11 @@ export class InternalMemoryServiceClient {
     query?: URLSearchParams,
   ) {
     const requestPath = path.startsWith('/') ? path : `/${path}`
-    const target = query?.size ? `${requestPath}?${query.toString()}` : requestPath
+    const target = query?.size
+      ? `${requestPath}?${query.toString()}`
+      : requestPath
     const url = new URL(target, this.config.baseUrl)
-    const body = jsonBody
-      ? JSON.stringify(jsonBody, undefined, 0)
-      : ''
+    const body = jsonBody ? JSON.stringify(jsonBody, undefined, 0) : ''
     return { requestPath, target, url, body }
   }
 
@@ -307,9 +314,11 @@ export class InternalMemoryServiceClient {
 }
 
 function createTimeoutSignal(timeoutMs: number): AbortSignal {
-  const timeoutFactory = (AbortSignal as typeof AbortSignal & {
-    timeout?: (milliseconds: number) => AbortSignal
-  }).timeout
+  const timeoutFactory = (
+    AbortSignal as typeof AbortSignal & {
+      timeout?: (milliseconds: number) => AbortSignal
+    }
+  ).timeout
   if (typeof timeoutFactory === 'function') {
     return timeoutFactory(timeoutMs)
   }

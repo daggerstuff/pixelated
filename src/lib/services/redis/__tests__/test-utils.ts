@@ -158,7 +158,7 @@ export async function simulateNetworkIssues(
     description: string
   },
 ): Promise<void> {
-   redis.disconnect()
+  redis.disconnect()
   await sleep(options.duration)
   await redis.connect()
 }

@@ -779,7 +779,7 @@ export interface ExtendedRequest extends IncomingMessage {
     remoteAddress?: string
     remotePort?: number
   }
-   body?: Record<string, unknown>
+  body?: Record<string, unknown>
   query?: Record<string, string | string[] | undefined>
   params?: Record<string, string>
   cookies?: Record<string, string>

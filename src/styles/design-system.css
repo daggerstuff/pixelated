@@ -9,35 +9,38 @@
   --bg-secondary-hex: var(--bg-secondary);
   --text-primary-hex: var(--text-primary);
   --text-secondary-hex: var(--text-secondary);
-  
+
   /* Primary Accent Colors */
   --color-primary-600: var(--accent-primary);
-  --color-primary-500: #FF8533; /* Lighter Orange for Hover */
+  --color-primary-500: #ff8533; /* Lighter Orange for Hover */
   --color-secondary-600: var(--accent-secondary);
   --color-secondary-500: var(--accent-secondary);
 
   /* === DESIGN SYSTEM TOKENS === */
   --bg-ghost: var(--bg-surface-ghost);
-  --border-primary: var(--border-subtle); /* Refers to rgba(253, 252, 252, 0.08) */
+  --border-primary: var(
+    --border-subtle
+  ); /* Refers to rgba(253, 252, 252, 0.08) */
   --divider-subtle: var(--divider-weak);
-  --grid-pattern: linear-gradient(90deg, var(--divider-dotted) 1px, transparent 1px), 
-                  linear-gradient(180deg, var(--divider-dotted) 1px, transparent 1px);
+  --grid-pattern:
+    linear-gradient(90deg, var(--divider-dotted) 1px, transparent 1px),
+    linear-gradient(180deg, var(--divider-dotted) 1px, transparent 1px);
   --noise-pattern: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
 
   /* === TYPOGRAPHY SYSTEM === */
   --font-family-mono: 'Berkeley Mono', monospace;
   --font-family-sans: 'Berkeley Mono', monospace;
-  
+
   --font-mono: var(--font-family-mono);
   --font-sans: var(--font-family-sans);
 
   /* Font Scale */
-  --text-xs: 0.75rem;   /* 12px */
-  --text-sm: 0.875rem;  /* 14px */
-  --text-base: 1rem;    /* 16px */
-  --text-lg: 1.125rem;  /* 18px */
-  --text-xl: 1.25rem;   /* 20px */
-  --text-2xl: 1.5rem;   /* 24px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
   --text-3xl: 2.125rem; /* 34px */
   --text-4xl: 2.625rem; /* 42px (H1 Target) */
 
@@ -55,9 +58,9 @@
 
   /* === COMPONENT DNA === */
   --radius-button: var(--radius-sm); /* 4px */
-  --radius-input: var(--radius-md);  /* 6px */
-  --radius-card: var(--radius-sm);   /* 4px */
-  
+  --radius-input: var(--radius-md); /* 6px */
+  --radius-card: var(--radius-sm); /* 4px */
+
   --glass-bg: var(--bg-glass);
   --glass-blur: blur(12px);
   --border-glass: var(--border-subtle);
@@ -66,7 +69,6 @@
   --container-max-width: var(--max-content-width, 880px);
   --container-padding: 1.5rem;
 }
-
 
 /* === UTILITY CLASSES (UnoCSS Integration) === */
 /* Layout Utilities */
@@ -85,7 +87,6 @@
   border-bottom: 1px dotted var(--divider-dotted);
   width: 100%;
 }
-
 
 /* Typography Utilities */
 .text-gradient {
@@ -124,7 +125,6 @@
   transform: translateY(-1px);
 }
 
-
 .button {
   display: inline-flex;
   align-items: center;
@@ -161,7 +161,6 @@
 .button-secondary:hover {
   background: var(--bg-glass);
 }
-
 
 /* Professional/Enterprise Aesthetic Classes */
 .enterprise-hero {

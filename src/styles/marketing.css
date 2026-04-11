@@ -35,13 +35,25 @@
 
 .marketing-section--soft {
   background:
-    radial-gradient(circle at top right, rgba(var(--accent-primary-rgb), 0.12), transparent 28%),
-    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.015), transparent 100%);
+    radial-gradient(
+      circle at top right,
+      rgba(var(--accent-primary-rgb), 0.12),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--accent-primary-rgb), 0.015),
+      transparent 100%
+    );
 }
 
 .marketing-section--emphasis {
   background:
-    radial-gradient(circle at top left, rgba(var(--accent-primary-rgb), 0.16), transparent 24%),
+    radial-gradient(
+      circle at top left,
+      rgba(var(--accent-primary-rgb), 0.16),
+      transparent 24%
+    ),
     linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.02), transparent);
 }
 
@@ -86,8 +98,16 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background:
-    radial-gradient(circle at top right, rgba(var(--accent-primary-rgb), 0.09), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+    radial-gradient(
+      circle at top right,
+      rgba(var(--accent-primary-rgb), 0.09),
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.01)
+    ),
     var(--bg-glass);
   backdrop-filter: blur(14px);
 }
@@ -212,7 +232,11 @@
   padding: 1.15rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.035),
+    rgba(255, 255, 255, 0.015)
+  );
 }
 
 .marketing-stat-card span,
@@ -273,7 +297,11 @@
   padding: clamp(1.35rem, 2vw, 1.75rem);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, rgba(48, 44, 44, 0.6), rgba(39, 35, 35, 0.44));
+  background: linear-gradient(
+    180deg,
+    rgba(48, 44, 44, 0.6),
+    rgba(39, 35, 35, 0.44)
+  );
   backdrop-filter: blur(10px);
 }
 
@@ -326,7 +354,11 @@
   padding: 1.5rem 1.65rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, rgba(48, 44, 44, 0.52), rgba(39, 35, 35, 0.34));
+  background: linear-gradient(
+    180deg,
+    rgba(48, 44, 44, 0.52),
+    rgba(39, 35, 35, 0.34)
+  );
 }
 
 .marketing-proof-band__items {
@@ -369,7 +401,11 @@
   padding: 1.55rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, rgba(48, 44, 44, 0.52), rgba(39, 35, 35, 0.36));
+  background: linear-gradient(
+    180deg,
+    rgba(48, 44, 44, 0.52),
+    rgba(39, 35, 35, 0.36)
+  );
 }
 
 .marketing-quote-card blockquote {
@@ -392,8 +428,16 @@
   border: 1px solid rgba(var(--accent-primary-rgb), 0.28);
   border-radius: var(--radius-sm);
   background:
-    radial-gradient(circle at top right, rgba(var(--accent-primary-rgb), 0.14), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+    radial-gradient(
+      circle at top right,
+      rgba(var(--accent-primary-rgb), 0.14),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.015)
+    );
   backdrop-filter: blur(12px);
 }
 
@@ -439,7 +483,9 @@
   color: rgba(253, 252, 252, 0.88);
   text-decoration: none;
   border-bottom: 1px dotted rgba(255, 255, 255, 0.28);
-  transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
 }
 
 .marketing-inline-link:hover {

@@ -21,10 +21,11 @@ export async function renderAstro<
   querySelectorAll: (selector: string) => NodeListOf<Element>
 }> {
   const renderProps = slotContent ? { ...props, slot: slotContent } : props
-  const resolvedHtml = await (typeof Component === "function"
+  const resolvedHtml = await (typeof Component === 'function'
     ? Promise.resolve(Component(renderProps))
     : Component.render(renderProps))
-  const html = typeof resolvedHtml === "string" ? resolvedHtml : String(resolvedHtml)
+  const html =
+    typeof resolvedHtml === 'string' ? resolvedHtml : String(resolvedHtml)
   const container = document.createElement('div')
   container.innerHTML = html
 

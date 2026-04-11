@@ -183,7 +183,12 @@ export class EnhancementPipeline {
       }
     } catch (error: unknown) {
       logger.error('Enhancement pipeline failed', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         action: 'process_error',
       })
 
@@ -214,7 +219,12 @@ export class EnhancementPipeline {
         results.push(result)
       } catch (error: unknown) {
         logger.error('Batch item processing failed', {
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           action: 'batch_item_error',
         })
 
@@ -293,7 +303,12 @@ export class EnhancementPipeline {
       } catch (error: unknown) {
         logger.warn('Enhancement attempt failed', {
           attempt: attempts,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           action: 'enhancement_attempt_failed',
         })
 
@@ -331,9 +346,9 @@ export class EnhancementPipeline {
     // Compare overall score
 
     // Compare individual objective scores
-    for (const [objectiveId, enhancedResult] of Object.entries<{ score: number }>(
-      enhanced.objectiveResults,
-    )) {
+    for (const [objectiveId, enhancedResult] of Object.entries<{
+      score: number
+    }>(enhanced.objectiveResults)) {
       const originalResult = original.objectiveResults[objectiveId]
 
       if (originalResult) {

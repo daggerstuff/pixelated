@@ -6,22 +6,22 @@ try {
 }
 
 const createStubSpan = () => ({
-  end: () => { },
+  end: () => {},
 })
 
 const createStubScope = () => ({
-  setTag: () => { },
-  setExtra: () => { },
-  setUser: () => { },
+  setTag: () => {},
+  setExtra: () => {},
+  setUser: () => {},
 })
 
 const createStubSentry = () => ({
-  init: () => { },
-  close: async () => { },
-  captureException: () => { },
-  setUser: () => { },
-  setContext: () => { },
-  withScope: (callback = () => { }) => {
+  init: () => {},
+  close: async () => {},
+  captureException: () => {},
+  setUser: () => {},
+  setContext: () => {},
+  withScope: (callback = () => {}) => {
     try {
       callback(createStubScope())
     } catch {
@@ -31,8 +31,8 @@ const createStubSentry = () => ({
   startInactiveSpan: () => createStubSpan(),
   startSpan: () => createStubSpan(),
   metrics: {
-    count: () => { },
-    distribution: () => { },
+    count: () => {},
+    distribution: () => {},
   },
 })
 
@@ -55,32 +55,36 @@ const getNodeMajorVersion = () => {
 try {
   const sentryNode = await import('@sentry/node')
   Sentry = sentryNode
-  httpIntegration = typeof sentryNode.httpIntegration === 'function'
-    ? sentryNode.httpIntegration
-    : () => null
+  httpIntegration =
+    typeof sentryNode.httpIntegration === 'function'
+      ? sentryNode.httpIntegration
+      : () => null
 
   const nodeMajor = getNodeMajorVersion()
-  const profilingSupported = nodeMajor !== null && SUPPORTED_PROFILING_NODE_MAJORS.has(nodeMajor)
+  const profilingSupported =
+    nodeMajor !== null && SUPPORTED_PROFILING_NODE_MAJORS.has(nodeMajor)
 
   if (profilingSupported) {
     try {
       const profiling = await import('@sentry/profiling-node')
-      nodeProfilingIntegration = profiling?.nodeProfilingIntegration ?? (() => null)
+      nodeProfilingIntegration =
+        profiling?.nodeProfilingIntegration ?? (() => null)
     } catch (profilingError) {
       console.warn(
         `[Sentry Profiling] Failed to load profiling addon on Node.js ${process.version}. ` +
-        'Ensure build tools are available to compile @sentry/profiling-node from source.',
-        profilingError
+          'Ensure build tools are available to compile @sentry/profiling-node from source.',
+        profilingError,
       )
     }
   } else {
     console.warn(
       `[Sentry Profiling] Node.js ${process.version} is not in the supported LTS list ` +
-      '(16, 18, 20, 22, 24). Profiling integration will be disabled.'
+        '(16, 18, 20, 22, 24). Profiling integration will be disabled.',
     )
   }
 } catch (error) {
-  const message = '[Sentry] Node SDK not available — disabling instrumentation. Install @sentry/node to enable full telemetry.'
+  const message =
+    '[Sentry] Node SDK not available — disabling instrumentation. Install @sentry/node to enable full telemetry.'
   if (process.env.NODE_ENV === 'production') {
     console.warn(message)
   } else {
@@ -107,15 +111,20 @@ Sentry.init({
 
   // Performance monitoring configuration
   tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
-  profilesSampleRate: parseFloat(process.env.SENTRY_PROFILES_SAMPLE_RATE) || 0.1,
+  profilesSampleRate:
+    parseFloat(process.env.SENTRY_PROFILES_SAMPLE_RATE) || 0.1,
 
   // Integrations for comprehensive monitoring
   integrations: [
     // HTTP integration for outgoing requests
-    typeof httpIntegration === 'function' ? httpIntegration({ tracing: true }) : null,
+    typeof httpIntegration === 'function'
+      ? httpIntegration({ tracing: true })
+      : null,
 
     // Profiling integration for performance monitoring
-    typeof nodeProfilingIntegration === 'function' ? nodeProfilingIntegration() : null,
+    typeof nodeProfilingIntegration === 'function'
+      ? nodeProfilingIntegration()
+      : null,
   ].filter(Boolean),
 
   // Tracing configuration
@@ -132,14 +141,14 @@ Sentry.init({
     // Filter out sensitive data from events
     if (event.request?.data) {
       // Remove sensitive fields from request data
-      const sensitiveFields = ['password', 'token', 'apiKey', 'secret'];
-      sensitiveFields.forEach(field => {
+      const sensitiveFields = ['password', 'token', 'apiKey', 'secret']
+      sensitiveFields.forEach((field) => {
         if (event.request.data[field]) {
-          event.request.data[field] = '[FILTERED]';
+          event.request.data[field] = '[FILTERED]'
         }
-      });
+      })
     }
-    return event;
+    return event
   },
 
   // Before breadcrumb hook for custom breadcrumb handling
@@ -147,9 +156,9 @@ Sentry.init({
     // Customize breadcrumbs as needed
     if (breadcrumb.category === 'console') {
       // Enhance console breadcrumbs with more context
-      breadcrumb.level = breadcrumb.level || 'info';
+      breadcrumb.level = breadcrumb.level || 'info'
     }
-    return breadcrumb;
+    return breadcrumb
   },
 
   // Initial scope configuration
@@ -160,36 +169,36 @@ Sentry.init({
       node_version: process.version,
     },
   },
-});
+})
 
 // Performance monitoring helpers
 export const startTransaction = (name, operation = 'function') => {
-  return Sentry.startInactiveSpan({ name, op: operation });
-};
+  return Sentry.startInactiveSpan({ name, op: operation })
+}
 
 export const startSpan = (name, operation = 'function') => {
-  return Sentry.startSpan({ name, op: operation });
-};
+  return Sentry.startSpan({ name, op: operation })
+}
 
 // Error handling helpers
 export const captureError = (error, context = {}) => {
   Sentry.withScope((scope) => {
     if (context.tags) {
       Object.entries(context.tags).forEach(([key, value]) => {
-        scope.setTag(key, value);
-      });
+        scope.setTag(key, value)
+      })
     }
     if (context.extra) {
       Object.entries(context.extra).forEach(([key, value]) => {
-        scope.setExtra(key, value);
-      });
+        scope.setExtra(key, value)
+      })
     }
     if (context.user) {
-      scope.setUser(context.user);
+      scope.setUser(context.user)
     }
-    Sentry.captureException(error);
-  });
-};
+    Sentry.captureException(error)
+  })
+}
 
 // User context helper
 export const setUserContext = (user) => {
@@ -198,8 +207,8 @@ export const setUserContext = (user) => {
     email: user.email,
     username: user.username,
     // Add any other relevant user fields
-  });
-};
+  })
+}
 
 // Custom metrics and monitoring using Sentry Metrics
 // See: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
@@ -208,9 +217,9 @@ export const recordMetric = (name, value = 1, tags = {}) => {
   if (Sentry.metrics && typeof Sentry.metrics.count === 'function') {
     Sentry.metrics.count(name, value, {
       attributes: tags,
-    });
+    })
   }
-};
+}
 
 // Record a duration metric (for example, API response time in milliseconds)
 export const recordDurationMetric = (name, durationMs, tags = {}) => {
@@ -218,42 +227,46 @@ export const recordDurationMetric = (name, durationMs, tags = {}) => {
     Sentry.metrics.distribution(name, durationMs, {
       unit: 'millisecond',
       attributes: tags,
-    });
+    })
   }
-};
+}
 
 // Health check function for monitoring
 export const healthCheck = () => {
-  const transaction = Sentry.startSpan({ name: 'health-check', op: 'function' });
+  const transaction = Sentry.startSpan({ name: 'health-check', op: 'function' })
   try {
     // Add your health check logic here
-    return { status: 'healthy', timestamp: new Date().toISOString() };
+    return { status: 'healthy', timestamp: new Date().toISOString() }
   } catch (error) {
-    Sentry.captureException(error);
-    return { status: 'unhealthy', error: error.message, timestamp: new Date().toISOString() };
+    Sentry.captureException(error)
+    return {
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    }
   } finally {
-    transaction?.end();
+    transaction?.end()
   }
-};
+}
 
 // Graceful shutdown handler
 export const closeSentry = async () => {
-  await Sentry.close();
-};
+  await Sentry.close()
+}
 
 // Middleware for Express.js applications
 export const sentryMiddleware = (req, res, next) => {
   const transaction = Sentry.startSpan({
     name: `${req.method} ${req.path}`,
     op: 'http.server',
-  });
+  })
 
   // Set user context if available
   if (req.user) {
     Sentry.setUser({
       id: req.user.id,
       email: req.user.email,
-    });
+    })
   }
 
   // Add request context
@@ -264,31 +277,34 @@ export const sentryMiddleware = (req, res, next) => {
       'user-agent': req.get('User-Agent'),
       'content-type': req.get('Content-Type'),
     },
-  });
+  })
 
   res.on('finish', () => {
-    transaction?.end();
-  });
+    transaction?.end()
+  })
 
-  next();
-};
+  next()
+}
 
 // Database instrumentation helper
-export const instrumentDatabaseQuery = async (query, operation = 'db.query') => {
-  const span = Sentry.startSpan({ name: query, op: operation });
+export const instrumentDatabaseQuery = async (
+  query,
+  operation = 'db.query',
+) => {
+  const span = Sentry.startSpan({ name: query, op: operation })
   try {
     // Your database query logic here
-    return await query;
+    return await query
   } catch (error) {
-    Sentry.captureException(error);
-    throw error;
+    Sentry.captureException(error)
+    throw error
   } finally {
-    span?.end();
+    span?.end()
   }
-};
+}
 
 // Export Sentry for direct access if needed
-export { Sentry };
+export { Sentry }
 
 // Export additional utilities
 export default {
@@ -302,7 +318,7 @@ export default {
   closeSentry,
   sentryMiddleware,
   instrumentDatabaseQuery,
-};
+}
 
 // This file is intended for import at the very top of your backend entry point.
 // If Sentry is not wanted, set SENTRY_DSN="" in config or remove import.

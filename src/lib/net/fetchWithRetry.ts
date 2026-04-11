@@ -96,13 +96,10 @@ export async function fetchWithRetry(
       return response
     } catch (err: unknown) {
       // If external abort triggered, rethrow immediately
-      if (externalSignal && (externalSignal).aborted) {
+      if (externalSignal && externalSignal.aborted) {
         clearTimeout(timeoutId)
         if (externalSignal) {
-          ;(externalSignal).removeEventListener(
-            'abort',
-            abortExternal,
-          )
+          externalSignal.removeEventListener('abort', abortExternal)
         }
         throw err
       }
@@ -130,10 +127,7 @@ export async function fetchWithRetry(
     } finally {
       clearTimeout(timeoutId)
       if (externalSignal) {
-        ;(externalSignal).removeEventListener(
-          'abort',
-          abortExternal,
-        )
+        externalSignal.removeEventListener('abort', abortExternal)
       }
     }
   }

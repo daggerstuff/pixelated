@@ -29,14 +29,8 @@ interface ExtendedManagementClient extends ManagementClient {
   deleteGuardianEnrollment(params: { id: string }): Promise<void>
   // Roles
   getRoles(params: { per_page?: number; page?: number }): Promise<any>
-  assignRolestoUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  removeRolesFromUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
+  assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+  removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
   getUserRoles(params: { id: string }): Promise<any>
 }
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -256,7 +250,7 @@ export class Auth0AdaptiveMFAService {
       }
 
       // Log risk assessment
-       logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, null, {
+      logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, null, {
         userId: context.userId,
         riskScore: normalizedScore,
         factors: factors.map((f) => ({ name: f.name, triggered: f.triggered })),
@@ -573,7 +567,7 @@ export class Auth0AdaptiveMFAService {
     this.config = { ...this.config, ...newConfig }
 
     // Log configuration update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'adaptive_mfa',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString(),
@@ -597,7 +591,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.push(ipAddress)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'add',
         ipAddress,
@@ -615,7 +609,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.splice(index, 1)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'remove',
         ipAddress,
@@ -632,7 +626,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.push(countryCode)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'add',
         countryCode,
@@ -650,7 +644,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.splice(index, 1)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'remove',
         countryCode,
@@ -666,7 +660,7 @@ export class Auth0AdaptiveMFAService {
     this.config.allowedTimeWindows.push(window)
 
     // Log time window update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'time_windows',
       action: 'add',
       window,
@@ -689,7 +683,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedTimeWindows.splice(index, 1)
 
       // Log time window update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'time_windows',
         action: 'remove',
         window,

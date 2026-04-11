@@ -71,7 +71,7 @@ const ROLE_TEXT_CONFIG = {
     submitButton: 'Send Response',
     activeColor: 'blue',
   },
-} as const;
+} as const
 
 export function TrainingSessionComponent() {
   const { data: session } = authClient.useSession()
@@ -87,11 +87,14 @@ export function TrainingSessionComponent() {
 
   // Fishbowl Mode State
   const [role, setRole] = useState<'trainee' | 'observer'>('trainee')
-  
+
   // Computed helpers (Review suggestion: extract isObserver and config)
   const isObserver = role === 'observer'
   // ⚡ Bolt: memoize textConfig to prevent unnecessary re-evaluations during renders
-  const textConfig = useMemo(() => (isObserver ? ROLE_TEXT_CONFIG.observer : ROLE_TEXT_CONFIG.trainee), [isObserver])
+  const textConfig = useMemo(
+    () => (isObserver ? ROLE_TEXT_CONFIG.observer : ROLE_TEXT_CONFIG.trainee),
+    [isObserver],
+  )
 
   const ws = useRef<WebSocket | null>(null)
   // Use refs to avoid stale closures in WebSocket handlers

@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { EvidenceAssistantPanel } from './EvidenceAssistantPanel'
 import type { EvidenceAssistantResponse } from '@/lib/api/evidence-assistant'
+
+import { EvidenceAssistantPanel } from './EvidenceAssistantPanel'
 
 const mockSearch = vi.fn()
 const mockReset = vi.fn()
@@ -33,7 +34,8 @@ vi.mock('@/hooks/useEvidenceAssistant', () => ({
 
 const mockResponse: EvidenceAssistantResponse = {
   query: 'How should crisis responses be escalated? ',
-  answer: 'Escalation should prioritize active-risk signals and follow internal playbooks.',
+  answer:
+    'Escalation should prioritize active-risk signals and follow internal playbooks.',
   providerUsed: 'local',
   results: [
     {
@@ -59,7 +61,9 @@ const mockResponse: EvidenceAssistantResponse = {
       collection: 'docs',
     },
   ],
-  warnings: ['No configured provider available for live grounding in this environment.'],
+  warnings: [
+    'No configured provider available for live grounding in this environment.',
+  ],
 }
 
 const renderPanel = () => {
@@ -82,7 +86,9 @@ describe('EvidenceAssistantPanel', () => {
     const queryInput = screen.getByPlaceholderText(
       /which internal docs define crisis sensitivity requirements/i,
     )
-    fireEvent.change(queryInput, { target: { value: '   how to escalate crisis   ' } })
+    fireEvent.change(queryInput, {
+      target: { value: '   how to escalate crisis   ' },
+    })
 
     const collectionSelect = screen.getByRole('combobox')
     fireEvent.change(collectionSelect, { target: { value: 'docs' } })
@@ -106,14 +112,16 @@ describe('EvidenceAssistantPanel', () => {
     renderPanel()
 
     expect(screen.getByText('Grounded answer')).toBeVisible()
-    expect(
-      screen.getByText('local', { exact: false }),
-    ).toBeInTheDocument()
+    expect(screen.getByText('local', { exact: false })).toBeInTheDocument()
     expect(
       screen.getByText('Escalation should prioritize active-risk signals'),
     ).toBeInTheDocument()
     expect(screen.getByText('[1] Crisis Playbook')).toBeInTheDocument()
-    expect(screen.getByText('No configured provider available for live grounding in this environment.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'No configured provider available for live grounding in this environment.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('resets local state and hook state when reset clicked', () => {
@@ -193,6 +201,8 @@ describe('EvidenceAssistantPanel', () => {
     hookState.error = new Error('search endpoint is temporarily unavailable')
     renderPanel()
 
-    expect(screen.getByText('search endpoint is temporarily unavailable')).toBeInTheDocument()
+    expect(
+      screen.getByText('search endpoint is temporarily unavailable'),
+    ).toBeInTheDocument()
   })
 })

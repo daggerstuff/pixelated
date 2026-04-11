@@ -86,8 +86,7 @@ export class ServiceIntegrationTester {
 
     const totalTime = Date.now() - startTime
     const success =
-      Object.values(results).every((result) =>  result) &&
-      errors.length === 0
+      Object.values(results).every((result) => result) && errors.length === 0
 
     logger.info('Service integration test completed', {
       success,
@@ -146,7 +145,6 @@ export class ServiceIntegrationTester {
         memories.length > 0 &&
         updated !== null &&
         searchResults.length > 0 &&
-        
         deleted
       )
     } catch (error: unknown) {

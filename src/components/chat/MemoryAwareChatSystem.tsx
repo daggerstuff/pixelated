@@ -77,7 +77,9 @@ export function MemoryAwareChatSystem({
   // Generate conversation summary when messages change
   useEffect(() => {
     if (messages.length > 4) {
-      void Promise.resolve(getConversationSummary()).then(setConversationSummary)
+      void Promise.resolve(getConversationSummary()).then(
+        setConversationSummary,
+      )
     }
   }, [messages])
 

@@ -77,7 +77,7 @@ export function usePatientModel() {
       } catch (err: unknown) {
         console.error(`Failed to load patient model ${currentModelId}:`, err)
         setError(
-          `Error loading patient model: ${err instanceof Error ? (err)?.message || String(err) : String(err)}`,
+          `Error loading patient model: ${err instanceof Error ? err?.message || String(err) : String(err)}`,
         )
       } finally {
         setIsLoading(false)

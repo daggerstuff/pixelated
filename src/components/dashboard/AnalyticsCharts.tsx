@@ -65,26 +65,28 @@ interface TimeRangeSelectorProps {
 /**
  * Memoized time range selector to prevent unnecessary re-renders. (Review suggestion)
  */
-const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(({ value, onChange }) => {
-  return (
-    <div className='flex space-x-2'>
-      {TIME_RANGE_OPTIONS.map((option) => (
-        <button
-          key={option.value}
-          type='button'
-          onClick={() => onChange(option.value)}
-          className={`rounded px-3 py-1 text-sm transition-colors ${
-            value === option.value
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  )
-})
+const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
+  ({ value, onChange }) => {
+    return (
+      <div className='flex space-x-2'>
+        {TIME_RANGE_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type='button'
+            onClick={() => onChange(option.value)}
+            className={`rounded px-3 py-1 text-sm transition-colors ${
+              value === option.value
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    )
+  },
+)
 TimeRangeSelector.displayName = 'TimeRangeSelector'
 
 // Session activity chart component

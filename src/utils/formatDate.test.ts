@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { formatDuration, isValidDate, getStartOf } from './formatDate'
 
 describe('formatDuration', () => {
@@ -47,16 +48,16 @@ describe('isValidDate', () => {
   it('rejects out-of-range calendar dates without rolling over', () => {
     // Numeric strings are parsed as invalid by Date constructor when passed as strings
     expect(isValidDate('123456789')).toBe(false)
-    
+
     // Invalid calendar dates should return false (unlike native JavaScript Date rollover)
     expect(isValidDate('2023-02-30')).toBe(false)
-    
+
     // Leap year handling
     expect(isValidDate('2024-02-29')).toBe(true)
-    
+
     // Not a leap year
     expect(isValidDate('2023-02-29')).toBe(false)
-    
+
     // Whitespace
     expect(isValidDate(' 2023-01-01 ')).toBe(true)
     expect(isValidDate('\t2023-01-01\n')).toBe(true)
@@ -74,7 +75,7 @@ describe('getStartOf', () => {
     // Use a midday UTC date to avoid any potential timezone rollover during test
     const date = new Date('2023-05-15T12:30:45.123')
     const start = getStartOf(date, 'day')
-    
+
     // We expect the same date but with time at 00:00:00.000
     expect(start.getFullYear()).toBe(2023)
     expect(start.getMonth()).toBe(4) // May is index 4
@@ -89,7 +90,7 @@ describe('getStartOf', () => {
     // 2023-05-17 is a Wednesday. Sunday would be 2023-05-14
     const date = new Date('2023-05-17T10:00:00')
     const start = getStartOf(date, 'week')
-    
+
     expect(start.getDate()).toBe(14)
     expect(start.getDay()).toBe(0) // Sunday
     expect(start.getHours()).toBe(0)
@@ -98,7 +99,7 @@ describe('getStartOf', () => {
   it('returns the start of the month', () => {
     const date = new Date('2023-05-15T10:00:00')
     const start = getStartOf(date, 'month')
-    
+
     expect(start.getDate()).toBe(1)
     expect(start.getHours()).toBe(0)
   })
@@ -106,7 +107,7 @@ describe('getStartOf', () => {
   it('returns the start of the year', () => {
     const date = new Date('2023-05-15T10:00:00')
     const start = getStartOf(date, 'year')
-    
+
     expect(start.getMonth()).toBe(0)
     expect(start.getDate()).toBe(1)
     expect(start.getHours()).toBe(0)

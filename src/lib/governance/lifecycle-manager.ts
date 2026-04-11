@@ -7,71 +7,78 @@ import { getLogger } from '../logging'
 
 const logger = getLogger({ module: 'lifecycle-manager' })
 
-export type RetentionPeriod = "30-day" | "90-day" | "7-year" | "permanent";
+export type RetentionPeriod = '30-day' | '90-day' | '7-year' | 'permanent'
 
 export interface RetentionRecord {
-  recordId: string;
-  period: RetentionPeriod;
-  createdAt: Date;
-  expiresAt: Date | null;
-  archivalScheduledAt?: Date;
+  recordId: string
+  period: RetentionPeriod
+  createdAt: Date
+  expiresAt: Date | null
+  archivalScheduledAt?: Date
 }
 
 export class LifecycleManager {
-  private retentionRecords: Map<string, RetentionRecord> = new Map();
+  private retentionRecords: Map<string, RetentionRecord> = new Map()
   // Alias for secure deletion operations
-  private records: Map<string, RetentionRecord> = this.retentionRecords;
+  private records: Map<string, RetentionRecord> = this.retentionRecords
 
   /**
    * Apply a retention policy to a record
    */
-  applyRetention(recordId: string, period: RetentionPeriod, createdAt: Date): void {
-    const expiresAt = this.calculateExpiryDate(createdAt, period);
+  applyRetention(
+    recordId: string,
+    period: RetentionPeriod,
+    createdAt: Date,
+  ): void {
+    const expiresAt = this.calculateExpiryDate(createdAt, period)
 
     const record: RetentionRecord = {
       recordId,
       period,
       createdAt,
       expiresAt,
-    };
+    }
 
-    this.retentionRecords.set(recordId, record);
+    this.retentionRecords.set(recordId, record)
   }
 
   /**
    * Get retention record for a specific record
    */
   getRetention(recordId: string): RetentionRecord | undefined {
-    return this.retentionRecords.get(recordId);
+    return this.retentionRecords.get(recordId)
   }
 
   /**
    * Schedule archival for a record
    */
   scheduleArchival(recordId: string, archivalDate: Date): void {
-    const record = this.retentionRecords.get(recordId);
+    const record = this.retentionRecords.get(recordId)
     if (!record) {
-      throw new Error("Record not found");
+      throw new Error('Record not found')
     }
 
-    record.archivalScheduledAt = archivalDate;
+    record.archivalScheduledAt = archivalDate
   }
 
   /**
    * Calculate expiry date based on period type
    */
-  private calculateExpiryDate(createdAt: Date, period: RetentionPeriod): Date | null {
+  private calculateExpiryDate(
+    createdAt: Date,
+    period: RetentionPeriod,
+  ): Date | null {
     switch (period) {
-      case "30-day":
-        return this.addDays(createdAt, 30);
-      case "90-day":
-        return this.addDays(createdAt, 90);
-      case "7-year":
-        return this.addYears(createdAt, 7);
-      case "permanent":
-        return null;
+      case '30-day':
+        return this.addDays(createdAt, 30)
+      case '90-day':
+        return this.addDays(createdAt, 90)
+      case '7-year':
+        return this.addYears(createdAt, 7)
+      case 'permanent':
+        return null
       default:
-        throw new Error(`Unknown retention period: ${period}`);
+        throw new Error(`Unknown retention period: ${period}`)
     }
   }
 
@@ -79,32 +86,34 @@ export class LifecycleManager {
    * Add days to a date
    */
   private addDays(date: Date, days: number): Date {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
+    const result = new Date(date)
+    result.setDate(result.getDate() + days)
+    return result
   }
 
   /**
    * Add years to a date
    */
   private addYears(date: Date, years: number): Date {
-    const result = new Date(date);
-    result.setFullYear(result.getFullYear() + years);
-    return result;
+    const result = new Date(date)
+    result.setFullYear(result.getFullYear() + years)
+    return result
   }
 
   /**
    * Securely delete a record using crypto-shred
    * Deletes the encryption key, making data unrecoverable
    */
-  async secureDelete(resourceId: string): Promise<{ deleted: boolean; method: string }> {
-    const record = this.records.get(resourceId);
+  async secureDelete(
+    resourceId: string,
+  ): Promise<{ deleted: boolean; method: string }> {
+    const record = this.records.get(resourceId)
     if (record) {
       // Delete encryption key (crypto-shred)
-      this.records.delete(resourceId);
-      logger.info(`Crypto-shred deleted ${resourceId}`);
-      return { deleted: true, method: "crypto-shred" };
+      this.records.delete(resourceId)
+      logger.info(`Crypto-shred deleted ${resourceId}`)
+      return { deleted: true, method: 'crypto-shred' }
     }
-    return { deleted: false, method: "none" };
+    return { deleted: false, method: 'none' }
   }
 }

@@ -108,7 +108,9 @@ export class TherapeuticResponseGenerator {
         Math.floor(Math.random() * this.crisisResponses.length)
       ]
 
-    const crisisIndicator = analysis.indicators?.find((i) => i.type === 'crisis')
+    const crisisIndicator = analysis.indicators?.find(
+      (i) => i.type === 'crisis',
+    )
     if (
       crisisIndicator &&
       crisisIndicator.evidence.some(
@@ -308,7 +310,9 @@ export class TherapeuticResponseGenerator {
     }
 
     // Crisis indicators take priority
-    const crisisIndicator = analysis.indicators?.find((i) => i.type === 'crisis')
+    const crisisIndicator = analysis.indicators?.find(
+      (i) => i.type === 'crisis',
+    )
     if (crisisIndicator) {
       return crisisIndicator
     }

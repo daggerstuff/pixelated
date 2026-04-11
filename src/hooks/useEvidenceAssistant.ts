@@ -53,7 +53,9 @@ export function useEvidenceAssistant() {
   }, [])
 
   const search = useCallback(
-    async (request: EvidenceAssistantRequest): Promise<EvidenceAssistantResponse> => {
+    async (
+      request: EvidenceAssistantRequest,
+    ): Promise<EvidenceAssistantResponse> => {
       abortControllerRef.current?.abort()
       abortControllerRef.current = new AbortController()
 
@@ -84,7 +86,9 @@ export function useEvidenceAssistant() {
         }
 
         const normalizedError =
-          error instanceof Error ? error : new Error('Evidence assistant failed')
+          error instanceof Error
+            ? error
+            : new Error('Evidence assistant failed')
 
         setState((current) => ({
           ...current,

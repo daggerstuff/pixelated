@@ -79,10 +79,26 @@ export function isPartialBiasDashboardSummary(
 ): v is Partial<BiasDashboardSummary> {
   if (!isObject(v)) return false
   const obj = v
-  if (obj['totalSessions'] !== undefined && typeof obj['totalSessions'] !== 'number') return false
-  if (obj['averageBiasScore'] !== undefined && typeof obj['averageBiasScore'] !== 'number') return false
-  if (obj['alertsLast24h'] !== undefined && typeof obj['alertsLast24h'] !== 'number') return false
-  if (obj['activeAlerts'] !== undefined && typeof obj['activeAlerts'] !== 'number') return false
+  if (
+    obj['totalSessions'] !== undefined &&
+    typeof obj['totalSessions'] !== 'number'
+  )
+    return false
+  if (
+    obj['averageBiasScore'] !== undefined &&
+    typeof obj['averageBiasScore'] !== 'number'
+  )
+    return false
+  if (
+    obj['alertsLast24h'] !== undefined &&
+    typeof obj['alertsLast24h'] !== 'number'
+  )
+    return false
+  if (
+    obj['activeAlerts'] !== undefined &&
+    typeof obj['activeAlerts'] !== 'number'
+  )
+    return false
   const trendDirection = obj['trendDirection']
   if (
     trendDirection !== undefined &&
@@ -105,4 +121,3 @@ export function isBiasAnalysisItem(v: unknown): v is BiasAnalysisItem {
 export function isBiasAnalysisItemArray(v: unknown): v is BiasAnalysisItem[] {
   return Array.isArray(v) && v.every(isBiasAnalysisItem)
 }
-

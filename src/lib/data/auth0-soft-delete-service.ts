@@ -208,7 +208,7 @@ export class Auth0SoftDeleteService {
       )
 
       // Log soft delete event
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.USER_SOFT_DELETED,
         deleteRequest.userId,
         {
@@ -231,13 +231,18 @@ export class Auth0SoftDeleteService {
       console.error('Failed to soft delete user:', error)
 
       // Log soft delete error
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.USER_SOFT_DELETE_ERROR,
         deleteRequest.userId,
         {
           deletedBy: deleteRequest.deletedBy,
           reason: deleteRequest.reason,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -286,7 +291,7 @@ export class Auth0SoftDeleteService {
       await collection.deleteOne({ auth0UserId: userId })
 
       // Log user restore event
-       logSecurityEvent(SecurityEventType.USER_RESTORED, userId, {
+      logSecurityEvent(SecurityEventType.USER_RESTORED, userId, {
         restoredBy: restoredBy,
         timestamp: new Date().toISOString(),
       })
@@ -299,9 +304,14 @@ export class Auth0SoftDeleteService {
       console.error('Failed to restore user:', error)
 
       // Log restore error
-       logSecurityEvent(SecurityEventType.USER_RESTORE_ERROR, userId, {
+      logSecurityEvent(SecurityEventType.USER_RESTORE_ERROR, userId, {
         restoredBy: restoredBy,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -436,7 +446,7 @@ export class Auth0SoftDeleteService {
       await auth0Management.deleteUser({ id: userId })
 
       // Log user purge event
-       logSecurityEvent(SecurityEventType.USER_PURGED, userId, {
+      logSecurityEvent(SecurityEventType.USER_PURGED, userId, {
         retentionPeriod: this.defaultPolicy.retentionPeriod,
         purgeAfter: this.defaultPolicy.purgeAfter,
         timestamp: new Date().toISOString(),
@@ -450,8 +460,13 @@ export class Auth0SoftDeleteService {
       console.error('Failed to purge user:', error)
 
       // Log purge error
-       logSecurityEvent(SecurityEventType.USER_PURGE_ERROR, userId, {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+      logSecurityEvent(SecurityEventType.USER_PURGE_ERROR, userId, {
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -479,7 +494,7 @@ export class Auth0SoftDeleteService {
       )
 
       // Log notification event
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.USER_PURGE_NOTIFICATION_SENT,
         userRecord.auth0UserId,
         {
@@ -508,14 +523,10 @@ export class Auth0SoftDeleteService {
     this.defaultPolicy = { ...this.defaultPolicy, ...newPolicy }
 
     // Log policy update
-     logSecurityEvent(
-      SecurityEventType.DATA_RETENTION_POLICY_UPDATED,
-      null,
-      {
-        updatedPolicy: this.defaultPolicy,
-        timestamp: new Date().toISOString(),
-      },
-    )
+    logSecurityEvent(SecurityEventType.DATA_RETENTION_POLICY_UPDATED, null, {
+      updatedPolicy: this.defaultPolicy,
+      timestamp: new Date().toISOString(),
+    })
 
     console.log('Data retention policy updated:', this.defaultPolicy)
   }
@@ -605,16 +616,12 @@ export class Auth0SoftDeleteService {
       )
 
       // Log retention extension
-       logSecurityEvent(
-        SecurityEventType.USER_RETENTION_EXTENDED,
-        userId,
-        {
-          extendedBy: extendedBy,
-          additionalDays: additionalDays,
-          newPurgeDate: newPurgeDate.toISOString(),
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.USER_RETENTION_EXTENDED, userId, {
+        extendedBy: extendedBy,
+        additionalDays: additionalDays,
+        newPurgeDate: newPurgeDate.toISOString(),
+        timestamp: new Date().toISOString(),
+      })
 
       // Update Phase 6 MCP server with retention extension progress
       await updatePhase6AuthenticationProgress(
@@ -627,13 +634,18 @@ export class Auth0SoftDeleteService {
       console.error('Failed to extend user retention:', error)
 
       // Log retention extension error
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.USER_RETENTION_EXTENSION_ERROR,
         userId,
         {
           extendedBy: extendedBy,
           additionalDays: additionalDays,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )

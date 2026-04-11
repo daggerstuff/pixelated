@@ -43,13 +43,16 @@ function inferTitle(markdownBody: string): string | undefined {
     ?.replace(/^#\s+/, '')
 }
 
-export function parseEvidenceFrontmatter(raw: string): ParsedEvidenceFrontmatter {
+export function parseEvidenceFrontmatter(
+  raw: string,
+): ParsedEvidenceFrontmatter {
   try {
     const parsed = matter(raw)
     const data = parsed.data as Record<string, unknown>
     const title =
       normalizeString(data.title) ?? inferTitle(parsed.content) ?? 'Untitled'
-    const category = normalizeString(data.category) ?? normalizeString(data.series)
+    const category =
+      normalizeString(data.category) ?? normalizeString(data.series)
 
     return {
       body: parsed.content,
@@ -60,7 +63,9 @@ export function parseEvidenceFrontmatter(raw: string): ParsedEvidenceFrontmatter
   } catch {
     const trimmed = raw.trim()
     const frontmatterMatch = trimmed.match(/^---\n[\s\S]*?\n---\n?/)
-    const body = frontmatterMatch ? trimmed.slice(frontmatterMatch[0].length) : trimmed
+    const body = frontmatterMatch
+      ? trimmed.slice(frontmatterMatch[0].length)
+      : trimmed
 
     return {
       body,

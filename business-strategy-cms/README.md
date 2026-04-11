@@ -15,10 +15,11 @@ Import is valid when both pass.
 ## Strategy import
 
 The import script syncs Markdown from the
-[business-strategy](../business-strategy/) folder into the CMS (MongoDB).
-It now includes **all** `.md` files under that folder, including:
+[business-strategy](../business-strategy/) folder into the CMS (MongoDB). It now
+includes **all** `.md` files under that folder, including:
 
-- Root-level strategy docs (`01-executive-summary.md`, `02-market-analysis.md`, etc.)
+- Root-level strategy docs (`01-executive-summary.md`, `02-market-analysis.md`,
+  etc.)
 - **outreach/** (e.g. `stanford-pilot-proposal.md`, `follow-up-templates.md`)
 - **pilot-operations/** (e.g. `operational-checklist.md`)
 

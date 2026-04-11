@@ -125,7 +125,11 @@ app.use(
     console.error('❌ Error:', error)
     res.status(500).json({
       error: 'Internal server error',
-      message: isProduction ? 'Something went wrong' : (error instanceof Error ? error.message : "Unknown error"),
+      message: isProduction
+        ? 'Something went wrong'
+        : error instanceof Error
+          ? error.message
+          : 'Unknown error',
     })
   },
 )
@@ -149,7 +153,9 @@ const startServer = () => {
 }
 
 // Only start the server if this file is run directly
-const isMain = process.argv[1]?.includes('server.prod.js') || process.argv[1]?.includes('server.prod.ts')
+const isMain =
+  process.argv[1]?.includes('server.prod.js') ||
+  process.argv[1]?.includes('server.prod.ts')
 if (isMain) {
   startServer()
 }

@@ -67,9 +67,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 
 export const SIMPLE_ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_NAV_ITEMS.filter(
   (item) =>
-    item.id === 'dashboard' ||
-    item.id === 'users' ||
-    item.id === 'settings',
+    item.id === 'dashboard' || item.id === 'users' || item.id === 'settings',
 )
 
 SIMPLE_ADMIN_NAV_ITEMS.splice(2, 0, {

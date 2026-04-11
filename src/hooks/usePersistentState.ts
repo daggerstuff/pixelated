@@ -17,24 +17,23 @@ interface UsePersistentStateOptions<T> extends Partial<StorageConfig> {
 
 // Overload for object-style options
 export function usePersistentState<T>(
-  options: UsePersistentStateOptions<T>
+  options: UsePersistentStateOptions<T>,
 ): [T, (value: T | ((prev: T) => T)) => void, boolean]
 
 // Overload for positional arguments (key, defaultValue)
 export function usePersistentState<T>(
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void, boolean]
 
 // Implementation
 export function usePersistentState<T>(
   arg1: UsePersistentStateOptions<T> | string,
-  arg2?: T
+  arg2?: T,
 ): [T, (value: T | ((prev: T) => T)) => void, boolean] {
   // Normalize arguments
-  const options = typeof arg1 === 'string'
-    ? { key: arg1, defaultValue: arg2 as T }
-    : arg1
+  const options =
+    typeof arg1 === 'string' ? { key: arg1, defaultValue: arg2 as T } : arg1
 
   const {
     key,

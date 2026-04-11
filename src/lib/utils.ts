@@ -485,13 +485,10 @@ export function getNestedProperty<T>(
   let result: unknown = obj
 
   for (const key of keys) {
-    if (
-      !isNonNullObject(result) ||
-      !(key in (result))
-    ) {
+    if (!isNonNullObject(result) || !(key in result)) {
       return defaultValue
     }
-    result = (result)[key]
+    result = result[key]
   }
 
   return result as T
@@ -544,13 +541,13 @@ export function omit<T extends Record<string, unknown>, K extends keyof T>(
  */
 export function escapeHtml(str: string): string {
   const entityMap: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  };
-  return str.replace(/[&<>"']/g, (s) => entityMap[s] || s);
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }
+  return str.replace(/[&<>"']/g, (s) => entityMap[s] || s)
 }
 
 /**

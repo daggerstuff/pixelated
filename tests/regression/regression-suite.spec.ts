@@ -332,7 +332,7 @@ export class RegressionTestUtils {
       for (let i = 0; i < 100; i++) {
         arrays.push(new Array(10000).fill('memory-pressure-test'))
       }
-      ;window.memoryPressureArrays = arrays
+      window.memoryPressureArrays = arrays
     })
   }
 

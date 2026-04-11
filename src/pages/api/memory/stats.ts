@@ -30,6 +30,7 @@ export async function buildMemoryStatsResponse(
   })
 }
 
-export const GET = withAuthenticatedMemoryRoute('retrieving memory stats', async ({ request }, user) =>
-  buildMemoryStatsResponse(request, user),
+export const GET = withAuthenticatedMemoryRoute(
+  'retrieving memory stats',
+  async ({ request }, user) => buildMemoryStatsResponse(request, user),
 )

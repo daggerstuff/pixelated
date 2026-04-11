@@ -8,24 +8,24 @@
  * Throws an error if the secret is missing, whitespace-only, or matches the legacy fallback.
  */
 function ensureJwtSecret(): string {
-  const secret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET;
-  const legacyFallback = 'fallback-secret-change-in-production';
-  
+  const secret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET
+  const legacyFallback = 'fallback-secret-change-in-production'
+
   if (!secret || secret.trim().length === 0) {
     throw new Error(
-      "JWT_SECRET environment variable is strictly required. " +
-      "Please set it in process.env.JWT_SECRET or import.meta.env.JWT_SECRET."
-    );
+      'JWT_SECRET environment variable is strictly required. ' +
+        'Please set it in process.env.JWT_SECRET or import.meta.env.JWT_SECRET.',
+    )
   }
 
   if (secret === legacyFallback) {
     throw new Error(
-      "JWT_SECRET matches the insecure legacy fallback value. " +
-      "Please provide a unique, cryptographically secure secret."
-    );
+      'JWT_SECRET matches the insecure legacy fallback value. ' +
+        'Please provide a unique, cryptographically secure secret.',
+    )
   }
 
-  return secret;
+  return secret
 }
 
 // JWT Configuration
@@ -238,9 +238,9 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
 
   // Validate JWT secret (Unify with ensureJwtSecret behavior - Review suggestion)
   try {
-    ensureJwtSecret();
+    ensureJwtSecret()
   } catch (e: any) {
-    errors.push(e.message);
+    errors.push(e.message)
   }
 
   // Validate Auth0 configuration in production

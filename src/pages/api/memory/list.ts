@@ -7,7 +7,9 @@ import {
   withAuthenticatedMemoryRoute,
 } from './_shared'
 
-export const GET = withAuthenticatedMemoryRoute('listing memories', async ({ request }, user) => {
+export const GET = withAuthenticatedMemoryRoute(
+  'listing memories',
+  async ({ request }, user) => {
     const url = new URL(request.url)
     const { limit, offset } = parsePagination(url)
     const requestedUserId = url.searchParams.get('userId')
@@ -36,4 +38,5 @@ export const GET = withAuthenticatedMemoryRoute('listing memories', async ({ req
         total: result.total,
       },
     })
-})
+  },
+)

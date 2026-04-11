@@ -75,10 +75,7 @@ export class SealPatternRecognitionService implements FHEService {
   /**
    * Encrypt data using SEAL
    */
-  async encrypt<T>(
-    value: T,
-    options?: unknown,
-  ): Promise<EncryptedData> {
+  async encrypt<T>(value: T, options?: unknown): Promise<EncryptedData> {
     return this.enhancedService.encrypt(value, options)
   }
 
@@ -656,8 +653,7 @@ export class SealPatternRecognitionService implements FHEService {
     const patternCount = 1 + Math.floor(Math.random() * 3)
 
     for (let i = 0; i < patternCount; i++) {
-      const type =
-        patternTypes[Math.floor(Math.random() * patternTypes.length)]
+      const type = patternTypes[Math.floor(Math.random() * patternTypes.length)]
       const confidence = threshold + Math.random() * (1 - threshold)
 
       results.push({

@@ -122,12 +122,9 @@ export function sanitizeThreatContext(
     }
 
     // Sanitize string values that might contain sensitive info
-    if (
-      typeof sanitized[key] === 'string' &&
-      (sanitized[key]).length > 100
-    ) {
+    if (typeof sanitized[key] === 'string' && sanitized[key].length > 100) {
       // Truncate long strings to prevent data leakage
-      sanitized[key] = (sanitized[key]).substring(0, 97) + '...'
+      sanitized[key] = sanitized[key].substring(0, 97) + '...'
     }
   })
 

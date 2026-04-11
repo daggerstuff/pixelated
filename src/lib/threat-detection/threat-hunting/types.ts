@@ -44,7 +44,12 @@ export interface ThreatFinding {
  */
 export interface IRedisClient {
   get(key: string): Promise<string | null>
-  set(key: string, value: string, mode?: string, duration?: number): Promise<'OK' | null>
+  set(
+    key: string,
+    value: string,
+    mode?: string,
+    duration?: number,
+  ): Promise<'OK' | null>
   lrange(key: string, start: number, stop: number): Promise<string[]>
   incr(key: string): Promise<number>
   smembers(key: string): Promise<string[]>
@@ -58,7 +63,11 @@ export interface IRedisClient {
 export interface IMongoCollection {
   insertOne(doc: unknown): Promise<unknown>
   insertMany(docs: unknown[]): Promise<unknown>
-  updateOne(filter: unknown, update: unknown, options?: unknown): Promise<unknown>
+  updateOne(
+    filter: unknown,
+    update: unknown,
+    options?: unknown,
+  ): Promise<unknown>
   replaceOne(filter: unknown, doc: unknown, options?: unknown): Promise<unknown>
   deleteMany(filter: unknown): Promise<unknown>
   findOne(filter: unknown): Promise<unknown>
@@ -170,7 +179,15 @@ export interface Investigation {
   title?: string
   description?: string
   type?: string
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'active' | 'in_progress' | 'resolved'
+  status:
+    | 'pending'
+    | 'running'
+    | 'completed'
+    | 'failed'
+    | 'cancelled'
+    | 'active'
+    | 'in_progress'
+    | 'resolved'
   priority: 'low' | 'medium' | 'high' | 'critical'
   assignedTo?: string
   steps: InvestigationStepResult[]

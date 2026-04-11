@@ -259,7 +259,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       if (!acc[category]) {
         acc[category] = []
       }
-      ;(acc[category]).push(stat)
+      acc[category].push(stat)
       return acc
     },
     {} as Record<string, DemographicData[]>,

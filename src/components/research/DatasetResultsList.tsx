@@ -1,5 +1,7 @@
 import React from 'react'
+
 import { type DatasetMetadata } from '@/lib/api/research'
+
 import DatasetCard from './DatasetCard'
 
 interface DatasetResultsListProps {
@@ -10,8 +12,8 @@ interface DatasetResultsListProps {
  * Memoized list of dataset results to prevent unnecessary re-renders
  * when parent state (like search query) changes without affecting the results.
  */
-const DatasetResultsList = React.memo(function DatasetResultsList({ 
-  results 
+const DatasetResultsList = React.memo(function DatasetResultsList({
+  results,
 }: DatasetResultsListProps) {
   if (results.length === 0) return null
 

@@ -350,7 +350,10 @@ export class ThreatValidationSystemCore
         ruleName: 'Threat Structure Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
+        issues: [
+          'Validation error: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        ],
         details: {},
       }
     }
@@ -428,7 +431,10 @@ export class ThreatValidationSystemCore
         ruleName: 'Indicator Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
+        issues: [
+          'Validation error: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        ],
         details: {},
       }
     }
@@ -458,7 +464,9 @@ export class ThreatValidationSystemCore
     } catch (error: unknown) {
       return {
         valid: false,
-        error: 'Format validation error: ' + (error instanceof Error ? error.message : "Unknown error"),
+        error:
+          'Format validation error: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
       }
     }
   }
@@ -626,7 +634,10 @@ export class ThreatValidationSystemCore
         ruleName: 'Attribution Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
+        issues: [
+          'Validation error: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        ],
         details: {},
       }
     }
@@ -693,7 +704,10 @@ export class ThreatValidationSystemCore
         ruleName: 'Metadata Validation',
         passed: false,
         score: 0,
-        issues: ['Validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
+        issues: [
+          'Validation error: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        ],
         details: {},
       }
     }
@@ -718,7 +732,10 @@ export class ThreatValidationSystemCore
           ruleName: rule.name,
           passed: false,
           score: 0,
-          issues: ['Rule execution error: ' + (error instanceof Error ? error.message : "Unknown error")],
+          issues: [
+            'Rule execution error: ' +
+              (error instanceof Error ? error.message : 'Unknown error'),
+          ],
           details: {},
         })
       }
@@ -769,7 +786,10 @@ export class ThreatValidationSystemCore
         ruleName: rule.name,
         passed: false,
         score: 0,
-        issues: ['Rule application error: ' + (error instanceof Error ? error.message : "Unknown error")],
+        issues: [
+          'Rule application error: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        ],
         details: {},
       }
     }
@@ -799,7 +819,9 @@ export class ThreatValidationSystemCore
     } catch (error: unknown) {
       return {
         passed: false,
-        message: 'Condition evaluation error: ' + (error instanceof Error ? error.message : "Unknown error"),
+        message:
+          'Condition evaluation error: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
       }
     }
   }
@@ -996,7 +1018,10 @@ export class ThreatValidationSystemCore
         ruleName: 'Cross-Reference Validation',
         passed: false,
         score: 0,
-        issues: ['Cross-reference validation error: ' + (error instanceof Error ? error.message : "Unknown error")],
+        issues: [
+          'Cross-reference validation error: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        ],
         details: {},
       }
     }

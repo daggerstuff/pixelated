@@ -1,5 +1,6 @@
-import React, { FC, memo } from 'react'
 import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline'
+import React, { FC, memo } from 'react'
+
 import { FadeIn } from '@/components/layout/AdvancedAnimations'
 
 interface ResearchMetrics {

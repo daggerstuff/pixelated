@@ -6,7 +6,9 @@ import {
   withAuthenticatedMemoryRoute,
 } from './_shared'
 
-export const DELETE = withAuthenticatedMemoryRoute('deleting memory', async ({ request }, user) => {
+export const DELETE = withAuthenticatedMemoryRoute(
+  'deleting memory',
+  async ({ request }, user) => {
     const body = await request.json()
     const { memoryId } = body
 
@@ -24,4 +26,5 @@ export const DELETE = withAuthenticatedMemoryRoute('deleting memory', async ({ r
       success: true,
       message: 'Memory deleted successfully',
     })
-})
+  },
+)

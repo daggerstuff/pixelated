@@ -15,7 +15,7 @@ export async function authMiddleware(
   next: NextFunction,
 ): Promise<void> {
   try {
-    // Adapt the Express Request into a standard Web API Request object to support 
+    // Adapt the Express Request into a standard Web API Request object to support
     // the shared `authenticateRequest` function used by both Express and Astro middleware.
     const webApiRequest = new globalThis.Request(
       `${req.protocol}://${req.get('host')}${req.originalUrl || req.url}`,
@@ -47,7 +47,11 @@ export async function authMiddleware(
     next()
   } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Authentication failed'
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Authentication failed'
     res.status(401).json({
       error: errorMessage,
       code: 'AUTH_ERROR',

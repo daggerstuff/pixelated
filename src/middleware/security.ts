@@ -225,7 +225,7 @@ export async function securityMiddleware(
     rateLimitResult.resetTime.toString(),
   )
   responseHeaders.set('X-Rate-Limit-Limit', RATE_LIMITS.maxRequests.toString())
-  ;(context)['securityHeaders'] = responseHeaders
+  context['securityHeaders'] = responseHeaders
 
   return null
 }

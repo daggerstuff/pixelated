@@ -75,7 +75,8 @@ jobs:
       - name: Security scan
         uses: aquasecurity/trivy-action@v0.35.0
         with:
-          image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          image-ref:
+            pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'

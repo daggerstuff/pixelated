@@ -95,7 +95,7 @@ export class PatternDiscoveryService {
           id: `pattern_${index + 1}`,
           description: this.describePattern(p),
           confidence: 'confidence' in p ? (p.confidence as number) : 1,
-          statisticalSignificance: 'pValue' in p ? (p.pValue) : 0.05,
+          statisticalSignificance: 'pValue' in p ? p.pValue : 0.05,
           supportingData: p,
         })),
         metadata: {
@@ -114,7 +114,11 @@ export class PatternDiscoveryService {
     } catch (error: unknown) {
       logger.error('Pattern discovery failed', { error })
       const errorMessage =
-        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Unknown error'
       throw new Error(`Pattern discovery failed: ${errorMessage}`, {
         cause: error,
       })

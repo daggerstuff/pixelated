@@ -23,7 +23,9 @@ class Logger {
       level: 'info',
       enabled: true,
       environment:
-        nodeEnv === 'development' || nodeEnv === 'test' || nodeEnv === 'production'
+        nodeEnv === 'development' ||
+        nodeEnv === 'test' ||
+        nodeEnv === 'production'
           ? nodeEnv
           : 'development',
       ...options,

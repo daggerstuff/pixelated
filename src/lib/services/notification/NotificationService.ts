@@ -188,12 +188,22 @@ export class NotificationService {
     this.templates = new Map()
     this.initializeVAPIDKeys().catch((error) => {
       logger.error('Failed to initialize VAPID keys', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
     })
     this.initializeCrisisTemplate().catch((error) => {
       logger.error('Failed to initialize crisis template', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
     })
   }
@@ -499,9 +509,7 @@ export class NotificationService {
 
     return Object.values(notifications)
       .map((n) =>
-        NotificationItemSchema.parse(
-          JSON.parse(n) as NotificationItem,
-        ),
+        NotificationItemSchema.parse(JSON.parse(n) as NotificationItem),
       )
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(offset, offset + limit)
@@ -520,9 +528,7 @@ export class NotificationService {
 
     return Object.values(notifications)
       .map((n) =>
-        NotificationItemSchema.parse(
-          JSON.parse(n) as NotificationItem,
-        ),
+        NotificationItemSchema.parse(JSON.parse(n) as NotificationItem),
       )
       .filter((n) => n.status !== NotificationStatus.READ).length
   }
@@ -621,7 +627,7 @@ export class NotificationService {
     } catch (error: unknown) {
       if (
         error instanceof Error &&
-        (error)?.name === 'ExpiredSubscriptionError'
+        error?.name === 'ExpiredSubscriptionError'
       ) {
         await this.removePushSubscription(notification.userId)
         logger.info('Removed expired push subscription', {

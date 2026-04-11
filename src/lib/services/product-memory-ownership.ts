@@ -1,7 +1,9 @@
+import { InternalMemoryServiceClient } from '@/lib/server/internal-memory-service-client'
 import {
-  InternalMemoryServiceClient,
-} from '@/lib/server/internal-memory-service-client'
-import { ProductMemoryGatewayError, type ProductMemoryDeleteInput, type ProductMemoryUpdateInput } from '@/lib/services/product-memory-gateway'
+  ProductMemoryGatewayError,
+  type ProductMemoryDeleteInput,
+  type ProductMemoryUpdateInput,
+} from '@/lib/services/product-memory-gateway'
 
 export async function assertOwnedMemoryAccessible(
   client: InternalMemoryServiceClient,
@@ -22,4 +24,3 @@ export async function assertOwnedMemoryAccessible(
     throw new ProductMemoryGatewayError('Memory not found', 404)
   }
 }
-

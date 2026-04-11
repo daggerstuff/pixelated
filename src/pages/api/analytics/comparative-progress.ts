@@ -112,7 +112,7 @@ export const get = async ({ request, cookies }) => {
     // Log the error
     logger.error('Error processing comparative progress request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
     })
 
     // Return error response

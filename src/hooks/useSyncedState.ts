@@ -1,13 +1,20 @@
-import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
-import { useSyncManager } from "@/lib/providers/SyncContext";
-import { deepEqual } from "@/utils/object";
-import type { SyncManager } from "@/lib/providers/SyncContext";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useLayoutEffect,
+} from 'react'
+
+import { useSyncManager } from '@/lib/providers/SyncContext'
+import type { SyncManager } from '@/lib/providers/SyncContext'
+import { deepEqual } from '@/utils/object'
 
 export interface UseSyncedStateOptions<T> {
-  key: string;
-  defaultValue: T;
-  debounceMs?: number;
-  enableSync?: boolean;
+  key: string
+  defaultValue: T
+  debounceMs?: number
+  enableSync?: boolean
   /**
    * Conflict resolution strategy.
    * - 'local-wins' / 'local': Always use local value
@@ -15,15 +22,15 @@ export interface UseSyncedStateOptions<T> {
    * - 'merge': Deep merge objects
    * - 'manual': Use onConflict callback
    */
-  conflictStrategy?: "local-wins" | "remote-wins" | "merge" | "manual";
-  onSync?: (value: T, sourceTabId: string) => void;
+  conflictStrategy?: 'local-wins' | 'remote-wins' | 'merge' | 'manual'
+  onSync?: (value: T, sourceTabId: string) => void
   /**
    * Conflict resolution handler.
    * Signature explicitly expects (key, localValue, remoteValue).
    */
-  onConflict?: (key: string, localValue: T, remoteValue: T) => T;
-  storagePrefix?: string;
-  storageVersion?: number;
+  onConflict?: (key: string, localValue: T, remoteValue: T) => T
+  storagePrefix?: string
+  storageVersion?: number
 }
 
 /**
@@ -31,24 +38,26 @@ export interface UseSyncedStateOptions<T> {
  * Decouples the React component lifecycle from the low-level tab communication protocol.
  */
 class SyncLifecycleManager<T> {
-  private syncManager: SyncManager;
-  private key: string;
-  private enableSync: boolean;
-  private instanceId: string;
-  private conflictStrategy: NonNullable<UseSyncedStateOptions<T>["conflictStrategy"]>;
-  private defaultValue: T;
-  private debounceMs: number;
-  private storageOptions: Record<string, any>;
-  private onSync?: (value: T, sourceTabId: string) => void;
-  private onConflict?: (key: string, localValue: T, remoteValue: T) => T;
+  private syncManager: SyncManager
+  private key: string
+  private enableSync: boolean
+  private instanceId: string
+  private conflictStrategy: NonNullable<
+    UseSyncedStateOptions<T>['conflictStrategy']
+  >
+  private defaultValue: T
+  private debounceMs: number
+  private storageOptions: Record<string, any>
+  private onSync?: (value: T, sourceTabId: string) => void
+  private onConflict?: (key: string, localValue: T, remoteValue: T) => T
 
-  private onStateChange: (value: T) => void;
-  private onStatusChange: (status: "synced" | "offline") => void;
+  private onStateChange: (value: T) => void
+  private onStatusChange: (status: 'synced' | 'offline') => void
 
-  private lastSyncValue: T;
-  private debounceRef: NodeJS.Timeout | null = null;
-  private unsubscribers: Array<() => void> = [];
-  private isInitialized = false;
+  private lastSyncValue: T
+  private debounceRef: NodeJS.Timeout | null = null
+  private unsubscribers: Array<() => void> = []
+  private isInitialized = false
 
   constructor(
     syncManager: SyncManager,
@@ -56,75 +65,86 @@ class SyncLifecycleManager<T> {
     options: UseSyncedStateOptions<T>,
     storageOptions: Record<string, any>,
     onStateChange: (value: T) => void,
-    onStatusChange: (status: "synced" | "offline") => void
+    onStatusChange: (status: 'synced' | 'offline') => void,
   ) {
-    this.syncManager = syncManager;
-    this.instanceId = instanceId;
-    this.key = options.key;
-    this.enableSync = options.enableSync ?? true;
-    this.conflictStrategy = options.conflictStrategy || "remote";
-    this.defaultValue = options.defaultValue;
-    this.debounceMs = options.debounceMs ?? 300;
-    this.storageOptions = storageOptions;
+    this.syncManager = syncManager
+    this.instanceId = instanceId
+    this.key = options.key
+    this.enableSync = options.enableSync ?? true
+    this.conflictStrategy = options.conflictStrategy || 'remote'
+    this.defaultValue = options.defaultValue
+    this.debounceMs = options.debounceMs ?? 300
+    this.storageOptions = storageOptions
 
-    this.onSync = options.onSync;
-    this.onConflict = options.onConflict;
-    this.onStateChange = onStateChange;
-    this.onStatusChange = onStatusChange;
+    this.onSync = options.onSync
+    this.onConflict = options.onConflict
+    this.onStateChange = onStateChange
+    this.onStatusChange = onStatusChange
 
-    this.lastSyncValue = this.defaultValue;
+    this.lastSyncValue = this.defaultValue
   }
 
   updateOptions(
-    options: Pick<UseSyncedStateOptions<T>, "key" | "enableSync" | "conflictStrategy" | "defaultValue" | "debounceMs">,
+    options: Pick<
+      UseSyncedStateOptions<T>,
+      'key' | 'enableSync' | 'conflictStrategy' | 'defaultValue' | 'debounceMs'
+    >,
     storageOptions: Record<string, any>,
     onSync?: (value: T, sourceTabId: string) => void,
-    onConflict?: (key: string, localValue: T, remoteValue: T) => T
+    onConflict?: (key: string, localValue: T, remoteValue: T) => T,
   ) {
-    this.key = options.key;
-    this.enableSync = options.enableSync ?? true;
-    this.conflictStrategy = options.conflictStrategy || "remote";
-    this.defaultValue = options.defaultValue;
-    this.debounceMs = options.debounceMs ?? 300;
-    this.storageOptions = storageOptions;
+    this.key = options.key
+    this.enableSync = options.enableSync ?? true
+    this.conflictStrategy = options.conflictStrategy || 'remote'
+    this.defaultValue = options.defaultValue
+    this.debounceMs = options.debounceMs ?? 300
+    this.storageOptions = storageOptions
 
-    this.onSync = onSync;
-    this.onConflict = onConflict;
+    this.onSync = onSync
+    this.onConflict = onConflict
   }
 
   init() {
-    if (this.isInitialized) return;
-    this.isInitialized = true;
+    if (this.isInitialized) return
+    this.isInitialized = true
 
     // Load initial state
     const storedValue = this.syncManager.getState<T>(
       this.key,
       this.defaultValue,
-      this.storageOptions
-    );
-    const initialValue = storedValue ?? this.defaultValue;
-    this.lastSyncValue = initialValue;
-    this.onStateChange(initialValue);
+      this.storageOptions,
+    )
+    const initialValue = storedValue ?? this.defaultValue
+    this.lastSyncValue = initialValue
+    this.onStateChange(initialValue)
 
     if (this.enableSync && this.syncManager.isAvailable()) {
-      this.syncManager.requestState(this.key);
+      this.syncManager.requestState(this.key)
 
-      const unsubReceived = this.syncManager.on("stateReceived", (data: any) => {
-        if (data.key !== this.key || data.sourceId === this.instanceId) return;
-        this.processIncomingState(data);
-      });
+      const unsubReceived = this.syncManager.on(
+        'stateReceived',
+        (data: any) => {
+          if (data.key !== this.key || data.sourceId === this.instanceId) return
+          this.processIncomingState(data)
+        },
+      )
 
-      const unsubRequest = this.syncManager.on("stateRequest", (data: any) => {
+      const unsubRequest = this.syncManager.on('stateRequest', (data: any) => {
         if (data.key === this.key) {
-          this.syncManager.respondToRequest(this.key, this.lastSyncValue);
+          this.syncManager.respondToRequest(this.key, this.lastSyncValue)
         }
-      });
+      })
 
-      this.unsubscribers.push(unsubReceived, unsubRequest);
+      this.unsubscribers.push(unsubReceived, unsubRequest)
     }
   }
 
-  private processIncomingState(data: { key: string; value: T; tabId: string; sourceId: string }) {
+  private processIncomingState(data: {
+    key: string
+    value: T
+    tabId: string
+    sourceId: string
+  }) {
     const result = this.syncManager.handleIncomingState(
       this.key,
       data.value,
@@ -133,24 +153,24 @@ class SyncLifecycleManager<T> {
       {
         strategy: this.conflictStrategy,
         onConflict: this.onConflict,
-      }
-    );
+      },
+    )
 
     if (result.shouldUpdate) {
-      this.lastSyncValue = result.value;
-      this.onStateChange(result.value);
+      this.lastSyncValue = result.value
+      this.onStateChange(result.value)
 
       if (this.onSync) {
-        this.onSync(result.value, data.tabId);
+        this.onSync(result.value, data.tabId)
       }
     }
 
-    this.onStatusChange("synced");
+    this.onStatusChange('synced')
   }
 
   saveAndSync(value: T) {
     if (this.debounceRef) {
-      clearTimeout(this.debounceRef);
+      clearTimeout(this.debounceRef)
     }
 
     this.debounceRef = setTimeout(() => {
@@ -158,33 +178,33 @@ class SyncLifecycleManager<T> {
         sync: this.enableSync,
         sourceId: this.instanceId,
         storageConfig: this.storageOptions,
-      });
+      })
 
       if (success) {
-        this.lastSyncValue = value;
-        const isSynced = this.enableSync && this.syncManager.isAvailable();
-        this.onStatusChange(isSynced ? "synced" : "offline");
+        this.lastSyncValue = value
+        const isSynced = this.enableSync && this.syncManager.isAvailable()
+        this.onStatusChange(isSynced ? 'synced' : 'offline')
       } else {
-        this.onStatusChange("offline");
+        this.onStatusChange('offline')
       }
-    }, this.debounceMs);
+    }, this.debounceMs)
   }
 
   handleUserUpdate(value: T) {
     if (value !== this.lastSyncValue) {
-      this.saveAndSync(value);
+      this.saveAndSync(value)
     }
   }
 
   cleanup() {
-    this.unsubscribers.forEach(unsub => unsub());
-    this.unsubscribers = [];
+    this.unsubscribers.forEach((unsub) => unsub())
+    this.unsubscribers = []
     if (this.debounceRef) {
-      clearTimeout(this.debounceRef);
-      this.debounceRef = null;
+      clearTimeout(this.debounceRef)
+      this.debounceRef = null
     }
-    this.isInitialized = false;
-    this.lastSyncValue = this.defaultValue;
+    this.isInitialized = false
+    this.lastSyncValue = this.defaultValue
   }
 }
 
@@ -193,47 +213,53 @@ export function useSyncedState<T>({
   defaultValue,
   debounceMs = 300,
   enableSync = true,
-  conflictStrategy = "remote",
+  conflictStrategy = 'remote',
   onSync,
   onConflict,
   ...storageOptions
 }: UseSyncedStateOptions<T>) {
-  const syncManager = useSyncManager();
-  const [state, setState] = useState<T>(defaultValue);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<"synced" | "offline">("synced");
-  const instanceId = useRef<string>();
-if (instanceId.current === undefined) {
-  // Use crypto.randomUUID() for unique, collision-resistant instance IDs
-  instanceId.current = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
-}
+  const syncManager = useSyncManager()
+  const [state, setState] = useState<T>(defaultValue)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'offline'>('synced')
+  const instanceId = useRef<string>()
+  if (instanceId.current === undefined) {
+    // Use crypto.randomUUID() for unique, collision-resistant instance IDs
+    instanceId.current =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2, 11)
+  }
 
   const handleStateChange = useCallback((value: T) => {
-    setState(value);
-  }, []);
+    setState(value)
+  }, [])
 
-  const handleStatusChange = useCallback((status: "synced" | "offline") => {
-    setSyncStatus(status);
-  }, []);
+  const handleStatusChange = useCallback((status: 'synced' | 'offline') => {
+    setSyncStatus(status)
+  }, [])
 
-  const [manager] = useState(() => new SyncLifecycleManager<T>(
-    syncManager,
-    instanceId.current!,
-    {
-      key,
-      defaultValue,
-      debounceMs,
-      enableSync,
-      conflictStrategy,
-    },
-    storageOptions,
-    handleStateChange,
-    handleStatusChange
-  ));
+  const [manager] = useState(
+    () =>
+      new SyncLifecycleManager<T>(
+        syncManager,
+        instanceId.current!,
+        {
+          key,
+          defaultValue,
+          debounceMs,
+          enableSync,
+          conflictStrategy,
+        },
+        storageOptions,
+        handleStateChange,
+        handleStatusChange,
+      ),
+  )
 
-  const prevStorageOptionsRef = useRef(storageOptions);
+  const prevStorageOptionsRef = useRef(storageOptions)
   if (!deepEqual(prevStorageOptionsRef.current, storageOptions)) {
-    prevStorageOptionsRef.current = storageOptions;
+    prevStorageOptionsRef.current = storageOptions
   }
 
   useLayoutEffect(() => {
@@ -241,28 +267,38 @@ if (instanceId.current === undefined) {
       { key, enableSync, conflictStrategy, defaultValue, debounceMs },
       prevStorageOptionsRef.current,
       onSync,
-      onConflict
-    );
-  }, [manager, key, enableSync, conflictStrategy, defaultValue, debounceMs, prevStorageOptionsRef.current, onSync, onConflict]);
+      onConflict,
+    )
+  }, [
+    manager,
+    key,
+    enableSync,
+    conflictStrategy,
+    defaultValue,
+    debounceMs,
+    prevStorageOptionsRef.current,
+    onSync,
+    onConflict,
+  ])
 
   useLayoutEffect(() => {
-    manager.init();
-    setIsLoaded(true);
-    return () => manager.cleanup();
+    manager.init()
+    setIsLoaded(true)
+    return () => manager.cleanup()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [manager, key, enableSync, syncManager]);
+  }, [manager, key, enableSync, syncManager])
 
   const setSyncedState = useCallback((value: T | ((prev: T) => T)) => {
-    setState(value);
-  }, []);
+    setState(value)
+  }, [])
 
   useEffect(() => {
     if (isLoaded) {
-      manager.handleUserUpdate(state);
+      manager.handleUserUpdate(state)
     }
-  }, [manager, state, isLoaded]);
+  }, [manager, state, isLoaded])
 
-  return [state, setSyncedState, isLoaded, syncStatus] as const;
+  return [state, setSyncedState, isLoaded, syncStatus] as const
 }
 
 export function useSyncedObject<T extends Record<string, any>>({
@@ -270,11 +306,11 @@ export function useSyncedObject<T extends Record<string, any>>({
   defaultValue,
   debounceMs = 300,
   enableSync = true,
-  conflictStrategy = "remote",
+  conflictStrategy = 'remote',
   onSync,
   onConflict,
   ...storageOptions
-}: Omit<UseSyncedStateOptions<T>, "defaultValue"> & { defaultValue: T }) {
+}: Omit<UseSyncedStateOptions<T>, 'defaultValue'> & { defaultValue: T }) {
   const [state, setState, isLoaded, syncStatus] = useSyncedState({
     key,
     defaultValue,
@@ -284,30 +320,40 @@ export function useSyncedObject<T extends Record<string, any>>({
     onSync,
     onConflict,
     ...storageOptions,
-  });
+  })
 
   const updateField = useCallback(
     <K extends keyof T>(field: K, value: T[K] | ((prev: T[K]) => T[K])) => {
       setState((prev: T) => ({
         ...prev,
-        [field]: typeof value === "function" ? (value as (prev: T[K]) => T[K])(prev[field]) : value,
-      }));
+        [field]:
+          typeof value === 'function'
+            ? (value as (prev: T[K]) => T[K])(prev[field])
+            : value,
+      }))
     },
     [setState],
-  );
+  )
 
   const removeField = useCallback(
     (field: keyof T) => {
       setState((prev: T) => {
-        const newState = { ...prev };
-        delete newState[field];
-        return newState;
-      });
+        const newState = { ...prev }
+        delete newState[field]
+        return newState
+      })
     },
     [setState],
-  );
+  )
 
-  return [state, setState, updateField, removeField, isLoaded, syncStatus] as const;
+  return [
+    state,
+    setState,
+    updateField,
+    removeField,
+    isLoaded,
+    syncStatus,
+  ] as const
 }
 
-export default useSyncedState;
+export default useSyncedState

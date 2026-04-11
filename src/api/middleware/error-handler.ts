@@ -80,7 +80,7 @@ export function errorHandler(
   // Handle custom AppError
   if (error instanceof AppError) {
     statusCode = error.statusCode
-    message = (error instanceof Error ? error.message : "Unknown error")
+    message = error instanceof Error ? error.message : 'Unknown error'
     code = error.code || 'APP_ERROR'
 
     if (error instanceof ValidationError && error.fields) {

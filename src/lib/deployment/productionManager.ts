@@ -491,7 +491,12 @@ class ProductionManager {
         status: 'fail',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }
     }
   }
@@ -590,7 +595,11 @@ class ProductionManager {
         success: false,
         duration: Date.now() - startTime,
         error:
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown rollback error',
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown rollback error',
       }
     }
   }
