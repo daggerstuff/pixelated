@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi, type Mock } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { authClient } from '@/lib/auth-client'
 
@@ -22,16 +22,15 @@ vi.mock('@/lib/auth-client', () => ({
 describe('RegisterForm', () => {
   const mockSignUp = vi.fn()
   const mockSignInWithOAuth = vi.fn()
+  const mockUseSession = vi.fn<() => { data: null; isPending: boolean; error: null }>(
+    () => ({ data: null, isPending: false, error: null }),
+  )
 
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(authClient.signUp.email as unknown as Mock).mockImplementation(mockSignUp)
-    ;(authClient.signIn.social as unknown as Mock).mockImplementation(
-      mockSignInWithOAuth,
-    )
-    ;(authClient.useSession as unknown as Mock).mockImplementation(() => ({
-      data: null,
-    }))
+    authClient.signUp.email = mockSignUp
+    authClient.signIn.social = mockSignInWithOAuth
+    authClient.useSession = mockUseSession
   })
 
   it('renders the form with proper accessibility attributes', () => {
@@ -76,9 +75,9 @@ describe('RegisterForm', () => {
   })
 
   it('announces loading state to screen readers', async () => {
-    mockSignUp.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100)),
-    )
+    mockSignUp.mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    })
     render(<RegisterForm />)
 
     // Fill out the form

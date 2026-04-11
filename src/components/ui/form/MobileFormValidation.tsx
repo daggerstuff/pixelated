@@ -2,20 +2,27 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 import { isFormField } from './form-validation-types'
 import type {
-  FormValues,
   ValidationRule,
   FormErrors,
   MobileFormValidationProps,
   FormState,
   ValidationResult,
-  FormFieldValidationProps,
 } from './form-validation-types'
+
+function isFormElement(
+  child: React.ReactElement,
+): child is React.ReactElement<
+  React.FormHTMLAttributes<HTMLFormElement>,
+  'form'
+> {
+  return child.type === 'form'
+}
 
 /**
  * Enhanced form validation component optimized for mobile devices
  * Provides real-time validation feedback with improved UX for touch interfaces
  */
-export function MobileFormValidation<T extends FormValues = FormValues>({
+export function MobileFormValidation({
   children,
   onValidationChange,
   validationRules,
@@ -24,10 +31,10 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
   validateOnSubmit = true,
   focusFirstInvalidField = true,
   showErrorSummary = false,
-}: MobileFormValidationProps<T>) {
+}: MobileFormValidationProps<Record<string, string>>) {
   // Strongly typed state
-  const [formState, setFormState] = useState<FormState<T>>({
-    values: {} as T,
+  const [formState, setFormState] = useState<FormState<Record<string, string>>>({
+    values: {},
     errors: {},
     touched: {},
     dirty: {},
@@ -56,7 +63,7 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
 
   // Validate a specific field with proper type inference
   const validateField = useCallback(
-    <K extends keyof T>(name: K, value: T[K]): string => {
+    (name: keyof Record<string, string>, value: string): string => {
       const rules = validationRules[name]
       if (!rules) {
         return ''
@@ -73,24 +80,35 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
     [validationRules],
   )
 
+  const updateErrors = (
+    prevErrors: FormErrors<Record<string, string>>,
+    fieldName: keyof Record<string, string>,
+    message: string,
+  ): FormErrors<Record<string, string>> => {
+    const nextErrors = { ...prevErrors }
+    if (message) {
+      nextErrors[fieldName] = message
+    } else {
+      delete nextErrors[fieldName]
+    }
+    return nextErrors
+  }
+
   // Handle input changes with proper type inference
   const handleChange = useCallback(
     (e: Event) => {
       const { target } = e
-      if (!target || !isFormField(target as Element)) {
+      if (!(target instanceof Element) || !isFormField(target)) {
         return
       }
 
-      const input = target as
-        | HTMLInputElement
-        | HTMLTextAreaElement
-        | HTMLSelectElement
-      const name = input.getAttribute('name')
+      const input = target
+      const { name } = input
       if (!name) {
         return
       }
 
-      const value = input.value as T[keyof T]
+      const value = input.value
 
       // Update form state
       setFormState((prev) => ({
@@ -100,21 +118,16 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
       }))
 
       if (validateOnChange) {
-        const error = validateField(name as keyof T, value)
+        const error = validateField(name, value)
 
         setFormState((prev) => {
-          const newErrors = { ...prev.errors } as Record<string, string>
-          if (error) {
-            newErrors[name] = error
-          } else {
-            delete newErrors[name]
-          }
+          const newErrors = updateErrors(prev.errors, name, error)
 
           const isValid = Object.keys(newErrors).length === 0
 
           return {
             ...prev,
-            errors: newErrors as FormErrors<T>,
+            errors: newErrors,
             isValid,
           }
         })
@@ -138,20 +151,17 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
       }
 
       const { target } = e
-      if (!target || !isFormField(target as Element)) {
+      if (!(target instanceof Element) || !isFormField(target)) {
         return
       }
 
-      const input = target as
-        | HTMLInputElement
-        | HTMLTextAreaElement
-        | HTMLSelectElement
-      const name = input.getAttribute('name')
+      const input = target
+      const { name } = input
       if (!name) {
         return
       }
 
-      const value = input.value as T[keyof T]
+      const value = input.value
 
       // Update touched state
       setFormState((prev) => ({
@@ -159,19 +169,14 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
         touched: { ...prev.touched, [name]: true },
       }))
 
-      const error = validateField(name as keyof T, value)
+      const error = validateField(name, value)
 
       setFormState((prev) => {
-        const newErrors = { ...prev.errors } as Record<string, string>
-        if (error) {
-          newErrors[name] = error
-        } else {
-          delete newErrors[name]
-        }
+        const newErrors = updateErrors(prev.errors, name, error)
 
         return {
           ...prev,
-          errors: newErrors as FormErrors<T>,
+          errors: newErrors,
           isValid: Object.keys(newErrors).length === 0,
         }
       })
@@ -183,8 +188,8 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
   )
 
   // Validate entire form with proper type inference
-  const validateForm = useCallback((): ValidationResult<T> => {
-    const newErrors: FormErrors<T> = {}
+  const validateForm = useCallback((): ValidationResult<Record<string, string>> => {
+    const newErrors: FormErrors<Record<string, string>> = {}
     let isValid = true
 
     if (!formRef.current) {
@@ -199,16 +204,19 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
         return
       }
 
-      const name = input.getAttribute('name')
-      if (!name || !validationRules[name as keyof T]) {
+      const { name } = input
+      if (!name) {
+        return
+      }
+      if (!name || !validationRules[name]) {
         return
       }
 
-      const value = input.value as T[keyof T]
-      const error = validateField(name as keyof T, value)
+      const value = input.value
+      const error = validateField(name, value)
 
       if (error) {
-        newErrors[name as keyof T] = error
+        newErrors[name] = error
         isValid = false
 
         // Update ARIA attributes
@@ -280,9 +288,7 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
         // Notify screen readers
         if (isMobile) {
           const errorCount = Object.keys(errors).length
-          const errorSummary = document.getElementById(
-            'validation-error-summary',
-          ) as HTMLElement
+          const errorSummary = document.getElementById('validation-error-summary')
           if (errorSummary) {
             errorSummary.textContent = `Form has ${errorCount} ${
               errorCount === 1 ? 'error' : 'errors'
@@ -317,70 +323,51 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
     const inputs = form.querySelectorAll('input, textarea, select')
 
     inputs.forEach((input) => {
-      if (!isFormField(input)) {
-        return
-      }
+      if (isFormField(input)) {
+        const { name } = input
+        if (name && validationRules[name]) {
+          input.setAttribute('name', name)
+          input.setAttribute('aria-required', 'true')
+          input.addEventListener('change', handleChange)
+          input.addEventListener('blur', handleBlur)
 
-      const name = input.getAttribute('name')
-      if (!name || !validationRules[name as keyof T]) {
-        return
-      }
-
-      // Add validation attributes
-      const validationProps: FormFieldValidationProps = {
-        name,
-        'aria-required': true,
-        onChange: handleChange as unknown as React.ChangeEventHandler,
-        onBlur: handleBlur as unknown as React.FocusEventHandler,
-      }
-
-      Object.entries(validationProps).forEach(([key, value]) => {
-        if (value !== undefined) {
-          input.setAttribute(key, value.toString())
+          // Enhanced mobile styling
+          if (isMobile) {
+            input.classList.add('mobile-input')
+          }
         }
-      })
-
-      // Enhanced mobile styling
-      if (isMobile) {
-        input.classList.add('mobile-input')
       }
     })
 
     // Clean up
-    return () => {
+      // eslint-disable-next-line consistent-return
+      return () => {
       inputs.forEach((input) => {
-        if (!isFormField(input)) {
-          return
+        if (isFormField(input)) {
+          input.removeEventListener('change', handleChange)
+          input.removeEventListener('blur', handleBlur)
         }
-        input.removeEventListener('change', handleChange)
-        input.removeEventListener('blur', handleBlur)
       })
     }
   }, [validationRules, isMobile, handleChange, handleBlur])
 
   // Clone and enhance form element
-  const enhancedForm = React.Children.map(children, (child) => {
-    if (React.isValidElement(child) && child.type === 'form') {
-      const formChild = child as React.ReactElement<
-        React.FormHTMLAttributes<HTMLFormElement>
-      >
-      return React.cloneElement(formChild, {
-        ...formChild.props,
-        ref: formRef,
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          handleSubmit(e)
-          // Call original onSubmit if it exists
-          if (formChild.props.onSubmit) {
-            formChild.props.onSubmit(e)
-          }
-        },
-        noValidate: true,
-      } as React.FormHTMLAttributes<HTMLFormElement> & {
-        ref: React.RefObject<HTMLFormElement>
-      })
+  const enhancedForm = React.Children.map(
+    children,
+    (child): React.ReactNode => {
+      if (React.isValidElement(child) && isFormElement(child)) {
+        const formChild = child
+        return React.cloneElement(formChild, {
+          onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+            formRef.current = e.currentTarget
+            handleSubmit(e)
+          },
+          noValidate: true,
+        })
+      }
+      return child
     }
-    return child
-  })
+  )
 
   return (
     <>
@@ -404,9 +391,9 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
                   href={`#${field}`}
                   onClick={(e) => {
                     e.preventDefault()
-                    const element = document.querySelector(
+                    const element = document.querySelector<HTMLElement>(
                       `[name="${field}"]`,
-                    ) as HTMLElement
+                    )
                     if (element instanceof HTMLElement) {
                       element.focus()
                       element.scrollIntoView({
@@ -436,7 +423,7 @@ function createRequiredRule<T>(
       if (typeof value === 'string') {
         return value.trim() !== ''
       }
-      return value !== undefined && value !== null
+      return value !== undefined
     },
     message,
   }
@@ -461,11 +448,11 @@ export const ValidationRules = {
   }),
   minLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length >= length,
-    message: message || `Must be at least ${length} characters`,
+    message: message ?? `Must be at least ${length} characters`,
   }),
   maxLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length <= length,
-    message: message || `Must be no more than ${length} characters`,
+    message: message ?? `Must be no more than ${length} characters`,
   }),
   pattern: (regex: RegExp, message: string): ValidationRule => ({
     test: (value) => regex.test(value),
@@ -473,10 +460,10 @@ export const ValidationRules = {
   }),
   match: (fieldName: string, message: string): ValidationRule => ({
     test: (value) => {
-      const matchField = document.querySelector(
+      const matchField = document.querySelector<HTMLInputElement>(
         `[name="${fieldName}"]`,
-      ) as HTMLInputElement
-      return matchField && matchField.value === value
+      )
+      return matchField?.value === value
     },
     message,
   }),

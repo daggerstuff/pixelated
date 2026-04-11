@@ -43,6 +43,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
+    "allowArbitraryExtensions": true,
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
     "types": ["node", "react", "react-dom", "vitest/globals"],

@@ -5,17 +5,55 @@ import { UserRegistration, UserCredentials } from '@/types/user'
 
 const router = Router()
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isUserRegistration = (value: unknown): value is UserRegistration => {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    typeof value['email'] === 'string' &&
+    typeof value['username'] === 'string' &&
+    typeof value['firstName'] === 'string' &&
+    typeof value['lastName'] === 'string' &&
+    typeof value['password'] === 'string'
+  )
+}
+
+const isUserCredentials = (value: unknown): value is UserCredentials =>
+  isRecord(value) &&
+  typeof value['email'] === 'string' &&
+  typeof value['password'] === 'string'
+
+const getStringField = (value: unknown, key: string): string | undefined => {
+  if (!isRecord(value)) {
+    return undefined
+  }
+
+  const field = value[key]
+  return typeof field === 'string' ? field : undefined
+}
+
 // Register new user
 router.post('/register', async (req, res) => {
   try {
-    const userData: UserRegistration = req.body
+    if (!isUserRegistration(req.body)) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid registration payload' },
+      })
+    }
+
+    const userData = req.body
     const result = await AuthService.register(userData)
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: result,
     })
   } catch (error: unknown) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       error: {
         message: error instanceof Error ? error.message : 'Registration failed',
@@ -27,14 +65,21 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
-    const credentials: UserCredentials = req.body
+    if (!isUserCredentials(req.body)) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid login payload' },
+      })
+    }
+
+    const credentials = req.body
     const result = await AuthService.login(credentials)
-    res.json({
+    return res.json({
       success: true,
       data: result,
     })
   } catch (error: unknown) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       error: {
         message: error instanceof Error ? error.message : 'Login failed',
@@ -46,14 +91,21 @@ router.post('/login', async (req, res) => {
 // Refresh token
 router.post('/refresh', async (req, res) => {
   try {
-    const { refreshToken } = req.body
+    const refreshToken = getStringField(req.body, 'refreshToken')
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Refresh token is required' },
+      })
+    }
+
     const tokens = await AuthService.refreshToken(refreshToken)
-    res.json({
+    return res.json({
       success: true,
       data: { tokens },
     })
   } catch (error: unknown) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       error: {
         message:
@@ -66,14 +118,21 @@ router.post('/refresh', async (req, res) => {
 // Logout user
 router.post('/logout', async (req, res) => {
   try {
-    const { userId } = req.body
+    const userId = getStringField(req.body, 'userId')
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'User ID is required' },
+      })
+    }
+
     await AuthService.logout(userId)
-    res.json({
+    return res.json({
       success: true,
       message: 'Logged out successfully',
     })
   } catch (error: unknown) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       error: {
         message: error instanceof Error ? error.message : 'Logout failed',

@@ -99,6 +99,19 @@ import type {
 } from '../lib/auth/auth0-webauthn-service'
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
+function toStringEnvValue(value: unknown): string | undefined {
+  return typeof value === 'string' && value !== '' ? value : undefined
+}
+
+interface Auth0ServiceConfig {
+  domain?: string
+  clientId?: string
+  clientSecret?: string
+  audience?: string
+  managementClientId?: string
+  managementClientSecret?: string
+}
+
 // Initialize Auth0 clients
 let auth0Management: ExtendedManagementClient | null = null
 let auth0Authentication: ExtendedAuthenticationClient | null = null
@@ -108,24 +121,14 @@ let auth0UserInfo: ExtendedUserInfoClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  const config = {
-    domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
-    clientId:
-      process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
-    clientSecret:
-      process.env.AUTH0_CLIENT_SECRET ||
-      import.meta.env.AUTH0_CLIENT_SECRET ||
-      '',
-    audience:
-      process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
-    managementClientId:
-      process.env.AUTH0_MANAGEMENT_CLIENT_ID ||
-      import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID ||
-      '',
-    managementClientSecret:
-      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
-      import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
-      '',
+  const config: Auth0ServiceConfig = {
+    domain: toStringEnvValue(process.env.AUTH0_DOMAIN) ?? toStringEnvValue(import.meta.env.AUTH0_DOMAIN),
+    clientId: toStringEnvValue(process.env.AUTH0_CLIENT_ID) ?? toStringEnvValue(import.meta.env.AUTH0_CLIENT_ID),
+    clientSecret: toStringEnvValue(process.env.AUTH0_CLIENT_SECRET) ?? toStringEnvValue(import.meta.env.AUTH0_CLIENT_SECRET),
+    audience: toStringEnvValue(process.env.AUTH0_AUDIENCE) ?? toStringEnvValue(import.meta.env.AUTH0_AUDIENCE),
+    managementClientId: toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_ID) ?? toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID),
+    managementClientSecret: toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_SECRET) ??
+      toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET),
   }
 
   // Initialize Management Client if config is available
@@ -134,13 +137,13 @@ function initializeAuth0Clients() {
     config.managementClientId &&
     config.managementClientSecret
   ) {
-    if (!auth0Management) {
-      auth0Management = new ManagementClient({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    auth0Management ??=
+      new ManagementClient({
         domain: config.domain,
         clientId: config.managementClientId,
         clientSecret: config.managementClientSecret,
-      })
-    }
+      }) as unknown as ExtendedManagementClient
   } else {
     console.warn(
       'Auth0 Management configuration is incomplete. User management features may not work.',
@@ -149,16 +152,16 @@ function initializeAuth0Clients() {
 
   // Initialize Authentication Client if config is available
   if (config.domain && config.clientId && config.clientSecret) {
-    if (!auth0Authentication) {
-      auth0Authentication = new AuthenticationClient({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    auth0Authentication ??=
+      new AuthenticationClient({
         domain: config.domain,
         clientId: config.clientId,
         clientSecret: config.clientSecret,
-      })
-    }
-    if (!auth0UserInfo) {
-      auth0UserInfo = new UserInfoClient({ domain: config.domain })
-    }
+      }) as unknown as ExtendedAuthenticationClient
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    auth0UserInfo ??=
+      new UserInfoClient({ domain: config.domain }) as ExtendedUserInfoClient
   } else {
     console.warn(
       'Auth0 Authentication configuration is incomplete. Login features will not work.',
@@ -391,7 +394,7 @@ export class Auth0UserService {
       const usersRes = await auth0Management.users.listUsersByEmail({
         email,
       })
-      const users = usersRes.data ?? []
+      const users = (usersRes as unknown as { data: any[] }).data ?? []
 
       if (users.length === 0) {
         return null

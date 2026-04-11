@@ -13,13 +13,17 @@ router.use(authenticateToken)
 // Initialize market data service
 const marketDataService = new MarketDataService()
 
+const getRouteParam = (
+  value: string | string[] | undefined,
+): string | undefined => (typeof value === 'string' && value.length > 0 ? value : undefined)
+
 /**
  * GET /api/market/quote/:symbol
  * Get comprehensive market data for a symbol
  */
 router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params
+    const symbol = getRouteParam(req.params['symbol'])
 
     if (!symbol) {
       return res.status(400).json({
@@ -86,7 +90,7 @@ router.post('/bulk', async (req: AuthenticatedRequest, res) => {
  */
 router.get('/technical/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params
+    const symbol = getRouteParam(req.params['symbol'])
 
     if (!symbol) {
       return res.status(400).json({
@@ -165,7 +169,7 @@ router.get('/economic', async (_req: AuthenticatedRequest, res) => {
  */
 router.get('/sentiment/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params
+    const symbol = getRouteParam(req.params['symbol'])
 
     if (!symbol) {
       return res.status(400).json({

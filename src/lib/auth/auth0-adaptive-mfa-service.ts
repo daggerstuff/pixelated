@@ -54,14 +54,14 @@ function initializeAuth0Management() {
     return
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  auth0Management ??=
+    new ManagementClient({
       domain: auth0Config.domain,
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
     }) as ExtendedManagementClient
-  }
 }
 
 // Initialize the management client

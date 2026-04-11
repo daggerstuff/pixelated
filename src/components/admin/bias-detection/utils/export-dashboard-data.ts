@@ -36,14 +36,15 @@ export type DashboardExportLogger = {
 export function getEnabledExportTypes(
   dataTypes: ExportDataTypes,
 ): ExportDataType[] {
-  return [
+  const allTypes: ExportDataType[] = [
     'summary',
     'alerts',
     'trends',
     'demographics',
     'sessions',
     'recommendations',
-  ].filter((key): key is ExportDataType => dataTypes[key])
+  ]
+  return allTypes.filter((key): key is ExportDataType => dataTypes[key])
 }
 
 function buildEnabledExportTypes(dataTypes: ExportDataTypes): ExportDataType[] {

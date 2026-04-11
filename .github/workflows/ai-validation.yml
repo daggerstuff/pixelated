@@ -5,7 +5,6 @@ permissions:
   actions: read
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   checks: read
   pull-requests: read
   security-events: write

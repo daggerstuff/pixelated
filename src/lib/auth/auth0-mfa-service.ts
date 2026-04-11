@@ -73,7 +73,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-    }) as ExtendedManagementClient
+    }) as unknown as ExtendedManagementClient
   }
 }
 

@@ -56,6 +56,9 @@ export type AuthenticationEvent =
   | `webauthn_authentication_completed_${string}`
   | `webauthn_credential_deleted_${string}`
   | `webauthn_credential_renamed_${string}`
+  | `risk_assessment_${number}`
+  | `role_assigned_${string}`
+  | `role_removed_${string}`
 
 /**
  * Update Phase 6 authentication progress

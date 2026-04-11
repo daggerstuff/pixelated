@@ -28,7 +28,7 @@ jobs:
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -63,7 +63,7 @@ jobs:
           install_components: 'kubectl'
 
       - name: Authenticate to GKE
-        uses: google-github-actions/get-gke-credentials@v2
+        uses: google-github-actions/get-gke-credentials@v3.0.0
         with:
           cluster_name: ${{ secrets['GKE_CLUSTER_NAME_PROD'] ||
             'pixelated-empathy-production' }}
