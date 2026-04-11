@@ -38,16 +38,15 @@ jobs:
             ${{ github.event_name == 'workflow_run' &&
             github.event.workflow_run.head_sha || github.sha }}
 
-      - name: Setup gcloud CLI
-        uses: google-github-actions/auth@v2
+      - name: Authenticate to Google Cloud (OIDC)
+        uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
-          audience: //iam.googleapis.com/${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3.0.1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           install_components: 'kubectl'
