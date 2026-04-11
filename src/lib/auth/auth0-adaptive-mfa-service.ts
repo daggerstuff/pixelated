@@ -259,7 +259,7 @@ export class Auth0AdaptiveMFAService {
       // Update Phase 6 MCP server with risk assessment
       await updatePhase6AuthenticationProgress(
         context.userId,
-        `risk_assessment_${normalizedScore}`,
+        `risk_assessment_${normalizedScore}` as any,
       )
 
       return {

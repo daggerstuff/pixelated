@@ -139,7 +139,7 @@ function initializeAuth0Clients() {
         domain: config.domain,
         clientId: config.managementClientId,
         clientSecret: config.managementClientSecret,
-      })
+      }) as any
     }
   } else {
     console.warn(
@@ -154,7 +154,7 @@ function initializeAuth0Clients() {
         domain: config.domain,
         clientId: config.clientId,
         clientSecret: config.clientSecret,
-      })
+      }) as any
     }
     if (!auth0UserInfo) {
       auth0UserInfo = new UserInfoClient({ domain: config.domain })
@@ -391,7 +391,7 @@ export class Auth0UserService {
       const usersRes = await auth0Management.users.listUsersByEmail({
         email,
       })
-      const users = usersRes.data ?? []
+      const users = (usersRes as any).data ?? usersRes ?? []
 
       if (users.length === 0) {
         return null

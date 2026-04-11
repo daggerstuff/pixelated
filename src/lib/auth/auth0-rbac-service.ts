@@ -280,6 +280,7 @@ export const AUTH0_ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'session_limited_to_30_minutes',
     ],
     isAssignable: false, // Default role for unauthenticated users
+    requiresApproval: false,
   },
 }
 
@@ -441,18 +442,18 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
         // Check if role already exists
         const { data: existingRoles } = await auth0Management.roles.list({
           name_filter: roleName,
-        })
+        } as any)
         const existingRole = existingRoles.find((r) => r.name === roleName)
 
         let _roleId: string
 
         if (!existingRole) {
           // Create new role
-          const { data: createdRole } = await auth0Management.roles.create({
+          const createdRole = await auth0Management.roles.create({
             name: roleName,
             description: roleDef.description,
-          })
-          _roleId = createdRole.id!
+          } as any)
+          _roleId = (createdRole as any).id || (createdRole as any).data?.id!
           console.log(`Created role: ${roleName}`)
         } else {
           _roleId = existingRole.id!
@@ -483,7 +484,7 @@ export async function assignRoleToUser(
 
   try {
     // Get role ID
-    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    const roles = await auth0Management.getRoles({ name_filter: roleName } as any)
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
@@ -491,7 +492,7 @@ export async function assignRoleToUser(
     const roleId = roles[0].id!
 
     // Assign role to user
-    await auth0Management.assignRolestoUser({ id: userId }, { roles: [roleId] })
+    await (auth0Management as any).assignRolestoUser({ id: userId }, { roles: [roleId] })
 
     // Log role assignment
     logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, null, {
@@ -503,7 +504,7 @@ export async function assignRoleToUser(
     // Update Phase 6 MCP server with role assignment progress
     await updatePhase6AuthenticationProgress(
       userId,
-      `role_assigned_${roleName}`,
+      `role_assigned_${roleName}` as any,
     )
   } catch (error: unknown) {
     console.error(`Failed to assign role ${roleName} to user ${userId}:`, error)
@@ -524,7 +525,7 @@ export async function removeRoleFromUser(
 
   try {
     // Get role ID
-    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    const roles = await auth0Management.getRoles({ name_filter: roleName } as any)
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
@@ -532,7 +533,7 @@ export async function removeRoleFromUser(
     const roleId = roles[0].id!
 
     // Remove role from user
-    await auth0Management.removeRolesFromUser(
+    await (auth0Management as any).removeRolesFromUser(
       { id: userId },
       { roles: [roleId] },
     )
@@ -545,7 +546,7 @@ export async function removeRoleFromUser(
     })
 
     // Update Phase 6 MCP server with role removal progress
-    await updatePhase6AuthenticationProgress(userId, `role_removed_${roleName}`)
+    await updatePhase6AuthenticationProgress(userId, `role_removed_${roleName}` as any)
   } catch (error: unknown) {
     console.error(
       `Failed to remove role ${roleName} from user ${userId}:`,

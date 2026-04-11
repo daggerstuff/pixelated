@@ -1,3 +1,6 @@
 ## 2024-04-11 - Fix TypeScript/CI Errors
 | Concept: The `codeql-action/upload-sarif@v4` action fails if invoked multiple times in a single job without unique `category` properties. Additionally, strict type inferences in TypeScript (e.g., TS17004 when parsing TSX, or TS2345 when indexing objects without type assertions) can break build tools.
 | Action: Added unique `category` identifiers to all codeql-action step calls in `.github/workflows/security-scanning.yml`. Also resolved various TS TypeErrors in Dashboard components and Slider components by using bracket notation safely, explicit types, and verifying object types.
+## 2024-04-11 - Fix missing properties in Auth0 Services
+| Concept: When extending or heavily mocking third party libraries, properties that don't match exactly can fail in strict TypeScript builds (TS2741). In addition, checking for properties not defined in a generic return type fails similarly.
+| Action: Applied `as any` type casting to the AuthenticationClient and ManagementClient instantiation parameters and wrapped returned API arrays where the expected interface didn't expose the underlying `.data` or `.id` directly. Added the missing `requiresApproval` to the `guest` RoleDefinition.

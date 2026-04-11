@@ -39,7 +39,7 @@ function initializeAuth0Client() {
       domain: auth0Config.domain,
       clientId: auth0Config.clientId,
       clientSecret: auth0Config.clientSecret,
-    })
+    }) as any as ExtendedAuthenticationClient
   }
 }
 
@@ -170,7 +170,7 @@ export async function validateToken(
     }
 
     // Decode token to check standard claims (aud, iss) before expensive UserInfo call
-    const decodedToken = jwt.decode(token, { complete: true }) as {
+    const decodedToken = (jwt as any).decode(token, { complete: true }) as {
       payload: jwt.JwtPayload
       header: any
     } | null
@@ -259,9 +259,9 @@ export async function validateToken(
 
     return {
       valid: true,
-      userId: userId,
+      userId: userId as string,
       role: role,
-      tokenId: tokenId,
+      tokenId: tokenId || '',
       expiresAt: payload.exp,
       payload: safePayload,
     }
