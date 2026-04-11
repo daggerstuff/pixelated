@@ -227,7 +227,7 @@ describe('Middleware Error Scenarios', () => {
       throw new Error('Auth service unavailable')
     })
 
-    expect(() =>
+    await expect(
       mockAuthMiddleware(mockRequest, mockResponse, vi.fn()),
     ).rejects.toThrow()
   })

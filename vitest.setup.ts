@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { vi } from 'vitest'
 
+const reactCompat = React as typeof React & {
+  act?: (callback: () => void | Promise<void>) => Promise<void>
+}
+
 // React 19 compatibility: polyfill React.act for react-dom-test-utils
-if (!React.act || typeof React.act !== 'function') {
+if (!reactCompat.act || typeof reactCompat.act !== 'function') {
   const act = (callback: () => void | Promise<void>): Promise<void> => {
     const result = callback()
     if (result && typeof result === 'object' && 'then' in result) {
@@ -23,7 +27,7 @@ if (!React.act || typeof React.act !== 'function') {
     return Promise.resolve()
   }
   try {
-    Object.defineProperty(React, 'act', {
+    Object.defineProperty(reactCompat, 'act', {
       value: act,
       writable: true,
       configurable: true,
