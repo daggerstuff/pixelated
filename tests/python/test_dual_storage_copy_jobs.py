@@ -194,7 +194,7 @@ def test_build_copy_plan_supports_explicit_host_bucket_template_override() -> No
         target="s3",
         include_salvage=False,
         s3_bucket="pixel-data",
-        s3_region="nyc3",
+        s3_region="hel1",
         s3_endpoint="hel1.your-objectstorage.com",
         s3_host_bucket_template="%(bucket)s.hel1.your-objectstorage.com",
         s3cmd_config_path="/tmp/pixel-data.s3cfg",
