@@ -582,6 +582,19 @@ export async function authenticateRequest(request: Request): Promise<{
   // services see it. resolveIdentity() does a Redis cache lookup first,
   // then falls back to Postgres. On first login it creates the mapping.
   const auth0Sub = validation.userId!
+  const email =
+    typeof validation.payload?.email === 'string' ? validation.payload.email : ''
+  const emailVerified = validation.payload?.email_verified === true
+  const name =
+    typeof validation.payload?.name === 'string'
+      ? validation.payload.name
+      : undefined
+  const picture =
+    typeof validation.payload?.picture === 'string'
+      ? validation.payload.picture
+      : undefined
+  const sid =
+    typeof validation.payload?.sid === 'string' ? validation.payload.sid : undefined
 
   const { resolveIdentity } = await import('./user-identity')
 
@@ -592,10 +605,10 @@ export async function authenticateRequest(request: Request): Promise<{
     identity = await resolveIdentity({
       sub: auth0Sub,
       // These fields are sourced from the validated token payload where available
-      email: validation.payload?.email ?? '',
-      emailVerified: validation.payload?.email_verified ?? false,
-      name: validation.payload?.name,
-      picture: validation.payload?.picture,
+      email,
+      emailVerified,
+      name,
+      picture,
       role: validation.role as string | undefined,
     })
   } catch (resolveError) {
@@ -667,7 +680,6 @@ export async function authenticateRequest(request: Request): Promise<{
   const hasMFA = await auth0UserService.userHasMFA(auth0Sub)
 
   // Device/Session Binding Check
-  const sid = validation.payload?.sid
   if (sid) {
     const { getFromCache, setInCache } = await import('../redis')
     const bindingKey = `session_binding:${identity.internalId}:${sid}`

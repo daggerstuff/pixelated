@@ -419,9 +419,7 @@ export class PythonBiasDetectionBridge {
             validity: dq['validity'] ?? 1,
             missingDataByDemographic: dq['missingDataByDemographic'] ?? {},
           },
-          detectedBiases: layerResult.detected_biases ?? [
-            'service_unavailable',
-          ],
+          detectedBiases: layerResult.detected_biases ?? ['service_unavailable'],
           recommendations: layerResult.recommendations ?? [
             'Python service unavailable - using fallback analysis',
           ],
@@ -551,6 +549,7 @@ export class PythonBiasDetectionBridge {
             demographicBreakdown: performance['demographic_breakdown'] ?? {},
           },
           groupPerformanceComparison: groupComp,
+          detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
         }
       }
@@ -593,6 +592,7 @@ export class PythonBiasDetectionBridge {
           },
           featureImportance: featureImp,
           whatIfScenarios: whatIf,
+          detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
         }
       }
@@ -652,6 +652,7 @@ export class PythonBiasDetectionBridge {
             interventionEffectiveness:
               temporal['intervention_effectiveness'] ?? [],
           },
+          detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
         }
       }
@@ -692,6 +693,7 @@ export class PythonBiasDetectionBridge {
         demographicBreakdown: {},
       },
       groupPerformanceComparison: [],
+      detectedBiases: ['service_unavailable'],
       recommendations: [
         'Model-level analysis unavailable; using fallback results',
       ],
@@ -716,6 +718,7 @@ export class PythonBiasDetectionBridge {
       },
       featureImportance: [],
       whatIfScenarios: [],
+      detectedBiases: ['service_unavailable'],
       recommendations: [
         'Interactive analysis unavailable; using fallback results',
       ],
@@ -751,6 +754,7 @@ export class PythonBiasDetectionBridge {
         seasonalPatterns: [],
         interventionEffectiveness: [],
       },
+      detectedBiases: ['service_unavailable'],
       recommendations: [
         'Evaluation analysis unavailable; using fallback results',
       ],
