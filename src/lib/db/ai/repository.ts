@@ -14,13 +14,10 @@ import type {
   ResponseGenerationResult,
   SentimentAnalysisResult,
 } from "./types";
-let mongodb:
-  | {
-      connect: () => Promise<{ getDb: () => any }>
-      getDb: () => any
-    }
-  | null
-  | unknown = null;
+let mongodb: {
+  connect: () => Promise<{ getDb: () => any }>
+  getDb: () => any
+} | null = null;
 let ObjectId: typeof import("mongodb").ObjectId | undefined;
 
 if (typeof window === "undefined") {
