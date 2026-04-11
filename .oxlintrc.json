@@ -55,6 +55,7 @@
     "react-hooks/exhaustive-deps": "off",
     "vitest/expect-expect": "off",
     "vitest/no-conditional-expect": "off",
+    "vitest/require-mock-type-parameters": "off",
     "vitest/require-to-throw-message": "off",
     "vitest/hoisted-apis-on-top": "off",
     "jest/require-to-throw-message": "off",

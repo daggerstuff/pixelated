@@ -46,67 +46,34 @@ vi.mock('ioredis', () => {
 
 vi.mock('mongodb', () => {
   return {
-    MongoClient: vi.fn<
-      (..._args: unknown[]) => {
-        connect: () => Promise<void>
-        db: () => {
-          collection: () => {
-            insertOne: () => Promise<{ insertedId: string }>
-            updateOne: () => Promise<{ modifiedCount: number }>
-            findOne: () => Promise<unknown | null>
-            find: () => {
-              toArray: () => Promise<unknown[]>
-              sort: () => {
-                toArray: () => Promise<unknown[]>
-              }
-              limit: () => {
-                toArray: () => Promise<unknown[]>
-              }
-            }
-            aggregate: () => {
-              toArray: () => Promise<unknown[]>
-            }
-          }
-          admin: () => {
-            ping: () => Promise<boolean>
-          }
-        }
-        close: () => Promise<void>
-      }
-    >(() => ({
+    MongoClient: vi.fn(() => ({
       connect: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
-      db: vi.fn<() => {
-        return {
-          collection: vi.fn<() => {
-            return {
-              insertOne: vi.fn<() => Promise<{ insertedId: string }>>().mockResolvedValue(
-                { insertedId: 'test-id' },
-              ),
-              updateOne: vi.fn<() => Promise<{ modifiedCount: number }>>().mockResolvedValue(
-                { modifiedCount: 1 },
-              ),
-              findOne: vi.fn<() => Promise<null>>().mockResolvedValue(null),
-              find: vi.fn<() => {
-                return {
-                  toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
-                  sort: vi.fn<() => { toArray: () => Promise<unknown[]> }>().mockReturnValue({
-                    toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
-                  }),
-                  limit: vi.fn<() => { toArray: () => Promise<unknown[]> }>().mockReturnValue({
-                    toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
-                  }),
-                }
-              }),
-              aggregate: vi.fn<() => { toArray: () => Promise<unknown[]> }>().mockReturnValue({
-                toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
-              }),
-            }
+      db: vi.fn(() => ({
+        collection: vi.fn(() => ({
+          insertOne: vi.fn<() => Promise<{ insertedId: string }>>().mockResolvedValue({
+            insertedId: 'test-id',
           }),
-          },
-        admin: vi.fn<() => { ping: () => Promise<boolean> }>().mockReturnValue({
+          updateOne: vi.fn<() => Promise<{ modifiedCount: number }>>().mockResolvedValue({
+            modifiedCount: 1,
+          }),
+          findOne: vi.fn<() => Promise<null>>().mockResolvedValue(null),
+          find: vi.fn(() => ({
+            toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+            sort: vi.fn(() => ({
+              toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+            })),
+            limit: vi.fn(() => ({
+              toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+            })),
+          })),
+          aggregate: vi.fn(() => ({
+            toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+          })),
+        })),
+        admin: vi.fn(() => ({
           ping: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
-        }),
-      }),
+        })),
+      })),
       close: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
     })),
   }
