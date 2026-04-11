@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, type Request } from 'express'
 import { Pool } from 'pg'
 
 import { uploadConfig } from '../middleware/upload.js'
@@ -20,6 +20,40 @@ interface FileMetadata {
   isPublic: boolean
   tags: string[]
   metadata: Record<string, unknown>
+}
+
+interface FileRecord {
+  id: string
+  original_name: string
+  file_name: string
+  mime_type: string
+  size: number
+  url: string
+  thumbnail_url?: string | null
+  uploaded_by: string
+  uploaded_at: Date
+  folder_id?: string | null
+  version: number
+  is_public: boolean
+  tags?: string[] | null
+  metadata?: Record<string, unknown> | null
+}
+
+interface UploadFileVersionBody {
+  originalFileId?: string
+  changes?: string
+}
+
+interface PresignedUploadBody {
+  fileName?: string
+  mimeType?: string
+  folder?: string
+  isPublic?: boolean | string
+}
+
+interface CreateFolderBody {
+  name: string
+  parentId?: string
 }
 
 const router = Router()
@@ -56,6 +90,49 @@ const parseStringArrayQuery = (value: unknown): string[] => {
   return []
 }
 
+const parseBoolean = (value: unknown, fallback = false): boolean => {
+  if (typeof value === 'boolean') {
+    return value
+  }
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true'
+  }
+  return fallback
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.getPrototypeOf(value) === Object.prototype
+  )
+}
+
+const toRecord = (value: unknown): Record<string, unknown> => {
+  if (isRecord(value)) {
+    return value
+  }
+  return {}
+}
+
+const fileRecordToMetadata = (row: FileRecord): FileMetadata => ({
+  id: row.id,
+  originalName: row.original_name,
+  fileName: row.file_name,
+  mimeType: row.mime_type,
+  size: row.size,
+  url: row.url,
+  thumbnailUrl: row.thumbnail_url ?? undefined,
+  uploadedBy: row.uploaded_by,
+  uploadedAt: row.uploaded_at,
+  folderId: row.folder_id ?? undefined,
+  version: row.version,
+  isPublic: row.is_public,
+  tags: row.tags ?? [],
+  metadata: toRecord(row.metadata),
+})
+
 export function createFileRoutes(db: Pool) {
   const fileStorage = new FileStorageService()
   const versioningService = new DocumentVersioningService(db)
@@ -64,19 +141,22 @@ export function createFileRoutes(db: Pool) {
   router.post(
     '/upload',
     uploadConfig.businessFiles.single('file'),
-    async (req, res) => {
+    async (
+      req: Request<Record<string, string>, unknown, UploadFileVersionBody>,
+      res,
+    ) => {
       try {
         if (!req.file) {
           return res.status(400).json({ error: 'No file provided' })
         }
 
-        const userId = req.user?.id || 'anonymous'
+        const userId = req.user?.id ?? 'anonymous'
         const { originalFileId, changes } = req.body
 
         const result = await versioningService.createFileVersion(
           req.file,
           userId,
-          originalFileId || undefined,
+          originalFileId,
           changes,
         )
 
@@ -98,32 +178,39 @@ export function createFileRoutes(db: Pool) {
   )
 
   // Get presigned upload URL
-  router.post('/presigned-upload', async (req, res) => {
-    try {
-      const { fileName, mimeType, folder, isPublic = false } = req.body
-      const userId = req.user?.id || 'anonymous'
+  router.post(
+    '/presigned-upload',
+    async (
+      req: Request<Record<string, string>, unknown, PresignedUploadBody>,
+      res,
+    ) => {
+      try {
+        const { fileName, mimeType, folder, isPublic = false } = req.body
+        const userId = req.user?.id ?? 'anonymous'
+        const isPublicFlag = parseBoolean(isPublic)
 
       const presignedUrl = await fileStorage.getPresignedUploadUrl(
-        fileName,
-        mimeType,
+        fileName ?? '',
+        mimeType ?? '',
         userId,
         {
           folder,
-          isPublic,
+          isPublic: isPublicFlag,
         },
       )
 
       return res.json(presignedUrl)
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error instanceof Error
-            ? error.message
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
             : 'Unknown error'
-          : 'Unknown error'
-      return res.status(500).json({ error: message })
+        return res.status(500).json({ error: message })
+      }
     }
-  })
+  )
 
   // Get file version history
   router.get('/:fileId/versions', async (req, res) => {
@@ -132,7 +219,7 @@ export function createFileRoutes(db: Pool) {
       if (!fileId) {
         return res.status(400).json({ error: 'File ID is required' })
       }
-      const userId = req.user?.id || 'anonymous'
+      const userId = req.user?.id ?? 'anonymous'
 
       const history = await versioningService.getVersionHistory(fileId)
 
@@ -234,7 +321,7 @@ export function createFileRoutes(db: Pool) {
       if (!fileId || !version) {
         return res.status(400).json({ error: 'File ID and version are required' })
       }
-      const userId = req.user?.id || 'anonymous'
+      const userId = req.user?.id ?? 'anonymous'
       const versionNumber = parseInt(version, 10)
       if (Number.isNaN(versionNumber)) {
         return res.status(400).json({ error: 'Invalid version number' })
@@ -269,14 +356,14 @@ export function createFileRoutes(db: Pool) {
       if (!fileId || !version) {
         return res.status(400).json({ error: 'File ID and version are required' })
       }
-      const userId = req.user?.id || 'anonymous'
+      const userId = req.user?.id ?? 'anonymous'
       const versionNumber = parseInt(version, 10)
       if (Number.isNaN(versionNumber)) {
         return res.status(400).json({ error: 'Invalid version number' })
       }
 
       // Check if user has permission to delete
-      const fileResult = await db.query(
+      const fileResult = await db.query<{ uploaded_by: string }>(
         'SELECT uploaded_by FROM files WHERE id = $1',
         [fileId],
       )
@@ -303,10 +390,15 @@ export function createFileRoutes(db: Pool) {
   })
 
   // Create folder
-  router.post('/folders', async (req, res) => {
+  router.post(
+    '/folders',
+    async (req: Request<Record<string, string>, unknown, CreateFolderBody>, res) => {
     try {
       const { name, parentId } = req.body
-      const userId = req.user?.id || 'anonymous'
+      if (!name) {
+        return res.status(400).json({ error: 'Folder name is required' })
+      }
+      const userId = req.user?.id ?? 'anonymous'
 
       const folderId = await versioningService.createFolder(
         name,
@@ -336,7 +428,7 @@ export function createFileRoutes(db: Pool) {
       if (!folderId) {
         return res.status(400).json({ error: 'Folder ID is required' })
       }
-      const userId = req.user?.id || 'anonymous'
+      const userId = req.user?.id ?? 'anonymous'
 
       const contents = await versioningService.getFolderContents(
         folderId,
@@ -386,24 +478,10 @@ export function createFileRoutes(db: Pool) {
       query += ` ORDER BY f.uploaded_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`
       params.push(limit, offset)
 
-      const result = await db.query(query, params)
-
-      const files: FileMetadata[] = result.rows.map((row) => ({
-        id: row.id,
-        originalName: row.original_name,
-        fileName: row.file_name,
-        mimeType: row.mime_type,
-        size: row.size,
-        url: row.url,
-        thumbnailUrl: row.thumbnail_url,
-        uploadedBy: row.uploaded_by,
-        uploadedAt: row.uploaded_at,
-        folderId: row.folder_id,
-        version: row.version,
-        isPublic: row.is_public,
-        tags: row.tags || [],
-        metadata: row.metadata || {},
-      }))
+      const result = await db.query<FileRecord>(query, params)
+      const files: FileMetadata[] = result.rows.map((row) =>
+        fileRecordToMetadata(row),
+      )
 
       return res.json(files)
     } catch (error: unknown) {
@@ -451,24 +529,10 @@ export function createFileRoutes(db: Pool) {
       query += ` ORDER BY f.uploaded_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`
       params.push(limit, offset)
 
-      const result = await db.query(query, params)
-
-      const files: FileMetadata[] = result.rows.map((row) => ({
-        id: row.id,
-        originalName: row.original_name,
-        fileName: row.file_name,
-        mimeType: row.mime_type,
-        size: row.size,
-        url: row.url,
-        thumbnailUrl: row.thumbnail_url,
-        uploadedBy: row.uploaded_by,
-        uploadedAt: row.uploaded_at,
-        folderId: row.folder_id,
-        version: row.version,
-        isPublic: row.is_public,
-        tags: row.tags || [],
-        metadata: row.metadata || {},
-      }))
+      const result = await db.query<FileRecord>(query, params)
+      const files: FileMetadata[] = result.rows.map((row) =>
+        fileRecordToMetadata(row),
+      )
 
       return res.json(files)
     } catch (error: unknown) {
