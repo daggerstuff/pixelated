@@ -46,10 +46,10 @@ jobs:
     # For issues: only on open/reopen
     # For comments: only if user types @gemini-cli and is OWNER/MEMBER/COLLABORATOR
     if: |-
-      ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false ) || 
-      ( github.event_name == 'issues' && contains(fromJSON('["opened", "reopened"]'), github.event.action) ) || 
-      ( github.event.sender.type == 'User' && startsWith(github.event.comment.body || github.event.review.body || github.event.issue.body, '@gemini-cli') && 
-      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association || github.event.review.author_association || github.event.issue.author_association) )
+      ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false ) ||
+      ( github.event_name == 'issues' && contains(fromJSON('["opened", "reopened"]'), github.event.action) ) ||
+      ( github.event.sender.type == 'User' && startsWith(github.event.comment.body || github.event.review.body || github.event.issue.body || '', '@gemini-cli') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association || github.event.review.author_association || github.event.issue.author_association || '') )
     runs-on: 'ubuntu-latest'
     permissions:
       contents: 'read'
@@ -57,9 +57,11 @@ jobs:
       pull-requests: 'write'
     outputs:
       command: '${{ steps.extract_command.outputs.command }}'
-      request: '${{ steps.extract_command.outputs.request }}'
       additional_context:
         '${{ steps.extract_command.outputs.additional_context }}'
+      has_gemini_auth: '${{ steps.validate_gemini_auth.outputs.has_gemini_auth }}'
+      auth_validation_error:
+        '${{ steps.validate_gemini_auth.outputs.auth_validation_error }}'
       issue_number:
         '${{ github.event.pull_request.number || github.event.issue.number }}'
     steps:
@@ -75,30 +77,84 @@ jobs:
         with:
           script: |
             const eventType = process.env.EVENT_TYPE;
-            const request = process.env.REQUEST;
-            core.setOutput('request', request);
+            const request = (process.env.REQUEST || '').replace(/\r?\n/g, ' ').trim();
+            const sanitize = (value) =>
+              (value || '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 4000);
+            const commandMatch = request.match(/^@gemini-cli\s*\/([a-zA-Z-]+)\s*(.*)$/i);
+
+            core.setOutput('command', '');
+            core.setOutput('additional_context', '');
             if (eventType === 'pull_request.opened') {
               core.setOutput('command', 'review');
             } else if (['issues.opened', 'issues.reopened'].includes(eventType)) {
               core.setOutput('command', 'triage');
-            } else if (request.startsWith("@gemini-cli /review")) {
-              core.setOutput('command', 'review');
-              const additionalContext = request.replace(/^@gemini-cli \/review/, '').trim();
-              core.setOutput('additional_context', additionalContext);
-            } else if (request.startsWith("@gemini-cli /triage")) {
-              core.setOutput('command', 'triage');
-            } else if (request.startsWith("@gemini-cli /approve")) {
-              core.setOutput('command', 'approve');
+            } else if (commandMatch) {
+              const verb = (commandMatch[1] || '').toLowerCase();
+              const context = sanitize(commandMatch[2] || '');
+              if (verb === 'review') {
+                core.setOutput('command', 'review');
+                core.setOutput('additional_context', context);
+              } else if (verb === 'triage') {
+                core.setOutput('command', 'triage');
+              } else if (verb === 'approve') {
+                core.setOutput('command', 'approve');
+              } else if (verb.length > 0) {
+                core.setOutput('command', 'invoke');
+                core.setOutput('additional_context', `${verb} ${context}`.trim());
+              }
             } else if (request.startsWith("@gemini-cli")) {
-              const additionalContext = request.replace(/^@gemini-cli/, '').trim();
               core.setOutput('command', 'invoke');
-              core.setOutput('additional_context', additionalContext);
             } else {
               core.setOutput('command', '');
             }
-      - name: 'Acknowledge request'
+
+      - name: 'Validate Gemini auth configuration'
+        id: 'validate_gemini_auth'
         if: |-
           ${{ steps.extract_command.outputs.command != '' }}
+        env:
+          HAS_GEMINI_API_KEY: "${{ secrets.GEMINI_API_KEY != '' }}"
+          HAS_GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY != '' }}"
+          HAS_GCP_WIF_PROVIDER: "${{ vars.GCP_WIF_PROVIDER != '' }}"
+          HAS_GCP_PROJECT: "${{ vars.GOOGLE_CLOUD_PROJECT != '' }}"
+          HAS_GCP_SERVICE_ACCOUNT: "${{ vars.SERVICE_ACCOUNT_EMAIL != '' }}"
+        run: |-
+          set -euo pipefail
+          auth_methods=0
+
+          if [ "${HAS_GEMINI_API_KEY}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+          if [ "${HAS_GOOGLE_API_KEY}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${HAS_GCP_WIF_PROVIDER}" = 'true' ]; then
+            if [ "${HAS_GCP_PROJECT}" != 'true' ] || [ "${HAS_GCP_SERVICE_ACCOUNT}" != 'true' ]; then
+              echo 'has_gemini_auth=false' >> "${GITHUB_OUTPUT}"
+              echo 'auth_validation_error=Gemini WIF configuration is incomplete. Configure vars.GCP_WIF_PROVIDER, vars.GOOGLE_CLOUD_PROJECT, and vars.SERVICE_ACCOUNT_EMAIL together.' >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${auth_methods}" -eq 0 ]; then
+            echo 'has_gemini_auth=false' >> "${GITHUB_OUTPUT}"
+            echo 'auth_validation_error=No Gemini authentication configured. Set one of: secrets.GEMINI_API_KEY, secrets.GOOGLE_API_KEY, or vars.GCP_WIF_PROVIDER + vars.GOOGLE_CLOUD_PROJECT + vars.SERVICE_ACCOUNT_EMAIL.' >> "${GITHUB_OUTPUT}"
+          elif [ "${auth_methods}" -gt 1 ]; then
+            echo 'has_gemini_auth=false' >> "${GITHUB_OUTPUT}"
+            echo 'auth_validation_error=Gemini auth is ambiguous. Set exactly one method: GEMINI_API_KEY, GOOGLE_API_KEY, or WIF vars.' >> "${GITHUB_OUTPUT}"
+          else
+            echo 'has_gemini_auth=true' >> "${GITHUB_OUTPUT}"
+            echo 'auth_validation_error=' >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: 'Acknowledge request'
+        if: |-
+          ${{ steps.extract_command.outputs.command != '' && steps.validate_gemini_auth.outputs.has_gemini_auth == 'true' }}
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN || github.token }}'
           ISSUE_NUMBER:
@@ -109,10 +165,30 @@ jobs:
           REPOSITORY: '${{ github.repository }}'
         run: |-
           gh issue comment "${ISSUE_NUMBER}" --body "${MESSAGE}" --repo "${REPOSITORY}"
+
+      - name: 'Notify auth config error'
+        if: |-
+          ${{ steps.extract_command.outputs.command != '' && steps.validate_gemini_auth.outputs.has_gemini_auth != 'true' }}
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN || github.token }}'
+          ISSUE_NUMBER:
+            '${{ github.event.pull_request.number || github.event.issue.number
+            }}'
+          MESSAGE: |-
+            ⚠️ I can't run this Gemini request yet. Error: `${{ steps.validate_gemini_auth.outputs.auth_validation_error || 'Gemini authentication is not configured' }}`
+            Configure one authentication method in repository secrets/vars:
+            - secrets.GEMINI_API_KEY
+            - secrets.GOOGLE_API_KEY
+            - vars.GCP_WIF_PROVIDER + vars.GOOGLE_CLOUD_PROJECT + vars.SERVICE_ACCOUNT_EMAIL
+            (use exactly one method).
+          REPOSITORY: '${{ github.repository }}'
+        run: |-
+          gh issue comment "${ISSUE_NUMBER}" --body "${MESSAGE}" --repo "${REPOSITORY}"
+
   review:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'review' }}
+      ${{ needs.dispatch.outputs.command == 'review' && needs.dispatch.outputs.has_gemini_auth == 'true' }}
     uses: ./.github/workflows/gemini-review.yml
     permissions:
       contents: 'read'
@@ -125,7 +201,7 @@ jobs:
   triage:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'triage' }}
+      ${{ needs.dispatch.outputs.command == 'triage' && needs.dispatch.outputs.has_gemini_auth == 'true' }}
     uses: ./.github/workflows/gemini-triage.yml
     permissions:
       contents: 'read'
@@ -138,7 +214,7 @@ jobs:
   invoke:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'invoke' }}
+      ${{ needs.dispatch.outputs.command == 'invoke' && needs.dispatch.outputs.has_gemini_auth == 'true' }}
     uses: ./.github/workflows/gemini-invoke.yml
     permissions:
       contents: 'read'
@@ -151,7 +227,7 @@ jobs:
   plan-execute:
     needs: 'dispatch'
     if: |-
-      ${{ needs.dispatch.outputs.command == 'approve' }}
+      ${{ needs.dispatch.outputs.command == 'approve' && needs.dispatch.outputs.has_gemini_auth == 'true' }}
     uses: ./.github/workflows/gemini-plan-execute.yml
     permissions:
       contents: 'write'

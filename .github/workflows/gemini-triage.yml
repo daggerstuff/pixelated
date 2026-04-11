@@ -52,10 +52,50 @@ jobs:
             core.setOutput('available_labels', labelNames.join(','));
             core.info(`Found ${labelNames.length} labels: ${labelNames.join(', ')}`);
             return labelNames;
+      - name: 'Validate Gemini auth configuration'
+        id: 'validate_gemini_auth'
+        if: |-
+          ${{ steps.get_labels.outputs.available_labels != '' }}
+        env:
+          HAS_GEMINI_API_KEY: "${{ secrets.GEMINI_API_KEY != '' }}"
+          HAS_GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY != '' }}"
+          HAS_GCP_WIF_PROVIDER: "${{ vars.GCP_WIF_PROVIDER != '' }}"
+          HAS_GCP_PROJECT: "${{ vars.GOOGLE_CLOUD_PROJECT != '' }}"
+          HAS_GCP_SERVICE_ACCOUNT: "${{ vars.SERVICE_ACCOUNT_EMAIL != '' }}"
+        run: |-
+          set -euo pipefail
+          auth_methods=0
+
+          if [ "${HAS_GEMINI_API_KEY}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+          if [ "${HAS_GOOGLE_API_KEY}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${HAS_GCP_WIF_PROVIDER}" = 'true' ]; then
+            if [ "${HAS_GCP_PROJECT}" != 'true' ] || [ "${HAS_GCP_SERVICE_ACCOUNT}" != 'true' ]; then
+              echo 'has_gemini_auth=false' >> "${GITHUB_OUTPUT}"
+              echo 'auth_validation_error=Gemini WIF configuration is incomplete. Configure vars.GCP_WIF_PROVIDER, vars.GOOGLE_CLOUD_PROJECT, and vars.SERVICE_ACCOUNT_EMAIL together.' >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${auth_methods}" -eq 0 ]; then
+            echo 'has_gemini_auth=false' >> "${GITHUB_OUTPUT}"
+            echo 'auth_validation_error=No Gemini authentication configured. Set one of: secrets.GEMINI_API_KEY, secrets.GOOGLE_API_KEY, or vars.GCP_WIF_PROVIDER + vars.GOOGLE_CLOUD_PROJECT + vars.SERVICE_ACCOUNT_EMAIL.' >> "${GITHUB_OUTPUT}"
+          elif [ "${auth_methods}" -gt 1 ]; then
+            echo 'has_gemini_auth=false' >> "${GITHUB_OUTPUT}"
+            echo 'auth_validation_error=Gemini auth is ambiguous. Set exactly one method: GEMINI_API_KEY, GOOGLE_API_KEY, or WIF vars.' >> "${GITHUB_OUTPUT}"
+          else
+            echo 'has_gemini_auth=true' >> "${GITHUB_OUTPUT}"
+            echo 'auth_validation_error=' >> "${GITHUB_OUTPUT}"
+          fi
       - name: 'Run Gemini issue analysis'
         id: 'gemini_analysis'
         if: |-
-          ${{ steps.get_labels.outputs.available_labels != '' }}
+          ${{ steps.get_labels.outputs.available_labels != '' && steps.validate_gemini_auth.outputs.has_gemini_auth == 'true' }}
         uses: 'google-github-actions/run-gemini-cli@v0'
         # ratchet:exclude
         env:
@@ -80,6 +120,12 @@ jobs:
           use_vertex_ai: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
           upload_artifacts: '${{ vars.UPLOAD_ARTIFACTS }}'
           workflow_name: 'gemini-triage'
+      - name: 'Abort on auth configuration error'
+        if: |-
+          ${{ steps.get_labels.outputs.available_labels != '' && steps.validate_gemini_auth.outputs.has_gemini_auth != 'true' }}
+        run: |-
+          echo "::error::${{ steps.validate_gemini_auth.outputs.auth_validation_error }}"
+          exit 1
       - name: 'Export selected labels'
         id: 'export_selected_labels'
         if: |-

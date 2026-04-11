@@ -173,7 +173,7 @@ export default defineConfig({
       // Enable hidden source maps in production for Sentry upload (not served to users)
       sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
-      chunkSizeWarningLimit: isProduction ? 500 : 1500,
+      chunkSizeWarningLimit: isProduction ? 1024 : 1500,
       // Temporarily disabled minification to debug build hang
       minify: false,
       // minify: isProduction ? 'terser' : false,

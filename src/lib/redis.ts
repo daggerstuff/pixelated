@@ -254,7 +254,7 @@ export function getRedisClient() {
 /**
  * Wrapper function for Redis get with error handling
  */
-export async function getFromCache(key: string): Promise<any | null> {
+export async function getFromCache<T = unknown>(key: string): Promise<T | null> {
   try {
     const raw = await redis.get(key)
     if (raw === null) {
@@ -262,10 +262,10 @@ export async function getFromCache(key: string): Promise<any | null> {
     }
     try {
       const parsed = JSON.parse(raw)
-      return parsed
+      return parsed as T
     } catch {
       // If not JSON, return as-is
-      return raw
+      return raw as T
     }
   } catch (error: unknown) {
     console.error(`Error getting key ${key} from Redis:`, error)
