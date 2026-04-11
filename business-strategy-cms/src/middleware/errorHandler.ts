@@ -11,8 +11,8 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction,
 ): void => {
-  const statusCode = error.statusCode || 500
-  const message = error.message || 'Internal Server Error'
+  const statusCode = error.statusCode ?? 500
+  const message = error.message ?? 'Internal Server Error'
 
   // Log error details
   console.error('Error:', {
