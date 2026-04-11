@@ -50,7 +50,6 @@ jobs:
         uses: actions/setup-node@v6.3.0
         with:
           node-version: '24.x'
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -96,7 +95,7 @@ jobs:
         uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
-          audience: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          audience: //iam.googleapis.com/${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
