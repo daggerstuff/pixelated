@@ -104,9 +104,9 @@ await MediaService.deleteFile('documents/file.pdf')
 
 ## Regional Endpoints
 
-| Region               | Endpoint                                |
-| -------------------- | --------------------------------------- |
-| Hetzner Default      | `https://hel1.your-objectstorage.com`   |
+| Region          | Endpoint                              |
+| --------------- | ------------------------------------- |
+| Hetzner Default | `https://hel1.your-objectstorage.com` |
 
 ## Migration from AWS S3
 
