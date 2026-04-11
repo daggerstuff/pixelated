@@ -32,7 +32,7 @@ jobs:
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload Trivy scan results
         if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: Trivy Scan Results
           path: trivy-results.sarif
@@ -91,7 +91,7 @@ jobs:
 
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
@@ -99,7 +99,7 @@ jobs:
 
       - name: Configure Google Cloud SDK
         if: github.event_name == 'push'
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3.0.1
         with:
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 

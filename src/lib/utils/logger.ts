@@ -18,12 +18,14 @@ class Logger {
   private options: LoggerOptions
 
   constructor(options?: Partial<LoggerOptions>) {
+    const nodeEnv = process.env['NODE_ENV']
     this.options = {
       level: 'info',
       enabled: true,
       environment:
-        (process.env['NODE_ENV'] as 'development' | 'test' | 'production') ||
-        'development',
+        nodeEnv === 'development' || nodeEnv === 'test' || nodeEnv === 'production'
+          ? nodeEnv
+          : 'development',
       ...options,
     }
   }

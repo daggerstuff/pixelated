@@ -58,10 +58,10 @@ interface FlexSearchDocumentInstance {
   add(document: SearchDocument): void
 }
 
-// FlexSearch Document constructor interface
-interface FlexSearchDocumentConstructor {
-  new (config: FlexSearchDocumentConfig): FlexSearchDocumentInstance
-}
+// FlexSearch Document constructor type
+type FlexSearchDocumentConstructor = new (
+  config: FlexSearchDocumentConfig,
+) => FlexSearchDocumentInstance
 
 // Define search index configuration type
 export interface SearchConfig {
