@@ -14,7 +14,11 @@ vi.mock('../../lib/database/connection', () => ({
 }))
 
 // Import after mock setup
-import { rateLimiter, rateLimitByUser, incrementRedisCounter } from '../rate-limiter'
+import {
+  rateLimiter,
+  rateLimitByUser,
+  incrementRedisCounter,
+} from '../rate-limiter'
 
 describe('Rate Limiter Middleware', () => {
   let mockRequest: any
@@ -39,7 +43,10 @@ describe('Rate Limiter Middleware', () => {
 
   describe('rateLimiter (IP-based)', () => {
     it('should call next when under rate limit', async () => {
-      mockMulti.mockResolvedValue([[null, 1], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1],
+        [null, 1],
+      ])
 
       await rateLimiter(mockRequest, mockResponse, mockNext)
 
@@ -47,7 +54,10 @@ describe('Rate Limiter Middleware', () => {
     })
 
     it('should return 429 when rate limit exceeded', async () => {
-      mockMulti.mockResolvedValue([[null, 1001], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1001],
+        [null, 1],
+      ])
 
       await rateLimiter(mockRequest, mockResponse, mockNext)
 
@@ -62,12 +72,17 @@ describe('Rate Limiter Middleware', () => {
     it('should use in-memory fallback when Redis unavailable', async () => {
       mockMulti.mockRejectedValue(new Error('Redis unavailable'))
 
-      await expect(rateLimiter(mockRequest, mockResponse, mockNext)).resolves.not.toThrow()
+      await expect(
+        rateLimiter(mockRequest, mockResponse, mockNext),
+      ).resolves.not.toThrow()
     })
 
     it('should extract IP from x-forwarded-for header if present', async () => {
       mockRequest.headers['x-forwarded-for'] = '203.0.113.195'
-      mockMulti.mockResolvedValue([[null, 1], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1],
+        [null, 1],
+      ])
 
       await rateLimiter(mockRequest, mockResponse, mockNext)
 
@@ -77,7 +92,10 @@ describe('Rate Limiter Middleware', () => {
 
     it('should handle multiple IPs in x-forwarded-for header', async () => {
       mockRequest.headers['x-forwarded-for'] = '203.0.113.195, 70.41.3.18'
-      mockMulti.mockResolvedValue([[null, 1], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1],
+        [null, 1],
+      ])
 
       await rateLimiter(mockRequest, mockResponse, mockNext)
 
@@ -87,7 +105,10 @@ describe('Rate Limiter Middleware', () => {
     it('should default to 127.0.0.1 when no IP available', async () => {
       mockRequest.ip = undefined
       mockRequest.headers = {}
-      mockMulti.mockResolvedValue([[null, 1], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1],
+        [null, 1],
+      ])
 
       await rateLimiter(mockRequest, mockResponse, mockNext)
 
@@ -99,7 +120,10 @@ describe('Rate Limiter Middleware', () => {
     it('should create middleware that limits by user ID', async () => {
       const middleware = rateLimitByUser(100, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([[null, 1], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1],
+        [null, 1],
+      ])
 
       await middleware(mockRequest, mockResponse, mockNext)
 
@@ -109,7 +133,10 @@ describe('Rate Limiter Middleware', () => {
     it('should use IP if user not authenticated', async () => {
       const middleware = rateLimitByUser(100, 60000)
       mockRequest.user = undefined
-      mockMulti.mockResolvedValue([[null, 1], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 1],
+        [null, 1],
+      ])
 
       await middleware(mockRequest, mockResponse, mockNext)
 
@@ -119,7 +146,10 @@ describe('Rate Limiter Middleware', () => {
     it('should return 429 when user exceeds limit', async () => {
       const middleware = rateLimitByUser(10, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([[null, 11], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 11],
+        [null, 1],
+      ])
 
       await middleware(mockRequest, mockResponse, mockNext)
 
@@ -129,11 +159,17 @@ describe('Rate Limiter Middleware', () => {
     it('should set custom headers for rate limit info', async () => {
       const middleware = rateLimitByUser(100, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([[null, 50], [null, 1]])
+      mockMulti.mockResolvedValue([
+        [null, 50],
+        [null, 1],
+      ])
 
       await middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.setHeader).toHaveBeenCalledWith('X-RateLimit-Remaining', expect.any(String))
+      expect(mockResponse.setHeader).toHaveBeenCalledWith(
+        'X-RateLimit-Remaining',
+        expect.any(String),
+      )
     })
   })
 

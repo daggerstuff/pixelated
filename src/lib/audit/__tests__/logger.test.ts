@@ -40,9 +40,10 @@ describe('AuditLogger', () => {
     const { AuditLogger } = await import('../logger')
     const auditLogger = AuditLogger.getInstance()
 
-    vi.spyOn(auditLogger as unknown as { persistEventWithRetry: () => Promise<void> }, 'persistEventWithRetry').mockRejectedValueOnce(
-      new Error('MongoDB unavailable'),
-    )
+    vi.spyOn(
+      auditLogger as unknown as { persistEventWithRetry: () => Promise<void> },
+      'persistEventWithRetry',
+    ).mockRejectedValueOnce(new Error('MongoDB unavailable'))
 
     const payload = {
       userId: 'user-1',

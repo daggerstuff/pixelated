@@ -165,13 +165,11 @@ export type Failure<E> = {
 
 /** Type guard for checking if result is successful */
 export const isSuccess = <T, E>(result: Result<T, E>): result is Success<T> =>
-  
   result.success
 
 /** Type guard for checking if result is a failure */
 export const isFailure = <T, E>(result: Result<T, E>): result is Failure<E> =>
-  !
-  result.success
+  !result.success
 
 // ============================================================================
 // VALIDATION TYPES

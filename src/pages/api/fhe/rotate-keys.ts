@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
 
   try {
     // Apply rate limiting (stricter for key rotation)
-    const rateLimitResult =  rateLimit.check(
+    const rateLimitResult = rateLimit.check(
       request.headers.get('x-forwarded-for') || 'anonymous',
       'key-rotation',
     )
@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
         securityLevel: 'high',
-        enableDebug: ! import.meta.env.PROD,
+        enableDebug: !import.meta.env.PROD,
       })
     }
 
@@ -82,9 +82,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       JSON.stringify({
         success: false,
         error: 'Failed to rotate encryption keys',
-        message:
-          !
-          import.meta.env.PROD ? (error as Error).message : undefined,
+        message: !import.meta.env.PROD ? (error as Error).message : undefined,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

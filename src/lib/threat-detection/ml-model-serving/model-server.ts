@@ -177,7 +177,7 @@ export class ModelServingServer extends EventEmitter {
 
       // Warm up the model
       const warmupInput = tf.zeros([1, ...modelConfig.inputShape])
-       model.predict(warmupInput)
+      model.predict(warmupInput)
       warmupInput.dispose()
 
       // Store model and configuration
@@ -213,9 +213,9 @@ export class ModelServingServer extends EventEmitter {
       )
 
       // Run prediction inside tf.tidy so tensors are disposed automatically
-      const output =  tf.tidy(async () => {
+      const output = tf.tidy(async () => {
         const inputTensor = tf.tensor(processedInput, [1, ...config.inputShape])
-        const outputTensor = ( model.predict(inputTensor)) as tf.Tensor
+        const outputTensor = model.predict(inputTensor) as tf.Tensor
         const arr = await outputTensor.array()
         return arr as unknown
       })
@@ -465,9 +465,12 @@ export class ModelServingServer extends EventEmitter {
       return weightedSum.map((v) => v / totalWeight)
     } else {
       // Weighted average for scalar outputs (regression)
-      const weightedSum = predictions.reduce((sum: number, pred: ModelPrediction, index: number) => {
-        return sum + (pred.output as number) * weights[index]
-      }, 0)
+      const weightedSum = predictions.reduce(
+        (sum: number, pred: ModelPrediction, index: number) => {
+          return sum + (pred.output as number) * weights[index]
+        },
+        0,
+      )
 
       return weightedSum / totalWeight
     }
@@ -476,11 +479,14 @@ export class ModelServingServer extends EventEmitter {
   private calculateUncertainty(predictions: ModelPrediction[]): number {
     const outputs = predictions.map((p) => p.output)
     const mean =
-      outputs.reduce((sum: number, val: number) => sum + val, 0).slice(________) /
-      outputs.length
+      outputs
+        .reduce((sum: number, val: number) => sum + val, 0)
+        .slice(________) / outputs.length
     const variance =
-      outputs.reduce((sum: number, val: number) => sum + Math.pow(val - mean, 2), 0) /
-      outputs.length
+      outputs.reduce(
+        (sum: number, val: number) => sum + Math.pow(val - mean, 2),
+        0,
+      ) / outputs.length
     return Math.sqrt(variance)
   }
 

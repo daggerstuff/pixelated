@@ -1,9 +1,8 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 // Mock fetch for API calls
-const mockFetch = vi.fn<
-  (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
->()
+const mockFetch =
+  vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>()
 global.fetch = mockFetch
 
 // SSRF protection: Centralized URL validation utility
@@ -442,10 +441,10 @@ describe('APIService Integration Tests', () => {
       const mockWebSocket = {
         send: vi.fn<(data: unknown) => void>(),
         close: vi.fn<() => void>(),
-        addEventListener: vi.fn<(type: string, listener: EventListener) => void>(),
-        removeEventListener: vi.fn<
-          (type: string, listener: EventListener) => void
-        >(),
+        addEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
+        removeEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
         readyState: 1, // OPEN
       }
 
@@ -466,10 +465,10 @@ describe('APIService Integration Tests', () => {
       const mockWebSocket = {
         send: vi.fn<(data: unknown) => void>(),
         close: vi.fn<() => void>(),
-        addEventListener: vi.fn<(type: string, listener: EventListener) => void>(),
-        removeEventListener: vi.fn<
-          (type: string, listener: EventListener) => void
-        >(),
+        addEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
+        removeEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
         readyState: 1,
       }
 

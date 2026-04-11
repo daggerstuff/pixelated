@@ -109,7 +109,7 @@ export class EnterpriseAPIClient {
       } catch (error: unknown) {
         clearTimeout(timeoutId)
 
-        if (error instanceof Error && (error)?.name === 'AbortError') {
+        if (error instanceof Error && error?.name === 'AbortError') {
           throw new APITimeoutError(`Request timeout after ${timeout}ms`)
         }
 

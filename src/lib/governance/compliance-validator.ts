@@ -32,8 +32,10 @@ export class ComplianceValidator {
     }
 
     const compliant = reasons.length === 0
-    
-    logger.info(`Compliance validation for ${ctx.operation}: ${compliant ? 'PASS' : 'FAIL'}`)
+
+    logger.info(
+      `Compliance validation for ${ctx.operation}: ${compliant ? 'PASS' : 'FAIL'}`,
+    )
     if (!compliant) {
       logger.warn(`Compliance failures: ${reasons.join(', ')}`)
     }
@@ -41,7 +43,7 @@ export class ComplianceValidator {
     return {
       compliant,
       reasons,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
   }
 }

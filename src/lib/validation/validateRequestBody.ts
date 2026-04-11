@@ -54,7 +54,12 @@ export async function validateRequestBody<T extends z.ZodType>(
       null,
       {
         details: {
-          body: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Invalid request body',
+          body:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Invalid request body',
         },
       },
     ]

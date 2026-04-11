@@ -57,7 +57,9 @@ describe('Business Intelligence Persistence Tests', () => {
       lastUpdated: new Date(),
     }
 
-    await expect(dbService.storeCompetitorAnalysis(analysis)).resolves.toBeUndefined()
+    await expect(
+      dbService.storeCompetitorAnalysis(analysis),
+    ).resolves.toBeUndefined()
   })
 
   it('should store and retrieve business metrics correctly in MongoDB', async () => {

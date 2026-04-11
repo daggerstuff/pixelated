@@ -80,7 +80,8 @@ export function ProgressTracker({
           (targets['datasets_acquired'] ?? 0) > 0
             ? Math.min(
                 100,
-                (currentMetrics.datasetsAcquired / (targets['datasets_acquired'] ?? 1)) *
+                (currentMetrics.datasetsAcquired /
+                  (targets['datasets_acquired'] ?? 1)) *
                   100,
               )
             : 0,

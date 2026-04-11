@@ -32,7 +32,7 @@ export interface CrossSessionPattern {
   significance?: number
   strength?: number
   categories?: string[]
- timeSpanDays?: number
+  timeSpanDays?: number
 }
 
 /**

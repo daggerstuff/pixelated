@@ -1,8 +1,5 @@
-import {
-  IMongoClient,
-  IRedisClient,
-} from '../threat-hunting/types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { IMongoClient, IRedisClient } from '../threat-hunting/types'
 
 const logger = createBuildSafeLogger('behavioral-analysis-repository')
 
@@ -18,14 +15,21 @@ export class BehavioralAnalysisRepository {
   async storeProfile(userId: string, profile: any): Promise<void> {
     try {
       const db = this.mongoClient.db('behavioral_analysis')
-      await db.collection('user_profiles').updateOne(
-        { userId },
-        { $set: profile, $setOnInsert: { createdAt: new Date() } },
-        { upsert: true }
-      )
-      
+      await db
+        .collection('user_profiles')
+        .updateOne(
+          { userId },
+          { $set: profile, $setOnInsert: { createdAt: new Date() } },
+          { upsert: true },
+        )
+
       // Cache in Redis
-      await this.redis.set(`profile:${userId}`, JSON.stringify(profile), 'EX', 14400);
+      await this.redis.set(
+        `profile:${userId}`,
+        JSON.stringify(profile),
+        'EX',
+        14400,
+      )
     } catch (error: unknown) {
       logger.error('Failed to store profile', { error, userId })
       throw error
@@ -42,7 +46,12 @@ export class BehavioralAnalysisRepository {
 
       // Cache the result from MongoDB in Redis
       if (profile) {
-        await this.redis.set(`profile:${userId}`, JSON.stringify(profile), 'EX', 14400)
+        await this.redis.set(
+          `profile:${userId}`,
+          JSON.stringify(profile),
+          'EX',
+          14400,
+        )
       }
 
       return profile
@@ -62,7 +71,11 @@ export class BehavioralAnalysisRepository {
     }
   }
 
-  async getRecentEvents(userId: string, limit: number = 100, timeframe?: string): Promise<any[]> {
+  async getRecentEvents(
+    userId: string,
+    limit: number = 100,
+    timeframe?: string,
+  ): Promise<any[]> {
     try {
       const db = this.mongoClient.db('behavioral_analysis')
       const query: any = { userId }
@@ -70,11 +83,14 @@ export class BehavioralAnalysisRepository {
       // Apply timeframe filter if provided
       if (timeframe) {
         const now = new Date()
-        const startTime = new Date(now.getTime() - this.parseTimeframe(timeframe))
+        const startTime = new Date(
+          now.getTime() - this.parseTimeframe(timeframe),
+        )
         query.timestamp = { $gte: startTime }
       }
 
-      return await db.collection('events')
+      return await db
+        .collection('events')
         .find(query)
         .sort({ timestamp: -1 })
         .limit(limit)
@@ -94,10 +110,14 @@ export class BehavioralAnalysisRepository {
     const unit = match[2]
 
     switch (unit) {
-      case 'm': return value * 60 * 1000 // minutes
-      case 'h': return value * 60 * 60 * 1000 // hours
-      case 'd': return value * 24 * 60 * 60 * 1000 // days
-      default: return 0
+      case 'm':
+        return value * 60 * 1000 // minutes
+      case 'h':
+        return value * 60 * 60 * 1000 // hours
+      case 'd':
+        return value * 24 * 60 * 60 * 1000 // days
+      default:
+        return 0
     }
   }
 }

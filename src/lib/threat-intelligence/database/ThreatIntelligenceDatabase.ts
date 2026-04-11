@@ -939,7 +939,12 @@ export class ThreatIntelligenceDatabaseCore
       logger.error('Failed to search threats:', { error, query })
       return {
         success: false,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Search failed',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Search failed',
         metadata: {
           timestamp: new Date(),
           requestId: `search_${Date.now()}`,

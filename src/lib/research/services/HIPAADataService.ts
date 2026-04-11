@@ -190,7 +190,7 @@ export class HIPAADataService {
     } catch (error: unknown) {
       logger.error('Encryption failed', { error, dataType })
       throw new Error(
-        `Encryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Encryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -241,7 +241,7 @@ export class HIPAADataService {
     } catch (error: unknown) {
       logger.error('Decryption failed', { error, dataType })
       throw new Error(
-        `Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -442,7 +442,7 @@ export class HIPAADataService {
             results.processed += anonymized
           } catch (error: unknown) {
             results.errors.push(
-              `Anonymization failed for ${dataType}: ${(error instanceof Error ? error.message : "Unknown error")}`,
+              `Anonymization failed for ${dataType}: ${error instanceof Error ? error.message : 'Unknown error'}`,
             )
           }
         }
@@ -455,7 +455,7 @@ export class HIPAADataService {
             results.processed += deleted
           } catch (error: unknown) {
             results.errors.push(
-              `Deletion failed for ${dataType}: ${(error instanceof Error ? error.message : "Unknown error")}`,
+              `Deletion failed for ${dataType}: ${error instanceof Error ? error.message : 'Unknown error'}`,
             )
           }
         }
@@ -469,7 +469,9 @@ export class HIPAADataService {
       })
     } catch (error: unknown) {
       logger.error('Retention policy application failed', { error })
-      results.errors.push(`Policy application failed: ${(error instanceof Error ? error.message : "Unknown error")}`)
+      results.errors.push(
+        `Policy application failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
 
     return results
@@ -530,7 +532,9 @@ export class HIPAADataService {
       }
     } catch (error: unknown) {
       logger.error('Key rotation failed', { error })
-      results.errors.push(`Key rotation failed: ${(error instanceof Error ? error.message : "Unknown error")}`)
+      results.errors.push(
+        `Key rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
 
     return results

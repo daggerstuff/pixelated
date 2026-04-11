@@ -417,9 +417,7 @@ export function createBetterAuthRateLimitMiddleware(
   const authRuleSet = {
     name: 'betterauth',
     description: 'Better-Auth specific rate limiting',
-    rules: Object.values(authConfig.authRules || {}).filter(
-      Boolean,
-    ),
+    rules: Object.values(authConfig.authRules || {}).filter(Boolean),
   }
 
   const authBypassRules: RateLimitBypassRule[] = []

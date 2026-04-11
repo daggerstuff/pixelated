@@ -26,10 +26,15 @@ export class FallbackGenerator implements IFallbackGenerator {
   public generate(error: Error): UnifiedProcessingResponse {
     if (error instanceof MetaAlignerError) {
       return {
-        enhancedResponse: `A known error occurred: ${(error instanceof Error ? error.message : "Unknown error")}`,
+        enhancedResponse: `A known error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`,
         originalResponse: '',
         alignment: {} as any,
-        errors: [{ message: (error instanceof Error ? error.message : "Unknown error"), stage: 'unknown' }],
+        errors: [
+          {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stage: 'unknown',
+          },
+        ],
       }
     } else {
       return {
@@ -37,7 +42,12 @@ export class FallbackGenerator implements IFallbackGenerator {
           'An unexpected error occurred. Please try again later.',
         originalResponse: '',
         alignment: {} as any,
-        errors: [{ message: (error instanceof Error ? error.message : "Unknown error"), stage: 'unknown' }],
+        errors: [
+          {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stage: 'unknown',
+          },
+        ],
       }
     }
   }

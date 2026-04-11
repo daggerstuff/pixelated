@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { IRedisClient, IMongoClient, HuntFinding } from './types'
 import { runInParallelBatches } from '../../utils/concurrency'
+import { IRedisClient, IMongoClient, HuntFinding } from './types'
 
 const logger = createBuildSafeLogger('threat-query-provider')
 
@@ -98,9 +98,7 @@ export class ThreatQueryProvider {
    * P4.1: Memory-efficient threat data search with security hardening and TTL caching.
    * Modularized into sub-methods to reduce cognitive complexity.
    */
-  public async searchThreatData(
-    searchData: Record<string, unknown>,
-  ): Promise<{
+  public async searchThreatData(searchData: Record<string, unknown>): Promise<{
     data: any[]
     pagination: {
       total: number
@@ -237,7 +235,7 @@ export class ThreatQueryProvider {
         const chunkResults = await this.redis.mget(chunk)
         results.push(...chunkResults.filter((t): t is string => t !== null))
       },
-      5 // Concurrency limit
+      5, // Concurrency limit
     )
 
     return results

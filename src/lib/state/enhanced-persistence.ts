@@ -289,7 +289,7 @@ class EnhancedStatePersistence {
     if (
       sessionState['lastActivity'] &&
       typeof sessionState['lastActivity'] === 'number' &&
-      now - (sessionState['lastActivity']) > sessionTimeout
+      now - sessionState['lastActivity'] > sessionTimeout
     ) {
       this.setStoredValue('session_state', {
         lastRoute: '/',
@@ -321,7 +321,7 @@ class EnhancedStatePersistence {
         const draftWithTimestamp = draft as Record<string, unknown> & {
           timestamp: number
         }
-        if (now - (draftWithTimestamp['timestamp']) > draftTimeout) {
+        if (now - draftWithTimestamp['timestamp'] > draftTimeout) {
           delete formDrafts[key]
         }
       }

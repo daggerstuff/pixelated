@@ -1,3 +1,4 @@
+import { resolveInternalMemoryServiceConfig } from '@/lib/server/internal-memory-service-auth'
 import {
   InternalMemoryServiceClient,
   InternalMemoryServiceError,
@@ -5,7 +6,6 @@ import {
   type InternalMemoryRecord,
 } from '@/lib/server/internal-memory-service-client'
 import { assertOwnedMemoryAccessible } from '@/lib/services/product-memory-ownership'
-import { resolveInternalMemoryServiceConfig } from '@/lib/server/internal-memory-service-auth'
 
 export interface ProductMemoryRecord {
   id: string
@@ -88,7 +88,8 @@ export class ProductMemoryGateway {
         runId: input.runId,
         includeShared: input.includeShared,
         content: input.content,
-        category: typeof metadata.category === 'string' ? metadata.category : undefined,
+        category:
+          typeof metadata.category === 'string' ? metadata.category : undefined,
         metadata,
       }),
     )
@@ -142,7 +143,9 @@ export class ProductMemoryGateway {
     }
   }
 
-  async updateMemory(input: ProductMemoryUpdateInput): Promise<ProductMemoryRecord> {
+  async updateMemory(
+    input: ProductMemoryUpdateInput,
+  ): Promise<ProductMemoryRecord> {
     const metadata = normalizeMetadata(input.metadata)
     await assertOwnedMemoryAccessible(this.client, input)
     await this.withGatewayError(() =>
@@ -161,7 +164,9 @@ export class ProductMemoryGateway {
     }
   }
 
-  async getMemory(input: ProductMemoryGetInput): Promise<ProductMemoryRecord | null> {
+  async getMemory(
+    input: ProductMemoryGetInput,
+  ): Promise<ProductMemoryRecord | null> {
     const memory = await this.withGatewayError(() =>
       this.client.getMemory({
         memoryId: input.memoryId,
@@ -182,8 +187,12 @@ export class ProductMemoryGateway {
     )
   }
 
-  async getMemoryStats(scope: ProductMemoryListOptions): Promise<ProductMemoryStats> {
-    return this.withGatewayError(() => this.client.getMemoryStats(toInternalScope(scope)))
+  async getMemoryStats(
+    scope: ProductMemoryListOptions,
+  ): Promise<ProductMemoryStats> {
+    return this.withGatewayError(() =>
+      this.client.getMemoryStats(toInternalScope(scope)),
+    )
   }
 
   private async withGatewayError<T>(callback: () => Promise<T>): Promise<T> {
@@ -192,7 +201,7 @@ export class ProductMemoryGateway {
     } catch (error: unknown) {
       if (error instanceof InternalMemoryServiceError) {
         throw new ProductMemoryGatewayError(
-          (error instanceof Error ? error.message : "Unknown error"),
+          error instanceof Error ? error.message : 'Unknown error',
           error.status,
           error.details,
         )
@@ -200,7 +209,6 @@ export class ProductMemoryGateway {
       throw error
     }
   }
-
 }
 
 function normalizeMetadata(
@@ -209,7 +217,9 @@ function normalizeMetadata(
   return (metadata ?? {}) as InternalMemoryMetadata
 }
 
-function mapProductMemoryRecord(memory: InternalMemoryRecord): ProductMemoryRecord {
+function mapProductMemoryRecord(
+  memory: InternalMemoryRecord,
+): ProductMemoryRecord {
   return {
     id: memory.id,
     content: memory.content ?? memory.memory ?? '',

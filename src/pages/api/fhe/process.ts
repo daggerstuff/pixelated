@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       'anonymous'
 
     // Check rate limit
-    const rateLimitResult =  rateLimit.check(clientIp, 'anonymous')
+    const rateLimitResult = rateLimit.check(clientIp, 'anonymous')
 
     if (!rateLimitResult.allowed) {
       return new Response(
@@ -65,7 +65,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
         securityLevel: 'high',
-        enableDebug: ! import.meta.env.PROD,
+        enableDebug: !import.meta.env.PROD,
       })
     }
 
@@ -93,9 +93,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       JSON.stringify({
         success: false,
         error: 'Failed to process encrypted data',
-        message:
-          !
-          import.meta.env.PROD ? (error as Error).message : undefined,
+        message: !import.meta.env.PROD ? (error as Error).message : undefined,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

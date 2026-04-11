@@ -70,7 +70,7 @@ export function createEnhancedFHEService(
     },
 
     // Pass through with stats tracking
-    generateKeys: async (config?: FHEConfig  ) => {
+    generateKeys: async (config?: FHEConfig) => {
       try {
         return await baseService.generateKeys(config)
       } catch (error: unknown) {
@@ -85,10 +85,7 @@ export function createEnhancedFHEService(
       baseService.supportsOperation(operation),
 
     // Enhanced encrypt with stats tracking
-    async encrypt<T>(
-      value: T,
-      options?: unknown,
-    ): Promise<EncryptedData> {
+    async encrypt<T>(value: T, options?: unknown): Promise<EncryptedData> {
       try {
         stats.encryptCount++
         return await baseService.encrypt(value, options)

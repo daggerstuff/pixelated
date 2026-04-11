@@ -91,28 +91,52 @@ describe('breachAnalytics', () => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    ;(listRecentBreaches as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue(mockBreaches)
-    ;(redis.get as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue(
+    ;(
+      listRecentBreaches as unknown as {
+        mockResolvedValue: (v: unknown) => Promise<unknown>
+      }
+    ).mockResolvedValue(mockBreaches)
+    ;(
+      redis.get as unknown as {
+        mockResolvedValue: (v: unknown) => Promise<unknown>
+      }
+    ).mockResolvedValue(
       JSON.stringify({
         completedAt: Date.now(),
       }),
     )
-    ;(RiskScoring.calculateOverallRisk as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
+    ;(
+      RiskScoring.calculateOverallRisk as unknown as {
+        mockResolvedValue: (v: unknown) => Promise<unknown>
+      }
+    ).mockResolvedValue({
       overallScore: 0.75,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
       recommendations: [],
     })
-    ;(RiskScoring.calculateDailyRisk as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
+    ;(
+      RiskScoring.calculateDailyRisk as unknown as {
+        mockResolvedValue: (v: unknown) => Promise<unknown>
+      }
+    ).mockResolvedValue({
       overallScore: 0.65,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
       recommendations: [],
     })
-    ;(ComplianceMetrics.calculateScore as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue(0.98)
-    ;(NotificationEffectiveness.calculate as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
+    ;(
+      ComplianceMetrics.calculateScore as unknown as {
+        mockResolvedValue: (v: unknown) => Promise<unknown>
+      }
+    ).mockResolvedValue(0.98)
+    ;(
+      NotificationEffectiveness.calculate as unknown as {
+        mockResolvedValue: (v: unknown) => Promise<unknown>
+      }
+    ).mockResolvedValue({
       overall: 0.95,
       delivery: 0.98,
       timing: 0.92,
@@ -198,7 +222,11 @@ describe('breachAnalytics', () => {
     })
 
     it('should handle empty breach list', async () => {
-      ;(listRecentBreaches as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue([])
+      ;(
+        listRecentBreaches as unknown as {
+          mockResolvedValue: (v: unknown) => Promise<unknown>
+        }
+      ).mockResolvedValue([])
 
       const metrics = await BreachAnalytics.generateMetrics(mockTimeframe)
 
@@ -305,7 +333,11 @@ describe('breachAnalytics', () => {
     })
 
     it('should include notification effectiveness insights when below threshold', async () => {
-      ;(NotificationEffectiveness.calculate as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue({
+      ;(
+        NotificationEffectiveness.calculate as unknown as {
+          mockResolvedValue: (v: unknown) => Promise<unknown>
+        }
+      ).mockResolvedValue({
         overall: 0.94,
         delivery: 0.95,
         timing: 0.88,
@@ -336,7 +368,11 @@ describe('breachAnalytics', () => {
     })
 
     it('should include compliance insights when below threshold', async () => {
-      ;(ComplianceMetrics.calculateScore as unknown as { mockResolvedValue: (v: unknown) => Promise<unknown> }).mockResolvedValue(0.97)
+      ;(
+        ComplianceMetrics.calculateScore as unknown as {
+          mockResolvedValue: (v: unknown) => Promise<unknown>
+        }
+      ).mockResolvedValue(0.97)
 
       const insights = await BreachAnalytics.generateInsights()
 

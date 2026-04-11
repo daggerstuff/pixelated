@@ -9,8 +9,7 @@ const getAuthToken = () => {
   }
   try {
     const token =
-      storageManager.get('auth_token') ??
-      storageManager.get('authToken')
+      storageManager.get('auth_token') ?? storageManager.get('authToken')
     if (!token) {
       return null
     }

@@ -133,7 +133,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         })
 
         // Get or generate key ID
-        const keyId =  keyRotationService.getActiveKeyId()
+        const keyId = keyRotationService.getActiveKeyId()
 
         set({
           isInitialized: true,
@@ -441,7 +441,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         await fheService.rotateKeys()
 
         // Get the new key ID
-        const newKeyId =  keyRotationService.getActiveKeyId()
+        const newKeyId = keyRotationService.getActiveKeyId()
 
         // Update key ID
         set({ keyId: newKeyId })

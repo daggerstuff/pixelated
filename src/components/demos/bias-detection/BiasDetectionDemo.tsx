@@ -151,7 +151,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
       } catch (err: unknown) {
         setError(
           err instanceof Error
-            ? (err)?.message || String(err)
+            ? err?.message || String(err)
             : 'Analysis failed',
         )
       } finally {

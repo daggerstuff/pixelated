@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { PolicyStore } from '../policy-store'
 import { MongoMemoryServer } from 'mongodb-memory-server'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+
+import { PolicyStore } from '../policy-store'
 import type { GovernancePolicy } from '../types'
 
 describe('PolicyStore', () => {
@@ -26,12 +27,20 @@ describe('PolicyStore', () => {
   })
 
   it('updates existing policy on save', async () => {
-    const policy: GovernancePolicy = { id: 'update-test', version: '1.0.0', rules: [] }
+    const policy: GovernancePolicy = {
+      id: 'update-test',
+      version: '1.0.0',
+      rules: [],
+    }
     await store.savePolicy(policy)
-    
-    const updated: GovernancePolicy = { id: 'update-test', version: '2.0.0', rules: [] }
+
+    const updated: GovernancePolicy = {
+      id: 'update-test',
+      version: '2.0.0',
+      rules: [],
+    }
     await store.savePolicy(updated)
-    
+
     const retrieved = await store.getPolicy('update-test')
     expect(retrieved?.version).toBe('2.0.0')
   })

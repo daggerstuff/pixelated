@@ -357,9 +357,7 @@ export class ExportService {
 
       // Set up error handling for PDF generation
       doc.on('error', (err: Error) => {
-        throw new Error(
-          `PDF generation error: ${(err)?.message || String(err)}`,
-        )
+        throw new Error(`PDF generation error: ${err?.message || String(err)}`)
       })
 
       // Create a buffer to store the PDF with timeout

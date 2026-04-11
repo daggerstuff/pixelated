@@ -1,7 +1,7 @@
 /**
  * Audit Event Types and Severities
  *
- * This file defines the core enums and interfaces for the HIPAA-compliant 
+ * This file defines the core enums and interfaces for the HIPAA-compliant
  * audit trail system.
  */
 

@@ -1,11 +1,11 @@
-import { TurnPhase, AgentRole, RequestedAction } from "./turn-log";
-import { getLedger } from "./server";
+import { getLedger } from './server'
+import { TurnPhase, AgentRole, RequestedAction } from './turn-log'
 
 export interface CollaborationContext {
-  artifactId: string;
-  agentId: string;
-  role: AgentRole;
-  phase: TurnPhase;
+  artifactId: string
+  agentId: string
+  role: AgentRole
+  phase: TurnPhase
 }
 
 /**
@@ -15,40 +15,47 @@ export interface CollaborationContext {
 export async function recordAgentActivity(
   context: CollaborationContext,
   activity: {
-    decision: string;
-    confidence: number;
-    assumptions?: string[];
-    openQuestions?: string[];
-    evidence?: string[];
-    suggestedAction?: RequestedAction;
-  }
+    decision: string
+    confidence: number
+    assumptions?: string[]
+    openQuestions?: string[]
+    evidence?: string[]
+    suggestedAction?: RequestedAction
+  },
 ) {
-  const ledger = getLedger();
+  const ledger = getLedger()
 
   const turn = {
-    turnId: "", // Ledger will generate if empty
+    turnId: '', // Ledger will generate if empty
     artifactId: context.artifactId,
     agentId: context.agentId,
     role: context.role,
     phase: context.phase,
     decision: activity.decision,
     confidence: activity.confidence,
-    assumptions: activity.assumptions || ["Default operational assumptions apply."],
+    assumptions: activity.assumptions || [
+      'Default operational assumptions apply.',
+    ],
     openQuestions: activity.openQuestions || [],
     evidence: activity.evidence || [],
-    requestedAction: activity.suggestedAction || (context.phase === "Handoff" ? "commit" : "handoff"),
-  };
+    requestedAction:
+      activity.suggestedAction ||
+      (context.phase === 'Handoff' ? 'commit' : 'handoff'),
+  }
 
-  return await ledger.submitTurn(turn);
+  return await ledger.submitTurn(turn)
 }
 
 /**
  * Auto-scales or escalates based on agent performance metrics.
  * This can be hooked into agent post-processing loops.
  */
-export function shouldEscalate(confidence: number, unresolvedQuestions: number): boolean {
-  const MIN_CONFIDENCE = 0.85;
-  const MAX_QUESTIONS = 3;
+export function shouldEscalate(
+  confidence: number,
+  unresolvedQuestions: number,
+): boolean {
+  const MIN_CONFIDENCE = 0.85
+  const MAX_QUESTIONS = 3
 
-  return confidence < MIN_CONFIDENCE || unresolvedQuestions > MAX_QUESTIONS;
+  return confidence < MIN_CONFIDENCE || unresolvedQuestions > MAX_QUESTIONS
 }

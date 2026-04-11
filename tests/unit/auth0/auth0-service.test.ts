@@ -560,7 +560,11 @@ describe('Auth0UserService', () => {
       mockManagementClient.createUser.mockResolvedValue(mockAuth0User)
 
       // Test admin role mapping
-      void auth0UserService.createUser('admin@example.com', 'password123', 'admin')
+      void auth0UserService.createUser(
+        'admin@example.com',
+        'password123',
+        'admin',
+      )
 
       expect(mockManagementClient.createUser).toHaveBeenCalledWith(
         expect.objectContaining({

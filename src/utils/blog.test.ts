@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { calculateReadingTime } from './blog'
 
 describe('calculateReadingTime', () => {

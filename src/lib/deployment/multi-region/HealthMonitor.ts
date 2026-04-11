@@ -109,9 +109,12 @@ export class HealthMonitor extends EventEmitter {
       this.emit('initialized', { regions: regions.length })
     } catch (error: unknown) {
       logger.error('Failed to initialize Health Monitor', { error })
-      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -245,7 +248,7 @@ export class HealthMonitor extends EventEmitter {
       this.updateHealthScore(region.id, failedScore)
       this.emit('health-check-failed', {
         regionId: region.id,
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
     }
   }

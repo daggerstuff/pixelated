@@ -17,10 +17,7 @@ export type ManagementClientOptionsWithClientCredentials = {
 interface ExtendedManagementClient extends ManagementClient {
   // Roles
   getRoles(params: { per_page?: number; page?: number }): Promise<any>
-  createRole(params: {
-    name: string
-    description?: string
-  }): Promise<any>
+  createRole(params: { name: string; description?: string }): Promise<any>
   updateRole(params: {
     id: string
     name?: string
@@ -38,14 +35,8 @@ interface ExtendedManagementClient extends ManagementClient {
     permissions: { value: string }[]
   }): Promise<void>
   // Users
-  assignRolestoUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  removeRolesFromUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
+  assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+  removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
   getUserRoles(params: { id: string }): Promise<any>
   // Permissions
   getPermissions(params: { per_page?: number; page?: number }): Promise<any>
@@ -54,10 +45,7 @@ interface ExtendedManagementClient extends ManagementClient {
     description: string
     audience: string
   }): Promise<any>
-  updatePermission(params: {
-    id: string
-    description?: string
-  }): Promise<any>
+  updatePermission(params: { id: string; description?: string }): Promise<any>
   deletePermission(params: { id: string }): Promise<void>
   // Logs
   getLogs(params: { per_page: number; q: string }): Promise<any>

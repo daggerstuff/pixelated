@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
 import { PolicyEngine } from '../policy-engine'
 
 describe('PolicyEngine hot reload', () => {
@@ -10,15 +11,17 @@ describe('PolicyEngine hot reload', () => {
 
   it('reloads policies from store', async () => {
     // Initial policy
-    await engine.loadPolicy({ 
-      id: 'reload-test', 
-      version: '1.0.0', 
-      rules: [{
-        id: 'rule-1',
-        action: 'test',
-        conditions: [],
-        required: []
-      }]
+    await engine.loadPolicy({
+      id: 'reload-test',
+      version: '1.0.0',
+      rules: [
+        {
+          id: 'rule-1',
+          action: 'test',
+          conditions: [],
+          required: [],
+        },
+      ],
     })
 
     // Verify initial version
@@ -32,13 +35,13 @@ describe('PolicyEngine hot reload', () => {
 
   it('logs when reloadPolicies is called', async () => {
     const consoleSpy = vi.spyOn(console, 'log')
-    
+
     await engine.reloadPolicies()
-    
+
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Policy reload triggered')
+      expect.stringContaining('Policy reload triggered'),
     )
-    
+
     consoleSpy.mockRestore()
   })
 })

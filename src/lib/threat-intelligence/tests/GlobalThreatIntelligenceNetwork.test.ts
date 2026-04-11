@@ -9,12 +9,14 @@ import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntel
 
 // Mock dependencies
 vi.mock('../../logging/build-safe-logger', () => ({
-  createBuildSafeLogger: vi.fn<() => {
-    info: (message: string, ...args: unknown[]) => void
-    error: (message: string | Error, ...args: unknown[]) => void
-    warn: (message: string, ...args: unknown[]) => void
-    debug: (message: string, ...args: unknown[]) => void
-  }>(() => ({
+  createBuildSafeLogger: vi.fn<
+    () => {
+      info: (message: string, ...args: unknown[]) => void
+      error: (message: string | Error, ...args: unknown[]) => void
+      warn: (message: string, ...args: unknown[]) => void
+      debug: (message: string, ...args: unknown[]) => void
+    }
+  >(() => ({
     info: vi.fn<(message: string, ...args: unknown[]) => void>(),
     error: vi.fn<(message: string | Error, ...args: unknown[]) => void>(),
     warn: vi.fn<(message: string, ...args: unknown[]) => void>(),
@@ -50,12 +52,16 @@ vi.mock('mongodb', () => {
       connect: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
       db: vi.fn(() => ({
         collection: vi.fn(() => ({
-          insertOne: vi.fn<() => Promise<{ insertedId: string }>>().mockResolvedValue({
-            insertedId: 'test-id',
-          }),
-          updateOne: vi.fn<() => Promise<{ modifiedCount: number }>>().mockResolvedValue({
-            modifiedCount: 1,
-          }),
+          insertOne: vi
+            .fn<() => Promise<{ insertedId: string }>>()
+            .mockResolvedValue({
+              insertedId: 'test-id',
+            }),
+          updateOne: vi
+            .fn<() => Promise<{ modifiedCount: number }>>()
+            .mockResolvedValue({
+              modifiedCount: 1,
+            }),
           findOne: vi.fn<() => Promise<null>>().mockResolvedValue(null),
           find: vi.fn(() => ({
             toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),

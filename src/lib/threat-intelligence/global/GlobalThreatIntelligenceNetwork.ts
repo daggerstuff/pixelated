@@ -611,9 +611,7 @@ export class GlobalThreatIntelligenceNetworkCore
         threatIds.map((id) => this.intelligenceDatabase.getThreatById(id)),
       )
 
-      const validThreats = threats.filter(
-        (t) => t !== null,
-      )
+      const validThreats = threats.filter((t) => t !== null)
 
       if (validThreats.length === 0) {
         return []

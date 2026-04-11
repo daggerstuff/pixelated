@@ -429,9 +429,9 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
           textEmotion: json.text_emotion || null,
           audioEmotion: json.audio_emotion || null,
           fusedEmotion: json.fused_emotion || null,
-            behavioralPattern: json.behavioral_pattern || null,
-            behavioralPatternConfidence:
-              json.behavioral_pattern_confidence ?? null,
+          behavioralPattern: json.behavioral_pattern || null,
+          behavioralPatternConfidence:
+            json.behavioral_pattern_confidence ?? null,
           conflictDetected: Boolean(
             json.conflict_detected ||
             (json.fused_emotion?.conflict_score &&

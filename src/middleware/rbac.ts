@@ -18,9 +18,9 @@ export interface UserPermissions {
 export function checkPermission(
   user: UserPermissions,
   resource: string,
-  action: string
+  action: string,
 ): boolean {
   return user.permissions.some(
-    (p) => p.resource === resource && p.action === action
+    (p) => p.resource === resource && p.action === action,
   )
 }

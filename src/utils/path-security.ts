@@ -5,59 +5,64 @@
  * All file operations should use these utilities to ensure paths are safe.
  */
 
-import path from "path";
-import { fileURLToPath } from "url";
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const UNSAFE_PATH_CHARS = /[<>:"|?*]/;
-const PATH_SEPARATOR = path.sep;
+const UNSAFE_PATH_CHARS = /[<>:"|?*]/
+const PATH_SEPARATOR = path.sep
 
 function validateUntrustedPathInput(
   filePath: string,
   options: { allowAbsolute?: boolean } = {},
 ): void {
-  const { allowAbsolute = false } = options;
+  const { allowAbsolute = false } = options
 
   if (!filePath) {
-    throw new Error("Path is required");
+    throw new Error('Path is required')
   }
 
   if (!allowAbsolute && path.isAbsolute(filePath)) {
-    throw new Error("Absolute paths are not allowed");
+    throw new Error('Absolute paths are not allowed')
   }
 
-  const hasControlCharacters = [...filePath].some((char) => (char.codePointAt(0) ?? 0) <= 0x1f);
+  const hasControlCharacters = [...filePath].some(
+    (char) => (char.codePointAt(0) ?? 0) <= 0x1f,
+  )
 
   if (UNSAFE_PATH_CHARS.test(filePath) || hasControlCharacters) {
-    throw new Error("Path contains unsafe characters");
+    throw new Error('Path contains unsafe characters')
   }
 
-  const segments = filePath.split(/[\\/]+/).filter(Boolean);
-  if (segments.includes("..")) {
-    throw new Error("Directory traversal sequences (..) are not allowed");
+  const segments = filePath.split(/[\\/]+/).filter(Boolean)
+  if (segments.includes('..')) {
+    throw new Error('Directory traversal sequences (..) are not allowed')
   }
 }
 
 function isPathEscapingBase(basePath: string, targetPath: string): boolean {
-  const normalizedBase = path.resolve(basePath);
-  const normalizedTarget = path.resolve(targetPath);
+  const normalizedBase = path.resolve(basePath)
+  const normalizedTarget = path.resolve(targetPath)
 
   const baseWithSeparator = normalizedBase.endsWith(PATH_SEPARATOR)
     ? normalizedBase
-    : `${normalizedBase}${PATH_SEPARATOR}`;
+    : `${normalizedBase}${PATH_SEPARATOR}`
 
-  return !normalizedTarget.startsWith(baseWithSeparator) && normalizedTarget !== normalizedBase;
+  return (
+    !normalizedTarget.startsWith(baseWithSeparator) &&
+    normalizedTarget !== normalizedBase
+  )
 }
 
 /**
  * Get the project root directory safely
  */
 export function getProjectRoot(): string {
-  if (typeof process !== "undefined" && process.cwd) {
-    return process.cwd();
+  if (typeof process !== 'undefined' && process.cwd) {
+    return process.cwd()
   }
   // Fallback for edge cases
-  const __filename = fileURLToPath(import.meta.url);
-  return path.dirname(path.dirname(path.dirname(__filename)));
+  const __filename = fileURLToPath(import.meta.url)
+  return path.dirname(path.dirname(path.dirname(__filename)))
 }
 
 /**
@@ -71,28 +76,28 @@ export function validatePath(
   allowedDir: string,
   options: { allowAbsolutePath?: boolean } = {},
 ): string {
-  const { allowAbsolutePath = false } = options;
+  const { allowAbsolutePath = false } = options
 
   // Reject unsafe path input before resolution
-  validateUntrustedPathInput(filePath, { allowAbsolute: allowAbsolutePath });
+  validateUntrustedPathInput(filePath, { allowAbsolute: allowAbsolutePath })
 
   // Normalize the allowed directory to absolute path
-  const normalizedAllowedDir = path.resolve(allowedDir);
+  const normalizedAllowedDir = path.resolve(allowedDir)
 
   // Resolve the file path to absolute using the same base policy
   const resolvedPath = allowAbsolutePath
     ? path.resolve(filePath)
-    : path.resolve(normalizedAllowedDir, filePath);
+    : path.resolve(normalizedAllowedDir, filePath)
 
-  const escapesBase = isPathEscapingBase(normalizedAllowedDir, resolvedPath);
+  const escapesBase = isPathEscapingBase(normalizedAllowedDir, resolvedPath)
 
   if (escapesBase) {
     throw new Error(
       `Path traversal detected: ${filePath} resolves outside allowed directory ${allowedDir}`,
-    );
+    )
   }
 
-  return path.normalize(resolvedPath);
+  return path.normalize(resolvedPath)
 }
 
 /**
@@ -101,19 +106,24 @@ export function validatePath(
  * @param ...pathSegments Path segments to join
  * @returns The validated absolute path
  */
-export function safeJoin(allowedDir: string, ...pathSegments: string[]): string {
-  const hasAbsoluteSegment = pathSegments.some((segment) => path.isAbsolute(segment));
+export function safeJoin(
+  allowedDir: string,
+  ...pathSegments: string[]
+): string {
+  const hasAbsoluteSegment = pathSegments.some((segment) =>
+    path.isAbsolute(segment),
+  )
 
   for (const segment of pathSegments) {
-    validateUntrustedPathInput(segment, { allowAbsolute: hasAbsoluteSegment });
+    validateUntrustedPathInput(segment, { allowAbsolute: hasAbsoluteSegment })
   }
 
   const joinedPath = hasAbsoluteSegment
     ? path.resolve(...pathSegments)
-    : path.join(...pathSegments);
+    : path.join(...pathSegments)
   return validatePath(joinedPath, allowedDir, {
     allowAbsolutePath: hasAbsoluteSegment,
-  });
+  })
 }
 
 /**
@@ -122,19 +132,22 @@ export function safeJoin(allowedDir: string, ...pathSegments: string[]): string 
  * @param allowedDirs Array of allowed base directories
  * @returns The normalized absolute path if valid, throws error if invalid
  */
-export function validatePathAgainstMultiple(filePath: string, allowedDirs: string[]): string {
+export function validatePathAgainstMultiple(
+  filePath: string,
+  allowedDirs: string[],
+): string {
   for (const allowedDir of allowedDirs) {
     try {
-      return validatePath(filePath, allowedDir);
+      return validatePath(filePath, allowedDir)
     } catch {
       // Try next directory
-      continue;
+      continue
     }
   }
 
   throw new Error(
-    `Path ${filePath} is not within any allowed directories: ${allowedDirs.join(", ")}`,
-  );
+    `Path ${filePath} is not within any allowed directories: ${allowedDirs.join(', ')}`,
+  )
 }
 
 /**
@@ -145,19 +158,19 @@ export function validatePathAgainstMultiple(filePath: string, allowedDirs: strin
 export function sanitizeFilename(filename: string): string {
   // Remove path separators and dangerous characters
   const withoutSeparators = filename
-    .replace(/[/\\]/g, "") // Remove path separators
-    .replace(/\.\./g, ""); // Remove parent directory references
+    .replace(/[/\\]/g, '') // Remove path separators
+    .replace(/\.\./g, '') // Remove parent directory references
 
   const filtered = Array.from(withoutSeparators)
     .filter((ch) => {
-      const code = ch.codePointAt(0);
-      if (code === undefined) return false;
-      if (code >= 0x00 && code <= 0x1f) return false;
-      return !["<", ">", ":", '"', "|", "?", "*"].includes(ch);
+      const code = ch.codePointAt(0)
+      if (code === undefined) return false
+      if (code >= 0x00 && code <= 0x1f) return false
+      return !['<', '>', ':', '"', '|', '?', '*'].includes(ch)
     })
-    .join("");
+    .join('')
 
-  return filtered.trim();
+  return filtered.trim()
 }
 
 /**
@@ -167,8 +180,8 @@ export function sanitizeFilename(filename: string): string {
  * @returns The validated absolute path
  */
 export function createSafeFilePath(baseDir: string, filename: string): string {
-  const sanitized = sanitizeFilename(filename);
-  return safeJoin(baseDir, sanitized);
+  const sanitized = sanitizeFilename(filename)
+  return safeJoin(baseDir, sanitized)
 }
 
 /**
@@ -177,46 +190,49 @@ export function createSafeFilePath(baseDir: string, filename: string): string {
  * @param allowedDir The allowed base directory
  * @returns The validated absolute path
  */
-export function validateAndCreateDir(dirPath: string, allowedDir: string): string {
-  return validatePath(dirPath, allowedDir);
+export function validateAndCreateDir(
+  dirPath: string,
+  allowedDir: string,
+): string {
+  return validatePath(dirPath, allowedDir)
 }
 
 /**
  * Common allowed directories for the application
  */
 // Lazy initialization to avoid issues with import.meta.url in some contexts
-let _projectRoot: string | null = null;
+let _projectRoot: string | null = null
 
 function getCachedProjectRoot(): string {
   if (!_projectRoot) {
-    _projectRoot = getProjectRoot();
+    _projectRoot = getProjectRoot()
   }
-  return _projectRoot;
+  return _projectRoot
 }
 
 export const ALLOWED_DIRECTORIES = {
   get PROJECT_ROOT() {
-    return getCachedProjectRoot();
+    return getCachedProjectRoot()
   },
   get CONTENT() {
-    return path.join(getCachedProjectRoot(), "content");
+    return path.join(getCachedProjectRoot(), 'content')
   },
   get PUBLIC() {
-    return path.join(getCachedProjectRoot(), "public");
+    return path.join(getCachedProjectRoot(), 'public')
   },
   get OUTPUT() {
-    return path.join(getCachedProjectRoot(), "output");
+    return path.join(getCachedProjectRoot(), 'output')
   },
   get LOGS() {
-    return path.join(getCachedProjectRoot(), "logs");
+    return path.join(getCachedProjectRoot(), 'logs')
   },
   get TEMP() {
-    return path.join(getCachedProjectRoot(), ".temp");
+    return path.join(getCachedProjectRoot(), '.temp')
   },
   get TESTS() {
-    return path.join(getCachedProjectRoot(), "tests");
+    return path.join(getCachedProjectRoot(), 'tests')
   },
   get SCRIPTS() {
-    return path.join(getCachedProjectRoot(), "scripts");
+    return path.join(getCachedProjectRoot(), 'scripts')
   },
-} as const;
+} as const

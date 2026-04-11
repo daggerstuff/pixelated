@@ -122,7 +122,10 @@ describe('Behavioral Analysis Service', () => {
 
     service = new AdvancedBehavioralAnalysisService(defaultConfig)
     // P4.2 FIX: Provide required mock dependencies
-    await service.initializeServices(mockRedisInstance as any, mockMongoClientInstance as any)
+    await service.initializeServices(
+      mockRedisInstance as any,
+      mockMongoClientInstance as any,
+    )
   })
 
   describe('Service Initialization', () => {

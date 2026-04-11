@@ -173,11 +173,11 @@ export function ExportToEHR({
                     ? 'Documentation exported successfully'
                     : 'Failed to export documentation'}
                 </h3>
-		{exportResult.errors && exportResult.errors.length > 0 && (
-			<div className="text-red-700 dark:text-red-300 mt-2 text-sm">
-				{exportResult.errors[0]}
-			</div>
-		)}
+                {exportResult.errors && exportResult.errors.length > 0 && (
+                  <div className='text-red-700 dark:text-red-300 mt-2 text-sm'>
+                    {exportResult.errors[0]}
+                  </div>
+                )}
 
                 {exportResult.success && showSuccessDetails && (
                   <div className='mt-2'>

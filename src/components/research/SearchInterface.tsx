@@ -73,7 +73,9 @@ export default function SearchInterface() {
         setResults(data.results)
       } catch (err: unknown) {
         console.error('Search error:', err)
-        setError(err instanceof Error ? err.message : 'Failed to fetch results.')
+        setError(
+          err instanceof Error ? err.message : 'Failed to fetch results.',
+        )
       } finally {
         setLoading(false)
       }

@@ -1,7 +1,7 @@
 // Historical progress tracking dashboard component
 
-import type { FC } from 'react'
 import { TrendingUp } from 'lucide-react'
+import type { FC } from 'react'
 
 import type { HistoricalComparison } from '../../../lib/types/bias-detection'
 
@@ -269,7 +269,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
 
             {comparison.sevenDayTrend === 'improving' && (
               <li className='flex items-start'>
-                <TrendingUp className="w-4 h-4 text-green-500 mr-2" />
+                <TrendingUp className='text-green-500 mr-2 h-4 w-4' />
                 Recent 7-day trend shows consistent improvement
               </li>
             )}

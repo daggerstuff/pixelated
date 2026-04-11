@@ -5,14 +5,10 @@ import type {
   SearchOptions,
 } from './memory-client'
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_ORIGIN || ''
+const BASE_URL = process.env.NEXT_PUBLIC_APP_ORIGIN || ''
 
 export const mcpMemoryManager = {
-  async addMemory(
-    input: AddMemoryInput,
-    userId?: string,
-  ): Promise<string> {
+  async addMemory(input: AddMemoryInput, userId?: string): Promise<string> {
     const resolvedUserId = requireUserId(userId)
     const response = await fetch(`${BASE_URL}/api/memory/add`, {
       method: 'POST',
@@ -42,27 +38,30 @@ export const mcpMemoryManager = {
     userId?: string,
   ): Promise<void> {
     const resolvedUserId = requireUserId(userId)
-    const response = await fetch(`${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, user_id: resolvedUserId }),
-    })
+    const response = await fetch(
+      `${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, user_id: resolvedUserId }),
+      },
+    )
 
     if (!response.ok) {
       throw new Error(`Failed to update memory: ${response.statusText}`)
     }
   },
 
-  async deleteMemory(
-    memoryId: string,
-    userId?: string,
-  ): Promise<void> {
+  async deleteMemory(memoryId: string, userId?: string): Promise<void> {
     const resolvedUserId = requireUserId(userId)
     const params = new URLSearchParams()
     params.set('userId', resolvedUserId)
-    const response = await fetch(`${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}?${params.toString()}`, {
-      method: 'DELETE',
-    })
+    const response = await fetch(
+      `${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}?${params.toString()}`,
+      {
+        method: 'DELETE',
+      },
+    )
 
     if (!response.ok) {
       throw new Error(`Failed to delete memory: ${response.statusText}`)
@@ -124,10 +123,7 @@ export const mcpMemoryManager = {
     )
   },
 
-  async searchByTags(
-    tags: string[],
-    userId?: string,
-  ): Promise<MemoryEntry[]> {
+  async searchByTags(tags: string[], userId?: string): Promise<MemoryEntry[]> {
     const resolvedUserId = requireUserId(userId)
     return fetchMappedMemories(
       buildMemoryListQuery({ userId: resolvedUserId, tags }),
@@ -217,8 +213,12 @@ function buildMemoryListQuery({
   return params
 }
 
-async function fetchMappedMemories(params: URLSearchParams): Promise<MemoryEntry[]> {
-  const response = await fetch(`${BASE_URL}/api/memory/list?${params.toString()}`)
+async function fetchMappedMemories(
+  params: URLSearchParams,
+): Promise<MemoryEntry[]> {
+  const response = await fetch(
+    `${BASE_URL}/api/memory/list?${params.toString()}`,
+  )
   if (!response.ok) {
     throw new Error(`Failed to fetch memories: ${response.statusText}`)
   }

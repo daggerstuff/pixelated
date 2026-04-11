@@ -481,7 +481,12 @@ export function useServiceHealth(checkInterval: number = 60000) {
         overall: 'error',
         services: [],
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
     } finally {
       setLoading(false)

@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+
 import { Router } from 'express'
 
 import { DocumentModelMongoose } from '../models/DocumentMongoose'
@@ -8,10 +9,7 @@ import { EdgeCaseMappingService } from '../services/edgeCaseMappingService'
 
 const router = Router()
 
-const LAST_IMPORT_FILE = path.join(
-  process.cwd(),
-  '.last-strategy-import.json',
-)
+const LAST_IMPORT_FILE = path.join(process.cwd(), '.last-strategy-import.json')
 
 /** Lean document shape returned by find().lean() for dashboard (metadata may include reviewScore, edgeCaseCount, aiReview, customFields). */
 interface LeanStrategyDoc {
@@ -22,8 +20,15 @@ interface LeanStrategyDoc {
   metadata?: Record<string, unknown>
 }
 
-function getSourceFile(metadata: Record<string, unknown> | undefined): string | undefined {
-  if (!metadata || typeof metadata.customFields !== 'object' || metadata.customFields === null) return undefined
+function getSourceFile(
+  metadata: Record<string, unknown> | undefined,
+): string | undefined {
+  if (
+    !metadata ||
+    typeof metadata.customFields !== 'object' ||
+    metadata.customFields === null
+  )
+    return undefined
   const cf = metadata.customFields as Record<string, unknown>
   const v = cf.source_file
   return typeof v === 'string' ? v : undefined
@@ -38,7 +43,9 @@ function getSourceFile(metadata: Record<string, unknown> | undefined): string | 
  */
 router.get('/dashboard', async (_req, res) => {
   try {
-    const documents = (await DocumentModelMongoose.find({}).lean()) as LeanStrategyDoc[]
+    const documents = (await DocumentModelMongoose.find(
+      {},
+    ).lean()) as LeanStrategyDoc[]
 
     // We can either compute this on the fly or read from metadata.
     // Since we ran the import script, metadata should be populated.
@@ -118,7 +125,7 @@ router.post('/refresh-analysis', async (_req, res) => {
         const idStr = doc._id.toString()
         const [review, mapping] = await Promise.all([
           AIStrategyReviewService.reviewDocument(idStr),
-          EdgeCaseMappingService.mapStrategyToEdgeCases(idStr)
+          EdgeCaseMappingService.mapStrategyToEdgeCases(idStr),
         ])
 
         return {
@@ -133,7 +140,7 @@ router.post('/refresh-analysis', async (_req, res) => {
             },
           },
         }
-      })
+      }),
     )
 
     if (bulkOps.length > 0) {

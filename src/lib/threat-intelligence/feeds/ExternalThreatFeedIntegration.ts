@@ -125,7 +125,7 @@ export class ExternalThreatFeedIntegrationCore
       },
       (error) => {
         logger.error('HTTP response error', {
-          error: (error instanceof Error ? error.message : "Unknown error"),
+          error: error instanceof Error ? error.message : 'Unknown error',
           status: error.response?.status,
           url: error.config?.url,
         })
@@ -440,7 +440,8 @@ export class ExternalThreatFeedIntegrationCore
         (subscription.itemsProcessed ?? 0) + processingResult.itemsProcessed
 
       if (processingResult.errors > 0) {
-        subscription.errors = (subscription.errors ?? 0) + processingResult.errors
+        subscription.errors =
+          (subscription.errors ?? 0) + processingResult.errors
       }
 
       // Update subscription in database
@@ -1319,11 +1320,7 @@ class STIXFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1452,11 +1449,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1585,11 +1578,7 @@ class MISPFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1718,11 +1707,7 @@ class OTXFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1850,11 +1835,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: 'malware',
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1959,11 +1940,7 @@ class GenericFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapGenericToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {

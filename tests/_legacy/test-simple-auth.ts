@@ -52,8 +52,9 @@ async function testSimpleAuth() {
   }
 }
 
-void // Run the test and handle any unhandled rejections
-testSimpleAuth()
-  .catch((error) => {
+void (
+  // Run the test and handle any unhandled rejections
+  testSimpleAuth().catch((error) => {
     console.error('Unhandled error:', error)
   })
+)

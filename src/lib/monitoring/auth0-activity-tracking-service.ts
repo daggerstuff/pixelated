@@ -639,7 +639,12 @@ export class Auth0ActivityTrackingService {
         userId,
         {
           sessionId: sessionId,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )

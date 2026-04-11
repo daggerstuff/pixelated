@@ -223,7 +223,13 @@ export interface ResponseStrategy {
   responseActions: ResponseAction[]
   conditions: ResponseCondition[]
   priority: number
-  primaryType?: 'block' | 'isolate' | 'alert' | 'investigate' | 'mitigate' | 'rate_limit'
+  primaryType?:
+    | 'block'
+    | 'isolate'
+    | 'alert'
+    | 'investigate'
+    | 'mitigate'
+    | 'rate_limit'
 }
 
 export interface ResponseAction {
@@ -569,7 +575,13 @@ export interface HuntExecution {
   patternId: string
   startTime: Date
   completedTime?: Date
-  status: 'preparing' | 'executing' | 'completed' | 'failed' | 'cancelled' | 'timeout'
+  status:
+    | 'preparing'
+    | 'executing'
+    | 'completed'
+    | 'failed'
+    | 'cancelled'
+    | 'timeout'
   scope: string[]
   dataSources: string[]
   regions: string[]

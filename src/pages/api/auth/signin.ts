@@ -128,14 +128,19 @@ export const POST = async ({
     console.error('Sign in error:', error)
 
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
-      error: (error instanceof Error ? error.message : "Unknown error"),
+      error: error instanceof Error ? error.message : 'Unknown error',
       clientInfo,
       timestamp: Date.now(),
     })
 
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Sign in failed',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Sign in failed',
       }),
       {
         status: 401,

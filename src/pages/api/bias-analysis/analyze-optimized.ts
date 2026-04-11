@@ -76,9 +76,7 @@ function scrubForClient(input: unknown): unknown {
     seen.add(value)
 
     if (Array.isArray(value)) {
-      return value
-        .map((v) => scrub(v))
-        .filter((v) => v !== undefined)
+      return value.map((v) => scrub(v)).filter((v) => v !== undefined)
     }
 
     const out: Record<string, unknown> = {}
@@ -124,13 +122,16 @@ export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now()
 
   // Validate environment configuration
-  const missingVars = REQUIRED_ENV_VARS.filter(v => !process.env[v])
+  const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v])
   if (missingVars.length > 0) {
-    logger.error('Missing critical environment variables', { requestId, missingVars })
+    logger.error('Missing critical environment variables', {
+      requestId,
+      missingVars,
+    })
     if (isProduction) {
       return new Response(
         JSON.stringify({ error: 'Service configuration error', requestId }),
-        { status: 500, headers: CACHE_HEADERS }
+        { status: 500, headers: CACHE_HEADERS },
       )
     }
   }
@@ -285,7 +286,11 @@ export const POST: APIRoute = async ({ request }) => {
     })
 
     // Return sanitized error to client (no stack)
-    if (error instanceof Error && (error instanceof Error ? error.message : "Unknown error") === 'Analysis timeout') {
+    if (
+      error instanceof Error &&
+      (error instanceof Error ? error.message : 'Unknown error') ===
+        'Analysis timeout'
+    ) {
       return new Response(
         JSON.stringify(
           scrubForClient({
@@ -398,7 +403,11 @@ export const GET: APIRoute = async ({ request }) => {
       ...(isProduction ? {} : { stack: safe.stack }),
     })
 
-    if (error instanceof Error && (error instanceof Error ? error.message : "Unknown error") === 'Summary timeout') {
+    if (
+      error instanceof Error &&
+      (error instanceof Error ? error.message : 'Unknown error') ===
+        'Summary timeout'
+    ) {
       return new Response(
         JSON.stringify(
           scrubForClient({
@@ -591,7 +600,11 @@ export const PUT: APIRoute = async ({ request }) => {
       ...(isProduction ? {} : { stack: safe.stack }),
     })
 
-    if (error instanceof Error && (error instanceof Error ? error.message : "Unknown error") === 'Analysis timeout') {
+    if (
+      error instanceof Error &&
+      (error instanceof Error ? error.message : 'Unknown error') ===
+        'Analysis timeout'
+    ) {
       return new Response(
         JSON.stringify(
           scrubForClient({

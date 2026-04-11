@@ -25,13 +25,16 @@ const isBuildCommand =
   process.env.CI === 'true' ||
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
-const hasSentryDSN =
-  !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
 const sentryRelease =
   process.env.SENTRY_RELEASE || process.env.npm_package_version || undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 
-function createScopedSentryVitePlugins({ ssr, assets, filesToDeleteAfterUpload }) {
+function createScopedSentryVitePlugins({
+  ssr,
+  assets,
+  filesToDeleteAfterUpload,
+}) {
   return sentryVitePlugin({
     org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
     project: process.env.SENTRY_PROJECT || 'pixel-astro',
@@ -217,15 +220,15 @@ export default defineConfig({
           'recharts',
           'chart.js',
           '@opentelemetry/api',
-        '@opentelemetry/otlp-exporter-base',
-        '@opentelemetry/exporter-trace-otlp-http',
-        '@opentelemetry/exporter-metrics-otlp-http',
-        '@opentelemetry/otlp-transformer',
-        /^@opentelemetry\//,
-        'stream-browserify',
-        'path-browserify',
-        'crypto-browserify',
-        'util',
+          '@opentelemetry/otlp-exporter-base',
+          '@opentelemetry/exporter-trace-otlp-http',
+          '@opentelemetry/exporter-metrics-otlp-http',
+          '@opentelemetry/otlp-transformer',
+          /^@opentelemetry\//,
+          'stream-browserify',
+          'path-browserify',
+          'crypto-browserify',
+          'util',
         ],
         onwarn(warning, warn) {
           if (
@@ -290,9 +293,9 @@ export default defineConfig({
         'stream-browserify': 'node:stream',
         'path-browserify': 'node:path',
         'crypto-browserify': 'node:crypto',
-        'buffer': 'node:buffer',
-        'events': 'node:events',
-        'util': 'node:util',
+        buffer: 'node:buffer',
+        events: 'node:events',
+        util: 'node:util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
