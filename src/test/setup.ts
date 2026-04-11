@@ -15,6 +15,10 @@ import { cleanup } from '@testing-library/react'
 // Keep auth-config imports from exploding in test/bootstrap contexts.
 process.env.JWT_SECRET ??= 'test-jwt-secret'
 
+const reactCompat = React as typeof React & {
+  act?: typeof act
+}
+
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>()
   const patchedAct = typeof actual.act === 'function' ? actual.act : act
@@ -33,9 +37,9 @@ vi.mock('react-dom/test-utils', () => ({
 }))
 
 // Make act available on React for components that import it directly
-if (!React.act || typeof React.act !== 'function') {
+if (!reactCompat.act || typeof reactCompat.act !== 'function') {
   try {
-    Object.defineProperty(React, 'act', {
+    Object.defineProperty(reactCompat, 'act', {
       value: act,
       writable: true,
       configurable: true,
