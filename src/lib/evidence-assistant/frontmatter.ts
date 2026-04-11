@@ -78,7 +78,9 @@ export function parseEvidenceFrontmatter(
           const listLine = lines[cursor] ?? ''
           const listMatch = listLine.match(/^\s*-\s*(.+)\s*$/)
           if (!listMatch) break
-          const listValue = normalizeString(listMatch[1]?.replace(/^["']|["']$/g, ''))
+          const listValue = normalizeString(
+            listMatch[1]?.replace(/^["']|["']$/g, ''),
+          )
           if (listValue) values.push(listValue)
           cursor += 1
         }
@@ -91,7 +93,8 @@ export function parseEvidenceFrontmatter(
     }
 
     const body = trimmed.slice(frontmatterMatch[0].length)
-    const title = normalizeString(parsed.title) ?? inferTitle(body) ?? 'Untitled'
+    const title =
+      normalizeString(parsed.title) ?? inferTitle(body) ?? 'Untitled'
     const category =
       normalizeString(parsed.category) ?? normalizeString(parsed.series)
 

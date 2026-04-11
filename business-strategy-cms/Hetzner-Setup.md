@@ -1,53 +1,50 @@
-# OVHCloud Object Storage Setup Guide
+# Hetzner Object Storage Setup Guide
 
 ## Overview
 
-This guide explains how to configure the Business Strategy CMS to use OVHCloud
-Object Storage instead of AWS S3. OVHCloud provides S3-compatible object storage
+This guide explains how to configure the Business Strategy CMS to use Hetzner
+Object Storage instead of AWS S3. Hetzner provides S3-compatible object storage
 with the same API endpoints and SDK compatibility.
 
 ## Configuration
 
 ### 1. Environment Variables
 
-Update your `.env` file with OVHCloud credentials:
+Update your `.env` file with Hetzner credentials:
 
 ```bash
-# OVHCloud Object Storage (S3-compatible)
-OVH_ENDPOINT=https://s3.[REGION].io.cloud.ovh.net
-OVH_ACCESS_KEY_ID=your-ovh-access-key
-OVH_SECRET_ACCESS_KEY=your-ovh-secret-key
-OVH_REGION=your-region (e.g., us-east-1, gra, de, uk)
-OVH_BUCKET_NAME=your-bucket-name
+# Hetzner Object Storage (S3-compatible)
+HETZNER_ENDPOINT=https://hel1.your-objectstorage.com
+HETZNER_ACCESS_KEY_ID=your-hetzner-access-key
+HETZNER_SECRET_ACCESS_KEY=your-hetzner-secret-key
+HETZNER_REGION=your-region (e.g., hel1)
+HETZNER_BUCKET_NAME=your-bucket-name
 
 # Optional: Custom settings
 MAX_FILE_SIZE=10485760  # 10MB default
 UPLOAD_PATH=./uploads   # Local fallback for development
 ```
 
-### 2. OVHCloud Credentials
+### 2. Hetzner Credentials
 
-Get your credentials from OVHCloud:
+Get your credentials from Hetzner:
 
-1. **Access Key ID**: Your OVHCloud access key
-2. **Secret Access Key**: Your OVHCloud secret key
+1. **Access Key ID**: Your Hetzner access key
+2. **Secret Access Key**: Your Hetzner secret key
 3. **Endpoint**: Based on your region:
-   - `https://s3.gra.io.cloud.ovh.net` (Gravelines, France)
-   - `https://s3.de.io.cloud.ovh.net` (Germany)
-   - `https://s3.uk.io.cloud.ovh.net` (United Kingdom)
-   - `https://s3.us-east-1.io.cloud.ovh.net` (US East)
-   - `https://s3.ca-east-1.io.cloud.ovh.net` (Canada East)
+   - `https://hel1.your-objectstorage.com` (Default Hetzner endpoint)
+   - `https://hel1.your-objectstorage.com` (Hetzner default)
 
 ### 3. Bucket Creation
 
-Create your bucket using OVHCloud Control Panel or API:
+Create your bucket using Hetzner Control Panel or API:
 
 ```bash
 # Using AWS CLI
 aws s3api create-bucket \
   --bucket your-bucket-name \
-  --endpoint-url https://s3.gra.io.cloud.ovh.net \
-  --region gra
+  --endpoint-url https://hel1.your-objectstorage.com \
+  --region hel1
 ```
 
 ## Usage
@@ -109,50 +106,45 @@ await MediaService.deleteFile('documents/file.pdf')
 
 | Region               | Endpoint                                |
 | -------------------- | --------------------------------------- |
-| Gravelines (France)  | `https://s3.gra.io.cloud.ovh.net`       |
-| Strasbourg (France)  | `https://s3.sbg.io.cloud.ovh.net`       |
-| Frankfurt (Germany)  | `https://s3.de.io.cloud.ovh.net`        |
-| London (UK)          | `https://s3.uk.io.cloud.ovh.net`        |
-| Beauharnois (Canada) | `https://s3.ca-east-1.io.cloud.ovh.net` |
-| US East              | `https://s3.us-east-1.io.cloud.ovh.net` |
+| Hetzner Default      | `https://hel1.your-objectstorage.com`   |
 
 ## Migration from AWS S3
 
 The migration is seamless since both use the same AWS SDK. Simply update:
 
-1. **Environment variables** from AWS*\* to OVH*\*
-2. **Endpoint URL** to OVHCloud regional endpoint
-3. **Region** to your OVHCloud region
+1. **Environment variables** from AWS*\* to HETZNER*\*
+2. **Endpoint URL** to Hetzner regional endpoint
+3. **Region** to your Hetzner region
 
 ### Before (AWS S3)
 
 ```bash
 AWS_ACCESS_KEY_ID=xxx
 AWS_SECRET_ACCESS_KEY=xxx
-AWS_REGION=us-east-1
+AWS_REGION=hel1
 AWS_S3_BUCKET=my-bucket
 ```
 
-### After (OVHCloud)
+### After (Hetzner)
 
 ```bash
-OVH_ACCESS_KEY_ID=xxx
-OVH_SECRET_ACCESS_KEY=xxx
-OVH_REGION=us-east-1
-OVH_BUCKET_NAME=my-bucket
-OVH_ENDPOINT=https://s3.us-east-1.io.cloud.ovh.net
+HETZNER_ACCESS_KEY_ID=xxx
+HETZNER_SECRET_ACCESS_KEY=xxx
+HETZNER_REGION=hel1
+HETZNER_BUCKET_NAME=my-bucket
+HETZNER_ENDPOINT=https://hel1.your-objectstorage.com
 ```
 
 ## Testing
 
-Test your OVHCloud integration:
+Test your Hetzner integration:
 
 ```bash
 # Install dependencies
 pnpm install
 
-# Test OVHCloud connection
-pnpm test:ovh
+# Test Hetzner connection
+pnpm test:hetzner
 
 # Upload test file
 curl -X POST http://localhost:3000/api/upload \
@@ -164,7 +156,7 @@ curl -X POST http://localhost:3000/api/upload \
 
 ### Common Issues
 
-1. **Access Denied**: Check OVHCloud credentials and bucket permissions
+1. **Access Denied**: Check Hetzner credentials and bucket permissions
 2. **Endpoint Not Found**: Verify region endpoint URL
 3. **Bucket Not Found**: Ensure bucket exists in correct region
 
@@ -182,7 +174,7 @@ DEBUG=aws-sdk* pnpm dev
 import AWS from 'aws-sdk'
 
 const s3 = new AWS.S3({
-  endpoint: 'https://s3.gra.io.cloud.ovh.net',
+  endpoint: 'https://hel1.your-objectstorage.com',
   accessKeyId: 'your-key',
   secretAccessKey: 'your-secret',
   region: 'gra',
@@ -197,12 +189,12 @@ s3.listBuckets().promise().then(console.log).catch(console.error)
 
 - **Upload Speed**: Comparable to AWS S3
 - **Latency**: Regional optimization
-- **Bandwidth**: No egress charges within OVHCloud
-- **CDN**: Optional integration with OVHCloud CDN
+- **Bandwidth**: No egress charges within Hetzner
+- **CDN**: Optional integration with Hetzner CDN
 
 ## Cost
 
-OVHCloud Object Storage pricing:
+Hetzner Object Storage pricing:
 
 - Storage: €0.01/GB/month
 - Outbound traffic: €0.01/GB
@@ -210,7 +202,7 @@ OVHCloud Object Storage pricing:
 
 ## Production Checklist
 
-- [ ] Valid OVHCloud credentials
+- [ ] Valid Hetzner credentials
 - [ ] Correct regional endpoint
 - [ ] Bucket created in correct region
 - [ ] Environment variables configured

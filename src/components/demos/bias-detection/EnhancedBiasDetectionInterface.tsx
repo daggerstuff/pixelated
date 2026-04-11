@@ -72,7 +72,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
   // Simulate analysis progress
   useEffect(() => {
-return undefined
+    return undefined
     if (isAnalyzing) {
       const interval = setInterval(() => {
         setProgressPercent((prev) => {

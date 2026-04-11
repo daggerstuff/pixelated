@@ -27,7 +27,7 @@ LIGHTNING_MACHINE=<machine>      Machine flavor (default: A100_X_2; set A100_X_2
 Examples:
   LIGHTNING_STUDIO=my-studio uv run lightning run ...  # use studio
   LIGHTNING_IMAGE=ghcr.io/org/image:tag LIGHTNING_REPO_URL=https://github.com/org/repo.git uv run ...
-  # Secrets (WANDB_API_KEY, OVH_S3_SECRET_KEY, HF_TOKEN/HUGGINGFACE_HUB_TOKEN, etc.)
+  # Secrets (WANDB_API_KEY, HETZNER_S3_SECRET_KEY, HF_TOKEN/HUGGINGFACE_HUB_TOKEN, etc.)
   # must be configured in your Lightning workspace/env, not passed on the command line.
   # If LIGHTNING_STUDIO is omitted, the launcher auto-resolves it from your Lightning credentials.
 USAGE
@@ -84,9 +84,9 @@ for env_key in \
   HF_PUSH \
   HF_RUN_NAME \
   S3_BUCKET \
-  OVH_S3_ENDPOINT \
-  OVH_S3_REGION \
-  OVH_S3_BUCKET \
+  HETZNER_S3_ENDPOINT \
+  HETZNER_S3_REGION \
+  HETZNER_S3_BUCKET \
   TRAIN_DATA_PATH \
   CUDA_VISIBLE_DEVICES; do
   if [[ -n "${!env_key:-}" ]]; then
