@@ -10,9 +10,9 @@ env:
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main, master, staging]
   pull_request:
-    branches: [main, staging]
+    branches: [main, master, staging]
   schedule:
     - cron: '0 0 * * *'
 

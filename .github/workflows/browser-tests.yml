@@ -6,9 +6,9 @@ permissions:
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main, master, staging]
   pull_request:
-    branches: [main, staging]
+    branches: [main, master, staging]
   workflow_dispatch:
 
 env:
@@ -42,7 +42,7 @@ jobs:
           version: 10.33.0
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}

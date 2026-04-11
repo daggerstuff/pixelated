@@ -7,9 +7,9 @@ permissions:
 
 on:
   push:
-    branches: [master, staging]
+    branches: [main, master, staging]
   pull_request:
-    branches: [master, staging]
+    branches: [main, master, staging]
   schedule:
     # Run every Monday at 2:00 AM UTC
     - cron: '0 2 * * 1'
@@ -72,7 +72,7 @@ jobs:
 
       - name: Setup pnpm cache
         if: matrix.language == 'javascript'
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}

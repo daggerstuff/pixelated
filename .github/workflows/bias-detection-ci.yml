@@ -10,7 +10,7 @@ permissions:
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main, master, staging]
     paths:
       - src/lib/ai/bias-detection/**
       - src/components/admin/bias-detection/**
@@ -18,7 +18,7 @@ on:
       - tests/**/*bias-detection*
       - .github/workflows/bias-detection-ci.yml
   pull_request:
-    branches: [main, staging]
+    branches: [main, master, staging]
     paths:
       - src/lib/ai/bias-detection/**
       - src/components/admin/bias-detection/**
@@ -86,7 +86,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache for CodeQL
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -135,7 +135,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -204,7 +204,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -277,7 +277,7 @@ jobs:
           service-dir: src/lib/ai/bias-detection/python-service
 
       - name: Cache pip dependencies
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
@@ -376,7 +376,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
