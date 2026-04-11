@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatTimestamp } from '@/lib/dates'
 import { simpleMarkdownToHtml } from '@/lib/markdown'
 import { cn } from '@/lib/utils'
+import DOMPurify from 'isomorphic-dompurify'
 import type { Message } from '@/types/chat'
 
 // Define the MentalHealthAnalysis interface with the properties we need
@@ -133,7 +134,7 @@ export function ChatMessage({
             <div
               className='prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none'
               dangerouslySetInnerHTML={{
-                __html: simpleMarkdownToHtml(message.content),
+                __html: DOMPurify.sanitize(simpleMarkdownToHtml(message.content)),
               }}
             />
           )}

@@ -1,0 +1,1 @@
+## 2026-04-11 - Fix XSS in ChatMessage | Vulnerability: Unsanitized markdown-to-html rendered via dangerouslySetInnerHTML | Learning: Custom markdown parsers can have edge cases that bypass XSS protections | Prevention: Always use isomorphic-dompurify or dompurify when setting inner HTML, even after custom markdown parsing
