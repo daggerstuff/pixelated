@@ -43,7 +43,7 @@ export function getEnabledExportTypes(
     'demographics',
     'sessions',
     'recommendations',
-  ].filter((key): key is ExportDataType => dataTypes[key])
+  ].filter((key): key is ExportDataType => dataTypes[key as ExportDataType])
 }
 
 function buildEnabledExportTypes(dataTypes: ExportDataTypes): ExportDataType[] {
