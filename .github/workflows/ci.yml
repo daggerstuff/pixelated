@@ -95,7 +95,6 @@ jobs:
         uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
-          audience: //iam.googleapis.com/${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
