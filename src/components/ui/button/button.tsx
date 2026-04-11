@@ -121,13 +121,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
     target: _target,
     rel: _rel,
     asChild: _asChild,
+    type = 'button',
     ...buttonProps
   } = props
 
   // Render as button
   return (
     <button
-      type='button'
+      type={type}
       ref={ref}
       disabled={disabled || loading}
       {...commonElementProps}

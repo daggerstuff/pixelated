@@ -1,5 +1,6 @@
 // import { Document } from '@/types/document'
 import { DocumentModel } from '@/models/Document'
+import { DocumentCategory } from '@/types/document'
 
 export interface StrategyReview {
   documentId: string
@@ -63,7 +64,7 @@ export class AIStrategyReviewService {
       review.recommendations.push('Develop a detailed risk mitigation strategy')
     }
 
-    if (document.category === 'executive_summary') {
+    if (document.category === DocumentCategory.EXECUTIVE_SUMMARY) {
       review.overallScore = content.length > 2000 ? 0.9 : 0.7
     }
 
@@ -78,7 +79,14 @@ export class AIStrategyReviewService {
     contradictions: string[]
     missingLinks: string[]
   }> {
-    const documents = await DocumentModel.findAll({ category })
+    const isDocumentCategory = Object.values(DocumentCategory).includes(
+      category as DocumentCategory,
+    )
+    const documents = await DocumentModel.findAll(
+      isDocumentCategory
+        ? { category: category as DocumentCategory }
+        : undefined,
+    )
 
     // Simulating cross-document analysis
     return {

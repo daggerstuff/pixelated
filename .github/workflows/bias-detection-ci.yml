@@ -28,7 +28,6 @@ on:
 
 env:
   GHA_LOCAL_RUN: 'false'
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PYTHON_VERSION: 3.13
   PNPM_VERSION: 10.33.0
@@ -48,16 +47,20 @@ jobs:
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         uses: aquasecurity/trivy-action@v0.35.0
         with:
+          cache: 'false'
           scan-type: fs
           scan-ref: .
           format: sarif
           output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: trivy-results.sarif
+          category: trivy-fs
 
       - name: Initialize CodeQL
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
@@ -503,7 +506,7 @@ jobs:
           NODE_ENV: test
 
       - name: Upload E2E test results
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         if: failure()
         with:
           name: e2e-test-results

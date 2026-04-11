@@ -49,7 +49,7 @@ export interface ButtonButtonProps
     ButtonBaseProps,
     Omit<
       ComponentPropsWithoutRef<'button'>,
-      keyof ButtonBaseProps | 'type' | 'href' | 'target' | 'rel'
+      keyof ButtonBaseProps | 'href' | 'target' | 'rel'
     >,
     ButtonVariantProps {
   href?: undefined
