@@ -132,7 +132,7 @@ interface ExtendedAuthenticationClient extends AuthenticationClient {
 }
 
 // Extend UserInfoClient
-interface ExtendedUserInfoClient extends UserInfoClient {
+type ExtendedUserInfoClient = Omit<UserInfoClient, 'getUserInfo'> & {
   getUserInfo: (token: string) => Promise<{ data: unknown }>
 }
 import type { Db } from 'mongodb'
@@ -321,7 +321,7 @@ export class Auth0UserService {
         const userInfoRes = await auth0UserInfo.getUserInfo(
           tokenResponse.access_token,
         )
-        userResponse = userInfoRes.data as Auth0UserRecord
+        userResponse = this.parseAuth0UserRecord(userInfoRes.data)
         // normalized to match old structure expected below
         userResponse = {
           ...userResponse,
@@ -382,7 +382,7 @@ export class Auth0UserService {
           created_at: new Date().toISOString(),
         },
       })
-      const auth0User = createRes.data as Auth0UserRecord
+      const auth0User = this.parseAuth0UserRecord(createRes.data)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -403,7 +403,7 @@ export class Auth0UserService {
 
     try {
       const getUserRes = await auth0Management.users.get({ id: userId })
-      const auth0User = getUserRes.data as Auth0UserRecord
+      const auth0User = this.parseAuth0UserRecord(getUserRes.data)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -423,7 +423,7 @@ export class Auth0UserService {
 
     try {
       const usersPage = await auth0Management.users.list({})
-      const users = usersPage.data as Auth0UserRecord[]
+      const users = this.parseAuth0UserList(usersPage.data)
       return users
         .map((user) => this.toAuthenticatedUser(user))
         .filter((user) => Boolean(user.id))
@@ -447,7 +447,7 @@ export class Auth0UserService {
       const usersRes = await auth0Management.users.listUsersByEmail({
         email,
       })
-      const users = (usersRes.data as Auth0UserRecord[]) ?? []
+      const users = this.parseAuth0UserList(usersRes)
 
       if (users.length === 0) {
         return null
@@ -516,7 +516,7 @@ export class Auth0UserService {
       }
 
       const updateRes = await auth0Management.users.update(userId, updateParams)
-      const auth0User = updateRes.data as Auth0UserRecord
+      const auth0User = this.parseAuth0UserRecord(updateRes.data)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -588,8 +588,8 @@ export class Auth0UserService {
         tokenResponse.access_token,
       )
       const userResponse = {
-        ...(userInfoRes.data as Auth0UserRecord),
-        user_id: (userInfoRes.data as Auth0UserRecord).sub,
+        ...this.parseAuth0UserRecord(userInfoRes.data),
+        user_id: this.parseAuth0UserRecord(userInfoRes.data).sub,
       }
       const auth0User = this.toAuthenticatedUser(userResponse)
       const expiresIn =
@@ -626,9 +626,10 @@ export class Auth0UserService {
         throw new Error('Auth0 UserInfo client not initialized')
       }
       const userInfoRes = await auth0UserInfo.getUserInfo(token)
+      const userInfoData = this.parseAuth0UserRecord(userInfoRes.data)
       const decodedToken = {
-        ...(userInfoRes.data as Auth0UserRecord),
-        user_id: (userInfoRes.data as Auth0UserRecord).sub,
+        ...userInfoData,
+        user_id: userInfoData.sub,
       }
 
       return {
@@ -659,8 +660,8 @@ export class Auth0UserService {
         result_url: returnUrl,
         ttl_sec: 3600, // 1 hour
       })
-      const ticket = ticketRes.data as Record<string, unknown>
-      return this.toStringOrUndefined(ticket.ticket) ?? null
+      const ticket = this.toRecord(ticketRes.data)
+      return ticket ? this.toStringOrUndefined(ticket.ticket) ?? null : null
     } catch (error: unknown) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')
@@ -981,13 +982,29 @@ export class Auth0UserService {
     return typeof value === 'boolean' ? value : false
   }
 
+  private parseAuth0UserRecord(value: unknown): Auth0UserRecord {
+    return this.toRecord(value) ?? {}
+  }
+
+  private parseAuth0UserList(value: unknown): Auth0UserRecord[] {
+    if (!Array.isArray(value)) {
+      return []
+    }
+
+    return value.map((item) => this.parseAuth0UserRecord(item))
+  }
+
   private toRecord(value: unknown): Record<string, unknown> | undefined {
     if (
       value !== null &&
       typeof value === 'object' &&
       !Array.isArray(value)
     ) {
-      return value as Record<string, unknown>
+      const record: Record<string, unknown> = {}
+      for (const [key, item] of Object.entries(value)) {
+        record[key] = item
+      }
+      return record
     }
     return undefined
   }
