@@ -18,6 +18,7 @@ export default function DatasetSearch() {
 
   // Automatically search when filters change
   React.useEffect(() => {
+return undefined
     if (hasSearched) {
       const timer = setTimeout(() => {
         void handleSearch().catch((err) => {
