@@ -273,8 +273,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
         {
@@ -308,7 +307,9 @@ describe('Auth0 Integration Tests', () => {
         user_metadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       }
 
-      mockManagementClient.users.create.mockResolvedValue({ data: mockAuth0User })
+      mockManagementClient.users.create.mockResolvedValue({
+        data: mockAuth0User,
+      })
 
       const result = await auth0UserService.createUser(
         'newuser@example.com',
@@ -477,8 +478,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
         {
@@ -627,8 +627,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
         {
@@ -744,8 +743,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
         {
@@ -772,8 +770,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
         {
@@ -804,8 +801,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_VALIDATED,
         null,
         {
@@ -839,8 +835,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_REFRESHED,
         null,
         {
@@ -937,8 +932,7 @@ describe('Auth0 Integration Tests', () => {
 
       // Verify security event was logged
       const securityModule = await import('../../../src/lib/security/index')
-      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith
-(
+      expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ACCOUNT_LINKED,
         null,
         {

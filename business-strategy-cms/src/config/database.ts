@@ -16,7 +16,7 @@ export const connectMongoDB = async (): Promise<void> => {
   while (retries < MAX_RETRIES) {
     try {
       const mongoUri =
-        process.env.MONGODB_URI ||
+        process.env['MONGODB_URI'] ??
         'mongodb://localhost:27017/business-strategy-cms'
 
       await mongoose.connect(mongoUri)
@@ -24,7 +24,7 @@ export const connectMongoDB = async (): Promise<void> => {
       logger.info('MongoDB connected successfully')
 
       // Handle connection events
-      mongoose.connection.on('error', (err) => {
+      mongoose.connection.on('error', (err: unknown) => {
         logger.error('MongoDB connection error:', err)
       })
 
@@ -48,11 +48,11 @@ export const connectMongoDB = async (): Promise<void> => {
 
 // PostgreSQL connection pool
 export const postgresPool = new Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT || '5432'),
-  database: process.env.POSTGRES_DB || 'business_strategy_cms',
-  user: process.env.POSTGRES_USER || 'admin',
-  password: process.env.POSTGRES_PASSWORD || 'password',
+  host: process.env['POSTGRES_HOST'] ?? 'localhost',
+  port: parseInt(process.env['POSTGRES_PORT'] ?? '5432'),
+  database: process.env['POSTGRES_DB'] ?? 'business_strategy_cms',
+  user: process.env['POSTGRES_USER'] ?? 'admin',
+  password: process.env['POSTGRES_PASSWORD'] ?? 'password',
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
@@ -79,8 +79,8 @@ export const testPostgresConnection = async (): Promise<void> => {
 // Redis connection
 export const redisClient = createClient({
   url:
-    process.env.REDIS_URL ||
-    `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || '6379'}`,
+    process.env['REDIS_URL'] ??
+    `redis://${process.env['REDIS_HOST'] ?? 'localhost'}:${process.env['REDIS_PORT'] ?? '6379'}`,
 })
 
 export const connectRedis = async (): Promise<void> => {
@@ -93,7 +93,7 @@ export const connectRedis = async (): Promise<void> => {
       logger.info('Redis connected successfully')
 
       // Handle connection events
-      redisClient.on('error', (err) => {
+      redisClient.on('error', (err: unknown) => {
         logger.error('Redis connection error:', err)
       })
 
