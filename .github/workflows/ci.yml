@@ -100,14 +100,12 @@ jobs:
           PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
           PROVIDER="${PROVIDER#//iam.googleapis.com/}"
           echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
-          echo "audience=//iam.googleapis.com/$PROVIDER" >> "$GITHUB_OUTPUT"
 
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'
         uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ steps.gcp-auth.outputs.provider }}
-          audience: ${{ steps.gcp-auth.outputs.audience }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
