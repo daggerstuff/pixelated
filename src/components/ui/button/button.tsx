@@ -37,94 +37,106 @@ export const buttonVariants = cva(
   },
 )
 
-const Button = React.forwardRef<
-  HTMLButtonElement | HTMLAnchorElement,
-  ButtonProps
->(
-  (
-    {
-      className,
-      variant,
-      size,
-      loading = false,
-      loadingText,
-      showSpinner = true,
-      disabled = false,
-      fullWidth = false,
-      leftIcon,
-      rightIcon,
-      children,
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+  const {
+    className,
+    variant,
+    size,
+    loading = false,
+    loadingText,
+    showSpinner = true,
+    disabled = false,
+    fullWidth = false,
+    leftIcon,
+    rightIcon,
+    children,
+  } = props
+
+  // Handle loading state text
+  const content = loading && loadingText ? loadingText : children
+
+  const combinedClassName = cn(
+    buttonVariants({ variant, size, className }),
+    getButtonClassName({ loading, disabled, fullWidth }),
+  )
+
+  // Render spinner if loading
+  const loadingSpinner =
+    loading && showSpinner ? (
+      <span
+        className='border-current border-t-transparent inline-block h-4 w-4 animate-spin rounded-full border-2'
+        role='status'
+        aria-label='Loading'
+      />
+    ) : null
+
+  // Common props for both button and anchor
+  const commonElementProps = {
+    className: combinedClassName,
+    ...getAriaProps({ loading, disabled, ...props }),
+  }
+
+  // Content wrapper
+  const contentWrapper = (
+    <>
+      {loadingSpinner}
+      {!loading && leftIcon}
+      {content}
+      {!loading && rightIcon}
+    </>
+  )
+
+  // Render as link if href is provided
+  if (isLinkButton(props)) {
+    const {
       href,
       target,
       rel,
-      ...props
-    }: ButtonProps,
-    ref: React.ForwardedRef<HTMLButtonElement | HTMLAnchorElement>,
-  ) => {
-    // Determine if this should be a link
-    const isLink = isLinkButton({ href })
-
-    // Handle loading state text
-    const content = loading && loadingText ? loadingText : children
-
-    // Common props for both button and anchor
-    const commonProps = {
-      className: cn(
-        buttonVariants({ variant, size, className }),
-        getButtonClassName({ loading, disabled, fullWidth }),
-      ),
-      disabled: disabled || loading,
-      ...getAriaProps({ loading, disabled, ...props }),
-      ...props,
-    }
-
-    // Render spinner if loading
-    const loadingSpinner =
-      loading && showSpinner ? (
-        <span
-          className='border-current border-t-transparent inline-block h-4 w-4 animate-spin rounded-full border-2'
-          role='status'
-          aria-label='Loading'
-        />
-      ) : null
-
-    // Content wrapper
-    const contentWrapper = (
-      <>
-        {loadingSpinner}
-        {!loading && leftIcon}
-        {content}
-        {!loading && rightIcon}
-      </>
-    )
-
-    // Render as link if href is provided
-    if (isLink) {
-      // Remove 'type' from commonProps for anchor
-      const { type: _type, disabled: _disabled, ...anchorProps } = commonProps
-      return (
-        <a
-          href={href}
-          target={target}
-          rel={target === '_blank' ? 'noopener noreferrer' : rel}
-          {...anchorProps}
-        >
-          {contentWrapper}
-        </a>
-      )
-    }
-
-    // Render as button
+      asChild: _asChild,
+      disabled: _disabled,
+      loading: _loading,
+      loadingText: _loadingText,
+      showSpinner: _showSpinner,
+      fullWidth: _fullWidth,
+      leftIcon: _leftIcon,
+      rightIcon: _rightIcon,
+      children: _children,
+      ...anchorProps
+    } = props
     return (
-      <button
-        type='button'
-        {...commonProps}
+      <a
+        href={href}
+        target={target}
+        rel={target === '_blank' ? 'noopener noreferrer' : rel}
+        {...commonElementProps}
+        {...anchorProps}
       >
         {contentWrapper}
-      </button>
+      </a>
     )
-  },
-)
+  }
+
+  const {
+    href: _href,
+    target: _target,
+    rel: _rel,
+    asChild: _asChild,
+    ...buttonProps
+  } = props
+
+  // Render as button
+  return (
+    <button
+      type='button'
+      ref={ref}
+      disabled={disabled || loading}
+      {...commonElementProps}
+      {...buttonProps}
+    >
+      {contentWrapper}
+    </button>
+  )
+})
 
 Button.displayName = 'Button'
 

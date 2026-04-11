@@ -11,9 +11,45 @@ import {
   DocumentUpdate,
   DocumentCategory,
   DocumentStatus,
+  DocumentSearchFilters,
 } from '@/types/document'
 
 const router = Router()
+
+const getRouteParam = (
+  req: AuthenticatedRequest,
+  key: string,
+): string | null => {
+  const value = req.params[key]
+  return typeof value === 'string' && value.length > 0 ? value : null
+}
+
+const getBodyString = (
+  req: AuthenticatedRequest,
+  key: string,
+): string | null => {
+  const value = req.body?.[key]
+  return typeof value === 'string' && value.length > 0 ? value : null
+}
+
+const getQueryString = (
+  req: AuthenticatedRequest,
+  key: string,
+): string | undefined => {
+  const value = req.query[key]
+  if (typeof value === 'string' && value.length > 0) {
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    const firstValue = value[0]
+    return typeof firstValue === 'string' && firstValue.length > 0
+      ? firstValue
+      : undefined
+  }
+
+  return undefined
+}
 
 // Create new document
 router.post(
@@ -50,12 +86,31 @@ router.post(
 // Get all documents with filters
 router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
   try {
-    const filters = {
-      category: req.query.category as DocumentCategory,
-      status: req.query.status as DocumentStatus,
-      authorId: req.query.authorId as string,
-      tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
-      searchTerm: req.query.search as string,
+    const filters: DocumentSearchFilters = {}
+    const category = getQueryString(req, 'category')
+    const status = getQueryString(req, 'status')
+    const authorId = getQueryString(req, 'authorId')
+    const tags = getQueryString(req, 'tags')
+    const searchTerm = getQueryString(req, 'search')
+
+    if (category) {
+      filters.category = category as DocumentCategory
+    }
+
+    if (status) {
+      filters.status = status as DocumentStatus
+    }
+
+    if (authorId) {
+      filters.authorId = authorId
+    }
+
+    if (tags) {
+      filters.tags = tags.split(',')
+    }
+
+    if (searchTerm) {
+      filters.searchTerm = searchTerm
     }
 
     const result = await DocumentService.getDocuments(filters)
@@ -80,7 +135,16 @@ router.get(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const document = await DocumentService.getDocument(req.params.id)
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
+      const document = await DocumentService.getDocument(documentId)
       if (!document) {
         res.status(404).json({
           success: false,
@@ -112,11 +176,20 @@ router.put(
   requireCreator,
   async (req: AuthenticatedRequest, res) => {
     try {
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
       const updates: DocumentUpdate = req.body
       const userId = req.user!.userId
 
       const document = await DocumentService.updateDocument(
-        req.params.id,
+        documentId,
         updates,
         userId,
       )
@@ -152,11 +225,17 @@ router.delete(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
       const userId = req.user!.userId
-      const success = await DocumentService.deleteDocument(
-        req.params.id,
-        userId,
-      )
+      const success = await DocumentService.deleteDocument(documentId, userId)
 
       if (!success) {
         res.status(404).json({
@@ -190,11 +269,28 @@ router.post(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const { userId: collaboratorId } = req.body
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
+      const collaboratorId = getBodyString(req, 'userId')
+      if (!collaboratorId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Collaborator user ID is required' },
+        })
+        return
+      }
+
       const requesterId = req.user!.userId
 
       const document = await DocumentService.addCollaborator(
-        req.params.id,
+        documentId,
         collaboratorId,
         requesterId,
       )
@@ -230,10 +326,28 @@ router.delete(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
+      const collaboratorId = getRouteParam(req, 'userId')
+      if (!collaboratorId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Collaborator user ID is required' },
+        })
+        return
+      }
+
       const requesterId = req.user!.userId
       const document = await DocumentService.removeCollaborator(
-        req.params.id,
-        req.params.userId,
+        documentId,
+        collaboratorId,
         requesterId,
       )
 
@@ -269,7 +383,16 @@ router.get(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const versions = await DocumentService.getDocumentVersions(req.params.id)
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
+      const versions = await DocumentService.getDocumentVersions(documentId)
       res.json({
         success: true,
         data: versions,
@@ -294,9 +417,35 @@ router.get(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const version = parseInt(req.params.version)
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
+      const versionParam = getRouteParam(req, 'version')
+      if (!versionParam) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document version is required' },
+        })
+        return
+      }
+
+      const version = Number.parseInt(versionParam, 10)
+      if (Number.isNaN(version)) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document version must be a number' },
+        })
+        return
+      }
+
       const documentVersion = await DocumentService.getDocumentVersion(
-        req.params.id,
+        documentId,
         version,
       )
 
@@ -333,9 +482,18 @@ router.put(
   requireCreator,
   async (req: AuthenticatedRequest, res) => {
     try {
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
       const userId = req.user!.userId
       const document = await DocumentService.publishDocument(
-        req.params.id,
+        documentId,
         userId,
       )
 
@@ -371,9 +529,18 @@ router.put(
   authenticateToken,
   async (req: AuthenticatedRequest, res) => {
     try {
+      const documentId = getRouteParam(req, 'id')
+      if (!documentId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Document ID is required' },
+        })
+        return
+      }
+
       const userId = req.user!.userId
       const document = await DocumentService.archiveDocument(
-        req.params.id,
+        documentId,
         userId,
       )
 

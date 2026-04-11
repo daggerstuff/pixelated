@@ -1,5 +1,5 @@
 import type { VariantProps } from 'class-variance-authority'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ComponentPropsWithoutRef } from 'react'
 
 import { buttonVariants } from './button'
 
@@ -33,11 +33,7 @@ export interface ButtonBaseProps {
   'aria-description'?: string
 }
 
-export interface ButtonProps
-  extends
-    ButtonBaseProps,
-    Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonVariantProps extends VariantProps<typeof buttonVariants> {
   /** The variant style to use */
   variant?: ButtonVariant
   /** The size of the button */
@@ -46,18 +42,39 @@ export interface ButtonProps
   leftIcon?: React.ReactNode
   /** Right icon component */
   rightIcon?: React.ReactNode
-  /** Whether the button should be rendered as a link */
-  href?: string
-  /** Target attribute for link buttons */
-  target?: string
-  /** Rel attribute for link buttons */
-  rel?: string
 }
 
-// Type guard to check if a button has href prop
+export interface ButtonButtonProps
+  extends
+    ButtonBaseProps,
+    Omit<
+      ComponentPropsWithoutRef<'button'>,
+      keyof ButtonBaseProps | 'type' | 'href' | 'target' | 'rel'
+    >,
+    ButtonVariantProps {
+  href?: undefined
+  target?: undefined
+  rel?: undefined
+}
+
+export interface ButtonLinkProps
+  extends
+    ButtonBaseProps,
+    Omit<ComponentPropsWithoutRef<'a'>, keyof ButtonBaseProps | 'type'>,
+    ButtonVariantProps {
+  /** Whether the button should be rendered as a link */
+  href: string
+  /** Target attribute for link buttons */
+  target?: ComponentProps<'a'>['target']
+  /** Rel attribute for link buttons */
+  rel?: ComponentProps<'a'>['rel']
+}
+
+export type ButtonProps = ButtonButtonProps | ButtonLinkProps
+
 export function isLinkButton(
   props: ButtonProps,
-): props is ButtonProps & Required<Pick<ButtonProps, 'href'>> {
+): props is ButtonLinkProps {
   return 'href' in props && typeof props.href === 'string'
 }
 

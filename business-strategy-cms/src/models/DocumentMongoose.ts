@@ -1,8 +1,8 @@
 import mongoose, {
-  Model,
   Schema,
-  Types,
-  Document as MongooseDocument,
+  type Model,
+  type Types,
+  type Document as MongooseDocument,
 } from 'mongoose'
 
 import {
@@ -93,8 +93,7 @@ export interface DocumentVersionDocument
 const documentVersionSchema = new Schema<DocumentVersionDocument>(
   {
     documentId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Document',
+      type: String,
       required: true,
       index: true,
     },

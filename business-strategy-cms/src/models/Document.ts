@@ -83,7 +83,7 @@ export class DocumentModel {
     }
 
     const docs = await DocumentModelMongoose.find(query).sort({ updatedAt: -1 })
-    return docs.map((doc) => toDocument(doc))
+    return docs.map((doc: DocumentDocument) => toDocument(doc))
   }
 
   static async update(
