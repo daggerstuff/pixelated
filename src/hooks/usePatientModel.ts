@@ -67,7 +67,7 @@ export function usePatientModel() {
       setError(null)
 
       try {
-        const model = await patientService.getModelById(currentModelId)
+        const model = await patientService.getModel(currentModelId)
 
         if (model) {
           setCurrentModel(model)
