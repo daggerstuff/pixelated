@@ -59,10 +59,14 @@ class MongoDB {
   private buildMongoDBUri(): string {
     const metaEnv =
       typeof import.meta === 'object' && typeof import.meta.env === 'object'
-        ? (import.meta.env as { MONGODB_URI?: string }).MONGODB_URI
+        && import.meta.env !== null
+        && 'MONGODB_URI' in import.meta.env
+        && typeof import.meta.env['MONGODB_URI'] === 'string'
+        ? import.meta.env['MONGODB_URI']
         : undefined
 
-    const mongoUri = process.env['MONGODB_URI'] ?? metaEnv
+    process.env['MONGODB_URI'] ??= metaEnv
+    const mongoUri = process.env['MONGODB_URI']
 
     if (mongoUri) {
       return mongoUri
@@ -82,9 +86,7 @@ class MongoDB {
   }
 
   public static getInstance(): MongoDB {
-    if (MongoDB.instance === null) {
-      MongoDB.instance = new MongoDB()
-    }
+    MongoDB.instance ??= new MongoDB()
     return MongoDB.instance
   }
 

@@ -33,7 +33,8 @@ export type SealPlainText = SealDisposable & { _sealPlainTextBrand?: never }
 
 export interface SealCipherText extends SealDisposable {
   copy(other: SealCipherText): void
-  // save?(compressionMode?: unknown): string; // If ciphertexts can be saved directly
+  save(compressionMode?: unknown): string
+  load(context: SealContextInternal, data: string): void
 }
 
 interface SealKeyGenerator extends SealDisposable {
