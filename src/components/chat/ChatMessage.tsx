@@ -1,5 +1,7 @@
 import { useContext } from 'react'
 
+import DOMPurify from 'isomorphic-dompurify'
+
 import { ThemeContext } from '@/components/theme/ThemeProvider'
 import { Badge } from '@/components/ui/badge'
 import { formatTimestamp } from '@/lib/dates'
@@ -133,7 +135,7 @@ export function ChatMessage({
             <div
               className='prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none'
               dangerouslySetInnerHTML={{
-                __html: simpleMarkdownToHtml(message.content),
+                __html: DOMPurify.sanitize(simpleMarkdownToHtml(message.content)),
               }}
             />
           )}
