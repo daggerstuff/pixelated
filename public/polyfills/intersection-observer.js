@@ -420,8 +420,8 @@ IntersectionObserver.prototype._unmonitorAllIntersections = function () {
   const unsubscribes = this._monitoringUnsubscribes.slice();
   this._monitoringDocuments.length = 0;
   this._monitoringUnsubscribes.length = 0;
-  for (let i = 0; i < unsubscribes.length; i++) {
-    unsubscribes[i]();
+  for (const unsubscribe of unsubscribes) {
+    unsubscribe();
   }
 };
 
@@ -645,8 +645,7 @@ IntersectionObserver.prototype._hasCrossedThreshold =
       return;
     }
 
-    for (let i = 0; i < this.thresholds.length; i++) {
-      const threshold = this.thresholds[i];
+    for (const threshold of this.thresholds) {
 
       // Return true if an entry matches a threshold or if the new ratio
       // and the old ratio are on the opposite sides of a threshold.

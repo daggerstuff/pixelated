@@ -44,8 +44,8 @@ class AudioProcessor extends AudioWorkletProcessor {
     }
 
     // Write new samples to ring buffer
-    for (let i = 0; i < inputChannel.length; i++) {
-      this.ringBuffer[this.writeIndex] = inputChannel[i]
+    for (const sample of inputChannel) {
+      this.ringBuffer[this.writeIndex] = sample
       this.writeIndex = (this.writeIndex + 1) % this.ringBuffer.length
     }
 
@@ -92,8 +92,8 @@ class AudioProcessor extends AudioWorkletProcessor {
 
   calculateEnergy(samples) {
     let sum = 0
-    for (let i = 0; i < samples.length; i++) {
-      sum += samples[i] * samples[i]
+    for (const sample of samples) {
+      sum += sample * sample
     }
     return Math.sqrt(sum / samples.length)
   }
