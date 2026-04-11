@@ -120,7 +120,7 @@ declare module 'aws-sdk' {
     constructor(config?: unknown)
     getSecretValue(params: unknown): Promise<unknown>
   }
-  export module config {
+  export namespace config {
     export function update(config: unknown): void
   }
 }
