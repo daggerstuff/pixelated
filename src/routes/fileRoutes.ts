@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { Pool } from 'pg'
-import type { ParsedQs } from 'qs'
 
 import { uploadConfig } from '../middleware/upload.js'
 import { DocumentVersioningService } from '../services/DocumentVersioningService.js'
@@ -25,34 +24,29 @@ interface FileMetadata {
 
 const router = Router()
 
-type QueryValue = string | ParsedQs | string[] | ParsedQs[]
-
-const parseQueryNumber = (
-  value: QueryValue | undefined,
-  fallback: number,
-): number => {
+const parseQueryNumber = (value: unknown, fallback: number): number => {
   if (typeof value === 'string') {
     const parsed = parseInt(value, 10)
     return Number.isNaN(parsed) ? fallback : parsed
   }
-  if (Array.isArray(value) && typeof value[0] === 'string') {
+  if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
     const parsed = parseInt(value[0], 10)
     return Number.isNaN(parsed) ? fallback : parsed
   }
   return fallback
 }
 
-const parseQueryString = (value: QueryValue | undefined): string | undefined => {
+const parseQueryString = (value: unknown): string | undefined => {
   if (typeof value === 'string') {
     return value
   }
-  if (Array.isArray(value) && typeof value[0] === 'string') {
+  if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
     return value[0]
   }
   return undefined
 }
 
-const parseStringArrayQuery = (value: QueryValue | undefined): string[] => {
+const parseStringArrayQuery = (value: unknown): string[] => {
   if (typeof value === 'string') {
     return [value]
   }
@@ -377,11 +371,11 @@ export function createFileRoutes(db: Pool) {
         SELECT f.* FROM files f
         WHERE f.uploaded_by = $1
       `
-      const params = [userId]
+      const params: Array<string | number | string[]> = [userId]
 
       if (folderId) {
         query += ` AND f.folder_id = $${params.length + 1}`
-        params.push(folderId as string)
+        params.push(folderId)
       }
 
       if (tags.length > 0) {
@@ -437,7 +431,7 @@ export function createFileRoutes(db: Pool) {
         SELECT f.* FROM files f
         WHERE (f.is_public = TRUE OR f.uploaded_by = $1)
       `
-      const params = [userId]
+      const params: Array<string | number | string[]> = [userId]
 
       if (q) {
         query += ` AND (f.original_name ILIKE $${params.length + 1} OR f.tags @> ARRAY[$${params.length + 2}])`

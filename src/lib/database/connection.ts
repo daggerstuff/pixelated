@@ -9,7 +9,8 @@ import { Pool, PoolClient } from 'pg'
 // CONNECTION INSTANCES
 // ============================================================================
 
-let mongoConnection: typeof mongoose | null = null
+type MongoConnection = Awaited<ReturnType<typeof mongoose.connect>>
+let mongoConnection: MongoConnection | null = null
 let postgresPool: Pool | null = null
 let redisClient: Redis | null = null
 

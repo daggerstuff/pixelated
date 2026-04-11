@@ -24,7 +24,7 @@ export type ManagementClientOptionsWithClientCredentials = {
 }
 
 // Extend ManagementClient to include methods that may not be in the TypeScript definitions
-interface ExtendedManagementClient extends ManagementClient {
+type ExtendedManagementClient = ManagementClient & {
   // Users
   users: ManagementClient['users'] & {
     create: (params: {
@@ -88,7 +88,7 @@ interface ExtendedManagementClient extends ManagementClient {
 }
 
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
-interface ExtendedAuthenticationClient extends AuthenticationClient {
+type ExtendedAuthenticationClient = AuthenticationClient & {
   oauth: AuthenticationClient['oauth'] & {
     passwordGrant: (params: {
       username: string
@@ -237,12 +237,11 @@ function initializeAuth0Clients() {
     config.managementClientSecret
   ) {
     auth0Management ??=
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       new ManagementClient({
         domain: config.domain,
         clientId: config.managementClientId,
         clientSecret: config.managementClientSecret,
-      }) as unknown as ExtendedManagementClient
+      }) as ExtendedManagementClient
   } else {
     console.warn(
       'Auth0 Management configuration is incomplete. User management features may not work.',
@@ -252,14 +251,12 @@ function initializeAuth0Clients() {
   // Initialize Authentication Client if config is available
   if (config.domain && config.clientId && config.clientSecret) {
     auth0Authentication ??=
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       new AuthenticationClient({
         domain: config.domain,
         clientId: config.clientId,
         clientSecret: config.clientSecret,
-      }) as unknown as ExtendedAuthenticationClient
+      }) as ExtendedAuthenticationClient
     auth0UserInfo ??=
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       new UserInfoClient({ domain: config.domain }) as ExtendedUserInfoClient
   } else {
     console.warn(

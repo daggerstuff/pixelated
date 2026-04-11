@@ -737,19 +737,26 @@ const KnowledgeArticleSchema = new mongoose.Schema(
 KnowledgeArticleSchema.index({ author: 1, status: 1 })
 KnowledgeArticleSchema.index({ category: 1, status: 1 })
 
+type BusinessDocumentDocument = mongoose.InferSchemaType<typeof BusinessDocumentSchema>
+type MarketResearchDocument = mongoose.InferSchemaType<typeof MarketResearchSchema>
+
 // ============================================================================
 // EXPORT MODELS
 // ============================================================================
 
-export const BusinessDocument = mongoose.model(
+export const BusinessDocument: mongoose.Model<BusinessDocumentDocument> =
+  mongoose.models.BusinessDocument ??
+  mongoose.model<BusinessDocumentDocument>(
   'BusinessDocument',
   BusinessDocumentSchema,
-)
+  )
 export const Project = mongoose.model('Project', ProjectSchema)
-export const MarketResearch = mongoose.model(
+export const MarketResearch: mongoose.Model<MarketResearchDocument> =
+  mongoose.models.MarketResearch ??
+  mongoose.model<MarketResearchDocument>(
   'MarketResearch',
   MarketResearchSchema,
-)
+  )
 export const StrategicPlan = mongoose.model(
   'StrategicPlan',
   StrategicPlanSchema,

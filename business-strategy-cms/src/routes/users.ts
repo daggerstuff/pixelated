@@ -32,7 +32,16 @@ const parseUserRole = (value: unknown): UserRole | undefined => {
     return undefined
   }
 
-  return Object.values(UserRole).includes(value) ? (value as UserRole) : undefined
+  if (
+    value === UserRole.ADMINISTRATOR ||
+    value === UserRole.CONTENT_CREATOR ||
+    value === UserRole.EDITOR ||
+    value === UserRole.VIEWER
+  ) {
+    return value
+  }
+
+  return undefined
 }
 
 // Get all users (Admin only)

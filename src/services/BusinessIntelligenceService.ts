@@ -1,6 +1,77 @@
 import axios from 'axios'
 import { Pool } from 'pg'
 
+type UnknownRecord = Record<string, unknown>
+
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | UnknownRecord
+  | Date
+
+interface YahooChartResponse {
+  chart?: {
+    result?: Array<{
+      meta?: UnknownRecord
+      indicators?: UnknownRecord
+    }>
+  }
+}
+
+interface AlphaVantageResponse {
+  [key: string]: JsonValue
+}
+
+interface DbCompetitorRow {
+  company: string
+  market_share: number
+  revenue: number
+  growth_rate: number
+  key_products: string[]
+  strengths: string[]
+  weaknesses: string[]
+  last_updated: Date | string
+}
+
+interface DbMarketOpportunityRow {
+  segment: string
+  market_size: number
+  growth_rate: number
+  competition: 'low' | 'medium' | 'high'
+  barriers: string[]
+  opportunities: string[]
+  risk_level: 'low' | 'medium' | 'high'
+  estimated_roi: number
+}
+
+interface DbBusinessMetricsRow {
+  revenue: number
+  growth_rate: number
+  customer_acquisition_cost: number
+  customer_lifetime_value: number
+  churn_rate: number
+  net_promoter_score: number
+  market_share: number
+  employee_count: number
+  quarter: string
+  year: number
+}
+
+interface DbBusinessAlertRow {
+  id: string
+  type: 'market_change' | 'competitor_activity' | 'opportunity' | 'risk'
+  title: string
+  description: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  source: string
+  timestamp: Date | string
+  is_read: boolean
+  action_url?: string
+}
+
 // Market data interfaces
 export interface MarketData {
   symbol: string
@@ -71,11 +142,11 @@ type MarketForecast = {
 }
 
 export class BusinessIntelligenceService {
-  private db: Pool
-  private alphaVantageApiKey: string
-  private yahooFinanceBaseUrl =
+  private readonly db: Pool
+  private readonly alphaVantageApiKey: string
+  private readonly yahooFinanceBaseUrl =
     'https://query1.finance.yahoo.com/v8/finance/chart'
-  private alphaVantageBaseUrl = 'https://www.alphavantage.co/query'
+  private readonly alphaVantageBaseUrl = 'https://www.alphavantage.co/query'
 
   constructor(db: Pool) {
     this.db = db
@@ -86,7 +157,7 @@ export class BusinessIntelligenceService {
   async getMarketData(symbol: string): Promise<MarketData> {
     try {
       // Use Yahoo Finance API for real-time data
-      const response = await axios.get(
+      const response = await axios.get<YahooChartResponse>(
         `${this.yahooFinanceBaseUrl}/${symbol}`,
         {
           params: {
@@ -95,18 +166,24 @@ export class BusinessIntelligenceService {
           },
         },
       )
-
-      const result = response.data.chart.result[0]
-      const meta = result.meta
+      const result = response.data?.chart?.result?.[0]
+      const rawMeta = result?.meta
+      if (!rawMeta) {
+        return this.getDemoMarketData(symbol)
+      }
+      const meta = this.parseYahooMeta(rawMeta)
+      if (!meta) {
+        return this.getDemoMarketData(symbol)
+      }
       const timestamp = new Date()
 
       return {
         symbol: meta.symbol,
         name: meta.symbol, // Would use company name from another endpoint
-        price: meta.regularMarketPrice,
-        change: meta.regularMarketChange,
-        changePercent: meta.regularMarketChangePercent,
-        volume: meta.regularMarketVolume,
+        price: meta.price,
+        change: meta.change,
+        changePercent: meta.changePercent,
+        volume: meta.volume,
         marketCap: meta.marketCap,
         timestamp,
       }
@@ -139,7 +216,7 @@ export class BusinessIntelligenceService {
       }
 
       // Fallback to database-stored data
-      const result = await this.db.query(
+      const result = await this.db.query<DbCompetitorRow>(
         `SELECT * FROM competitor_analysis WHERE industry = $1 ORDER BY market_share DESC`,
         [industry],
       )
@@ -152,7 +229,10 @@ export class BusinessIntelligenceService {
         keyProducts: row.key_products,
         strengths: row.strengths,
         weaknesses: row.weaknesses,
-        lastUpdated: row.last_updated,
+        lastUpdated:
+          typeof row.last_updated === 'string'
+            ? new Date(row.last_updated)
+            : row.last_updated,
       }))
     } catch (error: unknown) {
       console.error('Error fetching competitor analysis:', error)
@@ -170,7 +250,7 @@ export class BusinessIntelligenceService {
       }
 
       // Use database-stored opportunities
-      const result = await this.db.query(
+      const result = await this.db.query<DbMarketOpportunityRow>(
         `SELECT * FROM market_opportunities WHERE industry = $1 ORDER BY estimated_roi DESC`,
         [industry],
       )
@@ -197,7 +277,7 @@ export class BusinessIntelligenceService {
     year?: number,
   ): Promise<BusinessMetrics[]> {
     try {
-      const result = await this.db.query(
+      const result = await this.db.query<DbBusinessMetricsRow>(
         `SELECT * FROM business_metrics 
          WHERE user_id = $1 
          ${quarter ? 'AND quarter = $2' : ''} 
@@ -268,7 +348,7 @@ export class BusinessIntelligenceService {
     limit: number = 50,
   ): Promise<BusinessAlert[]> {
     try {
-      const result = await this.db.query(
+      const result = await this.db.query<DbBusinessAlertRow>(
         `SELECT * FROM business_alerts 
          WHERE user_id = $1 OR is_public = TRUE
          ORDER BY timestamp DESC
@@ -283,7 +363,8 @@ export class BusinessIntelligenceService {
         description: row.description,
         severity: row.severity,
         source: row.source,
-        timestamp: row.timestamp,
+        timestamp:
+          typeof row.timestamp === 'string' ? new Date(row.timestamp) : row.timestamp,
         isRead: row.is_read,
         actionUrl: row.action_url,
       }))
@@ -317,7 +398,9 @@ export class BusinessIntelligenceService {
   ): Promise<MarketForecast> {
     try {
       // Use Alpha Vantage for technical analysis
-      const response = await axios.get(this.alphaVantageBaseUrl, {
+      const response = await axios.get<AlphaVantageResponse>(
+        this.alphaVantageBaseUrl,
+        {
         params: {
           function: 'SMA',
           symbol,
@@ -443,7 +526,7 @@ export class BusinessIntelligenceService {
     quarter?: string,
     year?: number,
   ): BusinessMetrics[] {
-    const currentYear = year || new Date().getFullYear()
+    const currentYear = year ?? new Date().getFullYear()
     const quarters = quarter ? [quarter] : ['Q1', 'Q2', 'Q3', 'Q4']
 
     return quarters.map((q) => ({
@@ -530,7 +613,7 @@ export class BusinessIntelligenceService {
   }
 
   private getIndustrySymbols(industry: string): string[] {
-    const industryMap: Record<string, string[]> = {
+    const industryMap: Partial<Record<string, readonly string[]>> = {
       technology: ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META'],
       finance: ['JPM', 'BAC', 'WFC', 'GS', 'C'],
       healthcare: ['JNJ', 'PFE', 'UNH', 'ABBV', 'TMO'],
@@ -539,7 +622,7 @@ export class BusinessIntelligenceService {
       automotive: ['TSLA', 'F', 'GM', 'STLA', 'HMC'],
     }
 
-    return industryMap[industry.toLowerCase()] || ['SPY']
+    return [...(industryMap[industry.toLowerCase()] ?? ['SPY'])]
   }
 
   private async fetchCompetitorsFromAPI(
@@ -558,9 +641,42 @@ export class BusinessIntelligenceService {
     return []
   }
 
-  private async generateMarketForecast(data: any, days: number): Promise<MarketForecast> {
-    // This would process real market data for forecasts
-    // For now, return demo data
-    return this.getDemoMarketForecast('SPY', days)
+  private async generateMarketForecast(
+    data: UnknownRecord,
+    days: number,
+  ): Promise<MarketForecast> {
+    return this.getDemoMarketForecast(
+      typeof data['1. Symbol'] === 'string' ? data['1. Symbol'] : 'SPY',
+      days,
+    )
+  }
+
+  private parseYahooMeta(rawMeta: UnknownRecord): {
+    symbol: string
+    price: number
+    change: number
+    changePercent: number
+    volume: number
+    marketCap: number
+  } | null {
+    const symbol = this.toStringOrUndefined(rawMeta.symbol)
+    const price = this.toNumberOrUndefined(rawMeta.regularMarketPrice)
+    const change = this.toNumberOrUndefined(rawMeta.regularMarketChange)
+    const changePercent = this.toNumberOrUndefined(rawMeta.regularMarketChangePercent)
+    const volume = this.toNumberOrUndefined(rawMeta.regularMarketVolume)
+    const marketCap = this.toNumberOrUndefined(rawMeta.marketCap)
+
+    if (
+      !symbol ||
+      price === undefined ||
+      change === undefined ||
+      changePercent === undefined ||
+      volume === undefined ||
+      marketCap === undefined
+    ) {
+      return null
+    }
+
+    return { symbol, price, change, changePercent, volume, marketCap }
   }
 }

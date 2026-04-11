@@ -3,10 +3,8 @@ import { v4 as uuid } from 'uuid'
 import { slug } from '@/utils/common'
 
 // Market Research Service Layer
-import {
-  getMongoConnection,
-  getPostgresPool,
-} from '../../lib/database/connection'
+import { getPostgresPool } from '../../lib/database/connection'
+import { MarketResearch as MarketResearchModel } from '../../lib/database/mongodb/schemas'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 
 /**
@@ -25,7 +23,6 @@ export async function createMarketResearch(data: {
   methodology?: string
   budget?: string
 }) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
   const pool = getPostgresPool()
 
   const researchId = uuid()
@@ -72,8 +69,6 @@ export async function createMarketResearch(data: {
  * Get market research document
  */
 export async function getMarketResearch(researchId: string, userId: string) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -105,8 +100,6 @@ export async function addFinding(
     source?: string
   },
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -155,8 +148,6 @@ export async function addCompetitiveAnalysis(
     marketShare?: number
   },
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -204,8 +195,6 @@ export async function addRecommendation(
     expectedImpact?: string
   },
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -252,7 +241,6 @@ export async function listMarketResearch(
     industry?: string
   } = {},
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
   const page = options.page || 1
   const limit = options.limit || 50
 
@@ -289,8 +277,6 @@ export async function searchMarketResearch(
   userId: string,
   limit: number = 50,
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   return await MarketResearchModel.find({
     $text: { $search: query },
     $or: [{ owner: userId }, { 'permissions.view': userId }],
@@ -306,8 +292,6 @@ export async function shareMarketResearch(
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
