@@ -10,7 +10,6 @@ export async function renderAstro<
 >(
   Component:
     | { render(props: Record<string, unknown>): Promise<string> }
-    | { (props: Record<string, unknown>): unknown }
     | ((props: Record<string, unknown>) => unknown),
   props: Props = {} as Props,
   slotContent?: string,
@@ -22,10 +21,10 @@ export async function renderAstro<
   querySelectorAll: (selector: string) => NodeListOf<Element>
 }> {
   const renderProps = slotContent ? { ...props, slot: slotContent } : props
-  // Type assertion needed because Astro component types vary at runtime
-  const html = await (
-    Component as { render(props: Record<string, unknown>): Promise<string> }
-  ).render(renderProps)
+  const resolvedHtml = await (typeof Component === "function"
+    ? Promise.resolve(Component(renderProps))
+    : Component.render(renderProps))
+  const html = typeof resolvedHtml === "string" ? resolvedHtml : String(resolvedHtml)
   const container = document.createElement('div')
   container.innerHTML = html
 
