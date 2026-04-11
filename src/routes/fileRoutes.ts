@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { Pool } from 'pg'
+import type { ParsedQs } from 'qs'
 
 import { uploadConfig } from '../middleware/upload.js'
 import { DocumentVersioningService } from '../services/DocumentVersioningService.js'
@@ -23,6 +24,43 @@ interface FileMetadata {
 }
 
 const router = Router()
+
+type QueryValue = string | ParsedQs | string[] | ParsedQs[]
+
+const parseQueryNumber = (
+  value: QueryValue | undefined,
+  fallback: number,
+): number => {
+  if (typeof value === 'string') {
+    const parsed = parseInt(value, 10)
+    return Number.isNaN(parsed) ? fallback : parsed
+  }
+  if (Array.isArray(value) && typeof value[0] === 'string') {
+    const parsed = parseInt(value[0], 10)
+    return Number.isNaN(parsed) ? fallback : parsed
+  }
+  return fallback
+}
+
+const parseQueryString = (value: QueryValue | undefined): string | undefined => {
+  if (typeof value === 'string') {
+    return value
+  }
+  if (Array.isArray(value) && typeof value[0] === 'string') {
+    return value[0]
+  }
+  return undefined
+}
+
+const parseStringArrayQuery = (value: QueryValue | undefined): string[] => {
+  if (typeof value === 'string') {
+    return [value]
+  }
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string')
+  }
+  return []
+}
 
 export function createFileRoutes(db: Pool) {
   const fileStorage = new FileStorageService()
@@ -48,7 +86,7 @@ export function createFileRoutes(db: Pool) {
           changes,
         )
 
-        res.json({
+        return res.json({
           success: true,
           file: result.file,
           version: result.version,
@@ -60,7 +98,7 @@ export function createFileRoutes(db: Pool) {
               ? error.message
               : 'Unknown error'
             : 'Unknown error'
-        res.status(500).json({ error: message })
+        return res.status(500).json({ error: message })
       }
     },
   )
@@ -81,7 +119,7 @@ export function createFileRoutes(db: Pool) {
         },
       )
 
-      res.json(presignedUrl)
+      return res.json(presignedUrl)
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -89,14 +127,17 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Get file version history
   router.get('/:fileId/versions', async (req, res) => {
     try {
-      const { fileId } = req.params
+      const fileId = req.params['fileId']
+      if (!fileId) {
+        return res.status(400).json({ error: 'File ID is required' })
+      }
       const userId = req.user?.id || 'anonymous'
 
       const history = await versioningService.getVersionHistory(fileId)
@@ -106,7 +147,7 @@ export function createFileRoutes(db: Pool) {
         return res.status(403).json({ error: 'Access denied' })
       }
 
-      res.json(history)
+      return res.json(history)
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -114,16 +155,23 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Get specific file version
   router.get('/:fileId/versions/:version', async (req, res) => {
     try {
-      const { fileId, version } = req.params
+      const fileId = req.params['fileId']
+      const version = req.params['version']
+      if (!fileId || !version) {
+        return res.status(400).json({ error: 'File ID and version are required' })
+      }
 
-      const versionNumber = parseInt(version)
+      const versionNumber = parseInt(version, 10)
+      if (Number.isNaN(versionNumber)) {
+        return res.status(400).json({ error: 'Invalid version number' })
+      }
 
       const versionRecord = await versioningService.getFileVersion(
         fileId,
@@ -133,7 +181,7 @@ export function createFileRoutes(db: Pool) {
         return res.status(404).json({ error: 'Version not found' })
       }
 
-      res.json(versionRecord)
+      return res.json(versionRecord)
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -141,16 +189,23 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Download file version
   router.get('/:fileId/versions/:version/download', async (req, res) => {
     try {
-      const { fileId, version } = req.params
+      const fileId = req.params['fileId']
+      const version = req.params['version']
+      if (!fileId || !version) {
+        return res.status(400).json({ error: 'File ID and version are required' })
+      }
 
-      const versionNumber = parseInt(version)
+      const versionNumber = parseInt(version, 10)
+      if (Number.isNaN(versionNumber)) {
+        return res.status(400).json({ error: 'Invalid version number' })
+      }
 
       const versionRecord = await versioningService.getFileVersion(
         fileId,
@@ -165,7 +220,7 @@ export function createFileRoutes(db: Pool) {
         versionRecord.s3Key,
       )
 
-      res.json({ downloadUrl })
+      return res.json({ downloadUrl })
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -173,16 +228,23 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Rollback to previous version
   router.post('/:fileId/versions/:version/rollback', async (req, res) => {
     try {
-      const { fileId, version } = req.params
+      const fileId = req.params['fileId']
+      const version = req.params['version']
+      if (!fileId || !version) {
+        return res.status(400).json({ error: 'File ID and version are required' })
+      }
       const userId = req.user?.id || 'anonymous'
-      const versionNumber = parseInt(version)
+      const versionNumber = parseInt(version, 10)
+      if (Number.isNaN(versionNumber)) {
+        return res.status(400).json({ error: 'Invalid version number' })
+      }
 
       const newVersion = await versioningService.rollbackToVersion(
         fileId,
@@ -190,7 +252,7 @@ export function createFileRoutes(db: Pool) {
         userId,
       )
 
-      res.json({
+      return res.json({
         success: true,
         version: newVersion,
       })
@@ -201,16 +263,23 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Delete file version
   router.delete('/:fileId/versions/:version', async (req, res) => {
     try {
-      const { fileId, version } = req.params
+      const fileId = req.params['fileId']
+      const version = req.params['version']
+      if (!fileId || !version) {
+        return res.status(400).json({ error: 'File ID and version are required' })
+      }
       const userId = req.user?.id || 'anonymous'
-      const versionNumber = parseInt(version)
+      const versionNumber = parseInt(version, 10)
+      if (Number.isNaN(versionNumber)) {
+        return res.status(400).json({ error: 'Invalid version number' })
+      }
 
       // Check if user has permission to delete
       const fileResult = await db.query(
@@ -227,7 +296,7 @@ export function createFileRoutes(db: Pool) {
 
       await versioningService.deleteFileVersion(fileId, versionNumber)
 
-      res.json({ success: true })
+      return res.json({ success: true })
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -235,7 +304,7 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
@@ -251,7 +320,7 @@ export function createFileRoutes(db: Pool) {
         parentId,
       )
 
-      res.json({
+      return res.json({
         success: true,
         folderId,
       })
@@ -262,14 +331,17 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Get folder contents
   router.get('/folders/:folderId/contents', async (req, res) => {
     try {
-      const { folderId } = req.params
+      const folderId = req.params['folderId']
+      if (!folderId) {
+        return res.status(400).json({ error: 'Folder ID is required' })
+      }
       const userId = req.user?.id || 'anonymous'
 
       const contents = await versioningService.getFolderContents(
@@ -277,7 +349,7 @@ export function createFileRoutes(db: Pool) {
         userId,
       )
 
-      res.json(contents)
+      return res.json(contents)
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -285,15 +357,21 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // List user's files
   router.get('/user/:userId', async (req, res) => {
     try {
-      const { userId } = req.params
-      const { limit = 50, offset = 0, folderId, tags } = req.query
+      const userId = req.params['userId']
+      const folderId = parseQueryString(req.query['folderId'])
+      const tags = parseStringArrayQuery(req.query['tags'])
+      const limit = parseQueryNumber(req.query['limit'], 50)
+      const offset = parseQueryNumber(req.query['offset'], 0)
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' })
+      }
 
       let query = `
         SELECT f.* FROM files f
@@ -306,7 +384,7 @@ export function createFileRoutes(db: Pool) {
         params.push(folderId as string)
       }
 
-      if (tags && Array.isArray(tags)) {
+      if (tags.length > 0) {
         query += ` AND f.tags @> $${params.length + 1}`
         params.push(tags)
       }
@@ -333,7 +411,7 @@ export function createFileRoutes(db: Pool) {
         metadata: row.metadata || {},
       }))
 
-      res.json(files)
+      return res.json(files)
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -341,20 +419,25 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 
   // Search files
   router.get('/search', async (req, res) => {
     try {
-      const { q, userId, mimeType, tags, limit = 20, offset = 0 } = req.query
+      const q = parseQueryString(req.query['q'])
+      const userId = parseQueryString(req.query['userId']) ?? 'anonymous'
+      const mimeType = parseQueryString(req.query['mimeType'])
+      const tags = parseStringArrayQuery(req.query['tags'])
+      const limit = parseQueryNumber(req.query['limit'], 20)
+      const offset = parseQueryNumber(req.query['offset'], 0)
 
       let query = `
         SELECT f.* FROM files f
         WHERE (f.is_public = TRUE OR f.uploaded_by = $1)
       `
-      const params = [userId || 'anonymous']
+      const params = [userId]
 
       if (q) {
         query += ` AND (f.original_name ILIKE $${params.length + 1} OR f.tags @> ARRAY[$${params.length + 2}])`
@@ -363,10 +446,10 @@ export function createFileRoutes(db: Pool) {
 
       if (mimeType) {
         query += ` AND f.mime_type = $${params.length + 1}`
-        params.push(mimeType as string)
+        params.push(mimeType)
       }
 
-      if (tags && Array.isArray(tags)) {
+      if (tags.length > 0) {
         query += ` AND f.tags && $${params.length + 1}`
         params.push(tags)
       }
@@ -393,7 +476,7 @@ export function createFileRoutes(db: Pool) {
         metadata: row.metadata || {},
       }))
 
-      res.json(files)
+      return res.json(files)
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -401,7 +484,7 @@ export function createFileRoutes(db: Pool) {
             ? error.message
             : 'Unknown error'
           : 'Unknown error'
-      res.status(500).json({ error: message })
+      return res.status(500).json({ error: message })
     }
   })
 

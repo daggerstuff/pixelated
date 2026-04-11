@@ -1,61 +1,221 @@
-import { Router } from 'express'
+import { Router, type Response } from 'express'
+import { type ParamsDictionary } from 'express-serve-static-core'
+import type { ParsedQs } from 'qs'
 
-import { authenticateToken } from '../middleware/auth'
-import { requireRole } from '../middleware/rbac'
+import {
+  AuthenticatedRequest,
+  authenticateToken,
+  requireRole,
+} from '../middleware/auth'
 import { WorkflowService } from '../services/workflowService'
 import { UserRole } from '../types/user'
-import { WorkflowAction, ReviewPriority } from '../types/workflow'
+import {
+  ReviewPriority,
+  WorkflowAction,
+  WorkflowSearchFilters,
+  WorkflowStatus,
+} from '../types/workflow'
 
-const router = Router()
+type WorkflowCreateBody = {
+  documentId?: unknown
+  workflowTemplateId?: unknown
+  priority?: unknown
+  dueDate?: unknown
+  metadata?: unknown
+}
+
+type WorkflowSubmitBody = {
+  comment?: unknown
+}
+
+type WorkflowActionBody = {
+  action?: unknown
+  comment?: unknown
+}
+
+type WorkflowCommentBody = {
+  content?: unknown
+  step?: unknown
+  isPrivate?: unknown
+  attachments?: unknown
+  mentions?: unknown
+}
+
+type WorkflowSearchQuery = {
+  documentId?: unknown
+  status?: unknown
+  assignedTo?: unknown
+  createdBy?: unknown
+  priority?: unknown
+  dueBefore?: unknown
+  dueAfter?: unknown
+  category?: unknown
+}
+
+const router: import('express-serve-static-core').Router = Router()
+
+const toString = (value: unknown): string | undefined => {
+  if (typeof value === 'string') {
+    const normalized = value.trim()
+    return normalized.length > 0 ? normalized : undefined
+  }
+  return undefined
+}
+
+const toSingleQueryValue = (value: unknown): string | undefined => {
+  if (typeof value === 'string') {
+    return toString(value)
+  }
+  if (Array.isArray(value)) {
+    return toString(value[0])
+  }
+  return undefined
+}
+
+const toDate = (value: unknown): Date | undefined => {
+  const stringValue = toString(value)
+  if (!stringValue) {
+    return undefined
+  }
+  const date = new Date(stringValue)
+  return Number.isNaN(date.getTime()) ? undefined : date
+}
+
+const toNumber = (value: unknown): number | undefined => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  const stringValue = toString(value)
+  if (!stringValue) {
+    return undefined
+  }
+  const numberValue = Number(stringValue)
+  return Number.isFinite(numberValue) ? numberValue : undefined
+}
+
+const toBoolean = (value: unknown): boolean | undefined => {
+  if (typeof value === 'boolean') {
+    return value
+  }
+  const stringValue = toString(value)?.toLowerCase()
+  if (stringValue === 'true' || stringValue === '1' || stringValue === 'yes') {
+    return true
+  }
+  if (stringValue === 'false' || stringValue === '0' || stringValue === 'no') {
+    return false
+  }
+  return undefined
+}
+
+const toStringArray = (value: unknown): string[] | undefined => {
+  if (Array.isArray(value)) {
+    if (!value.every((entry): entry is string => typeof entry === 'string')) {
+      return undefined
+    }
+    return value
+  }
+  const stringValue = toString(value)
+  return stringValue ? [stringValue] : undefined
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+const toWorkflowStatus = (value: unknown): WorkflowStatus | undefined => {
+  const stringValue = toString(value)?.toLowerCase()
+  return stringValue && Object.values(WorkflowStatus).includes(stringValue as WorkflowStatus)
+    ? (stringValue as WorkflowStatus)
+    : undefined
+}
+
+const toWorkflowPriority = (value: unknown): ReviewPriority | undefined => {
+  const stringValue = toString(value)?.toLowerCase()
+  return stringValue && Object.values(ReviewPriority).includes(stringValue as ReviewPriority)
+    ? (stringValue as ReviewPriority)
+    : undefined
+}
+
+const toWorkflowAction = (value: unknown): WorkflowAction | undefined => {
+  const stringValue = toString(value)?.toLowerCase()
+  return stringValue && Object.values(WorkflowAction).includes(stringValue as WorkflowAction)
+    ? (stringValue as WorkflowAction)
+    : undefined
+}
+
+const getAuthenticatedUserId = (req: AuthenticatedRequest): string | undefined => {
+  const userId = req.user?.userId
+  return typeof userId === 'string' && userId.length > 0 ? userId : undefined
+}
 
 // Get all workflow templates
-router.get('/templates', authenticateToken, async (req, res) => {
+router.get('/templates', authenticateToken, async (_req: unknown, res: Response) => {
+  void _req
   try {
     const templates = WorkflowService.getWorkflowTemplates()
-    res.json(templates)
+    return res.json(templates)
   } catch {
-    res.status(500).json({ error: 'Failed to fetch workflow templates' })
+    return res.status(500).json({ error: 'Failed to fetch workflow templates' })
   }
 })
 
 // Get workflow template by ID
-router.get('/templates/:id', authenticateToken, async (req, res) => {
+router.get('/templates/:id', authenticateToken, async (
+  req: AuthenticatedRequest<ParamsDictionary>,
+  res: Response,
+) => {
   try {
-    const template = WorkflowService.getWorkflowTemplate(req.params.id)
+    const templateId = toString(req.params.id)
+    if (!templateId) {
+      return res.status(400).json({ error: 'Template ID is required' })
+    }
+    const template = WorkflowService.getWorkflowTemplate(templateId)
     if (!template) {
       return res.status(404).json({ error: 'Template not found' })
     }
-    res.json(template)
+    return res.json(template)
   } catch {
-    res.status(500).json({ error: 'Failed to fetch workflow template' })
+    return res.status(500).json({ error: 'Failed to fetch workflow template' })
   }
 })
 
 // Create workflow instance for document
-router.post('/instances', authenticateToken, async (req, res) => {
+router.post('/instances', authenticateToken, async (
+  req: AuthenticatedRequest<ParamsDictionary, unknown, WorkflowCreateBody>,
+  res: Response,
+) => {
   try {
-    const { documentId, workflowTemplateId, priority, dueDate, metadata } =
-      req.body
-
+    const documentId = toString(req.body.documentId)
+    const workflowTemplateId = toString(req.body.workflowTemplateId)
     if (!documentId || !workflowTemplateId) {
       return res
         .status(400)
         .json({ error: 'Document ID and workflow template ID are required' })
     }
 
+    const userId = getAuthenticatedUserId(req)
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const priority = toWorkflowPriority(req.body.priority) ?? ReviewPriority.MEDIUM
+    const dueDate = toDate(req.body.dueDate)
+    const metadata =
+      isRecord(req.body.metadata) ? req.body.metadata : (req.body.metadata === undefined ? {} : {})
+
     const instance = await WorkflowService.createWorkflowInstance(
       documentId,
       workflowTemplateId,
-      req.user.id,
-      priority || ReviewPriority.MEDIUM,
-      dueDate ? new Date(dueDate) : undefined,
-      metadata || {},
+      userId,
+      priority,
+      dueDate,
+      metadata,
     )
 
-    res.status(201).json(instance)
+    return res.status(201).json(instance)
   } catch (_error: unknown) {
     const message = _error instanceof Error ? _error.message : 'Unknown error'
-    res.status(400).json({ error: message })
+    return res.status(400).json({ error: message })
   }
 })
 
@@ -63,137 +223,247 @@ router.post('/instances', authenticateToken, async (req, res) => {
 router.get(
   '/instances/document/:documentId',
   authenticateToken,
-  async (req, res) => {
+  async (
+    req: AuthenticatedRequest<ParamsDictionary>,
+    res: Response,
+  ) => {
     try {
-      const instances = WorkflowService.getWorkflowInstancesForDocument(
-        req.params.documentId,
-      )
-      res.json(instances)
+      const documentId = toString(req.params.documentId)
+      if (!documentId) {
+        return res.status(400).json({ error: 'Document ID is required' })
+      }
+      const instances = WorkflowService.getWorkflowInstancesForDocument(documentId)
+      return res.json(instances)
     } catch {
-      res.status(500).json({ error: 'Failed to fetch workflow instances' })
+      return res.status(500).json({ error: 'Failed to fetch workflow instances' })
     }
   },
 )
 
 // Get workflow instance by ID
-router.get('/instances/:id', authenticateToken, async (req, res) => {
+router.get('/instances/:id', authenticateToken, async (
+  req: AuthenticatedRequest<ParamsDictionary>,
+  res: Response,
+) => {
   try {
-    const instance = WorkflowService.getWorkflowInstance(req.params.id)
+    const instanceId = toString(req.params.id)
+    if (!instanceId) {
+      return res.status(400).json({ error: 'Workflow instance ID is required' })
+    }
+    const instance = WorkflowService.getWorkflowInstance(instanceId)
     if (!instance) {
       return res.status(404).json({ error: 'Workflow instance not found' })
     }
-    res.json(instance)
+    return res.json(instance)
   } catch {
-    res.status(500).json({ error: 'Failed to fetch workflow instance' })
+    return res.status(500).json({ error: 'Failed to fetch workflow instance' })
   }
 })
 
 // Search workflow instances
-router.get('/instances', authenticateToken, async (req, res) => {
+router.get('/instances', authenticateToken, async (
+  req: AuthenticatedRequest<ParamsDictionary, unknown, unknown, WorkflowSearchQuery>,
+  res: Response,
+) => {
   try {
-    const filters = {
-      documentId: req.query.documentId as string,
-      status: req.query.status as string,
-      assignedTo: req.query.assignedTo as string,
-      createdBy: req.query.createdBy as string,
-      priority: req.query.priority as string,
-      dueBefore: req.query.dueBefore
-        ? new Date(req.query.dueBefore as string)
-        : undefined,
-      dueAfter: req.query.dueAfter
-        ? new Date(req.query.dueAfter as string)
-        : undefined,
-      category: req.query.category as string,
+    const filters: WorkflowSearchFilters = {}
+    const query = req.query
+
+    const documentId = toSingleQueryValue(query.documentId)
+    if (documentId) {
+      filters.documentId = documentId
+    }
+
+    const status = toWorkflowStatus(query.status)
+    if (status) {
+      filters.status = status
+    }
+
+    const assignedTo = toSingleQueryValue(query.assignedTo)
+    if (assignedTo) {
+      filters.assignedTo = assignedTo
+    }
+
+    const createdBy = toSingleQueryValue(query.createdBy)
+    if (createdBy) {
+      filters.createdBy = createdBy
+    }
+
+    const priority = toWorkflowPriority(query.priority)
+    if (priority) {
+      filters.priority = priority
+    }
+
+    const dueBefore = toDate(query.dueBefore)
+    if (dueBefore) {
+      filters.dueBefore = dueBefore
+    }
+
+    const dueAfter = toDate(query.dueAfter)
+    if (dueAfter) {
+      filters.dueAfter = dueAfter
+    }
+
+    const category = toSingleQueryValue(query.category)
+    if (category) {
+      filters.category = category
     }
 
     const instances = WorkflowService.searchWorkflowInstances(filters)
-    res.json(instances)
+    return res.json(instances)
   } catch {
-    res.status(500).json({ error: 'Failed to search workflow instances' })
+    return res.status(500).json({ error: 'Failed to search workflow instances' })
   }
 })
 
 // Submit document for review
-router.post('/instances/:id/submit', authenticateToken, async (req, res) => {
+router.post('/instances/:id/submit', authenticateToken, async (
+  req: AuthenticatedRequest<
+    ParamsDictionary,
+    unknown,
+    WorkflowSubmitBody,
+    ParsedQs
+  >,
+  res: Response,
+) => {
   try {
-    const { comment } = req.body
-    const instance = await WorkflowService.submitForReview(
-      req.params.id,
-      req.user.id,
-      comment,
-    )
-    res.json(instance)
+    const instanceId = toString(req.params.id)
+    if (!instanceId) {
+      return res.status(400).json({ error: 'Workflow instance ID is required' })
+    }
+
+    const userId = getAuthenticatedUserId(req)
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const comment = toString(req.body.comment)
+    const instance = await WorkflowService.submitForReview(instanceId, userId, comment)
+    return res.json(instance)
   } catch (_error: unknown) {
     const message = _error instanceof Error ? _error.message : 'Unknown error'
-    res.status(400).json({ error: message })
+    return res.status(400).json({ error: message })
   }
 })
 
 // Process workflow action
-router.post('/instances/:id/action', authenticateToken, async (req, res) => {
+router.post('/instances/:id/action', authenticateToken, async (
+  req: AuthenticatedRequest<
+    ParamsDictionary,
+    unknown,
+    WorkflowActionBody,
+    ParsedQs
+  >,
+  res: Response,
+) => {
   try {
-    const { action, comment } = req.body
+    const instanceId = toString(req.params.id)
+    if (!instanceId) {
+      return res.status(400).json({ error: 'Workflow instance ID is required' })
+    }
 
+    const userId = getAuthenticatedUserId(req)
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const action = toWorkflowAction(req.body.action)
     if (!action) {
       return res.status(400).json({ error: 'Action is required' })
     }
 
+    const comment = toString(req.body.comment)
     const instance = await WorkflowService.processAction(
-      req.params.id,
-      req.user.id,
-      action as WorkflowAction,
+      instanceId,
+      userId,
+      action,
       comment,
     )
-    res.json(instance)
+    return res.json(instance)
   } catch (_error: unknown) {
     const message = _error instanceof Error ? _error.message : 'Unknown error'
-    res.status(400).json({ error: message })
+    return res.status(400).json({ error: message })
   }
 })
 
 // Add comment to workflow
-router.post('/instances/:id/comments', authenticateToken, async (req, res) => {
+router.post('/instances/:id/comments', authenticateToken, async (
+  req: AuthenticatedRequest<
+    ParamsDictionary,
+    unknown,
+    WorkflowCommentBody,
+    ParsedQs
+  >,
+  res: Response,
+) => {
   try {
-    const { content, step, isPrivate, attachments, mentions } = req.body
+    const instanceId = toString(req.params.id)
+    if (!instanceId) {
+      return res.status(400).json({ error: 'Workflow instance ID is required' })
+    }
 
+    const userId = getAuthenticatedUserId(req)
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const content = toString(req.body.content)
+    const step = toNumber(req.body.step)
     if (!content || step === undefined) {
       return res.status(400).json({ error: 'Content and step are required' })
     }
 
+    const isPrivate = toBoolean(req.body.isPrivate) ?? false
+    const attachments = toStringArray(req.body.attachments)
+    const mentions = toStringArray(req.body.mentions)
+
     const comment = await WorkflowService.addComment(
-      req.params.id,
-      req.user.id,
+      instanceId,
+      userId,
       content,
       step,
-      isPrivate || false,
+      isPrivate,
       attachments,
       mentions,
     )
-
-    res.status(201).json(comment)
+    return res.status(201).json(comment)
   } catch (_error: unknown) {
     const message = _error instanceof Error ? _error.message : 'Unknown error'
-    res.status(400).json({ error: message })
+    return res.status(400).json({ error: message })
   }
 })
 
 // Get comments for workflow
-router.get('/instances/:id/comments', authenticateToken, async (req, res) => {
+router.get('/instances/:id/comments', authenticateToken, async (
+  req: AuthenticatedRequest<ParamsDictionary>,
+  res: Response,
+) => {
   try {
-    const comments = WorkflowService.getCommentsForWorkflow(req.params.id)
-    res.json(comments)
+    const instanceId = toString(req.params.id)
+    if (!instanceId) {
+      return res.status(400).json({ error: 'Workflow instance ID is required' })
+    }
+    const comments = WorkflowService.getCommentsForWorkflow(instanceId)
+    return res.json(comments)
   } catch {
-    res.status(500).json({ error: 'Failed to fetch comments' })
+    return res.status(500).json({ error: 'Failed to fetch comments' })
   }
 })
 
 // Get approvals for workflow
-router.get('/instances/:id/approvals', authenticateToken, async (req, res) => {
+router.get('/instances/:id/approvals', authenticateToken, async (
+  req: AuthenticatedRequest<ParamsDictionary>,
+  res: Response,
+) => {
   try {
-    const approvals = WorkflowService.getApprovalsForWorkflow(req.params.id)
-    res.json(approvals)
+    const instanceId = toString(req.params.id)
+    if (!instanceId) {
+      return res.status(400).json({ error: 'Workflow instance ID is required' })
+    }
+    const approvals = WorkflowService.getApprovalsForWorkflow(instanceId)
+    return res.json(approvals)
   } catch {
-    res.status(500).json({ error: 'Failed to fetch approvals' })
+    return res.status(500).json({ error: 'Failed to fetch approvals' })
   }
 })
 
@@ -202,12 +472,13 @@ router.get(
   '/analytics',
   authenticateToken,
   requireRole([UserRole.ADMINISTRATOR]),
-  async (req, res) => {
+  async (_req: unknown, res: Response) => {
+    void _req
     try {
       const analytics = WorkflowService.getWorkflowAnalytics()
-      res.json(analytics)
+      return res.json(analytics)
     } catch {
-      res.status(500).json({ error: 'Failed to fetch analytics' })
+      return res.status(500).json({ error: 'Failed to fetch analytics' })
     }
   },
 )
@@ -217,12 +488,13 @@ router.get(
   '/overdue',
   authenticateToken,
   requireRole([UserRole.ADMINISTRATOR]),
-  async (req, res) => {
+  async (_req: unknown, res: Response) => {
+    void _req
     try {
       const overdue = WorkflowService.getOverdueWorkflows()
-      res.json(overdue)
+      return res.json(overdue)
     } catch {
-      res.status(500).json({ error: 'Failed to fetch overdue workflows' })
+      return res.status(500).json({ error: 'Failed to fetch overdue workflows' })
     }
   },
 )

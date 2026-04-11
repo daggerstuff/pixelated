@@ -297,6 +297,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@types/mongoose": "^9.0.0",
     "@astrojs/markdoc": "^1.0.3",
     "@astrojs/rss": "^4.0.18",
     "@eslint/css": "^1.1.0",

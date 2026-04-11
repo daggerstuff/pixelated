@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import { UserRole } from '../types/user'
+import { DocumentCategory } from '../types/document'
 import {
   WorkflowInstance,
   WorkflowTemplate,
@@ -13,13 +14,14 @@ import {
   WorkflowAnalytics,
 } from '../types/workflow'
 import { DocumentService } from './documentService'
+import { UserService } from './userService'
 import { EmailService } from './emailService'
 
 export class WorkflowService {
-  private static workflowInstances: Map<string, WorkflowInstance> = new Map()
-  private static workflowTemplates: Map<string, WorkflowTemplate> = new Map()
-  private static approvals: Map<string, Approval> = new Map()
-  private static comments: Map<string, WorkflowComment> = new Map()
+  private static readonly workflowInstances: Map<string, WorkflowInstance> = new Map()
+  private static readonly workflowTemplates: Map<string, WorkflowTemplate> = new Map()
+  private static readonly approvals: Map<string, Approval> = new Map()
+  private static readonly comments: Map<string, WorkflowComment> = new Map()
 
   // Initialize default workflow templates
   static initializeDefaultTemplates() {
@@ -28,7 +30,7 @@ export class WorkflowService {
       name: 'Strategy Document Review',
       description:
         'Standard workflow for strategy document review and approval',
-      documentCategory: 'Strategy',
+      documentCategory: DocumentCategory.BUSINESS_PLAN,
       steps: [
         {
           id: 'content-review',
@@ -80,7 +82,7 @@ export class WorkflowService {
       id: 'marketing-content-template',
       name: 'Marketing Content Review',
       description: 'Workflow for marketing content approval',
-      documentCategory: 'Marketing',
+      documentCategory: DocumentCategory.MARKETING_STRATEGY,
       steps: [
         {
           id: 'brand-review',
@@ -151,8 +153,10 @@ export class WorkflowService {
       createdAt: new Date(),
       updatedAt: new Date(),
       priority,
-      dueDate,
       metadata,
+    }
+    if (dueDate) {
+      instance.dueDate = dueDate
     }
 
     this.workflowInstances.set(instance.id, instance)
@@ -216,7 +220,7 @@ export class WorkflowService {
     }
 
     // Validate user role
-    const user = await DocumentService.getUserById(userId)
+    const user = await UserService.getUserById(userId)
     if (!user || !currentStep.requiredRole.includes(user.role)) {
       throw new Error('User does not have required role for this action')
     }
@@ -227,9 +231,11 @@ export class WorkflowService {
       workflowInstanceId,
       reviewerId: userId,
       action,
-      comment,
       timestamp: new Date(),
       step: instance.currentStep,
+    }
+    if (comment) {
+      approval.comment = comment
     }
 
     this.approvals.set(approval.id, approval)
@@ -237,6 +243,19 @@ export class WorkflowService {
 
     // Process action
     switch (action) {
+      case WorkflowAction.SUBMIT_FOR_REVIEW:
+        throw new Error(
+          'Submit for review action is not supported in processAction. Use submitForReview.',
+        )
+      case WorkflowAction.PUBLISH:
+        await this.processPublish(instance, userId)
+        break
+      case WorkflowAction.ARCHIVE:
+        await this.processArchive(instance, userId)
+        break
+      case WorkflowAction.ASSIGN_REVIEWER:
+        await this.assignReviewers(workflowInstanceId, userId)
+        break
       case WorkflowAction.APPROVE:
         await this.processApproval(instance, template, userId)
         break
@@ -261,12 +280,33 @@ export class WorkflowService {
     return instance
   }
 
+  private static async processPublish(
+    instance: WorkflowInstance,
+    _userId: string,
+  ): Promise<void> {
+    instance.status = WorkflowStatus.PUBLISHED
+    instance.completedAt = new Date()
+    instance.updatedAt = new Date()
+  }
+
+  private static async processArchive(
+    instance: WorkflowInstance,
+    _userId: string,
+  ): Promise<void> {
+    instance.status = WorkflowStatus.ARCHIVED
+    instance.completedAt = new Date()
+    instance.updatedAt = new Date()
+  }
+
   private static async processApproval(
     instance: WorkflowInstance,
     template: WorkflowTemplate,
     userId: string,
   ): Promise<void> {
     const currentStep = template.steps[instance.currentStep - 1]
+    if (!currentStep) {
+      throw new Error('Invalid current step')
+    }
     const stepApprovals = instance.approvals.filter(
       (a) =>
         a.step === instance.currentStep && a.action === WorkflowAction.APPROVE,
@@ -340,8 +380,12 @@ export class WorkflowService {
       timestamp: new Date(),
       step,
       isPrivate,
-      attachments,
-      mentions,
+    }
+    if (attachments) {
+      comment.attachments = attachments
+    }
+    if (mentions) {
+      comment.mentions = mentions
     }
 
     this.comments.set(comment.id, comment)
@@ -396,7 +440,7 @@ export class WorkflowService {
 
     if (filters.createdBy) {
       instances = instances.filter(
-        (i) => i.metadata.createdBy === filters.createdBy,
+        (i) => i.metadata['createdBy'] === filters.createdBy,
       )
     }
 
@@ -467,7 +511,7 @@ export class WorkflowService {
       { count: number; totalTime: number }
     >()
     approvals.forEach((approval) => {
-      const stats = reviewerStats.get(approval.reviewerId) || {
+      const stats = reviewerStats.get(approval.reviewerId) ?? {
         count: 0,
         totalTime: 0,
       }

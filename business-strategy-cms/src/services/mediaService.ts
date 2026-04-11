@@ -1,6 +1,13 @@
 import * as AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
+interface UploadedFile {
+  originalname: string
+  mimetype: string
+  buffer: Buffer
+  size: number
+}
+
 // Hetzner Object Storage configuration (S3-compatible)
 const s3Client = new AWS.S3({
   endpoint:
@@ -31,7 +38,7 @@ export class MediaService {
    * Upload file to Hetzner Object Storage
    */
   static async uploadFile(
-    file: Express.Multer.File,
+    file: UploadedFile,
     userId: string,
     folder?: string,
   ): Promise<MediaUpload> {

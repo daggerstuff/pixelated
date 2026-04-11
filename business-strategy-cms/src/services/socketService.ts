@@ -6,7 +6,7 @@ import { redisClient } from '@/config/database'
 import { logger } from '@/utils/logger'
 
 import { AuthService } from './authService'
-import { CollaborationService } from './collaborationService'
+import { CollaborationService, type DocumentChange } from './collaborationService'
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -37,14 +37,25 @@ interface SocketEvents {
   'document-save': { content: string }
 }
 
+interface PersistedDocumentChange {
+  type: 'insert' | 'delete' | 'format'
+  position: number
+  content?: string
+  length?: number
+  format?: string
+  value?: unknown
+  userId: string
+  timestamp: string
+}
+
 export class SocketService {
-  private io: Server
-  private connectedUsers: Map<string, Set<string>> = new Map()
+  private readonly io: Server
+  private readonly connectedUsers: Map<string, Set<string>> = new Map()
 
   constructor(server: HttpServer) {
     this.io = new Server(server, {
       cors: {
-        origin: process.env['FRONTEND_URL'] || 'http://localhost:3000',
+        origin: process.env['FRONTEND_URL'] ?? 'http://localhost:3000',
         methods: ['GET', 'POST'],
         credentials: true,
       },
@@ -59,7 +70,7 @@ export class SocketService {
   private setupMiddleware(): void {
     this.io.use(async (socket: AuthenticatedSocket, next) => {
       try {
-        const token = socket.handshake.auth?.token
+        const token = this.getSocketToken(socket.handshake.auth)
         if (!token) {
           return next(new Error('Authentication token required'))
         }
@@ -176,7 +187,7 @@ export class SocketService {
     void socket.leave(`document:${documentId}`)
 
     if (socket.documentId === documentId) {
-      socket.documentId = undefined
+      delete socket.documentId
     }
 
     // Remove user from connected users
@@ -220,7 +231,7 @@ export class SocketService {
   ): void {
     if (!socket.user || !socket.documentId) return
 
-    const documentChange = {
+    const documentChange: DocumentChange = {
       ...change,
       userId: socket.user.userId,
       timestamp: new Date(),
@@ -235,7 +246,11 @@ export class SocketService {
       .emit('document-change', documentChange)
 
     // Store change in Redis for persistence
-    void this.storeChange(socket.documentId, documentChange)
+    const persistedChange: PersistedDocumentChange = {
+      ...documentChange,
+      timestamp: documentChange.timestamp.toISOString(),
+    }
+    void this.storeChange(socket.documentId, persistedChange)
   }
 
   private handleUserTyping(
@@ -287,12 +302,14 @@ export class SocketService {
     logger.info(`User ${socket.user?.userId} disconnected`)
   }
 
-  private async storeChange(documentId: string, change: any): Promise<void> {
+  private async storeChange(
+    documentId: string,
+    change: PersistedDocumentChange,
+  ): Promise<void> {
     try {
       const key = `changes:${documentId}`
       const existing = await redisClient.get(key)
-      const changes = existing ? JSON.parse(existing) : []
-
+      const changes = this.parseStoredChanges(existing)
       changes.push(change)
 
       // Keep only last 100 changes in Redis
@@ -304,6 +321,56 @@ export class SocketService {
     } catch (error: unknown) {
       logger.error('Error storing change in Redis:', error)
     }
+  }
+
+  private parseStoredChanges(rawChanges: string | null): PersistedDocumentChange[] {
+    if (!rawChanges) {
+      return []
+    }
+
+    try {
+      const parsed: unknown = JSON.parse(rawChanges)
+      if (!Array.isArray(parsed)) {
+        return []
+      }
+
+      return parsed.filter((value) => this.isPersistedDocumentChange(value))
+    } catch {
+      return []
+    }
+  }
+
+  private isPersistedDocumentChange(
+    value: unknown,
+  ): value is PersistedDocumentChange {
+    if (!value || typeof value !== 'object') {
+      return false
+    }
+
+    const change = value as {
+      type?: unknown
+      position?: unknown
+      content?: unknown
+      length?: unknown
+      format?: unknown
+      value?: unknown
+      userId?: unknown
+      timestamp?: unknown
+    }
+
+    return (
+      (change.type === 'insert' ||
+        change.type === 'delete' ||
+        change.type === 'format') &&
+      typeof change.position === 'number' &&
+      typeof change.userId === 'string' &&
+      typeof change.timestamp === 'string'
+    )
+  }
+
+  private getSocketToken(auth: Record<string, unknown>): string | undefined {
+    const token = auth['token']
+    return typeof token === 'string' && token.length > 0 ? token : undefined
   }
 
   private startPeriodicCleanup(): void {
