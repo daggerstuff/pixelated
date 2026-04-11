@@ -11,10 +11,12 @@ export const securityHeaders = async (
   const response = await next()
 
   const nonce = context.locals['cspNonce'] as string | undefined
+  const isRelaxedScriptEnv =
+    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
   const scriptSourceList = [
     "'self'",
     "'unsafe-inline'",
-    nonce ? `'nonce-${nonce}'` : null,
+    !isRelaxedScriptEnv && nonce ? `'nonce-${nonce}'` : null,
     'https://*.sentry.io',
     'https://cdn.jsdelivr.net',
     'https://giscus.app',
@@ -49,12 +51,14 @@ export const securityHeaders = async (
     csp.push('upgrade-insecure-requests')
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (isRelaxedScriptEnv) {
     // In development, we need 'unsafe-inline' and 'unsafe-eval' for Vite/Astro to work.
     csp = [
       ...csp.filter(
         (rule) =>
-          !rule.startsWith('default-src') && !rule.startsWith('connect-src'),
+          !rule.startsWith('default-src') &&
+          !rule.startsWith('connect-src') &&
+          !rule.startsWith('script-src'),
       ),
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       'connect-src *', // Allow any connection in dev
