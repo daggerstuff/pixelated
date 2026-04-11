@@ -1196,6 +1196,68 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     logger.info('Manual WebSocket reconnection initiated')
   }, [enableRealTimeUpdates, announceToScreenReader])
 
+  const resolvedDashboardData =
+    dashboardData ??
+    ({
+      summary: {
+        totalSessions: 0,
+        averageBiasScore: 0,
+        alertsLayerBreakdown: {},
+        alertsLast24h: 0,
+        activeAlerts: 0,
+        trendDirection: 'stable',
+        alerts: { low: 0, medium: 0, high: 0, critical: 0 },
+        complianceScore: 0,
+      },
+      recentAnalyses: [],
+      alerts: [],
+      trends: [],
+      demographics: {
+        age: {},
+        gender: {},
+        ethnicity: {},
+      },
+      recommendations: [],
+    } satisfies BiasDashboardData)
+
+  const {
+    summary = {
+      totalSessions: 0,
+      averageBiasScore: 0,
+      alertsLayerBreakdown: {},
+      alertsLast24h: 0,
+      activeAlerts: 0,
+      trendDirection: 'stable',
+      alerts: { low: 0, medium: 0, high: 0, critical: 0 },
+      complianceScore: 0,
+    },
+    recentAnalyses = [],
+    alerts = [],
+    trends = [],
+    demographics = { age: {}, gender: {}, ethnicity: {} } as {
+      age: Record<string, number>
+      gender: Record<string, number>
+      ethnicity: Record<string, number>
+    },
+    recommendations = [],
+  } = resolvedDashboardData
+
+  // Apply filters to data with memoization
+  const filteredTrends = useMemo<BiasDashboardData['trends']>(() => {
+    const data = getFilteredData(trends, 'trends')
+    return isTrendItemArray(data) ? data : []
+  }, [getFilteredData, trends])
+
+  const filteredAlerts = useMemo<AlertItem[]>(() => {
+    const data = getFilteredData(alerts, 'alerts')
+    return isAlertItemArray(data) ? data : []
+  }, [getFilteredData, alerts])
+
+  const filteredSessions = useMemo<BiasAnalysisItem[]>(() => {
+    const data = getFilteredData(recentAnalyses, 'sessions')
+    return isBiasAnalysisItemArray(data) ? data : []
+  }, [getFilteredData, recentAnalyses])
+
   if (loading && !dashboardData) {
     return (
       <div className={`p-6 ${className}`}>
@@ -1238,45 +1300,6 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   if (!dashboardData) {
     return null
   }
-
-  const {
-    summary = {
-      totalSessions: 0,
-      averageBiasScore: 0,
-      alertsLayerBreakdown: {},
-      alertsLast24h: 0,
-      activeAlerts: 0,
-      trendDirection: 'stable',
-      alerts: { low: 0, medium: 0, high: 0, critical: 0 },
-      complianceScore: 0,
-    },
-    recentAnalyses = [],
-    alerts = [],
-    trends = [],
-    demographics = { age: {}, gender: {}, ethnicity: {} } as {
-      age: Record<string, number>
-      gender: Record<string, number>
-      ethnicity: Record<string, number>
-    },
-    recommendations = [],
-  } = dashboardData
-
-  // Apply filters to data
-  // Apply filters to data with memoization
-  const filteredTrends = useMemo<BiasDashboardData['trends']>(() => {
-    const data = getFilteredData(trends, 'trends')
-    return isTrendItemArray(data) ? data : []
-  }, [getFilteredData, trends])
-
-  const filteredAlerts = useMemo<AlertItem[]>(() => {
-    const data = getFilteredData(alerts, 'alerts')
-    return isAlertItemArray(data) ? data : []
-  }, [getFilteredData, alerts])
-
-  const filteredSessions = useMemo<BiasAnalysisItem[]>(() => {
-    const data = getFilteredData(recentAnalyses, 'sessions')
-    return isBiasAnalysisItemArray(data) ? data : []
-  }, [getFilteredData, recentAnalyses])
 
   return (
     <div

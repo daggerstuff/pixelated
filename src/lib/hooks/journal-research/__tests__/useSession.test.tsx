@@ -50,11 +50,29 @@ const createWrapper = () => {
 }
 
 describe('useSession hooks', () => {
+  const baseStoreState = {
+    selectedSessionId: null as string | null,
+    filters: { searchTerm: '', phases: [] as string[] },
+    openCreateDrawer: vi.fn(),
+    closeCreateDrawer: vi.fn(),
+    setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(useJournalSessionStore as any).mockReturnValue({
-      filters: { searchTerm: '', phases: [] },
-    })
+    const storeState = {
+      ...baseStoreState,
+      openCreateDrawer: vi.fn(),
+      closeCreateDrawer: vi.fn(),
+      setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+    }
+    ;(useJournalSessionStore as any).mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(useJournalSessionStore as typeof useJournalSessionStore & {
+      getState?: () => typeof storeState
+    }).getState = () => storeState
   })
 
   describe('useSessionListQuery', () => {
@@ -75,9 +93,21 @@ describe('useSession hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listSessions).mockResolvedValue(mockSessionList)
-      ;(useJournalSessionStore as any).mockReturnValue({
+      const filteredStoreState = {
+        ...baseStoreState,
         filters: { searchTerm: 'test', phases: ['discovery'] },
-      })
+      }
+      ;(useJournalSessionStore as any).mockImplementation(
+        (
+          selector?: (state: typeof filteredStoreState) => unknown,
+        ) =>
+          typeof selector === 'function'
+            ? selector(filteredStoreState)
+            : filteredStoreState,
+      )
+      ;(useJournalSessionStore as typeof useJournalSessionStore & {
+        getState?: () => typeof filteredStoreState
+      }).getState = () => filteredStoreState
 
       const { result } = renderHook(() => useSessionListQuery(), {
         wrapper: createWrapper(),
@@ -166,7 +196,12 @@ describe('useSession hooks', () => {
       const setSelectedSessionId = vi.fn<(id: string | null) => void>()
       const closeCreateDrawer = vi.fn<() => void>()
 
-      vi.spyOn(useJournalSessionStore as any, 'getState').mockReturnValue({
+      ;(useJournalSessionStore as typeof useJournalSessionStore & {
+        getState?: () => {
+          setSelectedSessionId: typeof setSelectedSessionId
+          closeCreateDrawer: typeof closeCreateDrawer
+        }
+      }).getState = () => ({
         setSelectedSessionId,
         closeCreateDrawer,
       })
@@ -219,7 +254,12 @@ describe('useSession hooks', () => {
       vi.mocked(api.deleteSession).mockResolvedValue(undefined)
       const setSelectedSessionId = vi.fn<(id: string | null) => void>()
 
-      vi.spyOn(useJournalSessionStore as any, 'getState').mockReturnValue({
+      ;(useJournalSessionStore as typeof useJournalSessionStore & {
+        getState?: () => {
+          selectedSessionId: string
+          setSelectedSessionId: typeof setSelectedSessionId
+        }
+      }).getState = () => ({
         selectedSessionId: 'test-session-1',
         setSelectedSessionId,
       })
@@ -242,7 +282,12 @@ describe('useSession hooks', () => {
       vi.mocked(api.deleteSession).mockResolvedValue(undefined)
       const setSelectedSessionId = vi.fn<(id: string | null) => void>()
 
-      vi.spyOn(useJournalSessionStore as any, 'getState').mockReturnValue({
+      ;(useJournalSessionStore as typeof useJournalSessionStore & {
+        getState?: () => {
+          selectedSessionId: string
+          setSelectedSessionId: typeof setSelectedSessionId
+        }
+      }).getState = () => ({
         selectedSessionId: 'other-session',
         setSelectedSessionId,
       })

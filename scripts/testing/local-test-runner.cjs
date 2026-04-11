@@ -18,10 +18,18 @@ const vitestBin = path.resolve(
   '../../node_modules/.bin',
   process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
 )
-const args = process.argv.slice(2)
+const args = ['--config', path.resolve(__dirname, '../../config/vitest.config.ts'), ...process.argv.slice(2)]
 
 const cmd = vitestBin
-const child = spawn(cmd, args, { stdio: 'inherit' })
+const child = spawn(cmd, args, {
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NODE_ENV: process.env.NODE_ENV && process.env.NODE_ENV !== 'production'
+      ? process.env.NODE_ENV
+      : 'test',
+  },
+})
 child.on('exit', (code) => process.exit(code))
 child.on('error', (err) => {
   console.error('Failed to run vitest:', err)
