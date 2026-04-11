@@ -1,4 +1,11 @@
 import type { EmotionAnalysis } from "../../ai/emotions/types";
+interface EmotionData {
+  type: string;
+  intensity: number;
+  timestamp: Date;
+  context?: string;
+}
+
 import type { TherapySession } from "../../ai/models/ai-types";
 import type {
   AIUsageStats,
@@ -1085,10 +1092,10 @@ export class AIRepository {
   /**
    * Get emotion data for sessions
    */
-  async getEmotionData(sessionIds: string[]): Promise<EmotionAnalysis[]> {
+  async getEmotionData(sessionIds: string[]): Promise<EmotionData[]> {
     const db = await this.getDatabase();
     const results = await db
-      .collection('emotion_analysis')
+      .collection('emotion_data')
       .find({ sessionId: { $in: sessionIds } })
       .toArray();
     return results;
@@ -1100,7 +1107,7 @@ export class AIRepository {
   async getCriticalEmotions(
     clientId: string,
     emotionTypes?: string[]
-  ): Promise<EmotionAnalysis[]> {
+  ): Promise<EmotionData[]> {
     const db = await this.getDatabase();
     const query: Record<string, unknown> = { clientId, riskLevel: 'critical' };
     if (emotionTypes && emotionTypes.length > 0) {
@@ -1117,7 +1124,7 @@ export class AIRepository {
     clientId: string,
     startDate: Date,
     endDate: Date
-  ): Promise<EmotionAnalysis[]> {
+  ): Promise<EmotionData[]> {
     const db = await this.getDatabase();
     const results = await db
       .collection('emotion_analysis')
