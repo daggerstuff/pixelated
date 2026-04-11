@@ -7,9 +7,9 @@
  * Represents the state of the circuit breaker.
  */
 export enum CircuitBreakerState {
-  CLOSED,
-  OPEN,
-  HALF_OPEN,
+  CLOSED = 0,
+  OPEN = 1,
+  HALF_OPEN = 2,
 }
 
 /**

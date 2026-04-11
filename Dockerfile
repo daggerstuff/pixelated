@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY package.json pnpm-lock.yaml* ./
 # Include patch files and npm configuration required during installation
 COPY patches ./patches
-COPY .npmrc ./.npmrc
+COPY config/package/.npmrc ./.npmrc
 
 # Install all dependencies (dev + prod) required for build
 # Retry logic with fallback for lockfile mismatches
