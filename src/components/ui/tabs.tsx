@@ -49,7 +49,7 @@ export function Tabs({
 
   // Initialize with controlled value, defaultValue, or first registered tab
   const [internalValue, setInternalValue] = useState<string>(
-    value || defaultValue || '',
+    value ?? (defaultValue ?? ''),
   )
 
   // If this is a controlled component, use the provided value

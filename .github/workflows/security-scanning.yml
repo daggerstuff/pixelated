@@ -102,6 +102,7 @@ jobs:
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         with:
           sarif_file: 'trivy-results.sarif'
+          category: 'trivy-scan'
 
       - name: Upload Trivy SARIF as artifact
         uses: actions/upload-artifact@v7.0.0
@@ -115,6 +116,7 @@ jobs:
         if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
         with:
           sarif_file: 'checkov-results.sarif'
+          category: 'checkov-scan'
 
       - name: Create diagnostic artifact when Checkov SARIF missing
         if: ${{ steps.checkov_sarif.outputs.found == 'false' }}

@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { Button } from './ui/button/index'
 import React, { useState } from 'react'
 
 import { cn } from '../lib/utils.js'
@@ -54,7 +55,7 @@ export function BlogSearch() {
           aria-hidden='true'
         />
 
-        <Button
+        <Button type="button"
           type='submit'
           variant='ghost'
           size='sm'

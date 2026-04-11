@@ -24,15 +24,15 @@ export const connectMongoDB = async (): Promise<void> => {
       logger.info('MongoDB connected successfully')
 
       // Handle connection events
-      mongoose.connection.on('error', (err) => {
+      mongoose.connection?.on('error', (err) => {
         logger.error('MongoDB connection error:', err)
       })
 
-      mongoose.connection.on('disconnected', () => {
+      mongoose.connection?.on('disconnected', () => {
         logger.warn('MongoDB disconnected')
       })
 
-      mongoose.connection.on('reconnected', () => {
+      mongoose.connection?.on('reconnected', () => {
         logger.info('MongoDB reconnected')
       })
 
@@ -129,7 +129,7 @@ export const initializeDatabases = async (): Promise<void> => {
 export const closeDatabaseConnections = async (): Promise<void> => {
   try {
     await Promise.all([
-      mongoose.connection.close(),
+      mongoose.connection?.close(),
       postgresPool.end(),
       redisClient.quit(),
     ])

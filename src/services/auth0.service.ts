@@ -24,6 +24,17 @@ export type ManagementClientOptionsWithClientCredentials = {
 
 // Extend ManagementClient to include methods that may not be in the TypeScript definitions
 interface ExtendedManagementClient extends ManagementClient {
+  getRoles: (params?: any) => Promise<any>;
+  createRole: (params: any) => Promise<any>;
+  updateRole: (params: any) => Promise<any>;
+  deleteRole: (params: any) => Promise<any>;
+  getRoleUsers: (params: any) => Promise<any>;
+  assignRolestoUser: (params: any) => Promise<any>;
+  removeRolesFromUser: (params: any) => Promise<any>;
+  getUserRoles: (params: any) => Promise<any>;
+  getGuardianFactors: () => Promise<any>;
+  createGuardianEnrollmentTicket: (params: any) => Promise<any>;
+  deleteGuardianEnrollment: (params: any) => Promise<any>;
   // Users
   users: ManagementClient['users'] & {
     create: (params: any) => Promise<any>
@@ -74,6 +85,8 @@ interface ExtendedManagementClient extends ManagementClient {
 
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 interface ExtendedAuthenticationClient extends AuthenticationClient {
+  getProfile: (token: string) => Promise<any>;
+  refreshToken: (params: any) => Promise<any>;
   oauth: AuthenticationClient['oauth'] & {
     passwordGrant: (params: any) => Promise<any>
     refreshTokenGrant: (params: any) => Promise<any>
@@ -397,7 +410,7 @@ export class Auth0UserService {
       const usersRes = await auth0Management.users.listUsersByEmail({
         email,
       })
-      const users = usersRes.data ?? []
+      const users = Array.isArray(usersRes) ? usersRes : (usersRes.data ?? [])
 
       if (users.length === 0) {
         return null

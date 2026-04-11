@@ -133,12 +133,12 @@ export function errorHandler(
   }
 
   // Add stack trace in development
-  if (process.env.NODE_ENV === 'development') {
+  if ((process.env.NODE_ENV as string) === "development") {
     response.error.stack = error.stack
   }
 
   // Add request info for debugging
-  if (process.env.NODE_ENV === 'development') {
+  if ((process.env.NODE_ENV as string) === "development") {
     response.request = {
       method: req.method,
       url: req.url,

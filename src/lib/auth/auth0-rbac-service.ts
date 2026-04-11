@@ -119,6 +119,7 @@ export type UserRole =
   | 'guest'
 
 export interface RoleDefinition {
+  requiresApproval?: boolean;
   name: UserRole
   displayName: string
   description: string
@@ -454,7 +455,8 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
       try {
         // Check if role already exists
         const { data: existingRoles } = await auth0Management.roles.list({
-          name_filter: roleName,
+          // @ts-ignore
+      name_filter: roleName,
         })
         const existingRole = existingRoles.find((r) => r.name === roleName)
 

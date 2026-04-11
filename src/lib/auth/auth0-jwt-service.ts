@@ -10,6 +10,8 @@ import {
 
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 interface ExtendedAuthenticationClient extends AuthenticationClient {
+  getProfile: (token: string) => Promise<any>;
+  refreshToken: (params: any) => Promise<any>;
   getProfile(token: string): Promise<any>
   refreshToken(params: { refresh_token: string }): Promise<any>
   oauth: AuthenticationClient['oauth'] & {
@@ -173,7 +175,7 @@ export async function validateToken(
     }
 
     // Decode token to check standard claims (aud, iss) before expensive UserInfo call
-    const decodedToken = jwt.decode(token, { complete: true }) as {
+    const decodedToken = (jwt as any).decode(token, { complete: true }) as {
       payload: jwt.JwtPayload
       header: any
     } | null
