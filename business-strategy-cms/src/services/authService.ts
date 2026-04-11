@@ -17,8 +17,10 @@ const JWT_SECRET = process.env['JWT_SECRET'] ?? 'your-super-secret-jwt-key'
 const JWT_REFRESH_SECRET =
   process.env['JWT_REFRESH_SECRET'] ?? 'your-super-secret-refresh-key'
 
+const USER_ROLES = new Set<string>(Object.values(UserRole))
+
 const isUserRole = (value: unknown): value is UserRole =>
-  typeof value === 'string' && Object.values(UserRole).some((role) => role === value)
+  typeof value === 'string' && USER_ROLES.has(value)
 
 const parseDurationToSeconds = (value: string, fallback: number): number => {
   const match = /^(\d+)(ms|s|m|h|d|w)?$/.exec(value.trim())

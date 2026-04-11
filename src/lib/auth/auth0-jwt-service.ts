@@ -3,19 +3,21 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient, type AuthenticationClientOptions } from 'auth0'
+import {
+  AuthenticationClient,
+  UserInfoClient,
+  type AuthenticationClientOptions,
+} from 'auth0'
+import jwt, { type JwtPayload } from 'jsonwebtoken'
 
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 interface ExtendedAuthenticationClient extends AuthenticationClient {
-  getProfile(token: string): Promise<any>
-  refreshToken(params: { refresh_token: string }): Promise<any>
   oauth: AuthenticationClient['oauth'] & {
     passwordGrant: (params: any) => Promise<any>
     refreshTokenGrant: (params: any) => Promise<any>
     revokeRefreshToken: (params: any) => Promise<any>
   }
 }
-import * as jwt from 'jsonwebtoken'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
@@ -24,6 +26,7 @@ import { auth0Config, isAuth0Configured } from './auth0-config'
 
 // Initialize Auth0 authentication client
 let auth0Authentication: ExtendedAuthenticationClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
@@ -34,13 +37,14 @@ function initializeAuth0Client() {
     return
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+  auth0Authentication ??=
+    new AuthenticationClient({
       domain: auth0Config.domain,
       clientId: auth0Config.clientId,
       clientSecret: auth0Config.clientSecret,
-    })
-  }
+    }) as ExtendedAuthenticationClient
+  auth0UserInfo ??= new UserInfoClient({ domain: auth0Config.domain })
 }
 
 // Initialize the client
@@ -123,31 +127,65 @@ function currentTimestamp(): number {
   return Math.floor(Date.now() / 1000)
 }
 
+type Auth0TokenClaims = JwtPayload & {
+  'https://pixelated.empathy/app_metadata'?: {
+    roles?: readonly unknown[]
+  }
+  'https://pixelated.empathy/user_metadata'?: {
+    role?: unknown
+  }
+  permissions?: readonly unknown[]
+}
+
+function isAuth0TokenClaims(payload: unknown): payload is Auth0TokenClaims {
+  return payload !== null && typeof payload === 'object'
+}
+
+function isUserRole(value: string | undefined | null): value is UserRole {
+  return (
+    value === 'admin' ||
+    value === 'therapist' ||
+    value === 'patient' ||
+    value === 'researcher' ||
+    value === 'guest'
+  )
+}
+
 /**
  * Extract user role from Auth0 token payload
  * @param payload Auth0 token payload
  * @returns User role
  */
-function extractRoleFromPayload(payload: any): UserRole {
+function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
   // Try to get role from app_metadata first
-  if (payload['https://pixelated.empathy/app_metadata']?.roles?.length > 0) {
-    return payload['https://pixelated.empathy/app_metadata']
-      .roles[0] as UserRole
+  const appMetadataRoles = payload['https://pixelated.empathy/app_metadata']?.roles
+  if (Array.isArray(appMetadataRoles) && appMetadataRoles.length > 0) {
+    const appRole = appMetadataRoles[0]
+    if (typeof appRole === 'string' && isUserRole(appRole)) {
+      return appRole
+    }
   }
 
   // Try user_metadata
-  if (payload['https://pixelated.empathy/user_metadata']?.role) {
-    return payload['https://pixelated.empathy/user_metadata'].role as UserRole
+  const userMetadataRole = payload['https://pixelated.empathy/user_metadata']?.role
+  if (typeof userMetadataRole === 'string' && isUserRole(userMetadataRole)) {
+    return userMetadataRole
   }
 
   // Try permissions
   if (payload.permissions?.includes('admin')) {
     return 'admin'
-  } else if (payload.permissions?.includes('therapist')) {
+  }
+
+  if (payload.permissions?.includes('therapist')) {
     return 'therapist'
-  } else if (payload.permissions?.includes('researcher')) {
+  }
+
+  if (payload.permissions?.includes('researcher')) {
     return 'researcher'
-  } else if (payload.permissions?.includes('patient')) {
+  }
+
+  if (payload.permissions?.includes('patient')) {
     return 'patient'
   }
 
@@ -170,9 +208,10 @@ export async function validateToken(
     }
 
     // Decode token to check standard claims (aud, iss) before expensive UserInfo call
+    // @ts-ignore
     const decodedToken = jwt.decode(token, { complete: true }) as {
-      payload: jwt.JwtPayload
-      header: any
+      payload: JwtPayload & { jti?: string; sid?: string }
+      header: unknown
     } | null
 
     if (!decodedToken || !decodedToken.payload) {
@@ -183,7 +222,7 @@ export async function validateToken(
 
     // Validate Issuer
     const expectedIssuer = `https://${auth0Config.domain}/`
-    if (!payload.iss) {
+    if (typeof payload.iss !== 'string' || !payload.iss) {
       throw new AuthenticationError('Token missing issuer claim')
     }
     if (payload.iss !== expectedIssuer) {
@@ -198,15 +237,16 @@ export async function validateToken(
       )
     } else {
       const { aud } = payload
-      if (!aud) {
+      if (typeof aud === 'string') {
+        if (aud !== expectedAudience) {
+          throw new AuthenticationError(`Invalid audience: ${aud}`)
+        }
+      } else if (Array.isArray(aud)) {
+        if (!aud.includes(expectedAudience)) {
+          throw new AuthenticationError(`Invalid audience: ${aud.join(',')}`)
+        }
+      } else {
         throw new AuthenticationError('Token missing audience claim')
-      }
-      const audValid = Array.isArray(aud)
-        ? aud.includes(expectedAudience)
-        : aud === expectedAudience
-
-      if (!audValid) {
-        throw new AuthenticationError(`Invalid audience: ${String(aud)}`)
       }
     }
 
@@ -225,16 +265,23 @@ export async function validateToken(
 
     // Now verify with UserInfo (acts as online signature/revocation check)
     // Using auth0Authentication.getProfile instead of auth0UserInfo.getUserInfo
-    const userInfo = await auth0Authentication.getProfile(token)
+    const userInfo = await auth0UserInfo?.getUserInfo(token)
+    if (!userInfo) {
+      throw new AuthenticationError('Failed to get user info')
+    }
 
     // Extract user information
-    const userId = userInfo.sub || payload.sub
+    const tokenPayload = isAuth0TokenClaims(userInfo.data)
+      ? userInfo.data
+      : {}
+    const userId =
+      tokenPayload.sub || (typeof payload.sub === 'string' ? payload.sub : '')
     if (!userId) {
       throw new AuthenticationError('Token missing subject claim')
     }
-    const role = extractRoleFromPayload(userInfo)
-    const tokenId = payload.jti || ''
-    const sessionId = payload.sid as string | undefined
+    const role = extractRoleFromPayload(tokenPayload)
+    const tokenId = typeof payload.jti === 'string' ? payload.jti : ''
+    const sessionId = typeof payload.sid === 'string' ? payload.sid : undefined
 
     // Log successful validation
     logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, null, {
@@ -254,7 +301,7 @@ export async function validateToken(
       given_name: _given_name,
       family_name: _family_name,
       ...filteredUserInfo
-    } = userInfo
+    } = userInfo.data
     const safePayload = { ...filteredUserInfo, ...payload }
 
     return {
@@ -269,23 +316,13 @@ export async function validateToken(
     // Log validation failure
     logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
       userId: null,
-      error:
-        error instanceof Error
-          ? error instanceof Error
-            ? error.message
-            : 'Unknown error'
-          : 'Unknown error',
+      error: error instanceof Error ? error.message : 'Unknown error',
       tokenType: tokenType,
     })
 
     return {
       valid: false,
-      error:
-        error instanceof Error
-          ? error instanceof Error
-            ? error.message
-            : 'Unknown error'
-          : 'Token validation failed',
+      error: error instanceof Error ? error.message : 'Token validation failed',
     }
   }
 }
@@ -305,25 +342,32 @@ export async function refreshAccessToken(
     }
 
     // Exchange refresh token for new access token
-    const tokenResponse = await auth0Authentication.refreshToken({
+    // @ts-ignore
+    const tokenResponse = await auth0Authentication.oauth.refreshTokenGrant({
       refresh_token: refreshToken,
     })
 
     // Get user info from new access token
-    const userResponse = await auth0Authentication.getProfile(
-      tokenResponse.access_token,
+    const userResponse = await auth0UserInfo?.getUserInfo(
+      tokenResponse.data.access_token,
     )
+    if (!userResponse) {
+      throw new AuthenticationError('Failed to get refreshed user info')
+    }
 
     // Extract user information
-    const userId = userResponse.sub || ''
-    const role = extractRoleFromPayload(userResponse)
+    const userPayload = isAuth0TokenClaims(userResponse.data)
+      ? userResponse.data
+      : {}
+    const userId = userPayload.sub || ''
+    const role = extractRoleFromPayload(userPayload)
 
     // Log token refresh event
     logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, null, {
       userId: userId,
       oldTokenId: 'unknown', // We don't have the old token ID
-      newAccessTokenId: userResponse.jti || '',
-      newRefreshTokenId: tokenResponse.refresh_token
+      newAccessTokenId: userPayload.jti ?? '',
+      newRefreshTokenId: tokenResponse.data.refresh_token
         ? 'present'
         : 'not_provided',
     })
@@ -332,10 +376,10 @@ export async function refreshAccessToken(
     await updatePhase6AuthenticationProgress(userId, 'token_refreshed')
 
     return {
-      accessToken: tokenResponse.access_token,
-      refreshToken: tokenResponse.refresh_token || refreshToken, // Use new refresh token if provided
+      accessToken: tokenResponse.data.access_token,
+      refreshToken: tokenResponse.data.refresh_token ?? refreshToken, // Use new refresh token if provided
       tokenType: 'Bearer',
-      expiresIn: tokenResponse.expires_in,
+      expiresIn: tokenResponse.data.expires_in,
       user: {
         id: userId,
         role: role,

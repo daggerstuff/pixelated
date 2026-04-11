@@ -13,7 +13,6 @@ on:
 
 env:
   GHA_LOCAL_RUN: 'false'
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.33.0
   NODE_ENV: test
@@ -102,34 +101,22 @@ jobs:
               exit 1
             fi
 
-            DETECTED_PREVIEW_PORT=$(grep -oE 'local: http://[^:]+:[0-9]+' /tmp/pixelated-preview.log | tail -n 1 | sed -E 's/.*:([0-9]+)$/\1/' || true)
+            DETECTED_PREVIEW_PORT=$(grep -oE 'Server listening on [^:]+:[0-9]+' /tmp/pixelated-preview.log | tail -n 1 | sed -E 's/.*:([0-9]+)$/\1/' || true)
+            if [ -z "$DETECTED_PREVIEW_PORT" ]; then
+              DETECTED_PREVIEW_PORT=$(grep -oE 'local: http://[^:]+:[0-9]+' /tmp/pixelated-preview.log | tail -n 1 | sed -E 's/.*:([0-9]+)$/\1/' || true)
+            fi
 
-            if [ -n "$DETECTED_PREVIEW_PORT" ]; then
-              echo "Detected preview port from log: ${DETECTED_PREVIEW_PORT}"
-              if curl -sSf --connect-timeout 2 --max-time 2 "http://127.0.0.1:${DETECTED_PREVIEW_PORT}" > /dev/null 2>&1 \
-                || curl -sSf --connect-timeout 2 --max-time 2 "http://localhost:${DETECTED_PREVIEW_PORT}" > /dev/null 2>&1; then
-                PREVIEW_PORT="$DETECTED_PREVIEW_PORT"
+            for port in "$DETECTED_PREVIEW_PORT" 4323 4322 4321; do
+              if [ -z "$port" ]; then
+                continue
+              fi
+              if curl -sS --connect-timeout 2 --max-time 2 "http://127.0.0.1:${port}" > /dev/null 2>&1; then
+                PREVIEW_PORT=$port
                 echo "Server is ready on port ${PREVIEW_PORT}!"
                 echo "DETECTED_PREVIEW_PORT=${PREVIEW_PORT}" >> "$GITHUB_ENV"
                 exit 0
               fi
-            fi
-
-            if curl -sSf --connect-timeout 2 --max-time 2 http://127.0.0.1:4322 > /dev/null 2>&1 \
-              || curl -sSf --connect-timeout 2 --max-time 2 http://localhost:4322 > /dev/null 2>&1; then
-              PREVIEW_PORT=4322
-              echo "Server is ready on port 4322!"
-              echo "DETECTED_PREVIEW_PORT=4322" >> "$GITHUB_ENV"
-              exit 0
-            fi
-
-            if curl -sSf --connect-timeout 2 --max-time 2 http://127.0.0.1:4321 > /dev/null 2>&1 \
-              || curl -sSf --connect-timeout 2 --max-time 2 http://localhost:4321 > /dev/null 2>&1; then
-              PREVIEW_PORT=4321
-              echo "Server is ready on port 4321!"
-              echo "DETECTED_PREVIEW_PORT=4321" >> "$GITHUB_ENV"
-              exit 0
-            fi
+            done
 
             RETRY_COUNT=$((RETRY_COUNT + 1))
             echo "Attempt $RETRY_COUNT/$MAX_RETRIES - server not ready yet..."
@@ -148,14 +135,14 @@ jobs:
           export DISABLE_AUTH=true
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
-          export BASE_URL="http://127.0.0.1:${DETECTED_PREVIEW_PORT:-4321}"
+          export BASE_URL="http://127.0.0.1:${DETECTED_PREVIEW_PORT:-4323}"
           pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
         env:
           CI: true
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: browser-test-results-${{ github.run_id }}
           path: |
@@ -170,8 +157,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [browser-tests]
     if: always()
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v6
@@ -287,7 +272,7 @@ jobs:
           echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Upload consolidated report
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: browser-compatibility-report-${{ github.run_id }}
           path: report.html

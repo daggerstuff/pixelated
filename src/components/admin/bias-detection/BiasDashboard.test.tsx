@@ -837,7 +837,12 @@ describe('BiasDashboard', () => {
           !button.closest('button')?.textContent?.includes('Bulk'),
       ) || acknowledgeButtons[0]
 
-    fireEvent.click(individualAcknowledgeButton)
+    const individualAcknowledgeElement = individualAcknowledgeButton?.closest('button')
+    if (!individualAcknowledgeElement) {
+      throw new Error('Expected acknowledge button to be present')
+    }
+
+    fireEvent.click(individualAcknowledgeElement)
 
     // Should update alert status (in real app, would check API calls)
     await waitFor(() => {

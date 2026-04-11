@@ -34,7 +34,7 @@ export class UserService {
     role: UserRole,
   ): Promise<{ user: User; temporaryPassword: string }> {
     const temporaryPassword = Math.random().toString(36).substring(2, 15)
-    const username = email.split('@')[0]
+    const username = email.split('@')[0] || email
 
     const saltRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12')
     const hashedPassword = await bcrypt.hash(temporaryPassword, saltRounds)
