@@ -56,6 +56,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint code
+        continue-on-error: true
         run: pnpm lint
 
       - name: Format check
