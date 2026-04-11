@@ -70,10 +70,21 @@ deploy_aws() {
 
 # Function to deploy to DigitalOcean (legacy)
 deploy_digitalocean() {
+    local enable_legacy_doctl="${ENABLE_LEGACY_DOCTL:-0}"
+
+    echo -e "${YELLOW}⚠️  Legacy flow: This DigitalOcean deployment path is deprecated.${NC}"
+    echo "   Use only when running in legacy environments."
+    if [[ "${enable_legacy_doctl}" != "1" ]]; then
+        echo -e "${YELLOW}⚠️  Set ENABLE_LEGACY_DOCTL=1 to opt in to DigitalOcean (legacy) deployment.${NC}"
+        return 1
+    fi
+
     echo -e "${YELLOW}🎯 Deploying to DigitalOcean App Platform (legacy flow)...${NC}"
     
     # Check if doctl is installed
-    if ! command -v doctl &> /dev/null; then
+    local doctl_cli="${DOCTL_CLI:-doctl}"
+
+    if ! command -v "${doctl_cli}" &> /dev/null; then
         echo -e "${RED}doctl is required but not installed.${NC}"
         echo "Install it from: https://docs.digitalocean.com/reference/doctl/"
         exit 1
@@ -117,7 +128,7 @@ services:
     value: \${AWS_S3_BUCKET}
 EOF
     
-    doctl apps create --spec app.yaml
+    "${doctl_cli}" apps create --spec app.yaml
     echo -e "${GREEN}✅ Successfully deployed to DigitalOcean (legacy flow)!${NC}"
 }
 
@@ -143,7 +154,7 @@ main() {
     echo "Select deployment platform:"
     echo "1) Vercel (Recommended for serverless)"
     echo "2) AWS ECS (Scalable containers)"
-    echo "3) DigitalOcean (legacy flow)"
+    echo "3) DigitalOcean (legacy flow, opt-in via ENABLE_LEGACY_DOCTL=1)"
     echo "4) Run tests only"
     echo ""
     

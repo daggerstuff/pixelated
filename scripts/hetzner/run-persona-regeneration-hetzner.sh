@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+HETZNER_AI_CLI="${HETZNER_AI_CLI:-ovhai}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="${SCRIPT_DIR}/lib"
@@ -125,8 +126,8 @@ if ! command -v docker >/dev/null; then
   exit 1
 fi
 
-if ! command -v ovhai >/dev/null; then
-  echo "ERROR: ovhai CLI is required for Hetzner target and was not found in PATH." >&2
+if ! command -v ${HETZNER_AI_CLI} >/dev/null; then
+  echo "ERROR: ${HETZNER_AI_CLI} CLI is required for Hetzner target and was not found in PATH." >&2
   exit 1
 fi
 
@@ -150,26 +151,26 @@ if [[ -z "${HETZNER_S3_ACCESS_KEY:-}" || -z "${HETZNER_S3_SECRET_KEY:-}" ]]; the
 fi
 
 if [[ -n "${HETZNER_AI_TOKEN:-}" ]]; then
-  if ovhai --token "${HETZNER_AI_TOKEN}" me >/tmp/ovhai_preflight.log 2>&1; then
-    log_info "ovhai authentication preflight check passed using HETZNER_AI_TOKEN."
-  elif ! ovhai me >/tmp/ovhai_preflight.log 2>&1; then
-    echo "ERROR: ovhai authentication is not valid. Run: ovhai login" >&2
+  if ${HETZNER_AI_CLI} --token "${HETZNER_AI_TOKEN}" me >/tmp/hetzner_ai_preflight.log 2>&1; then
+    log_info "${HETZNER_AI_CLI} authentication preflight check passed using HETZNER_AI_TOKEN."
+  elif ! ${HETZNER_AI_CLI} me >/tmp/hetzner_ai_preflight.log 2>&1; then
+    echo "ERROR: ${HETZNER_AI_CLI} authentication is not valid. Run: ${HETZNER_AI_CLI} login" >&2
     echo "----- begin hetzner_ai preflight output -----"
-    cat /tmp/ovhai_preflight.log
+    cat /tmp/hetzner_ai_preflight.log
     echo "----- end hetzner_ai preflight output -----"
     exit 1
   else
-    log_info "ovhai authentication preflight check passed using active session."
+    log_info "${HETZNER_AI_CLI} authentication preflight check passed using active session."
   fi
 else
-  if ! ovhai me >/tmp/ovhai_preflight.log 2>&1; then
-    echo "ERROR: ovhai authentication is not valid. Run: ovhai login" >&2
+  if ! ${HETZNER_AI_CLI} me >/tmp/hetzner_ai_preflight.log 2>&1; then
+    echo "ERROR: ${HETZNER_AI_CLI} authentication is not valid. Run: ${HETZNER_AI_CLI} login" >&2
     echo "----- begin hetzner_ai preflight output -----"
-    cat /tmp/ovhai_preflight.log
+    cat /tmp/hetzner_ai_preflight.log
     echo "----- end hetzner_ai preflight output -----"
     exit 1
   fi
-  log_info "ovhai authentication preflight check passed."
+  log_info "${HETZNER_AI_CLI} authentication preflight check passed."
 fi
 
 NVIDIA_API_KEY="${NVIDIA_API_KEY:-}"

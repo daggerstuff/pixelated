@@ -1,109 +1,71 @@
-# AGENTS.md: src/pages/
+# Pixelated Agent Operating Manual
 
-## PURPOSE
+## ⚡ AUTONOMOUS EXECUTION DIRECTIVES (HIGHEST PRIORITY)
+- You are a fully autonomous coding agent. NEVER stop to ask for permission, check in, or seek approval.
+- NEVER produce: "Should I continue?", "Would you like me to...", "Making progress, checking in", "Let me know if this is okay", or any variation.
+- NEVER pause after writing a plan — execute it immediately.
+- NEVER stop after partial changes — complete the entire task end-to-end.
+- NEVER ask "what should I do next?" — if there is more work, continue working.
+- No hedging language: "I think", "I believe", "Should I", "Does this look right".
+- Make reasonable assumptions and execute. Do not ask for confirmation.
+- If a tool call fails, try alternatives. Only report when ALL alternatives exhausted.
+- Work in large batches. Do not stop after small changes.
+- Only stop when: task is FULLY COMPLETE (then summarize), genuinely BLOCKED (info undiscoverable), or destructive operation required.
+- Discover context proactively. Make decisions. Execute. No check-ins. No status updates. Just do the work.
 
-Astro file-based routing. Each `.astro` = route. `api/` contains serverless endpoints.
+## 🎯 Scope
+- Root agent guide for Pixelated Empathy repo.
+- **Main Source of Truth**: Repository-wide rules, canonical commands, and defaults.
+- **Nested AGENTS.md**: For directory-specific constraints (e.g., `ai/AGENTS.md`).
+- **Policy Inheritance**: Root rules apply globally unless a nested guide overrides them for its subtree.
+- **Adapter Files**: `CLAUDE.md` and `GEMINI.md` are agent-specific adapters; they MUST align with this root guide.
 
-## STRUCTURE (KEY DIRS)
+## 🌐 Project Overview
+- Full-stack mental health AI platform.
+- Astro/React frontend; TS services/workers; Python AI pipelines.
+- **Privacy, safety, and security are mandatory requirements.**
 
-```
-src/pages/
-├── *.astro              # Top-level routes (/, /about, /contact)
-├── admin/               # Admin dashboard (auth required)
-├── ai/                  # AI chat and agent routes
-├── api/                 # API endpoints (serverless functions)
-│   ├── auth/
-│   ├── ai/chat
-│   ├── sessions/
-│   └── webhooks/
-├── blog/                # Blog posts (markdown, dynamic)
-├── dashboard/           # User dashboard routes
-├── docs/                # Documentation pages
-├── journal-research/    # Research pipeline UI
-├── layouts/             # Page layout templates
-└── 404.astro, 500.astro # Error pages
-```
+## 🚀 Unified Agent Workflow (2026 Standard)
+Follow this loop for every task to ensure durability and reliability:
 
-## CONVENTIONS
+1.  **Recall**: Start with Hindsight MCP tools (`recall` or `reflect`).
+2.  **Search (Proactive Capability Mapping)**:
+    -   Identify specialized **Skills** (`.agent/skills/`) or **MCP tools**.
+    -   Use name-based filtering and the initial `<skills>` block.
+    -   Only deep-scan `SKILL.md` documents for high-probability matches.
+    -   **Prioritize efficiency** over exhaustive scanning.
+    -   Minimize context window bloat and reduce session latency.
+3.  **Plan**: Draft in `.agent/internal/plans/` (`YYYY-MM-DD-task-name.md`).
+4.  **Act**: Small, atomic chunks. Fix root causes, not symptoms.
+5.  **Verify**: Validate each change with the smallest focused local checks that cover the behavior.
+6.  **Retain**: Log actions/learnings in Hindsight (`retain`) at task end.
 
-- **Routing**: `about.astro` → `/about`; `blog/[slug].astro` → `/blog/:slug`
-- **Astro pages**: `.astro` (server-rendered); embed React as needed
-- **API routes**: `.ts` export `GET`, `POST`, etc.
-- **Dynamic routes**: Use `getServerData` for data fetching
-- **Layouts**: Wrap content; import from `../layouts/`
+## 🏗️ Project Structure
+- `src/`: Astro app, React UI, API routes, shared TypeScript libraries, hooks, and workers.
+- `ai/`: Python inference, training, monitoring, safety, and pipeline code.
+- `tests/`: Integration, browser, performance, security, and API coverage.
+- `scripts/`, `docker/`, `config/`, `.github/workflows/`: Operational and deployment code.
+- `public/`: Static assets.
+- `docs/`: **PUBLIC** documentation only.
+- `.agent/internal/`: **PRIVATE** internal plans, research, and notes (git-ignored).
 
-### Minimal Page
+## 🛠️ Canonical Commands
+- `pnpm dev`: Run main app locally on port `5173`.
+- `pnpm build` & `pnpm preview`: Validate production-ready output.
+- `pnpm lint` & `pnpm format`: Primary quality gates for frontend and TS.
+- `pnpm test`, `pnpm test:unit`, `pnpm e2e`: Main JS and browser tests.
+- `uv run pytest`: Primary Python test entry point.
+- `pnpm security:check` or `pnpm security:scan`: Audit for sensitive changes.
 
-```astro
----
-// dashboard/index.astro
-import Layout from '../layouts/Dashboard.astro'
-export const prerender = false
-export const getServerData = async ({ redirect }) => {
-  const session = await requireAuth()
-  if (!session) redirect('/login')
-  return { props: { session } }
-}
----
-<Layout><main>Dashboard</main></Layout>
-```
+## ⚖️ Working Rules
+- **Environment**: Use `pnpm` for Node/TS and `uv run` for Python. PROHIBITED: raw `npm`, `pip`, `conda`, `poetry`.
+- **Quality**: No stubs, placeholders, or suppressed lint/TS errors. Enterprise-grade code only.
+- **Data**: Synthetic test data ONLY. No secrets or local credentials.
+- **Boundary**: Treat `ai/` as a submodule with its own commit discipline.
+- **Safety**: DO NOT guess. Verify commands and structure if unsure.
+- **Context**: Use `context7` for provider docs and `exa` for web search.
 
-### Minimal API
-
-```typescript
-// api/ai/chat.ts
-export const POST: APIRoute = async ({ request, locals }) => {
-  if (!locals.user) return json({ error: 'Unauthorized' }, 401)
-  const body = await request.json()
-  const result = await aiService.chat(body)
-  return json(result, 200)
-}
-```
-
-## KEY ROUTES
-
-| Route | File | Purpose |
-|-------|------|---------|
-| `/` | `index.astro` | Landing page |
-| `/ai/chat` | `ai/chat.astro` | Chat interface |
-| `/dashboard` | `dashboard/index.astro` | User dashboard |
-| `/admin` | `admin/index.astro` | Admin console |
-| `/api/*` | `api/` subdirs | REST endpoints |
-| `/blog/*` | `blog/[slug].astro` | Blog posts |
-
-## PERFORMANCE
-
-- `prerender = true` (static) or `false` (dynamic)
-- API `Cache-Control` for caching
-- Streaming for large data
-
-## SECURITY
-
-- Auth: cookies/JWT; `locals.user` from middleware
-- Authorization: role checks; enforce ownership
-- Validation: Zod schemas on all inputs
-- Rate limiting: on chat, auth
-- CSRF: tokens for state-changing ops
-
-## ERROR HANDLING
-
-- `404.astro`, `500.astro`
-- API: JSON `{ error, message }` with status
-- Log server errors with context
-
-## TESTING
-
-- Pages: `@testing-library/astro`
-- API: test handlers with `supertest`
-- E2E: Playwright in `tests/e2e/`
-
-## ANTI-PATTERNS
-
-❌ Business logic in pages → services
-❌ Direct AI calls → API layer
-❌ Hard-coded URLs → config
-❌ Silent failures → log and return errors
-
----
-
-_Generated: 2025-03-15 | Domain: Astro Pages & API Routes_
+## 🔒 Verification & Memory
+- **Hindsight**: Always recall context at start and retain learnings at task end.
+- **Hindsight Identity**: In this project, NEVER use Hindsight with `user_id: "default"`. Use `user_id: "vivi"` unless the user explicitly provides a different identity.
+- **Validation**: Smallest relevant test surface; do not skip behavior checks.

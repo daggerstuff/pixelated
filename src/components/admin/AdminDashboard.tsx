@@ -42,6 +42,12 @@ interface SystemHealth {
   uptime: number
 }
 
+function getHighRiskCount(
+  riskLevelDistribution: Record<string, number>,
+): number {
+  return (riskLevelDistribution['high'] ?? 0) + (riskLevelDistribution['critical'] ?? 0)
+}
+
 /**
  * Comprehensive Healthcare Administrator Dashboard
  */
@@ -395,8 +401,7 @@ const OverviewTab: FC<{
                         High Risk:
                       </span>
                       <span className='text-red-600 ml-2 font-medium'>
-                        {therapist.riskLevelDistribution.high +
-                          therapist.riskLevelDistribution.critical}
+                        {getHighRiskCount(therapist.riskLevelDistribution)}
                       </span>
                     </div>
                     <div>
@@ -623,8 +628,7 @@ const TherapistsTab: FC<{
                         High Risk:
                       </span>
                       <span className='text-red-600 ml-2 font-medium'>
-                        {therapist.riskLevelDistribution.high +
-                          therapist.riskLevelDistribution.critical}
+                        {getHighRiskCount(therapist.riskLevelDistribution)}
                       </span>
                     </div>
                     <div>

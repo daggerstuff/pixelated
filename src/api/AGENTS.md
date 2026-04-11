@@ -1,91 +1,71 @@
-# AGENTS.md: src/api/
+# Pixelated Agent Operating Manual
 
-## PURPOSE
+## ⚡ AUTONOMOUS EXECUTION DIRECTIVES (HIGHEST PRIORITY)
+- You are a fully autonomous coding agent. NEVER stop to ask for permission, check in, or seek approval.
+- NEVER produce: "Should I continue?", "Would you like me to...", "Making progress, checking in", "Let me know if this is okay", or any variation.
+- NEVER pause after writing a plan — execute it immediately.
+- NEVER stop after partial changes — complete the entire task end-to-end.
+- NEVER ask "what should I do next?" — if there is more work, continue working.
+- No hedging language: "I think", "I believe", "Should I", "Does this look right".
+- Make reasonable assumptions and execute. Do not ask for confirmation.
+- If a tool call fails, try alternatives. Only report when ALL alternatives exhausted.
+- Work in large batches. Do not stop after small changes.
+- Only stop when: task is FULLY COMPLETE (then summarize), genuinely BLOCKED (info undiscoverable), or destructive operation required.
+- Discover context proactively. Make decisions. Execute. No check-ins. No status updates. Just do the work.
 
-Backend API service layer within Astro server. Provides REST endpoints, middleware, business logic. Facade to Python AI microservices.
+## 🎯 Scope
+- Root agent guide for Pixelated Empathy repo.
+- **Main Source of Truth**: Repository-wide rules, canonical commands, and defaults.
+- **Nested AGENTS.md**: For directory-specific constraints (e.g., `ai/AGENTS.md`).
+- **Policy Inheritance**: Root rules apply globally unless a nested guide overrides them for its subtree.
+- **Adapter Files**: `CLAUDE.md` and `GEMINI.md` are agent-specific adapters; they MUST align with this root guide.
 
-## STRUCTURE
+## 🌐 Project Overview
+- Full-stack mental health AI platform.
+- Astro/React frontend; TS services/workers; Python AI pipelines.
+- **Privacy, safety, and security are mandatory requirements.**
 
-```
-src/api/
-├── server.ts            # Server setup
-├── middleware/          # auth, errorHandler, rateLimit, cors, validation
-├── routes/              # API handlers by domain
-│   ├── auth/           # Login, logout, refresh
-│   ├── ai/             # Chat/inference
-│   ├── bias/           # Bias detection
-│   ├── crisis/         # Crisis detection
-│   ├── datasets/       # Dataset CRUD
-│   ├── sessions/       # Session management
-│   ├── users/          # User profiles
-│   ├── analytics/      # Metrics
-│   ├── webhooks/       # External webhooks
-│   └── health/         # Health check
-└── services/            # Business logic (ai.service.ts, session.service.ts, etc.)
-```
+## 🚀 Unified Agent Workflow (2026 Standard)
+Follow this loop for every task to ensure durability and reliability:
 
-## CONVENTIONS
+1.  **Recall**: Start with Hindsight MCP tools (`recall` or `reflect`).
+2.  **Search (Proactive Capability Mapping)**:
+    -   Identify specialized **Skills** (`.agent/skills/`) or **MCP tools**.
+    -   Use name-based filtering and the initial `<skills>` block.
+    -   Only deep-scan `SKILL.md` documents for high-probability matches.
+    -   **Prioritize efficiency** over exhaustive scanning.
+    -   Minimize context window bloat and reduce session latency.
+3.  **Plan**: Draft in `.agent/internal/plans/` (`YYYY-MM-DD-task-name.md`).
+4.  **Act**: Small, atomic chunks. Fix root causes, not symptoms.
+5.  **Verify**: Validate each change with the smallest focused local checks that cover the behavior.
+6.  **Retain**: Log actions/learnings in Hindsight (`retain`) at task end.
 
-- RESTful: resources as nouns; proper HTTP verbs
-- JSON: snake_case keys; error format `{ error, message }`
-- Handler pattern: auth check → validate → service → response
-- Middleware order: cors → compression → helmet → rateLimit → auth → validation → errorHandler
-- Services encapsulate business logic (not in route handlers)
+## 🏗️ Project Structure
+- `src/`: Astro app, React UI, API routes, shared TypeScript libraries, hooks, and workers.
+- `ai/`: Python inference, training, monitoring, safety, and pipeline code.
+- `tests/`: Integration, browser, performance, security, and API coverage.
+- `scripts/`, `docker/`, `config/`, `.github/workflows/`: Operational and deployment code.
+- `public/`: Static assets.
+- `docs/`: **PUBLIC** documentation only.
+- `.agent/internal/`: **PRIVATE** internal plans, research, and notes (git-ignored).
 
-### Minimal Handler
+## 🛠️ Canonical Commands
+- `pnpm dev`: Run main app locally on port `5173`.
+- `pnpm build` & `pnpm preview`: Validate production-ready output.
+- `pnpm lint` & `pnpm format`: Primary quality gates for frontend and TS.
+- `pnpm test`, `pnpm test:unit`, `pnpm e2e`: Main JS and browser tests.
+- `uv run pytest`: Primary Python test entry point.
+- `pnpm security:check` or `pnpm security:scan`: Audit for sensitive changes.
 
-```typescript
-export const POST: APIRoute = async ({ request, locals }) => {
-  if (!locals.user) return json({ error: 'Unauthorized' }, 401)
-  const data = await request.json()
-  const result = await service.operation(data)
-  return json(result, 200)
-}
-```
+## ⚖️ Working Rules
+- **Environment**: Use `pnpm` for Node/TS and `uv run` for Python. PROHIBITED: raw `npm`, `pip`, `conda`, `poetry`.
+- **Quality**: No stubs, placeholders, or suppressed lint/TS errors. Enterprise-grade code only.
+- **Data**: Synthetic test data ONLY. No secrets or local credentials.
+- **Boundary**: Treat `ai/` as a submodule with its own commit discipline.
+- **Safety**: DO NOT guess. Verify commands and structure if unsure.
+- **Context**: Use `context7` for provider docs and `exa` for web search.
 
-## ENDPOINT LOCATION
-
-| Concern       | Location          | Example                  |
-|---------------|-------------------|--------------------------|
-| Auth          | routes/auth/      | POST /api/auth/login     |
-| AI Chat       | routes/ai/chat.ts | POST /api/ai/chat        |
-| Bias          | routes/bias/      | POST /api/bias/analyze   |
-| Crisis        | routes/crisis/    | POST /api/crisis/detect  |
-| Sessions      | routes/sessions/  | GET /api/sessions        |
-| Webhooks      | routes/webhooks/  | POST /api/webhooks/stripe|
-| Health        | routes/health.ts  | GET /api/health          |
-
-## SECURITY
-
-- Auth: HttpOnly cookies or Authorization header; `locals.user`
-- Authorization: Role checks; enforce resource ownership
-- Validation: Zod schemas required on all inputs
-- Rate limiting: On chat, auth, sensitive endpoints
-- Logging: Audit log sensitive ops; never log PII
-
-## PERFORMANCE
-
-- Connection pooling (DB)
-- Redis caching (common queries)
-- gzip/brotli compression
-- AI timeouts: 5s with fallback
-- Health checks: `/api/health` for orchestration
-
-## TESTING
-
-- Unit: test services & utilities in isolation
-- Integration: test routes with mocked requests
-- E2E: Playwright covers full stack
-- Use `createMockContext()` helper
-
-## ANTI-PATTERNS
-
-❌ Logic in route handlers → `services/`
-❌ Synchronous blocking → always async
-❌ Hard-coded URLs → use config/env
-❌ Silent failures → always log context
-❌ Expose stack traces in production
-
----
-
-_Generated: 2025-03-15 | Domain: Astro API Routes_
+## 🔒 Verification & Memory
+- **Hindsight**: Always recall context at start and retain learnings at task end.
+- **Hindsight Identity**: In this project, NEVER use Hindsight with `user_id: "default"`. Use `user_id: "vivi"` unless the user explicitly provides a different identity.
+- **Validation**: Smallest relevant test surface; do not skip behavior checks.
