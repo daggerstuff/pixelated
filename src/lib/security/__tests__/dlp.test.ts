@@ -57,6 +57,7 @@ vi.mock('../../audit/log', () => {
 
 vi.mock('../../audit', () => {
   return {
+    logAuditEvent: vi.fn().mockResolvedValue(undefined),
     AuditEventType: {
       DLP_ALLOWED: 'dlp_allowed',
       DLP_BLOCKED: 'dlp_blocked',

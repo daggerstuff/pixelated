@@ -26,8 +26,8 @@ export const EventDataSchema = z.object({
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   timestamp: z.number().default(() => Date.now()),
-  properties: z.record(z.unknown()).default({}),
-  metadata: z.record(z.unknown()).default({}),
+  properties: z.record(z.string(), z.unknown()).default({}),
+  metadata: z.record(z.string(), z.unknown()).default({}),
 })
 
 export type EventData = z.infer<typeof EventDataSchema>
@@ -44,7 +44,7 @@ export const MetricSchema = z.object({
   name: z.string(),
   value: z.number(),
   timestamp: z.number().default(() => Date.now()),
-  tags: z.record(z.string()).default({}),
+  tags: z.record(z.string(), z.string()).default({}),
 })
 
 export type Metric = z.infer<typeof MetricSchema>

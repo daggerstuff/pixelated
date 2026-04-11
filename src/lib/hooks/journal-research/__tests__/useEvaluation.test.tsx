@@ -64,23 +64,36 @@ const createWrapper = () => {
 }
 
 describe('useEvaluation hooks', () => {
+  const baseStoreState = {
+    filters: {
+      priorityTiers: [],
+      minimumScore: null,
+      maximumScore: null,
+      sortBy: 'overall_score',
+      sortDirection: 'desc',
+    },
+    selectedEvaluationId: null,
+    setSelectedEvaluationId: vi.fn<(id: string | null) => void>(),
+    editingEvaluationId: null,
+    setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
+    isBulkEditMode: false,
+    toggleBulkEditMode: vi.fn<() => void>(),
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
-    useEvaluationStore.mockReturnValue({
-      filters: {
-        priorityTiers: [],
-        minimumScore: null,
-        maximumScore: null,
-        sortBy: 'overall_score',
-        sortDirection: 'desc',
-      },
-      selectedEvaluationId: null,
+    const storeState = {
+      ...baseStoreState,
       setSelectedEvaluationId: vi.fn<(id: string | null) => void>(),
-      editingEvaluationId: null,
       setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
-      isBulkEditMode: false,
       toggleBulkEditMode: vi.fn<() => void>(),
-    })
+    }
+    useEvaluationStore.mockImplementation((selector?: (state: typeof storeState) => unknown) =>
+      typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(useEvaluationStore as typeof useEvaluationStore & {
+      getState?: () => typeof storeState
+    }).getState = () => storeState
   })
 
   describe('useEvaluationListQuery', () => {
@@ -104,7 +117,8 @@ describe('useEvaluation hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listEvaluations).mockResolvedValue(mockEvaluationList)
-      useEvaluationStore.mockReturnValue({
+      const filteredStoreState = {
+        ...baseStoreState,
         filters: {
           priorityTiers: ['high'],
           minimumScore: 0.8,
@@ -112,7 +126,18 @@ describe('useEvaluation hooks', () => {
           sortBy: 'therapeutic_relevance',
           sortDirection: 'asc',
         },
-      })
+      }
+      useEvaluationStore.mockImplementation(
+        (
+          selector?: (state: typeof filteredStoreState) => unknown,
+        ) =>
+          typeof selector === 'function'
+            ? selector(filteredStoreState)
+            : filteredStoreState,
+      )
+      ;(useEvaluationStore as typeof useEvaluationStore & {
+        getState?: () => typeof filteredStoreState
+      }).getState = () => filteredStoreState
 
       const { result } = renderHook(() => useEvaluationListQuery('session-1'), {
         wrapper: createWrapper(),
@@ -202,9 +227,11 @@ describe('useEvaluation hooks', () => {
       vi.mocked(api.initiateEvaluation).mockResolvedValue(mockEvaluation)
       const setSelectedEvaluationId = vi.fn<(id: string) => void>()
 
-      vi.spyOn(useEvaluationStore, 'getState').mockReturnValue({
+      ;(useEvaluationStore as typeof useEvaluationStore & {
+        getState?: () => { setSelectedEvaluationId: typeof setSelectedEvaluationId }
+      }).getState = () => ({
         setSelectedEvaluationId,
-      } as any)
+      })
 
       const { result } = renderHook(
         () => useEvaluationInitiateMutation('session-1'),

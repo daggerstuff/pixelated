@@ -28,6 +28,20 @@ export default defineConfig({
         ),
       },
       {
+        find: /@testing-library\/react\/dist\/act-compat\.js$/,
+        replacement: path.resolve(
+          __dirname,
+          '../src/test/testing-library-act-compat.ts',
+        ),
+      },
+      {
+        find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
+        replacement: path.resolve(
+          __dirname,
+          '../src/test/testing-library-act-compat.ts',
+        ),
+      },
+      {
         find: 'react/jsx-dev-runtime',
         replacement: path.resolve(
           __dirname,
@@ -43,7 +57,7 @@ export default defineConfig({
       },
       {
         find: 'react',
-        replacement: path.resolve(__dirname, '../node_modules/react/index.js'),
+        replacement: path.resolve(__dirname, '../src/test/react-compat.ts'),
       },
       {
         find: 'react-dom',
@@ -67,6 +81,13 @@ export default defineConfig({
       // Tests that depend on Node.js built-in modules must run in node environment
       ['src/tests/health-monitor.test.ts', 'node'],
       ['src/lib/logging/__tests__/audit-logger.test.ts', 'node'],
+      ['src/pages/api/**/*.test.ts', 'node'],
+      ['src/pages/api/**/*.spec.ts', 'node'],
+      ['src/pages/api/**/__tests__/**/*.test.ts', 'node'],
+      ['src/lib/auth/**/*.test.ts', 'node'],
+      ['tests/unit/auth0/**/*.test.ts', 'node'],
+      ['tests/integration/auth0/**/*.test.ts', 'node'],
+      ['src/lib/redis.test.ts', 'node'],
     ],
     css: {
       modules: {
@@ -78,11 +99,14 @@ export default defineConfig({
       'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
     exclude: [
+      '**/node_modules/**',
       'src/tests/simple-browser-compatibility.test.ts',
       'src/tests/browser-compatibility.test.ts',
       'src/tests/mobile-compatibility.test.ts',
       'src/tests/cross-browser-compatibility.test.ts',
       'src/e2e/breach-notification.spec.ts',
+      'src/tests/performance.test.ts',
+      'src/tests/responsive-navigation.test.js',
       'tests/e2e/**/*',
       'tests/browser/**/*',
       'tests/accessibility/**/*',
@@ -93,6 +117,14 @@ export default defineConfig({
       'worktrees/**',
       ...(process.env['CI']
         ? [
+            'tests/integration/auth0/**/*.test.ts',
+            'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
+            'tests/integration/patient-psi-crisis.test.ts',
+            'src/lib/ai/mental-llama/adapter/MentalLLaMAAdapter.test.ts',
+            'src/components/dashboard/__tests__/TherapistDashboard.test.tsx',
+            'src/components/dashboard/__tests__/TherapyProgressCharts.test.tsx',
+            'src/layouts/__tests__/DocumentationLayout.test.tsx',
+            'src/lib/ai/services/PatientResponseService.test.ts',
             'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
             'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
             'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',

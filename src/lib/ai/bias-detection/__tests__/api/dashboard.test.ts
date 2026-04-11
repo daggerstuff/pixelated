@@ -2,7 +2,7 @@
  * Unit tests for the Bias Detection Dashboard API Endpoint
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 // Mock fetch globally
 global.fetch = vi.fn()

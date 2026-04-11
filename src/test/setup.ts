@@ -4,11 +4,29 @@
  */
 
 import * as React from 'react'
+import { vi } from 'vitest'
 
 // React 19 compatibility: delegate to setup-react19.ts which has proper error handling
 import { act } from './setup-react19'
 
 import '@testing-library/jest-dom'
+
+vi.mock('react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react')>()
+  const patchedAct = typeof actual.act === 'function' ? actual.act : act
+  return {
+    ...actual,
+    act: patchedAct,
+    default: {
+      ...(actual.default ?? actual),
+      act: patchedAct,
+    },
+  }
+})
+
+vi.mock('react-dom/test-utils', () => ({
+  act,
+}))
 
 // Make act available on React for components that import it directly
 if (!React.act || typeof React.act !== 'function') {
@@ -62,6 +80,40 @@ if (typeof window !== 'undefined') {
       removeEventListener: () => {},
       dispatchEvent: () => {},
     }),
+  })
+}
+
+if (typeof HTMLCanvasElement !== 'undefined') {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+    value: vi.fn(() => ({
+      canvas: {},
+      clearRect: vi.fn(),
+      fillRect: vi.fn(),
+      getImageData: vi.fn(() => ({ data: [] })),
+      putImageData: vi.fn(),
+      createImageData: vi.fn(() => []),
+      setTransform: vi.fn(),
+      drawImage: vi.fn(),
+      save: vi.fn(),
+      fillText: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      stroke: vi.fn(),
+      translate: vi.fn(),
+      scale: vi.fn(),
+      rotate: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
+      measureText: vi.fn(() => ({ width: 0 })),
+      transform: vi.fn(),
+      rect: vi.fn(),
+      clip: vi.fn(),
+    })),
+    writable: true,
+    configurable: true,
   })
 }
 

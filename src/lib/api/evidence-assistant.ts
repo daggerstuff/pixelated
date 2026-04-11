@@ -119,7 +119,7 @@ function normalizeEvidenceAssistantMetadata(
       description:
         typeof payload.description === 'string'
           ? payload.description
-          : 'Internal evidence search and grounded answer API.',
+          : 'Internal evidence assistant endpoint.',
       methods: Array.isArray(payload.methods)
         ? payload.methods.filter(
             (method): method is string => typeof method === 'string',
