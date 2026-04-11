@@ -8,7 +8,9 @@ import { logger } from '@/utils/logger'
 const MAX_RETRIES = 10
 const RETRY_DELAY = 3000
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = async (ms: number): Promise<void> => {
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 // MongoDB connection
 export const connectMongoDB = async (): Promise<void> => {
