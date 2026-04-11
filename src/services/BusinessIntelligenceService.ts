@@ -166,7 +166,7 @@ export class BusinessIntelligenceService {
           },
         },
       )
-      const result = response.data?.chart?.result?.[0]
+      const result = response.data.chart?.result?.[0]
       const rawMeta = result?.meta
       if (!rawMeta) {
         return this.getDemoMarketData(symbol)
@@ -198,7 +198,7 @@ export class BusinessIntelligenceService {
     try {
       // Use Alpha Vantage for industry trends
       const symbols = this.getIndustrySymbols(industry)
-      const promises = symbols.map((symbol) => this.getMarketData(symbol))
+      const promises = symbols.map(async (symbol) => this.getMarketData(symbol))
       return Promise.all(promises)
     } catch (error: unknown) {
       console.error('Error fetching market trends:', error)
