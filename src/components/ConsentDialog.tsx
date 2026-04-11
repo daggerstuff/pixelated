@@ -18,7 +18,7 @@ export function ConsentDialog({
   onClose,
   onConsent,
 }: ConsentDialogProps) {
-  const [checked, setChecked] = useState<boolean>(false)
+  const [checked, setChecked] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
   const { consentText, privacyPoints } = generateConsentForm()
 

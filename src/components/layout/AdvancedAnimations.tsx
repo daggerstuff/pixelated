@@ -108,14 +108,20 @@ export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({
 export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
   children,
   lift = 4,
-}) => (
-  <div
-    className='transition-transform duration-200 ease-out hover:translate-y-[-4px]'
-    style={{ '--lift': `${lift}px` } as CSSProperties}
-  >
-    {children}
-  </div>
-)
+}) => {
+  const hoverLiftStyle: CSSProperties & { '--lift': string } = {
+    '--lift': `${lift}px`,
+  }
+
+  return (
+    <div
+      className='transition-transform duration-200 ease-out hover:translate-y-[-4px]'
+      style={hoverLiftStyle}
+    >
+      {children}
+    </div>
+  )
+}
 
 export const PressEffect: FC<{ children: ReactNode; scale?: number }> = ({
   children,
@@ -196,7 +202,7 @@ export const ScrollReveal: FC<{
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry && entry.isIntersecting) {
           setIsVisible(true)
           observer.disconnect()
         }

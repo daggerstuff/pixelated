@@ -29,7 +29,7 @@ export default function AIChatReact({
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState(
-    availableModels[0]?.id || '',
+    availableModels[0]?.id ?? '',
   )
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -59,17 +59,48 @@ jobs:
       - name: Build project
         run: pnpm run build
 
+      - name: Validate browser test targets
+        run: |
+          echo "Validating browser test entrypoints..."
+          MISSING_FILES=0
+
+          for file in tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Required browser test file not found: ${file}"
+              MISSING_FILES=1
+            else
+              echo "✅ Found ${file}"
+            fi
+          done
+
+          if [ "$MISSING_FILES" -ne 0 ]; then
+            echo "Available browser specs:"
+            find tests/browser -maxdepth 1 -type f -name "*.spec.ts" | sort
+            exit 1
+          fi
+
       - name: Start preview server in background
-        run: pnpm run preview -- --port 4323 &
+        run: |
+          pnpm run preview -- --host 127.0.0.1 --port 4323 > /tmp/pixelated-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          echo "PREVIEW_PID=$PREVIEW_PID" >> "$GITHUB_ENV"
+          echo "Preview server started (PID: ${PREVIEW_PID}) at http://127.0.0.1:4323"
         shell: bash
 
       - name: Wait for server
         run: |
           echo "Waiting for preview server to be ready..."
-          MAX_RETRIES=30
+          MAX_RETRIES=60
           RETRY_COUNT=0
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if curl -sSf http://localhost:4323 > /dev/null 2>&1; then
+            if ! kill -0 "$PREVIEW_PID" > /dev/null 2>&1; then
+              echo "Preview process (PID: ${PREVIEW_PID}) is not running."
+              echo "Last preview logs:"
+              tail -n 60 /tmp/pixelated-preview.log
+              exit 1
+            fi
+
+            if curl -sSf --connect-timeout 2 --max-time 2 http://127.0.0.1:4323 > /dev/null 2>&1; then
               echo "Server is ready!"
               exit 0
             fi
@@ -77,7 +108,10 @@ jobs:
             echo "Attempt $RETRY_COUNT/$MAX_RETRIES - server not ready yet..."
             sleep 1
           done
-          echo "Server failed to become ready after ${MAX_RETRIES} seconds"
+          echo "Server failed to become ready after ${MAX_RETRIES} seconds."
+          echo "Preview server PID: ${PREVIEW_PID}"
+          echo "Last preview logs:"
+          tail -n 80 /tmp/pixelated-preview.log
           exit 1
 
       - name: Run browser tests
@@ -86,8 +120,8 @@ jobs:
           export DISABLE_AUTH=true
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
-          export BASE_URL=http://localhost:4323
-          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
+          export BASE_URL=http://127.0.0.1:4323
+          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
         env:
           CI: true
 

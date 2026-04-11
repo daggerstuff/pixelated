@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+HETZNER_AI_CLI="${HETZNER_AI_CLI:-ovhai}"
 
 HETZNER_REGION="${HETZNER_REGION:-hel1}"
 APP_NAME="${APP_NAME:-pixelated-ollama}"
@@ -25,7 +26,7 @@ get_flavor() {
 
 find_app_id() {
   # Try to find app ID by name (in spec.name), label, or direct ID match
-  ovhai app list --output json 2>/dev/null | jq -r --arg name "$APP_NAME" '.[] | select((.spec.name // "") == $name or .id == $name or (.spec.labels."app" // "") == $name) | .id' | head -1
+  ${HETZNER_AI_CLI} app list --output json 2>/dev/null | jq -r --arg name "$APP_NAME" '.[] | select((.spec.name // "") == $name or .id == $name or (.spec.labels."app" // "") == $name) | .id' | head -1
 }
 IMAGE_TAG="${IMAGE_TAG:-pixelated-ollama:latest}"
 # Note: CI/CD builds with both Build.BuildNumber and 'latest' tags
@@ -37,21 +38,21 @@ log() {
 }
 
 ensure_cli() {
-  for cmd in ovhai jq; do
+  for cmd in ${HETZNER_AI_CLI} jq; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
       echo "Missing dependency: $cmd" >&2
       exit 1
     fi
   done
-  if ! ovhai me >/dev/null 2>&1; then
-    echo "ovhai CLI is not authenticated. Run: ovhai login" >&2
+  if ! ${HETZNER_AI_CLI} me >/dev/null 2>&1; then
+    echo "${HETZNER_AI_CLI} CLI is not authenticated. Run: ${HETZNER_AI_CLI} login" >&2
     exit 1
   fi
 }
 
 registry_url() {
   # Parse table output: skip header, get last field (URL) from first data row
-  ovhai registry list | tail -n +2 | awk '{print $NF}'
+  ${HETZNER_AI_CLI} registry list | tail -n +2 | awk '{print $NF}'
 }
 
 # Note: Image building should be done via CI/CD (e.g., Azure Pipelines)
@@ -92,8 +93,8 @@ deploy_app() {
   local existing_id="$(find_app_id)"
   if [ -n "$existing_id" ]; then
     log "App ${APP_NAME} (ID: $existing_id) exists; redeploying"
-    ovhai app stop "$existing_id" || true
-    ovhai app delete "$existing_id" || true
+    ${HETZNER_AI_CLI} app stop "$existing_id" || true
+    ${HETZNER_AI_CLI} app delete "$existing_id" || true
     sleep 5
   fi
 
@@ -103,7 +104,7 @@ deploy_app() {
   log "  Flavor: $flavor (GPU: $GPU_COUNT)"
   log "  Replicas: $REPLICAS"
   
-  ovhai app run \
+  ${HETZNER_AI_CLI} app run \
     --name "$APP_NAME" \
     --label "app=$APP_NAME" \
     --flavor "$flavor" \
@@ -116,7 +117,7 @@ deploy_app() {
     --default-http-port "$PORT" \
     "$image"
 
-  log "App deployed. Use 'ovhai app get ${APP_NAME}' for status."
+  log "App deployed. Use '${HETZNER_AI_CLI} app get ${APP_NAME}' for status."
 }
 
 start_app() {
@@ -126,7 +127,7 @@ start_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app start "$app_id"
+  ${HETZNER_AI_CLI} app start "$app_id"
 }
 
 stop_app() {
@@ -136,7 +137,7 @@ stop_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app stop "$app_id"
+  ${HETZNER_AI_CLI} app stop "$app_id"
 }
 
 status_app() {
@@ -146,7 +147,7 @@ status_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app get "$app_id"
+  ${HETZNER_AI_CLI} app get "$app_id"
 }
 
 delete_app() {
@@ -156,7 +157,7 @@ delete_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app delete "$app_id"
+  ${HETZNER_AI_CLI} app delete "$app_id"
 }
 
 show_registry() {

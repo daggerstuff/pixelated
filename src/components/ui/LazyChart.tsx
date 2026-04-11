@@ -1,4 +1,8 @@
 import React, { Suspense, lazy } from 'react'
+import type {
+  AreaProps,
+  ResponsiveContainerProps,
+} from 'recharts'
 
 // Lazy load chart components to reduce bundle size
 const LazyAreaChart = lazy(() =>
@@ -92,12 +96,15 @@ function ChartLoading({ height = 300, className = '' }: ChartLoadingProps) {
 export function ResponsiveContainer({
   children,
   ...props
-}: {
-  children?: React.ReactNode
-  [key: string]: unknown
-}) {
+}: ResponsiveContainerProps) {
   return (
-    <Suspense fallback={<ChartLoading height={props['height']} />}>
+    <Suspense
+      fallback={
+        <ChartLoading
+          height={typeof props.height === 'number' ? props.height : undefined}
+        />
+      }
+    >
       <LazyResponsiveContainer {...props}>{children}</LazyResponsiveContainer>
     </Suspense>
   )
@@ -222,7 +229,7 @@ export function Bar(props: { [key: string]: unknown }) {
   )
 }
 
-export function Area(props: { [key: string]: unknown }) {
+export function Area(props: AreaProps<unknown, unknown>) {
   return (
     <Suspense fallback={null}>
       <LazyArea {...props} />
