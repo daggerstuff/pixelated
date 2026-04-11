@@ -9,7 +9,7 @@ on:
     workflows: ["CI"]
     types:
       - completed
-    branches: [main, master, staging]
+    branches: [main, master]
   workflow_dispatch:
     inputs:
       image_tag:
