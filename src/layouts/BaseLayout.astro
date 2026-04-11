@@ -67,6 +67,8 @@ const {
 const hasCustomCursor =
   newTab && cursorType.length > 0 && cursorType !== 'pointer'
 if (hasCustomCursor) style['--external-link-cursor'] = cursorType
+
+const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
 ---
 
 <!doctype html>
@@ -143,7 +145,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <Backdrop />
 
     <!-- Vercel Speed Insights and Analytics -->
-    <SpeedInsights />
-    <Analytics />
+    {shouldRenderAnalytics && <SpeedInsights />}
+    {shouldRenderAnalytics && <Analytics />}
   </body>
 </html>
