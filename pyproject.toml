@@ -37,7 +37,7 @@ dependencies = [
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
   "wandb>=0.21.1",
-    "tqdm>=4.67.0", # Progress bar for data processing scripts
+  "tqdm>=4.67.0", # Progress bar for data processing scripts
   # Training dependencies
   "datasets>=2.19.0",
   "sentencepiece>=0.2.0",
@@ -248,8 +248,8 @@ addopts = "-ra --strict-markers"
 testpaths = ["tests", "ai/core/tests"]
 norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
 markers = [
-    "integration: marks tests as integration tests (require external services)",
-    "slow: marks tests as slow running",
+  "integration: marks tests as integration tests (require external services)",
+  "slow: marks tests as slow running",
 ]
 filterwarnings = [
   "ignore:.*WordPiece.*:DeprecationWarning",
@@ -264,13 +264,13 @@ show_missing = true
 skip_covered = true
 fail_under = 70
 exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "@abstractmethod",
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@abstractmethod",
 ]
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]

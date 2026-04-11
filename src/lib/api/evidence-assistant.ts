@@ -36,7 +36,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-
 function isEvidenceSearchResult(value: unknown): value is EvidenceSearchResult {
   return (
     isRecord(value) &&
@@ -115,17 +114,21 @@ function normalizeEvidenceAssistantMetadata(
         typeof payload.name === 'string'
           ? payload.name
           : 'Evidence Assistant API',
-      version: typeof payload.version === 'string' ? payload.version : 'unknown',
+      version:
+        typeof payload.version === 'string' ? payload.version : 'unknown',
       description:
         typeof payload.description === 'string'
           ? payload.description
           : 'Internal evidence search and grounded answer API.',
       methods: Array.isArray(payload.methods)
-        ? payload.methods.filter((method): method is string => typeof method === 'string')
+        ? payload.methods.filter(
+            (method): method is string => typeof method === 'string',
+          )
         : [],
       collections: Array.isArray(payload.collections)
         ? payload.collections.filter(
-            (collection): collection is string => typeof collection === 'string',
+            (collection): collection is string =>
+              typeof collection === 'string',
           )
         : [],
       availableProviders: Array.isArray(payload.availableProviders)
@@ -144,7 +147,9 @@ function normalizeEvidenceAssistantMetadata(
     name: payload.name,
     version: payload.version,
     description: payload.description,
-    methods: payload.methods.filter((method): method is string => typeof method === 'string'),
+    methods: payload.methods.filter(
+      (method): method is string => typeof method === 'string',
+    ),
     collections: payload.collections.filter(
       (collection): collection is string => typeof collection === 'string',
     ),

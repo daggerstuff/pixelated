@@ -236,12 +236,22 @@ export class CDNEdgeOptimizer {
       logger.error('Image optimization failed', {
         imagePath,
         options,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
 
       return {
         success: false,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Optimization failed',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Optimization failed',
       }
     }
   }
@@ -385,7 +395,12 @@ export class CDNEdgeOptimizer {
     } catch (error: unknown) {
       logger.error('CDN cache invalidation failed', {
         patterns,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
 
       return false

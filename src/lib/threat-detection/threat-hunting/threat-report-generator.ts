@@ -1,14 +1,12 @@
-import {
-  InvestigationFinding,
-  HuntFinding,
-  HuntReport,
-} from './types'
+import { InvestigationFinding, HuntFinding, HuntReport } from './types'
 
 export class ThreatReportGenerator {
   /**
    * Generate recommendations based on findings
    */
-  public generateRecommendations(findings: (InvestigationFinding | HuntFinding)[]): string[] {
+  public generateRecommendations(
+    findings: (InvestigationFinding | HuntFinding)[],
+  ): string[] {
     const recommendations = new Set<string>()
 
     for (const finding of findings) {
@@ -38,22 +36,32 @@ export class ThreatReportGenerator {
   /**
    * Generate a summary report for a hunt
    */
-  public generateHuntReport(huntId: string, findings: HuntFinding[]): HuntReport {
-    const severityDist: Record<string, number> = { low: 0, medium: 0, high: 0, critical: 0 }
+  public generateHuntReport(
+    huntId: string,
+    findings: HuntFinding[],
+  ): HuntReport {
+    const severityDist: Record<string, number> = {
+      low: 0,
+      medium: 0,
+      high: 0,
+      critical: 0,
+    }
     let totalConfidence = 0
 
-    findings.forEach(f => {
+    findings.forEach((f) => {
       severityDist[f.severity] = (severityDist[f.severity] || 0) + 1
       totalConfidence += f.confidence
     })
 
-    const avgConfidence = findings.length > 0 ? totalConfidence / findings.length : 0
+    const avgConfidence =
+      findings.length > 0 ? totalConfidence / findings.length : 0
     const now = new Date()
 
     // Determine overall threat level based on the highest finding severity
-    const maxSeverityNum = findings.length > 0
-      ? Math.max(...findings.map(f => this.severityToNumber(f.severity)))
-      : 1
+    const maxSeverityNum =
+      findings.length > 0
+        ? Math.max(...findings.map((f) => this.severityToNumber(f.severity)))
+        : 1
     const maxSeverity = this.numberToSeverity(maxSeverityNum)
 
     return {
@@ -65,14 +73,16 @@ export class ThreatReportGenerator {
         totalFindings: findings.length,
         severityDistribution: severityDist,
         avgConfidence,
-        investigationTriggered: findings.some(f => f.severity === 'high' || f.severity === 'critical')
+        investigationTriggered: findings.some(
+          (f) => f.severity === 'high' || f.severity === 'critical',
+        ),
       },
       meta: {
         threatLevel: maxSeverity,
         confidence: avgConfidence,
       },
       findings,
-      recommendations: this.generateRecommendations(findings)
+      recommendations: this.generateRecommendations(findings),
     }
   }
 
@@ -80,7 +90,12 @@ export class ThreatReportGenerator {
    * Severity mapping utilities
    */
   public severityToNumber(severity: string): number {
-    const map: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 }
+    const map: Record<string, number> = {
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
+    }
     return map[severity] || 1
   }
 
@@ -91,7 +106,9 @@ export class ThreatReportGenerator {
     return 'low'
   }
 
-  public mapThreatLevelToSeverity(threatLevel: string): 'low' | 'medium' | 'high' | 'critical' {
+  public mapThreatLevelToSeverity(
+    threatLevel: string,
+  ): 'low' | 'medium' | 'high' | 'critical' {
     const map: Record<string, 'low' | 'medium' | 'high' | 'critical'> = {
       low: 'low',
       medium: 'medium',
@@ -99,9 +116,8 @@ export class ThreatReportGenerator {
       critical: 'critical',
       suspicious: 'high',
       benign: 'low',
-      anomaly: 'medium'
+      anomaly: 'medium',
     }
     return map[threatLevel] || 'low'
   }
-
 }

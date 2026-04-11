@@ -43,13 +43,14 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         const event = new CustomEvent('password-reset-success')
         document.dispatchEvent(event)
       } else {
-        throw new Error((response as { error?: { message?: string } }).error?.message || 'Password reset failed')
+        throw new Error(
+          (response as { error?: { message?: string } }).error?.message ||
+            'Password reset failed',
+        )
       }
     } catch (err: unknown) {
       const message =
-        err instanceof Error
-          ? (err)?.message || String(err)
-          : 'An error occurred'
+        err instanceof Error ? err?.message || String(err) : 'An error occurred'
       setError(message)
 
       // Dispatch error event

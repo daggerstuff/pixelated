@@ -1,13 +1,16 @@
-import React, { FC, memo } from 'react'
 import { LightBulbIcon } from '@heroicons/react/24/outline'
+import React, { FC, memo } from 'react'
+
 import { SlideUp } from '@/components/layout/AdvancedAnimations'
 
 const InsightsPanel: FC = memo(() => {
   return (
     <SlideUp>
-      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6 h-full'>
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full rounded-lg border p-6'>
         <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
-          <span><LightBulbIcon className="w-5 h-5" /></span>
+          <span>
+            <LightBulbIcon className='h-5 w-5' />
+          </span>
           Research Insights
         </h3>
         <div className='space-y-3'>

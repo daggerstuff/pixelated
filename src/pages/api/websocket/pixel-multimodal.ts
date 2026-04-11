@@ -130,7 +130,11 @@ function ensureServer(): WebSocketServer {
         }
       } catch (error: unknown) {
         const message =
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Invalid message'
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Invalid message'
         ws.send(JSON.stringify({ type: 'error', message }))
       }
     })
@@ -201,7 +205,9 @@ async function handleComplete(
     }
 
     const start = performance.now()
-    const pixelResponse = (await forwardToPixel(form)) as MultimodalResultPayload
+    const pixelResponse = (await forwardToPixel(
+      form,
+    )) as MultimodalResultPayload
     const latencyMs = performance.now() - start
 
     ws.send(
@@ -219,7 +225,12 @@ async function handleComplete(
     state.totalBytes = 0
     state.text = ''
   } catch (error: unknown) {
-    const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Inference failed'
+    const message =
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Inference failed'
     ws.send(JSON.stringify({ type: 'error', message }))
   }
 }

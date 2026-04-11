@@ -648,29 +648,29 @@ export function MemoryDashboard({
               </CardHeader>
               <CardContent>
                 <div className='space-y-3'>
-                  {(
-                    Object.entries(memory.stats.categoryCounts)
-                  ).map(([category, count]) => (
-                    <div
-                      key={category}
-                      className='flex items-center justify-between'
-                    >
-                      <div className='flex items-center gap-2'>
-                        <Badge variant='outline'>{category}</Badge>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <div className='bg-secondary h-2 w-24 rounded-full'>
-                          <div
-                            className='bg-primary h-2 rounded-full'
-                            style={{
-                              width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
-                            }}
-                          />
+                  {Object.entries(memory.stats.categoryCounts).map(
+                    ([category, count]) => (
+                      <div
+                        key={category}
+                        className='flex items-center justify-between'
+                      >
+                        <div className='flex items-center gap-2'>
+                          <Badge variant='outline'>{category}</Badge>
                         </div>
-                        <span className='text-sm font-medium'>{count}</span>
+                        <div className='flex items-center gap-2'>
+                          <div className='bg-secondary h-2 w-24 rounded-full'>
+                            <div
+                              className='bg-primary h-2 rounded-full'
+                              style={{
+                                width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          <span className='text-sm font-medium'>{count}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -70,7 +70,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const handleError = useCallback((err: unknown) => {
     const errorMessage =
       err instanceof Error
-        ? (err)?.message || String(err)
+        ? err?.message || String(err)
         : 'An unknown error occurred'
     setError(errorMessage)
     console.error('Memory operation error:', err)

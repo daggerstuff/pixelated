@@ -76,7 +76,12 @@ export const GET: APIRoute = async ({ request }) => {
       JSON.stringify({
         status: 'error',
         message: 'Failed to retrieve rate limiting status',
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -307,7 +312,12 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         status: 'error',
         message: 'Failed to process monitor addition',
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

@@ -563,13 +563,16 @@ export interface AlignmentMetrics {
 
 export interface AlignmentEvaluationResult {
   overallScore: number
-  objectiveResults: Record<string, {
-    objectiveId: string
-    score: number
-    criteriaScores: Record<string, number>
-    confidence: number
-    explanation?: string
-  }>
+  objectiveResults: Record<
+    string,
+    {
+      objectiveId: string
+      score: number
+      criteriaScores: Record<string, number>
+      confidence: number
+      explanation?: string
+    }
+  >
   weights: Record<string, number>
   normalizedScores: Record<string, number>
   evaluationContext: AlignmentContext

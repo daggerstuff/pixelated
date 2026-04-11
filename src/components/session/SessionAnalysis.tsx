@@ -100,7 +100,7 @@ export default function SessionAnalysis({
         console.error('Error fetching session emotion data:', err)
         setError(
           err instanceof Error
-            ? (err)?.message || String(err)
+            ? err?.message || String(err)
             : 'An unknown error occurred',
         )
       } finally {

@@ -29,7 +29,15 @@ export async function createInvestigation(
     await redis.set(`investigation:inv_${id}`, JSON.stringify(investigation))
     return investigation
   } catch (error: unknown) {
-    return { errors: [error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)] }
+    return {
+      errors: [
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
+      ],
+    }
   }
 }
 

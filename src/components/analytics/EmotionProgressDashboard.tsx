@@ -1,5 +1,5 @@
-import type { FC } from 'react'
 import { LightBulbIcon } from '@heroicons/react/24/outline'
+import type { FC } from 'react'
 
 interface EmotionProgressData {
   date: string
@@ -327,7 +327,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
           </div>
           <div className='bg-white rounded p-4'>
             <h4 className='text-blue-700 mb-2 font-semibold'>
-              <LightBulbIcon className="w-5 h-5" /> Recommendations
+              <LightBulbIcon className='h-5 w-5' /> Recommendations
             </h4>
             <ul className='text-gray-600 space-y-1'>
               <li>• Continue current coping strategies</li>

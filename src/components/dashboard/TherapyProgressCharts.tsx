@@ -6,6 +6,7 @@
 import React from 'react'
 
 import type { TherapistAnalyticsChartData } from '@/types/analytics'
+
 import { AnalyticsCharts } from './AnalyticsCharts'
 
 interface TherapyProgressChartsProps {

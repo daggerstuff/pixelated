@@ -31,14 +31,8 @@ interface ExtendedManagementClient extends ManagementClient {
   getLogs(params: { per_page: number; q: string }): Promise<any>
   // Roles
   getRoles(params: { per_page?: number; page?: number }): Promise<any>
-  assignRolestoUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  removeRolesFromUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
+  assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+  removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
   getUserRoles(params: { id: string }): Promise<any>
 }
 
@@ -163,7 +157,7 @@ export class Auth0MFAService {
     } catch (error: unknown) {
       console.error('Failed to get available MFA factors:', error)
       throw new Error(
-        `Failed to get available MFA factors: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to get available MFA factors: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -245,7 +239,7 @@ export class Auth0MFAService {
     } catch (error: unknown) {
       console.error('Failed to start MFA enrollment:', error)
       throw new Error(
-        `Failed to start MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to start MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -290,7 +284,7 @@ export class Auth0MFAService {
     } catch (error: unknown) {
       console.error('Failed to complete MFA enrollment:', error)
       throw new Error(
-        `Failed to complete MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to complete MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -353,7 +347,7 @@ export class Auth0MFAService {
         error,
       )
       throw new Error(
-        `Failed to delete MFA factor: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to delete MFA factor: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -397,7 +391,7 @@ export class Auth0MFAService {
     } catch (error: unknown) {
       console.error('Failed to challenge user for MFA:', error)
       throw new Error(
-        `Failed to challenge user for MFA: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to challenge user for MFA: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -439,7 +433,12 @@ export class Auth0MFAService {
       logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, null, {
         userId: userId,
         challengeType: verification.challengeType,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 

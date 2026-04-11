@@ -71,8 +71,10 @@ export function contentIdToUrl(
   }
 
   return (
-    `/${id.replace(/\/index$/, '').replace(/^index$/, '')}`.replace(/\/$/, '') ||
-    '/'
+    `/${id.replace(/\/index$/, '').replace(/^index$/, '')}`.replace(
+      /\/$/,
+      '',
+    ) || '/'
   )
 }
 
@@ -132,10 +134,11 @@ export function buildExcerpt(
     const coveredTerms = matchedTerms.filter((term) =>
       window.includes(term.toLowerCase()),
     )
-    const firstCoveredMatch = candidateMatches
-      .filter((match) => match.index >= start && match.index < end)
-      .map((match) => match.index)
-      .sort((a, b) => a - b)[0] ?? Number.POSITIVE_INFINITY
+    const firstCoveredMatch =
+      candidateMatches
+        .filter((match) => match.index >= start && match.index < end)
+        .map((match) => match.index)
+        .sort((a, b) => a - b)[0] ?? Number.POSITIVE_INFINITY
 
     if (
       coveredTerms.length > bestCoverage ||
@@ -230,7 +233,10 @@ export class EvidenceSearchIndex {
       return []
     }
 
-    const limit = Math.min(Math.max(options.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT)
+    const limit = Math.min(
+      Math.max(options.limit ?? DEFAULT_LIMIT, 1),
+      MAX_LIMIT,
+    )
 
     return this.documents
       .filter((document) => {

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   ]
 
   // Stream response with Supermemory tools
-  const result =  streamText({
+  const result = streamText({
     model: anthropic('claude-3-5-sonnet-20241022'),
     messages,
     tools: supermemoryTools(process.env.SUPERMEMORY_API_KEY ?? '', {

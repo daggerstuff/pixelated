@@ -1,92 +1,101 @@
 // Logging Middleware
 // Request logging and activity tracking
 
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from 'express'
 
-import { getPostgresPool } from "../../lib/database/connection";
+import { getPostgresPool } from '../../lib/database/connection'
 
 /**
  * Request logger middleware
  * Logs all incoming requests
  */
-export function requestLogger(req: Request, res: Response, next: NextFunction): void {
-  const startTime = Date.now();
-  const requestId = createRequestId();
+export function requestLogger(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  const startTime = Date.now()
+  const requestId = createRequestId()
 
   // Store metadata on request object
-  (req as any).requestId = requestId;
-  (req as any).startTime = startTime;
+  ;(req as any).requestId = requestId
+  ;(req as any).startTime = startTime
 
   // Log on response finish
-  res.on("finish", () => {
-    const duration = Date.now() - startTime;
-    const level = res.statusCode >= 400 ? "error" : "info";
+  res.on('finish', () => {
+    const duration = Date.now() - startTime
+    const level = res.statusCode >= 400 ? 'error' : 'info'
 
     console.log(
       `[${requestId}] ${level.toUpperCase()} - ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`,
-    );
+    )
 
     // Audit log for user actions
     if (req.user && shouldAuditLog(req as any)) {
-      void logAuditEvent(req as any, res, requestId, duration);
+      void logAuditEvent(req as any, res, requestId, duration)
     }
-  });
+  })
 
-  next();
+  next()
 }
 
 // ============================================================================
 // RATE LIMITING MIDDLEWARE
 // ============================================================================
 
-const requestCounts = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = 100; // requests per window
+const requestCounts = new Map<string, { count: number; resetTime: number }>()
+const RATE_LIMIT_WINDOW = 60000 // 1 minute
+const RATE_LIMIT_MAX = 100 // requests per window
 
 export function rateLimiter(req: Request, res: Response, next: NextFunction) {
-  const ip = req.ip || "unknown";
-  const now = Date.now();
+  const ip = req.ip || 'unknown'
+  const now = Date.now()
 
-  let record = requestCounts.get(ip);
+  let record = requestCounts.get(ip)
 
   if (!record || record.resetTime < now) {
-    record = { count: 1, resetTime: now + RATE_LIMIT_WINDOW };
-    requestCounts.set(ip, record);
-    return next();
+    record = { count: 1, resetTime: now + RATE_LIMIT_WINDOW }
+    requestCounts.set(ip, record)
+    return next()
   }
 
-  record.count++;
+  record.count++
 
   if (record.count > RATE_LIMIT_MAX) {
     return res.status(429).json({
-      error: "Too Many Requests",
+      error: 'Too Many Requests',
       message: `Rate limit exceeded. Max ${RATE_LIMIT_MAX} requests per ${RATE_LIMIT_WINDOW / 1000} seconds`,
-    });
+    })
   }
 
   // Set rate limit headers
-  res.setHeader("X-RateLimit-Limit", RATE_LIMIT_MAX);
-  res.setHeader("X-RateLimit-Remaining", RATE_LIMIT_MAX - record.count);
-  res.setHeader("X-RateLimit-Reset", record.resetTime);
+  res.setHeader('X-RateLimit-Limit', RATE_LIMIT_MAX)
+  res.setHeader('X-RateLimit-Remaining', RATE_LIMIT_MAX - record.count)
+  res.setHeader('X-RateLimit-Reset', record.resetTime)
 
-  next();
+  next()
 }
 
 // ============================================================================
 // AUDIT LOGGING
 // ============================================================================
 
-async function logAuditEvent(req: Request, res: Response, _requestId: string, _duration: number) {
+async function logAuditEvent(
+  req: Request,
+  res: Response,
+  _requestId: string,
+  _duration: number,
+) {
   try {
-    const pool = getPostgresPool();
+    const pool = getPostgresPool()
 
     // Determine action type from request
-    const action = getActionType(req);
+    const action = getActionType(req)
 
     // Only log mutations and specific read operations
-    if (!action) return;
+    if (!action) return
 
-    const changes = extractChanges(req);
+    const changes = extractChanges(req)
 
     await pool.query(
       `INSERT INTO audit_logs
@@ -99,81 +108,81 @@ async function logAuditEvent(req: Request, res: Response, _requestId: string, _d
         getResourceId(req),
         changes,
         req.ip,
-        req.headers["user-agent"],
-        res.statusCode >= 400 ? "error" : "success",
+        req.headers['user-agent'],
+        res.statusCode >= 400 ? 'error' : 'success',
       ],
-    );
+    )
   } catch (error: unknown) {
-    console.error("Failed to log audit event:", error);
+    console.error('Failed to log audit event:', error)
     // Don't throw - audit logging failures shouldn't break the app
   }
 }
 
 function getActionType(req: Request): string | null {
-  const method = req.method.toUpperCase();
+  const method = req.method.toUpperCase()
 
-  if (method === "POST") return "create";
-  if (method === "PUT" || method === "PATCH") return "update";
-  if (method === "DELETE") return "delete";
-  if (method === "GET" && req.path.includes("/export")) return "export";
-  if (method === "GET" && req.path.includes("/download")) return "download";
+  if (method === 'POST') return 'create'
+  if (method === 'PUT' || method === 'PATCH') return 'update'
+  if (method === 'DELETE') return 'delete'
+  if (method === 'GET' && req.path.includes('/export')) return 'export'
+  if (method === 'GET' && req.path.includes('/download')) return 'download'
 
-  return null;
+  return null
 }
 
 function getResourceType(req: Request): string {
-  const path = req.path.toLowerCase();
+  const path = req.path.toLowerCase()
 
-  if (path.includes("/documents")) return "document";
-  if (path.includes("/projects")) return "project";
-  if (path.includes("/strategic-plans")) return "strategic_plan";
-  if (path.includes("/market-research")) return "market_research";
-  if (path.includes("/sales-opportunities")) return "sales_opportunity";
+  if (path.includes('/documents')) return 'document'
+  if (path.includes('/projects')) return 'project'
+  if (path.includes('/strategic-plans')) return 'strategic_plan'
+  if (path.includes('/market-research')) return 'market_research'
+  if (path.includes('/sales-opportunities')) return 'sales_opportunity'
 
-  return "unknown";
+  return 'unknown'
 }
 
 function getResourceId(req: Request): string | undefined {
-  const parts = req.path.split("/").filter(Boolean);
+  const parts = req.path.split('/').filter(Boolean)
 
-  if (parts.length === 0) return undefined;
+  if (parts.length === 0) return undefined
 
   // Only return a resource ID if path follows resource/id pattern
   // /api/users/123 → '123', but /api/users → undefined (need 3+ segments with api prefix)
-  if (parts[0] === "api") {
+  if (parts[0] === 'api') {
     if (parts.length >= 3) {
-      const lastPart = parts[parts.length - 1];
-      if (lastPart && !lastPart.includes("?")) {
-        return lastPart;
+      const lastPart = parts[parts.length - 1]
+      if (lastPart && !lastPart.includes('?')) {
+        return lastPart
       }
     }
   } else if (parts.length >= 2) {
     // /users/456 → '456', but /users → undefined
-    const lastPart = parts[parts.length - 1];
-    if (lastPart && !lastPart.includes("?")) {
-      return lastPart;
+    const lastPart = parts[parts.length - 1]
+    if (lastPart && !lastPart.includes('?')) {
+      return lastPart
     }
   }
 
   // Try to extract from query params
-  const id = (req.query.id as string) || (req.query.documentId as string);
-  return id || undefined;
+  const id = (req.query.id as string) || (req.query.documentId as string)
+  return id || undefined
 }
 
 function extractChanges(req: Request): string | null {
-  if (!req.body) return null;
+  if (!req.body) return null
 
   // Don't log sensitive fields
-  const sensitiveFields = ["password", "token", "secret", "key"];
-  const changes: Record<string, any> = {};
+  const sensitiveFields = ['password', 'token', 'secret', 'key']
+  const changes: Record<string, any> = {}
 
   for (const [key, value] of Object.entries(req.body)) {
     if (!sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
-      changes[key] = value;
+      changes[key] = value
     }
   }
 
-  return Object.keys(changes).length > 0 ? JSON.stringify(changes) : null;
+  return Object.keys(changes).length > 0 ? JSON.stringify(changes) : null
 }
 
 function shouldAuditLog(req: Request): boolean {
@@ -183,11 +192,11 @@ function shouldAuditLog(req: Request): boolean {
   // - Approval actions
 
   return (
-    ["POST", "PUT", "PATCH", "DELETE"].includes(req.method) ||
-    req.path.includes("/export") ||
-    req.path.includes("/download") ||
-    req.path.includes("/approve")
-  );
+    ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) ||
+    req.path.includes('/export') ||
+    req.path.includes('/download') ||
+    req.path.includes('/approve')
+  )
 }
 
 // ============================================================================
@@ -198,9 +207,9 @@ function shouldAuditLog(req: Request): boolean {
  * Generate a unique request ID
  */
 function createRequestId(): string {
-  return `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  return `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 }
 
 export function getRequestId(req: Request): string {
-  return (req as any).requestId || "unknown";
+  return (req as any).requestId || 'unknown'
 }

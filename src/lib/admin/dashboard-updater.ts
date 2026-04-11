@@ -95,9 +95,7 @@ export class DashboardUpdater {
     } catch (err: unknown) {
       console.error('Error updating metrics:', err)
       this.showError(
-        err instanceof Error
-          ? (err)?.message || String(err)
-          : String(err),
+        err instanceof Error ? err?.message || String(err) : String(err),
       )
     }
   }

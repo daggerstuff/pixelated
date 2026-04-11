@@ -1,4 +1,4 @@
-name: "Code Quality Checks"
+name: 'Code Quality Checks'
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -23,8 +23,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.14.0"
-          cache: "pnpm"
+          node-version: '24.14.0'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

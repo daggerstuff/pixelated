@@ -12,24 +12,24 @@
 
 /* === FONTS === */
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-regular.woff2") format("woff2");
+  font-family: 'Inter';
+  src: url('/fonts/inter-regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/inter-bold.woff2") format("woff2");
+  font-family: 'Inter';
+  src: url('/fonts/inter-bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "DM Mono";
-  src: url("/fonts/dm-mono-medium.woff2") format("woff2");
+  font-family: 'DM Mono';
+  src: url('/fonts/dm-mono-medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -55,9 +55,22 @@
   --surface-paper-top-soft: #f5f2ea;
   --surface-paper-top-bright: #f7f4ed;
   --surface-paper-top-alt: #efede4;
-  --surface-paper-gradient: linear-gradient(180deg, var(--surface-paper) 0%, var(--surface-paper-alt) 52%, var(--surface-paper-top) 100%);
-  --surface-paper-gradient-soft: linear-gradient(180deg, var(--surface-paper-top-soft), var(--surface-paper-top-alt));
-  --surface-paper-gradient-bright: linear-gradient(180deg, var(--surface-paper-top-bright), var(--surface-paper-top-soft));
+  --surface-paper-gradient: linear-gradient(
+    180deg,
+    var(--surface-paper) 0%,
+    var(--surface-paper-alt) 52%,
+    var(--surface-paper-top) 100%
+  );
+  --surface-paper-gradient-soft: linear-gradient(
+    180deg,
+    var(--surface-paper-top-soft),
+    var(--surface-paper-top-alt)
+  );
+  --surface-paper-gradient-bright: linear-gradient(
+    180deg,
+    var(--surface-paper-top-bright),
+    var(--surface-paper-top-soft)
+  );
   --surface-paper-panel: rgba(255, 255, 255, 0.6);
   --surface-paper-panel-muted: rgba(255, 255, 255, 0.52);
   --surface-paper-panel-soft: rgba(255, 255, 255, 0.48);
@@ -103,16 +116,18 @@
 
   /* === TYPOGRAPHY SYSTEM === */
   /* Headings: sharper editorial serif for a less toy-like, more clinical voice */
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville", Georgia, serif;
-  
+  --font-display:
+    'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Baskerville',
+    Georgia, serif;
+
   /* Body: neutral UI sans */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Technical accents: restrained mono, no oversized terminal feel */
-  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   --font-heading: var(--font-display);
-
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.72rem, 0.69rem + 0.12vw, 0.8rem);
@@ -377,7 +392,7 @@ pre {
 }
 
 .container-grid::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   right: 0;
@@ -584,7 +599,7 @@ pre {
 }
 
 .btn-terminal::before {
-  content: ">";
+  content: '>';
   position: absolute;
   left: var(--space-4);
   color: var(--accent-primary);
@@ -701,7 +716,7 @@ pre {
 
 /* Nav link with underline indicator */
 .nav-link-indicator::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -4px;
   left: 0;
@@ -912,8 +927,13 @@ pre {
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-float {
@@ -921,8 +941,13 @@ pre {
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .animate-pulse-soft {

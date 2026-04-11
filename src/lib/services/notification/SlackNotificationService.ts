@@ -180,7 +180,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
     } catch (error: unknown) {
       logger.error('Exception while sending Slack crisis alert:', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        stack: error instanceof Error ? error?.stack : undefined,
         webhookUrl:
           this.webhookUrl.substring(
             0,

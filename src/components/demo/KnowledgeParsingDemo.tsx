@@ -170,7 +170,7 @@ export default function KnowledgeParsingDemo() {
       console.error('Analysis failed:', err)
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'Analysis failed. Please try again.',
       )
 

@@ -1,12 +1,5 @@
 {
-  "*.{js,ts,jsx,tsx,astro}": [
-    "oxlint -c .oxlintrc.json"
-  ],
-  "*.{md,mdx}": [
-    "markdownlint --config .markdownlint.json"
-  ],
-  "*.py": [
-    "ruff check --fix --exit-zero",
-    "ruff format"
-  ]
+  "*.{js,ts,jsx,tsx,astro}": ["oxlint -c .oxlintrc.json"],
+  "*.{md,mdx}": ["markdownlint --config .markdownlint.json"],
+  "*.py": ["ruff check --fix --exit-zero", "ruff format"]
 }

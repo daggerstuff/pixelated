@@ -8,13 +8,13 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { SealResourceScope } from './seal-memory'
 import type { SealOperations } from './seal-operations'
+import { SealService } from './seal-service'
 import { SealSchemeType } from './seal-types'
 import type { SealContextOptions } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
 import type { HomomorphicOperationResult } from './types'
-import { SealService } from './seal-service'
-import { SealResourceScope } from './seal-memory'
 
 // Get logger
 const logger = createBuildSafeLogger('homomorphic-ops')
@@ -262,7 +262,9 @@ export class HomomorphicOperations {
               // Cleanup the temporary result object
               ;(sentimentResult.result as any).delete()
             } else {
-              throw new Error(`Sentiment analysis failed: ${sentimentResult.error}`)
+              throw new Error(
+                `Sentiment analysis failed: ${sentimentResult.error}`,
+              )
             }
             metadata.confidence = 0.85
             break
@@ -295,7 +297,7 @@ export class HomomorphicOperations {
               inputCiphertext,
               params,
             )
-            
+
             if (opResult.success && opResult.result) {
               const serializedResult = opResult.result
               result = JSON.stringify({
@@ -304,7 +306,9 @@ export class HomomorphicOperations {
                 timestamp: Date.now(),
               })
             } else {
-              throw new Error(`Operation ${operation} failed: ${opResult.error}`)
+              throw new Error(
+                `Operation ${operation} failed: ${opResult.error}`,
+              )
             }
             break
 
@@ -378,13 +382,10 @@ export class HomomorphicOperations {
       case FHEOperation.Addition:
         // Add a constant or another ciphertext
         addend = (params?.['addend'] as number[]) || [1]
-        addResult = await this.sealOps.add(
-          inputCiphertext,
-          addend,
-        )
+        addResult = await this.sealOps.add(inputCiphertext, addend)
         if (addResult.success && addResult.result) {
-          const res = (addResult.result as any).save();
-          (addResult.result as any).delete();
+          const res = (addResult.result as any).save()
+          ;(addResult.result as any).delete()
           return { result: res, success: true }
         }
         return { result: '', success: false, error: addResult.error }
@@ -392,13 +393,10 @@ export class HomomorphicOperations {
       case FHEOperation.Subtraction:
         // Subtract a constant or another ciphertext
         subtrahend = (params?.['subtrahend'] as number[]) || [1]
-        subResult = await this.sealOps.subtract(
-          inputCiphertext,
-          subtrahend,
-        )
+        subResult = await this.sealOps.subtract(inputCiphertext, subtrahend)
         if (subResult.success && subResult.result) {
-          const res = (subResult.result as any).save();
-          (subResult.result as any).delete();
+          const res = (subResult.result as any).save()
+          ;(subResult.result as any).delete()
           return { result: res, success: true }
         }
         return { result: '', success: false, error: subResult.error }
@@ -406,13 +404,10 @@ export class HomomorphicOperations {
       case FHEOperation.Multiplication:
         // Multiply by a constant or another ciphertext
         multiplier = (params?.['multiplier'] as number[]) || [2]
-        multResult = await this.sealOps.multiply(
-          inputCiphertext,
-          multiplier,
-        )
+        multResult = await this.sealOps.multiply(inputCiphertext, multiplier)
         if (multResult.success && multResult.result) {
-          const res = (multResult.result as any).save();
-          (multResult.result as any).delete();
+          const res = (multResult.result as any).save()
+          ;(multResult.result as any).delete()
           return { result: res, success: true }
         }
         return { result: '', success: false, error: multResult.error }
@@ -421,8 +416,8 @@ export class HomomorphicOperations {
         // Negate the value
         negResult = await this.sealOps.negate(inputCiphertext)
         if (negResult.success && negResult.result) {
-          const res = (negResult.result as any).save();
-          (negResult.result as any).delete();
+          const res = (negResult.result as any).save()
+          ;(negResult.result as any).delete()
           return { result: res, success: true }
         }
         return { result: '', success: false, error: negResult.error }
@@ -430,10 +425,13 @@ export class HomomorphicOperations {
       case FHEOperation.Polynomial:
         // Apply a polynomial function
         coefficients = (params?.['coefficients'] as number[]) || [0, 1]
-        polyResult = await this.sealOps.polynomial(inputCiphertext, coefficients)
+        polyResult = await this.sealOps.polynomial(
+          inputCiphertext,
+          coefficients,
+        )
         if (polyResult.success && polyResult.result) {
-          const res = (polyResult.result as any).save();
-          (polyResult.result as any).delete();
+          const res = (polyResult.result as any).save()
+          ;(polyResult.result as any).delete()
           return { result: res, success: true }
         }
         return { result: '', success: false, error: polyResult.error }
@@ -443,8 +441,8 @@ export class HomomorphicOperations {
         steps = (params?.['steps'] as number) || 1
         rotResult = await this.sealOps.rotate(inputCiphertext, steps)
         if (rotResult.success && rotResult.result) {
-          const res = (rotResult.result as any).save();
-          (rotResult.result as any).delete();
+          const res = (rotResult.result as any).save()
+          ;(rotResult.result as any).delete()
           return { result: res, success: true }
         }
         return { result: '', success: false, error: rotResult.error }
@@ -486,7 +484,12 @@ export class HomomorphicOperations {
         const decoded = atob(encryptedData)
         const parsed = JSON.parse(decoded) as any
 
-        if (parsed && typeof parsed === 'object' && 'data' in parsed && typeof parsed.data === 'string') {
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          'data' in parsed &&
+          typeof parsed.data === 'string'
+        ) {
           decodedData = parsed.data
         } else {
           decodedData = 'Unknown encoded format'

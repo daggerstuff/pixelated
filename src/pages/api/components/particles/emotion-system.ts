@@ -185,7 +185,12 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -263,7 +268,12 @@ export const POST: APIRoute = protectRoute()(async (
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -423,7 +433,9 @@ function generateEmotionParticles(
     const rand = Math.random()
     let cumulative = 0
 
-    for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix) as [string, number][]) {
+    for (const [emo, percentage] of Object.entries(
+      emotionProfile.emotionMix,
+    ) as [string, number][]) {
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

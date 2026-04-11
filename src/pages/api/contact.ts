@@ -84,7 +84,7 @@ export const POST = async ({ request }: APIContext) => {
       if (
         !formData[field] ||
         typeof formData[field] !== 'string' ||
-        !(formData[field]).trim()
+        !formData[field].trim()
       ) {
         return new Response(
           JSON.stringify({
@@ -140,7 +140,7 @@ export const POST = async ({ request }: APIContext) => {
 
     logger.error('Contact form submission failed with unexpected error', {
       error: error instanceof Error ? String(error) : 'Unknown error',
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
       userAgent: request.headers.get('user-agent'),
       ip: getClientIP(request),
       duration: `${duration}ms`,

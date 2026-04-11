@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Switch } from '@/components/ui/switch'
+
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -13,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
 
 import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 
@@ -50,7 +57,11 @@ export default function DLPRuleEditor() {
         return
       }
       const detail = event.detail as EditorRule
-      setCurrentRule({ ...defaultRule, ...detail, matchPattern: detail.matchPattern ?? '' })
+      setCurrentRule({
+        ...defaultRule,
+        ...detail,
+        matchPattern: detail.matchPattern ?? '',
+      })
       setIsEditing(true)
     }
 
@@ -91,7 +102,10 @@ export default function DLPRuleEditor() {
     if (!pattern) {
       document.dispatchEvent(
         new CustomEvent('dlp:error', {
-          detail: { message: 'Match pattern is required (this is the term or regex to detect)' },
+          detail: {
+            message:
+              'Match pattern is required (this is the term or regex to detect)',
+          },
         }),
       )
       return
@@ -212,7 +226,8 @@ export default function DLPRuleEditor() {
               onChange={(e) => handleChange('matchPattern', e.target.value)}
             />
             <p className='text-muted-foreground text-xs'>
-              Literal text or regex to detect. Content matching this will trigger the rule.
+              Literal text or regex to detect. Content matching this will
+              trigger the rule.
             </p>
           </div>
 

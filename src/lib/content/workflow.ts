@@ -25,11 +25,13 @@ export const workflowContent = {
   outputs: [
     {
       label: 'Durable record',
-      value: 'A saved transcript and notes lane the team can reopen without guesswork.',
+      value:
+        'A saved transcript and notes lane the team can reopen without guesswork.',
     },
     {
       label: 'Specific feedback',
-      value: 'A concrete read on where the room shifted and what should change next.',
+      value:
+        'A concrete read on where the room shifted and what should change next.',
     },
     {
       label: 'Shared standard',

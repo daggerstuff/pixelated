@@ -9,7 +9,11 @@ export interface MonitorEvent {
   details?: Record<string, unknown>
 }
 
-export type AlertHandler = (alert: { type: string; count: number; source: string }) => void
+export type AlertHandler = (alert: {
+  type: string
+  count: number
+  source: string
+}) => void
 
 const ALERT_THRESHOLD = 5
 const MAX_EVENTS_PER_SOURCE = 1000 // Memory limit
@@ -24,14 +28,14 @@ export class UnifiedMonitor {
     // Store event in source-keyed map (O(1) insertion)
     const sourceEvents = this.eventsBySource.get(event.source) || []
     sourceEvents.push(event)
-    
+
     // Enforce memory limit - remove oldest events if exceeded
     if (sourceEvents.length > MAX_EVENTS_PER_SOURCE) {
       sourceEvents.shift() // Remove oldest
     }
-    
+
     this.eventsBySource.set(event.source, sourceEvents)
-    
+
     logger.info(`Recorded event: ${event.source}/${event.event}`)
 
     // Check alert thresholds synchronously before any await
@@ -45,7 +49,11 @@ export class UnifiedMonitor {
         // Reset counter immediately to prevent duplicate alerts
         this.failureCounts.set(key, 0)
         // Log and notify handlers (async but after sync state update)
-        this.triggerAlert({ type: 'compliance_failure', count, source: event.source })
+        this.triggerAlert({
+          type: 'compliance_failure',
+          count,
+          source: event.source,
+        })
       }
     }
   }
@@ -71,10 +79,16 @@ export class UnifiedMonitor {
     this.failureCounts.clear()
   }
 
-  private triggerAlert(alert: { type: string; count: number; source: string }): void {
+  private triggerAlert(alert: {
+    type: string
+    count: number
+    source: string
+  }): void {
     for (const handler of this.alertHandlers) {
       handler(alert)
     }
-    logger.warn(`ALERT: ${alert.type} (count: ${alert.count}, source: ${alert.source})`)
+    logger.warn(
+      `ALERT: ${alert.type} (count: ${alert.count}, source: ${alert.source})`,
+    )
   }
 }

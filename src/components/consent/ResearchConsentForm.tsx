@@ -1,8 +1,8 @@
+import DOMPurify from 'isomorphic-dompurify'
 import { useState, useEffect, useMemo } from 'react'
 
 import { authClient } from '@/lib/auth-client'
 import { consentService } from '@/lib/security/consent/ConsentService'
-import DOMPurify from 'isomorphic-dompurify'
 import type { UserConsentStatus } from '@/lib/security/consent/types'
 
 interface ResearchConsentFormProps {
@@ -27,9 +27,11 @@ const TEXT = {
   consentButton: 'I Consent',
   withdrawButton: 'Withdraw Consent',
   withdrawTitle: 'Withdraw Research Consent',
-  withdrawWarning: "You're about to withdraw your consent for research participation. This means your data will no longer be used for research purposes.",
+  withdrawWarning:
+    "You're about to withdraw your consent for research participation. This means your data will no longer be used for research purposes.",
   reasonLabel: 'Reason for withdrawal (optional)',
-  reasonPlaceholder: "Please let us know why you're withdrawing consent (optional)",
+  reasonPlaceholder:
+    "Please let us know why you're withdrawing consent (optional)",
   cancel: 'Cancel',
 }
 
@@ -71,9 +73,9 @@ export function ResearchConsentForm({
     if (!isHydrated || !consentStatus?.currentVersion.documentText) {
       return ''
     }
-    
+
     return DOMPurify.sanitize(consentStatus.currentVersion.documentText, {
-      USE_PROFILES: { html: true }
+      USE_PROFILES: { html: true },
     })
   }, [consentStatus?.currentVersion.documentText, isHydrated])
 
@@ -261,19 +263,23 @@ export function ResearchConsentForm({
   return (
     <div className={`bg-white rounded-lg shadow ${className}`}>
       <div className='border-gray-200 border-b p-6'>
-        <h2 className='text-gray-800 text-xl font-semibold'>
-          {TEXT.header}
-        </h2>
+        <h2 className='text-gray-800 text-xl font-semibold'>{TEXT.header}</h2>
         <p className='text-gray-500 mt-1 text-sm'>
           {consentStatus.hasActiveConsent
-            ? TEXT.consentGranted(new Date(consentStatus.userConsent?.grantedAt || '').toLocaleDateString())
+            ? TEXT.consentGranted(
+                new Date(
+                  consentStatus.userConsent?.grantedAt || '',
+                ).toLocaleDateString(),
+              )
             : TEXT.requestConsent}
         </p>
       </div>
 
       <div className='p-6'>
         <div className='mb-6'>
-          <h3 className='text-gray-800 mb-2 font-medium'>{TEXT.summaryTitle}</h3>
+          <h3 className='text-gray-800 mb-2 font-medium'>
+            {TEXT.summaryTitle}
+          </h3>
           <p className='text-gray-600'>
             {consentStatus.currentVersion.summary}
           </p>
@@ -285,9 +291,7 @@ export function ResearchConsentForm({
               onClick={() => setExpandedView(!expandedView)}
               className='text-green-700 hover:text-green-800 flex items-center text-sm font-medium'
             >
-              {expandedView
-                ? TEXT.hideDetails
-                : TEXT.viewDetails}
+              {expandedView ? TEXT.hideDetails : TEXT.viewDetails}
               <svg
                 className={`ml-1 h-4 w-4 transform ${expandedView ? 'rotate-180' : ''}`}
                 xmlns='http://www.w3.org/2000/svg'
@@ -341,14 +345,17 @@ export function ResearchConsentForm({
                     >
                       {option.description}
                       {option.isRequired && (
-                        <span className='text-red-500 ml-1'>{TEXT.requiredField}</span>
+                        <span className='text-red-500 ml-1'>
+                          {TEXT.requiredField}
+                        </span>
                       )}
                     </label>
                   </div>
                 ))}
               </div>
               <p className='text-gray-500 mt-2 text-xs'>
-                <span className='text-red-500'>{TEXT.requiredField}</span> {TEXT.requiredNote}
+                <span className='text-red-500'>{TEXT.requiredField}</span>{' '}
+                {TEXT.requiredNote}
               </p>
             </div>
           )}
@@ -381,7 +388,7 @@ export function ResearchConsentForm({
       </div>
 
       {withdrawDialogOpen && (
-        <div 
+        <div
           className='bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 p-4'
           role='dialog'
           aria-modal='true'
@@ -389,15 +396,16 @@ export function ResearchConsentForm({
         >
           <div className='bg-white w-full max-w-md rounded-lg shadow-xl'>
             <div className='border-b p-4'>
-              <h3 id='withdraw-dialog-title' className='text-gray-800 text-lg font-semibold'>
+              <h3
+                id='withdraw-dialog-title'
+                className='text-gray-800 text-lg font-semibold'
+              >
                 {TEXT.withdrawTitle}
               </h3>
             </div>
 
             <div className='p-4'>
-              <p className='text-gray-600 mb-4'>
-                {TEXT.withdrawWarning}
-              </p>
+              <p className='text-gray-600 mb-4'>{TEXT.withdrawWarning}</p>
 
               <label
                 htmlFor='withdraw-reason'

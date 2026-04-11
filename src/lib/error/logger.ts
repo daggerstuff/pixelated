@@ -119,7 +119,9 @@ class ErrorLoggingService {
 
     try {
       const errorObj =
-        error.cause instanceof Error ? error.cause : new Error((error instanceof Error ? error.message : "Unknown error"))
+        error.cause instanceof Error
+          ? error.cause
+          : new Error(error instanceof Error ? error.message : 'Unknown error')
 
       const context: Record<string, unknown> = {
         severity: error.severity,
@@ -174,14 +176,17 @@ class ErrorLoggingService {
 
     entries.forEach((entry) => {
       // Recreate AppError from formatted error
-      const error = new AppError(entry.error instanceof Error ? entry.error.message : "Unknown error", {
-        code: entry.error.code,
-        severity: entry.error.severity,
-        category: entry.error.category,
-        context: entry.context,
-        recoverable: entry.error.recoverable,
-        retryable: entry.error.retryable,
-      })
+      const error = new AppError(
+        entry.error instanceof Error ? entry.error.message : 'Unknown error',
+        {
+          code: entry.error.code,
+          severity: entry.error.severity,
+          category: entry.error.category,
+          context: entry.context,
+          recoverable: entry.error.recoverable,
+          retryable: entry.error.retryable,
+        },
+      )
       this.sendToMonitoring(error, entry)
     })
   }
@@ -255,13 +260,16 @@ export function normalizeErrorForLogging(
   }
 
   if (error instanceof Error) {
-    return new AppError((error instanceof Error ? error.message : "Unknown error"), {
-      code: 'unhandled.error',
-      severity: ErrorSeverity.MEDIUM,
-      category: ErrorCategory.UNKNOWN,
-      context,
-      recoverable: true,
-    })
+    return new AppError(
+      error instanceof Error ? error.message : 'Unknown error',
+      {
+        code: 'unhandled.error',
+        severity: ErrorSeverity.MEDIUM,
+        category: ErrorCategory.UNKNOWN,
+        context,
+        recoverable: true,
+      },
+    )
   }
 
   return new AppError(String(error), {

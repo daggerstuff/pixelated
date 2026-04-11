@@ -199,12 +199,12 @@ export function AdvancedFilteringComponent({
                     'timeRange',
                     'presetRange',
                     value as
-                    | 'day'
-                    | 'week'
-                    | 'month'
-                    | 'quarter'
-                    | 'year'
-                    | 'custom',
+                      | 'day'
+                      | 'week'
+                      | 'month'
+                      | 'quarter'
+                      | 'year'
+                      | 'custom',
                   )
                 }
                 placeholder='Select time range'
@@ -369,7 +369,7 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                    .valence[1]
+                                      .valence[1]
                                   : 1,
                               ],
                             )
@@ -395,7 +395,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                    .valence[0]
+                                      .valence[0]
                                   : -1,
                                 max,
                               ],
@@ -438,7 +438,7 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                    .arousal[1]
+                                      .arousal[1]
                                   : 1,
                               ],
                             )
@@ -464,7 +464,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                    .arousal[0]
+                                      .arousal[0]
                                   : -1,
                                 max,
                               ],
@@ -509,7 +509,7 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                    .dominance[1]
+                                      .dominance[1]
                                   : 1,
                               ],
                             )
@@ -535,7 +535,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                    .dominance[0]
+                                      .dominance[0]
                                   : -1,
                                 max,
                               ],

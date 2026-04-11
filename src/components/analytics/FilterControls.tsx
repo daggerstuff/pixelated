@@ -85,7 +85,11 @@ export function FilterControls({
           >
             Reset
           </Button>
-          <Button size='sm' onClick={onApply} aria-label='Apply current filters'>
+          <Button
+            size='sm'
+            onClick={onApply}
+            aria-label='Apply current filters'
+          >
             Apply Filters
           </Button>
         </div>

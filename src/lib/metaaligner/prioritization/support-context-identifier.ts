@@ -503,7 +503,7 @@ export class SupportContextIdentifier {
 
     // Ultra-defensive: if high urgency and still no crisis/hotline/emergency entry, prepend a guaranteed hotline
     const immediateNeedsText = Array.isArray(result.metadata?.immediateNeeds)
-      ? (result.metadata.immediateNeeds).join(' ').toLowerCase()
+      ? result.metadata.immediateNeeds.join(' ').toLowerCase()
       : ''
     if (
       (urgCheck === 'high' ||

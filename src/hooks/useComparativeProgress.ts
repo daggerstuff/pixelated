@@ -176,7 +176,7 @@ export function useComparativeProgress(
       }
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'An unknown error occurred',
       )
     } finally {

@@ -1,6 +1,13 @@
+import {
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  StarIcon,
+  UserGroupIcon,
+  CalendarIcon,
+  BoltIcon,
+} from '@heroicons/react/24/outline'
 import type { FC } from 'react'
 import React from 'react'
-import { ChartBarIcon, ArrowTrendingUpIcon, StarIcon, UserGroupIcon, CalendarIcon, BoltIcon } from '@heroicons/react/24/outline'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
@@ -147,7 +154,17 @@ export const TherapistDashboard: FC = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  <>{tab.icon === 'chart' ? <ChartBarIcon className="w-5 h-5" /> : tab.icon === 'trending' ? <ArrowTrendingUpIcon className="w-5 h-5" /> : tab.icon === 'users' ? <UserGroupIcon className="w-5 h-5" /> : tab.icon === 'calendar' ? <CalendarIcon className="w-5 h-5" /> : null}</>
+                  <>
+                    {tab.icon === 'chart' ? (
+                      <ChartBarIcon className='h-5 w-5' />
+                    ) : tab.icon === 'trending' ? (
+                      <ArrowTrendingUpIcon className='h-5 w-5' />
+                    ) : tab.icon === 'users' ? (
+                      <UserGroupIcon className='h-5 w-5' />
+                    ) : tab.icon === 'calendar' ? (
+                      <CalendarIcon className='h-5 w-5' />
+                    ) : null}
+                  </>
                   {tab.label}
                 </button>
               ))}
@@ -171,7 +188,7 @@ export const TherapistDashboard: FC = () => {
                 }
               }}
               selectedPatients={selectedPatients}
-				timeRange={timeRange}
+              timeRange={timeRange}
             />
           )}
 
@@ -233,7 +250,7 @@ const OverviewTab: FC<{
                 </p>
               </div>
               <div className='bg-blue-100 dark:bg-blue-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
-                <ChartBarIcon className="text-blue-600 dark:text-blue-400 w-5 h-5" />
+                <ChartBarIcon className='text-blue-600 dark:text-blue-400 h-5 w-5' />
               </div>
             </div>
             <p className='text-gray-500 mt-2 text-sm'>
@@ -297,7 +314,7 @@ const OverviewTab: FC<{
                 </p>
               </div>
               <div className='bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
-                <StarIcon className="text-yellow-600 dark:text-yellow-400 w-5 h-5" />
+                <StarIcon className='text-yellow-600 dark:text-yellow-400 h-5 w-5' />
               </div>
             </div>
             <p className='text-gray-500 mt-2 text-sm'>Average rating</p>
@@ -700,12 +717,11 @@ function getRiskColor(risk: string) {
   return colors[risk as keyof typeof colors] || colors.low
 }
 
-
 function getProgressColor(progress: number) {
-	if (progress >= 80) return 'bg-green-500'
-	if (progress >= 60) return 'bg-blue-500'
-	if (progress >= 40) return 'bg-yellow-500'
-	if (progress >= 20) return 'bg-orange-500'
-	return 'bg-red-500'
+  if (progress >= 80) return 'bg-green-500'
+  if (progress >= 60) return 'bg-blue-500'
+  if (progress >= 40) return 'bg-yellow-500'
+  if (progress >= 20) return 'bg-orange-500'
+  return 'bg-red-500'
 }
 export default TherapistDashboard

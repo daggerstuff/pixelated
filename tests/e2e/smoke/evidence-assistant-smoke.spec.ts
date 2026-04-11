@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test'
 import { TestData } from '../data/TestData'
 
 test.describe('Evidence Assistant admin page', () => {
-  test('page is accessible and includes the admin UI shell', async ({ page }) => {
+  test('page is accessible and includes the admin UI shell', async ({
+    page,
+  }) => {
     await page.goto('/admin/ai/evidence-assistant', {
       waitUntil: 'load',
       timeout: 30_000,
@@ -23,7 +25,9 @@ test.describe('Evidence Assistant admin page', () => {
     ).toBeVisible()
   })
 
-  test('search form renders response data with mocked API response', async ({ page }) => {
+  test('search form renders response data with mocked API response', async ({
+    page,
+  }) => {
     await page.route('**/api/ai/evidence-assistant', async (route) => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
@@ -85,7 +89,9 @@ test.describe('Evidence Assistant admin page', () => {
     const collectionSelect = page.getByRole('combobox')
     await collectionSelect.selectOption('docs')
 
-    const submitButton = page.getByRole('button', { name: 'Run evidence search' })
+    const submitButton = page.getByRole('button', {
+      name: 'Run evidence search',
+    })
     await expect(submitButton).toBeVisible()
     await submitButton.click()
 
@@ -98,7 +104,9 @@ test.describe('Evidence Assistant admin page', () => {
     await expect(page.getByText('[1] Crisis Playbook')).toBeVisible()
   })
 
-  test('admin flow can be smoke-tested with configured test admin credentials', async ({ page }) => {
+  test('admin flow can be smoke-tested with configured test admin credentials', async ({
+    page,
+  }) => {
     const { email, password } = TestData.users.adminUser
     await page.goto('/auth/sign-in')
 

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react'
+
+import { fheService } from '@/lib/fhe'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
 import { EmotionLlamaProvider } from '../../lib/ai/providers/EmotionLlamaProvider'
-import { fheService } from '@/lib/fhe'
 import { useSimulatorContext } from '../context/SimulatorContext'
 
 const logger = createBuildSafeLogger('useEmotionDetection')

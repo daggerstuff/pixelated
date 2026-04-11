@@ -17,10 +17,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from '@/components/ui/toast'
+import type { VerificationResult } from '@/types/backup'
 
 import type { BackupType, BackupStatus } from '../../../lib/security/backup'
 import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types'
-import type { VerificationResult } from '@/types/backup'
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {

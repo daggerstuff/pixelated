@@ -111,7 +111,7 @@ export class AdaptiveSelector {
       this.lastDetectedContext !== detection.detectedContext
     ) {
       detection.metadata = detection.metadata || {}
-      ;(detection.metadata)['transition'] = {
+      detection.metadata['transition'] = {
         from: this.lastDetectedContext,
         to: detection.detectedContext,
       }

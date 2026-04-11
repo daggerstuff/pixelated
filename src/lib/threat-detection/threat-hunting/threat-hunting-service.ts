@@ -1,5 +1,12 @@
 import { EventEmitter } from 'events'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { runInParallelBatches } from '../../utils/concurrency'
+import { ThreatInvestigationManager } from './threat-investigation-manager'
+import { ThreatInvestigationRepository } from './threat-investigation-repository'
+import { ThreatMLInferenceManager } from './threat-ml-inference-manager'
+import { ThreatQueryProvider } from './threat-query-provider'
+import { ThreatReportGenerator } from './threat-report-generator'
 import {
   IRedisClient,
   IMongoClient,
@@ -9,13 +16,6 @@ import {
   HuntFinding,
   Investigation,
 } from './types'
-import { ThreatMLInferenceManager } from './threat-ml-inference-manager'
-import { ThreatInvestigationManager } from './threat-investigation-manager'
-import { ThreatReportGenerator } from './threat-report-generator'
-import { ThreatInvestigationRepository } from './threat-investigation-repository'
-import { ThreatQueryProvider } from './threat-query-provider'
-
-import { runInParallelBatches } from '../../utils/concurrency'
 
 const logger = createBuildSafeLogger('threat-hunting-service')
 
@@ -46,20 +46,27 @@ export class ThreatHuntingService extends EventEmitter {
       reportGenerator?: ThreatReportGenerator
       repository?: ThreatInvestigationRepository
       queryProvider?: ThreatQueryProvider
-    }
+    },
   ) {
     super()
-    this.mlInference = overrides?.mlInference || new ThreatMLInferenceManager(this.redis, config)
-    this.reportGenerator = overrides?.reportGenerator || new ThreatReportGenerator()
-    this.repository = overrides?.repository || new ThreatInvestigationRepository(mongoClient, redis)
-    this.queryProvider = overrides?.queryProvider || new ThreatQueryProvider(redis, mongoClient)
-    
-    this.investigationManager = overrides?.investigationManager || new ThreatInvestigationManager(
-      this.repository,
-      this.reportGenerator,
-      aiService,
-      behavioralService,
-    )
+    this.mlInference =
+      overrides?.mlInference || new ThreatMLInferenceManager(this.redis, config)
+    this.reportGenerator =
+      overrides?.reportGenerator || new ThreatReportGenerator()
+    this.repository =
+      overrides?.repository ||
+      new ThreatInvestigationRepository(mongoClient, redis)
+    this.queryProvider =
+      overrides?.queryProvider || new ThreatQueryProvider(redis, mongoClient)
+
+    this.investigationManager =
+      overrides?.investigationManager ||
+      new ThreatInvestigationManager(
+        this.repository,
+        this.reportGenerator,
+        aiService,
+        behavioralService,
+      )
 
     this.setupEvents()
   }
@@ -70,9 +77,15 @@ export class ThreatHuntingService extends EventEmitter {
   public async initialize(): Promise<void> {
     try {
       logger.info('Initializing ThreatHuntingService and sub-dependencies')
-      
-      if (this.behavioralService && typeof this.behavioralService.initializeServices === 'function') {
-        await this.behavioralService.initializeServices(this.redis, this.mongoClient)
+
+      if (
+        this.behavioralService &&
+        typeof this.behavioralService.initializeServices === 'function'
+      ) {
+        await this.behavioralService.initializeServices(
+          this.redis,
+          this.mongoClient,
+        )
       }
 
       this.isInitialized = true
@@ -86,7 +99,9 @@ export class ThreatHuntingService extends EventEmitter {
 
   private checkInitialized(): void {
     if (!this.isInitialized) {
-      throw new Error('ThreatHuntingService is not initialized. Call .initialize() first.')
+      throw new Error(
+        'ThreatHuntingService is not initialized. Call .initialize() first.',
+      )
     }
   }
 
@@ -146,7 +161,9 @@ export class ThreatHuntingService extends EventEmitter {
    */
   private async executeHunts(): Promise<void> {
     const rules = (this.config.huntingRules ?? []).filter((r) => r.enabled)
-    logger.info(`Executing ${rules.length} hunting rules with concurrency limit`)
+    logger.info(
+      `Executing ${rules.length} hunting rules with concurrency limit`,
+    )
 
     await runInParallelBatches(
       rules,
@@ -154,13 +171,15 @@ export class ThreatHuntingService extends EventEmitter {
         try {
           await this.executeRule(rule)
         } catch (error: unknown) {
-          logger.error(`Failed to execute rule: ${rule.name}`, { error, ruleId: rule.ruleId })
+          logger.error(`Failed to execute rule: ${rule.name}`, {
+            error,
+            ruleId: rule.ruleId,
+          })
         }
       },
-      5 // Concurrency limit
+      5, // Concurrency limit
     )
   }
-
 
   private async executeRule(rule: HuntingRule): Promise<void> {
     const findings = await this.queryProvider.executeHuntQuery(rule.query)
@@ -168,7 +187,9 @@ export class ThreatHuntingService extends EventEmitter {
     if (findings.length > 0) {
       const analyzedFindings = await this.mlInference.analyzeFindings(
         findings,
-        this.reportGenerator.mapThreatLevelToSeverity.bind(this.reportGenerator),
+        this.reportGenerator.mapThreatLevelToSeverity.bind(
+          this.reportGenerator,
+        ),
       )
 
       const result: HuntResult = {
@@ -180,7 +201,9 @@ export class ThreatHuntingService extends EventEmitter {
         confidence: this.calculateHuntConfidence(analyzedFindings),
         severity: this.reportGenerator.numberToSeverity(
           Math.max(
-            ...analyzedFindings.map((f) => this.reportGenerator.severityToNumber(f.severity)),
+            ...analyzedFindings.map((f) =>
+              this.reportGenerator.severityToNumber(f.severity),
+            ),
             this.reportGenerator.severityToNumber(rule.severity),
           ),
         ),
@@ -191,10 +214,11 @@ export class ThreatHuntingService extends EventEmitter {
       }
 
       if (this.shouldTriggerInvestigation(analyzedFindings, rule)) {
-        const investigationId = await this.investigationManager.startInvestigation({
-          huntId: result.huntId,
-          priority: rule.investigationPriority,
-        })
+        const investigationId =
+          await this.investigationManager.startInvestigation({
+            huntId: result.huntId,
+            priority: rule.investigationPriority,
+          })
         result.investigationTriggered = true
         result.investigationId = investigationId
       }
@@ -217,9 +241,14 @@ export class ThreatHuntingService extends EventEmitter {
     return Math.min(avg + volumeBonus, 1.0)
   }
 
-  private shouldTriggerInvestigation(findings: HuntFinding[], rule: HuntingRule): boolean {
+  private shouldTriggerInvestigation(
+    findings: HuntFinding[],
+    rule: HuntingRule,
+  ): boolean {
     return (
-      findings.some((f) => f.severity === 'high' || f.severity === 'critical') ||
+      findings.some(
+        (f) => f.severity === 'high' || f.severity === 'critical',
+      ) ||
       (findings.length > 3 && rule.autoInvestigate)
     )
   }
@@ -241,10 +270,11 @@ export class ThreatHuntingService extends EventEmitter {
 
   public async createInvestigation(data: any) {
     this.checkInitialized()
-    if (!data.title || !data.priority) throw new Error('Invalid investigation data')
+    if (!data.title || !data.priority)
+      throw new Error('Invalid investigation data')
     return this.investigationManager.startInvestigation({
       huntId: 'manual',
-      priority: this.reportGenerator.severityToNumber(data.priority)
+      priority: this.reportGenerator.severityToNumber(data.priority),
     })
   }
 
@@ -258,7 +288,16 @@ export class ThreatHuntingService extends EventEmitter {
    */
   public async searchThreatData(
     searchData: Record<string, unknown>,
-  ): Promise<{ data: any[]; pagination: { total: number; page: number; limit: number; isCapped: boolean; processingLimit: number } }> {
+  ): Promise<{
+    data: any[]
+    pagination: {
+      total: number
+      page: number
+      limit: number
+      isCapped: boolean
+      processingLimit: number
+    }
+  }> {
     this.checkInitialized()
     return this.queryProvider.searchThreatData(searchData)
   }
@@ -279,4 +318,3 @@ export type {
   HuntFinding,
   Investigation,
 } from './types'
-
