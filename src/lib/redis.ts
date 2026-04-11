@@ -40,6 +40,49 @@ function createMockRedisClient() {
     return new RegExp(regexStr)
   }
 
+  const parseJsonArray = (value: string): string[] => {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')
+      ? parsed
+      : []
+  }
+
+  const parseStringRecord = (value: string): Record<string, string> => {
+    const parsed = JSON.parse(value)
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed)
+    ) {
+      const result: Record<string, string> = {}
+      for (const [key, rawValue] of Object.entries(parsed)) {
+        if (typeof rawValue === 'string') {
+          result[key] = rawValue
+        }
+      }
+      return result
+    }
+    return {}
+  }
+
+  const parseNumberRecord = (value: string): Record<string, number> => {
+    const parsed = JSON.parse(value)
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed)
+    ) {
+      const result: Record<string, number> = {}
+      for (const [key, rawValue] of Object.entries(parsed)) {
+        if (typeof rawValue === 'number') {
+          result[key] = rawValue
+        }
+      }
+      return result
+    }
+    return {}
+  }
+
   // Return a mock client with all Redis operations needed by the threat detection system
   return {
     // Basic operations
@@ -113,22 +156,18 @@ function createMockRedisClient() {
     // List operations
     lpush: async (key: string, ...values: string[]) => {
       const listKey = `list:${key}`
-      const existing = mockStore.get(listKey) || '[]'
-      const list = JSON.parse(existing)
+      const list = parseJsonArray(mockStore.get(listKey) || '[]')
       list.unshift(...values)
       mockStore.set(listKey, JSON.stringify(list))
       return list.length
     },
     lRange: async (key: string, start: number, stop: number) => {
       const listKey = `list:${key}`
-      const existing = mockStore.get(listKey) || '[]'
-      const list = JSON.parse(existing)
-      return list.slice(start, stop + 1)
+      return parseJsonArray(mockStore.get(listKey) || '[]').slice(start, stop + 1)
     },
     lrem: async (key: string, count: number, value: string) => {
       const listKey = `list:${key}`
-      const existing = mockStore.get(listKey) || '[]'
-      const list = JSON.parse(existing)
+      const list = parseJsonArray(mockStore.get(listKey) || '[]')
       const filtered = list.filter((item: string) => item !== value)
       mockStore.set(listKey, JSON.stringify(filtered))
       return list.length - filtered.length
@@ -137,29 +176,24 @@ function createMockRedisClient() {
     // Sorted set operations
     zadd: async (key: string, score: number, member: string) => {
       const zsetKey = `zset:${key}`
-      const existing = mockStore.get(zsetKey) || '{}'
-      const zset = JSON.parse(existing)
+      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
       zset[member] = score
       mockStore.set(zsetKey, JSON.stringify(zset))
       return 1
     },
     zrangebyscore: async (key: string, min: number, max: number) => {
       const zsetKey = `zset:${key}`
-      const existing = mockStore.get(zsetKey) || '{}'
-      const zset = JSON.parse(existing)
+      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
       return Object.entries(zset)
-        .filter(
-          ([_, score]) => (score as number) >= min && (score as number) <= max,
-        )
+        .filter(([, score]) => score >= min && score <= max)
         .map(([member]) => member)
     },
     zremrangebyscore: async (key: string, min: number, max: number) => {
       const zsetKey = `zset:${key}`
-      const existing = mockStore.get(zsetKey) || '{}'
-      const zset = JSON.parse(existing)
+      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
       let removed = 0
       for (const [member, score] of Object.entries(zset)) {
-        if ((score as number) >= min && (score as number) <= max) {
+        if (score >= min && score <= max) {
           delete zset[member]
           removed++
         }
@@ -220,17 +254,18 @@ export function getRedisClient() {
 /**
  * Wrapper function for Redis get with error handling
  */
-export async function getFromCache<T>(key: string): Promise<T | null> {
+export async function getFromCache(key: string): Promise<any | null> {
   try {
     const raw = await redis.get(key)
     if (raw === null) {
       return null
     }
     try {
-      return JSON.parse(raw) as unknown as T
+      const parsed = JSON.parse(raw)
+      return parsed
     } catch {
       // If not JSON, return as-is
-      return raw as unknown as T
+      return raw
     }
   } catch (error: unknown) {
     console.error(`Error getting key ${key} from Redis:`, error)

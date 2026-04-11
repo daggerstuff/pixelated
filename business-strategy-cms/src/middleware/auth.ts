@@ -1,15 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
-import type { ParsedQs } from 'qs'
-import type { ParamsDictionary } from 'express-serve-static-core'
 
 import { AuthService } from '@/services/authService'
 import { type JwtPayload, UserRole } from '@/types/user'
 
 export interface AuthenticatedRequest<
-  P = ParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery = ParsedQs,
+  P extends Record<string, string> = Record<string, string>,
+  ResBody = unknown,
+  ReqBody = unknown,
+  ReqQuery = Record<string, string | string[] | undefined>,
 > extends Request<P, ResBody, ReqBody, ReqQuery> {
   user?: JwtPayload
 }

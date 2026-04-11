@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { type FC } from 'react'
 
 interface ScrollAreaProps {
   children: React.ReactNode

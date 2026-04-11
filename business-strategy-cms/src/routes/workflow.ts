@@ -1,6 +1,4 @@
-import { Router, type Response } from 'express'
-import { type ParamsDictionary } from 'express-serve-static-core'
-import type { ParsedQs } from 'qs'
+import { Router, type Response, type Router as ExpressRouter } from 'express'
 
 import {
   AuthenticatedRequest,
@@ -52,7 +50,38 @@ type WorkflowSearchQuery = {
   category?: unknown
 }
 
-const router: import('express-serve-static-core').Router = Router()
+type WorkflowCreateRequest = AuthenticatedRequest<Record<string, string>, unknown, WorkflowCreateBody>
+type WorkflowSubmitRequest = AuthenticatedRequest<Record<string, string>, unknown, WorkflowSubmitBody>
+type WorkflowActionRequest = AuthenticatedRequest<Record<string, string>, unknown, WorkflowActionBody>
+type WorkflowCommentRequest = AuthenticatedRequest<Record<string, string>, unknown, WorkflowCommentBody>
+type WorkflowSearchRequest = AuthenticatedRequest<Record<string, string>, unknown, unknown, WorkflowSearchQuery>
+
+const router: ExpressRouter = Router()
+
+const workflowStatusByInput: Record<string, WorkflowStatus> = {
+  [WorkflowStatus.DRAFT]: WorkflowStatus.DRAFT,
+  [WorkflowStatus.IN_REVIEW]: WorkflowStatus.IN_REVIEW,
+  [WorkflowStatus.APPROVED]: WorkflowStatus.APPROVED,
+  [WorkflowStatus.REJECTED]: WorkflowStatus.REJECTED,
+  [WorkflowStatus.PUBLISHED]: WorkflowStatus.PUBLISHED,
+  [WorkflowStatus.ARCHIVED]: WorkflowStatus.ARCHIVED,
+}
+const reviewPriorityByInput: Record<string, ReviewPriority> = {
+  [ReviewPriority.LOW]: ReviewPriority.LOW,
+  [ReviewPriority.MEDIUM]: ReviewPriority.MEDIUM,
+  [ReviewPriority.HIGH]: ReviewPriority.HIGH,
+  [ReviewPriority.URGENT]: ReviewPriority.URGENT,
+}
+const workflowActionByInput: Record<string, WorkflowAction> = {
+  [WorkflowAction.SUBMIT_FOR_REVIEW]: WorkflowAction.SUBMIT_FOR_REVIEW,
+  [WorkflowAction.APPROVE]: WorkflowAction.APPROVE,
+  [WorkflowAction.REJECT]: WorkflowAction.REJECT,
+  [WorkflowAction.REQUEST_CHANGES]: WorkflowAction.REQUEST_CHANGES,
+  [WorkflowAction.PUBLISH]: WorkflowAction.PUBLISH,
+  [WorkflowAction.ARCHIVE]: WorkflowAction.ARCHIVE,
+  [WorkflowAction.ASSIGN_REVIEWER]: WorkflowAction.ASSIGN_REVIEWER,
+  [WorkflowAction.ADD_COMMENT]: WorkflowAction.ADD_COMMENT,
+}
 
 const toString = (value: unknown): string | undefined => {
   if (typeof value === 'string') {
@@ -124,23 +153,17 @@ const isRecord = (value: unknown): value is Record<string, unknown> => {
 
 const toWorkflowStatus = (value: unknown): WorkflowStatus | undefined => {
   const stringValue = toString(value)?.toLowerCase()
-  return stringValue && Object.values(WorkflowStatus).includes(stringValue as WorkflowStatus)
-    ? (stringValue as WorkflowStatus)
-    : undefined
+  return stringValue ? workflowStatusByInput[stringValue] : undefined
 }
 
 const toWorkflowPriority = (value: unknown): ReviewPriority | undefined => {
   const stringValue = toString(value)?.toLowerCase()
-  return stringValue && Object.values(ReviewPriority).includes(stringValue as ReviewPriority)
-    ? (stringValue as ReviewPriority)
-    : undefined
+  return stringValue ? reviewPriorityByInput[stringValue] : undefined
 }
 
 const toWorkflowAction = (value: unknown): WorkflowAction | undefined => {
   const stringValue = toString(value)?.toLowerCase()
-  return stringValue && Object.values(WorkflowAction).includes(stringValue as WorkflowAction)
-    ? (stringValue as WorkflowAction)
-    : undefined
+  return stringValue ? workflowActionByInput[stringValue] : undefined
 }
 
 const getAuthenticatedUserId = (req: AuthenticatedRequest): string | undefined => {
@@ -149,7 +172,7 @@ const getAuthenticatedUserId = (req: AuthenticatedRequest): string | undefined =
 }
 
 // Get all workflow templates
-router.get('/templates', authenticateToken, async (_req: unknown, res: Response) => {
+router.get('/templates', authenticateToken, async (_req: AuthenticatedRequest, res: Response) => {
   void _req
   try {
     const templates = WorkflowService.getWorkflowTemplates()
@@ -160,12 +183,9 @@ router.get('/templates', authenticateToken, async (_req: unknown, res: Response)
 })
 
 // Get workflow template by ID
-router.get('/templates/:id', authenticateToken, async (
-  req: AuthenticatedRequest<ParamsDictionary>,
-  res: Response,
-) => {
+router.get('/templates/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const templateId = toString(req.params.id)
+    const templateId = toString(req.params['id'])
     if (!templateId) {
       return res.status(400).json({ error: 'Template ID is required' })
     }
@@ -181,7 +201,7 @@ router.get('/templates/:id', authenticateToken, async (
 
 // Create workflow instance for document
 router.post('/instances', authenticateToken, async (
-  req: AuthenticatedRequest<ParamsDictionary, unknown, WorkflowCreateBody>,
+  req: WorkflowCreateRequest,
   res: Response,
 ) => {
   try {
@@ -220,15 +240,9 @@ router.post('/instances', authenticateToken, async (
 })
 
 // Get workflow instances for document
-router.get(
-  '/instances/document/:documentId',
-  authenticateToken,
-  async (
-    req: AuthenticatedRequest<ParamsDictionary>,
-    res: Response,
-  ) => {
+router.get('/instances/document/:documentId', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const documentId = toString(req.params.documentId)
+      const documentId = toString(req.params['documentId'])
       if (!documentId) {
         return res.status(400).json({ error: 'Document ID is required' })
       }
@@ -241,12 +255,9 @@ router.get(
 )
 
 // Get workflow instance by ID
-router.get('/instances/:id', authenticateToken, async (
-  req: AuthenticatedRequest<ParamsDictionary>,
-  res: Response,
-) => {
+router.get('/instances/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const instanceId = toString(req.params.id)
+    const instanceId = toString(req.params['id'])
     if (!instanceId) {
       return res.status(400).json({ error: 'Workflow instance ID is required' })
     }
@@ -261,50 +272,47 @@ router.get('/instances/:id', authenticateToken, async (
 })
 
 // Search workflow instances
-router.get('/instances', authenticateToken, async (
-  req: AuthenticatedRequest<ParamsDictionary, unknown, unknown, WorkflowSearchQuery>,
-  res: Response,
-) => {
+router.get('/instances', authenticateToken, async (req: WorkflowSearchRequest, res: Response) => {
   try {
     const filters: WorkflowSearchFilters = {}
     const query = req.query
 
-    const documentId = toSingleQueryValue(query.documentId)
+    const documentId = toSingleQueryValue(query['documentId'])
     if (documentId) {
       filters.documentId = documentId
     }
 
-    const status = toWorkflowStatus(query.status)
+    const status = toWorkflowStatus(query['status'])
     if (status) {
       filters.status = status
     }
 
-    const assignedTo = toSingleQueryValue(query.assignedTo)
+    const assignedTo = toSingleQueryValue(query['assignedTo'])
     if (assignedTo) {
       filters.assignedTo = assignedTo
     }
 
-    const createdBy = toSingleQueryValue(query.createdBy)
+    const createdBy = toSingleQueryValue(query['createdBy'])
     if (createdBy) {
       filters.createdBy = createdBy
     }
 
-    const priority = toWorkflowPriority(query.priority)
+    const priority = toWorkflowPriority(query['priority'])
     if (priority) {
       filters.priority = priority
     }
 
-    const dueBefore = toDate(query.dueBefore)
+    const dueBefore = toDate(query['dueBefore'])
     if (dueBefore) {
       filters.dueBefore = dueBefore
     }
 
-    const dueAfter = toDate(query.dueAfter)
+    const dueAfter = toDate(query['dueAfter'])
     if (dueAfter) {
       filters.dueAfter = dueAfter
     }
 
-    const category = toSingleQueryValue(query.category)
+    const category = toSingleQueryValue(query['category'])
     if (category) {
       filters.category = category
     }
@@ -317,17 +325,9 @@ router.get('/instances', authenticateToken, async (
 })
 
 // Submit document for review
-router.post('/instances/:id/submit', authenticateToken, async (
-  req: AuthenticatedRequest<
-    ParamsDictionary,
-    unknown,
-    WorkflowSubmitBody,
-    ParsedQs
-  >,
-  res: Response,
-) => {
+router.post('/instances/:id/submit', authenticateToken, async (req: WorkflowSubmitRequest, res: Response) => {
   try {
-    const instanceId = toString(req.params.id)
+    const instanceId = toString(req.params['id'])
     if (!instanceId) {
       return res.status(400).json({ error: 'Workflow instance ID is required' })
     }
@@ -347,17 +347,9 @@ router.post('/instances/:id/submit', authenticateToken, async (
 })
 
 // Process workflow action
-router.post('/instances/:id/action', authenticateToken, async (
-  req: AuthenticatedRequest<
-    ParamsDictionary,
-    unknown,
-    WorkflowActionBody,
-    ParsedQs
-  >,
-  res: Response,
-) => {
+router.post('/instances/:id/action', authenticateToken, async (req: WorkflowActionRequest, res: Response) => {
   try {
-    const instanceId = toString(req.params.id)
+    const instanceId = toString(req.params['id'])
     if (!instanceId) {
       return res.status(400).json({ error: 'Workflow instance ID is required' })
     }
@@ -387,17 +379,9 @@ router.post('/instances/:id/action', authenticateToken, async (
 })
 
 // Add comment to workflow
-router.post('/instances/:id/comments', authenticateToken, async (
-  req: AuthenticatedRequest<
-    ParamsDictionary,
-    unknown,
-    WorkflowCommentBody,
-    ParsedQs
-  >,
-  res: Response,
-) => {
+router.post('/instances/:id/comments', authenticateToken, async (req: WorkflowCommentRequest, res: Response) => {
   try {
-    const instanceId = toString(req.params.id)
+    const instanceId = toString(req.params['id'])
     if (!instanceId) {
       return res.status(400).json({ error: 'Workflow instance ID is required' })
     }
@@ -434,12 +418,9 @@ router.post('/instances/:id/comments', authenticateToken, async (
 })
 
 // Get comments for workflow
-router.get('/instances/:id/comments', authenticateToken, async (
-  req: AuthenticatedRequest<ParamsDictionary>,
-  res: Response,
-) => {
+router.get('/instances/:id/comments', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const instanceId = toString(req.params.id)
+    const instanceId = toString(req.params['id'])
     if (!instanceId) {
       return res.status(400).json({ error: 'Workflow instance ID is required' })
     }
@@ -451,12 +432,9 @@ router.get('/instances/:id/comments', authenticateToken, async (
 })
 
 // Get approvals for workflow
-router.get('/instances/:id/approvals', authenticateToken, async (
-  req: AuthenticatedRequest<ParamsDictionary>,
-  res: Response,
-) => {
+router.get('/instances/:id/approvals', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const instanceId = toString(req.params.id)
+    const instanceId = toString(req.params['id'])
     if (!instanceId) {
       return res.status(400).json({ error: 'Workflow instance ID is required' })
     }
@@ -468,12 +446,8 @@ router.get('/instances/:id/approvals', authenticateToken, async (
 })
 
 // Get workflow analytics
-router.get(
-  '/analytics',
-  authenticateToken,
-  requireRole([UserRole.ADMINISTRATOR]),
-  async (_req: unknown, res: Response) => {
-    void _req
+router.get('/analytics', authenticateToken, requireRole([UserRole.ADMINISTRATOR]), async (_req: AuthenticatedRequest, res: Response) => {
+  void _req
     try {
       const analytics = WorkflowService.getWorkflowAnalytics()
       return res.json(analytics)
@@ -484,12 +458,8 @@ router.get(
 )
 
 // Get overdue workflows
-router.get(
-  '/overdue',
-  authenticateToken,
-  requireRole([UserRole.ADMINISTRATOR]),
-  async (_req: unknown, res: Response) => {
-    void _req
+router.get('/overdue', authenticateToken, requireRole([UserRole.ADMINISTRATOR]), async (_req: AuthenticatedRequest, res: Response) => {
+  void _req
     try {
       const overdue = WorkflowService.getOverdueWorkflows()
       return res.json(overdue)
