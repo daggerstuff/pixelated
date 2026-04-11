@@ -21,11 +21,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 env_path = Path(__file__).parents[2] / "ai" / ".env"
 load_dotenv(env_path)
 
-BUCKET = os.getenv("OVH_S3_BUCKET", "pixel-data")
-ENDPOINT = os.getenv("OVH_S3_ENDPOINT", "https://s3.us-east-va.io.cloud.ovh.us")
-ACCESS_KEY = os.getenv("OVH_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
-SECRET_KEY = os.getenv("OVH_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
-REGION = os.getenv("OVH_S3_REGION", "us-east-va")
+BUCKET = os.getenv("HETZNER_S3_BUCKET", "pixel-data")
+ENDPOINT = os.getenv("HETZNER_S3_ENDPOINT", "https://hel1.your-objectstorage.com")
+ACCESS_KEY = os.getenv("HETZNER_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
+SECRET_KEY = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
+REGION = os.getenv("HETZNER_S3_REGION", "hel1")
 
 
 def get_s3_client():

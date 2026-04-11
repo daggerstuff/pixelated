@@ -76,8 +76,8 @@ from botocore.config import Config
 from botocore.exceptions import ClientError
 
 session = boto3.session.Session(
-    aws_access_key_id=os.environ["OVH_S3_ACCESS_KEY"],
-    aws_secret_access_key=os.environ["OVH_S3_SECRET_KEY"],
+    aws_access_key_id=os.environ["HETZNER_S3_ACCESS_KEY"],
+    aws_secret_access_key=os.environ["HETZNER_S3_SECRET_KEY"],
 )
 client = session.client(
     "s3",

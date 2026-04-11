@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-run_ovh_persona_job() {
+run_hetzner_persona_job() {
   local resume_flag="${RESUME_FLAG:---resume}"
   ovhai job run \
     --name "${JOB_NAME}" \
@@ -8,12 +8,12 @@ run_ovh_persona_job() {
     --flavor "${GPU_FLAVOR}" \
     --env PYTHONPATH="/app" \
     --env NVIDIA_API_KEY="${NVIDIA_API_KEY}" \
-    --env OVH_S3_ACCESS_KEY="${OVH_S3_ACCESS_KEY}" \
-    --env OVH_S3_SECRET_KEY="${OVH_S3_SECRET_KEY}" \
-    --env OVH_S3_ENDPOINT="${S3_ENDPOINT}" \
-    --env OVH_S3_BUCKET="${S3_BUCKET}" \
-    --env OVH_S3_REGION="${S3_REGION}" \
-    --env OVH_S3_CA_BUNDLE="${S3_CA_BUNDLE}" \
+    --env HETZNER_S3_ACCESS_KEY="${HETZNER_S3_ACCESS_KEY}" \
+    --env HETZNER_S3_SECRET_KEY="${HETZNER_S3_SECRET_KEY}" \
+    --env HETZNER_S3_ENDPOINT="${S3_ENDPOINT}" \
+    --env HETZNER_S3_BUCKET="${S3_BUCKET}" \
+    --env HETZNER_S3_REGION="${S3_REGION}" \
+    --env HETZNER_S3_CA_BUNDLE="${S3_CA_BUNDLE}" \
     --env CHECKPOINT_PREFIX="${CHECKPOINT_PREFIX}" \
     --env CHECKPOINT_S3_KEY="${CHECKPOINT_S3_KEY}" \
     --env CHECKPOINT_JOB_NAME="${CHECKPOINT_JOB_NAME}" \

@@ -53,9 +53,11 @@ describe('Dashboard', () => {
       (selector?: (state: typeof storeState) => unknown) =>
         typeof selector === 'function' ? selector(storeState) : storeState,
     )
-    ;(store.useJournalSessionStore as typeof store.useJournalSessionStore & {
-      getState?: () => typeof storeState
-    }).getState = () => storeState
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
     mockUseSessionListQuery.mockReturnValue({
       data: {
         items: [mockSession],
@@ -138,9 +140,11 @@ describe('Dashboard', () => {
           ? selector(selectedStoreState)
           : selectedStoreState,
     )
-    ;(store.useJournalSessionStore as typeof store.useJournalSessionStore & {
-      getState?: () => typeof selectedStoreState
-    }).getState = () => selectedStoreState
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof selectedStoreState
+      }
+    ).getState = () => selectedStoreState
     mockUseSessionQuery.mockReturnValue({
       data: mockSession,
       isLoading: false,
@@ -186,9 +190,11 @@ describe('Dashboard', () => {
           ? selector(clickableStoreState)
           : clickableStoreState,
     )
-    ;(store.useJournalSessionStore as typeof store.useJournalSessionStore & {
-      getState?: () => typeof clickableStoreState
-    }).getState = () => clickableStoreState
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof clickableStoreState
+      }
+    ).getState = () => clickableStoreState
 
     renderWithProviders(<Dashboard />)
 

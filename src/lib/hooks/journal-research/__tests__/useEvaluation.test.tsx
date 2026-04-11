@@ -88,12 +88,15 @@ describe('useEvaluation hooks', () => {
       setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
       toggleBulkEditMode: vi.fn<() => void>(),
     }
-    useEvaluationStore.mockImplementation((selector?: (state: typeof storeState) => unknown) =>
-      typeof selector === 'function' ? selector(storeState) : storeState,
+    useEvaluationStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
     )
-    ;(useEvaluationStore as typeof useEvaluationStore & {
-      getState?: () => typeof storeState
-    }).getState = () => storeState
+    ;(
+      useEvaluationStore as typeof useEvaluationStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
   })
 
   describe('useEvaluationListQuery', () => {
@@ -128,16 +131,16 @@ describe('useEvaluation hooks', () => {
         },
       }
       useEvaluationStore.mockImplementation(
-        (
-          selector?: (state: typeof filteredStoreState) => unknown,
-        ) =>
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
           typeof selector === 'function'
             ? selector(filteredStoreState)
             : filteredStoreState,
       )
-      ;(useEvaluationStore as typeof useEvaluationStore & {
-        getState?: () => typeof filteredStoreState
-      }).getState = () => filteredStoreState
+      ;(
+        useEvaluationStore as typeof useEvaluationStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(() => useEvaluationListQuery('session-1'), {
         wrapper: createWrapper(),
@@ -227,9 +230,13 @@ describe('useEvaluation hooks', () => {
       vi.mocked(api.initiateEvaluation).mockResolvedValue(mockEvaluation)
       const setSelectedEvaluationId = vi.fn<(id: string) => void>()
 
-      ;(useEvaluationStore as typeof useEvaluationStore & {
-        getState?: () => { setSelectedEvaluationId: typeof setSelectedEvaluationId }
-      }).getState = () => ({
+      ;(
+        useEvaluationStore as typeof useEvaluationStore & {
+          getState?: () => {
+            setSelectedEvaluationId: typeof setSelectedEvaluationId
+          }
+        }
+      ).getState = () => ({
         setSelectedEvaluationId,
       })
 

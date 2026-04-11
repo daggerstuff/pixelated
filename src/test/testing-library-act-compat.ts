@@ -17,16 +17,24 @@ export function getIsReactActEnvironment() {
 }
 
 function withGlobalActEnvironment(
-  actImplementation: (callback: () => void | Promise<void>) => Promise<void> | void,
+  actImplementation: (
+    callback: () => void | Promise<void>,
+  ) => Promise<void> | void,
 ) {
   return (callback: () => void | Promise<void>) => {
     const previousActEnvironment = getIsReactActEnvironment()
     setReactActEnvironment(true)
     try {
       const actResult = actImplementation(callback)
-      if (actResult && typeof (actResult as PromiseLike<unknown>).then === 'function') {
+      if (
+        actResult &&
+        typeof (actResult as PromiseLike<unknown>).then === 'function'
+      ) {
         return {
-          then: (resolve: (value: unknown) => void, reject: (reason?: unknown) => void) =>
+          then: (
+            resolve: (value: unknown) => void,
+            reject: (reason?: unknown) => void,
+          ) =>
             (actResult as PromiseLike<unknown>).then(
               (returnValue) => {
                 setReactActEnvironment(previousActEnvironment)

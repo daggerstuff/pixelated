@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 def get_s3_client():
     return boto3.client(
         "s3",
-        endpoint_url=os.environ.get("OVH_S3_ENDPOINT"),
-        aws_access_key_id=os.environ.get("OVH_S3_ACCESS_KEY"),
-        aws_secret_access_key=os.environ.get("OVH_S3_SECRET_KEY"),
-        region_name=os.environ.get("OVH_S3_REGION", "us-east-va"),
+        endpoint_url=os.environ.get("HETZNER_S3_ENDPOINT"),
+        aws_access_key_id=os.environ.get("HETZNER_S3_ACCESS_KEY"),
+        aws_secret_access_key=os.environ.get("HETZNER_S3_SECRET_KEY"),
+        region_name=os.environ.get("HETZNER_S3_REGION", "hel1"),
     )
 
 

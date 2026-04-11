@@ -3,6 +3,7 @@
  * This file is automatically loaded by Vitest before tests are run
  */
 
+import { cleanup } from '@testing-library/react'
 import * as React from 'react'
 import { vi } from 'vitest'
 
@@ -10,7 +11,6 @@ import { vi } from 'vitest'
 import { act } from './setup-react19'
 
 import '@testing-library/jest-dom'
-import { cleanup } from '@testing-library/react'
 
 // Keep auth-config imports from exploding in test/bootstrap contexts.
 process.env.JWT_SECRET ??= 'test-jwt-secret'

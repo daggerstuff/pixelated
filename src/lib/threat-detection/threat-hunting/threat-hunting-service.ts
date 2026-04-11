@@ -286,9 +286,7 @@ export class ThreatHuntingService extends EventEmitter {
   /**
    * P4.1: Delegates search to ThreatQueryProvider (P3.1).
    */
-  public async searchThreatData(
-    searchData: Record<string, unknown>,
-  ): Promise<{
+  public async searchThreatData(searchData: Record<string, unknown>): Promise<{
     data: any[]
     pagination: {
       total: number

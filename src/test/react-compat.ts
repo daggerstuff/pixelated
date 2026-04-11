@@ -9,7 +9,7 @@ const fallbackAct = async (callback: () => void | Promise<void>) => {
 
 export const act =
   typeof (ReactNS as { act?: unknown }).act === 'function'
-    ? ((ReactNS as { act: typeof fallbackAct }).act)
+    ? (ReactNS as { act: typeof fallbackAct }).act
     : fallbackAct
 
 export * from '../../node_modules/react/index.js'

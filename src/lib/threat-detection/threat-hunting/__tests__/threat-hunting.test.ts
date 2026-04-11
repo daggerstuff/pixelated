@@ -32,10 +32,14 @@ function createMongoClientMock(): IMongoClient {
     }),
     insertMany: vi.fn(async () => ({ acknowledged: true })),
     updateOne: vi.fn(async (filter: unknown, update: unknown) => {
-      const investigationId = (filter as { investigationId?: string }).investigationId
-      const existing = investigationId ? investigations.get(investigationId) : undefined
+      const investigationId = (filter as { investigationId?: string })
+        .investigationId
+      const existing = investigationId
+        ? investigations.get(investigationId)
+        : undefined
       if (investigationId && existing) {
-        const payload = (update as { $set?: InvestigationRecord }).$set ?? existing
+        const payload =
+          (update as { $set?: InvestigationRecord }).$set ?? existing
         investigations.set(investigationId, payload)
       }
       return { acknowledged: true }
@@ -43,15 +47,20 @@ function createMongoClientMock(): IMongoClient {
     replaceOne: vi.fn(async () => ({ acknowledged: true })),
     deleteMany: vi.fn(async () => ({ acknowledged: true })),
     findOne: vi.fn(async (filter: unknown) => {
-      const investigationId = (filter as { investigationId?: string }).investigationId
-      return investigationId ? investigations.get(investigationId) ?? null : null
+      const investigationId = (filter as { investigationId?: string })
+        .investigationId
+      return investigationId
+        ? (investigations.get(investigationId) ?? null)
+        : null
     }),
     find: vi.fn((filter: unknown) => {
-      const filtered = Array.from(investigations.values()).filter((investigation) => {
-        if (!filter || typeof filter !== 'object') return true
-        const entries = Object.entries(filter as Record<string, unknown>)
-        return entries.every(([key, value]) => investigation[key] === value)
-      })
+      const filtered = Array.from(investigations.values()).filter(
+        (investigation) => {
+          if (!filter || typeof filter !== 'object') return true
+          const entries = Object.entries(filter as Record<string, unknown>)
+          return entries.every(([key, value]) => investigation[key] === value)
+        },
+      )
 
       return {
         sort: vi.fn(() => ({

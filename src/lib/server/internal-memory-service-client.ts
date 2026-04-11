@@ -154,9 +154,7 @@ export class InternalMemoryServiceClient {
     })
   }
 
-  async getMemoryStats(
-    input: InternalMemoryScopeInput,
-  ): Promise<{
+  async getMemoryStats(input: InternalMemoryScopeInput): Promise<{
     totalMemories: number
     categoryCounts: Record<string, number>
   }> {

@@ -3,8 +3,9 @@
  * This provides minimal compatibility fixes without breaking actual component rendering
  */
 
-import * as React from 'react'
 import { createRequire } from 'node:module'
+
+import * as React from 'react'
 
 // In React 19, act has been moved. We need to create a polyfill
 // that works with React Testing Library
@@ -39,7 +40,10 @@ const reactNamespace = React as unknown as object
 const actDescriptor = Object.getOwnPropertyDescriptor(reactNamespace, 'act')
 const require = createRequire(import.meta.url)
 const reactCjs = require('react') as Record<string, unknown>
-const reactDomTestUtils = require('react-dom/test-utils') as Record<string, unknown>
+const reactDomTestUtils = require('react-dom/test-utils') as Record<
+  string,
+  unknown
+>
 const cjsActDescriptor = Object.getOwnPropertyDescriptor(reactCjs, 'act')
 const testUtilsActDescriptor = Object.getOwnPropertyDescriptor(
   reactDomTestUtils,
@@ -62,7 +66,11 @@ if (!React.act || typeof React.act !== 'function') {
 }
 
 if (typeof reactCjs.act !== 'function') {
-  if (!cjsActDescriptor || cjsActDescriptor.configurable || cjsActDescriptor.writable) {
+  if (
+    !cjsActDescriptor ||
+    cjsActDescriptor.configurable ||
+    cjsActDescriptor.writable
+  ) {
     try {
       Object.defineProperty(reactCjs, 'act', {
         value: act,
