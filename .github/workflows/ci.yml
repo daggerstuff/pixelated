@@ -100,7 +100,7 @@ jobs:
           PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
           PROVIDER="${PROVIDER#//iam.googleapis.com/}"
           echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
-          echo "audience=https://iam.googleapis.com/$PROVIDER" >> "$GITHUB_OUTPUT"
+          echo "audience=//iam.googleapis.com/$PROVIDER" >> "$GITHUB_OUTPUT"
 
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'

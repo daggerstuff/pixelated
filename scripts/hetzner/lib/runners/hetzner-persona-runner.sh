@@ -2,7 +2,7 @@
 
 run_hetzner_persona_job() {
   local resume_flag="${RESUME_FLAG:---resume}"
-  ovhai job run \
+  ${HETZNER_AI_CLI} job run \
     --name "${JOB_NAME}" \
     --gpu "${GPU_COUNT}" \
     --flavor "${GPU_FLAVOR}" \

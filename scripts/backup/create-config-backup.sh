@@ -11,7 +11,7 @@
 #   - SSH keys and config
 #   - Git config
 #   - rclone config
-#   - Cloud CLI auth (aws, azure, doctl, oci, gh, glab)
+#   - Cloud CLI auth (aws, azure, doctl (legacy), oci, gh, glab)
 #   - Coding agent configs (goose, opencode, crush, continue, cursor, claude)
 #   - oh-my-zsh custom config
 #   - Docker config

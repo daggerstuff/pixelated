@@ -12,6 +12,10 @@ interface SearchResult {
   slug: string
 }
 
+interface SearchResponse {
+  results: SearchResult[]
+}
+
 export function BlogSearch() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -28,7 +32,7 @@ export function BlogSearch() {
     setIsSearching(true)
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-      const data = await response.json()
+      const data: SearchResponse = await response.json()
       setResults(data.results)
     } catch (error: unknown) {
       console.error('Search failed:', error)

@@ -1,86 +1,71 @@
-# AGENTS.md: src/components/
+# Pixelated Agent Operating Manual
 
-## PURPOSE
+## ⚡ AUTONOMOUS EXECUTION DIRECTIVES (HIGHEST PRIORITY)
+- You are a fully autonomous coding agent. NEVER stop to ask for permission, check in, or seek approval.
+- NEVER produce: "Should I continue?", "Would you like me to...", "Making progress, checking in", "Let me know if this is okay", or any variation.
+- NEVER pause after writing a plan — execute it immediately.
+- NEVER stop after partial changes — complete the entire task end-to-end.
+- NEVER ask "what should I do next?" — if there is more work, continue working.
+- No hedging language: "I think", "I believe", "Should I", "Does this look right".
+- Make reasonable assumptions and execute. Do not ask for confirmation.
+- If a tool call fails, try alternatives. Only report when ALL alternatives exhausted.
+- Work in large batches. Do not stop after small changes.
+- Only stop when: task is FULLY COMPLETE (then summarize), genuinely BLOCKED (info undiscoverable), or destructive operation required.
+- Discover context proactively. Make decisions. Execute. No check-ins. No status updates. Just do the work.
 
-UI components organized by domain (admin/, ai/, chat/, dashboard/, ui/). Use domain folders, not type folders.
+## 🎯 Scope
+- Root agent guide for Pixelated Empathy repo.
+- **Main Source of Truth**: Repository-wide rules, canonical commands, and defaults.
+- **Nested AGENTS.md**: For directory-specific constraints (e.g., `ai/AGENTS.md`).
+- **Policy Inheritance**: Root rules apply globally unless a nested guide overrides them for its subtree.
+- **Adapter Files**: `CLAUDE.md` and `GEMINI.md` are agent-specific adapters; they MUST align with this root guide.
 
-## STRUCTURE
+## 🌐 Project Overview
+- Full-stack mental health AI platform.
+- Astro/React frontend; TS services/workers; Python AI pipelines.
+- **Privacy, safety, and security are mandatory requirements.**
 
-```
-src/components/
-├── admin/          # Admin dashboard
-├── ai/             # AI chat interfaces
-├── analytics/      # Data viz
-├── auth/           # Login, signup
-├── chat/           # Core chat UI
-├── crisis/         # Crisis intervention
-├── dashboard/      # User dashboards
-├── journal-research/ # Research pipeline UI
-├── layout/         # Page layouts
-├── monitoring/     # Metrics displays
-├── professional/   # Clinical tools
-├── security/       # Security UI
-├── session/        # Session management
-├── therapy/        # Therapeutic tools
-├── ui/             # shadcn/ui base (81 files)
-├── widgets/        # Reusable widgets
-├── *.tsx/.astro    # Top-level page components
-└── __tests__/      # Component tests
-```
+## 🚀 Unified Agent Workflow (2026 Standard)
+Follow this loop for every task to ensure durability and reliability:
 
-## CONVENTIONS
+1.  **Recall**: Start with Hindsight MCP tools (`recall` or `reflect`).
+2.  **Search (Proactive Capability Mapping)**:
+    -   Identify specialized **Skills** (`.agent/skills/`) or **MCP tools**.
+    -   Use name-based filtering and the initial `<skills>` block.
+    -   Only deep-scan `SKILL.md` documents for high-probability matches.
+    -   **Prioritize efficiency** over exhaustive scanning.
+    -   Minimize context window bloat and reduce session latency.
+3.  **Plan**: Draft in `.agent/internal/plans/` (`YYYY-MM-DD-task-name.md`).
+4.  **Act**: Small, atomic chunks. Fix root causes, not symptoms.
+5.  **Verify**: Validate each change with the smallest focused local checks that cover the behavior.
+6.  **Retain**: Log actions/learnings in Hindsight (`retain`) at task end.
 
-- **React**: PascalCase (`BiasDetectionEngine.tsx`)
-- **Astro**: kebab-case (`chat.astro`)
-- **Tests**: `*.test.tsx` alongside or `__tests__/`
-- **Domain grouping**: Use domain folders (ai/, chat/), not type-based
-- **Reusable UI**: put in `ui/` as shadcn components
-- **Styling**: Tailwind first; `cn()` for conditionals; WCAG AA accessible
-- **Props**: Explicit interfaces; default export
-- **State**: Local `useState`, global Zustand, server React Query
-- **Responsive**: Mobile-first (`md:`, `lg:`)
-- **Dark mode**: `dark:` variants with HSL tokens
+## 🏗️ Project Structure
+- `src/`: Astro app, React UI, API routes, shared TypeScript libraries, hooks, and workers.
+- `ai/`: Python inference, training, monitoring, safety, and pipeline code.
+- `tests/`: Integration, browser, performance, security, and API coverage.
+- `scripts/`, `docker/`, `config/`, `.github/workflows/`: Operational and deployment code.
+- `public/`: Static assets.
+- `docs/`: **PUBLIC** documentation only.
+- `.agent/internal/`: **PRIVATE** internal plans, research, and notes (git-ignored).
 
-## WHERE TO FIND
+## 🛠️ Canonical Commands
+- `pnpm dev`: Run main app locally on port `5173`.
+- `pnpm build` & `pnpm preview`: Validate production-ready output.
+- `pnpm lint` & `pnpm format`: Primary quality gates for frontend and TS.
+- `pnpm test`, `pnpm test:unit`, `pnpm e2e`: Main JS and browser tests.
+- `uv run pytest`: Primary Python test entry point.
+- `pnpm security:check` or `pnpm security:scan`: Audit for sensitive changes.
 
-| Domain | Folder | Key Components |
-|--------|--------|----------------|
-| AI Chat | `ai/`, `chat/` | `AIChatReact.tsx`, `PixelatedEmpathyAgentChat.tsx` |
-| Admin | `admin/` | Dashboard, analytics |
-| Clinical | `professional/`, `therapy/` | Therapist tools |
-| Shared UI | `ui/`, `widgets/` | Buttons, cards, dialogs |
-| Monitoring | `monitoring/` | Metrics, health |
+## ⚖️ Working Rules
+- **Environment**: Use `pnpm` for Node/TS and `uv run` for Python. PROHIBITED: raw `npm`, `pip`, `conda`, `poetry`.
+- **Quality**: No stubs, placeholders, or suppressed lint/TS errors. Enterprise-grade code only.
+- **Data**: Synthetic test data ONLY. No secrets or local credentials.
+- **Boundary**: Treat `ai/` as a submodule with its own commit discipline.
+- **Safety**: DO NOT guess. Verify commands and structure if unsure.
+- **Context**: Use `context7` for provider docs and `exa` for web search.
 
-## CODE MAP
-
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Main chat UI | `ai/AIChatReact.tsx` | Conversational interface |
-| Agent chat | `PixelatedEmpathyAgentChat.tsx` | Full AI agent experience |
-| Training | `training/TrainingSession.tsx` | Therapy simulator |
-
-## TESTING & QUALITY
-
-- Unit: Vitest + RTL (`*.test.tsx`)
-- Accessibility: `jest-axe` for WCAG violations
-- E2E: Playwright in `tests/browser/`
-- Target: 80%+ coverage
-
-## SECURITY & PERFORMANCE
-
-- **HIPAA**: Never log PII; redact patient data
-- **FHE**: Show encryption status for secured AI
-- **Crisis**: Include safety interventions in chat flows
-- **Perf**: `React.memo()`, lazy load, virtualize lists; keep <200 lines
-
-## ANTI-PATTERNS
-
-❌ Business logic in components → `src/lib/services/`
-❌ Direct API calls → use `@/lib` clients
-❌ Hard-coded strings → i18n for user-facing text
-❌ Inline styles → Tailwind only
-❌ Empty divs for spacing → use spacing utilities
-
----
-
-_Generated: 2025-03-15 | Domain: Frontend UI Components_
+## 🔒 Verification & Memory
+- **Hindsight**: Always recall context at start and retain learnings at task end.
+- **Hindsight Identity**: In this project, NEVER use Hindsight with `user_id: "default"`. Use `user_id: "vivi"` unless the user explicitly provides a different identity.
+- **Validation**: Smallest relevant test surface; do not skip behavior checks.

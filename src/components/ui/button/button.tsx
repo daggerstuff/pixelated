@@ -107,7 +107,6 @@ const Button = React.forwardRef<
           href={href}
           target={target}
           rel={target === '_blank' ? 'noopener noreferrer' : rel}
-          ref={ref as React.Ref<HTMLAnchorElement>}
           {...anchorProps}
         >
           {contentWrapper}
@@ -118,7 +117,6 @@ const Button = React.forwardRef<
     // Render as button
     return (
       <button
-        ref={ref as React.Ref<HTMLButtonElement>}
         type='button'
         {...commonProps}
       >

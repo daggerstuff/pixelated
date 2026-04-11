@@ -1,6 +1,7 @@
 #!/bin/bash
 # hetzner-run-stage2.sh - Launch Stage 2 (CoT) SFT on Hetzner AI
 set -euo pipefail
+HETZNER_AI_CLI="${HETZNER_AI_CLI:-ovhai}"
 
 # 1. Environment Check
 if [[ -z "${HETZNER_AI_REGISTRY:-}" ]]; then
@@ -26,7 +27,7 @@ TRAINING_ENTRYPOINT="${HETZNER_TRAINING_ENTRYPOINT:-/app/train_hetzner.py}"
 # We use the previous successful job checkpoint location as the base
 RESUME_CHECKPOINT="/checkpoints/foundation/final"
 
-ovhai job run \
+${HETZNER_AI_CLI} job run \
   --name "pixelated-stage2-reasoning-v1" \
   --gpu 1 \
   --flavor "l40s-1-gpu" \
