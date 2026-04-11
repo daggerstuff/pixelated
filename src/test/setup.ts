@@ -10,6 +10,10 @@ import { vi } from 'vitest'
 import { act } from './setup-react19'
 
 import '@testing-library/jest-dom'
+import { cleanup } from '@testing-library/react'
+
+// Keep auth-config imports from exploding in test/bootstrap contexts.
+process.env.JWT_SECRET ??= 'test-jwt-secret'
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>()
@@ -169,4 +173,9 @@ beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
   vi.spyOn(console, 'info').mockImplementation(() => {})
   vi.spyOn(console, 'debug').mockImplementation(() => {})
+})
+
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
 })
