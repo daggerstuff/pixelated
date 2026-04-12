@@ -97,6 +97,7 @@ jobs:
         run: |
           [[ -n "$GCP_WIF_PROVIDER_RAW" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
           PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
+          PROVIDER="${PROVIDER#v1/}"
           PROVIDER="${PROVIDER#//iam.googleapis.com/}"
           [[ -n "$PROVIDER" ]] || { echo "Normalized provider was empty"; exit 1; }
           echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
@@ -112,6 +113,7 @@ jobs:
           [[ -n "$GCP_PROJECT_ID" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
           [[ -n "$GCP_WIF_PROVIDER" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
           [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
+          [[ -n "${{ steps.gcp-auth.outputs.provider }}" ]] || { echo "Normalized workload identity provider was empty"; exit 1; }
           echo "Google Cloud auth inputs validated"
 
       - name: Authenticate to Google Cloud (OIDC)
