@@ -466,9 +466,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
       })
 
       // Add click handlers to buttons for demo purposes
-      document.querySelectorAll('.btn').forEach((button) => {
-        button.addEventListener('click', function (e) {
-          if (!this.disabled) {
+      document.querySelectorAll('.btn').forEach((button: any) => {
+        button.addEventListener('click', (e: any) => {
+          if (!button.disabled) {
             // Create ripple effect
             const ripple = document.createElement('span')
             ripple.style.position = 'absolute'
@@ -479,7 +479,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
             ripple.style.left = e.clientX - e.target.offsetLeft + 'px'
             ripple.style.top = e.clientY - e.target.offsetTop + 'px'
 
-            this.appendChild(ripple)
+            button.appendChild(ripple)
 
             setTimeout(() => {
               ripple.remove()

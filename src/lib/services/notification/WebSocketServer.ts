@@ -66,6 +66,20 @@ export class WebSocketServer {
   }
 
   /**
+   * Delegate event listeners to internal WebSocket server
+   */
+  public on(event: string, listener: (...args: any[]) => void): void {
+    this.wss.on(event, listener)
+  }
+
+  /**
+   * Close the server
+   */
+  public close(): void {
+    this.wss.close()
+  }
+
+  /**
    * Handle server-level errors
    */
   private handleServerError(error: Error): void {

@@ -672,17 +672,6 @@ const universityResults = [
 </style>
 
 <script>
-  // Type definitions
-  declare global {
-    interface Window {
-      gtag?: (
-        command: string,
-        event: string,
-        params: Record<string, unknown>,
-      ) => void
-    }
-  }
-
   // Analytics tracking for demo interactions
   document.addEventListener('DOMContentLoaded', () => {
     // Track page view

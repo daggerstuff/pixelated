@@ -45,6 +45,8 @@ export interface Database {
           role: string
           content: string
           created_at?: string
+          is_flagged?: boolean
+          metadata?: Json
         }
         Insert: {
           _id?: string
@@ -52,6 +54,8 @@ export interface Database {
           role: string
           content: string
           created_at?: string
+          is_flagged?: boolean
+          metadata?: Json
         }
         Update: Partial<{
           _id: string
@@ -59,6 +63,8 @@ export interface Database {
           role: string
           content: string
           created_at?: string
+          is_flagged?: boolean
+          metadata?: Json
         }>
       }
     }
