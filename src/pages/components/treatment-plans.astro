@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { ChartBar, Dumbbell, Target } from 'lucide-react'
-import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.tsx'
+import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -23,7 +23,7 @@ import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.ts
 
       <!-- Main Treatment Plan Interface -->
       <div class="mb-8">
-        <TreatmentPlanManager client:load className="w-full" readOnly={false} />
+        <DynamicTreatmentPlanManager client:load className="w-full" readOnly={false} />
       </div>
 
       <!-- Features Overview -->
