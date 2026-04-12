@@ -1,5 +1,53 @@
-import { mcpSnapshot } from '@playwright/mcp'
-import { test, expect } from '@playwright/test'
+import { type Page, expect, test } from '@playwright/test'
+declare const require: (specifier: string) => unknown
+type McpSnapshotOptions = {
+  name: string
+  description: string
+  [key: string]: unknown
+}
+
+type McpSnapshotFn = (page: Page, options: McpSnapshotOptions) => Promise<unknown> | void
+
+const isMcpSnapshotFunction = (
+  value: unknown,
+): value is McpSnapshotFn => typeof value === 'function'
+
+const isObject = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null
+}
+
+let availableMcpSnapshot: McpSnapshotFn | undefined
+
+const getMcpSnapshot = (): void => {
+  if (typeof require !== 'function') {
+    return
+  }
+
+  try {
+    const mcpModule = require('@playwright/mcp')
+    if (!isObject(mcpModule)) {
+      return
+    }
+
+    const snapshot = mcpModule.mcpSnapshot
+    if (isMcpSnapshotFunction(snapshot)) {
+      availableMcpSnapshot = snapshot
+    }
+  } catch {
+    return
+  }
+}
+
+getMcpSnapshot()
+
+const takeMcpSnapshot = async (
+  page: Page,
+  options: McpSnapshotOptions,
+): Promise<void> => {
+  if (availableMcpSnapshot) {
+    await availableMcpSnapshot(page, options)
+  }
+}
 
 /**
  * Authentication Flow Test for MCP Server
@@ -29,7 +77,7 @@ test.describe('Authentication Flow', () => {
     await page.goto('/auth/register')
 
     // Take MCP snapshot for context
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'register-page-initial',
       description: 'Initial state of the registration page',
     })
@@ -41,7 +89,7 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[name="confirmPassword"]', testUser.password)
 
     // Take MCP snapshot of filled form
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'register-page-filled',
       description: 'Registration form filled with test user data',
     })
@@ -53,7 +101,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForURL('/dashboard')
 
     // Take MCP snapshot of post-registration state
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'post-registration',
       description: 'Dashboard page after successful registration',
     })
@@ -68,7 +116,7 @@ test.describe('Authentication Flow', () => {
     await page.goto('/auth/login')
 
     // Take MCP snapshot for context
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'login-page-initial',
       description: 'Initial state of the login page',
     })
@@ -78,7 +126,7 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[name="password"]', testUser.password)
 
     // Take MCP snapshot of filled form
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'login-page-filled',
       description: 'Login form filled with test user credentials',
     })
@@ -93,7 +141,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForURL('/dashboard')
 
     // Take MCP snapshot of post-login state
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'post-login',
       description: 'Dashboard page after successful login',
     })
@@ -118,21 +166,25 @@ test.describe('Authentication Flow', () => {
     await expect(page.locator('h1')).toContainText('Dashboard')
 
     // Take MCP snapshot of logged-in state
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'authenticated-session',
       description: 'User session is authenticated',
     })
 
     // Close and reopen browser (simulate new session)
     await page.context().close()
-    const newContext = await page.context().browser().newContext()
+    const browser = page.context().browser()
+    if (!browser) {
+      throw new Error('Browser instance is unavailable for session context recreation')
+    }
+    const newContext = await browser.newContext()
     const newPage = await newContext.newPage()
 
     // Go directly to a protected page
     await newPage.goto('/dashboard')
 
     // Take MCP snapshot of persistence check
-    await mcpSnapshot(newPage, {
+    await takeMcpSnapshot(newPage, {
       name: 'session-persistence',
       description: 'Checking if session persists after browser restart',
     })
@@ -152,7 +204,7 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[name="password"]', 'WrongPassword123!')
 
     // Take MCP snapshot of invalid credentials
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'login-invalid-credentials',
       description: 'Login form with invalid credentials',
     })
@@ -167,7 +219,7 @@ test.describe('Authentication Flow', () => {
     )
 
     // Take MCP snapshot of error state
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'login-error-state',
       description: 'Login page showing error message for invalid credentials',
     })
@@ -187,7 +239,7 @@ test.describe('Authentication Flow', () => {
     await expect(page).toHaveURL('/auth/forgot-password')
 
     // Take MCP snapshot of password reset page
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'forgot-password-page',
       description: 'Password reset request page',
     })
@@ -205,7 +257,7 @@ test.describe('Authentication Flow', () => {
     )
 
     // Take MCP snapshot of success state
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'password-reset-request-success',
       description: 'Success message after password reset request',
     })
@@ -222,7 +274,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForURL('/dashboard')
 
     // Take MCP snapshot of admin dashboard
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'admin-dashboard',
       description: 'Dashboard as viewed by admin user',
     })
@@ -238,7 +290,7 @@ test.describe('Authentication Flow', () => {
     await expect(page.locator('.admin-controls')).toBeVisible()
 
     // Take MCP snapshot of admin page
-    await mcpSnapshot(page, {
+    await takeMcpSnapshot(page, {
       name: 'admin-page',
       description: 'Admin page showing admin-only controls',
     })

@@ -5,6 +5,37 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config'
 
+const baseNodeTestGlobs = [
+  'src/tests/health-monitor.test.ts',
+  'src/lib/logging/__tests__/audit-logger.test.ts',
+  'src/pages/api/**/*.test.ts',
+  'src/pages/api/**/*.spec.ts',
+  'src/pages/api/**/__tests__/**/*.test.ts',
+  'src/lib/auth/**/*.test.ts',
+  'tests/unit/auth0/**/*.test.ts',
+  'tests/integration/auth0/**/*.test.ts',
+  'src/lib/redis.test.ts',
+] as const
+
+const ciNodeTestGlobs = process.env['CI']
+  ? [
+      'tests/integration/auth0/**/*.test.ts',
+      'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
+      'tests/integration/patient-psi-crisis.test.ts',
+      'src/lib/ai/mental-llama/adapter/MentalLLaMAAdapter.test.ts',
+      'src/components/dashboard/__tests__/TherapistDashboard.test.tsx',
+      'src/components/dashboard/__tests__/TherapyProgressCharts.test.tsx',
+      'src/layouts/__tests__/DocumentationLayout.test.tsx',
+      'src/lib/ai/services/PatientResponseService.test.ts',
+      'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
+      'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
+      'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
+      'tests/integration/bias-detection-api.integration.test.ts',
+    ]
+  : []
+
+const nodeTestGlobs = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
+
 export default defineConfig({
   plugins: [react(), tsconfigPaths({ root: path.resolve(__dirname, '..') })],
   define: {
@@ -77,18 +108,6 @@ export default defineConfig({
       './src/test/setup-react19.ts',
       './vitest.setup.ts',
     ],
-    environmentMatchGlobs: [
-      // Tests that depend on Node.js built-in modules must run in node environment
-      ['src/tests/health-monitor.test.ts', 'node'],
-      ['src/lib/logging/__tests__/audit-logger.test.ts', 'node'],
-      ['src/pages/api/**/*.test.ts', 'node'],
-      ['src/pages/api/**/*.spec.ts', 'node'],
-      ['src/pages/api/**/__tests__/**/*.test.ts', 'node'],
-      ['src/lib/auth/**/*.test.ts', 'node'],
-      ['tests/unit/auth0/**/*.test.ts', 'node'],
-      ['tests/integration/auth0/**/*.test.ts', 'node'],
-      ['src/lib/redis.test.ts', 'node'],
-    ],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -115,22 +134,15 @@ export default defineConfig({
       'backups/**',
       'backups/**/*',
       'worktrees/**',
-      ...(process.env['CI']
-        ? [
-            'tests/integration/auth0/**/*.test.ts',
-            'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
-            'tests/integration/patient-psi-crisis.test.ts',
-            'src/lib/ai/mental-llama/adapter/MentalLLaMAAdapter.test.ts',
-            'src/components/dashboard/__tests__/TherapistDashboard.test.tsx',
-            'src/components/dashboard/__tests__/TherapyProgressCharts.test.tsx',
-            'src/layouts/__tests__/DocumentationLayout.test.tsx',
-            'src/lib/ai/services/PatientResponseService.test.ts',
-            'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
-            'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
-            'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
-            'tests/integration/bias-detection-api.integration.test.ts',
-          ]
-        : []),
+      ...nodeTestGlobs,
+    ],
+    projects: [
+      {
+        test: {
+          include: nodeTestGlobs,
+          environment: 'node',
+        },
+      },
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,

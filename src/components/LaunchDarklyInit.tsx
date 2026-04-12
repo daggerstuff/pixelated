@@ -3,16 +3,19 @@ import * as LaunchDarkly from 'launchdarkly-js-client-sdk'
 
 let ldClient: LaunchDarkly.LDClient | null = null
 const clientId =
-  typeof import.meta.env.PUBLIC_LD_CLIENT_ID === 'string'
-    ? import.meta.env.PUBLIC_LD_CLIENT_ID
+  typeof import.meta.env['PUBLIC_LD_CLIENT_ID'] === 'string'
+    ? import.meta.env['PUBLIC_LD_CLIENT_ID']
     : undefined
 const userKey =
-  typeof import.meta.env.PUBLIC_LD_USER_KEY === 'string'
-    ? import.meta.env.PUBLIC_LD_USER_KEY
+  typeof import.meta.env['PUBLIC_LD_USER_KEY'] === 'string'
+    ? import.meta.env['PUBLIC_LD_USER_KEY']
     : undefined
 
-if (!import.meta.env.SSR && !ldClient) {
-  // Initialize LaunchDarkly for feature flagging; use env/config abstraction in real code
+function initializeClient() {
+  if (typeof window === 'undefined' || ldClient !== null) {
+    return
+  }
+
   if (typeof clientId === 'string' && typeof userKey === 'string') {
     ldClient = LaunchDarkly.initialize(clientId, { kind: 'user', key: userKey })
 
@@ -28,5 +31,6 @@ if (!import.meta.env.SSR && !ldClient) {
 }
 
 export default function LaunchDarklyInit() {
+  initializeClient()
   return null // runs once on the client to bootstrap LaunchDarkly
 }

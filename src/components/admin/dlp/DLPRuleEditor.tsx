@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import type { ReactNode } from 'react'
+import { type ChangeEvent, useEffect, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '../../ui/button/button'
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '../../ui/card/card'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
+} from '../../ui/select'
+import { Switch } from '../../ui/switch'
+import { Textarea } from '../../ui/textarea'
 
 import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 
@@ -45,6 +44,41 @@ function escapeRegexLiteral(s: string): string {
  */
 /** Editor state: DLPRule fields plus matchPattern (not persisted on DLPRule, used to build matches/redact). */
 type EditorRule = Partial<DLPRule> & { matchPattern?: string }
+type EditorRuleChangeField =
+  | 'id'
+  | 'name'
+  | 'matchPattern'
+  | 'description'
+  | 'action'
+  | 'isActive'
+
+type RecordLike = Record<string, unknown>
+
+const isRecordLike = (value: unknown): value is RecordLike => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+const isDLPAction = (value: unknown): value is DLPAction => {
+  return (
+    typeof value === 'string' &&
+    new Set<string>(Object.values(DLPAction)).has(value)
+  )
+}
+
+const isEditorRule = (detail: unknown): detail is EditorRule => {
+  if (!isRecordLike(detail)) {
+    return false
+  }
+
+  return (
+    (detail.id === undefined || typeof detail.id === 'string') &&
+    (detail.name === undefined || typeof detail.name === 'string') &&
+    (detail.matchPattern === undefined || typeof detail.matchPattern === 'string') &&
+    (detail.description === undefined || typeof detail.description === 'string') &&
+    (detail.action === undefined || isDLPAction(detail.action)) &&
+    (detail.isActive === undefined || typeof detail.isActive === 'boolean')
+  )
+}
 
 export default function DLPRuleEditor() {
   const [currentRule, setCurrentRule] = useState<EditorRule>(defaultRule)
@@ -56,11 +90,18 @@ export default function DLPRuleEditor() {
       if (!(event instanceof CustomEvent)) {
         return
       }
-      const detail = event.detail as EditorRule
+      const detail: unknown = event.detail
+      if (!isEditorRule(detail)) {
+        return
+      }
+
       setCurrentRule({
         ...defaultRule,
         ...detail,
         matchPattern: detail.matchPattern ?? '',
+        action: detail.action ?? DLPAction.REDACT,
+        isActive: detail.isActive ?? true,
+        description: detail.description ?? '',
       })
       setIsEditing(true)
     }
@@ -81,11 +122,27 @@ export default function DLPRuleEditor() {
     }
   }, [])
 
-  const handleChange = (field: string, value: string | boolean) => {
-    setCurrentRule({
-      ...currentRule,
+  const handleChange = (
+    field: EditorRuleChangeField,
+    value: string | boolean | DLPAction,
+  ) => {
+    setCurrentRule((prevRule) => ({
+      ...prevRule,
       [field]: value,
-    })
+    }))
+  }
+
+  const handleTextChange =
+    (field: 'id' | 'name' | 'matchPattern' | 'description') =>
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      handleChange(field, event.target.value)
+    }
+
+  const handleActionChange = (value: string) => {
+    if (!isDLPAction(value)) {
+      return
+    }
+    handleChange('action', value)
   }
 
   // Save rule
@@ -114,12 +171,11 @@ export default function DLPRuleEditor() {
     try {
       const escaped = escapeRegexLiteral(pattern)
       const ruleToSave: DLPRule = {
-        id: currentRule.id || '',
-        name: currentRule.name || '',
-        description: currentRule.description || '',
+        id: currentRule.id ?? '',
+        name: currentRule.name ?? '',
+        description: currentRule.description ?? '',
         action: currentRule.action ?? DLPAction.REDACT,
-        isActive:
-          currentRule.isActive === undefined ? true : !!currentRule.isActive,
+        isActive: currentRule.isActive ?? true,
         matches: (content: string) => {
           return content.toLowerCase().includes(pattern.toLowerCase())
         },
@@ -197,7 +253,7 @@ export default function DLPRuleEditor() {
                 id='rule-id'
                 placeholder='unique-rule-id'
                 value={currentRule.id}
-                onChange={(e) => handleChange('id', e.target.value)}
+                onChange={handleTextChange('id')}
                 readOnly={isEditing}
                 className={isEditing ? 'bg-muted' : ''}
               />
@@ -209,7 +265,7 @@ export default function DLPRuleEditor() {
                 id='rule-name'
                 placeholder='PHI Detection'
                 value={currentRule.name}
-                onChange={(e) => handleChange('name', e.target.value)}
+                onChange={handleTextChange('name')}
               />
               <p className='text-muted-foreground text-xs'>
                 Descriptive label only; not used for matching.
@@ -223,7 +279,7 @@ export default function DLPRuleEditor() {
               id='rule-pattern'
               placeholder='e.g. SSN, \\d{3}-\\d{2}-\\d{4}, or literal phrase'
               value={currentRule.matchPattern ?? ''}
-              onChange={(e) => handleChange('matchPattern', e.target.value)}
+              onChange={handleTextChange('matchPattern')}
             />
             <p className='text-muted-foreground text-xs'>
               Literal text or regex to detect. Content matching this will
@@ -237,9 +293,7 @@ export default function DLPRuleEditor() {
               id='rule-description'
               placeholder='Describe what this rule does and when it applies'
               value={currentRule.description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                handleChange('description', e.target.value)
-              }
+              onChange={handleTextChange('description')}
               rows={3}
             />
           </div>
@@ -249,7 +303,7 @@ export default function DLPRuleEditor() {
               <Label htmlFor='rule-action'>Action</Label>
               <Select
                 value={currentRule.action ?? DLPAction.REDACT}
-                onValueChange={(value: string) => handleChange('action', value)}
+                onValueChange={handleActionChange}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -269,9 +323,7 @@ export default function DLPRuleEditor() {
               <Switch
                 id='rule-active'
                 checked={!!currentRule.isActive}
-                onCheckedChange={(checked: boolean) =>
-                  handleChange('isActive', checked)
-                }
+                onCheckedChange={(checked: boolean) => handleChange('isActive', checked)}
               />
 
               <Label htmlFor='rule-active'>Active</Label>
@@ -287,7 +339,7 @@ export default function DLPRuleEditor() {
               <div className='text-sm'>
                 <span>Original: </span>
                 <span className='font-mono'>
-                  This contains {currentRule.matchPattern || '[pattern]'}
+                  This contains {currentRule.matchPattern ?? '[pattern]'}
                 </span>
               </div>
               <div className='text-sm'>
