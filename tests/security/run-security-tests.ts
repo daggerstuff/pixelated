@@ -115,7 +115,7 @@ async function runTestSuite(suite: TestSuite): Promise<TestResultOutput> {
 
     const childProcess = spawn('ts-node', [scriptPath], {
       env: {
-        ...(process.env),
+        ...process.env,
         BASE_URL: config.baseUrl,
         AUTH_TOKEN: config.authToken,
         ADMIN_TOKEN: config.adminToken,

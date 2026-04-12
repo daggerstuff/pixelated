@@ -25,12 +25,8 @@
         "id": "chromium",
         "name": "chromium",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -43,12 +39,8 @@
         "id": "firefox",
         "name": "firefox",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -61,12 +53,8 @@
         "id": "webkit",
         "name": "webkit",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -79,12 +67,8 @@
         "id": "msedge",
         "name": "msedge",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -97,12 +81,8 @@
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -115,12 +95,8 @@
         "id": "Mobile Safari",
         "name": "Mobile Safari",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -133,12 +109,8 @@
         "id": "Tablet Chrome",
         "name": "Tablet Chrome",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -151,12 +123,8 @@
         "id": "Tablet Safari",
         "name": "Tablet Safari",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -169,12 +137,8 @@
         "id": "theme-compatibility",
         "name": "theme-compatibility",
         "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": [
-          "tests/accessibility/**"
-        ],
-        "testMatch": [
-          "**/theme-compatibility.spec.ts"
-        ],
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/theme-compatibility.spec.ts"],
         "timeout": 30000
       }
     ],
