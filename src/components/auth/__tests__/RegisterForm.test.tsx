@@ -22,9 +22,9 @@ vi.mock('@/lib/auth-client', () => ({
 describe('RegisterForm', () => {
   const mockSignUp = vi.fn()
   const mockSignInWithOAuth = vi.fn()
-  const mockUseSession = vi.fn<() => { data: null; isPending: boolean; error: null }>(
-    () => ({ data: null, isPending: false, error: null }),
-  )
+  const mockUseSession = vi.fn<
+    () => { data: null; isPending: boolean; error: null }
+  >(() => ({ data: null, isPending: false, error: null }))
 
   beforeEach(() => {
     vi.clearAllMocks()

@@ -130,9 +130,7 @@ const getCrypto = async () => {
         encryptedData.set(part2, part1.length)
 
         // Get authentication tag
-        const authTag = new Uint8Array(
-          (cipher).getAuthTag(),
-        )
+        const authTag = new Uint8Array(cipher.getAuthTag())
 
         return { encryptedData, authTag }
       },
@@ -798,7 +796,7 @@ export class BackupSecurityManager {
         }
       } catch (error: unknown) {
         logger.error(
-          `Error searching for backup metadata in ${location}: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
+          `Error searching for backup metadata in ${location}: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
         )
       }
     }
@@ -810,28 +808,36 @@ export class BackupSecurityManager {
    * Get data to backup based on backup type
    */
   private async getLastBackupTime(requireFull = false): Promise<Date | null> {
-    let latestTimestamp = 0;
+    let latestTimestamp = 0
 
-    const storageEntries = Array.from(this.storageProviders.entries());
+    const storageEntries = Array.from(this.storageProviders.entries())
     for (let i = 0; i < storageEntries.length; i++) {
-      const [, provider] = storageEntries[i];
-      if (!provider) continue;
+      const [, provider] = storageEntries[i]
+      if (!provider) continue
 
       try {
-        const files = await provider.listFiles("backups/");
-        const metaFiles = files.filter((f) => f.endsWith(".meta.json"));
+        const files = await provider.listFiles('backups/')
+        const metaFiles = files.filter((f) => f.endsWith('.meta.json'))
         for (const metaFile of metaFiles) {
           try {
-            const metadataBuffer = await provider.getFile(metaFile);
-            const metadata = JSON.parse(new TextDecoder().decode(metadataBuffer)) as BackupMetadata;
+            const metadataBuffer = await provider.getFile(metaFile)
+            const metadata = JSON.parse(
+              new TextDecoder().decode(metadataBuffer),
+            ) as BackupMetadata
 
             if (metadata.status === BackupStatus.COMPLETED) {
-              if (requireFull && metadata.type !== BackupType.FULL) continue;
-              if (!requireFull && metadata.type !== BackupType.FULL && metadata.type !== BackupType.DIFFERENTIAL && metadata.type !== BackupType.INCREMENTAL) continue;
+              if (requireFull && metadata.type !== BackupType.FULL) continue
+              if (
+                !requireFull &&
+                metadata.type !== BackupType.FULL &&
+                metadata.type !== BackupType.DIFFERENTIAL &&
+                metadata.type !== BackupType.INCREMENTAL
+              )
+                continue
 
-              const timestamp = new Date(metadata.timestamp).getTime();
+              const timestamp = new Date(metadata.timestamp).getTime()
               if (timestamp > latestTimestamp) {
-                latestTimestamp = timestamp;
+                latestTimestamp = timestamp
               }
             }
           } catch {
@@ -839,65 +845,77 @@ export class BackupSecurityManager {
           }
         }
       } catch (error: unknown) {
-        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`);
+        logger.error(
+          `Error searching for latest backup metadata: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+        )
       }
     }
 
-    return latestTimestamp > 0 ? new Date(latestTimestamp) : null;
+    return latestTimestamp > 0 ? new Date(latestTimestamp) : null
   }
 
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    let appDataJson = '{"timestamp":"' + new Date().toISOString() + '","type":"' + type + '","data":{';
+    let appDataJson =
+      '{"timestamp":"' +
+      new Date().toISOString() +
+      '","type":"' +
+      type +
+      '","data":{'
 
     try {
-      const mongooseModule = "mongoose";
-      const mongoose = (await import(/* @vite-ignore */ mongooseModule)).default || await import(/* @vite-ignore */ mongooseModule);
-      const models = mongoose.modelNames();
+      const mongooseModule = 'mongoose'
+      const mongoose =
+        (await import(/* @vite-ignore */ mongooseModule)).default ||
+        (await import(/* @vite-ignore */ mongooseModule))
+      const models = mongoose.modelNames()
 
-      let isFirstModel = true;
+      let isFirstModel = true
 
-      let baselineTime: Date | null = null;
+      let baselineTime: Date | null = null
       if (type === BackupType.DIFFERENTIAL || type === BackupType.INCREMENTAL) {
-        const requireFull = type === BackupType.DIFFERENTIAL;
-        const lastBackupTime = await this.getLastBackupTime(requireFull);
-        baselineTime = lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const requireFull = type === BackupType.DIFFERENTIAL
+        const lastBackupTime = await this.getLastBackupTime(requireFull)
+        baselineTime =
+          lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000)
       }
 
       for (const modelName of models) {
-        const Model = mongoose.model(modelName);
-        const query: Record<string, unknown> = {};
+        const Model = mongoose.model(modelName)
+        const query: Record<string, unknown> = {}
 
         if (baselineTime && Model.schema.paths.updatedAt) {
-          query.updatedAt = { $gte: baselineTime };
+          query.updatedAt = { $gte: baselineTime }
         }
 
         if (!isFirstModel) {
-          appDataJson += ',';
+          appDataJson += ','
         }
-        appDataJson += '"' + modelName + '":[';
-        isFirstModel = false;
+        appDataJson += '"' + modelName + '":['
+        isFirstModel = false
 
-        const cursor = Model.find(query).lean().cursor();
-        let isFirstDoc = true;
+        const cursor = Model.find(query).lean().cursor()
+        let isFirstDoc = true
 
         for await (const doc of cursor) {
           if (!isFirstDoc) {
-            appDataJson += ',';
+            appDataJson += ','
           }
-          appDataJson += JSON.stringify(doc);
-          isFirstDoc = false;
+          appDataJson += JSON.stringify(doc)
+          isFirstDoc = false
         }
 
-        appDataJson += ']';
+        appDataJson += ']'
       }
 
-      appDataJson += '}}';
+      appDataJson += '}}'
     } catch (error: unknown) {
-      logger.error(`Failed to collect data for backup: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`);
-      throw error; // Fail loudly to prevent silent data corruption
+      logger.error(
+        `Failed to collect data for backup: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+      )
+      throw error // Fail loudly to prevent silent data corruption
     }
 
-    return new TextEncoder().encode(appDataJson);
+    return new TextEncoder().encode(appDataJson)
   }
 
   /**

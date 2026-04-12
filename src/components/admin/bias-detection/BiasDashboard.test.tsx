@@ -837,7 +837,8 @@ describe('BiasDashboard', () => {
           !button.closest('button')?.textContent?.includes('Bulk'),
       ) || acknowledgeButtons[0]
 
-    const individualAcknowledgeElement = individualAcknowledgeButton?.closest('button')
+    const individualAcknowledgeElement =
+      individualAcknowledgeButton?.closest('button')
     if (!individualAcknowledgeElement) {
       throw new Error('Expected acknowledge button to be present')
     }

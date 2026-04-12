@@ -239,7 +239,7 @@ export class PresidioPHIDetector {
     } catch (error: unknown) {
       logger.error('Error detecting PHI', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        stack: error instanceof Error ? error?.stack : undefined,
       })
 
       // Use fallback detection in case of error
@@ -460,7 +460,9 @@ export function detectAndRedactPHI(text: string): string {
   try {
     // For simplicity, we'll fall back to regex-based detection in the sync version
     const detector = PresidioPHIDetector.getInstance()
-    const entities = (detector['fallbackDetection'] as (text: string) => PHIEntity[])(text)
+    const entities = (
+      detector['fallbackDetection'] as (text: string) => PHIEntity[]
+    )(text)
 
     if (entities.length === 0) {
       return text

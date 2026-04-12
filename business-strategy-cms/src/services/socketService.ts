@@ -6,7 +6,10 @@ import { redisClient } from '@/config/database'
 import { logger } from '@/utils/logger'
 
 import { AuthService } from './authService'
-import { CollaborationService, type DocumentChange } from './collaborationService'
+import {
+  CollaborationService,
+  type DocumentChange,
+} from './collaborationService'
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -323,7 +326,9 @@ export class SocketService {
     }
   }
 
-  private parseStoredChanges(rawChanges: string | null): PersistedDocumentChange[] {
+  private parseStoredChanges(
+    rawChanges: string | null,
+  ): PersistedDocumentChange[] {
     if (!rawChanges) {
       return []
     }

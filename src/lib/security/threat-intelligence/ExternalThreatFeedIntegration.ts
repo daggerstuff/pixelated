@@ -673,7 +673,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
       return feedId
     } catch (error: unknown) {
-      logger.error('Failed to add threat feed', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to add threat feed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }

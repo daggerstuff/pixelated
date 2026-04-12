@@ -25,7 +25,8 @@ async function createP5Loader() {
   }
 
   const script =
-    getExistingP5Script() ?? (() => {
+    getExistingP5Script() ??
+    (() => {
       const created = document.createElement('script')
       created.src = P5_CDN_URL
       created.integrity = P5_CDN_INTEGRITY
@@ -67,9 +68,9 @@ export default async function loadP5() {
   }
 
   p5Promise ??= createP5Loader().catch((error) => {
-      p5Promise = null
-      throw error
-    })
+    p5Promise = null
+    throw error
+  })
 
   return p5Promise
 }

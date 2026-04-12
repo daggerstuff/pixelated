@@ -157,8 +157,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     if (!data) {
       // Simulate loading data
       const timer = setTimeout(() => {
-        const resolvedType =
-          type === 'heatmap' ? 'line' : type
+        const resolvedType = type === 'heatmap' ? 'line' : type
         setChartData(defaultData[resolvedType] || defaultData.line)
         setIsLoading(false)
       }, 500)

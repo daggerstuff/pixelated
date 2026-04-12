@@ -77,10 +77,7 @@ const JWT_REFRESH_EXPIRES_IN = parseDurationToSeconds(
   process.env['JWT_REFRESH_EXPIRES_IN'] ?? '7d',
   7 * 24 * 60 * 60,
 )
-const BCRYPT_ROUNDS = Number.parseInt(
-  process.env['BCRYPT_ROUNDS'] ?? '12',
-  10,
-)
+const BCRYPT_ROUNDS = Number.parseInt(process.env['BCRYPT_ROUNDS'] ?? '12', 10)
 
 export class AuthService {
   public static generateTokens(payload: JwtPayload): AuthTokens {

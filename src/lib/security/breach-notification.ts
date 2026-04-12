@@ -334,10 +334,7 @@ export async function listRecentBreaches(): Promise<BreachDetails[]> {
 
     return breaches
       .filter((item): item is BreachDetails => Boolean(item))
-      .sort(
-        (a, b) =>
-          (b).timestamp - (a).timestamp,
-      )
+      .sort((a, b) => b.timestamp - a.timestamp)
   } catch (error: unknown) {
     logger.error('Failed to list recent breaches:', error)
     throw error

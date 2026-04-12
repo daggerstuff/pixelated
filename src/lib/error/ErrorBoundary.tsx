@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { logger } from '@/lib/logger'
 
+import { type ErrorContext } from './types'
 import {
   normalizeError,
   logError,
   formatErrorForUser,
   createErrorContext,
 } from './utils'
-import { type ErrorContext } from './types'
 
 interface Props {
   children: ReactNode
@@ -46,21 +46,28 @@ interface State {
 const MAX_RETRY_COUNT = 3
 
 export class ErrorBoundary extends Component<Props, State> {
-  private getSentryClient(): {
-    captureException: (error: Error, context?: Record<string, unknown>) => void
-  } | undefined {
-    if (typeof window === 'undefined') {
-      return undefined
-    }
-
-    return (window as Window & {
-      Sentry?: {
+  private getSentryClient():
+    | {
         captureException: (
           error: Error,
           context?: Record<string, unknown>,
         ) => void
       }
-    }).Sentry
+    | undefined {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    return (
+      window as Window & {
+        Sentry?: {
+          captureException: (
+            error: Error,
+            context?: Record<string, unknown>,
+          ) => void
+        }
+      }
+    ).Sentry
   }
 
   public override state: State = {

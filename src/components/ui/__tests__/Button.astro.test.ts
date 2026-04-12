@@ -88,11 +88,7 @@ describe('Button.astro', () => {
 
     // Test small size
     document.body.innerHTML = ''
-    const smallResult = await renderAstro(
-      Button,
-      { size: 'sm' },
-      'Small',
-    )
+    const smallResult = await renderAstro(Button, { size: 'sm' }, 'Small')
     container = smallResult.container
     button = container.querySelector('button')
     expect(button).toHaveClass('h-9')
@@ -100,11 +96,7 @@ describe('Button.astro', () => {
 
     // Test large size
     document.body.innerHTML = ''
-    const largeResult = await renderAstro(
-      Button,
-      { size: 'lg' },
-      'Large',
-    )
+    const largeResult = await renderAstro(Button, { size: 'lg' }, 'Large')
     container = largeResult.container
     button = container.querySelector('button')
     expect(button).toHaveClass('h-11')
@@ -128,11 +120,7 @@ describe('Button.astro', () => {
   })
 
   it('handles loading state without loading text', async () => {
-    const { container } = await renderAstro(
-      Button,
-      { loading: true },
-      'Submit',
-    )
+    const { container } = await renderAstro(Button, { loading: true }, 'Submit')
 
     const button = container.querySelector('button')
     expect(button).toHaveAttribute('disabled')
