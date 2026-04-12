@@ -33,6 +33,8 @@ interface Props {
   showFooter?: boolean
   showBackLink?: boolean
   fullWidthMain?: boolean
+  centered?: boolean
+  contentClass?: string
 }
 
 const {
@@ -47,6 +49,8 @@ const {
   showFooter = true,
   showBackLink = true,
   fullWidthMain = false,
+  centered = false,
+  contentClass = '',
 } = Astro.props
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
@@ -112,7 +116,9 @@ const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
       id="main"
       class:list={[
         'flex-grow w-full pt-24',
+        centered && 'mx-auto max-w-7xl',
         fullWidthMain && 'main--full-width',
+        contentClass,
       ]}
     >
       <!-- Content -->
