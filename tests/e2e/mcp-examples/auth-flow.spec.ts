@@ -6,11 +6,13 @@ type McpSnapshotOptions = {
   [key: string]: unknown
 }
 
-type McpSnapshotFn = (page: Page, options: McpSnapshotOptions) => Promise<unknown> | void
+type McpSnapshotFn = (
+  page: Page,
+  options: McpSnapshotOptions,
+) => Promise<unknown> | void
 
-const isMcpSnapshotFunction = (
-  value: unknown,
-): value is McpSnapshotFn => typeof value === 'function'
+const isMcpSnapshotFunction = (value: unknown): value is McpSnapshotFn =>
+  typeof value === 'function'
 
 const isObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null
@@ -175,7 +177,9 @@ test.describe('Authentication Flow', () => {
     await page.context().close()
     const browser = page.context().browser()
     if (!browser) {
-      throw new Error('Browser instance is unavailable for session context recreation')
+      throw new Error(
+        'Browser instance is unavailable for session context recreation',
+      )
     }
     const newContext = await browser.newContext()
     const newPage = await newContext.newPage()
