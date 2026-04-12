@@ -16,6 +16,30 @@ interface SearchResponse {
   results: SearchResult[]
 }
 
+const isSearchResponse = (value: unknown): value is SearchResponse => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  return (
+    'results' in value &&
+    Array.isArray((value as { results?: unknown }).results) &&
+    (value as { results: unknown[] }).results.every((item) => {
+      if (!item || typeof item !== 'object') {
+        return false
+      }
+
+      const resultItem = item as Record<string, unknown>
+      return (
+        typeof resultItem['id'] === 'string' &&
+        typeof resultItem['title'] === 'string' &&
+        typeof resultItem['description'] === 'string' &&
+        typeof resultItem['slug'] === 'string'
+      )
+    })
+  )
+}
+
 export function BlogSearch() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -32,8 +56,12 @@ export function BlogSearch() {
     setIsSearching(true)
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-      const data = (await response.json()) as SearchResponse
-      setResults(Array.isArray(data?.results) ? data.results : [])
+      const data: unknown = await response.json()
+      if (isSearchResponse(data)) {
+        setResults(data.results)
+      } else {
+        setResults([])
+      }
     } catch (error: unknown) {
       console.error('Search failed:', error)
     } finally {

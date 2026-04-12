@@ -49,11 +49,11 @@ export function Tabs({
 
   // Initialize with controlled value, defaultValue, or first registered tab
   const [internalValue, setInternalValue] = useState(
-    value || defaultValue || '',
+    value ?? defaultValue ?? '',
   )
 
   // If this is a controlled component, use the provided value
-  const activeValue = value !== undefined ? value : internalValue
+  const activeValue = value ?? internalValue
 
   // Update internal value when controlled value changes
   useEffect(() => {

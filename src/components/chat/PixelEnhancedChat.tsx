@@ -50,7 +50,7 @@ export function PixelEnhancedChat({
   } = usePixelConversationIntegration({
     sessionId,
     userId,
-    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || 'http://localhost:8001',
+    pixelApiUrl: process.env['REACT_APP_PIXEL_API_URL'] || 'http://localhost:8001',
   })
 
   // Local state

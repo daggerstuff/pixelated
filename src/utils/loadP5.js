@@ -1,6 +1,6 @@
-const P5_CDN_URL = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js'
+const P5_CDN_URL = 'https://cdn.jsdelivr.net/npm/p5@2.2.3/lib/p5.min.js'
 const P5_CDN_INTEGRITY =
-  'sha384-+QwQ6Q0imeISFRCGDpa2BkLomqKgJo0vvArkH5AO9M/dwZ0pniS3pSkeCZMt2rtI'
+  'sha384-9t6FYgx9Sv+2yYZns5+TnrQQynCqrCBB6lZRFAsHYmN4qeR1/iQvf54clhFgAYHr'
 const P5_SCRIPT_ATTR = 'data-pixelated-p5-loader'
 
 /** @type {Promise<unknown> | null} */

@@ -5,6 +5,7 @@ import Footer from '@/components/mizu/Footer.astro'
 import ToTopButton from '@/components/widgets/ToTopButton.astro'
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
 import '@/styles/docs-prose.css'
+import { FEATURES } from '@/config'
 
 interface Props {
   title: string
@@ -33,6 +34,7 @@ const title = frontmatter?.title || propTitle
 const description = frontmatter?.description || propDescription
 const image = frontmatter?.image || propImage
 const { cspNonce } = Astro.locals
+const { nprogress, mediumZoom } = FEATURES
 ---
 
 <!doctype html>
@@ -55,6 +57,9 @@ const { cspNonce } = Astro.locals
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
+    {(nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module"></script>
+    )}
   </head>
 
   <body

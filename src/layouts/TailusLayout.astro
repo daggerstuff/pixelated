@@ -4,6 +4,7 @@ import AppFooter from '@components/tailus/AppFooter.astro'
 import AppHeader from '@components/tailus/AppHeader.astro'
 import SpeedInsights from '@vercel/speed-insights/astro'
 import Analytics from '@vercel/analytics/astro'
+import { FEATURES } from '@/config'
 
 interface Props {
   title?: string
@@ -15,6 +16,7 @@ const {
   description = 'Experience personalized mental health support through our advanced AI platform. Get insights, therapy assistance, and emotional wellness tools designed for your unique journey.',
 } = Astro.props
 const { cspNonce } = Astro.locals
+const { nprogress, mediumZoom } = FEATURES
 ---
 
 <!doctype html>
@@ -36,6 +38,9 @@ const { cspNonce } = Astro.locals
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
+    {(nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module"></script>
+    )}
 
     <!-- GoatCounter Analytics -->
     <script
