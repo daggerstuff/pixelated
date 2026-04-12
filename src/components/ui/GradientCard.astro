@@ -122,7 +122,7 @@ const contentClasses = `
 ---
 
 {
-  href ?
+  href ? (
     <a class={baseClasses} href={href} target={target} rel={rel}>
       {/* Gradient overlay for depth */}
       <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -149,7 +149,8 @@ const contentClasses = `
         <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
       )}
     </a>
-  : <div class={baseClasses}>
+  ) : (
+    <div class={baseClasses}>
       {/* Gradient overlay for depth */}
       <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -175,6 +176,7 @@ const contentClasses = `
         <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
       )}
     </div>
+  )
 }
 
 <style>

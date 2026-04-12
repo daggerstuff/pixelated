@@ -39,7 +39,9 @@ export class TokenEncryptionService {
     this.logger = logger
 
     if (!this.config.salt || this.config.salt.length < 16) {
-      throw new SecurityError('Token encryption salt is required and must be at least 16 characters long')
+      throw new SecurityError(
+        'Token encryption salt is required and must be at least 16 characters long',
+      )
     }
 
     // Try to auto-initialize if password is provided
@@ -66,25 +68,35 @@ export class TokenEncryptionService {
     if (this.encryptionKey) return
 
     if (!this.initializationPromise) {
-      const password = this.config.password || process.env['TOKEN_ENCRYPTION_PASSWORD']
+      const password =
+        this.config.password || process.env['TOKEN_ENCRYPTION_PASSWORD']
       if (password) {
         this.initializationPromise = this.initialize(password)
       } else {
-        throw new SecurityError('Token encryption service not initialized and no password available')
+        throw new SecurityError(
+          'Token encryption service not initialized and no password available',
+        )
       }
     }
 
     await this.initializationPromise
   }
 
-  async encrypt(data: any): Promise<{ encryptedToken: string; iv: string; authTag: string }> {
+  async encrypt(
+    data: any,
+  ): Promise<{ encryptedToken: string; iv: string; authTag: string }> {
     this.logger.debug('Encrypting data')
     await this.ensureInitialized()
-    const serializedData = typeof data === 'string' ? data : JSON.stringify(data)
+    const serializedData =
+      typeof data === 'string' ? data : JSON.stringify(data)
     return await this.encryptToken(serializedData)
   }
 
-  async decrypt<T>(result: { encryptedToken: string; iv: string; authTag: string }): Promise<T> {
+  async decrypt<T>(result: {
+    encryptedToken: string
+    iv: string
+    authTag: string
+  }): Promise<T> {
     this.logger.debug('Decrypting token')
     await this.ensureInitialized()
     const decrypted = await this.decryptToken(
@@ -123,7 +135,9 @@ export class TokenEncryptionService {
 
       const configuredTagLength = this.config.authTagLength || 16
       if (authTag.length !== configuredTagLength) {
-        throw new SecurityError(`Authentication tag length mismatch: expected ${configuredTagLength}, got ${authTag.length}`)
+        throw new SecurityError(
+          `Authentication tag length mismatch: expected ${configuredTagLength}, got ${authTag.length}`,
+        )
       }
 
       return {
@@ -137,7 +151,11 @@ export class TokenEncryptionService {
     }
   }
 
-  async decryptToken(encryptedToken: string, iv: string, authTag: string): Promise<string> {
+  async decryptToken(
+    encryptedToken: string,
+    iv: string,
+    authTag: string,
+  ): Promise<string> {
     await this.ensureInitialized()
 
     try {
@@ -149,9 +167,11 @@ export class TokenEncryptionService {
 
       const authTagBuffer = Buffer.from(authTag, 'base64')
       const tagLength = this.config.authTagLength || 16
-      
+
       if (authTagBuffer.length !== tagLength) {
-        throw new SecurityError(`Invalid authentication tag length: expected ${tagLength}, got ${authTagBuffer.length}`)
+        throw new SecurityError(
+          `Invalid authentication tag length: expected ${tagLength}, got ${authTagBuffer.length}`,
+        )
       }
 
       ;(decipher as unknown as { setAuthTag(tag: Buffer): void }).setAuthTag(

@@ -63,7 +63,11 @@ const parseQueryNumber = (value: unknown, fallback: number): number => {
     const parsed = parseInt(value, 10)
     return Number.isNaN(parsed) ? fallback : parsed
   }
-  if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
+  if (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    typeof value[0] === 'string'
+  ) {
     const parsed = parseInt(value[0], 10)
     return Number.isNaN(parsed) ? fallback : parsed
   }
@@ -74,7 +78,11 @@ const parseQueryString = (value: unknown): string | undefined => {
   if (typeof value === 'string') {
     return value
   }
-  if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
+  if (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    typeof value[0] === 'string'
+  ) {
     return value[0]
   }
   return undefined
@@ -189,17 +197,17 @@ export function createFileRoutes(db: Pool) {
         const userId = req.user?.id ?? 'anonymous'
         const isPublicFlag = parseBoolean(isPublic)
 
-      const presignedUrl = await fileStorage.getPresignedUploadUrl(
-        fileName ?? '',
-        mimeType ?? '',
-        userId,
-        {
-          folder,
-          isPublic: isPublicFlag,
-        },
-      )
+        const presignedUrl = await fileStorage.getPresignedUploadUrl(
+          fileName ?? '',
+          mimeType ?? '',
+          userId,
+          {
+            folder,
+            isPublic: isPublicFlag,
+          },
+        )
 
-      return res.json(presignedUrl)
+        return res.json(presignedUrl)
       } catch (error: unknown) {
         const message =
           error instanceof Error
@@ -209,7 +217,7 @@ export function createFileRoutes(db: Pool) {
             : 'Unknown error'
         return res.status(500).json({ error: message })
       }
-    }
+    },
   )
 
   // Get file version history
@@ -246,7 +254,9 @@ export function createFileRoutes(db: Pool) {
       const fileId = req.params['fileId']
       const version = req.params['version']
       if (!fileId || !version) {
-        return res.status(400).json({ error: 'File ID and version are required' })
+        return res
+          .status(400)
+          .json({ error: 'File ID and version are required' })
       }
 
       const versionNumber = parseInt(version, 10)
@@ -280,7 +290,9 @@ export function createFileRoutes(db: Pool) {
       const fileId = req.params['fileId']
       const version = req.params['version']
       if (!fileId || !version) {
-        return res.status(400).json({ error: 'File ID and version are required' })
+        return res
+          .status(400)
+          .json({ error: 'File ID and version are required' })
       }
 
       const versionNumber = parseInt(version, 10)
@@ -319,7 +331,9 @@ export function createFileRoutes(db: Pool) {
       const fileId = req.params['fileId']
       const version = req.params['version']
       if (!fileId || !version) {
-        return res.status(400).json({ error: 'File ID and version are required' })
+        return res
+          .status(400)
+          .json({ error: 'File ID and version are required' })
       }
       const userId = req.user?.id ?? 'anonymous'
       const versionNumber = parseInt(version, 10)
@@ -354,7 +368,9 @@ export function createFileRoutes(db: Pool) {
       const fileId = req.params['fileId']
       const version = req.params['version']
       if (!fileId || !version) {
-        return res.status(400).json({ error: 'File ID and version are required' })
+        return res
+          .status(400)
+          .json({ error: 'File ID and version are required' })
       }
       const userId = req.user?.id ?? 'anonymous'
       const versionNumber = parseInt(version, 10)
@@ -392,34 +408,38 @@ export function createFileRoutes(db: Pool) {
   // Create folder
   router.post(
     '/folders',
-    async (req: Request<Record<string, string>, unknown, CreateFolderBody>, res) => {
-    try {
-      const { name, parentId } = req.body
-      if (!name) {
-        return res.status(400).json({ error: 'Folder name is required' })
-      }
-      const userId = req.user?.id ?? 'anonymous'
+    async (
+      req: Request<Record<string, string>, unknown, CreateFolderBody>,
+      res,
+    ) => {
+      try {
+        const { name, parentId } = req.body
+        if (!name) {
+          return res.status(400).json({ error: 'Folder name is required' })
+        }
+        const userId = req.user?.id ?? 'anonymous'
 
-      const folderId = await versioningService.createFolder(
-        name,
-        userId,
-        parentId,
-      )
+        const folderId = await versioningService.createFolder(
+          name,
+          userId,
+          parentId,
+        )
 
-      return res.json({
-        success: true,
-        folderId,
-      })
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error instanceof Error
-            ? error.message
+        return res.json({
+          success: true,
+          folderId,
+        })
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
             : 'Unknown error'
-          : 'Unknown error'
-      return res.status(500).json({ error: message })
-    }
-  })
+        return res.status(500).json({ error: message })
+      }
+    },
+  )
 
   // Get folder contents
   router.get('/folders/:folderId/contents', async (req, res) => {

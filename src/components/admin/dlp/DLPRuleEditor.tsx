@@ -1,5 +1,6 @@
 import { type ChangeEvent, useEffect, useState } from 'react'
 
+import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 import { Button } from '../../ui/button/button'
 import {
   Card,
@@ -19,8 +20,6 @@ import {
 } from '../../ui/select'
 import { Switch } from '../../ui/switch'
 import { Textarea } from '../../ui/textarea'
-
-import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 
 // Default empty rule (matchPattern is the functional pattern; name is descriptive only)
 const defaultRule = {
@@ -73,8 +72,10 @@ const isEditorRule = (detail: unknown): detail is EditorRule => {
   return (
     (detail.id === undefined || typeof detail.id === 'string') &&
     (detail.name === undefined || typeof detail.name === 'string') &&
-    (detail.matchPattern === undefined || typeof detail.matchPattern === 'string') &&
-    (detail.description === undefined || typeof detail.description === 'string') &&
+    (detail.matchPattern === undefined ||
+      typeof detail.matchPattern === 'string') &&
+    (detail.description === undefined ||
+      typeof detail.description === 'string') &&
     (detail.action === undefined || isDLPAction(detail.action)) &&
     (detail.isActive === undefined || typeof detail.isActive === 'boolean')
   )
@@ -323,7 +324,9 @@ export default function DLPRuleEditor() {
               <Switch
                 id='rule-active'
                 checked={!!currentRule.isActive}
-                onCheckedChange={(checked: boolean) => handleChange('isActive', checked)}
+                onCheckedChange={(checked: boolean) =>
+                  handleChange('isActive', checked)
+                }
               />
 
               <Label htmlFor='rule-active'>Active</Label>

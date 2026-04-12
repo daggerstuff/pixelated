@@ -583,7 +583,9 @@ export async function authenticateRequest(request: Request): Promise<{
   // then falls back to Postgres. On first login it creates the mapping.
   const auth0Sub = validation.userId!
   const email =
-    typeof validation.payload?.email === 'string' ? validation.payload.email : ''
+    typeof validation.payload?.email === 'string'
+      ? validation.payload.email
+      : ''
   const emailVerified = validation.payload?.email_verified === true
   const name =
     typeof validation.payload?.name === 'string'
@@ -594,7 +596,9 @@ export async function authenticateRequest(request: Request): Promise<{
       ? validation.payload.picture
       : undefined
   const sid =
-    typeof validation.payload?.sid === 'string' ? validation.payload.sid : undefined
+    typeof validation.payload?.sid === 'string'
+      ? validation.payload.sid
+      : undefined
 
   const { resolveIdentity } = await import('./user-identity')
 

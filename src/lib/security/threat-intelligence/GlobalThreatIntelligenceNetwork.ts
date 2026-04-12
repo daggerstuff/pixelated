@@ -157,11 +157,11 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       this.emit('initialized', { region: this.region, timestamp: new Date() })
     } catch (error: unknown) {
       logger.error('Failed to initialize Global Threat Intelligence Network', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
       throw new Error(
-        `Failed to initialize threat intelligence network: ${(error instanceof Error ? error.message : "Unknown error")}`,
+        `Failed to initialize threat intelligence network: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -199,7 +199,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to create database indexes', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
       throw error
@@ -234,7 +234,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Redis pub/sub setup completed', { region: this.region })
     } catch (error: unknown) {
       logger.error('Failed to setup Redis pub/sub', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
       throw error
@@ -291,7 +291,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to handle incoming threat', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
     }
@@ -413,7 +413,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       await this.logSharingActivity(threat.id, threat.region, 'received')
     } catch (error: unknown) {
       logger.error('Failed to store threat', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         threatId: threat.id,
         region: this.region,
       })
@@ -479,7 +479,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
           })
         } catch (error: unknown) {
           logger.error('Failed to share threat with region', {
-            error: (error instanceof Error ? error.message : "Unknown error"),
+            error: error instanceof Error ? error.message : 'Unknown error',
             threatId: threat.id,
             targetRegion: region,
             sourceRegion: this.region,
@@ -498,7 +498,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to share threat', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         threatId: threat.id,
         region: this.region,
       })
@@ -546,7 +546,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       } as ThreatIntelligence
     } catch (error: unknown) {
       logger.error('Failed to encrypt threat', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         threatId: threat.id,
         region: this.region,
       })
@@ -571,7 +571,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       return threat
     } catch (error: unknown) {
       logger.error('Failed to decrypt threat', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         threatId: threat.id,
         region: this.region,
       })
@@ -606,7 +606,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to log sharing activity', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         threatId,
         region: this.region,
       })
@@ -647,7 +647,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to propagate threats', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
     }
@@ -695,10 +695,13 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       this.emit('health:check', healthStatus)
     } catch (error: unknown) {
       logger.error('Health check failed', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
-      this.emit('health:error', { error: (error instanceof Error ? error.message : "Unknown error"), region: this.region })
+      this.emit('health:error', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        region: this.region,
+      })
     }
   }
 
@@ -710,7 +713,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       return await this.threatsCollection.findOne({ id: threatId })
     } catch (error: unknown) {
       logger.error('Failed to get threat by ID', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         threatId,
         region: this.region,
       })
@@ -750,7 +753,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
         .toArray()
     } catch (error: unknown) {
       logger.error('Failed to search threats', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         query,
         region: this.region,
       })
@@ -769,7 +772,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       return healthData ? JSON.parse(healthData) : null
     } catch (error: unknown) {
       logger.error('Failed to get network health', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
       throw error
@@ -804,7 +807,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Error during shutdown', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         region: this.region,
       })
       throw error

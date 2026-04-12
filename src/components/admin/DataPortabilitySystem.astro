@@ -1,34 +1,36 @@
 <!-- This is an auto-generated reply by CodeRabbit -->
-
 <script>
-const bindDataPortabilityHandlers = () => {
-  const form = document.getElementById('data-portability-form')
-  const cancelBtn = document.getElementById('data-portability-cancel-btn')
+  const bindDataPortabilityHandlers = () => {
+    const form = document.getElementById('data-portability-form')
+    const cancelBtn = document.getElementById('data-portability-cancel-btn')
 
-  if (form instanceof HTMLFormElement && cancelBtn instanceof HTMLButtonElement) {
-    cancelBtn.onclick = () => form.reset()
+    if (
+      form instanceof HTMLFormElement &&
+      cancelBtn instanceof HTMLButtonElement
+    ) {
+      cancelBtn.onclick = () => form.reset()
+    }
+
+    if (form instanceof HTMLFormElement) {
+      form.addEventListener('submit', (e: Event) => {
+        e.preventDefault()
+
+        // In a real implementation, we would collect form data and process it
+        const formData = new FormData(e.target as HTMLFormElement)
+
+        // For demonstration purposes, just show an alert
+        alert(
+          'Data transfer request submitted. In a production environment, this would generate a secure transfer package.',
+        )
+
+        // In production, this would trigger the actual data export and transfer process
+        console.log('Data portability form submitted successfully')
+      })
+    }
   }
 
-  if (form instanceof HTMLFormElement) {
-    form.addEventListener('submit', (e: Event) => {
-      e.preventDefault()
-
-      // In a real implementation, we would collect form data and process it
-      const formData = new FormData(e.target as HTMLFormElement)
-
-      // For demonstration purposes, just show an alert
-      alert(
-        'Data transfer request submitted. In a production environment, this would generate a secure transfer package.',
-      )
-
-      // In production, this would trigger the actual data export and transfer process
-      console.log('Data portability form submitted successfully')
-    })
-  }
-}
-
-document.addEventListener('DOMContentLoaded', bindDataPortabilityHandlers)
-document.addEventListener('astro:page-load', bindDataPortabilityHandlers)
+  document.addEventListener('DOMContentLoaded', bindDataPortabilityHandlers)
+  document.addEventListener('astro:page-load', bindDataPortabilityHandlers)
 </script>
 
 <!-- Restored component UI -->

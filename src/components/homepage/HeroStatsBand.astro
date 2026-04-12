@@ -8,17 +8,22 @@ const { stats } = Astro.props
 
 <div class="hero-stats">
   <div class="hero-stats__lead">
-    <span class="hero-stats__eyebrow pe-meta-label">What the pilot changes</span>
-    <span class="hero-stats__caption">Review surface, supervision signal, and retry quality in one record.</span>
+    <span class="hero-stats__eyebrow pe-meta-label">What the pilot changes</span
+    >
+    <span class="hero-stats__caption"
+      >Review surface, supervision signal, and retry quality in one record.</span
+    >
   </div>
 
   <ul class="hero-stats-grid" aria-label="Proof points" role="list">
-    {stats.map((stat) => (
-      <li class="stat-item">
-        <span class="stat-value">{stat.value}</span>
-        <span class="stat-label">{stat.label}</span>
-      </li>
-    ))}
+    {
+      stats.map((stat) => (
+        <li class="stat-item">
+          <span class="stat-value">{stat.value}</span>
+          <span class="stat-label">{stat.label}</span>
+        </li>
+      ))
+    }
   </ul>
 </div>
 
@@ -95,7 +100,7 @@ const { stats } = Astro.props
       border-right: 0;
       border-bottom: 1px solid var(--divider-subtle);
     }
-    
+
     .hero-stats-grid {
       grid-template-columns: 1fr;
     }
