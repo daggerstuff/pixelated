@@ -238,15 +238,15 @@ export interface BrowserCompatibilityConfig {
   }
 }
 
-export interface TestSection<P = unknown> {
+export interface TestSection<P = any> {
   title: string
-  component?: ComponentType<P>
+  component?: any
   instructions?: string[]
   props?: P
 }
 
 export type TestSections = {
-  [key: string]: TestSection
+  [key: string]: TestSection<any>
 }
 
 export interface LoadingSize {

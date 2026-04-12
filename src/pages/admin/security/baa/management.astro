@@ -11,7 +11,8 @@ import {
 const businessAssociateService = new BusinessAssociateService()
 
 // Get current query parameters
-const { status = '', searchQuery = '' } = Astro.url.searchParams
+const status = Astro.url.searchParams.get('status') || ''
+const searchQuery = Astro.url.searchParams.get('searchQuery') || ''
 
 // Get all business associates
 const businessAssociates = businessAssociateService.getAllBusinessAssociates()
@@ -530,12 +531,12 @@ const mockUpcomingActions = [
     // Auto-submit form when status changes
     const statusSelect = document.getElementById('status')
     statusSelect?.addEventListener('change', () => {
-      document.getElementById('search-form')?.submit()
+      ;(document.getElementById('search-form') as HTMLFormElement)?.submit()
     })
 
     // Handle search form submission
-    const searchForm = document.getElementById('search-form')
-    searchForm?.addEventListener('submit', (e) => {
+    const searchForm = document.getElementById('search-form') as HTMLFormElement
+    searchForm?.addEventListener('submit', (e: any) => {
       e.preventDefault()
       searchForm.submit()
     })
@@ -549,7 +550,7 @@ const mockUpcomingActions = [
     // Handle "Create BAA" buttons
     const createBaaButtons = document.querySelectorAll('.create-baa')
     createBaaButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -560,7 +561,7 @@ const mockUpcomingActions = [
     // Handle "Send BAA" buttons
     const sendBaaButtons = document.querySelectorAll('.send-baa')
     sendBaaButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -572,7 +573,7 @@ const mockUpcomingActions = [
     // Handle "Renew BAA" buttons
     const renewBaaButtons = document.querySelectorAll('.renew-baa')
     renewBaaButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )
@@ -589,7 +590,7 @@ const mockUpcomingActions = [
     // Handle action detail buttons
     const actionButtons = document.querySelectorAll('[data-action-id]')
     actionButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const actionId = (e.target as HTMLElement).getAttribute(
           'data-action-id',
         )

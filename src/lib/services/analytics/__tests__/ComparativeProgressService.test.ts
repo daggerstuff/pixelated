@@ -14,13 +14,13 @@ class TestComparativeProgressService extends ComparativeProgressService {
   public mockUserSnapshots: ProgressSnapshot[] = []
   public mockBenchmark: Benchmark | null = null
 
-  async fetchUserProgressData(
+  override async fetchUserProgressData(
     _params: ComparativeProgressParams,
   ): Promise<ProgressSnapshot[]> {
     return this.mockUserSnapshots
   }
 
-  async fetchBenchmarkData(
+  override async fetchBenchmarkData(
     _params: ComparativeProgressParams,
   ): Promise<Benchmark | null> {
     return this.mockBenchmark
@@ -29,17 +29,14 @@ class TestComparativeProgressService extends ComparativeProgressService {
 
 describe('ComparativeProgressService', () => {
   let service: TestComparativeProgressService
-  let mockLogger: {
-    info: ReturnType<typeof vi.fn>
-    error: ReturnType<typeof vi.fn>
-  }
+  let mockLogger: any
 
   beforeEach(() => {
     mockLogger = {
       info: vi.fn(),
       error: vi.fn(),
     }
-    service = new TestComparativeProgressService(mockLogger)
+    service = new TestComparativeProgressService(mockLogger as any)
   })
 
   afterEach(() => {
