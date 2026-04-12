@@ -3,41 +3,10 @@
  * This approach uses buffer package as recommended by Vite solutions
  */
 
+import { Buffer as BufferFromPackage } from 'buffer'
+
 // Try to import from buffer package safely
-let BufferPolyfill
-try {
-  // Import Buffer from buffer package
-  const bufferPkg = require('buffer/')
-  BufferPolyfill = bufferPkg.Buffer
-} catch {
-  // Fallback implementation if package import fails
-  BufferPolyfill = class BufferShim extends Uint8Array {
-    static from(data, _encoding) {
-      if (typeof data === 'string') {
-        const encoder = new TextEncoder()
-        return encoder.encode(data)
-      }
-      return new Uint8Array(data)
-    }
-
-    static alloc(size, fill = 0) {
-      const buffer = new Uint8Array(size)
-      if (fill !== 0) {
-        buffer.fill(fill)
-      }
-      return buffer
-    }
-
-    static isBuffer(obj) {
-      return obj instanceof Uint8Array
-    }
-
-    toString(_encoding) {
-      const decoder = new TextDecoder()
-      return decoder.decode(this)
-    }
-  }
-}
+const BufferPolyfill = BufferFromPackage
 
 // Safely expose Buffer to global scope only if not already defined
 if (
