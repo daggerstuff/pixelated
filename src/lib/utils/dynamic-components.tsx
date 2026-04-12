@@ -119,6 +119,16 @@ export const DynamicChartComponent = (props: Record<string, unknown>) => (
   </Suspense>
 )
 
+export const EnhancedChartComponent = React.lazy(
+  () => import('../../components/analytics/EnhancedChartComponent'),
+)
+
+export const DynamicEnhancedChartComponent = (props: Record<string, unknown>) => (
+  <Suspense fallback={<VisualizationLoading />}>
+    <EnhancedChartComponent {...props} />
+  </Suspense>
+)
+
 // Dynamic imports for large dashboard components
 export const TreatmentPlanManager = React.lazy(
   () => import('../../components/treatment/TreatmentPlanManager'),
