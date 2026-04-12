@@ -1,0 +1,5 @@
+🧪 QA: Test TodoDAO collection initialization and creation
+
+💡 What: Added unit tests for TodoDAO.getCollection implicitly via create() testing. Fixed testing pattern violation involving vi.resetModules.
+🎯 Why: Requires mocking the MongoDB client dependency, but standard DAO patterns make it straightforward to verify the correct collection methods are called.
+✅ Verification: Vitest suite execution.
