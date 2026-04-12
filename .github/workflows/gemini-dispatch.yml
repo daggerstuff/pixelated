@@ -59,7 +59,8 @@ jobs:
       command: '${{ steps.extract_command.outputs.command }}'
       additional_context:
         '${{ steps.extract_command.outputs.additional_context }}'
-      has_gemini_auth: '${{ steps.validate_gemini_auth.outputs.has_gemini_auth }}'
+      has_gemini_auth:
+        '${{ steps.validate_gemini_auth.outputs.has_gemini_auth }}'
       auth_validation_error:
         '${{ steps.validate_gemini_auth.outputs.auth_validation_error }}'
       issue_number:
