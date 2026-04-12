@@ -31,13 +31,32 @@ const organizationSchema = {
     title="Bring the pilot question, the hard case, or the trust review."
     lede="Reach out if you want to evaluate the platform, talk through a pilot, ask security questions, or figure out whether the workflow fits your training program."
     note="The fastest conversations start with the actual supervision problem."
-    trustLine={['Founder-led replies', 'Response target: two business days', 'United States']}
-    primaryCTA={{ text: 'Email the team', href: 'mailto:info@pixelatedempathy.com' }}
+    trustLine={[
+      'Founder-led replies',
+      'Response target: two business days',
+      'United States',
+    ]}
+    primaryCTA={{
+      text: 'Email the team',
+      href: 'mailto:info@pixelatedempathy.com',
+    }}
     secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
     stats={[
-      { label: 'Best for', value: 'Pilots + trust review', detail: 'Bring rollout, privacy, or supervision questions' },
-      { label: 'Email', value: 'info@pixelatedempathy.com', detail: 'For demos, partnerships, and evaluation' },
-      { label: 'Company', value: 'Founder-led', detail: 'Built in the United States' },
+      {
+        label: 'Best for',
+        value: 'Pilots + trust review',
+        detail: 'Bring rollout, privacy, or supervision questions',
+      },
+      {
+        label: 'Email',
+        value: 'info@pixelatedempathy.com',
+        detail: 'For demos, partnerships, and evaluation',
+      },
+      {
+        label: 'Company',
+        value: 'Founder-led',
+        detail: 'Built in the United States',
+      },
     ]}
   />
 
@@ -49,14 +68,25 @@ const organizationSchema = {
             <span class="marketing-card__label">Best first message</span>
             <ul class="marketing-list">
               <li>The case or supervision workflow you want to improve</li>
-              <li>Whether you want a demo, pilot discussion, or security review</li>
-              <li>Any rollout, retention, or deployment constraints that matter early</li>
+              <li>
+                Whether you want a demo, pilot discussion, or security review
+              </li>
+              <li>
+                Any rollout, retention, or deployment constraints that matter
+                early
+              </li>
             </ul>
           </article>
 
           <article class="marketing-card marketing-card--accent">
             <span class="marketing-card__label">Direct contact</span>
-            <p><a class="marketing-inline-link" href="mailto:info@pixelatedempathy.com">info@pixelatedempathy.com</a></p>
+            <p>
+              <a
+                class="marketing-inline-link"
+                href="mailto:info@pixelatedempathy.com"
+                >info@pixelatedempathy.com</a
+              >
+            </p>
             <p>United States</p>
             <p>Founded 2025 • Founder-led</p>
           </article>
@@ -64,8 +94,18 @@ const organizationSchema = {
           <article class="marketing-card">
             <span class="marketing-card__label">Elsewhere</span>
             <div class="marketing-inline-links">
-              <a href="https://twitter.com/pixelatedempathy" class="marketing-inline-link" target="_blank" rel="noopener noreferrer">Twitter</a>
-              <a href="https://github.com/nochadisfaction/pixelated" class="marketing-inline-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a
+                href="https://twitter.com/pixelatedempathy"
+                class="marketing-inline-link"
+                target="_blank"
+                rel="noopener noreferrer">Twitter</a
+              >
+              <a
+                href="https://github.com/nochadisfaction/pixelated"
+                class="marketing-inline-link"
+                target="_blank"
+                rel="noopener noreferrer">GitHub</a
+              >
             </div>
           </article>
         </div>
@@ -97,7 +137,8 @@ const organizationSchema = {
                   class="brutalist-input"
                   placeholder="Your name"
                 />
-                <div class="mt-1 hidden text-xs text-red-400" id="name-error"></div>
+                <div class="mt-1 hidden text-xs text-red-400" id="name-error">
+                </div>
               </div>
 
               <div>
@@ -113,7 +154,8 @@ const organizationSchema = {
                   class="brutalist-input"
                   placeholder="you@example.com"
                 />
-                <div class="mt-1 hidden text-xs text-red-400" id="email-error"></div>
+                <div class="mt-1 hidden text-xs text-red-400" id="email-error">
+                </div>
               </div>
             </div>
 
@@ -130,7 +172,8 @@ const organizationSchema = {
                 class="brutalist-input"
                 placeholder="Pilot, demo, trust review, or something else"
               />
-              <div class="mt-1 hidden text-xs text-red-400" id="subject-error"></div>
+              <div class="mt-1 hidden text-xs text-red-400" id="subject-error">
+              </div>
             </div>
 
             <div>
@@ -144,9 +187,11 @@ const organizationSchema = {
                 required
                 maxlength="2000"
                 class="brutalist-input resize-none"
-                placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."></textarea>
+                placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."
+              ></textarea>
               <div class="mt-1 flex items-center justify-between">
-                <div class="hidden text-xs text-red-400" id="message-error"></div>
+                <div class="hidden text-xs text-red-400" id="message-error">
+                </div>
                 <div class="text-xs" style="color: var(--text-muted);">
                   <span id="message-count">0</span>/2000
                 </div>
@@ -193,7 +238,10 @@ const organizationSchema = {
             style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);"
             role="alert"
           >
-            <h3 class="mb-2 font-semibold" style="color: var(--accent-primary);">
+            <h3
+              class="mb-2 font-semibold"
+              style="color: var(--accent-primary);"
+            >
               Message sent successfully!
             </h3>
             <p
