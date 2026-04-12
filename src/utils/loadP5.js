@@ -1,86 +1,75 @@
-// Shared p5.js loading utility to prevent duplication across components
-/**
- * Shared p5.js loading utility to prevent duplication across components.
- * Uses a closure to encapsulate the p5Promise, avoiding global mutable state.
- */
-const getP5Promise = (() => {
-  let p5Promise
-  return () => {
-    if (!p5Promise) {
-      console.log('[loadP5] Creating new p5Promise (closure encapsulated)')
-      p5Promise = new Promise((resolve, reject) => {
-        if (typeof window === 'undefined') {
-          reject(new Error('p5.js can only be loaded in the browser'))
-          return
-        }
-        if (window.p5) {
-          console.log(
-            '[loadP5] window.p5 already exists, resolving immediately.',
-          )
-          resolve(window.p5)
-          return
-        }
-        const script = document.createElement('script')
-        script.src = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js'
-        script.integrity =
-          'sha384-+QwQ6Q0imeISFRCGDpa2BkLomqKgJo0vvArkH5AO9M/dwZ0pniS3pSkeCZMt2rtI'
-        script.crossOrigin = 'anonymous'
-        script.onload = () => {
-          console.log(
-            '[loadP5] p5.js loaded successfully with SRI and crossorigin.',
-          )
-          resolve(window.p5)
-        }
-        script.onerror = (event) => {
-          console.error(
-            '[loadP5] p5.js failed to load:',
-            event,
-            'script.src:',
-            script.src,
-            'event.target:',
-            event?.target,
-          )
-          const src = event?.target?.src || script.src || 'unknown'
-          reject(new Error(`[loadP5] Failed to load p5.js: ${src}`))
-        }
-        document.head.appendChild(script)
-        console.log('[loadP5] Script tag injected:', script.src)
-      })
-      p5Promise.then(
-        () => console.log('[loadP5] p5Promise resolved.'),
-        (err) => console.error('[loadP5] p5Promise rejected:', err),
-      )
-    } else {
-      console.log(
-        '[loadP5] Returning existing p5Promise (closure encapsulated)',
-      )
-    }
-    return p5Promise
-  }
-})()
+const P5_CDN_URL = 'https://cdn.jsdelivr.net/npm/p5@2.0.3/lib/p5.min.js'
+const P5_CDN_INTEGRITY =
+  'sha384-+QwQ6Q0imeISFRCGDpa2BkLomqKgJo0vvArkH5AO9M/dwZ0pniS3pSkeCZMt2rtI'
+const P5_SCRIPT_ATTR = 'data-pixelated-p5-loader'
 
-export default function loadP5() {
-  return getP5Promise()
+/** @type {Promise<unknown> | null} */
+let p5Promise = null
+
+function isBrowser() {
+  return typeof window !== 'undefined' && typeof document !== 'undefined'
 }
 
-// TEST-ONLY: Reset function for test/dev environments to clear the closure state.
-// Not intended for production use.
-if (typeof window !== 'undefined') {
-  window.__resetP5Promise = () => {
-    // Access the closure and reset p5Promise
-    // This works because getP5Promise is a closure over p5Promise
-    // eslint-disable-next-line no-underscore-dangle
-    if (getP5Promise && getP5Promise.toString().includes('let p5Promise')) {
-      // Hack: forcibly reset by reassigning the closure
-      // (redefine getP5Promise in test/dev if needed)
-      // In practice, you may need to reload the module or use a test helper.
-      // Here, we provide a no-op for test runners to hook into.
-      // (You may implement a more robust reset if needed.)
-    }
-  }
+function getExistingP5Script() {
+  return document.querySelector(
+    `script[src="${P5_CDN_URL}"], script[${P5_SCRIPT_ATTR}]`,
+  )
 }
 
 /**
- * No manual cleanup function is exported, as state is now encapsulated in the closure.
- * If test isolation is needed, consider exposing a test-only reset function via a separate export.
+ * @returns {Promise<unknown>}
  */
+async function createP5Loader() {
+  if (typeof window.p5 !== 'undefined') {
+    return window.p5
+  }
+
+  const script =
+    getExistingP5Script() ?? (() => {
+      const created = document.createElement('script')
+      created.src = P5_CDN_URL
+      created.integrity = P5_CDN_INTEGRITY
+      created.crossOrigin = 'anonymous'
+      created.setAttribute(P5_SCRIPT_ATTR, 'true')
+      return created
+    })()
+
+  if (!script.isConnected) {
+    document.head.appendChild(script)
+  }
+
+  return await new Promise((resolve, reject) => {
+    script.addEventListener(
+      'load',
+      () => {
+        if (typeof window.p5 === 'undefined') {
+          reject(new Error('p5.js loaded without exposing window.p5'))
+          return
+        }
+        resolve(window.p5)
+      },
+      { once: true },
+    )
+    script.addEventListener(
+      'error',
+      () => {
+        reject(new Error(`Failed to load p5.js from ${P5_CDN_URL}`))
+      },
+      { once: true },
+    )
+  })
+}
+
+/** @returns {Promise<unknown>} */
+export default async function loadP5() {
+  if (!isBrowser()) {
+    throw new Error('loadP5 can only be called in a browser environment')
+  }
+
+  p5Promise ??= createP5Loader().catch((error) => {
+      p5Promise = null
+      throw error
+    })
+
+  return p5Promise
+}

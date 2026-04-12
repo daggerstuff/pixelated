@@ -41,9 +41,12 @@ export class RedisService extends EventEmitter implements IRedisService {
     // Merge the provided config with defaults
     Object.assign(this.config, config)
 
+    const upstashRedisUrl = process.env['UPSTASH_REDIS_REST_URL']
+    const redisUrl = process.env['REDIS_URL']
+
     // Check if we have either UPSTASH_REDIS_REST_URL or traditional Redis URL
-    const hasUpstashUrl = Boolean(process.env['UPSTASH_REDIS_REST_URL'])
-    const hasRedisUrl = Boolean(process.env['REDIS_URL'])
+    const hasUpstashUrl = Boolean(upstashRedisUrl)
+    const hasRedisUrl = Boolean(redisUrl)
 
     logger.debug(
       `[RedisService] Config check: hasUpstashUrl=${hasUpstashUrl}, hasRedisUrl=${hasRedisUrl}`,
@@ -51,9 +54,9 @@ export class RedisService extends EventEmitter implements IRedisService {
 
     // If environment variables exist, use them regardless of what was in config
     if (hasUpstashUrl) {
-      this.config.url = process.env['UPSTASH_REDIS_REST_URL'] as string
+      this.config.url = upstashRedisUrl ?? ''
     } else if (hasRedisUrl) {
-      this.config.url = process.env['REDIS_URL'] as string
+      this.config.url = redisUrl ?? ''
 
       // Support for Docker Secrets (/run/secrets/*) or any *_FILE env var
       const redisPasswordFile = process.env['REDIS_PASSWORD_FILE']
@@ -125,10 +128,10 @@ export class RedisService extends EventEmitter implements IRedisService {
       const redisOptions: Record<string, unknown> = {
         maxRetriesPerRequest: this.config.maxRetries,
         retryStrategy: (times: number) => {
-          if (times > (this.config.maxRetries || 3)) {
+          if (times > (this.config.maxRetries ?? 3)) {
             return null
           }
-          return this.config.retryDelay || 100
+          return this.config.retryDelay ?? 100
         },
       }
 
@@ -445,10 +448,10 @@ export class RedisService extends EventEmitter implements IRedisService {
       url: this.config.url,
       maxRetriesPerRequest: this.config.maxRetries,
       retryStrategy: (times: number) => {
-        if (times > (this.config.maxRetries || 3)) {
+        if (times > (this.config.maxRetries ?? 3)) {
           return null
         }
-        return this.config.retryDelay || 100
+        return this.config.retryDelay ?? 100
       },
       keyPrefix: this.config.keyPrefix,
       connectTimeout: this.config.connectTimeout,

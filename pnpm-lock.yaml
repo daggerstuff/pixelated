@@ -223,6 +223,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.97.0
         version: 5.97.0(react@19.2.4)
+      '@tarquinen/opencode-dcp':
+        specifier: ^3.1.9
+        version: 3.1.9(@opencode-ai/plugin@1.4.3)
       '@tensorflow/tfjs':
         specifier: ^4.22.0
         version: 4.22.0(encoding@0.1.13)(seedrandom@3.0.5)
@@ -952,6 +955,9 @@ packages:
 
   '@antfu/utils@8.1.1':
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
+
+  '@anthropic-ai/tokenizer@0.0.4':
+    resolution: {integrity: sha512-EHRKbxlxlc8W4KCBEseByJ7YwyYCmgu9OyN59H9+IYIGPoKv8tXyQXinkeGDI+cI8Tiuz9wk2jZb/kK7AyvL7g==}
 
   '@asamuzakjp/css-color@5.1.9':
     resolution: {integrity: sha512-zd9c/Wdso6v1U7v6w3i/hbAr4K7NaSHImdpvmLt+Y9ea5BhilnIGNkfhOJ7FEIuPipAnE9tZeDOll05WDT0kgg==}
@@ -2571,6 +2577,20 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
+
+  '@opencode-ai/plugin@1.4.3':
+    resolution: {integrity: sha512-Ob/3tVSIeuMRJBr2O23RtrnC5djRe01Lglx+TwGEmjrH9yDBJ2tftegYLnNEjRoMuzITgq9LD8168p4pzv+U/A==}
+    peerDependencies:
+      '@opentui/core': '>=0.1.97'
+      '@opentui/solid': '>=0.1.97'
+    peerDependenciesMeta:
+      '@opentui/core':
+        optional: true
+      '@opentui/solid':
+        optional: true
+
+  '@opencode-ai/sdk@1.4.3':
+    resolution: {integrity: sha512-X0CAVbwoGAjTY2iecpWkx2B+GAa2jSaQKYpJ+xILopeF/OGKZUN15mjqci+L7cEuwLHV5wk3x2TStUOVCa5p0A==}
 
   '@opentelemetry/api-logs@0.203.0':
     resolution: {integrity: sha512-9B9RU0H7Ya1Dx/Rkyc4stuBZSGVQF27WigitInx2QQoj6KUpEFYPKoWjdFTunJYxmXmh17HeBvbMa1EhGyPmqQ==}
@@ -5074,6 +5094,11 @@ packages:
     resolution: {integrity: sha512-y4So4eGcQoK2WVMAcDNZE9ofB/p5v1OlKvtc1F3uqHwrtifobT7q+ZnXk2mRkc8E84HKYSlAE9z6HXl2V0+ySQ==}
     peerDependencies:
       react: ^19.2.4
+
+  '@tarquinen/opencode-dcp@3.1.9':
+    resolution: {integrity: sha512-oo82YRJSCMw8Q8LOM/55qw4gzo/ylfsAw+R57/9ch5W8N5iG2R7O6JGtTl5uk+ahS4K8tevVVWMf7+eFkUQYhQ==}
+    peerDependencies:
+      '@opencode-ai/plugin': '>=1.2.0'
 
   '@tensorflow/tfjs-backend-cpu@4.22.0':
     resolution: {integrity: sha512-1u0FmuLGuRAi8D2c3cocHTASGXOmHc/4OvoVDENJayjYkS119fcTcQf4iHrtLthWyDIPy3JiPhRrZQC9EwnhLw==}
@@ -11406,6 +11431,9 @@ packages:
   three@0.183.2:
     resolution: {integrity: sha512-di3BsL2FEQ1PA7Hcvn4fyJOlxRRgFYBpMTcyOgkwJIaDOdJMebEFPA+t98EvjuljDx4hNulAGwF6KIjtwI5jgQ==}
 
+  tiktoken@1.0.22:
+    resolution: {integrity: sha512-PKvy1rVF1RibfF3JlXBSP0Jrcw2uq3yXdgcEXtKTYn3QJ/cBRBHDnrJ5jHky+MENZ6DIPwNUGWpkVx+7joCpNA==}
+
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
 
@@ -12604,6 +12632,11 @@ snapshots:
       tinyexec: 1.1.1
 
   '@antfu/utils@8.1.1': {}
+
+  '@anthropic-ai/tokenizer@0.0.4':
+    dependencies:
+      '@types/node': 18.19.130
+      tiktoken: 1.0.22
 
   '@asamuzakjp/css-color@5.1.9':
     dependencies:
@@ -15243,6 +15276,15 @@ snapshots:
   '@openai/codex@0.118.0-win32-x64':
     optional: true
 
+  '@opencode-ai/plugin@1.4.3':
+    dependencies:
+      '@opencode-ai/sdk': 1.4.3
+      zod: 4.3.6
+
+  '@opencode-ai/sdk@1.4.3':
+    dependencies:
+      cross-spawn: 7.0.6
+
   '@opentelemetry/api-logs@0.203.0':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -17873,6 +17915,14 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.97.0
       react: 19.2.4
+
+  '@tarquinen/opencode-dcp@3.1.9(@opencode-ai/plugin@1.4.3)':
+    dependencies:
+      '@anthropic-ai/tokenizer': 0.0.4
+      '@opencode-ai/plugin': 1.4.3
+      '@opencode-ai/sdk': 1.4.3
+      jsonc-parser: 3.3.1
+      zod: 4.3.6
 
   '@tensorflow/tfjs-backend-cpu@4.22.0(@tensorflow/tfjs-core@4.22.0(encoding@0.1.13))':
     dependencies:
@@ -25546,6 +25596,8 @@ snapshots:
       three: 0.183.2
 
   three@0.183.2: {}
+
+  tiktoken@1.0.22: {}
 
   tiny-inflate@1.0.3: {}
 
