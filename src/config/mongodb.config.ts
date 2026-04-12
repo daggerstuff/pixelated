@@ -59,7 +59,9 @@ class MongoDB {
   private buildMongoDBUri(): string {
     const metaEnv = import.meta.env?.['MONGODB_URI']
 
-    process.env['MONGODB_URI'] ??= metaEnv
+    if (metaEnv && process.env['MONGODB_URI'] === undefined) {
+      process.env['MONGODB_URI'] = metaEnv
+    }
     const mongoUri = process.env['MONGODB_URI']
 
     if (mongoUri) {
@@ -123,13 +125,14 @@ class MongoDB {
       if (!this.db) {
         await this.connect()
       }
-      // After connect(), this.db should be non-null.
-      // We perform an explicit check to satisfy TypeScript's strict null checks.
-      if (this.db) {
-        await this.db.admin().ping()
-        return true
+
+      const db = this.db
+      if (!db) {
+        return false
       }
-      return false
+
+      await db.admin().ping()
+      return true
     } catch (error: unknown) {
       console.error('MongoDB health check failed:', error)
       return false

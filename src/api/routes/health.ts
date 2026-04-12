@@ -38,7 +38,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
   // Check MongoDB
   try {
     const mongoConn = getMongoConnection()
-    const adminDbConnection = mongoConn.connection.db
+    const adminDbConnection = mongoConn.db
     if (!adminDbConnection) {
       throw new Error('MongoDB admin database is not initialized')
     }

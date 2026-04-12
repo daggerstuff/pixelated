@@ -89,11 +89,37 @@ jobs:
           path: trivy-results.sarif
           retention-days: 30
 
+      - name: Normalize Google workload identity settings
+        if: github.event_name == 'push'
+        id: gcp-auth
+        env:
+          GCP_WIF_PROVIDER_RAW: ${{ secrets['GCP_WIF_PROVIDER'] }}
+        run: |
+          [[ -n "$GCP_WIF_PROVIDER_RAW" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
+          PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
+          PROVIDER="${PROVIDER#//iam.googleapis.com/}"
+          [[ -n "$PROVIDER" ]] || { echo "Normalized provider was empty"; exit 1; }
+          echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
+          echo "audience=$PROVIDER" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Google Cloud auth inputs
+        if: github.event_name == 'push'
+        env:
+          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
+          GCP_WIF_PROVIDER: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+        run: |
+          [[ -n "$GCP_PROJECT_ID" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
+          [[ -n "$GCP_WIF_PROVIDER" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
+          [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
+          echo "Google Cloud auth inputs validated"
+
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'
         uses: google-github-actions/auth@v3.0.0
         with:
-          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          workload_identity_provider: ${{ steps.gcp-auth.outputs.provider }}
+          audience: ${{ steps.gcp-auth.outputs.audience }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
@@ -106,9 +132,6 @@ jobs:
       - name: Authenticate Docker to Artifact Registry
         if: github.event_name == 'push'
         run: |
-          [[ -n "${{ secrets['GCP_PROJECT_ID'] }}" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
-          [[ -n "${{ secrets['GCP_WIF_PROVIDER'] }}" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
-          [[ -n "${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
           gcloud auth configure-docker "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev" --quiet
 
       - name: Push Docker image to Google Artifact Registry

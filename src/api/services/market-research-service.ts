@@ -7,6 +7,29 @@ import { getPostgresPool } from '../../lib/database/connection'
 import { MarketResearch as MarketResearchModel } from '../../lib/database/mongodb/schemas'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 
+type MarketResearchPermissionLevel = 'view' | 'edit' | 'comment'
+
+type MarketResearchPermissions = {
+  view?: string[]
+  edit?: string[]
+  comment?: string[]
+}
+
+const normalizePermissions = (permissions?: MarketResearchPermissions) => ({
+  view: permissions?.view ?? [],
+  edit: permissions?.edit ?? [],
+  comment: permissions?.comment ?? [],
+})
+
+const hasPermission = (
+  permissions: MarketResearchPermissions | undefined,
+  permissionLevel: MarketResearchPermissionLevel,
+  userId: string,
+) => {
+  const normalized = normalizePermissions(permissions)
+  return normalized[permissionLevel].includes(userId)
+}
+
 /**
  * Create a new market research document
  */
@@ -77,7 +100,7 @@ export async function getMarketResearch(researchId: string, userId: string) {
 
   // Check permissions
   if (
-    !research.permissions.view.includes(userId) &&
+    !hasPermission(research.permissions, 'view', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot access this research')
@@ -108,7 +131,7 @@ export async function addFinding(
 
   // Check edit permission
   if (
-    !research.permissions.edit.includes(userId) &&
+    !hasPermission(research.permissions, 'edit', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
@@ -156,7 +179,7 @@ export async function addCompetitiveAnalysis(
 
   // Check edit permission
   if (
-    !research.permissions.edit.includes(userId) &&
+    !hasPermission(research.permissions, 'edit', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
@@ -203,7 +226,7 @@ export async function addRecommendation(
 
   // Check edit permission
   if (
-    !research.permissions.edit.includes(userId) &&
+    !hasPermission(research.permissions, 'edit', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
@@ -305,8 +328,10 @@ export async function shareMarketResearch(
 
   // Add to appropriate permission array
   const permissionKey = permissionLevel
-  if (!research.permissions[permissionKey].includes(targetUserId)) {
-    research.permissions[permissionKey].push(targetUserId)
+  const permissions = normalizePermissions(research.permissions)
+  if (!permissions[permissionKey].includes(targetUserId)) {
+    permissions[permissionKey].push(targetUserId)
+    research.permissions = permissions
     await research.save()
   }
 

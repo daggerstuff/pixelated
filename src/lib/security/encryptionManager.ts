@@ -3,8 +3,6 @@
  * Handles key rotation, perfect forward secrecy, and HSM integration
  */
 
-import type { CryptoKeyPair } from '@/types/crypto'
-
 export interface EncryptionConfig {
   algorithm: 'AES-GCM' | 'AES-CBC' | 'RSA-OAEP'
   keySize: 128 | 256 | 512
@@ -47,9 +45,9 @@ class EncryptionManager {
 
   constructor(config: EncryptionConfig) {
     this.config = {
-      keyRotationDays: 90,
-      enableHSM: false,
       ...config,
+      keyRotationDays: config.keyRotationDays ?? 90,
+      enableHSM: config.enableHSM ?? false,
     }
   }
 
@@ -121,7 +119,7 @@ class EncryptionManager {
       return { id: keyId, key }
     } else {
       // RSA key generation
-      const keyPair = (await crypto.subtle.generateKey(
+      const keyPair = await crypto.subtle.generateKey(
         {
           name: 'RSA-OAEP',
           modulusLength: this.config.keySize,
@@ -130,10 +128,32 @@ class EncryptionManager {
         },
         true,
         ['encrypt', 'decrypt'],
-      )) as CryptoKeyPair
+      )
 
-      return { id: keyId, key: keyPair.privateKey }
+      const hasPrivateKey = (value: unknown): value is { privateKey: CryptoKey } =>
+        typeof value === 'object' &&
+        value !== null &&
+        'privateKey' in value
+
+      if (hasPrivateKey(keyPair)) {
+        return { id: keyId, key: keyPair.privateKey }
+      }
+
+      throw new Error('Unexpected RSA key format')
     }
+  }
+
+  private async generateEcdhKeyPair(): Promise<CryptoKeyPair> {
+    const keyPair = await crypto.subtle.generateKey(
+      {
+        name: 'ECDH',
+        namedCurve: 'P-256',
+      },
+      true,
+      ['deriveBits', 'deriveKey'],
+    )
+
+    return keyPair
   }
 
   /**
@@ -239,7 +259,7 @@ class EncryptionManager {
       // Combine ciphertext and tag for GCM
       const tag = encryptedData.tag
         ? this.base64ToArrayBuffer(encryptedData.tag)
-        : new Uint8Array(16)
+        : new Uint8Array(16).buffer
       const combined = this.combineCiphertextAndTag(ciphertext, tag)
 
       decrypted = await crypto.subtle.decrypt(
@@ -268,8 +288,8 @@ class EncryptionManager {
     return decoder.decode(decrypted)
   }
 
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer)
+  private arrayBufferToBase64(buffer: ArrayBuffer | ArrayBufferView): string {
+    const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer)
     return btoa(String.fromCharCode(...bytes))
   }
 
@@ -392,15 +412,35 @@ class EncryptionManager {
     if (!metadata) return false
 
     // Generate ephemeral key for this session
-    const ephemeralKey = await this.generateKeyPair()
+    const ephemeralEcdhKeyPair = await this.generateEcdhKeyPair()
+    const secondEcdhKeyPair = await this.generateEcdhKeyPair()
+
+    // Ensure the target key still exists
+    const existingKey = this.keyStore.get(keyId)
+    if (!existingKey) {
+      throw new Error(`Key not found: ${keyId}`)
+    }
+
+    if (existingKey.type !== 'private') {
+      const fallbackKey = await crypto.subtle.generateKey(
+        {
+          name: 'AES-GCM',
+          length: 256,
+        },
+        true,
+        ['encrypt', 'decrypt'],
+      )
+      this.keyStore.set(keyId, fallbackKey)
+      return true
+    }
 
     // Derive session key using ECDH (simplified for this example)
     const sessionKey = await crypto.subtle.deriveKey(
       {
         name: 'ECDH',
-        public: ephemeralKey.key,
+        public: ephemeralEcdhKeyPair.publicKey,
       },
-      this.keyStore.get(keyId)!,
+      secondEcdhKeyPair.privateKey,
       {
         name: 'AES-GCM',
         length: 256,

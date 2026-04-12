@@ -302,6 +302,20 @@ const MarketResearchSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    permissions: {
+      view: {
+        type: [String],
+        default: [],
+      },
+      edit: {
+        type: [String],
+        default: [],
+      },
+      comment: {
+        type: [String],
+        default: [],
+      },
+    },
 
     // Research Data
     findings: [
