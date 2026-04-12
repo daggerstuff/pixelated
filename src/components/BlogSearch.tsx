@@ -32,8 +32,8 @@ export function BlogSearch() {
     setIsSearching(true)
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-      const data: SearchResponse = await response.json()
-      setResults(data.results)
+      const data = (await response.json()) as SearchResponse
+      setResults(Array.isArray(data?.results) ? data.results : [])
     } catch (error: unknown) {
       console.error('Search failed:', error)
     } finally {

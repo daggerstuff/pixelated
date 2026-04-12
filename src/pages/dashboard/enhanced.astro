@@ -3,12 +3,14 @@ export const prerender = false
 
 import DashboardLayout from '../../layouts/DashboardLayout.astro'
 import Card from '@/components/ui/Card.astro'
-import EnhancedChartComponent from '@/components/analytics/EnhancedChartComponent.tsx'
-import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmotionChart.tsx'
-import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.tsx'
-import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
-import Particle from '@/components/three/Particle.tsx'
-import FHEDemo from '@/components/security/FHEDemo.tsx'
+import {
+  DynamicEnhancedChartComponent,
+  DynamicFHEDemo,
+  DynamicMultidimensionalEmotionChart,
+  DynamicParticleVisualization,
+  DynamicSwiperCarousel,
+  DynamicTreatmentPlanManager,
+} from '@/lib/utils/dynamic-components'
 
 // @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
@@ -143,7 +145,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                 </span>
                 Therapy Journey Overview
               </h2>
-              <SwiperCarousel
+              <DynamicSwiperCarousel
                 client:load
                 effect="slide"
                 autoplay={{ delay: 5000, disableOnInteraction: false }}
@@ -167,7 +169,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                   </span>
                   Progress Tracking
                 </h3>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="line"
                   title="Therapy Progress Over Time"
@@ -194,7 +196,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                   </span>
                   Session Metrics
                 </h3>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="bar"
                   title="Weekly Session Analysis"
@@ -221,7 +223,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
               <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <div>
                   <h4 class="text-lg font-medium mb-3">3D Emotion Mapping</h4>
-                  <MultidimensionalEmotionChart
+                  <DynamicMultidimensionalEmotionChart
                     client:load
                     showTrails={true}
                     showAxes={true}
@@ -329,7 +331,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                 </span>
                 Treatment Plan Management
               </h2>
-              <TreatmentPlanManager
+              <DynamicTreatmentPlanManager
                 client:load
                 className="w-full"
                 readOnly={false}
@@ -342,7 +344,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
             <Card>
               <div class="p-6">
                 <h3 class="text-xl font-semibold mb-4">Patient Outcomes</h3>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="line"
                   title="Treatment Effectiveness"
@@ -362,7 +364,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
             <Card>
               <div class="p-6">
                 <h3 class="text-xl font-semibold mb-4">Session Analysis</h3>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="scatter"
                   title="Engagement vs Progress"
@@ -387,7 +389,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                   </span>
                   Privacy-Preserving Analytics
                 </h3>
-                <FHEDemo
+                <DynamicFHEDemo
                   client:load
                   className="w-full"
                   showAdvanced={true}
@@ -475,7 +477,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
             <Card>
               <div class="p-6">
                 <h3 class="text-xl font-semibold mb-4">3D Emotion Journey</h3>
-                <MultidimensionalEmotionChart
+                <DynamicMultidimensionalEmotionChart
                   client:load
                   showTrails={true}
                   showAxes={true}
@@ -489,7 +491,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                 <h3 class="text-xl font-semibold mb-4">
                   Interactive Emotion Particles
                 </h3>
-                <Particle
+                <DynamicParticleVisualization
                   client:load
                   particleCount={60}
                   emotion="neutral"
@@ -508,7 +510,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
             <Card>
               <div class="p-6">
                 <h4 class="text-lg font-medium mb-3">Progress Trends</h4>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="line"
                   title="6-Month Progress"
@@ -527,7 +529,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
             <Card>
               <div class="p-6">
                 <h4 class="text-lg font-medium mb-3">Emotion Categories</h4>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="pie"
                   title="Emotion Distribution"
