@@ -75,7 +75,8 @@ function getChunkName(id) {
   const normalizedId = id.replace(/\\/g, '/')
 
   if (normalizedId.includes('/src/components/')) {
-    const componentSegments = normalizedId.split('/src/components/')[1]?.split('/') || []
+    const componentSegments =
+      normalizedId.split('/src/components/')[1]?.split('/') || []
     const componentRoot = componentSegments[0]
     if (componentRoot) {
       return `components-${componentRoot}`
@@ -173,9 +174,10 @@ function getChunkName(id) {
       return `vendor-${sanitizedName}`
     }
     if (segments.length > 0 && segments[0]) {
-      const packageName = segments[0].startsWith('@') && segments.length > 1
-        ? `${segments[0]}-${segments[1]}`
-        : segments[0]
+      const packageName =
+        segments[0].startsWith('@') && segments.length > 1
+          ? `${segments[0]}-${segments[1]}`
+          : segments[0]
       const sanitizedName = packageName
         .replace('@', 'at-')
         .replace(/[^a-zA-Z0-9-]/g, '-')

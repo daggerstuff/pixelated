@@ -82,7 +82,8 @@ jobs:
         uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
-          image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          image-ref:
+            pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
@@ -127,39 +128,11 @@ jobs:
             exit 1
           fi
 
-      - name: Normalize Google workload identity settings
-        if: github.event_name == 'push'
-        id: gcp-auth
-        env:
-          GCP_WIF_PROVIDER_RAW: ${{ secrets['GCP_WIF_PROVIDER'] }}
-        run: |
-          [[ -n "$GCP_WIF_PROVIDER_RAW" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
-          PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
-          PROVIDER="${PROVIDER#v1/}"
-          PROVIDER="${PROVIDER#//iam.googleapis.com/}"
-          [[ -n "$PROVIDER" ]] || { echo "Normalized provider was empty"; exit 1; }
-          echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
-          echo "audience=$PROVIDER" >> "$GITHUB_OUTPUT"
-
-      - name: Validate Google Cloud auth inputs
-        if: github.event_name == 'push'
-        env:
-          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
-          GCP_WIF_PROVIDER: ${{ secrets['GCP_WIF_PROVIDER'] }}
-          GCP_WIF_SERVICE_ACCOUNT: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
-        run: |
-          [[ -n "$GCP_PROJECT_ID" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
-          [[ -n "$GCP_WIF_PROVIDER" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
-          [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
-          [[ -n "${{ steps.gcp-auth.outputs.provider }}" ]] || { echo "Normalized workload identity provider was empty"; exit 1; }
-          echo "Google Cloud auth inputs validated"
-
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'
         uses: google-github-actions/auth@v3.0.0
         with:
-          workload_identity_provider: ${{ steps.gcp-auth.outputs.provider }}
-          audience: ${{ steps.gcp-auth.outputs.audience }}
+          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
