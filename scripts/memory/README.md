@@ -2,25 +2,31 @@
 
 ## Quick Start
 
-```bash
-# Copy config
-cp scripts/memory/mcp-config.json .mcp.json
+Foresight is now a standalone package. Install it separately:
 
-# Edit .mcp.json:
-# 1. Update "cwd" to your pixelated repo path
-# 2. Update "FORESIGHT_DB_PATH" to where you want memories stored
-# 3. Update "FORESIGHT_USER_ID" to your username
+```bash
+# Clone the standalone repo
+git clone https://github.com/vectorize-ai/foresight-mcp.git
+cd foresight-mcp
+
+# Install with uv
+uv sync
+
+# Run the server
+uv run foresight-mcp
 ```
 
-## Minimal Config
+## Add to Claude Code
+
+After installing foresight-mcp package:
 
 ```json
 {
   "mcpServers": {
     "foresight": {
       "command": "uv",
-      "args": ["run", "python", "-m", "ai.foresight.app"],
-      "cwd": "/absolute/path/to/pixelated",
+      "args": ["run", "-m", "foresight_mcp"],
+      "cwd": "/path/to/foresight-mcp",
       "env": {
         "FORESIGHT_DB_PATH": "/home/user/.foresight/memory.db",
         "FORESIGHT_USER_ID": "username"
@@ -32,15 +38,17 @@ cp scripts/memory/mcp-config.json .mcp.json
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `FORESIGHT_DB_PATH` | No | `~/.foresight/memory.db` | Where to store memories |
-| `FORESIGHT_USER_ID` | No | System username | Your user ID |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `FORESIGHT_DB_PATH` | `~/.foresight/memory.db` | Database path |
+| `FORESIGHT_USER_ID` | System user | User identifier |
 
 ## Tools
 
-- `foresight_store_memory` - Store memory
-- `foresight_query_memories` - Search memories  
-- `foresight_list_memories` - List memories
-- `foresight_delete_memory` - Delete memory
-- `foresight_memory_status` - System status
+- `store_memory` - Store memory
+- `query_memories` - Search memories
+- `list_memories` - List memories
+- `get_memory` - Get specific memory
+- `update_memory` - Update memory
+- `delete_memory` - Delete memory
+- `memory_status` - System status
