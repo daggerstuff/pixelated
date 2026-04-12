@@ -15,12 +15,6 @@ const { mockManagementClient, mockAuthenticationClient, mockUserInfoClient } = v
       changePassword: vi.fn(),
     }
   };
-  // Duplicate for old API compatibility in tests
-  mockManagementClient.users.create = mockManagementClient.users.create;
-  mockManagementClient.users.get = mockManagementClient.users.get;
-  mockManagementClient.users.gets = mockManagementClient.users.getAll;
-  mockManagementClient.users.update = mockManagementClient.users.update;
-  mockManagementClient.tickets.changePassword = mockManagementClient.tickets.changePassword;
 
   const mockAuthenticationClient = {
     oauth: {
@@ -30,9 +24,9 @@ const { mockManagementClient, mockAuthenticationClient, mockUserInfoClient } = v
     },
     getProfile: vi.fn(),
   };
-  mockAuthenticationClient.passwordGrant = mockAuthenticationClient.oauth.passwordGrant;
-  mockAuthenticationClient.refreshToken = mockAuthenticationClient.oauth.refreshTokenGrant;
-  mockAuthenticationClient.revokeRefreshToken = mockAuthenticationClient.oauth.revokeRefreshToken;
+
+
+
 
   const mockUserInfoClient = {
     getUserInfo: vi.fn(),
