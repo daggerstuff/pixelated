@@ -299,13 +299,19 @@ export class Auth0UserService {
 
     try {
       // Use Auth0's Resource Owner Password grant for direct authentication
-      const response = await auth0Authentication.oauth.passwordGrant({
-        username: email,
-        password: password,
-        realm: 'Username-Password-Authentication',
-        scope: 'openid profile email',
-        audience: process.env.AUTH0_AUDIENCE ?? '',
-      })
+      let response;
+      try {
+        response = await auth0Authentication.oauth.passwordGrant({
+          username: email,
+          password: password,
+          realm: 'Username-Password-Authentication',
+          scope: 'openid profile email',
+          audience: process.env.AUTH0_AUDIENCE ?? '',
+        })
+      } catch (error) {
+        console.error('Auth0 password grant failed:', error);
+        throw new Error('Invalid credentials');
+      }
       const tokenResponse = response.data as Auth0PasswordGrantResponse
 
       if (!auth0UserInfo) {

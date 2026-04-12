@@ -16,10 +16,13 @@ vi.mock('auth0', () => {
     }),
     AuthenticationClient: vi.fn().mockImplementation(() => {
       return {
-        passwordGrant: vi.fn(),
+        oauth: {
+          passwordGrant: vi.fn(),
+          refreshTokenGrant: vi.fn(),
+          revokeRefreshToken: vi.fn(),
+        },
         getProfile: vi.fn(),
         refreshToken: vi.fn(),
-        revokeRefreshToken: vi.fn(),
       }
     }),
   }
@@ -94,7 +97,7 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'user' },
       }
 
-      mockAuthenticationClient.passwordGrant.mockResolvedValue(
+      mockAuthenticationClient.oauth.passwordGrant.mockResolvedValue(
         mockTokenResponse,
       )
       mockAuthenticationClient.getProfile.mockResolvedValue(mockUserProfile)
@@ -121,7 +124,7 @@ describe('Auth0UserService', () => {
         refreshToken: 'mock-refresh-token',
       })
 
-      expect(mockAuthenticationClient.passwordGrant).toHaveBeenCalledWith({
+      expect(mockAuthenticationClient.oauth.passwordGrant).toHaveBeenCalledWith({
         username: 'test@example.com',
         password: 'password123',
         realm: 'Username-Password-Authentication',
@@ -131,7 +134,7 @@ describe('Auth0UserService', () => {
     })
 
     it('should throw error for invalid credentials', async () => {
-      mockAuthenticationClient.passwordGrant.mockRejectedValue(
+      mockAuthenticationClient.oauth.passwordGrant.mockRejectedValue(
         new Error('Unauthorized'),
       )
 
@@ -391,17 +394,17 @@ describe('Auth0UserService', () => {
 
   describe('signOut', () => {
     it('should successfully revoke refresh token', async () => {
-      mockAuthenticationClient.revokeRefreshToken.mockResolvedValue({})
+      mockAuthenticationClient.oauth.revokeRefreshToken.mockResolvedValue({})
 
       await auth0UserService.signOut('mock-refresh-token')
 
-      expect(mockAuthenticationClient.revokeRefreshToken).toHaveBeenCalledWith({
+      expect(mockAuthenticationClient.oauth.revokeRefreshToken).toHaveBeenCalledWith({
         token: 'mock-refresh-token',
       })
     })
 
     it('should not throw error when sign out fails', async () => {
-      mockAuthenticationClient.revokeRefreshToken.mockRejectedValue(
+      mockAuthenticationClient.oauth.revokeRefreshToken.mockRejectedValue(
         new Error('Invalid token'),
       )
 
