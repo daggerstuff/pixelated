@@ -74,6 +74,14 @@ const preferredPort = (() => {
 function getChunkName(id) {
   const normalizedId = id.replace(/\\/g, '/')
 
+  if (normalizedId.includes('/src/components/')) {
+    const componentSegments = normalizedId.split('/src/components/')[1]?.split('/') || []
+    const componentRoot = componentSegments[0]
+    if (componentRoot) {
+      return `components-${componentRoot}`
+    }
+  }
+
   if (
     normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')
   ) {
@@ -152,6 +160,28 @@ function getChunkName(id) {
     return 'swiper-vendor'
   }
   if (normalizedId.includes('/node_modules/')) {
+    const relativePath = normalizedId.split('/node_modules/')[1] || ''
+    const segments = relativePath.split('/')
+    if (segments.length > 0 && segments[0] === '.pnpm' && segments.length > 1) {
+      const packageName =
+        segments[1].includes('@') && segments[1].includes('/')
+          ? `${segments[1]}-${segments[2]}`
+          : segments[1]
+      const sanitizedName = packageName
+        .replace('@', 'at-')
+        .replace(/[^a-zA-Z0-9-]/g, '-')
+      return `vendor-${sanitizedName}`
+    }
+    if (segments.length > 0 && segments[0]) {
+      const packageName = segments[0].startsWith('@') && segments.length > 1
+        ? `${segments[0]}-${segments[1]}`
+        : segments[0]
+      const sanitizedName = packageName
+        .replace('@', 'at-')
+        .replace(/[^a-zA-Z0-9-]/g, '-')
+      return `vendor-${sanitizedName}`
+    }
+
     return 'vendor'
   }
   return null
@@ -215,6 +245,19 @@ export default defineConfig({
     },
   },
   vite: {
+    logLevel: 'error',
+    environments: {
+      client: {
+        build: {
+          chunkSizeWarningLimit: isProduction ? 5000 : 10000,
+        },
+      },
+      server: {
+        build: {
+          chunkSizeWarningLimit: isProduction ? 5000 : 10000,
+        },
+      },
+    },
     server: {
       watch: {
         ignored: [
@@ -237,9 +280,9 @@ export default defineConfig({
       // Enable hidden source maps in production for Sentry upload (not served to users)
       sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
-      chunkSizeWarningLimit: isProduction ? 500 : 1500,
+      chunkSizeWarningLimit: isProduction ? 5000 : 10000,
       // Temporarily disabled minification to debug build hang
-      minify: false,
+      minify: process.env.CI === 'true' || isProduction ? 'terser' : false,
       // minify: isProduction ? 'terser' : false,
       terserOptions: isProduction
         ? {

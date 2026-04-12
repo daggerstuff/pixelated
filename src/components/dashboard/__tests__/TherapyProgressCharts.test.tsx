@@ -205,7 +205,7 @@ describe('TherapyProgressCharts', () => {
   it('renders with single session metric', () => {
     const singleData = {
       ...mockData,
-      sessionMetrics: [mockData.sessionMetrics[0]],
+      sessionMetrics: [mockData.sessionMetrics[0]!],
     }
     render(<TherapyProgressCharts data={singleData} />)
     expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
@@ -214,7 +214,7 @@ describe('TherapyProgressCharts', () => {
   it('renders with single skill', () => {
     const singleData = {
       ...mockData,
-      skillProgress: [mockData.skillProgress[0]],
+      skillProgress: [mockData.skillProgress[0]!],
     }
     render(<TherapyProgressCharts data={singleData} />)
     expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
