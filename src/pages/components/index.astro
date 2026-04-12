@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
+import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -22,7 +22,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
 
       <!-- Component Overview Carousel -->
       <div class="mb-16">
-        <SwiperCarousel
+        <DynamicSwiperCarousel
           client:load
           effect="coverflow"
           autoplay={{ delay: 6000, disableOnInteraction: false }}
