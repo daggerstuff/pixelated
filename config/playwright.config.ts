@@ -33,7 +33,7 @@ try {
   if (!isRemoteUrl) {
     // Use explicit port if provided, otherwise use default based on CI context
     // (3000 for dev, 4321 for preview/CI)
-    webServerPort = explicitPort !== null ? explicitPort : isCi ? 4321 : 3000
+    webServerPort = explicitPort ?? (isCi ? 4321 : 3000)
 
     // Construct webServerUrl with the correct port
     // If the original URL had a port, use it; otherwise construct with the determined port
