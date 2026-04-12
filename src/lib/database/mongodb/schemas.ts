@@ -1,7 +1,7 @@
 // MongoDB Collections Schema Definitions
 // Using Mongoose for type safety and validation
 
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
 // ============================================================================
 // BUSINESS DOCUMENTS SCHEMA
@@ -31,14 +31,14 @@ const BusinessDocumentSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: [
-        'strategy_plan',
-        'market_analysis',
-        'competitive_analysis',
-        'case_study',
-        'pitch_deck',
-        'operational_guide',
-        'research_report',
-        'custom',
+        "strategy_plan",
+        "market_analysis",
+        "competitive_analysis",
+        "case_study",
+        "pitch_deck",
+        "operational_guide",
+        "research_report",
+        "custom",
       ],
       required: true,
       index: true,
@@ -70,8 +70,8 @@ const BusinessDocumentSchema = new mongoose.Schema(
     // Status & Workflow
     status: {
       type: String,
-      enum: ['draft', 'review', 'approved', 'published', 'archived'],
-      default: 'draft',
+      enum: ["draft", "review", "approved", "published", "archived"],
+      default: "draft",
       index: true,
     },
     version: {
@@ -85,7 +85,7 @@ const BusinessDocumentSchema = new mongoose.Schema(
         timestamp: Date,
         author: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
         changes: String,
         content: String,
@@ -95,33 +95,33 @@ const BusinessDocumentSchema = new mongoose.Schema(
     // Permissions & Ownership
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
       index: true,
     },
     contributors: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
       },
     ],
     permissions: {
       view: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
       ],
       edit: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
       ],
       comment: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
       ],
     },
@@ -131,7 +131,7 @@ const BusinessDocumentSchema = new mongoose.Schema(
     linkedProjects: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Project',
+        ref: "Project",
       },
     ],
     tags: [
@@ -160,7 +160,7 @@ const BusinessDocumentSchema = new mongoose.Schema(
         uploadedAt: Date,
         uploadedBy: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
       },
     ],
@@ -168,14 +168,14 @@ const BusinessDocumentSchema = new mongoose.Schema(
   {
     timestamps: true,
     strict: true,
-    collection: 'business_documents',
+    collection: "business_documents",
   },
-)
+);
 
 // Add compound indexes for common queries
-BusinessDocumentSchema.index({ owner: 1, status: 1 })
-BusinessDocumentSchema.index({ type: 1, category: 1 })
-BusinessDocumentSchema.index({ tags: 1 })
+BusinessDocumentSchema.index({ owner: 1, status: 1 });
+BusinessDocumentSchema.index({ type: 1, category: 1 });
+BusinessDocumentSchema.index({ tags: 1 });
 
 // ============================================================================
 // PROJECTS SCHEMA
@@ -197,8 +197,8 @@ const ProjectSchema = new mongoose.Schema(
     description: String,
     status: {
       type: String,
-      enum: ['planning', 'active', 'on_hold', 'completed', 'cancelled'],
-      default: 'planning',
+      enum: ["planning", "active", "on_hold", "completed", "cancelled"],
+      default: "planning",
       index: true,
     },
 
@@ -210,7 +210,7 @@ const ProjectSchema = new mongoose.Schema(
     // Leadership
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
       index: true,
     },
@@ -218,7 +218,7 @@ const ProjectSchema = new mongoose.Schema(
       {
         userId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
         role: String,
         joinedAt: {
@@ -236,11 +236,11 @@ const ProjectSchema = new mongoose.Schema(
         successCriteria: [String],
         priority: {
           type: String,
-          enum: ['critical', 'high', 'medium', 'low'],
+          enum: ["critical", "high", "medium", "low"],
         },
         status: {
           type: String,
-          enum: ['not_started', 'in_progress', 'completed', 'blocked'],
+          enum: ["not_started", "in_progress", "completed", "blocked"],
         },
       },
     ],
@@ -250,13 +250,13 @@ const ProjectSchema = new mongoose.Schema(
     linkedStrategies: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'StrategicPlan',
+        ref: "StrategicPlan",
       },
     ],
     relatedProjects: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Project',
+        ref: "Project",
       },
     ],
 
@@ -268,11 +268,11 @@ const ProjectSchema = new mongoose.Schema(
   {
     timestamps: true,
     strict: true,
-    collection: 'projects',
+    collection: "projects",
   },
-)
+);
 
-ProjectSchema.index({ owner: 1, status: 1 })
+ProjectSchema.index({ owner: 1, status: 1 });
 
 // ============================================================================
 // MARKET RESEARCH SCHEMA
@@ -293,12 +293,12 @@ const MarketResearchSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: [
-        'market_analysis',
-        'competitor_analysis',
-        'trend_research',
-        'customer_research',
-      ],
+      enum: ["market_analysis", "competitor_analysis", "trend_research", "customer_research"],
+      required: true,
+      index: true,
+    },
+    owner: {
+      type: String,
       required: true,
       index: true,
     },
@@ -320,15 +320,45 @@ const MarketResearchSchema = new mongoose.Schema(
     // Research Data
     findings: [
       {
-        id: String,
+        _id: String,
         title: String,
         description: String,
-        impact: {
+        impactLevel: {
           type: String,
-          enum: ['high', 'medium', 'low'],
+          enum: ["high", "medium", "low"],
         },
-        evidence: [String],
-        implications: String,
+        supportingData: {},
+        source: String,
+        createdAt: Date,
+        updatedAt: Date,
+      },
+    ],
+    competitiveAnalysis: [
+      {
+        _id: String,
+        competitorName: String,
+        strengths: [String],
+        weaknesses: [String],
+        opportunities: [String],
+        threats: [String],
+        marketShare: Number,
+        createdAt: Date,
+        updatedAt: Date,
+      },
+    ],
+    recommendations: [
+      {
+        _id: String,
+        title: String,
+        description: String,
+        priority: {
+          type: String,
+          enum: ["high", "medium", "low"],
+        },
+        expectedImpact: String,
+        status: String,
+        createdAt: Date,
+        updatedAt: Date,
       },
     ],
 
@@ -367,7 +397,7 @@ const MarketResearchSchema = new mongoose.Schema(
         accessedDate: Date,
         credibility: {
           type: String,
-          enum: ['high', 'medium', 'low'],
+          enum: ["high", "medium", "low"],
         },
       },
     ],
@@ -375,24 +405,23 @@ const MarketResearchSchema = new mongoose.Schema(
     // Metadata
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+      ref: "User",
     },
     status: {
       type: String,
-      enum: ['draft', 'validated', 'published'],
-      default: 'draft',
+      enum: ["draft", "validated", "published"],
+      default: "draft",
       index: true,
     },
   },
   {
     timestamps: true,
     strict: true,
-    collection: 'market_research',
+    collection: "market_research",
   },
-)
+);
 
-MarketResearchSchema.index({ type: 1, status: 1 })
+MarketResearchSchema.index({ type: 1, status: 1 });
 
 // ============================================================================
 // STRATEGIC PLANS SCHEMA
@@ -413,7 +442,7 @@ const StrategicPlanSchema = new mongoose.Schema(
     },
     planType: {
       type: String,
-      enum: ['annual', 'quarterly', 'multi_year', 'product', 'market'],
+      enum: ["annual", "quarterly", "multi_year", "product", "market"],
       required: true,
     },
 
@@ -441,7 +470,7 @@ const StrategicPlanSchema = new mongoose.Schema(
             dueDate: Date,
             status: {
               type: String,
-              enum: ['on_track', 'at_risk', 'off_track', 'completed'],
+              enum: ["on_track", "at_risk", "off_track", "completed"],
             },
           },
         ],
@@ -452,7 +481,7 @@ const StrategicPlanSchema = new mongoose.Schema(
     initiatives: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Project',
+        ref: "Project",
       },
     ],
 
@@ -475,16 +504,16 @@ const StrategicPlanSchema = new mongoose.Schema(
         description: String,
         probability: {
           type: String,
-          enum: ['high', 'medium', 'low'],
+          enum: ["high", "medium", "low"],
         },
         impact: {
           type: String,
-          enum: ['high', 'medium', 'low'],
+          enum: ["high", "medium", "low"],
         },
         mitigation_strategy: String,
         owner: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
       },
     ],
@@ -499,7 +528,7 @@ const StrategicPlanSchema = new mongoose.Schema(
         measurement_frequency: String,
         owner: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
         current_value: Number,
         last_updated: Date,
@@ -509,27 +538,20 @@ const StrategicPlanSchema = new mongoose.Schema(
     // Review & Approval
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
       index: true,
     },
     approvers: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
       },
     ],
     status: {
       type: String,
-      enum: [
-        'draft',
-        'under_review',
-        'approved',
-        'executing',
-        'completed',
-        'archived',
-      ],
-      default: 'draft',
+      enum: ["draft", "under_review", "approved", "executing", "completed", "archived"],
+      default: "draft",
       index: true,
     },
     approvalDate: Date,
@@ -537,12 +559,12 @@ const StrategicPlanSchema = new mongoose.Schema(
   {
     timestamps: true,
     strict: true,
-    collection: 'strategic_plans',
+    collection: "strategic_plans",
   },
-)
+);
 
-StrategicPlanSchema.index({ owner: 1, status: 1 })
-StrategicPlanSchema.index({ fiscalYear: 1, planType: 1 })
+StrategicPlanSchema.index({ owner: 1, status: 1 });
+StrategicPlanSchema.index({ fiscalYear: 1, planType: 1 });
 
 // ============================================================================
 // SALES OPPORTUNITIES SCHEMA
@@ -573,16 +595,8 @@ const SalesOpportunitySchema = new mongoose.Schema(
     currency: String,
     stage: {
       type: String,
-      enum: [
-        'prospect',
-        'qualified_lead',
-        'proposal',
-        'negotiation',
-        'won',
-        'lost',
-        'stalled',
-      ],
-      default: 'prospect',
+      enum: ["prospect", "qualified_lead", "proposal", "negotiation", "won", "lost", "stalled"],
+      default: "prospect",
       index: true,
     },
 
@@ -597,13 +611,13 @@ const SalesOpportunitySchema = new mongoose.Schema(
     // People & Relationships
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
       index: true,
     },
     accountManager: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     contacts: [
       {
@@ -626,7 +640,7 @@ const SalesOpportunitySchema = new mongoose.Schema(
         notes: String,
         participant: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
       },
     ],
@@ -634,11 +648,11 @@ const SalesOpportunitySchema = new mongoose.Schema(
     // Metadata
     source: {
       type: String,
-      enum: ['inbound', 'outbound', 'referral', 'event', 'partnership'],
+      enum: ["inbound", "outbound", "referral", "event", "partnership"],
     },
     priority: {
       type: String,
-      enum: ['high', 'medium', 'low'],
+      enum: ["high", "medium", "low"],
     },
     probability: Number,
 
@@ -648,12 +662,12 @@ const SalesOpportunitySchema = new mongoose.Schema(
   {
     timestamps: true,
     strict: true,
-    collection: 'sales_opportunities',
+    collection: "sales_opportunities",
   },
-)
+);
 
-SalesOpportunitySchema.index({ owner: 1, stage: 1 })
-SalesOpportunitySchema.index({ account: 1, stage: 1 })
+SalesOpportunitySchema.index({ owner: 1, stage: 1 });
+SalesOpportunitySchema.index({ account: 1, stage: 1 });
 
 // ============================================================================
 // KNOWLEDGE ARTICLES SCHEMA
@@ -692,7 +706,7 @@ const KnowledgeArticleSchema = new mongoose.Schema(
     summary: String,
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
 
@@ -700,8 +714,8 @@ const KnowledgeArticleSchema = new mongoose.Schema(
     publishedDate: Date,
     status: {
       type: String,
-      enum: ['draft', 'published', 'archived'],
-      default: 'draft',
+      enum: ["draft", "published", "archived"],
+      default: "draft",
       index: true,
     },
     featured: {
@@ -744,19 +758,15 @@ const KnowledgeArticleSchema = new mongoose.Schema(
   {
     timestamps: true,
     strict: true,
-    collection: 'knowledge_articles',
+    collection: "knowledge_articles",
   },
-)
+);
 
-KnowledgeArticleSchema.index({ author: 1, status: 1 })
-KnowledgeArticleSchema.index({ category: 1, status: 1 })
+KnowledgeArticleSchema.index({ author: 1, status: 1 });
+KnowledgeArticleSchema.index({ category: 1, status: 1 });
 
-type BusinessDocumentDocument = mongoose.InferSchemaType<
-  typeof BusinessDocumentSchema
->
-type MarketResearchDocument = mongoose.InferSchemaType<
-  typeof MarketResearchSchema
->
+type BusinessDocumentDocument = mongoose.InferSchemaType<typeof BusinessDocumentSchema>;
+export type MarketResearchDocument = mongoose.InferSchemaType<typeof MarketResearchSchema>;
 
 // ============================================================================
 // EXPORT MODELS
@@ -764,23 +774,11 @@ type MarketResearchDocument = mongoose.InferSchemaType<
 
 export const BusinessDocument: mongoose.Model<BusinessDocumentDocument> =
   mongoose.models.BusinessDocument ??
-  mongoose.model<BusinessDocumentDocument>(
-    'BusinessDocument',
-    BusinessDocumentSchema,
-  )
-export const Project = mongoose.model('Project', ProjectSchema)
+  mongoose.model<BusinessDocumentDocument>("BusinessDocument", BusinessDocumentSchema);
+export const Project = mongoose.model("Project", ProjectSchema);
 export const MarketResearch: mongoose.Model<MarketResearchDocument> =
   mongoose.models.MarketResearch ??
-  mongoose.model<MarketResearchDocument>('MarketResearch', MarketResearchSchema)
-export const StrategicPlan = mongoose.model(
-  'StrategicPlan',
-  StrategicPlanSchema,
-)
-export const SalesOpportunity = mongoose.model(
-  'SalesOpportunity',
-  SalesOpportunitySchema,
-)
-export const KnowledgeArticle = mongoose.model(
-  'KnowledgeArticle',
-  KnowledgeArticleSchema,
-)
+  mongoose.model<MarketResearchDocument>("MarketResearch", MarketResearchSchema);
+export const StrategicPlan = mongoose.model("StrategicPlan", StrategicPlanSchema);
+export const SalesOpportunity = mongoose.model("SalesOpportunity", SalesOpportunitySchema);
+export const KnowledgeArticle = mongoose.model("KnowledgeArticle", KnowledgeArticleSchema);
