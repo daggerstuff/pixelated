@@ -342,3 +342,8 @@ DESIGN.md
 QWEN.md
 skills-lock.json
 .github/mcp.json
+
+.kilo
+.cm
+__mocks__
+ai/config/staging/memory-service.env
