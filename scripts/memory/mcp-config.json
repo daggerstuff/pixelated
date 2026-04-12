@@ -1,18 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "mcpServers": {
-    "hindsight": {
+    "foresight": {
       "command": "uv",
-      "args": ["run", "python", "-m", "ai.api.mcp_server.fastmcp_v2_app"],
+      "args": ["run", "python", "-m", "ai.foresight.app"],
       "cwd": "/path/to/your/pixelated",
       "env": {
-        "MEMORY_PROVIDER": "local_hindsight",
-        "HINDSIGHT_LOCAL_DB_PATH": "/path/to/your/memory.db",
-        "HINDSIGHT_BANK_ID": "default",
-        "HINDSIGHT_MCP_STDIO_TRUST": "true",
-        "HINDSIGHT_COMPAT_DEFAULT_USER_ID": "your-username",
-        "LOCAL_MEMORY_ACTOR_TOKENS_JSON": "{}",
-        "LOCAL_MEMORY_ACTOR_POLICIES_JSON": "{}"
+        "FORESIGHT_DB_PATH": "/home/your-user/.foresight/memory.db",
+        "FORESIGHT_USER_ID": "your-username"
       }
     }
   }
