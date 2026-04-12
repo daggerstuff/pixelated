@@ -50,6 +50,18 @@ jobs:
           echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
           echo "audience=$PROVIDER" >> "$GITHUB_OUTPUT"
 
+      - name: Validate Google Cloud auth inputs
+        env:
+          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
+          GCP_WIF_PROVIDER: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+        run: |
+          [[ -n "$GCP_PROJECT_ID" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
+          [[ -n "$GCP_WIF_PROVIDER" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
+          [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
+          [[ -n "${{ steps.gcp-auth.outputs.provider }}" ]] || { echo "Normalized workload identity provider was empty"; exit 1; }
+          echo "Google Cloud auth inputs validated"
+
       - name: Authenticate to Google Cloud (OIDC)
         uses: google-github-actions/auth@v3.0.0
         with:
