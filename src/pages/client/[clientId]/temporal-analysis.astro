@@ -2,7 +2,7 @@
 export const prerender = false
 import type { AstroGlobal } from 'astro'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
-import EmotionTemporalAnalysisChart from '../../../components/session/EmotionTemporalAnalysisChart'
+import { DynamicEmotionTemporalAnalysisChart } from '@/lib/utils/dynamic-components'
 import ClientHeader from '../../../components/client/ClientHeader.astro'
 import SessionList from '../../../components/session/SessionList.astro'
 import { requirePageAuth } from '../../../lib/auth/serverAuth'
@@ -103,12 +103,12 @@ const title = `Temporal Analysis - ${client.name}`
         </p>
 
         <div class="bg-white rounded-lg shadow-sm mb-8">
-          <EmotionTemporalAnalysisChart
+        <DynamicEmotionTemporalAnalysisChart
             client:load
             data={placeholderData}
             clientId={safeClientId}
             height={500}
-          />
+        />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

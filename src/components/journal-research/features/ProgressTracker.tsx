@@ -12,7 +12,7 @@ import {
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 
-import { ProgressCharts } from '../charts/ProgressCharts'
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import { ProgressBar } from '../shared/ProgressBar'
 
 export interface ProgressTrackerProps {
@@ -173,7 +173,7 @@ export function ProgressTracker({
             <CardTitle>Progress Visualizations</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressCharts progress={progress} metrics={metrics} />
+            <LazyProgressCharts progress={progress} metrics={metrics} />
           </CardContent>
         </Card>
       )}

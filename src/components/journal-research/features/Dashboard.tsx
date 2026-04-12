@@ -18,7 +18,7 @@ import {
 import { useJournalSessionStore } from '@/lib/stores/journal-research'
 import { cn } from '@/lib/utils'
 
-import { ProgressCharts } from '../charts/ProgressCharts'
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import { SessionList } from '../lists/SessionList'
 import { SessionCard } from '../shared/SessionCard'
 
@@ -100,7 +100,7 @@ export function Dashboard({ className }: DashboardProps) {
             <div className='space-y-4'>
               <SessionCard session={selectedSession} />
               {metrics && (
-                <ProgressCharts progress={progress} metrics={metrics} />
+                <LazyProgressCharts progress={progress} metrics={metrics} />
               )}
             </div>
           </CardContent>
