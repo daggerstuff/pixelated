@@ -10,6 +10,11 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
 
+interface VerificationTokenPayload {
+  iat: number
+  exp: number
+}
+
 /**
  * Create a signed verification token for data integrity
  *
@@ -19,8 +24,9 @@ const logger = createBuildSafeLogger('default')
 export function createSignedVerificationToken(payload: unknown): string {
   try {
     const timestamp = Date.now()
+    const tokenPayload = JSON.parse(JSON.stringify(payload))
     const token = {
-      ...JSON.parse(JSON.stringify(payload) as unknown),
+      ...tokenPayload,
       iat: timestamp,
       exp: timestamp + 3600000, // 1 hour expiration
     }
@@ -43,15 +49,33 @@ export function createSignedVerificationToken(payload: unknown): string {
 export function verifyToken(token: string): unknown | null {
   try {
     // Use atob for browser compatibility instead of Buffer
-    const decoded = JSON.parse(atob(token) as unknown)
+    const parsed = JSON.parse(atob(token))
+
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      !('exp' in parsed) ||
+      typeof parsed.exp !== 'number'
+    ) {
+      logger.warn('Token payload invalid', { token })
+      return null
+    }
+
+    const exp = Object.getOwnPropertyDescriptor(parsed, 'exp')?.value
+    const iat = Object.getOwnPropertyDescriptor(parsed, 'iat')?.value
+
+    if (typeof exp !== 'number' || typeof iat !== 'number') {
+      logger.warn('Token payload invalid', { token })
+      return null
+    }
 
     // Check expiration
-    if (decoded.exp < Date.now()) {
+    if (exp < Date.now()) {
       logger.warn('Token expired', { token })
       return null
     }
 
-    return decoded
+    return parsed
   } catch (error: unknown) {
     logger.error('Error verifying token', { error, token })
     return null

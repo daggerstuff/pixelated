@@ -223,7 +223,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn('Using mock Redis client in development')
         // Create a mock client that implements basic Redis methods
-        return this.createMockClient() as Redis
+      return this.createMockClient()
       }
 
       throw new RedisServiceError(
@@ -237,18 +237,17 @@ export class RedisService extends EventEmitter implements IRedisService {
 
   /**
    * Mock client for development when no Redis URL is available
-   * Return type changed to unknown to avoid type errors with the mock implementation
+   * Return type implements Redis for compatibility with the service contract
    */
-  private createMockClient(): unknown {
+  private createMockClient(): Redis {
     // Create a simple in-memory store
     const store = new Map<string, string>()
     const setStore = new Map<string, Set<string>>()
     const hashStore = new Map<string, Map<string, string>>()
     const zsetStore = new Map<string, Map<string, number>>()
 
-    // Create a mock client implementing RedisMockClient interface
-    // Cast to any to avoid type errors in development mock
-    const mockClient: unknown = {
+    // Create a mock client implementing the Redis interface
+    const mockClient: Redis = {
       get: async (key: string) => store.get(key) || null,
       set: async (key: string, value: string) => {
         store.set(key, value)
@@ -411,26 +410,29 @@ export class RedisService extends EventEmitter implements IRedisService {
       info: async () => 'connected_clients:1\nblocked_clients:0',
       publish: async () => 0,
       quit: async () => 'OK',
-      connect: async () => {},
+      connect: () => Promise.resolve(),
       on: (event: string, callback: (...args: unknown[]) => void) => {
         // Emit the event immediately to simulate connection events
         if (['connect', 'ready'].includes(event)) {
           setTimeout(() => callback(), 0)
         }
-        return this as unknown as Redis
+        return mockClient
       }, // Basic event handling for mock
       pipeline: () => {
         const commands: RedisPipelineOperation[] = []
         const pipeline: RedisPipeline = {
           del: (key: string) => {
             commands.push({ cmd: 'del', args: [key] })
-            return mockClient as Redis
+            return mockClient
           },
           exec: async () => {
             return commands.map((cmd) => {
               if (cmd.cmd === 'del') {
-                const deleted = store.delete(cmd.args[0] as string)
-                return [null, deleted ? 1 : 0]
+                const key = cmd.args[0]
+                return [
+                  null,
+                  typeof key === 'string' && store.delete(key) ? 1 : 0,
+                ]
               }
               return [null, null]
             })
@@ -438,7 +440,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         }
         return pipeline
       },
-    } as unknown as Redis
+    }
 
     return mockClient
   }
@@ -471,7 +473,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       } catch (error: unknown) {
         logger.error('Health check failed:', { error: String(error) })
       }
-    }, this.config.healthCheckInterval || 5000)
+    }, this.config.healthCheckInterval ?? 5000)
   }
 
   async isHealthy(): Promise<boolean> {

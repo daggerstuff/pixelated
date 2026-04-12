@@ -772,12 +772,7 @@ export class BackupSecurityManager {
   ): Promise<BackupMetadata | null> {
     // Try to find in all configured storage locations
     const storageEntries = Array.from(this.storageProviders.entries())
-    for (let i = 0; i < storageEntries.length; i++) {
-      const entry = storageEntries[i]
-      if (!entry || !Array.isArray(entry) || entry.length < 2) {
-        continue
-      }
-      const [location, provider] = entry
+    for (const [location, provider] of storageEntries) {
       if (!provider) {
         continue
       }
@@ -811,8 +806,7 @@ export class BackupSecurityManager {
     let latestTimestamp = 0
 
     const storageEntries = Array.from(this.storageProviders.entries())
-    for (let i = 0; i < storageEntries.length; i++) {
-      const [, provider] = storageEntries[i]
+    for (const [, provider] of storageEntries) {
       if (!provider) continue
 
       try {
