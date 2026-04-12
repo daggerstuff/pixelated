@@ -103,13 +103,13 @@ jobs:
           PROVIDER="${PROVIDER#//iam.googleapis.com/}"
           [[ -n "$PROVIDER" ]] || { echo "Normalized provider was empty"; exit 1; }
           echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
-    
+
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'
         uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ steps.gcp-auth.outputs.provider }}
-              service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+          service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
       - name: Configure Google Cloud SDK
