@@ -89,12 +89,22 @@ function getChunkName(id) {
     return 'feature-swiper'
   }
   if (
-    normalizedId.includes('/src/components/treatment/TreatmentPlanManager')
+    normalizedId.includes('/src/components/treatment/TreatmentPlanManager') ||
+    normalizedId.includes('/src/components/therapy/TreatmentPlanManager')
   ) {
     return 'feature-treatment-plan'
   }
   if (normalizedId.includes('/src/components/security/FHEDemo')) {
     return 'feature-fhe'
+  }
+  if (normalizedId.includes('/src/components/demo/FHEDemo')) {
+    return 'feature-fhe-demo'
+  }
+  if (normalizedId.includes('/src/components/chat/TherapyChatSystem')) {
+    return 'feature-therapy-chat'
+  }
+  if (normalizedId.includes('/src/components/session/EmotionTemporalAnalysisChart')) {
+    return 'feature-emotion-temporal'
   }
 
   if (normalizedId.includes('/react/') || normalizedId.includes('/react-dom/')) {

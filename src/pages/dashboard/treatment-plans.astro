@@ -1,8 +1,8 @@
 ---
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import TreatmentPlanManager from '@/components/therapy/TreatmentPlanManager.tsx'
+import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
 ---
 
 <DashboardLayout title="Treatment Plans | Pixelated Empathy Health">
-  <TreatmentPlanManager client:load />
+  <DynamicTreatmentPlanManager client:load />
 </DashboardLayout>
