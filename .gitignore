@@ -283,7 +283,7 @@ yt-downloader
 # === INTERNAL & PRIVATE ===
 business-strategy/
 metrics/
-security/
+/security/
 scripts/data/run_pix30_academic_pulls.py
 scripts/data/extract_youtube_transcripts.py
 scripts/generate_dual_persona_data.py
@@ -341,3 +341,4 @@ memory.db-wal
 DESIGN.md
 QWEN.md
 skills-lock.json
+.github/mcp.json
