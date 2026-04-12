@@ -53,9 +53,7 @@ export interface SelectProps {
       disabled={Astro.props.disabled}
       class:list={['input', Astro.props.error && 'input-error']}
     />
-    {Astro.props.error && (
-      <span class="form-error">{Astro.props.error}</span>
-    )}
+    {Astro.props.error && <span class="form-error">{Astro.props.error}</span>}
   </div>
 </fragment>
 
@@ -63,16 +61,16 @@ export interface SelectProps {
   .form-group {
     margin-bottom: var(--spacing-5);
   }
-  
+
   .input-error {
     border-color: var(--color-danger);
   }
-  
+
   .input-error:focus {
     border-color: var(--color-danger);
     box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.1);
   }
-  
+
   .form-error {
     display: block;
     font-family: var(--font-mono);

@@ -24,13 +24,22 @@ const { content } = Astro.props
     <h2 class="pe-heading-l">{content.title}</h2>
 
     <div class="home-card-grid home-card-grid--spaced">
-      {content.cards.map((card, index) => (
-        <article class:list={['home-card', 'glass-panel', index === 0 && 'home-card--featured', index === 2 && 'home-card--muted']}>
-          <span class="home-card-kicker">{card.kicker}</span>
-          <h3 class="pe-heading-s">{card.title}</h3>
-          <p>{card.body}</p>
-        </article>
-      ))}
+      {
+        content.cards.map((card, index) => (
+          <article
+            class:list={[
+              'home-card',
+              'glass-panel',
+              index === 0 && 'home-card--featured',
+              index === 2 && 'home-card--muted',
+            ]}
+          >
+            <span class="home-card-kicker">{card.kicker}</span>
+            <h3 class="pe-heading-s">{card.title}</h3>
+            <p>{card.body}</p>
+          </article>
+        ))
+      }
     </div>
 
     <InfoStrip
@@ -76,7 +85,9 @@ const { content } = Astro.props
 
   .home-card {
     padding: var(--spacing-8);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .home-card:hover {

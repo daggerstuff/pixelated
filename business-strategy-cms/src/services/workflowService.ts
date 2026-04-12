@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import { UserRole } from '../types/user'
 import { DocumentCategory } from '../types/document'
+import { UserRole } from '../types/user'
 import {
   WorkflowInstance,
   WorkflowTemplate,
@@ -14,12 +14,14 @@ import {
   WorkflowAnalytics,
 } from '../types/workflow'
 import { DocumentService } from './documentService'
-import { UserService } from './userService'
 import { EmailService } from './emailService'
+import { UserService } from './userService'
 
 export class WorkflowService {
-  private static readonly workflowInstances: Map<string, WorkflowInstance> = new Map()
-  private static readonly workflowTemplates: Map<string, WorkflowTemplate> = new Map()
+  private static readonly workflowInstances: Map<string, WorkflowInstance> =
+    new Map()
+  private static readonly workflowTemplates: Map<string, WorkflowTemplate> =
+    new Map()
   private static readonly approvals: Map<string, Approval> = new Map()
   private static readonly comments: Map<string, WorkflowComment> = new Map()
 

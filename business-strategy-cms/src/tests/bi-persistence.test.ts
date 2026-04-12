@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest'
+
 import { DatabaseService } from '../services/databaseService'
 import {
   MarketData,
