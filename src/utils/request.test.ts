@@ -71,19 +71,9 @@ describe('request utilities', () => {
       expect(getBrowserLanguage()).toBe('fr-FR')
     })
 
-    it('should fallback to en-US if window is missing navigator', () => {
-      // This tests the SSR fallback path when window is strictly undefined but the test environment behaves differently
-      // It simulates what the original issue was asking for (testing the branch when navigator is undefined)
-      const originalWindow = global.window
-      global.window = {}
-      let error
-      try {
-        getBrowserLanguage()
-      } catch (e) {
-        error = e
-      }
-      global.window = originalWindow
-      expect(error).toBeInstanceOf(TypeError)
+    it('should throw TypeError if window is missing navigator', () => {
+      vi.stubGlobal('window', {})
+      expect(() => getBrowserLanguage()).toThrow(TypeError)
     })
 
     it('should fallback to en-US if navigator.language is missing', () => {
