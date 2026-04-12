@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChartBar, Search, TrendingUp, Save } from 'lucide-react'
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, JSX } from 'react'
 
 import type {
   SessionData,
@@ -30,6 +30,25 @@ interface EnhancedBiasDetectionInterfaceProps {
 }
 
 type AnalysisStep = 'input' | 'analyzing' | 'results' | 'insights'
+type AnalysisTab = 'analysis' | 'counterfactual' | 'historical' | 'export'
+type QuickFilterState = {
+  riskLevel: RiskLevelFilter
+  category: BiasCategoryFilter
+}
+type TabItem = {
+  id: AnalysisTab
+  label: string
+  icon: 'chart' | 'search' | 'trending' | 'save'
+  badge?: number
+}
+type RiskLevelFilter = 'all' | 'low' | 'medium' | 'high' | 'critical'
+type BiasCategoryFilter =
+  | 'all'
+  | 'cultural'
+  | 'gender'
+  | 'age'
+  | 'linguistic'
+  | 'intersectional'
 
 export const EnhancedBiasDetectionInterface: React.FC<
   EnhancedBiasDetectionInterfaceProps
@@ -46,21 +65,15 @@ export const EnhancedBiasDetectionInterface: React.FC<
     useState<HistoricalComparison | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [activeTab, setActiveTab] = useState<
-    'analysis' | 'counterfactual' | 'historical' | 'export'
+    AnalysisTab
   >('analysis')
   const [progressPercent, setProgressPercent] = useState(0)
 
   // Enhanced state for improved UX
   const [savedSessions, setSavedSessions] = useState<SessionData[]>([])
-  const [quickFilters, setQuickFilters] = useState({
-    riskLevel: 'all' as 'all' | 'low' | 'medium' | 'high' | 'critical',
-    category: 'all' as
-      | 'all'
-      | 'cultural'
-      | 'gender'
-      | 'age'
-      | 'linguistic'
-      | 'intersectional',
+  const [quickFilters, setQuickFilters] = useState<QuickFilterState>({
+    riskLevel: 'all',
+    category: 'all',
   })
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [analysisSettings, setAnalysisSettings] = useState({
@@ -69,10 +82,22 @@ export const EnhancedBiasDetectionInterface: React.FC<
     includeHistorical: true,
     confidenceThreshold: 0.6,
   })
+  const analysisStepOrder: AnalysisStep[] = [
+    'input',
+    'analyzing',
+    'results',
+    'insights',
+  ]
+  const [selectedPreset, setSelectedPreset] = useState<PresetScenario | null>(null)
+  const tabIcons: Record<TabItem['icon'], JSX.Element> = {
+    chart: <ChartBar className='h-5 w-5' />,
+    search: <Search className='h-5 w-5' />,
+    trending: <TrendingUp className='h-5 w-5' />,
+    save: <Save className='h-5 w-5' />,
+  }
 
   // Simulate analysis progress
   useEffect(() => {
-    return undefined
     if (isAnalyzing) {
       const interval = setInterval(() => {
         setProgressPercent((prev) => {
@@ -86,6 +111,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
       return () => clearInterval(interval)
     }
+    return undefined
   }, [isAnalyzing])
 
   const handleAnalyze = useCallback(
@@ -199,11 +225,12 @@ export const EnhancedBiasDetectionInterface: React.FC<
         setProgressPercent(0)
       }
     },
-    [analysisSettings],
+    [analysisSettings, generateRecommendations, generateCounterfactualScenarios, generateHistoricalComparison, calculateBiasFactors, generateSessionId],
   )
 
   const handleLoadPreset = useCallback(
     (preset: PresetScenario) => {
+      setSelectedPreset(preset)
       const sessionData: SessionData = {
         sessionId: generateSessionId(),
         scenario: preset.scenario,
@@ -216,12 +243,31 @@ export const EnhancedBiasDetectionInterface: React.FC<
     [handleAnalyze],
   )
 
+  const handleSessionSubmit = useCallback(
+    (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => {
+      const sessionData: SessionData = {
+        ...data,
+        sessionId: generateSessionId(),
+        timestamp: new Date(),
+      }
+      void handleAnalyze(sessionData)
+    },
+    [handleAnalyze],
+  )
+
   const handleExport = useCallback(() => {
     if (analysisResults) {
+      const fallbackHistoricalComparison: HistoricalComparison = {
+        thirtyDayAverage: 0,
+        sevenDayTrend: 'stable',
+        percentileRank: 50,
+        comparisonToAverage: 0,
+        trendDirection: 'neutral',
+      }
       const exportData = createExportData(
         analysisResults,
         counterfactualScenarios,
-        historicalComparison,
+        historicalComparison ?? fallbackHistoricalComparison,
       )
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
         type: 'application/json',
@@ -263,6 +309,22 @@ export const EnhancedBiasDetectionInterface: React.FC<
     return true
   })
 
+  const tabConfig: TabItem[] = [
+    { id: 'analysis', label: 'Main Analysis', icon: 'chart' },
+    {
+      id: 'counterfactual',
+      label: 'What-If Scenarios',
+      icon: 'search',
+      badge: counterfactualScenarios.length,
+    },
+    {
+      id: 'historical',
+      label: 'Historical Trends',
+      icon: 'trending',
+    },
+    { id: 'export', label: 'Export & Share', icon: 'save' },
+  ]
+
   return (
     <div className={`enhanced-bias-detection-interface ${className}`}>
       {/* Enhanced Header with Progress */}
@@ -284,9 +346,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
           {/* Step Indicator */}
           <div className='flex items-center space-x-2'>
-            {(
-              ['input', 'analyzing', 'results', 'insights'] as AnalysisStep[]
-            ).map((step, index) => (
+            {analysisStepOrder.map((step, index) => (
               <div
                 key={step}
                 className={`flex items-center ${index < 3 ? 'mr-2' : ''}`}
@@ -296,14 +356,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     currentStep === step
                       ? 'bg-blue-600 text-white'
                       : index <
-                          (
-                            [
-                              'input',
-                              'analyzing',
-                              'results',
-                              'insights',
-                            ] as AnalysisStep[]
-                          ).indexOf(currentStep)
+                          analysisStepOrder.indexOf(currentStep)
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-200 text-gray-500'
                   }`}
@@ -314,14 +367,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   <div
                     className={`mx-1 h-0.5 w-8 transition-all duration-300 ${
                       index <
-                      (
-                        [
-                          'input',
-                          'analyzing',
-                          'results',
-                          'insights',
-                        ] as AnalysisStep[]
-                      ).indexOf(currentStep)
+                      analysisStepOrder.indexOf(currentStep)
                         ? 'bg-green-500'
                         : 'bg-gray-200'
                     }`}
@@ -378,12 +424,21 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   </label>
                   <select
                     value={quickFilters.riskLevel}
-                    onChange={(e) =>
-                      setQuickFilters((prev) => ({
-                        ...prev,
-                        riskLevel: e.target.value as typeof prev.riskLevel,
-                      }))
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (
+                        value === 'all' ||
+                        value === 'low' ||
+                        value === 'medium' ||
+                        value === 'high' ||
+                        value === 'critical'
+                      ) {
+                        setQuickFilters((prev) => ({
+                          ...prev,
+                          riskLevel: value,
+                        }))
+                      }
+                    }}
                     className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2'
                   >
                     <option value='all'>All Risk Levels</option>
@@ -400,12 +455,22 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   </label>
                   <select
                     value={quickFilters.category}
-                    onChange={(e) =>
-                      setQuickFilters((prev) => ({
-                        ...prev,
-                        category: e.target.value as typeof prev.category,
-                      }))
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (
+                        value === 'all' ||
+                        value === 'cultural' ||
+                        value === 'gender' ||
+                        value === 'age' ||
+                        value === 'linguistic' ||
+                        value === 'intersectional'
+                      ) {
+                        setQuickFilters((prev) => ({
+                          ...prev,
+                          category: value,
+                        }))
+                      }
+                    }}
                     className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2'
                   >
                     <option value='all'>All Categories</option>
@@ -543,9 +608,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 Preset Scenarios ({filteredPresets.length} available)
               </h3>
               <PresetScenarioSelector
-                presets={filteredPresets}
-                onSelectPreset={handleLoadPreset}
-                className='enhanced-preset-selector'
+                scenarios={filteredPresets}
+                selectedScenario={selectedPreset}
+                onScenarioSelect={handleLoadPreset}
+                disabled={isAnalyzing}
               />
             </div>
 
@@ -555,8 +621,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 Custom Analysis
               </h3>
               <SessionInputForm
-                onSubmit={handleAnalyze}
-                className='enhanced-session-form'
+                onSubmit={handleSessionSubmit}
+                disabled={isAnalyzing}
               />
             </div>
 
@@ -571,7 +637,9 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     <div
                       key={session.sessionId}
                       className='bg-gray-50 hover:bg-gray-100 flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors'
-                      onClick={() => handleAnalyze(session)}
+                      onClick={() => {
+                        void handleAnalyze(session)
+                      }}
                     >
                       <div>
                         <div className='text-sm font-medium'>
@@ -648,7 +716,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
         )}
 
         {(currentStep === 'results' || currentStep === 'insights') &&
-          analysisResults && (
+          analysisResults &&
+          sessionData && (
             <motion.div
               key='results'
               initial={{ opacity: 0, y: 20 }}
@@ -700,39 +769,17 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 {/* Enhanced Tab Navigation */}
                 <div className='border-gray-200 mt-6 border-b'>
                   <div className='flex space-x-8'>
-                    {[
-                      { id: 'analysis', label: 'Main Analysis', icon: 'chart' },
-                      {
-                        id: 'counterfactual',
-                        label: 'What-If Scenarios',
-                        icon: 'search',
-                        badge: counterfactualScenarios.length,
-                      },
-                      {
-                        id: 'historical',
-                        label: 'Historical Trends',
-                        icon: 'trending',
-                      },
-                      { id: 'export', label: 'Export & Share', icon: 'save' },
-                    ].map((tab) => (
+                    {tabConfig.map((tab) => (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                        onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
                           activeTab === tab.id
                             ? 'border-blue-500 text-blue-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
-                        {tab.icon === 'chart' ? (
-                          <ChartBar className='h-5 w-5' />
-                        ) : tab.icon === 'search' ? (
-                          <Search className='h-5 w-5' />
-                        ) : tab.icon === 'trending' ? (
-                          <TrendingUp className='h-5 w-5' />
-                        ) : tab.icon === 'save' ? (
-                          <Save className='h-5 w-5' />
-                        ) : null}
+                        {tabIcons[tab.icon]}
                         <span>{tab.label}</span>
                         {tab.badge && (
                           <span className='bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 text-xs'>
@@ -754,10 +801,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    <BiasAnalysisDisplay
-                      results={analysisResults}
-                      sessionData={sessionData!}
-                    />
+                      <BiasAnalysisDisplay
+                        results={analysisResults}
+                        sessionData={sessionData}
+                      />
                   </motion.div>
                 )}
 
@@ -770,7 +817,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   >
                     <CounterfactualAnalysis
                       scenarios={counterfactualScenarios}
-                      originalScore={analysisResults.overallBiasScore}
+                      originalSession={sessionData}
                     />
                   </motion.div>
                 )}
@@ -797,9 +844,9 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     exit={{ opacity: 0, x: 20 }}
                   >
                     <ExportControls
-                      data={analysisResults}
-                      counterfactual={counterfactualScenarios}
-                      historical={historicalComparison}
+                      analysisResults={analysisResults}
+                      counterfactualScenarios={counterfactualScenarios}
+                      historicalComparison={historicalComparison}
                       onExport={handleExport}
                     />
                   </motion.div>
