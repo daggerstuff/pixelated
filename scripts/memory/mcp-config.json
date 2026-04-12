@@ -3,11 +3,11 @@
   "mcpServers": {
     "foresight": {
       "command": "uv",
-      "args": ["run", "python", "-m", "ai.foresight.app"],
-      "cwd": "/path/to/your/pixelated",
+      "args": ["run", "-m", "foresight_mcp"],
+      "cwd": "/path/to/foresight-mcp-package",
       "env": {
-        "FORESIGHT_DB_PATH": "/home/your-user/.foresight/memory.db",
-        "FORESIGHT_USER_ID": "your-username"
+        "FORESIGHT_DB_PATH": "/home/user/.foresight/memory.db",
+        "FORESIGHT_USER_ID": "username"
       }
     }
   }
