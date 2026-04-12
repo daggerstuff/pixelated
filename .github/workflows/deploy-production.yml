@@ -130,9 +130,14 @@ jobs:
           "pixelated-empathy-api=$IMAGE_URI" -n pixelated-empathy
 
       - name: Render and apply runtime secrets
+        env:
+          DATABASE_URL: ${{ secrets['DATABASE_URL'] }}
+          REDIS_URL: ${{ secrets['REDIS_URL'] }}
+          JWT_SECRET: ${{ secrets['JWT_SECRET'] }}
+          API_KEY: ${{ secrets['API_KEY'] }}
         run: |
           chmod +x ./scripts/render-k8s-secrets.sh
-          DATABASE_URL="${{ secrets['DATABASE_URL'] }}"                   REDIS_URL="${{ secrets['REDIS_URL'] }}"                   JWT_SECRET="${{ secrets['JWT_SECRET'] }}"                   API_KEY="${{ secrets['API_KEY'] }}"                   ./scripts/render-k8s-secrets.sh
+          ./scripts/render-k8s-secrets.sh
 
       - name: Restart to apply updated runtime secrets
         run:

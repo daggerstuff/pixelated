@@ -168,7 +168,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
               },
             },
           },
-          recommendations: generateRecommendations(adjustedFactors),
+          recommendations: generateRecommendations(adjustedFactors, data.demographics),
           demographics: data.demographics,
         }
 
@@ -756,7 +756,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   >
                     <BiasAnalysisDisplay
                       results={analysisResults}
-                      sessionData={sessionData}
+                      sessionData={sessionData!}
                     />
                   </motion.div>
                 )}
@@ -770,7 +770,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   >
                     <CounterfactualAnalysis
                       scenarios={counterfactualScenarios}
-                      originalSession={sessionData}
+                      originalScore={analysisResults.overallBiasScore}
                     />
                   </motion.div>
                 )}
@@ -784,6 +784,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   >
                     <HistoricalProgressTracker
                       comparison={historicalComparison}
+                      currentScore={analysisResults.overallBiasScore}
                     />
                   </motion.div>
                 )}

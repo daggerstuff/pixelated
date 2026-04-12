@@ -247,7 +247,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     const zsetStore = new Map<string, Map<string, number>>()
 
     // Create a mock client implementing the Redis interface
-    const mockClient: Redis = {
+    const mockClient = {
       get: async (key: string) => store.get(key) || null,
       set: async (key: string, value: string) => {
         store.set(key, value)
@@ -416,14 +416,14 @@ export class RedisService extends EventEmitter implements IRedisService {
         if (['connect', 'ready'].includes(event)) {
           setTimeout(() => callback(), 0)
         }
-        return mockClient
+        return {} as any
       }, // Basic event handling for mock
       pipeline: () => {
         const commands: RedisPipelineOperation[] = []
-        const pipeline: RedisPipeline = {
+        const pipeline = {
           del: (key: string) => {
             commands.push({ cmd: 'del', args: [key] })
-            return mockClient
+            return {} as any
           },
           exec: async () => {
             return commands.map((cmd) => {
@@ -438,11 +438,11 @@ export class RedisService extends EventEmitter implements IRedisService {
             })
           },
         }
-        return pipeline
+        return pipeline as any
       },
     }
 
-    return mockClient
+    return mockClient as any
   }
 
   private createClient(): Redis {
