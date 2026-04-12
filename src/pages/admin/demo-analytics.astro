@@ -373,6 +373,16 @@ export const prerender = false // Enable SSR for real-time data
 
 <script>
   class DemoAnalyticsDashboard {
+    private eventSource: EventSource | null = null
+    private data: any = {
+      totalSessions: 0,
+      conversionRate: 0,
+      avgTimeToCTA: 0,
+      avgScrollDepth: 0,
+      variants: { A: {}, B: {}, C: {} },
+      funnel: { pageViews: 0, demoInteractions: 0, ctaClicks: 0 },
+    }
+
     constructor() {
       this.eventSource = null
       this.data = {
@@ -417,6 +427,7 @@ export const prerender = false // Enable SSR for real-time data
     }
 
     updateDashboard(data) {
+      this.data = data
       // Update main stats
       const totalSessionsEl = document.getElementById('total-sessions')
       if (totalSessionsEl)
@@ -513,6 +524,8 @@ export const prerender = false // Enable SSR for real-time data
 
     updateEventTimeline(events) {
       const timeline = document.getElementById('event-timeline')
+      if (!timeline) return
+
       const recentEvents = events.slice(-10).reverse()
 
       if (recentEvents.length === 0) {

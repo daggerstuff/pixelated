@@ -15,6 +15,10 @@ declare global {
       type: 'success' | 'error' | 'warning',
       message: string,
     ) => void
+    /**
+     * Google Analytics gtag helper
+     */
+    gtag?: (...args: any[]) => void
   }
 }
 
