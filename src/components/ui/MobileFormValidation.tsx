@@ -317,6 +317,12 @@ export function MobileFormValidation({
         React.FormHTMLAttributes<HTMLFormElement>
       >
       // Set up form props with the right type
+      type FormSubmitEvent = NonNullable<
+        React.ComponentProps<'form'>['onSubmit']
+      > extends (event: infer T) => unknown
+        ? T
+        : never
+
       const formProps: React.FormHTMLAttributes<HTMLFormElement> & {
         ref: React.RefObject<HTMLFormElement | null>
       } = {
@@ -326,7 +332,7 @@ export function MobileFormValidation({
           handleSubmit(e)
           // Call the original onSubmit if it exists
           if (specificChild.props.onSubmit) {
-            specificChild.props.onSubmit(e)
+            specificChild.props.onSubmit(e as FormSubmitEvent)
           }
         },
         noValidate: true, // Disable browser validation in favor of our custom validation

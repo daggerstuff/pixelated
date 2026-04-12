@@ -1,11 +1,14 @@
 import { defineConfig, devices } from '@playwright/test'
 // Detect CI environment to avoid running dev server with file watchers in CI (which can fail under low inotify limits).
 const isCi = !!process.env['CI']
+const shouldSkipWebServer =
+  process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === '1' ||
+  process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === 'true'
 
 // Get base URL from environment or default to localhost
 // Default to port 3000 for local dev, 4321 for CI (preview server)
 const baseURL =
-  process.env['BASE_URL'] ||
+  process.env['BASE_URL'] ??
   (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
 
 // Parse URL to extract hostname and port
@@ -33,7 +36,7 @@ try {
   if (!isRemoteUrl) {
     // Use explicit port if provided, otherwise use default based on CI context
     // (3000 for dev, 4321 for preview/CI)
-    webServerPort = explicitPort !== null ? explicitPort : isCi ? 4321 : 3000
+    webServerPort = explicitPort ?? (isCi ? 4321 : 3000)
 
     // Construct webServerUrl with the correct port
     // If the original URL had a port, use it; otherwise construct with the determined port
@@ -156,14 +159,14 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   // Only start webServer if BASE_URL is localhost (not a remote URL)
   // When BASE_URL points to staging/production, skip webServer to avoid timeout
-  webServer: isRemoteUrl
+  webServer: isRemoteUrl || shouldSkipWebServer
     ? undefined
     : isCi
       ? {
           // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
           // Use port from BASE_URL if specified, otherwise default to 4321
-          command: `pnpm run build && pnpm run preview -- --port ${webServerPort || 4321}`,
-          url: webServerUrl || 'http://localhost:4321',
+          command: `pnpm run build && pnpm run preview -- --port ${webServerPort ?? 4321}`,
+          url: webServerUrl ?? 'http://localhost:4321',
           reuseExistingServer: false,
           timeout: 10 * 60 * 1000, // allow time for build + preview start
         }
@@ -175,7 +178,7 @@ export default defineConfig({
             webServerPort !== undefined && webServerPort !== 3000
               ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
               : 'pnpm dev',
-          url: webServerUrl || 'http://localhost:3000',
+          url: webServerUrl ?? 'http://localhost:3000',
           reuseExistingServer: true,
           timeout: 180 * 1000,
         },

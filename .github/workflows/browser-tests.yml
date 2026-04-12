@@ -137,10 +137,11 @@ jobs:
 
           export NODE_ENV=test
           export DISABLE_AUTH=true
+          export DISABLE_PLAYWRIGHT_WEBSERVER=true
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
           export BASE_URL="${PREVIEW_URL}"
-          pnpm exec playwright test --config=config/playwright.config.ts tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1 --no-server
+          pnpm exec playwright test --config=config/playwright.config.ts tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
         env:
           CI: true
 
