@@ -7,6 +7,7 @@ import { auth0UserService } from '../../services/auth0.service'
 import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
 import { validateToken } from './auth0-jwt-service'
 import { ROLE_DEFINITIONS, type UserRole } from './auth0-rbac-service'
+import { apiKeyService } from './api-key-service'
 
 export interface ClientInfo {
   ip?: string
@@ -437,12 +438,16 @@ export async function securityHeaders(
     (request.headers as any).Origin ||
     (request.headers as any).origin
 
+  const hasApiKey =
+    request.headers.get?.('X-API-Key') ||
+    (request.headers as any)?.['X-API-Key']
+
   const allowedOrigins = [
     'https://app.example.com',
     process.env.ALLOWED_ORIGIN || 'http://localhost:4321',
   ]
 
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && (hasApiKey || allowedOrigins.includes(origin))) {
     headers.set('Access-Control-Allow-Origin', origin)
     headers.set(
       'Access-Control-Allow-Methods',
@@ -450,7 +455,7 @@ export async function securityHeaders(
     )
     headers.set(
       'Access-Control-Allow-Headers',
-      'Content-Type, Authorization, X-CSRF-Token',
+      'Content-Type, Authorization, X-CSRF-Token, X-API-Key',
     )
     headers.set('Access-Control-Allow-Credentials', 'true')
     headers.set('Access-Control-Max-Age', '86400')
@@ -490,26 +495,128 @@ export interface AuthenticatedRequest extends Request {
   }
   tokenId?: string
   sessionId?: string
+  authMode?: 'jwt' | 'api_key'
+  scopes?: string[]
+}
+
+export type AuthStrategy = 'jwtOnly' | 'apiKeyOnly' | 'either'
+
+export interface AuthOptions {
+  strategy?: AuthStrategy
+  requiredScopes?: string[]
 }
 
 /**
- * Authenticate request middleware using Auth0
+ * Authenticate request middleware using Auth0 or API Key
  */
-export async function authenticateRequest(request: Request): Promise<{
+export async function authenticateRequest(
+  request: Request,
+  options: AuthOptions = {},
+): Promise<{
   success: boolean
   request?: AuthenticatedRequest
   response?: Response
   error?: string
 }> {
-  // Extract authorization header - use comprehensive extraction
-  const authHeader =
-    request.headers.get?.('Authorization') ||
-    request.headers.get?.('authorization') ||
-    (request.headers as any)?.Authorization ||
-    (request.headers as any)?.authorization ||
-    (request.headers as any)?.get?.('Authorization')
+  const { strategy = 'either', requiredScopes = [] } = options
 
-  if (!authHeader) {
+  // Check for API Key first if strategy allows it
+  if (strategy === 'apiKeyOnly' || strategy === 'either') {
+    const apiKey = request.headers.get?.('X-API-Key') || (request.headers as any)?.['X-API-Key'];
+    if (apiKey) {
+      const validation = await apiKeyService.validateAPIKey(apiKey);
+      if (validation.valid && validation.userId) {
+        const user = await apiKeyService.getUserById(validation.userId);
+        if (user) {
+          const authenticatedRequest = request as AuthenticatedRequest;
+          authenticatedRequest.user = {
+            id: user.id,
+            email: user.email,
+            role: 'developer', // API key users are developers
+            emailVerified: user.email_verified ?? false,
+            fullName: user.first_name + ' ' + user.last_name,
+            avatarUrl: user.picture,
+          };
+          authenticatedRequest.authMode = 'api_key';
+          authenticatedRequest.scopes = validation.scopes;
+
+          // Check scopes if required
+          if (requiredScopes.length > 0) {
+            const hasAllScopes = requiredScopes.every(scope => 
+              validation.scopes?.includes(scope)
+            );
+            if (!hasAllScopes) {
+              return {
+                success: false,
+                error: 'Insufficient scopes',
+                response: new Response(
+                  JSON.stringify({ 
+                    error: 'Insufficient permissions',
+                    required: requiredScopes 
+                  }),
+                  {
+                    status: 403,
+                    headers: { 'Content-Type': 'application/json' },
+                  }
+                )
+              };
+            }
+          }
+          
+          // Log successful API key authentication
+          const { logSecurityEvent, SecurityEventType } = await import('../security');
+          await logSecurityEvent(
+            SecurityEventType.AUTHENTICATION_SUCCESS,
+            user.id,
+            {
+              authMode: 'api_key',
+              endpoint: new URL(request.url).pathname,
+            }
+          );
+          
+          return { success: true, request: authenticatedRequest };
+        }
+      }
+      // If strategy was apiKeyOnly and we failed or have no valid key
+      if (strategy === 'apiKeyOnly') {
+        return {
+          success: false,
+          error: 'Invalid or missing API key',
+          response: new Response(
+            JSON.stringify({ error: 'Invalid or missing API key' }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          ),
+        }
+      }
+    } else if (strategy === 'apiKeyOnly') {
+      return {
+        success: false,
+        error: 'API key required',
+        response: new Response(
+          JSON.stringify({ error: 'API key required' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
+      }
+    }
+  }
+
+  // Fall through to JWT if strategy is 'jwtOnly' or 'either'
+  if (strategy === 'jwtOnly' || strategy === 'either') {
+    // Extract authorization header - use comprehensive extraction
+    const authHeader =
+      request.headers.get?.('Authorization') ||
+      request.headers.get?.('authorization') ||
+      (request.headers as any)?.Authorization ||
+      (request.headers as any)?.authorization ||
+      (request.headers as any)?.get?.('Authorization')
+
+    if (!authHeader) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       error: 'No authorization header',
@@ -573,6 +680,30 @@ export async function authenticateRequest(request: Request): Promise<{
         },
       ),
       error: validation.error || 'Invalid token',
+    }
+  }
+
+  // Check scopes if required
+  if (requiredScopes.length > 0) {
+    const permissions = (validation.payload?.permissions as string[]) || []
+    const hasAllScopes = requiredScopes.every((scope) =>
+      permissions.includes(scope),
+    )
+    if (!hasAllScopes) {
+      return {
+        success: false,
+        error: 'Insufficient scopes',
+        response: new Response(
+          JSON.stringify({
+            error: 'Insufficient permissions',
+            required: requiredScopes,
+          }),
+          {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
+      }
     }
   }
 
@@ -811,6 +942,8 @@ export async function authenticateRequest(request: Request): Promise<{
   } as AuthenticatedRequest['user']
   authenticatedRequest.tokenId = validation.tokenId
   authenticatedRequest.sessionId = sid
+  authenticatedRequest.authMode = 'jwt'
+  authenticatedRequest.scopes = validation.payload?.permissions as string[] | undefined
 
   return { success: true, request: authenticatedRequest }
 }

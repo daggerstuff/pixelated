@@ -1,58 +1,69 @@
 import { sequence, defineMiddleware } from 'astro:middleware'
 
-import { authenticateRequest } from './lib/auth/auth0-middleware'
+import { authenticateRequest, type AuthStrategy, type AuthOptions } from './lib/auth/auth0-middleware'
+import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { tracingMiddleware } from './lib/tracing/middleware'
 import { markSpanError } from './lib/tracing/utils'
 
-// Simple route matcher for protected API routes and journal-research pages
-const protectedRoutePatterns: RegExp[] = [
-  /\/api\/protected(.*)/,
-  /\/api\/journal-research(.*)/, // Protect journal-research API endpoints
-  /\/api\/agent-notes(.*)/, // Protect agent note collaboration APIs
-  /\/journal-research(.*)/, // Protect journal-research pages
+interface RouteConfig extends AuthOptions {
+  pattern: RegExp
+}
+
+// Route authentication configuration
+// Defines which routes require authentication and what strategy/scopes to use
+const routeAuthConfig: RouteConfig[] = [
+  { pattern: /\/api\/v1\/(.*)/, strategy: 'either', requiredScopes: ['api:read'] },
+  { pattern: /\/api\/protected(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research API endpoints
+  { pattern: /\/api\/agent-notes(.*)/, strategy: 'jwtOnly' }, // Protect agent note collaboration APIs
+  { pattern: /\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research pages
 ]
 
-function isProtectedRoute(request: Request) {
+function getRouteConfig(request: Request): RouteConfig | null {
   try {
     const url = new URL(request.url)
     const { pathname } = url
 
     // Allow public API routes (auth endpoints, health checks, etc.)
     if (pathname.startsWith('/api/auth/')) {
-      return false
+      return null
     }
 
     // Allow health check endpoints (used by smoke tests and monitoring)
     if (pathname.includes('/health') || pathname.endsWith('/health')) {
-      return false
+      return null
     }
 
-    return protectedRoutePatterns.some((r) => r.test(pathname))
+    return routeAuthConfig.find((config) => config.pattern.test(pathname)) || null
   } catch (err) {
     // If URL parsing fails, be conservative and treat as not protected
     // Log the error for observability without exposing PII
     markSpanError(err instanceof Error ? err : new Error(String(err)))
-    return false
+    return null
   }
 }
 
 /**
- * Auth middleware that uses Auth0 for authentication.
- * If a request targets a protected route and there's no valid Auth0 session, return 401.
+ * Auth middleware that uses Auth0 or API Keys for authentication.
+ * If a request targets a protected route and there's no valid session, return 401/403.
  */
 const projectAuthMiddleware = defineMiddleware(async (context, next) => {
   const { request } = context
+  const routeConfig = getRouteConfig(request)
 
   // Allow non-protected routes through quickly
-  if (!isProtectedRoute(request)) {
+  if (!routeConfig) {
     return next()
   }
 
-  // Check authentication using Auth0
+  // Check authentication using the specified strategy and scopes
   try {
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request, {
+      strategy: routeConfig.strategy,
+      requiredScopes: routeConfig.requiredScopes,
+    })
 
     if (!authResult.success) {
       // If authentication failed, return the response from Auth0 middleware
@@ -108,5 +119,6 @@ export const onRequest = sequence(
   tracingMiddleware as any,
   generateCspNonce as any,
   securityHeaders as any,
+  corsMiddleware as any,
   projectAuthMiddleware as any,
 )
