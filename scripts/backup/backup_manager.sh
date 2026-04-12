@@ -343,10 +343,9 @@ check_disk_space_warnings() {
 # Generate specific rollback commands for different scenarios
 # Requirements: 3.5, 7.1, 7.2, 7.3
 generate_rollback_commands() {
+	log_info "Generating rollback commands (type: ${1})"
+
 	local rollback_type="${1:-all}" # "filesystem", "container", "registry", or "all"
-
-	log_info "Generating rollback commands (type: ${rollback_type})"
-
 	local metadata
 	metadata=$(read_backup_metadata)
 	local current_backup
@@ -399,8 +398,8 @@ FILESYSTEM_ROLLBACK
     print_status "Rolling back to current backup: ${current_backup}"
     
     if [[ -d "${PROJECT_DIR}" ]]; then
-        print_status "Moving failed deployment to /root/pixelated-failed-\$(date +%Y%m%d_%H%M%S)"
-        sudo mv "${PROJECT_DIR}" "/root/pixelated-failed-\$(date +%Y%m%d_%H%M%S)"
+        print_status "Moving failed deployment to /root/pixelated-failed-$(date +%Y%m%d_%H%M%S)"
+        sudo mv "${PROJECT_DIR}" "/root/pixelated-failed-$(date +%Y%m%d_%H%M%S)"
     fi
     
     print_status "Restoring from current backup..."
@@ -409,12 +408,12 @@ FILESYSTEM_ROLLBACK
 CURRENT_BACKUP_ROLLBACK
 		elif [[ -n ${latest_archived} && -d ${latest_archived} ]]; then
 			cat >>"${rollback_commands_file}" <<ARCHIVED_BACKUP_ROLLBACK
-    # Rollback to latest archived backup
+    # Rollback to latest archived backup: ${latest_archived}
     print_status "Rolling back to latest archived backup: ${latest_archived}"
     
     if [[ -d "${PROJECT_DIR}" ]]; then
-        print_status "Moving failed deployment to /root/pixelated-failed-\$(date +%Y%m%d_%H%M%S)"
-        sudo mv "${PROJECT_DIR}" "/root/pixelated-failed-\$(date +%Y%m%d_%H%M%S)"
+        print_status "Moving failed deployment to /root/pixelated-failed-$(date +%Y%m%d_%H%M%S)"
+        sudo mv "${PROJECT_DIR}" "/root/pixelated-failed-$(date +%Y%m%d_%H%M%S)"
     fi
     
     print_status "Restoring from archived backup..."
@@ -441,12 +440,12 @@ NO_BACKUP_ROLLBACK
     docker build -t pixelated-empathy:rollback .
     
     # Start container
-    docker run -d \\
-        --name pixelated-app \\
-        --restart unless-stopped \\
-        -p 4321:4321 \\
-        -e NODE_ENV=production \\
-        -e PORT=4321 \\
+    docker run -d \
+        --name pixelated-app \
+        --restart unless-stopped \
+        -p 4321:4321 \
+        -e NODE_ENV=production \
+        -e PORT=4321 \
         pixelated-empathy:rollback
     
     # Restart caddy
@@ -475,18 +474,18 @@ container_rollback() {
     docker rm pixelated-app 2>/dev/null || print_warning "Container not found"
     
     # Find previous container image
-    PREVIOUS_IMAGE=\$(docker images pixelated-empathy --format "table {{.Repository}}:{{.Tag}}" | grep -v "latest" | head -n 1)
+    PREVIOUS_IMAGE="$(docker images pixelated-empathy --format "table {{.Repository}}:{{.Tag}}" | grep -v "latest" | head -n 1)"
     
-    if [[ -n "\$PREVIOUS_IMAGE" ]]; then
-        print_status "Rolling back to previous image: \$PREVIOUS_IMAGE"
+    if [[ -n "${PREVIOUS_IMAGE}" ]]; then
+        print_status "Rolling back to previous image: ${PREVIOUS_IMAGE}"
         
-        docker run -d \\
-            --name pixelated-app \\
-            --restart unless-stopped \\
-            -p 4321:4321 \\
-            -e NODE_ENV=production \\
-            -e PORT=4321 \\
-            "\$PREVIOUS_IMAGE"
+        docker run -d \
+            --name pixelated-app \
+            --restart unless-stopped \
+            -p 4321:4321 \
+            -e NODE_ENV=production \
+            -e PORT=4321 \
+            "${PREVIOUS_IMAGE}"
         
         print_status "✅ Container rollback completed"
     else
@@ -518,20 +517,20 @@ registry_rollback() {
     REGISTRY_URL="git.pixelatedempathy.com/pixelated-empathy"
     
     print_status "Available registry images (you may need to authenticate):"
-    docker search "\$REGISTRY_URL" 2>/dev/null || {
+    docker search "$REGISTRY_URL" 2>/dev/null || {
         print_warning "Could not list registry images automatically"
         print_status "Manual registry rollback steps:"
-        print_status "1. List available tags: docker search \$REGISTRY_URL"
-        print_status "2. Pull desired version: docker pull \$REGISTRY_URL:<tag>"
-        print_status "3. Run container: docker run -d --name pixelated-app -p 4321:4321 \$REGISTRY_URL:<tag>"
+        print_status "1. List available tags: docker search $REGISTRY_URL"
+        print_status "2. Pull desired version: docker pull $REGISTRY_URL:<tag>"
+        print_status "3. Run container: docker run -d --name pixelated-app -p 4321:4321 $REGISTRY_URL:<tag>"
         return 1
     }
     
     print_status "To complete registry rollback:"
     print_status "1. Choose a previous tag from the list above"
-    print_status "2. Run: docker pull \$REGISTRY_URL:<chosen-tag>"
+    print_status "2. Run: docker pull $REGISTRY_URL:<chosen-tag>"
     print_status "3. Stop current container: docker stop pixelated-app && docker rm pixelated-app"
-    print_status "4. Start rollback container: docker run -d --name pixelated-app -p 4321:4321 \$REGISTRY_URL:<chosen-tag>"
+    print_status "4. Start rollback container: docker run -d --name pixelated-app -p 4321:4321 $REGISTRY_URL:<chosen-tag>"
 }
 
 REGISTRY_ROLLBACK
@@ -545,10 +544,10 @@ REGISTRY_ROLLBACK
 # ============================================================================
 
 print_status "Pixelated Empathy Deployment Rollback Script"
-print_status "Generated on: \$(date)"
+print_status "Generated on: $(date)"
 print_status ""
 
-case "\${1:-all}" in
+case "${1:-all}" in
     "filesystem")
         filesystem_rollback
         ;;
@@ -575,7 +574,7 @@ case "\${1:-all}" in
         fi
         ;;
     *)
-        print_status "Usage: \$0 [filesystem|container|registry|all]"
+        print_status "Usage: $0 [filesystem|container|registry|all]"
         print_status ""
         print_status "Rollback options:"
         print_status "  filesystem - Restore from filesystem backup (fastest)"
@@ -734,7 +733,7 @@ verify_backup_integrity() {
 	return 0
 }
 
-# Main function for testing
+# Main function
 main() {
 	local action="${1:-help}"
 

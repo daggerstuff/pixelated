@@ -1156,7 +1156,7 @@ setup_backup_system() {
     systemctl start backup-home-vivi.timer 2>/dev/null || true
     systemctl start config-backup.timer 2>/dev/null || true
     
-    success "Backup system configured (weekly config backup + 6-hourly home backup)"
+success "Backup system configured (weekly config backup + twice-daily home backup)"
 }
 
 # =============================================================================

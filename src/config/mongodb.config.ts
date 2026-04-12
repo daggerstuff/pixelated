@@ -57,14 +57,7 @@ class MongoDB {
    * Build MongoDB URI from environment variables
    */
   private buildMongoDBUri(): string {
-    const metaEnv =
-      typeof import.meta === 'object' &&
-      typeof import.meta.env === 'object' &&
-      import.meta.env !== null &&
-      'MONGODB_URI' in import.meta.env &&
-      typeof import.meta.env['MONGODB_URI'] === 'string'
-        ? import.meta.env['MONGODB_URI']
-        : undefined
+    const metaEnv = import.meta.env?.['MONGODB_URI']
 
     process.env['MONGODB_URI'] ??= metaEnv
     const mongoUri = process.env['MONGODB_URI']

@@ -322,9 +322,10 @@ describe('Auth0 Integration Tests', () => {
         email: 'newuser@example.com',
         emailVerified: false,
         role: 'user',
-        fullName: null,
-        avatarUrl: null,
+        fullName: undefined,
+        avatarUrl: undefined,
         createdAt: '2023-01-01T00:00:00Z',
+      lastLogin: undefined,
         appMetadata: { roles: ['User'] },
         userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       })
@@ -496,7 +497,7 @@ describe('Auth0 Integration Tests', () => {
       const validToken =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTYiLCJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjk5OTk5OTk5OTksImlhdCI6MTYxNjIzOTAyMn0.signature'
 
-      const mockPayload = {
+      const mockUserInfo = {
         sub: 'auth0|123456',
         iss: 'https://test-domain.auth0.com/',
         aud: 'https://api.pixelated-empathy.com',
@@ -504,8 +505,10 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] },
       }
 
-      const mockAuthClient = mockAuthenticationClient
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
+      // The code uses auth0UserInfo.getUserInfo, not getProfile
+      mockUserInfoClient.getUserInfo.mockResolvedValue({
+        data: mockUserInfo,
+      })
 
       const result = await auth0JwtService.validateToken(validToken, 'access')
 
@@ -520,7 +523,7 @@ describe('Auth0 Integration Tests', () => {
         }),
       })
 
-      expect(mockAuthClient.getProfile).toHaveBeenCalledWith(validToken)
+      expect(mockUserInfoClient.getUserInfo).toHaveBeenCalledWith(validToken)
     })
 
     it('should reject an expired token', async () => {
@@ -528,16 +531,7 @@ describe('Auth0 Integration Tests', () => {
       const expiredToken =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTYiLCJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjE1MTYyMzkwMjJ9.signature'
 
-      const mockPayload = {
-        sub: 'auth0|123456',
-        iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelatedempathy.com',
-        exp: 1516239022,
-      }
-
-      const mockAuthClient = mockAuthenticationClient
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
-
+      // No mock needed - the code will decode the token locally and detect expiration
       const result = await auth0JwtService.validateToken(expiredToken, 'access')
 
       expect(result).toEqual({
@@ -560,9 +554,14 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['user'] },
       }
 
-      const mockAuthClient = mockAuthenticationClient
-      mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
-      mockAuthClient.getProfile.mockResolvedValue(mockUserResponse)
+      // The code uses oauth.refreshTokenGrant
+      mockAuthenticationClient.oauth.refreshTokenGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      // The code uses auth0UserInfo.getUserInfo
+      mockUserInfoClient.getUserInfo.mockResolvedValue({
+        data: mockUserResponse,
+      })
 
       const result = await auth0JwtService.refreshAccessToken(
         'old-refresh-token',
@@ -583,14 +582,15 @@ describe('Auth0 Integration Tests', () => {
         },
       })
 
-      expect(mockAuthClient.refreshToken).toHaveBeenCalledWith({
+      expect(mockAuthenticationClient.oauth.refreshTokenGrant).toHaveBeenCalledWith({
         refresh_token: 'old-refresh-token',
       })
     })
 
     it('should revoke token successfully', async () => {
       const redisModule = await import('../../../src/lib/redis')
-      redisModule.setInCache.mockResolvedValue(undefined)
+      // Use vi.mocked to properly type the mock
+      vi.mocked(redisModule.setInCache).mockResolvedValue(true)
 
       await auth0JwtService.revokeToken('token-to-revoke', 'user_logout')
 
@@ -620,9 +620,11 @@ describe('Auth0 Integration Tests', () => {
       expect(mockManagementClient.getRoles).toHaveBeenCalledWith({
         name_filter: 'therapist',
       })
-      expect(mockManagementClient.assignRolestoUser).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
-        { roles: ['role-id-123'] },
+      
+      expect(mockManagementClient.assignRolestoUser).toHaveBeenCalledWith({
+        id: 'auth0|user123',
+        roles: ['role-id-123'],
+      })
       )
 
       // Verify security event was logged
@@ -785,17 +787,19 @@ describe('Auth0 Integration Tests', () => {
       const mockPayload = {
         sub: 'auth0|123456',
         iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelatedempathy.com',
+        aud: 'https://api.pixelated-empathy.com',
         exp: 9999999999,
         jti: 'token-id-123', // Added jti for tokenId expectation
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] },
       }
 
-      const mockAuthClient = mockAuthenticationClient
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
+      // The code uses auth0UserInfo.getUserInfo
+      mockUserInfoClient.getUserInfo.mockResolvedValue({
+        data: mockPayload,
+      })
 
       await auth0JwtService.validateToken(
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHwxMjM0NTYiLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjE5OTk5OTk5OTksImlhdCI6MTUxNjIzOTAyMiwiaHR0cHM6Ly9waXhlbGF0ZWQuZW1wYXRoeS9hcHBfbWV0YWRhdGEiOnsicm9sZXMiOlsiYWRtaW4iXX0sImh0dHBzOi8vcGl4ZWxhdGVkLmVtcGF0aHkvdXNlcl9tZXRhZGF0YSI6eyJyb2xlIjoiYWRtaW4ifX0.signature',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHwxMjM0NTYiLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjE5OTk5OTk5OTksImlhdCI6MTUxNjIzOTAyMiwianRpIjoidG9rZW4taWQtMTIzIiwiaHR0cHM6Ly9waXhlbGF0ZWQuZW1wYXRoeS9hcHBfbWV0YWRhdGEiOnsicm9sZXMiOlsiYWRtaW4iXX0sImh0dHBzOi8vcGl4ZWxhdGVkLmVtcGF0aHkvdXNlcl9tZXRhZGF0YSI6eyJyb2xlIjoiYWRtaW4ifX0.signature',
         'access',
       )
 
@@ -806,7 +810,7 @@ describe('Auth0 Integration Tests', () => {
         null,
         {
           userId: 'auth0|123456',
-          tokenId: expect.any(String),
+          tokenId: 'token-id-123',
           tokenType: 'access',
           sessionId: undefined,
         },
@@ -827,9 +831,14 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['user'] },
       }
 
-      const mockAuthClient = mockAuthenticationClient
-      mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
-      mockAuthClient.getProfile.mockResolvedValue(mockUserResponse)
+      // The code uses oauth.refreshTokenGrant
+      mockAuthenticationClient.oauth.refreshTokenGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      // The code uses auth0UserInfo.getUserInfo
+      mockUserInfoClient.getUserInfo.mockResolvedValue({
+        data: mockUserResponse,
+      })
 
       await auth0JwtService.refreshAccessToken('valid-refresh-token', {})
 
@@ -857,7 +866,7 @@ describe('Auth0 Integration Tests', () => {
         refresh_token: 'mock-refresh-token',
         expires_in: 3600,
       }
-      // Valid dummy JWT for validation
+      // Valid dummy JWT for validation - must match the expected userId for consistency
       const validToken =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHx1c2VyMTIzIiwiaXNzIjoiaHR0cHM6Ly90ZXN0LWRvbWFpbi5hdXRoMC5jb20vIiwiYXVkIjoiaHR0cHM6Ly9hcGkucGl4ZWxhdGVkLWVtcGF0aHkuY29tIiwiZXhwIjo5OTk5OTk5OTk5fQ.signature'
 
@@ -872,8 +881,7 @@ describe('Auth0 Integration Tests', () => {
         'https://pixelated.empathy/user_metadata': { role: 'user' },
       }
 
-      const mockAuthClient = mockAuthenticationClient
-      mockAuthClient.oauth.passwordGrant.mockResolvedValue({
+      mockAuthenticationClient.oauth.passwordGrant.mockResolvedValue({
         data: mockTokenResponse,
       })
       mockUserInfoClient.getUserInfo.mockResolvedValue({
@@ -889,16 +897,15 @@ describe('Auth0 Integration Tests', () => {
         'password123',
       )
 
-      // 2. Validate Token using the result from Sign In (mocked to point to validToken structure)
-      // We spy on validateToken to ensure it uses the mock profile internally or we can just call it
-      // But validateToken takes a string. We pass our validToken.
-
-      mockAuthClient.getProfile.mockResolvedValue({
-        sub: 'auth0|user123',
-        aud: 'https://api.pixelated-empathy.com',
-        iss: 'https://test-domain.auth0.com/',
-        exp: 9999999999,
-        'https://pixelated.empathy/app_metadata': { roles: ['user'] },
+      // 2. Validate Token - set up mock for the userInfo call
+      mockUserInfoClient.getUserInfo.mockResolvedValue({
+        data: {
+          sub: 'auth0|user123',
+          aud: 'https://api.pixelated-empathy.com',
+          iss: 'https://test-domain.auth0.com/',
+          exp: 9999999999,
+          'https://pixelated.empathy/app_metadata': { roles: ['user'] },
+        },
       })
 
       const tokenValidationResult = await auth0JwtService.validateToken(
@@ -922,7 +929,7 @@ describe('Auth0 Integration Tests', () => {
       )
 
       expect(mockManagementClient.users.link).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
+        id: 'auth0|user123',
         {
           provider: 'google-oauth2',
           connection_id: 'google-oauth2',
