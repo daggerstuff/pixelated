@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import { AuthService } from '../services/authService'
 import { CollaborationService } from '../services/collaborationService'
 import { DocumentService } from '../services/documentService'

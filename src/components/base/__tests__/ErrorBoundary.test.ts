@@ -1,5 +1,6 @@
-import { renderAstro } from '@/test/utils/astro'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderAstro } from '@/test/utils/astro'
 
 import ErrorBoundary from '../ErrorBoundary.astro'
 
@@ -36,7 +37,9 @@ describe('ErrorBoundary', () => {
     // Check error UI
     const fallback = querySelector('[slot="fallback"]')
     expect(fallback).toBeInTheDocument()
-    expect(fallback).toHaveTextContent('Something went wrong. Please try refreshing the page.')
+    expect(fallback).toHaveTextContent(
+      'Something went wrong. Please try refreshing the page.',
+    )
   })
 
   it('cleans up event listeners on disconnect', async () => {

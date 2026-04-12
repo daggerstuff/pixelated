@@ -217,7 +217,12 @@ class PIIDetectionService {
       logger.info(`FHE key rotation completed for keyId: ${keyId}`)
     } catch (error: unknown) {
       logger.error(`Failed to rotate FHE keys for keyId: ${keyId}`, {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       throw error
     }
@@ -264,7 +269,11 @@ class PIIDetectionService {
       })
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error)
       logger.error('Failed to load ML model', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -472,7 +481,11 @@ class PIIDetectionService {
       return result
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error)
       logger.error('Error detecting PII', {
         error: errorMessage,
         textLength: text.length,
@@ -540,7 +553,10 @@ class PIIDetectionService {
         try {
           resultData = JSON.parse(result.result) as PIIFHEResultData
         } catch (e) {
-          throw new Error('Failed to parse FHE operation result: ' + (result.result as string).substring(0, 100))
+          throw new Error(
+            'Failed to parse FHE operation result: ' +
+              (result.result as string).substring(0, 100),
+          )
         }
       } else if (result.result && typeof result.result === 'object') {
         resultData = result.result as PIIFHEResultData
@@ -566,9 +582,11 @@ class PIIDetectionService {
         isEncrypted: true,
         metadata: {
           operationId: result.metadata?.operation?.toString() || 'unknown',
-          processingTime: result.metadata?.timestamp && typeof result.metadata.timestamp === 'number'
-            ? (Date.now() - result.metadata.timestamp).toString()
-            : '0',
+          processingTime:
+            result.metadata?.timestamp &&
+            typeof result.metadata.timestamp === 'number'
+              ? (Date.now() - result.metadata.timestamp).toString()
+              : '0',
         },
       }
 
@@ -580,7 +598,12 @@ class PIIDetectionService {
       return detectionResult
     } catch (error: unknown) {
       logger.error('Error detecting PII in encrypted text', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         encryptedTextLength: encryptedText.length,
         timestamp: new Date().toISOString(),
       })
@@ -677,7 +700,10 @@ class PIIDetectionService {
       }
 
       if (depth > MAX_DEPTH) {
-        logger.warn('PII processing reached max depth, skipping deeper levels', { key, depth })
+        logger.warn(
+          'PII processing reached max depth, skipping deeper levels',
+          { key, depth },
+        )
         return value
       }
 
@@ -725,7 +751,11 @@ class PIIDetectionService {
         const entries = Object.entries(value as object)
 
         for (const [objKey, objValue] of entries) {
-          processedObject[objKey] = await processValue(objValue, objKey, depth + 1)
+          processedObject[objKey] = await processValue(
+            objValue,
+            objKey,
+            depth + 1,
+          )
         }
 
         return processedObject

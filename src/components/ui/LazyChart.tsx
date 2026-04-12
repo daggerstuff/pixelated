@@ -1,8 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import type {
-  AreaProps,
-  ResponsiveContainerProps,
-} from 'recharts'
+import type { AreaProps, ResponsiveContainerProps } from 'recharts'
 
 // Lazy load chart components to reduce bundle size
 const LazyAreaChart = lazy(() =>

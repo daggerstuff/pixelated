@@ -492,10 +492,7 @@ router.put(
       }
 
       const userId = req.user!.userId
-      const document = await DocumentService.publishDocument(
-        documentId,
-        userId,
-      )
+      const document = await DocumentService.publishDocument(documentId, userId)
 
       if (!document) {
         res.status(404).json({
@@ -539,10 +536,7 @@ router.put(
       }
 
       const userId = req.user!.userId
-      const document = await DocumentService.archiveDocument(
-        documentId,
-        userId,
-      )
+      const document = await DocumentService.archiveDocument(documentId, userId)
 
       if (!document) {
         res.status(404).json({

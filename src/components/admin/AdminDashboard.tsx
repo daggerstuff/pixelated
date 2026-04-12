@@ -45,7 +45,10 @@ interface SystemHealth {
 function getHighRiskCount(
   riskLevelDistribution: Record<string, number>,
 ): number {
-  return (riskLevelDistribution['high'] ?? 0) + (riskLevelDistribution['critical'] ?? 0)
+  return (
+    (riskLevelDistribution['high'] ?? 0) +
+    (riskLevelDistribution['critical'] ?? 0)
+  )
 }
 
 /**

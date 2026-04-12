@@ -135,7 +135,9 @@ export const EnhancedChartComponent = React.lazy(
   () => import('../../components/analytics/EnhancedChartComponent'),
 )
 
-export const DynamicEnhancedChartComponent = (props: Record<string, unknown>) => (
+export const DynamicEnhancedChartComponent = (
+  props: Record<string, unknown>,
+) => (
   <Suspense fallback={<VisualizationLoading />}>
     <EnhancedChartComponent {...props} />
   </Suspense>

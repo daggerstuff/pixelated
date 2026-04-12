@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
 import type { TokenEncryptionConfig } from '../token.encryption'
 import { TokenEncryptionService } from '../token.encryption'
 
@@ -86,7 +87,9 @@ describe('token Encryption Service', () => {
             ...testConfig,
             salt: 'short',
           }),
-      ).toThrow('Token encryption salt is required and must be at least 16 characters long')
+      ).toThrow(
+        'Token encryption salt is required and must be at least 16 characters long',
+      )
     })
 
     it('should throw error when initialization fails', async () => {
@@ -148,7 +151,11 @@ describe('token Encryption Service', () => {
 
     it('should throw error when decrypting with invalid data', async () => {
       await expect(
-        tokenEncryptionService.decryptToken('invalid', 'iv_base64', 'tag_base64'),
+        tokenEncryptionService.decryptToken(
+          'invalid',
+          'iv_base64',
+          'tag_base64',
+        ),
       ).rejects.toThrow('Invalid authentication tag length')
       expect(mockLogger.error).toHaveBeenCalled()
     })

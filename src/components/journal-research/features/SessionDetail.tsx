@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { useState } from 'react'
 
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import {
   Card,
   CardContent,
@@ -18,7 +19,6 @@ import {
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 
-import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import { SessionForm } from '../forms/SessionForm'
 import { SessionCard } from '../shared/SessionCard'
 

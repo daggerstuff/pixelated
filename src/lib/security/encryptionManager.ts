@@ -109,14 +109,14 @@ class EncryptionManager {
     const keyId = `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
     if (this.config.algorithm.startsWith('AES')) {
-      const key = (await crypto.subtle.generateKey(
+      const key = await crypto.subtle.generateKey(
         {
           name: this.config.algorithm,
           length: this.config.keySize,
         },
         true, // extractable
         ['encrypt', 'decrypt'],
-      ))
+      )
 
       return { id: keyId, key }
     } else {

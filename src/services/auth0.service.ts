@@ -11,6 +11,7 @@ import {
   UserInfoClient,
   type AuthenticationClientOptions,
 } from 'auth0'
+
 import type { AuthRole } from '../config/auth.config'
 
 // Type alias for auth0 v5+ compatibility
@@ -42,7 +43,9 @@ type ExtendedManagementClient = ManagementClient & {
       data: Record<string, unknown>,
     ) => Promise<{ data: unknown }>
     delete: (params: { id: string }) => Promise<void>
-    listUsersByEmail: (params: { email: string }) => Promise<{ data: unknown[] }>
+    listUsersByEmail: (params: {
+      email: string
+    }) => Promise<{ data: unknown[] }>
     getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
     getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
   }
@@ -52,7 +55,10 @@ type ExtendedManagementClient = ManagementClient & {
     page?: number
     name_filter?: string
   }) => Promise<unknown[]>
-  createRole: (params: { name: string; description?: string }) => Promise<unknown>
+  createRole: (params: {
+    name: string
+    description?: string
+  }) => Promise<unknown>
   updateRole: (params: {
     id: string
     name?: string
@@ -103,9 +109,7 @@ type ExtendedAuthenticationClient = AuthenticationClient & {
         expires_in: number
       }
     }>
-    refreshTokenGrant: (params: {
-      refresh_token: string
-    }) => Promise<{
+    refreshTokenGrant: (params: { refresh_token: string }) => Promise<{
       data: {
         access_token: string
         refresh_token?: string
@@ -171,7 +175,7 @@ interface Auth0ServiceConfig {
 type UnknownRecord = Record<string, unknown>
 
 type Auth0UserRecord = {
- sub?: unknown
+  sub?: unknown
   user_id?: unknown
   email?: unknown
   email_verified?: unknown
@@ -221,12 +225,23 @@ let auth0UserInfo: ExtendedUserInfoClient | null = null
  */
 function initializeAuth0Clients() {
   const config: Auth0ServiceConfig = {
-    domain: toStringEnvValue(process.env.AUTH0_DOMAIN) ?? toStringEnvValue(import.meta.env.AUTH0_DOMAIN),
-    clientId: toStringEnvValue(process.env.AUTH0_CLIENT_ID) ?? toStringEnvValue(import.meta.env.AUTH0_CLIENT_ID),
-    clientSecret: toStringEnvValue(process.env.AUTH0_CLIENT_SECRET) ?? toStringEnvValue(import.meta.env.AUTH0_CLIENT_SECRET),
-    audience: toStringEnvValue(process.env.AUTH0_AUDIENCE) ?? toStringEnvValue(import.meta.env.AUTH0_AUDIENCE),
-    managementClientId: toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_ID) ?? toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID),
-    managementClientSecret: toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_SECRET) ??
+    domain:
+      toStringEnvValue(process.env.AUTH0_DOMAIN) ??
+      toStringEnvValue(import.meta.env.AUTH0_DOMAIN),
+    clientId:
+      toStringEnvValue(process.env.AUTH0_CLIENT_ID) ??
+      toStringEnvValue(import.meta.env.AUTH0_CLIENT_ID),
+    clientSecret:
+      toStringEnvValue(process.env.AUTH0_CLIENT_SECRET) ??
+      toStringEnvValue(import.meta.env.AUTH0_CLIENT_SECRET),
+    audience:
+      toStringEnvValue(process.env.AUTH0_AUDIENCE) ??
+      toStringEnvValue(import.meta.env.AUTH0_AUDIENCE),
+    managementClientId:
+      toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_ID) ??
+      toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID),
+    managementClientSecret:
+      toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_SECRET) ??
       toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET),
   }
 
@@ -236,12 +251,11 @@ function initializeAuth0Clients() {
     config.managementClientId &&
     config.managementClientSecret
   ) {
-    auth0Management ??=
-      new ManagementClient({
-        domain: config.domain,
-        clientId: config.managementClientId,
-        clientSecret: config.managementClientSecret,
-      }) as ExtendedManagementClient
+    auth0Management ??= new ManagementClient({
+      domain: config.domain,
+      clientId: config.managementClientId,
+      clientSecret: config.managementClientSecret,
+    }) as ExtendedManagementClient
   } else {
     console.warn(
       'Auth0 Management configuration is incomplete. User management features may not work.',
@@ -250,14 +264,14 @@ function initializeAuth0Clients() {
 
   // Initialize Authentication Client if config is available
   if (config.domain && config.clientId && config.clientSecret) {
-    auth0Authentication ??=
-      new AuthenticationClient({
-        domain: config.domain,
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
-      }) as ExtendedAuthenticationClient
-    auth0UserInfo ??=
-      new UserInfoClient({ domain: config.domain }) as ExtendedUserInfoClient
+    auth0Authentication ??= new AuthenticationClient({
+      domain: config.domain,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret,
+    }) as ExtendedAuthenticationClient
+    auth0UserInfo ??= new UserInfoClient({
+      domain: config.domain,
+    }) as ExtendedUserInfoClient
   } else {
     console.warn(
       'Auth0 Authentication configuration is incomplete. Login features will not work.',
@@ -658,7 +672,7 @@ export class Auth0UserService {
         ttl_sec: 3600, // 1 hour
       })
       const ticket = this.toRecord(ticketRes.data)
-      return ticket ? this.toStringOrUndefined(ticket.ticket) ?? null : null
+      return ticket ? (this.toStringOrUndefined(ticket.ticket) ?? null) : null
     } catch (error: unknown) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')
@@ -890,8 +904,7 @@ export class Auth0UserService {
    */
   private extractRoleFromUser(user: Auth0UserRecord): AuthRole {
     const appMetadata = this.toRecord(
-      user.app_metadata ??
-        user['https://pixelated-empathy.com/app_metadata'],
+      user.app_metadata ?? user['https://pixelated-empathy.com/app_metadata'],
     )
     const appMetadataRoles = appMetadata?.roles
     if (this.isStringArray(appMetadataRoles) && appMetadataRoles.length > 0) {
@@ -899,8 +912,7 @@ export class Auth0UserService {
     }
 
     const userMetadata = this.toRecord(
-      user.user_metadata ??
-        user['https://pixelated-empathy.com/user_metadata'],
+      user.user_metadata ?? user['https://pixelated-empathy.com/user_metadata'],
     )
     const metadataRole = this.toStringOrUndefined(userMetadata?.role)
     return this.normalizeRole(metadataRole)
@@ -921,7 +933,13 @@ export class Auth0UserService {
   }
 
   private normalizeRole(role: string | undefined): AuthRole {
-    if (role === 'admin' || role === 'staff' || role === 'therapist' || role === 'user' || role === 'guest') {
+    if (
+      role === 'admin' ||
+      role === 'staff' ||
+      role === 'therapist' ||
+      role === 'user' ||
+      role === 'guest'
+    ) {
       return role
     }
 
@@ -954,8 +972,7 @@ export class Auth0UserService {
       createdAt: this.toStringOrUndefined(user.created_at),
       lastLogin: this.toStringOrUndefined(user.last_login),
       appMetadata: this.toRecord(
-        user.app_metadata ??
-          user['https://pixelated-empathy.com/app_metadata'],
+        user.app_metadata ?? user['https://pixelated-empathy.com/app_metadata'],
       ),
       userMetadata: this.toRecord(
         user.user_metadata ??
@@ -992,11 +1009,7 @@ export class Auth0UserService {
   }
 
   private toRecord(value: unknown): Record<string, unknown> | undefined {
-    if (
-      value !== null &&
-      typeof value === 'object' &&
-      !Array.isArray(value)
-    ) {
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
       const record: Record<string, unknown> = {}
       for (const [key, item] of Object.entries(value)) {
         record[key] = item
@@ -1007,9 +1020,10 @@ export class Auth0UserService {
   }
 
   private normalizeNumber(value: unknown, fallback = 0): number {
-    return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+    return typeof value === 'number' && Number.isFinite(value)
+      ? value
+      : fallback
   }
-
 }
 
 // Export singleton instance
@@ -1068,7 +1082,10 @@ export async function getAvailableMFAFactors(userId: string) {
   return await auth0UserService.getAvailableMFAFactors(userId)
 }
 
-export async function startMFAEnrollment(userId: string, factor: MFAEnrollment) {
+export async function startMFAEnrollment(
+  userId: string,
+  factor: MFAEnrollment,
+) {
   return await auth0UserService.startMFAEnrollment(userId, factor)
 }
 

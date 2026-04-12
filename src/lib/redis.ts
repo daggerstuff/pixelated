@@ -42,18 +42,15 @@ function createMockRedisClient() {
 
   const parseJsonArray = (value: string): string[] => {
     const parsed = JSON.parse(value)
-    return Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')
+    return Array.isArray(parsed) &&
+      parsed.every((item) => typeof item === 'string')
       ? parsed
       : []
   }
 
   const parseStringRecord = (value: string): Record<string, string> => {
     const parsed = JSON.parse(value)
-    if (
-      parsed &&
-      typeof parsed === 'object' &&
-      !Array.isArray(parsed)
-    ) {
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       const result: Record<string, string> = {}
       for (const [key, rawValue] of Object.entries(parsed)) {
         if (typeof rawValue === 'string') {
@@ -67,11 +64,7 @@ function createMockRedisClient() {
 
   const parseNumberRecord = (value: string): Record<string, number> => {
     const parsed = JSON.parse(value)
-    if (
-      parsed &&
-      typeof parsed === 'object' &&
-      !Array.isArray(parsed)
-    ) {
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       const result: Record<string, number> = {}
       for (const [key, rawValue] of Object.entries(parsed)) {
         if (typeof rawValue === 'number') {
@@ -163,7 +156,10 @@ function createMockRedisClient() {
     },
     lRange: async (key: string, start: number, stop: number) => {
       const listKey = `list:${key}`
-      return parseJsonArray(mockStore.get(listKey) || '[]').slice(start, stop + 1)
+      return parseJsonArray(mockStore.get(listKey) || '[]').slice(
+        start,
+        stop + 1,
+      )
     },
     lrem: async (key: string, count: number, value: string) => {
       const listKey = `list:${key}`
@@ -254,7 +250,9 @@ export function getRedisClient() {
 /**
  * Wrapper function for Redis get with error handling
  */
-export async function getFromCache<T = unknown>(key: string): Promise<T | null> {
+export async function getFromCache<T = unknown>(
+  key: string,
+): Promise<T | null> {
   try {
     const raw = await redis.get(key)
     if (raw === null) {

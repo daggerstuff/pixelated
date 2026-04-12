@@ -33,15 +33,17 @@ export function MobileFormValidation({
   showErrorSummary = false,
 }: MobileFormValidationProps<Record<string, string>>) {
   // Strongly typed state
-  const [formState, setFormState] = useState<FormState<Record<string, string>>>({
-    values: {},
-    errors: {},
-    touched: {},
-    dirty: {},
-    isValid: true,
-    isSubmitting: false,
-    submitCount: 0,
-  })
+  const [formState, setFormState] = useState<FormState<Record<string, string>>>(
+    {
+      values: {},
+      errors: {},
+      touched: {},
+      dirty: {},
+      isValid: true,
+      isSubmitting: false,
+      submitCount: 0,
+    },
+  )
 
   const [isMobile, setIsMobile] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
@@ -188,7 +190,9 @@ export function MobileFormValidation({
   )
 
   // Validate entire form with proper type inference
-  const validateForm = useCallback((): ValidationResult<Record<string, string>> => {
+  const validateForm = useCallback((): ValidationResult<
+    Record<string, string>
+  > => {
     const newErrors: FormErrors<Record<string, string>> = {}
     let isValid = true
 
@@ -288,7 +292,9 @@ export function MobileFormValidation({
         // Notify screen readers
         if (isMobile) {
           const errorCount = Object.keys(errors).length
-          const errorSummary = document.getElementById('validation-error-summary')
+          const errorSummary = document.getElementById(
+            'validation-error-summary',
+          )
           if (errorSummary) {
             errorSummary.textContent = `Form has ${errorCount} ${
               errorCount === 1 ? 'error' : 'errors'
@@ -340,8 +346,8 @@ export function MobileFormValidation({
     })
 
     // Clean up
-      // eslint-disable-next-line consistent-return
-      return () => {
+    // eslint-disable-next-line consistent-return
+    return () => {
       inputs.forEach((input) => {
         if (isFormField(input)) {
           input.removeEventListener('change', handleChange)
@@ -366,7 +372,7 @@ export function MobileFormValidation({
         })
       }
       return child
-    }
+    },
   )
 
   return (

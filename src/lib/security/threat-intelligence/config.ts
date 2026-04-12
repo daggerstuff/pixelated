@@ -3,6 +3,8 @@
  * Centralized configuration for all threat intelligence components
  */
 
+import * as crypto from 'crypto'
+
 import { AutomatedThreatResponseOrchestratorConfig } from './AutomatedThreatResponseOrchestrator'
 import { EdgeThreatDetectionSystemConfig } from './EdgeThreatDetectionSystem'
 import { ExternalThreatFeedIntegrationConfig } from './ExternalThreatFeedIntegration'
@@ -12,31 +14,34 @@ import { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
 import { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
 import { ThreatValidationSystemConfig } from './ThreatValidationSystem'
 
-import * as crypto from 'crypto'
-
 /**
  * Generates a dynamic fallback secret for non-production environments.
  * Explicitly whitelists 'development' and 'test' environments.
  * Returns a hex string derived from random bytes of specified length.
- * 
+ *
  * @param name Secret name for error reporting
  * @param byteLength Number of random bytes to generate (entropy)
  */
-const generateFallbackSecret = (name: string, byteLength: number = 32): string => {
-  const env = process.env.NODE_ENV || 'development';
-  const isSafeEnv = env === 'development' || env === 'test';
+const generateFallbackSecret = (
+  name: string,
+  byteLength: number = 32,
+): string => {
+  const env = process.env.NODE_ENV || 'development'
+  const isSafeEnv = env === 'development' || env === 'test'
 
   if (!isSafeEnv) {
-    throw new Error(`CRITICAL: Mandatory secret ${name} is not set in production environment (${env}).`);
+    throw new Error(
+      `CRITICAL: Mandatory secret ${name} is not set in production environment (${env}).`,
+    )
   }
 
-  const secret = crypto.randomBytes(byteLength).toString('hex');
-  
+  const secret = crypto.randomBytes(byteLength).toString('hex')
+
   // Set the environment variable so other services reading process.env directly stay in sync (Review suggestion)
-  process.env[name] = secret;
-  
-  return secret;
-};
+  process.env[name] = secret
+
+  return secret
+}
 
 const baseConfig = {
   mongodb: {
@@ -627,10 +632,7 @@ export function getThreatIntelConfig(component: string): unknown {
     validation: threatValidationConfig,
   }
 
-  return (
-    (configMap)[component] ||
-    threatIntelligenceConfig
-  )
+  return configMap[component] || threatIntelligenceConfig
 }
 
 // Environment validation

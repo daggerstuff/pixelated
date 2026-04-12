@@ -1,3 +1,5 @@
+import carbonIcons from '@iconify-json/carbon/icons.json'
+import mdiIcons from '@iconify-json/mdi/icons.json'
 import {
   defineConfig,
   presetUno,
@@ -6,9 +8,6 @@ import {
   presetTypography,
   presetWebFonts,
 } from 'unocss'
-
-import carbonIcons from '@iconify-json/carbon/icons.json'
-import mdiIcons from '@iconify-json/mdi/icons.json'
 
 export default defineConfig({
   presets: [

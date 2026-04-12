@@ -214,7 +214,9 @@ export const useJournalResearchWebSocket = ({
     } catch (error: unknown) {
       setConnectionState('error')
       const normalizedError =
-        error instanceof Error ? error : new Error('WebSocket connection failed')
+        error instanceof Error
+          ? error
+          : new Error('WebSocket connection failed')
       onError?.(normalizedError)
     }
   }, [

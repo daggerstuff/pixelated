@@ -3,10 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import {
-  AuthenticationClient,
-  UserInfoClient,
-} from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0'
 
 interface JwtPayload {
   iss?: string
@@ -18,7 +15,6 @@ interface JwtPayload {
   jti?: string
   sid?: string
 }
-
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
@@ -242,25 +238,51 @@ function isUserRole(value: string | undefined | null): value is UserRole {
 }
 
 /**
+ * Map any role string to UserRole
+ * Handles legacy roles ("user", "staff") and Auth0 Management API roles
+ */
+function mapToUserRole(role: string): UserRole {
+  const normalizedRole = role.toLowerCase()
+  switch (normalizedRole) {
+    case 'admin':
+      return 'admin'
+    case 'therapist':
+      return 'therapist'
+    case 'patient':
+      return 'patient'
+    case 'researcher':
+      return 'researcher'
+    case 'user':
+    case 'staff':
+      return 'patient'
+    case 'guest':
+    default:
+      return 'guest'
+  }
+}
+
+/**
  * Extract user role from Auth0 token payload
  * @param payload Auth0 token payload
  * @returns User role
  */
 function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
   // Try to get role from app_metadata first
-  const appMetadataRoles = payload['https://pixelated.empathy/app_metadata']?.roles
+  const appMetadataRoles =
+    payload['https://pixelated.empathy/app_metadata']?.roles
   if (Array.isArray(appMetadataRoles)) {
     for (const appRole of appMetadataRoles) {
-      if (typeof appRole === 'string' && isUserRole(appRole)) {
-        return appRole
+      if (typeof appRole === 'string') {
+        return mapToUserRole(appRole)
       }
     }
   }
 
   // Try user_metadata
-  const userMetadataRole = payload['https://pixelated.empathy/user_metadata']?.role
-  if (typeof userMetadataRole === 'string' && isUserRole(userMetadataRole)) {
-    return userMetadataRole
+  const userMetadataRole =
+    payload['https://pixelated.empathy/user_metadata']?.role
+  if (typeof userMetadataRole === 'string') {
+    return mapToUserRole(userMetadataRole)
   }
 
   // Try permissions
@@ -357,16 +379,16 @@ export async function validateToken(
 
     // Extract user information
     const userInfoData = toStringRecord(userInfo.data)
-  const tokenPayload: Auth0TokenClaims = isAuth0TokenClaims(userInfoData)
-    ? userInfoData
-    : payload
-  const userId =
-    typeof tokenPayload.sub === 'string'
-      ? tokenPayload.sub
-      : typeof payload.sub === 'string'
-        ? payload.sub
-        : ''
-  if (userId.length === 0) {
+    const tokenPayload: Auth0TokenClaims = isAuth0TokenClaims(userInfoData)
+      ? userInfoData
+      : payload
+    const userId =
+      typeof tokenPayload.sub === 'string'
+        ? tokenPayload.sub
+        : typeof payload.sub === 'string'
+          ? payload.sub
+          : ''
+    if (userId.length === 0) {
       throw new AuthenticationError('Token missing subject claim')
     }
     const role = extractRoleFromPayload(tokenPayload)
@@ -448,9 +470,7 @@ export async function refreshAccessToken(
     }
 
     // Get user info from new access token
-    const userResponse = await auth0UserInfo?.getUserInfo(
-      accessToken,
-    )
+    const userResponse = await auth0UserInfo?.getUserInfo(accessToken)
     if (!userResponse) {
       throw new AuthenticationError('Failed to get refreshed user info')
     }
@@ -461,10 +481,7 @@ export async function refreshAccessToken(
       throw new AuthenticationError('Invalid user payload')
     }
     const userPayload = userResponseData
-    const userId =
-      typeof userPayload.sub === 'string'
-        ? userPayload.sub
-        : ''
+    const userId = typeof userPayload.sub === 'string' ? userPayload.sub : ''
     const accessTokenId =
       typeof userPayload.jti === 'string' ? userPayload.jti : undefined
     const role = extractRoleFromPayload(userPayload)

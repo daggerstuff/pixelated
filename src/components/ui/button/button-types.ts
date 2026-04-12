@@ -72,9 +72,7 @@ export interface ButtonLinkProps
 
 export type ButtonProps = ButtonButtonProps | ButtonLinkProps
 
-export function isLinkButton(
-  props: ButtonProps,
-): props is ButtonLinkProps {
+export function isLinkButton(props: ButtonProps): props is ButtonLinkProps {
   return 'href' in props && typeof props.href === 'string'
 }
 

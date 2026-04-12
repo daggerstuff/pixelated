@@ -23,18 +23,26 @@ const { content } = Astro.props
         <span class="pe-meta-label">{content.label}</span>
         <h2 class="pe-heading-l">{content.title}</h2>
         <p class="pe-home-copy">
-          One case should move from live room to review lane without becoming opinion, shorthand, or memory repair.
+          One case should move from live room to review lane without becoming
+          opinion, shorthand, or memory repair.
         </p>
       </div>
 
       <div class="home-how__steps">
-        {content.steps.map((step, index) => (
-          <article class:list={['home-how__step', index === 0 && 'home-how__step--lead']}>
-            <span class="home-how__number">{step.number}</span>
-            <h3 class="pe-heading-s">{step.title}</h3>
-            <p>{step.body}</p>
-          </article>
-        ))}
+        {
+          content.steps.map((step, index) => (
+            <article
+              class:list={[
+                'home-how__step',
+                index === 0 && 'home-how__step--lead',
+              ]}
+            >
+              <span class="home-how__number">{step.number}</span>
+              <h3 class="pe-heading-s">{step.title}</h3>
+              <p>{step.body}</p>
+            </article>
+          ))
+        }
       </div>
     </div>
 
@@ -105,7 +113,11 @@ const { content } = Astro.props
   }
 
   .home-how__outputs :global(.info-strip) {
-    background: linear-gradient(180deg, rgba(48, 44, 44, 0.52), rgba(39, 35, 35, 0.34));
+    background: linear-gradient(
+      180deg,
+      rgba(48, 44, 44, 0.52),
+      rgba(39, 35, 35, 0.34)
+    );
   }
 
   @media (min-width: 980px) {

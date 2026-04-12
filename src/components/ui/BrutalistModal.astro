@@ -12,30 +12,42 @@ export interface Props {
 const { id = 'modal', title, open = false } = Astro.props
 ---
 
-<div 
-  class="modal-overlay" 
+<div
+  class="modal-overlay"
   id={`${id}-overlay`}
   data-open={open}
   aria-hidden={!open}
 >
-  <div 
-    class="modal" 
-    id={id}
+  <div
+    class="modal"
+    {id}
     role="dialog"
     aria-modal="true"
     aria-labelledby={title ? `${id}-title` : undefined}
   >
-    {title && (
-      <div class="modal-header">
-        <span class="label-mono">{title}</span>
-        <button class="modal-close" aria-label="Close modal" data-close={id}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-    )}
+    {
+      title && (
+        <div class="modal-header">
+          <span class="label-mono">{title}</span>
+          <button class="modal-close" aria-label="Close modal" data-close={id}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      )
+    }
     <div class="modal-content">
       <slot />
     </div>
@@ -53,11 +65,11 @@ const { id = 'modal', title, open = false } = Astro.props
     background: rgba(0, 0, 0, 0.9);
     padding: var(--spacing-4);
   }
-  
-  .modal-overlay[data-open="true"] {
+
+  .modal-overlay[data-open='true'] {
     display: flex;
   }
-  
+
   .modal {
     background: var(--bg-primary);
     border: var(--border-primary);
@@ -68,7 +80,7 @@ const { id = 'modal', title, open = false } = Astro.props
     overflow-y: auto;
     animation: modal-in 0.2s var(--ease-out);
   }
-  
+
   @keyframes modal-in {
     from {
       opacity: 0;
@@ -79,7 +91,7 @@ const { id = 'modal', title, open = false } = Astro.props
       transform: translateY(0);
     }
   }
-  
+
   .modal-header {
     display: flex;
     align-items: center;
@@ -87,7 +99,7 @@ const { id = 'modal', title, open = false } = Astro.props
     padding: var(--spacing-4) var(--spacing-6);
     border-bottom: var(--border-primary);
   }
-  
+
   .modal-close {
     display: flex;
     align-items: center;
@@ -101,12 +113,12 @@ const { id = 'modal', title, open = false } = Astro.props
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-out);
   }
-  
+
   .modal-close:hover {
     border-color: var(--text-muted);
     color: var(--text-primary);
   }
-  
+
   .modal-content {
     padding: var(--spacing-6);
   }
@@ -116,30 +128,32 @@ const { id = 'modal', title, open = false } = Astro.props
   // Close modal handlers
   document.querySelectorAll('[data-close]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const modalId = btn.getAttribute('data-close');
-      const overlay = document.getElementById(`${modalId}-overlay`);
-      overlay?.setAttribute('data-open', 'false');
-      overlay?.setAttribute('aria-hidden', 'true');
-    });
-  });
-  
+      const modalId = btn.getAttribute('data-close')
+      const overlay = document.getElementById(`${modalId}-overlay`)
+      overlay?.setAttribute('data-open', 'false')
+      overlay?.setAttribute('aria-hidden', 'true')
+    })
+  })
+
   // Close on overlay click
   document.querySelectorAll('.modal-overlay').forEach((overlay) => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
-        overlay.setAttribute('data-open', 'false');
-        overlay.setAttribute('aria-hidden', 'true');
+        overlay.setAttribute('data-open', 'false')
+        overlay.setAttribute('aria-hidden', 'true')
       }
-    });
-  });
-  
+    })
+  })
+
   // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      document.querySelectorAll('.modal-overlay[data-open="true"]').forEach((overlay) => {
-        overlay.setAttribute('data-open', 'false');
-        overlay.setAttribute('aria-hidden', 'true');
-      });
+      document
+        .querySelectorAll('.modal-overlay[data-open="true"]')
+        .forEach((overlay) => {
+          overlay.setAttribute('data-open', 'false')
+          overlay.setAttribute('aria-hidden', 'true')
+        })
     }
-  });
+  })
 </script>

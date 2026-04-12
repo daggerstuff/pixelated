@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { useMemo } from 'react'
 
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import {
   Card,
   CardContent,
@@ -18,7 +19,6 @@ import {
 import { useJournalSessionStore } from '@/lib/stores/journal-research'
 import { cn } from '@/lib/utils'
 
-import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import { SessionList } from '../lists/SessionList'
 import { SessionCard } from '../shared/SessionCard'
 

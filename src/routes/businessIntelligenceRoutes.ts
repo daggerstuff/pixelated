@@ -52,11 +52,12 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       type: parseString(value.type) as CreateBusinessAlertInput['type'],
       title: parseString(value.title) ?? '',
       description: parseString(value.description) ?? '',
-      severity: parseString(value.severity) as CreateBusinessAlertInput['severity'],
+      severity: parseString(
+        value.severity,
+      ) as CreateBusinessAlertInput['severity'],
       source: parseString(value.source) ?? '',
       isRead: parseBoolean(value.isRead) ?? false,
       actionUrl: parseString(value.actionUrl),
-      
     }
   }
 
@@ -107,7 +108,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         return res.status(400).json({ error: 'Symbol is required' })
       }
 
-const marketData = await biService.getMarketData(symbol.toUpperCase())
+      const marketData = await biService.getMarketData(symbol.toUpperCase())
       return res.json(marketData)
     } catch (error: unknown) {
       return res.status(500).json({ error: 'Failed to fetch market data' })
@@ -132,7 +133,9 @@ const marketData = await biService.getMarketData(symbol.toUpperCase())
       const analysis = await biService.getCompetitorAnalysis(industry)
       return res.json(analysis)
     } catch (error: unknown) {
-      return res.status(500).json({ error: 'Failed to fetch competitor analysis' })
+      return res
+        .status(500)
+        .json({ error: 'Failed to fetch competitor analysis' })
     }
   })
 
@@ -143,7 +146,9 @@ const marketData = await biService.getMarketData(symbol.toUpperCase())
       const opportunities = await biService.getMarketOpportunities(industry)
       return res.json(opportunities)
     } catch (error: unknown) {
-      return res.status(500).json({ error: 'Failed to fetch market opportunities' })
+      return res
+        .status(500)
+        .json({ error: 'Failed to fetch market opportunities' })
     }
   })
 
@@ -232,7 +237,9 @@ const marketData = await biService.getMarketData(symbol.toUpperCase())
       )
       return res.json(forecast)
     } catch (error: unknown) {
-      return res.status(500).json({ error: 'Failed to generate market forecast' })
+      return res
+        .status(500)
+        .json({ error: 'Failed to generate market forecast' })
     }
   })
 
@@ -243,7 +250,9 @@ const marketData = await biService.getMarketData(symbol.toUpperCase())
       const analysis = await biService.getIndustryAnalysis(industry)
       return res.json(analysis)
     } catch (error: unknown) {
-      return res.status(500).json({ error: 'Failed to generate industry analysis' })
+      return res
+        .status(500)
+        .json({ error: 'Failed to generate industry analysis' })
     }
   })
 

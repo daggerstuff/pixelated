@@ -1,11 +1,17 @@
 type AstroSlotRenderer = { render: () => string }
 type AstroRenderResult = string | { html: string }
 type AstroRenderOptions = { default?: AstroSlotRenderer }
-type AstroRenderFunction = (props: Record<string, unknown>, options?: AstroRenderOptions) => Promise<AstroRenderResult> | AstroRenderResult
+type AstroRenderFunction = (
+  props: Record<string, unknown>,
+  options?: AstroRenderOptions,
+) => Promise<AstroRenderResult> | AstroRenderResult
 
 export type AstroComponentFactory = {
   name?: string
-  render: (props: Record<string, unknown>, options?: AstroRenderOptions) => Promise<AstroRenderResult> | AstroRenderResult
+  render: (
+    props: Record<string, unknown>,
+    options?: AstroRenderOptions,
+  ) => Promise<AstroRenderResult> | AstroRenderResult
 }
 
 function extractHtml(renderResult: unknown): string {
@@ -13,7 +19,11 @@ function extractHtml(renderResult: unknown): string {
     return renderResult
   }
 
-  if (typeof renderResult === 'object' && renderResult !== null && 'html' in renderResult) {
+  if (
+    typeof renderResult === 'object' &&
+    renderResult !== null &&
+    'html' in renderResult
+  ) {
     const html = (renderResult as Record<string, unknown>).html
     if (typeof html === 'string') {
       return html
@@ -74,7 +84,9 @@ export async function renderAstro<
  * @param props Props to override in the mock
  * @returns A mock Astro global object
  */
-export function createMockAstro(props: Record<string, unknown> = {}): Record<string, unknown> {
+export function createMockAstro(
+  props: Record<string, unknown> = {},
+): Record<string, unknown> {
   return {
     props,
     request: new Request('http://localhost:3000'),

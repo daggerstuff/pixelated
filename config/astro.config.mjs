@@ -74,13 +74,17 @@ const preferredPort = (() => {
 function getChunkName(id) {
   const normalizedId = id.replace(/\\/g, '/')
 
-  if (normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')) {
+  if (
+    normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')
+  ) {
     return 'feature-three-emotion'
   }
   if (normalizedId.includes('/src/components/three/Particle')) {
     return 'feature-three-particle'
   }
-  if (normalizedId.includes('/src/components/analytics/EnhancedChartComponent')) {
+  if (
+    normalizedId.includes('/src/components/analytics/EnhancedChartComponent')
+  ) {
     return 'feature-enhanced-chart'
   }
   if (normalizedId.includes('/src/components/ui/SwiperCarousel')) {
@@ -101,11 +105,18 @@ function getChunkName(id) {
   if (normalizedId.includes('/src/components/chat/TherapyChatSystem')) {
     return 'feature-therapy-chat'
   }
-  if (normalizedId.includes('/src/components/session/EmotionTemporalAnalysisChart')) {
+  if (
+    normalizedId.includes(
+      '/src/components/session/EmotionTemporalAnalysisChart',
+    )
+  ) {
     return 'feature-emotion-temporal'
   }
 
-  if (normalizedId.includes('/react/') || normalizedId.includes('/react-dom/')) {
+  if (
+    normalizedId.includes('/react/') ||
+    normalizedId.includes('/react-dom/')
+  ) {
     return 'react-vendor'
   }
   if (
@@ -134,10 +145,7 @@ function getChunkName(id) {
   ) {
     return 'chartjs-vendor'
   }
-  if (
-    normalizedId.includes('three') ||
-    normalizedId.includes('@react-three')
-  ) {
+  if (normalizedId.includes('three') || normalizedId.includes('@react-three')) {
     return 'three-vendor'
   }
   if (normalizedId.includes('/swiper')) {

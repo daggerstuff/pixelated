@@ -25,10 +25,13 @@ export interface DocumentChange {
 }
 
 export class CollaborationService {
-  private static readonly sessions: Map<string, CollaborationSession[]> = new Map()
-  private static readonly changes: Map<string, DocumentChange[]> = new Map()
-  private static readonly cursorListeners: Map<string, ((update: any) => void)[]> =
+  private static readonly sessions: Map<string, CollaborationSession[]> =
     new Map()
+  private static readonly changes: Map<string, DocumentChange[]> = new Map()
+  private static readonly cursorListeners: Map<
+    string,
+    ((update: any) => void)[]
+  > = new Map()
   private static readonly contentListeners: Map<
     string,
     ((change: DocumentChange) => void)[]
@@ -121,7 +124,7 @@ export class CollaborationService {
       session.lastActivity = new Date()
 
       // Notify listeners
-    const listeners = this.cursorListeners.get(documentId) ?? []
+      const listeners = this.cursorListeners.get(documentId) ?? []
       listeners.forEach((callback) =>
         callback({
           userId,

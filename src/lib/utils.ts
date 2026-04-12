@@ -88,10 +88,7 @@ export function isNonNullObject(
  * @returns Uint8Array of random bytes
  */
 export function getRandomBytes(size: number): Uint8Array {
-  if (
-    typeof window !== 'undefined' &&
-    window.crypto?.getRandomValues
-  ) {
+  if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
     // Browser environment - use Web Crypto API
     const bytes = new Uint8Array(size)
     window.crypto.getRandomValues(bytes)
@@ -166,16 +163,13 @@ export function cn(...inputs: ClassValue[]): string {
  * @returns A unique UUID string
  */
 export function generateUniqueId(): string {
-  if (
-    typeof window !== 'undefined' &&
-    window.crypto?.randomUUID
-  ) {
+  if (typeof window !== 'undefined' && window.crypto?.randomUUID) {
     // Browser environment with Web Crypto API
     return window.crypto.randomUUID()
   } else if (
     typeof (globalThis as { crypto?: unknown }).crypto !== 'undefined' &&
-    typeof (globalThis as { crypto?: { randomUUID?: unknown } }).crypto?.randomUUID ===
-      'function'
+    typeof (globalThis as { crypto?: { randomUUID?: unknown } }).crypto
+      ?.randomUUID === 'function'
   ) {
     // Browser or Node.js global crypto (Node 18+ exposes globalThis.crypto)
     return (

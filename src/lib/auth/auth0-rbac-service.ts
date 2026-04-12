@@ -40,13 +40,19 @@ declare module 'auth0' {
     assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
     removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
     getUserRoles(params: { id: string }): Promise<unknown[]>
-    getPermissions(params: { per_page?: number; page?: number }): Promise<unknown[]>
+    getPermissions(params: {
+      per_page?: number
+      page?: number
+    }): Promise<unknown[]>
     createPermission(params: {
       name: string
       description: string
       audience: string
     }): Promise<unknown>
-    updatePermission(params: { id: string; description?: string }): Promise<unknown>
+    updatePermission(params: {
+      id: string
+      description?: string
+    }): Promise<unknown>
     deletePermission(params: { id: string }): Promise<void>
     getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
     getGuardianEnrollments(params: { id: string }): Promise<unknown>
@@ -156,7 +162,7 @@ function initializeAuth0Management() {
     clientId: auth0Config.managementClientId,
     clientSecret: auth0Config.managementClientSecret,
     audience: `https://${auth0Config.domain}/api/v2/`,
-    })
+  })
 }
 
 // Initialize the management client

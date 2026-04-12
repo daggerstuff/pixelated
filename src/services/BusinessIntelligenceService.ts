@@ -150,8 +150,7 @@ export class BusinessIntelligenceService {
 
   constructor(db: Pool) {
     this.db = db
-    this.alphaVantageApiKey =
-      process.env.ALPHA_VANTAGE_API_KEY ?? 'demo'
+    this.alphaVantageApiKey = process.env.ALPHA_VANTAGE_API_KEY ?? 'demo'
   }
 
   async getMarketData(symbol: string): Promise<MarketData> {
@@ -364,7 +363,9 @@ export class BusinessIntelligenceService {
         severity: row.severity,
         source: row.source,
         timestamp:
-          typeof row.timestamp === 'string' ? new Date(row.timestamp) : row.timestamp,
+          typeof row.timestamp === 'string'
+            ? new Date(row.timestamp)
+            : row.timestamp,
         isRead: row.is_read,
         actionUrl: row.action_url,
       }))
@@ -401,14 +402,15 @@ export class BusinessIntelligenceService {
       const response = await axios.get<AlphaVantageResponse>(
         this.alphaVantageBaseUrl,
         {
-        params: {
-          function: 'SMA',
-          symbol,
-          interval: 'daily',
-          time_period: 20,
-          apikey: this.alphaVantageApiKey,
+          params: {
+            function: 'SMA',
+            symbol,
+            interval: 'daily',
+            time_period: 20,
+            apikey: this.alphaVantageApiKey,
+          },
         },
-      })
+      )
 
       // Process and return forecast data
       return this.generateMarketForecast(response.data, days)
@@ -577,10 +579,7 @@ export class BusinessIntelligenceService {
     return alerts.slice(0, limit)
   }
 
-  private getDemoMarketForecast(
-    _symbol: string,
-    days: number,
-  ): MarketForecast {
+  private getDemoMarketForecast(_symbol: string, days: number): MarketForecast {
     const predictions: {
       date: Date
       predictedPrice: number
@@ -662,7 +661,9 @@ export class BusinessIntelligenceService {
     const symbol = this.toStringOrUndefined(rawMeta.symbol)
     const price = this.toNumberOrUndefined(rawMeta.regularMarketPrice)
     const change = this.toNumberOrUndefined(rawMeta.regularMarketChange)
-    const changePercent = this.toNumberOrUndefined(rawMeta.regularMarketChangePercent)
+    const changePercent = this.toNumberOrUndefined(
+      rawMeta.regularMarketChangePercent,
+    )
     const volume = this.toNumberOrUndefined(rawMeta.regularMarketVolume)
     const marketCap = this.toNumberOrUndefined(rawMeta.marketCap)
 

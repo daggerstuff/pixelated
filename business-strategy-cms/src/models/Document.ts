@@ -36,9 +36,7 @@ function buildVersionPayload(
 }
 
 export class DocumentModel {
-  static async create(
-    documentData: DocumentCreateInput,
-  ): Promise<Document> {
+  static async create(documentData: DocumentCreateInput): Promise<Document> {
     const doc = await DocumentModelMongoose.create({
       ...documentData,
       version: 1,
@@ -162,7 +160,9 @@ export class DocumentModel {
     return version.save()
   }
 
-  static async getVersions(documentId: string): Promise<DocumentVersionDocument[]> {
+  static async getVersions(
+    documentId: string,
+  ): Promise<DocumentVersionDocument[]> {
     return DocumentVersionModel.find({ documentId }).sort({ version: -1 })
   }
 

@@ -15,7 +15,8 @@ const marketDataService = new MarketDataService()
 
 const getRouteParam = (
   value: string | string[] | undefined,
-): string | undefined => (typeof value === 'string' && value.length > 0 ? value : undefined)
+): string | undefined =>
+  typeof value === 'string' && value.length > 0 ? value : undefined
 
 /**
  * GET /api/market/quote/:symbol

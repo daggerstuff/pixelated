@@ -17,9 +17,7 @@ type RuleDeletedDetail = {
   name?: string
 }
 
-const isRuleUpdatedDetail = (
-  detail: unknown,
-): detail is RuleUpdatedDetail => {
+const isRuleUpdatedDetail = (detail: unknown): detail is RuleUpdatedDetail => {
   if (!isRecordLike(detail)) {
     return false
   }
@@ -34,17 +32,12 @@ const isRuleUpdatedDetail = (
   )
 }
 
-const isRuleDeletedDetail = (
-  detail: unknown,
-): detail is RuleDeletedDetail => {
+const isRuleDeletedDetail = (detail: unknown): detail is RuleDeletedDetail => {
   if (!isRecordLike(detail)) {
     return false
   }
 
-  return (
-    'id' in detail &&
-    typeof detail.id === 'string'
-  )
+  return 'id' in detail && typeof detail.id === 'string'
 }
 
 // Function to handle rule updates
