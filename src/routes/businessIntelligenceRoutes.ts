@@ -56,7 +56,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       source: parseString(value.source) ?? '',
       isRead: parseBoolean(value.isRead) ?? false,
       actionUrl: parseString(value.actionUrl),
-      userId,
+      
     }
   }
 
@@ -107,10 +107,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
         return res.status(400).json({ error: 'Symbol is required' })
       }
 
-      const marketData = (await biService.getMarketData(symbol.toUpperCase())).slice(
-        0,
-        100,
-      )
+const marketData = await biService.getMarketData(symbol.toUpperCase())
       return res.json(marketData)
     } catch (error: unknown) {
       return res.status(500).json({ error: 'Failed to fetch market data' })

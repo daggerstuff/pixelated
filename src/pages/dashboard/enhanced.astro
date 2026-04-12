@@ -12,7 +12,6 @@ import {
   DynamicTreatmentPlanManager,
 } from '@/lib/utils/dynamic-components'
 
-// @ts-expect-error Astro.props is injected at runtime
 const { user } = Astro.props as { user: any }
 
 // Get query parameters for dashboard customization
@@ -232,7 +231,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                 </div>
                 <div>
                   <h4 class="text-lg font-medium mb-3">Emotion Distribution</h4>
-                  <EnhancedChartComponent
+                  <DynamicEnhancedChartComponent
                     client:load
                     type="pie"
                     title="Current Emotional State"
@@ -547,7 +546,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
             <Card>
               <div class="p-6">
                 <h4 class="text-lg font-medium mb-3">Weekly Sessions</h4>
-                <EnhancedChartComponent
+                <DynamicEnhancedChartComponent
                   client:load
                   type="bar"
                   title="Session Frequency"
