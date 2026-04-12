@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmotionChart.tsx'
-import Particle from '@/components/three/Particle.tsx'
+import {
+  DynamicMultidimensionalEmotionChart,
+  DynamicParticleVisualization,
+} from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -32,7 +34,7 @@ import Particle from '@/components/three/Particle.tsx'
           valence-arousal-dominance space. Hover over emotion points to see
           details and explore the emotional journey.
         </p>
-        <MultidimensionalEmotionChart
+        <DynamicMultidimensionalEmotionChart
           client:load
           showTrails={true}
           showAxes={true}
@@ -50,7 +52,7 @@ import Particle from '@/components/three/Particle.tsx'
           Use the emotion controls to see how particles behave based on
           different feelings.
         </p>
-        <Particle
+        <DynamicParticleVisualization
           client:load
           particleCount={40}
           emotion="neutral"

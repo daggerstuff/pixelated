@@ -67,29 +67,75 @@ const preferredPort = (() => {
 function getChunkName(id) {
   // Memory optimization: consolidate chunks during Docker builds
   if (isDockerBuild) {
-    if (id.includes('node_modules')) {
+    if (id.includes('/node_modules/') || id.includes('node_modules')) {
       return 'vendor'
     }
     // Return null for all other modules to reduce chunk count
     return null
   }
 
-  if (id.includes('react') || id.includes('react-dom')) {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')) {
+    return 'feature-three-emotion'
+  }
+  if (normalizedId.includes('/src/components/three/Particle')) {
+    return 'feature-three-particle'
+  }
+  if (normalizedId.includes('/src/components/analytics/EnhancedChartComponent')) {
+    return 'feature-enhanced-chart'
+  }
+  if (normalizedId.includes('/src/components/ui/SwiperCarousel')) {
+    return 'feature-swiper'
+  }
+  if (
+    normalizedId.includes('/src/components/treatment/TreatmentPlanManager')
+  ) {
+    return 'feature-treatment-plan'
+  }
+  if (normalizedId.includes('/src/components/security/FHEDemo')) {
+    return 'feature-fhe'
+  }
+
+  if (normalizedId.includes('/react/') || normalizedId.includes('/react-dom/')) {
     return 'react-vendor'
   }
-  if (id.includes('framer-motion') || id.includes('lucide-react')) {
+  if (
+    normalizedId.includes('framer-motion') ||
+    normalizedId.includes('@radix-ui/react-virtualizer') ||
+    normalizedId.includes('lucide-react')
+  ) {
     return 'ui-vendor'
   }
-  if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+  if (
+    normalizedId.includes('/clsx/') ||
+    normalizedId.includes('/date-fns/') ||
+    normalizedId.includes('/axios/')
+  ) {
     return 'utils-vendor'
   }
-  if (id.includes('recharts') || id.includes('chart.js')) {
+  if (
+    normalizedId.includes('/recharts') ||
+    normalizedId.includes('/react-chartjs-2')
+  ) {
     return 'charts-vendor'
   }
-  if (id.includes('three') || id.includes('@react-three')) {
+  if (
+    normalizedId.includes('/chart.js') ||
+    normalizedId.includes('/chart.js/')
+  ) {
+    return 'chartjs-vendor'
+  }
+  if (
+    normalizedId.includes('three') ||
+    normalizedId.includes('@react-three')
+  ) {
     return 'three-vendor'
   }
-  if (id.includes('node_modules')) {
+  if (normalizedId.includes('/swiper')) {
+    return 'swiper-vendor'
+  }
+  if (normalizedId.includes('/node_modules/')) {
     return 'vendor'
   }
   return null
@@ -157,7 +203,7 @@ export default defineConfig({
       // Enable hidden source maps in production for Sentry upload (not served to users)
       sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
-      chunkSizeWarningLimit: isProduction ? 1024 : 1500,
+      chunkSizeWarningLimit: isProduction ? 500 : 1500,
       // Memory optimization: Use esbuild for minification (faster, lower memory than terser)
       minify: 'esbuild',
       // Limit parallel file operations to prevent resource exhaustion
