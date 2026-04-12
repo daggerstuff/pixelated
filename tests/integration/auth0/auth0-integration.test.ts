@@ -461,8 +461,9 @@ describe('Auth0 Integration Tests', () => {
         userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       })
 
-      const createUserCall =
-        vi.mocked(mockManagementClient.users.create).mock.calls.at(-1)?.[0]
+      const createUserCall = vi
+        .mocked(mockManagementClient.users.create)
+        .mock.calls.at(-1)?.[0]
       expect(createUserCall).toMatchObject({
         email: 'newuser@example.com',
         password: EXAMPLE_TEST_SECRET_PLACEHOLDER,
@@ -547,7 +548,8 @@ describe('Auth0 Integration Tests', () => {
         data: mockUserInfo,
       })
 
-      const userInfo = await auth0SocialAuthService.getUserInfo('access-token-123')
+      const userInfo =
+        await auth0SocialAuthService.getUserInfo('access-token-123')
 
       expect(userInfo).toMatchObject({
         id: 'google-oauth2|123456789',
@@ -642,10 +644,7 @@ describe('Auth0 Integration Tests', () => {
         data: mockUserInfo,
       })
 
-      const result = await auth0JwtService.validateToken(
-        validToken,
-        'access',
-      )
+      const result = await auth0JwtService.validateToken(validToken, 'access')
 
       expect(result).toEqual({
         valid: true,
@@ -667,10 +666,7 @@ describe('Auth0 Integration Tests', () => {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTYiLCJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjE1MTYyMzkwMjJ9.signature'
 
       // No mock needed - the code will decode the token locally and detect expiration
-      const result = await auth0JwtService.validateToken(
-        expiredToken,
-        'access',
-      )
+      const result = await auth0JwtService.validateToken(expiredToken, 'access')
 
       expect(result).toEqual({
         valid: false,
@@ -701,10 +697,13 @@ describe('Auth0 Integration Tests', () => {
         data: mockUserResponse,
       })
 
-      const result = await auth0JwtService.refreshAccessToken('old-refresh-token', {
-        ip: '127.0.0.1',
-        userAgent: 'test-agent',
-      })
+      const result = await auth0JwtService.refreshAccessToken(
+        'old-refresh-token',
+        {
+          ip: '127.0.0.1',
+          userAgent: 'test-agent',
+        },
+      )
 
       expect(result).toEqual({
         accessToken: 'new-access-token',
@@ -738,8 +737,9 @@ describe('Auth0 Integration Tests', () => {
         }),
         24 * 60 * 60,
       )
-      const lastSetInCacheCall =
-        vi.mocked(redisModule.setInCache).mock.calls.at(-1)
+      const lastSetInCacheCall = vi
+        .mocked(redisModule.setInCache)
+        .mock.calls.at(-1)
       expect(lastSetInCacheCall).toBeDefined()
       const revokedTokenCachePayload = lastSetInCacheCall?.[1]
       expect(revokedTokenCachePayload).toEqual(
@@ -854,7 +854,10 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should validate role transition', () => {
-      const transition = auth0RbacService.validateRoleTransition('therapist', 'admin')
+      const transition = auth0RbacService.validateRoleTransition(
+        'therapist',
+        'admin',
+      )
 
       expect(transition.fromRole).toBe('therapist')
       expect(transition.toRole).toBe('admin')
@@ -1044,7 +1047,10 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // 1. Sign In
-      const emailAuthResult = await auth0UserService.signIn('test@example.com', 'password123')
+      const emailAuthResult = await auth0UserService.signIn(
+        'test@example.com',
+        'password123',
+      )
 
       // 2. Validate Token - set up mock for the userInfo call
       mockUserInfoClient.getUserInfo.mockResolvedValue({

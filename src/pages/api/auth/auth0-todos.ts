@@ -205,9 +205,10 @@ export const POST: APIRoute = async ({ request }) => {
 // project's centralized logging (e.g., Sentry) and include request IDs.
 async function logError(context: string, err: unknown) {
   const message = err instanceof Error ? err.message : String(err)
-  const error = err instanceof Error
-    ? err
-    : new Error(`[auth0-todos.api] ${context} - ${message}`)
+  const error =
+    err instanceof Error
+      ? err
+      : new Error(`[auth0-todos.api] ${context} - ${message}`)
 
   try {
     const { captureException } = await import('@sentry/node')

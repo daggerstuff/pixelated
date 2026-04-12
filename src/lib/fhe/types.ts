@@ -317,9 +317,7 @@ export function isEncryptedData(obj: unknown): obj is EncryptedData {
   const data = Object.getOwnPropertyDescriptor(obj, 'data')?.value
 
   return (
-    typeof id === 'string' &&
-    typeof dataType === 'string' &&
-    data !== undefined
+    typeof id === 'string' && typeof dataType === 'string' && data !== undefined
   )
 }
 

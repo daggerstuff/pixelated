@@ -159,29 +159,30 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   // Only start webServer if BASE_URL is localhost (not a remote URL)
   // When BASE_URL points to staging/production, skip webServer to avoid timeout
-  webServer: isRemoteUrl || shouldSkipWebServer
-    ? undefined
-    : isCi
-      ? {
-          // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
-          // Use port from BASE_URL if specified, otherwise default to 4321
-          command: `pnpm run build && pnpm run preview -- --port ${webServerPort ?? 4321}`,
-          url: webServerUrl ?? 'http://localhost:4321',
-          reuseExistingServer: false,
-          timeout: 10 * 60 * 1000, // allow time for build + preview start
-        }
-      : {
-          // Local/dev flow should keep the fast dev server with HMR.
-          // Use port from BASE_URL if specified, otherwise use default (3000 from package.json dev script)
-          // Astro dev command accepts --port flag and also respects PORT/ASTRO_PORT env vars
-          command:
-            webServerPort !== undefined && webServerPort !== 3000
-              ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
-              : 'pnpm dev',
-          url: webServerUrl ?? 'http://localhost:3000',
-          reuseExistingServer: true,
-          timeout: 180 * 1000,
-        },
+  webServer:
+    isRemoteUrl || shouldSkipWebServer
+      ? undefined
+      : isCi
+        ? {
+            // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
+            // Use port from BASE_URL if specified, otherwise default to 4321
+            command: `pnpm run build && pnpm run preview -- --port ${webServerPort ?? 4321}`,
+            url: webServerUrl ?? 'http://localhost:4321',
+            reuseExistingServer: false,
+            timeout: 10 * 60 * 1000, // allow time for build + preview start
+          }
+        : {
+            // Local/dev flow should keep the fast dev server with HMR.
+            // Use port from BASE_URL if specified, otherwise use default (3000 from package.json dev script)
+            // Astro dev command accepts --port flag and also respects PORT/ASTRO_PORT env vars
+            command:
+              webServerPort !== undefined && webServerPort !== 3000
+                ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
+                : 'pnpm dev',
+            url: webServerUrl ?? 'http://localhost:3000',
+            reuseExistingServer: true,
+            timeout: 180 * 1000,
+          },
 
   /* Global setup and teardown */
   // globalSetup: './tests/e2e/global-setup.ts',

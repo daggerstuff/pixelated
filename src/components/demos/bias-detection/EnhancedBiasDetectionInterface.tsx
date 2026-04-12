@@ -64,9 +64,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
   const [historicalComparison, setHistoricalComparison] =
     useState<HistoricalComparison | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [activeTab, setActiveTab] = useState<
-    AnalysisTab
-  >('analysis')
+  const [activeTab, setActiveTab] = useState<AnalysisTab>('analysis')
   const [progressPercent, setProgressPercent] = useState(0)
 
   // Enhanced state for improved UX
@@ -88,7 +86,9 @@ export const EnhancedBiasDetectionInterface: React.FC<
     'results',
     'insights',
   ]
-  const [selectedPreset, setSelectedPreset] = useState<PresetScenario | null>(null)
+  const [selectedPreset, setSelectedPreset] = useState<PresetScenario | null>(
+    null,
+  )
   const tabIcons: Record<TabItem['icon'], JSX.Element> = {
     chart: <ChartBar className='h-5 w-5' />,
     search: <Search className='h-5 w-5' />,
@@ -194,7 +194,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
               },
             },
           },
-          recommendations: generateRecommendations(adjustedFactors, data.demographics),
+          recommendations: generateRecommendations(
+            adjustedFactors,
+            data.demographics,
+          ),
           demographics: data.demographics,
         }
 
@@ -225,7 +228,14 @@ export const EnhancedBiasDetectionInterface: React.FC<
         setProgressPercent(0)
       }
     },
-    [analysisSettings, generateRecommendations, generateCounterfactualScenarios, generateHistoricalComparison, calculateBiasFactors, generateSessionId],
+    [
+      analysisSettings,
+      generateRecommendations,
+      generateCounterfactualScenarios,
+      generateHistoricalComparison,
+      calculateBiasFactors,
+      generateSessionId,
+    ],
   )
 
   const handleLoadPreset = useCallback(
@@ -355,8 +365,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-all duration-300 ${
                     currentStep === step
                       ? 'bg-blue-600 text-white'
-                      : index <
-                          analysisStepOrder.indexOf(currentStep)
+                      : index < analysisStepOrder.indexOf(currentStep)
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-200 text-gray-500'
                   }`}
@@ -366,8 +375,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 {index < 3 && (
                   <div
                     className={`mx-1 h-0.5 w-8 transition-all duration-300 ${
-                      index <
-                      analysisStepOrder.indexOf(currentStep)
+                      index < analysisStepOrder.indexOf(currentStep)
                         ? 'bg-green-500'
                         : 'bg-gray-200'
                     }`}
@@ -801,10 +809,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                      <BiasAnalysisDisplay
-                        results={analysisResults}
-                        sessionData={sessionData}
-                      />
+                    <BiasAnalysisDisplay
+                      results={analysisResults}
+                      sessionData={sessionData}
+                    />
                   </motion.div>
                 )}
 

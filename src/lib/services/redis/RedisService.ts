@@ -223,7 +223,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn('Using mock Redis client in development')
         // Create a mock client that implements basic Redis methods
-      return this.createMockClient()
+        return this.createMockClient()
       }
 
       throw new RedisServiceError(

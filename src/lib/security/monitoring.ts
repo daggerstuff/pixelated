@@ -150,11 +150,12 @@ const defaultConfig: SecurityMonitoringConfig = {
  */
 export class SecurityMonitoringService {
   private readonly config: SecurityMonitoringConfig
-  private readonly failedLogins: Map<string, { count: number; firstAttempt: Date }> =
-    new Map<string, { count: number; firstAttempt: Date }>()
+  private readonly failedLogins: Map<
+    string,
+    { count: number; firstAttempt: Date }
+  > = new Map<string, { count: number; firstAttempt: Date }>()
 
-  private readonly lockedAccounts: Map<string, Date> =
-    new Map<string, Date>()
+  private readonly lockedAccounts: Map<string, Date> = new Map<string, Date>()
   private readonly cleanupInterval: NodeJS.Timeout
 
   constructor(config: Partial<SecurityMonitoringConfig> = {}) {

@@ -10,7 +10,10 @@
 <script>
   import loadP5 from '@/utils/loadP5'
 
-  type P5Constructor = new (sketch: (p: any) => void, node?: HTMLElement) => {
+  type P5Constructor = new (
+    sketch: (p: any) => void,
+    node?: HTMLElement,
+  ) => {
     remove: () => void
   }
 
@@ -21,7 +24,6 @@
 
     connectedCallback() {
       void p5Promise.then((p5: P5Constructor) => {
-
         const sketch = (p: any) => {
           const SCALE = 200
           const LENGTH = 10
