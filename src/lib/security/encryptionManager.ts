@@ -289,7 +289,11 @@ class EncryptionManager {
   }
 
   private arrayBufferToBase64(buffer: ArrayBuffer | ArrayBufferView): string {
-    const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer)
+    const bytes = buffer instanceof Uint8Array 
+      ? buffer 
+      : ArrayBuffer.isView(buffer)
+        ? new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
+        : new Uint8Array(buffer)
     return btoa(String.fromCharCode(...bytes))
   }
 

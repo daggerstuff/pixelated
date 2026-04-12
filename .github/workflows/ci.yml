@@ -39,6 +39,8 @@ jobs:
           submodules: false
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm

@@ -347,4 +347,4 @@ skills-lock.json
 .cm
 __mocks__
 ai/config/staging/memory-service.env
-*/AGENTS.md
+**/AGENTS.md
