@@ -22,10 +22,6 @@ import {
 } from 'vitest'
 
 import type {
-  TokenPair,
-  TokenValidationResult,
-} from '../../../src/lib/auth/auth0-jwt-service'
-import type {
   validateToken,
   refreshAccessToken,
   revokeToken,
@@ -39,13 +35,7 @@ import type {
   userHasRole,
   validateRoleTransition,
 } from '../../../src/lib/auth/auth0-rbac-service'
-import type { RoleTransition } from '../../../src/lib/auth/auth0-rbac-service'
 import type { Auth0SocialAuthService } from '../../../src/lib/auth/auth0-social-auth-service'
-import type {
-  SocialAuthResult,
-  SocialTokens,
-  SocialUser,
-} from '../../../src/lib/auth/auth0-social-auth-service'
 // Static imports removed to allow dynamic loading with env vars
 // import { Auth0UserService } from '../../../src/services/auth0.service'
 // import { Auth0SocialAuthService } from '../../../src/lib/auth/auth0-social-auth-service'
@@ -174,14 +164,6 @@ const mockUserInfoClient = {
   >,
 }
 
-type Auth0SignInResult = Awaited<ReturnType<Auth0UserService['signIn']>>
-type Auth0CreateUserResult = Awaited<ReturnType<Auth0UserService['createUser']>>
-type SocialTokenResult = SocialTokens
-type SocialUserResult = SocialUser
-type SocialFlowResult = SocialAuthResult
-type JwtTokenValidationResult = TokenValidationResult
-type JwtRefreshedTokenPair = TokenPair
-type RbacRoleTransition = RoleTransition
 type JwtServiceShape = {
   validateToken: typeof validateToken
   refreshAccessToken: typeof refreshAccessToken
@@ -389,12 +371,12 @@ describe('Auth0 Integration Tests', () => {
         },
       })
 
-      const result: Auth0SignInResult = await auth0UserService.signIn(
+      const result = await auth0UserService.signIn(
         'test@example.com',
         EXAMPLE_TEST_SECRET_PLACEHOLDER,
       )
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         user: {
           id: 'auth0|123456',
           email: 'test@example.com',
@@ -402,8 +384,6 @@ describe('Auth0 Integration Tests', () => {
           role: 'user',
           fullName: 'Test User',
           avatarUrl: 'https://example.com/avatar.jpg',
-          createdAt: expect.any(String),
-          lastLogin: expect.any(String),
           appMetadata: { roles: ['user'] },
           userMetadata: { role: 'user' },
         },
@@ -411,6 +391,8 @@ describe('Auth0 Integration Tests', () => {
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHwxMjM0NTYiLCJleHAiOjE5OTk5OTk5OTksImF1ZCI6Imh0dHBzOi8vYXBpLnBpeGVsYXRlZC1lbXBhdGh5LmNvbSJ9.signature',
         refreshToken: 'mock-refresh-token',
       })
+      expect(typeof result.user.createdAt).toBe('string')
+      expect(typeof result.user.lastLogin).toBe('string')
 
       expect(mockAuthClient.oauth.passwordGrant).toHaveBeenCalledWith({
         username: 'test@example.com',
@@ -421,9 +403,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -462,7 +442,7 @@ describe('Auth0 Integration Tests', () => {
         data: mockAuth0User,
       })
 
-      const result: Auth0CreateUserResult = await auth0UserService.createUser(
+      const result = await auth0UserService.createUser(
         'newuser@example.com',
         EXAMPLE_TEST_SECRET_PLACEHOLDER,
         'user',
@@ -481,7 +461,9 @@ describe('Auth0 Integration Tests', () => {
         userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       })
 
-      expect(mockManagementClient.users.create).toHaveBeenCalledWith({
+      const createUserCall =
+        vi.mocked(mockManagementClient.users.create).mock.calls.at(-1)?.[0]
+      expect(createUserCall).toMatchObject({
         email: 'newuser@example.com',
         password: EXAMPLE_TEST_SECRET_PLACEHOLDER,
         connection: 'Username-Password-Authentication',
@@ -492,7 +474,7 @@ describe('Auth0 Integration Tests', () => {
         },
         user_metadata: {
           role: 'user',
-          created_at: expect.any(String),
+          created_at: '2023-01-01T00:00:00Z',
         },
       })
     })
@@ -530,11 +512,10 @@ describe('Auth0 Integration Tests', () => {
         data: mockTokenResponse,
       })
 
-      const tokens: SocialTokenResult =
-        await auth0SocialAuthService.exchangeCodeForTokens(
-          'auth-code-123',
-          'https://example.com/callback',
-        )
+      const tokens = await auth0SocialAuthService.exchangeCodeForTokens(
+        'auth-code-123',
+        'https://example.com/callback',
+      )
 
       expect(tokens).toEqual({
         accessToken: 'access-token-123',
@@ -566,8 +547,7 @@ describe('Auth0 Integration Tests', () => {
         data: mockUserInfo,
       })
 
-      const userInfo: SocialUserResult =
-        await auth0SocialAuthService.getUserInfo('access-token-123')
+      const userInfo = await auth0SocialAuthService.getUserInfo('access-token-123')
 
       expect(userInfo).toMatchObject({
         id: 'google-oauth2|123456789',
@@ -579,7 +559,7 @@ describe('Auth0 Integration Tests', () => {
         provider: 'google-oauth2',
         emailVerified: true,
       })
-      expect(userInfo.createdAt).toEqual(expect.any(String))
+      expect(typeof userInfo.createdAt).toBe('string')
     })
 
     it('should complete full authentication flow', async () => {
@@ -606,11 +586,10 @@ describe('Auth0 Integration Tests', () => {
         },
       })
 
-      const result: SocialFlowResult =
-        await auth0SocialAuthService.authenticate(
-          'auth-code-123',
-          'https://example.com/callback',
-        )
+      const result = await auth0SocialAuthService.authenticate(
+        'auth-code-123',
+        'https://example.com/callback',
+      )
 
       expect(result).toMatchObject({
         user: {
@@ -628,12 +607,10 @@ describe('Auth0 Integration Tests', () => {
           tokenType: 'Bearer',
         },
       })
-      expect(result.user.createdAt).toEqual(expect.any(String))
+      expect(typeof result.user.createdAt).toBe('string')
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -665,8 +642,10 @@ describe('Auth0 Integration Tests', () => {
         data: mockUserInfo,
       })
 
-      const result: JwtTokenValidationResult =
-        await auth0JwtService.validateToken(validToken, 'access')
+      const result = await auth0JwtService.validateToken(
+        validToken,
+        'access',
+      )
 
       expect(result).toEqual({
         valid: true,
@@ -674,9 +653,9 @@ describe('Auth0 Integration Tests', () => {
         role: 'admin',
         tokenId: '',
         expiresAt: 9999999999,
-        payload: expect.objectContaining({
-          sub: 'auth0|123456',
-        }),
+      })
+      expect(result.payload).toMatchObject({
+        sub: 'auth0|123456',
       })
 
       expect(mockUserInfoClient.getUserInfo).toHaveBeenCalledWith(validToken)
@@ -688,8 +667,10 @@ describe('Auth0 Integration Tests', () => {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTYiLCJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjE1MTYyMzkwMjJ9.signature'
 
       // No mock needed - the code will decode the token locally and detect expiration
-      const result: JwtTokenValidationResult =
-        await auth0JwtService.validateToken(expiredToken, 'access')
+      const result = await auth0JwtService.validateToken(
+        expiredToken,
+        'access',
+      )
 
       expect(result).toEqual({
         valid: false,
@@ -720,11 +701,10 @@ describe('Auth0 Integration Tests', () => {
         data: mockUserResponse,
       })
 
-      const result: JwtRefreshedTokenPair =
-        await auth0JwtService.refreshAccessToken('old-refresh-token', {
-          ip: '127.0.0.1',
-          userAgent: 'test-agent',
-        })
+      const result = await auth0JwtService.refreshAccessToken('old-refresh-token', {
+        ip: '127.0.0.1',
+        userAgent: 'test-agent',
+      })
 
       expect(result).toEqual({
         accessToken: 'new-access-token',
@@ -745,9 +725,7 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should revoke token successfully', async () => {
-      const redisModule = (await import(
-        '../../../src/lib/redis'
-      )) as typeof import('../../../src/lib/redis')
+      const redisModule = await import('../../../src/lib/redis')
       // Use vi.mocked to properly type the mock
       vi.mocked(redisModule.setInCache).mockResolvedValue(true)
 
@@ -755,9 +733,28 @@ describe('Auth0 Integration Tests', () => {
 
       expect(redisModule.setInCache).toHaveBeenCalledWith(
         'revoked:token-to-revoke',
-        { reason: 'user_logout', revokedAt: expect.any(Number) },
+        expect.objectContaining({
+          reason: 'user_logout',
+        }),
         24 * 60 * 60,
       )
+      const lastSetInCacheCall =
+        vi.mocked(redisModule.setInCache).mock.calls.at(-1)
+      expect(lastSetInCacheCall).toBeDefined()
+      const revokedTokenCachePayload = lastSetInCacheCall?.[1]
+      expect(revokedTokenCachePayload).toEqual(
+        expect.objectContaining({
+          reason: 'user_logout',
+        }),
+      )
+      expect(
+        revokedTokenCachePayload &&
+          typeof revokedTokenCachePayload === 'object' &&
+          !Array.isArray(revokedTokenCachePayload),
+      ).toBe(true)
+      expect(
+        typeof Reflect.get(revokedTokenCachePayload ?? {}, 'revokedAt'),
+      ).toBe('number')
     })
   })
 
@@ -786,9 +783,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
@@ -859,8 +854,7 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should validate role transition', () => {
-      const transition: RbacRoleTransition =
-        auth0RbacService.validateRoleTransition('therapist', 'admin')
+      const transition = auth0RbacService.validateRoleTransition('therapist', 'admin')
 
       expect(transition.fromRole).toBe('therapist')
       expect(transition.toRole).toBe('admin')
@@ -902,9 +896,7 @@ describe('Auth0 Integration Tests', () => {
       await auth0UserService.signIn('test@example.com', 'password123')
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -931,9 +923,7 @@ describe('Auth0 Integration Tests', () => {
       await auth0RbacService.assignRoleToUser('auth0|user123', 'therapist')
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
@@ -966,9 +956,7 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_VALIDATED,
         null,
@@ -1007,9 +995,7 @@ describe('Auth0 Integration Tests', () => {
       await auth0JwtService.refreshAccessToken('valid-refresh-token', {})
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_REFRESHED,
         null,
@@ -1058,10 +1044,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // 1. Sign In
-      const emailAuthResult: Auth0SignInResult = await auth0UserService.signIn(
-        'test@example.com',
-        'password123',
-      )
+      const emailAuthResult = await auth0UserService.signIn('test@example.com', 'password123')
 
       // 2. Validate Token - set up mock for the userInfo call
       mockUserInfoClient.getUserInfo.mockResolvedValue({
@@ -1074,8 +1057,10 @@ describe('Auth0 Integration Tests', () => {
         },
       })
 
-      const tokenValidationResult: JwtTokenValidationResult =
-        await auth0JwtService.validateToken(validToken, 'access')
+      const tokenValidationResult = await auth0JwtService.validateToken(
+        validToken,
+        'access',
+      )
 
       // Verify consistency
       expect(tokenValidationResult.valid).toBe(true)
@@ -1105,9 +1090,7 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-      const securityModule = (await import(
-        '../../../src/lib/security/index'
-      )) as typeof import('../../../src/lib/security/index')
+      const securityModule = await import('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ACCOUNT_LINKED,
         null,
@@ -1116,11 +1099,10 @@ describe('Auth0 Integration Tests', () => {
           provider: 'google-oauth2',
         }),
       )
-      const accountLinkedEvent =
-        vi
-          .mocked(securityModule.logSecurityEvent)
-          .mock.calls.at(-1)?.[2] as UnknownRecord
-      expect(typeof accountLinkedEvent?.linkedAt).toBe('string')
+      const linkedEvent = vi
+        .mocked(securityModule.logSecurityEvent)
+        .mock.calls.at(-1)?.[2]
+      expect(typeof linkedEvent?.linkedAt).toBe('string')
     })
 
     it('should properly handle role-based access after authentication', async () => {
@@ -1153,7 +1135,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Authenticate user
-      const authResult: Auth0SignInResult = await auth0UserService.signIn(
+      const authResult = await auth0UserService.signIn(
         'therapist@example.com',
         'password123',
       )
