@@ -1,11 +1,11 @@
 // Progress Bar & Image Zoom
 
-const nprogressPromise = import('https://cdn.jsdelivr.net/npm/nprogress@0.2.0/+esm').catch(
-  () => null,
-)
-const mediumZoomPromise = import('https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/+esm').catch(
-  () => null,
-)
+const nprogressPromise =
+  import('https://cdn.jsdelivr.net/npm/nprogress@0.2.0/+esm').catch(() => null)
+const mediumZoomPromise =
+  import('https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/+esm').catch(
+    () => null,
+  )
 
 function resolveDefaultExport(module) {
   if (!module) return null

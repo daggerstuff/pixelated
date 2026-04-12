@@ -317,11 +317,12 @@ export function MobileFormValidation({
         React.FormHTMLAttributes<HTMLFormElement>
       >
       // Set up form props with the right type
-      type FormSubmitEvent = NonNullable<
-        React.ComponentProps<'form'>['onSubmit']
-      > extends (event: infer T) => unknown
-        ? T
-        : never
+      type FormSubmitEvent =
+        NonNullable<React.ComponentProps<'form'>['onSubmit']> extends (
+          event: infer T,
+        ) => unknown
+          ? T
+          : never
 
       const formProps: React.FormHTMLAttributes<HTMLFormElement> & {
         ref: React.RefObject<HTMLFormElement | null>

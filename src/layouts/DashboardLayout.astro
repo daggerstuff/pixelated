@@ -72,9 +72,11 @@ const { nprogress, mediumZoom } = FEATURES
   <script src="/js/polyfill-detector.js" is:inline></script>
   <script src="/js/module-loader.js" defer is:inline></script>
   <script src="/js/background-loader.js" defer is:inline></script>
-  {(nprogress || mediumZoom) && (
-    <script src="/js/nprogress-and-zoom.js" type="module"></script>
-  )}
+  {
+    (nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module" />
+    )
+  }
   <style is:global>
     /* Mizu theme dark colors - default for all pages */
     :root {
