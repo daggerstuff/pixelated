@@ -34,7 +34,7 @@ describe('APIKeyService', () => {
     const hash = createHash('sha256').update(key).digest('hex');
     
     (query as any).mockResolvedValueOnce({
-      rows: [{ user_id: userId, scopes: ['api:read'] }],
+      rows: [{ user_id: userId, scopes: '["api:read"]' }],
     });
 
     const result = await apiKeyService.validateAPIKey(key);

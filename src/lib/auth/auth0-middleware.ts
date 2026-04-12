@@ -947,6 +947,7 @@ export async function authenticateRequest(
 
   return { success: true, request: authenticatedRequest }
 }
+}
 
 /**
  * Require role middleware

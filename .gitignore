@@ -329,9 +329,8 @@ memory.db-wal
 # === COPILOT CLI ===
 .github/copilot/settings.local.json
 .omx/
-.opencode/oh-my-openagent.jsonc
+.opencode/
 .github/mcp.json
-.opencode/oh-my-openagent.json
 .squad/
 .copilot/
 .factory/
@@ -346,7 +345,6 @@ skills-lock.json
 .kilo
 .cm
 __mocks__
-ai/config/staging/memory-service.env
 **/AGENTS.md
 # Squad: ignore runtime state (logs, inbox, sessions)
 .squad/orchestration-log/
@@ -355,3 +353,6 @@ ai/config/staging/memory-service.env
 .squad/sessions/
 # Squad: SubSquad activation file (local to this machine)
 .squad-workstream
+
+.goose/
+ai/.moderne
