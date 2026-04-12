@@ -231,7 +231,9 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
     }
   }, [animate])
 
-  const getActivityLevel = (activity: number) => {
+  const getActivityLevel = (
+    activity: number,
+  ): { label: string; color: string } => {
     if (activity > 0.8) {
       return { label: 'Very High', color: 'bg-red-500' }
     }

@@ -48,9 +48,7 @@ export function Tabs({
   const [tabValues, setTabValues] = useState<string[]>([])
 
   // Initialize with controlled value, defaultValue, or first registered tab
-  const [internalValue, setInternalValue] = useState<string>(
-    value || defaultValue || '',
-  )
+  const [internalValue, setInternalValue] = useState(value || defaultValue || '')
 
   // If this is a controlled component, use the provided value
   const activeValue = value !== undefined ? value : internalValue

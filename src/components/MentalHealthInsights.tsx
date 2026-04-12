@@ -42,7 +42,7 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
   }
 
   const getRiskBadgeVariant = () => {
-    return RISK_BADGE_VARIANT_MAP[analysis.riskLevel] || 'secondary'
+    return RISK_BADGE_VARIANT_MAP[analysis.riskLevel]
   }
 
   return (
