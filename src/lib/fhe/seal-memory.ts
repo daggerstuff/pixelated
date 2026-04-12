@@ -31,11 +31,8 @@ export class SealMemoryManager {
    * @returns The same object for chaining
    */
   public track<T extends Disposable>(obj: T, name?: string): T {
-    if (!obj) {
-      return obj
-    }
 
-    const id = name || `seal-obj-${++this.objectCounter}`
+    const id = name ?? `seal-obj-${++this.objectCounter}`
     this.objects.set(id, obj)
 
     return obj
@@ -87,7 +84,7 @@ export class SealMemoryManager {
 
     for (const [id, obj] of this.objects.entries()) {
       try {
-        if (obj && typeof obj.delete === 'function') {
+        if (typeof obj.delete === 'function') {
           obj.delete()
         }
       } catch (error: unknown) {
