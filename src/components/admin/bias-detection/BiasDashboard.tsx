@@ -1258,6 +1258,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     return isBiasAnalysisItemArray(data) ? data : []
   }, [getFilteredData, recentAnalyses])
 
+  // ⚡ Bolt: Memoize the average bias score to avoid recalculating the sum multiple times during render
+  const averageFilteredBiasScore = useMemo(() => {
+    if (filteredSessions.length === 0) return summary?.averageBiasScore ?? 0;
+    const sum = filteredSessions.reduce(
+      (acc: number, session: BiasAnalysisItem) => acc + (session.overallBiasScore || 0),
+      0
+    );
+    return sum / filteredSessions.length;
+  }, [filteredSessions, summary?.averageBiasScore]);
+
   if (loading && !dashboardData) {
     return (
       <div className={`p-6 ${className}`}>
@@ -2412,41 +2422,12 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <div
-              className={`text-2xl font-bold ${getBiasScoreColor(
-                filteredSessions.length > 0
-                  ? filteredSessions.reduce(
-                      (sum: number, session: BiasAnalysisItem) =>
-                        sum + (session.overallBiasScore || 0),
-                      0,
-                    ) / filteredSessions.length
-                  : (summary?.averageBiasScore ?? 0),
-              )}`}
+              className={`text-2xl font-bold ${getBiasScoreColor(averageFilteredBiasScore)}`}
             >
-              {filteredSessions.length > 0
-                ? (
-                    (filteredSessions.reduce(
-                      (sum: number, session: BiasAnalysisItem) =>
-                        sum + (session.overallBiasScore || 0),
-                      0,
-                    ) /
-                      filteredSessions.length) *
-                    100
-                  ).toFixed(1)
-                : ((summary?.averageBiasScore ?? 0) * 100).toFixed(1)}
-              %
+              {(averageFilteredBiasScore * 100).toFixed(1)}%
             </div>
             <Progress
-              value={
-                filteredSessions.length > 0
-                  ? (filteredSessions.reduce(
-                      (sum: number, session: BiasAnalysisItem) =>
-                        sum + (session.overallBiasScore || 0),
-                      0,
-                    ) /
-                      filteredSessions.length) *
-                    100
-                  : (summary?.averageBiasScore ?? 0) * 100
-              }
+              value={averageFilteredBiasScore * 100}
               className='mt-2'
             />
           </CardContent>
