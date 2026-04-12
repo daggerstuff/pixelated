@@ -1,6 +1,6 @@
 import { getEmailService } from '@/lib/email'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-const logger = createBuildSafeLogger({ prefix: 'email-worker' })
+const logger = createBuildSafeLogger('email-worker')
 
 const WORKER_ID = crypto.randomUUID()
 const PROCESSING_INTERVAL = 1000 // 1 second

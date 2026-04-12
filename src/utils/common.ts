@@ -1,4 +1,4 @@
-interface VNode {
+export interface VNode {
   type: string | object
   props?: Record<string, any>
   children?: string | VNode | Array<string | VNode>

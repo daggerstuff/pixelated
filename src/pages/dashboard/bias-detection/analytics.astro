@@ -374,6 +374,9 @@ export const prerender = false
 
 <script>
   class AdvancedAnalyticsDashboard {
+    private currentDays: number = 30
+    private analyticsData: any = null
+
     constructor() {
       this.currentDays = 30
       this.analyticsData = null
@@ -453,19 +456,31 @@ export const prerender = false
       const uniqueDemographics = demographics.length
 
       // Update DOM
-      document.getElementById('total-analyses').textContent =
-        totalAnalyses.toString()
-      document.getElementById('avg-bias-score').textContent = avgBiasScore + '%'
-      document.getElementById('high-alerts').textContent = highAlerts.toString()
-      document.getElementById('unique-demographics').textContent =
-        uniqueDemographics.toString()
+      const totalAnalysesEl = document.getElementById('total-analyses')
+      if (totalAnalysesEl) totalAnalysesEl.textContent = totalAnalyses.toString()
+
+      const avgBiasScoreEl = document.getElementById('avg-bias-score')
+      if (avgBiasScoreEl) avgBiasScoreEl.textContent = avgBiasScore + '%'
+
+      const highAlertsEl = document.getElementById('high-alerts')
+      if (highAlertsEl) highAlertsEl.textContent = highAlerts.toString()
+
+      const uniqueDemographicsEl = document.getElementById('unique-demographics')
+      if (uniqueDemographicsEl)
+        uniqueDemographicsEl.textContent = uniqueDemographics.toString()
 
       // Update trends (simplified)
-      document.getElementById('analysis-trend').textContent =
-        '+12% from last period'
-      document.getElementById('bias-trend').textContent = '-5% improvement'
-      document.getElementById('alert-trend').textContent = '+8% this period'
-      document.getElementById('demo-trend').textContent = '3 new groups'
+      const analysisTrendEl = document.getElementById('analysis-trend')
+      if (analysisTrendEl) analysisTrendEl.textContent = '+12% from last period'
+
+      const biasTrendEl = document.getElementById('bias-trend')
+      if (biasTrendEl) biasTrendEl.textContent = '-5% improvement'
+
+      const alertTrendEl = document.getElementById('alert-trend')
+      if (alertTrendEl) alertTrendEl.textContent = '+8% this period'
+
+      const demoTrendEl = document.getElementById('demo-trend')
+      if (demoTrendEl) demoTrendEl.textContent = '3 new groups'
     }
 
     renderMainChart() {

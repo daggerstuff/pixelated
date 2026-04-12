@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import { Target } from 'lucide-react'
 // import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
@@ -402,19 +403,6 @@ const universityResults = [
 </BaseLayout>
 
 <script>
-  // Type definitions
-  declare global {
-    interface Window {
-      gtag?: (
-        command: 'event',
-        action: string,
-        params: {
-          [key: string]: any
-        },
-      ) => void
-    }
-  }
-
   // Analytics tracking for demo interactions
   document.addEventListener('DOMContentLoaded', () => {
     // Track page view
@@ -516,7 +504,7 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             scroll_depth: maxScroll,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset?.['variant'] ||
+              (document.querySelector('[data-variant]') as HTMLElement)?.dataset?.['variant'] ||
               'unknown',
           })
         }

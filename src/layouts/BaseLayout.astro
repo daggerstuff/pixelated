@@ -24,6 +24,8 @@ import type { BgType } from '@/types'
 interface Props {
   title?: string
   description?: string
+  keywords?: string
+  themeMode?: 'light' | 'dark' | 'system'
   ogImage?: string | boolean
   bgType?: BgType | false
   pubDate?: string
@@ -40,6 +42,8 @@ interface Props {
 const {
   title,
   description,
+  keywords,
+  themeMode,
   ogImage,
   bgType,
   pubDate,
@@ -82,7 +86,15 @@ const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
   style="--bg-primary:#201d1d; --bg-secondary:#302c2c; --bg-glass:rgba(48,44,44,0.74); --text-primary:#f7f3eb; --text-secondary:#c7bfb7; --text-muted:#a1958b; --accent-primary:#ff6b00; --accent-primary-rgb:255,107,0; --accent-secondary:#007aff; --border-subtle:rgba(253,252,252,0.08); --divider-dotted:rgba(253,252,252,0.11); --divider-weak:rgba(253,252,252,0.05); --bg-surface-ghost:rgba(253,252,252,0.02); --radius-sm:4px; --radius-md:6px;"
 >
   <head>
-    <Head {title} {description} {ogImage} {pubDate} {lastModDate} {cspNonce} />
+    <Head
+      {title}
+      {description}
+      {keywords}
+      {ogImage}
+      {pubDate}
+      {lastModDate}
+      {cspNonce}
+    />
 
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#201D1D" />
