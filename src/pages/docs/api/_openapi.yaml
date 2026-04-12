@@ -1,39 +1,66 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Pixelated Empathy API
   description: |
-    The Pixelated Empathy API provides a comprehensive set of endpoints for integrating
-    with our platform.
+    The Pixelated Empathy API provides programmatic access to the platform's core features,
+    including user profiles, mental health analytics, and administrative tools.
+    
+    ### Authentication
+    
+    Most endpoints require authentication using either a **JWT (Bearer Token)** or an **API Key**.
+    - For browser-based applications, use the JWT provided by Auth0.
+    - For server-side integrations, use an API Key in the `X-API-Key` header.
   version: '1.0.0'
   contact:
-    name: Pixelated Empathy API Support
-    email: api-support@pixelated.dev
-    url: https://pixelated.dev/support
+    name: Pixelated API Support
+    email: api-support@pixelatedempathy.com
+    url: https://pixelatedempathy.com/support
 servers:
-  - url: 'https://api.pixelated.dev/api/v1'
+  - url: 'https://api.pixelatedempathy.com/api/v1'
     description: Production API server
-  - url: 'https://staging-api.pixelated.dev/api/v1'
-    description: Staging API server (for testing)
+  - url: 'https://staging-api.pixelatedempathy.com/api/v1'
+    description: Staging API server
 security:
   - ApiKeyAuth: []
+  - BearerAuth: []
 paths:
+  /health:
+    get:
+      summary: API Health Check
+      description: Check the current status and health of the API services.
+      tags:
+        - System
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: System is unhealthy or degraded
   /search:
     get:
-      summary: Search content
-      description: Search across blog posts and documentation
+      summary: Search Content
+      description: Search across blog posts, documentation, and research articles.
       operationId: searchContent
       tags:
-        - Search
+        - Content
       parameters:
         - name: q
           in: query
-          description: Search query
+          description: Search query string
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Successful search
+          description: Search results returned successfully
+          headers:
+            X-API-Version:
+              schema:
+                type: string
+                example: 'v1'
           content:
             application/json:
               schema:
@@ -41,43 +68,88 @@ paths:
                 properties:
                   version:
                     type: string
-                    description: API version
                     example: 'v1'
                   results:
                     type: array
-                    maxItems: 100
                     items:
                       $ref: '#/components/schemas/SearchResult'
+  /profile:
+    get:
+      summary: Get User Profile
+      description: Retrieve the authenticated user's profile information.
+      operationId: getProfile
+      tags:
+        - User
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Profile not found
+    put:
+      summary: Update User Profile
+      description: Update the authenticated user's profile metadata.
+      operationId: updateProfile
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: '#/components/schemas/UserProfile'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /users:
+  /admin/users:
     get:
-      summary: List users
-      description: Retrieve a list of users
+      summary: List Platform Users
+      description: Retrieve a paginated list of users (Admin only).
       operationId: listUsers
       tags:
-        - Users
+        - Admin
       parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
         - name: limit
           in: query
-          description: Maximum number of users to return
           schema:
             type: integer
-            minimum: 1
+            default: 20
             maximum: 100
-            default: 10
-        - name: offset
+        - name: role
           in: query
-          description: Number of users to skip
           schema:
-            type: integer
-            minimum: 0
-            default: 0
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
       responses:
         '200':
-          description: List of users
+          description: List of users retrieved successfully
           content:
             application/json:
               schema:
@@ -85,9 +157,10 @@ paths:
                 properties:
                   data:
                     type: array
-                    maxItems: 100
                     items:
-                      $ref: '#/components/schemas/User'
+                      $ref: '#/components/schemas/AdminUserView'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -97,87 +170,97 @@ components:
     ApiKeyAuth:
       type: apiKey
       in: header
-      name: Authorization
-      description: API key provided in the format `Bearer YOUR_API_KEY`
+      name: X-API-Key
+      description: Developer API Key for server-to-server calls.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT for browser-based session authentication.
   schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: number
     SearchResult:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the search result
-        title:
-          type: string
-          description: Title of the content
-        excerpt:
-          type: string
-          description: Excerpt of the content with search terms highlighted
-        url:
-          type: string
-          description: URL to access the full content
-        type:
-          type: string
-          description: Type of content (blog, documentation, etc.)
-        score:
-          type: number
-          description: Relevance score for the search result
-    User:
+        id: { type: string }
+        title: { type: string }
+        excerpt: { type: string }
+        url: { type: string }
+        type: { type: string }
+        score: { type: number }
+    UserProfile:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the user
-        name:
-          type: string
-          description: Full name of the user
-        email:
-          type: string
-          format: email
-          description: Email address of the user
-        created_at:
-          type: string
-          format: date-time
-          description: Time when the user was created
+        id: { type: string, format: uuid }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        role: { type: string }
+        avatarUrl: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        lastLogin: { type: string, format: date-time }
+        userMetadata: { type: object }
+        appMetadata: { type: object }
+    UserProfileUpdate:
+      type: object
+      properties:
+        fullName: { type: string }
+        avatarUrl: { type: string }
+        userMetadata: { type: object }
+    AdminUserView:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        role: { type: string }
+        createdAt: { type: string, format: date-time }
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
     Error:
       type: object
       properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              description: Error code
-            message:
-              type: string
-              description: Error message
-            status:
-              type: integer
-              description: HTTP status code
+        error: { type: string }
+        message: { type: string }
+        code: { type: string }
   responses:
     BadRequest:
-      description: Bad request
+      description: Invalid request parameters or body
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
     Unauthorized:
-      description: Unauthorized
+      description: Authentication failed or missing
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
     Forbidden:
-      description: Forbidden
+      description: Authenticated user lacks necessary permissions
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
 tags:
-  - name: Search
-    description: Search operations
-  - name: Users
-    description: User management
-  - name: Sessions
-    description: Session management
-  - name: Analytics
-    description: Analytics and reporting
+  - name: User
+    description: User profile and management
+  - name: Content
+    description: Content search and discovery
+  - name: Admin
+    description: Platform administration
+  - name: System
+    description: System health and status
