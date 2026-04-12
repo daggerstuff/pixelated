@@ -121,6 +121,7 @@ dependencies = [
   "voyageai>=0.3.7",
   "hindsight-litellm>=0.5.0",
   "aiosqlite>=0.22.1",
+  "semgrep>=1.79.0",
 ]
 [project.optional-dependencies]
 test = [
