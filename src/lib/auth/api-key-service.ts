@@ -27,10 +27,19 @@ export class APIKeyService {
       
       const record = result.rows[0];
       
+      // Parse scopes from JSON string
+      let scopes: string[] = [];
+      try {
+        scopes = JSON.parse(record.scopes || '[]');
+      } catch (error) {
+        console.error('Error parsing scopes JSON:', error);
+        scopes = [];
+      }
+      
       // Update last_used
       await query('UPDATE api_keys SET last_used = NOW() WHERE key_hash = $1', [hash]);
       
-      return { valid: true, userId: record.user_id, scopes: record.scopes };
+      return { valid: true, userId: record.user_id, scopes };
     } catch (error) {
       console.error('Error validating API key:', error);
       return { valid: false };
@@ -38,22 +47,32 @@ export class APIKeyService {
   }
   
   async createAPIKey(userId: string, scopes: string[] = ['read']): Promise<string> {
-    const key = randomBytes(32).toString('hex');
-    const hash = createHash('sha256').update(key).digest('hex');
-    
-    const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
-    
-    await query(
-      'INSERT INTO api_keys (user_id, key_hash, scopes, created_at, expires_at) VALUES ($1, $2, $3, NOW(), $4)',
-      [userId, hash, JSON.stringify(scopes), expiresAt]
-    );
-    
-    return key;
+    try {
+      const key = randomBytes(32).toString('hex');
+      const hash = createHash('sha256').update(key).digest('hex');
+      
+      const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+      
+      await query(
+        'INSERT INTO api_keys (user_id, key_hash, scopes, created_at, expires_at) VALUES ($1, $2, $3, NOW(), $4)',
+        [userId, hash, JSON.stringify(scopes), expiresAt]
+      );
+      
+      return key;
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      throw new Error('Failed to create API key');
+    }
   }
   
   async getUserById(id: string): Promise<any> {
-    const result = await query('SELECT * FROM users WHERE id = $1 AND is_active = true', [id]);
-    return result.rows[0] || null;
+    try {
+      const result = await query('SELECT * FROM users WHERE id = $1 AND is_active = true', [id]);
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error('Error getting user by ID:', error);
+      return null;
+    }
   }
 }
 
