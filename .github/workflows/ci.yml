@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       ARTIFACT_REGISTRY_LOCATION: us-west1
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
 
@@ -49,20 +50,19 @@ jobs:
         uses: actions/setup-node@v6.3.0
         with:
           node-version: '24.x'
-          package-manager-cache: false
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Lint code
-        continue-on-error: true
         run: pnpm lint
 
       - name: Format check
         run: pnpm format
 
-      - name: Run blocking test suite
-        run: pnpm test:blocking
+      - name: Run unit tests
+        run: pnpm test
 
       - name: Build Docker image
         id: build-image
@@ -74,15 +74,12 @@ jobs:
       - name: Security scan
         uses: aquasecurity/trivy-action@v0.35.0
         with:
-          cache: 'false'
           image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
-          # trivy-action clears TRIVY_SEVERITY for SARIF unless this is enabled.
-          limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results
         if: always() && hashFiles('trivy-results.sarif') != ''
@@ -92,23 +89,11 @@ jobs:
           path: trivy-results.sarif
           retention-days: 30
 
-      - name: Normalize Google workload identity settings
-        if: github.event_name == 'push'
-        id: gcp-auth
-        env:
-          GCP_WIF_PROVIDER_RAW: ${{ secrets['GCP_WIF_PROVIDER'] }}
-        run: |
-          [[ -n "$GCP_WIF_PROVIDER_RAW" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
-          PROVIDER="${GCP_WIF_PROVIDER_RAW#https://iam.googleapis.com/}"
-          PROVIDER="${PROVIDER#//iam.googleapis.com/}"
-          [[ -n "$PROVIDER" ]] || { echo "Normalized provider was empty"; exit 1; }
-          echo "provider=$PROVIDER" >> "$GITHUB_OUTPUT"
-
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push'
         uses: google-github-actions/auth@v3.0.0
         with:
-          workload_identity_provider: ${{ steps.gcp-auth.outputs.provider }}
+          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
