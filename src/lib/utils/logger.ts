@@ -14,6 +14,8 @@ interface LoggerOptions {
   redact?: string[]
 }
 
+let baseLoggerInstance: Logger | null = null
+
 class Logger {
   private options: LoggerOptions
 
@@ -198,14 +200,8 @@ class Logger {
  * Refactored to avoid TDZ/circular import issues.
  */
 export function getLogger(prefix?: string): Logger {
-  // Use a function-scoped static variable to avoid TDZ/circular import issues
-  // @ts-expect-error - Using function property for singleton pattern
-  if (!getLogger._instance) {
-    // @ts-expect-error - Using function property for singleton pattern
-    getLogger._instance = new Logger()
-  }
-  // @ts-expect-error - Using function property for singleton pattern
-  const baseLogger: Logger = getLogger._instance
+  baseLoggerInstance ??= new Logger()
+  const baseLogger: Logger = baseLoggerInstance
   return prefix ? baseLogger.child(prefix) : baseLogger
 }
 
