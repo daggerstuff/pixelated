@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixelated-empathy-redis
+  namespace: pixelated-empathy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pixelated-empathy-redis
+  template:
+    metadata:
+      labels:
+        app: pixelated-empathy-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"

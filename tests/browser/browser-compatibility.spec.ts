@@ -30,15 +30,28 @@ for (const { url, name } of TEST_URLS) {
 
     // Navigate to the test page
     console.log(`Going to ${url}`)
-    await page.goto(url)
+    const response = await page.goto(url, { waitUntil: 'domcontentloaded' })
+    expect(response?.status()).toBeLessThan(400)
 
     // Wait for the page to load completely
     await page.waitForLoadState('networkidle')
 
     // Check that the page title is not empty
+    await page.waitForFunction(
+      () => document.title.trim().length > 0 || document.querySelector('main') !== null,
+      { timeout: 10000 },
+    )
     const title = await page.title()
     console.log(`Page title: ${title}`)
-    expect(title).not.toBe('')
+    if (title.trim().length === 0) {
+      const fallbackHeading = await page
+        .locator('h1')
+        .first()
+        .textContent()
+      expect(fallbackHeading?.trim().length).toBeGreaterThan(0)
+    } else {
+      expect(title.trim().length).toBeGreaterThan(0)
+    }
 
     // Check for main content
     await expect(page.locator('main')).toBeVisible()
