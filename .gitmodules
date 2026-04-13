@@ -6,3 +6,7 @@
 [submodule "docs"]
 	path = docs
 	url = ../docs
+
+[submodule "foresight-mcp"]
+        path = foresight-mcp
+        url = ../foresight-mcp

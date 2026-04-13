@@ -394,7 +394,7 @@ const performanceBudgets = {
 
       barElement.className = `h-2 ${color} rounded-full`
 
-      // Calculate width as percentage of target
+      // Calculate width
       let budget = performanceBudgets[metric]
       let percentOfBudget = (value / budget.needsImprovement) * 100
       percentOfBudget = Math.min(percentOfBudget, 100) // Cap at 100%
