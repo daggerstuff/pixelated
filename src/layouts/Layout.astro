@@ -4,12 +4,13 @@ import BaseLayout from './BaseLayout.astro'
 interface Props {
   title?: string
   description?: string
+  keywords?: string
   fullWidthMain?: boolean
 }
 
-const { title, description, fullWidthMain = false } = Astro.props
+const { title, description, keywords, fullWidthMain = false } = Astro.props
 ---
 
-<BaseLayout {title} {description} showBackLink={false} {fullWidthMain}>
+<BaseLayout {title} {description} {keywords} showBackLink={false} {fullWidthMain}>
   <slot />
 </BaseLayout>

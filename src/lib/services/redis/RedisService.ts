@@ -289,7 +289,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       },
       hget: async (key: string, field: string) => {
         const hash = hashStore.get(key);
-        return hash ? hash.get(field) || null : null;
+        return hash?.get(field) ?? null;
       },
       hgetall: async (key: string) => {
         const hash = hashStore.get(key);
@@ -354,18 +354,7 @@ export class RedisService extends EventEmitter implements IRedisService {
           return [];
         }
         const sorted = Array.from(zset.entries()).sort((a, b) => a[1] - b[1]);
-        if (sorted.length === 0) {
-          logger.debug(
-            `[RedisService Mock] zpopmin found no elements after sorting for key: ${key}`,
-          );
-          return [];
-        }
-        const first = sorted[0];
-        if (!first) {
-          logger.debug(`[RedisService Mock] zpopmin: sorted[0] is undefined for key: ${key}`);
-          return [];
-        }
-        const [member, score] = first;
+        const [member, score] = sorted[0]!;
         zset.delete(member);
         return [{ value: member, score }];
       },
@@ -391,7 +380,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       info: async () => "connected_clients:1\nblocked_clients:0",
       publish: async () => 0,
       quit: async () => "OK",
-      connect: () => Promise.resolve(),
+      connect: async () => {},
       on: (event: string, callback: (...args: unknown[]) => void) => {
         // Emit the event immediately to simulate connection events
         if (["connect", "ready"].includes(event)) {

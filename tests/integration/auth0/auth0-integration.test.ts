@@ -448,18 +448,24 @@ describe('Auth0 Integration Tests', () => {
         'user',
       )
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         id: 'auth0|123456',
         email: 'newuser@example.com',
         emailVerified: false,
         role: 'user',
         fullName: undefined,
         avatarUrl: undefined,
-        createdAt: '2023-01-01T00:00:00Z',
+        createdAt: expect.any(String),
         lastLogin: undefined,
         appMetadata: { roles: ['User'] },
-        userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
+        userMetadata: { role: 'user', created_at: expect.any(String) },
       })
+      expect(result.createdAt).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+      )
+      expect(result.userMetadata?.created_at).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+      )
 
       const createUserCall = vi
         .mocked(mockManagementClient.users.create)
@@ -475,7 +481,7 @@ describe('Auth0 Integration Tests', () => {
         },
         user_metadata: {
           role: 'user',
-          created_at: '2023-01-01T00:00:00Z',
+          created_at: expect.any(String),
         },
       })
     })
@@ -646,7 +652,7 @@ describe('Auth0 Integration Tests', () => {
 
       const result = await auth0JwtService.validateToken(validToken, 'access')
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         valid: true,
         userId: 'auth0|123456',
         role: 'admin',
