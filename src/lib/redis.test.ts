@@ -1,3 +1,5 @@
+import { describe, beforeEach, expect, it, vi } from "vitest";
+
 import {
   checkRedisConnection,
   getFromCache,

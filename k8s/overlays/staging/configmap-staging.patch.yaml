@@ -3,4 +3,4 @@
   value: "staging"
 - op: replace
   path: /data/LOG_LEVEL
-  value: "INFO"
+  value: "info"

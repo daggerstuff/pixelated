@@ -18,6 +18,12 @@ interface MongoConfig {
   };
 }
 
+type ImportMetaEnvLike = {
+  env?: {
+    [key: string]: string | undefined;
+  };
+};
+
 class MongoDB {
   private static instance: MongoDB | null = null;
   private client: MongoClient | null = null;
@@ -57,10 +63,11 @@ class MongoDB {
    * Build MongoDB URI from environment variables
    */
   private buildMongoDBUri(): string {
-    const metaEnv = (import.meta as any)?.env?.["MONGODB_URI"];
+    const importMeta = import.meta as ImportMetaEnvLike;
+    const metaEnv = importMeta.env?.["MONGODB_URI"];
 
     if (metaEnv && process.env["MONGODB_URI"] === undefined) {
-      process.env["MONGODB_URI"] = metaEnv as string;
+      process.env["MONGODB_URI"] = metaEnv;
     }
     const mongoUri = process.env["MONGODB_URI"];
 

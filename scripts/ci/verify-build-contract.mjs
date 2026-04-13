@@ -7,6 +7,13 @@ const projectRoot = process.cwd()
 const srcRoot = path.join(projectRoot, 'src')
 const nodeModulesRoot = path.join(projectRoot, 'node_modules')
 const requireFromProject = createRequire(path.join(projectRoot, 'package.json'))
+const packageManifest = JSON.parse(
+  fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'),
+)
+const declaredDeps = new Set([
+  ...Object.keys(packageManifest.dependencies || {}),
+  ...Object.keys(packageManifest.devDependencies || {}),
+])
 
 const TS_IMPORT_EXTENSIONS = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.astro'])
 const STYLE_EXTENSIONS = new Set(['.css', '.pcss', '.scss', '.sass'])
@@ -32,6 +39,13 @@ const LOCAL_IGNORE_FILES = [
 const LOCAL_IGNORE_PREFIXES = ['src/lib/', 'src/components/', 'src/services/']
 
 const unresolved = new Set()
+const missingDependencies = new Set()
+
+function getPackageRoot(specifier) {
+  const segments = specifier.split('/')
+  if (!segments.length) return specifier
+  return specifier.startsWith('@') ? `${segments[0]}/${segments[1]}` : segments[0]
+}
 
 function pushIssue(issue) {
   unresolved.add(issue)
@@ -242,7 +256,18 @@ function checkImport(specifier, fromDir, sourcePath) {
 
   if (!tryResolveNodeModule(specifier)) {
     if (shouldIgnoreUnresolved(sourcePath, specifier)) return
+    const packageRoot = getPackageRoot(specifier)
+    if (!declaredDeps.has(packageRoot) && !packageRoot.startsWith('.')) {
+      missingDependencies.add(packageRoot)
+    }
     pushIssue(`${sourcePath} -> ${specifier} (package or style import cannot be resolved)`)
+  }
+}
+
+function recordUnresolvedPackageImport(specifier, sourcePath) {
+  const packageRoot = getPackageRoot(specifier)
+  if (!declaredDeps.has(packageRoot) && !packageRoot.startsWith('.')) {
+    missingDependencies.add(packageRoot)
   }
 }
 
@@ -280,6 +305,7 @@ function scanFile(filePath, discoveredImports) {
 
       if (!tryResolveNodeModule(specifier)) {
         if (shouldIgnoreUnresolved(filePath, specifier)) continue
+        recordUnresolvedPackageImport(specifier, filePath)
         pushIssue(`${filePath} -> ${specifier} (package or style import cannot be resolved)`)
       }
     }
@@ -312,6 +338,20 @@ if (unresolved.size > 0) {
   for (const issue of unresolved) {
     console.error(`  - ${issue}`)
   }
+  if (missingDependencies.size > 0) {
+    const missingList = [...missingDependencies].sort().join(', ')
+    console.error('')
+    console.error(
+      `❗ Missing dependency declarations likely involved: ${missingList}`,
+    )
+    console.error('Add the missing package(s) to package.json and reinstall deps.')
+    console.error(
+      'Example: pnpm add <package> (or pnpm add -D for dev dependency)',
+    )
+  }
+  console.error(
+    'Hint: if the package is already in package.json, run pnpm install --frozen-lockfile to repair node_modules.',
+  )
   process.exit(1)
 }
 
