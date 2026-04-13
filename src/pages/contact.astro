@@ -258,7 +258,10 @@ const organizationSchema = {
 
   <script>
     const form = document.getElementById('contact-form')!
-    const submitButton = document.getElementById('submit-button')!
+    const submitButton = document.getElementById(
+      'submit-btn',
+    ) as HTMLButtonElement
+
     const submitText = document.getElementById('submit-text')
     const loadingSpinner = document.getElementById('loading-spinner')!
     const successMessage = document.getElementById('success-message')!
