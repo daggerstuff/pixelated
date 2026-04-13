@@ -406,7 +406,7 @@ export const prerender = false // Enable SSR for real-time data
       try {
         const response = await fetch('/api/analytics/demo-tracking')
         const data = await response.json()
-        this.updateDashboard(data: any)
+        this.updateDashboard(data)
       } catch (error) {
         console.error('Failed to load initial data:', error)
       }
@@ -446,7 +446,7 @@ export const prerender = false // Enable SSR for real-time data
           Math.round(data.summary.scroll_depth_avg) + '%'
 
       // Update A/B test results
-      this.updateVariantStats(data: any)
+      this.updateVariantStats(data)
 
       // Update funnel
       this.updateFunnel(data.summary.conversion_funnel)
@@ -455,7 +455,7 @@ export const prerender = false // Enable SSR for real-time data
       this.updateEventTimeline(data.events)
 
       // Update statistical significance
-      this.updateStatisticalSignificance(data: any)
+      this.updateStatisticalSignificance(data)
     }
 
     updateVariantStats(data: any) {
@@ -543,7 +543,7 @@ export const prerender = false // Enable SSR for real-time data
           return `
           <div class="flex items-center justify-between bg-slate-800/30 rounded p-3">
             <div class="flex items-center gap-3">
-              <span class="text-xs bg-${this.getVariantColor(variant: any)}-500/20 text-${this.getVariantColor(variant: any)}-300 px-2 py-1 rounded">
+              <span class="text-xs bg-${this.getVariantColor(variant)}-500/20 text-${this.getVariantColor(variant)}-300 px-2 py-1 rounded">
                 ${variant}
               </span>
               <span class="text-gray-300 capitalize">${eventType}</span>
@@ -570,7 +570,7 @@ export const prerender = false // Enable SSR for real-time data
         if (recommendationEl) recommendationEl.textContent = 'Continue Testing'
       } else {
         // Calculate statistical significance (simplified)
-        const significance = this.calculateSignificance(_data: any)
+        const significance = this.calculateSignificance(data)
         if (testStatusEl) testStatusEl.textContent = 'Ready for Analysis'
         if (confidenceEl)
           confidenceEl.textContent = significance.confidence + '%'
@@ -579,7 +579,7 @@ export const prerender = false // Enable SSR for real-time data
       }
     }
 
-    calculateSignificance(_data: any) {
+    calculateSignificance(data: any) {
       // Simplified statistical significance calculation
       // In production, use proper statistical tests
       return {

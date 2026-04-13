@@ -543,7 +543,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
     })
 
     document.querySelectorAll('[data-demo-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         const link = target?.dataset['demoLink']
         if (link) {
@@ -553,7 +553,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
     })
 
     document.querySelectorAll('[data-blog-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         const link = target?.dataset['blogLink']
         if (link) {
@@ -595,7 +595,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
     // Track CTA clicks
     document.querySelectorAll('button').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         if (typeof (window as any).gtag !== 'undefined') {
           ;(window as any).gtag('event', 'blog_cta_click', {
@@ -608,7 +608,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
     // Track related post clicks
     document.querySelectorAll('a[href*="/blog/"]').forEach((link) => {
-      link.addEventListener('click', (e) => {
+      link.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         if (typeof (window as any).gtag !== 'undefined') {
           ;(window as any).gtag('event', 'related_post_click', {

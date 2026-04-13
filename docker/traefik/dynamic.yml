@@ -87,61 +87,6 @@ http:
 
   # Routers
   routers:
-    # Main Application
-    app:
-      rule: 'Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)'
-      entryPoints:
-        - websecure
-      service: pixelated-backend
-      middlewares:
-        - security-headers
-        - compression
-        - circuit-breaker
-        - retry
-      tls:
-        certResolver: letsencrypt
+    # Any additional static routers can go here
+    # (Moved main app routers to Docker labels for better service discovery)
 
-    # API Routes
-    api:
-      rule:
-        '(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) &&
-        PathPrefix(`/api/`)'
-      entryPoints:
-        - websecure
-      service: pixelated-backend
-      middlewares:
-        - security-headers
-        - rate-limit-api
-        - compression
-        - circuit-breaker
-      tls:
-        certResolver: letsencrypt
-
-    # Auth Routes (stricter rate limiting)
-    auth:
-      rule:
-        '(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) &&
-        PathPrefix(`/api/auth/`)'
-      entryPoints:
-        - websecure
-      service: pixelated-backend
-      middlewares:
-        - security-headers
-        - rate-limit-auth
-        - compression
-      priority: 100
-      tls:
-        certResolver: letsencrypt
-
-    # WebSocket Routes
-    websocket:
-      rule:
-        '(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) &&
-        PathPrefix(`/ws`)'
-      entryPoints:
-        - websecure
-      service: pixelated-backend
-      middlewares:
-        - security-headers
-      tls:
-        certResolver: letsencrypt
