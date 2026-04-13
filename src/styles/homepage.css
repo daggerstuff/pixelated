@@ -113,7 +113,7 @@
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--accent-primary, #ff6b00);
   margin: 0;
