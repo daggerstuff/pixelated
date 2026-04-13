@@ -137,7 +137,7 @@
   font-family: var(--font-mono);
   font-size: clamp(1.85rem, 2.8vw, 2.7rem);
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.4;
   letter-spacing: -0.05em;
   color: var(--text-primary, #f7f3eb);
   text-wrap: balance;
