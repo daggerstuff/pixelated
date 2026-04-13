@@ -84,7 +84,7 @@ jobs:
           python-version: '3.13'
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
 
       - name: Run evaluator tests
         run: |
@@ -210,7 +210,7 @@ jobs:
           PY
 
       - name: Upload realism artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: simulator-realism-evaluation-${{ github.run_id }}
