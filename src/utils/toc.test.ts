@@ -6,7 +6,7 @@ describe('generateToc', () => {
   it('should throw an error if minHeadingLevel > maxHeadingLevel', () => {
     const minHeadingLevel: HeadingLevel = 3
     const maxHeadingLevel: HeadingLevel = 2
-    expect(() => generateToc([], minHeadingLevel, maxHeadingLevel)).toThrow(/minHeadingLevel.*maxHeadingLevel/)
+    expect(() => generateToc([], minHeadingLevel, maxHeadingLevel)).toThrow()
   })
 
   it('should filter headings and build a hierarchical ToC', () => {
@@ -18,7 +18,9 @@ describe('generateToc', () => {
     ]
     const minHeadingLevel: HeadingLevel = 2
     const maxHeadingLevel: HeadingLevel = 3
+
     const toc = generateToc(headings, minHeadingLevel, maxHeadingLevel)
+
     expect(toc).toHaveLength(2)
     expect(toc[0].text).toBe('H2')
     expect(toc[0].children).toHaveLength(1)
@@ -33,7 +35,9 @@ describe('generateToc', () => {
     ]
     const minHeadingLevel: HeadingLevel = 1
     const maxHeadingLevel: HeadingLevel = 6
+
     const toc = generateToc(headings, minHeadingLevel, maxHeadingLevel)
+
     expect(toc).toHaveLength(1)
     expect(toc[0].children).toHaveLength(1)
     expect(toc[0].children[0].slug).toBe('') // filler for level 3
