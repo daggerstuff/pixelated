@@ -189,9 +189,9 @@ export function mockCrypto(): { restore: () => void } {
   const mockCrypto = {
     ...originalCrypto,
     randomUUID: vi
-      .fn<() => `${string}-${string}-${string}-${string}-${string}`>()
-      .mockReturnValue('test-uuid-123'),
-  } as Crypto
+      .fn()
+      .mockReturnValue('550e8400-e29b-41d4-a716-446655440000'),
+  } as any
 
   Object.assign(global, { crypto: mockCrypto })
 

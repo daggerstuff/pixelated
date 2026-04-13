@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: ..
-      dockerfile: Dockerfile.production
+      dockerfile: docker/Dockerfile.production
     container_name: pixelated-app
     restart: unless-stopped
     ports:
@@ -23,18 +23,19 @@ services:
       - AUTH0_CLIENT_ID_FILE=/run/secrets/auth0_client_id
       - AUTH0_CLIENT_SECRET_FILE=/run/secrets/auth0_client_secret
       - AUTH0_MANAGEMENT_CLIENT_ID_FILE=/run/secrets/auth0_management_client_id
-      - AUTH0_MANAGEMENT_CLIENT_SECRET_FILE=/run/secrets/auth0_management_client_secret
+      - AUTH0_MANAGEMENT_CLIENT_SECRET_FILE=/run/secrets/auth0-management-client-secret
+      - SECRETS_DIR=/run/secrets
       - PUBLIC_SITE_URL=${PUBLIC_SITE_URL:-https://pixelatedempathy.com}
       - CDN_BASE_URL=${CDN_BASE_URL:-https://cdn.pixelatedempathy.com}
     secrets:
-      - db_password
-      - redis_password
-      - jwt_secret
-      - auth0_domain
-      - auth0_client_id
-      - auth0_client_secret
-      - auth0_management_client_id
-      - auth0_management_client_secret
+      - db-password
+      - redis-password
+      - jwt-secret
+      - auth0-domain
+      - auth0-client-id
+      - auth0-client-secret
+      - auth0-management-client-id
+      - auth0-management-client-secret
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,9 +57,10 @@ services:
           memory: 512M
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.app.rule=Host(`${DOMAIN:-pixelatedempathy.com}`)'
+      - 'traefik.http.routers.app.rule=Host(`${DOMAIN:-pixelatedempathy.com}`) || Host(`www.${DOMAIN:-pixelatedempathy.com}`)'
       - 'traefik.http.routers.app.entrypoints=websecure'
       - 'traefik.http.routers.app.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.app.middlewares=security-headers@file,compression@file'
 
   # PostgreSQL Database
   postgres:
@@ -68,9 +70,9 @@ services:
     environment:
       - POSTGRES_DB=${DB_NAME:-pixelated}
       - POSTGRES_USER=${DB_USER:-pixelated_user}
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
     secrets:
-      - db_password
+      - db-password
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
@@ -95,17 +97,17 @@ services:
     container_name: pixelated-redis
     restart: unless-stopped
     command:
-      sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)"
+      sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis-password)"
       --appendonly yes'
     secrets:
-      - redis_password
+      - redis-password
     volumes:
       - redis_data:/data
     healthcheck:
       test:
         [
           'CMD-SHELL',
-          'redis-cli -a "$$(cat /run/secrets/redis_password)" ping | grep -q
+          'redis-cli -a "$$(cat /run/secrets/redis-password)" ping | grep -q
           PONG',
         ]
       interval: 10s
@@ -136,16 +138,13 @@ services:
       - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
       - TRAEFIK_ENTRYPOINTS_web_ADDRESS=:80
       - TRAEFIK_ENTRYPOINTS_websecure_ADDRESS=:443
-      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_EMAIL=${SSL_EMAIL}
+      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_EMAIL=${SSL_EMAIL:-admin@pixelatedempathy.com}
       - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_STORAGE=/ssl-certs/acme.json
-      # - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_HTTPCHALLENGE_ENTRYPOINT=web
-      - CF_DNS_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - TRAEFIK_CERTIFICATESRESOLVERS_letsencrypt_ACME_DNSCHALLENGE_PROVIDER=cloudflare
+      - CF_API_EMAIL=${CLOUDFLARE_EMAIL}
+      - CF_API_KEY=${CLOUDFLARE_API_KEY}
     labels:
-      - 'traefik.enable=true'
-      # - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN:-pixelatedempathy.com}`)"
-      # - "traefik.http.routers.traefik.service=api@internal"
-      # - "traefik.http.routers.traefik.entrypoints=websecure"
-      # - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - 'traefik.enable=false'
     deploy:
       resources:
         limits:
@@ -241,6 +240,12 @@ services:
       - '5000:5000'
     environment:
       - MONGODB_URI=${MONGODB_URI}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.ai-api.rule=(Host(`${DOMAIN:-pixelatedempathy.com}`) || Host(`www.${DOMAIN:-pixelatedempathy.com}`)) && PathPrefix(`/api/ai`)'
+      - 'traefik.http.routers.ai-api.entrypoints=websecure'
+      - 'traefik.http.routers.ai-api.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.ai-api.middlewares=security-headers@file,rate-limit-api@file'
     deploy:
       resources:
         limits:
@@ -265,21 +270,21 @@ volumes:
     driver: local
 
 secrets:
-  db_password:
+  db-password:
     file: ../config/secrets/db-password
-  redis_password:
+  redis-password:
     file: ../config/secrets/redis-password
-  jwt_secret:
+  jwt-secret:
     file: ../config/secrets/jwt-secret
-  auth0_domain:
+  auth0-domain:
     file: ../config/secrets/auth0-domain
-  auth0_client_id:
+  auth0-client-id:
     file: ../config/secrets/auth0-client-id
-  auth0_client_secret:
+  auth0-client-secret:
     file: ../config/secrets/auth0-client-secret
-  auth0_management_client_id:
+  auth0-management-client-id:
     file: ../config/secrets/auth0-management-client-id
-  auth0_management_client_secret:
+  auth0-management-client-secret:
     file: ../config/secrets/auth0-management-client-secret
 
 networks:

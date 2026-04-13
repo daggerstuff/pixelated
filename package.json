@@ -301,6 +301,7 @@
   "devDependencies": {
     "@astrojs/markdoc": "^1.0.3",
     "@astrojs/rss": "^4.0.18",
+    "@cloudflare/mcp-server-cloudflare": "^0.2.0",
     "@eslint/css": "^1.1.0",
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^1.2.0",
