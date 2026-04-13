@@ -92,9 +92,6 @@ jobs:
           [[ -n "$JWT_SECRET" ]] || { echo "Missing secret: JWT_SECRET"; exit 1; }
           [[ -n "$API_KEY" ]] || { echo "Missing secret: API_KEY"; exit 1; }
 
-      - name: Ensure namespace exists
-        run: kubectl apply -f k8s/base/namespace.yaml
-
       - name: Apply production kustomize manifests
         run: kubectl apply -k k8s/overlays/production
 
