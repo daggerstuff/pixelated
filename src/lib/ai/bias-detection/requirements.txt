@@ -614,7 +614,7 @@ pexpect==4.9.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   ipython
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   imageio
@@ -720,7 +720,7 @@ pyparsing==3.3.2
     #   great-expectations
     #   httplib2
     #   matplotlib
-pytest==9.0.2
+pytest==9.0.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   pytest-mock
@@ -754,7 +754,7 @@ regex==2026.1.15
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   nltk
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   dash
