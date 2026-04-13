@@ -7,7 +7,7 @@
  */
 
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
-import type { AnalysisResult } from '@/lib/ai/bias-detection/types'
+import type { AnalysisResult, SessionData } from '@/lib/ai/bias-detection/types'
 import type {
   DatasetForAudit,
   DatasetAuditResult,
@@ -345,43 +345,42 @@ export class BiasAuditService {
   /**
    * Generate sample sessions for bias analysis
    */
-  private generateSampleSessions(dataset: DatasetForAudit, count: number) {
+  private generateSampleSessions(dataset: DatasetForAudit, count: number): SessionData[] {
     // In production, this would read actual data from the dataset file
     // For now, generate synthetic samples for demonstration
-    const sessions = []
+    const sessions: SessionData[] = []
+    const ageGroups = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+']
+    const genders = ['male', 'female', 'non-binary', 'prefer_not_to_say']
+    const ethnicities = [
+      'caucasian',
+      'african_american',
+      'hispanic',
+      'asian',
+      'other',
+    ]
     for (let i = 0; i < count; i++) {
+      const demographic = {
+        age: ageGroups[Math.floor(Math.random() * ageGroups.length)],
+        gender: genders[Math.floor(Math.random() * genders.length)],
+        ethnicity: ethnicities[Math.floor(Math.random() * ethnicities.length)],
+        primaryLanguage: 'en',
+      }
       sessions.push({
         sessionId: `${dataset.datasetId}_sample_${i}`,
-        messages: [
-          {
-            role: 'user' as const,
-            content: `Sample message ${i} from dataset ${dataset.name}`,
-            timestamp: new Date(),
+        sessionDate: new Date().toISOString(),
+        sessionDuration: 120,
+        sessionType: 'general-wellness',
+        sessionNotes: `Sample session ${i} from dataset ${dataset.name}`,
+        sessionData: {
+          transcript: `Sample message ${i} from dataset ${dataset.name}. Sample response ${i}.`,
+          metadata: {
+            age: demographic.age,
+            gender: demographic.gender,
+            race: demographic.ethnicity,
+            language: demographic.primaryLanguage,
           },
-          {
-            role: 'assistant' as const,
-            content: `Sample response ${i}`,
-            timestamp: new Date(),
-          },
-        ],
-        demographics: {
-          age: Math.floor(Math.random() * 60) + 18,
-          gender: ['male', 'female', 'non-binary', 'prefer_not_to_say'][
-            Math.floor(Math.random() * 4)
-          ],
-          ethnicity: [
-            'caucasian',
-            'african_american',
-            'hispanic',
-            'asian',
-            'other',
-          ][Math.floor(Math.random() * 5)],
-          primaryLanguage: 'en',
         },
-        metadata: {
-          sessionStartTime: new Date(),
-          sessionEndTime: new Date(),
-        },
+        participantDemographics: demographic,
       })
     }
     return sessions
@@ -524,13 +523,18 @@ export class BiasAuditService {
 
       if (attribute === 'age' && demo?.age) {
         // Group ages into ranges
-        const age = demo.age
-        if (age < 25) key = '18-24'
-        else if (age < 35) key = '25-34'
-        else if (age < 45) key = '35-44'
-        else if (age < 55) key = '45-54'
-        else if (age < 65) key = '55-64'
-        else key = '65+'
+        const parsedAge = Number.parseInt(demo.age, 10)
+        if (Number.isNaN(parsedAge)) {
+          key = 'unknown'
+        } else {
+          const age = parsedAge
+          if (age < 25) key = '18-24'
+          else if (age < 35) key = '25-34'
+          else if (age < 45) key = '35-44'
+          else if (age < 55) key = '45-54'
+          else if (age < 65) key = '55-64'
+          else key = '65+'
+        }
       } else if (attribute === 'gender' && demo?.gender) {
         key = demo.gender
       } else if (attribute === 'ethnicity' && demo?.ethnicity) {

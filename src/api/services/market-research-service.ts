@@ -18,14 +18,16 @@ type MarketResearchPermissions = {
   comment?: string[];
 };
 
-const normalizePermissions = (permissions?: MarketResearchPermissions | null) => ({
+const normalizePermissions = (
+  permissions?: MarketResearchPermissions | null,
+): MarketResearchPermissions => ({
   view: permissions?.view ?? [],
   edit: permissions?.edit ?? [],
   comment: permissions?.comment ?? [],
 });
 
 const hasPermission = (
-  permissions: MarketResearchPermissions | undefined,
+  permissions: MarketResearchPermissions | null | undefined,
   permissionLevel: MarketResearchPermissionLevel,
   userId: string,
 ) => {
@@ -103,10 +105,7 @@ export async function getMarketResearch(researchId: string, userId: string) {
 
   // Check permissions
   const researchDoc = research as any;
-  if (
-    !hasPermission(research.permissions as MarketResearchPermissions, "view", userId) &&
-    researchDoc.owner !== userId
-  ) {
+  if (!hasPermission(research.permissions, "view", userId) && researchDoc.owner !== userId) {
     throw new ForbiddenError("Cannot access this research");
   }
 

@@ -254,7 +254,7 @@ export const useJournalResearchWebSocket = ({
     (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
       if (socketRef.current?.readyState === WebSocket.OPEN) {
         const payload = (() => {
-          if (typeof data === 'string' || data instanceof Blob) {
+          if (typeof data === 'string') {
             return data
           }
 
@@ -266,8 +266,18 @@ export const useJournalResearchWebSocket = ({
             return data
           }
 
+          if (data instanceof Blob) {
+            return null
+          }
+
           return new Uint8Array(data)
         })()
+
+        if (payload === null) {
+          const blobUnsupportedError = new Error('Blob payloads are not supported')
+          onError?.(blobUnsupportedError)
+          return
+        }
 
         socketRef.current.send(payload)
       } else {

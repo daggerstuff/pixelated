@@ -3,7 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient, UserInfoClient } from 'auth0'
+import { AuthenticationClient } from 'auth0'
 
 interface JwtPayload {
   iss?: string
@@ -19,27 +19,47 @@ interface JwtPayload {
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
-import { auth0Config, isAuth0Configured } from './auth0-config'
+import { auth0Config } from './auth0-config'
+
+type Auth0RuntimeConfig = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience: string
+}
+
+function getRuntimeAuth0Config(): Auth0RuntimeConfig {
+  return {
+    domain: process.env.AUTH0_DOMAIN || auth0Config.domain,
+    clientId: process.env.AUTH0_CLIENT_ID || auth0Config.clientId,
+    clientSecret:
+      process.env.AUTH0_CLIENT_SECRET || auth0Config.clientSecret,
+    audience: process.env.AUTH0_AUDIENCE || auth0Config.audience,
+  }
+}
+
+function isRuntimeAuth0Configured(config: Auth0RuntimeConfig): boolean {
+  return !!(config.domain && config.clientId && config.clientSecret)
+}
 
 // Initialize Auth0 authentication client
 let auth0Authentication: AuthenticationClient | null = null
-let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
  */
 function initializeAuth0Client() {
-  if (!isAuth0Configured()) {
+  const runtimeConfig = getRuntimeAuth0Config()
+  if (!isRuntimeAuth0Configured(runtimeConfig)) {
     console.warn('Auth0 configuration incomplete')
     return
   }
 
-  auth0Authentication ??= new AuthenticationClient({
-    domain: auth0Config.domain,
-    clientId: auth0Config.clientId,
-    clientSecret: auth0Config.clientSecret,
+  auth0Authentication = new AuthenticationClient({
+    domain: runtimeConfig.domain,
+    clientId: runtimeConfig.clientId,
+    clientSecret: runtimeConfig.clientSecret,
   })
-  auth0UserInfo ??= new UserInfoClient({ domain: auth0Config.domain })
 }
 
 // Initialize the client
@@ -314,21 +334,39 @@ export async function validateToken(
   tokenType: TokenType,
 ): Promise<TokenValidationResult> {
   try {
+    initializeAuth0Client()
+
     if (!auth0Authentication) {
       throw new AuthenticationError(
         'Auth0 authentication client not initialized',
       )
     }
 
-    // Decode token to check standard claims (aud, iss) before expensive UserInfo call
-    const payload = decodeAuth0JwtPayload(token)
+    // Validate token type matches expected (access tokens only for now)
+    // Check this before expensive UserInfo call to fail fast
+    if (tokenType === 'refresh') {
+      throw new AuthenticationError(
+        'Refresh token validation not supported with this method',
+      )
+    }
 
+    // Now verify with UserInfo (acts as online signature/revocation check)
+    // Using auth0Authentication.getProfile instead of auth0UserInfo.getUserInfo
+    const userInfo = await auth0Authentication.getProfile(token)
+    if (!userInfo) {
+      throw new AuthenticationError('Failed to get user info')
+    }
+
+    // Decode token to check standard claims (aud, iss) before expensive response parsing
+    const payload = decodeAuth0JwtPayload(token)
     if (!payload) {
       throw new AuthenticationError('Malformed token')
     }
 
+    const currentConfig = getRuntimeAuth0Config()
+
     // Validate Issuer
-    const expectedIssuer = `https://${auth0Config.domain}/`
+    const expectedIssuer = `https://${currentConfig.domain}/`
     if (typeof payload.iss !== 'string' || !payload.iss) {
       throw new AuthenticationError('Token missing issuer claim')
     }
@@ -337,7 +375,7 @@ export async function validateToken(
     }
 
     // Validate Audience
-    const expectedAudience = auth0Config.audience
+    const expectedAudience = currentConfig.audience
     if (!expectedAudience || expectedAudience.trim() === '') {
       console.warn(
         'AUTH0_AUDIENCE not configured - audience validation skipped',
@@ -360,21 +398,6 @@ export async function validateToken(
     // Validate expiration locally first
     if (payload.exp && payload.exp < currentTimestamp()) {
       throw new AuthenticationError('Token has expired')
-    }
-
-    // Validate token type matches expected (access tokens only for now)
-    // Check this before expensive UserInfo call to fail fast
-    if (tokenType === 'refresh') {
-      throw new AuthenticationError(
-        'Refresh token validation not supported with this method',
-      )
-    }
-
-    // Now verify with UserInfo (acts as online signature/revocation check)
-    // Using auth0Authentication.getProfile instead of auth0UserInfo.getUserInfo
-    const userInfo = await auth0UserInfo?.getUserInfo(token)
-    if (!userInfo) {
-      throw new AuthenticationError('Failed to get user info')
     }
 
     // Extract user information
@@ -450,6 +473,7 @@ export async function refreshAccessToken(
   _clientInfo: ClientInfo,
 ): Promise<TokenPair> {
   try {
+    initializeAuth0Client()
     if (!auth0Authentication) {
       throw new AuthenticationError(
         'Auth0 authentication client not initialized',
@@ -470,7 +494,7 @@ export async function refreshAccessToken(
     }
 
     // Get user info from new access token
-    const userResponse = await auth0UserInfo?.getUserInfo(accessToken)
+    const userResponse = await auth0Authentication.getProfile(accessToken)
     if (!userResponse) {
       throw new AuthenticationError('Failed to get refreshed user info')
     }

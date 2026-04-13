@@ -106,29 +106,26 @@ export class ConsentService {
     try {
       // TODO: Replace with MongoDB implementation
       const data: unknown[] = [] // Stub: Replace with MongoDB result
-      return data.map((option: unknown) => ({
-        id: (option as Record<string, unknown>)['id'] as string,
-        consentTypeId: (option as Record<string, unknown>)[
-          'consent_type_id'
-        ] as string,
-        optionName: (option as Record<string, unknown>)[
-          'option_name'
-        ] as string,
-        description: (option as Record<string, unknown>)[
-          'description'
-        ] as string,
-        isRequired: (option as Record<string, unknown>)[
-          'is_required'
-        ] as boolean,
-        defaultValue: (option as Record<string, unknown>)[
-          'default_value'
-        ] as string,
-        displayOrder: (option as Record<string, unknown>)[
-          'display_order'
-        ] as number,
-        createdAt: (option as Record<string, unknown>)['created_at'] as string,
-        updatedAt: (option as Record<string, unknown>)['updated_at'] as string,
-      })) as ConsentOption[]
+      return data.map((option: unknown) => {
+        const optionData = option as Record<string, unknown>
+        const rawDefaultValue = optionData['default_value']
+        const defaultValue =
+          typeof rawDefaultValue === 'boolean'
+            ? rawDefaultValue
+            : rawDefaultValue === 'true' || rawDefaultValue === '1'
+
+        return {
+          id: optionData['id'] as string,
+          consentTypeId: optionData['consent_type_id'] as string,
+          optionName: optionData['option_name'] as string,
+          description: optionData['description'] as string,
+          isRequired: optionData['is_required'] as boolean,
+          defaultValue,
+          displayOrder: optionData['display_order'] as number,
+          createdAt: optionData['created_at'] as string,
+          updatedAt: optionData['updated_at'] as string,
+        }
+      })
     } catch (error: unknown) {
       logger.error('Unexpected error in getConsentOptions', error)
       throw new Error('Failed to fetch consent options', { cause: error })
