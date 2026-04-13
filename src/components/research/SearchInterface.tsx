@@ -111,6 +111,7 @@ export default function SearchInterface() {
               type='text'
               className='search-bar w-full pe-24 ps-4'
               placeholder='Search for books, papers, articles...'
+              aria-label='Search literature query'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />

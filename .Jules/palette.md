@@ -1,0 +1,1 @@
+## 2026-04-13 - Adding aria-label to inputs | Learning: Placeholders alone are insufficient for screen readers; inputs lacking explicit labels (<label for>) need aria-label for accessibility. | Action: Add aria-label to all text inputs missing <label> tags.
