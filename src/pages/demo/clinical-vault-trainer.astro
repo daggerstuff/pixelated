@@ -411,14 +411,13 @@ const universityResults = [
         page_title: 'ClinicalVault Trainer Demo',
         page_location: window.location.href,
         ab_variant:
-          document.querySelector('[data-variant]')?.dataset?.variant ||
-          'unknown',
+          (document.querySelector('[data-variant]') as HTMLElement)?.dataset?.variant || 'unknown',
       })
     }
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -431,8 +430,7 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             interaction_type: action,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset.variant ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement)?.dataset.variant || 'unknown',
           })
         }
 
@@ -447,8 +445,7 @@ const universityResults = [
             timestamp: new Date().toISOString(),
             session_id: sessionStorage.getItem('session_id') || 'anonymous',
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset?.variant ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement)?.dataset?.variant || 'unknown',
           }),
         }).catch(console.error)
       })
@@ -456,7 +453,7 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
