@@ -1,14 +1,15 @@
 import { describe, it, expect } from 'vitest'
-
-import type { HeadingLevel } from '@/types'
-
 import { generateToc, type MarkdownHeading } from './toc'
+import type { HeadingLevel } from '@/types'
 
 describe('generateToc', () => {
   it('should throw an error if minHeadingLevel > maxHeadingLevel', () => {
     const minHeadingLevel: HeadingLevel = 3
     const maxHeadingLevel: HeadingLevel = 2
-    expect(() => generateToc([], minHeadingLevel, maxHeadingLevel)).toThrow(/minHeadingLevel.*maxHeadingLevel/)
+    expect(() => generateToc([], minHeadingLevel, maxHeadingLevel)
+    ).toThrowError(
+      '`minHeadingLevel` must be less than or equal to `maxHeadingLevel`'
+    )
   })
   it('should filter headings and build a hierarchical ToC', () => {
     const headings: MarkdownHeading[] = [
@@ -34,7 +35,10 @@ describe('generateToc', () => {
     const minHeadingLevel: HeadingLevel = 1
     const maxHeadingLevel: HeadingLevel = 6
     const toc = generateToc(headings, minHeadingLevel, maxHeadingLevel)
-    expect(toc[0].children[0].slug).toBe('') // filler for level 3
+    expect(toc).toHaveLength(1)
+    expect(toc[0].text).toBe('H2')
+    expect(toc[0].children).toHaveLength(1)
+    expect(toc[0].children[0].children).toHaveLength(1)
     expect(toc[0].children[0].children[0].text).toBe('H4')
   })
 })
