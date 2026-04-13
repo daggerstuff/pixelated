@@ -11,7 +11,7 @@
   <div u-i-ri-sun-line u-dark:i-ri-moon-line></div>
 </button>
 
-<!-- Initialize as inline scripts for faster response, avoiding FOUC  -->
+<!-- Initialize, avoiding FOUC  -->
 <script is:inline data-astro-rerun>
   function initTheme() {
     let theme
@@ -47,7 +47,7 @@
   // related to #45
   const chooseFill = (): FillMode => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uach = (navigator as any).userAgentData
+    const uach = (navigator).userAgentData
 
     if (uach?.brands?.length) {
       const brands: { brand: string; version: string }[] = uach.brands
@@ -109,7 +109,7 @@
         document.documentElement.classList.toggle('dark')
         isDark = document.documentElement.classList.contains('dark')
         changeGiscusTheme(isDark)
-        updateAria(currentTarget as HTMLElement)
+        updateAria(currentTarget)
         setColorTheme()
         saveTheme()
       }
