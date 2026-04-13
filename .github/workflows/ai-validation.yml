@@ -35,7 +35,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: 24.14.0
 
@@ -60,7 +60,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6
         with:
           version: 10.33.0
           run_install: false
@@ -248,7 +248,7 @@ jobs:
 
       - name: Send notification on validation issues
         if: ${{ steps.results.outputs.needs_alert == 'true' }}
-        uses: actions/github-script@v8.0.0
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
