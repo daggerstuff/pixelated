@@ -29,7 +29,7 @@ jobs:
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
