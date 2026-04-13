@@ -81,7 +81,7 @@ jobs:
 
       - name: Security scan
         id: trivy_scan
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@0.35.0
         continue-on-error: true
         with:
           image-ref:
