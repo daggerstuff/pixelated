@@ -42,7 +42,7 @@
 .pe-home-shell,
 .pe-page-shell {
   width: 100%;
-  max-width: var(--marketing-shell, 78rem);
+  max-width: 880px;
   margin: 0 auto;
   padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
 }
