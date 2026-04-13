@@ -37,7 +37,7 @@ const generatedOgImage = withBasePath(
 )
 const assignedOgImage =
   ogImage && ogImage !== true
-    ? withBasePath('og-images', ogImage as string)
+    ? withBasePath('og-images', ogImage)
     : undefined
 
 const ogImageURL = new URL(
