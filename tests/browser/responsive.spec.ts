@@ -4,6 +4,7 @@
  * If using TypeScript, ensure your tsconfig includes "types": ["@playwright/test"]
  */
 import { test, expect } from '@playwright/test'
+import { getLoginFormLocator } from "../helpers/test-utils";
 
 // Define common breakpoints to test
 const breakpoints = [
@@ -124,7 +125,7 @@ for (const bp of breakpoints) {
     await page.waitForTimeout(500)
 
     // Check login form visibility
-    await expect(page.locator('form')).toBeVisible()
+    await expect(getLoginFormLocator(page)).toBeVisible()
     await expect(page.locator('input[type="email"]')).toBeVisible()
     await expect(page.locator('input[type="password"]')).toBeVisible()
     await expect(page.locator('button[type="submit"]')).toBeVisible()

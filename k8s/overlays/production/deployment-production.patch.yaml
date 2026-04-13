@@ -6,3 +6,8 @@
   value:
     name: APP_ENV
     value: "production"
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  value:
+    name: REDIS_URL
+    value: "redis://pixelated-empathy-redis:6379"
