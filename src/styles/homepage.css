@@ -50,7 +50,7 @@
 .pe-home-section,
 .pe-page-section {
   position: relative;
-  padding: clamp(4.2rem, 8vh, 6.2rem) 0;
+  padding: 120px 0;
   overflow: hidden;
 }
 
