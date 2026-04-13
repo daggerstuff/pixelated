@@ -5,11 +5,27 @@ export interface APIKeyRecord {
   id: string;
   user_id: string;
   key_hash: string;
-  scopes: string[];
+  scopes: string | null;
   created_at: Date;
   expires_at?: Date;
   last_used?: Date;
 }
+
+const parseScopes = (value: string | null | undefined): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? parsed.filter((scope): scope is string => typeof scope === 'string')
+      : [];
+  } catch (error) {
+    console.error('Error parsing scopes JSON:', error);
+    return [];
+  }
+};
 
 export class APIKeyService {
   async validateAPIKey(key: string): Promise<{ valid: boolean; userId?: string; scopes?: string[] }> {
@@ -29,12 +45,7 @@ export class APIKeyService {
       
       // Parse scopes from JSON string
       let scopes: string[] = [];
-      try {
-        scopes = JSON.parse(record.scopes || '[]');
-      } catch (error) {
-        console.error('Error parsing scopes JSON:', error);
-        scopes = [];
-      }
+      scopes = parseScopes(record.scopes)
       
       // Update last_used
       await query('UPDATE api_keys SET last_used = NOW() WHERE key_hash = $1', [hash]);

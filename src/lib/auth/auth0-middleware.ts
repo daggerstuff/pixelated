@@ -947,6 +947,18 @@ export async function authenticateRequest(
 
   return { success: true, request: authenticatedRequest }
 }
+
+  return {
+    success: false,
+    error: 'Unable to authenticate request',
+    response: new Response(
+      JSON.stringify({ error: 'Unable to authenticate request' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    ),
+  }
 }
 
 /**
