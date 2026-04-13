@@ -13,6 +13,7 @@ import {
   verifyPageElements,
   waitForPageStable,
   ensureTestResultsDir,
+  getLoginFormLocator,
 } from '../helpers/test-utils'
 
 // Use TEST_PAGES from test-utils
@@ -92,7 +93,7 @@ test('forms work correctly across browsers', async ({ page, browserName }) => {
   await navigateToPage(page, '/contact')
 
   // Check if the page has a form
-  const hasForm = (await page.locator('form').count()) > 0
+  const hasForm = (await getLoginFormLocator(page).count()) > 0
 
   // Additional form testing would go here
 
