@@ -3,6 +3,8 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - service.yaml
+  - managed-cert.yaml
+  - frontend-config.yaml
   - ingress.yaml
   - hpa.yaml
 labels:

@@ -2,7 +2,8 @@ import path from 'node:path'
 import process from 'node:process'
 
 import { glob } from 'astro/loaders'
-import { defineCollection, z } from 'astro:content'
+import { defineCollection } from 'astro:content'
+import { z } from 'astro:schema'
 
 import {
   postSchema,

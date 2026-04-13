@@ -1,12 +1,10 @@
 [submodule "ai"]
 	path = ai
-	url = ../ai
+	url = https://github.com/daggerstuff/ai.git
 	branch = staging
-
 [submodule "docs"]
 	path = docs
-	url = ../docs
-
+	url = https://github.com/daggerstuff/docs.git
 [submodule "foresight-mcp"]
-        path = foresight-mcp
-        url = ../foresight-mcp
+	path = foresight-mcp
+	url = https://github.com/daggerstuff/foresight-mcp.git

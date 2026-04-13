@@ -29,7 +29,7 @@ jobs:
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -39,20 +39,20 @@ jobs:
             github.event.workflow_run.head_sha || github.sha }}
 
       - name: Authenticate to Google Cloud (OIDC)
-        uses: google-github-actions/auth@v3.0.0
+        uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3.0.1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           install_components: 'kubectl'
 
       - name: Authenticate to GKE
-        uses: google-github-actions/get-gke-credentials@v3.0.0
+        uses: google-github-actions/get-gke-credentials@v2
         with:
           cluster_name:
             ${{ secrets.GKE_CLUSTER_NAME_STAGING || 'pixelated-empathy-staging'

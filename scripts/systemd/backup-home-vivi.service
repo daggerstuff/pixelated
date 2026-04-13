@@ -7,6 +7,10 @@ Wants=network-online.target
 Type=oneshot
 NoNewPrivileges=yes
 PrivateTmp=yes
+User=vivi
+Group=vivi
+Environment=HOME=/home/vivi
+Environment=RCLONE_CONFIG=%h/.config/rclone/rclone.conf
 Environment=SOURCE_DIR=/home/vivi
 Environment=BACKUP_DIR=%h/.local/share/home_backups
 Environment=RCLONE_TARGET=drive:vivi-home-backups

@@ -34,7 +34,7 @@ jobs:
       TRIVY_STRICT_GATE: false
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -47,12 +47,12 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v4
         with:
           node-version: '24.x'
           cache: 'pnpm'
@@ -81,7 +81,7 @@ jobs:
 
       - name: Security scan
         id: trivy_scan
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@0.29.0
         continue-on-error: true
         with:
           image-ref:
@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload Trivy scan results
         if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v4
         with:
           name: Trivy Scan Results
           path: trivy-results.sarif

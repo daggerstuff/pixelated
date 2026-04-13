@@ -27,7 +27,7 @@ interface Props {
   keywords?: string
   themeMode?: 'light' | 'dark' | 'system'
   ogImage?: string | boolean
-  bgType?: BgType | false
+  bgType?: BgType | false | string
   pubDate?: string
   lastModDate?: string
   pathname?: string
@@ -37,6 +37,8 @@ interface Props {
   fullWidthMain?: boolean
   centered?: boolean
   contentClass?: string
+  transitionMode?: string
+  isLoginPage?: boolean
 }
 
 const {
@@ -55,6 +57,8 @@ const {
   fullWidthMain = false,
   centered = false,
   contentClass = '',
+  transitionMode = 'fade',
+  isLoginPage = false,
 } = Astro.props
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
