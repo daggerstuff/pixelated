@@ -8,6 +8,17 @@ RETENTION_COUNT="${BACKUP_RETENTION_COUNT:-2}"
 LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
 LOCK_FILE="${HOME}/.cache/home-vivi-backup.lock"
 
+if [[ -z "${RCLONE_CONFIG:-}" ]]; then
+  if [[ -f "${HOME}/.config/rclone/rclone.conf" ]]; then
+    export RCLONE_CONFIG="${HOME}/.config/rclone/rclone.conf"
+  elif [[ "${SOURCE_DIR%/*}" == "/home" && -f "${SOURCE_DIR}/.config/rclone/rclone.conf" ]]; then
+    # Fallback for service contexts that run as root with an unexpected HOME.
+    # Keep this local-only and safe for this project's conventions.
+    export RCLONE_CONFIG="${SOURCE_DIR}/.config/rclone/rclone.conf"
+    export HOME="${SOURCE_DIR}"
+  fi
+fi
+
 mkdir -p "$BACKUP_DIR"
 mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCK_FILE")"
 mkdir -p "$SOURCE_DIR"

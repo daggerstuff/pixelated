@@ -1,6 +1,6 @@
 import { sequence, defineMiddleware } from 'astro:middleware'
 
-import { authenticateRequest, type AuthStrategy, type AuthOptions } from './lib/auth/auth0-middleware'
+import { authenticateRequest, type AuthOptions } from './lib/auth/auth0-middleware'
 import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
