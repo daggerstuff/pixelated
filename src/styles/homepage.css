@@ -63,7 +63,7 @@
   width: min(calc(100% - 2.5rem), var(--marketing-shell, 78rem));
   height: 1px;
   transform: translateX(-50%);
-  background-image: linear-gradient(
+  /* background-image: linear-gradient( */
     to right,
     rgba(253, 252, 252, 0.18) 1px,
     transparent 1px
@@ -93,7 +93,7 @@
 .pe-home-rail__line {
   width: 3rem;
   height: 1px;
-  background-image: linear-gradient(
+  /* background-image: linear-gradient( */
     to right,
     rgba(var(--accent-primary-rgb), 1) 1px,
     transparent 1px
