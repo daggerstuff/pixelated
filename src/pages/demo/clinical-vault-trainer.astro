@@ -411,7 +411,7 @@ const universityResults = [
         page_title: 'ClinicalVault Trainer Demo',
         page_location: window.location.href,
         ab_variant:
-          (document.querySelector('[data-variant]') as HTMLElement)?.dataset?.variant || 'unknown',
+          (document.querySelector('[data-variant]') as HTMLElement | null)?.dataset?.variant || 'unknown',
       })
     }
 
@@ -430,7 +430,7 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             interaction_type: action,
             ab_variant:
-              (document.querySelector('[data-variant]') as HTMLElement)?.dataset.variant || 'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement | null)?.dataset.variant || 'unknown',
           })
         }
 
@@ -445,7 +445,7 @@ const universityResults = [
             timestamp: new Date().toISOString(),
             session_id: sessionStorage.getItem('session_id') || 'anonymous',
             ab_variant:
-              (document.querySelector('[data-variant]') as HTMLElement)?.dataset?.variant || 'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement | null)?.dataset?.variant || 'unknown',
           }),
         }).catch(console.error)
       })
@@ -501,7 +501,7 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             scroll_depth: maxScroll,
             ab_variant:
-              (document.querySelector('[data-variant]') as HTMLElement)?.dataset?.['variant'] ||
+              (document.querySelector('[data-variant]') as HTMLElement | null)?.dataset?.['variant'] ||
               'unknown',
           })
         }
