@@ -161,4 +161,3 @@ if (isMain) {
 }
 
 export { server, db, redis, socketService, startServer }
-r }

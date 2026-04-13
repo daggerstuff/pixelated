@@ -11,7 +11,7 @@ interface Props {
 
 const { subtitle } = Astro.props
 
-let tabs: Tabs = Array.isArray(UI.tabbedLayoutTabs) ? UI.tabbedLayoutTabs : []
+let tabs: any = Array.isArray(UI.tabbedLayoutTabs) ? UI.tabbedLayoutTabs : []
 
 const currentPath = ensureTrailingSlash(Astro.url.pathname)
 const isActive = (href: string) => currentPath === resolvePath(href)

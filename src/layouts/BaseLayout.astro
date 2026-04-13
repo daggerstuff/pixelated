@@ -39,6 +39,9 @@ interface Props {
   contentClass?: string
   transitionMode?: string
   isLoginPage?: boolean
+  showSettingsPanel?: boolean
+  showAnalysisPanel?: boolean
+  initialTab?: string
 }
 
 const {
@@ -59,6 +62,9 @@ const {
   contentClass = '',
   transitionMode = 'fade',
   isLoginPage = false,
+  showSettingsPanel = false,
+  showAnalysisPanel = false,
+  initialTab = 'chat',
 } = Astro.props
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered

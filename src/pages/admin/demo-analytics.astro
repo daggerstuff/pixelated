@@ -406,7 +406,7 @@ export const prerender = false // Enable SSR for real-time data
       try {
         const response = await fetch('/api/analytics/demo-tracking')
         const data = await response.json()
-        this.updateDashboard(data)
+        this.updateDashboard(data: any)
       } catch (error) {
         console.error('Failed to load initial data:', error)
       }
@@ -426,7 +426,7 @@ export const prerender = false // Enable SSR for real-time data
       }, 30000)
     }
 
-    updateDashboard(data) {
+    updateDashboard(data: any) {
       this.data = data
       // Update main stats
       const totalSessionsEl = document.getElementById('total-sessions')
@@ -446,7 +446,7 @@ export const prerender = false // Enable SSR for real-time data
           Math.round(data.summary.scroll_depth_avg) + '%'
 
       // Update A/B test results
-      this.updateVariantStats(data)
+      this.updateVariantStats(data: any)
 
       // Update funnel
       this.updateFunnel(data.summary.conversion_funnel)
@@ -455,19 +455,19 @@ export const prerender = false // Enable SSR for real-time data
       this.updateEventTimeline(data.events)
 
       // Update statistical significance
-      this.updateStatisticalSignificance(data)
+      this.updateStatisticalSignificance(data: any)
     }
 
-    updateVariantStats(data) {
+    updateVariantStats(data: any) {
       const variants = ['A', 'B', 'C']
 
       variants.forEach((variant) => {
         const variantEvents = data.events.filter(
-          (e) => e.ab_variant === variant,
+          (e: any) => e.ab_variant === variant,
         )
-        const sessions = new Set(variantEvents.map((e) => e.session_id)).size
+        const sessions = new Set(variantEvents.map((e: any) => e.session_id)).size
         const conversions = variantEvents.filter(
-          (e) => e.event === 'demo_cta_click',
+          (e: any) => e.event === 'demo_cta_click',
         ).length
         const rate =
           sessions > 0 ? ((conversions / sessions) * 100).toFixed(1) : '0.0'
@@ -487,7 +487,7 @@ export const prerender = false // Enable SSR for real-time data
       })
     }
 
-    updateFunnel(funnelData) {
+    updateFunnel(funnelData: any) {
       const pageViews = funnelData.page_views
       const demoInteractions = funnelData.demo_interactions
       const ctaClicks = funnelData.cta_clicks
@@ -522,7 +522,7 @@ export const prerender = false // Enable SSR for real-time data
       if (ctaClickBarEl) ctaClickBarEl.style.width = ctaClickPct + '%'
     }
 
-    updateEventTimeline(events) {
+    updateEventTimeline(events: any) {
       const timeline = document.getElementById('event-timeline')
       if (!timeline) return
 
@@ -535,7 +535,7 @@ export const prerender = false // Enable SSR for real-time data
       }
 
       timeline.innerHTML = recentEvents
-        .map((event) => {
+        .map((event: any) => {
           const time = new Date(event.timestamp).toLocaleTimeString()
           const variant = event.ab_variant
           const eventType = event.event.replace('demo_', '').replace('_', ' ')
@@ -543,7 +543,7 @@ export const prerender = false // Enable SSR for real-time data
           return `
           <div class="flex items-center justify-between bg-slate-800/30 rounded p-3">
             <div class="flex items-center gap-3">
-              <span class="text-xs bg-${this.getVariantColor(variant)}-500/20 text-${this.getVariantColor(variant)}-300 px-2 py-1 rounded">
+              <span class="text-xs bg-${this.getVariantColor(variant: any)}-500/20 text-${this.getVariantColor(variant: any)}-300 px-2 py-1 rounded">
                 ${variant}
               </span>
               <span class="text-gray-300 capitalize">${eventType}</span>
@@ -555,30 +555,31 @@ export const prerender = false // Enable SSR for real-time data
         .join('')
     }
 
-    updateStatisticalSignificance(data) {
+    updateStatisticalSignificance(data: any) {
       const totalConversions = data.summary.conversion_funnel.cta_clicks
-      const totalSessions = data.summary.unique_sessions
+      const _totalSessions = data.summary.unique_sessions
+
+      const testStatusEl = document.getElementById('test-status')
+      const confidenceEl = document.getElementById('confidence-level')
+      const recommendationEl = document.getElementById('recommendation')
 
       if (totalConversions < 100) {
-        document.getElementById('test-status').textContent =
-          `Collecting Data (${totalConversions}/100)`
-        document.getElementById('confidence-level').textContent =
-          'Insufficient Data'
-        document.getElementById('recommendation').textContent =
-          'Continue Testing'
+        if (testStatusEl)
+          testStatusEl.textContent = `Collecting Data (${totalConversions}/100)`
+        if (confidenceEl) confidenceEl.textContent = 'Insufficient Data'
+        if (recommendationEl) recommendationEl.textContent = 'Continue Testing'
       } else {
         // Calculate statistical significance (simplified)
-        const significance = this.calculateSignificance(data)
-        document.getElementById('test-status').textContent =
-          'Ready for Analysis'
-        document.getElementById('confidence-level').textContent =
-          significance.confidence + '%'
-        document.getElementById('recommendation').textContent =
-          significance.recommendation
+        const significance = this.calculateSignificance(_data: any)
+        if (testStatusEl) testStatusEl.textContent = 'Ready for Analysis'
+        if (confidenceEl)
+          confidenceEl.textContent = significance.confidence + '%'
+        if (recommendationEl)
+          recommendationEl.textContent = significance.recommendation
       }
     }
 
-    calculateSignificance(data) {
+    calculateSignificance(_data: any) {
       // Simplified statistical significance calculation
       // In production, use proper statistical tests
       return {
@@ -587,7 +588,7 @@ export const prerender = false // Enable SSR for real-time data
       }
     }
 
-    getVariantColor(variant) {
+    getVariantColor(variant: any) {
       const colors = { A: 'purple', B: 'green', C: 'blue' }
       return colors[variant] || 'gray'
     }
