@@ -34,7 +34,7 @@ jobs:
       TRIVY_STRICT_GATE: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -47,12 +47,12 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10.33.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24.x'
           cache: 'pnpm'
@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload Trivy scan results
         if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Trivy Scan Results
           path: trivy-results.sarif
@@ -132,7 +132,7 @@ jobs:
 
       - name: Authenticate to Google Cloud (OIDC)
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: google-github-actions/auth@v3.0.0
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
           service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
@@ -140,7 +140,7 @@ jobs:
 
       - name: Configure Google Cloud SDK
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: google-github-actions/setup-gcloud@v3.0.1
+        uses: google-github-actions/setup-gcloud@v3
         with:
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
