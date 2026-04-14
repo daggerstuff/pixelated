@@ -45,6 +45,9 @@
   max-width: 880px;
   margin: 0 auto;
   padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pe-home-section,
@@ -60,7 +63,7 @@
   position: absolute;
   top: 0;
   left: 50%;
-  width: min(calc(100% - 2.5rem), var(--marketing-shell, 78rem));
+  width: min(calc(100% - 2.5rem), 880px);
   height: 1px;
   transform: translateX(-50%);
   background-image: linear-gradient(
@@ -90,8 +93,6 @@
   display: grid;
   gap: 1rem;
   align-content: start;
-  justify-items: start;
-  text-align: left;
 }
 
 .pe-home-rail__line {
