@@ -201,7 +201,7 @@ async function testEndpoints() {
         const loadTestHealth = async () => {
           const promises = Array(10)
             .fill()
-            .map(() => makeRequest(`http://localhost:${port}/api/health`, 2000))
+            .map(async () => makeRequest(`http://localhost:${port}/api/health`, 2000))
           const start = performance.now()
           const results = await Promise.all(promises)
           const end = performance.now()
@@ -233,9 +233,9 @@ async function testEndpoints() {
         )
 
         const avgHealthTime =
-          healthLoad.results.reduce((sum, r) => sum + r.responseTime, 0) / 10
+          Number(healthLoad.results.reduce((sum, r) => Number(sum) + Number(r.responseTime), 0)) / 10
         const avgSimpleTime =
-          simpleLoad.results.reduce((sum, r) => sum + r.responseTime, 0) / 10
+          Number(simpleLoad.results.reduce((sum, r) => Number(sum) + Number(r.responseTime), 0)) / 10
 
         console.log(
           `Average response times: health=${avgHealthTime.toFixed(2)}ms, simple=${avgSimpleTime.toFixed(2)}ms`,
