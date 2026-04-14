@@ -152,7 +152,7 @@ jobs:
           name: browser-test-results-${{ github.run_id }}
           path: |
             playwright-report/
-            public/test-results/
+            test-results/
           retention-days: 30
           if-no-files-found: warn
           compression-level: 6

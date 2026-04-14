@@ -122,9 +122,15 @@ export function TabsList({ children, className = '' }: TabsListProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const list = e.currentTarget
     const tabs = Array.from(
-      list.querySelectorAll('[role="tab"]:not([disabled])'),
+      list.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'),
     )
-    const index = tabs.indexOf(document.activeElement as HTMLElement)
+    const activeElement = document.activeElement
+
+    if (!(activeElement instanceof HTMLElement)) {
+      return
+    }
+
+    const index = tabs.indexOf(activeElement)
 
     if (index < 0) return
 
@@ -148,7 +154,7 @@ export function TabsList({ children, className = '' }: TabsListProps) {
     }
 
     e.preventDefault()
-    const activeTab = tabs[nextIndex] as HTMLElement
+    const activeTab = tabs[nextIndex]
     activeTab.focus()
     activeTab.click()
   }

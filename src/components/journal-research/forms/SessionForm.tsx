@@ -51,7 +51,7 @@ export function SessionForm({
     CreateSessionPayload | UpdateSessionPayload
   >({
     sessionId: session?.sessionId,
-    targetSources: session?.targetSources ?? ['pubmed', 'doaj'],
+    targetSources: session?.['targetSources'] ?? ['pubmed', 'doaj'],
     searchKeywords: session?.searchKeywords ?? {},
     weeklyTargets: session?.weeklyTargets ?? {},
   })
@@ -65,7 +65,7 @@ export function SessionForm({
   useEffect(() => {
     if (session) {
       setFormData({
-        targetSources: session.targetSources,
+        targetSources: session['targetSources'],
         searchKeywords: session.searchKeywords,
         weeklyTargets: session.weeklyTargets,
         currentPhase: session.currentPhase,
@@ -114,11 +114,11 @@ export function SessionForm({
   }
 
   const handleSourceToggle = (source: string) => {
-    const current = formData.targetSources ?? []
+    const current = formData['targetSources'] ?? []
     const updated = current.includes(source)
       ? current.filter((s) => s !== source)
       : [...current, source]
-    setFormData({ ...formData, targetSources: updated })
+    setFormData({ ...formData, ['targetSources']: updated })
   }
 
   const handleAddKeyword = () => {
@@ -226,7 +226,7 @@ export function SessionForm({
                 >
                   <input
                     type='checkbox'
-                    checked={(formData.targetSources ?? []).includes(source)}
+                    checked={(formData['targetSources'] ?? []).includes(source)}
                     onChange={() => handleSourceToggle(source)}
                     className='rounded'
                   />

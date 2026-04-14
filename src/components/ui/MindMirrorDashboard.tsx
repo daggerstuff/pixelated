@@ -70,6 +70,12 @@ const ARCHETYPES = {
   },
 }
 
+type ArchetypeKey = keyof typeof ARCHETYPES
+
+const isArchetypeKey = (key: string): key is ArchetypeKey => {
+  return key in ARCHETYPES
+}
+
 export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   analysis,
   isAnalyzing = false,
@@ -78,13 +84,18 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   const [activeTab, setActiveTab] = useState('overview')
 
   const archetypeInfo = useMemo(() => {
-    if (!analysis?.archetype) {
+    if (!analysis) {
       return null
     }
     const archetypeKey = analysis.archetype.main_archetype
       .toLowerCase()
       .replace(' ', '_')
-    return ARCHETYPES[archetypeKey as keyof typeof ARCHETYPES] || null
+
+    if (!isArchetypeKey(archetypeKey)) {
+      return null
+    }
+
+    return ARCHETYPES[archetypeKey] || null
   }, [analysis?.archetype])
 
   const moodMetrics = useMemo(() => {
@@ -276,15 +287,17 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className='space-y-3'>
-                {analysis.insights?.map((insight: any) => (
-                  <div
-                    key={insight}
-                    className='bg-blue-50 flex items-start space-x-3 rounded-lg p-3'
-                  >
-                    <Sparkles className='text-blue-500 mt-0.5 h-4 w-4 flex-shrink-0' />
-                    <p className='text-gray-700 text-sm'>{insight}</p>
-                  </div>
-                )) || (
+                {analysis.insights.length > 0 ? (
+                  analysis.insights.map((insight) => (
+                    <div
+                      key={insight}
+                      className='bg-blue-50 flex items-start space-x-3 rounded-lg p-3'
+                    >
+                      <Sparkles className='text-blue-500 mt-0.5 h-4 w-4 flex-shrink-0' />
+                      <p className='text-gray-700 text-sm'>{insight}</p>
+                    </div>
+                  ))
+                ) : (
                   <p className='text-gray-500 text-sm italic'>
                     No specific insights available
                   </p>
@@ -304,15 +317,17 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className='space-y-3'>
-                {analysis.recommendations?.map((rec: any) => (
-                  <div
-                    key={rec}
-                    className='bg-green-50 flex items-start space-x-3 rounded-lg p-3'
-                  >
-                    <Shield className='text-green-500 mt-0.5 h-4 w-4 flex-shrink-0' />
-                    <p className='text-gray-700 text-sm'>{rec}</p>
-                  </div>
-                )) || (
+                {analysis.recommendations.length > 0 ? (
+                  analysis.recommendations.map((rec) => (
+                    <div
+                      key={rec}
+                      className='bg-green-50 flex items-start space-x-3 rounded-lg p-3'
+                    >
+                      <Shield className='text-green-500 mt-0.5 h-4 w-4 flex-shrink-0' />
+                      <p className='text-gray-700 text-sm'>{rec}</p>
+                    </div>
+                  ))
+                ) : (
                   <p className='text-gray-500 text-sm italic'>
                     No specific recommendations available
                   </p>

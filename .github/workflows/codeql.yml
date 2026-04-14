@@ -148,12 +148,30 @@ jobs:
           # Configure output format
           output: sarif-latest
 
+      - name: Collect CodeQL SARIF results
+        id: codeql-sarif
+        if: always()
+        shell: bash
+        run: |
+          mapfile -t SARIF_FILES < <(find "${RUNNER_TEMP}/codeql_databases" -type f -name "*.sarif")
+          if [ "${#SARIF_FILES[@]}" -eq 0 ]; then
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            echo "No CodeQL SARIF files were found under ${RUNNER_TEMP}/codeql_databases."
+          else
+            echo "found=true" >> "${GITHUB_OUTPUT}"
+            {
+              echo "paths<<EOF"
+              printf "%s\n" "${SARIF_FILES[@]}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Upload SARIF results as artifact
         uses: actions/upload-artifact@v7
-        if: always()
+        if: always() && steps.codeql-sarif.outputs.found == 'true'
         with:
           name: codeql-sarif-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases/*/results/*.sarif
+          path: ${{ steps.codeql-sarif.outputs.paths }}
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
@@ -161,5 +179,5 @@ jobs:
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases
+          path: ${{ runner.temp }}/codeql_databases
           retention-days: 7
