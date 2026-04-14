@@ -31,6 +31,11 @@ export function SourceList({
     currentPage: sources.page ?? 1,
     pageSize: sources.pageSize ?? 10,
   })
+  const handleTableStateChange: (newState: Partial<TableState>) => void = (
+    newState,
+  ) => {
+    setTableState((prevState) => ({ ...prevState, ...newState }))
+  }
 
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
@@ -232,7 +237,7 @@ export function SourceList({
         columns={columns}
         dataSource={tableDataSource}
         tableState={tableState}
-        onStateChange={setTableState}
+        onStateChange={handleTableStateChange}
         hoverable
         striped
         bordered

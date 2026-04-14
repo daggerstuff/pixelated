@@ -54,7 +54,9 @@ export function AcquisitionList({
     currentPage: acquisitions.page ?? 1,
     pageSize: acquisitions.pageSize ?? 10,
   })
-  const handleTableStateChange = (newState: Partial<TableState>) => {
+  const handleTableStateChange: (newState: Partial<TableState>) => void = (
+    newState,
+  ) => {
     setTableState((prevState) => ({
       ...prevState,
       ...newState,

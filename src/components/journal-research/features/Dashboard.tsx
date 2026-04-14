@@ -191,7 +191,7 @@ export function Dashboard({ className }: DashboardProps) {
                   </div>
                   <div className='text-right'>
                     <p className='text-sm font-medium'>
-                      {session.progressMetrics?.progress_percentage ?? 0}%
+                      {session.progressMetrics?.['progress_percentage'] ?? 0}%
                     </p>
                     <p className='text-muted-foreground text-xs'>Progress</p>
                   </div>

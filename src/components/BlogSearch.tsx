@@ -16,28 +16,29 @@ interface SearchResponse {
   results: SearchResult[]
 }
 
-const isSearchResponse = (value: unknown): value is SearchResponse => {
-  if (!value || typeof value !== 'object') {
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+const isSearchResult = (value: unknown): value is SearchResult => {
+  if (!isRecord(value)) {
     return false
   }
 
   return (
-    'results' in value &&
-    Array.isArray((value as { results?: unknown }).results) &&
-    (value as { results: unknown[] }).results.every((item) => {
-      if (!item || typeof item !== 'object') {
-        return false
-      }
-
-      const resultItem = item as Record<string, unknown>
-      return (
-        typeof resultItem['id'] === 'string' &&
-        typeof resultItem['title'] === 'string' &&
-        typeof resultItem['description'] === 'string' &&
-        typeof resultItem['slug'] === 'string'
-      )
-    })
+    typeof value.id === 'string' &&
+    typeof value.title === 'string' &&
+    typeof value.description === 'string' &&
+    typeof value.slug === 'string'
   )
+}
+
+const isSearchResponse = (value: unknown): value is SearchResponse => {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return Array.isArray(value.results) && value.results.every(isSearchResult)
 }
 
 export function BlogSearch() {
