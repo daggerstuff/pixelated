@@ -127,7 +127,7 @@ export interface ParameterOptimizationResult {
  * recommend optimal FHE parameters for the Microsoft SEAL library.
  */
 export class FHEParameterOptimizer {
-  private static instance: FHEParameterOptimizer
+  private static instance: FHEParameterOptimizer | null = null
 
   // Performance history for auto-adaptation
   private performanceHistory: FHEPerformanceMetrics[] = []
@@ -150,10 +150,10 @@ export class FHEParameterOptimizer {
    * Get singleton instance of the optimizer
    */
   public static getInstance(): FHEParameterOptimizer {
-    if (!FHEParameterOptimizer.instance) {
-      FHEParameterOptimizer.instance = new FHEParameterOptimizer()
-    }
-    return FHEParameterOptimizer.instance
+    return (
+      FHEParameterOptimizer.instance ??
+      (FHEParameterOptimizer.instance = new FHEParameterOptimizer())
+    )
   }
 
   /**
