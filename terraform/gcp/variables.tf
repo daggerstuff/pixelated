@@ -15,6 +15,12 @@ variable "app_name" {
   default     = "pixelated-empathy"
 }
 
+variable "artifact_registry_kms_key_name" {
+  description = "Cloud KMS key resource name for Artifact Registry customer-managed encryption."
+  type        = string
+  default     = ""
+}
+
 variable "gcp_region" {
   description = "GCP region for all regional resources."
   type        = string
