@@ -55,11 +55,13 @@ const comparison = [
   },
   {
     label: 'Before',
-    quote: 'Each trainee sees a different roleplay, so the coaching never lines up.',
+    quote:
+      'Each trainee sees a different roleplay, so the coaching never lines up.',
   },
   {
     label: 'After',
-    quote: 'The team can compare how multiple clinicians handled the same rupture.',
+    quote:
+      'The team can compare how multiple clinicians handled the same rupture.',
   },
 ]
 
@@ -89,13 +91,29 @@ const foundations = [
     title="Features that make hard cases easier to coach."
     lede="Pixelated Empathy is organized around a simple goal: keep the conversation believable, preserve the record, and make the next supervision meeting more specific."
     note="Start with the demo, not a long feature tour"
-    trustLine={['Simulation + review', 'Cohort comparison', 'Trust-aware rollout']}
+    trustLine={[
+      'Simulation + review',
+      'Cohort comparison',
+      'Trust-aware rollout',
+    ]}
     primaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
     secondaryCTA={{ text: 'Plan a pilot review', href: '/contact' }}
     stats={[
-      { label: 'What teams keep', value: 'Transcript + coaching notes', detail: 'The session record stays attached to the run' },
-      { label: 'What teams compare', value: 'One shared case', detail: 'Useful for cohorts, supervisors, and training leads' },
-      { label: 'What improves', value: 'Specific feedback', detail: 'The next attempt starts from a visible moment' },
+      {
+        label: 'What teams keep',
+        value: 'Transcript + coaching notes',
+        detail: 'The session record stays attached to the run',
+      },
+      {
+        label: 'What teams compare',
+        value: 'One shared case',
+        detail: 'Useful for cohorts, supervisors, and training leads',
+      },
+      {
+        label: 'What improves',
+        value: 'Specific feedback',
+        detail: 'The next attempt starts from a visible moment',
+      },
     ]}
   />
 
@@ -104,19 +122,24 @@ const foundations = [
       <div class="marketing-proof-band">
         <div>
           <span class="marketing-eyebrow">Signals in the first week</span>
-          <h2 class="marketing-title marketing-title--medium">This should feel clearer quickly.</h2>
+          <h2 class="marketing-title marketing-title--medium">
+            This should feel clearer quickly.
+          </h2>
           <p class="marketing-section-copy">
-            The best early sign is simple: people stop speaking in fuzzy summaries and start pointing at specific turns in the transcript.
+            The best early sign is simple: people stop speaking in fuzzy
+            summaries and start pointing at specific turns in the transcript.
           </p>
         </div>
 
         <div class="marketing-proof-band__items">
-          {firstWeekSignals.map((item, index) => (
-            <div class="marketing-proof-item">
-              <span>Signal {String(index + 1).padStart(2, '0')}</span>
-              <strong>{item}</strong>
-            </div>
-          ))}
+          {
+            firstWeekSignals.map((item, index) => (
+              <div class="marketing-proof-item">
+                <span>Signal {String(index + 1).padStart(2, '0')}</span>
+                <strong>{item}</strong>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
@@ -126,16 +149,25 @@ const foundations = [
     <div class="marketing-shell">
       <div class="marketing-section-header">
         <span class="marketing-eyebrow">What the shift looks like</span>
-        <h2 class="marketing-title marketing-title--medium">Better features create better supervision language.</h2>
+        <h2 class="marketing-title marketing-title--medium">
+          Better features create better supervision language.
+        </h2>
       </div>
 
       <div class="marketing-quote-grid">
-        {comparison.map((item) => (
-          <article class:list={['marketing-quote-card', item.label === 'After' && 'marketing-card--accent']}>
-            <span class="marketing-quote-label">{item.label}</span>
-            <blockquote>{item.quote}</blockquote>
-          </article>
-        ))}
+        {
+          comparison.map((item) => (
+            <article
+              class:list={[
+                'marketing-quote-card',
+                item.label === 'After' && 'marketing-card--accent',
+              ]}
+            >
+              <span class="marketing-quote-label">{item.label}</span>
+              <blockquote>{item.quote}</blockquote>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -144,19 +176,25 @@ const foundations = [
     <div class="marketing-shell">
       <div class="marketing-section-header">
         <span class="marketing-eyebrow">Capability map</span>
-        <h2 class="marketing-title marketing-title--medium">The platform is built around four practical jobs.</h2>
+        <h2 class="marketing-title marketing-title--medium">
+          The platform is built around four practical jobs.
+        </h2>
       </div>
 
       <div class="marketing-grid marketing-grid--2">
-        {coreCapabilities.map((capability) => (
-          <article class="marketing-card">
-            <span class="marketing-card__label">{capability.label}</span>
-            <h3>{capability.title}</h3>
-            <ul class="marketing-list">
-              {capability.items.map((item) => <li>{item}</li>)}
-            </ul>
-          </article>
-        ))}
+        {
+          coreCapabilities.map((capability) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{capability.label}</span>
+              <h3>{capability.title}</h3>
+              <ul class="marketing-list">
+                {capability.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -164,12 +202,14 @@ const foundations = [
   <section class="marketing-section marketing-section--soft">
     <div class="marketing-shell">
       <div class="marketing-grid marketing-grid--3">
-        {foundations.map((item) => (
-          <article class="marketing-card">
-            <span class="marketing-card__label">{item.label}</span>
-            <p>{item.body}</p>
-          </article>
-        ))}
+        {
+          foundations.map((item) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{item.label}</span>
+              <p>{item.body}</p>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>

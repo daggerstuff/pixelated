@@ -184,7 +184,7 @@ describe('SupportContextIdentifier', () => {
         },
       }
 
-      ;(mockAIService.generateText).mockResolvedValue(
+      mockAIService.generateText.mockResolvedValue(
         JSON.stringify(mockAIResponse),
       )
     })

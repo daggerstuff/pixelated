@@ -15,29 +15,21 @@ export type ManagementClientOptionsWithClientCredentials = {
 
 import { auth0UserService } from '../../services/auth0.service'
 
-// Extend ManagementClient to include methods that may not be in the TypeScript definitions
-interface ExtendedManagementClient extends ManagementClient {
-  // Logs
-  getLogs(params: { per_page: number; q: string }): Promise<any>
-  // Guardian methods
-  getGuardianEnrollments(params: { id: string }): Promise<any>
-  getGuardianFactors(): Promise<any>
-  createGuardianEnrollmentTicket(params: {
-    user_id: string
-    send_mail: boolean
-  }): Promise<any>
-  deleteGuardianEnrollment(params: { id: string }): Promise<void>
-  // Roles
-  getRoles(params: { per_page?: number; page?: number }): Promise<any>
-  assignRolestoUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  removeRolesFromUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  getUserRoles(params: { id: string }): Promise<any>
+declare module 'auth0' {
+  interface ManagementClient {
+    getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
+    getGuardianEnrollments(params: { id: string }): Promise<unknown>
+    getGuardianFactors(): Promise<unknown>
+    createGuardianEnrollmentTicket(params: {
+      user_id: string
+      send_mail: boolean
+    }): Promise<unknown>
+    deleteGuardianEnrollment(params: { id: string }): Promise<void>
+    getRoles(params: { per_page?: number; page?: number }): Promise<unknown[]>
+    assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+    removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
+    getUserRoles(params: { id: string }): Promise<unknown[]>
+  }
 }
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
@@ -45,7 +37,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
 // Initialize Auth0 management client
-let auth0Management: ExtendedManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 
 /**
  * Initialize Auth0 management client
@@ -60,16 +52,12 @@ function initializeAuth0Management() {
     return
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:users read:logs read:attack-protection update:attack-protection',
-    })
-  }
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  })
 }
 
 // Initialize the management client
@@ -100,11 +88,13 @@ export interface RiskScore {
   recommendedAction: 'allow' | 'challenge' | 'deny'
 }
 
+type RiskFactorValue = Record<string, unknown>
+
 export interface RiskFactor {
   name: string
   weight: number // 0-100
   description: string
-  value: any
+  value: RiskFactorValue
   triggered: boolean
 }
 
@@ -256,7 +246,7 @@ export class Auth0AdaptiveMFAService {
       }
 
       // Log risk assessment
-       logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, null, {
+      logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, null, {
         userId: context.userId,
         riskScore: normalizedScore,
         factors: factors.map((f) => ({ name: f.name, triggered: f.triggered })),
@@ -299,7 +289,7 @@ export class Auth0AdaptiveMFAService {
     let weight = 25 // Base weight
     let triggered = false
     let description = `IP address analysis for ${ipAddress}`
-    let value: any = ipAddress
+    let value: RiskFactorValue = { ipAddress }
 
     try {
       // Check if IP is in whitelist
@@ -326,7 +316,7 @@ export class Auth0AdaptiveMFAService {
 
         // Check if this is a new IP for the user
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin && Math.random() < 0.1) {
+        if (user?.lastLogin && Math.random() < 0.1) {
           triggered = true
           description = `New or unusual IP address for user`
         }
@@ -354,7 +344,7 @@ export class Auth0AdaptiveMFAService {
     let weight = 20 // Base weight
     let triggered = false
     let description = 'Geolocation analysis'
-    let value: any = location
+    let value: RiskFactorValue = { ...location }
 
     try {
       if (this.config.enableGeofencing && location.country) {
@@ -399,7 +389,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 15 // Base weight
     let triggered = false
     let description = 'Time-based analysis'
-    const value: any = {
+    const value: RiskFactorValue = {
       hour: timestamp.getUTCHours(),
       dayOfWeek: timestamp.getUTCDay(),
       timestamp: timestamp.toISOString(),
@@ -455,7 +445,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 20 // Base weight
     let triggered = false
     let description = 'Behavioral analysis'
-    let value: any = { userId, timestamp: timestamp.toISOString() }
+    let value: RiskFactorValue = { userId, timestamp: timestamp.toISOString() }
 
     try {
       if (this.config.enableBehavioralAnalysis) {
@@ -479,7 +469,7 @@ export class Auth0AdaptiveMFAService {
 
         // Check for unusual login patterns (simulated)
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin) {
+        if (user?.lastLogin) {
           const lastLoginTime = new Date(user.lastLogin)
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
 
@@ -513,7 +503,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 10 // Base weight
     let triggered = false
     let description = 'Device analysis'
-    const value: any = { userAgent }
+    const value: RiskFactorValue = { userAgent }
 
     try {
       if (this.config.enableDeviceProfiling) {
@@ -573,7 +563,7 @@ export class Auth0AdaptiveMFAService {
     this.config = { ...this.config, ...newConfig }
 
     // Log configuration update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'adaptive_mfa',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString(),
@@ -597,7 +587,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.push(ipAddress)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'add',
         ipAddress,
@@ -615,7 +605,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.splice(index, 1)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'remove',
         ipAddress,
@@ -632,7 +622,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.push(countryCode)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'add',
         countryCode,
@@ -650,7 +640,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.splice(index, 1)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'remove',
         countryCode,
@@ -666,7 +656,7 @@ export class Auth0AdaptiveMFAService {
     this.config.allowedTimeWindows.push(window)
 
     // Log time window update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'time_windows',
       action: 'add',
       window,
@@ -689,7 +679,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedTimeWindows.splice(index, 1)
 
       // Log time window update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'time_windows',
         action: 'remove',
         window,

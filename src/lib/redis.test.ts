@@ -1,3 +1,5 @@
+import { describe, beforeEach, expect, it, vi } from "vitest";
+
 import {
   checkRedisConnection,
   getFromCache,
@@ -47,7 +49,9 @@ const mockRedis = {
 
 // Mock ioredis
 vi.mock("ioredis", () => {
-  return vi.fn().mockImplementation(() => mockRedis);
+  return {
+    default: vi.fn().mockImplementation(() => mockRedis),
+  };
 });
 
 describe("Redis Module", () => {

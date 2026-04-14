@@ -39,7 +39,8 @@ export function parsePagination(url: URL): {
   const rawOffset = Number.parseInt(url.searchParams.get('offset') || '0', 10)
 
   return {
-    limit: Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 10,
+    limit:
+      Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 10,
     offset: Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0,
   }
 }
@@ -60,7 +61,11 @@ export function assertRequestedUser(
   requestedUserId: string | null | undefined,
 ): Response | null {
   if (requestedUserId && requestedUserId !== actualUserId) {
-    return jsonError(400, 'Bad Request', 'userId must match the authenticated user')
+    return jsonError(
+      400,
+      'Bad Request',
+      'userId must match the authenticated user',
+    )
   }
   return null
 }
@@ -71,9 +76,14 @@ type MemoryRouteContext = {
   cookies?: unknown
 }
 
-export function withAuthenticatedMemoryRoute<TContext extends MemoryRouteContext>(
+export function withAuthenticatedMemoryRoute<
+  TContext extends MemoryRouteContext,
+>(
   action: string,
-  handler: (context: TContext, user: Awaited<ReturnType<typeof requireMemoryUser>>) => Promise<Response>,
+  handler: (
+    context: TContext,
+    user: Awaited<ReturnType<typeof requireMemoryUser>>,
+  ) => Promise<Response>,
 ) {
   return async (context: TContext): Promise<Response> => {
     const user = await requireMemoryUser(context.request)
@@ -93,17 +103,14 @@ export function withAuthenticatedMemoryRoute<TContext extends MemoryRouteContext
   }
 }
 
-export function handleMemoryApiError(
-  action: string,
-  error: unknown,
-): Response {
+export function handleMemoryApiError(action: string, error: unknown): Response {
   const correlationId = randomUUID()
 
   if (error instanceof ProductMemoryGatewayError) {
     memoryApiLogger.error(`Error ${action}:`, {
       correlationId,
       status: error.status,
-      message: (error instanceof Error ? error.message : "Unknown error"),
+      message: error instanceof Error ? error.message : 'Unknown error',
     })
     if (error.status === 404) {
       return jsonError(404, 'Not Found', 'Memory not found')
@@ -132,7 +139,7 @@ export function handleMemoryApiError(
     memoryApiLogger.error(`Error ${action}:`, {
       correlationId,
       name: error.name,
-      message: (error instanceof Error ? error.message : "Unknown error"),
+      message: error instanceof Error ? error.message : 'Unknown error',
     })
     return jsonError(
       500,

@@ -161,7 +161,12 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-admin-users',
       {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -302,7 +307,12 @@ export const PATCH: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-admin-users',
       {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )

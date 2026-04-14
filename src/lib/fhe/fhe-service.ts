@@ -1,25 +1,25 @@
 /**
  * Real FHE Service Implementation
- * 
+ *
  * This file provides the real implementation of the FHE service interface
  * that delegates to the homomorphic operations module.
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import homomorphicOps from './homomorphic-ops'
+import { SealResourceScope } from './seal-memory'
+import { SealService } from './seal-service'
+import type { SealCipherText } from './seal-service'
+import { SealSchemeType } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
-import type { 
-  FHEService, 
+import type {
+  FHEService,
   FHEScheme,
-  FHEOperationResult, 
+  FHEOperationResult,
   EncryptedData,
   FHEConfig,
-  FHEKeys
+  FHEKeys,
 } from './types'
-import homomorphicOps from './homomorphic-ops'
-import { SealService } from './seal-service'
-import { SealSchemeType } from './seal-types'
-import { SealResourceScope } from './seal-memory'
-import type { SealCipherText } from './seal-service'
 
 const logger = createBuildSafeLogger('fhe-service')
 
@@ -39,7 +39,7 @@ export class RealFHEService implements FHEService {
       return Object.values(FHEOperation).includes(operation)
     },
   }
-  
+
   /**
    * Initialize the FHE service
    */
@@ -82,7 +82,7 @@ export class RealFHEService implements FHEService {
       keyId: (config as any)?.keyId?.toString() || 'default-' + Date.now(),
       createdAt: new Date(),
       scheme: (config as any)?.scheme || 'BFV',
-      status: 'active'
+      status: 'active',
     } as FHEKeys
   }
 
@@ -91,22 +91,22 @@ export class RealFHEService implements FHEService {
    */
   public async encrypt<T>(value: T, options?: any): Promise<EncryptedData> {
     await this.ensureInitialized()
-    
+
     // Create a memory scope for safe resource tracking
     const scope = new SealResourceScope()
-    
+
     try {
       const sealService = SealService.getInstance()
-      
+
       // 1. Encode value to number[]
       const dataToEncrypt = this.encodeValue(value)
-      
+
       // 2. Encrypt
       const ciphertext = scope.track(await sealService.encrypt(dataToEncrypt))
-      
+
       // 3. Serialize
       const serialized = (ciphertext as any).save()
-      
+
       return {
         id: 'enc-' + Date.now(),
         data: serialized,
@@ -114,48 +114,58 @@ export class RealFHEService implements FHEService {
         metadata: {
           encryptedAt: Date.now(),
           mode: EncryptionMode.FHE,
-          scheme: sealService.getSchemeType()
-        }
+          scheme: sealService.getSchemeType(),
+        },
       }
     } catch (error: unknown) {
       logger.error('Encryption failed in RealFHEService', { error })
-      throw new Error(`Encryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`)
+      throw new Error(
+        `Encryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+      )
     } finally {
       // Ensure all resources are released
-      scope.releaseAll()
+      scope.close()
     }
   }
 
   /**
    * Decrypt data
    */
-  public async decrypt<T>(encryptedData: EncryptedData, options?: any): Promise<T> {
+  public async decrypt<T>(
+    encryptedData: EncryptedData,
+    options?: any,
+  ): Promise<T> {
     await this.ensureInitialized()
-    
+
     // Create a memory scope for safe resource tracking
     const scope = new SealResourceScope()
-    
+
     try {
       const sealService = SealService.getInstance()
       const seal = sealService.getSeal()
       const context = sealService.getContext()
-      
+
       // 1. Re-create SealCipherText instance and load data
       const ciphertext = scope.track(seal.CipherText()) as any
       ciphertext.load(context, encryptedData.data)
-      
+
       // 2. Decrypt
       const decryptedNumbers = await sealService.decrypt(ciphertext)
-      
+
       // 3. Decode number[] back to T
-      const result = this.decodeValue<T>(decryptedNumbers, encryptedData.dataType)
+      const result = this.decodeValue<T>(
+        decryptedNumbers,
+        encryptedData.dataType,
+      )
       return result
     } catch (error: unknown) {
       logger.error('Decryption failed in RealFHEService', { error })
-      throw new Error(`Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`)
+      throw new Error(
+        `Decryption failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+      )
     } finally {
       // Ensure all resources are released
-      scope.releaseAll()
+      scope.close()
     }
   }
 
@@ -167,7 +177,8 @@ export class RealFHEService implements FHEService {
     operation: FHEOperation | string,
     params?: Record<string, unknown>,
   ): Promise<FHEOperationResult<T>> {
-    const op = typeof operation === 'string' ? operation as FHEOperation : operation
+    const op =
+      typeof operation === 'string' ? (operation as FHEOperation) : operation
     try {
       await this.ensureInitialized()
       logger.info(`Processing encrypted data with operation: ${op}`)
@@ -199,12 +210,22 @@ export class RealFHEService implements FHEService {
     } catch (error: unknown) {
       logger.error('Error in RealFHEService.processEncrypted', {
         operation: op,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
 
       return {
         success: false,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         operation: op,
         timestamp: Date.now(),
         metadata: {
@@ -214,7 +235,7 @@ export class RealFHEService implements FHEService {
       }
     }
   }
-  
+
   /**
    * Dispose of resources
    */
@@ -224,7 +245,7 @@ export class RealFHEService implements FHEService {
     this.initPromise = null
     // Future: homomorphicOps.dispose() if implemented
   }
-  
+
   /**
    * Rotate encryption keys
    */
@@ -232,14 +253,14 @@ export class RealFHEService implements FHEService {
     await this.ensureInitialized()
     logger.info('Rotating FHE keys')
   }
-  
+
   /**
    * Get the current encryption mode
    */
   public getMode(): EncryptionMode {
     return EncryptionMode.FHE
   }
-  
+
   /**
    * Convenience method to encrypt and return as a string
    */
@@ -262,27 +283,27 @@ export class RealFHEService implements FHEService {
     if (typeof value === 'number') {
       return [value]
     }
-    
+
     if (typeof value === 'string') {
       // Convert string to array of char codes
-      return value.split('').map(c => c.charCodeAt(0))
+      return value.split('').map((c) => c.charCodeAt(0))
     }
-    
+
     if (typeof value === 'boolean') {
       return [value ? 1 : 0]
     }
-    
+
     if (Array.isArray(value)) {
-      // If it's already an array, try to use it if it's numbers, 
+      // If it's already an array, try to use it if it's numbers,
       // otherwise stringify first
-      if (value.every(v => typeof v === 'number')) {
+      if (value.every((v) => typeof v === 'number')) {
         return value
       }
     }
-    
+
     // Fallback: JSON stringify and convert to codes
     const json = JSON.stringify(value)
-    return json.split('').map(c => c.charCodeAt(0))
+    return json.split('').map((c) => c.charCodeAt(0))
   }
 
   /**
@@ -292,25 +313,27 @@ export class RealFHEService implements FHEService {
     if (dataType === 'number') {
       return data[0] as unknown as T
     }
-    
+
     if (dataType === 'boolean') {
       return (data[0] !== 0) as unknown as T
     }
-    
+
     if (dataType === 'string') {
       return String.fromCharCode(...data) as unknown as T
     }
-    
+
     if (dataType === 'object' || dataType === 'array') {
       try {
         const json = String.fromCharCode(...data)
         return JSON.parse(json) as T
       } catch (err) {
-        logger.warn('Failed to parse decrypted JSON, returning as char codes', { err })
+        logger.warn('Failed to parse decrypted JSON, returning as char codes', {
+          err,
+        })
         return data as unknown as T
       }
     }
-    
+
     return data as unknown as T
   }
 
@@ -329,13 +352,15 @@ export class RealFHEService implements FHEService {
   public getEncryptionMode(): EncryptionMode {
     return this.getMode()
   }
-  
+
   /**
    * Check if service is initialized
    */
   private checkInitialized() {
     if (!this.initialized) {
-      throw new Error('Real FHE service not initialized. Call initialize() first.')
+      throw new Error(
+        'Real FHE service not initialized. Call initialize() first.',
+      )
     }
   }
 }

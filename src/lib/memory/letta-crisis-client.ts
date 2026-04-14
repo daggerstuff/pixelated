@@ -68,7 +68,9 @@ export class LettaCrisisClient {
     })
 
     if (!response.ok) {
-      throw new Error(`Crisis detection failed: ${response.status} ${response.statusText}`)
+      throw new Error(
+        `Crisis detection failed: ${response.status} ${response.statusText}`,
+      )
     }
 
     return response.json() as Promise<CrisisResult>
@@ -80,7 +82,10 @@ export class LettaCrisisClient {
    * @param result - Crisis detection result
    * @param context - Contextual information (userId, sessionId)
    */
-  async reportCrisis(result: CrisisResult, context: CrisisContext): Promise<void> {
+  async reportCrisis(
+    result: CrisisResult,
+    context: CrisisContext,
+  ): Promise<void> {
     const response = await fetch(`${this.config.apiUrl}/crisis/report`, {
       method: 'POST',
       headers: {
@@ -90,7 +95,9 @@ export class LettaCrisisClient {
     })
 
     if (!response.ok) {
-      throw new Error(`Crisis report failed: ${response.status} ${response.statusText}`)
+      throw new Error(
+        `Crisis report failed: ${response.status} ${response.statusText}`,
+      )
     }
   }
 
@@ -113,7 +120,9 @@ export class LettaCrisisClient {
       throw new Error('Failed to get crisis resources')
     }
 
-    const data = (await response.json()) as CrisisResources | { resources: string[] }
+    const data = (await response.json()) as
+      | CrisisResources
+      | { resources: string[] }
     return data.resources
   }
 

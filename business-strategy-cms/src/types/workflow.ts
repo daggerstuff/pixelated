@@ -1,3 +1,5 @@
+import { DocumentCategory } from './document'
+
 export enum WorkflowStatus {
   DRAFT = 'draft',
   IN_REVIEW = 'in_review',
@@ -85,7 +87,7 @@ export interface WorkflowTemplate {
   id: string
   name: string
   description: string
-  documentCategory: string
+  documentCategory: DocumentCategory
   steps: WorkflowStep[]
   isActive: boolean
   createdBy: string

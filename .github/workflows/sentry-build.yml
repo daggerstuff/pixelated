@@ -4,9 +4,6 @@ permissions:
   contents: read
   packages: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 on:
   push:
     branches: [main, master, staging]
@@ -17,24 +14,24 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: '--max-old-space-size=4096'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6
         with:
           version: 10.33.0
 
       - name: Use Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
-          node-version: "24"
-          cache: "pnpm"
+          node-version: '24'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -83,5 +80,6 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+          tags:
+            ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false

@@ -43,7 +43,7 @@ describe('FHE Encryption', () => {
     const mockEncrypted: EncryptedData = {
       ciphertext: 'aGVsbG8gd29ybGQ=',
       iv: 'random-iv-bytes',
-      tag: 'auth-tag'
+      tag: 'auth-tag',
     }
 
     expect(mockEncrypted.ciphertext).toBeDefined()
@@ -56,7 +56,7 @@ describe('FHE Encryption', () => {
     const mockEncrypted: EncryptedData = {
       ciphertext: btoa(originalData),
       iv: 'random-iv',
-      tag: 'tag'
+      tag: 'tag',
     }
 
     const decrypted = atob(mockEncrypted.ciphertext)
@@ -79,7 +79,7 @@ describe('JWT Token Validation', () => {
     const mockToken: JWTToken = {
       header: { alg: 'HS256', typ: 'JWT' },
       payload: { sub: 'user-123', iat: Date.now() },
-      signature: 'signature-here'
+      signature: 'signature-here',
     }
 
     expect(mockToken.header.alg).toBe('HS256')
@@ -100,10 +100,10 @@ describe('JWT Token Validation', () => {
     const mockPayload = {
       sub: 'user-123',
       iat: Date.now(),
-      exp: Date.now() + 3600000
+      exp: Date.now() + 3600000,
     }
 
-    requiredClaims.forEach(claim => {
+    requiredClaims.forEach((claim) => {
       expect(mockPayload).toHaveProperty(claim)
     })
   })
@@ -118,16 +118,17 @@ describe('Input Sanitization', () => {
       '<script>alert("XSS")</script>',
       '<img src=x onerror=alert(1)>',
       'javascript:alert(1)',
-      '<svg onload=alert("XSS")>'
+      '<svg onload=alert("XSS")>',
     ]
 
     const sanitizeInput = (input: string): string => {
-      return input.replace(/<script[^>]*>.*?<\/script>/gi, '')
+      return input
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
         .replace(/<[^>]*on[^>]*=[^>]*>/gi, '')
         .replace(/javascript:/gi, '')
     }
 
-    maliciousInputs.forEach(input => {
+    maliciousInputs.forEach((input) => {
       const sanitized = sanitizeInput(input)
       expect(sanitized).not.toContain('<script>')
       expect(sanitized).not.toContain('onerror=')
@@ -139,7 +140,7 @@ describe('Input Sanitization', () => {
     const sqlInjectionPatterns = [
       "'; DROP TABLE users; --",
       '1 OR 1=1',
-      "' UNION SELECT * FROM users --"
+      "' UNION SELECT * FROM users --",
     ]
 
     const detectSqlInjection = (input: string): boolean => {
@@ -147,7 +148,7 @@ describe('Input Sanitization', () => {
       return sqlPattern.test(input)
     }
 
-    sqlInjectionPatterns.forEach(pattern => {
+    sqlInjectionPatterns.forEach((pattern) => {
       expect(detectSqlInjection(pattern)).toBe(true)
     })
   })
@@ -156,14 +157,14 @@ describe('Input Sanitization', () => {
     const maliciousPaths = [
       '../../../etc/passwd',
       '..\\..\\..\\windows\\system32',
-      '.../...//etc/passwd'
+      '.../...//etc/passwd',
     ]
 
     const sanitizePath = (path: string): string => {
       return path.replace(/\.\.\/|\.\.\\|%2e%2e/gi, '')
     }
 
-    maliciousPaths.forEach(path => {
+    maliciousPaths.forEach((path) => {
       const sanitized = sanitizePath(path)
       // Sanitized path should not contain the original malicious pattern
       expect(sanitized.length).toBeLessThan(path.length)
@@ -182,7 +183,7 @@ describe('Secure Cookie Handling', () => {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 3600
+      maxAge: 3600,
     }
 
     expect(secureCookie.httpOnly).toBe(true)
@@ -197,7 +198,7 @@ describe('Secure Cookie Handling', () => {
       value: 'token123',
       httpOnly: true,
       secure: true,
-      sameSite: 'strict'
+      sameSite: 'strict',
     }
 
     // httpOnly cookies cannot be accessed via JavaScript
@@ -210,7 +211,7 @@ describe('Secure Cookie Handling', () => {
       value: 'token',
       httpOnly: true,
       secure: true,
-      sameSite: 'strict'
+      sameSite: 'strict',
     }
 
     const laxCookie: SecureCookie = {
@@ -218,7 +219,7 @@ describe('Secure Cookie Handling', () => {
       value: 'prefs',
       httpOnly: false,
       secure: true,
-      sameSite: 'lax'
+      sameSite: 'lax',
     }
 
     expect(strictCookie.sameSite).toBe('strict')
@@ -256,11 +257,11 @@ describe('CSRF Protection', () => {
     const stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH']
     const readMethods = ['GET', 'HEAD', 'OPTIONS']
 
-    stateChangingMethods.forEach(method => {
+    stateChangingMethods.forEach((method) => {
       expect(['POST', 'PUT', 'DELETE', 'PATCH']).toContain(method)
     })
 
-    readMethods.forEach(method => {
+    readMethods.forEach((method) => {
       expect(['GET', 'HEAD', 'OPTIONS']).toContain(method)
     })
   })

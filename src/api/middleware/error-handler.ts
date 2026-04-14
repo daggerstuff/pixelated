@@ -7,6 +7,10 @@ import { Request, Response, NextFunction } from 'express'
 // CUSTOM ERROR CLASSES
 // ============================================================================
 
+/**
+ * Base class for all application-specific errors.
+ * Extends the built-in Error object to include HTTP status codes and custom error codes.
+ */
 export class AppError extends Error {
   constructor(
     public statusCode: number,
@@ -14,6 +18,8 @@ export class AppError extends Error {
     public code?: string,
   ) {
     super(message)
+    // We explicitly set the prototype here to fix the prototype chain when transpiling to ES5.
+    // Without this, `error instanceof AppError` would return false, breaking error handlers.
     Object.setPrototypeOf(this, AppError.prototype)
   }
 }
@@ -80,7 +86,7 @@ export function errorHandler(
   // Handle custom AppError
   if (error instanceof AppError) {
     statusCode = error.statusCode
-    message = (error instanceof Error ? error.message : "Unknown error")
+    message = error instanceof Error ? error.message : 'Unknown error'
     code = error.code || 'APP_ERROR'
 
     if (error instanceof ValidationError && error.fields) {

@@ -30,110 +30,127 @@ import { ObjectiveSwitcher } from '../prioritization/objective-switcher'
 // Mock AI Service
 const createMockAIService = (): AIService => {
   return {
-    getModelInfo: vi.fn<() => { id: string; name: string; provider: string; capabilities: string[]; contextWindow: number; maxTokens: number }>().mockReturnValue({
-      id: 'test-model',
-      name: 'Test Model',
-      provider: 'test',
-      capabilities: [],
-      contextWindow: 4096,
-      maxTokens: 2048,
-    }),
-    createChatCompletion: vi.fn<(messages: Array<{ role: string; content: string }>) => Promise<AICompletion>>().mockImplementation(async (messages) => {
-      // Simple mock responses based on user input
-      const userMessage =
-        messages.find((m: any) => m.role === 'user')?.content || ''
-
-      let detectedContext = ContextType.GENERAL
-      let confidence = 0.7
-      let urgency: 'low' | 'medium' | 'high' | 'critical' = 'low'
-
-      // Crisis detection
-      if (
-        userMessage.toLowerCase().includes('hurt myself') ||
-        userMessage.toLowerCase().includes('suicide') ||
-        userMessage.toLowerCase().includes('end it all')
-      ) {
-        detectedContext = ContextType.CRISIS
-        confidence = 0.95
-        urgency = 'critical'
-      }
-      // Educational queries
-      else if (
-        userMessage.toLowerCase().includes('what is') ||
-        userMessage.toLowerCase().includes('tell me about') ||
-        userMessage.toLowerCase().includes('explain')
-      ) {
-        detectedContext = ContextType.EDUCATIONAL
-        confidence = 0.9
-        urgency = 'low'
-      }
-      // Clinical assessment
-      else if (
-        userMessage.toLowerCase().includes('diagnose') ||
-        userMessage.toLowerCase().includes('assessment') ||
-        userMessage.toLowerCase().includes('phq-9')
-      ) {
-        detectedContext = ContextType.CLINICAL_ASSESSMENT
-        confidence = 0.88
-        urgency = 'medium'
-      }
-      // Support context
-      else if (
-        userMessage.toLowerCase().includes('feeling') ||
-        userMessage.toLowerCase().includes('cope') ||
-        userMessage.toLowerCase().includes('help me')
-      ) {
-        detectedContext = ContextType.SUPPORT
-        confidence = 0.85
-        urgency = 'medium'
-      }
-      // Informational
-      else if (
-        userMessage.toLowerCase().includes('where can i') ||
-        userMessage.toLowerCase().includes('how do i find') ||
-        userMessage.toLowerCase().includes('hotline')
-      ) {
-        detectedContext = ContextType.INFORMATIONAL
-        confidence = 0.87
-        urgency = 'low'
-      }
-
-      return {
-        id: 'test-completion',
-        created: Date.now(),
-        model: 'test-model',
-        choices: [
-          {
-            message: {
-              role: 'assistant' as const,
-              content: JSON.stringify({
-                detectedContext: detectedContext,
-                confidence: confidence,
-                contextualIndicators: [
-                  {
-                    type: 'pattern_match',
-                    description: `Detected ${detectedContext} context`,
-                    confidence: confidence,
-                  },
-                ],
-                needsSpecialHandling:
-                  detectedContext === ContextType.CRISIS ||
-                  detectedContext === ContextType.CLINICAL_ASSESSMENT,
-                urgency: urgency,
-                metadata: {},
-              }),
-            },
-            finishReason: 'stop' as const,
-          },
-        ],
-        usage: {
-          promptTokens: 10,
-          completionTokens: 20,
-          totalTokens: 30,
-        },
+    getModelInfo: vi
+      .fn<
+        () => {
+          id: string
+          name: string
+          provider: string
+          capabilities: string[]
+          contextWindow: number
+          maxTokens: number
+        }
+      >()
+      .mockReturnValue({
+        id: 'test-model',
+        name: 'Test Model',
         provider: 'test',
-      }
-    }),
+        capabilities: [],
+        contextWindow: 4096,
+        maxTokens: 2048,
+      }),
+    createChatCompletion: vi
+      .fn<
+        (
+          messages: Array<{ role: string; content: string }>,
+        ) => Promise<AICompletion>
+      >()
+      .mockImplementation(async (messages) => {
+        // Simple mock responses based on user input
+        const userMessage =
+          messages.find((m: any) => m.role === 'user')?.content || ''
+
+        let detectedContext = ContextType.GENERAL
+        let confidence = 0.7
+        let urgency: 'low' | 'medium' | 'high' | 'critical' = 'low'
+
+        // Crisis detection
+        if (
+          userMessage.toLowerCase().includes('hurt myself') ||
+          userMessage.toLowerCase().includes('suicide') ||
+          userMessage.toLowerCase().includes('end it all')
+        ) {
+          detectedContext = ContextType.CRISIS
+          confidence = 0.95
+          urgency = 'critical'
+        }
+        // Educational queries
+        else if (
+          userMessage.toLowerCase().includes('what is') ||
+          userMessage.toLowerCase().includes('tell me about') ||
+          userMessage.toLowerCase().includes('explain')
+        ) {
+          detectedContext = ContextType.EDUCATIONAL
+          confidence = 0.9
+          urgency = 'low'
+        }
+        // Clinical assessment
+        else if (
+          userMessage.toLowerCase().includes('diagnose') ||
+          userMessage.toLowerCase().includes('assessment') ||
+          userMessage.toLowerCase().includes('phq-9')
+        ) {
+          detectedContext = ContextType.CLINICAL_ASSESSMENT
+          confidence = 0.88
+          urgency = 'medium'
+        }
+        // Support context
+        else if (
+          userMessage.toLowerCase().includes('feeling') ||
+          userMessage.toLowerCase().includes('cope') ||
+          userMessage.toLowerCase().includes('help me')
+        ) {
+          detectedContext = ContextType.SUPPORT
+          confidence = 0.85
+          urgency = 'medium'
+        }
+        // Informational
+        else if (
+          userMessage.toLowerCase().includes('where can i') ||
+          userMessage.toLowerCase().includes('how do i find') ||
+          userMessage.toLowerCase().includes('hotline')
+        ) {
+          detectedContext = ContextType.INFORMATIONAL
+          confidence = 0.87
+          urgency = 'low'
+        }
+
+        return {
+          id: 'test-completion',
+          created: Date.now(),
+          model: 'test-model',
+          choices: [
+            {
+              message: {
+                role: 'assistant' as const,
+                content: JSON.stringify({
+                  detectedContext: detectedContext,
+                  confidence: confidence,
+                  contextualIndicators: [
+                    {
+                      type: 'pattern_match',
+                      description: `Detected ${detectedContext} context`,
+                      confidence: confidence,
+                    },
+                  ],
+                  needsSpecialHandling:
+                    detectedContext === ContextType.CRISIS ||
+                    detectedContext === ContextType.CLINICAL_ASSESSMENT,
+                  urgency: urgency,
+                  metadata: {},
+                }),
+              },
+              finishReason: 'stop' as const,
+            },
+          ],
+          usage: {
+            promptTokens: 10,
+            completionTokens: 20,
+            totalTokens: 30,
+          },
+          provider: 'test',
+        }
+      }),
     createStreamingChatCompletion: vi.fn<() => Promise<unknown>>(),
     dispose: vi.fn<() => void>(),
   } as unknown as AIService

@@ -15,10 +15,11 @@ Import is valid when both pass.
 ## Strategy import
 
 The import script syncs Markdown from the
-[business-strategy](../business-strategy/) folder into the CMS (MongoDB).
-It now includes **all** `.md` files under that folder, including:
+[business-strategy](../business-strategy/) folder into the CMS (MongoDB). It now
+includes **all** `.md` files under that folder, including:
 
-- Root-level strategy docs (`01-executive-summary.md`, `02-market-analysis.md`, etc.)
+- Root-level strategy docs (`01-executive-summary.md`, `02-market-analysis.md`,
+  etc.)
 - **outreach/** (e.g. `stanford-pilot-proposal.md`, `follow-up-templates.md`)
 - **pilot-operations/** (e.g. `operational-checklist.md`)
 
@@ -38,7 +39,7 @@ After a successful run, the script writes `.last-strategy-import.json` (sources
 and timestamp). The API exposes `GET /strategy/sources` and the strategy
 dashboard includes `source_file` per document for editor reference.
 
-## OVHCloud storage
+## Hetzner storage
 
-See [OVHCloud-Setup.md](OVHCloud-Setup.md) for Object Storage (S3-compatible)
+See [Hetzner-Setup.md](Hetzner-Setup.md) for Object Storage (S3-compatible)
 configuration.

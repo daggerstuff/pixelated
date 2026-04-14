@@ -205,7 +205,10 @@ export class ContextDetector {
         }
       }
 
-      const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+      const messages: Array<{
+        role: 'system' | 'user' | 'assistant'
+        content: string
+      }> = [
         {
           role: 'system',
           content: CONTEXT_DETECTION_PROMPT,
@@ -231,10 +234,10 @@ export class ContextDetector {
         if ('content' in response && typeof response.content === 'string') {
           content = response.content
         } else if (
-          Array.isArray((response).choices) &&
-          (response).choices[0]?.message?.content
+          Array.isArray(response.choices) &&
+          response.choices[0]?.message?.content
         ) {
-          content = String((response).choices[0].message.content)
+          content = String(response.choices[0].message.content)
         }
       }
 
@@ -350,7 +353,12 @@ export class ContextDetector {
         needsSpecialHandling: false,
         urgency: 'low',
         metadata: {
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
         },
       }
     }
@@ -475,11 +483,11 @@ export class ContextDetector {
         .map((it) =>
           it && typeof it === 'object'
             ? {
-                type: String((it)['type'] ?? 'indicator'),
-                description: String((it)['description'] ?? ''),
-                confidence: clamp01((it)['confidence'] ?? 0.5, 0.5),
-                ...(typeof (it)['severity'] === 'number'
-                  ? { severity: (it)['severity'] }
+                type: String(it['type'] ?? 'indicator'),
+                description: String(it['description'] ?? ''),
+                confidence: clamp01(it['confidence'] ?? 0.5, 0.5),
+                ...(typeof it['severity'] === 'number'
+                  ? { severity: it['severity'] }
                   : {}),
               }
             : null,

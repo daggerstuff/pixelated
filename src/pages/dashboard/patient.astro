@@ -3,10 +3,12 @@ export const prerender = false
 
 import DashboardLayout from '../../layouts/DashboardLayout.astro'
 import Card from '@/components/ui/Card.astro'
-import EnhancedChartComponent from '@/components/analytics/EnhancedChartComponent.tsx'
-import MultidimensionalEmotionChart from '@/components/three/MultidimensionalEmotionChart.tsx'
-import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
-import Particle from '@/components/three/Particle.tsx'
+import {
+  DynamicEnhancedChartComponent,
+  DynamicMultidimensionalEmotionChart,
+  DynamicParticleVisualization,
+  DynamicSwiperCarousel,
+} from '@/lib/utils/dynamic-components'
 
 const { user } = Astro.props as { user: any }
 
@@ -65,7 +67,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           <span class="material-symbols-outlined text-primary">timeline</span>
           Your Therapy Journey
         </h2>
-        <SwiperCarousel
+        <DynamicSwiperCarousel
           client:load
           effect="coverflow"
           autoplay={{ delay: 6000, disableOnInteraction: false }}
@@ -137,7 +139,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
             Interact with particles that respond to different emotions. Move
             your mouse to see how emotions can flow and change.
           </p>
-          <Particle
+          <DynamicParticleVisualization
             client:load
             particleCount={40}
             emotion="neutral"
@@ -162,7 +164,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
             Explore your emotional landscape in 3D space. Each point represents
             your emotional state during different therapy sessions.
           </p>
-          <MultidimensionalEmotionChart
+          <DynamicMultidimensionalEmotionChart
             client:load
             showTrails={true}
             showAxes={true}
@@ -185,7 +187,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           <p class="text-muted-foreground text-sm mb-4">
             Track your improvement across different areas of your therapy.
           </p>
-          <EnhancedChartComponent
+          <DynamicEnhancedChartComponent
             client:load
             type="line"
             title="Monthly Progress Tracking"
@@ -213,7 +215,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           <p class="text-muted-foreground text-sm mb-4">
             Understand the distribution of your emotional states.
           </p>
-          <EnhancedChartComponent
+          <DynamicEnhancedChartComponent
             client:load
             type="pie"
             title="Emotion Distribution (Last 30 Days)"

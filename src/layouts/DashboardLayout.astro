@@ -15,6 +15,7 @@ import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
 import Header from '@/components/layout/Header.astro'
 import Footer from '@/components/mizu/Footer.astro'
 import Sidebar from '@/components/layout/Sidebar.astro'
+import { FEATURES } from '@/config'
 
 // Define a more robust props interface with JSDoc comments
 interface Props {
@@ -50,11 +51,12 @@ const {
 } = Astro.props
 
 const { cspNonce } = Astro.locals
+const { nprogress, mediumZoom } = FEATURES
 ---
 
 <!doctype html>
 <html lang="en" class="dark scroll-smooth">
-  <Head {title} {description} ogImage={metaImage} cspNonce={cspNonce} />
+  <Head {title} {description} ogImage={metaImage} {cspNonce} />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#0f172a" />
 
@@ -70,6 +72,11 @@ const { cspNonce } = Astro.locals
   <script src="/js/polyfill-detector.js" is:inline></script>
   <script src="/js/module-loader.js" defer is:inline></script>
   <script src="/js/background-loader.js" defer is:inline></script>
+  {
+    (nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module" />
+    )
+  }
   <style is:global>
     /* Mizu theme dark colors - default for all pages */
     :root {

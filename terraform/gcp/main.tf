@@ -68,6 +68,12 @@ resource "google_compute_subnetwork" "gke" {
   }
 
   private_ip_google_access = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 resource "google_compute_global_address" "private_services" {
@@ -97,6 +103,11 @@ resource "google_container_cluster" "primary" {
 
   networking_mode = "VPC_NATIVE"
 
+  network_policy {
+    enabled  = true
+    provider = "CALICO"
+  }
+
   ip_allocation_policy {
     cluster_secondary_range_name  = "pods"
     services_secondary_range_name = "services"
@@ -110,6 +121,32 @@ resource "google_container_cluster" "primary" {
     enable_private_nodes    = true
     enable_private_endpoint = false
     master_ipv4_cidr_block  = "172.16.0.0/28"
+  }
+
+  master_auth {
+    client_certificate_config {
+      issue_client_certificate = false
+    }
+  }
+
+  authenticator_groups_config {
+    security_group = "gke-security-groups@${var.project_id}.iam.gserviceaccount.com"
+  }
+
+  node_config {
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+
+    metadata = {
+      disable-legacy-endpoints = true
+    }
+  }
+
+
+
+  binary_authorization {
+    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
   }
 
   workload_identity_config {

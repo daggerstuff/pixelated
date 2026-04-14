@@ -36,7 +36,9 @@ describe('ProductMemoryGateway', () => {
 
   beforeEach(() => {
     client = createClientMock()
-    gateway = new ProductMemoryGateway(client as unknown as InternalMemoryServiceClient)
+    gateway = new ProductMemoryGateway(
+      client as unknown as InternalMemoryServiceClient,
+    )
   })
 
   it('creates a memory and preserves metadata on the product boundary', async () => {

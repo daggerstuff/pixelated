@@ -23,13 +23,6 @@ const navLinks = [
       class="flex items-center justify-between header-content"
       style="height: var(--spacing-16);"
       class:list={['md:height-20']}
-      <!--
-      Brutalist
-      Branding
-      with
-      Enterprise
-      Clarity
-      --
     >
       <div class="flex items-center flex-1 min-w-0">
         <a
@@ -40,13 +33,13 @@ const navLinks = [
           <div
             class="relative touch-target logo-container"
             style="width: 2rem; height: 2rem; background: var(--accent-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; transition: all var(--transition-spring); position: relative; overflow: hidden;"
-            class:list={['sm:width-2.5rem', 'sm:height-2.5rem']}
+            class:list={['sm-header-logo-container']}
           >
             <img
               src="/apple-touch-icon.png"
               alt="PE"
               style="width: 1.4rem; height: 1.4rem; border-radius: var(--radius-md); filter: brightness(0) invert(1);"
-              class:list={['sm:width-1.8rem', 'sm:height-1.8rem']}
+              class:list={['sm-header-logo-image']}
               width="64"
               height="64"
               fetchpriority="high"
@@ -146,7 +139,7 @@ const navLinks = [
           <svg
             id="menu-icon"
             style="width: 1.25rem; height: 1.25rem; transition: all var(--transition-fast);"
-            class:list={['md:width-1.5rem', 'md:height-1.5rem']}
+            class:list={['md-header-menu-icon']}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -160,7 +153,7 @@ const navLinks = [
           <svg
             id="close-icon"
             style="width: 1.25rem; height: 1.25rem; display: none; transition: all var(--transition-fast);"
-            class:list={['md:width-1.5rem', 'md:height-1.5rem']}
+            class:list={['md-header-menu-icon']}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -719,16 +712,6 @@ const navLinks = [
     }
   }
 
-  /* Icon size responsive utilities */
-  @media (min-width: 768px) {
-    .md\\:width-1\\.5rem {
-      width: 1.5rem !important;
-    }
-    .md\\:height-1\\.5rem {
-      height: 1.5rem !important;
-    }
-  }
-
   /* Container responsive margin */
   @media (min-width: 1024px) {
     .lg\\:margin-left-8 {
@@ -761,17 +744,19 @@ const navLinks = [
 
   /* Responsive icon sizes */
   @media (min-width: 640px) {
-    .sm\\:width-2\\.5rem {
+    .sm-header-logo-container {
       width: 2.5rem !important;
-    }
-    .sm\\:height-2\\.5rem {
       height: 2.5rem !important;
     }
-    .sm\\:width-1\\.8rem {
+    .sm-header-logo-image {
       width: 1.8rem !important;
-    }
-    .sm\\:height-1\\.8rem {
       height: 1.8rem !important;
+    }
+  }
+  @media (min-width: 768px) {
+    .md-header-menu-icon {
+      width: 1.5rem !important;
+      height: 1.5rem !important;
     }
   }
 

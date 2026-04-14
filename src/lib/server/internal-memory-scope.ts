@@ -12,7 +12,9 @@ export function buildScopePayload(scope: InternalMemoryScopeInput) {
   }
 }
 
-export function buildScopeQuery(scope: InternalMemoryScopeInput): URLSearchParams {
+export function buildScopeQuery(
+  scope: InternalMemoryScopeInput,
+): URLSearchParams {
   const params = new URLSearchParams()
   params.set('user_id', scope.userId)
   if (scope.orgId) params.set('org_id', scope.orgId)
@@ -23,4 +25,3 @@ export function buildScopeQuery(scope: InternalMemoryScopeInput): URLSearchParam
   params.set('include_shared', String(scope.includeShared ?? true))
   return params
 }
-

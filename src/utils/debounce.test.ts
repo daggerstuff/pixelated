@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { debounce } from './debounce'
 
 describe('debounce', () => {
@@ -58,10 +59,10 @@ describe('debounce', () => {
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc('test', 123)
-    
+
     // Validate it hasn't been called yet (Patience Protocol/Review suggestion)
     expect(func).not.toHaveBeenCalled()
-    
+
     vi.advanceTimersByTime(100)
 
     // Use toHaveBeenLastCalledWith to ensure exactly these args (Review suggestion)
@@ -88,7 +89,7 @@ describe('debounce', () => {
     const debouncedFunc = debounce(func, 100, true)
 
     debouncedFunc('immediate', { ok: true })
-    
+
     expect(func).toHaveBeenCalledTimes(1)
     expect(func).toHaveBeenLastCalledWith('immediate', { ok: true })
 
@@ -99,17 +100,16 @@ describe('debounce', () => {
   it('should handle complex argument types correctly', () => {
     const func = vi.fn<any>()
     const debouncedFunc = debounce(func, 100)
-    
+
     const obj = { nested: { value: 1 } }
     const arr = [1, 2, 3]
     const callback = () => 'result'
 
     debouncedFunc(obj, arr, callback)
-    
+
     vi.advanceTimersByTime(100)
 
     expect(func).toHaveBeenCalledTimes(1)
     expect(func).toHaveBeenLastCalledWith(obj, arr, callback)
   })
-
 })

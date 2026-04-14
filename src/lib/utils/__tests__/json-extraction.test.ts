@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest'
 /**
  * Unit tests for JSON extraction utility functions
  */
@@ -64,9 +64,12 @@ describe('extractJsonFromString', () => {
   })
 
   it('should handle curly braces inside strings', () => {
-    const input = 'Here is the data: {"code": "function() { return true; }", "valid": true} End.'
+    const input =
+      'Here is the data: {"code": "function() { return true; }", "valid": true} End.'
     const result = extractJsonFromString(input)
-    expect(result).toBe('{"code": "function() { return true; }", "valid": true}')
+    expect(result).toBe(
+      '{"code": "function() { return true; }", "valid": true}',
+    )
   })
 })
 

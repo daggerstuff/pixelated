@@ -106,6 +106,7 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Auto-refresh effect
   useEffect(() => {
+    return undefined
     void fetchDashboardData()
 
     if (autoRefresh) {
@@ -288,7 +289,7 @@ export const CrisisMonitoringDashboard: React.FC<
           {/* Critical Alerts Section */}
           {alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
             .length > 0 && (
-            <Alert variant='destructive'>
+            <Alert variant='error'>
               <AlertTriangle className='h-4 w-4' />
               <div>
                 <strong>Critical Alerts Requiring Immediate Attention</strong>

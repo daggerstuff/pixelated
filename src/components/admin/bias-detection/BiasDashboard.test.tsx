@@ -511,9 +511,7 @@ describe('BiasDashboard', () => {
       expect(screen.getByText(/filters & time range/i)).toBeInTheDocument()
     })
 
-    const timeRangeSelect = screen.getByLabelText(
-      /time range/i,
-    )
+    const timeRangeSelect = screen.getByLabelText(/time range/i)
     fireEvent.change(timeRangeSelect, { target: { value: '7d' } })
 
     expect((timeRangeSelect as HTMLSelectElement).value).toBe('7d')
@@ -540,9 +538,7 @@ describe('BiasDashboard', () => {
       expect(screen.getByText(/filters & time range/i)).toBeInTheDocument()
     })
 
-    const biasScoreSelect = screen.getByLabelText(
-      /bias score level/i,
-    )
+    const biasScoreSelect = screen.getByLabelText(/bias score level/i)
     fireEvent.change(biasScoreSelect, { target: { value: 'high' } })
 
     expect((biasScoreSelect as HTMLSelectElement).value).toBe('high')
@@ -555,9 +551,7 @@ describe('BiasDashboard', () => {
       expect(screen.getByText(/filters & time range/i)).toBeInTheDocument()
     })
 
-    const alertLevelSelect = screen.getByLabelText(
-      /alert level/i,
-    )
+    const alertLevelSelect = screen.getByLabelText(/alert level/i)
     fireEvent.change(alertLevelSelect, { target: { value: 'critical' } })
 
     expect((alertLevelSelect as HTMLSelectElement).value).toBe('critical')
@@ -843,7 +837,13 @@ describe('BiasDashboard', () => {
           !button.closest('button')?.textContent?.includes('Bulk'),
       ) || acknowledgeButtons[0]
 
-    fireEvent.click(individualAcknowledgeButton)
+    const individualAcknowledgeElement =
+      individualAcknowledgeButton?.closest('button')
+    if (!individualAcknowledgeElement) {
+      throw new Error('Expected acknowledge button to be present')
+    }
+
+    fireEvent.click(individualAcknowledgeElement)
 
     // Should update alert status (in real app, would check API calls)
     await waitFor(() => {

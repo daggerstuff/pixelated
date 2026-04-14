@@ -42,7 +42,7 @@
 .pe-home-shell,
 .pe-page-shell {
   width: 100%;
-  max-width: var(--marketing-shell, 78rem);
+  max-width: 880px;
   margin: 0 auto;
   padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
 }
@@ -50,7 +50,7 @@
 .pe-home-section,
 .pe-page-section {
   position: relative;
-  padding: clamp(4.2rem, 8vh, 6.2rem) 0;
+  padding: 120px 0;
   overflow: hidden;
 }
 
@@ -113,7 +113,7 @@
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--accent-primary, #ff6b00);
   margin: 0;
@@ -137,7 +137,7 @@
   font-family: var(--font-mono);
   font-size: clamp(1.85rem, 2.8vw, 2.7rem);
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.4;
   letter-spacing: -0.05em;
   color: var(--text-primary, #f7f3eb);
   text-wrap: balance;

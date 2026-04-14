@@ -25,13 +25,16 @@ const isBuildCommand =
   process.env.CI === 'true' ||
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
-const hasSentryDSN =
-  !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
 const sentryRelease =
   process.env.SENTRY_RELEASE || process.env.npm_package_version || undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 
-function createScopedSentryVitePlugins({ ssr, assets, filesToDeleteAfterUpload }) {
+function createScopedSentryVitePlugins({
+  ssr,
+  assets,
+  filesToDeleteAfterUpload,
+}) {
   return sentryVitePlugin({
     org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
     project: process.env.SENTRY_PROJECT || 'pixel-astro',
@@ -69,22 +72,118 @@ const preferredPort = (() => {
 })()
 
 function getChunkName(id) {
-  if (id.includes('react') || id.includes('react-dom')) {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (normalizedId.includes('/src/components/')) {
+    const componentSegments =
+      normalizedId.split('/src/components/')[1]?.split('/') || []
+    const componentRoot = componentSegments[0]
+    if (componentRoot) {
+      return `components-${componentRoot}`
+    }
+  }
+
+  if (
+    normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')
+  ) {
+    return 'feature-three-emotion'
+  }
+  if (normalizedId.includes('/src/components/three/Particle')) {
+    return 'feature-three-particle'
+  }
+  if (
+    normalizedId.includes('/src/components/analytics/EnhancedChartComponent')
+  ) {
+    return 'feature-enhanced-chart'
+  }
+  if (normalizedId.includes('/src/components/ui/SwiperCarousel')) {
+    return 'feature-swiper'
+  }
+  if (
+    normalizedId.includes('/src/components/treatment/TreatmentPlanManager') ||
+    normalizedId.includes('/src/components/therapy/TreatmentPlanManager')
+  ) {
+    return 'feature-treatment-plan'
+  }
+  if (normalizedId.includes('/src/components/security/FHEDemo')) {
+    return 'feature-fhe'
+  }
+  if (normalizedId.includes('/src/components/demo/FHEDemo')) {
+    return 'feature-fhe-demo'
+  }
+  if (normalizedId.includes('/src/components/chat/TherapyChatSystem')) {
+    return 'feature-therapy-chat'
+  }
+  if (
+    normalizedId.includes(
+      '/src/components/session/EmotionTemporalAnalysisChart',
+    )
+  ) {
+    return 'feature-emotion-temporal'
+  }
+
+  if (
+    normalizedId.includes('/react/') ||
+    normalizedId.includes('/react-dom/')
+  ) {
     return 'react-vendor'
   }
-  if (id.includes('framer-motion') || id.includes('lucide-react')) {
+  if (
+    normalizedId.includes('framer-motion') ||
+    normalizedId.includes('@radix-ui/react-virtualizer') ||
+    normalizedId.includes('lucide-react')
+  ) {
     return 'ui-vendor'
   }
-  if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+  if (
+    normalizedId.includes('/clsx/') ||
+    normalizedId.includes('/date-fns/') ||
+    normalizedId.includes('/axios/')
+  ) {
     return 'utils-vendor'
   }
-  if (id.includes('recharts') || id.includes('chart.js')) {
+  if (
+    normalizedId.includes('/recharts') ||
+    normalizedId.includes('/react-chartjs-2')
+  ) {
     return 'charts-vendor'
   }
-  if (id.includes('three') || id.includes('@react-three')) {
+  if (
+    normalizedId.includes('/chart.js') ||
+    normalizedId.includes('/chart.js/')
+  ) {
+    return 'chartjs-vendor'
+  }
+  if (normalizedId.includes('three') || normalizedId.includes('@react-three')) {
     return 'three-vendor'
   }
-  if (id.includes('node_modules')) {
+  if (normalizedId.includes('/swiper')) {
+    return 'swiper-vendor'
+  }
+  if (normalizedId.includes('/node_modules/')) {
+    const relativePath = normalizedId.split('/node_modules/')[1] || ''
+    const segments = relativePath.split('/')
+    if (segments.length > 0 && segments[0] === '.pnpm' && segments.length > 1) {
+      const packageName =
+        segments[1].includes('@') && segments[1].includes('/')
+          ? `${segments[1]}-${segments[2]}`
+          : segments[1]
+      const sanitizedName = packageName
+        .replace('@', 'at-')
+        .replace(/[^a-zA-Z0-9-]/g, '-')
+      return `vendor-${sanitizedName}`
+    }
+    if (segments.length > 0 && segments[0]) {
+      const packageName =
+        segments[0].startsWith('@') && segments.length > 1
+          ? `${segments[0]}-${segments[1]}`
+          : segments[0]
+      const sanitizedName = packageName
+        .replace('@', 'at-')
+        .replace(/[^a-zA-Z0-9-]/g, '-')
+      return `vendor-${sanitizedName}`
+    }
+
     return 'vendor'
   }
   return null
@@ -148,6 +247,19 @@ export default defineConfig({
     },
   },
   vite: {
+    logLevel: 'error',
+    environments: {
+      client: {
+        build: {
+          chunkSizeWarningLimit: isProduction ? 5000 : 10000,
+        },
+      },
+      server: {
+        build: {
+          chunkSizeWarningLimit: isProduction ? 5000 : 10000,
+        },
+      },
+    },
     server: {
       watch: {
         ignored: [
@@ -170,9 +282,9 @@ export default defineConfig({
       // Enable hidden source maps in production for Sentry upload (not served to users)
       sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
-      chunkSizeWarningLimit: isProduction ? 500 : 1500,
+      chunkSizeWarningLimit: isProduction ? 5000 : 10000,
       // Temporarily disabled minification to debug build hang
-      minify: false,
+      minify: process.env.CI === 'true' || isProduction ? 'terser' : false,
       // minify: isProduction ? 'terser' : false,
       terserOptions: isProduction
         ? {
@@ -217,15 +329,15 @@ export default defineConfig({
           'recharts',
           'chart.js',
           '@opentelemetry/api',
-        '@opentelemetry/otlp-exporter-base',
-        '@opentelemetry/exporter-trace-otlp-http',
-        '@opentelemetry/exporter-metrics-otlp-http',
-        '@opentelemetry/otlp-transformer',
-        /^@opentelemetry\//,
-        'stream-browserify',
-        'path-browserify',
-        'crypto-browserify',
-        'util',
+          '@opentelemetry/otlp-exporter-base',
+          '@opentelemetry/exporter-trace-otlp-http',
+          '@opentelemetry/exporter-metrics-otlp-http',
+          '@opentelemetry/otlp-transformer',
+          /^@opentelemetry\//,
+          'stream-browserify',
+          'path-browserify',
+          'crypto-browserify',
+          'util',
         ],
         onwarn(warning, warn) {
           if (
@@ -290,9 +402,9 @@ export default defineConfig({
         'stream-browserify': 'node:stream',
         'path-browserify': 'node:path',
         'crypto-browserify': 'node:crypto',
-        'buffer': 'node:buffer',
-        'events': 'node:events',
-        'util': 'node:util',
+        buffer: 'node:buffer',
+        events: 'node:events',
+        util: 'node:util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,

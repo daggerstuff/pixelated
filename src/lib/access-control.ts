@@ -75,6 +75,13 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
 }
 
+/**
+ * Determines if a permission grants access to high-risk or administrative operations.
+ *
+ * Why it exists: Sensitive operations (like deletions or admin access) must be
+ * explicitly separated from routine, high-volume actions (like reading messages)
+ * so that they can trigger mandatory audit logging for security monitoring and compliance.
+ */
 function isSensitivePermission(permission: Permission): boolean {
   return (
     permission.startsWith('delete:') ||

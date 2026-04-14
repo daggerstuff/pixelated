@@ -31,6 +31,8 @@ export default defineConfig({
       secondary: {
         500: '#007aff',
         600: '#0056b3',
+        700: '#004080',
+        800: '#002f66',
       },
       foreground: '#fdfcfc',
       background: '#201d1d',

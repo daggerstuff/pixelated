@@ -1,3 +1,5 @@
+import carbonIcons from '@iconify-json/carbon/icons.json'
+import mdiIcons from '@iconify-json/mdi/icons.json'
 import {
   defineConfig,
   presetUno,
@@ -13,10 +15,10 @@ export default defineConfig({
     presetAttributify(),
     presetIcons({
       collections: {
-        carbon: () =>
-          import('@iconify-json/carbon/icons.json').then((i) => i.default),
-        mdi: () =>
-          import('@iconify-json/mdi/icons.json').then((i) => i.default),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        carbon: carbonIcons,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        mdi: mdiIcons,
       },
     }),
     presetTypography(),
@@ -173,6 +175,7 @@ export default defineConfig({
     [
       /^bg-gradient-(\w+)-(\w+)$/,
       ([, _direction, gradient]) => {
+        /** @type {Record<string, string>} */
         const gradients = {
           primary:
             'linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600))',
@@ -189,7 +192,7 @@ export default defineConfig({
 
         return {
           background:
-            gradients[gradient] ||
+            gradients[gradient] ??
             `linear-gradient(135deg, var(--color-${gradient}-600), var(--color-${gradient}-500))`,
         }
       },
@@ -424,10 +427,10 @@ export default defineConfig({
   // Extractors for Astro components
   extractors: [
     {
-      extractor: (code) => {
+      extractor: /** @param {string} code @returns {string[]} */ (code) => {
         // Extract class names from Astro components
         const classMatches =
-          code.match(/class(?:Name)?=["'`]([^"'`]*?)["'`]/g) || []
+          code.match(/class(?:Name)?=["'`]([^"'`]*?)["'`]/g) ?? []
         return classMatches.flatMap((match) => {
           const classes = match
             .replace(/class(?:Name)?=["'`]/, '')

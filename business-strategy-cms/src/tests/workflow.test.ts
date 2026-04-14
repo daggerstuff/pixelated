@@ -1,53 +1,76 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import { AuthService } from '../services/authService'
 import { DocumentService } from '../services/documentService'
-// describe, it, expect, beforeEach, afterEach are globals in Jest
 import { WorkflowService } from '../services/workflowService'
-import { DocumentCategory, DocumentStatus } from '../types/document'
+import { Document, DocumentCategory, DocumentStatus } from '../types/document'
+import { User } from '../types/user'
 import {
   WorkflowStatus,
   WorkflowAction,
   ReviewPriority,
+  WorkflowInstance,
 } from '../types/workflow'
 
+const ensureId = (value: string | undefined, label: string): string => {
+  if (!value) {
+    throw new Error(`${label} is required for workflow tests`)
+  }
+  return value
+}
+
+const withRequiredId = <T extends { id?: string }>(
+  value: T,
+  label: string,
+) => ({
+  ...value,
+  id: ensureId(value.id, label),
+})
+
 describe('WorkflowService Property Tests', () => {
-  let user1: any
-  let user2: any
-  let document: any
-  let workflowInstance: any
+  let user1: User & { id: string }
+  let user2: User & { id: string }
+  let document: Document & { id: string }
+  let workflowInstance: WorkflowInstance & { id: string }
 
   beforeEach(async () => {
     // Initialize workflow service
     WorkflowService.initializeDefaultTemplates()
 
     // Create test users
-    user1 = await AuthService.register({
+    const userRegistration1 = await AuthService.register({
       email: 'user1@example.com',
       password: 'password123',
       username: 'user1',
       firstName: 'User',
       lastName: 'One',
     })
+    user1 = withRequiredId(userRegistration1.user, 'user1.id')
 
-    user2 = await AuthService.register({
+    const userRegistration2 = await AuthService.register({
       email: 'user2@example.com',
       password: 'password123',
       username: 'user2',
       firstName: 'User',
       lastName: 'Two',
     })
+    user2 = withRequiredId(userRegistration2.user, 'user2.id')
 
     // Create test document
-    document = await DocumentService.createDocument(
-      {
-        title: 'Test Strategy Document',
-        content: 'This is a test strategy document for workflow testing',
-        category: DocumentCategory.BUSINESS_PLAN,
-        status: DocumentStatus.DRAFT,
-        collaborators: [],
-        metadata: {},
-        tags: [],
-      },
-      user1.id,
+    document = withRequiredId(
+      await DocumentService.createDocument(
+        {
+          title: 'Test Strategy Document',
+          content: 'This is a test strategy document for workflow testing',
+          category: DocumentCategory.BUSINESS_PLAN,
+          status: DocumentStatus.DRAFT,
+          collaborators: [],
+          metadata: {},
+          tags: [],
+        },
+        user1.id,
+      ),
+      'document.id',
     )
   })
 
@@ -81,11 +104,14 @@ describe('WorkflowService Property Tests', () => {
 
   describe('Workflow Instance Creation', () => {
     it('should create workflow instance for valid document', async () => {
-      const instance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
-        ReviewPriority.HIGH,
+      const instance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+          ReviewPriority.HIGH,
+        ),
+        'workflowInstance.id',
       )
 
       expect(instance).toBeDefined()
@@ -117,17 +143,20 @@ describe('WorkflowService Property Tests', () => {
     })
 
     it('should throw error for mismatched document category', async () => {
-      const marketingDoc = await DocumentService.createDocument(
-        {
-          title: 'Marketing Document',
-          content: 'Marketing content',
-          category: DocumentCategory.MARKETING_STRATEGY,
-          status: DocumentStatus.DRAFT,
-          collaborators: [],
-          metadata: {},
-          tags: [],
-        },
-        user1.id,
+      const marketingDoc = withRequiredId(
+        await DocumentService.createDocument(
+          {
+            title: 'Marketing Document',
+            content: 'Marketing content',
+            category: DocumentCategory.MARKETING_STRATEGY,
+            status: DocumentStatus.DRAFT,
+            collaborators: [],
+            metadata: {},
+            tags: [],
+          },
+          user1.id,
+        ),
+        'marketingDoc.id',
       )
 
       await expect(
@@ -142,10 +171,13 @@ describe('WorkflowService Property Tests', () => {
 
   describe('Document Submission for Review', () => {
     beforeEach(async () => {
-      workflowInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
+      workflowInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+        ),
+        'workflowInstance.id',
       )
     })
 
@@ -173,10 +205,13 @@ describe('WorkflowService Property Tests', () => {
 
   describe('Workflow Action Processing', () => {
     beforeEach(async () => {
-      workflowInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
+      workflowInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+        ),
+        'workflowInstance.id',
       )
       await WorkflowService.submitForReview(workflowInstance.id, user1.id)
     })
@@ -257,14 +292,63 @@ describe('WorkflowService Property Tests', () => {
         'Consider adding more data on competitors',
       )
     })
+
+    it('should reject submit for review action in processAction', async () => {
+      await expect(
+        WorkflowService.processAction(
+          workflowInstance.id,
+          user2.id,
+          WorkflowAction.SUBMIT_FOR_REVIEW,
+          'Attempted submit via action endpoint',
+        ),
+      ).rejects.toThrow(
+        'Submit for review action is not supported in processAction. Use submitForReview.',
+      )
+    })
+
+    it('should process publish action', async () => {
+      const published = await WorkflowService.processAction(
+        workflowInstance.id,
+        user2.id,
+        WorkflowAction.PUBLISH,
+      )
+
+      expect(published.status).toBe(WorkflowStatus.PUBLISHED)
+      expect(published.completedAt).toBeDefined()
+    })
+
+    it('should process archive action', async () => {
+      const archived = await WorkflowService.processAction(
+        workflowInstance.id,
+        user2.id,
+        WorkflowAction.ARCHIVE,
+      )
+
+      expect(archived.status).toBe(WorkflowStatus.ARCHIVED)
+      expect(archived.completedAt).toBeDefined()
+    })
+
+    it('should assign reviewers action', async () => {
+      const reassigned = await WorkflowService.processAction(
+        workflowInstance.id,
+        user2.id,
+        WorkflowAction.ASSIGN_REVIEWER,
+      )
+
+      expect(reassigned.assignedReviewers).toHaveLength(1)
+      expect(reassigned.assignedReviewers[0]).toMatch(/^reviewer-/)
+    })
   })
 
   describe('Comment Management', () => {
     beforeEach(async () => {
-      workflowInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
+      workflowInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+        ),
+        'workflowInstance.id',
       )
     })
 
@@ -297,11 +381,14 @@ describe('WorkflowService Property Tests', () => {
 
   describe('Workflow Search and Analytics', () => {
     beforeEach(async () => {
-      workflowInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
-        ReviewPriority.HIGH,
+      workflowInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+          ReviewPriority.HIGH,
+        ),
+        'workflowInstance.id',
       )
     })
 
@@ -348,10 +435,13 @@ describe('WorkflowService Property Tests', () => {
 
   describe('Approval Management', () => {
     beforeEach(async () => {
-      workflowInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
+      workflowInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+        ),
+        'workflowInstance.id',
       )
       await WorkflowService.submitForReview(workflowInstance.id, user1.id)
     })
@@ -377,12 +467,15 @@ describe('WorkflowService Property Tests', () => {
     it('should identify overdue workflows', async () => {
       const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
 
-      const overdueInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
-        ReviewPriority.HIGH,
-        pastDate,
+      const overdueInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+          ReviewPriority.HIGH,
+          pastDate,
+        ),
+        'overdueInstance.id',
       )
 
       await WorkflowService.submitForReview(overdueInstance.id, user1.id)
@@ -394,10 +487,13 @@ describe('WorkflowService Property Tests', () => {
 
   describe('Workflow Instance Retrieval', () => {
     beforeEach(async () => {
-      workflowInstance = await WorkflowService.createWorkflowInstance(
-        document.id,
-        'strategy-document-template',
-        user1.id,
+      workflowInstance = withRequiredId(
+        await WorkflowService.createWorkflowInstance(
+          document.id,
+          'strategy-document-template',
+          user1.id,
+        ),
+        'workflowInstance.id',
       )
     })
 

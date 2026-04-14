@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
 import { ChartBar } from 'lucide-react'
+import React, { useState } from 'react'
 
 import { researchAPI, type DatasetMetadata } from '@/lib/api/research'
 
@@ -11,13 +11,14 @@ export default function DatasetSearch() {
   const [results, setResults] = useState<DatasetMetadata[]>([])
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   // Filters
   const [minTurns, setMinTurns] = useState(1)
   const [minQuality, setMinQuality] = useState(0.0)
 
   // Automatically search when filters change
   React.useEffect(() => {
+    return undefined
     if (hasSearched) {
       const timer = setTimeout(() => {
         void handleSearch().catch((err) => {
@@ -55,7 +56,7 @@ export default function DatasetSearch() {
       console.error('Dataset search error:', err)
       setError(
         err.message ||
-        'Failed to fetch datasets. Please ensure the backend services are running.',
+          'Failed to fetch datasets. Please ensure the backend services are running.',
       )
     } finally {
       setLoading(false)
@@ -162,7 +163,10 @@ export default function DatasetSearch() {
         {/* Results Area */}
         <div>
           {loading && (
-            <div className='grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3' aria-busy='true'>
+            <div
+              className='grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'
+              aria-busy='true'
+            >
               {[...Array(6)].map((_, i) => (
                 <div key={i} className='bg-slate-800 h-64 rounded-xl'></div>
               ))}
@@ -170,14 +174,17 @@ export default function DatasetSearch() {
           )}
 
           {error && (
-            <div className='bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center' role='alert'>
+            <div
+              className='bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center'
+              role='alert'
+            >
               {error}
             </div>
           )}
 
           {!loading && !hasSearched && (
             <div className='py-20 text-center'>
-              <ChartBar className="w-24 h-24 opacity-20" />
+              <ChartBar className='h-24 w-24 opacity-20' />
               <h3 className='text-slate-200 mb-2 text-2xl font-bold'>
                 Explore Therapy Datasets
               </h3>

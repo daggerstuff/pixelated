@@ -7,8 +7,12 @@ Wants=network-online.target
 Type=oneshot
 NoNewPrivileges=yes
 PrivateTmp=yes
+User=vivi
+Group=vivi
+Environment=HOME=/home/vivi
+Environment=RCLONE_CONFIG=/home/vivi/.config/rclone/rclone.conf
 Environment=SOURCE_DIR=/home/vivi
-Environment=BACKUP_DIR=%h/.local/share/home_backups
+Environment=BACKUP_DIR=/home/vivi/.local/share/home_backups
 Environment=RCLONE_TARGET=drive:vivi-home-backups
 Environment=BACKUP_RETENTION_COUNT=2
 ExecStart=/usr/bin/env bash /home/vivi/pixelated/scripts/backup/backup-home-vivi.sh

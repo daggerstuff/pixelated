@@ -115,7 +115,12 @@ export const GET: APIRoute = async ({ request, url }) => {
     return new Response(
       JSON.stringify({
         error: 'Failed to lookup threat intelligence',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -231,7 +236,12 @@ export const POST: APIRoute = async ({ request }) => {
           return {
             indicator,
             type,
-            error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+            error:
+              error instanceof Error
+                ? error instanceof Error
+                  ? error.message
+                  : 'Unknown error'
+                : 'Unknown error',
             status: 'error',
           }
         }
@@ -257,7 +267,12 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Failed to process bulk threat intelligence lookup',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -348,7 +363,12 @@ export const PUT: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Failed to update threat intelligence configuration',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,

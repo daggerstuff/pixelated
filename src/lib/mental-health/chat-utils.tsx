@@ -1,10 +1,11 @@
 import { Brain, Shield, ChartBar, AlertTriangle, Lightbulb } from 'lucide-react'
 import React from 'react'
+
+import type { MentalHealthAnalysisResult } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 import {
   type EnhancedMentalHealthAnalysis,
   type MindMirrorAnalysis,
 } from '@/lib/mental-health/types'
-import type { MentalHealthAnalysisResult } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 
 export interface ChatMessage {
   id: string
@@ -44,16 +45,25 @@ export const convertToMindMirrorAnalysis = (
 
   // Determine energy and social connection based on explanation content
   const explanationLower = (analysis.explanation || '').toLowerCase()
-  
+
   // Refine archetype based on specific indicators
   if (analysis.category === 'low') {
-    if (explanationLower.includes('curiosity') || explanationLower.includes('wonder')) {
+    if (
+      explanationLower.includes('curiosity') ||
+      explanationLower.includes('wonder')
+    ) {
       archetype = 'inner_child'
     }
   } else if (analysis.category === 'medium') {
-    if (explanationLower.includes('angry') || explanationLower.includes('frustrated')) {
+    if (
+      explanationLower.includes('angry') ||
+      explanationLower.includes('frustrated')
+    ) {
       archetype = 'rebel_spirit'
-    } else if (explanationLower.includes('analytical') || explanationLower.includes('planning')) {
+    } else if (
+      explanationLower.includes('analytical') ||
+      explanationLower.includes('planning')
+    ) {
       archetype = 'shadow_strategist'
     }
   }
@@ -116,8 +126,8 @@ How are you feeling today? I'm here to listen and help.`,
     displayContent: (
       <div className='space-y-3'>
         <p>
-          Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here
-          to provide thoughtful, evidence-based support.
+          Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here to
+          provide thoughtful, evidence-based support.
         </p>
         <div className='space-y-2 py-1'>
           <div className='flex items-center gap-2'>
@@ -159,19 +169,24 @@ How are you feeling today? I'm here to listen and help.`,
 /**
  * Creates a therapeutic intervention message
  */
-export const createInterventionMessage = (id: string, intervention: string): ChatMessage => ({
+export const createInterventionMessage = (
+  id: string,
+  intervention: string,
+): ChatMessage => ({
   id,
   role: 'assistant',
   content: `**Therapeutic Intervention**\n\n${intervention}`,
   displayContent: (
     <div className='space-y-2'>
-      <div className='flex items-center gap-2 text-amber-600'>
+      <div className='text-amber-600 flex items-center gap-2'>
         <Lightbulb className='h-4 w-4' />
         <span className='font-bold'>Therapeutic Intervention</span>
       </div>
       <div className='mt-2'>
         {intervention.split('\n\n').map((para, i) => (
-          <p key={i} className={i > 0 ? 'mt-2' : ''}>{para}</p>
+          <p key={i} className={i > 0 ? 'mt-2' : ''}>
+            {para}
+          </p>
         ))}
       </div>
     </div>

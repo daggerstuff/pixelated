@@ -14,6 +14,8 @@ interface LoggerOptions {
   redact?: string[]
 }
 
+let baseLoggerInstance: Logger | null = null
+
 class Logger {
   private options: LoggerOptions
 
@@ -23,7 +25,9 @@ class Logger {
       level: 'info',
       enabled: true,
       environment:
-        nodeEnv === 'development' || nodeEnv === 'test' || nodeEnv === 'production'
+        nodeEnv === 'development' ||
+        nodeEnv === 'test' ||
+        nodeEnv === 'production'
           ? nodeEnv
           : 'development',
       ...options,
@@ -38,7 +42,9 @@ class Logger {
       return obj
     }
 
-    const newObj = { ...(obj as Record<string, unknown>) }
+    const newObj = Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, value]),
+    )
     for (const key of keys) {
       if (key in newObj) {
         newObj[key] = '[REDACTED]'
@@ -194,14 +200,8 @@ class Logger {
  * Refactored to avoid TDZ/circular import issues.
  */
 export function getLogger(prefix?: string): Logger {
-  // Use a function-scoped static variable to avoid TDZ/circular import issues
-  // @ts-expect-error - Using function property for singleton pattern
-  if (!getLogger._instance) {
-    // @ts-expect-error - Using function property for singleton pattern
-    getLogger._instance = new Logger()
-  }
-  // @ts-expect-error - Using function property for singleton pattern
-  const baseLogger: Logger = getLogger._instance
+  baseLoggerInstance ??= new Logger()
+  const baseLogger: Logger = baseLoggerInstance
   return prefix ? baseLogger.child(prefix) : baseLogger
 }
 

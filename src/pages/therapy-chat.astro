@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
-import TherapyChatSystem from '@/components/chat/TherapyChatSystem.tsx'
+import { DynamicTherapyChatSystem } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout title="Therapy Chat System - Pixelated Empathy">
-  <TherapyChatSystem client:load />
+  <DynamicTherapyChatSystem client:load />
 </BaseLayout>

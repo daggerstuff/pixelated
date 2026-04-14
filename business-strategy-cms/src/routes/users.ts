@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, type Router as ExpressRouter } from 'express'
 
 import {
   authenticateToken,
@@ -8,7 +8,42 @@ import {
 import { UserService } from '@/services/userService'
 import { UserRole } from '@/types/user'
 
-const router = Router()
+const router: ExpressRouter = Router()
+
+const userRoles = new Set<string>(Object.values(UserRole))
+
+const isUserRole = (value: string): value is UserRole => {
+  return userRoles.has(value)
+}
+
+type UpdateRoleBody = {
+  role?: unknown
+}
+
+type InviteBody = {
+  email?: unknown
+  role?: unknown
+}
+
+type UpdateRoleRequest = AuthenticatedRequest & {
+  body: UpdateRoleBody
+}
+
+type InviteRequest = AuthenticatedRequest & {
+  body: InviteBody
+}
+
+const parseUserRole = (value: unknown): UserRole | undefined => {
+  if (typeof value !== 'string') {
+    return undefined
+  }
+
+  if (!isUserRole(value)) {
+    return undefined
+  }
+
+  return value
+}
 
 // Get all users (Admin only)
 router.get(
@@ -41,7 +76,16 @@ router.get(
   requireAdmin,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const user = await UserService.getUserById(req.params.id)
+      const userId = req.params['id']
+      if (!userId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'User ID is required' },
+        })
+        return
+      }
+
+      const user = await UserService.getUserById(userId)
       if (!user) {
         res.status(404).json({
           success: false,
@@ -70,10 +114,10 @@ router.put(
   '/:id/role',
   authenticateToken,
   requireAdmin,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: UpdateRoleRequest, res) => {
     try {
-      const { role } = req.body
-      if (!Object.values(UserRole).includes(role)) {
+      const role = parseUserRole(req.body.role)
+      if (!role) {
         res.status(400).json({
           success: false,
           error: { message: 'Invalid role' },
@@ -81,7 +125,16 @@ router.put(
         return
       }
 
-      const user = await UserService.updateUserRole(req.params.id, role)
+      const userId = req.params['id']
+      if (!userId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'User ID is required' },
+        })
+        return
+      }
+
+      const user = await UserService.updateUserRole(userId, role)
       if (!user) {
         res.status(404).json({
           success: false,
@@ -113,9 +166,26 @@ router.post(
   '/invite',
   authenticateToken,
   requireAdmin,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: InviteRequest, res) => {
     try {
-      const { email, role } = req.body
+      if (typeof req.body.email !== 'string' || !req.body.email.trim()) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Valid email is required' },
+        })
+        return
+      }
+
+      const role = parseUserRole(req.body.role)
+      if (!role) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Invalid role' },
+        })
+        return
+      }
+
+      const email = req.body.email.trim()
       const result = await UserService.inviteUser(email, role)
       res.status(201).json({
         success: true,
@@ -140,7 +210,16 @@ router.put(
   requireAdmin,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const user = await UserService.deactivateUser(req.params.id)
+      const userId = req.params['id']
+      if (!userId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'User ID is required' },
+        })
+        return
+      }
+
+      const user = await UserService.deactivateUser(userId)
       if (!user) {
         res.status(404).json({
           success: false,
@@ -174,7 +253,16 @@ router.put(
   requireAdmin,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const user = await UserService.activateUser(req.params.id)
+      const userId = req.params['id']
+      if (!userId) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'User ID is required' },
+        })
+        return
+      }
+
+      const user = await UserService.activateUser(userId)
       if (!user) {
         res.status(404).json({
           success: false,

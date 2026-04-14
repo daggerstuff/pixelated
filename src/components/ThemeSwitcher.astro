@@ -51,7 +51,10 @@
     const applyTheme = (theme: 'light' | 'dark') => {
       document.documentElement.classList.toggle('dark', theme === 'dark')
       if (themeToggle) {
-        themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false')
+        themeToggle.setAttribute(
+          'aria-pressed',
+          theme === 'dark' ? 'true' : 'false',
+        )
       }
     }
 
@@ -63,12 +66,13 @@
 
     // Check for saved theme preference or set based on system preference
     const storedTheme = localStorage.getItem('theme')
-    
+
     // Initial application (does NOT persist if it was based on system preference)
     if (storedTheme === 'dark' || storedTheme === 'light') {
       applyTheme(storedTheme)
     } else {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
         ? 'dark'
         : 'light'
       applyTheme(systemTheme)
@@ -77,8 +81,10 @@
     // Toggle theme on button click
     themeToggle?.addEventListener('click', (_event) => {
       // Determine current applied theme
-      const currentApplied = document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-      
+      const currentApplied = document.documentElement.classList.contains('dark')
+        ? 'dark'
+        : 'light'
+
       const newTheme = currentApplied === 'dark' ? 'light' : 'dark'
       setTheme(newTheme)
     })

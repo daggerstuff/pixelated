@@ -2,7 +2,7 @@
 """
 Re-categorize S3 'Other' Files Using Hybrid Taxonomy Classifier
 
-Processes files from OVHAI S3 bucket and re-categorizes them using the
+Processes files from HETZNER_AI S3 bucket and re-categorizes them using the
 Phase 2 hybrid taxonomy classifier (keyword + LLM fallback).
 
 Usage:
@@ -64,13 +64,13 @@ class S3Recategorizer:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.confidence_threshold = confidence_threshold
 
-        # Initialize S3 loader with OVHAI configuration
+        # Initialize S3 loader with HETZNER_AI configuration
         s3_config = S3Config(
-            endpoint_url=os.getenv("OVH_S3_ENDPOINT"),
+            endpoint_url=os.getenv("HETZNER_S3_ENDPOINT"),
             bucket_name="pixel-data",
-            access_key_id=os.getenv("OVH_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID"),
-            secret_access_key=os.getenv("OVH_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY"),
-            region_name=os.getenv("OVH_S3_REGION", "us-east-va"),
+            access_key_id=os.getenv("HETZNER_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID"),
+            secret_access_key=os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY"),
+            region_name=os.getenv("HETZNER_S3_REGION", "hel1"),
             verify_checksums=False,
         )
         self.s3_loader = S3DatasetLoader(s3_config)

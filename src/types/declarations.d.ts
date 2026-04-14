@@ -4,7 +4,7 @@
 declare module 'k6' {
   export function check(
     data: unknown,
-    checks: Record<string, (data: unknown) => boolean>
+    checks: Record<string, (data: unknown) => boolean>,
   ): boolean
   export function sleep(seconds: number): void
   export { check, sleep }
@@ -16,12 +16,12 @@ declare module 'k6/http' {
     static post(
       url: string,
       body?: string,
-      headers?: Record<string, string>
+      headers?: Record<string, string>,
     ): Response
     static put(
       url: string,
       body?: string,
-      headers?: Record<string, string>
+      headers?: Record<string, string>,
     ): Response
     static del(url: string, headers?: Record<string, string>): Response
   }
@@ -64,7 +64,12 @@ declare module 'pdfkit' {
     fontSize(size: number): this
     text(content: string, options?: unknown): this
     moveDown(lines?: number): this
-    image(source: string | Buffer, x: number, y: number, options?: unknown): this
+    image(
+      source: string | Buffer,
+      x: number,
+      y: number,
+      options?: unknown,
+    ): this
     rect(x: number, y: number, width: number, height: number): this
     fill(color: string): this
     stroke(): this
@@ -115,7 +120,7 @@ declare module 'aws-sdk' {
     constructor(config?: unknown)
     getSecretValue(params: unknown): Promise<unknown>
   }
-  export module config {
+  export namespace config {
     export function update(config: unknown): void
   }
 }
@@ -125,18 +130,27 @@ declare module '@supabase/supabase-js' {
   export function createClient(
     url: string,
     key: string,
-    options?: unknown
+    options?: unknown,
   ): {
     from(table: string): {
       select(): {
-        eq(key: string, value: unknown): Promise<{ data: unknown[]; error: unknown }>
+        eq(
+          key: string,
+          value: unknown,
+        ): Promise<{ data: unknown[]; error: unknown }>
       }
       insert(data: unknown): Promise<{ data: unknown; error: unknown }>
       update(data: unknown): {
-        eq(key: string, value: unknown): Promise<{ data: unknown; error: unknown }>
+        eq(
+          key: string,
+          value: unknown,
+        ): Promise<{ data: unknown; error: unknown }>
       }
       delete(): {
-        eq(key: string, value: unknown): Promise<{ data: unknown; error: unknown }>
+        eq(
+          key: string,
+          value: unknown,
+        ): Promise<{ data: unknown; error: unknown }>
       }
     }
   }
@@ -174,7 +188,7 @@ declare module 'consul' {
       service: (params: unknown) => Promise<unknown>
     }
   }
-  export default function(opts?: unknown): Consul
+  export default function (opts?: unknown): Consul
 }
 
 // etcd3
@@ -233,7 +247,7 @@ declare module 'csv-parse' {
   export function parse(
     data: string,
     options?: unknown,
-    callback?: (err: Error | null, data: unknown[]) => void
+    callback?: (err: Error | null, data: unknown[]) => void,
   ): void
   export class Parser {
     constructor(options?: unknown)
@@ -407,12 +421,12 @@ declare module 'jsonwebtoken' {
   export function sign(
     payload: string | Buffer | object | Buffer[],
     secretOrPrivateKey: string | Buffer | object,
-    options?: object
+    options?: object,
   ): string
   export function verify(
     token: string | Buffer,
     secretOrPublicKey: string | Buffer,
-    options?: object
+    options?: object,
   ): string | JwtPayload
 }
 

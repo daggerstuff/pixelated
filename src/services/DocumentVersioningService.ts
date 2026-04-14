@@ -1,7 +1,7 @@
+import { sql } from 'drizzle-orm'
+import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 import { v4 as uuidv4 } from 'uuid'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { sql } from 'drizzle-orm'
 
 import { FileStorageService, FileMetadata } from './FileStorageService.js'
 
@@ -50,13 +50,16 @@ export class DocumentVersioningService {
       if (originalFileId) {
         // This is a new version of an existing file
         const currentVersionResult = await tx.execute(
-          sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${originalFileId}`
+          sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${originalFileId}`,
         )
-        newVersion = (Number((currentVersionResult.rows[0] as any)?.max_version) || 0) + 1
+        newVersion =
+          (Number((currentVersionResult.rows[0] as any)?.max_version) || 0) + 1
         fileId = originalFileId
 
         // Update the original file record
-        await tx.execute(sql`UPDATE files SET updated_at = NOW() WHERE id = ${fileId}`)
+        await tx.execute(
+          sql`UPDATE files SET updated_at = NOW() WHERE id = ${fileId}`,
+        )
       } else {
         // This is a new file
         fileId = uuidv4()
@@ -79,7 +82,11 @@ export class DocumentVersioningService {
         VALUES (${versionId}, ${fileId}, ${newVersion}, ${file.originalname}, ${file.size}, ${fileMetadata.url}, ${fileMetadata.fileName}, ${userId}, ${changes || `Version ${newVersion}`}, ${await this.generateChecksum(file.buffer)}, true)
       `)
 
-      const versionRecord = await this.getFileVersionInternal(tx, fileId, newVersion)
+      const versionRecord = await this.getFileVersionInternal(
+        tx,
+        fileId,
+        newVersion,
+      )
       if (!versionRecord) {
         throw new Error('Failed to create file version')
       }
@@ -105,7 +112,7 @@ export class DocumentVersioningService {
     version: number,
   ): Promise<DocumentVersion | null> {
     const result = await executor.execute(
-      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`
+      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
     )
 
     const row = result.rows[0] as any
@@ -137,7 +144,7 @@ export class DocumentVersioningService {
   async getCurrentVersion(fileId: string): Promise<DocumentVersion | null> {
     const db = drizzle(this.db)
     const result = await db.execute(
-      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND is_current = true LIMIT 1`
+      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND is_current = true LIMIT 1`,
     )
 
     const row = result.rows[0] as any
@@ -161,14 +168,16 @@ export class DocumentVersioningService {
 
   async getVersionHistory(fileId: string): Promise<VersionHistory> {
     const db = drizzle(this.db)
-    
-    const fileResult = await db.execute(sql`SELECT * FROM files WHERE id = ${fileId} LIMIT 1`)
+
+    const fileResult = await db.execute(
+      sql`SELECT * FROM files WHERE id = ${fileId} LIMIT 1`,
+    )
     const fileRow = fileResult.rows[0] as any
 
     if (!fileRow) {
       throw new Error('File not found')
     }
-    
+
     const file: FileMetadata = {
       id: fileRow.id as string,
       originalName: fileRow.original_name as string,
@@ -187,7 +196,7 @@ export class DocumentVersioningService {
     }
 
     const versionsResult = await db.execute(
-      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} ORDER BY version DESC`
+      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} ORDER BY version DESC`,
     )
 
     const versions: DocumentVersion[] = versionsResult.rows.map((row: any) => ({
@@ -224,7 +233,7 @@ export class DocumentVersioningService {
     return await db.transaction(async (tx) => {
       // Get the target version
       const result = await tx.execute(
-        sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${targetVersion} LIMIT 1`
+        sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${targetVersion} LIMIT 1`,
       )
       const targetVersionRow = result.rows[0] as any
 
@@ -248,7 +257,7 @@ export class DocumentVersioningService {
 
     await db.transaction(async (tx) => {
       const result = await tx.execute(
-        sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`
+        sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
       )
       const versionRow = result.rows[0] as any
 
@@ -262,7 +271,9 @@ export class DocumentVersioningService {
       await this.fileStorage.deleteFile(s3Key)
 
       // Delete from database
-      await tx.execute(sql`DELETE FROM file_versions WHERE file_id = ${fileId} AND version = ${version}`)
+      await tx.execute(
+        sql`DELETE FROM file_versions WHERE file_id = ${fileId} AND version = ${version}`,
+      )
     })
   }
 
@@ -348,9 +359,10 @@ export class DocumentVersioningService {
     changes?: string,
   ): Promise<DocumentVersion> {
     const versionResult = await executor.execute(
-      sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${fileId}`
+      sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${fileId}`,
     )
-    const newVersion = (Number((versionResult.rows[0] as any)?.max_version) || 0) + 1
+    const newVersion =
+      (Number((versionResult.rows[0] as any)?.max_version) || 0) + 1
 
     const versionId = uuidv4()
     await executor.execute(sql`
@@ -358,7 +370,11 @@ export class DocumentVersioningService {
       VALUES (${versionId}, ${fileId}, ${newVersion}, ${`version-${newVersion}`}, 0, '', ${s3Key}, ${userId}, ${changes || `Version ${newVersion}`}, ${await this.generateChecksum(Buffer.from(''))}, true)
     `)
 
-    const newVersionRecord = await this.getFileVersionInternal(executor, fileId, newVersion)
+    const newVersionRecord = await this.getFileVersionInternal(
+      executor,
+      fileId,
+      newVersion,
+    )
     if (!newVersionRecord) {
       throw new Error('Failed to create file version from existing')
     }

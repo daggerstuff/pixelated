@@ -600,7 +600,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = ( anomalyModel.predict(input)) as tf.Tensor
+      const prediction = anomalyModel.predict(input) as tf.Tensor
       const anomalyScore = await prediction.data()
 
       input.dispose()
@@ -640,7 +640,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = ( classificationModel.predict(input)) as tf.Tensor
+      const prediction = classificationModel.predict(input) as tf.Tensor
       const probabilities = await prediction.data()
 
       input.dispose()
@@ -704,7 +704,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = ( predictionModel.predict(input)) as tf.Tensor
+      const prediction = predictionModel.predict(input) as tf.Tensor
       const threatProbability = await prediction.data()
 
       input.dispose()

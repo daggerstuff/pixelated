@@ -46,7 +46,8 @@ test('DocumentationLayout renders with correct title and content', async () => {
   // Render the component - Astro components in tests typically return Response-like or HTML string
   // const result = await DocumentationLayout.render(props) // Use .render() which is common for Astro testing
   const result = await DocumentationLayout(props) // Call the component directly
-  const renderedHtml = typeof result === 'string' ? result : await (result as Response).text() // Get text if Response-like
+  const renderedHtml =
+    typeof result === 'string' ? result : await (result as Response).text() // Get text if Response-like
 
   // Check for important elements
   expect(renderedHtml).toContain(
@@ -86,7 +87,8 @@ test('DocumentationLayout uses frontmatter props when available', async () => {
   // Render the component
   // const result = await DocumentationLayout.render(props) // Use .render()
   const result = await DocumentationLayout(props) // Call the component directly
-  const renderedHtml = typeof result === 'string' ? result : await (result as Response).text() // Get text if Response-like
+  const renderedHtml =
+    typeof result === 'string' ? result : await (result as Response).text() // Get text if Response-like
 
   // Check that frontmatter props are used in head and potentially body
   expect(renderedHtml).toContain(

@@ -283,7 +283,7 @@ yt-downloader
 # === INTERNAL & PRIVATE ===
 business-strategy/
 metrics/
-security/
+/security/
 scripts/data/run_pix30_academic_pulls.py
 scripts/data/extract_youtube_transcripts.py
 scripts/generate_dual_persona_data.py
@@ -308,7 +308,6 @@ AGENTS.md
 CLAUDE.md
 AGENTS.md
 scripts/colab
-scripts/ovh
 .github/instructions/openmemory.instructions.md
 
 gha-creds-*.json
@@ -330,15 +329,30 @@ memory.db-wal
 # === COPILOT CLI ===
 .github/copilot/settings.local.json
 .omx/
-.opencode/oh-my-openagent.jsonc
+.opencode/
 .github/mcp.json
-.opencode/oh-my-openagent.json
-
-.copilot
-.factory
-.moderne
-.qlty
-.shared
+.squad/
+.copilot/
+.factory/
+.moderne/
+.qlty/
+.shared/
 DESIGN.md
 QWEN.md
 skills-lock.json
+.github/mcp.json
+
+.kilo
+.cm
+__mocks__
+**/AGENTS.md
+# Squad: ignore runtime state (logs, inbox, sessions)
+.squad/orchestration-log/
+.squad/log/
+.squad/decisions/inbox/
+.squad/sessions/
+# Squad: SubSquad activation file (local to this machine)
+.squad-workstream
+
+.goose/
+ai/.moderne

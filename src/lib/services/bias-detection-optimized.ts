@@ -8,7 +8,12 @@ import { performance } from 'node:perf_hooks'
 
 import { BiasDetectionEngine } from '../ai/bias-detection/BiasDetectionEngine'
 import { getCache } from '../cache/redis-cache'
-import { getPool, createContentHash, biasAnalysisManager, initializeDatabase } from '../db'
+import {
+  getPool,
+  createContentHash,
+  biasAnalysisManager,
+  initializeDatabase,
+} from '../db'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('bias-detection-service')
@@ -25,7 +30,7 @@ const PERFORMANCE_CONFIG = {
 
   // Database query timeouts
   QUERY_TIMEOUTS: {
-    ANALYSIS_INSERT: 5000, 
+    ANALYSIS_INSERT: 5000,
     CACHE_LOOKUP: 1000,
     SUMMARY_QUERY: 3000,
   },
@@ -47,7 +52,8 @@ export class OptimizedBiasDetectionService {
 
   public static getInstance(): OptimizedBiasDetectionService {
     if (!OptimizedBiasDetectionService.instance) {
-      OptimizedBiasDetectionService.instance = new OptimizedBiasDetectionService()
+      OptimizedBiasDetectionService.instance =
+        new OptimizedBiasDetectionService()
     }
     return OptimizedBiasDetectionService.instance
   }
@@ -166,7 +172,12 @@ export class OptimizedBiasDetectionService {
       logger.error('Bias analysis failed', {
         analysisId,
         processingTime,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       throw error
     }
@@ -260,12 +271,16 @@ export class OptimizedBiasDetectionService {
       }
     } catch (error: unknown) {
       logger.error('Engine analysis failed', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       throw error
     }
   }
-
 
   /**
    * Insert (or skip) the session row for this analysis.
@@ -386,7 +401,11 @@ export class OptimizedBiasDetectionService {
           // attempt ROLLBACK (would cause pg sync errors). Mark for destruction.
           timedOut = true
         } else {
-          try { await client.query('ROLLBACK') } catch { /* best-effort */ }
+          try {
+            await client.query('ROLLBACK')
+          } catch {
+            /* best-effort */
+          }
         }
         throw error
       } finally {
@@ -447,7 +466,10 @@ export class OptimizedBiasDetectionService {
       }
 
       // Get from database with timeout
-      const summaryPromise = biasAnalysisManager.getBiasSummary(therapistId, days)
+      const summaryPromise = biasAnalysisManager.getBiasSummary(
+        therapistId,
+        days,
+      )
       const timeoutPromise = new Promise<null>((resolve) =>
         setTimeout(
           () => resolve(null),

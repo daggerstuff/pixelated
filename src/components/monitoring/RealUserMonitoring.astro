@@ -2,11 +2,13 @@
 interface Props {
   title?: string
   description?: string
+  refreshInterval?: number
 }
 
 const {
   title = 'Real User Monitoring',
   description = 'Monitor real user performance metrics',
+  refreshInterval = 30000,
 } = Astro.props
 ---
 

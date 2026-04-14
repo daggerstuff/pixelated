@@ -37,7 +37,8 @@ describe('resolveInternalMemoryServiceConfig', () => {
     delete process.env.MEMORY_SERVICE_ACTOR_ID
     delete process.env.MEMORY_SERVICE_ACTOR_SECRET
     delete process.env.MEMORY_SERVICE_TIMEOUT_MS
-    process.env.SUBCONSCIOUS_MEMORY_BASE_URL = 'http://subconscious.internal:54321'
+    process.env.SUBCONSCIOUS_MEMORY_BASE_URL =
+      'http://subconscious.internal:54321'
     process.env.SUBCONSCIOUS_MEMORY_ACTOR_ID = 'subconscious-gateway'
     process.env.SUBCONSCIOUS_MEMORY_ACTOR_SECRET = 'subconscious-secret'
 

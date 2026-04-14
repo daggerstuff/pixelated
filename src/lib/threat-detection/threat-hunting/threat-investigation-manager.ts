@@ -1,12 +1,9 @@
 import { EventEmitter } from 'events'
-import {
-  Investigation,
-  InvestigationStepResult,
-  HuntFinding,
-} from './types'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ThreatInvestigationRepository } from './threat-investigation-repository'
 import { ThreatReportGenerator } from './threat-report-generator'
+import { Investigation, InvestigationStepResult, HuntFinding } from './types'
 
 const logger = createBuildSafeLogger('threat-investigation-manager')
 
@@ -47,10 +44,16 @@ export class ThreatInvestigationManager extends EventEmitter {
       await this.repository.store(investigation)
       await this.repository.addToActive(investigationId)
 
-      this.emit('investigation_started', { investigationId, huntId: params.huntId })
+      this.emit('investigation_started', {
+        investigationId,
+        huntId: params.huntId,
+      })
       return investigationId
     } catch (error: unknown) {
-      logger.error('Failed to start investigation', { error, huntId: params.huntId })
+      logger.error('Failed to start investigation', {
+        error,
+        huntId: params.huntId,
+      })
       this.emit('investigation_failed', { huntId: params.huntId, error })
       throw error
     }
@@ -60,7 +63,9 @@ export class ThreatInvestigationManager extends EventEmitter {
     return this.repository.findById(id)
   }
 
-  public async listInvestigations(filter: Record<string, any> = {}): Promise<Investigation[]> {
+  public async listInvestigations(
+    filter: Record<string, any> = {},
+  ): Promise<Investigation[]> {
     return this.repository.find(filter)
   }
 
@@ -89,9 +94,14 @@ export class ThreatInvestigationManager extends EventEmitter {
         case 'analyze_behavior':
           if (this.behavioralService) {
             // Extract userId from params or investigation context
-            const userId = params.userId || params.user_id || investigation.assignedTo || 'unknown'
+            const userId =
+              params.userId ||
+              params.user_id ||
+              investigation.assignedTo ||
+              'unknown'
             // Map timeWindow (ms) to timeframe format or use provided timeframe
-            const timeframe = params.timeframe || this.formatTimeframe(params.timeWindow)
+            const timeframe =
+              params.timeframe || this.formatTimeframe(params.timeWindow)
             stepFindings = await this.behavioralService.analyzeUserBehavior(
               String(userId),
               timeframe,
@@ -120,8 +130,8 @@ export class ThreatInvestigationManager extends EventEmitter {
               type: 'report_summary',
               summary: report.summary,
               threatLevel: report.meta.threatLevel,
-              timestamp: report.timestamp
-            }
+              timestamp: report.timestamp,
+            },
           ]
           break
 
@@ -134,7 +144,9 @@ export class ThreatInvestigationManager extends EventEmitter {
       const remainingCapacity = MAX_FINDINGS_PER_INVESTIGATION - currentCount
 
       if (remainingCapacity <= 0) {
-        logger.warn(`Investigation ${investigationId} has reached finding limit. Ignoring new step findings.`)
+        logger.warn(
+          `Investigation ${investigationId} has reached finding limit. Ignoring new step findings.`,
+        )
       } else if (stepFindings.length > 0) {
         const findingsToAdd = stepFindings.slice(0, remainingCapacity)
         investigation.findings.push(...findingsToAdd)
@@ -161,7 +173,12 @@ export class ThreatInvestigationManager extends EventEmitter {
         status: 'failed',
         executionTime: Date.now() - startTime,
         timestamp: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       }
 
       investigation.steps.push(stepResult)
@@ -216,7 +233,9 @@ export class ThreatInvestigationManager extends EventEmitter {
     return this.repository.getByIds(ids)
   }
 
-  private mapPriority(priority: number): 'low' | 'medium' | 'high' | 'critical' {
+  private mapPriority(
+    priority: number,
+  ): 'low' | 'medium' | 'high' | 'critical' {
     if (priority >= 4) return 'critical'
     if (priority >= 3) return 'high'
     if (priority >= 2) return 'medium'

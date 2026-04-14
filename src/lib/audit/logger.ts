@@ -5,11 +5,12 @@
  * Integrates with the application's logging and security systems.
  */
 
-import { v4 as uuidv4 } from 'uuid'
 import type { Db } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
+
+import { mongodb } from '../../config/mongodb.config'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { dlpService } from '../security/dlp'
-import { mongodb } from '../../config/mongodb.config'
 import {
   type AuditEvent,
   AuditAction,
@@ -43,10 +44,13 @@ class AuditPersistenceQueue {
 
   schedule(auditEvent: AuditEvent, persist: () => Promise<void>): void {
     if (this.pendingJobs >= this.maxPendingJobs) {
-      logger.warn('Audit persistence queue saturated, using volatile fallback', {
-        auditId: auditEvent.id,
-        pendingJobs: this.pendingJobs,
-      })
+      logger.warn(
+        'Audit persistence queue saturated, using volatile fallback',
+        {
+          auditId: auditEvent.id,
+          pendingJobs: this.pendingJobs,
+        },
+      )
       emitVolatileFallback(auditEvent, 'queue-saturated')
       return
     }
@@ -55,14 +59,26 @@ class AuditPersistenceQueue {
 
     persist()
       .catch((error: unknown) => {
-        logger.error('CRITICAL: Audit Event Persistence Failed after all retries', {
-          auditId: auditEvent.id,
-          userId: auditEvent.userId,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
-        })
+        logger.error(
+          'CRITICAL: Audit Event Persistence Failed after all retries',
+          {
+            auditId: auditEvent.id,
+            userId: auditEvent.userId,
+            error:
+              error instanceof Error
+                ? error instanceof Error
+                  ? error.message
+                  : 'Unknown error'
+                : String(error),
+          },
+        )
         emitVolatileFallback(
           auditEvent,
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         )
       })
       .finally(() => {
@@ -89,10 +105,13 @@ function sanitizeAuditMetadata(auditEvent: AuditEvent): AuditEvent {
     }
 
     if (!looksLikeJsonObject(scanResult.redactedContent)) {
-      logger.warn('Failed to parse redacted metadata back to JSON, keeping as string', {
-        auditId: auditEvent.id,
-        error: 'redacted metadata is not JSON',
-      })
+      logger.warn(
+        'Failed to parse redacted metadata back to JSON, keeping as string',
+        {
+          auditId: auditEvent.id,
+          error: 'redacted metadata is not JSON',
+        },
+      )
 
       return {
         ...auditEvent,
@@ -103,13 +122,22 @@ function sanitizeAuditMetadata(auditEvent: AuditEvent): AuditEvent {
     try {
       return {
         ...auditEvent,
-        metadata: JSON.parse(scanResult.redactedContent) as Record<string, unknown>,
+        metadata: JSON.parse(scanResult.redactedContent) as Record<
+          string,
+          unknown
+        >,
       }
     } catch (parseError) {
-      logger.warn('Failed to parse redacted metadata back to JSON, keeping as string', {
-        auditId: auditEvent.id,
-        error: parseError instanceof Error ? parseError.message : String(parseError),
-      })
+      logger.warn(
+        'Failed to parse redacted metadata back to JSON, keeping as string',
+        {
+          auditId: auditEvent.id,
+          error:
+            parseError instanceof Error
+              ? parseError.message
+              : String(parseError),
+        },
+      )
 
       return {
         ...auditEvent,
@@ -135,7 +163,10 @@ function redactMetadataShape(
   value: Record<string, unknown>,
 ): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(value).map(([key, entry]) => [key, redactMetadataValue(entry)]),
+    Object.entries(value).map(([key, entry]) => [
+      key,
+      redactMetadataValue(entry),
+    ]),
   )
 }
 
@@ -183,14 +214,18 @@ export class AuditLogger {
   /**
    * Log a general audit event
    */
-  public async logEvent(event: Omit<AuditEvent, 'id' | 'timestamp'>): Promise<string> {
+  public async logEvent(
+    event: Omit<AuditEvent, 'id' | 'timestamp'>,
+  ): Promise<string> {
     const auditEvent = sanitizeAuditMetadata({
       ...event,
       id: uuidv4(),
       timestamp: new Date(),
     })
 
-    this.persistenceQueue.schedule(auditEvent, () => this.persistEventWithRetry(auditEvent))
+    this.persistenceQueue.schedule(auditEvent, () =>
+      this.persistEventWithRetry(auditEvent),
+    )
 
     return auditEvent.id
   }
@@ -212,42 +247,57 @@ export class AuditLogger {
     return events.map((event) => ({
       ...event,
       timestamp:
-        event.timestamp instanceof Date ? event.timestamp : new Date(event.timestamp),
+        event.timestamp instanceof Date
+          ? event.timestamp
+          : new Date(event.timestamp),
     }))
   }
 
   /**
    * Persist the event to the database with a simple retry mechanism
    */
-  private async persistEventWithRetry(auditEvent: AuditEvent, attempt = 1): Promise<void> {
+  private async persistEventWithRetry(
+    auditEvent: AuditEvent,
+    attempt = 1,
+  ): Promise<void> {
     try {
       const db = await this.ensureConnected()
       await db.collection('audit_logs').insertOne({
         ...auditEvent,
-        timestamp: auditEvent.timestamp instanceof Date ? auditEvent.timestamp : new Date(auditEvent.timestamp)
+        timestamp:
+          auditEvent.timestamp instanceof Date
+            ? auditEvent.timestamp
+            : new Date(auditEvent.timestamp),
       })
-      
+
       logger.info('Audit Event Persisted to Database', {
         auditId: auditEvent.id,
-        attempt
+        attempt,
       })
     } catch (error: unknown) {
       if (attempt < this.maxRetries) {
         const delay = Math.pow(2, attempt) * 1000 // Exponential backoff
-        logger.warn(`Audit Log Persistence Attempt ${attempt} Failed. Retrying in ${delay}ms...`, {
-          auditId: auditEvent.id,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
-        })
-        
-        await new Promise(resolve => setTimeout(resolve, delay))
+        logger.warn(
+          `Audit Log Persistence Attempt ${attempt} Failed. Retrying in ${delay}ms...`,
+          {
+            auditId: auditEvent.id,
+            error:
+              error instanceof Error
+                ? error instanceof Error
+                  ? error.message
+                  : 'Unknown error'
+                : String(error),
+          },
+        )
+
+        await new Promise((resolve) => setTimeout(resolve, delay))
         return this.persistEventWithRetry(auditEvent, attempt + 1)
       }
-      
+
       // If we reach here, retries are exhausted
       throw error
     }
   }
-
 }
 
 /**

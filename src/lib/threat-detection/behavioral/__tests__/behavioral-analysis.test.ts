@@ -36,16 +36,16 @@ const mockRedisInstance = {
 
 const mockDb = {
   collection: vi.fn(() => ({
-    replaceOne: vi.fn<any>().mockResolvedValue<any>({}),
-    insertMany: vi.fn<any>().mockResolvedValue<any>({}),
-    insertOne: vi.fn<any>().mockResolvedValue<any>({}),
+    replaceOne: vi.fn().mockResolvedValue({}),
+    insertMany: vi.fn().mockResolvedValue({}),
+    insertOne: vi.fn().mockResolvedValue({}),
   })),
 }
 
 const mockMongoClientInstance = {
-  connect: vi.fn<any>().mockResolvedValue<any>(undefined),
+  connect: vi.fn().mockResolvedValue(undefined),
   db: vi.fn(() => mockDb),
-  close: vi.fn<any>().mockResolvedValue<any>(undefined),
+  close: vi.fn().mockResolvedValue(undefined),
 }
 
 // Mock external modules
@@ -122,7 +122,10 @@ describe('Behavioral Analysis Service', () => {
 
     service = new AdvancedBehavioralAnalysisService(defaultConfig)
     // P4.2 FIX: Provide required mock dependencies
-    await service.initializeServices(mockRedisInstance as any, mockMongoClientInstance as any)
+    await service.initializeServices(
+      mockRedisInstance as any,
+      mockMongoClientInstance as any,
+    )
   })
 
   describe('Service Initialization', () => {
@@ -154,11 +157,11 @@ describe('Behavioral Analysis Service', () => {
         },
       ]
 
-      mockRedisInstance.setex.mockResolvedValue<any>('OK')
+      mockRedisInstance.setex.mockResolvedValue('OK')
       // Use internal repository mock via any to setup the expectation
       const repo = (service as any).repository
-      vi.spyOn<any, any>(repo, 'getRecentEvents').mockResolvedValue<any>(events)
-      vi.spyOn<any, any>(repo, 'storeProfile').mockResolvedValue<any>(undefined)
+      vi.spyOn<any, any>(repo, 'getRecentEvents').mockResolvedValue(events)
+      vi.spyOn<any, any>(repo, 'storeProfile').mockResolvedValue(undefined)
 
       await service.createBehaviorProfile(userId)
 
@@ -193,7 +196,7 @@ describe('Behavioral Analysis Service', () => {
       }
 
       const repo = (service as any).repository
-      vi.spyOn<any, any>(repo, 'getProfile').mockResolvedValue<any>(profile)
+      vi.spyOn<any, any>(repo, 'getProfile').mockResolvedValue(profile)
 
       const anomalies = await service.detectAnomalies(userId, events[0])
       expect(anomalies).toBeDefined()

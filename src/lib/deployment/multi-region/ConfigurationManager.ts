@@ -205,9 +205,12 @@ export class ConfigurationManager extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to initialize Configuration Manager', { error })
-      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 

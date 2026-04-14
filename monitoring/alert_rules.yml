@@ -71,7 +71,9 @@ groups:
           description: 'EI Engine error rate is {{ $value }} errors per second'
 
       - alert: AIInferenceLatencyHigh
-        expr: rate(ai_inference_duration_seconds_sum[5m]) / rate(ai_inference_duration_seconds_count[5m]) > 2.0
+        expr:
+          rate(ai_inference_duration_seconds_sum[5m]) /
+          rate(ai_inference_duration_seconds_count[5m]) > 2.0
         for: 5m
         labels:
           severity: warning

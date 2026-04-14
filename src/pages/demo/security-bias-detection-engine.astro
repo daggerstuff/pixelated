@@ -450,7 +450,9 @@ const universityResults = [
             class="border border-red-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
           >
             <CardContent class="p-8 lg:p-12">
-              <div class="text-6xl text-red-400 mb-6"><Target className="w-24 h-24" /></div>
+              <div class="text-6xl text-red-400 mb-6">
+                <Target className="w-24 h-24" />
+              </div>
 
               <div class="mb-6">
                 <Badge
@@ -663,19 +665,6 @@ const universityResults = [
 </style>
 
 <script>
-  // Type definitions
-  declare global {
-    interface Window {
-      gtag?: (
-        command: 'event',
-        action: string,
-        params: {
-          [key: string]: any
-        },
-      ) => void
-    }
-  }
-
   // Analytics tracking for demo interactions
   document.addEventListener('DOMContentLoaded', () => {
     // Track page view
@@ -694,7 +683,7 @@ const universityResults = [
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -728,7 +717,7 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 

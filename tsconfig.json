@@ -3,36 +3,17 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable",
-      "WebWorker"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "~/*": [
-        "./src/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@layouts/*": [
-        "./src/layouts/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@types/*": [
-        "./src/types/*"
-      ]
+      "@/*": ["./src/*"],
+      "~/*": ["./src/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@components/*": ["./src/components/*"],
+      "@layouts/*": ["./src/layouts/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@types/*": ["./src/types/*"]
     },
     "allowJs": true,
     "resolveJsonModule": true,
@@ -62,14 +43,10 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
+    "allowArbitraryExtensions": true,
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
-    "types": [
-      "node",
-      "react",
-      "react-dom",
-      "vitest/globals"
-    ],
+    "types": ["node", "react", "react-dom", "vitest/globals"],
     "typeRoots": [
       "../node_modules/@types",
       "./node_modules/@types",

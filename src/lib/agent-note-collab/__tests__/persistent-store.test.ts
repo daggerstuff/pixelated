@@ -1,10 +1,11 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
-import { InMemoryTurnLedger } from '../store'
 import { PersistentTurnLedger } from '../persistent-store'
+import { InMemoryTurnLedger } from '../store'
 
 describe('PersistentTurnLedger', () => {
   const artifactId = 'artifact://demo.md'
@@ -18,7 +19,8 @@ describe('PersistentTurnLedger', () => {
     confidence: 0.92,
     assumptions: ['Context source is stable.'],
     openQuestions: ['How should this be prioritized with existing evidence?'],
-    decision: 'Record baseline observations and route to collaboration handoff.',
+    decision:
+      'Record baseline observations and route to collaboration handoff.',
     evidence: ['http://docs.internal/observations'],
     requestedAction: 'ask-human' as const,
   }
@@ -96,8 +98,12 @@ describe('PersistentTurnLedger', () => {
     })
 
     expect(submitResult.ok).toBe(true)
-    expect(inMemory.nextTurnIdForArtifact(artifactId)).toBe(`${artifactId}#turn-00002`)
-    expect(inMemory.openQuestionCount(artifactId)).toBe(validTurn.openQuestions.length)
+    expect(inMemory.nextTurnIdForArtifact(artifactId)).toBe(
+      `${artifactId}#turn-00002`,
+    )
+    expect(inMemory.openQuestionCount(artifactId)).toBe(
+      validTurn.openQuestions.length,
+    )
     expect(inMemory.getById(submitResult.turn.turnId)).toMatchObject({
       artifactId,
       phase: 'Counter',

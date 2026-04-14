@@ -1,6 +1,7 @@
 // Document Service
 // Business logic for document operations
 
+import { Types } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 
 import { slug } from '@/utils/common'
@@ -8,6 +9,26 @@ import { slug } from '@/utils/common'
 import { getPostgresPool } from '../../lib/database/connection'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
+
+type DocumentStatus = 'approved' | 'archived' | 'draft' | 'published' | 'review'
+
+function toObjectId(value: string): Types.ObjectId {
+  return new Types.ObjectId(value)
+}
+
+function getDocumentPermissions(document: {
+  permissions?: {
+    view?: Types.ObjectId[]
+    edit?: Types.ObjectId[]
+    comment?: Types.ObjectId[]
+  } | null
+}) {
+  return {
+    view: document.permissions?.view ?? [],
+    edit: document.permissions?.edit ?? [],
+    comment: document.permissions?.comment ?? [],
+  }
+}
 
 // ============================================================================
 // CREATE DOCUMENT
@@ -78,10 +99,11 @@ export async function getDocument(documentId: string, userId: string) {
   }
 
   // Check permissions
+  const permissions = getDocumentPermissions(document)
   const hasAccess =
     document.owner.toString() === userId ||
-    document.permissions.view?.some((id: any) => id.toString() === userId) ||
-    document.permissions.edit?.some((id: any) => id.toString() === userId)
+    permissions.view.some((id) => id.toString() === userId) ||
+    permissions.edit.some((id) => id.toString() === userId)
 
   if (!hasAccess) {
     throw new ForbiddenError('You do not have permission to view this document')
@@ -99,7 +121,7 @@ export async function updateDocument(
   updates: {
     title?: string
     content?: any
-    status?: string
+    status?: DocumentStatus
     description?: string
   },
   userId: string,
@@ -111,9 +133,10 @@ export async function updateDocument(
   }
 
   // Check edit permission
+  const permissions = getDocumentPermissions(document)
   const canEdit =
     document.owner.toString() === userId ||
-    document.permissions.edit?.some((id: any) => id.toString() === userId)
+    permissions.edit.some((id) => id.toString() === userId)
 
   if (!canEdit) {
     throw new ForbiddenError('You do not have permission to edit this document')
@@ -219,21 +242,28 @@ export async function shareDocument(
   }
 
   // Add to appropriate permission array
+  const permissions = getDocumentPermissions(document)
+  const sharedWithUserObjectId = toObjectId(sharedWithUserId)
+
+  if (!document.permissions) {
+    document.permissions = permissions
+  }
+
   if (
     permissionLevel === 'view' &&
-    !document.permissions.view.includes(sharedWithUserId)
+    !permissions.view.some((id) => id.equals(sharedWithUserObjectId))
   ) {
-    document.permissions.view.push(sharedWithUserId)
+    permissions.view.push(sharedWithUserObjectId)
   } else if (
     permissionLevel === 'edit' &&
-    !document.permissions.edit.includes(sharedWithUserId)
+    !permissions.edit.some((id) => id.equals(sharedWithUserObjectId))
   ) {
-    document.permissions.edit.push(sharedWithUserId)
+    permissions.edit.push(sharedWithUserObjectId)
   } else if (
     permissionLevel === 'comment' &&
-    !document.permissions.comment.includes(sharedWithUserId)
+    !permissions.comment.some((id) => id.equals(sharedWithUserObjectId))
   ) {
-    document.permissions.comment.push(sharedWithUserId)
+    permissions.comment.push(sharedWithUserObjectId)
   }
 
   await document.save()

@@ -122,9 +122,12 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       logger.error('Failed to initialize Multi-Region Deployment Manager', {
         error,
       })
-      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -169,7 +172,10 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       return statuses
     } catch (error: unknown) {
       logger.error('Multi-region deployment failed', { error })
-      throw new Error(`Deployment failed: ${(error instanceof Error ? error.message : "Unknown error")}`, { cause: error })
+      throw new Error(
+        `Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { cause: error },
+      )
     }
   }
 
@@ -228,14 +234,14 @@ export class MultiRegionDeploymentManager extends EventEmitter {
         lastDeployment: new Date(),
         healthScore: 0,
         activeInstances: 0,
-        errors: [(error instanceof Error ? error.message : "Unknown error")],
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
         metrics: { latency: 0, throughput: 0, errorRate: 1 },
       }
 
       this.deploymentStatuses.set(region.id, status)
       this.emit('region-deployment-failed', {
         region: region.id,
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
 
       throw error
@@ -295,9 +301,12 @@ export class MultiRegionDeploymentManager extends EventEmitter {
         `Failed to configure regional services for: ${region.name}`,
         { error },
       )
-      throw new Error(`Service configuration failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Service configuration failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 

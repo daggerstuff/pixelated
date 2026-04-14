@@ -6,11 +6,15 @@ import {
   withAuthenticatedMemoryRoute,
 } from './_shared'
 
-function resolveMemoryId(params: Record<string, string | undefined>): string | undefined {
+function resolveMemoryId(
+  params: Record<string, string | undefined>,
+): string | undefined {
   return params.memoryId
 }
 
-export const GET = withAuthenticatedMemoryRoute('fetching memory', async ({ params, request }, user) => {
+export const GET = withAuthenticatedMemoryRoute(
+  'fetching memory',
+  async ({ params, request }, user) => {
     const memoryId = resolveMemoryId(params)
     if (!memoryId) {
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
@@ -28,9 +32,12 @@ export const GET = withAuthenticatedMemoryRoute('fetching memory', async ({ para
       success: true,
       memory,
     })
-})
+  },
+)
 
-const handlePatch = withAuthenticatedMemoryRoute('updating memory', async ({ params, request }, user) => {
+const handlePatch = withAuthenticatedMemoryRoute(
+  'updating memory',
+  async ({ params, request }, user) => {
     const memoryId = resolveMemoryId(params)
     if (!memoryId) {
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
@@ -53,11 +60,14 @@ const handlePatch = withAuthenticatedMemoryRoute('updating memory', async ({ par
       success: true,
       memory: result,
     })
-})
+  },
+)
 
 export const PATCH = handlePatch
 
-export const DELETE = withAuthenticatedMemoryRoute('deleting memory', async ({ params, request }, user) => {
+export const DELETE = withAuthenticatedMemoryRoute(
+  'deleting memory',
+  async ({ params, request }, user) => {
     const memoryId = resolveMemoryId(params)
     if (!memoryId) {
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
@@ -72,4 +82,5 @@ export const DELETE = withAuthenticatedMemoryRoute('deleting memory', async ({ p
       success: true,
       message: 'Memory deleted successfully',
     })
-})
+  },
+)

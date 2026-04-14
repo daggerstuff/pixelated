@@ -1,6 +1,8 @@
 import { cleanup } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
+import { renderAstro } from '@/test/utils/astro'
+
 import SearchDemo from '../SearchDemo.astro'
 
 // Mock the SearchDemoReact component
@@ -50,19 +52,6 @@ vi.mock('../SearchDemoReact', () => {
   return { default: mockFn }
 })
 
-// Helper function to render Astro components in tests
-async function renderAstroComponent(
-  Component: any,
-  props = {},
-): Promise<{ container: HTMLDivElement }> {
-  const { default: defaultExport } = Component
-  const html = await defaultExport.render(props)
-  const container = document.createElement('div')
-  container.innerHTML = html.html
-  document.body.appendChild(container)
-  return { container }
-}
-
 describe('SearchDemo.astro', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
@@ -74,7 +63,7 @@ describe('SearchDemo.astro', () => {
   })
 
   it('renders with default props', async () => {
-    const { container } = await renderAstroComponent(SearchDemo)
+    const { container } = await renderAstro(SearchDemo)
 
     // Check if the title and description are rendered with default values
     expect(container.querySelector('h2')).toHaveTextContent('Search Demo')
@@ -93,7 +82,7 @@ describe('SearchDemo.astro', () => {
       className: 'custom-class',
     }
 
-    const { container } = await renderAstroComponent(SearchDemo, customProps)
+    const { container } = await renderAstro(SearchDemo, customProps)
 
     // Check if the custom title and description are rendered
     expect(container.querySelector('h2')).toHaveTextContent('Custom Search')
@@ -106,7 +95,7 @@ describe('SearchDemo.astro', () => {
   })
 
   it('applies transition styles', async () => {
-    const { container } = await renderAstroComponent(SearchDemo)
+    const { container } = await renderAstro(SearchDemo)
 
     // Check if transition styles are applied
     const mainDiv = container.querySelector('div')

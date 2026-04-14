@@ -47,28 +47,50 @@ const evaluationChecklist = [
     title="Trust built for sensitive training workflows."
     lede="Pixelated Empathy is being built for teams that need to pressure-test privacy, security, and operational controls before they put a product into supervision or training."
     note="Security review on request"
-    trustLine={['Privacy-aware design', 'Sensitive-workflow evaluation', 'Founder-led conversations']}
+    trustLine={[
+      'Privacy-aware design',
+      'Sensitive-workflow evaluation',
+      'Founder-led conversations',
+    ]}
     primaryCTA={{ text: 'Request security information', href: '/contact' }}
     secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
     stats={[
-      { label: 'Review focus', value: 'Security + privacy', detail: 'Discuss operational fit before rollout' },
-      { label: 'Primary users', value: 'Supervisors + educators', detail: 'Controls should match the actual workflow' },
-      { label: 'Evaluation mode', value: 'Practical', detail: 'Bring the requirements your team already uses' },
+      {
+        label: 'Review focus',
+        value: 'Security + privacy',
+        detail: 'Discuss operational fit before rollout',
+      },
+      {
+        label: 'Primary users',
+        value: 'Supervisors + educators',
+        detail: 'Controls should match the actual workflow',
+      },
+      {
+        label: 'Evaluation mode',
+        value: 'Practical',
+        detail: 'Bring the requirements your team already uses',
+      },
     ]}
   />
 
   <section class="marketing-section">
     <div class="marketing-shell">
       <div class="marketing-grid marketing-grid--3">
-        {trustAreas.map((area) => (
-          <article class="marketing-card">
-            <span class="marketing-card__label">{area.label}</span>
-            <h2 class="marketing-title marketing-title--medium">{area.title}</h2>
-            <ul class="marketing-list">
-              {area.items.map((item) => <li>{item}</li>)}
-            </ul>
-          </article>
-        ))}
+        {
+          trustAreas.map((area) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{area.label}</span>
+              <h2 class="marketing-title marketing-title--medium">
+                {area.title}
+              </h2>
+              <ul class="marketing-list">
+                {area.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -78,19 +100,24 @@ const evaluationChecklist = [
       <div class="marketing-proof-band">
         <div>
           <span class="marketing-eyebrow">Common review topics</span>
-          <h2 class="marketing-title marketing-title--medium">Most teams come in with the same three questions.</h2>
+          <h2 class="marketing-title marketing-title--medium">
+            Most teams come in with the same three questions.
+          </h2>
           <p class="marketing-section-copy">
-            If you are evaluating the platform, these are the areas we expect to discuss early so nobody is guessing about operational fit.
+            If you are evaluating the platform, these are the areas we expect to
+            discuss early so nobody is guessing about operational fit.
           </p>
         </div>
 
         <div class="marketing-proof-band__items">
-          {evaluationChecklist.map((item, index) => (
-            <div class="marketing-proof-item">
-              <span>Topic {String(index + 1).padStart(2, '0')}</span>
-              <strong>{item}</strong>
-            </div>
-          ))}
+          {
+            evaluationChecklist.map((item, index) => (
+              <div class="marketing-proof-item">
+                <span>Topic {String(index + 1).padStart(2, '0')}</span>
+                <strong>{item}</strong>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>

@@ -4,8 +4,8 @@
  * with centralized conflict resolution and storage persistence
  */
 
-import storageManager from '@/utils/storage/storageManager'
 import { mergeValues, deepEqual } from '@/utils/object'
+import storageManager from '@/utils/storage/storageManager'
 import type { StorageConfig } from '@/utils/storage/storageManager'
 
 /**

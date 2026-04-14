@@ -259,13 +259,14 @@ export class MockFHEService implements FHEService {
       const originalText = JSON.parse(data.originalValue) as unknown
       if (typeof originalText === 'string') {
         const text = originalText.toLowerCase()
-        
+
         // Simple PII detection simulation
         const piiTypes: string[] = []
         if (text.includes('@')) piiTypes.push('email')
         if (/\d{3}-\d{2}-\d{4}/.test(text)) piiTypes.push('ssn')
-        if (/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/.test(text)) piiTypes.push('phone')
-        
+        if (/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/.test(text))
+          piiTypes.push('phone')
+
         const hasPII = piiTypes.length > 0
         const confidence = hasPII ? 0.95 : 0.1
 
@@ -275,12 +276,12 @@ export class MockFHEService implements FHEService {
             hasPII: String(hasPII),
             confidence: String(confidence),
             types: piiTypes.join(','),
-            processed: true
+            processed: true,
           }),
           operation: FHEOperation.ANALYZE,
           metadata: {
-            timestamp: Date.now()
-          }
+            timestamp: Date.now(),
+          },
         }
       }
     } catch {
@@ -293,12 +294,12 @@ export class MockFHEService implements FHEService {
         hasPII: 'false',
         confidence: '0',
         types: '',
-        processed: true
+        processed: true,
       }),
       operation: FHEOperation.ANALYZE,
       metadata: {
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     }
   }
 

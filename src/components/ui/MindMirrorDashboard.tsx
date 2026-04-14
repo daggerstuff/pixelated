@@ -1,6 +1,7 @@
 import { Brain, Heart, Zap, Shield, User } from 'lucide-react'
 import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
+import type { FC } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

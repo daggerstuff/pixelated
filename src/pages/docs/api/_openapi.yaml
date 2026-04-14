@@ -1,83 +1,308 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Pixelated Empathy API
   description: |
-    The Pixelated Empathy API provides a comprehensive set of endpoints for integrating
-    with our platform.
+    The Pixelated Empathy API provides programmatic access to the platform's core features,
+    including user profiles, mental health analytics, bias detection, and memory management.
+
+    ### Authentication
+
+    Most endpoints require authentication using either a **JWT (Bearer Token)** or an **API Key**.
+    - For browser-based applications, use the JWT provided by Auth0.
+    - For server-side integrations, use an API Key in the `X-API-Key` header.
   version: '1.0.0'
   contact:
-    name: Pixelated Empathy API Support
-    email: api-support@pixelated.dev
-    url: https://pixelated.dev/support
+    name: Pixelated API Support
+    email: api-support@pixelatedempathy.com
+    url: https://pixelatedempathy.com/support
 servers:
-  - url: 'https://api.pixelated.dev/api/v1'
+  - url: 'https://api.pixelatedempathy.com/api/v1'
     description: Production API server
-  - url: 'https://staging-api.pixelated.dev/api/v1'
-    description: Staging API server (for testing)
+  - url: 'https://staging-api.pixelatedempathy.com/api/v1'
+    description: Staging API server
 security:
   - ApiKeyAuth: []
+  - BearerAuth: []
 paths:
+  /health:
+    get:
+      summary: API Health Check
+      description: Check the current status and health of the API services.
+      tags: [System]
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthStatus' }
+        '503':
+          description: System is unhealthy or degraded
+  /version:
+    get:
+      summary: API Version
+      description: Get the current API version and build information.
+      tags: [System]
+      responses:
+        '200':
+          description: Version information
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VersionInfo' }
   /search:
     get:
-      summary: Search content
-      description: Search across blog posts and documentation
+      summary: Search Content
+      description: Search across blog posts, documentation, and research articles.
       operationId: searchContent
-      tags:
-        - Search
+      tags: [Content]
       parameters:
         - name: q
           in: query
-          description: Search query
+          description: Search query string
           required: true
-          schema:
-            type: string
+          schema: { type: string }
       responses:
         '200':
-          description: Successful search
+          description: Search results returned successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  version:
-                    type: string
-                    description: API version
-                    example: 'v1'
                   results:
                     type: array
-                    maxItems: 100
-                    items:
-                      $ref: '#/components/schemas/SearchResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-  /users:
+                    items: { $ref: '#/components/schemas/SearchResult' }
+  /profile:
     get:
-      summary: List users
-      description: Retrieve a list of users
-      operationId: listUsers
-      tags:
-        - Users
+      summary: Get User Profile
+      description: Retrieve the authenticated user's profile information.
+      operationId: getProfile
+      tags: [User]
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile: { $ref: '#/components/schemas/UserProfile' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: Profile not found }
+    put:
+      summary: Update User Profile
+      description: Update the authenticated user's profile metadata.
+      operationId: updateProfile
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserProfileUpdate' }
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile: { $ref: '#/components/schemas/UserProfile' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /preferences:
+    get:
+      summary: Get User Preferences
+      description: Retrieve the authenticated user's preferences.
+      operationId: getPreferences
+      tags: [User]
+      responses:
+        '200':
+          description: Preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences: { $ref: '#/components/schemas/UserPreferences' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    put:
+      summary: Update User Preferences
+      description: Update the authenticated user's preferences.
+      operationId: updatePreferences
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserPreferencesUpdate' }
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences: { $ref: '#/components/schemas/UserPreferences' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /bias-analysis/analyze:
+    post:
+      summary: Analyze Bias
+      description: Perform bias analysis on clinical text.
+      operationId: analyzeBias
+      tags: [Bias Analysis]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BiasAnalysisRequest' }
+      responses:
+        '200':
+          description: Bias analysis completed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BiasAnalysisResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /memory/sessions:
+    get:
+      summary: List Memory Sessions
+      description: List all memory sessions for the authenticated user.
+      operationId: listSessions
+      tags: [Memory]
       parameters:
         - name: limit
           in: query
-          description: Maximum number of users to return
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
+          schema: { type: integer, default: 20 }
         - name: offset
           in: query
-          description: Number of users to skip
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
+          schema: { type: integer, default: 0 }
       responses:
         '200':
-          description: List of users
+          description: Sessions listed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items: { $ref: '#/components/schemas/MemorySession' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /memory/sessions/{sessionId}:
+    get:
+      summary: Get Memory Session
+      description: Get a specific memory session by ID.
+      operationId: getSession
+      tags: [Memory]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Session retrieved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MemorySession' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /memory/sessions/{sessionId}/turns:
+    post:
+      summary: Add Turn to Session
+      description: Add a new turn to a memory session.
+      operationId: addTurn
+      tags: [Memory]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MemoryTurnCreate' }
+      responses:
+        '200':
+          description: Turn added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MemoryTurn' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /developer/api-keys:
+    get:
+      summary: List API Keys
+      description: List all API keys for the authenticated user.
+      operationId: listApiKeys
+      tags: [Developer API Keys]
+      responses:
+        '200':
+          description: API keys listed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keys:
+                    type: array
+                    items: { $ref: '#/components/schemas/ApiKey' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      summary: Create API Key
+      description: Create a new API key.
+      operationId: createApiKey
+      tags: [Developer API Keys]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateApiKeyRequest' }
+      responses:
+        '200':
+          description: API key created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateApiKeyResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /developer/api-keys/{keyId}:
+    delete:
+      summary: Revoke API Key
+      description: Revoke an existing API key.
+      operationId: revokeApiKey
+      tags: [Developer API Keys]
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: API key revoked }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /admin/users:
+    get:
+      summary: List Platform Users
+      description: Retrieve a paginated list of users (Admin only).
+      operationId: listUsers
+      tags: [Admin]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20, maximum: 100 }
+        - name: role
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of users retrieved successfully
           content:
             application/json:
               schema:
@@ -85,99 +310,214 @@ paths:
                 properties:
                   data:
                     type: array
-                    maxItems: 100
-                    items:
-                      $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    items: { $ref: '#/components/schemas/AdminUserView' }
+                  pagination: { $ref: '#/components/schemas/Pagination' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       in: header
-      name: Authorization
-      description: API key provided in the format `Bearer YOUR_API_KEY`
+      name: X-API-Key
+      description: Developer API Key for server-to-server calls.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT for browser-based session authentication.
   schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status: { type: string, enum: [healthy, degraded, unhealthy] }
+        timestamp: { type: string, format: date-time }
+        uptime: { type: number }
+    VersionInfo:
+      type: object
+      properties:
+        version: { type: string }
+        build: { type: string }
+        timestamp: { type: string, format: date-time }
     SearchResult:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the search result
-        title:
-          type: string
-          description: Title of the content
-        excerpt:
-          type: string
-          description: Excerpt of the content with search terms highlighted
-        url:
-          type: string
-          description: URL to access the full content
-        type:
-          type: string
-          description: Type of content (blog, documentation, etc.)
-        score:
-          type: number
-          description: Relevance score for the search result
-    User:
+        id: { type: string }
+        title: { type: string }
+        excerpt: { type: string }
+        url: { type: string }
+        type: { type: string }
+        score: { type: number }
+    UserProfile:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the user
-        name:
-          type: string
-          description: Full name of the user
-        email:
-          type: string
-          format: email
-          description: Email address of the user
-        created_at:
-          type: string
-          format: date-time
-          description: Time when the user was created
+        id: { type: string, format: uuid }
+        fullName: { type: string }
+        email: { type: string, format: email }
+        role: { type: string }
+        avatarUrl: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        lastLogin: { type: string, format: date-time }
+        userMetadata: { type: object }
+        appMetadata: { type: object }
+    UserProfileUpdate:
+      type: object
+      properties:
+        fullName: { type: string }
+        avatarUrl: { type: string }
+        userMetadata: { type: object }
+    UserPreferences:
+      type: object
+      properties:
+        theme: { type: string, enum: [light, dark, system] }
+        language: { type: string }
+        timezone: { type: string }
+        notifications:
+          type: object
+          properties:
+            email: { type: boolean }
+            push: { type: boolean }
+    UserPreferencesUpdate:
+      type: object
+      properties:
+        theme: { type: string }
+        language: { type: string }
+        timezone: { type: string }
+        notifications:
+          type: object
+          properties:
+            email: { type: boolean }
+            push: { type: boolean }
+    BiasAnalysisRequest:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+        context: { type: string }
+        therapistId: { type: string }
+        sessionId: { type: string }
+        clientId: { type: string }
+        demographics: { type: object }
+        sessionType: { type: string }
+        therapistNotes: { type: string }
+    BiasAnalysisResult:
+      type: object
+      properties:
+        id: { type: string }
+        biases:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string }
+              confidence: { type: number }
+              evidence: { type: string }
+              suggestion: { type: string }
+        overallScore: { type: number }
+        recommendations:
+          type: array
+          items: { type: string }
+    MemoryTurn:
+      type: object
+      properties:
+        id: { type: string }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        timestamp: { type: string, format: date-time }
+        metadata: { type: object }
+    MemoryTurnCreate:
+      type: object
+      required: [role, content]
+      properties:
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        metadata: { type: object }
+    MemorySession:
+      type: object
+      properties:
+        id: { type: string }
+        turns:
+          type: array
+          items: { $ref: '#/components/schemas/MemoryTurn' }
+        metadata: { type: object }
+    ApiKey:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        created: { type: string, format: date-time }
+        expires: { type: string, format: date-time }
+        scopes:
+          type: array
+          items: { type: string }
+    CreateApiKeyRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        scopes:
+          type: array
+          items: { type: string }
+    CreateApiKeyResponse:
+      type: object
+      properties:
+        id: { type: string }
+        key: { type: string }
+        name: { type: string }
+        created: { type: string, format: date-time }
+    AdminUserView:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        role: { type: string }
+        createdAt: { type: string, format: date-time }
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
     Error:
       type: object
       properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              description: Error code
-            message:
-              type: string
-              description: Error message
-            status:
-              type: integer
-              description: HTTP status code
+        error: { type: string }
+        message: { type: string }
+        code: { type: string }
   responses:
     BadRequest:
-      description: Bad request
+      description: Invalid request parameters or body
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          schema: { $ref: '#/components/schemas/Error' }
     Unauthorized:
-      description: Unauthorized
+      description: Authentication failed or missing
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          schema: { $ref: '#/components/schemas/Error' }
     Forbidden:
-      description: Forbidden
+      description: Authenticated user lacks necessary permissions
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
 tags:
-  - name: Search
-    description: Search operations
-  - name: Users
-    description: User management
-  - name: Sessions
-    description: Session management
-  - name: Analytics
-    description: Analytics and reporting
+  - name: User
+    description: User profile and management
+  - name: Content
+    description: Content search and discovery
+  - name: Admin
+    description: Platform administration
+  - name: System
+    description: System health and status
+  - name: Bias Analysis
+    description: Bias detection and analysis
+  - name: Memory
+    description: Memory and session management
+  - name: Developer API Keys
+    description: API key management for developers

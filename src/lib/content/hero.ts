@@ -28,25 +28,30 @@ export const heroContent = {
     context: [
       {
         label: 'What stays attached',
-        value: 'The live conversation, saved transcript, and coaching lane stay tied to the same case.',
+        value:
+          'The live conversation, saved transcript, and coaching lane stay tied to the same case.',
       },
       {
         label: 'Why it matters',
-        value: 'A supervisor can point to the exact turn that needs work instead of reconstructing the room from memory.',
+        value:
+          'A supervisor can point to the exact turn that needs work instead of reconstructing the room from memory.',
       },
     ],
     outputs: [
       {
         label: 'Specific next move',
-        value: 'Point to the intervention worth revisiting next, not a vague impression.',
+        value:
+          'Point to the intervention worth revisiting next, not a vague impression.',
       },
       {
         label: 'Shared review surface',
-        value: 'Keep transcript and notes attached to one difficult case the whole team can study.',
+        value:
+          'Keep transcript and notes attached to one difficult case the whole team can study.',
       },
       {
         label: 'Cleaner retry',
-        value: 'Start the next attempt from a visible decision instead of a fuzzy recap.',
+        value:
+          'Start the next attempt from a visible decision instead of a fuzzy recap.',
       },
     ],
     readout: [

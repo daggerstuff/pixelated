@@ -31,26 +31,14 @@ describe('FHEParameterOptimizer', () => {
   })
 
   it('default strategy is BalancedApproach', () => {
-    // Access private property through a getter for testing
-    const strategy =
-      Object.getOwnPropertyDescriptor(
-        Object.getPrototypeOf(optimizer),
-        'strategy',
-      )?.get?.call(optimizer) || OptimizationStrategy.BalancedApproach
-
+    const strategy = Reflect.get(optimizer, 'strategy')
     expect(strategy).toBe(OptimizationStrategy.BalancedApproach)
   })
 
   it('setStrategy updates the active strategy', () => {
     optimizer.setStrategy(OptimizationStrategy.SecurityFocused)
 
-    // Access private property through a getter for testing
-    const strategy =
-      Object.getOwnPropertyDescriptor(
-        Object.getPrototypeOf(optimizer),
-        'strategy',
-      )?.get?.call(optimizer) || OptimizationStrategy.BalancedApproach
-
+    const strategy = Reflect.get(optimizer, 'strategy')
     expect(strategy).toBe(OptimizationStrategy.SecurityFocused)
   })
 
@@ -60,13 +48,7 @@ describe('FHEParameterOptimizer', () => {
       maximumMemoryMB: 2048,
     })
 
-    // Access private property through a getter for testing
-    const constraints =
-      Object.getOwnPropertyDescriptor(
-        Object.getPrototypeOf(optimizer),
-        'constraints',
-      )?.get?.call(optimizer) || {}
-
+    const constraints = Reflect.get(optimizer, 'constraints')
     expect(constraints).toEqual({
       minimumSecurityLevel: SecurityLevel.TC192,
       maximumMemoryMB: 2048,

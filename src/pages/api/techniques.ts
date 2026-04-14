@@ -123,7 +123,7 @@ export const POST = async ({ request, cookies }) => {
 
     // Get AI recommendations
     const recommendationRequest = { ...patientData, ...preferences }
-    const recommendations =  recommend(recommendationRequest)
+    const recommendations = recommend(recommendationRequest)
 
     return new Response(
       JSON.stringify({

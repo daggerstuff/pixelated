@@ -170,7 +170,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
             />
             <label for="isDefault" class="ml-2 block text-sm text-gray-700">
-              Set as default template
+              Set
             </label>
           </div>
         </div>
@@ -358,16 +358,16 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const removeBtn = sectionElement.querySelector('.remove-section')
         const titleInput = sectionElement.querySelector(
           '.section-title',
-        ) as HTMLInputElement | null
+        )
         const descriptionInput = sectionElement.querySelector(
           '.section-description',
-        ) as HTMLInputElement | null
+        )
         const contentTextarea = sectionElement.querySelector(
           '.section-content',
-        ) as HTMLTextAreaElement | null
+        )
         const requiredCheckbox = sectionElement.querySelector(
           '.section-required',
-        ) as HTMLInputElement | null
+        )
 
         moveUpBtn?.addEventListener('click', () => {
           if (index > 0) {
@@ -395,22 +395,22 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         })
 
         titleInput?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           sections[index].title = target.value
         })
 
         descriptionInput?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           sections[index].description = target.value
         })
 
         contentTextarea?.addEventListener('change', (e) => {
-          const target = e.target as HTMLTextAreaElement
+          const target = e.target
           sections[index].content = target.value
         })
 
         requiredCheckbox?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           sections[index].required = target.checked
         })
 
@@ -452,7 +452,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
                 value="${placeholder.key}"
                 class="placeholder-key w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
-              <p class="text-xs text-gray-500 mt-1">Use in content as {{KEY}}</p>
+              <p class="text-xs text-gray-500 mt-1">Use in content{{KEY}}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Label</label>
@@ -499,19 +499,19 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         )
         const keyInput = placeholderElement.querySelector(
           '.placeholder-key',
-        ) as HTMLInputElement | null
+        )
         const labelInput = placeholderElement.querySelector(
           '.placeholder-label',
-        ) as HTMLInputElement | null
+        )
         const descriptionInput = placeholderElement.querySelector(
           '.placeholder-description',
-        ) as HTMLInputElement | null
+        )
         const defaultInput = placeholderElement.querySelector(
           '.placeholder-default',
-        ) as HTMLInputElement | null
+        )
         const requiredCheckbox = placeholderElement.querySelector(
           '.placeholder-required',
-        ) as HTMLInputElement | null
+        )
 
         removeBtn?.addEventListener('click', () => {
           placeholders.splice(index, 1)
@@ -519,28 +519,28 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         })
 
         keyInput?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           placeholders[index].key = target.value.toUpperCase()
           if (keyInput) keyInput.value = placeholders[index].key // Update to show uppercase
         })
 
         labelInput?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           placeholders[index].label = target.value
         })
 
         descriptionInput?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           placeholders[index].description = target.value
         })
 
         defaultInput?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           placeholders[index].defaultValue = target.value
         })
 
         requiredCheckbox?.addEventListener('change', (e) => {
-          const target = e.target as HTMLInputElement
+          const target = e.target
           placeholders[index].required = target.checked
         })
 

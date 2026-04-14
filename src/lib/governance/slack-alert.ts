@@ -2,26 +2,26 @@
  * SlackAlerter - Sends alerts to Slack webhooks
  */
 export interface SlackMessage {
-  text?: string;
+  text?: string
   blocks?: Array<{
-    type: string;
+    type: string
     text?: {
-      type: string;
-      text: string;
-    };
-  }>;
-  [key: string]: unknown;
+      type: string
+      text: string
+    }
+  }>
+  [key: string]: unknown
 }
 
 export interface SlackAlertResult {
-  success: boolean;
+  success: boolean
 }
 
 export class SlackAlerter {
-  private webhookUrl: string;
+  private webhookUrl: string
 
   constructor(webhookUrl: string) {
-    this.webhookUrl = webhookUrl;
+    this.webhookUrl = webhookUrl
   }
 
   async send(message: SlackMessage): Promise<SlackAlertResult> {
@@ -32,11 +32,11 @@ export class SlackAlerter {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(message),
-      });
+      })
 
-      return { success: response.ok };
+      return { success: response.ok }
     } catch {
-      return { success: false };
+      return { success: false }
     }
   }
 }

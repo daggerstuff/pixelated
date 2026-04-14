@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+HETZNER_AI_CLI="${HETZNER_AI_CLI:-ovhai}"
 
-OVH_REGION="${OVH_REGION:-US-EAST-VA}"
+HETZNER_REGION="${HETZNER_REGION:-hel1}"
 APP_NAME="${APP_NAME:-pixelated-ollama}"
 GPU_MODEL="${GPU_MODEL:-L4}"
 GPU_COUNT="${GPU_COUNT:-1}"
@@ -10,9 +11,9 @@ MEMORY_SIZE="${MEMORY_SIZE:-16Gi}"
 PORT="${PORT:-11434}"
 REPLICAS="${REPLICAS:-1}"
 PRELOAD_MODELS="${PRELOAD_MODELS:-kimi:k2,qwen3-coder:14b,glm-4:9b}"
-VOLUME_REF="${OLLAMA_VOLUME:-pixelated-ollama-cache@$OVH_REGION:/models:rw}"
+VOLUME_REF="${OLLAMA_VOLUME:-pixelated-ollama-cache@$HETZNER_REGION:/models:rw}"
 
-# Map GPU model names to OVH flavor IDs
+# Map GPU model names to cloud flavor IDs
 get_flavor() {
   case "${GPU_MODEL,,}" in
     l4) echo "l4-1-gpu" ;;
@@ -25,40 +26,40 @@ get_flavor() {
 
 find_app_id() {
   # Try to find app ID by name (in spec.name), label, or direct ID match
-  ovhai app list --output json 2>/dev/null | jq -r --arg name "$APP_NAME" '.[] | select((.spec.name // "") == $name or .id == $name or (.spec.labels."app" // "") == $name) | .id' | head -1
+  ${HETZNER_AI_CLI} app list --output json 2>/dev/null | jq -r --arg name "$APP_NAME" '.[] | select((.spec.name // "") == $name or .id == $name or (.spec.labels."app" // "") == $name) | .id' | head -1
 }
 IMAGE_TAG="${IMAGE_TAG:-pixelated-ollama:latest}"
 # Note: CI/CD builds with both Build.BuildNumber and 'latest' tags
 # Default to 'latest' for convenience, override with IMAGE_TAG if needed
-DOCKERFILE="${DOCKERFILE:-ai/ovh/Dockerfile.ollama}"
+DOCKERFILE="${DOCKERFILE:-ai/hetzner/Dockerfile.ollama}"
 
 log() {
   printf '[ollama-cli] %s\n' "$1"
 }
 
 ensure_cli() {
-  for cmd in ovhai jq; do
+  for cmd in ${HETZNER_AI_CLI} jq; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
       echo "Missing dependency: $cmd" >&2
       exit 1
     fi
   done
-  if ! ovhai me >/dev/null 2>&1; then
-    echo "ovhai CLI is not authenticated. Run: ovhai login" >&2
+  if ! ${HETZNER_AI_CLI} me >/dev/null 2>&1; then
+    echo "${HETZNER_AI_CLI} CLI is not authenticated. Run: ${HETZNER_AI_CLI} login" >&2
     exit 1
   fi
 }
 
 registry_url() {
   # Parse table output: skip header, get last field (URL) from first data row
-  ovhai registry list | tail -n +2 | awk '{print $NF}'
+  ${HETZNER_AI_CLI} registry list | tail -n +2 | awk '{print $NF}'
 }
 
 # Note: Image building should be done via CI/CD (e.g., Azure Pipelines)
 # This function is kept for reference but requires docker locally
 build_image() {
   echo "Error: Local Docker builds are not supported." >&2
-  echo "Build the image via CI/CD (Azure Pipelines) or OVH's remote build service." >&2
+  echo "Build the image via CI/CD (Azure Pipelines) or the cloud provider's remote build service." >&2
   echo "Then provide the full image URL to 'deploy' command." >&2
   exit 1
 }
@@ -74,7 +75,7 @@ deploy_app() {
       log "No image URL provided, using: $image"
     else
       echo "Error: Image URL required and unable to determine registry." >&2
-      echo "Example: scripts/ovh/ollama-app.sh deploy <registry-url>/pixelated-ollama:latest" >&2
+      echo "Example: scripts/devops/ollama-app.sh deploy <registry-url>/pixelated-ollama:latest" >&2
       exit 1
     fi
   elif [[ "$image" != *"/"* ]]; then
@@ -92,18 +93,18 @@ deploy_app() {
   local existing_id="$(find_app_id)"
   if [ -n "$existing_id" ]; then
     log "App ${APP_NAME} (ID: $existing_id) exists; redeploying"
-    ovhai app stop "$existing_id" || true
-    ovhai app delete "$existing_id" || true
+    ${HETZNER_AI_CLI} app stop "$existing_id" || true
+    ${HETZNER_AI_CLI} app delete "$existing_id" || true
     sleep 5
   fi
 
   local flavor="$(get_flavor)"
-  log "Creating app ${APP_NAME} in ${OVH_REGION}"
+  log "Creating app ${APP_NAME} in ${HETZNER_REGION}"
   log "  Image: $image"
   log "  Flavor: $flavor (GPU: $GPU_COUNT)"
   log "  Replicas: $REPLICAS"
   
-  ovhai app run \
+  ${HETZNER_AI_CLI} app run \
     --name "$APP_NAME" \
     --label "app=$APP_NAME" \
     --flavor "$flavor" \
@@ -116,7 +117,7 @@ deploy_app() {
     --default-http-port "$PORT" \
     "$image"
 
-  log "App deployed. Use 'ovhai app get ${APP_NAME}' for status."
+  log "App deployed. Use '${HETZNER_AI_CLI} app get ${APP_NAME}' for status."
 }
 
 start_app() {
@@ -126,7 +127,7 @@ start_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app start "$app_id"
+  ${HETZNER_AI_CLI} app start "$app_id"
 }
 
 stop_app() {
@@ -136,7 +137,7 @@ stop_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app stop "$app_id"
+  ${HETZNER_AI_CLI} app stop "$app_id"
 }
 
 status_app() {
@@ -146,7 +147,7 @@ status_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app get "$app_id"
+  ${HETZNER_AI_CLI} app get "$app_id"
 }
 
 delete_app() {
@@ -156,7 +157,7 @@ delete_app() {
     echo "App ${APP_NAME} not found" >&2
     exit 1
   fi
-  ovhai app delete "$app_id"
+  ${HETZNER_AI_CLI} app delete "$app_id"
 }
 
 show_registry() {
@@ -172,11 +173,11 @@ show_registry() {
 
 usage() {
   cat <<EOF
-Manage the Pixelated Ollama OVH app.
+Manage the Pixelated Ollama deployment.
 
 Commands:
-  registry            Show your OVH registry URL
-  deploy [image-url]  Deploy or redeploy the OVH app (image must be pre-built via CI/CD)
+  registry            Show your registry URL
+  deploy [image-url]  Deploy or redeploy the app (image must be pre-built via CI/CD)
                       If no URL provided, auto-constructs from registry + pixelated-ollama:latest
   start               Start the existing app
   stop                Stop the app to save credits
@@ -188,12 +189,12 @@ Note: Docker images are built via CI/CD (Azure Pipelines), not locally.
 
 Environment overrides:
   APP_NAME, GPU_MODEL, GPU_COUNT, CPU_COUNT, MEMORY_SIZE, REPLICAS
-  PRELOAD_MODELS, OLLAMA_VOLUME, IMAGE_TAG, OVH_REGION
+  PRELOAD_MODELS, OLLAMA_VOLUME, IMAGE_TAG, HETZNER_REGION
 
 Examples:
-  scripts/ovh/ollama-app.sh deploy                    # Uses registry + pixelated-ollama:latest
-  scripts/ovh/ollama-app.sh deploy pixelated-ollama:latest  # Auto-adds registry
-  scripts/ovh/ollama-app.sh deploy <full-registry-url>/pixelated-ollama:latest
+  scripts/devops/ollama-app.sh deploy                    # Uses registry + pixelated-ollama:latest
+  scripts/devops/ollama-app.sh deploy pixelated-ollama:latest  # Auto-adds registry
+  scripts/devops/ollama-app.sh deploy <full-registry-url>/pixelated-ollama:latest
 EOF
 }
 

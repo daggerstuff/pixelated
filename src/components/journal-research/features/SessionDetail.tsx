@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { useState } from 'react'
 
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import {
   Card,
   CardContent,
@@ -18,7 +19,6 @@ import {
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 
-import { ProgressCharts } from '../charts/ProgressCharts'
 import { SessionForm } from '../forms/SessionForm'
 import { SessionCard } from '../shared/SessionCard'
 
@@ -122,7 +122,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
             <CardTitle>Progress Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressCharts
+            <LazyProgressCharts
               progress={progress}
               metrics={metrics ?? undefined}
             />

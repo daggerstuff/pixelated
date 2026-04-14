@@ -38,7 +38,11 @@ router.get('/detailed', async (req: Request, res: Response) => {
   // Check MongoDB
   try {
     const mongoConn = getMongoConnection()
-    const adminDb = mongoConn.connection.db.admin()
+    const adminDbConnection = mongoConn.db
+    if (!adminDbConnection) {
+      throw new Error('MongoDB admin database is not initialized')
+    }
+    const adminDb = adminDbConnection.admin()
     const serverStatus = await adminDb.serverStatus()
     health.services.mongodb = {
       status: 'connected',
