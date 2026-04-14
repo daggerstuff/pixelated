@@ -98,9 +98,12 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       logger.error('Failed to initialize Global Traffic Routing Manager', {
         error,
       })
-      throw new Error(`Initialization failed: ${(error instanceof Error ? error.message : "Unknown error")}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -277,7 +280,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       // Fallback to default region
       const fallbackDecision = this.getFallbackDecision()
       this.emit('traffic-routing-failed', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         fallback: fallbackDecision.target.regionId,
       })
 

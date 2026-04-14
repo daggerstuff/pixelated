@@ -1,3 +1,38 @@
+type AstroSlotRenderer = { render: () => string }
+type AstroRenderResult = string | { html: string }
+type AstroRenderOptions = { default?: AstroSlotRenderer }
+type AstroRenderFunction = (
+  props: Record<string, unknown>,
+  options?: AstroRenderOptions,
+) => Promise<AstroRenderResult> | AstroRenderResult
+
+export type AstroComponentFactory = {
+  name?: string
+  render: (
+    props: Record<string, unknown>,
+    options?: AstroRenderOptions,
+  ) => Promise<AstroRenderResult> | AstroRenderResult
+}
+
+function extractHtml(renderResult: unknown): string {
+  if (typeof renderResult === 'string') {
+    return renderResult
+  }
+
+  if (
+    typeof renderResult === 'object' &&
+    renderResult !== null &&
+    'html' in renderResult
+  ) {
+    const html = (renderResult as Record<string, unknown>).html
+    if (typeof html === 'string') {
+      return html
+    }
+  }
+
+  return String(renderResult)
+}
+
 /**
  * Renders an Astro component for testing
  * @param Component The Astro component to render
@@ -8,11 +43,8 @@
 export async function renderAstro<
   Props extends Record<string, unknown> = Record<string, unknown>,
 >(
-  Component:
-    | { render(props: Record<string, unknown>): Promise<string> }
-    | { (props: Record<string, unknown>): unknown }
-    | ((props: Record<string, unknown>) => unknown),
-  props: Props = {} as Props,
+  Component: AstroComponentFactory | AstroRenderFunction,
+  props?: Props,
   slotContent?: string,
 ): Promise<{
   astroContainer: HTMLDivElement
@@ -21,11 +53,18 @@ export async function renderAstro<
   querySelector: (selector: string) => Element | null
   querySelectorAll: (selector: string) => NodeListOf<Element>
 }> {
-  const renderProps = slotContent ? { ...props, slot: slotContent } : props
-  // Type assertion needed because Astro component types vary at runtime
-  const html = await (
-    Component as { render(props: Record<string, unknown>): Promise<string> }
-  ).render(renderProps)
+  const renderProps = props ?? {}
+  const renderSlots = slotContent
+    ? {
+        default: {
+          render: () => slotContent,
+        },
+      }
+    : undefined
+  const resolvedHtml = await (typeof Component === 'function'
+    ? Promise.resolve(Component(renderProps, renderSlots))
+    : Component.render(renderProps, renderSlots))
+  const html = extractHtml(resolvedHtml)
   const container = document.createElement('div')
   container.innerHTML = html
 
@@ -45,7 +84,9 @@ export async function renderAstro<
  * @param props Props to override in the mock
  * @returns A mock Astro global object
  */
-export function createMockAstro(props: Record<string, unknown> = {}): void {
+export function createMockAstro(
+  props: Record<string, unknown> = {},
+): Record<string, unknown> {
   return {
     props,
     request: new Request('http://localhost:3000'),

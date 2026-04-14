@@ -151,7 +151,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Failover readiness check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
+          message: `Failover readiness check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
         }
       }
     })
@@ -175,7 +175,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Data sync lag check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
+          message: `Data sync lag check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
         }
       }
     })
@@ -226,7 +226,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       this.logger.error('Failover readiness check failed', { error })
       return {
         ready: false,
-        message: `Readiness check error: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
+        message: `Readiness check error: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
       }
     }
   }
@@ -272,7 +272,15 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       return { healthy: true }
     } catch (error: unknown) {
       this.logger.error('Backup regions health check failed', { error })
-      return { healthy: false, reason: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error) }
+      return {
+        healthy: false,
+        reason:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
+      }
     }
   }
 
@@ -566,18 +574,18 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       this.logger.error('Failover failed', { error })
 
       this.failoverState.status = 'healthy'
-      this.failoverState.reason = `Failover failed: ${(error instanceof Error ? error.message : "Unknown error")}`
+      this.failoverState.reason = `Failover failed: ${error instanceof Error ? error.message : 'Unknown error'}`
 
       // Send failure notifications
       await this.sendFailoverNotifications(
         'failed',
         backupRegion,
-        (error instanceof Error ? error.message : "Unknown error"),
+        error instanceof Error ? error.message : 'Unknown error',
       )
 
       this.emit('failoverFailed', {
         targetRegion: backupRegion,
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
       })
 
@@ -1255,7 +1263,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       if (response.Payload) {
         const decodedPayload = new TextDecoder().decode(response.Payload)
-      return JSON.parse(decodedPayload) as T
+        return JSON.parse(decodedPayload)
       }
 
       return null

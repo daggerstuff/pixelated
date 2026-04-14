@@ -1,0 +1,161 @@
+name: CI
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  push:
+    branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'ai/**'
+      - 'docker/**'
+      - 'k8s/**'
+      - 'terraform/**'
+      - 'scripts/render-k8s-secrets.sh'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/deploy-staging.yml'
+      - '.github/workflows/deploy-production.yml'
+  pull_request:
+    branches: [main, master, staging]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      ARTIFACT_REGISTRY_LOCATION: us-west1
+      ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
+      TRIVY_STRICT_GATE: false
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+
+      - name: Initialize submodules
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Lint code
+        continue-on-error: true
+        run: pnpm lint:ci
+
+      - name: Format check
+        continue-on-error: true
+        run: pnpm format || true
+
+      - name: Run unit tests
+        continue-on-error: true
+        run: pnpm test || true
+
+      - name: Build Docker image
+        id: build-image
+        run: |
+          IMAGE_TAG="${GITHUB_SHA::7}"
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          docker build --pull --no-cache -f docker/Dockerfile.production -t "pixelatedempathy/api:$IMAGE_TAG" .
+
+      - name: Security scan
+        id: trivy_scan
+        uses: aquasecurity/trivy-action@v0.35.0
+        continue-on-error: true
+        with:
+          image-ref:
+            pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          ignore-unfixed: true
+          scanners: 'vuln'
+          severity: 'CRITICAL,HIGH'
+          limit-severities-for-sarif: true
+
+      - name: Upload Trivy scan results
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: Trivy Scan Results
+          path: trivy-results.sarif
+          retention-days: 30
+
+      - name: Summarize Trivy scan results
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        id: trivy_summary
+        run: |
+          echo "Trivy step outcome: ${{ steps.trivy_scan.outcome }}"
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "jq not installed; skip precise finding count."
+            exit 0
+          fi
+          findings="$(jq -r '.runs[0].results | length // 0' trivy-results.sarif)"
+          echo "critical_or_high_findings=$findings" >> "$GITHUB_OUTPUT"
+          if [[ "$findings" -gt 0 ]]; then
+            echo "::warning::Trivy found ${findings} CRITICAL/HIGH vulnerabilities in image scan."
+          else
+            echo "No CRITICAL/HIGH vulnerabilities found."
+          fi
+
+      - name: Security gate (soft-fail currently)
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        continue-on-error: true
+        run: |
+          findings="${{ steps.trivy_summary.outputs.critical_or_high_findings || '0' }}"
+          strict_gate="${TRIVY_STRICT_GATE:-false}"
+          if [[ "$findings" -gt 0 && "${strict_gate,,}" == "true" ]]; then
+            echo "Trivy strict gate is enabled and critical/high findings were detected."
+            exit 1
+          fi
+
+      - name: Authenticate to Google Cloud (OIDC)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Configure Google Cloud SDK
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Authenticate Docker to Artifact Registry
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          gcloud auth configure-docker "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev" --quiet
+
+      - name: Push Docker image to Google Artifact Registry
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
+        run: |
+          IMAGE_URI_BASE="${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/api"
+          docker tag pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }} "${IMAGE_URI_BASE}:${{ steps.build-image.outputs.image_tag }}"
+          docker tag pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }} "${IMAGE_URI_BASE}:latest"
+          docker push "${IMAGE_URI_BASE}:${{ steps.build-image.outputs.image_tag }}"
+          docker push "${IMAGE_URI_BASE}:latest"

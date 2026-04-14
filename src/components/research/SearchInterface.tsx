@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion'
 import React, { useState, useCallback } from 'react'
-
+import { useTranslation } from 'react-i18next'
 import { researchAPI, type BookMetadata } from '@/lib/api/research'
-
 import ExportPanel from './ExportPanel'
 import ResultsGrid from './ResultsGrid'
 import SearchFilters, { type SearchFiltersState } from './SearchFilters'
@@ -16,6 +15,7 @@ const DEFAULT_FILTERS: SearchFiltersState = {
 }
 
 export default function SearchInterface() {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<BookMetadata[]>([])
@@ -73,7 +73,9 @@ export default function SearchInterface() {
         setResults(data.results)
       } catch (err: unknown) {
         console.error('Search error:', err)
-        setError(err instanceof Error ? err.message : 'Failed to fetch results.')
+        setError(
+          err instanceof Error ? err.message : 'Failed to fetch results.',
+        )
       } finally {
         setLoading(false)
       }
@@ -91,6 +93,7 @@ export default function SearchInterface() {
     (newFilters: SearchFiltersState) => {
       setFilters(newFilters)
       setShowFilters(false)
+
       // Auto-refresh search if we already have a query
       if (query.trim()) {
         void executeSearch(query, selectedSources, newFilters)
@@ -109,6 +112,7 @@ export default function SearchInterface() {
               type='text'
               className='search-bar w-full pe-24 ps-4'
               placeholder='Search for books, papers, articles...'
+              aria-label={t('research.searchInterface.searchInputAriaLabel')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -116,7 +120,9 @@ export default function SearchInterface() {
               <button
                 type='button'
                 onClick={() => setShowFilters(!showFilters)}
-                className={`hover:bg-slate-700 rounded-md p-2 transition-colors ${showFilters ? 'text-pink-400 bg-slate-700' : 'text-slate-400'}`}
+                className={`hover:bg-slate-700 rounded-md p-2 transition-colors ${
+                  showFilters ? 'text-pink-400 bg-slate-700' : 'text-slate-400'
+                }`}
                 title='Advanced Filters'
                 aria-label='Toggle advanced filters'
                 aria-expanded={showFilters}

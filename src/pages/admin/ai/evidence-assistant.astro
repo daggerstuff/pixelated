@@ -1,0 +1,29 @@
+---
+import { EvidenceAssistantPanel } from '@/components/admin/EvidenceAssistantPanel'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const session = (Astro.locals as any)?.session
+const user = (Astro.locals as any)?.user
+
+if (!session || !user || user.role !== 'admin') {
+  return Astro.redirect('/auth/sign-in')
+}
+---
+
+<BaseLayout
+  title="AI Evidence Assistant"
+  description="Internal evidence-backed assistant for product, compliance, and research questions"
+>
+  <div class="container py-8">
+    <div class="mb-8 max-w-3xl">
+      <h1 class="text-4xl font-bold text-white">AI Evidence Assistant</h1>
+      <p class="mt-3 text-sm text-slate-300">
+        Admin-only search and grounded answer generation over internal docs and
+        pages. This is a bounded retrieval surface built for internal decision
+        support, not autonomous clinical use.
+      </p>
+    </div>
+
+    <EvidenceAssistantPanel client:load />
+  </div>
+</BaseLayout>

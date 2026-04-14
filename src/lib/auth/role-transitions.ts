@@ -219,12 +219,21 @@ export async function requestRoleTransition(
 
     return transitionRequest
   } catch (error: unknown) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED, null, {
-      userId: userId,
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
-      requestedRole,
-      requestedBy,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED,
+      null,
+      {
+        userId: userId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        requestedRole,
+        requestedBy,
+      },
+    )
 
     throw error instanceof AuthenticationError
       ? error
@@ -254,7 +263,9 @@ export async function processRoleTransitionApproval(
   } = approval
   try {
     // Get the transition request
-    const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
+    const request = (await getFromCache<RoleTransitionRequest>(
+      `role_transition:request:${requestId}`,
+    ))!
     if (!request) {
       throw new AuthenticationError('Role transition request not found')
     }
@@ -351,12 +362,21 @@ export async function processRoleTransitionApproval(
 
     return request
   } catch (error: unknown) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED, null, {
-      userId: approverId,
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
-      requestId,
-      decision,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED,
+      null,
+      {
+        userId: approverId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        requestId,
+        decision,
+      },
+    )
 
     throw error instanceof AuthenticationError
       ? error
@@ -373,7 +393,11 @@ async function executeRoleTransition(
 ): Promise<void> {
   try {
     // Get user's current authentication data
-    const userAuth = (await getFromCache<{ role: UserRole; permissions: string[]; updatedAt: number }>(`user_auth:${request.userId}`))!
+    const userAuth = (await getFromCache<{
+      role: UserRole
+      permissions: string[]
+      updatedAt: number
+    }>(`user_auth:${request.userId}`))!
     if (!userAuth) {
       throw new AuthenticationError('User authentication data not found')
     }
@@ -420,11 +444,20 @@ async function executeRoleTransition(
       'role_transition_completed',
     )
   } catch (error: unknown) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED, null, {
-      userId: request.userId,
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
-      requestId: request.id,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED,
+      null,
+      {
+        userId: request.userId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        requestId: request.id,
+      },
+    )
 
     throw new AuthenticationError('Failed to execute role transition')
   }
@@ -445,7 +478,9 @@ export async function cancelRoleTransitionRequest(
 ): Promise<void> {
   try {
     // Get the transition request
-    const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
+    const request = (await getFromCache<RoleTransitionRequest>(
+      `role_transition:request:${requestId}`,
+    ))!
     if (!request) {
       throw new AuthenticationError('Role transition request not found')
     }
@@ -509,7 +544,12 @@ export async function cancelRoleTransitionRequest(
       SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
       {
         userId: userId,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         requestId,
       },
     )
@@ -534,7 +574,9 @@ export async function getUserRoleTransitionRequests(
     const requests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
-      const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
+      const request = (await getFromCache<RoleTransitionRequest>(
+        `role_transition:request:${requestId}`,
+      ))!
       if (request && (!status || request.status === status)) {
         requests.push(request)
       }
@@ -564,7 +606,9 @@ export async function getPendingRoleTransitionRequests(
     const eligibleRequests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
-      const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
+      const request = (await getFromCache<RoleTransitionRequest>(
+        `role_transition:request:${requestId}`,
+      ))!
       if (
         request &&
         request.status === 'pending' &&
@@ -673,7 +717,9 @@ async function getPendingRoleRequests(
     const requests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
-      const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
+      const request = (await getFromCache<RoleTransitionRequest>(
+        `role_transition:request:${requestId}`,
+      ))!
       if (request && request.status === 'pending') {
         requests.push(request)
       }
@@ -691,7 +737,9 @@ async function getPendingRoleRequests(
  */
 async function expireRoleTransitionRequest(requestId: string): Promise<void> {
   try {
-    const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
+    const request = (await getFromCache<RoleTransitionRequest>(
+      `role_transition:request:${requestId}`,
+    ))!
     if (!request) return
 
     request.status = 'expired'
@@ -714,7 +762,7 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
       roleFrom: request.currentRole,
       roleTo: request.requestedRole,
       actorId: 'system',
-      actorRole: 'admin' as UserRole,  // system actor
+      actorRole: 'admin' as UserRole, // system actor
       reason: 'Request expired',
       timestamp: Date.now(),
       ipAddress: 'system',
@@ -827,7 +875,9 @@ export async function getRoleTransitionAuditTrail(
     const recentIds = auditIds.slice(-limit)
 
     for (const auditId of recentIds) {
-      const auditLog = (await getFromCache<RoleTransitionAuditLog>(`role_transition:audit:${auditId}`))!
+      const auditLog = (await getFromCache<RoleTransitionAuditLog>(
+        `role_transition:audit:${auditId}`,
+      ))!
       if (auditLog) {
         auditLogs.push(auditLog)
       }
@@ -914,7 +964,9 @@ export async function validateRoleAssignment(
     }
 
     // Check for existing role conflicts
-    const targetUserAuth = (await getFromCache<{ role: UserRole }>(`user_auth:${targetUserId}`))!
+    const targetUserAuth = (await getFromCache<{ role: UserRole }>(
+      `user_auth:${targetUserId}`,
+    ))!
     if (targetUserAuth) {
       const currentRole = targetUserAuth.role
       if (currentRole === targetRole) {

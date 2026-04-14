@@ -12,7 +12,7 @@
 #   3. Docker + credential helpers
 #   4. Homebrew (Linuxbrew)
 #   5. Dev tools: nvm, npm, pnpm, bun, uv, ohmyzsh
-#   6. Cloud CLIs: aws, az, azd, doctl, s3cmd, acli, gh, glab
+#   6. Cloud CLIs: aws, az, azd, doctl (legacy/optional), s3cmd, acli, gh, glab
 #   7. SSH setup: keys, config, askpass, agent forwarding
 #   8. Git config + credentials
 #   9. rclone setup + restore from backup
@@ -679,9 +679,14 @@ setup_cloud_clis() {
         curl -fsSL https://aka.ms/install-azd.sh | bash
     fi
     
-    # DigitalOcean doctl (via brew)
-    if ! command_exists doctl; then
-        sudo -u "${username}" brew install doctl 2>/dev/null || true
+    # DigitalOcean doctl (legacy/optional for legacy workflows)
+    local enable_legacy_doctl="${ENABLE_LEGACY_DOCTL:-0}"
+    if [[ "${enable_legacy_doctl}" == "1" ]]; then
+      if ! command_exists doctl; then
+          sudo -u "${username}" brew install doctl 2>/dev/null || true
+      fi
+    else
+      warn "Skipping DigitalOcean doctl install (legacy/optional): set ENABLE_LEGACY_DOCTL=1 to opt in."
     fi
     
     # s3cmd (via brew - already have it)
@@ -728,11 +733,16 @@ setup_cloud_cli_auth() {
         chown -R "${username}:${username}" "${user_home}/.config/Azure"
     fi
     
-    # DigitalOcean
-    if [[ -f "${backup_config}/doctl/config.yaml" ]]; then
+    # DigitalOcean / doctl (legacy backup restore)
+    local enable_legacy_doctl="${ENABLE_LEGACY_DOCTL:-0}"
+    if [[ "${enable_legacy_doctl}" == "1" ]]; then
+      if [[ -f "${backup_config}/doctl/config.yaml" ]]; then
         mkdir -p "${user_home}/.config/doctl"
         cp "${backup_config}/doctl/config.yaml" "${user_home}/.config/doctl/"
         chown -R "${username}:${username}" "${user_home}/.config/doctl"
+      fi
+    else
+      warn "Skipping DigitalOcean doctl auth restore (legacy/optional). Set ENABLE_LEGACY_DOCTL=1 to import."
     fi
     
     # Oracle Cloud
@@ -1146,7 +1156,7 @@ setup_backup_system() {
     systemctl start backup-home-vivi.timer 2>/dev/null || true
     systemctl start config-backup.timer 2>/dev/null || true
     
-    success "Backup system configured (weekly config backup + 6-hourly home backup)"
+success "Backup system configured (weekly config backup + twice-daily home backup)"
 }
 
 # =============================================================================
@@ -1179,7 +1189,11 @@ print_summary() {
     echo "  AWS CLI:     $(command -v aws 2>/dev/null || echo 'not found')"
     echo "  Azure CLI:   $(command -v az 2>/dev/null || echo 'not found')"
     echo "  Azure Dev:   $(command -v azd 2>/dev/null || echo 'not found')"
-    echo "  DigitalOcean: $(command -v doctl 2>/dev/null || echo 'not found')"
+    if [[ "${ENABLE_LEGACY_DOCTL:-0}" == "1" ]]; then
+      echo "  DigitalOcean (legacy doctl): $(command -v doctl 2>/dev/null || echo 'not found')"
+    else
+      echo "  DigitalOcean (legacy doctl): disabled (set ENABLE_LEGACY_DOCTL=1)"
+    fi
     echo "  Oracle:      $(command -v acli 2>/dev/null || echo 'not found')"
     echo "  GitHub:      $(command -v gh 2>/dev/null || echo 'not found')"
     echo "  GitLab:      $(command -v glab 2>/dev/null || echo 'not found')"
@@ -1212,7 +1226,7 @@ print_summary() {
     echo -e "${BLUE}Next Steps:${NC}"
     echo "  1. SSH in:     ssh -p ${CONFIG[ssh_port]} vivi@$(hostname -I | awk '{print $1}')"
     echo "  2. Upgrade:    sudo do-release-upgrade  (if Ubuntu 22/24)"
-    echo "  3. Auth:       aws configure, az login, doctl auth init, etc."
+    echo "  3. Auth:       aws configure, az login, doctl auth init (legacy, optional), etc."
     echo "  4. Configure:  rclone config (if not restored)"
     echo "  5. Restore:    rclone copy drive:vivi-home-backups/pixelated/ ${CONFIG[workspace_dir]}/"
     echo "  6. View logs:  tail -f ${LOG_FILE}"

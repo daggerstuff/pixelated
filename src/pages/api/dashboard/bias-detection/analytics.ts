@@ -199,7 +199,11 @@ export const GET: APIRoute = async ({ url }) => {
       JSON.stringify({
         error: 'Failed to fetch analytics data',
         details:
-          process.env['NODE_ENV'] === 'development' ? (error instanceof Error ? error.message : "Unknown error") : undefined,
+          process.env['NODE_ENV'] === 'development'
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : undefined,
       }),
       {
         status: 500,

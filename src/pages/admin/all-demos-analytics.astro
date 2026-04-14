@@ -7,6 +7,7 @@ import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
 import Badge from '@/components/ui/Badge.astro'
 import { Button } from '@/components/ui/button/button'
+import { ChartBar } from 'lucide-react'
 
 export const prerender = false // Enable SSR for real-time data
 
@@ -35,7 +36,6 @@ const demoPages = [
     color: 'red',
     description: 'Real-time bias protection',
   },
-import { ChartBar } from 'lucide-react'
 ]
 ---
 
@@ -496,9 +496,10 @@ import { ChartBar } from 'lucide-react'
         {/* Export and Actions */}
         <div class="flex justify-center gap-4">
           <Button
+            variant="outline"
             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3"
           >
-            <Button variant="outline"><ChartBar className="w-4 h-4 mr-2" /> Export All Data</Button>
+            <ChartBar className="w-4 h-4 mr-2" /> Export All Data
           </Button>
           <Button
             variant="outline"

@@ -141,7 +141,10 @@ export class OptimizedConnectionPool extends EventEmitter {
       })
 
       this.pool.on('error', (error, client) => {
-        logger.error('Pool error', { error: (error instanceof Error ? error.message : "Unknown error"), client: !!client })
+        logger.error('Pool error', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          client: !!client,
+        })
         this.metrics.failedQueries++
         this.updateHealthScore()
         this.emit('connection-error', error, client)
@@ -277,7 +280,12 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.error('Query execution failed', {
         query: text.substring(0, 100),
         duration,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
 
       throw error

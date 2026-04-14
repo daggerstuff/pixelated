@@ -62,7 +62,7 @@ if (businessAssociateService.getAllBusinessAssociates().length === 0) {
 // Filter business associates based on search parameters
 const businessAssociates = businessAssociateService.searchBusinessAssociates(
   searchQuery,
-  type || undefined,
+  type as BusinessAssociateType || undefined,
   compliance || undefined,
 )
 
@@ -497,7 +497,7 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
     // Handle delete vendor buttons
     const deleteButtons = document.querySelectorAll('.delete-vendor')
     deleteButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const vendorId = (e.target as HTMLElement).getAttribute(
           'data-vendor-id',
         )

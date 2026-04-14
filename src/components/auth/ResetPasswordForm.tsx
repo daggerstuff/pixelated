@@ -32,24 +32,25 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
 
     try {
       // Call auth service to verify token and set new password
-      const response = await authClient.resetPassword({
+      const response = await authClient.resetPassword.send({
         newPassword: password,
         token,
         email,
       })
 
-      if (!response.error) {
+      if (!('error' in response && response.error)) {
         // Dispatch custom event that the parent page is listening for
         const event = new CustomEvent('password-reset-success')
         document.dispatchEvent(event)
       } else {
-        throw new Error(response.error.message || 'Password reset failed')
+        throw new Error(
+          (response as { error?: { message?: string } }).error?.message ||
+            'Password reset failed',
+        )
       }
     } catch (err: unknown) {
       const message =
-        err instanceof Error
-          ? (err)?.message || String(err)
-          : 'An error occurred'
+        err instanceof Error ? err?.message || String(err) : 'An error occurred'
       setError(message)
 
       // Dispatch error event

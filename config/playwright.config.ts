@@ -1,23 +1,15 @@
 import { defineConfig, devices } from '@playwright/test'
 // Detect CI environment to avoid running dev server with file watchers in CI (which can fail under low inotify limits).
 const isCi = !!process.env['CI']
+const shouldSkipWebServer =
+  process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === '1' ||
+  process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === 'true'
 
 // Get base URL from environment or default to localhost
 // Default to port 3000 for local dev, 4321 for CI (preview server)
 const baseURL =
-  process.env['BASE_URL'] ||
+  process.env['BASE_URL'] ??
   (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
-
-// Optional Cloudflare Access service token support for staging/prod runs
-const cfAccessClientId = process.env['CF_ACCESS_CLIENT_ID']
-const cfAccessClientSecret = process.env['CF_ACCESS_CLIENT_SECRET']
-const extraHTTPHeaders =
-  cfAccessClientId && cfAccessClientSecret
-    ? {
-      'CF-Access-Client-Id': cfAccessClientId,
-      'CF-Access-Client-Secret': cfAccessClientSecret,
-    }
-    : undefined
 
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
@@ -44,7 +36,7 @@ try {
   if (!isRemoteUrl) {
     // Use explicit port if provided, otherwise use default based on CI context
     // (3000 for dev, 4321 for preview/CI)
-    webServerPort = explicitPort !== null ? explicitPort : isCi ? 4321 : 3000
+    webServerPort = explicitPort ?? (isCi ? 4321 : 3000)
 
     // Construct webServerUrl with the correct port
     // If the original URL had a port, use it; otherwise construct with the determined port
@@ -64,6 +56,19 @@ try {
   webServerUrl = undefined
   webServerPort = undefined
 }
+
+// Optional Cloudflare Access service token support for staging/prod runs
+// Keep localhost preview traffic free of Cloudflare-only headers to avoid
+// CORS noise in browser tests.
+const cfAccessClientId = process.env['CF_ACCESS_CLIENT_ID']
+const cfAccessClientSecret = process.env['CF_ACCESS_CLIENT_SECRET']
+const extraHTTPHeaders =
+  isRemoteUrl && cfAccessClientId && cfAccessClientSecret
+    ? {
+        'CF-Access-Client-Id': cfAccessClientId,
+        'CF-Access-Client-Secret': cfAccessClientSecret,
+      }
+    : undefined
 
 /**
  * Playwright configuration for Pixelated Empathy AI E2E tests
@@ -154,29 +159,30 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   // Only start webServer if BASE_URL is localhost (not a remote URL)
   // When BASE_URL points to staging/production, skip webServer to avoid timeout
-  webServer: isRemoteUrl
-    ? undefined
-    : isCi
-      ? {
-        // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
-        // Use port from BASE_URL if specified, otherwise default to 4321
-        command: `pnpm run build && pnpm run preview -- --port ${webServerPort || 4321}`,
-        url: webServerUrl || 'http://localhost:4321',
-        reuseExistingServer: false,
-        timeout: 10 * 60 * 1000, // allow time for build + preview start
-      }
-      : {
-        // Local/dev flow should keep the fast dev server with HMR.
-        // Use port from BASE_URL if specified, otherwise use default (3000 from package.json dev script)
-        // Astro dev command accepts --port flag and also respects PORT/ASTRO_PORT env vars
-        command:
-          webServerPort !== undefined && webServerPort !== 3000
-            ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
-            : 'pnpm dev',
-        url: webServerUrl || 'http://localhost:3000',
-        reuseExistingServer: true,
-        timeout: 180 * 1000,
-      },
+  webServer:
+    isRemoteUrl || shouldSkipWebServer
+      ? undefined
+      : isCi
+        ? {
+            // In CI, build and serve a production preview to avoid Vite/HMR file watcher issues.
+            // Use port from BASE_URL if specified, otherwise default to 4321
+            command: `pnpm run build && pnpm run preview -- --port ${webServerPort ?? 4321}`,
+            url: webServerUrl ?? 'http://localhost:4321',
+            reuseExistingServer: false,
+            timeout: 10 * 60 * 1000, // allow time for build + preview start
+          }
+        : {
+            // Local/dev flow should keep the fast dev server with HMR.
+            // Use port from BASE_URL if specified, otherwise use default (3000 from package.json dev script)
+            // Astro dev command accepts --port flag and also respects PORT/ASTRO_PORT env vars
+            command:
+              webServerPort !== undefined && webServerPort !== 3000
+                ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
+                : 'pnpm dev',
+            url: webServerUrl ?? 'http://localhost:3000',
+            reuseExistingServer: true,
+            timeout: 180 * 1000,
+          },
 
   /* Global setup and teardown */
   // globalSetup: './tests/e2e/global-setup.ts',

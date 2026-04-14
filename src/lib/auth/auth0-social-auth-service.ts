@@ -69,7 +69,6 @@ function initializeAuth0Clients() {
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users create:users',
     })
   }
 }
@@ -191,7 +190,7 @@ export class Auth0SocialAuthService {
     } catch (error: unknown) {
       console.error('Token exchange failed:', error)
       throw new Error(
-        `Token exchange failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Token exchange failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -222,7 +221,7 @@ export class Auth0SocialAuthService {
     } catch (error: unknown) {
       console.error('Failed to get user info:', error)
       throw new Error(
-        `Failed to get user info: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to get user info: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -252,7 +251,7 @@ export class Auth0SocialAuthService {
     } catch (error: unknown) {
       console.error('Token refresh failed:', error)
       throw new Error(
-        `Token refresh failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Token refresh failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -368,7 +367,7 @@ export class Auth0SocialAuthService {
         error,
       )
       throw new Error(
-        `Failed to link social account: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to link social account: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -413,7 +412,7 @@ export class Auth0SocialAuthService {
         error,
       )
       throw new Error(
-        `Failed to unlink social account: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Failed to unlink social account: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }

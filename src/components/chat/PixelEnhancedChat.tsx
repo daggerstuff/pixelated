@@ -50,7 +50,8 @@ export function PixelEnhancedChat({
   } = usePixelConversationIntegration({
     sessionId,
     userId,
-    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || 'http://localhost:8001',
+    pixelApiUrl:
+      process.env['REACT_APP_PIXEL_API_URL'] || 'http://localhost:8001',
   })
 
   // Local state
@@ -197,9 +198,12 @@ export function PixelEnhancedChat({
                   {lastAnalysis.behavioral_pattern}
                 </p>
                 {lastAnalysis.behavioral_pattern_confidence !== undefined && (
-                  <p className='text-sm text-gray-600'>
+                  <p className='text-gray-600 text-sm'>
                     Confidence:{' '}
-                    {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(0)}%
+                    {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(
+                      0,
+                    )}
+                    %
                   </p>
                 )}
               </CardContent>
@@ -417,7 +421,10 @@ function MessageBubble({
                 {pixelMetrics.behavioral_pattern_confidence !== undefined && (
                   <p className='opacity-75'>
                     Confidence:{' '}
-                    {(pixelMetrics.behavioral_pattern_confidence * 100).toFixed(0)}%
+                    {(pixelMetrics.behavioral_pattern_confidence * 100).toFixed(
+                      0,
+                    )}
+                    %
                   </p>
                 )}
               </div>

@@ -18,7 +18,7 @@ dependencies = [
   "shap>=0.41.0",
   "lime",
   "scikit-image>=0.26.0",
-  "spacy>=3.8.11", # Updated to latest secure version
+  "spacy>=3.8.14", # Updated to latest secure version
   "nltk>=3.9.3", # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip)
   "evaluate",
   "cryptography>=46.0.5", # Updated to latest secure version
@@ -31,13 +31,13 @@ dependencies = [
   "psutil>=7.0.0",
   "chardet>=5.2.0,<8.0.0",
   "pydub>=0.25.1",
-  "pyarrow>=21.0.0",
+  "pyarrow>=23.0.1",
   "hatch>=1.14.1",
   "textstat>=0.7.8",
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
   "wandb>=0.21.1",
-    "tqdm>=4.67.0", # Progress bar for data processing scripts
+  "tqdm>=4.67.0", # Progress bar for data processing scripts
   # Training dependencies
   "datasets>=2.19.0",
   "sentencepiece>=0.2.0",
@@ -46,7 +46,7 @@ dependencies = [
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
   "transformers>=4.48.0", # Required for dataset_pipeline training_runner
-  "torch==2.10.0", # Downgraded to match ai-services/requirements.txt and src/lib/ai/training/requirements.txt
+  "torch==2.11.0", # Downgraded to match ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
@@ -60,7 +60,7 @@ dependencies = [
   "redis>=6.4.0",
   "bcrypt>=4.3.0",
   "email-validator>=2.3.0",
-  "python-socketio>=5.14.0",
+  "python-socketio>=5.16.1",
   "flask-socketio>=5.3.6",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
@@ -86,11 +86,11 @@ dependencies = [
   "google-auth-httplib2>=0.2.0",
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
-  "ngcsdk>=4.10.0",
+  "ngcsdk>=4.16.0",
   "onnx>=1.20.1",
-  "onnxscript>=0.5.7",
+  "onnxscript>=0.6.2",
   "fastapi>=0.124.4",
-  "uvicorn>=0.38.0",
+  "uvicorn>=0.44.0",
   "minio>=7.2.20",
   "librosa>=0.11.0",
   "langsmith-fetch>=0.3.1",
@@ -101,7 +101,7 @@ dependencies = [
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
   "e2b>=2.6.1",
-  "lancedb>=0.29.2",
+  "lancedb>=0.30.2",
   "openai-whisper>=20250625",
   "faster-whisper>=1.2.0",
   "kernels>=0.12.1",
@@ -114,13 +114,14 @@ dependencies = [
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
   "GitPython>=3.1.43",
-  "modal>=1.3.5",
+  "modal>=1.4.1",
   "gradient-adk>=0.2.11",
-  "honeyhive>=0.2.19",
+  "honeyhive>=0.2.57",
   "virtualenv>=21.2.0",
   "voyageai>=0.3.7",
   "hindsight-litellm>=0.5.0",
   "aiosqlite>=0.22.1",
+  "semgrep>=1.79.0",
 ]
 [project.optional-dependencies]
 test = [
@@ -248,8 +249,8 @@ addopts = "-ra --strict-markers"
 testpaths = ["tests", "ai/core/tests"]
 norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
 markers = [
-    "integration: marks tests as integration tests (require external services)",
-    "slow: marks tests as slow running",
+  "integration: marks tests as integration tests (require external services)",
+  "slow: marks tests as slow running",
 ]
 filterwarnings = [
   "ignore:.*WordPiece.*:DeprecationWarning",
@@ -264,13 +265,13 @@ show_missing = true
 skip_covered = true
 fail_under = 70
 exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "@abstractmethod",
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@abstractmethod",
 ]
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
@@ -294,8 +295,8 @@ dev = [
   "pip-audit>=2.9.0",
   "pytest-asyncio>=1.0.0",
   "pytest-cov>=6.2.1",
-  "pytest-mock>=3.12.0",
-  "pytest>=8.4.2",
+  "pytest-mock>=3.15.1",
+  "pytest>=9.0.3",
   "pyright>=1.1.408",
   "ruff-lsp>=0.0.62",
   "ruff>=0.12.5",

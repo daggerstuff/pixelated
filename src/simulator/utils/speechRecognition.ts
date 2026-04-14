@@ -24,13 +24,9 @@ interface SpeechGrammarListInterface {
   addFromString(string: string, weight: number): void
 }
 
-interface SpeechRecognitionConstructor {
-  new (): SpeechRecognitionInterface
-}
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInterface
 
-interface SpeechGrammarListConstructor {
-  new (): SpeechGrammarListInterface
-}
+type SpeechGrammarListConstructor = new () => SpeechGrammarListInterface
 
 // Define the speech recognition window interface
 declare global {

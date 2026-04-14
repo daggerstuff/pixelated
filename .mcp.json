@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "mcpServers": {
+    "foresight": {
+      "command": "uv",
+      "args": ["run", "-m", "foresight_mcp"],
+      "cwd": "/home/vivi/pixelated/foresight-mcp",
+      "env": {
+        "FORESIGHT_DB_PATH": "/home/vivi/.foresight/memory.db",
+        "FORESIGHT_USER_ID": "vivi"
+      }
+    },
+    "cloudflare": {
+      "command": "npx",
+      "args": ["@cloudflare/mcp-server-cloudflare"],
+      "env": {
+        "CLOUDFLARE_API_KEY": "${CLOUDFLARE_API_KEY}",
+        "CLOUDFLARE_EMAIL": "${CLOUDFLARE_EMAIL}",
+        "CLOUDFLARE_ACCOUNT_ID": "${CLOUDFLARE_ACCOUNT_ID}"
+      }
+    }
+  }
+}

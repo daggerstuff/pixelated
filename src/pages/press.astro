@@ -6,15 +6,18 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 const quickFacts = [
   {
     label: 'What the company does',
-    value: 'Builds clinical simulation and transcript-backed review tools for therapist training teams.',
+    value:
+      'Builds clinical simulation and transcript-backed review tools for therapist training teams.',
   },
   {
     label: 'Who it serves',
-    value: 'Therapists, supervisors, training programs, and care teams rehearsing difficult conversations.',
+    value:
+      'Therapists, supervisors, training programs, and care teams rehearsing difficult conversations.',
   },
   {
     label: 'How to describe it',
-    value: 'A founder-led software company focused on clearer supervision for hard therapy sessions.',
+    value:
+      'A founder-led software company focused on clearer supervision for hard therapy sessions.',
   },
 ]
 
@@ -29,31 +32,53 @@ const coverageTopics = [
 <BaseLayout
   title="Press & Media | Pixelated Empathy"
   description="Press information and company background for Pixelated Empathy."
+  fullWidthMain
 >
   <MarketingPageHero
     eyebrow="Press"
     title="Company facts for reporters, partners, and evaluators."
     lede="Pixelated Empathy builds AI roleplay and simulation tools for therapist training. If you are covering mental health technology, supervision workflows, or practice-based training, this page is the fast orientation."
     note="Media contact: info@pixelatedempathy.com"
-    trustLine={['Founder-led company', 'United States', 'Response goal: two business days']}
-    primaryCTA={{ text: 'Email media contact', href: 'mailto:info@pixelatedempathy.com' }}
+    trustLine={[
+      'Founder-led company',
+      'United States',
+      'Response goal: two business days',
+    ]}
+    primaryCTA={{
+      text: 'Email media contact',
+      href: 'mailto:info@pixelatedempathy.com',
+    }}
     secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
     stats={[
-      { label: 'Media email', value: 'info@pixelatedempathy.com', detail: 'For background, company facts, and interview coordination' },
-      { label: 'Response window', value: 'Two business days', detail: 'Typical reply target for press inquiries' },
-      { label: 'Coverage fit', value: 'Mental health tech', detail: 'Training workflows, supervision, and AI simulation' },
+      {
+        label: 'Media email',
+        value: 'info@pixelatedempathy.com',
+        detail: 'For background, company facts, and interview coordination',
+      },
+      {
+        label: 'Response window',
+        value: 'Two business days',
+        detail: 'Typical reply target for press inquiries',
+      },
+      {
+        label: 'Coverage fit',
+        value: 'Mental health tech',
+        detail: 'Training workflows, supervision, and AI simulation',
+      },
     ]}
   />
 
   <section class="marketing-section">
     <div class="marketing-shell">
       <div class="marketing-grid marketing-grid--3">
-        {quickFacts.map((fact) => (
-          <article class="marketing-card">
-            <span class="marketing-card__label">{fact.label}</span>
-            <p>{fact.value}</p>
-          </article>
-        ))}
+        {
+          quickFacts.map((fact) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{fact.label}</span>
+              <p>{fact.value}</p>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -64,7 +89,10 @@ const coverageTopics = [
         <article class="marketing-card marketing-card--accent">
           <span class="marketing-card__label">Boilerplate</span>
           <p>
-            Pixelated Empathy is a founder-led company building AI simulation tools that help therapists, supervisors, and training programs practice difficult mental health conversations before they happen in the real world.
+            Pixelated Empathy is a founder-led company building AI simulation
+            tools that help therapists, supervisors, and training programs
+            practice difficult mental health conversations before they happen in
+            the real world.
           </p>
         </article>
 
@@ -87,7 +115,10 @@ const coverageTopics = [
       'What you are covering or evaluating',
       'Your ideal response window',
     ]}
-    primaryCTA={{ text: 'Email media contact', href: 'mailto:info@pixelatedempathy.com' }}
+    primaryCTA={{
+      text: 'Email media contact',
+      href: 'mailto:info@pixelatedempathy.com',
+    }}
     secondaryCTA={{ text: 'Talk to the team', href: '/contact' }}
     note="If you are evaluating the product rather than covering it, use the contact page instead."
   />

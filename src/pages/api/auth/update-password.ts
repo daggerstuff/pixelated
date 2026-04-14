@@ -91,7 +91,11 @@ export const POST = async ({ request, cookies }: APIContext) => {
       JSON.stringify({
         success: false,
         message:
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Failed to update password',
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Failed to update password',
       }),
       {
         status: 500,

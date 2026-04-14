@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-# Disable insecure request warnings for OVH self-signed certs
+# Disable insecure request warnings for HETZNER self-signed certs
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables
@@ -25,11 +25,11 @@ env_path = Path(__file__).parents[2] / "ai" / ".env"
 load_dotenv(env_path)
 
 # S3 Configuration
-BUCKET = os.getenv("OVH_S3_BUCKET", "pixel-data")
-ENDPOINT = os.getenv("OVH_S3_ENDPOINT", "https://s3.us-east-va.io.cloud.ovh.us")
-ACCESS_KEY = os.getenv("OVH_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
-SECRET_KEY = os.getenv("OVH_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
-REGION = os.getenv("OVH_S3_REGION", "us-east-va")
+BUCKET = os.getenv("HETZNER_S3_BUCKET", "pixel-data")
+ENDPOINT = os.getenv("HETZNER_S3_ENDPOINT", "https://hel1.your-objectstorage.com")
+ACCESS_KEY = os.getenv("HETZNER_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
+SECRET_KEY = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
+REGION = os.getenv("HETZNER_S3_REGION", "hel1")
 
 MAX_WORKERS = 32  # Increase for faster migration
 

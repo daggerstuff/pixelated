@@ -1,18 +1,11 @@
 ---
-/**
- * Homepage - Pixelated Brutalism Design
- * Modern + Minimalist + Brutalist aesthetic
- */
 import Layout from '@/layouts/Layout.astro'
 import BrutalistHero from '@/components/BrutalistHero.astro'
-import InfoStrip from '@/components/homepage/InfoStrip.astro'
 import IntroSection from '@/components/homepage/IntroSection.astro'
-import WorkflowSection from '@/components/homepage/WorkflowSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
 import { homepageContent } from '@/lib/content'
 import '@/styles/homepage.css'
-
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -42,90 +35,50 @@ const organizationSchema = {
 <Layout
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
+  keywords="clinical simulation, therapy training, clinical supervision, mental health"
+  fullWidthMain
 >
+  <div class="pe-homepage">
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+    />
 
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema)}
-  />
+    <BrutalistHero
+      kicker={homepageContent.hero.kicker}
+      title={homepageContent.hero.title}
+      subtitle={homepageContent.hero.subtitle}
+      helperText={homepageContent.hero.helperText}
+      proofPoints={homepageContent.hero.proofPoints}
+      primaryCTA={homepageContent.hero.primaryCTA}
+      secondaryCTA={homepageContent.hero.secondaryCTA}
+      artifact={homepageContent.hero.artifact}
+    />
 
-  <BrutalistHero
-    kicker={homepageContent.hero.kicker}
-    title={homepageContent.hero.title}
-    subtitle={homepageContent.hero.subtitle}
-    helperText={homepageContent.hero.helperText}
-    proofPoints={homepageContent.hero.proofPoints}
-    primaryCTA={homepageContent.hero.primaryCTA}
-    secondaryCTA={homepageContent.hero.secondaryCTA}
-    artifact={homepageContent.hero.artifact}
-  />
+    <IntroSection content={homepageContent.intro} />
 
-  <section class="trust-band-section border-y border-white/5 bg-black/10">
-    <div class="container trust-band-shell">
+    <CoreFeatures
+      label={homepageContent.features.label}
+      title={homepageContent.features.title}
+      copy={homepageContent.features.copy}
+      proofLabel={homepageContent.features.proofLabel}
+      proofItems={homepageContent.features.proofItems}
+      cards={homepageContent.features.cards}
+      comparison={homepageContent.features.comparison}
+    />
 
-      <InfoStrip
-        className="trust-band"
-        label="Why teams stay on the page"
-        items={[
-          {
-            label: 'Who it is for',
-            value: 'Clinical educators, supervisors, and training leads',
-          },
-          {
-            label: 'What you actually keep',
-            value: 'Transcript, decisions, and coaching notes in one record',
-          },
-          {
-            label: 'Best first move',
-            value: 'See the demo, then bring one hard case to a pilot review',
-          },
-        ]}
-        theme="dark"
-      />
-    </div>
-  </section>
-
-  <IntroSection content={homepageContent.intro} />
-  <WorkflowSection content={homepageContent.how} />
-
-  <CoreFeatures
-    label={homepageContent.features.label}
-    title={homepageContent.features.title}
-    copy={homepageContent.features.copy}
-    proofLabel={homepageContent.features.proofLabel}
-    proofItems={homepageContent.features.proofItems}
-    cards={homepageContent.features.cards}
-    comparison={homepageContent.features.comparison}
-  />
-
-  <CTA
-    label={homepageContent.cta.label}
-    title={homepageContent.cta.title}
-    intro={homepageContent.cta.intro}
-    verdictCopy={homepageContent.cta.verdictCopy}
-    proofItems={homepageContent.cta.proofItems}
-    decisionTitle={homepageContent.cta.decisionTitle}
-    rubric={homepageContent.cta.rubric}
-    primaryCTA={homepageContent.cta.primaryCTA}
-    secondaryCTA={homepageContent.cta.secondaryCTA}
-    meta={homepageContent.cta.meta}
-  />
+    <CTA
+      label={homepageContent.cta.label}
+      title={homepageContent.cta.title}
+      intro={homepageContent.cta.intro}
+      verdictCopy={homepageContent.cta.verdictCopy}
+      proofItems={homepageContent.cta.proofItems}
+      decisionTitle={homepageContent.cta.decisionTitle}
+      rubric={homepageContent.cta.rubric}
+      primaryCTA={homepageContent.cta.primaryCTA}
+      secondaryCTA={homepageContent.cta.secondaryCTA}
+      meta={homepageContent.cta.meta}
+    />
+  </div>
 </Layout>
-
-
-<style>
-  .trust-band-section {
-    position: relative;
-    padding: 1.5rem 0;
-  }
-
-  .trust-band-shell {
-    position: relative;
-    z-index: 1;
-  }
-
-  .trust-band {
-    width: 100%;
-  }
-
-</style>

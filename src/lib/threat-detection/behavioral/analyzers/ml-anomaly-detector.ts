@@ -13,7 +13,7 @@ import type {
  * TODO: Replace with actual Isolation Forest implementation
  */
 class MockIsolationForest {
-  constructor(_nTrees: number, _sampleSize: number) { }
+  constructor(_nTrees: number, _sampleSize: number) {}
 
   predict(data: number[][]): number[] {
     // Return random scores in low range - real implementation needed for actual detection

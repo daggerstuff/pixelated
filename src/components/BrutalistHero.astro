@@ -1,12 +1,13 @@
 ---
 /**
  * Brutalist Hero Component
- * Balanced product-first homepage entry for the supervision workflow.
+ * Product-first homepage entry built around one coaching artifact.
  */
 import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
 import HeroContent from '@/components/homepage/HeroContent.astro'
 import HeroStage from '@/components/homepage/HeroStage.astro'
+
 export interface Props {
   kicker?: string
   title?: string
@@ -45,26 +46,26 @@ const {
     <HeroAtmosphere />
   </div>
 
-
   <div class="container hero-shell">
-
     <HeroStage>
       <div class="hero-layout">
         <HeroContent
-          kicker={kicker}
-          title={title}
-          subtitle={subtitle}
-          helperText={helperText}
-          proofPoints={proofPoints}
-          primaryCTA={primaryCTA}
-          secondaryCTA={secondaryCTA}
+          {kicker}
+          {title}
+          {subtitle}
+          {helperText}
+          {proofPoints}
+          {primaryCTA}
+          {secondaryCTA}
         />
 
-        {artifact && (
-          <div class="hero-artifact-shell">
-            <BrutalistHeroArtifact artifact={artifact} />
-          </div>
-        )}
+        {
+          artifact && (
+            <div class="hero-artifact-shell">
+              <BrutalistHeroArtifact artifact={artifact} />
+            </div>
+          )
+        }
       </div>
     </HeroStage>
   </div>
@@ -78,14 +79,13 @@ const {
     display: flex;
     align-items: flex-start;
     overflow: hidden;
-    min-height: 80dvh;
-    padding: clamp(6.2rem, 9vh, 8.6rem) 0 clamp(4.75rem, 7vh, 6.25rem);
+    min-height: min(100dvh, 46rem);
+    padding: clamp(5.6rem, 9vh, 7.6rem) 0 clamp(3.8rem, 6vh, 4.8rem);
     background: var(--bg-primary);
   }
 
-
   .hero-section {
-    border-top: 0;
+    border-top: 1px dotted rgba(253, 252, 252, 0.1);
   }
 
   .hero-background {
@@ -94,36 +94,22 @@ const {
     z-index: 0;
   }
 
-
-
-
-
-
   .hero-shell {
     position: relative;
     z-index: 1;
+    width: min(100%, var(--max-content-width));
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
   }
-
 
   .hero-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(1.9rem, 3vw, 3rem);
-    align-items: start;
-    justify-items: center;
+    gap: clamp(1.8rem, 3vw, 3rem);
+    align-items: center;
     position: relative;
     z-index: 1;
   }
-
-  @media (min-width: 1181px) {
-    .hero-layout {
-      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-      align-items: center;
-      justify-items: stretch;
-    }
-  }
-
-
 
   .hero-artifact-shell {
     position: relative;
@@ -133,10 +119,8 @@ const {
     justify-content: center;
     min-width: 0;
     isolation: isolate;
-    margin-top: 0;
-    transform: none;
     width: 100%;
-    max-width: 64rem;
+    max-width: 40rem;
   }
 
   .hero-fadeout {
@@ -148,23 +132,22 @@ const {
     background: linear-gradient(to top, var(--bg-primary), transparent);
   }
 
-  @media (max-width: 1180px) {
+  @media (min-width: 1040px) {
     .hero-layout {
-      grid-template-columns: 1fr;
-      gap: 1.75rem;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: clamp(2.25rem, 4vw, 4rem);
     }
 
     .hero-artifact-shell {
-      margin-top: 0;
-      transform: none;
+      justify-content: flex-end;
     }
   }
 
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 5rem;
-      padding-bottom: 4rem;
+      padding-top: 4.25rem;
+      padding-bottom: 3rem;
     }
 
     .hero-shell {
@@ -172,19 +155,7 @@ const {
     }
 
     .hero-artifact-shell {
-      margin-top: 0.2rem;
-      max-height: none;
-      overflow: visible;
-    }
-
-    .hero-artifact {
-      max-height: none;
-      overflow: visible;
-    }
-
-    .hero-artifact__image {
-      max-height: 20rem;
-      object-fit: contain;
+      max-width: 100%;
     }
 
     .hero-background {
@@ -194,7 +165,7 @@ const {
 
   @media (max-width: 480px) {
     .hero {
-      padding-top: 4.2rem;
+      padding-top: 4.55rem;
       padding-bottom: 2.8rem;
     }
   }

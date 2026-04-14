@@ -27,7 +27,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 /* Global styles */
 html {
   font-family: 'Berkeley Mono', monospace;
@@ -57,18 +56,17 @@ body {
 }
 
 body::before {
-  content: "";
+  content: '';
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW1mzM3M3M7MzMzMzMyZmZl3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3dLPlnIAAAAAnRSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLjs8mAAAAK5JREFUeNrd070OwyAMQWGfOwaS8P/f6JoZ6VqqRru6p7vH1BCHv6V3V0N5v6N2L3m/oHUrWb+glCtZf6CUi1l/oZQtWf+mVDu2/U2t9mS7m8p2pLs7pTrG9HeS9XfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSfVfSfVfSdVfS/X/Z/v/ZP6Y9AL4B85p5AAAAAElFTkSuQmCC");
-  opacity: 0.04;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW1mzM3M3M7MzMzMzMyZmZl3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3dLPlnIAAAAAnRSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLjs8mAAAAK5JREFUeNrd070OwyAMQWGfOwaS8P/f6JoZ6VqqRru6p7vH1BCHv6V3V0N5v6N2L3m/oHUrWb+glCtZf6CUi1l/oZQtWf+mVDu2/U2t9mS7m8p2pLs7pTrG9HeS9XfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSdVfSfVfSfVfSdVfS/X/Z/v/ZP6Y9AL4B85p5AAAAAElFTkSuQmCC');
+  opacity: 0.02;
   pointer-events: none;
   z-index: var(--z-overlay);
 }
-
 
 /* Prevent horizontal overflow on all elements */
 *,
@@ -99,8 +97,8 @@ code {
 main {
   margin: 0 auto;
   width: 100%;
-  max-width: var(--max-content-width, 880px);
-  padding: 4rem 1.75rem;
+  max-width: var(--max-content-width, 74rem);
+  padding: 4rem clamp(1.2rem, 2.4vw, 2rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -108,6 +106,12 @@ main {
   overflow-x: hidden;
 }
 
+main.main--full-width {
+  margin: 0;
+  max-width: none;
+  padding: 0;
+  align-items: stretch;
+}
 
 /* Typography */
 h1,
@@ -126,9 +130,8 @@ h6 {
 h1 {
   font-size: 2.625rem; /* 42px */
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.16;
 }
-
 
 code,
 pre,

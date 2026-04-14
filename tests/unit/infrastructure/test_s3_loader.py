@@ -24,11 +24,11 @@ def test_s3_loader_methods_exist():
 
 def test_s3_loader_requires_credentials(monkeypatch):
     for key in [
-        "OVH_S3_ACCESS_KEY",
-        "OVH_ACCESS_KEY",
+        "HETZNER_S3_ACCESS_KEY",
+        "HETZNER_ACCESS_KEY",
         "AWS_ACCESS_KEY_ID",
-        "OVH_S3_SECRET_KEY",
-        "OVH_SECRET_KEY",
+        "HETZNER_S3_SECRET_KEY",
+        "HETZNER_SECRET_KEY",
         "AWS_SECRET_ACCESS_KEY",
     ]:
         monkeypatch.delenv(key, raising=False)

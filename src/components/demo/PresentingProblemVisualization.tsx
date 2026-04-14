@@ -18,8 +18,13 @@ const PresentingProblemVisualization: FC<
       if (!match) {
         return 0
       }
-      const num = parseInt(match[1], 10)
-      const unit = match[2].toLowerCase()
+      const [, value, unitRaw] = match
+      if (!value || !unitRaw) {
+        return 0
+      }
+
+      const num = parseInt(value, 10)
+      const unit = unitRaw.toLowerCase()
 
       switch (unit) {
         case 'year':

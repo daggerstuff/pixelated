@@ -194,7 +194,9 @@ export function useInitiateAudit() {
       // Invalidate relevant queries
       void queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
       void queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
-      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.auditResults() })
+      void queryClient.invalidateQueries({
+        queryKey: biasAuditKeys.auditResults(),
+      })
 
       // Set individual results in cache
       for (const result of results) {

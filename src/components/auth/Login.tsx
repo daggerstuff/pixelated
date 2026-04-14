@@ -30,7 +30,7 @@ export default function LoginForm() {
 
     const result = schema.safeParse(user)
     if (!result.success) {
-      setError(result.error.issues[0].message)
+      setError(result.error.issues?.[0]?.message || 'Validation failed')
       setIsLoading(false)
       return
     }

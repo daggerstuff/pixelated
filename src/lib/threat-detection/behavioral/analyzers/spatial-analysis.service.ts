@@ -3,14 +3,20 @@
  * Handles geolocation, IP analysis, and spatial pattern detection
  */
 
-import type { SecurityEvent, SpatialFeatures, NetworkCharacteristics } from './types'
 import { generateAnomalyId } from './analyzer-utils'
+import type {
+  SecurityEvent,
+  SpatialFeatures,
+  NetworkCharacteristics,
+} from './types'
 
 export class SpatialAnalysisService {
   /**
    * Extract spatial features from security events
    */
-  async extractSpatialFeatures(events: SecurityEvent[]): Promise<SpatialFeatures> {
+  async extractSpatialFeatures(
+    events: SecurityEvent[],
+  ): Promise<SpatialFeatures> {
     const ipAddresses = events.map((e) => e.sourceIp)
     const locations = await this.geolocateIPs(ipAddresses)
 
@@ -56,8 +62,7 @@ export class SpatialAnalysisService {
     const spatialFeatures = await this.extractSpatialFeatures(events)
 
     if (
-      spatialFeatures.geographicSpread >
-      baselineMetrics.geographicThreshold
+      spatialFeatures.geographicSpread > baselineMetrics.geographicThreshold
     ) {
       anomalies.push({
         anomalyId: this.generateAnomalyId(),

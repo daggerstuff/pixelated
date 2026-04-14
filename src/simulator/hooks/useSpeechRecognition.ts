@@ -6,10 +6,10 @@ const logger = createBuildSafeLogger('speech-recognition')
 
 /**
  * Custom hook for managing the Web Speech API lifecycle in a therapeutic simulator context.
- * 
+ *
  * Orchestrates the browser speech recognition engine and therapeutic grammar lists.
  * Keeps high-frequency updates scoped locally to limit broader rerender impact during frequent interim results.
- * 
+ *
  * DESIGN RATIONALE:
  * - Direct orchestration of window.SpeechRecognition avoids complex state synchronization issues
  * - Local transcript state prevents top-level context re-renders on every word detection
@@ -24,7 +24,8 @@ export function useSpeechRecognition() {
   useEffect(() => {
     // Check for browser support
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition
 
     if (!SpeechRecognition) {
       logger.warn('Web Speech API is not supported in this browser')

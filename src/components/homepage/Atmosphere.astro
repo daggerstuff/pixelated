@@ -56,7 +56,11 @@ const { variant = 'section' } = Astro.props
     left: -8%;
     width: min(48rem, 66vw);
     height: min(34rem, 52vw);
-    background: linear-gradient(140deg, rgba(255, 255, 255, 0.03), transparent);
+    background: linear-gradient(
+      140deg,
+      rgba(var(--accent-primary-rgb), 0.03),
+      transparent
+    );
     opacity: 0.4;
   }
 
@@ -70,8 +74,12 @@ const { variant = 'section' } = Astro.props
     left: -5%;
     width: 50%;
     height: 60%;
-    background: radial-gradient(circle at 0% 0%, rgba(var(--accent-primary-rgb), 0.05), transparent 70%);
-    opacity: 0.6;
+    background: radial-gradient(
+      circle at 0% 0%,
+      rgba(var(--accent-primary-rgb), 0.09),
+      transparent 70%
+    );
+    opacity: 0.7;
   }
 
   .atmosphere__plane--right {
@@ -79,7 +87,11 @@ const { variant = 'section' } = Astro.props
     bottom: -16%;
     width: min(34rem, 44vw);
     height: min(34rem, 44vw);
-    background: linear-gradient(160deg, rgba(var(--accent-primary-rgb), 0.05), transparent);
+    background: linear-gradient(
+      160deg,
+      rgba(var(--accent-primary-rgb), 0.05),
+      transparent
+    );
     opacity: 0.4;
   }
 
@@ -93,8 +105,12 @@ const { variant = 'section' } = Astro.props
     right: -5%;
     width: 40%;
     height: 50%;
-    background: radial-gradient(circle at 100% 100%, rgba(var(--accent-primary-rgb), 0.03), transparent 70%);
-    opacity: 0.5;
+    background: radial-gradient(
+      circle at 100% 100%,
+      rgba(var(--accent-primary-rgb), 0.07),
+      transparent 70%
+    );
+    opacity: 0.56;
   }
 
   /* === BEAMS === */
@@ -108,8 +124,8 @@ const { variant = 'section' } = Astro.props
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(var(--accent-primary-rgb), 0.2) 48%,
-      rgba(255, 255, 255, 0.1) 100%
+      rgba(var(--accent-primary-rgb), 0.3) 50%,
+      transparent 100%
     );
     opacity: 0.3;
   }
@@ -119,7 +135,12 @@ const { variant = 'section' } = Astro.props
     right: 10%;
     width: 40%;
     transform: rotate(-15deg);
-    background: linear-gradient(90deg, transparent, rgba(var(--accent-primary-rgb), 0.3), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--accent-primary-rgb), 0.3),
+      transparent
+    );
     opacity: 0.4;
   }
 
@@ -149,7 +170,11 @@ const { variant = 'section' } = Astro.props
     left: 5%;
     width: 30vw;
     height: 30vw;
-    background: var(--accent-primary);
+    background: radial-gradient(
+      circle,
+      rgba(255, 107, 0, 0.16) 0%,
+      rgba(255, 107, 0, 0.02) 70%
+    );
   }
 
   .atmosphere__glow--right {
@@ -159,7 +184,7 @@ const { variant = 'section' } = Astro.props
     height: min(34rem, 48vw);
     background: radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.05) 0%,
+      rgba(var(--accent-primary-rgb), 0.05) 0%,
       transparent 70%
     );
   }
@@ -169,7 +194,11 @@ const { variant = 'section' } = Astro.props
     right: 5%;
     width: 25vw;
     height: 25vw;
-    background: var(--accent-primary);
+    background: radial-gradient(
+      circle,
+      rgba(255, 107, 0, 0.12) 0%,
+      rgba(255, 107, 0, 0.02) 70%
+    );
   }
 
   /* === GRID === */
@@ -182,7 +211,7 @@ const { variant = 'section' } = Astro.props
   }
 
   .atmosphere--hero .atmosphere__grid {
-    opacity: 0.15;
+    opacity: 0.22;
   }
 
   .atmosphere--section-soft .atmosphere__grid {

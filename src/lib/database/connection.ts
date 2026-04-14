@@ -3,13 +3,14 @@
 
 import Redis from 'ioredis'
 import mongoose from 'mongoose'
-import { Pool, Client } from 'pg'
+import { Pool, PoolClient } from 'pg'
 
 // ============================================================================
 // CONNECTION INSTANCES
 // ============================================================================
 
-let mongoConnection: typeof mongoose | null = null
+type MongoConnection = mongoose.Connection
+let mongoConnection: MongoConnection | null = null
 let postgresPool: Pool | null = null
 let redisClient: Redis | null = null
 
@@ -28,7 +29,7 @@ export async function connectMongoDB() {
       throw new Error('MONGODB_URI is not defined in environment variables')
     }
 
-    mongoConnection = await mongoose.connect(mongoUri, {
+    await mongoose.connect(mongoUri, {
       maxPoolSize: 10,
       minPoolSize: 2,
       serverSelectionTimeoutMS: 5000,
@@ -36,6 +37,7 @@ export async function connectMongoDB() {
       retryWrites: true,
       w: 'majority',
     })
+    mongoConnection = mongoose.connection
 
     // Event listeners
     mongoose.connection.on('connected', () => {
@@ -207,7 +209,7 @@ export async function disconnectAll() {
 // ============================================================================
 
 export async function withPostgresTransaction<T>(
-  callback: (client: Client) => Promise<T>,
+  callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   const pool = getPostgresPool()
   const client = await pool.connect()

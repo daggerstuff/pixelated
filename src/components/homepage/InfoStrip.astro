@@ -21,15 +21,16 @@ const {
 <div class:list={['info-strip', `info-strip--${theme}`, className]}>
   <div class="info-strip__lead">
     <span class="pe-meta-label">{label}</span>
-    {title ? <h3 class="pe-heading-s">{title}</h3> : null}
-    {body ? <p>{body}</p> : null}
+    {title ? <h3 class="pe-heading-s info-strip__title">{title}</h3> : null}
+    {body ? <p class="info-strip__body">{body}</p> : null}
   </div>
-  <div class="info-strip__grid">
+
+  <div class="info-strip__list pe-home-stack">
     {
       items.map((item) => (
-        <div class="info-strip__item">
-          <span>{item.label}</span>
-          <strong>{item.value}</strong>
+        <div class="info-strip__row">
+          <span class="info-strip__label">{item.label}</span>
+          <p class="info-strip__value">{item.value}</p>
         </div>
       ))
     }
@@ -39,87 +40,91 @@ const {
 <style>
   .info-strip {
     display: grid;
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: var(--spacing-8);
-    padding: var(--spacing-8);
-    border-radius: 4px;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    padding: clamp(1rem, 1.8vw, 1.5rem) 0 0;
     position: relative;
     overflow: hidden;
   }
 
   .info-strip__lead {
     display: grid;
-    gap: var(--spacing-4);
+    gap: 0.85rem;
     align-content: start;
   }
 
-  .info-strip__lead p {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    opacity: 0.7;
+  .info-strip__title {
+    max-width: 18ch;
+  }
+
+  .info-strip__body {
     margin: 0;
-  }
-
-  .info-strip__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-4);
-  }
-
-  .info-strip__item {
-    padding: var(--spacing-4);
-    border: 1px solid var(--divider-subtle);
-    background: var(--bg-ghost);
-    border-radius: 2px;
-    display: grid;
-    gap: var(--spacing-2);
-  }
-
-  .info-strip__item span {
+    max-width: 34ch;
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.92rem;
+    line-height: 1.68;
+    color: rgba(253, 252, 252, 0.7);
+  }
+
+  .info-strip__list {
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
+  }
+
+  .info-strip__row {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem 0;
+  }
+
+  .info-strip__label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    opacity: 0.5;
+    color: rgba(253, 252, 252, 0.52);
   }
 
-  .info-strip__item strong {
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  /* Dark / Terminal Theme */
-  .info-strip--dark {
-    border: 1px solid var(--border-glass);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
+  .info-strip__value {
+    margin: 0;
+    max-width: 40ch;
+    font-family: var(--font-mono);
+    font-size: 0.94rem;
+    line-height: 1.65;
     color: var(--text-primary);
   }
 
-  .info-strip--dark .info-strip__item {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.05);
+  .info-strip--dark {
+    border-top: 1px dotted rgba(253, 252, 252, 0.16);
+    color: var(--text-primary);
   }
 
-  /* Paper / Light Theme */
   .info-strip--paper {
-    background: var(--surface-paper);
-    color: var(--ink-primary);
-    border: 1px solid var(--ink-border);
+    background: rgba(253, 252, 252, 0.96);
+    color: #201d1d;
+    border: 1px solid rgba(32, 29, 29, 0.12);
   }
 
-  .info-strip--paper .info-strip__item {
-    background: rgba(0, 0, 0, 0.02);
-    border-color: rgba(0, 0, 0, 0.05);
+  .info-strip--paper .info-strip__body,
+  .info-strip--paper .info-strip__label {
+    color: rgba(32, 29, 29, 0.62);
   }
 
-  @media (max-width: 880px) {
+  .info-strip--paper .info-strip__value {
+    color: #201d1d;
+  }
+
+  @media (min-width: 960px) {
     .info-strip {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
     }
-    
-    .info-strip__grid {
-      grid-template-columns: 1fr;
+
+    .info-strip__list {
+      border-top: 0;
+      border-left: 1px dotted rgba(253, 252, 252, 0.12);
+      padding-left: 1.5rem;
+    }
+
+    .info-strip--paper .info-strip__list {
+      border-left-color: rgba(32, 29, 29, 0.12);
     }
   }
 </style>

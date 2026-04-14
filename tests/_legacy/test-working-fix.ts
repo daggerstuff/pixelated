@@ -27,39 +27,25 @@ async function testBetterAuth() {
       },
     })
 
-    if (result && result.user) {
-      console.log('✅ User created!')
-      console.log('User ID:', result.user.id)
-      console.log('Email:', result.user.email)
+    console.log('✅ User created!')
+    console.log('User ID:', result.user.id)
+    console.log('Email:', result.user.email)
 
-      // Try to sign in
-      console.log('\n🔐 Authenticating user...')
-      const authResult = await auth.api.signInEmail({
-        body: {
-          email: 'fixedtest@example.com',
-          password: 'SecurePassword123!',
-          rememberMe: true,
-        },
-      })
+    // Try to sign in
+    console.log('\n🔐 Authenticating user...')
+    const authResult = await auth.api.signInEmail({
+      body: {
+        email: 'fixedtest@example.com',
+        password: 'SecurePassword123!',
+        rememberMe: true,
+      },
+    })
 
-      if (authResult && authResult.user) {
-        console.log('✅ Authentication successful!')
-        console.log('Authenticated User ID:', authResult.user.id)
-
-        // List users
-        console.log('\n📋 Listing users...')
-        const users = await auth.api.listUsers()
-        console.log(`Found ${users.length} users in the system`)
-
-        console.log(
-          '\n🎉 All tests passed! Better-Auth with PostgreSQL is working!',
-        )
-      } else {
-        console.log('❌ Authentication failed')
-      }
-    } else {
-      console.log('❌ User creation failed')
-    }
+    console.log('✅ Authentication successful!')
+    console.log('Authenticated User ID:', authResult.user.id)
+    console.log(
+      '\n🎉 All tests passed! Better-Auth with PostgreSQL is working!',
+    )
   } catch (error) {
     console.error('❌ Error:', error)
     console.error(

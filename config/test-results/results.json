@@ -1,1 +1,624 @@
-{}
+{
+  "config": {
+    "configFile": "/home/vivi/pixelated/config/playwright.config.ts",
+    "rootDir": "/home/vivi/pixelated/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 10,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "msedge",
+        "name": "msedge",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Tablet Chrome",
+        "name": "Tablet Chrome",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "Tablet Safari",
+        "name": "Tablet Safari",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/vivi/pixelated/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "theme-compatibility",
+        "name": "theme-compatibility",
+        "testDir": "/home/vivi/pixelated/tests",
+        "testIgnore": ["tests/accessibility/**"],
+        "testMatch": ["**/theme-compatibility.spec.ts"],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": {
+      "command": "ASTRO_PORT=4323 pnpm dev --port 4323",
+      "url": "http://127.0.0.1:4323",
+      "reuseExistingServer": true,
+      "timeout": 180000
+    }
+  },
+  "suites": [
+    {
+      "title": "browser/auth.spec.ts",
+      "file": "browser/auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "login page has correct form elements",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 725,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:35.714Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-65d8d64253a59930a3c5",
+          "file": "browser/auth.spec.ts",
+          "line": 4,
+          "column": 1
+        },
+        {
+          "title": "login form shows validation errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3181,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:36.560Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-a7de8e1a0acb82c0870e",
+          "file": "browser/auth.spec.ts",
+          "line": 21,
+          "column": 1
+        },
+        {
+          "title": "login form is properly visible on mobile viewport",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "This test is mobile-only",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
+                    "line": 111,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 216,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:39.771Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "This test is mobile-only",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
+                        "line": 111,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-10a58190e4df691a302b",
+          "file": "browser/auth.spec.ts",
+          "line": 106,
+          "column": 1
+        },
+        {
+          "title": "login page has proper transitions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2478,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:40.011Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-4246a0e449a9db00beea",
+          "file": "browser/auth.spec.ts",
+          "line": 130,
+          "column": 1
+        },
+        {
+          "title": "login page visual comparison",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3301,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:42.508Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ad37a75ba3da77f8b725-12e6036596c5b0fd1d07",
+          "file": "browser/auth.spec.ts",
+          "line": 197,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "browser/browser-compatibility.spec.ts",
+      "file": "browser/browser-compatibility.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Home page should work in all browsers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "line": 26,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2182,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Testing Home page in chromium\n"
+                    },
+                    {
+                      "text": "Going to /\n"
+                    },
+                    {
+                      "text": "Page title: Pixelated Empathy | Clinical simulation for therapist training and supervision - Pixelated Empathy\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:45.837Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-7d1e83e15eabbb9874a9",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "title": "Blog page should work in all browsers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "line": 26,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2074,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Testing Blog page in chromium\n"
+                    },
+                    {
+                      "text": "Going to /blog\n"
+                    },
+                    {
+                      "text": "Page title: Blog - Pixelated Empathy\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:48.034Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-5b70280cee3e46a33a57",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "title": "Documentation page should work in all browsers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [
+                {
+                  "type": "slow",
+                  "location": {
+                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "line": 26,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2042,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Testing Documentation page in chromium\n"
+                    },
+                    {
+                      "text": "Going to /docs\n"
+                    },
+                    {
+                      "text": "Page title: Getting Started with Pixelated Empathy - Pixelated Empathy\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:50.118Z",
+                  "annotations": [
+                    {
+                      "type": "slow",
+                      "location": {
+                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-0a9b229c15cc7eeb965f",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "title": "CSS feature support check",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1082,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "CSS features support in chromium: {\n  flexbox: \u001b[33mtrue\u001b[39m,\n  grid: \u001b[33mtrue\u001b[39m,\n  variables: \u001b[33mtrue\u001b[39m,\n  sticky: \u001b[33mtrue\u001b[39m,\n  animations: \u001b[33mtrue\u001b[39m,\n  filters: \u001b[33mtrue\u001b[39m,\n  aspectRatio: \u001b[33mtrue\u001b[39m\n}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-11T21:17:52.174Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b6c4abe85fc513ddff34-b65c4847fe42742ccda2",
+          "file": "browser/browser-compatibility.spec.ts",
+          "line": 90,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-11T21:17:35.030Z",
+    "duration": 18331.113,
+    "expected": 8,
+    "skipped": 1,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

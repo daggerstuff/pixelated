@@ -24,9 +24,7 @@
       { "resourceType": "script", "budget": 600 },
       { "resourceType": "total", "budget": 3000 }
     ],
-    "timings": [
-      { "metric": "first-contentful-paint", "budget": 3500 }
-    ]
+    "timings": [{ "metric": "first-contentful-paint", "budget": 3500 }]
   },
   {
     "path": "/login",
@@ -34,8 +32,6 @@
       { "resourceType": "script", "budget": 400 },
       { "resourceType": "total", "budget": 2000 }
     ],
-    "timings": [
-      { "metric": "first-contentful-paint", "budget": 2500 }
-    ]
+    "timings": [{ "metric": "first-contentful-paint", "budget": 2500 }]
   }
 ]

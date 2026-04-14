@@ -4,8 +4,8 @@
    ================================================ */
 
 @font-face {
-  font-family: 'Berkeley Mono';
-  src: local('Berkeley Mono'), local('IBM Plex Mono'), local('Menlo'), local('Monaco'), local('Courier New'), monospace;
+  font-family: 'JetBrains Mono Fallback';
+  src: url('/fonts/jetbrains-mono-400.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -13,9 +13,46 @@
 
 @font-face {
   font-family: 'Berkeley Mono';
-  src: local('Berkeley Mono Bold'), local('IBM Plex Mono Bold'), local('Menlo Bold'), local('Monaco Bold'), local('Courier New Bold'), monospace;
-  font-weight: 700;
+  src:
+    local('Berkeley Mono'),
+    local('Berkeley Mono Regular'),
+    local('TX-02'),
+    url('/fonts/jetbrains-mono-400.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Berkeley Mono';
+  src:
+    local('Berkeley Mono Medium'),
+    local('Berkeley Mono Regular'),
+    local('TX-02 Medium'),
+    url('/fonts/jetbrains-mono-500.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src:
+    local('Berkeley Mono Semibold'),
+    local('TX-02 Semibold'),
+    url('/fonts/jetbrains-mono-600.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src:
+    local('Berkeley Mono Bold'),
+    local('TX-02 Bold'),
+    url('/fonts/jetbrains-mono-700.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

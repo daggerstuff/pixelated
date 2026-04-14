@@ -1,4 +1,4 @@
-import { z } from 'astro:content'
+import { z } from 'zod'
 
 /* Pages */
 export const pageSchema = z.object({

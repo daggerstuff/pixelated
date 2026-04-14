@@ -552,7 +552,10 @@ Adapt complexity and resource recommendations accordingly.`
       queryWithContext = `Previous context: ${conversationHistory.slice(-3).join(' ')}\n\nCurrent query: ${userQuery}`
     }
 
-    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    const messages: Array<{
+      role: 'system' | 'user' | 'assistant'
+      content: string
+    }> = [
       { role: 'system', content: contextualPrompt },
       { role: 'user', content: queryWithContext },
     ]

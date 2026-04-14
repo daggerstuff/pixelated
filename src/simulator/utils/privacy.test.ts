@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { getUserConsentPreference, setUserConsentPreference } from './privacy'
 
 describe('privacy utilities', () => {
@@ -32,10 +33,10 @@ describe('privacy utilities', () => {
     it('stores the preference correctly', () => {
       const setSpy = vi.spyOn(window.localStorage, 'setItem')
       setUserConsentPreference(true)
-      expect(setSpy).toHaveBeenCalledWith('pixelated_metrics_consent', 'true')
-      
+      expect(setSpy).toHaveBeenCalledWith('simulator_metrics_consent', 'true')
+
       setUserConsentPreference(false)
-      expect(setSpy).toHaveBeenCalledWith('pixelated_metrics_consent', 'false')
+      expect(setSpy).toHaveBeenCalledWith('simulator_metrics_consent', 'false')
     })
   })
 })

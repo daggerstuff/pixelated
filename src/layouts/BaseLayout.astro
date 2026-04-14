@@ -24,19 +24,31 @@ import type { BgType } from '@/types'
 interface Props {
   title?: string
   description?: string
+  keywords?: string
+  themeMode?: 'light' | 'dark' | 'system'
   ogImage?: string | boolean
-  bgType?: BgType | false
+  bgType?: BgType | false | string
   pubDate?: string
   lastModDate?: string
   pathname?: string
   showNavBar?: boolean
   showFooter?: boolean
   showBackLink?: boolean
+  fullWidthMain?: boolean
+  centered?: boolean
+  contentClass?: string
+  transitionMode?: string
+  isLoginPage?: boolean
+  showSettingsPanel?: boolean
+  showAnalysisPanel?: boolean
+  initialTab?: string
 }
 
 const {
   title,
   description,
+  keywords,
+  themeMode,
   ogImage,
   bgType,
   pubDate,
@@ -45,6 +57,14 @@ const {
   showNavBar = true,
   showFooter = true,
   showBackLink = true,
+  fullWidthMain = false,
+  centered = false,
+  contentClass = '',
+  transitionMode = 'fade',
+  isLoginPage = false,
+  showSettingsPanel = false,
+  showAnalysisPanel = false,
+  initialTab = 'chat',
 } = Astro.props
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
@@ -54,7 +74,7 @@ const cspNonce = Astro.locals.cspNonce ?? ''
 
 let style: Record<string, string> = {}
 
-const { slideEnterAnim } = FEATURES
+const { slideEnterAnim, nprogress, mediumZoom } = FEATURES
 const enableSlideEnterAnim = Array.isArray(slideEnterAnim) && slideEnterAnim[0]
 if (enableSlideEnterAnim)
   style['--enter-step'] = `${slideEnterAnim[1].enterStep}ms`
@@ -65,12 +85,26 @@ const {
 const hasCustomCursor =
   newTab && cursorType.length > 0 && cursorType !== 'pointer'
 if (hasCustomCursor) style['--external-link-cursor'] = cursorType
+
+const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
 ---
 
 <!doctype html>
-<html lang={SITE.lang} class="dark scroll-smooth">
+<html
+  lang={SITE.lang}
+  class="dark scroll-smooth"
+  style="--bg-primary:#201d1d; --bg-secondary:#302c2c; --bg-glass:rgba(48,44,44,0.74); --text-primary:#f7f3eb; --text-secondary:#c7bfb7; --text-muted:#a1958b; --accent-primary:#ff6b00; --accent-primary-rgb:255,107,0; --accent-secondary:#007aff; --border-subtle:rgba(253,252,252,0.08); --divider-dotted:rgba(253,252,252,0.11); --divider-weak:rgba(253,252,252,0.05); --bg-surface-ghost:rgba(253,252,252,0.02); --radius-sm:4px; --radius-md:6px;"
+>
   <head>
-        <Head {title} {description} {ogImage} {pubDate} {lastModDate} {cspNonce} />
+    <Head
+      {title}
+      {description}
+      {keywords}
+      {ogImage}
+      {pubDate}
+      {lastModDate}
+      {cspNonce}
+    />
 
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#201D1D" />
@@ -78,6 +112,11 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
+    {
+      (nprogress || mediumZoom) && (
+        <script src="/js/nprogress-and-zoom.js" type="module" />
+      )
+    }
   </head>
 
   <body
@@ -85,7 +124,6 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     style={Object.keys(style).length !== 0 ? style : undefined}
     data-no-sliding={enableSlideEnterAnim ? undefined : ''}
   >
-
     <!-- Background -->
     {bgType && <Background type={bgType} />}
 
@@ -101,7 +139,15 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     {showNavBar && <Navbar />}
 
     <!-- Main -->
-    <main id="main" class="flex-grow w-full pt-24">
+    <main
+      id="main"
+      class:list={[
+        'flex-grow w-full pt-24',
+        centered && 'mx-auto max-w-7xl',
+        fullWidthMain && 'main--full-width',
+        contentClass,
+      ]}
+    >
       <!-- Content -->
       <slot />
       <!-- Share -->
@@ -122,7 +168,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     {
       showFooter && (
         <>
-          <Footer />
+          <Footer showTopCTA={currentPathname !== withBasePath('/')} />
           <ToTopButton />
         </>
       )
@@ -131,21 +177,8 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <!-- Panel Backdrop (on mobile) -->
     <Backdrop />
 
-    <!-- Progress Bar -->
-    <script nonce={cspNonce}>
-      import nprogress from 'nprogress'
-
-      document.addEventListener('astro:before-preparation', () => {
-        nprogress.start()
-      })
-
-      document.addEventListener('astro:page-load', () => {
-        nprogress.done()
-      })
-    </script>
-
     <!-- Vercel Speed Insights and Analytics -->
-    <SpeedInsights />
-    <Analytics />
+    {shouldRenderAnalytics && <SpeedInsights />}
+    {shouldRenderAnalytics && <Analytics />}
   </body>
 </html>

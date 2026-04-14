@@ -1,4 +1,5 @@
 import { render, screen, act } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as hooks from '../../../lib/monitoring/hooks'
 import RUMWidget from '../RUMWidget'

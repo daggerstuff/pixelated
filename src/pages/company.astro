@@ -22,15 +22,28 @@ const operatingProfile = [
 ]
 
 const facts = [
-  { label: 'Founded', value: '2025', detail: 'Operating from the United States' },
-  { label: 'Focus', value: 'Clinical simulation', detail: 'Therapist training, supervision, and review' },
-  { label: 'Primary ask', value: 'One hard case', detail: 'Enough to prove whether coaching gets clearer' },
+  {
+    label: 'Founded',
+    value: '2025',
+    detail: 'Operating from the United States',
+  },
+  {
+    label: 'Focus',
+    value: 'Clinical simulation',
+    detail: 'Therapist training, supervision, and review',
+  },
+  {
+    label: 'Primary ask',
+    value: 'One hard case',
+    detail: 'Enough to prove whether coaching gets clearer',
+  },
 ]
 ---
 
 <BaseLayout
   title="Company Overview - Pixelated Empathy"
   description="Company overview for Pixelated Empathy, including operating profile, focus, and who the product is built for."
+  fullWidthMain
 >
   <MarketingPageHero
     eyebrow="Company"
@@ -47,17 +60,21 @@ const facts = [
     <div class="marketing-shell">
       <div class="marketing-section-header">
         <span class="marketing-eyebrow">Operating profile</span>
-        <h2 class="marketing-title marketing-title--medium">The company is set up to stay close to the workflow.</h2>
+        <h2 class="marketing-title marketing-title--medium">
+          The company is set up to stay close to the workflow.
+        </h2>
       </div>
 
       <div class="marketing-grid marketing-grid--3">
-        {operatingProfile.map((item) => (
-          <article class="marketing-card">
-            <span class="marketing-card__label">{item.label}</span>
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
-          </article>
-        ))}
+        {
+          operatingProfile.map((item) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{item.label}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -67,17 +84,25 @@ const facts = [
       <div class="marketing-grid marketing-grid--2">
         <article class="marketing-card">
           <span class="marketing-card__label">What we provide</span>
-          <h2 class="marketing-title marketing-title--medium">A training environment teams can actually review.</h2>
+          <h2 class="marketing-title marketing-title--medium">
+            A training environment teams can actually review.
+          </h2>
           <p>
-            The product helps teams rehearse crisis assessment, rupture repair, trauma disclosure, resistance, and other sessions that are hard to stage consistently in live training.
+            The product helps teams rehearse crisis assessment, rupture repair,
+            trauma disclosure, resistance, and other sessions that are hard to
+            stage consistently in live training.
           </p>
         </article>
 
         <article class="marketing-card marketing-card--accent">
           <span class="marketing-card__label">How teams use it</span>
-          <h2 class="marketing-title marketing-title--medium">Run, compare, and coach from one shared case.</h2>
+          <h2 class="marketing-title marketing-title--medium">
+            Run, compare, and coach from one shared case.
+          </h2>
           <p>
-            Programs can assign the same scenario to multiple trainees, compare how the room shifted, and coach from transcripts and structured review instead of vague recollection alone.
+            Programs can assign the same scenario to multiple trainees, compare
+            how the room shifted, and coach from transcripts and structured
+            review instead of vague recollection alone.
           </p>
         </article>
       </div>

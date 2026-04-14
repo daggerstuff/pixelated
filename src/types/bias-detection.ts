@@ -28,7 +28,9 @@ export type AlertItem = Omit<BiasAlert, 'level' | 'status'> & {
 
 // Bias score filter types
 export type BiasScoreFilterLiteral = 'all' | 'low' | 'medium' | 'high'
-export type BiasScoreFilter = BiasScoreFilterLiteral | { min: number; max: number }
+export type BiasScoreFilter =
+  | BiasScoreFilterLiteral
+  | { min: number; max: number }
 
 // Time range filter
 export type TimeRange = '24h' | '7d' | '30d' | '90d' | 'custom'

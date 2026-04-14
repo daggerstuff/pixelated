@@ -1,19 +1,19 @@
-import React from 'react'
+import { type CSSProperties, type ReactElement, type ReactNode } from 'react'
 
 interface ScrollAreaProps {
-  children: React.ReactNode
+  children: ReactNode
   className?: string
   height?: string | number
   maxHeight?: string | number
 }
 
-export const ScrollArea: FC<ScrollAreaProps> = ({
+export const ScrollArea = ({
   children,
   className = '',
   height,
   maxHeight = '400px',
-}) => {
-  const style: React.CSSProperties = {}
+}: ScrollAreaProps): ReactElement => {
+  const style: CSSProperties = {}
 
   if (height) {
     style.height = typeof height === 'number' ? `${height}px` : height

@@ -104,13 +104,13 @@ function convertAnalysisToLegacyFormat(
         .map((indicator) => indicator.description)
         .join('; '),
       expertGuided: false,
+
       scores: {
         depression: scores['depression'] || 0,
         anxiety: scores['anxiety'] || 0,
         stress: scores['stress'] || 0,
         anger: scores['anger'] || 0,
         socialIsolation: scores['isolation'] || 0,
-        ...scores,
       },
       evidence: {
         depression: evidence['depression'] || [],

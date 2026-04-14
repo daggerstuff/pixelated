@@ -6,7 +6,9 @@ import {
   withAuthenticatedMemoryRoute,
 } from './_shared'
 
-export const POST = withAuthenticatedMemoryRoute('creating memory', async ({ request }, user) => {
+export const POST = withAuthenticatedMemoryRoute(
+  'creating memory',
+  async ({ request }, user) => {
     const body = await request.json()
     const { content, metadata } = body
 
@@ -29,4 +31,5 @@ export const POST = withAuthenticatedMemoryRoute('creating memory', async ({ req
       },
       201,
     )
-})
+  },
+)

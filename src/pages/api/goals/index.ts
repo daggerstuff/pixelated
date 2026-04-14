@@ -78,9 +78,7 @@ export const POST = async ({ request }: { request: any }) => {
       JSON.stringify({
         error: 'Server error',
         details:
-          err instanceof Error
-            ? (err)?.message || String(err)
-            : String(err),
+          err instanceof Error ? err?.message || String(err) : String(err),
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

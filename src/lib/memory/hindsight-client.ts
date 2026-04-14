@@ -40,7 +40,7 @@ export interface HindsightClientConfig {
 
 /**
  * Hindsight client for browser/frontend use through app-owned routes.
- * 
+ *
  * Implements the agentic memory pattern:
  * 1. Retain: Store facts and experiences.
  * 2. Recall: Retrieve relevant context.
@@ -74,15 +74,15 @@ export class HindsightClient {
 
   /**
    * Retain: Store information in a memory bank.
-   * 
+   *
    * @param content - The text to store
    * @param bankId - Target bank ID
    * @param options - Metadata and additional context
    */
   async retain(
-    content: string, 
+    content: string,
     bankId: string = this.defaultBankId,
-    options: HindsightRetainOptions = {}
+    options: HindsightRetainOptions = {},
   ): Promise<{ memory_id: string }> {
     return this.request<{ memory_id: string }>('/api/hindsight/retain', {
       method: 'POST',
@@ -97,7 +97,7 @@ export class HindsightClient {
 
   /**
    * Recall: Retrieve relevant memories from a bank.
-   * 
+   *
    * @param query - The search query
    * @param bankId - Bank ID to search
    * @param options - Limit and confidence filters
@@ -105,24 +105,27 @@ export class HindsightClient {
   async recall(
     query: string,
     bankId: string = this.defaultBankId,
-    options: HindsightRecallOptions = {}
+    options: HindsightRecallOptions = {},
   ): Promise<HindsightMemory[]> {
-    const response = await this.request<{ memories: HindsightMemory[] }>('/api/hindsight/recall', {
-      method: 'POST',
-      body: JSON.stringify({
-        query,
-        bank_id: bankId,
-        limit: options.limit || 10,
-        min_confidence: options.min_confidence,
-        context: options.context,
-      }),
-    })
+    const response = await this.request<{ memories: HindsightMemory[] }>(
+      '/api/hindsight/recall',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          query,
+          bank_id: bankId,
+          limit: options.limit || 10,
+          min_confidence: options.min_confidence,
+          context: options.context,
+        }),
+      },
+    )
     return response.memories
   }
 
   /**
    * Reflect: Generate insights by reasoning over a bank's memories.
-   * 
+   *
    * @param query - The question or prompt to reflect on
    * @param bankId - Bank ID to use for context
    * @param options - Reasoning options
@@ -130,35 +133,46 @@ export class HindsightClient {
   async reflect(
     query: string,
     bankId: string = this.defaultBankId,
-    options: HindsightReflectOptions = {}
+    options: HindsightReflectOptions = {},
   ): Promise<{ answer: string; references?: string[] }> {
-    return this.request<{ answer: string; references?: string[] }>('/api/hindsight/reflect', {
-      method: 'POST',
-      body: JSON.stringify({
-        query,
-        bank_id: bankId,
-        stream: options.stream || false,
-        context: options.context,
-      }),
-    })
+    return this.request<{ answer: string; references?: string[] }>(
+      '/api/hindsight/reflect',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          query,
+          bank_id: bankId,
+          stream: options.stream || false,
+          context: options.context,
+        }),
+      },
+    )
   }
 
   /**
    * Get all memories from a bank (administrative/debug use).
    */
-  async getBankMemories(bankId: string = this.defaultBankId): Promise<HindsightMemory[]> {
-    const response = await this.request<{ memories: HindsightMemory[] }>(`/api/hindsight/banks/${bankId}/memories`, {
-      method: 'GET'
-    })
+  async getBankMemories(
+    bankId: string = this.defaultBankId,
+  ): Promise<HindsightMemory[]> {
+    const response = await this.request<{ memories: HindsightMemory[] }>(
+      `/api/hindsight/banks/${bankId}/memories`,
+      {
+        method: 'GET',
+      },
+    )
     return response.memories
   }
 
   /**
    * Delete a specific memory.
    */
-  async deleteMemory(memoryId: string, bankId: string = this.defaultBankId): Promise<void> {
+  async deleteMemory(
+    memoryId: string,
+    bankId: string = this.defaultBankId,
+  ): Promise<void> {
     await this.request(`/api/hindsight/banks/${bankId}/memories/${memoryId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     })
   }
 }
@@ -166,6 +180,8 @@ export class HindsightClient {
 /**
  * Create a Hindsight client instance.
  */
-export function createHindsightClient(config?: HindsightClientConfig): HindsightClient {
+export function createHindsightClient(
+  config?: HindsightClientConfig,
+): HindsightClient {
   return new HindsightClient(config)
 }

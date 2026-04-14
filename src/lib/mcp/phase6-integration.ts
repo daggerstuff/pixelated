@@ -7,7 +7,7 @@
 // Stub implementation to prevent build failures
 // The full implementation exists in src/lib/auth/phase6-integration.ts but needs to be migrated
 
-import { secureRandomUUID } from '@/lib/crypto/secure-random' // new import (uses project alias)
+import { secureRandomUUID } from '../crypto/secure-random'
 
 export type AuthenticationEvent =
   | 'user_created'
@@ -50,6 +50,15 @@ export type AuthenticationEvent =
   | `mfa_verification_completed_${string}`
   | `mfa_factor_deleted_${string}`
   | `mfa_preferred_factor_set_${string}`
+  | 'webauthn_registration_options_generated'
+  | 'webauthn_authentication_options_generated'
+  | `webauthn_registration_completed_${string}`
+  | `webauthn_authentication_completed_${string}`
+  | `webauthn_credential_deleted_${string}`
+  | `webauthn_credential_renamed_${string}`
+  | `risk_assessment_${number}`
+  | `role_assigned_${string}`
+  | `role_removed_${string}`
 
 /**
  * Update Phase 6 authentication progress

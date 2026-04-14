@@ -9,9 +9,11 @@ const getAuthToken = () => {
   }
   try {
     const token =
-      storageManager.get('auth_token') ??
-      storageManager.get('authToken')
+      storageManager.get('auth_token') ?? storageManager.get('authToken')
     if (!token) {
+      return null
+    }
+    if (typeof token !== 'string') {
       return null
     }
     return token.startsWith('Bearer ') ? token.slice(7) : token
@@ -168,7 +170,9 @@ export const useJournalResearchWebSocket = ({
     )
 
     try {
-      socketRef.current = new WebSocket(wsUrl, protocols)
+      const websocketProtocols =
+        protocols && protocols.length > 0 ? protocols : undefined
+      socketRef.current = new WebSocket(wsUrl, websocketProtocols)
 
       socketRef.current.onopen = () => {
         setConnectionState('connected')
@@ -209,7 +213,11 @@ export const useJournalResearchWebSocket = ({
       }
     } catch (error: unknown) {
       setConnectionState('error')
-      onError?.(error as Error)
+      const normalizedError =
+        error instanceof Error
+          ? error
+          : new Error('WebSocket connection failed')
+      onError?.(normalizedError)
     }
   }, [
     sessionId,
@@ -245,7 +253,33 @@ export const useJournalResearchWebSocket = ({
   const send = useCallback(
     (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
       if (socketRef.current?.readyState === WebSocket.OPEN) {
-        socketRef.current.send(data)
+        const payload = (() => {
+          if (typeof data === 'string') {
+            return data
+          }
+
+          if (ArrayBuffer.isView(data)) {
+            return data
+          }
+
+          if (data instanceof ArrayBuffer) {
+            return data
+          }
+
+          if (data instanceof Blob) {
+            return null
+          }
+
+          return new Uint8Array(data)
+        })()
+
+        if (payload === null) {
+          const blobUnsupportedError = new Error('Blob payloads are not supported')
+          onError?.(blobUnsupportedError)
+          return
+        }
+
+        socketRef.current.send(payload)
       } else {
         const error = new Error('WebSocket is not connected')
         onError?.(error)

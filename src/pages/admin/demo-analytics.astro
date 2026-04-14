@@ -373,6 +373,16 @@ export const prerender = false // Enable SSR for real-time data
 
 <script>
   class DemoAnalyticsDashboard {
+    private eventSource: EventSource | null = null
+    private data: any = {
+      totalSessions: 0,
+      conversionRate: 0,
+      avgTimeToCTA: 0,
+      avgScrollDepth: 0,
+      variants: { A: {}, B: {}, C: {} },
+      funnel: { pageViews: 0, demoInteractions: 0, ctaClicks: 0 },
+    }
+
     constructor() {
       this.eventSource = null
       this.data = {
@@ -416,7 +426,8 @@ export const prerender = false // Enable SSR for real-time data
       }, 30000)
     }
 
-    updateDashboard(data) {
+    updateDashboard(data: any) {
+      this.data = data
       // Update main stats
       const totalSessionsEl = document.getElementById('total-sessions')
       if (totalSessionsEl)
@@ -447,16 +458,16 @@ export const prerender = false // Enable SSR for real-time data
       this.updateStatisticalSignificance(data)
     }
 
-    updateVariantStats(data) {
+    updateVariantStats(data: any) {
       const variants = ['A', 'B', 'C']
 
       variants.forEach((variant) => {
         const variantEvents = data.events.filter(
-          (e) => e.ab_variant === variant,
+          (e: any) => e.ab_variant === variant,
         )
-        const sessions = new Set(variantEvents.map((e) => e.session_id)).size
+        const sessions = new Set(variantEvents.map((e: any) => e.session_id)).size
         const conversions = variantEvents.filter(
-          (e) => e.event === 'demo_cta_click',
+          (e: any) => e.event === 'demo_cta_click',
         ).length
         const rate =
           sessions > 0 ? ((conversions / sessions) * 100).toFixed(1) : '0.0'
@@ -476,7 +487,7 @@ export const prerender = false // Enable SSR for real-time data
       })
     }
 
-    updateFunnel(funnelData) {
+    updateFunnel(funnelData: any) {
       const pageViews = funnelData.page_views
       const demoInteractions = funnelData.demo_interactions
       const ctaClicks = funnelData.cta_clicks
@@ -511,8 +522,10 @@ export const prerender = false // Enable SSR for real-time data
       if (ctaClickBarEl) ctaClickBarEl.style.width = ctaClickPct + '%'
     }
 
-    updateEventTimeline(events) {
+    updateEventTimeline(events: any) {
       const timeline = document.getElementById('event-timeline')
+      if (!timeline) return
+
       const recentEvents = events.slice(-10).reverse()
 
       if (recentEvents.length === 0) {
@@ -522,7 +535,7 @@ export const prerender = false // Enable SSR for real-time data
       }
 
       timeline.innerHTML = recentEvents
-        .map((event) => {
+        .map((event: any) => {
           const time = new Date(event.timestamp).toLocaleTimeString()
           const variant = event.ab_variant
           const eventType = event.event.replace('demo_', '').replace('_', ' ')
@@ -542,30 +555,31 @@ export const prerender = false // Enable SSR for real-time data
         .join('')
     }
 
-    updateStatisticalSignificance(data) {
+    updateStatisticalSignificance(data: any) {
       const totalConversions = data.summary.conversion_funnel.cta_clicks
-      const totalSessions = data.summary.unique_sessions
+      const _totalSessions = data.summary.unique_sessions
+
+      const testStatusEl = document.getElementById('test-status')
+      const confidenceEl = document.getElementById('confidence-level')
+      const recommendationEl = document.getElementById('recommendation')
 
       if (totalConversions < 100) {
-        document.getElementById('test-status').textContent =
-          `Collecting Data (${totalConversions}/100)`
-        document.getElementById('confidence-level').textContent =
-          'Insufficient Data'
-        document.getElementById('recommendation').textContent =
-          'Continue Testing'
+        if (testStatusEl)
+          testStatusEl.textContent = `Collecting Data (${totalConversions}/100)`
+        if (confidenceEl) confidenceEl.textContent = 'Insufficient Data'
+        if (recommendationEl) recommendationEl.textContent = 'Continue Testing'
       } else {
         // Calculate statistical significance (simplified)
         const significance = this.calculateSignificance(data)
-        document.getElementById('test-status').textContent =
-          'Ready for Analysis'
-        document.getElementById('confidence-level').textContent =
-          significance.confidence + '%'
-        document.getElementById('recommendation').textContent =
-          significance.recommendation
+        if (testStatusEl) testStatusEl.textContent = 'Ready for Analysis'
+        if (confidenceEl)
+          confidenceEl.textContent = significance.confidence + '%'
+        if (recommendationEl)
+          recommendationEl.textContent = significance.recommendation
       }
     }
 
-    calculateSignificance(data) {
+    calculateSignificance(data: any) {
       // Simplified statistical significance calculation
       // In production, use proper statistical tests
       return {
@@ -574,7 +588,7 @@ export const prerender = false // Enable SSR for real-time data
       }
     }
 
-    getVariantColor(variant) {
+    getVariantColor(variant: any) {
       const colors = { A: 'purple', B: 'green', C: 'blue' }
       return colors[variant] || 'gray'
     }

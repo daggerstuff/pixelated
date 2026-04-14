@@ -498,3 +498,4 @@ export function initializeDemoAnalytics(
 
   return analytics
 }
+declare function gtag(...args: any[]): void

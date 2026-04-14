@@ -15,6 +15,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     icon: 'stats',
   },
   {
+    id: 'ai-evidence-assistant',
+    label: 'AI Evidence Assistant',
+    href: '/admin/ai/evidence-assistant',
+    icon: 'document',
+  },
+  {
     id: 'security',
     label: 'Security',
     href: '/admin/security-dashboard',
@@ -61,9 +67,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 
 export const SIMPLE_ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_NAV_ITEMS.filter(
   (item) =>
-    item.id === 'dashboard' ||
-    item.id === 'users' ||
-    item.id === 'settings',
+    item.id === 'dashboard' || item.id === 'users' || item.id === 'settings',
 )
 
 SIMPLE_ADMIN_NAV_ITEMS.splice(2, 0, {

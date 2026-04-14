@@ -1,64 +1,62 @@
 export const heroContent = {
-  title: 'Turn your hardest therapy sessions into sharper supervision.',
+  title: 'Coach the moment that changed the room.',
   subtitle:
-    'Run one realistic case, capture the exact moment the room shifts, and coach from a transcript your team can point to together.',
+    'Run one difficult therapy case, keep the transcript and review lane attached, and leave supervision with one visible next move instead of a fuzzy recap.',
   helperText:
-    'Start with the demo. Bring one difficult case only when the workflow feels right.',
-  kicker: 'For therapist training teams that need clearer feedback fast',
+    'Bring a real case only if the review becomes sharper in the very next supervision.',
+  kicker: 'For clinical training teams that need sharper supervision',
   proofPoints: [
     {
-      label: 'Catch the moment',
-      text: 'Save the intervention, miss, or repair that changed the room.',
+      label: 'Keep the turning point visible',
+      text: 'Save the intervention, miss, or repair that changed the room instead of rebuilding it from memory.',
     },
     {
-      label: 'Coach from evidence',
-      text: 'Review transcript, notes, and decision points instead of memory.',
-    },
-    {
-      label: 'Compare judgment',
-      text: 'Put multiple clinicians through the same hard case and see what changed.',
+      label: 'Coach from the actual exchange',
+      text: 'Review transcript, notes, and rationale together so the next move is specific before the room gets fuzzy.',
     },
   ],
-  primaryCTA: { text: 'See the product demo', href: '/demo-hub' },
-  secondaryCTA: { text: 'Plan a pilot review', href: '/contact' },
+  primaryCTA: { text: 'Book a pilot', href: '/contact' },
+  secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Product proof',
-    status: 'A review-ready session record your team can coach from this week.',
-    chip: 'Actual product surface',
+    status: 'A review record your team can coach from next week.',
+    chip: 'Session record',
     mode: 'Proof before pitch',
     image: '/images/homepage/training-session-proof.png',
     imageAlt:
       'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
       {
-        label: 'What your team sees',
+        label: 'What stays attached',
         value:
-          'The live conversation, saved transcript, and coaching lane stay attached in one surface.',
+          'The live conversation, saved transcript, and coaching lane stay tied to the same case.',
       },
       {
-        label: 'Why it lands',
+        label: 'Why it matters',
         value:
-          'A supervisor can point to the exact turn that needs work instead of rebuilding the session from memory.',
+          'A supervisor can point to the exact turn that needs work instead of reconstructing the room from memory.',
       },
     ],
     outputs: [
       {
-        label: 'Specific feedback',
-        value: 'Supervisors can coach the exact intervention to revisit next.',
-      },
-      {
-        label: 'Shared reference',
-        value: 'Transcript and notes stay attached to the same difficult case.',
-      },
-      {
-        label: 'Cleaner next attempt',
+        label: 'Specific next move',
         value:
-          'The retry starts from a visible decision, not a vague impression.',
+          'Point to the intervention worth revisiting next, not a vague impression.',
+      },
+      {
+        label: 'Shared review surface',
+        value:
+          'Keep transcript and notes attached to one difficult case the whole team can study.',
+      },
+      {
+        label: 'Cleaner retry',
+        value:
+          'Start the next attempt from a visible decision instead of a fuzzy recap.',
       },
     ],
     readout: [
       { label: 'Who it is for', value: 'Clinical training teams' },
-      { label: 'What stays', value: 'Transcript + coaching notes' },
+      { label: 'What stays', value: 'Transcript + coaching lane' },
       { label: 'What changes', value: 'Sharper supervision' },
     ],
   },

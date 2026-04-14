@@ -92,7 +92,7 @@ export function MetricsChart({
         },
       ],
     }
-  }, [metrics, timeRange]).slice()
+  }, [metrics, timeRange])
 
   return (
     <Card className={cn('w-full', className)}>

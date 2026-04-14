@@ -459,8 +459,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
     // Calculate RMS (loudness)
     let sumSquares = 0
-    for (let i = 0; i < audioData.length; i++) {
-      const sample = audioData[i]
+    for (const sample of audioData) {
       if (sample !== undefined) {
         sumSquares += sample * sample
       }
@@ -497,8 +496,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
     // Calculate RMS
     let sumSquares = 0
-    for (let i = 0; i < audioData.length; i++) {
-      const sample = audioData[i]
+    for (const sample of audioData) {
       if (sample !== undefined) {
         sumSquares += sample * sample
       }
@@ -627,8 +625,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     // Normalize timestamps relative to the first timestamp
     const baseTime = recentTrends[0].timestamp
 
-    for (let i = 0; i < recentTrends.length; i++) {
-      const trend = recentTrends[i]
+    for (const trend of recentTrends) {
       if (!trend) {
         continue
       }

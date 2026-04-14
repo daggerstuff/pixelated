@@ -155,10 +155,10 @@ const BrutalistChatDemo: FC = () => {
               </p>
             </div>
             <div className='flex gap-2'>
-              <span className='bg-amber-100 text-amber-700 border-amber-200 rounded-full border px-2 py-1 text-xs'>
+              <span className='bg-amber-100 text-amber-700 border-amber-200 rounded-[4px] border px-2 py-1 text-xs'>
                 Moderate Difficulty
               </span>
-              <span className='bg-blue-100 text-blue-700 border-blue-200 rounded-full border px-2 py-1 text-xs'>
+              <span className='bg-blue-100 text-blue-700 border-blue-200 rounded-[4px] border px-2 py-1 text-xs'>
                 Low Bias Risk
               </span>
             </div>

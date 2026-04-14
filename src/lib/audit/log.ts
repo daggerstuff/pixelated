@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { AuditLogger } from './logger'
 import { AuditAction, AuditEventType, AuditSeverity } from './events'
+import { AuditLogger } from './logger'
 
 const logger = createBuildSafeLogger('audit-log')
 

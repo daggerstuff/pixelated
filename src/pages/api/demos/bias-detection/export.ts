@@ -258,7 +258,7 @@ function convertToText(exportData: ExportData): string {
     >
     scenarios.forEach((scenario, index) => {
       content += `${index + 1}. ${scenario.change}\n`
-      content += `   Expected Reduction: ${(scenario.expectedBiasReduction as number * 100).toFixed(1)}%\n`
+      content += `   Expected Reduction: ${((scenario.expectedBiasReduction as number) * 100).toFixed(1)}%\n`
       content += `   Likelihood: ${scenario.likelihood}\n`
       content += `   Description: ${scenario.description}\n\n`
     })

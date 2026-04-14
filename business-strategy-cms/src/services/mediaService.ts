@@ -1,19 +1,26 @@
 import * as AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
-// OVHCloud Object Storage configuration (S3-compatible)
+interface UploadedFile {
+  originalname: string
+  mimetype: string
+  buffer: Buffer
+  size: number
+}
+
+// Hetzner Object Storage configuration (S3-compatible)
 const s3Client = new AWS.S3({
   endpoint:
-    process.env['OVH_ENDPOINT'] || 'https://s3.us-east-1.io.cloud.ovh.net',
-  accessKeyId: process.env['OVH_ACCESS_KEY_ID'] || '',
-  secretAccessKey: process.env['OVH_SECRET_ACCESS_KEY'] || '',
-  region: process.env['OVH_REGION'] || 'us-east-1',
+    process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com',
+  accessKeyId: process.env['HETZNER_ACCESS_KEY_ID'] || '',
+  secretAccessKey: process.env['HETZNER_SECRET_ACCESS_KEY'] || '',
+  region: process.env['HETZNER_REGION'] || 'hel1',
   s3ForcePathStyle: true,
   signatureVersion: 'v4',
 })
 
 const BUCKET_NAME =
-  process.env['OVH_BUCKET_NAME'] || 'business-strategy-cms-uploads'
+  process.env['HETZNER_BUCKET_NAME'] || 'business-strategy-cms-uploads'
 
 export interface MediaUpload {
   id: string
@@ -28,10 +35,10 @@ export interface MediaUpload {
 
 export class MediaService {
   /**
-   * Upload file to OVHCloud Object Storage
+   * Upload file to Hetzner Object Storage
    */
   static async uploadFile(
-    file: Express.Multer.File,
+    file: UploadedFile,
     userId: string,
     folder?: string,
   ): Promise<MediaUpload> {
@@ -81,7 +88,7 @@ export class MediaService {
   }
 
   /**
-   * Delete file from OVHCloud
+   * Delete file from Hetzner
    */
   static async deleteFile(key: string): Promise<void> {
     const params = {
@@ -190,7 +197,7 @@ export class MediaService {
    */
   private static buildUrl(key: string): string {
     const endpoint =
-      process.env['OVH_ENDPOINT'] || 'https://s3.us-east-1.io.cloud.ovh.net'
+      process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com'
 
     // Remove protocol from endpoint if present
     const cleanEndpoint = endpoint.replace(/^https?:\/\//, '')

@@ -9,50 +9,78 @@ import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntel
 
 // Mock dependencies
 vi.mock('../../logging/build-safe-logger', () => ({
-  createBuildSafeLogger: vi.fn(() => ({
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
+  createBuildSafeLogger: vi.fn<
+    () => {
+      info: (message: string, ...args: unknown[]) => void
+      error: (message: string | Error, ...args: unknown[]) => void
+      warn: (message: string, ...args: unknown[]) => void
+      debug: (message: string, ...args: unknown[]) => void
+    }
+  >(() => ({
+    info: vi.fn<(message: string, ...args: unknown[]) => void>(),
+    error: vi.fn<(message: string | Error, ...args: unknown[]) => void>(),
+    warn: vi.fn<(message: string, ...args: unknown[]) => void>(),
+    debug: vi.fn<(message: string, ...args: unknown[]) => void>(),
   })),
 }))
 
 vi.mock('ioredis', () => {
   return {
-    Redis: vi.fn().mockImplementation(() => ({
-      ping: vi.fn().mockResolvedValue('PONG'),
-      setex: vi.fn().mockResolvedValue('OK'),
-      get: vi.fn().mockResolvedValue(null),
-      del: vi.fn().mockResolvedValue(1),
-      publish: vi.fn().mockResolvedValue(1),
-      quit: vi.fn().mockResolvedValue('OK'),
+    Redis: vi.fn<
+      (..._args: unknown[]) => {
+        ping: () => Promise<string>
+        setex: () => Promise<string>
+        get: () => Promise<string | null>
+        del: () => Promise<number>
+        publish: () => Promise<number>
+        quit: () => Promise<string>
+      }
+    >(() => ({
+      ping: vi.fn<() => Promise<string>>().mockResolvedValue('PONG'),
+      setex: vi.fn<() => Promise<string>>().mockResolvedValue('OK'),
+      get: vi.fn<() => Promise<string | null>>().mockResolvedValue(null),
+      del: vi.fn<() => Promise<number>>().mockResolvedValue(1),
+      publish: vi.fn<() => Promise<number>>().mockResolvedValue(1),
+      quit: vi.fn<() => Promise<string>>().mockResolvedValue('OK'),
     })),
   }
 })
 
 vi.mock('mongodb', () => {
   return {
-    MongoClient: vi.fn().mockImplementation(() => ({
-      connect: vi.fn().mockResolvedValue(undefined),
-      db: vi.fn().mockReturnValue({
-        collection: vi.fn().mockReturnValue({
-          insertOne: vi.fn().mockResolvedValue({ insertedId: 'test-id' }),
-          updateOne: vi.fn().mockResolvedValue({ modifiedCount: 1 }),
-          findOne: vi.fn().mockResolvedValue(null),
-          find: vi.fn().mockReturnValue({
-            toArray: vi.fn().mockResolvedValue([]),
-            sort: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockReturnThis(),
-          }),
-          aggregate: vi.fn().mockReturnValue({
-            toArray: vi.fn().mockResolvedValue([]),
-          }),
-        }),
-        admin: vi.fn().mockReturnValue({
-          ping: vi.fn().mockResolvedValue(true),
-        }),
-      }),
-      close: vi.fn().mockResolvedValue(undefined),
+    MongoClient: vi.fn(() => ({
+      connect: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      db: vi.fn(() => ({
+        collection: vi.fn(() => ({
+          insertOne: vi
+            .fn<() => Promise<{ insertedId: string }>>()
+            .mockResolvedValue({
+              insertedId: 'test-id',
+            }),
+          updateOne: vi
+            .fn<() => Promise<{ modifiedCount: number }>>()
+            .mockResolvedValue({
+              modifiedCount: 1,
+            }),
+          findOne: vi.fn<() => Promise<null>>().mockResolvedValue(null),
+          find: vi.fn(() => ({
+            toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+            sort: vi.fn(() => ({
+              toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+            })),
+            limit: vi.fn(() => ({
+              toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+            })),
+          })),
+          aggregate: vi.fn(() => ({
+            toArray: vi.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
+          })),
+        })),
+        admin: vi.fn(() => ({
+          ping: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
+        })),
+      })),
+      close: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
     })),
   }
 })

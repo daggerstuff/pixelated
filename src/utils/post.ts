@@ -19,9 +19,7 @@ export interface PostData {
 export type PostCollectionType = 'blog' | 'docs'
 
 // Helper type for our collection entries
-export type PostCollectionEntry =
-  | AstroCollectionEntry<'blog'>
-   
+export type PostCollectionEntry = AstroCollectionEntry<'blog'>
 
 export function filterDrafts(
   entries: PostCollectionEntry[],

@@ -18,10 +18,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import MindMirrorDashboard from '@/components/ui/MindMirrorDashboard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  type EnhancedMentalHealthAnalysis,
-  type MindMirrorAnalysis,
-} from '@/lib/mental-health/types'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {
@@ -29,6 +25,10 @@ import type {
   RoutingContext,
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import {
+  type EnhancedMentalHealthAnalysis,
+  type MindMirrorAnalysis,
+} from '@/lib/mental-health/types'
 
 interface MentalHealthAdapter {
   analyzeMentalHealth(
@@ -384,12 +384,15 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
 
           // Validate API response structure (addresses Issue #1)
           if (!chatResult || !chatResult.analysis || !chatResult.response) {
-            throw new Error('Invalid API response format: missing analysis or response data')
+            throw new Error(
+              'Invalid API response format: missing analysis or response data',
+            )
           }
 
           // Convert API response to our analysis format
           const analysisResult: MentalHealthAnalysisResult = {
-            mentalHealthCategory: chatResult.analysis.emotionalState || 'unknown',
+            mentalHealthCategory:
+              chatResult.analysis.emotionalState || 'unknown',
             confidence: (chatResult.analysis.concernSeverity || 0) / 10, // Convert 1-10 to 0-1
             supportingEvidence: chatResult.analysis.keyTopics || [],
             isCrisis:
@@ -486,7 +489,8 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
             const assistantMessage: ChatMessage = {
               id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
               role: 'assistant',
-              content: chatResult.response?.message || "I'm processing your request.",
+              content:
+                chatResult.response?.message || "I'm processing your request.",
               timestamp: new Date().toISOString(),
               // Include API metadata for enhanced display
               metadata: {

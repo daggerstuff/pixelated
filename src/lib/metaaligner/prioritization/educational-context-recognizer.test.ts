@@ -19,9 +19,22 @@ import type {
 
 // Mock dependencies
 const mockAIService: AIService = {
-  getModelInfo: vi.fn(),
-  createChatCompletion: vi.fn(),
-  createChatStream: vi.fn(),
+  getModelInfo:
+    vi.fn<(model: string) => ReturnType<AIService['getModelInfo']>>(),
+  createChatCompletion:
+    vi.fn<
+      (
+        messages: Parameters<AIService['createChatCompletion']>[0],
+        options?: Parameters<AIService['createChatCompletion']>[1],
+      ) => ReturnType<AIService['createChatCompletion']>
+    >(),
+  createChatStream:
+    vi.fn<
+      (
+        messages: Parameters<AIService['createStreamingChatCompletion']>[0],
+        options?: Parameters<AIService['createStreamingChatCompletion']>[1],
+      ) => ReturnType<AIService['createStreamingChatCompletion']>
+    >(),
 }
 
 describe('EducationalContextRecognizer', () => {

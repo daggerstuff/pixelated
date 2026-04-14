@@ -55,8 +55,8 @@ export function isAlertItem(v: unknown): v is AlertItem {
   return (
     isObject(v) &&
     typeof v['alertId'] === 'string' &&
-    typeof v.message === 'string' &&
-    typeof v.level === 'string' &&
+    typeof v['message'] === 'string' &&
+    typeof v['level'] === 'string' &&
     (typeof v['timestamp'] === 'string' || v['timestamp'] instanceof Date)
   )
 }
@@ -79,10 +79,26 @@ export function isPartialBiasDashboardSummary(
 ): v is Partial<BiasDashboardSummary> {
   if (!isObject(v)) return false
   const obj = v
-  if (obj['totalSessions'] !== undefined && typeof obj['totalSessions'] !== 'number') return false
-  if (obj['averageBiasScore'] !== undefined && typeof obj['averageBiasScore'] !== 'number') return false
-  if (obj['alertsLast24h'] !== undefined && typeof obj['alertsLast24h'] !== 'number') return false
-  if (obj['activeAlerts'] !== undefined && typeof obj['activeAlerts'] !== 'number') return false
+  if (
+    obj['totalSessions'] !== undefined &&
+    typeof obj['totalSessions'] !== 'number'
+  )
+    return false
+  if (
+    obj['averageBiasScore'] !== undefined &&
+    typeof obj['averageBiasScore'] !== 'number'
+  )
+    return false
+  if (
+    obj['alertsLast24h'] !== undefined &&
+    typeof obj['alertsLast24h'] !== 'number'
+  )
+    return false
+  if (
+    obj['activeAlerts'] !== undefined &&
+    typeof obj['activeAlerts'] !== 'number'
+  )
+    return false
   const trendDirection = obj['trendDirection']
   if (
     trendDirection !== undefined &&
@@ -97,12 +113,11 @@ export function isPartialBiasDashboardSummary(
 export function isBiasAnalysisItem(v: unknown): v is BiasAnalysisItem {
   return (
     isObject(v) &&
-    typeof v.sessionId === 'string' &&
-    typeof v.overallBiasScore === 'number'
+    typeof v['sessionId'] === 'string' &&
+    typeof v['overallBiasScore'] === 'number'
   )
 }
 
 export function isBiasAnalysisItemArray(v: unknown): v is BiasAnalysisItem[] {
   return Array.isArray(v) && v.every(isBiasAnalysisItem)
 }
-

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pixelated-empathy-config
+  namespace: pixelated-empathy
+data:
+  APP_NAME: "pixelated-empathy"
+  APP_ENV: "base"
+  LOG_LEVEL: "INFO"
+  PORT: "4321"
+  METRICS_ENABLED: "true"
+  HEALTH_PATH: "/health"

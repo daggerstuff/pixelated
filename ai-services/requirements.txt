@@ -2,18 +2,18 @@
 # CPU-optimized for free-tier VPS
 
 # Core ML/AI
-torch==2.10.0
-torchvision==0.25.0+cpu
-torchaudio==2.10.0+cpu
+torch==2.11.0
+torchvision==0.26.0
+torchaudio==2.11.0
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
 
-transformers==5.3.0
-sentence-transformers==5.3.0
+transformers==5.5.3
+sentence-transformers==5.4.0
 scikit-learn==1.8.0
 fairlearn==0.13.0
 
 # Data processing
-pandas==2.2.3
+pandas==3.0.2
 numpy==2.4.4
 scipy==1.15.3
 pymongo==4.10.1
@@ -27,7 +27,7 @@ flask-cors==6.0.2
 pydantic==2.12.5
 
 # Utilities
-cryptography==46.0.6
+cryptography==46.0.7
 python-dateutil==2.9.0
 pyyaml==6.0.3
 requests==2.33.1

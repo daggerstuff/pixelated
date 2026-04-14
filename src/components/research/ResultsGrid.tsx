@@ -9,7 +9,11 @@ interface ResultsGridProps {
   loading?: boolean
 }
 
-export default function ResultsGrid({ results, loading }: ResultsGridProps) {
+// ⚡ Bolt: Wrapped in React.memo to prevent expensive re-renders of the entire grid when parent SearchInterface state changes
+const ResultsGrid = React.memo(function ResultsGrid({
+  results,
+  loading,
+}: ResultsGridProps) {
   if (loading) {
     return (
       <div className='grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
@@ -37,4 +41,6 @@ export default function ResultsGrid({ results, loading }: ResultsGridProps) {
       </div>
     </div>
   )
-}
+})
+
+export default ResultsGrid

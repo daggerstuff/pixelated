@@ -2,11 +2,53 @@
 set -euo pipefail
 
 SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
-BACKUP_DIR="${BACKUP_DIR:-/home/vivi/.local/share/home_backups}"
 RCLONE_TARGET="${RCLONE_TARGET:-drive:vivi-home-backups}"
 RETENTION_COUNT="${BACKUP_RETENTION_COUNT:-2}"
+
+# Normalize home context because systemd Environment substitutions can be resolved incorrectly
+# in some deployment paths (for example, resolving %h as /root before service user switches).
+if [[ -z "${HOME:-}" || ! -d "$HOME" || "$HOME" == "/root" ]]; then
+  if [[ -d "/home/vivi" ]]; then
+    export HOME="/home/vivi"
+  elif [[ "${SOURCE_DIR%/*}" == "/home" && -d "$SOURCE_DIR" ]]; then
+    export HOME="${SOURCE_DIR}"
+  else
+    export HOME="/home/$(id -un)"
+  fi
+fi
+
+BACKUP_DIR="${BACKUP_DIR:-$HOME/.local/share/home_backups}"
+
+# Repair wrong defaults injected by systemd units that still resolve to root paths.
+if [[ "$BACKUP_DIR" == /root/* && "$HOME" == /home/* ]]; then
+  BACKUP_DIR="$HOME/.local/share/home_backups"
+fi
+
 LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
 LOCK_FILE="${HOME}/.cache/home-vivi-backup.lock"
+
+if [[ -n "${RCLONE_CONFIG:-}" && ! -r "$RCLONE_CONFIG" ]]; then
+  RCLONE_CONFIG=""
+fi
+
+if [[ -z "${RCLONE_CONFIG:-}" ]]; then
+  if [[ -r "${HOME}/.config/rclone/rclone.conf" ]]; then
+    export RCLONE_CONFIG="${HOME}/.config/rclone/rclone.conf"
+  elif [[ "${SOURCE_DIR%/*}" == "/home" && -r "${SOURCE_DIR}/.config/rclone/rclone.conf" ]]; then
+    export RCLONE_CONFIG="${SOURCE_DIR}/.config/rclone/rclone.conf"
+    export HOME="${SOURCE_DIR}"
+    LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
+    LOCK_FILE="${HOME}/.cache/home-vivi-backup.lock"
+  fi
+fi
+
+if [[ -z "${RCLONE_CONFIG:-}" || ! -r "$RCLONE_CONFIG" ]]; then
+  echo "Unable to locate a readable rclone config file for backup upload." >&2
+  echo "Expected one of:" >&2
+  echo "  ${HOME}/.config/rclone/rclone.conf" >&2
+  [[ "${SOURCE_DIR%/*}" == "/home" ]] && echo "  ${SOURCE_DIR}/.config/rclone/rclone.conf" >&2
+  exit 1
+fi
 
 mkdir -p "$BACKUP_DIR"
 mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCK_FILE")"

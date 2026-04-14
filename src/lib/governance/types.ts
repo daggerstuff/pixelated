@@ -19,7 +19,10 @@ export interface Condition {
   value: string
 }
 
-export type RequiredCondition = 'fhe_encryption' | 'audit_logged' | 'consent_verified'
+export type RequiredCondition =
+  | 'fhe_encryption'
+  | 'audit_logged'
+  | 'consent_verified'
 
 export interface PolicyEvaluationResult {
   allowed: boolean

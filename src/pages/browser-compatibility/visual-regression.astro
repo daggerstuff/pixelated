@@ -440,6 +440,14 @@ const placeholderThumbnail =
     </div>
   </div>
 
+  <div
+    id="visual-data"
+    data-visual-data={JSON.stringify(visualData)}
+    data-placeholder={placeholderThumbnail}
+    class="hidden"
+  >
+  </div>
+
   <!-- Image Comparison Modal -->
   <div
     id="imageModal"
@@ -531,7 +539,12 @@ const placeholderThumbnail =
   }
 </style>
 
-<script define:vars={{ visualData, placeholderThumbnail }}>
+<script>
+  // Get data from container
+  const dataContainer = document.getElementById('visual-data') as HTMLElement
+  const visualData = JSON.parse(dataContainer?.dataset.visualData || '{}')
+  const placeholderThumbnail = dataContainer?.dataset.placeholder || ''
+
   // Refresh button
   document.getElementById('refresh-data')?.addEventListener('click', () => {
     window.location.reload()
@@ -541,9 +554,14 @@ const placeholderThumbnail =
   const modal = document.getElementById('imageModal')
   const closeModalBtn = document.getElementById('closeModal')
   const modalTitle = document.getElementById('modalTitle')
-  const modalExpected = document.getElementById('modalExpected')
-  const modalActual = document.getElementById('modalActual')
-  const modalDiff = document.getElementById('modalDiff')
+  const modalExpected = document.getElementById('modalExpected') as HTMLImageElement
+  const modalActual = document.getElementById('modalActual') as HTMLImageElement
+  const modalDiff = document.getElementById('modalDiff') as HTMLImageElement
+
+  // Close modal function
+  function closeModal() {
+    modal?.classList.add('hidden')
+  }
 
   // Close modal with escape key
   document.addEventListener('keydown', (e) => {
@@ -551,11 +569,6 @@ const placeholderThumbnail =
       closeModal()
     }
   })
-
-  // Close modal function
-  function closeModal() {
-    modal?.classList.add('hidden')
-  }
 
   // Close modal button click
   closeModalBtn?.addEventListener('click', () => {
@@ -569,11 +582,13 @@ const placeholderThumbnail =
     }
   })
 
-  // Add the openImageComparisonModal function to the window object
-  function openImageComparisonModal(name) {
+  /**
+   * Opens the image comparison modal with data for the specified screenshot.
+   */
+  function openImageComparisonModal(name: string) {
     // Find the screenshot data
-    const screenshots = visualData.screenshots
-    const screenshot = screenshots.find((s) => s.name === name)
+    const screenshots = visualData.screenshots || []
+    const screenshot = screenshots.find((s: any) => s.name === name)
 
     if (!screenshot) return
 
@@ -597,5 +612,5 @@ const placeholderThumbnail =
   }
 
   // Make the function globally available
-  window.openImageComparisonModal = openImageComparisonModal
+  ;(window as any).openImageComparisonModal = openImageComparisonModal
 </script>

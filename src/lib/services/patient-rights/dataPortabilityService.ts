@@ -294,7 +294,7 @@ export async function createDataExportRequest(
   } catch (error: unknown) {
     logger.error('Error creating export request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
       input,
     })
 
@@ -535,7 +535,7 @@ async function processExportRequest(exportId: string): Promise<void> {
   } catch (error: unknown) {
     logger.error('Error processing export', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
       exportId,
     })
 

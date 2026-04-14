@@ -6,14 +6,13 @@ permissions:
 
 on:
   push:
-    branches: [main, staging]
+    branches: [main, master, staging]
   pull_request:
-    branches: [main, staging]
+    branches: [main, master, staging]
   workflow_dispatch:
 
 env:
   GHA_LOCAL_RUN: 'false'
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.33.0
   NODE_ENV: test
@@ -32,17 +31,17 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6
         with:
           version: 10.33.0
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -59,41 +58,96 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Start preview server in background
-        run: pnpm run preview -- --port 4323 &
-        shell: bash
-
-      - name: Wait for server
+      - name: Validate browser test targets
         run: |
-          echo "Waiting for preview server to be ready..."
-          MAX_RETRIES=30
-          RETRY_COUNT=0
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if curl -sSf http://localhost:4323 > /dev/null 2>&1; then
-              echo "Server is ready!"
-              exit 0
+          echo "Validating browser test entrypoints..."
+          MISSING_FILES=0
+
+          for file in tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Required browser test file not found: ${file}"
+              MISSING_FILES=1
+            else
+              echo "✅ Found ${file}"
             fi
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            echo "Attempt $RETRY_COUNT/$MAX_RETRIES - server not ready yet..."
+          done
+
+          if [ "$MISSING_FILES" -ne 0 ]; then
+            echo "Available browser specs:"
+            find tests/browser -maxdepth 1 -type f -name "*.spec.ts" | sort
+            exit 1
+          fi
+
+      - name: Start preview server and run browser tests
+        run: |
+          set -euo pipefail
+
+          PREVIEW_PORT=4323
+          PREVIEW_URL="http://127.0.0.1:${PREVIEW_PORT}"
+          PREVIEW_LOG=/tmp/pixelated-preview.log
+          rm -f "${PREVIEW_LOG}"
+
+          cleanup() {
+            local exit_code=$?
+            if [[ -n "${PREVIEW_PID:-}" ]] && kill -0 "${PREVIEW_PID}" > /dev/null 2>&1; then
+              kill "${PREVIEW_PID}" > /dev/null 2>&1 || true
+              wait "${PREVIEW_PID}" > /dev/null 2>&1 || true
+            fi
+
+            if [[ ${exit_code} -ne 0 ]]; then
+              echo "Last preview logs:"
+              tail -n 80 "${PREVIEW_LOG}" || true
+            fi
+
+            exit "${exit_code}"
+          }
+
+          trap cleanup EXIT
+
+          echo "Starting preview server on ${PREVIEW_URL}..."
+          nohup env HOST=127.0.0.1 PORT="${PREVIEW_PORT}" WEBSITES_PORT="${PREVIEW_PORT}" pnpm run preview > "${PREVIEW_LOG}" 2>&1 &
+          PREVIEW_PID=$!
+          echo "Preview server started (PID: ${PREVIEW_PID})"
+
+          echo "Waiting for preview server to be ready..."
+          for attempt in $(seq 1 60); do
+            if ! kill -0 "${PREVIEW_PID}" > /dev/null 2>&1; then
+              echo "Preview process (PID: ${PREVIEW_PID}) is not running."
+              exit 1
+            fi
+
+            if curl -sS --connect-timeout 2 --max-time 5 "${PREVIEW_URL}" > /dev/null 2>&1; then
+              echo "Server is ready at ${PREVIEW_URL}!"
+              break
+            fi
+
+            echo "Attempt ${attempt}/60 - server not ready yet..."
+            if ss -ltn "( sport = :${PREVIEW_PORT} )" | grep -q LISTEN; then
+              echo "Port ${PREVIEW_PORT} is listening; waiting for HTTP responses..."
+            fi
+
+            if [[ ${attempt} -eq 60 ]]; then
+              echo "Server failed to become ready after 60 seconds."
+              echo "Preview server PID: ${PREVIEW_PID}"
+              exit 1
+            fi
+
             sleep 1
           done
-          echo "Server failed to become ready after ${MAX_RETRIES} seconds"
-          exit 1
 
-      - name: Run browser tests
-        run: |
           export NODE_ENV=test
           export DISABLE_AUTH=true
+          export DISABLE_PLAYWRIGHT_WEBSERVER=true
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
-          export BASE_URL=http://localhost:4323
-          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
+          export BASE_URL="${PREVIEW_URL}"
+          pnpm exec playwright test --config=config/playwright.config.ts tests/browser/auth.spec.ts tests/browser/browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
         env:
           CI: true
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: browser-test-results-${{ github.run_id }}
           path: |
@@ -108,8 +162,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [browser-tests]
     if: always()
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v6
@@ -225,7 +277,7 @@ jobs:
           echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Upload consolidated report
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: browser-compatibility-report-${{ github.run_id }}
           path: report.html
@@ -237,7 +289,9 @@ jobs:
         env:
           ISSUE_COUNT: ${{ steps.generate_report.outputs.issue_count }}
           TOTAL_TESTS: ${{ steps.generate_report.outputs.total_tests }}
-          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_URL:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+            github.run_id }}
         run: |
           # Prepare notification content
           cat > notification.txt << EOF

@@ -68,7 +68,7 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
         }
       }),
       analyze_session: vi
-        .fn()
+        .fn<any>()
         .mockImplementation(async (session: TherapeuticSession) => {
           await new Promise((resolve) =>
             setTimeout(resolve, Math.random() * 200 + 50),

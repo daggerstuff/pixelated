@@ -321,7 +321,7 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
 
     #handleInput = async (event: Event) => {
       if (!this.#content) return
-      const value = (event.target as HTMLInputElement).value.trim()
+      const value = (event.target).value.trim()
 
       if (import.meta.env.PROD) {
         const requestId = ++this.#activeRequestId
@@ -447,13 +447,13 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
 
       if (this.#input?.value) {
         this.#resetView()
-        await this.#handleInput({ target: this.#input } as unknown as Event)
+        await this.#handleInput({ target: this.#input })
         this.#input?.focus()
       }
     }
 
     #handlePaginateClick = async (ev: MouseEvent) => {
-      const btn = ev.currentTarget as HTMLButtonElement
+      const btn = ev.currentTarget
       if (!btn || this.#batchLoading) return
 
       const requestId = this.#activeRequestId

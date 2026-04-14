@@ -174,8 +174,7 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
 
       setProgressState((prevState: any) => {
         const prevMetrics =
-          prevState?.progressMetrics ??
-          (DEFAULT_MEMORY.progressMetrics)
+          prevState?.progressMetrics ?? DEFAULT_MEMORY.progressMetrics
         const prevResponses = (prevMetrics.responsesCount ?? 0) as number
         const prevAvg = (prevMetrics.responseTime ?? 0) as number
 

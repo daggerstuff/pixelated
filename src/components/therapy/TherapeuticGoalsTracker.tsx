@@ -2,7 +2,12 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
@@ -155,7 +160,7 @@ export function TherapeuticGoalsTracker({
       setActiveGoalId(newGoal.id)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err)?.message || String(err))
+        setActionError(err?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -183,7 +188,7 @@ export function TherapeuticGoalsTracker({
       )
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err)?.message || String(err))
+        setActionError(err?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -207,7 +212,7 @@ export function TherapeuticGoalsTracker({
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err)?.message || String(err))
+        setActionError(err?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -383,7 +388,7 @@ export function TherapeuticGoalsTracker({
             <DialogHeader>
               <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
             </DialogHeader>
-            
+
             <form onSubmit={handleFormSubmit} className='space-y-4'>
               <Input
                 name='title'
@@ -530,7 +535,8 @@ export function TherapeuticGoalsTracker({
                   variant='destructive'
                   onClick={(e) => {
                     e.stopPropagation()
-                    if (window.confirm('Delete this goal?')) void deleteGoal(goal.id)
+                    if (window.confirm('Delete this goal?'))
+                      void deleteGoal(goal.id)
                   }}
                   disabled={actionLoading}
                 >

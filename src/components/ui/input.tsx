@@ -12,8 +12,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     // Consolidate accessibility attributes (Review suggestion)
     const ariaAttributes = {
       'aria-invalid': error ? true : undefined,
-      'aria-describedby': error && errorId ? errorId : props['aria-describedby'],
-    };
+      'aria-describedby':
+        error && errorId ? errorId : props['aria-describedby'],
+    }
 
     return (
       <input

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { ComplianceValidator } from '../compliance-validator'
 
 describe('ComplianceValidator', () => {
@@ -13,7 +14,7 @@ describe('ComplianceValidator', () => {
       operation: 'access_phi',
       fheActive: true,
       auditEnabled: true,
-      consentVerified: true
+      consentVerified: true,
     })
     expect(result.compliant).toBe(true)
   })
@@ -23,7 +24,7 @@ describe('ComplianceValidator', () => {
       operation: 'access_phi',
       fheActive: false,
       auditEnabled: true,
-      consentVerified: true
+      consentVerified: true,
     })
     expect(result.compliant).toBe(false)
     expect(result.reasons).toContain('FHE encryption required')
@@ -34,7 +35,7 @@ describe('ComplianceValidator', () => {
       operation: 'access_phi',
       fheActive: true,
       auditEnabled: false,
-      consentVerified: true
+      consentVerified: true,
     })
     expect(result.compliant).toBe(false)
     expect(result.reasons).toContain('Audit trail required')
@@ -45,7 +46,7 @@ describe('ComplianceValidator', () => {
       operation: 'access_phi',
       fheActive: true,
       auditEnabled: true,
-      consentVerified: false
+      consentVerified: false,
     })
     expect(result.compliant).toBe(false)
     expect(result.reasons).toContain('Consent verification required')
@@ -56,7 +57,7 @@ describe('ComplianceValidator', () => {
       operation: 'access_phi',
       fheActive: true,
       auditEnabled: true,
-      consentVerified: true
+      consentVerified: true,
     })
     expect(result.timestamp).toBeDefined()
     expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp)

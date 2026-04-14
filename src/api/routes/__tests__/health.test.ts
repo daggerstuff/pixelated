@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { Router } from 'express'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 // Mock database connections
 const mockMongoDb = {
@@ -35,7 +35,7 @@ describe('Health Endpoints', () => {
     const express = require('express')
     app = express()
     app.use(express.json())
-    app.use('/', healthRoutes())
+    app.use('/', healthRoutes)
   })
 
   describe('GET /', () => {
@@ -164,7 +164,9 @@ describe('Health Endpoints', () => {
     })
 
     it('should include failed service in error response', async () => {
-      mockMongoDb.isConnected.mockRejectedValue(new Error('MongoDB connection failed'))
+      mockMongoDb.isConnected.mockRejectedValue(
+        new Error('MongoDB connection failed'),
+      )
       mockPostgres.query.mockResolvedValue(true)
       mockRedis.ping.mockResolvedValue('PONG')
 
@@ -224,7 +226,10 @@ describe('Health Endpoints', () => {
 
     it('should timeout slow health checks', async () => {
       mockMongoDb.isConnected.mockImplementation(
-        () => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 100))
+        () =>
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout')), 100),
+          ),
       )
       mockPostgres.query.mockResolvedValue(true)
       mockRedis.ping.mockResolvedValue('PONG')

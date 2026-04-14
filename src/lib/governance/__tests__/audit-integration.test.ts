@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { ComplianceValidator } from '../compliance-validator'
+
 import { AuditEventType, AuditEventStatus, logAuditEvent } from '@/lib/audit'
+
+import { ComplianceValidator } from '../compliance-validator'
 
 // Mock the audit logger
 vi.mock('@/lib/audit', () => ({
@@ -32,7 +34,7 @@ describe('Audit Integration', () => {
       operation: 'test_phi_access',
       fheActive: true,
       auditEnabled: true,
-      consentVerified: true
+      consentVerified: true,
     })
 
     expect(result.compliant).toBe(true)
@@ -50,7 +52,7 @@ describe('Audit Integration', () => {
       operation: 'access_phi',
       fheActive: false,
       auditEnabled: true,
-      consentVerified: true
+      consentVerified: true,
     })
 
     const testUserId = 'user-123'
@@ -63,7 +65,11 @@ describe('Audit Integration', () => {
         'governance_validation',
         testUserId,
         testResourceId,
-        { operation: 'access_phi', reasons: result.reasons, status: AuditEventStatus.SUCCESS }
+        {
+          operation: 'access_phi',
+          reasons: result.reasons,
+          status: AuditEventStatus.SUCCESS,
+        },
       )
     } else {
       logAuditEvent(
@@ -71,7 +77,11 @@ describe('Audit Integration', () => {
         'governance_validation',
         testUserId,
         testResourceId,
-        { operation: 'access_phi', reasons: result.reasons, status: AuditEventStatus.BLOCKED }
+        {
+          operation: 'access_phi',
+          reasons: result.reasons,
+          status: AuditEventStatus.BLOCKED,
+        },
       )
     }
 
@@ -83,8 +93,8 @@ describe('Audit Integration', () => {
       expect.objectContaining({
         operation: 'access_phi',
         reasons: expect.arrayContaining(['FHE encryption required']),
-        status: AuditEventStatus.BLOCKED
-      })
+        status: AuditEventStatus.BLOCKED,
+      }),
     )
   })
 })

@@ -6,7 +6,10 @@ export const supabase = {
     return {
       select() {
         return {
-          eq: async (key: string, value: unknown): Promise<{ data: T[]; error: unknown }> => {
+          eq: async (
+            key: string,
+            value: unknown,
+          ): Promise<{ data: T[]; error: unknown }> => {
             return { data: [], error: null }
           },
         }
@@ -18,14 +21,20 @@ export const supabase = {
       },
       update(data: Partial<T>) {
         return {
-          eq: async (key: string, value: unknown): Promise<{ data: T; error: unknown }> => {
+          eq: async (
+            key: string,
+            value: unknown,
+          ): Promise<{ data: T; error: unknown }> => {
             return { data: null as unknown as T, error: null }
           },
         }
       },
       delete() {
         return {
-          eq: async (key: string, value: unknown): Promise<{ error: unknown }> => {
+          eq: async (
+            key: string,
+            value: unknown,
+          ): Promise<{ error: unknown }> => {
             return { error: null }
           },
         }

@@ -71,7 +71,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys are removed
       for (const key of keys) {
-         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+        expect(key).not.toEqual(expect.objectContaining({ exists: true }))
       }
     })
 
@@ -130,7 +130,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys exist
       for (const key of keys) {
-         expect(key).toEqual(expect.objectContaining({ exists: true }))
+        expect(key).toEqual(expect.objectContaining({ exists: true }))
       }
 
       // Invalidate by tag
@@ -139,7 +139,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys are removed
       for (const key of keys) {
-         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+        expect(key).not.toEqual(expect.objectContaining({ exists: true }))
       }
     })
 
@@ -153,13 +153,13 @@ describe('cacheInvalidation Integration', () => {
       await cacheInvalidation.set(key, value, { pattern: key, tags })
 
       // Verify key exists
-       expect(key).toEqual(expect.objectContaining({ exists: true }))
+      expect(key).toEqual(expect.objectContaining({ exists: true }))
 
       // Invalidate using each tag
       for (const tag of tags) {
         await cacheInvalidation.invalidateTag(tag)
         await sleep(100) // Allow time for invalidation to propagate
-         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+        expect(key).not.toEqual(expect.objectContaining({ exists: true }))
 
         // Reset key for next tag test
         if (tag !== tags[tags.length - 1]) {
@@ -238,7 +238,7 @@ describe('cacheInvalidation Integration', () => {
       await cacheInvalidation.invalidatePattern(`${pattern}:*`)
       await sleep(100) // Allow time for invalidation to propagate
 
-       expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+      expect(key).not.toEqual(expect.objectContaining({ exists: true }))
     })
   })
 

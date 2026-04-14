@@ -219,10 +219,10 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       this.emit('initialized', { timestamp: new Date() })
     } catch (error: unknown) {
       logger.error('Failed to initialize Threat Intelligence Database', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw new Error(
-        `Failed to initialize threat intelligence database: ${(error instanceof Error ? error.message : "Unknown error")}`,
+        `Failed to initialize threat intelligence database: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -265,7 +265,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       logger.info('Database indexes created successfully')
     } catch (error: unknown) {
       logger.error('Failed to create database indexes', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw error
     }
@@ -307,7 +307,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to initialize TAXII collections', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw error
     }
@@ -426,7 +426,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       return stixObject.id
     } catch (error: unknown) {
       logger.error('Failed to store STIX object', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         stix_id: stixObject.id,
       })
       throw error
@@ -555,7 +555,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       return result.stix_object
     } catch (error: unknown) {
       logger.error('Failed to get STIX object', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         stix_id: stixId,
       })
       throw error
@@ -627,7 +627,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to query STIX objects', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         query,
       })
       throw error
@@ -655,7 +655,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         modified: coll.updated_at.toISOString(),
       }))
     } catch (error: unknown) {
-      logger.error('Failed to get TAXII collections', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to get TAXII collections', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -687,7 +689,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to get TAXII collection', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         collectionId,
       })
       throw error
@@ -709,7 +711,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         .toArray()
     } catch (error: unknown) {
       logger.error('Failed to get TAXII manifest', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         collectionId,
       })
       throw error
@@ -781,7 +783,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to get TAXII objects', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         collectionId,
       })
       throw error
@@ -809,7 +811,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       )
     } catch (error: unknown) {
       logger.error('Failed to update TAXII manifest', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         stixId,
         collectionId,
       })
@@ -853,7 +855,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       try {
         this.validateSTIXObject(stixObject)
       } catch (error: any) {
-        errors.push((error instanceof Error ? error.message : "Unknown error"))
+        errors.push(error instanceof Error ? error.message : 'Unknown error')
       }
 
       // Additional validation rules
@@ -879,7 +881,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to validate STIX object', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         stixId,
       })
       throw error
@@ -977,7 +979,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to process STIX object', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
         stixId,
       })
       throw error
@@ -1019,7 +1021,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         normalized: true,
       }
     } catch (error: unknown) {
-      logger.error('Failed to process indicator', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to process indicator', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -1057,7 +1061,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         normalized: true,
       }
     } catch (error: unknown) {
-      logger.error('Failed to process malware', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to process malware', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -1115,7 +1121,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
             await this.processSTIXObject(obj.stix_id)
           } catch (error: unknown) {
             logger.error('Failed to process object during indexing', {
-              error: (error instanceof Error ? error.message : "Unknown error"),
+              error: error instanceof Error ? error.message : 'Unknown error',
               stix_id: obj.stix_id,
             })
           }
@@ -1141,7 +1147,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       logger.info('Database indexing completed')
     } catch (error: unknown) {
-      logger.error('Failed to perform indexing', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to perform indexing', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
     }
   }
 
@@ -1191,7 +1199,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Failed to get database statistics', {
-        error: (error instanceof Error ? error.message : "Unknown error"),
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw error
     }
@@ -1248,7 +1256,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       return JSON.stringify(bundle, null, 2)
     } catch (error: unknown) {
-      logger.error('Failed to export STIX objects', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to export STIX objects', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -1281,7 +1291,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
           await this.storeSTIXObject(obj, metadata)
           imported++
         } catch (error: any) {
-          errors.push(`Failed to import ${obj.id}: ${(error instanceof Error ? error.message : "Unknown error")}`)
+          errors.push(
+            `Failed to import ${obj.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          )
         }
       }
 
@@ -1289,7 +1301,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       return { imported, errors }
     } catch (error: unknown) {
-      logger.error('Failed to import STIX objects', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Failed to import STIX objects', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -1313,7 +1327,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       logger.info('Threat Intelligence Database shutdown completed')
     } catch (error: unknown) {
-      logger.error('Error during shutdown', { error: (error instanceof Error ? error.message : "Unknown error") })
+      logger.error('Error during shutdown', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }

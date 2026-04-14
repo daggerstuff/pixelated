@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { PolicyEngine } from '../policy-engine'
 import type { GovernancePolicy } from '../types'
 
@@ -10,12 +11,16 @@ describe('PolicyEngine', () => {
     testPolicy = {
       id: 'test-phi-access',
       version: '1.0.0',
-      rules: [{
-        id: 'rule-1',
-        action: 'access',
-        conditions: [{ field: 'userRole', operator: 'equals', value: 'therapist' }],
-        required: ['fhe_encryption', 'audit_logged']
-      }]
+      rules: [
+        {
+          id: 'rule-1',
+          action: 'access',
+          conditions: [
+            { field: 'userRole', operator: 'equals', value: 'therapist' },
+          ],
+          required: ['fhe_encryption', 'audit_logged'],
+        },
+      ],
     }
     engine = new PolicyEngine()
   })
@@ -24,12 +29,12 @@ describe('PolicyEngine', () => {
     await engine.loadPolicy(testPolicy)
     const result = await engine.evaluate({
       action: 'access',
-      context: { 
-        userRole: 'therapist', 
+      context: {
+        userRole: 'therapist',
         resourceId: 'phi-123',
         fheEncryptionActive: true,
-        auditEnabled: true
-      }
+        auditEnabled: true,
+      },
     })
     expect(result.allowed).toBe(true)
   })
@@ -38,12 +43,12 @@ describe('PolicyEngine', () => {
     await engine.loadPolicy(testPolicy)
     const result = await engine.evaluate({
       action: 'access',
-      context: { 
-        userRole: 'guest', 
+      context: {
+        userRole: 'guest',
         resourceId: 'phi-123',
         fheEncryptionActive: true,
-        auditEnabled: true
-      }
+        auditEnabled: true,
+      },
     })
     expect(result.allowed).toBe(false)
   })
@@ -52,12 +57,12 @@ describe('PolicyEngine', () => {
     await engine.loadPolicy(testPolicy)
     const result = await engine.evaluate({
       action: 'access',
-      context: { 
-        userRole: 'therapist', 
+      context: {
+        userRole: 'therapist',
         resourceId: 'phi-123',
         fheEncryptionActive: false,
-        auditEnabled: true
-      }
+        auditEnabled: true,
+      },
     })
     expect(result.allowed).toBe(false)
     expect(result.reason).toContain('FHE encryption')
@@ -67,12 +72,12 @@ describe('PolicyEngine', () => {
     await engine.loadPolicy(testPolicy)
     const result = await engine.evaluate({
       action: 'access',
-      context: { 
-        userRole: 'therapist', 
+      context: {
+        userRole: 'therapist',
         resourceId: 'phi-123',
         fheEncryptionActive: false,
-        auditEnabled: false
-      }
+        auditEnabled: false,
+      },
     })
     expect(result.allowed).toBe(false)
     expect(result.reason).toContain('FHE encryption')
@@ -91,18 +96,26 @@ describe('PolicyEngine regex safety', () => {
     const policy: GovernancePolicy = {
       id: 'regex-test',
       version: '1.0.0',
-      rules: [{
-        id: 'rule-1',
-        action: 'test',
-        conditions: [{ field: 'email', operator: 'regex', value: '^[a-z]+@[a-z]+\\.com$' }],
-        required: []
-      }]
+      rules: [
+        {
+          id: 'rule-1',
+          action: 'test',
+          conditions: [
+            {
+              field: 'email',
+              operator: 'regex',
+              value: '^[a-z]+@[a-z]+\\.com$',
+            },
+          ],
+          required: [],
+        },
+      ],
     }
     await engine.loadPolicy(policy)
-    
+
     const result = await engine.evaluate({
       action: 'test',
-      context: { email: 'test@example.com' }
+      context: { email: 'test@example.com' },
     })
     expect(result.allowed).toBe(true)
   })

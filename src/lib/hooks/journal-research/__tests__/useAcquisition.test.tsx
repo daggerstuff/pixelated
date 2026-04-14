@@ -1,11 +1,11 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
-import { ReactNode } from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook, waitFor } from '@testing-library/react'
+import { ReactNode } from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import type { Acquisition, AcquisitionList } from "@/lib/api/journal-research";
-import * as api from "@/lib/api/journal-research";
-import { useAcquisitionStore } from "@/lib/stores/journal-research";
+import type { Acquisition, AcquisitionList } from '@/lib/api/journal-research'
+import * as api from '@/lib/api/journal-research'
+import { useAcquisitionStore } from '@/lib/stores/journal-research'
 
 import {
   useAcquisitionListQuery,
@@ -13,32 +13,32 @@ import {
   useAcquisitionInitiateMutation,
   useAcquisitionUpdateMutation,
   useAcquisitionSelection,
-} from "../useAcquisition";
+} from '../useAcquisition'
 
 // Mock API functions
-vi.mock("@/lib/api/journal-research", () => ({
+vi.mock('@/lib/api/journal-research', () => ({
   listAcquisitions: vi.fn<() => Promise<AcquisitionList>>(),
   getAcquisition: vi.fn<() => Promise<Acquisition>>(),
   initiateAcquisition: vi.fn<() => Promise<Acquisition>>(),
   updateAcquisition: vi.fn<() => Promise<Acquisition>>(),
-}));
+}))
 
 // Mock store
-vi.mock("@/lib/stores/journal-research", () => ({
+vi.mock('@/lib/stores/journal-research', () => ({
   useAcquisitionStore: vi.fn<() => unknown>(),
-}));
+}))
 
 const mockAcquisition = {
-  acquisitionId: "acq-1",
-  sessionId: "session-1",
-  evaluationId: "eval-1",
-  sourceId: "source-1",
-  status: "completed" as const,
-  downloadUrl: "https://example.com/data.zip",
-  downloadedAt: "2024-01-01T00:00:00Z",
+  acquisitionId: 'acq-1',
+  sessionId: 'session-1',
+  evaluationId: 'eval-1',
+  sourceId: 'source-1',
+  status: 'completed' as const,
+  downloadUrl: 'https://example.com/data.zip',
+  downloadedAt: '2024-01-01T00:00:00Z',
   fileSize: 1024000,
   errorMessage: null,
-};
+}
 
 const mockAcquisitionList = {
   items: [mockAcquisition],
@@ -46,7 +46,7 @@ const mockAcquisitionList = {
   page: 1,
   pageSize: 25,
   totalPages: 1,
-};
+}
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -54,248 +54,313 @@ const createWrapper = () => {
       queries: { retry: false },
       mutations: { retry: false },
     },
-  });
+  })
 
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+  )
+}
 
-describe("useAcquisition hooks", () => {
+describe('useAcquisition hooks', () => {
+  const baseStoreState = {
+    filters: {
+      statuses: [],
+      showDownloadFailuresOnly: false,
+    },
+    selectedAcquisitionId: null,
+    setSelectedAcquisitionId: vi.fn<(id: string | null) => void>(),
+    expandedRowIds: [],
+    expandRow: vi.fn<(id: string) => void>(),
+    collapseRow: vi.fn<(id: string) => void>(),
+  }
+
   beforeEach(() => {
-    vi.clearAllMocks();
-    useAcquisitionStore.mockReturnValue({
-      filters: {
-        statuses: [],
-        showDownloadFailuresOnly: false,
-      },
-      selectedAcquisitionId: null,
+    vi.clearAllMocks()
+    const storeState = {
+      ...baseStoreState,
       setSelectedAcquisitionId: vi.fn<(id: string | null) => void>(),
-      expandedRowIds: [],
       expandRow: vi.fn<(id: string) => void>(),
       collapseRow: vi.fn<(id: string) => void>(),
-    });
-  });
+    }
+    useAcquisitionStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(
+      useAcquisitionStore as typeof useAcquisitionStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
+  })
 
-  describe("useAcquisitionListQuery", () => {
-    it("fetches acquisition list successfully", async () => {
-      vi.mocked(api.listAcquisitions).mockResolvedValue(mockAcquisitionList);
+  describe('useAcquisitionListQuery', () => {
+    it('fetches acquisition list successfully', async () => {
+      vi.mocked(api.listAcquisitions).mockResolvedValue(mockAcquisitionList)
 
-      const { result } = renderHook(() => useAcquisitionListQuery("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionListQuery('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(result.current.data).toBeDefined();
-      expect(api.listAcquisitions).toHaveBeenCalledWith("session-1", {
+      expect(result.current.data).toBeDefined()
+      expect(api.listAcquisitions).toHaveBeenCalledWith('session-1', {
         page: 1,
         pageSize: 25,
-      });
-    });
+      })
+    })
 
-    it("applies filters from store", async () => {
-      vi.mocked(api.listAcquisitions).mockResolvedValue(mockAcquisitionList);
-      useAcquisitionStore.mockReturnValue({
+    it('applies filters from store', async () => {
+      vi.mocked(api.listAcquisitions).mockResolvedValue(mockAcquisitionList)
+      const filteredStoreState = {
+        ...baseStoreState,
         filters: {
-          statuses: ["completed"],
+          statuses: ['completed'],
           showDownloadFailuresOnly: false,
         },
-      });
+      }
+      useAcquisitionStore.mockImplementation(
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
+          typeof selector === 'function'
+            ? selector(filteredStoreState)
+            : filteredStoreState,
+      )
+      ;(
+        useAcquisitionStore as typeof useAcquisitionStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
-      const { result } = renderHook(() => useAcquisitionListQuery("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionListQuery('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(result.current.data).toBeDefined();
-    });
+      expect(result.current.data).toBeDefined()
+    })
 
-    it("does not fetch when sessionId is null", () => {
+    it('does not fetch when sessionId is null', () => {
       const { result } = renderHook(() => useAcquisitionListQuery(null), {
         wrapper: createWrapper(),
-      });
+      })
 
-      expect(result.current.isLoading).toBe(false);
-      expect(api.listAcquisitions).not.toHaveBeenCalled();
-    });
+      expect(result.current.isLoading).toBe(false)
+      expect(api.listAcquisitions).not.toHaveBeenCalled()
+    })
 
-    it("handles error state", async () => {
-      const error = new Error("Failed to fetch acquisitions");
-      vi.mocked(api.listAcquisitions).mockRejectedValue(error);
+    it('handles error state', async () => {
+      const error = new Error('Failed to fetch acquisitions')
+      vi.mocked(api.listAcquisitions).mockRejectedValue(error)
 
-      const { result } = renderHook(() => useAcquisitionListQuery("session-1"), {
-        wrapper: createWrapper(),
-      });
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(result.current.error).toEqual(error);
-    });
-  });
-
-  describe("useAcquisitionQuery", () => {
-    it("fetches acquisition successfully", async () => {
-      vi.mocked(api.getAcquisition).mockResolvedValue(mockAcquisition);
-
-      const { result } = renderHook(() => useAcquisitionQuery("session-1", "acq-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionListQuery('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isError).toBe(true)
+      })
 
-      expect(result.current.data).toEqual(mockAcquisition);
-      expect(api.getAcquisition).toHaveBeenCalledWith("session-1", "acq-1");
-    });
+      expect(result.current.error).toEqual(error)
+    })
+  })
 
-    it("does not fetch when sessionId or acquisitionId is null", () => {
-      const { result } = renderHook(() => useAcquisitionQuery(null, "acq-1"), {
-        wrapper: createWrapper(),
-      });
+  describe('useAcquisitionQuery', () => {
+    it('fetches acquisition successfully', async () => {
+      vi.mocked(api.getAcquisition).mockResolvedValue(mockAcquisition)
 
-      expect(result.current.isLoading).toBe(false);
-      expect(api.getAcquisition).not.toHaveBeenCalled();
-    });
-
-    it("handles error state", async () => {
-      const error = new Error("Failed to fetch acquisition");
-      vi.mocked(api.getAcquisition).mockRejectedValue(error);
-
-      const { result } = renderHook(() => useAcquisitionQuery("session-1", "acq-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionQuery('session-1', 'acq-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(result.current.error).toEqual(error);
-    });
-  });
+      expect(result.current.data).toEqual(mockAcquisition)
+      expect(api.getAcquisition).toHaveBeenCalledWith('session-1', 'acq-1')
+    })
 
-  describe("useAcquisitionInitiateMutation", () => {
-    it("initiates acquisition successfully", async () => {
-      vi.mocked(api.initiateAcquisition).mockResolvedValue(mockAcquisition);
-      const setSelectedAcquisitionId = vi.fn<(id: string) => void>();
+    it('does not fetch when sessionId or acquisitionId is null', () => {
+      const { result } = renderHook(() => useAcquisitionQuery(null, 'acq-1'), {
+        wrapper: createWrapper(),
+      })
 
-      vi.spyOn(useAcquisitionStore, "getState").mockReturnValue({
+      expect(result.current.isLoading).toBe(false)
+      expect(api.getAcquisition).not.toHaveBeenCalled()
+    })
+
+    it('handles error state', async () => {
+      const error = new Error('Failed to fetch acquisition')
+      vi.mocked(api.getAcquisition).mockRejectedValue(error)
+
+      const { result } = renderHook(
+        () => useAcquisitionQuery('session-1', 'acq-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true)
+      })
+
+      expect(result.current.error).toEqual(error)
+    })
+  })
+
+  describe('useAcquisitionInitiateMutation', () => {
+    it('initiates acquisition successfully', async () => {
+      vi.mocked(api.initiateAcquisition).mockResolvedValue(mockAcquisition)
+      const setSelectedAcquisitionId = vi.fn<(id: string) => void>()
+
+      ;(
+        useAcquisitionStore as typeof useAcquisitionStore & {
+          getState?: () => {
+            setSelectedAcquisitionId: typeof setSelectedAcquisitionId
+          }
+        }
+      ).getState = () => ({
         setSelectedAcquisitionId,
-      } as any);
+      })
 
-      const { result } = renderHook(() => useAcquisitionInitiateMutation("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionInitiateMutation('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       const payload = {
-        evaluationIds: ["eval-1"],
-      };
+        evaluationIds: ['eval-1'],
+      }
 
-      result.current.mutate(payload);
+      result.current.mutate(payload)
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(api.initiateAcquisition).toHaveBeenCalledWith("session-1", payload);
-      expect(setSelectedAcquisitionId).toHaveBeenCalledWith("acq-1");
-    });
+      expect(api.initiateAcquisition).toHaveBeenCalledWith('session-1', payload)
+      expect(setSelectedAcquisitionId).toHaveBeenCalledWith('acq-1')
+    })
 
-    it("handles error state", async () => {
-      const error = new Error("Failed to initiate acquisition");
-      vi.mocked(api.initiateAcquisition).mockRejectedValue(error);
+    it('handles error state', async () => {
+      const error = new Error('Failed to initiate acquisition')
+      vi.mocked(api.initiateAcquisition).mockRejectedValue(error)
 
-      const { result } = renderHook(() => useAcquisitionInitiateMutation("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionInitiateMutation('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       result.current.mutate({
-        evaluationIds: ["eval-1"],
-      });
+        evaluationIds: ['eval-1'],
+      })
 
       await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+        expect(result.current.isError).toBe(true)
+      })
 
-      expect(result.current.error).toEqual(error);
-    });
-  });
+      expect(result.current.error).toEqual(error)
+    })
+  })
 
-  describe("useAcquisitionUpdateMutation", () => {
-    it("updates acquisition successfully", async () => {
+  describe('useAcquisitionUpdateMutation', () => {
+    it('updates acquisition successfully', async () => {
       const updatedAcquisition = {
         ...mockAcquisition,
-        status: "failed" as const,
-        errorMessage: "Download failed",
-      };
-      vi.mocked(api.updateAcquisition).mockResolvedValue(updatedAcquisition);
+        status: 'failed' as const,
+        errorMessage: 'Download failed',
+      }
+      vi.mocked(api.updateAcquisition).mockResolvedValue(updatedAcquisition)
 
-      const { result } = renderHook(() => useAcquisitionUpdateMutation("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionUpdateMutation('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       const payload = {
-        status: "failed" as const,
-        errorMessage: "Download failed",
-      };
+        status: 'failed' as const,
+        errorMessage: 'Download failed',
+      }
 
-      result.current.mutate({ acquisitionId: "acq-1", payload });
+      result.current.mutate({ acquisitionId: 'acq-1', payload })
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(api.updateAcquisition).toHaveBeenCalledWith("session-1", "acq-1", payload);
-    });
+      expect(api.updateAcquisition).toHaveBeenCalledWith(
+        'session-1',
+        'acq-1',
+        payload,
+      )
+    })
 
-    it("handles error state", async () => {
-      const error = new Error("Failed to update acquisition");
-      vi.mocked(api.updateAcquisition).mockRejectedValue(error);
+    it('handles error state', async () => {
+      const error = new Error('Failed to update acquisition')
+      vi.mocked(api.updateAcquisition).mockRejectedValue(error)
 
-      const { result } = renderHook(() => useAcquisitionUpdateMutation("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useAcquisitionUpdateMutation('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       result.current.mutate({
-        acquisitionId: "acq-1",
-        payload: { status: "failed" },
-      });
+        acquisitionId: 'acq-1',
+        payload: { status: 'failed' },
+      })
 
       await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+        expect(result.current.isError).toBe(true)
+      })
 
-      expect(result.current.error).toEqual(error);
-    });
-  });
+      expect(result.current.error).toEqual(error)
+    })
+  })
 
-  describe("useAcquisitionSelection", () => {
-    it("returns selection state from store", () => {
+  describe('useAcquisitionSelection', () => {
+    it('returns selection state from store', () => {
       const mockState = {
-        selectedAcquisitionId: "acq-1",
+        selectedAcquisitionId: 'acq-1',
         setSelectedAcquisitionId: vi.fn<(id: string) => void>(),
-        expandedRowIds: ["acq-1", "acq-2"],
+        expandedRowIds: ['acq-1', 'acq-2'],
         expandRow: vi.fn<(id: string) => void>(),
         collapseRow: vi.fn<(id: string) => void>(),
-      };
+      }
 
-      useAcquisitionStore.mockReturnValue(mockState);
+      useAcquisitionStore.mockReturnValue(mockState)
 
-      const { result } = renderHook(() => useAcquisitionSelection());
+      const { result } = renderHook(() => useAcquisitionSelection())
 
-      expect(result.current.selectedAcquisitionId).toBe("acq-1");
-      expect(result.current.expandedRowIds).toEqual(["acq-1", "acq-2"]);
-      expect(typeof result.current.setSelectedAcquisitionId).toBe("function");
-      expect(typeof result.current.expandRow).toBe("function");
-      expect(typeof result.current.collapseRow).toBe("function");
-    });
-  });
-});
+      expect(result.current.selectedAcquisitionId).toBe('acq-1')
+      expect(result.current.expandedRowIds).toEqual(['acq-1', 'acq-2'])
+      expect(typeof result.current.setSelectedAcquisitionId).toBe('function')
+      expect(typeof result.current.expandRow).toBe('function')
+      expect(typeof result.current.collapseRow).toBe('function')
+    })
+  })
+})

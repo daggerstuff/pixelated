@@ -126,10 +126,7 @@ function validatePayload(raw: unknown): GestaltUpdatePayload | null {
   return {
     defense_label: r['defense_label'],
     defense_label_name: r['defense_label_name'],
-    defense_confidence: Math.max(
-      0,
-      Math.min(1, r['defense_confidence']),
-    ),
+    defense_confidence: Math.max(0, Math.min(1, r['defense_confidence'])),
     defense_maturity:
       typeof r['defense_maturity'] === 'number'
         ? Math.max(0, Math.min(1, r['defense_maturity']))

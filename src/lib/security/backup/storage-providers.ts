@@ -678,8 +678,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       return await new Promise<Uint8Array>((resolve, reject) => {
         const chunks: Uint8Array[] = []
         // The type is handled at runtime - AWS SDK v3 provides proper typed responses
-        const body = (response as { Body: NodeJS.ReadableStream })
-          .Body
+        const body = (response as { Body: NodeJS.ReadableStream }).Body
         body.on('data', (chunk: Uint8Array) => chunks.push(chunk))
         body.on('end', () => resolve(concatUint8Arrays(chunks)))
         body.on('error', reject)

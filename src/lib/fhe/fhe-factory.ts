@@ -118,10 +118,7 @@ const sealFHEService: FHEService = {
     }
   },
 
-  async encrypt<T>(
-    data: T,
-    _options?: unknown,
-  ): Promise<EncryptedData> {
+  async encrypt<T>(data: T, _options?: unknown): Promise<EncryptedData> {
     try {
       if (
         !Array.isArray(data) ||
@@ -309,10 +306,7 @@ const sealFHEService: FHEService = {
     }
   },
 
-  async rotate(
-    vector: EncryptedData,
-    steps: number,
-  ): Promise<EncryptedData> {
+  async rotate(vector: EncryptedData, steps: number): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
@@ -531,10 +525,7 @@ export async function getTenantFHEService(
     ...baseService,
 
     // Override encrypt to use tenant-specific context
-    encrypt: async <T>(
-      data: T,
-      options?: unknown,
-    ): Promise<EncryptedData> => {
+    encrypt: async <T>(data: T, options?: unknown): Promise<EncryptedData> => {
       // Track operation for rate limiting
       if (!tenantManager.trackOperation(tenantId)) {
         throw new Error(`Rate limit exceeded for tenant ${tenantId}`)

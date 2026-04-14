@@ -117,7 +117,7 @@ coverage==7.13.2
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   pytest-cov
-cryptography==46.0.6
+cryptography==46.0.7
     # via -r src/lib/ai/training/requirements.txt
 cuda-bindings==12.9.4
     # via
@@ -494,7 +494,7 @@ pathspec==1.0.3
     #   mypy
 peft==0.18.1
     # via -r src/lib/ai/training/requirements.txt
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   tensorboard
@@ -589,7 +589,7 @@ pyphen==0.17.2
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   textstat
-pytest==9.0.2
+pytest==9.0.3
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   pytest-asyncio
@@ -635,7 +635,7 @@ regex==2026.1.15
     #   -r src/lib/ai/training/requirements.txt
     #   nltk
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   databricks-sdk
@@ -774,7 +774,7 @@ tqdm==4.67.1
     #   pytorch-lightning
     #   spacy
     #   transformers
-transformers==5.0.0
+transformers==5.5.3
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   peft

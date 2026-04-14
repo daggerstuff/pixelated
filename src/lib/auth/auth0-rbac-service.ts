@@ -13,62 +13,56 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-// Extend ManagementClient to include methods that may not be in the TypeScript definitions
-interface ExtendedManagementClient extends ManagementClient {
-  // Roles
-  getRoles(params: { per_page?: number; page?: number }): Promise<any>
-  createRole(params: {
-    name: string
-    description?: string
-  }): Promise<any>
-  updateRole(params: {
-    id: string
-    name?: string
-    description?: string
-  }): Promise<any>
-  deleteRole(params: { id: string }): Promise<void>
-  getRoleUsers(params: { id: string }): Promise<any>
-  getRolePermissions(params: { id: string }): Promise<any>
-  assignPermissionsToRole(params: {
-    id: string
-    permissions: { value: string }[]
-  }): Promise<any>
-  removePermissionsFromRole(params: {
-    id: string
-    permissions: { value: string }[]
-  }): Promise<void>
-  // Users
-  assignRolestoUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  removeRolesFromUser(params: {
-    id: string
-    roles: string[]
-  }): Promise<void>
-  getUserRoles(params: { id: string }): Promise<any>
-  // Permissions
-  getPermissions(params: { per_page?: number; page?: number }): Promise<any>
-  createPermission(params: {
-    name: string
-    description: string
-    audience: string
-  }): Promise<any>
-  updatePermission(params: {
-    id: string
-    description?: string
-  }): Promise<any>
-  deletePermission(params: { id: string }): Promise<void>
-  // Logs
-  getLogs(params: { per_page: number; q: string }): Promise<any>
-  // Guardian
-  getGuardianEnrollments(params: { id: string }): Promise<any>
-  getGuardianFactors(): Promise<any>
-  createGuardianEnrollmentTicket(params: {
-    user_id: string
-    send_mail: boolean
-  }): Promise<any>
-  deleteGuardianEnrollment(params: { id: string }): Promise<void>
+declare module 'auth0' {
+  interface ManagementClient {
+    getRoles(params: {
+      per_page?: number
+      page?: number
+      name_filter?: string
+    }): Promise<unknown[]>
+    createRole(params: { name: string; description?: string }): Promise<unknown>
+    updateRole(params: {
+      id: string
+      name?: string
+      description?: string
+    }): Promise<unknown>
+    deleteRole(params: { id: string }): Promise<void>
+    getRoleUsers(params: { id: string }): Promise<unknown>
+    getRolePermissions(params: { id: string }): Promise<unknown>
+    assignPermissionsToRole(params: {
+      id: string
+      permissions: { value: string }[]
+    }): Promise<unknown>
+    removePermissionsFromRole(params: {
+      id: string
+      permissions: { value: string }[]
+    }): Promise<void>
+    assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
+    removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
+    getUserRoles(params: { id: string }): Promise<unknown[]>
+    getPermissions(params: {
+      per_page?: number
+      page?: number
+    }): Promise<unknown[]>
+    createPermission(params: {
+      name: string
+      description: string
+      audience: string
+    }): Promise<unknown>
+    updatePermission(params: {
+      id: string
+      description?: string
+    }): Promise<unknown>
+    deletePermission(params: { id: string }): Promise<void>
+    getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
+    getGuardianEnrollments(params: { id: string }): Promise<unknown>
+    getGuardianFactors(): Promise<unknown>
+    createGuardianEnrollmentTicket(params: {
+      user_id: string
+      send_mail: boolean
+    }): Promise<unknown>
+    deleteGuardianEnrollment(params: { id: string }): Promise<void>
+  }
 }
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -76,8 +70,77 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
+interface Auth0ManagementRole {
+  id?: string | null
+  name?: unknown
+}
+
+interface Auth0UserRole {
+  name?: unknown
+}
+
+type UnknownRecord = Record<string, unknown>
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function toAuth0ManagementRoles(value: unknown): Auth0ManagementRole[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const roles: Auth0ManagementRole[] = []
+  for (const entry of value) {
+    if (isRecord(entry)) {
+      const role = entry
+      roles.push({
+        id: typeof role.id === 'string' ? role.id : undefined,
+        name:
+          typeof role.name === 'string' || Array.isArray(role.name)
+            ? role.name
+            : undefined,
+      })
+    }
+  }
+  return roles
+}
+
+function toAuth0UserRoles(value: unknown): Auth0UserRole[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const roles: Auth0UserRole[] = []
+  for (const entry of value) {
+    if (isRecord(entry)) {
+      const userRole = entry
+      roles.push({
+        name:
+          typeof userRole.name === 'string' ||
+          typeof userRole.name === 'number' ||
+          typeof userRole.name === 'boolean'
+            ? String(userRole.name)
+            : userRole.name,
+      })
+    }
+  }
+  return roles
+}
+
+function getPermissionDefinition(permission: string): Permission | undefined {
+  for (const [permissionName, definition] of Object.entries(
+    AUTH0_PERMISSION_DEFINITIONS,
+  )) {
+    if (permissionName === permission) {
+      return definition
+    }
+  }
+  return undefined
+}
+
 // Initialize Auth0 management client
-let auth0Management: ExtendedManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 
 /**
  * Initialize Auth0 management client
@@ -94,16 +157,12 @@ function initializeAuth0Management() {
     return
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:roles create:roles update:roles delete:roles read:users read:permissions create:permissions update:permissions delete:permissions',
-    })
-  }
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  })
 }
 
 // Initialize the management client
@@ -117,6 +176,17 @@ export type UserRole =
   | 'researcher'
   | 'support'
   | 'guest'
+
+function isUserRole(value: unknown): value is UserRole {
+  return (
+    value === 'admin' ||
+    value === 'therapist' ||
+    value === 'patient' ||
+    value === 'researcher' ||
+    value === 'support' ||
+    value === 'guest'
+  )
+}
 
 export interface RoleDefinition {
   name: UserRole
@@ -294,6 +364,7 @@ export const AUTH0_ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'session_limited_to_30_minutes',
     ],
     isAssignable: false, // Default role for unauthenticated users
+    requiresApproval: false,
   },
 }
 
@@ -462,7 +533,7 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
 
         if (!existingRole) {
           // Create new role
-          const { data: createdRole } = await auth0Management.roles.create({
+          const createdRole = await auth0Management.roles.create({
             name: roleName,
             description: roleDef.description,
           })
@@ -497,15 +568,22 @@ export async function assignRoleToUser(
 
   try {
     // Get role ID
-    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    const roles = toAuth0ManagementRoles(
+      await auth0Management.getRoles({
+        name_filter: roleName,
+      }),
+    )
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
 
-    const roleId = roles[0].id!
+    const roleId = roles[0]?.id
+    if (!roleId) {
+      throw new Error(`Role ${roleName} did not return a valid id`)
+    }
 
     // Assign role to user
-    await auth0Management.assignRolestoUser({ id: userId }, { roles: [roleId] })
+    await auth0Management.assignRolestoUser({ id: userId, roles: [roleId] })
 
     // Log role assignment
     logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, null, {
@@ -538,18 +616,22 @@ export async function removeRoleFromUser(
 
   try {
     // Get role ID
-    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    const roles = toAuth0ManagementRoles(
+      await auth0Management.getRoles({
+        name_filter: roleName,
+      }),
+    )
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
 
-    const roleId = roles[0].id!
+    const roleId = roles[0]?.id
+    if (!roleId) {
+      throw new Error(`Role ${roleName} did not return a valid id`)
+    }
 
     // Remove role from user
-    await auth0Management.removeRolesFromUser(
-      { id: userId },
-      { roles: [roleId] },
-    )
+    await auth0Management.removeRolesFromUser({ id: userId, roles: [roleId] })
 
     // Log role removal
     logSecurityEvent(SecurityEventType.ROLE_REMOVED, null, {
@@ -578,8 +660,12 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
   }
 
   try {
-    const userRoles = await auth0Management.getUserRoles({ id: userId })
-    return userRoles.map((role) => role.name as UserRole).filter(Boolean)
+    const userRoles = toAuth0UserRoles(
+      await auth0Management.getUserRoles({ id: userId }),
+    )
+    return userRoles
+      .map((role) => (typeof role.name === 'string' ? role.name : undefined))
+      .filter((roleName): roleName is UserRole => isUserRole(roleName))
   } catch (error: unknown) {
     console.error(`Failed to get roles for user ${userId}:`, error)
     return []
@@ -621,9 +707,8 @@ export async function userHasPermission(
     for (const roleName of userRoles) {
       const roleDef = AUTH0_ROLE_DEFINITIONS[roleName]
       if (
-        roleDef &&
-        (roleDef.permissions.includes('*') ||
-          roleDef.permissions.includes(permission))
+        roleDef.permissions.includes('*') ||
+        roleDef.permissions.includes(permission)
       ) {
         return true
       }
@@ -660,16 +745,14 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
     const permissions = new Set<string>()
     for (const roleName of userRoles) {
       const roleDef = AUTH0_ROLE_DEFINITIONS[roleName]
-      if (roleDef) {
-        if (roleDef.permissions.includes('*')) {
-          // Add all permissions
-          Object.keys(AUTH0_PERMISSION_DEFINITIONS).forEach((p) =>
-            permissions.add(p),
-          )
-        } else {
-          // Add specific permissions
-          roleDef.permissions.forEach((p) => permissions.add(p))
-        }
+      if (roleDef.permissions.includes('*')) {
+        // Add all permissions
+        Object.keys(AUTH0_PERMISSION_DEFINITIONS).forEach((p) =>
+          permissions.add(p),
+        )
+      } else {
+        // Add specific permissions
+        roleDef.permissions.forEach((p) => permissions.add(p))
       }
     }
 
@@ -685,8 +768,6 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
  */
 export function roleHasPermission(role: UserRole, permission: string): boolean {
   const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-  if (!roleDef) return false
-
   // Admin has all permissions
   if (roleDef.permissions.includes('*')) return true
 
@@ -703,8 +784,6 @@ export function hasRequiredRole(
   const userRoleDef = AUTH0_ROLE_DEFINITIONS[userRole]
   const requiredRoleDef = AUTH0_ROLE_DEFINITIONS[requiredRole]
 
-  if (!userRoleDef || !requiredRoleDef) return false
-
   return userRoleDef.hierarchyLevel >= requiredRoleDef.hierarchyLevel
 }
 
@@ -713,7 +792,6 @@ export function hasRequiredRole(
  */
 export function getRolePermissions(role: UserRole): string[] {
   const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-  if (!roleDef) return []
 
   if (roleDef.permissions.includes('*')) {
     // Return all available permissions for admin
@@ -727,16 +805,16 @@ export function getRolePermissions(role: UserRole): string[] {
  * Check if permission requires MFA
  */
 export function requiresMFA(permission: string): boolean {
-  const permDef = AUTH0_PERMISSION_DEFINITIONS[permission]
-  return permDef?.requiresMFA || false
+  const permDef = getPermissionDefinition(permission)
+  return Boolean(permDef?.requiresMFA)
 }
 
 /**
  * Check if permission requires audit logging
  */
 export function requiresAudit(permission: string): boolean {
-  const permDef = AUTH0_PERMISSION_DEFINITIONS[permission]
-  return permDef?.auditRequired || false
+  const permDef = getPermissionDefinition(permission)
+  return Boolean(permDef?.auditRequired)
 }
 
 /**
@@ -745,7 +823,9 @@ export function requiresAudit(permission: string): boolean {
 export function getRoleByHierarchy(level: number): UserRole | null {
   for (const [role, def] of Object.entries(AUTH0_ROLE_DEFINITIONS)) {
     if (def.hierarchyLevel === level) {
-      return role as UserRole
+      if (isUserRole(role)) {
+        return role
+      }
     }
   }
   return null
@@ -761,8 +841,6 @@ export function canAssignRole(
   const assignerDef = AUTH0_ROLE_DEFINITIONS[assignerRole]
   const targetDef = AUTH0_ROLE_DEFINITIONS[targetRole]
 
-  if (!assignerDef || !targetDef) return false
-
   // Cannot assign roles higher than your own
   if (targetDef.hierarchyLevel >= assignerDef.hierarchyLevel) return false
 
@@ -777,7 +855,6 @@ export function canAssignRole(
  */
 export function getAssignableRoles(role: UserRole): UserRole[] {
   const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-  if (!roleDef) return []
 
   return AUTH0_ROLE_HIERARCHY.filter((targetRole) =>
     canAssignRole(role, targetRole),
@@ -801,10 +878,6 @@ export function validateRoleTransition(
 ): RoleTransition {
   const fromDef = AUTH0_ROLE_DEFINITIONS[fromRole]
   const toDef = AUTH0_ROLE_DEFINITIONS[toRole]
-
-  if (!fromDef || !toDef) {
-    throw new Error('Invalid role specified')
-  }
 
   // Cannot transition to same role
   if (fromRole === toRole) {

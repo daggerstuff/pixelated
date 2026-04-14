@@ -110,7 +110,12 @@ export class MCPIntegration {
       logger.error('MCP request failed', { error, method: request.method })
       return {
         success: false,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }
     }
   }
@@ -200,7 +205,12 @@ export async function POST(context: APIContext) {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -229,7 +239,12 @@ export async function GET(_context: APIContext) {
     return new Response(
       JSON.stringify({
         status: 'error',
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

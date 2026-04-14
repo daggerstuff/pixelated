@@ -128,7 +128,11 @@ class AuthClient {
 
       return { data, error: null }
     } catch (error: any) {
-      return { error: (error instanceof Error ? error.message : "Unknown error") || 'An unexpected error occurred' }
+      return {
+        error:
+          (error instanceof Error ? error.message : 'Unknown error') ||
+          'An unexpected error occurred',
+      }
     } finally {
       this._isLoading = false
     }
@@ -154,7 +158,11 @@ class AuthClient {
 
       return { data, error: null }
     } catch (error: any) {
-      return { error: (error instanceof Error ? error.message : "Unknown error") || 'An unexpected error occurred' }
+      return {
+        error:
+          (error instanceof Error ? error.message : 'Unknown error') ||
+          'An unexpected error occurred',
+      }
     } finally {
       this._isLoading = false
     }

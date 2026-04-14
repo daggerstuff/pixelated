@@ -6,7 +6,7 @@
  * indicators, and clinical markers.
  */
 
-import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+import { getClinicalAnalysisLogger } from '../../../logging/standardized-logger'
 
 import type {
   IModelProvider,

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { ChartBar } from 'lucide-react'
-import FHEDemo from '@/components/security/FHEDemo.tsx'
+import { DynamicFHEDemo } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -60,7 +60,7 @@ import FHEDemo from '@/components/security/FHEDemo.tsx'
 
       <!-- Interactive FHE Demo -->
       <div class="mb-8">
-        <FHEDemo
+        <DynamicFHEDemo
           client:load
           className="w-full"
           showAdvanced={true}

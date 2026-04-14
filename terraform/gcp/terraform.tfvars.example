@@ -1,0 +1,33 @@
+project_id   = "your-gcp-project-id"
+environment  = "staging"
+app_name     = "pixelated-empathy"
+gcp_region   = "us-west1"
+gcp_location = "us-west1"
+
+# Optional cluster naming override
+# gke_cluster_name = "pixelated-empathy-staging"
+
+gke_deletion_protection = false
+enable_deletion_protection = false
+
+network_cidr           = "10.0.0.0/16"
+pods_secondary_cidr    = "10.4.0.0/19"
+services_secondary_cidr = "10.4.32.0/20"
+
+# Cloud SQL
+postgres_version       = "POSTGRES_15"
+postgres_tier          = "db-f1-micro"
+postgres_disk_size_gb  = 20
+postgres_db_name       = "pixelated_empathy"
+postgres_username      = "pixelated_user"
+postgres_password      = "REPLACE_ME_DB_PASSWORD"
+postgres_backup_start_time = "03:00"
+postgres_retained_backups = 7
+postgres_max_connections = 200
+postgres_authorized_networks = [
+  { name = "office", value = "203.0.113.0/24" }
+]
+
+# Redis
+redis_tier       = "BASIC"
+redis_memory_gb  = 1

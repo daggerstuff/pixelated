@@ -3,8 +3,8 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 
 import { authClient } from '@/lib/auth-client'
 
-import type { AIMessage } from '../../lib/ai'
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
+import type { AIMessage } from '../../lib/ai/models/ai-types'
 import {
   ChatContainer,
   useChatCompletion,

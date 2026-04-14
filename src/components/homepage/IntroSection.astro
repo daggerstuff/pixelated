@@ -13,214 +13,150 @@ export interface Props {
 const { content } = Astro.props
 ---
 
-<section class="home-section home-section--intro">
-  <div class="container">
+<section class="pe-home-section home-section--intro">
+  <div class="pe-home-shell">
     <div class="home-intro">
       <div class="home-intro__lead">
         <span class="pe-meta-label">{content.label}</span>
         <h2 class="pe-heading-l">{content.title}</h2>
-        {
-          content.paragraphs.map((paragraph, index) => (
-            <p
-              class:list={[
-                'home-copy',
-                index === 0 ? 'home-copy--first' : 'home-copy--subsequent',
-              ]}
-            >
-              {paragraph}
-            </p>
-          ))
-        }
-      </div>
-
-      <div class="home-intro__panel glass-panel">
-        <span class="pe-meta-label">{content.panelLabel}</span>
-        <div class="home-proof-stack">
+        <div class="home-intro__prose">
           {
-            content.panelItems.map((item) => (
-              <div class="home-proof-item">
-                <span class="home-proof-item__label">{item.label}</span>
-                <p>{item.body}</p>
-              </div>
+            content.paragraphs.map((paragraph) => (
+              <p class="pe-home-copy">{paragraph}</p>
             ))
           }
         </div>
       </div>
-    </div>
 
-    <div class="home-evidence-grid home-evidence-grid--spaced">
-      {
-        content.evidenceCards.map((card, index) => (
-          <article
-            class:list={[
-              'home-evidence-card',
-              'glass-panel',
-              index === 0 && 'home-evidence-card--light',
-            ]}
-          >
-            <span class="pe-meta-label">{card.title}</span>
-            <ul class="home-evidence-list">
-              {card.items.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          </article>
-        ))
-      }
+      <div class="home-intro__body">
+        <section class="home-intro__diagnostic">
+          <span class="pe-page-panel-label">{content.panelLabel}</span>
+          <div class="home-intro__issue-grid">
+            {
+              content.panelItems.map((item) => (
+                <article class="home-intro__issue">
+                  <span class="home-intro__issue-label">{item.label}</span>
+                  <p>{item.body}</p>
+                </article>
+              ))
+            }
+          </div>
+        </section>
+
+        <div class="home-intro__evidence-board">
+          {
+            content.evidenceCards.map((card) => (
+              <section class="home-intro__evidence-column">
+                <h3 class="pe-heading-s">{card.title}</h3>
+                <ul class="home-intro__evidence-list">
+                  {card.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
   .home-section--intro {
-    background: #201d1d;
+    background: transparent;
     color: var(--text-primary);
-    padding: 6rem 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .home-copy {
-    max-width: 48ch;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin: 1.5rem auto 0;
-    text-align: center;
-    color: var(--text-secondary);
   }
 
   .home-intro {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4rem;
-    position: relative;
-    z-index: 1;
-    max-width: 55rem;
-    margin: 0 auto;
+    display: grid;
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
   }
 
   .home-intro__lead {
-    text-align: center;
-    width: 100%;
-  }
-
-  .home-intro__panel {
-    width: 100%;
-    padding: 3rem 2rem;
-    border: 1px dotted rgba(253, 252, 252, 0.2);
-    background: rgba(48, 44, 44, 0.4);
-    backdrop-filter: blur(8px);
-    text-align: left;
-  }
-
-  .home-proof-stack {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2.5rem;
+    gap: 1.05rem;
+    max-width: 34rem;
   }
 
-  .home-proof-item {
-    padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 2px;
-  }
-
-  .home-proof-item__label {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--accent-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 0.75rem;
-  }
-
-  .home-proof-item p {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: var(--text-secondary);
-    margin: 0;
-  }
-
-  .home-evidence-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    margin-top: 5rem;
-    width: 100%;
-    max-width: 55rem;
-    margin-inline: auto;
-  }
-
-  .home-evidence-card {
-    padding: 3rem 2rem;
-    border: 1px dotted rgba(255, 255, 255, 0.1);
-    background: rgba(48, 44, 44, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .home-evidence-card:hover {
-    border-color: var(--accent-primary);
-    background: rgba(255, 107, 0, 0.05);
-  }
-
-  .home-evidence-list {
-    margin: 2rem 0 0;
-    padding: 0;
-    list-style: none;
+  .home-intro__prose {
     display: grid;
     gap: 1rem;
-    text-align: left; /* Keep lists left-aligned for readability within centered cards */
   }
 
-  .home-evidence-list li {
-    font-size: 0.95rem;
-    padding-left: 1.5rem;
-    position: relative;
-    color: var(--text-secondary);
+  .home-intro__body {
+    display: grid;
+    gap: 1.5rem;
   }
 
-  .home-evidence-list li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent-primary);
+  .home-intro__diagnostic {
+    display: grid;
+    gap: 1rem;
+    padding-top: 0.35rem;
+  }
+
+  .home-intro__issue-grid {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .home-intro__issue {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem 1rem 1.05rem;
+    border-top: 1px dotted rgba(253, 252, 252, 0.1);
+  }
+
+  .home-intro__issue-label {
     font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
   }
 
+  .home-intro__issue p,
+  .home-intro__evidence-list li {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.94rem;
+    line-height: 1.74;
+    color: rgba(253, 252, 252, 0.8);
+  }
 
-  @media (max-width: 880px) {
-    .home-proof-stack {
-      grid-template-columns: 1fr;
-    }
-    
-    .home-evidence-grid {
-      grid-template-columns: 1fr;
-    }
+  .home-intro__evidence-board {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .home-intro__evidence-column {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1.1rem 0 0;
+    border-top: 1px dotted rgba(253, 252, 252, 0.1);
+  }
+
+  .home-intro__evidence-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   @media (min-width: 980px) {
     .home-intro {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.92fr);
-      align-items: start;
-      max-width: 70rem;
+      grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
     }
 
-    .home-intro__lead {
-      text-align: left;
+    .home-intro__issue-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .home-copy {
-      margin-inline: 0;
-      text-align: left;
-    }
-
-    .home-evidence-grid {
-      max-width: 70rem;
+    .home-intro__evidence-board {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>

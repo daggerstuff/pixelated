@@ -1,23 +1,22 @@
 ---
-import { AuthButtons } from '@/components/auth/AuthButtons'
-
 const currentPath = Astro.url.pathname
 
 const links = [
-  { text: 'Features', href: '/features', isAnchor: false },
-  { text: 'Trust', href: '/trust', isAnchor: false },
-  { text: 'Company', href: '/company', isAnchor: false },
-  { text: 'Contact', href: '/contact', isAnchor: false },
+  { text: 'Features', href: '/features' },
+  { text: 'Trust', href: '/trust' },
+  { text: 'Company', href: '/company' },
+  { text: 'Contact', href: '/contact' },
 ]
 ---
 
-<header
-  class="marketing-nav fixed top-4 left-4 right-4 z-50"
->
+<header class="marketing-nav fixed top-3 left-4 right-4 z-50">
   <div class="marketing-nav__shell">
     <div class="marketing-nav__row">
-
-      <a href="/" class="marketing-nav__brand" aria-label="Pixelated Empathy home">
+      <a
+        href="/"
+        class="marketing-nav__brand"
+        aria-label="Pixelated Empathy home"
+      >
         <div class="marketing-nav__logo">
           <img
             src="/favicon.svg"
@@ -28,9 +27,9 @@ const links = [
 
         <div class="marketing-nav__title">
           <span class="marketing-nav__name">Pixelated Empathy</span>
-          <span class="marketing-nav__tag">
-            Clearer coaching for hard therapy sessions
-          </span>
+          <span class="marketing-nav__tag"
+            >Clinical supervision, kept specific</span
+          >
         </div>
       </a>
 
@@ -41,22 +40,19 @@ const links = [
               href={link.href}
               class:list={[
                 'marketing-nav__link',
-                currentPath === link.href
-                  ? 'marketing-nav__link--active'
-                  : '',
+                currentPath === link.href && 'marketing-nav__link--active',
               ]}
               aria-current={currentPath === link.href ? 'page' : undefined}
             >
               {link.text}
             </a>
           ))
-
         }
       </nav>
 
       <div class="marketing-nav__actions">
-        <a href="/contact" class="marketing-nav__pilot">Plan a pilot</a>
-        <AuthButtons client:only="react" />
+        <a href="/contact" class="marketing-nav__pilot">Book a pilot</a>
+        <a href="/demo-hub" class="marketing-nav__demo">Watch demo</a>
       </div>
 
       <button
@@ -66,7 +62,7 @@ const links = [
         aria-expanded="false"
       >
         <svg
-          class="w-6 h-6"
+          class="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -80,40 +76,32 @@ const links = [
       </button>
     </div>
 
-    <div
-      id="mobile-menu"
-      class="marketing-mobile-menu hidden"
-    >
-      <nav class="marketing-mobile-menu__content" aria-label="Mobile navigation">
+    <div id="mobile-menu" class="marketing-mobile-menu hidden">
+      <nav
+        class="marketing-mobile-menu__content"
+        aria-label="Mobile navigation"
+      >
         {
           links.map((link) => (
-            <a
-              href={link.href}
-              class="marketing-mobile-menu__link"
-            >
+            <a href={link.href} class="marketing-mobile-menu__link">
               {link.text}
             </a>
           ))
         }
         <div class="marketing-mobile-menu__actions">
-          <a
-            href="/contact"
-            class="marketing-button marketing-button--secondary"
+          <a href="/contact" class="marketing-button marketing-button--primary"
+            >Book a pilot</a
           >
-            Plan a pilot
-          </a>
           <a
             href="/demo-hub"
-            class="marketing-button marketing-button--primary"
+            class="marketing-button marketing-button--secondary"
+            >Watch the demo</a
           >
-            See demo
-          </a>
           <a
             href="/login"
             class="marketing-mobile-menu__link marketing-mobile-menu__link--muted"
+            >Log in</a
           >
-            Log in
-          </a>
         </div>
       </nav>
     </div>
@@ -123,76 +111,106 @@ const links = [
 <style>
   .marketing-nav__shell {
     margin: 0 auto;
-    width: min(78rem, calc(100vw - 2rem));
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    background: rgba(32, 29, 29, 0.78);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    width: min(var(--marketing-shell), calc(100vw - 1.5rem));
+    border: 1px solid rgba(253, 252, 252, 0.08);
+    border-radius: 4px;
+    background: linear-gradient(
+      180deg,
+      rgba(48, 44, 44, 0.76),
+      rgba(32, 29, 29, 0.92)
+    );
+    backdrop-filter: blur(20px);
   }
 
   .marketing-nav__row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 20rem) 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    min-height: 4.8rem;
-    padding: 0.8rem 1rem;
+    gap: 1.15rem;
+    min-height: 3.75rem;
+    padding: 0.55rem 0.9rem;
   }
 
   .marketing-nav__brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.85rem;
     min-width: 0;
     text-decoration: none;
   }
 
   .marketing-nav__logo {
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 2.1rem;
+    height: 2.1rem;
     border-radius: 4px;
     overflow: hidden;
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(253, 252, 252, 0.08);
     background: rgba(255, 255, 255, 0.03);
   }
 
   .marketing-nav__title {
     display: grid;
     min-width: 0;
+    gap: 0.16rem;
   }
 
   .marketing-nav__name {
-    color: var(--text-primary);
-    font-size: 0.96rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    color: var(--text-primary);
   }
 
   .marketing-nav__tag {
-    color: var(--text-muted);
+    color: rgba(253, 252, 252, 0.56);
     font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
+    font-size: 0.55rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
   .marketing-nav__links {
     display: flex;
     align-items: center;
-    gap: 1.4rem;
+    justify-content: center;
+    gap: 1.2rem;
+    min-width: 0;
   }
 
   .marketing-nav__link {
-    color: var(--text-secondary);
+    position: relative;
+    padding-bottom: 0.3rem;
+    color: rgba(253, 252, 252, 0.76);
     text-decoration: none;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.74rem;
+    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .marketing-nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-image: linear-gradient(
+      to right,
+      currentColor 1px,
+      transparent 1px
+    );
+    background-size: 5px 1px;
+    background-repeat: repeat-x;
+    opacity: 0;
+    transform: translateY(2px);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
   }
 
   .marketing-nav__link:hover,
@@ -200,29 +218,66 @@ const links = [
     color: var(--text-primary);
   }
 
+  .marketing-nav__link:hover::after,
+  .marketing-nav__link--active::after {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+
   .marketing-nav__actions {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 0.7rem;
+  }
+
+  .marketing-nav__demo,
+  .marketing-nav__pilot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
   }
 
   .marketing-nav__pilot {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    transition: color var(--duration-fast) var(--ease-out);
+    border: 1px solid rgba(var(--accent-primary-rgb), 0.46);
+    background: #ff6b00;
+    color: #201d1d;
   }
 
   .marketing-nav__pilot:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+  }
+
+  .marketing-nav__demo {
+    border: 1px solid rgba(253, 252, 252, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(253, 252, 252, 0.84);
+  }
+
+  .marketing-nav__demo:hover {
+    transform: translateY(-1px);
+    border-color: rgba(var(--accent-primary-rgb), 0.36);
     color: var(--accent-primary);
   }
 
   .marketing-nav__toggle {
     display: none;
+    align-items: center;
+    justify-content: center;
     color: var(--text-primary);
     background: transparent;
     border: 0;
@@ -231,7 +286,7 @@ const links = [
   }
 
   .marketing-mobile-menu {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
   .marketing-mobile-menu__content {
@@ -248,7 +303,7 @@ const links = [
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 0.5rem 0;
+    padding: 0.45rem 0;
   }
 
   .marketing-mobile-menu__link--muted {
@@ -259,12 +314,11 @@ const links = [
     display: grid;
     gap: 0.8rem;
     padding-top: 0.8rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px dotted rgba(253, 252, 252, 0.12);
   }
 
-  @media (max-width: 1024px) {
-    .marketing-nav__tag,
-    .marketing-nav__pilot {
+  @media (max-width: 1080px) {
+    .marketing-nav__tag {
       display: none;
     }
   }
@@ -273,7 +327,13 @@ const links = [
     .marketing-nav {
       left: 0.75rem;
       right: 0.75rem;
-      top: 0.75rem;
+      top: 0.55rem;
+    }
+
+    .marketing-nav__row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      min-height: 3.4rem;
     }
 
     .marketing-nav__links,
@@ -283,8 +343,6 @@ const links = [
 
     .marketing-nav__toggle {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
   }
 </style>

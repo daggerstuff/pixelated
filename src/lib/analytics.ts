@@ -206,7 +206,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to flush analytics events', errorObj)
 
@@ -285,7 +285,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to send analytics to endpoint', errorObj)
       throw error
@@ -318,7 +318,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to save analytics to local storage', errorObj)
     }
@@ -473,7 +473,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error(`Failed to record analytics event: ${eventName}`, errorObj)
     }
@@ -640,7 +640,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to get analytics events', errorObj)
       return []
@@ -662,7 +662,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to clear analytics events', errorObj)
     }

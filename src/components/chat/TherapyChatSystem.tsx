@@ -3,7 +3,12 @@ import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
 import { clientScenarios } from '@/data/scenarios'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
-import type { Message, MentalHealthChatAnalysis, InterventionConfig, TherapeuticInterventions } from '@/types/chat'
+import type {
+  Message,
+  MentalHealthChatAnalysis,
+  InterventionConfig,
+  TherapeuticInterventions,
+} from '@/types/chat'
 import type { Scenario } from '@/types/scenarios'
 // Import this component dynamically for code splitting
 const LazyAnalyticsDashboard = lazy(() => import('./LazyAnalyticsDashboard'))
@@ -236,7 +241,9 @@ function ProfessionalTherapistWorkspace() {
                 ? 'preventive'
                 : 'supportive',
           requiresExpert: riskAssessment.requiresExpert,
-          emotions,
+          emotions: emotions.primaryEmotion
+            ? [emotions.primaryEmotion, ...emotions.secondaryEmotions]
+            : [],
           riskFactors: riskAssessment.factors,
         }
 
@@ -289,7 +296,7 @@ function ProfessionalTherapistWorkspace() {
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'An error occurred while processing your message',
       )
       console.error('Chat error:', err)
@@ -335,12 +342,12 @@ function ProfessionalTherapistWorkspace() {
     try {
       // Convert messages to the format expected by generatePatientResponse
       const conversationMessages: Array<{
-			role: 'therapist' | 'patient'
-			content: string
-		}> = messages.map((msg) => ({
+        role: 'therapist' | 'patient'
+        content: string
+      }> = messages.map((msg) => ({
         role: (msg.role === 'assistant' ? 'patient' : 'therapist') as
-			| 'therapist'
-			| 'patient',
+          | 'therapist'
+          | 'patient',
         content: msg.content,
       }))
 

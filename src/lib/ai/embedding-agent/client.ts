@@ -124,11 +124,11 @@ export class EmbeddingAgentClient {
   /**
    * Make an HTTP request to the embedding agent API.
    */
-  private async request<T>(
-    method: 'GET' | 'POST' | 'DELETE',
-    path: string,
-    body?: unknown,
-  ): Promise<T> {
+   private async request<T>(
+     method: 'GET' | 'POST' | 'DELETE',
+     path: string,
+     body?: Record<string, unknown>,
+   ): Promise<T> {
     const url = `${this.config.baseUrl}${path}`
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

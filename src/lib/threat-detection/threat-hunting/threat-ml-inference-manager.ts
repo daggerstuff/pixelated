@@ -1,12 +1,12 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('threat-ml-inference')
-import { IRedisClient, ThreatHuntingConfig, HuntFinding } from './types'
 import { runInParallelBatches } from '../../utils/concurrency'
+import { IRedisClient, ThreatHuntingConfig, HuntFinding } from './types'
 
 export class ThreatMLInferenceManager {
   constructor(
     private readonly redis: IRedisClient,
-    private readonly config: ThreatHuntingConfig
+    private readonly config: ThreatHuntingConfig,
   ) {}
 
   /**
@@ -15,7 +15,7 @@ export class ThreatMLInferenceManager {
    */
   public async analyzeFindings(
     findings: HuntFinding[],
-    inferenceLabelToSeverity: (label: string) => HuntFinding['severity']
+    inferenceLabelToSeverity: (label: string) => HuntFinding['severity'],
   ): Promise<HuntFinding[]> {
     logger.info(`Analyzing ${findings.length} findings with ML inference`)
 
@@ -25,35 +25,39 @@ export class ThreatMLInferenceManager {
         const result = await this.runInference(finding)
 
         // P3.1: Return all findings, updating severity only if confidence is high
-        if (result.confidence > (this.config.mlModelConfig?.confidenceThreshold || 0.7)) {
+        if (
+          result.confidence >
+          (this.config.mlModelConfig?.confidenceThreshold || 0.7)
+        ) {
           return {
             ...finding,
             confidence: result.confidence,
-            severity: inferenceLabelToSeverity(result.label)
+            severity: inferenceLabelToSeverity(result.label),
           }
         }
 
         // Return original finding with its inference confidence if below threshold
         return {
           ...finding,
-          confidence: result.confidence
+          confidence: result.confidence,
         }
       },
-      5 // Concurrency limit
+      5, // Concurrency limit
     )
   }
 
-
-
-  public async runInference(data: any): Promise<{ confidence: number; label: string }> {
+  public async runInference(
+    data: any,
+  ): Promise<{ confidence: number; label: string }> {
     // P3.1/P4.5: Decomposed inference logic
     // In a real implementation, this would call a Python microservice or a local model.
     // For now, we use a simplified version for demonstration.
 
     const confidence = Math.random()
-    const label = confidence > (this.config.mlModelConfig?.confidenceThreshold || 0.7)
-      ? 'suspicious'
-      : 'benign'
+    const label =
+      confidence > (this.config.mlModelConfig?.confidenceThreshold || 0.7)
+        ? 'suspicious'
+        : 'benign'
 
     return { confidence, label }
   }

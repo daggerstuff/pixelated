@@ -143,8 +143,7 @@ export class Phase3IntegrationTester {
 
     const totalTime = Date.now() - startTime
     const success =
-      Object.values(results).every((result) =>  result) &&
-      errors.length === 0
+      Object.values(results).every((result) => result) && errors.length === 0
 
     // Generate performance recommendations
     if (serviceTimings.crossServiceCommunication > 5000) {

@@ -1,24 +1,23 @@
 export const introContent = {
-  label: 'Why coaching gets vague',
-  title:
-    'Most supervision loses the useful moment right after the session ends.',
+  label: 'Why coaching gets fuzzy',
+  title: 'Most supervision loses the useful turn as soon as the room settles.',
   paragraphs: [
-    'Teams usually know a session went sideways. What they do not keep is the exact exchange that caused it.',
-    'Pixelated Empathy preserves the case, transcript, and review path long enough for a supervisor to coach one concrete next move.',
+    'Teams usually know a session drifted, tightened, or ruptured. What they lose is the exact exchange that made it happen.',
+    'Pixelated Empathy keeps the case, transcript, and review lane attached long enough for a supervisor to name one concrete next move.',
   ],
   panelLabel: 'What breaks in the usual workflow',
   panelItems: [
     {
-      label: 'No durable evidence',
-      body: 'A hard conversation runs once, then turns into opinion, shorthand notes, and partial recall.',
+      label: 'The evidence disappears',
+      body: 'A difficult roleplay runs once, then turns into shorthand notes, opinions, and partial recall.',
     },
     {
-      label: 'Feedback gets fuzzy',
-      body: 'The team can feel the shift, but cannot name the exact intervention that should change next.',
+      label: 'Feedback gets vague',
+      body: 'The team can feel the shift, but cannot name the exact intervention, miss, or repair to revisit next.',
     },
     {
-      label: 'Comparison disappears',
-      body: 'When each trainee gets a different case, supervision stops comparing judgment against the same moment.',
+      label: 'Comparison falls apart',
+      body: 'When every trainee sees a different case, supervision stops comparing judgment against the same moment.',
     },
   ],
   evidenceCards: [

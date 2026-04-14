@@ -34,12 +34,18 @@ const {
           (primaryCTA || secondaryCTA) && (
             <div class="marketing-actions">
               {primaryCTA && (
-                <a class="marketing-button marketing-button--primary" href={primaryCTA.href}>
+                <a
+                  class="marketing-button marketing-button--primary"
+                  href={primaryCTA.href}
+                >
                   {primaryCTA.text}
                 </a>
               )}
               {secondaryCTA && (
-                <a class="marketing-button marketing-button--secondary" href={secondaryCTA.href}>
+                <a
+                  class="marketing-button marketing-button--secondary"
+                  href={secondaryCTA.href}
+                >
                   {secondaryCTA.text}
                 </a>
               )}
@@ -52,7 +58,9 @@ const {
         {
           trustLine.length > 0 && (
             <div class="marketing-hero__trustline">
-              {trustLine.map((item) => <span>{item}</span>)}
+              {trustLine.map((item) => (
+                <span>{item}</span>
+              ))}
             </div>
           )
         }

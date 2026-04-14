@@ -46,7 +46,7 @@ class TherapyChatWebSocketServer {
             await this.handleChatMessage(clientId, message)
             break
           case 'status':
-             this.handleStatusUpdate(clientId, message)
+            this.handleStatusUpdate(clientId, message)
             break
           default:
             logger.warn(`Unknown message type: ${message.type}`)

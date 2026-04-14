@@ -38,7 +38,12 @@ export interface SearchOptions {
 export interface MemoryStats {
   totalMemories: number
   categoryCounts: Record<string, number>
-  recentActivity?: Array<{ id: string; timestamp: string; operation: string; memoryId?: string }>
+  recentActivity?: Array<{
+    id: string
+    timestamp: string
+    operation: string
+    memoryId?: string
+  }>
 }
 
 export interface AddMemoryInput {
@@ -110,29 +115,31 @@ export const memoryManager = {
     if (idx >= 0 && list[idx]) {
       const existingMemory = list[idx]
       const now = nowISO()
-      
+
       // Create a deep copy of the updated memory
       const updatedMemory: MemoryEntry = {
         ...existingMemory,
         content,
-        metadata: existingMemory.metadata 
-          ? { ...existingMemory.metadata, timestamp: now } 
+        metadata: existingMemory.metadata
+          ? { ...existingMemory.metadata, timestamp: now }
           : { timestamp: now },
         updatedAt: now,
       }
-      
+
       // Atomic update of the store by replacing the entire list reference
       const newList = [...list]
       newList[idx] = updatedMemory
       store.set(userId, newList)
-      
+
       addHistory(userId, 'update', memoryId)
-      
+
       // Return a deep copy to prevent external mutation (addresses Issue #2)
       // We manually spread because these are simple objects, ensuring compatibility
       const deepCopiedResult: MemoryEntry = {
         ...updatedMemory,
-        metadata: updatedMemory.metadata ? { ...updatedMemory.metadata } : undefined
+        metadata: updatedMemory.metadata
+          ? { ...updatedMemory.metadata }
+          : undefined,
       }
       return deepCopiedResult
     }
