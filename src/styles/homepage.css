@@ -157,6 +157,10 @@
   color: var(--text-primary, #f7f3eb);
 }
 
+.pe-home-copy {
+  margin: 0 auto !important;
+  text-align: center;
+}
 .pe-home-copy,
 .pe-page-copy,
 .pe-home-prose p {
