@@ -18,7 +18,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: pixelated-empathy-api
-          image: us-west1-docker.pkg.dev/REPLACE_ME_PROJECT/pixelated-empathy/api:latest
+          image: us-west1-docker.pkg.dev/grand-karma-492912-v1/pixelated-empathy/api:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4321

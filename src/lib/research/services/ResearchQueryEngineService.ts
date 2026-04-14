@@ -276,7 +276,7 @@ export class ResearchQueryEngineService {
     } catch (error: unknown) {
       console.error('Error executing research query:', error)
       throw new Error(
-        `Query execution failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Query execution failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         { cause: error },
       )
     }

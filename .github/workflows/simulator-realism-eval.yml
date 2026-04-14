@@ -1,0 +1,218 @@
+name: Simulator Realism Evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'ai/research/simulator_realism/**'
+      - 'ai/tests/research/**'
+      - 'ai/scripts/run_simulator_realism_eval.sh'
+  workflow_dispatch:
+    inputs:
+      maxKsStat:
+        type: string
+        required: false
+        default: '0.35'
+        description: 'Population KS threshold'
+      minHumanLikenessAuc:
+        type: string
+        required: false
+        default: '0.5'
+        description: 'Minimum HLS AUC threshold'
+      datasetStage:
+        type: string
+        required: false
+        default: ''
+        description:
+          'Optional fixture stage folder under
+          ai/research/simulator_realism/fixtures'
+      humanDataset:
+        type: string
+        required: false
+        default: ''
+        description:
+          'Optional explicit human dataset path (relative to repo root)'
+      simulatedDataset:
+        type: string
+        required: false
+        default: ''
+        description:
+          'Optional explicit simulated dataset path (relative to repo root)'
+      baselinePath:
+        type: string
+        required: false
+        default: ''
+        description:
+          'Optional baseline realism_evaluation.json path (relative to repo
+          root)'
+
+jobs:
+  evaluate:
+    name: Evaluate ConvApparel-style realism
+    runs-on: ubuntu-24.04
+    env:
+      MAX_KS_STAT:
+        ${{ github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.maxKsStat || vars['REALISM_MAX_KS_STAT'] || '0.35'
+        }}
+      MIN_HLS_AUC:
+        ${{ github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.minHumanLikenessAuc || vars['REALISM_MIN_HLS_AUC']
+        || '0.5' }}
+      REALISM_DATASET_STAGE:
+        ${{ github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.datasetStage || vars['REALISM_DATASET_STAGE'] || ''
+        }}
+      REALISM_HUMAN_DATASET:
+        ${{ github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.humanDataset || vars['REALISM_HUMAN_DATASET'] || ''
+        }}
+      REALISM_SIMULATED_DATASET:
+        ${{ github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.simulatedDataset ||
+        vars['REALISM_SIMULATED_DATASET'] || '' }}
+      REALISM_BASELINE_PATH:
+        ${{ github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.baselinePath || vars['REALISM_BASELINE_PATH'] || ''
+        }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run evaluator tests
+        run: |
+          cd "${{ github.workspace }}"
+          uv run --project ai python -m pytest ai/tests/research/test_simulator_realism.py -q
+
+      - name: Resolve evaluation fixture datasets
+        run: |
+          mkdir -p /tmp/sim-eval
+          set -euo pipefail
+          WORKSPACE="${{ github.workspace }}"
+          STAGE_ROOT="/tmp/sim-eval"
+          WORKSPACE_STAGE="${WORKSPACE}/ai/research/simulator_realism/fixtures/${REALISM_DATASET_STAGE}"
+
+          HUMAN_DATASET=""
+          SIM_DATASET=""
+
+          if [ -n "${REALISM_HUMAN_DATASET}" ] && [ -n "${REALISM_SIMULATED_DATASET}" ]; then
+            HUMAN_DATASET="${WORKSPACE}/${REALISM_HUMAN_DATASET}"
+            SIM_DATASET="${WORKSPACE}/${REALISM_SIMULATED_DATASET}"
+          elif [ -n "${REALISM_DATASET_STAGE}" ] && [ -d "${WORKSPACE_STAGE}" ]; then
+            HUMAN_DATASET="${WORKSPACE_STAGE}/human.jsonl"
+            SIM_DATASET="${WORKSPACE_STAGE}/simulated.jsonl"
+          fi
+
+          if [ -n "${HUMAN_DATASET}" ] && [ -n "${SIM_DATASET}" ] \
+            && [ -f "${HUMAN_DATASET}" ] && [ -f "${SIM_DATASET}" ]; then
+            ln -sf "${HUMAN_DATASET}" "${STAGE_ROOT}/human.jsonl"
+            ln -sf "${SIM_DATASET}" "${STAGE_ROOT}/simulated.jsonl"
+            echo "Using real dataset files:"
+            echo "  human=${HUMAN_DATASET}"
+            echo "  simulated=${SIM_DATASET}"
+          else
+            cat <<'EOF' > "${STAGE_ROOT}/human.jsonl"
+          {"conversation_id":"h1","turns":[{"speaker":"user","text":"I need help choosing a hoodie."},{"speaker":"assistant","text":"Sure, what style are you looking for?"}]}
+          {"conversation_id":"h2","turns":[{"speaker":"user","text":"Can you help me calm down before class?"},{"speaker":"assistant","text":"Absolutely, let me guide you."}]}
+          EOF
+
+            cat <<'EOF' > "${STAGE_ROOT}/simulated.jsonl"
+          {"conversation_id":"s1","turns":[{"speaker":"user","text":"I need help choosing a hoodie."},{"speaker":"assistant","text":"Sure, what style are you looking for?"}]}
+          {"conversation_id":"s2","turns":[{"speaker":"user","text":"Can you help me calm down before class?"},{"speaker":"assistant","text":"Absolutely, let me guide you."}]}
+          EOF
+            echo "Synthetic fixture created at ${STAGE_ROOT}"
+          fi
+
+      - name: Run regression gate
+        run: |
+          cd "${{ github.workspace }}"
+          GATE_OUTPUT_DIR="/tmp/sim-eval/artifacts/${{ github.run_id }}"
+          export GATE_OUTPUT_DIR
+          export GITHUB_WORKSPACE
+          uv run --project ai python -m ai.research.simulator_realism \
+            --human /tmp/sim-eval/human.jsonl \
+            --simulated /tmp/sim-eval/simulated.jsonl \
+            --output-dir "$GATE_OUTPUT_DIR" \
+            --max-ks-stat "${{ env.MAX_KS_STAT }}" \
+            --min-human-likeness-auc "${{ env.MIN_HLS_AUC }}" \
+            --no-hls \
+            --fail-on-threshold-violations
+          echo "Gate evaluation completed; output in ${GATE_OUTPUT_DIR}"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import os
+
+          p = Path(os.environ["GATE_OUTPUT_DIR"]) / "realism_evaluation.json"
+          payload = json.loads(p.read_text())
+          gates = payload["results"].get("quality_gates", {})
+          population = payload["results"]["population"]
+          turn_ks = population["turn_count"]["ks"]["statistic"]
+          words_ks = population["avg_words_per_turn"]["ks"]["statistic"]
+          human_auc = payload["results"]["human_likeness"]["auc"] if payload["results"].get("human_likeness") else None
+
+          trend = {
+            "run_id": os.environ.get("GITHUB_RUN_ID"),
+            "branch": os.environ.get("GITHUB_REF_NAME"),
+            "commit": os.environ.get("GITHUB_SHA"),
+            "thresholds": gates.get("thresholds", {}),
+            "metrics": {
+              "population": {
+                "turn_count": {
+                  "ks": turn_ks,
+                  "p_value": population["turn_count"]["ks"]["p_value"],
+                },
+                "avg_words_per_turn": {
+                  "ks": words_ks,
+                  "p_value": population["avg_words_per_turn"]["ks"]["p_value"],
+                },
+              },
+              "human_likeness_auc": human_auc,
+            },
+            "violations": gates.get("violations", []),
+            "passed": bool(gates.get("passed")),
+          }
+
+          baseline_path = os.environ.get("REALISM_BASELINE_PATH", "")
+          if baseline_path:
+            baseline_file = Path(os.environ["GITHUB_WORKSPACE"]) / baseline_path
+            if baseline_file.exists():
+              baseline = json.loads(baseline_file.read_text())
+              baseline_population = baseline.get("results", {}).get("population", {})
+              deltas = {}
+              if baseline_population:
+                deltas["turn_count_ks_delta"] = turn_ks - baseline_population["turn_count"]["ks"]["statistic"]
+                deltas["words_per_turn_ks_delta"] = words_ks - baseline_population["avg_words_per_turn"]["ks"]["statistic"]
+              if human_auc is not None and baseline.get("results", {}).get("human_likeness") is not None:
+                deltas["human_likeness_auc_delta"] = human_auc - baseline["results"]["human_likeness"]["auc"]
+              trend["baseline"] = {
+                "path": baseline_path,
+                "deltas": deltas,
+              }
+
+          trend_payload = {"quality_gate_trend": trend}
+          trend_path = Path(os.environ["GATE_OUTPUT_DIR"]) / "quality_gate_trend.json"
+          trend_path.write_text(json.dumps(trend_payload, indent=2), encoding="utf-8")
+
+          print(f"Gate passed: {gates.get('passed')}")
+          if gates.get("violations"):
+            print("Gate violations:")
+            for violation in gates["violations"]:
+              print(f"- {violation}")
+          print(f"Gate trend written: {trend_path}")
+          PY
+
+      - name: Upload realism artifacts
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: simulator-realism-evaluation-${{ github.run_id }}
+          path: /tmp/sim-eval/artifacts/${{ github.run_id }}
+          if-no-files-found: warn

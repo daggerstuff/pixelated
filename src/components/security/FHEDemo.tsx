@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
 import { Search, ChartBar, Lightbulb } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 interface FHEOperation {
   id: string
@@ -200,9 +200,9 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       case 'multiply':
         return '✖️'
       case 'compare':
-        return <Search className="w-4 h-4" />
+        return <Search className='h-4 w-4' />
       case 'aggregate':
-        return <ChartBar className="w-4 h-4" />
+        return <ChartBar className='h-4 w-4' />
       default:
         return '🔧'
     }
@@ -506,7 +506,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       {/* Educational Info */}
       <div className='bg-blue-50 mt-6 rounded-lg p-4'>
         <h4 className='text-blue-900 mb-2 font-semibold'>
-          <Lightbulb className="w-5 h-5" /> Why FHE Matters for Therapy Data
+          <Lightbulb className='h-5 w-5' /> Why FHE Matters for Therapy Data
         </h4>
         <ul className='text-blue-800 space-y-1 text-sm'>
           <li>

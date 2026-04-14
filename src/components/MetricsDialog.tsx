@@ -6,7 +6,7 @@ interface MetricsDialogProps {
 }
 
 /**
- * Text configuration for MetricsDialog. 
+ * Text configuration for MetricsDialog.
  * Facilitates future i18n implementation and centralizes user-facing strings.
  */
 const TEXT = {
@@ -83,7 +83,9 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
             <h4 className='text-md mb-2 font-medium'>{TEXT.skillsBreakdown}</h4>
             <div className='space-y-2'>
               <div>
-                <p className='mb-1 text-sm font-medium'>{TEXT.skillsImproving}</p>
+                <p className='mb-1 text-sm font-medium'>
+                  {TEXT.skillsImproving}
+                </p>
                 {metrics.skillsImproving.length > 0 ? (
                   <ul className='text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm'>
                     {metrics.skillsImproving.map((skill) => (
@@ -97,7 +99,9 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
                 )}
               </div>
               <div>
-                <p className='mb-1 text-sm font-medium'>{TEXT.skillsNeedingFocus}</p>
+                <p className='mb-1 text-sm font-medium'>
+                  {TEXT.skillsNeedingFocus}
+                </p>
                 {metrics.skillsNeeding.length > 0 ? (
                   <ul className='text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm'>
                     {metrics.skillsNeeding.map((skill) => (

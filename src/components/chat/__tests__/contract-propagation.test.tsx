@@ -1,7 +1,7 @@
 // Tests contract propagation: messages passed to ChatContainer/ChatMessage have consistent roles & no stray type fields.
 
 import { render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 
@@ -11,11 +11,11 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 // Helpers
 const messages: Array<{
-		role: 'user' | 'assistant' | 'system'
-		content: string
-		name: string
-		type?: string
-	}> = [
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  name: string
+  type?: string
+}> = [
   { role: 'user', content: 'User message', name: 'You' },
   { role: 'assistant', content: 'Bot response', name: 'Assistant' },
   { role: 'system', content: 'System note', name: 'System' },
@@ -48,10 +48,10 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
 
   it('maps therapy/patient/therapist roles to bot/user/system correctly', () => {
     const therapyMessages: Array<{
-			role: 'therapist' | 'patient' | 'system'
-			content: string
-			name: string
-		}> = [
+      role: 'therapist' | 'patient' | 'system'
+      content: string
+      name: string
+    }> = [
       {
         role: 'therapist',
         content: 'Therapist acting as user',
@@ -62,17 +62,17 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
     ]
     // Simulate TherapyChatSystem's mapping (see production mapping)
     const mapped: Array<{
-		role: 'user' | 'assistant' | 'system'
-		content: string
-		name: string
-	}> = therapyMessages.map((msg) => ({
+      role: 'user' | 'assistant' | 'system'
+      content: string
+      name: string
+    }> = therapyMessages.map((msg) => ({
       ...msg,
       role:
         msg.role === 'therapist'
-        ? 'user' as const
+          ? ('user' as const)
           : msg.role === 'patient'
-        ? 'assistant' as const
-        : 'system' as const,
+            ? ('assistant' as const)
+            : ('system' as const),
     }))
     render(
       <ThemeProvider>

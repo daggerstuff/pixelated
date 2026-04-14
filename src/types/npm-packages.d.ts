@@ -66,10 +66,7 @@ declare module '@nestjs/common' {
 
 // bcrypt
 declare module 'bcrypt' {
-  export function hash(
-    data: string,
-    saltRounds: number
-  ): Promise<string>
+  export function hash(data: string, saltRounds: number): Promise<string>
   export function compare(data: string, hash: string): Promise<boolean>
   export function genSalt(rounds: number): Promise<string>
   export function hashSync(data: string, saltRounds: number): string
@@ -82,10 +79,7 @@ declare module 'bcrypt' {
 declare module 'mongoose' {
   export function connect(uri: string, options?: unknown): Promise<void>
   export function disconnect(): Promise<void>
-  export function model<T>(
-    name: string,
-    schema?: unknown
-  ): unknown
+  export function model<T>(name: string, schema?: unknown): unknown
   export class Schema<T = unknown> {
     constructor(definition?: T)
   }
@@ -102,48 +96,58 @@ declare module 'typeorm' {
     name: string
     target?: new (...args: unknown[]) => T
     tableName?: string
-    columns: Record<string, {
-      type: string
-      primary?: boolean
-      generated?: boolean | 'increment' | 'uuid' | 'rowid'
-      nullable?: boolean
-      unique?: boolean
-      length?: number
-    }>
-    relations?: Record<string, {
-      type: string
-      joinColumn?: { name: string }
-      onDelete?: string
-    }>
+    columns: Record<
+      string,
+      {
+        type: string
+        primary?: boolean
+        generated?: boolean | 'increment' | 'uuid' | 'rowid'
+        nullable?: boolean
+        unique?: boolean
+        length?: number
+      }
+    >
+    relations?: Record<
+      string,
+      {
+        type: string
+        joinColumn?: { name: string }
+        onDelete?: string
+      }
+    >
     indices?: Array<{ columns: string[] }>
   }
   export class EntitySchema<T = unknown> {
     constructor(options: EntitySchemaOptions<T>)
   }
   export function Entity(
-    tableName?: string | { name?: string; schema?: string }
+    tableName?: string | { name?: string; schema?: string },
   ): ClassDecorator
-  export function Column(
-    options?: { type?: string; nullable?: boolean; length?: number }
-  ): PropertyDecorator
+  export function Column(options?: {
+    type?: string
+    nullable?: boolean
+    length?: number
+  }): PropertyDecorator
   export function PrimaryGeneratedColumn(
-    type?: 'increment' | 'uuid' | 'rowid' | string
+    type?: 'increment' | 'uuid' | 'rowid' | string,
   ): PropertyDecorator
-  export function PrimaryColumn(
-    options?: { type?: string; length?: number }
-  ): PropertyDecorator
+  export function PrimaryColumn(options?: {
+    type?: string
+    length?: number
+  }): PropertyDecorator
   export function OneToMany(
     type: string | (() => unknown),
-    inverseSide?: string | ((object: unknown) => unknown)
+    inverseSide?: string | ((object: unknown) => unknown),
   ): PropertyDecorator
   export function ManyToOne(
     type: string | (() => unknown),
     inverseSide?: string | ((object: unknown) => unknown),
-    options?: { nullable?: boolean; onDelete?: string }
+    options?: { nullable?: boolean; onDelete?: string },
   ): PropertyDecorator
-  export function JoinColumn(
-    options?: { name?: string; referencedColumnName?: string }
-  ): PropertyDecorator
+  export function JoinColumn(options?: {
+    name?: string
+    referencedColumnName?: string
+  }): PropertyDecorator
   export function CreateDateColumn(): PropertyDecorator
   export function UpdateDateColumn(): PropertyDecorator
   export interface DataSourceOptions {
@@ -161,7 +165,9 @@ declare module 'typeorm' {
     constructor(options: DataSourceOptions)
     initialize(): Promise<this>
     destroy(): Promise<void>
-    getRepository<T>(target: new (...args: unknown[]) => T | EntitySchema<T>): Repository<T>
+    getRepository<T>(
+      target: new (...args: unknown[]) => T | EntitySchema<T>,
+    ): Repository<T>
   }
   export class Repository<T> {
     create(): T

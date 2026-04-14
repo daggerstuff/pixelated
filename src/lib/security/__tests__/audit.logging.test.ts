@@ -51,9 +51,9 @@ describe('auditLoggingService', () => {
         auditLoggingService.logEvent(testEntry),
       ).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalled()
-      const loggedEntry = JSON.parse(
-        mockLogger.info.mock.calls[0][0],
-      ) as { details: { password: string } }
+      const loggedEntry = JSON.parse(mockLogger.info.mock.calls[0][0]) as {
+        details: { password: string }
+      }
       expect(loggedEntry.details.password).toBe('[REDACTED]')
     })
 

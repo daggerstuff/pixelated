@@ -78,8 +78,8 @@ export function SessionList({
             bValue = b.currentPhase
             break
           case 'progress':
-            aValue = a.progressMetrics?.progress_percentage ?? 0
-            bValue = b.progressMetrics?.progress_percentage ?? 0
+            aValue = a.progressMetrics?.['progress_percentage'] ?? 0
+            bValue = b.progressMetrics?.['progress_percentage'] ?? 0
             break
           default:
             return 0

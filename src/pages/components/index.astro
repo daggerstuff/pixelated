@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
+import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -22,7 +22,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
 
       <!-- Component Overview Carousel -->
       <div class="mb-16">
-        <SwiperCarousel
+        <DynamicSwiperCarousel
           client:load
           effect="coverflow"
           autoplay={{ delay: 6000, disableOnInteraction: false }}
@@ -88,7 +88,8 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
           <div
             class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white"
           >
-            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"></svg>
+            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"
+            ></svg>
             <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
             <p class="text-blue-100">
               Advanced charting and data visualization tools
@@ -148,7 +149,8 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
           <div
             class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white"
           >
-            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"></svg>
+            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"
+            ></svg>
             <h3 class="text-xl font-bold mb-2">Treatment Plan Manager</h3>
             <p class="text-green-100">
               Comprehensive clinical workflow management

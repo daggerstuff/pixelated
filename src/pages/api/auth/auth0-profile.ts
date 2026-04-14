@@ -65,7 +65,12 @@ export const GET = async ({ request }) => {
     console.error('Auth0 Profile GET error:', error)
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Failed to get profile',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Failed to get profile',
       }),
       {
         status: 500,
@@ -129,7 +134,11 @@ export const PATCH = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error:
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Failed to update profile',
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Failed to update profile',
       }),
       {
         status: 500,

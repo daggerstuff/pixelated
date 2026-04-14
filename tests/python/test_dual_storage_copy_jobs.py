@@ -194,13 +194,13 @@ def test_build_copy_plan_supports_explicit_host_bucket_template_override() -> No
         target="s3",
         include_salvage=False,
         s3_bucket="pixel-data",
-        s3_region="nyc3",
-        s3_endpoint="nyc3.digitaloceanspaces.com",
-        s3_host_bucket_template="%(bucket)s.digitaloceanspaces.com",
+        s3_region="hel1",
+        s3_endpoint="hel1.your-objectstorage.com",
+        s3_host_bucket_template="%(bucket)s.hel1.your-objectstorage.com",
         s3cmd_config_path="/tmp/pixel-data.s3cfg",
     )
 
-    assert copy_plan["s3_target"]["host_bucket_template"] == ("%(bucket)s.digitaloceanspaces.com")
+    assert copy_plan["s3_target"]["host_bucket_template"] == ("%(bucket)s.hel1.your-objectstorage.com")
     assert copy_plan["s3_target"]["config_path"] == "/tmp/pixel-data.s3cfg"
     assert copy_plan["jobs"][0]["s3_job"]["command"] == [
         "s3cmd",
@@ -209,9 +209,9 @@ def test_build_copy_plan_supports_explicit_host_bucket_template_override() -> No
         "--config",
         "/tmp/pixel-data.s3cfg",
         "--host",
-        "nyc3.digitaloceanspaces.com",
+        "hel1.your-objectstorage.com",
         "--host-bucket",
-        "%(bucket)s.digitaloceanspaces.com",
+        "%(bucket)s.hel1.your-objectstorage.com",
         "/mnt/garbage/pixelated-dual-storage/curated_sources/final_dataset/",
         "s3://pixel-data/curated_sources/final_dataset/",
     ]

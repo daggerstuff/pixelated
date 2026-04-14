@@ -1,31 +1,35 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
-import { ReactNode } from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook, waitFor } from '@testing-library/react'
+import { ReactNode } from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import type { Report, ReportList } from "@/lib/api/journal-research";
-import * as api from "@/lib/api/journal-research";
+import type { Report, ReportList } from '@/lib/api/journal-research'
+import * as api from '@/lib/api/journal-research'
 
-import { useReportListQuery, useReportQuery, useGenerateReportMutation } from "../useReports";
+import {
+  useReportListQuery,
+  useReportQuery,
+  useGenerateReportMutation,
+} from '../useReports'
 
 // Mock API functions
-vi.mock("@/lib/api/journal-research", () => ({
+vi.mock('@/lib/api/journal-research', () => ({
   listReports: vi.fn<() => Promise<ReportList>>(),
   getReport: vi.fn<() => Promise<Report>>(),
   generateReport: vi.fn<() => Promise<Report>>(),
-}));
+}))
 
 const mockReport = {
-  reportId: "report-1",
-  sessionId: "session-1",
-  reportType: "summary" as const,
-  format: "json" as const,
-  generatedAt: "2024-01-01T00:00:00Z",
+  reportId: 'report-1',
+  sessionId: 'session-1',
+  reportType: 'summary' as const,
+  format: 'json' as const,
+  generatedAt: '2024-01-01T00:00:00Z',
   content: {
-    summary: "Test report",
+    summary: 'Test report',
     metrics: {},
   },
-};
+}
 
 const mockReportList = {
   items: [mockReport],
@@ -33,7 +37,7 @@ const mockReportList = {
   page: 1,
   pageSize: 25,
   totalPages: 1,
-};
+}
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -41,143 +45,155 @@ const createWrapper = () => {
       queries: { retry: false },
       mutations: { retry: false },
     },
-  });
+  })
 
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+  )
+}
 
-describe("useReports hooks", () => {
+describe('useReports hooks', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-  });
+    vi.clearAllMocks()
+  })
 
-  describe("useReportListQuery", () => {
-    it("fetches report list successfully", async () => {
-      vi.mocked(api.listReports).mockResolvedValue(mockReportList);
+  describe('useReportListQuery', () => {
+    it('fetches report list successfully', async () => {
+      vi.mocked(api.listReports).mockResolvedValue(mockReportList)
 
-      const { result } = renderHook(() => useReportListQuery("session-1"), {
+      const { result } = renderHook(() => useReportListQuery('session-1'), {
         wrapper: createWrapper(),
-      });
+      })
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(result.current.data).toEqual(mockReportList);
-      expect(api.listReports).toHaveBeenCalledWith("session-1", {
+      expect(result.current.data).toEqual(mockReportList)
+      expect(api.listReports).toHaveBeenCalledWith('session-1', {
         page: 1,
         pageSize: 25,
-      });
-    });
+      })
+    })
 
-    it("does not fetch when sessionId is null", () => {
+    it('does not fetch when sessionId is null', () => {
       const { result } = renderHook(() => useReportListQuery(null), {
         wrapper: createWrapper(),
-      });
+      })
 
-      expect(result.current.isLoading).toBe(false);
-      expect(api.listReports).not.toHaveBeenCalled();
-    });
+      expect(result.current.isLoading).toBe(false)
+      expect(api.listReports).not.toHaveBeenCalled()
+    })
 
-    it("handles error state", async () => {
-      const error = new Error("Failed to fetch reports");
-      vi.mocked(api.listReports).mockRejectedValue(error);
+    it('handles error state', async () => {
+      const error = new Error('Failed to fetch reports')
+      vi.mocked(api.listReports).mockRejectedValue(error)
 
-      const { result } = renderHook(() => useReportListQuery("session-1"), {
+      const { result } = renderHook(() => useReportListQuery('session-1'), {
         wrapper: createWrapper(),
-      });
+      })
 
       await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+        expect(result.current.isError).toBe(true)
+      })
 
-      expect(result.current.error).toEqual(error);
-    });
-  });
+      expect(result.current.error).toEqual(error)
+    })
+  })
 
-  describe("useReportQuery", () => {
-    it("fetches report successfully", async () => {
-      vi.mocked(api.getReport).mockResolvedValue(mockReport);
+  describe('useReportQuery', () => {
+    it('fetches report successfully', async () => {
+      vi.mocked(api.getReport).mockResolvedValue(mockReport)
 
-      const { result } = renderHook(() => useReportQuery("session-1", "report-1"), {
-        wrapper: createWrapper(),
-      });
-
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
-
-      expect(result.current.data).toEqual(mockReport);
-      expect(api.getReport).toHaveBeenCalledWith("session-1", "report-1");
-    });
-
-    it("does not fetch when sessionId or reportId is null", () => {
-      const { result } = renderHook(() => useReportQuery(null, "report-1"), {
-        wrapper: createWrapper(),
-      });
-
-      expect(result.current.isLoading).toBe(false);
-      expect(api.getReport).not.toHaveBeenCalled();
-    });
-
-    it("handles error state", async () => {
-      const error = new Error("Failed to fetch report");
-      vi.mocked(api.getReport).mockRejectedValue(error);
-
-      const { result } = renderHook(() => useReportQuery("session-1", "report-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useReportQuery('session-1', 'report-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(result.current.error).toEqual(error);
-    });
-  });
+      expect(result.current.data).toEqual(mockReport)
+      expect(api.getReport).toHaveBeenCalledWith('session-1', 'report-1')
+    })
 
-  describe("useGenerateReportMutation", () => {
-    it("generates report successfully", async () => {
-      vi.mocked(api.generateReport).mockResolvedValue(mockReport);
-
-      const { result } = renderHook(() => useGenerateReportMutation("session-1"), {
+    it('does not fetch when sessionId or reportId is null', () => {
+      const { result } = renderHook(() => useReportQuery(null, 'report-1'), {
         wrapper: createWrapper(),
-      });
+      })
+
+      expect(result.current.isLoading).toBe(false)
+      expect(api.getReport).not.toHaveBeenCalled()
+    })
+
+    it('handles error state', async () => {
+      const error = new Error('Failed to fetch report')
+      vi.mocked(api.getReport).mockRejectedValue(error)
+
+      const { result } = renderHook(
+        () => useReportQuery('session-1', 'report-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true)
+      })
+
+      expect(result.current.error).toEqual(error)
+    })
+  })
+
+  describe('useGenerateReportMutation', () => {
+    it('generates report successfully', async () => {
+      vi.mocked(api.generateReport).mockResolvedValue(mockReport)
+
+      const { result } = renderHook(
+        () => useGenerateReportMutation('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       const payload = {
-        reportType: "summary_report" as const,
-        format: "json" as const,
-      };
+        reportType: 'summary_report' as const,
+        format: 'json' as const,
+      }
 
-      result.current.mutate(payload);
+      result.current.mutate(payload)
 
       await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
+        expect(result.current.isSuccess).toBe(true)
+      })
 
-      expect(api.generateReport).toHaveBeenCalledWith("session-1", payload);
-    });
+      expect(api.generateReport).toHaveBeenCalledWith('session-1', payload)
+    })
 
-    it("handles error state", async () => {
-      const error = new Error("Failed to generate report");
-      vi.mocked(api.generateReport).mockRejectedValue(error);
+    it('handles error state', async () => {
+      const error = new Error('Failed to generate report')
+      vi.mocked(api.generateReport).mockRejectedValue(error)
 
-      const { result } = renderHook(() => useGenerateReportMutation("session-1"), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(
+        () => useGenerateReportMutation('session-1'),
+        {
+          wrapper: createWrapper(),
+        },
+      )
 
       result.current.mutate({
-        reportType: "summary_report",
-        format: "json",
-      });
+        reportType: 'summary_report',
+        format: 'json',
+      })
 
       await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
+        expect(result.current.isError).toBe(true)
+      })
 
-      expect(result.current.error).toEqual(error);
-    });
-  });
-});
+      expect(result.current.error).toEqual(error)
+    })
+  })
+})

@@ -68,7 +68,7 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -125,13 +125,17 @@ app.use(
     console.error('❌ Error:', error)
     res.status(500).json({
       error: 'Internal server error',
-      message: isProduction ? 'Something went wrong' : (error instanceof Error ? error.message : "Unknown error"),
+      message: isProduction
+        ? 'Something went wrong'
+        : error instanceof Error
+          ? error.message
+          : 'Unknown error',
     })
   },
 )
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({
     error: 'Not found',
     message: 'The requested resource was not found',
@@ -149,7 +153,9 @@ const startServer = () => {
 }
 
 // Only start the server if this file is run directly
-const isMain = process.argv[1]?.includes('server.prod.js') || process.argv[1]?.includes('server.prod.ts')
+const isMain =
+  process.argv[1]?.includes('server.prod.js') ||
+  process.argv[1]?.includes('server.prod.ts')
 if (isMain) {
   startServer()
 }

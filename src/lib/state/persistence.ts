@@ -20,7 +20,9 @@ interface PersistenceConfig {
 
 const defaultOptions: Required<StorageOptions> = {
   storage:
-    typeof window !== 'undefined' ? storageManager.getStorage() : ({} as Storage),
+    typeof window !== 'undefined'
+      ? storageManager.getStorage()
+      : ({} as Storage),
   prefix: 'app_state_',
   encrypt: false,
   compress: false,

@@ -84,12 +84,6 @@ export interface BiasDetectionConfig {
     timeoutMs?: number
     retries?: number
   }
-  mlToolkitConfig?: {
-    enabled?: boolean
-    framework?: 'tensorflow' | 'pytorch' | 'scikit-learn'
-    version?: string
-    tensorflow?: { enabled?: boolean }
-  }
 }
 
 export interface BiasMetricsConfig {
@@ -240,6 +234,9 @@ export interface GroupPerformanceComparison {
 export interface TherapeuticSession {
   sessionId: string
   sessionDate: string
+  sessionDuration?: number
+  sessionType?: string
+  sessionNotes?: string
   participantDemographics: ParticipantDemographics
   scenario: TrainingScenario
   content: SessionContent
@@ -265,25 +262,31 @@ export interface ParticipantDemographics {
 
 export interface TrainingScenario {
   scenarioId: string
+  complexity?: 'low' | 'medium' | 'high' | 'intermediate' | 'advanced'
+  description?: string
   type:
-  | 'depression'
-  | 'anxiety'
-  | 'trauma'
-  | 'substance-abuse'
-  | 'relationship-issues'
-  | 'general-wellness'
+    | 'depression'
+    | 'anxiety'
+    | 'trauma'
+    | 'substance-abuse'
+    | 'relationship-issues'
+    | 'general-wellness'
+  tags?: string[]
 }
 
 export interface SessionContent {
   transcript: string
   aiResponses: string[]
   userInputs: string[]
+  patientPresentation?: string
+  patientResponses?: string[]
+  therapeuticInterventions?: string[]
   metadata?: Record<string, any>
 }
 
 export interface AIResponse {
   responseId: string
-  text: string
+  text?: string
   timestamp: Date
   type?: 'diagnostic' | 'intervention' | 'risk-assessment' | 'recommendation'
   content?: string
@@ -310,11 +313,16 @@ export interface SessionTranscript {
 }
 
 export interface SessionMetadata {
-  sessionStartTime: Date
-  sessionEndTime: Date
+  sessionStartTime?: Date
+  sessionEndTime?: Date
   location?: string
   device?: string
   tags?: string[]
+  trainingInstitution?: string
+  traineeId?: string
+  sessionDuration?: number
+  completionStatus?: string
+  [key: string]: any
 }
 
 export interface PreprocessingLayerResult {
@@ -324,7 +332,7 @@ export interface PreprocessingLayerResult {
     racialBiasScore: number
     ageBiasScore: number
     culturalBiasScore: number
-    biasedTerms: string[]
+    biasedTerms: Array<string | { term: string; context: string; biasType: string; severity: string; suggestedAlternative: string }>
     sentimentAnalysis: {
       overallSentiment: number
       emotionalValence: number
@@ -341,7 +349,7 @@ export interface PreprocessingLayerResult {
   }
   dataQualityMetrics: DataQualityMetrics
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -352,7 +360,7 @@ export interface ModelLevelLayerResult {
   performanceMetrics: ModelPerformanceMetrics
   groupPerformanceComparison: GroupPerformanceComparison[]
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -368,7 +376,7 @@ export interface InteractiveLayerResult {
   featureImportance: any[]
   whatIfScenarios: any[]
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -395,7 +403,7 @@ export interface EvaluationLayerResult {
     interventionEffectiveness: any[]
   }
   recommendations: string[]
-  detectedBiases: string[]
+  detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
 }
@@ -436,6 +444,7 @@ export interface BiasAlert {
   biasScore?: number
   acknowledged?: boolean
   status?: string
+  type?: string
   resolvedAt?: Date
 }
 
@@ -445,6 +454,9 @@ export interface BiasDashboardSummary {
   alertsLayerBreakdown: Record<string, number>
   alertsLast24h: number
   activeAlerts: number
+  totalAlerts?: number
+  highRiskSessions?: number
+  criticalAlerts?: number
   trendDirection: 'up' | 'down' | 'stable'
   alerts: Record<AlertLevel, number>
   complianceScore: number
@@ -553,10 +565,21 @@ export interface BiasReport {
   }
   appendices?: any[]
   data: Record<string, any>
+  summary?: {
+    sessionCount: number
+    averageBiasScore: number
+  }
+  performance?: Record<string, unknown>
+  alerts?: Record<string, number>
 }
 
 export interface PerformanceSnapshot {
   timestamp: number
+  memoryUsage?: {
+    before: number
+    after: number
+    delta: number
+  }
   metrics: Array<{
     name: string
     value: number
@@ -701,7 +724,7 @@ export interface BiasSummaryStats {
   alertsLayerBreakdown: Record<string, number>
   alertsLast24h: number
   activeAlerts: number
-  trendDirection: 'up' | 'down' | 'stable'
+  trendDirection: 'up' | 'down' | 'stable' | 'increasing' | 'decreasing' | 'worsening'
   alerts: Record<AlertLevel, number>
   criticalIssues: number
   improvementRate: number
@@ -784,3 +807,4 @@ export interface AnalysisCompleteWebSocketEvent extends WebSocketMessage {
     processingTime: number
   }
 }
+

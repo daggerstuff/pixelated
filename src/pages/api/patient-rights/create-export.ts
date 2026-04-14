@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
     const validationResult = createExportSchema.safeParse(requestData)
 
     if (!validationResult.success) {
-      const {fieldErrors} = validationResult.error.flatten()
+      const { fieldErrors } = validationResult.error.flatten()
       logger.warn('Invalid export request data', {
         errors: fieldErrors,
         userId: currentUser.id,
@@ -105,7 +105,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // IDOR guard: verify the requesting user is authorized for this specific patient.
     // Role alone is insufficient — we enforce resource-level ownership.
-    const isAdmin = currentUser.role === 'admin' || currentUser.role === 'superadmin'
+    const isAdmin =
+      currentUser.role === 'admin' || currentUser.role === 'superadmin'
     const isSelf = currentUser.id === validatedData.patientId
 
     // Therapists and providers must have an existing session with the patient in the DB.
@@ -127,7 +128,8 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'You do not have permission to export data for this patient.',
+          message:
+            'You do not have permission to export data for this patient.',
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } },
       )

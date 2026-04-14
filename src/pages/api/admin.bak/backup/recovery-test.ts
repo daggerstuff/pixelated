@@ -147,7 +147,7 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
       error instanceof Error ? String(error) : 'Unknown error'
     logger.error('Recovery test failed', {
       error: errorMessage,
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
     })
 
     return {

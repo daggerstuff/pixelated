@@ -215,7 +215,12 @@ const Content = details ? 'collapsible-content' : 'div'
               <p class="op-60">{formatDate(date, false)}</p>
             )}
             {details && (
-              <button type="button" aria-expanded="false" aria-label="Toggle details" class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]">
+              <button
+                type="button"
+                aria-expanded="false"
+                aria-label="Toggle details"
+                class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]"
+              >
                 <div u-i-lucide-chevron-down class="icon-down" />
                 <div u-i-lucide-chevron-up class="icon-up hidden" />
               </button>

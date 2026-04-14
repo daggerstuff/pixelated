@@ -1,14 +1,15 @@
 import { Request, Response, NextFunction } from 'express'
 
 import { AuthService } from '@/services/authService'
-import { UserRole } from '@/types/user'
+import { type JwtPayload, UserRole } from '@/types/user'
 
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string
-    email: string
-    role: UserRole
-  }
+export interface AuthenticatedRequest<
+  P extends Record<string, string> = Record<string, string>,
+  ResBody = unknown,
+  ReqBody = unknown,
+  ReqQuery = Record<string, string | string[] | undefined>,
+> extends Request<P, ResBody, ReqBody, ReqQuery> {
+  user?: JwtPayload
 }
 
 /**

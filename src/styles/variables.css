@@ -5,18 +5,18 @@
 
 :root {
   /* === THE CANVAS (Warm Terminal) === */
-  --bg-primary: #201d1d;          /* Warm Near-Black */
-  --bg-secondary: #302c2c;        /* Elevated Dark Surface */
+  --bg-primary: #201d1d; /* Warm Near-Black */
+  --bg-secondary: #302c2c; /* Elevated Dark Surface */
   --bg-glass: rgba(48, 44, 44, 0.74); /* Glassmorphic Base */
-  --text-primary: #f7f3eb;        /* Warm Off-White */
-  --text-secondary: #c7bfb7;      /* Editorial secondary copy */
-  --text-muted: #a1958b;          /* Muted labels */
-  
+  --text-primary: #f7f3eb; /* Warm Off-White */
+  --text-secondary: #c7bfb7; /* Editorial secondary copy */
+  --text-muted: #a1958b; /* Muted labels */
+
   /* === VIVID ACCENTS === */
-  --accent-primary: #FF6B00;      /* Vivid Mizu Orange */
+  --accent-primary: #ff6b00; /* Vivid Mizu Orange */
   --accent-primary-rgb: 255, 107, 0;
-  --accent-secondary: #007aff;    /* System Blue */
-  
+  --accent-secondary: #007aff; /* System Blue */
+
   /* === SEMANTIC COLORS (Apple HIG) === */
   --success: #30d158;
   --warning: #ff9f0a;
@@ -25,11 +25,11 @@
   /* === STRUCTURAL === */
   --border-subtle: rgba(253, 252, 252, 0.08); /* Hairline */
   --divider-dotted: rgba(253, 252, 252, 0.11); /* Dotted lines */
-  --divider-weak: rgba(253, 252, 252, 0.05);   /* Very subtle divider */
+  --divider-weak: rgba(253, 252, 252, 0.05); /* Very subtle divider */
   --bg-surface-ghost: rgba(253, 252, 252, 0.02); /* Ghostly background */
-  --radius-sm: 4px;   /* Standard components */
-  --radius-md: 6px;   /* Inputs */
-  
+  --radius-sm: 4px; /* Standard components */
+  --radius-md: 6px; /* Inputs */
+
   /* === ANIMATION === */
   --duration-fast: 0.15s;
   --duration-normal: 0.25s;
@@ -38,23 +38,23 @@
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  
+
   /* Legacy/Composite Transitions for Compatibility */
   --transition-fast: var(--duration-fast) var(--ease-out);
   --transition-normal: var(--duration-normal) var(--ease-out);
   --transition-slow: var(--duration-slow) var(--ease-out);
   --transition-spring: var(--duration-normal) var(--ease-spring);
-  
+
   /* === LAYOUT === */
   --max-content-width: 76rem;
   --max-editorial-width: 55rem;
   --grid-unit: 8px;
   --section-padding-y: 5rem; /* Mapping to var(--spacing-20) / 80px */
-  
+
   /* Additional Spacing */
   --spacing-5: 20px;
   --spacing-20: 80px;
-  
+
   /* === Z-INDEX === */
   --z-base: 1;
   --z-elevated: 10;

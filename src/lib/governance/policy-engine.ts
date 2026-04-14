@@ -1,7 +1,12 @@
-import type { GovernancePolicy, PolicyEvaluationResult, PolicyEvaluationContext, RequiredCondition } from './types'
+import type {
+  GovernancePolicy,
+  PolicyEvaluationResult,
+  PolicyEvaluationContext,
+  RequiredCondition,
+} from './types'
 
 const logger = {
-  info: (msg: string) => console.log(`[policy-engine] ${msg}`)
+  info: (msg: string) => console.log(`[policy-engine] ${msg}`),
 }
 
 // Validate regex pattern for safety (prevents catastrophic backtracking)
@@ -43,10 +48,10 @@ export class PolicyEngine {
     const compiledPolicy: CompiledPolicy = {
       id: policy.id,
       version: policy.version,
-      rules: policy.rules.map(rule => ({
+      rules: policy.rules.map((rule) => ({
         id: rule.id,
         action: rule.action,
-        conditions: rule.conditions.map(cond => {
+        conditions: rule.conditions.map((cond) => {
           // Pre-compile regex ONCE during load
           let compiledRegex: RegExp | null = null
           if (cond.operator === 'regex') {
@@ -60,52 +65,70 @@ export class PolicyEngine {
             test: (value: unknown) => {
               const strValue = String(value ?? '')
               switch (cond.operator) {
-                case 'equals': return value === cond.value
-                case 'contains': return strValue.includes(cond.value)
-                case 'regex': 
+                case 'equals':
+                  return value === cond.value
+                case 'contains':
+                  return strValue.includes(cond.value)
+                case 'regex':
                   // Use pre-compiled regex (or reject if unsafe)
                   if (!compiledRegex) return false
                   return compiledRegex.test(strValue)
-                default: return false
+                default:
+                  return false
               }
-            }
+            },
           }
         }),
-        required: rule.required
-      }))
+        required: rule.required,
+      })),
     }
     this.policies.set(compiledPolicy.id, compiledPolicy)
     this.loadedVersion = policy.version
     logger.info(`Loaded policy ${policy.id} v${policy.version}`)
   }
 
-  async evaluate(context: PolicyEvaluationContext): Promise<PolicyEvaluationResult> {
+  async evaluate(
+    context: PolicyEvaluationContext,
+  ): Promise<PolicyEvaluationResult> {
     for (const [, policy] of this.policies) {
       for (const rule of policy.rules) {
         if (rule.action !== context.action) continue
 
         // Check conditions
-        const matches = rule.conditions.every(cond => cond.test(context.context[cond.field]))
+        const matches = rule.conditions.every((cond) =>
+          cond.test(context.context[cond.field]),
+        )
         if (!matches) continue
 
         // Check required security controls
-        const missingRequired = this.checkRequiredControls(rule.required, context)
+        const missingRequired = this.checkRequiredControls(
+          rule.required,
+          context,
+        )
         if (missingRequired.length > 0) {
           return {
             allowed: false,
             reason: `Missing required controls: ${missingRequired.join(', ')}`,
             policyId: policy.id,
-            ruleId: rule.id
+            ruleId: rule.id,
           }
         }
 
-        return { allowed: true, reason: 'Policy matched', policyId: policy.id, ruleId: rule.id }
+        return {
+          allowed: true,
+          reason: 'Policy matched',
+          policyId: policy.id,
+          ruleId: rule.id,
+        }
       }
     }
     return { allowed: false, reason: 'No matching policy', policyId: 'none' }
   }
 
-  private checkRequiredControls(required: RequiredCondition[], context: PolicyEvaluationContext): string[] {
+  private checkRequiredControls(
+    required: RequiredCondition[],
+    context: PolicyEvaluationContext,
+  ): string[] {
     const missing: string[] = []
     const ctx = context.context as Record<string, unknown>
 

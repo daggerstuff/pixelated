@@ -1,0 +1,72 @@
+<testsuites id="" name="" tests="9" failures="0" skipped="1" errors="0" time="18.331113000000002">
+<testsuite name="browser/auth.spec.ts" timestamp="2026-04-11T21:17:35.162Z" hostname="chromium" tests="5" failures="0" skipped="1" time="9.901" errors="0">
+<testcase name="login page has correct form elements" classname="browser/auth.spec.ts" time="0.725">
+</testcase>
+<testcase name="login form shows validation errors" classname="browser/auth.spec.ts" time="3.181">
+</testcase>
+<testcase name="login form is properly visible on mobile viewport" classname="browser/auth.spec.ts">
+<properties>
+<property name="skip" value="This test is mobile-only">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="login page has proper transitions" classname="browser/auth.spec.ts" time="2.478">
+</testcase>
+<testcase name="login page visual comparison" classname="browser/auth.spec.ts" time="3.301">
+</testcase>
+</testsuite>
+<testsuite name="browser/browser-compatibility.spec.ts" timestamp="2026-04-11T21:17:35.162Z" hostname="chromium" tests="4" failures="0" skipped="0" time="7.38" errors="0">
+<testcase name="Home page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.182">
+<properties>
+<property name="slow" value="">
+</property>
+</properties>
+<system-out>
+<![CDATA[Testing Home page in chromium
+Going to /
+Page title: Pixelated Empathy | Clinical simulation for therapist training and supervision - Pixelated Empathy
+]]>
+</system-out>
+</testcase>
+<testcase name="Blog page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.074">
+<properties>
+<property name="slow" value="">
+</property>
+</properties>
+<system-out>
+<![CDATA[Testing Blog page in chromium
+Going to /blog
+Page title: Blog - Pixelated Empathy
+]]>
+</system-out>
+</testcase>
+<testcase name="Documentation page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.042">
+<properties>
+<property name="slow" value="">
+</property>
+</properties>
+<system-out>
+<![CDATA[Testing Documentation page in chromium
+Going to /docs
+Page title: Getting Started with Pixelated Empathy - Pixelated Empathy
+]]>
+</system-out>
+</testcase>
+<testcase name="CSS feature support check" classname="browser/browser-compatibility.spec.ts" time="1.082">
+<system-out>
+<![CDATA[CSS features support in chromium: {
+  flexbox: [33mtrue[39m,
+  grid: [33mtrue[39m,
+  variables: [33mtrue[39m,
+  sticky: [33mtrue[39m,
+  animations: [33mtrue[39m,
+  filters: [33mtrue[39m,
+  aspectRatio: [33mtrue[39m
+}
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

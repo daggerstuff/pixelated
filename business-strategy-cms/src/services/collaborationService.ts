@@ -25,11 +25,14 @@ export interface DocumentChange {
 }
 
 export class CollaborationService {
-  private static sessions: Map<string, CollaborationSession[]> = new Map()
-  private static changes: Map<string, DocumentChange[]> = new Map()
-  private static cursorListeners: Map<string, ((update: any) => void)[]> =
+  private static readonly sessions: Map<string, CollaborationSession[]> =
     new Map()
-  private static contentListeners: Map<
+  private static readonly changes: Map<string, DocumentChange[]> = new Map()
+  private static readonly cursorListeners: Map<
+    string,
+    ((update: any) => void)[]
+  > = new Map()
+  private static readonly contentListeners: Map<
     string,
     ((change: DocumentChange) => void)[]
   > = new Map()
@@ -81,7 +84,7 @@ export class CollaborationService {
       this.sessions.set(documentId, [])
     }
 
-    const existingSessions = this.sessions.get(documentId) || []
+    const existingSessions = this.sessions.get(documentId) ?? []
     const existingIndex = existingSessions.findIndex((s) => s.userId === userId)
 
     if (existingIndex >= 0) {
@@ -95,13 +98,13 @@ export class CollaborationService {
   }
 
   static leaveSession(documentId: string, userId: string): void {
-    const sessions = this.sessions.get(documentId) || []
+    const sessions = this.sessions.get(documentId) ?? []
     const filteredSessions = sessions.filter((s) => s.userId !== userId)
     this.sessions.set(documentId, filteredSessions)
   }
 
   static getActiveUsers(documentId: string): CollaborationSession[] {
-    return this.sessions.get(documentId) || []
+    return this.sessions.get(documentId) ?? []
   }
 
   static updateCursor(
@@ -110,16 +113,18 @@ export class CollaborationService {
     position: number,
     selection?: { start: number; end: number },
   ): void {
-    const sessions = this.sessions.get(documentId) || []
+    const sessions = this.sessions.get(documentId) ?? []
     const session = sessions.find((s) => s.userId === userId)
 
     if (session) {
       session.cursorPosition = position
-      session.selection = selection
+      if (selection) {
+        session.selection = selection
+      }
       session.lastActivity = new Date()
 
       // Notify listeners
-      const listeners = this.cursorListeners.get(documentId) || []
+      const listeners = this.cursorListeners.get(documentId) ?? []
       listeners.forEach((callback) =>
         callback({
           userId,
@@ -136,7 +141,7 @@ export class CollaborationService {
       this.changes.set(documentId, [])
     }
 
-    const changes = this.changes.get(documentId) || []
+    const changes = this.changes.get(documentId) ?? []
     changes.push(change)
 
     // Keep only last 100 changes
@@ -147,12 +152,12 @@ export class CollaborationService {
     this.changes.set(documentId, changes)
 
     // Notify listeners
-    const listeners = this.contentListeners.get(documentId) || []
+    const listeners = this.contentListeners.get(documentId) ?? []
     listeners.forEach((callback) => callback(change))
   }
 
   static getChanges(documentId: string, since?: Date): DocumentChange[] {
-    const changes = this.changes.get(documentId) || []
+    const changes = this.changes.get(documentId) ?? []
 
     if (since) {
       return changes.filter((c) => c.timestamp > since)
@@ -212,7 +217,7 @@ export class CollaborationService {
       hash = userId.charCodeAt(i) + ((hash << 5) - hash)
     }
 
-    return colors[Math.abs(hash) % colors.length]
+    return colors[Math.abs(hash) % colors.length]!
   }
 
   static cleanupInactiveSessions(): void {

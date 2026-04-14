@@ -192,7 +192,9 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
             class="border border-green-600/30 bg-green-900/20 rounded-2xl overflow-hidden"
           >
             <CardContent class="p-6 lg:p-8 text-center">
-              <div class="text-4xl mb-4 text-green-400"><Lightbulb className="w-10 h-10" /></div>
+              <div class="text-4xl mb-4 text-green-400">
+                <Lightbulb className="w-10 h-10" />
+              </div>
               <h3 class="text-xl font-bold text-green-100 mb-4">
                 Found This Helpful?
               </h3>
@@ -541,7 +543,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
     })
 
     document.querySelectorAll('[data-demo-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         const link = target?.dataset['demoLink']
         if (link) {
@@ -551,7 +553,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
     })
 
     document.querySelectorAll('[data-blog-link]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         const link = target?.dataset['blogLink']
         if (link) {
@@ -593,7 +595,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
     // Track CTA clicks
     document.querySelectorAll('button').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         if (typeof (window as any).gtag !== 'undefined') {
           ;(window as any).gtag('event', 'blog_cta_click', {
@@ -606,7 +608,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
     // Track related post clicks
     document.querySelectorAll('a[href*="/blog/"]').forEach((link) => {
-      link.addEventListener('click', (e) => {
+      link.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement
         if (typeof (window as any).gtag !== 'undefined') {
           ;(window as any).gtag('event', 'related_post_click', {

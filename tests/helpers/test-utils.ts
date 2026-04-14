@@ -160,3 +160,7 @@ export async function ensureTestResultsDir(subDir?: string) {
     // Directory might already exist, ignore error
   }
 }
+
+export function getLoginFormLocator(page: Page) {
+  return page.locator('[data-testid="login-form"], form[data-testid="login-form"]')
+}

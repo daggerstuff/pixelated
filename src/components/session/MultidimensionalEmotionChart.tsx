@@ -12,9 +12,7 @@ async function loadThreeWithTypes() {
   ])
   return {
     THREE: threeModule,
-    OrbitControls: (
-      orbitModule
-    ).OrbitControls,
+    OrbitControls: orbitModule.OrbitControls,
   }
 }
 
@@ -329,9 +327,7 @@ export default function MultidimensionalEmotionChart({
           scene.add(zLabel)
         }
 
-        labelsRef.current = [xLabel, yLabel, zLabel].filter(
-          Boolean,
-        )
+        labelsRef.current = [xLabel, yLabel, zLabel].filter(Boolean)
       }
 
       // Add grid helper - simplify for lower detail

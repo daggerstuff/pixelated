@@ -311,12 +311,14 @@ export function isEncryptedData(obj: unknown): obj is EncryptedData {
   if (!obj || typeof obj !== 'object') {
     return false
   }
-  const record = obj as Record<string, unknown>
+
+  const dataObj = obj as Record<string, unknown>
+  const id = dataObj.id
+  const dataType = dataObj.dataType
+  const data = dataObj.data
 
   return (
-    typeof record['id'] === 'string' &&
-    typeof record['dataType'] === 'string' &&
-    'data' in record
+    typeof id === 'string' && typeof dataType === 'string' && data !== undefined
   )
 }
 
@@ -463,10 +465,7 @@ export interface FHEService {
    * @param encryptedData The encrypted data to decrypt
    * @returns The decrypted value
    */
-  decrypt<T>(
-    encryptedData: EncryptedData,
-    options?: unknown,
-  ): Promise<T>
+  decrypt<T>(encryptedData: EncryptedData, options?: unknown): Promise<T>
 
   /**
    * Add two encrypted values
@@ -474,10 +473,7 @@ export interface FHEService {
    * @param b Second encrypted value or scalar
    * @returns Result of addition
    */
-  add?(
-    a: EncryptedData,
-    b: EncryptedData | number,
-  ): Promise<EncryptedData>
+  add?(a: EncryptedData, b: EncryptedData | number): Promise<EncryptedData>
 
   /**
    * Subtract one encrypted value from another
@@ -485,10 +481,7 @@ export interface FHEService {
    * @param b Second encrypted value or scalar
    * @returns Result of subtraction
    */
-  subtract?(
-    a: EncryptedData,
-    b: EncryptedData | number,
-  ): Promise<EncryptedData>
+  subtract?(a: EncryptedData, b: EncryptedData | number): Promise<EncryptedData>
 
   /**
    * Multiply encrypted value
@@ -496,10 +489,7 @@ export interface FHEService {
    * @param b Another encrypted value or scalar
    * @returns Result of multiplication
    */
-  multiply?(
-    a: EncryptedData,
-    b: EncryptedData | number,
-  ): Promise<EncryptedData>
+  multiply?(a: EncryptedData, b: EncryptedData | number): Promise<EncryptedData>
 
   /**
    * Negate an encrypted value
@@ -525,10 +515,7 @@ export interface FHEService {
    * @param steps Number of steps to rotate (positive for right, negative for left)
    * @returns Rotated encrypted vector
    */
-  rotate?(
-    vector: EncryptedData,
-    steps: number,
-  ): Promise<EncryptedData>
+  rotate?(vector: EncryptedData, steps: number): Promise<EncryptedData>
 
   /**
    * Process encrypted data

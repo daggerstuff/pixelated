@@ -70,7 +70,10 @@ export class WebSocketClient {
     })
 
     this.socket.on('error', (error: { message: string }) => {
-      console.error('WebSocket error:', (error instanceof Error ? error.message : "Unknown error"))
+      console.error(
+        'WebSocket error:',
+        error instanceof Error ? error.message : 'Unknown error',
+      )
     })
   }
 
@@ -96,7 +99,9 @@ export class WebSocketClient {
       })
 
       this.socket.once('error', (error: { message: string }) => {
-        reject(new Error((error instanceof Error ? error.message : "Unknown error")))
+        reject(
+          new Error(error instanceof Error ? error.message : 'Unknown error'),
+        )
       })
     })
   }

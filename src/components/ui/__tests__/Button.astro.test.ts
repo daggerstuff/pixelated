@@ -1,23 +1,9 @@
 import { cleanup } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
+import { renderAstro } from '@/test/utils/astro'
 
 import Button from '../Button.astro'
-
-// Helper function to render Astro components in tests
-async function renderAstroComponent(
-  Component: any,
-  props = {},
-  slotContent: string | null = null,
-) {
-  // Add slot content if provided
-  const renderOptions = slotContent
-    ? { default: { render: () => slotContent, name: 'default' } }
-    : {}
-  const html = await Component.render(props, renderOptions)
-  const container = document.createElement('div')
-  container.innerHTML = html.html
-  document.body.appendChild(container)
-  return { container }
-}
 
 describe('Button.astro', () => {
   beforeEach(() => {
@@ -29,7 +15,7 @@ describe('Button.astro', () => {
   })
 
   it('renders a button element by default', async () => {
-    const { container } = await renderAstroComponent(Button, {}, 'Click me')
+    const { container } = await renderAstro(Button, {}, 'Click me')
 
     const button = container.querySelector('button')
     expect(button).toBeTruthy()
@@ -39,7 +25,7 @@ describe('Button.astro', () => {
   })
 
   it('renders an anchor element when href is provided', async () => {
-    const { container } = await renderAstroComponent(
+    const { container } = await renderAstro(
       Button,
       { href: '/dashboard' },
       'Go to Dashboard',
@@ -53,7 +39,7 @@ describe('Button.astro', () => {
 
   it('applies the correct variant classes', async () => {
     // Test default variant
-    let { container } = await renderAstroComponent(
+    let { container } = await renderAstro(
       Button,
       { variant: 'default' },
       'Default',
@@ -64,7 +50,7 @@ describe('Button.astro', () => {
 
     // Test destructive variant
     document.body.innerHTML = ''
-    const destructiveResult = await renderAstroComponent(
+    const destructiveResult = await renderAstro(
       Button,
       { variant: 'destructive' },
       'Destructive',
@@ -76,7 +62,7 @@ describe('Button.astro', () => {
 
     // Test outline variant
     document.body.innerHTML = ''
-    const outlineResult = await renderAstroComponent(
+    const outlineResult = await renderAstro(
       Button,
       { variant: 'outline' },
       'Outline',
@@ -90,7 +76,7 @@ describe('Button.astro', () => {
 
   it('applies the correct size classes', async () => {
     // Test default size
-    let { container } = await renderAstroComponent(
+    let { container } = await renderAstro(
       Button,
       { size: 'default' },
       'Default Size',
@@ -102,11 +88,7 @@ describe('Button.astro', () => {
 
     // Test small size
     document.body.innerHTML = ''
-    const smallResult = await renderAstroComponent(
-      Button,
-      { size: 'sm' },
-      'Small',
-    )
+    const smallResult = await renderAstro(Button, { size: 'sm' }, 'Small')
     container = smallResult.container
     button = container.querySelector('button')
     expect(button).toHaveClass('h-9')
@@ -114,11 +96,7 @@ describe('Button.astro', () => {
 
     // Test large size
     document.body.innerHTML = ''
-    const largeResult = await renderAstroComponent(
-      Button,
-      { size: 'lg' },
-      'Large',
-    )
+    const largeResult = await renderAstro(Button, { size: 'lg' }, 'Large')
     container = largeResult.container
     button = container.querySelector('button')
     expect(button).toHaveClass('h-11')
@@ -126,7 +104,7 @@ describe('Button.astro', () => {
   })
 
   it('handles loading state correctly', async () => {
-    const { container } = await renderAstroComponent(
+    const { container } = await renderAstro(
       Button,
       { loading: true, loadingText: 'Processing...' },
       'Submit',
@@ -142,11 +120,7 @@ describe('Button.astro', () => {
   })
 
   it('handles loading state without loading text', async () => {
-    const { container } = await renderAstroComponent(
-      Button,
-      { loading: true },
-      'Submit',
-    )
+    const { container } = await renderAstro(Button, { loading: true }, 'Submit')
 
     const button = container.querySelector('button')
     expect(button).toHaveAttribute('disabled')
@@ -158,7 +132,7 @@ describe('Button.astro', () => {
   })
 
   it('passes through custom attributes correctly', async () => {
-    const { container } = await renderAstroComponent(
+    const { container } = await renderAstro(
       Button,
       {
         id: 'custom-button',

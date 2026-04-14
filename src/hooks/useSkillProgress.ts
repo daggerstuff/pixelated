@@ -33,7 +33,7 @@ export function useSkillProgress(
 
     setLoading(true)
     setError(null)
-    ;void (async () => {
+    void (async () => {
       try {
         if (!session) {
           if (mounted) {

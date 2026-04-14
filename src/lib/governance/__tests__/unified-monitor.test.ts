@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { UnifiedMonitor } from '../unified-monitor'
+
 import { SlackAlerter } from '../slack-alert'
+import { UnifiedMonitor } from '../unified-monitor'
 
 describe('UnifiedMonitor', () => {
   let monitor: UnifiedMonitor
@@ -13,7 +14,7 @@ describe('UnifiedMonitor', () => {
     await monitor.record({
       source: 'fhe',
       event: 'encryption_complete',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     const events = monitor.getEvents('fhe')
@@ -22,9 +23,21 @@ describe('UnifiedMonitor', () => {
   })
 
   it('tracks events from multiple sources', async () => {
-    await monitor.record({ source: 'fhe', event: 'e1', timestamp: new Date().toISOString() })
-    await monitor.record({ source: 'audit', event: 'e2', timestamp: new Date().toISOString() })
-    await monitor.record({ source: 'secrets', event: 'e3', timestamp: new Date().toISOString() })
+    await monitor.record({
+      source: 'fhe',
+      event: 'e1',
+      timestamp: new Date().toISOString(),
+    })
+    await monitor.record({
+      source: 'audit',
+      event: 'e2',
+      timestamp: new Date().toISOString(),
+    })
+    await monitor.record({
+      source: 'secrets',
+      event: 'e3',
+      timestamp: new Date().toISOString(),
+    })
 
     expect(monitor.getEvents('fhe').length).toBe(1)
     expect(monitor.getEvents('audit').length).toBe(1)
@@ -41,15 +54,17 @@ describe('UnifiedMonitor', () => {
       await monitor.record({
         source: 'governance',
         event: 'compliance_failure',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
     }
 
     expect(alertSpy).toHaveBeenCalled()
-    expect(alertSpy).toHaveBeenCalledWith(expect.objectContaining({
-      type: 'compliance_failure',
-      count: 5
-    }))
+    expect(alertSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'compliance_failure',
+        count: 5,
+      }),
+    )
   })
 
   it('does not trigger alert below threshold', async () => {
@@ -60,7 +75,7 @@ describe('UnifiedMonitor', () => {
       await monitor.record({
         source: 'governance',
         event: 'compliance_failure',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
     }
 
@@ -68,7 +83,11 @@ describe('UnifiedMonitor', () => {
   })
 
   it('clears events', async () => {
-    await monitor.record({ source: 'fhe', event: 'e1', timestamp: new Date().toISOString() })
+    await monitor.record({
+      source: 'fhe',
+      event: 'e1',
+      timestamp: new Date().toISOString(),
+    })
     monitor.clearEvents()
     expect(monitor.getAllEvents().length).toBe(0)
   })

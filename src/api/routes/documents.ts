@@ -358,7 +358,11 @@ router.get(
         'Content-Disposition',
         `attachment; filename="${document.slug}.md"`,
       )
-      res.send(document.content.markdown)
+      const markdownContent = document.content?.markdown
+      if (!markdownContent) {
+        throw new NotFoundError('Document content', documentId)
+      }
+      res.send(markdownContent)
     } else {
       res.setHeader('Content-Type', 'application/json')
       res.setHeader(

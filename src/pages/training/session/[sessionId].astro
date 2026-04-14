@@ -6,7 +6,7 @@ import Layout from '@/layouts/Layout.astro'
 import { getSession } from '@/lib/auth'
 
 const { sessionId } = Astro.params
-const session = await getSession()
+const session = await getSession(Astro.request)
 
 if (!session) {
   return Astro.redirect('/auth/login')
@@ -354,7 +354,12 @@ const isSupervisor = userRole === 'admin'
                         id="suggestions-button"
                         class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 transition-colors"
                       >
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"></svg> Get Suggestions
+                        <svg
+                          class="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        />{' '}
+                        Get Suggestions
                       </button>
                     </div>
 
@@ -466,7 +471,7 @@ const isSupervisor = userRole === 'admin'
                 </h3>
                 <div id="feedback-messages" class="space-y-2 text-sm">
                   <p class="text-gray-500">
-                    Feedback will appear here as you interact with the client.
+                    Feedback will appear here.
                   </p>
                 </div>
               </div>

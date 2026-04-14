@@ -8,7 +8,9 @@ import {
   withAuthenticatedMemoryRoute,
 } from './_shared'
 
-export const GET = withAuthenticatedMemoryRoute('searching memories', async ({ request }, user) => {
+export const GET = withAuthenticatedMemoryRoute(
+  'searching memories',
+  async ({ request }, user) => {
     const url = new URL(request.url)
     const query = url.searchParams.get('q')
     const { limit, offset } = parsePagination(url)
@@ -49,9 +51,12 @@ export const GET = withAuthenticatedMemoryRoute('searching memories', async ({ r
         role: user.role,
       },
     })
-})
+  },
+)
 
-export const POST = withAuthenticatedMemoryRoute('searching memories', async ({ request }, user) => {
+export const POST = withAuthenticatedMemoryRoute(
+  'searching memories',
+  async ({ request }, user) => {
     const body = await request.json()
     const query = typeof body.query === 'string' ? body.query : body.q
     const requestedUserId = body.user_id ?? body.userId
@@ -94,4 +99,5 @@ export const POST = withAuthenticatedMemoryRoute('searching memories', async ({ 
         role: user.role,
       },
     })
-})
+  },
+)

@@ -35,7 +35,6 @@ const isAdmin = isLoggedIn && user && (await hasAdminRole(user))
 if (!isLoggedIn || !isAdmin) {
   return Astro.redirect('/login?redirect=/admin')
 }
-
 ---
 
 <html lang={SITE.lang} transition:animate="fade">

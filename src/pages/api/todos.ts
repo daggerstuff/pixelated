@@ -38,7 +38,7 @@ export const GET = async ({ request }) => {
       },
     )
   } catch (error: unknown) {
-    logError('GET /api/todos', error)
+    await logError('GET /api/todos', error)
     return new Response(
       JSON.stringify({
         success: false,
@@ -95,7 +95,7 @@ export const POST = async ({ request }) => {
       },
     )
   } catch (error: unknown) {
-    logError('POST /api/todos', error)
+    await logError('POST /api/todos', error)
     return new Response(
       JSON.stringify({
         success: false,
@@ -113,13 +113,24 @@ export const POST = async ({ request }) => {
 // Provide minimal structured error logging to aid debugging in CI and local
 // development. For production-grade logging, route these through the
 // project's centralized logging (e.g., Sentry) and include request IDs.
-function logError(context: string, err: unknown) {
-  // Avoid exposing sensitive details in responses; these logs are for server-side
-  // investigation only. Replace with Sentry.captureException or similar as needed.
-  console.error(
-    `[todos.api] ${context} -`,
-    err instanceof Error ? err.stack || err.message : String(err),
-  )
+async function logError(context: string, err: unknown) {
+  const message = err instanceof Error ? err.message : String(err)
+  const error =
+    err instanceof Error
+      ? err
+      : new Error(`[todos.api] ${context} - ${message}`)
+  try {
+    const { captureException } = await import('@sentry/node')
+    captureException(error, {
+      tags: { source: 'todos-api', context },
+      extra: {
+        context,
+        rawMessage: message,
+      },
+    })
+  } catch {
+    // Sentry optional dependency; keep error handling side-effect free on failure.
+  }
 }
 
 // Rate limiting should be implemented at the edge or via middleware (API gateway,

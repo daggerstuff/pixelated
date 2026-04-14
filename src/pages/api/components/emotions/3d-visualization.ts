@@ -228,7 +228,12 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -322,7 +327,12 @@ export const POST: APIRoute = protectRoute()(async (
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,

@@ -1,10 +1,8 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 // Mock fetch for API calls
-const mockFetch = vi.fn<
-  (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
->()
-global.fetch = mockFetch
+const mockFetch = vi.fn()
+global.fetch = mockFetch as typeof fetch
 
 // SSRF protection: Centralized URL validation utility
 // Removed localhost and 127.0.0.1 to prevent local service attacks
@@ -14,6 +12,8 @@ const ALLOWED_DOMAINS = [
   'ml.azure.com',
   'mlflow.company.com',
 ]
+
+const createMockHeaders = (init?: HeadersInit) => new Headers(init)
 
 const safeFetch = async (
   input: RequestInfo | URL,
@@ -72,10 +72,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) =>
-            _header === 'content-length' ? '500' : null,
-        },
+        headers: createMockHeaders({ 'content-length': '500' }),
         json: () => Promise.resolve(mockResponse),
         body: new ReadableStream({
           start(controller) {
@@ -124,9 +121,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () => Promise.resolve({ success: true, syncId: 'sync-123' }),
         body: new ReadableStream({
           start(controller) {
@@ -174,9 +169,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 201,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () =>
             Promise.resolve({
               id: 'dataset-123',
@@ -207,9 +200,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 401,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () => Promise.resolve({ error: 'Invalid token' }),
         })
 
@@ -242,9 +233,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 200,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () => Promise.resolve({ experiment_id: 'exp-123' }),
         })
 
@@ -274,9 +263,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 200,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () => Promise.resolve({}),
         })
 
@@ -307,9 +294,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 200,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () =>
             Promise.resolve({
               run: { id: 'wandb-run-123', url: 'https://wandb.ai/run/123' },
@@ -345,9 +330,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 201,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () =>
             Promise.resolve({
               id: 'azureml-dataset-123',
@@ -386,9 +369,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 202,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve({
             jobId: 'export-job-123',
@@ -412,9 +393,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve({
             jobId: 'export-job-123',
@@ -442,15 +421,15 @@ describe('APIService Integration Tests', () => {
       const mockWebSocket = {
         send: vi.fn<(data: unknown) => void>(),
         close: vi.fn<() => void>(),
-        addEventListener: vi.fn<(type: string, listener: EventListener) => void>(),
-        removeEventListener: vi.fn<
-          (type: string, listener: EventListener) => void
-        >(),
+        addEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
+        removeEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
         readyState: 1, // OPEN
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn<[], typeof mockWebSocket>(function () {
+      global.WebSocket = vi.fn(function () {
         return mockWebSocket
       }) as any
 
@@ -466,14 +445,14 @@ describe('APIService Integration Tests', () => {
       const mockWebSocket = {
         send: vi.fn<(data: unknown) => void>(),
         close: vi.fn<() => void>(),
-        addEventListener: vi.fn<(type: string, listener: EventListener) => void>(),
-        removeEventListener: vi.fn<
-          (type: string, listener: EventListener) => void
-        >(),
+        addEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
+        removeEventListener:
+          vi.fn<(type: string, listener: EventListener) => void>(),
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn<[], typeof mockWebSocket>(function () {
+      global.WebSocket = vi.fn(function () {
         return mockWebSocket
       }) as any
 
@@ -499,9 +478,7 @@ describe('APIService Integration Tests', () => {
         .mockResolvedValueOnce({
           ok: true,
           status: 200,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () => Promise.resolve({ success: true }),
         })
 
@@ -539,7 +516,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        headers: new Map([['Retry-After', '60']]),
+        headers: createMockHeaders({ 'Retry-After': '60' }),
         json: () => Promise.resolve({ error: 'Rate limit exceeded' }),
       })
 
@@ -554,9 +531,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 503,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve({
             error: 'Service temporarily unavailable',
@@ -601,9 +576,7 @@ describe('APIService Integration Tests', () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
           status: 200,
-          headers: {
-            get: (_header: string) => null,
-          },
+          headers: createMockHeaders(),
           json: () => Promise.resolve({ success: true }),
           body: new ReadableStream({
             start(controller) {
@@ -626,9 +599,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
           start(controller) {
@@ -656,9 +627,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
           start(controller) {
@@ -682,9 +651,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve({
             access_token: 'new-access-token',
@@ -726,9 +693,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () => Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
           start(controller) {
@@ -756,9 +721,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () => Promise.resolve({ success: true }),
         body: new ReadableStream({
           start(controller) {
@@ -782,9 +745,7 @@ describe('APIService Integration Tests', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: {
-          get: (_header: string) => null,
-        },
+        headers: createMockHeaders(),
         json: () =>
           Promise.resolve({
             access_token: 'new-access-token',

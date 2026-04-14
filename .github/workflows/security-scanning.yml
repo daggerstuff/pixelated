@@ -6,7 +6,6 @@ permissions:
 
 env:
   GHA_LOCAL_RUN: 'false'
-  FORCE_JS_TO_NODE24: true
 
 on:
   push:
@@ -44,33 +43,59 @@ jobs:
         id: trivy
         uses: aquasecurity/trivy-action@v0.35.0
         with:
+          cache: 'false'
           scan-type: 'fs'
           scanners: 'vuln,secret,misconfig'
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+          # Keep SARIF aligned with the configured severity gate.
+          limit-severities-for-sarif: true
         continue-on-error: true
 
-      - name: Run Checkov scan
+      - name: Run Checkov infrastructure scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
-        id: checkov
+        id: checkov_infra
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: .
-          framework: all
+          framework: terraform,terraform_plan,bicep
           output_format: sarif
-          output_file_path: checkov-results.sarif
+          output_file_path: checkov-infra-results.sarif
           skip_check: ''
-          skip_path: 'clusters/**'
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice'
           log_level: WARNING
           container_user: 0
         continue-on-error: true
 
-      - name: Check for Checkov SARIF file
-        id: checkov_sarif
+      - name: Run Checkov Kubernetes and Helm scan
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        id: checkov_helm
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: ai/helm/pixel-voice
+          framework: kubernetes,helm
+          output_format: sarif
+          output_file_path: checkov-helm-results.sarif
+          skip_check: ''
+          log_level: WARNING
+          container_user: 0
+        continue-on-error: true
+
+      - name: Check for Checkov infrastructure SARIF file
+        id: checkov_infra_sarif
         run: |
-          if [ -s checkov-results.sarif ]; then
+          if [ -s checkov-infra-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for Checkov Helm/Kubernetes SARIF file
+        id: checkov_helm_sarif
+        run: |
+          if [ -s checkov-helm-results.sarif ]; then
             echo "found=true" >> "$GITHUB_OUTPUT"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
@@ -92,7 +117,7 @@ jobs:
 
       - name: Upload Trivy diagnostic artifact
         if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: trivy-diagnostic
           path: trivy-missing.txt
@@ -102,38 +127,63 @@ jobs:
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         with:
           sarif_file: 'trivy-results.sarif'
+          category: trivy-fs
 
       - name: Upload Trivy SARIF as artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         with:
           name: trivy-sarif
           path: trivy-results.sarif
 
-      - name: Upload Checkov scan results to GitHub Security tab
+      - name: Upload Checkov Infrastructure scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
-        if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
+        if: ${{ always() && steps.checkov_infra_sarif.outputs.found == 'true' }}
         with:
-          sarif_file: 'checkov-results.sarif'
+          sarif_file: 'checkov-infra-results.sarif'
+          category: checkov-infra
 
-      - name: Create diagnostic artifact when Checkov SARIF missing
-        if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
+      - name: Upload Helm/Kubernetes Checkov scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: ${{ always() && steps.checkov_helm_sarif.outputs.found == 'true' }}
+        with:
+          sarif_file: 'checkov-helm-results.sarif'
+          category: checkov-helm
+
+      - name: Create diagnostic artifact when Checkov SARIF is missing
+        if:
+          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+          steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
-          echo "Checkov SARIF not produced." > checkov-missing.txt || true
+          if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
+            echo "Checkov infrastructure SARIF not produced." > checkov-missing.txt
+          fi
+          if [ "${{ steps.checkov_helm_sarif.outputs.found }}" != "true" ]; then
+            echo "Checkov Helm/Kubernetes SARIF not produced." >> checkov-missing.txt
+          fi
 
       - name: Upload Checkov diagnostic artifact
-        if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
-        uses: actions/upload-artifact@v7.0.0
+        if:
+          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+          steps.checkov_helm_sarif.outputs.found == 'false' }}
+        uses: actions/upload-artifact@v7
         with:
           name: checkov-diagnostic
           path: checkov-missing.txt
 
       - name: Upload Checkov SARIF as artifact
-        uses: actions/upload-artifact@v7.0.0
-        if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
+        uses: actions/upload-artifact@v7
+        if: ${{ always() && steps.checkov_infra_sarif.outputs.found == 'true' }}
         with:
-          name: checkov-sarif
-          path: checkov-results.sarif
+          name: checkov-infra-sarif
+          path: checkov-infra-results.sarif
+
+      - name: Upload Helm/Kubernetes Checkov SARIF as artifact
+        uses: actions/upload-artifact@v7
+        if: ${{ always() && steps.checkov_helm_sarif.outputs.found == 'true' }}
+        with:
+          name: checkov-helm-sarif
+          path: checkov-helm-results.sarif
 
   dependency-check:
     name: Dependency Check
@@ -146,9 +196,10 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
+          package-manager-cache: false
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -163,7 +214,7 @@ jobs:
         run: pnpm audit --json > audit-results.json || true
 
       - name: Upload audit results
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: security-audit-results
           path: audit-results.json

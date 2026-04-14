@@ -101,7 +101,12 @@ export class PlatformStatusMonitor {
         status: 'down',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }
     }
 
@@ -130,7 +135,12 @@ export class PlatformStatusMonitor {
         name: 'database',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Connection failed',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Connection failed',
       }
     }
   }
@@ -155,7 +165,12 @@ export class PlatformStatusMonitor {
         name: 'redis',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Connection failed',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Connection failed',
       }
     }
   }
@@ -180,7 +195,12 @@ export class PlatformStatusMonitor {
         name: 'ai-service',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Service unavailable',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Service unavailable',
       }
     }
   }
@@ -206,7 +226,12 @@ export class PlatformStatusMonitor {
         name: 'voice-pipeline',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Pipeline unavailable',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Pipeline unavailable',
       }
     }
   }
@@ -233,7 +258,12 @@ export class PlatformStatusMonitor {
         name: 'safety-filter',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Filter unavailable',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Filter unavailable',
       }
     }
   }
@@ -258,7 +288,12 @@ export class PlatformStatusMonitor {
         name: 'mcp-integration',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'MCP unavailable',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'MCP unavailable',
       }
     }
   }
@@ -283,7 +318,12 @@ export class PlatformStatusMonitor {
         name: 'auth-service',
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Auth unavailable',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Auth unavailable',
       }
     }
   }
@@ -307,7 +347,11 @@ export class PlatformStatusMonitor {
         status: 'down',
         lastCheck: new Date(),
         error:
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'ContentFilter unavailable',
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'ContentFilter unavailable',
       }
     }
   }
@@ -343,7 +387,12 @@ export class PlatformStatusMonitor {
         name,
         status: 'down',
         lastCheck: new Date(),
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Service unavailable',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Service unavailable',
       }
     }
   }

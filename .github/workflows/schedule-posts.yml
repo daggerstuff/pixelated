@@ -10,7 +10,6 @@ permissions:
 
 # Environment variables can be defined here
 env:
-  FORCE_JS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.33.0
   NODE_ENV: production
@@ -26,12 +25,12 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6
         with:
           version: 10.33.0
 

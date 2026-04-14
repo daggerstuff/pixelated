@@ -19,8 +19,8 @@ import { randomUUID } from 'crypto'
 
 import { PoolClient } from 'pg'
 
-import { getFromCache, setInCache, removeFromCache } from '../redis'
 import { query, transaction } from '../db/index'
+import { getFromCache, setInCache, removeFromCache } from '../redis'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -129,7 +129,13 @@ async function createUserWithLink(
        SET email_verified = EXCLUDED.email_verified,
            name           = COALESCE(EXCLUDED.name, users.name),
            updated_at     = NOW()`,
-    [internalId, profile.email, profile.emailVerified, profile.name ?? null, role],
+    [
+      internalId,
+      profile.email,
+      profile.emailVerified,
+      profile.name ?? null,
+      role,
+    ],
   )
 
   // Fetch the actual id in case ON CONFLICT hit an existing row

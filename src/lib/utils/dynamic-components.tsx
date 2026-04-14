@@ -97,6 +97,18 @@ export const DynamicFHEDemo = (props: Record<string, unknown>) => (
   </Suspense>
 )
 
+export const DemoFHEDemo = React.lazy(() =>
+  import('../../components/demo/FHEDemo').then((module) => ({
+    default: module.default,
+  })),
+)
+
+export const DynamicDemoFHEDemo = (props: Record<string, unknown>) => (
+  <Suspense fallback={<DefaultLoading />}>
+    <DemoFHEDemo {...props} />
+  </Suspense>
+)
+
 // Dynamic imports for large UI components
 export const SwiperCarousel = React.lazy(
   () => import('../../components/ui/SwiperCarousel'),
@@ -119,9 +131,21 @@ export const DynamicChartComponent = (props: Record<string, unknown>) => (
   </Suspense>
 )
 
+export const EnhancedChartComponent = React.lazy(
+  () => import('../../components/analytics/EnhancedChartComponent'),
+)
+
+export const DynamicEnhancedChartComponent = (
+  props: Record<string, unknown>,
+) => (
+  <Suspense fallback={<VisualizationLoading />}>
+    <EnhancedChartComponent {...props} />
+  </Suspense>
+)
+
 // Dynamic imports for large dashboard components
 export const TreatmentPlanManager = React.lazy(
-  () => import('../../components/treatment/TreatmentPlanManager'),
+  () => import('../../components/therapy/TreatmentPlanManager'),
 )
 
 export const DynamicTreatmentPlanManager = (props: Record<string, unknown>) => (

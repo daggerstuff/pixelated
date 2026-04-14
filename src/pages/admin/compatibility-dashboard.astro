@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Card from '@/components/ui/Card.astro'
-import { Chart } from 'chart.js/auto'
 
 // This data would normally come from a database or API endpoint
 // It represents aggregated data collected by the polyfill analytics
@@ -184,14 +183,15 @@ function formatDate(dateString: string): string {
 
 <script>
   import type { ChartConfiguration, TooltipItem } from 'chart.js'
-  import { Chart } from 'chart.js/auto'
 
   // Initialize charts once the page has loaded
   document.addEventListener('astro:page-load', () => {
-    setupCharts()
+    void setupCharts()
   })
 
-  function setupCharts() {
+  async function setupCharts() {
+    const chartModule = await import('chart.js/auto')
+
     // Polyfill Usage Overview Chart
     const polyfillUsageCanvas = document.getElementById(
       'polyfillUsageChart',
@@ -199,7 +199,7 @@ function formatDate(dateString: string): string {
     if (polyfillUsageCanvas) {
       const polyfillUsageCtx = polyfillUsageCanvas.getContext('2d')
       if (polyfillUsageCtx) {
-        void new Chart(polyfillUsageCtx, {
+        void new chartModule.Chart(polyfillUsageCtx, {
           type: 'bar',
           data: {
             labels: [
@@ -269,7 +269,7 @@ function formatDate(dateString: string): string {
     if (browserDistributionCanvas) {
       const browserDistributionCtx = browserDistributionCanvas.getContext('2d')
       if (browserDistributionCtx) {
-        void new Chart(browserDistributionCtx, {
+        void new chartModule.Chart(browserDistributionCtx, {
           type: 'doughnut',
           data: {
             labels: [
@@ -326,7 +326,7 @@ function formatDate(dateString: string): string {
     if (polyfillTrendCanvas) {
       const polyfillTrendCtx = polyfillTrendCanvas.getContext('2d')
       if (polyfillTrendCtx) {
-        void new Chart(polyfillTrendCtx, {
+        void new chartModule.Chart(polyfillTrendCtx, {
           type: 'line',
           data: {
             labels: [
@@ -386,7 +386,7 @@ function formatDate(dateString: string): string {
     if (deviceTypeCanvas) {
       const deviceTypeCtx = deviceTypeCanvas.getContext('2d')
       if (deviceTypeCtx) {
-        void new Chart(deviceTypeCtx, {
+        void new chartModule.Chart(deviceTypeCtx, {
           type: 'pie',
           data: {
             labels: ['Desktop', 'Mobile', 'Tablet'],

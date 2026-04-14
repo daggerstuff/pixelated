@@ -1,6 +1,6 @@
 import { format, addDays, differenceInDays } from 'date-fns'
-import React, { useState, useEffect } from 'react'
 import { Target, Brain, Heart, Users, Dumbbell, Clipboard } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
 
 interface TreatmentGoal {
   id: string
@@ -173,7 +173,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   const getCategoryIcon = (category: TreatmentGoal['category']) => {
     switch (category) {
       case 'behavioral':
-        return <Target className="w-4 h-4" />
+        return <Target className='h-4 w-4' />
       case 'cognitive':
         return '🧠'
       case 'emotional':
@@ -181,7 +181,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
       case 'social':
         return '👥'
       case 'physical':
-        return <Dumbbell className="w-4 h-4" />
+        return <Dumbbell className='h-4 w-4' />
       default:
         return '📋'
     }

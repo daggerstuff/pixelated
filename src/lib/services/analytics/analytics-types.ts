@@ -26,8 +26,8 @@ export const EventDataSchema = z.object({
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   timestamp: z.number().default(() => Date.now()),
-  properties: z.record(z.unknown()).default({}),
-  metadata: z.record(z.unknown()).default({}),
+  properties: z.record(z.string(), z.unknown()).default({}),
+  metadata: z.record(z.string(), z.unknown()).default({}),
 })
 
 export type EventData = z.infer<typeof EventDataSchema>
@@ -44,7 +44,7 @@ export const MetricSchema = z.object({
   name: z.string(),
   value: z.number(),
   timestamp: z.number().default(() => Date.now()),
-  tags: z.record(z.string()).default({}),
+  tags: z.record(z.string(), z.string()).default({}),
 })
 
 export type Metric = z.infer<typeof MetricSchema>
@@ -54,12 +54,12 @@ export interface RedisClient {
   [x: string]: unknown
   lRange(arg0: string, arg1: number, arg2: number): unknown
   zrangebyscore(
-    arg0: string,
+    key: string,
     start: string | number,
     end: string | number,
-    arg3: string,
-    offset: number,
-    limit: number,
+    limitStr?: string,
+    offset?: number,
+    limit?: number,
   ): string[] | PromiseLike<string[]>
   lpush(key: string, value: string): Promise<void>
   lrange(key: string, start: number, stop: number): Promise<string[]>

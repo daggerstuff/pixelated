@@ -114,7 +114,12 @@ export const GET = async ({
       JSON.stringify({
         success: false,
         error: 'Export Failed',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         processingTime,
       }),
       {

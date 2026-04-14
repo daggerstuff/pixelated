@@ -35,7 +35,7 @@ const AuthButtonsInner = () => {
         </button>
         <a
           href='/dashboard'
-          className='rounded-[4px] border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-white/25 hover:bg-white/5'
+          className='border-white/10 text-white hover:border-white/25 hover:bg-white/5 rounded-[4px] border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors'
         >
           Dashboard
         </a>

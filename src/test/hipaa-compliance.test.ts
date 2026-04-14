@@ -38,7 +38,7 @@ const mockAuditEvent: AuditEvent = {
   timestamp: new Date().toISOString(),
   ip_address: '192.168.1.1',
   action: 'login',
-  details: { success: true }
+  details: { success: true },
 }
 
 const mockSession: Session = {
@@ -46,7 +46,7 @@ const mockSession: Session = {
   user_id: 'user-456',
   role: 'therapist',
   created_at: new Date().toISOString(),
-  last_activity: new Date().toISOString()
+  last_activity: new Date().toISOString(),
 }
 
 /**
@@ -60,7 +60,7 @@ describe('HIPAA Audit Trail Logging', () => {
       timestamp: new Date().toISOString(),
       ip_address: '192.168.1.1',
       action: 'login',
-      details: { success: true }
+      details: { success: true },
     }
 
     expect(event.event_type).toBe('USER_LOGIN')
@@ -74,7 +74,7 @@ describe('HIPAA Audit Trail Logging', () => {
       user_id: 'user-123',
       timestamp: new Date().toISOString(),
       action: 'read',
-      resource: 'session_record:456'
+      resource: 'session_record:456',
     }
 
     expect(event.event_type).toBe('PHI_ACCESS')
@@ -88,7 +88,7 @@ describe('HIPAA Audit Trail Logging', () => {
       user_id: 'user-123',
       timestamp: new Date().toISOString(),
       action: 'export',
-      details: { record_count: 50, destination: 'user_download' }
+      details: { record_count: 50, destination: 'user_download' },
     }
 
     expect(event.event_type).toBe('DATA_EXPORT')
@@ -107,7 +107,7 @@ describe('HIPAA Audit Trail Logging', () => {
     const auditEntry = {
       created_at: new Date().toISOString(),
       hash: 'sha256_mock_hash',
-      signed: true
+      signed: true,
     }
 
     expect(auditEntry.signed).toBe(true)
@@ -124,7 +124,7 @@ describe('HIPAA Encryption', () => {
       scheme: 'SEAL',
       polynomial_modulus_degree: 4096,
       coefficient_modulus_bit_sizes: [21, 22, 21],
-      encryption_parameter_quality: '128-bit'
+      encryption_parameter_quality: '128-bit',
     }
 
     expect(fheConfig.scheme).toBe('SEAL')
@@ -135,7 +135,7 @@ describe('HIPAA Encryption', () => {
     const originalData = {
       patient_name: 'John Doe',
       ssn: '123-45-6789',
-      diagnosis: 'Depression'
+      diagnosis: 'Depression',
     }
 
     // Simulate encryption roundtrip
@@ -152,7 +152,7 @@ describe('HIPAA Encryption', () => {
       key_id: 'key-2026-03',
       created_at: '2026-03-01T00:00:00Z',
       rotates_at: '2026-06-01T00:00:00Z',
-      algorithm: 'AES-256-GCM'
+      algorithm: 'AES-256-GCM',
     }
 
     expect(keyMetadata.rotates_at).toBeDefined()
@@ -163,7 +163,7 @@ describe('HIPAA Encryption', () => {
     const mongoConfig = {
       field_level_encryption: true,
       encrypted_fields: ['ssn', 'patient_name', 'diagnosis', 'notes'],
-      key_vault: 'encryption-keys'
+      key_vault: 'encryption-keys',
     }
 
     expect(mongoConfig.field_level_encryption).toBe(true)
@@ -174,7 +174,7 @@ describe('HIPAA Encryption', () => {
     const transportConfig = {
       tls_version: '1.3',
       min_tls_version: 1.2,
-      cipher_suites: ['TLS_AES_256_GCM_SHA384', 'TLS_CHACHA20_POLY1305_SHA256']
+      cipher_suites: ['TLS_AES_256_GCM_SHA384', 'TLS_CHACHA20_POLY1305_SHA256'],
     }
 
     expect(transportConfig.min_tls_version).toBeGreaterThanOrEqual(1.2)
@@ -190,7 +190,7 @@ describe('HIPAA Access Control', () => {
     const roles = {
       therapist: ['read:own_sessions', 'write:own_sessions'],
       admin: ['read:all_sessions', 'write:all_sessions', 'manage:users'],
-      patient: ['read:own_data']
+      patient: ['read:own_data'],
     }
 
     expect(roles.therapist).toBeDefined()
@@ -203,7 +203,7 @@ describe('HIPAA Access Control', () => {
       '/api/sessions',
       '/api/patients',
       '/api/audit-logs',
-      '/api/analytics'
+      '/api/analytics',
     ]
 
     protectedRoutes.forEach((route) => {
@@ -222,7 +222,7 @@ describe('HIPAA Access Control', () => {
     const authResult = {
       success: false,
       error_code: 'INVALID_CREDENTIALS',
-      message: 'Authentication failed'
+      message: 'Authentication failed',
     }
 
     expect(authResult.success).toBe(false)
@@ -248,7 +248,7 @@ describe('HIPAA PHI Redaction', () => {
       level: 'INFO',
       message: 'User login successful',
       user_id: 'user-123',
-      phi_fields_redacted: true
+      phi_fields_redacted: true,
     }
 
     expect(logEntry.phi_fields_redacted).toBe(true)
@@ -280,7 +280,7 @@ describe('HIPAA PHI Redaction', () => {
     const anonymizationConfig = {
       enabled: true,
       methods: ['redaction', 'pseudonymization', 'aggregation'],
-      compliance_mode: 'HIPAA'
+      compliance_mode: 'HIPAA',
     }
 
     expect(anonymizationConfig.enabled).toBe(true)
@@ -296,7 +296,7 @@ describe('HIPAA Session Management', () => {
     const timeoutConfig = {
       inactive_timeout_minutes: 30,
       absolute_timeout_hours: 8,
-      warning_before_logout_seconds: 300
+      warning_before_logout_seconds: 300,
     }
 
     expect(timeoutConfig.inactive_timeout_minutes).toBeGreaterThan(0)
@@ -307,7 +307,7 @@ describe('HIPAA Session Management', () => {
     const sessionLimits = {
       max_concurrent_sessions: 3,
       terminate_oldest: true,
-      notify_on_new_session: true
+      notify_on_new_session: true,
     }
 
     expect(sessionLimits.max_concurrent_sessions).toBeGreaterThan(0)
@@ -319,7 +319,7 @@ describe('HIPAA Session Management', () => {
       session_id: mockSession.session_id,
       invalidated: true,
       logout_timestamp: new Date().toISOString(),
-      tokens_revoked: true
+      tokens_revoked: true,
     }
 
     expect(logoutResult.invalidated).toBe(true)
@@ -331,7 +331,7 @@ describe('HIPAA Session Management', () => {
       encryption: true,
       httponly: true,
       secure: true,
-      samesite: 'Strict' as const
+      samesite: 'Strict' as const,
     }
 
     expect(sessionStorage.encryption).toBe(true)
@@ -346,8 +346,8 @@ describe('HIPAA Session Management', () => {
       last_activity: new Date().toISOString(),
       activity_log: [
         { action: 'login', timestamp: new Date().toISOString() },
-        { action: 'view_session', timestamp: new Date().toISOString() }
-      ]
+        { action: 'view_session', timestamp: new Date().toISOString() },
+      ],
     }
 
     expect(session.activity_log.length).toBeGreaterThan(0)
@@ -364,7 +364,7 @@ describe('HIPAA Compliance Integration', () => {
       { step: 'login', compliance_check: 'audit_logged' },
       { step: 'access_phi', compliance_check: 'encrypted_at_rest' },
       { step: 'view_data', compliance_check: 'phi_redacted_in_logs' },
-      { step: 'logout', compliance_check: 'session_invalidated' }
+      { step: 'logout', compliance_check: 'session_invalidated' },
     ]
 
     flowSteps.forEach((step) => {
@@ -377,7 +377,7 @@ describe('HIPAA Compliance Integration', () => {
       enabled: true,
       threshold_hours: 24,
       recipients: ['security-team', 'compliance-officer', 'legal'],
-      template: 'HIPAA_BREACH_NOTIFICATION'
+      template: 'HIPAA_BREACH_NOTIFICATION',
     }
 
     expect(breachNotification.enabled).toBe(true)
@@ -389,7 +389,7 @@ describe('HIPAA Compliance Integration', () => {
       detection_automation: true,
       response_time_sla_minutes: 15,
       escalation_levels: ['security', 'management', 'legal', 'executive'],
-      documentation_required: true
+      documentation_required: true,
     }
 
     expect(incidentResponse.detection_automation).toBe(true)
@@ -401,7 +401,7 @@ describe('HIPAA Compliance Integration', () => {
     const auditService = {
       initialized: true,
       log_destination: 'mongodb',
-      encryption_enabled: true
+      encryption_enabled: true,
     }
 
     expect(auditService.initialized).toBe(true)
@@ -414,7 +414,7 @@ describe('HIPAA Compliance Integration', () => {
       audit_controls: true,
       integrity_controls: true,
       person_or_entity_authentication: true,
-      transmission_security: true
+      transmission_security: true,
     }
 
     Object.values(safeguards).forEach((implemented) => {

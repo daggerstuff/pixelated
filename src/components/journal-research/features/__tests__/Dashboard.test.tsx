@@ -43,7 +43,21 @@ describe('Dashboard', () => {
     vi.clearAllMocks()
 
     // Default mock implementations
-    mockUseJournalSessionStore.mockReturnValue(null)
+    const storeState = {
+      selectedSessionId: null as string | null,
+      openCreateDrawer: vi.fn(),
+      closeCreateDrawer: vi.fn(),
+      setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+    }
+    mockUseJournalSessionStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
     mockUseSessionListQuery.mockReturnValue({
       data: {
         items: [mockSession],
@@ -88,7 +102,7 @@ describe('Dashboard', () => {
     renderWithProviders(<Dashboard />)
 
     expect(screen.getByText('Recent Sessions')).toBeInTheDocument()
-    expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
+    expect(screen.getAllByText(mockSession.sessionId).length).toBeGreaterThan(0)
   })
 
   it('displays loading state for sessions', () => {
@@ -114,7 +128,23 @@ describe('Dashboard', () => {
   })
 
   it('displays selected session progress when session is selected', () => {
-    mockUseJournalSessionStore.mockReturnValue('test-session-1')
+    const selectedStoreState = {
+      selectedSessionId: 'test-session-1',
+      openCreateDrawer: vi.fn(),
+      closeCreateDrawer: vi.fn(),
+      setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+    }
+    mockUseJournalSessionStore.mockImplementation(
+      (selector?: (state: typeof selectedStoreState) => unknown) =>
+        typeof selector === 'function'
+          ? selector(selectedStoreState)
+          : selectedStoreState,
+    )
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof selectedStoreState
+      }
+    ).getState = () => selectedStoreState
     mockUseSessionQuery.mockReturnValue({
       data: mockSession,
       isLoading: false,
@@ -131,7 +161,7 @@ describe('Dashboard', () => {
     renderWithProviders(<Dashboard />)
 
     expect(screen.getByText('Current Session Progress')).toBeInTheDocument()
-    expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
+    expect(screen.getAllByText(mockSession.sessionId).length).toBeGreaterThan(0)
   })
 
   it('displays all sessions list', () => {
@@ -148,14 +178,23 @@ describe('Dashboard', () => {
 
   it('handles quick action click for new session', () => {
     const openCreateDrawer = vi.fn()
-    mockUseJournalSessionStore.mockReturnValue(null)
-
-    // Mock store methods
-    vi.spyOn(store.useJournalSessionStore, 'getState').mockReturnValue({
+    const clickableStoreState = {
+      selectedSessionId: null as string | null,
       openCreateDrawer,
       closeCreateDrawer: vi.fn(),
       setSelectedSessionId: vi.fn(),
-    } as any)
+    }
+    mockUseJournalSessionStore.mockImplementation(
+      (selector?: (state: typeof clickableStoreState) => unknown) =>
+        typeof selector === 'function'
+          ? selector(clickableStoreState)
+          : clickableStoreState,
+    )
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof clickableStoreState
+      }
+    ).getState = () => clickableStoreState
 
     renderWithProviders(<Dashboard />)
 

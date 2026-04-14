@@ -4,9 +4,8 @@
  */
 
 import { userManager } from '../db'
-import { extractTokenFromRequest } from './auth0-middleware'
 import { validateToken, type TokenValidationResult } from './auth0-jwt-service'
-
+import { extractTokenFromRequest } from './auth0-middleware'
 
 /**
  * Lightweight session shape returned by getSession and consumed by middleware
@@ -50,7 +49,9 @@ const tokenCache = new Map<string, TokenCacheEntry>()
  * Minimal JWT payload shape used internally when building a Session from a
  * raw decoded token. Not the same as a next-auth JWT.
  */
-type TokenPayload = Awaited<ReturnType<typeof validateToken>> & { payload?: Record<string, unknown> }
+type TokenPayload = Awaited<ReturnType<typeof validateToken>> & {
+  payload?: Record<string, unknown>
+}
 
 /**
  * Build a Session from an already-validated token result.
@@ -122,8 +123,6 @@ export async function getUserProfile(userId: string) {
   }
 }
 
-
-
 /**
  * Get user role for permission checks
  * @param session Session object
@@ -181,7 +180,9 @@ export async function getSession(request: Request): Promise<Session | null> {
 
     // Cache until SESSION_CACHE_EVICT_BUFFER_MS before token expiry, but enforce
     // a maximum session cache TTL to detect administrative revocation.
-    const tokenExpiresAt = result.expiresAt ? result.expiresAt * 1000 : Date.now() + 60 * 60 * 1_000
+    const tokenExpiresAt = result.expiresAt
+      ? result.expiresAt * 1000
+      : Date.now() + 60 * 60 * 1_000
     const evictAt = Math.min(
       tokenExpiresAt - SESSION_CACHE_EVICT_BUFFER_MS,
       Date.now() + SESSION_CACHE_MAX_TTL_MS,

@@ -47,7 +47,10 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
   const [isLoading, setIsLoading] = useState(!data)
 
   // Default data for demonstration
-  const defaultData = {
+  const defaultData: Record<
+    Exclude<NonNullable<ChartComponentProps['type']>, 'heatmap'>,
+    unknown
+  > = {
     line: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [
@@ -154,7 +157,8 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     if (!data) {
       // Simulate loading data
       const timer = setTimeout(() => {
-        setChartData(defaultData[type] || defaultData.line)
+        const resolvedType = type === 'heatmap' ? 'line' : type
+        setChartData(defaultData[resolvedType] || defaultData.line)
         setIsLoading(false)
       }, 500)
       return () => clearTimeout(timer)
@@ -184,6 +188,8 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
         return <Pie data={chartData} options={mergedOptions} />
       case 'scatter':
         return <Scatter data={chartData} options={mergedOptions} />
+      case 'heatmap':
+        return <Line data={chartData} options={mergedOptions} />
       case 'line':
       default:
         return <Line data={chartData} options={mergedOptions} />

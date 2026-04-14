@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import {
   Card,
   CardContent,
@@ -12,7 +13,6 @@ import {
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 
-import { ProgressCharts } from '../charts/ProgressCharts'
 import { ProgressBar } from '../shared/ProgressBar'
 
 export interface ProgressTrackerProps {
@@ -80,7 +80,8 @@ export function ProgressTracker({
           (targets['datasets_acquired'] ?? 0) > 0
             ? Math.min(
                 100,
-                (currentMetrics.datasetsAcquired / (targets['datasets_acquired'] ?? 1)) *
+                (currentMetrics.datasetsAcquired /
+                  (targets['datasets_acquired'] ?? 1)) *
                   100,
               )
             : 0,
@@ -172,7 +173,7 @@ export function ProgressTracker({
             <CardTitle>Progress Visualizations</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressCharts progress={progress} metrics={metrics} />
+            <LazyProgressCharts progress={progress} metrics={metrics} />
           </CardContent>
         </Card>
       )}

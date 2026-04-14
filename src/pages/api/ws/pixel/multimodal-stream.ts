@@ -161,7 +161,12 @@ export const GET: APIRoute = async (context) => {
         sessionId: connectionData.sessionId,
         timestamp: Date.now(),
         data: {
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
         },
       })
     }

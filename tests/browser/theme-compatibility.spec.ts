@@ -207,7 +207,7 @@ test.describe('Theme Compatibility Tests', () => {
     })
 
     test('should update meta theme-color', async () => {
-      const metaThemeColor =  page.locator('meta[name="theme-color"]')
+      const metaThemeColor = page.locator('meta[name="theme-color"]')
 
       // Test light theme
       await page.evaluate(() => {

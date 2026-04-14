@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+
 import { Router } from 'express'
 
 import { DocumentModelMongoose } from '../models/DocumentMongoose'
@@ -8,10 +9,7 @@ import { EdgeCaseMappingService } from '../services/edgeCaseMappingService'
 
 const router = Router()
 
-const LAST_IMPORT_FILE = path.join(
-  process.cwd(),
-  '.last-strategy-import.json',
-)
+const LAST_IMPORT_FILE = path.join(process.cwd(), '.last-strategy-import.json')
 
 /** Lean document shape returned by find().lean() for dashboard (metadata may include reviewScore, edgeCaseCount, aiReview, customFields). */
 interface LeanStrategyDoc {
@@ -22,10 +20,30 @@ interface LeanStrategyDoc {
   metadata?: Record<string, unknown>
 }
 
-function getSourceFile(metadata: Record<string, unknown> | undefined): string | undefined {
-  if (!metadata || typeof metadata.customFields !== 'object' || metadata.customFields === null) return undefined
-  const cf = metadata.customFields as Record<string, unknown>
-  const v = cf.source_file
+const getMetadataRecord = (
+  value: unknown,
+): Record<string, unknown> | undefined =>
+  typeof value === 'object' && value !== null
+    ? (value as Record<string, unknown>)
+    : undefined
+
+const getMetadataNumber = (
+  metadata: Record<string, unknown> | undefined,
+  key: string,
+): number => {
+  const value = metadata?.[key]
+  return typeof value === 'number' ? value : 0
+}
+
+function getSourceFile(
+  metadata: Record<string, unknown> | undefined,
+): string | undefined {
+  const customFields = getMetadataRecord(metadata?.['customFields'])
+  if (!customFields) {
+    return undefined
+  }
+
+  const v = customFields['source_file']
   return typeof v === 'string' ? v : undefined
 }
 
@@ -38,32 +56,34 @@ function getSourceFile(metadata: Record<string, unknown> | undefined): string | 
  */
 router.get('/dashboard', async (_req, res) => {
   try {
-    const documents = (await DocumentModelMongoose.find({}).lean()) as LeanStrategyDoc[]
+    const documents = (await DocumentModelMongoose.find({}, undefined, {
+      lean: true,
+    })) as unknown as LeanStrategyDoc[]
 
     // We can either compute this on the fly or read from metadata.
     // Since we ran the import script, metadata should be populated.
     // However, if new documents are added, we might want to trigger a check.
     // For this dashboard, we'll return the stored metadata + a summary.
 
-    const dashboardData = await Promise.all(
-      documents.map(async (doc: LeanStrategyDoc) => {
-        const strategies = {
-          id: doc._id,
-          title: doc.title,
-          category: doc.category,
-          status: doc.status,
-          source_file: getSourceFile(doc.metadata),
-          aiScore: doc.metadata?.reviewScore || 0,
-          technicalBacking: {
-            edgeCaseCount: doc.metadata?.edgeCaseCount || 0,
-            hasTechnicalProof: (doc.metadata?.edgeCaseCount || 0) > 0,
-          },
-          aiReview: doc.metadata?.aiReview || null,
-        }
+    const dashboardData = documents.map((doc: LeanStrategyDoc) => {
+      const metadata = getMetadataRecord(doc.metadata)
+      const aiScore = getMetadataNumber(metadata, 'reviewScore')
+      const edgeCaseCount = getMetadataNumber(metadata, 'edgeCaseCount')
 
-        return strategies
-      }),
-    )
+      return {
+        id: doc._id,
+        title: doc.title,
+        category: doc.category,
+        status: doc.status,
+        source_file: getSourceFile(metadata),
+        aiScore,
+        technicalBacking: {
+          edgeCaseCount,
+          hasTechnicalProof: edgeCaseCount > 0,
+        },
+        aiReview: metadata?.['aiReview'] ?? null,
+      }
+    })
 
     // Calculate aggregated stats
     const totalDocs = dashboardData.length
@@ -73,19 +93,25 @@ router.get('/dashboard', async (_req, res) => {
     const averageFeasibility =
       dashboardData.reduce((acc, curr) => acc + curr.aiScore, 0) /
       (totalDocs || 1)
+    const realityGap =
+      totalDocs === 0
+        ? '0.0%'
+        : `${((1 - provenStrategies / totalDocs) * 100).toFixed(1)}%`
 
-    res.json({
+    return res.json({
       overview: {
         totalStrategies: totalDocs,
         technicallyBackedStrategies: provenStrategies,
-        realityGap: `${((1 - provenStrategies / totalDocs) * 100).toFixed(1)}%`,
+        realityGap,
         averageFeasibilityScore: averageFeasibility.toFixed(2),
       },
       data: dashboardData.sort((a, b) => b.aiScore - a.aiScore),
     })
   } catch (error: unknown) {
     console.error('Dashboard Error:', error)
-    res.status(500).json({ error: 'Failed to generate strategy dashboard' })
+    return res
+      .status(500)
+      .json({ error: 'Failed to generate strategy dashboard' })
   }
 })
 
@@ -97,12 +123,14 @@ router.get('/sources', (_req, res) => {
     }
     const raw = fs.readFileSync(LAST_IMPORT_FILE, 'utf8')
     const data = JSON.parse(raw) as { sources?: string[]; lastImport?: string }
-    res.json({
+    return res.json({
       sources: Array.isArray(data.sources) ? data.sources : [],
       lastImport: typeof data.lastImport === 'string' ? data.lastImport : null,
     })
   } catch {
-    res.status(500).json({ error: 'Failed to read strategy import metadata' })
+    return res
+      .status(500)
+      .json({ error: 'Failed to read strategy import metadata' })
   }
 })
 
@@ -118,7 +146,7 @@ router.post('/refresh-analysis', async (_req, res) => {
         const idStr = doc._id.toString()
         const [review, mapping] = await Promise.all([
           AIStrategyReviewService.reviewDocument(idStr),
-          EdgeCaseMappingService.mapStrategyToEdgeCases(idStr)
+          EdgeCaseMappingService.mapStrategyToEdgeCases(idStr),
         ])
 
         return {
@@ -133,19 +161,19 @@ router.post('/refresh-analysis', async (_req, res) => {
             },
           },
         }
-      })
+      }),
     )
 
     if (bulkOps.length > 0) {
-      await DocumentModelMongoose.bulkWrite(bulkOps as any)
+      await DocumentModelMongoose.bulkWrite(bulkOps)
     }
 
     const updatedCount = bulkOps.length
-    res.json({
+    return res.json({
       message: `Successfully refreshed analysis for ${updatedCount} documents.`,
     })
   } catch {
-    res.status(500).json({ error: 'Analysis refresh failed' })
+    return res.status(500).json({ error: 'Analysis refresh failed' })
   }
 })
 

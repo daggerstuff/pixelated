@@ -118,15 +118,19 @@ export const RATE_LIMITS = {
   maxRequests: 100, // limit each IP to 100 requests per windowMs
   keyGenerator: (request: Request): string => {
     // Use x-forwarded-for header, or fallback to a default for local dev
-    return (
-      request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-      '127.0.0.1'
-    )
+    const forwardedFor = request.headers
+      .get('x-forwarded-for')
+      ?.split(',')[0]
+      .trim()
+    return forwardedFor ?? '127.0.0.1'
   },
 }
 
 class RateLimiter {
-  private requests = new Map<string, { count: number; resetTime: number }>()
+  private readonly requests = new Map<
+    string,
+    { count: number; resetTime: number }
+  >()
 
   checkLimit(identifier: string): {
     allowed: boolean
@@ -225,7 +229,7 @@ export async function securityMiddleware(
     rateLimitResult.resetTime.toString(),
   )
   responseHeaders.set('X-Rate-Limit-Limit', RATE_LIMITS.maxRequests.toString())
-  ;(context)['securityHeaders'] = responseHeaders
+  context['securityHeaders'] = responseHeaders
 
   return null
 }

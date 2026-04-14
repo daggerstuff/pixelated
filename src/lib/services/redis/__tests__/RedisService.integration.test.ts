@@ -124,7 +124,7 @@ describeFn('RedisService Integration Tests', () => {
         const updatedSession = await redis.get(
           `integration:session:${sessionId}`,
         )
-        expect((JSON.parse(updatedSession!)).roles).toContain('admin')
+        expect(JSON.parse(updatedSession!).roles).toContain('admin')
 
         // Delete session
         await redis.del(`integration:session:${sessionId}`)

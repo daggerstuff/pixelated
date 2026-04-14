@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { FHEDemo } from '@/components/demo/FHEDemo'
+import { DynamicDemoFHEDemo } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -19,7 +19,7 @@ import { FHEDemo } from '@/components/demo/FHEDemo'
       </div>
 
       <div class="max-w-4xl mx-auto w-full">
-        <FHEDemo
+        <DynamicDemoFHEDemo
           client:load
           defaultMessage="Your data is protected with FHE technology"
         />

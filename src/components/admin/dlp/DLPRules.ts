@@ -1,16 +1,72 @@
 import { dlpService } from '../../../lib/security/dlp'
 
+type RecordLike = Record<string, unknown>
+
+const isRecordLike = (value: unknown): value is RecordLike => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+type RuleUpdatedDetail = {
+  id: string
+  name: string
+  isActive: boolean
+}
+
+type RuleDeletedDetail = {
+  id: string
+  name?: string
+}
+
+const isRuleUpdatedDetail = (detail: unknown): detail is RuleUpdatedDetail => {
+  if (!isRecordLike(detail)) {
+    return false
+  }
+
+  return (
+    'id' in detail &&
+    'name' in detail &&
+    'isActive' in detail &&
+    typeof detail.id === 'string' &&
+    typeof detail.name === 'string' &&
+    typeof detail.isActive === 'boolean'
+  )
+}
+
+const isRuleDeletedDetail = (detail: unknown): detail is RuleDeletedDetail => {
+  if (!isRecordLike(detail)) {
+    return false
+  }
+
+  return 'id' in detail && typeof detail.id === 'string'
+}
+
 // Function to handle rule updates
-function handleRuleUpdated(event: CustomEvent): void {
-  const { id, name, isActive } = event.detail
+function handleRuleUpdated(event: Event): void {
+  if (!(event instanceof CustomEvent)) {
+    return
+  }
+  const detail: unknown = event.detail
+  if (!isRuleUpdatedDetail(detail)) {
+    return
+  }
+
+  const { id, name, isActive } = detail
   console.log(
     `Rule updated: ${name} (${id}) is now ${isActive ? 'active' : 'inactive'}`,
   )
 }
 
 // Function to handle rule deletions
-function handleRuleDeleted(event: CustomEvent): void {
-  const { id, name } = event.detail
+function handleRuleDeleted(event: Event): void {
+  if (!(event instanceof CustomEvent)) {
+    return
+  }
+  const detail: unknown = event.detail
+  if (!isRuleDeletedDetail(detail)) {
+    return
+  }
+
+  const { id, name } = detail
   console.log(`Rule deleted: ${name} (${id})`)
 
   // Find and remove the deleted rule element

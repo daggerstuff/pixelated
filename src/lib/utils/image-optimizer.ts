@@ -50,7 +50,10 @@ const IMAGE_CONFIG = {
 
   // Output directories
   OUTPUT_DIRS: {
-    optimized: validatePath('public/assets/optimized', ALLOWED_DIRECTORIES.PUBLIC),
+    optimized: validatePath(
+      'public/assets/optimized',
+      ALLOWED_DIRECTORIES.PUBLIC,
+    ),
     webp: validatePath('public/assets/webp', ALLOWED_DIRECTORIES.PUBLIC),
     avif: validatePath('public/assets/avif', ALLOWED_DIRECTORIES.PUBLIC),
   },
@@ -109,7 +112,7 @@ export class ImageOptimizer {
       validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
     } catch (error: unknown) {
       throw new Error(
-        `Invalid image path: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
+        `Invalid image path: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
       )
     }
 
@@ -200,7 +203,12 @@ export class ImageOptimizer {
     } catch (error: unknown) {
       logger.error('Image optimization failed', {
         imagePath,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
 
       throw error
@@ -272,7 +280,12 @@ export class ImageOptimizer {
     } catch (error: unknown) {
       logger.warn('WebP generation failed', {
         imagePath,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       return null
     }
@@ -310,7 +323,12 @@ export class ImageOptimizer {
     } catch (error: unknown) {
       logger.warn('AVIF generation failed', {
         imagePath,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       return null
     }

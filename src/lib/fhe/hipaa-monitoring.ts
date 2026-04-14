@@ -339,7 +339,12 @@ export class HIPAAMonitoringService extends EventEmitter {
       logger.error('Failed to retrieve recent audit events', {
         eventType,
         since,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
 
       // Return empty array to prevent system failure
@@ -470,7 +475,12 @@ export class HIPAAMonitoringService extends EventEmitter {
       return true
     } catch (error: unknown) {
       logger.error('Failed to connect to persistent audit storage', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
       return false
     }
@@ -505,7 +515,12 @@ export class HIPAAMonitoringService extends EventEmitter {
     } catch (error: unknown) {
       logger.error('Failed to store audit event', {
         eventId: event.eventId,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
       return false
     }
@@ -645,7 +660,12 @@ export class HIPAAMonitoringService extends EventEmitter {
       logger.debug('Threat detection analysis completed successfully')
     } catch (error: unknown) {
       logger.error('Threat detection analysis failed', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
 
       // Generate alert for threat detection failure
@@ -657,7 +677,12 @@ export class HIPAAMonitoringService extends EventEmitter {
         ipAddress: '127.0.0.1',
         success: false,
         details: {
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           recoveryAction: 'manual_security_review_required',
         },
         riskLevel: 'high',
@@ -1030,7 +1055,12 @@ export class HIPAAMonitoringService extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Compliance check failed', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
 
       // Generate alert for compliance check failure
@@ -1042,7 +1072,12 @@ export class HIPAAMonitoringService extends EventEmitter {
         ipAddress: '127.0.0.1',
         success: false,
         details: {
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           recoveryAction: 'manual_compliance_review_required',
         },
         riskLevel: 'high',
@@ -1136,7 +1171,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Key rotation compliance check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Key rotation compliance check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1218,7 +1253,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Audit trail integrity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Audit trail integrity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1268,7 +1303,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Retention policy compliance check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Retention policy compliance check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1316,7 +1351,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Encryption standards check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Encryption standards check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1438,7 +1473,12 @@ export class HIPAAMonitoringService extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('System health check failed', {
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
 
       // Generate alert for health check failure
@@ -1450,7 +1490,12 @@ export class HIPAAMonitoringService extends EventEmitter {
         ipAddress: '127.0.0.1',
         success: false,
         details: {
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           recoveryAction: 'immediate_system_review_required',
         },
         riskLevel: 'high',
@@ -1494,7 +1539,7 @@ export class HIPAAMonitoringService extends EventEmitter {
             metrics[`${name.toLowerCase()}_status`] = 'available'
           } catch (error: unknown) {
             issues.push(
-              `${name} service unavailable: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+              `${name} service unavailable: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
             )
             metrics[`${name.toLowerCase()}_status`] = 'unavailable'
           }
@@ -1510,7 +1555,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Service availability check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Service availability check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1537,7 +1582,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         metrics.cloudWatchConnectivity = 'operational'
       } catch (error: unknown) {
         issues.push(
-          `CloudWatch connectivity failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+          `CloudWatch connectivity failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         )
         metrics.cloudWatchConnectivity = 'failed'
       }
@@ -1548,7 +1593,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         metrics.snsConnectivity = 'operational'
       } catch (error: unknown) {
         issues.push(
-          `SNS connectivity failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+          `SNS connectivity failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         )
         metrics.snsConnectivity = 'failed'
       }
@@ -1564,7 +1609,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `AWS connectivity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `AWS connectivity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
       metrics.awsConnectivity = 'failed'
     }
@@ -1624,12 +1669,17 @@ export class HIPAAMonitoringService extends EventEmitter {
       } catch (error: unknown) {
         metrics.diskUsage = {
           status: 'check_failed',
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
         }
       }
     } catch (error: unknown) {
       issues.push(
-        `Resource utilization check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Resource utilization check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1696,7 +1746,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Configuration validation failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Configuration validation failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -1735,7 +1785,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Database connectivity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Database connectivity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
       metrics.databaseConnectivity = 'check_failed'
     }
@@ -1777,7 +1827,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
     } catch (error: unknown) {
       issues.push(
-        `Encryption service check failed: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error'}`,
+        `Encryption service check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
       metrics.encryptionService = 'check_failed'
     }

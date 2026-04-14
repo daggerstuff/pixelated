@@ -1,6 +1,15 @@
+import {
+  ChartBar,
+  TrendingUp,
+  Star,
+  Users,
+  Building,
+  Settings,
+  Clipboard,
+  Stethoscope,
+} from 'lucide-react'
 import type { FC } from 'react'
 import React from 'react'
-import { ChartBar, TrendingUp, Star, Users, Building, Settings, Clipboard, Stethoscope } from 'lucide-react'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
@@ -31,6 +40,15 @@ interface SystemHealth {
   memoryUsage: number
   errorRate: number
   uptime: number
+}
+
+function getHighRiskCount(
+  riskLevelDistribution: Record<string, number>,
+): number {
+  return (
+    (riskLevelDistribution['high'] ?? 0) +
+    (riskLevelDistribution['critical'] ?? 0)
+  )
 }
 
 /**
@@ -154,7 +172,11 @@ export const AdminDashboard: FC = () => {
               {[
                 { id: 'overview', label: 'Overview', icon: 'chart' },
                 { id: 'therapists', label: 'Therapists', icon: 'therapist' },
-                { id: 'institutions', label: 'Institutions', icon: 'institution' },
+                {
+                  id: 'institutions',
+                  label: 'Institutions',
+                  icon: 'institution',
+                },
                 { id: 'system', label: 'System Health', icon: 'system' },
                 { id: 'compliance', label: 'Compliance', icon: 'compliance' },
               ].map((tab) => (
@@ -167,7 +189,17 @@ export const AdminDashboard: FC = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  {tab.icon === "chart" ? <ChartBar className="w-5 h-5" /> : tab.icon === "therapist" ? <Stethoscope className="w-5 h-5" /> : tab.icon === "institution" ? <Building className="w-5 h-5" /> : tab.icon === "system" ? <Settings className="w-5 h-5" /> : tab.icon === "compliance" ? <Clipboard className="w-5 h-5" /> : null}
+                  {tab.icon === 'chart' ? (
+                    <ChartBar className='h-5 w-5' />
+                  ) : tab.icon === 'therapist' ? (
+                    <Stethoscope className='h-5 w-5' />
+                  ) : tab.icon === 'institution' ? (
+                    <Building className='h-5 w-5' />
+                  ) : tab.icon === 'system' ? (
+                    <Settings className='h-5 w-5' />
+                  ) : tab.icon === 'compliance' ? (
+                    <Clipboard className='h-5 w-5' />
+                  ) : null}
                   {tab.label}
                 </button>
               ))}
@@ -282,7 +314,7 @@ const OverviewTab: FC<{
                 </p>
               </div>
               <div className='bg-purple-100 dark:bg-purple-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
-                <TrendingUp className='w-5 h-5 text-purple-600 dark:text-purple-400' />
+                <TrendingUp className='text-purple-600 dark:text-purple-400 h-5 w-5' />
               </div>
             </div>
             <p className='text-gray-500 mt-2 text-sm'>
@@ -344,7 +376,8 @@ const OverviewTab: FC<{
                     </p>
                     <div className='flex items-center gap-2'>
                       <span className='text-gray-600 dark:text-gray-400 text-sm'>
-                        <Star className='w-4 h-4' /> {therapist.avgSessionRating}/5.0
+                        <Star className='h-4 w-4' />{' '}
+                        {therapist.avgSessionRating}/5.0
                       </span>
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-medium ${
@@ -373,8 +406,7 @@ const OverviewTab: FC<{
                         High Risk:
                       </span>
                       <span className='text-red-600 ml-2 font-medium'>
-                        {therapist.riskLevelDistribution.high +
-                          therapist.riskLevelDistribution.critical}
+                        {getHighRiskCount(therapist.riskLevelDistribution)}
                       </span>
                     </div>
                     <div>
@@ -441,7 +473,7 @@ const OverviewTab: FC<{
         <SlideUp>
           <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
             <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
-              <ChartBar className='w-5 h-5' />
+              <ChartBar className='h-5 w-5' />
               Performance Metrics
             </h3>
             <div className='space-y-4'>
@@ -573,7 +605,8 @@ const TherapistsTab: FC<{
                     </h3>
                     <div className='flex items-center gap-2'>
                       <span className='text-gray-600 dark:text-gray-400 text-sm'>
-                        <Star className='w-4 h-4' /> {therapist.avgSessionRating}/5.0
+                        <Star className='h-4 w-4' />{' '}
+                        {therapist.avgSessionRating}/5.0
                       </span>
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-medium ${
@@ -602,8 +635,7 @@ const TherapistsTab: FC<{
                         High Risk:
                       </span>
                       <span className='text-red-600 ml-2 font-medium'>
-                        {therapist.riskLevelDistribution.high +
-                          therapist.riskLevelDistribution.critical}
+                        {getHighRiskCount(therapist.riskLevelDistribution)}
                       </span>
                     </div>
                     <div>

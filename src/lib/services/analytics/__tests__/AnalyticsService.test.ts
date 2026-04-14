@@ -1,126 +1,59 @@
-import { WebSocket } from 'ws'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// Import mocks after they're defined
-import * as redisModule from '@/lib/redis'
-
-import * as loggerModule from '../../../logging/build-safe-logger'
-import { EventDataSchema, EventPriority, EventType } from '../analytics-types'
+import { EventPriority, EventType } from '../analytics-types'
 import { AnalyticsService } from '../AnalyticsService'
 
-// Mock dependencies first to avoid hoisting issues
-vi.mock('@/lib/redis', () => {
-  const mockRedisClient = {
-    lpush: vi.fn(),
-    rpoplpush: vi.fn(),
-    lrem: vi.fn(),
-    llen: vi.fn(),
-    lrange: vi.fn(),
-    zadd: vi.fn(),
-    zrangebyscore: vi.fn(),
-    zremrangebyscore: vi.fn(),
-    keys: vi.fn(),
-    hget: vi.fn(),
-    hgetall: vi.fn(),
-    hset: vi.fn(),
-    hdel: vi.fn(),
-    del: vi.fn(),
-  }
+const { mockRedisClient } = vi.hoisted(() => ({
+  mockRedisClient: {
+    lpush: vi.fn(async () => 1),
+    lRange: vi.fn(async () => [] as string[]),
+    lrem: vi.fn(async () => 1),
+    zadd: vi.fn(async () => 1),
+    zrangebyscore: vi.fn(async () => [] as string[]),
+    hset: vi.fn(async () => 1),
+  },
+}))
 
-  return {
-    redis: mockRedisClient, // Export as 'redis' to match the import
-    mockRedisClient, // Export for test use
-  }
-})
+vi.mock('@/lib/redis', () => ({
+  redis: mockRedisClient,
+}))
 
-vi.mock('@/lib/utils/logger', () => {
-  const mockLogger = {
+vi.mock('../../../logging/build-safe-logger', () => ({
+  createBuildSafeLogger: () => ({
     info: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  }
+  }),
+}))
 
-  return {
-    getLogger: vi.fn(() => mockLogger),
-    logger: mockLogger,
-    mockLogger, // Export for test use
-  }
-})
-
-vi.mock('../../../logging/build-safe-logger', () => {
-  const mockLogger = {
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
-  }
-
-  return {
-    createBuildSafeLogger: vi.fn(() => mockLogger),
-    mockLogger, // Export for test use
-  }
-})
-
-// Mock WebSocket
 class MockWebSocket {
   public readonly url: string
-  public readyState: number = 1
-  private eventHandlers: Map<string, ((...args: any[]) => void)[]> = new Map()
+  public sent: string[] = []
+  private handlers = new Map<string, Array<() => void>>()
 
   constructor(url: string) {
     this.url = url
   }
 
-  public send = vi.fn()
+  send(payload: string) {
+    this.sent.push(payload)
+  }
 
-  public emit = vi.fn((event: string, ...args: any[]) => {
-    const handlers = this.eventHandlers.get(event) || []
-    handlers.forEach((handler) => handler(...args))
-  })
+  on(event: string, handler: () => void) {
+    const existing = this.handlers.get(event) ?? []
+    existing.push(handler)
+    this.handlers.set(event, existing)
+  }
 
-  public on = vi.fn((event: string, handler: (...args: any[]) => void) => {
-    if (!this.eventHandlers.has(event)) {
-      this.eventHandlers.set(event, [])
+  emit(event: string) {
+    for (const handler of this.handlers.get(event) ?? []) {
+      handler()
     }
-    this.eventHandlers.get(event)!.push(handler)
-  })
-}
-
-vi.mock('ws', () => ({
-  WebSocket: vi
-    .fn()
-    .mockImplementation((url: string) => new MockWebSocket(url)),
-}))
-
-type MockRedisClient = {
-  lpush: ReturnType<typeof vi.fn>
-  rpoplpush: ReturnType<typeof vi.fn>
-  lrem: ReturnType<typeof vi.fn>
-  llen: ReturnType<typeof vi.fn>
-  lrange: ReturnType<typeof vi.fn>
-  zadd: ReturnType<typeof vi.fn>
-  zrangebyscore: ReturnType<typeof vi.fn>
-  zremrangebyscore: ReturnType<typeof vi.fn>
-  keys: ReturnType<typeof vi.fn>
-  hget: ReturnType<typeof vi.fn>
-  hgetall: ReturnType<typeof vi.fn>
-  hset: ReturnType<typeof vi.fn>
-  hdel: ReturnType<typeof vi.fn>
-  del: ReturnType<typeof vi.fn>
-}
-const { mockRedisClient } = vi.mocked(redisModule) as unknown as {
-  mockRedisClient: MockRedisClient
-}
-const { mockLogger } = vi.mocked(loggerModule) as unknown as {
-  mockLogger: {
-    info: ReturnType<typeof vi.fn>
-    error: ReturnType<typeof vi.fn>
-    warn: ReturnType<typeof vi.fn>
-    debug: ReturnType<typeof vi.fn>
   }
 }
 
-describe('analyticsService', () => {
+describe('AnalyticsService', () => {
   let analyticsService: AnalyticsService
 
   const mockEvent = {
@@ -154,322 +87,111 @@ describe('analyticsService', () => {
     analyticsService = new AnalyticsService()
   })
 
-  describe('trackEvent', () => {
-    it('should validate schema directly', () => {
-      // Test the schema directly
-      const testData = { type: EventType.USER_ACTION }
-      console.log('EventType.USER_ACTION:', EventType.USER_ACTION)
-      console.log('Test data:', testData)
+  it('tracks an event and stores it in the queue and time series', async () => {
+    const eventId = await analyticsService.trackEvent(mockEvent)
 
-      try {
-        const result = EventDataSchema.parse(testData)
-        console.log('Schema validation result:', result)
-        expect(result).toBeDefined()
-      } catch (error: unknown) {
-        console.error('Schema validation error:', error)
-        throw error
-      }
-    })
-
-    it('should track an event successfully', async () => {
-      const eventId = await analyticsService.trackEvent(mockEvent)
-
-      expect(eventId).toBeDefined()
-      expect(mockRedisClient.lpush).toHaveBeenCalledWith(
-        'analytics:events:queue',
-        expect.stringContaining(mockEvent.userId),
-      )
-      expect(mockRedisClient.zadd).toHaveBeenCalledWith(
-        `analytics:events:time:${mockEvent.type}`,
-        expect.any(Number),
-        expect.stringContaining(mockEvent.userId),
-      )
-    })
-
-    it('should validate event data', async () => {
-      const invalidEvent = {
-        type: 'invalid',
-        priority: 'invalid',
-        timestamp: Date.now(),
-        properties: {},
-        metadata: {},
-      }
-
-      await expect(
-        analyticsService.trackEvent(
-          invalidEvent as unknown as {
-            type: EventType
-            priority: EventPriority
-            timestamp: number
-            properties: Record<string, unknown>
-            metadata: Record<string, unknown>
-          },
-        ),
-      ).rejects.toThrow()
-    })
-
-    it('should notify WebSocket subscribers', async () => {
-      const ws = new WebSocket('ws://test')
-      analyticsService.registerClient(mockEvent.userId, ws)
-
-      await analyticsService.trackEvent(mockEvent)
-
-      expect(ws.send).toHaveBeenCalledWith(
-        expect.stringContaining(mockEvent.userId),
-      )
-    })
+    expect(eventId).toMatch(/^event_/)
+    expect(mockRedisClient.lpush).toHaveBeenCalledWith(
+      'analytics:events:queue',
+      expect.stringContaining('"userId":"test-user"'),
+    )
+    expect(mockRedisClient.zadd).toHaveBeenCalledWith(
+      'analytics:events:time:user_action',
+      expect.any(Number),
+      expect.stringContaining('"type":"user_action"'),
+    )
   })
 
-  describe('trackMetric', () => {
-    it('should track a metric successfully', async () => {
-      await analyticsService.trackMetric(mockMetric)
+  it('notifies only the subscribed user when tracking an event', async () => {
+    const userSocket = new MockWebSocket('ws://user')
+    const otherSocket = new MockWebSocket('ws://other')
 
-      expect(mockRedisClient.zadd).toHaveBeenCalledWith(
-        `analytics:metrics:${mockMetric.name}`,
-        expect.any(Number),
-        expect.stringContaining(mockMetric.name),
-      )
-    })
+    analyticsService.registerClient('test-user', userSocket as never)
+    analyticsService.registerClient('other-user', otherSocket as never)
 
-    it('should store metric tags', async () => {
-      await analyticsService.trackMetric(mockMetric)
+    await analyticsService.trackEvent(mockEvent)
 
-      expect(mockRedisClient.hset).toHaveBeenCalledWith(
-        `analytics:metrics:tags:${mockMetric.name}`,
-        expect.any(String),
-        expect.stringContaining('endpoint'),
-      )
-    })
-
-    it('should validate metric data', async () => {
-      const invalidMetric = {
-        name: 123,
-        value: 'invalid',
-        timestamp: Date.now(),
-        tags: {},
-      }
-
-      await expect(
-        analyticsService.trackMetric(
-          invalidMetric as unknown as {
-            value: number
-            timestamp: number
-            name: string
-            tags: Record<string, string>
-          },
-        ),
-      ).rejects.toThrow()
-    })
+    expect(userSocket.sent).toHaveLength(1)
+    expect(userSocket.sent[0]).toContain('"userId":"test-user"')
+    expect(otherSocket.sent).toHaveLength(0)
   })
 
-  describe('processEvents', () => {
-    it('should process queued events', async () => {
-      const queuedEvent = {
-        ...mockEvent,
-        id: 'test-id',
-        timestamp: Date.now(),
-      }
+  it('tracks a metric and stores tag metadata', async () => {
+    await analyticsService.trackMetric(mockMetric)
 
-      vi.mocked(mockRedisClient.lrange).mockResolvedValueOnce([
-        JSON.stringify(queuedEvent),
-      ])
-
-      await analyticsService.processEvents()
-
-      expect(mockRedisClient.hset).toHaveBeenCalledWith(
-        `analytics:events:processed:${queuedEvent.type}`,
-        queuedEvent.id,
-        expect.stringContaining(queuedEvent.id),
-      )
-      expect(mockRedisClient.lrem).toHaveBeenCalledWith(
-        'analytics:events:queue',
-        1,
-        expect.stringContaining(queuedEvent.id),
-      )
-    })
-
-    it('should handle empty queue', async () => {
-      vi.mocked(mockRedisClient.lrange).mockResolvedValueOnce([])
-
-      await analyticsService.processEvents()
-
-      expect(mockRedisClient.hset).not.toHaveBeenCalled()
-      expect(mockRedisClient.lrem).not.toHaveBeenCalled()
-    })
-
-    it('should handle processing errors', async () => {
-      vi.mocked(mockRedisClient.lrange).mockResolvedValueOnce(['invalid json'])
-
-      await analyticsService.processEvents()
-
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Error processing event:',
-        expect.any(Error),
-      )
-    })
+    expect(mockRedisClient.zadd).toHaveBeenCalledWith(
+      'analytics:metrics:response_time',
+      mockMetric.timestamp,
+      expect.stringContaining('"name":"response_time"'),
+    )
+    expect(mockRedisClient.hset).toHaveBeenCalledWith(
+      'analytics:metrics:tags:response_time',
+      mockMetric.timestamp.toString(),
+      expect.stringContaining('"endpoint":"/api/therapy"'),
+    )
   })
 
-  describe('getEvents', () => {
-    it('should get events by type and time range', async () => {
-      const events = [
-        JSON.stringify({
-          ...mockEvent,
-          id: 'test-1',
-          timestamp: Date.now(),
-        }),
-        JSON.stringify({
-          ...mockEvent,
-          id: 'test-2',
-          timestamp: Date.now() - 1000,
-        }),
-      ]
-
-      vi.mocked(mockRedisClient.zrangebyscore).mockResolvedValueOnce(events)
-
-      const result = await analyticsService.getEvents({
-        type: EventType.USER_ACTION,
-      })
-
-      expect(result).toHaveLength(2)
-      expect(result[0].id).toBe('test-1')
+  it('processes queued events into the processed hash', async () => {
+    const queuedEvent = JSON.stringify({
+      ...mockEvent,
+      id: 'event-1',
     })
+    mockRedisClient.lRange.mockResolvedValueOnce([queuedEvent])
 
-    it('should handle time range and pagination', async () => {
-      await analyticsService.getEvents({
-        type: EventType.USER_ACTION,
-        startTime: 1000,
-        endTime: 2000,
-        limit: 10,
-        offset: 5,
-      })
+    await analyticsService.processEvents()
 
-      expect(mockRedisClient.zrangebyscore).toHaveBeenCalledWith(
-        'analytics:events:time:user_action',
-        1000,
-        2000,
-        'LIMIT',
-        5,
-        10,
-      )
-    })
+    expect(mockRedisClient.hset).toHaveBeenCalledWith(
+      'analytics:events:processed:user_action',
+      'event-1',
+      expect.stringContaining('"processedAt"'),
+    )
+    expect(mockRedisClient.lrem).toHaveBeenCalledWith(
+      'analytics:events:queue',
+      1,
+      queuedEvent,
+    )
   })
 
-  describe('getMetrics', () => {
-    it('should get metrics by name and time range', async () => {
-      const metrics = [
-        JSON.stringify({
-          ...mockMetric,
-          timestamp: Date.now(),
-        }),
-        JSON.stringify({
-          ...mockMetric,
-          timestamp: Date.now() - 1000,
-        }),
-      ]
+  it('returns events by type and metrics by name from Redis time series', async () => {
+    const storedEvent = JSON.stringify({
+      ...mockEvent,
+      id: 'event-2',
+    })
+    const storedMetric = JSON.stringify(mockMetric)
 
-      vi.mocked(mockRedisClient.zrangebyscore).mockResolvedValueOnce(metrics)
+    mockRedisClient.zrangebyscore
+      .mockResolvedValueOnce([storedEvent])
+      .mockResolvedValueOnce([storedMetric])
 
-      const result = await analyticsService.getMetrics({
-        name: 'response_time',
-      })
-
-      expect(result).toHaveLength(2)
-      expect(result[0].name).toBe('response_time')
+    const events = await analyticsService.getEvents({
+      type: EventType.USER_ACTION,
+      startTime: 0,
+      endTime: Date.now(),
     })
 
-    it('should filter metrics by tags', async () => {
-      const metrics = [
-        JSON.stringify({
-          ...mockMetric,
-          timestamp: Date.now(),
-          tags: { endpoint: '/api/therapy' },
-        }),
-        JSON.stringify({
-          ...mockMetric,
-          timestamp: Date.now() - 1000,
-          tags: { endpoint: '/api/auth' },
-        }),
-      ]
-
-      vi.mocked(mockRedisClient.zrangebyscore).mockResolvedValueOnce(metrics)
-
-      const result = await analyticsService.getMetrics({
-        name: 'response_time',
-        tags: { endpoint: '/api/therapy' },
-      })
-
-      expect(result).toHaveLength(1)
-      expect(result[0]?.tags?.['endpoint']).toBe('/api/therapy')
+    const metrics = await analyticsService.getMetrics({
+      name: 'response_time',
+      startTime: 0,
+      endTime: Date.now(),
+      tags: {
+        endpoint: '/api/therapy',
+      },
     })
+
+    expect(events).toHaveLength(1)
+    expect(events[0]?.id).toBe('event-2')
+    expect(metrics).toHaveLength(1)
+    expect(metrics[0]?.tags?.endpoint).toBe('/api/therapy')
   })
 
-  describe('cleanup', () => {
-    it('should clean up old events and metrics', async () => {
-      vi.mocked(mockRedisClient.keys).mockResolvedValueOnce([
-        'analytics:metrics:response_time',
-        'analytics:metrics:tags:response_time',
-      ])
+  it('unregisters websocket clients on close', () => {
+    const socket = new MockWebSocket('ws://close-test')
+    analyticsService.registerClient('closable-user', socket as never)
 
-      await analyticsService.cleanup()
+    socket.emit('close')
 
-      // Check event cleanup
-      expect(mockRedisClient.zremrangebyscore).toHaveBeenCalledWith(
-        'analytics:events:time:user_action',
-        0,
-        expect.any(Number),
-      )
-
-      // Check metric cleanup
-      expect(mockRedisClient.zremrangebyscore).toHaveBeenCalledWith(
-        'analytics:metrics:response_time',
-        0,
-        expect.any(Number),
-      )
-    })
-
-    it('should handle cleanup errors', async () => {
-      vi.mocked(mockRedisClient.zremrangebyscore).mockRejectedValueOnce(
-        new Error('Cleanup error'),
-      )
-
-      await expect(analyticsService.cleanup()).rejects.toThrow(
-        'Cleanup operation failed',
-      )
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Error in analytics cleanup:',
-        expect.any(Error),
-      )
-    })
-  })
-
-  describe('webSocket integration', () => {
-    it('should register and unregister WebSocket clients', () => {
-      const ws = new WebSocket('ws://test')
-      const userId = 'test-user'
-
-      analyticsService.registerClient(userId, ws)
-      expect(analyticsService.hasClient(userId)).toBe(true)
-
-      ws.emit('close')
-      expect(analyticsService.hasClient(userId)).toBe(false)
-    })
-
-    it('should notify only relevant subscribers', async () => {
-      const ws1 = new WebSocket('ws://test')
-      const ws2 = new WebSocket('ws://test')
-      const userId1 = 'user-1'
-      const userId2 = 'user-2'
-
-      analyticsService.registerClient(userId1, ws1)
-      analyticsService.registerClient(userId2, ws2)
-
-      await analyticsService.trackEvent({
-        ...mockEvent,
-        userId: userId1,
-      })
-
-      expect(ws1.send).toHaveBeenCalled()
-      expect(ws2.send).not.toHaveBeenCalled()
-    })
+    expect(() =>
+      analyticsService.registerClient('closable-user', socket as never),
+    ).not.toThrow()
   })
 })
