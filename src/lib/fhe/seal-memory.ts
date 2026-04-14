@@ -124,7 +124,7 @@ export class SealMemoryManager {
  * Resource scope for automatic cleanup of SEAL objects
  */
 export class SealResourceScope {
-  private memoryManager = new SealMemoryManager();
+  private readonly memoryManager = new SealMemoryManager();
 
   /**
    * Track a SEAL object for cleanup when the scope ends
