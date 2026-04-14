@@ -83,6 +83,10 @@
 }
 
 .pe-home-rail {
+  margin: 0 auto;
+  max-width: 38rem;
+  text-align: center;
+  justify-items: center;
   display: grid;
   gap: 1rem;
   align-content: start;
