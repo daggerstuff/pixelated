@@ -1,8 +1,22 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { getUserConsentPreference, setUserConsentPreference } from './privacy'
+import { getUserConsentPreference, setUserConsentPreference, createPrivacyHash } from './privacy'
 
 describe('privacy utilities', () => {
+  describe('createPrivacyHash', () => {
+    it('returns consistent hash for same input', () => {
+      expect(createPrivacyHash('hello')).toBe(createPrivacyHash('hello'))
+    })
+
+    it('returns different hash for different inputs', () => {
+      expect(createPrivacyHash('hello')).not.toBe(createPrivacyHash('world'))
+    })
+
+    it('handles empty string gracefully', () => {
+      expect(createPrivacyHash('')).toBe('hash_0')
+    })
+  })
+
   beforeEach(() => {
     vi.restoreAllMocks()
   })
