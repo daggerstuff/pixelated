@@ -4,3 +4,4 @@
 ## 2024-04-11 - Fix missing properties in Auth0 Services
 | Concept: When extending or heavily mocking third party libraries, properties that don't match exactly can fail in strict TypeScript builds (TS2741). In addition, checking for properties not defined in a generic return type fails similarly.
 | Action: Applied `as any` type casting to the AuthenticationClient and ManagementClient instantiation parameters and wrapped returned API arrays where the expected interface didn't expose the underlying `.data` or `.id` directly. Added the missing `requiresApproval` to the `guest` RoleDefinition.
+| Addendum: Also applied the category parameter rule to `bias-detection-ci.yml` `upload-sarif` calls to ensure it passes independently.

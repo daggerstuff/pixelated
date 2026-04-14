@@ -58,6 +58,7 @@ jobs:
         if: always()
         with:
           sarif_file: trivy-results.sarif
+          category: trivy-bias
 
       - name: Initialize CodeQL
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
