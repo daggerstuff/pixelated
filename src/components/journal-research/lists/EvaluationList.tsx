@@ -30,6 +30,11 @@ export function EvaluationList({
     currentPage: evaluations.page ?? 1,
     pageSize: evaluations.pageSize ?? 10,
   })
+  const handleTableStateChange: (newState: Partial<TableState>) => void = (
+    newState,
+  ) => {
+    setTableState((prevState) => ({ ...prevState, ...newState }))
+  }
 
   const [searchTerm, setSearchTerm] = useState('')
   const [tierFilter, setTierFilter] = useState<string>('all')
@@ -250,7 +255,7 @@ export function EvaluationList({
         columns={columns}
         dataSource={tableDataSource}
         tableState={tableState}
-        onStateChange={setTableState}
+        onStateChange={handleTableStateChange}
         hoverable
         striped
         bordered
