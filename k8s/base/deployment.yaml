@@ -17,43 +17,43 @@ spec:
     spec:
       terminationGracePeriodSeconds: 30
       containers:
-        - name: pixelated-empathy-api
-          image: us-west1-docker.pkg.dev/grand-karma-492912-v1/pixelated-empathy/api:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 4321
-              name: http
-              protocol: TCP
-          envFrom:
-            - configMapRef:
-                name: pixelated-empathy-config
-            - secretRef:
-                name: pixelated-empathy-secrets
-          env:
-            - name: APP_NAME
-              value: "pixelated-empathy"
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "256Mi"
-            limits:
-              cpu: "300m"
-              memory: "512Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 5
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 5
+      - name: pixelated-empathy-api
+        image: us-west1-docker.pkg.dev/grand-karma-492912-v1/pixelated-empathy/api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5001
+          name: http
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: pixelated-empathy-config
+        - secretRef:
+            name: pixelated-empathy-secrets
+        env:
+        - name: APP_NAME
+          value: "pixelated-empathy"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 5

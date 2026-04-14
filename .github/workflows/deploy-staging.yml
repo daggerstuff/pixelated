@@ -113,7 +113,7 @@ jobs:
       - name: Wait for rollout
         run:
           kubectl rollout status deployment/pixelated-empathy-api -n
-          pixelated-empathy --timeout=180s
+          pixelated-empathy --timeout=300s
 
       - name: Verify deployment
         run: |

@@ -7,6 +7,7 @@ data:
   APP_NAME: "pixelated-empathy"
   APP_ENV: "base"
   LOG_LEVEL: "INFO"
-  PORT: "4321"
+  PORT: "5001"
+  CMS_PORT: "5001"
   METRICS_ENABLED: "true"
   HEALTH_PATH: "/health"
