@@ -437,6 +437,7 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "overrides": {
+      "follow-redirects": ">=1.16.0",
       "@opentelemetry/api": "^1.9.0",
       "scmp": "2.1.0",
       "@opentelemetry/otlp-proto-exporter-base": "^0.51.1",
