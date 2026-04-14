@@ -1,3 +1,12 @@
+provider "google" {
+  project = var.project_id
+  region  = var.gcp_region
+}
+
+data "google_project" "current" {
+  project_id = var.project_id
+}
+
 terraform {
   required_version = ">= 1.6.0"
 
@@ -20,13 +29,13 @@ locals {
   sql_instance_name       = "${local.app_label}-postgres"
   redis_instance_name     = "${local.app_label}-redis"
   artifact_repo_name      = var.app_name
+  artifact_repo_kms_key = (
+    var.artifact_registry_kms_key_name != ""
+    ? var.artifact_registry_kms_key_name
+    : try(google_kms_crypto_key.artifact_registry[0].id, "")
+  )
   compute_network_name    = "${local.app_label}-network"
   compute_subnetwork_name = "${local.app_label}-subnet"
-}
-
-provider "google" {
-  project = var.project_id
-  region  = var.gcp_region
 }
 
 # --- APIs ---
@@ -37,6 +46,7 @@ resource "google_project_service" "apis" {
     "compute.googleapis.com",
     "redis.googleapis.com",
     "sqladmin.googleapis.com",
+    "cloudkms.googleapis.com",
     "servicenetworking.googleapis.com",
   ])
 
@@ -98,14 +108,22 @@ resource "google_container_cluster" "primary" {
   deletion_protection = var.gke_deletion_protection
   enable_autopilot    = true
 
+  resource_labels = {
+    app         = var.app_name
+    environment = var.environment
+    managed_by  = "terraform"
+  }
+
   network    = google_compute_network.main.id
   subnetwork = google_compute_subnetwork.gke.id
 
   networking_mode = "VPC_NATIVE"
 
-  network_policy {
-    enabled  = true
-    provider = "CALICO"
+  master_authorized_networks_config {
+    cidr_blocks {
+      cidr_block   = var.network_cidr
+      display_name = "VPC subnetwork"
+    }
   }
 
   ip_allocation_policy {
@@ -138,6 +156,10 @@ resource "google_container_cluster" "primary" {
       mode = "GKE_METADATA"
     }
 
+    shielded_instance_config {
+      enable_secure_boot = true
+    }
+
     metadata = {
       disable-legacy-endpoints = true
     }
@@ -162,7 +184,33 @@ resource "google_artifact_registry_repository" "app_images" {
   repository_id = local.artifact_repo_name
   description   = "Pixelated Empathy image repository"
   format        = "DOCKER"
-  depends_on    = [google_project_service.apis]
+  kms_key_name  = local.artifact_repo_kms_key
+  depends_on    = [google_project_service.apis, google_kms_crypto_key.artifact_registry, google_kms_crypto_key_iam_member.artifact_registry]
+}
+
+resource "google_kms_key_ring" "artifact_registry" {
+  count    = var.artifact_registry_kms_key_name == "" ? 1 : 0
+  name     = "${local.artifact_repo_name}-artifact-registry"
+  location = var.gcp_region
+  project  = var.project_id
+}
+
+resource "google_kms_crypto_key" "artifact_registry" {
+  count           = var.artifact_registry_kms_key_name == "" ? 1 : 0
+  name            = "${local.artifact_repo_name}-artifact-registry-key"
+  key_ring        = google_kms_key_ring.artifact_registry[0].id
+  rotation_period = "7776000s"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_kms_crypto_key_iam_member" "artifact_registry" {
+  count         = var.artifact_registry_kms_key_name == "" ? 1 : 0
+  crypto_key_id = google_kms_crypto_key.artifact_registry[0].id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:service-${data.google_project.current.number}@gcp-sa-artifactregistry.iam.gserviceaccount.com"
 }
 
 # --- Datastore ---
@@ -192,6 +240,7 @@ resource "google_sql_database_instance" "postgres" {
     ip_configuration {
       ipv4_enabled    = false
       private_network = google_compute_network.main.id
+      ssl_mode        = "TRUSTED_CLIENT_CERTIFICATE_REQUIRED"
       dynamic "authorized_networks" {
         for_each = var.postgres_authorized_networks
         content {
@@ -204,6 +253,21 @@ resource "google_sql_database_instance" "postgres" {
     database_flags {
       name  = "max_connections"
       value = tostring(var.postgres_max_connections)
+    }
+
+    database_flags {
+      name  = "log_connections"
+      value = "on"
+    }
+
+    database_flags {
+      name  = "log_disconnections"
+      value = "on"
+    }
+
+    database_flags {
+      name  = "log_checkpoints"
+      value = "on"
     }
   }
 

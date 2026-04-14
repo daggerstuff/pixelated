@@ -193,8 +193,10 @@ export class RedisService extends EventEmitter implements IRedisService {
         this.client = null;
       }
 
-      for (const subscriber of this.subscribers.values()) {
-        await subscriber.quit();
+      if (this.subscribers.size > 0) {
+        await Promise.all(
+          Array.from(this.subscribers.values(), (subscriber) => subscriber.quit()),
+        );
       }
       this.subscribers.clear();
     } catch (error: unknown) {
