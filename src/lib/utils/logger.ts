@@ -200,7 +200,10 @@ class Logger {
 export function getLogger(prefix?: string): Logger {
   // Use a function-scoped static variable to avoid TDZ/circular import issues
   // @ts-expect-error - Using function property for singleton pattern
-  getLogger._instance ??= new Logger()
+  if (!getLogger._instance) {
+    // @ts-expect-error - Using function property for singleton pattern
+    getLogger._instance = new Logger()
+  }
   // @ts-expect-error - Using function property for singleton pattern
   const baseLogger: Logger = getLogger._instance
   return prefix ? baseLogger.child(prefix) : baseLogger

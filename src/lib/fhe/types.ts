@@ -311,7 +311,7 @@ export function isEncryptedData(obj: unknown): obj is EncryptedData {
   if (!obj || typeof obj !== 'object') {
     return false
   }
-  const record = obj as object & Record<string, unknown>
+  const record = obj as Record<string, unknown>
 
   return (
     typeof record['id'] === 'string' &&

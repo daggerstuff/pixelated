@@ -56,7 +56,7 @@ export default function DLPRuleEditor() {
       if (!(event instanceof CustomEvent)) {
         return
       }
-      const detail = (event as CustomEvent<EditorRule>).detail
+      const detail = event.detail as EditorRule
       setCurrentRule({
         ...defaultRule,
         ...detail,
@@ -114,12 +114,12 @@ export default function DLPRuleEditor() {
     try {
       const escaped = escapeRegexLiteral(pattern)
       const ruleToSave: DLPRule = {
-        id: currentRule.id ?? '',
-        name: currentRule.name ?? '',
-        description: currentRule.description ?? '',
+        id: currentRule.id || '',
+        name: currentRule.name || '',
+        description: currentRule.description || '',
         action: currentRule.action ?? DLPAction.REDACT,
         isActive:
-          currentRule.isActive ?? true,
+          currentRule.isActive === undefined ? true : !!currentRule.isActive,
         matches: (content: string) => {
           return content.toLowerCase().includes(pattern.toLowerCase())
         },

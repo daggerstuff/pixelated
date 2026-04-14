@@ -80,8 +80,8 @@ export async function getDocument(documentId: string, userId: string) {
   // Check permissions
   const hasAccess =
     document.owner.toString() === userId ||
-    (document.permissions?.view || [])?.some((id: any) => id.toString() === userId) ||
-    (document.permissions?.edit || [])?.some((id: any) => id.toString() === userId)
+    document.permissions.view?.some((id: any) => id.toString() === userId) ||
+    document.permissions.edit?.some((id: any) => id.toString() === userId)
 
   if (!hasAccess) {
     throw new ForbiddenError('You do not have permission to view this document')
@@ -99,7 +99,7 @@ export async function updateDocument(
   updates: {
     title?: string
     content?: any
-    status?: 'draft' | 'review' | 'approved' | 'published' | 'archived'
+    status?: string
     description?: string
   },
   userId: string,
@@ -113,7 +113,7 @@ export async function updateDocument(
   // Check edit permission
   const canEdit =
     document.owner.toString() === userId ||
-    (document.permissions?.edit || [])?.some((id: any) => id.toString() === userId)
+    document.permissions.edit?.some((id: any) => id.toString() === userId)
 
   if (!canEdit) {
     throw new ForbiddenError('You do not have permission to edit this document')
@@ -221,19 +221,19 @@ export async function shareDocument(
   // Add to appropriate permission array
   if (
     permissionLevel === 'view' &&
-    !(document.permissions?.view || []).includes(sharedWithUserId as any)
+    !document.permissions.view.includes(sharedWithUserId)
   ) {
-    document.permissions?.view?.push(sharedWithUserId as any)
+    document.permissions.view.push(sharedWithUserId)
   } else if (
     permissionLevel === 'edit' &&
-    !(document.permissions?.edit || []).includes(sharedWithUserId as any)
+    !document.permissions.edit.includes(sharedWithUserId)
   ) {
-    document.permissions?.edit?.push(sharedWithUserId as any)
+    document.permissions.edit.push(sharedWithUserId)
   } else if (
     permissionLevel === 'comment' &&
-    !(document.permissions?.comment || []).includes(sharedWithUserId as any)
+    !document.permissions.comment.includes(sharedWithUserId)
   ) {
-    document.permissions?.comment?.push(sharedWithUserId as any)
+    document.permissions.comment.push(sharedWithUserId)
   }
 
   await document.save()

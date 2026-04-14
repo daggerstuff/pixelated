@@ -1,7 +1,7 @@
 import { dlpService } from '../../../lib/security/dlp'
 
 // Function to handle rule updates
-function handleRuleUpdated(event: CustomEvent<{ id: string, name: string, isActive: boolean }>): void {
+function handleRuleUpdated(event: CustomEvent): void {
   const { id, name, isActive } = event.detail
   console.log(
     `Rule updated: ${name} (${id}) is now ${isActive ? 'active' : 'inactive'}`,
@@ -9,7 +9,7 @@ function handleRuleUpdated(event: CustomEvent<{ id: string, name: string, isActi
 }
 
 // Function to handle rule deletions
-function handleRuleDeleted(event: CustomEvent<{ id: string, name: string }>): void {
+function handleRuleDeleted(event: CustomEvent): void {
   const { id, name } = event.detail
   console.log(`Rule deleted: ${name} (${id})`)
 

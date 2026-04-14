@@ -51,9 +51,9 @@ export class RedisService extends EventEmitter implements IRedisService {
 
     // If environment variables exist, use them regardless of what was in config
     if (hasUpstashUrl) {
-      this.config.url = process.env['UPSTASH_REDIS_REST_URL']!
+      this.config.url = process.env['UPSTASH_REDIS_REST_URL'] as string
     } else if (hasRedisUrl) {
-      this.config.url = process.env['REDIS_URL']!
+      this.config.url = process.env['REDIS_URL'] as string
 
       // Support for Docker Secrets (/run/secrets/*) or any *_FILE env var
       const redisPasswordFile = process.env['REDIS_PASSWORD_FILE']
@@ -125,10 +125,10 @@ export class RedisService extends EventEmitter implements IRedisService {
       const redisOptions: Record<string, unknown> = {
         maxRetriesPerRequest: this.config.maxRetries,
         retryStrategy: (times: number) => {
-          if (times > (this.config.maxRetries ?? 3)) {
+          if (times > (this.config.maxRetries || 3)) {
             return null
           }
-          return this.config.retryDelay ?? 100
+          return this.config.retryDelay || 100
         },
       }
 
@@ -198,7 +198,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       }
 
       await Promise.all(
-        Array.from(this.subscribers.values()).map(async (sub) => sub.quit()),
+        Array.from(this.subscribers.values()).map((sub) => sub.quit()),
       )
       this.subscribers.clear()
     } catch (error: unknown) {
@@ -220,7 +220,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn('Using mock Redis client in development')
         // Create a mock client that implements basic Redis methods
-        return this.createMockClient() as unknown as Redis
+        return this.createMockClient() as Redis
       }
 
       throw new RedisServiceError(
@@ -421,7 +421,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         const pipeline: RedisPipeline = {
           del: (key: string) => {
             commands.push({ cmd: 'del', args: [key] })
-            return mockClient as unknown as Redis
+            return mockClient as Redis
           },
           exec: async () => {
             return commands.map((cmd) => {

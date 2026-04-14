@@ -19,10 +19,10 @@ export type {
 
 // Environment variable resolution logic using utility function
 const redisUrl =
-  getEnv('UPSTASH_REDIS_REST_URL') ??
-  getEnv('REDIS_URL') ??
+  getEnv('UPSTASH_REDIS_REST_URL') ||
+  getEnv('REDIS_URL') ||
   'redis://localhost:6379'
-const redisPrefix = getEnv('REDIS_PREFIX') ?? ''
+const redisPrefix = getEnv('REDIS_PREFIX') || ''
 
 const config: RedisServiceConfig = {
   url: redisUrl,

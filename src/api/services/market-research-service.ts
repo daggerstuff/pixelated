@@ -78,7 +78,7 @@ export async function getMarketResearch(researchId: string, userId: string) {
   // Check permissions
   if (
     !research.permissions.view.includes(userId) &&
-    research.author?.toString() !== userId
+    research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot access this research')
   }
@@ -108,8 +108,8 @@ export async function addFinding(
 
   // Check edit permission
   if (
-    !(research.permissions?.edit || []).includes(userId) &&
-    research.author?.toString() !== userId
+    !research.permissions.edit.includes(userId) &&
+    research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
   }
@@ -156,15 +156,15 @@ export async function addCompetitiveAnalysis(
 
   // Check edit permission
   if (
-    !(research.permissions?.edit || []).includes(userId) &&
-    research.author?.toString() !== userId
+    !research.permissions.edit.includes(userId) &&
+    research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
   }
 
   const analysisId = uuid()
 
-  research.competitors.push({
+  research.competitiveAnalysis.push({
     _id: analysisId,
     competitorName: analysis.competitorName,
     strengths: analysis.strengths || [],
@@ -203,8 +203,8 @@ export async function addRecommendation(
 
   // Check edit permission
   if (
-    !(research.permissions?.edit || []).includes(userId) &&
-    research.author?.toString() !== userId
+    !research.permissions.edit.includes(userId) &&
+    research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
   }
