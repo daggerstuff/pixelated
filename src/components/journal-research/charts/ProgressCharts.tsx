@@ -156,7 +156,7 @@ export function ProgressCharts({
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: (value) => `${value}%`,
+                    callback: (value: number | string) => `${value}%`,
                   },
                 },
               },
@@ -202,7 +202,7 @@ export function ProgressCharts({
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: (value) => `${value}%`,
+                    callback: (value: number | string) => `${value}%`,
                   },
                 },
               },

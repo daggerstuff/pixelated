@@ -234,7 +234,7 @@ export function SessionForm({
                 </label>
               ))}
             </div>
-            <FieldError error={errors.targetSources} />
+            <FieldError error={errors['targetSources']} />
           </div>
 
           <div className='space-y-2'>
