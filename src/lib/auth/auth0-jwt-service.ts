@@ -3,7 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient } from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0'
 
 interface JwtPayload {
   iss?: string
@@ -44,6 +44,7 @@ function isRuntimeAuth0Configured(config: Auth0RuntimeConfig): boolean {
 
 // Initialize Auth0 authentication client
 let auth0Authentication: AuthenticationClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
@@ -60,6 +61,7 @@ function initializeAuth0Client() {
     clientId: runtimeConfig.clientId,
     clientSecret: runtimeConfig.clientSecret,
   })
+  auth0UserInfo = new UserInfoClient({ domain: runtimeConfig.domain })
 }
 
 // Initialize the client
@@ -88,9 +90,34 @@ export interface TokenValidationResult {
 }
 
 type UnknownRecord = Record<string, unknown>
+type Auth0UserInfoResponse = {
+  data: UnknownRecord
+}
+type Auth0UserInfoClient = {
+  getUserInfo?: (accessToken: string) => Promise<Auth0UserInfoResponse>
+  getProfile?: (accessToken: string) => Promise<Auth0UserInfoResponse>
+}
 
 function isRecord(value: unknown): value is UnknownRecord {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+async function getAuth0UserInfo(
+  accessToken: string,
+): Promise<Auth0UserInfoResponse> {
+  if (!auth0UserInfo) {
+    throw new AuthenticationError('Auth0 user info client not initialized')
+  }
+
+  const userInfoClient = auth0UserInfo as Auth0UserInfoClient
+  if (typeof userInfoClient.getUserInfo === 'function') {
+    return await userInfoClient.getUserInfo(accessToken)
+  }
+  if (typeof userInfoClient.getProfile === 'function') {
+    return await userInfoClient.getProfile(accessToken)
+  }
+
+  throw new AuthenticationError('Auth0 user info method not available')
 }
 
 export interface IdTokenPayload {
@@ -336,9 +363,9 @@ export async function validateToken(
   try {
     initializeAuth0Client()
 
-    if (!auth0Authentication) {
+    if (!auth0Authentication || !auth0UserInfo) {
       throw new AuthenticationError(
-        'Auth0 authentication client not initialized',
+        'Auth0 authentication clients not initialized',
       )
     }
 
@@ -351,8 +378,7 @@ export async function validateToken(
     }
 
     // Now verify with UserInfo (acts as online signature/revocation check)
-    // Using auth0Authentication.getProfile instead of auth0UserInfo.getUserInfo
-    const userInfo = await auth0Authentication.getProfile(token)
+    const userInfo = await getAuth0UserInfo(token)
     if (!userInfo) {
       throw new AuthenticationError('Failed to get user info')
     }
@@ -474,9 +500,9 @@ export async function refreshAccessToken(
 ): Promise<TokenPair> {
   try {
     initializeAuth0Client()
-    if (!auth0Authentication) {
+    if (!auth0Authentication || !auth0UserInfo) {
       throw new AuthenticationError(
-        'Auth0 authentication client not initialized',
+        'Auth0 authentication clients not initialized',
       )
     }
 
@@ -494,7 +520,7 @@ export async function refreshAccessToken(
     }
 
     // Get user info from new access token
-    const userResponse = await auth0Authentication.getProfile(accessToken)
+    const userResponse = await getAuth0UserInfo(accessToken)
     if (!userResponse) {
       throw new AuthenticationError('Failed to get refreshed user info')
     }

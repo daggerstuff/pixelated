@@ -54,6 +54,12 @@ export function AcquisitionList({
     currentPage: acquisitions.page ?? 1,
     pageSize: acquisitions.pageSize ?? 10,
   })
+  const handleTableStateChange = (newState: Partial<TableState>) => {
+    setTableState((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
 
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -313,7 +319,7 @@ export function AcquisitionList({
         columns={columns}
         dataSource={tableDataSource}
         tableState={tableState}
-        onStateChange={setTableState}
+        onStateChange={handleTableStateChange}
         hoverable
         striped
         bordered

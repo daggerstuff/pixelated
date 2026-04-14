@@ -458,7 +458,7 @@ export interface FHEService {
    * @param value The value to encrypt
    * @returns The encrypted data
    */
-  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData>
+  encrypt(value: unknown, options?: unknown): Promise<EncryptedData>
 
   /**
    * Decrypt encrypted data

@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-import { Target } from 'lucide-react'
+import { Target as TargetIcon } from 'lucide-react'
 // import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
@@ -346,7 +346,7 @@ const universityResults = [
   <section class="brutalist-section">
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-6xl mb-6"><Target className="w-24 h-24" /></div>
+        <div class="text-6xl mb-6"><TargetIcon className="w-24 h-24" /></div>
 
         <div
           class="status-indicator status-indicator--warning inline-flex mb-6"

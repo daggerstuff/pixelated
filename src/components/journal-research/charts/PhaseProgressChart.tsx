@@ -142,7 +142,7 @@ export function PhaseProgressChart({
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: (value) => `${value}%`,
+                    callback: (value: number | string) => `${value}%`,
                   },
                 },
               },
