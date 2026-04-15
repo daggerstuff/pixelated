@@ -8,6 +8,11 @@ metadata:
 spec:
   replicas: 3
   progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
   selector:
     matchLabels:
       app: pixelated-empathy-api

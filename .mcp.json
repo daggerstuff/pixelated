@@ -3,7 +3,7 @@
   "mcpServers": {
     "foresight": {
       "command": "uv",
-      "args": ["run", "-m", "foresight_mcp"],
+      "args": ["run", "--active", "-m", "foresight_mcp"],
       "cwd": "/home/vivi/pixelated/foresight-mcp",
       "env": {
         "FORESIGHT_DB_PATH": "/home/vivi/.foresight/memory.db",

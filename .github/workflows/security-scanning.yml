@@ -204,16 +204,112 @@ jobs:
           package-manager-cache: false
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: |
+          pnpm_version="$(node -p "require('./package.json').packageManager.replace('pnpm@', '')")"
+          if [ -z "${pnpm_version}" ]; then
+            echo "Failed to read pnpm version from package.json (packageManager field missing)." >&2
+            exit 1
+          fi
+
+          for attempt in 1 2 3; do
+            if npm install -g "pnpm@${pnpm_version}"; then
+              break
+            fi
+            if [ "${attempt}" -eq 3 ]; then
+              echo "pnpm install failed after 3 attempts." >&2
+              exit 1
+            fi
+            echo "pnpm install failed on attempt ${attempt}. Retrying in 5s..."
+            sleep 5
+          done
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Run security audit
-        run: pnpm audit --audit-level moderate
+        run: |
+          pnpm audit --json --omit=dev --audit-level moderate > audit-results.json || true
+          if [ ! -s audit-results.json ]; then
+            echo "pnpm audit returned an empty output." >&2
+            exit 1
+          fi
 
-      - name: Check for known vulnerabilities
-        run: pnpm audit --json > audit-results.json || true
+      - name: Enforce moderate+ vulnerability threshold
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          let data = '{}';
+          try {
+            data = fs.readFileSync('audit-results.json', 'utf8');
+          } catch (error) {
+            console.error('Could not read audit-results.json:', error.message);
+            process.exit(1);
+          }
+
+          if (!data.trim()) {
+            console.error('pnpm audit output is empty.');
+            process.exit(1);
+          }
+
+          let audit;
+          try {
+            audit = JSON.parse(data || '{}');
+          } catch (error) {
+            console.error('Failed to parse pnpm audit JSON:', error.message);
+            process.exit(1);
+          }
+
+          const summary = audit.metadata && (audit.metadata.vulnerabilities || audit.metadata.vulnerableDependencies);
+          const advisories = audit.advisories || {};
+          const vulnerabilityMap = audit.vulnerabilities || {};
+          const hasVulnSummary = Boolean(summary || advisories || vulnerabilityMap);
+
+          if (audit.error || !hasVulnSummary) {
+            console.error('pnpm audit did not return a valid vulnerability report:', audit.error || 'unexpected format');
+            process.exit(1);
+          }
+
+          const counts = (summary && summary.vulnerabilities) || summary || {};
+          const advisoryList = Array.isArray(vulnerabilityMap) ? vulnerabilityMap : Object.values(advisories);
+          const summaryFromAdvisories = advisoryList.reduce(
+            (result, item) => {
+              const severity = (item.severity || '').toLowerCase();
+              if (severity === 'low') result.low += 1;
+              if (severity === 'moderate') result.moderate += 1;
+              if (severity === 'high') result.high += 1;
+              if (severity === 'critical') result.critical += 1;
+              return result;
+            },
+            { low: 0, moderate: 0, high: 0, critical: 0 }
+          );
+
+          const uniqueAdvisories = new Set(Object.values(advisories).map((entry) => entry.id)).size;
+          const moderate = counts.moderate || 0;
+          const high = counts.high || 0;
+          const critical = counts.critical || 0;
+          const low = counts.low || 0;
+          const totalFromMetadata = moderate + high + critical;
+          const totalFromAdvisories = Number(summaryFromAdvisories.moderate) + Number(summaryFromAdvisories.high) + Number(summaryFromAdvisories.critical);
+          const auditSummary = {
+            low: counts.low || summaryFromAdvisories.low,
+            moderate: counts.moderate || summaryFromAdvisories.moderate,
+            high: counts.high || summaryFromAdvisories.high,
+            critical: counts.critical || summaryFromAdvisories.critical,
+          };
+
+          console.log('pnpm audit summary:', JSON.stringify(auditSummary, null, 2));
+          if (totalFromMetadata > 0 || totalFromAdvisories > 0) {
+            console.error(
+              `Dependency scan found moderate+ vulnerabilities: moderate=${auditSummary.moderate}, high=${auditSummary.high}, critical=${auditSummary.critical}`
+            );
+            process.exit(1);
+          }
+
+          console.log(`No vulnerabilities at moderate or higher found (dev deps excluded).`);
+          console.log(`Low severity count: ${auditSummary.low}`);
+          console.log(`Unique advisory definitions analyzed: ${uniqueAdvisories}`);
+          NODE
 
       - name: Upload audit results
         uses: actions/upload-artifact@v7
