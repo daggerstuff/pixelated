@@ -326,6 +326,7 @@ resource "google_redis_instance" "cache" {
   tier               = var.redis_tier
   memory_size_gb     = var.redis_memory_gb
   auth_enabled       = true
+  transit_encryption_mode = "SERVER_AUTHENTICATION"
   redis_version      = "REDIS_7_0"
   authorized_network = google_compute_network.main.id
 
