@@ -32,6 +32,7 @@ jobs:
       ARTIFACT_REGISTRY_LOCATION: us-west1
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
       TRIVY_STRICT_GATE: false
+      PNPM_CACHE_VERSION: v2
 
     steps:
       - uses: actions/checkout@v6
@@ -65,9 +66,10 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
