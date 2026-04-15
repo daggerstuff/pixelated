@@ -106,7 +106,6 @@ resource "google_container_cluster" "primary" {
   location = var.gcp_location
 
   deletion_protection = var.gke_deletion_protection
-  enable_autopilot    = true
 
   resource_labels = {
     app         = var.app_name
@@ -141,6 +140,13 @@ resource "google_container_cluster" "primary" {
     master_ipv4_cidr_block  = "172.16.0.0/28"
   }
 
+  network_policy {
+    enabled  = true
+    provider = "CALICO"
+  }
+
+  enable_intranode_visibility = true
+
   master_auth {
     client_certificate_config {
       issue_client_certificate = false
@@ -158,6 +164,7 @@ resource "google_container_cluster" "primary" {
 
     shielded_instance_config {
       enable_secure_boot = true
+      enable_integrity_monitoring = true
     }
 
     metadata = {
@@ -269,6 +276,31 @@ resource "google_sql_database_instance" "postgres" {
       name  = "log_checkpoints"
       value = "on"
     }
+
+    database_flags {
+      name  = "log_hostname"
+      value = "on"
+    }
+
+    database_flags {
+      name  = "log_lock_waits"
+      value = "on"
+    }
+
+    database_flags {
+      name  = "log_statement"
+      value = "all"
+    }
+
+    database_flags {
+      name  = "log_min_error_statement"
+      value = "error"
+    }
+
+    database_flags {
+      name  = "pgaudit.log"
+      value = "all"
+    }
   }
 
   depends_on = [
@@ -293,6 +325,7 @@ resource "google_redis_instance" "cache" {
   region             = var.gcp_region
   tier               = var.redis_tier
   memory_size_gb     = var.redis_memory_gb
+  auth_enabled       = true
   redis_version      = "REDIS_7_0"
   authorized_network = google_compute_network.main.id
 
