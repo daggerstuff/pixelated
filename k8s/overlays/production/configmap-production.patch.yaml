@@ -1,6 +1,0 @@
-- op: replace
-  path: /data/APP_ENV
-  value: "production"
-- op: replace
-  path: /data/LOG_LEVEL
-  value: "WARN"
