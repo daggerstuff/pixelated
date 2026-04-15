@@ -1,4 +1,4 @@
-name: Deploy to Staging
+name: Deploy to Production (staging branch)
 
 permissions:
   contents: read
@@ -92,10 +92,10 @@ jobs:
           [[ -n "$JWT_SECRET" ]] || { echo "Missing secret: JWT_SECRET"; exit 1; }
           [[ -n "$API_KEY" ]] || { echo "Missing secret: API_KEY"; exit 1; }
 
-      - name: Apply staging kustomize manifests
-        run: kubectl apply -k k8s/overlays/staging
+      - name: Apply production kustomize manifests
+        run: kubectl apply -k k8s/overlays/production
 
-      - name: Update k8s deployment image (staging)
+      - name: Update k8s deployment image
         run:
           kubectl set image deployment/pixelated-empathy-api
           "pixelated-empathy-api=$IMAGE_URI" -n pixelated-empathy

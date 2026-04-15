@@ -5,8 +5,8 @@ metadata:
   namespace: pixelated-empathy
 data:
   APP_NAME: "pixelated-empathy"
-  APP_ENV: "base"
-  LOG_LEVEL: "INFO"
+  APP_ENV: "production"
+  LOG_LEVEL: "WARN"
   PORT: "5001"
   CMS_PORT: "5001"
   METRICS_ENABLED: "true"
