@@ -72,7 +72,12 @@ variable "services_secondary_cidr" {
 variable "postgres_version" {
   description = "Cloud SQL PostgreSQL version."
   type        = string
-  default     = "POSTGRES_15"
+  default     = "POSTGRES_16"
+
+  validation {
+    condition     = var.postgres_version == "POSTGRES_16"
+    error_message = "Use the latest major PostgreSQL version. Set postgres_version to POSTGRES_16."
+  }
 }
 
 variable "postgres_tier" {

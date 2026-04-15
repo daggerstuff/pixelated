@@ -18,6 +18,10 @@
         "CLOUDFLARE_EMAIL": "${CLOUDFLARE_EMAIL}",
         "CLOUDFLARE_ACCOUNT_ID": "${CLOUDFLARE_ACCOUNT_ID}"
       }
+    },
+    "solana": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp.solana.com/mcp"]
     }
   }
 }
