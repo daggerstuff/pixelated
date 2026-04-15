@@ -64,12 +64,21 @@ helm upgrade --install "$REL" ./helm \
 
 if $WAIT; then
   echo "Waiting for rollout..."
-  kubectl rollout status deploy/"$REL" -n "$NS" --timeout="$TIMEOUT" || {
+  if ! kubectl rollout status deploy/"$REL" -n "$NS" --timeout="$TIMEOUT"; then
     echo "Rollout failed" >&2
-    kubectl get pods -n "$NS" -o wide
-    kubectl describe deploy/"$REL" -n "$NS"
+    kubectl describe deploy/"$REL" -n "$NS" || true
+    echo "Deployment status:"
+    kubectl get deploy/"$REL" -n "$NS" -o wide || true
+    echo "Current pods:"
+    kubectl get pods -n "$NS" -l app="${REL}" -o wide || true
+    for pod in $(kubectl get pods -n "$NS" --no-headers -o custom-columns=":metadata.name" -l app="${REL}"); do
+      echo "=== Logs for ${pod} (previous) ==="
+      kubectl logs "${pod}" -n "$NS" --previous --tail=120 || true
+      echo "=== Logs for ${pod} (current) ==="
+      kubectl logs "${pod}" -n "$NS" --tail=120 || true
+    done
     exit 1
-  }
+  fi
 fi
 
 echo "Deployment completed: release=$REL namespace=$NS image=$IMG:$TAG"

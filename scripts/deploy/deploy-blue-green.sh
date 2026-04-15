@@ -6,6 +6,25 @@ echo "🔵🟢 Starting blue-green deployment to GKE..."
 echo "Image: $CONTAINER_IMAGE"
 echo "Deployment: $GKE_DEPLOYMENT_NAME"
 echo "Namespace: $GKE_NAMESPACE"
+diagnose_rollout_failure() {
+  local deployment_name="$1"
+  local namespace="$2"
+
+  echo "Rollout failed or timed out for ${deployment_name}."
+  echo "Deployment details:"
+  kubectl describe deployment "${deployment_name}" -n "${namespace}" || true
+  echo "Deployment status:"
+  kubectl get deployment "${deployment_name}" -n "${namespace}" -o wide || true
+  echo "Current pods:"
+  kubectl get pods -l app="${GKE_DEPLOYMENT_NAME}" -n "${namespace}" -o wide || true
+
+  for pod in $(kubectl get pods -l app="${GKE_DEPLOYMENT_NAME}" -n "${namespace}" --no-headers -o custom-columns=":metadata.name"); do
+    echo "=== Logs for ${pod} (previous) ==="
+    kubectl logs "${pod}" -n "${namespace}" --previous --tail=120 || true
+    echo "=== Logs for ${pod} (current) ==="
+    kubectl logs "${pod}" -n "${namespace}" --tail=120 || true
+  done
+}
 
 # Get current deployment color
 CURRENT_COLOR=$(kubectl get service "$GKE_SERVICE_NAME" -n "$GKE_NAMESPACE" -o jsonpath='{.spec.selector.color}' 2>/dev/null || echo "")
@@ -55,7 +74,10 @@ EOF
 
 # Wait for new deployment to be ready
 echo "⏳ Waiting for new deployment to be ready..."
-kubectl rollout status deployment/"${GKE_DEPLOYMENT_NAME}-${NEW_COLOR}" -n "$GKE_NAMESPACE" --timeout="${HEALTH_CHECK_TIMEOUT}s"
+if ! kubectl rollout status deployment/"${GKE_DEPLOYMENT_NAME}-${NEW_COLOR}" -n "$GKE_NAMESPACE" --timeout="${HEALTH_CHECK_TIMEOUT}s"; then
+  diagnose_rollout_failure "${GKE_DEPLOYMENT_NAME}-${NEW_COLOR}" "$GKE_NAMESPACE"
+  exit 1
+fi
 
 # Switch traffic to new deployment
 echo "🔄 Switching traffic to new deployment..."
