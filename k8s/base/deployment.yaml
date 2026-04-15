@@ -6,7 +6,7 @@ metadata:
   labels:
     app: pixelated-empathy-api
 spec:
-  replicas: 3
+  replicas: 2
   progressDeadlineSeconds: 600
   strategy:
     type: RollingUpdate
@@ -40,11 +40,11 @@ spec:
           value: "pixelated-empathy"
         resources:
           requests:
-            cpu: "100m"
-            memory: "256Mi"
+            cpu: "25m"
+            memory: "64Mi"
           limits:
-            cpu: "300m"
-            memory: "512Mi"
+            cpu: "150m"
+            memory: "192Mi"
         startupProbe:
           httpGet:
             path: /health

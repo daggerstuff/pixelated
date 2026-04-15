@@ -61,6 +61,28 @@ resource "google_compute_network" "main" {
   routing_mode                    = "REGIONAL"
 }
 
+resource "google_compute_firewall" "allow_internal" {
+  name      = "${local.compute_network_name}-allow-internal"
+  network   = google_compute_network.main.id
+  direction = "INGRESS"
+
+  source_ranges = [var.network_cidr]
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+}
+
 resource "google_compute_subnetwork" "gke" {
   name          = local.compute_subnetwork_name
   region        = var.gcp_region
@@ -223,7 +245,7 @@ resource "google_kms_crypto_key_iam_member" "artifact_registry" {
 # --- Datastore ---
 resource "google_sql_database_instance" "postgres" {
   name                = local.sql_instance_name
-  database_version    = var.postgres_version
+  database_version    = "POSTGRES_16"
   region              = var.gcp_region
   deletion_protection = var.enable_deletion_protection
 
@@ -290,6 +312,11 @@ resource "google_sql_database_instance" "postgres" {
     database_flags {
       name  = "log_statement"
       value = "all"
+    }
+
+    database_flags {
+      name  = "shared_preload_libraries"
+      value = "pgaudit"
     }
 
     database_flags {
