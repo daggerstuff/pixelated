@@ -16,13 +16,29 @@ ENV PATH="$PNPM_HOME:$PATH"
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=1
 RUN npm install -g pnpm@10.33.0
 RUN npm install -g npm@11.12.1
-RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y \
-    python3 \
-    make \
-    g++ \
-    libvips-dev \
-    curl \
-    git && \
+RUN set -eux; \
+    echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::https::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries && \
+    apt-get update && \
+    if ! apt-get install --no-install-recommends --no-install-suggests -y \
+      python3 \
+      make \
+      g++ \
+      libvips-dev \
+      curl \
+      git; then \
+      echo "Retrying after apt index sync issue..." && \
+      rm -rf /var/lib/apt/lists/* && \
+      apt-get update && \
+      apt-get install --no-install-recommends --no-install-suggests -y \
+        python3 \
+        make \
+        g++ \
+        libvips-dev \
+        curl \
+        git; \
+    fi && \
     rm -rf /var/lib/apt/lists/*
 
 # Runtime base stage (no build toolchain)
@@ -30,7 +46,18 @@ FROM ${NODE_IMAGE} AS runtime
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN apt-get update && apt-get upgrade -y && apt-get install --no-install-recommends -y curl && rm -rf /var/lib/apt/lists/*
+RUN set -eux; \
+    echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::https::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries && \
+    apt-get update && \
+    if ! apt-get install --no-install-recommends --no-install-suggests -y curl; then \
+      echo "Retrying after apt index sync issue..." && \
+      rm -rf /var/lib/apt/lists/* && \
+      apt-get update && \
+      apt-get install --no-install-recommends --no-install-suggests -y curl; \
+    fi && \
+    rm -rf /var/lib/apt/lists/*
 
 # Production dependencies stage
 FROM build-base AS prod-deps
