@@ -3,12 +3,36 @@ import { test, expect } from '@playwright/test'
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 import { BreachNotificationSystem } from '../lib/security/breach-notification'
 import { RedisService } from '../lib/services/redis/RedisService'
-import AuthService from '../services/AuthService'
+
+class MockAuthService {
+  private static instance: MockAuthService | null = null
+
+  private constructor() {}
+
+  static getInstance(): MockAuthService {
+    if (!MockAuthService.instance) {
+      MockAuthService.instance = new MockAuthService()
+    }
+    return MockAuthService.instance
+  }
+
+  async signUp(
+    _email: string,
+    _password: string,
+    _options: { fullName: string },
+  ): Promise<void> {
+    return
+  }
+
+  async signOut(): Promise<void> {
+    return
+  }
+}
 
 // Define fixture types
 type BreachTestFixtures = {
   redis: RedisService
-  auth: AuthService
+  auth: MockAuthService
 }
 
 // Initialize logger for PHI audit logging
@@ -62,7 +86,7 @@ const breachTest = test.extend<BreachTestFixtures>({
     process.env['HHS_NOTIFICATION_EMAIL'] = 'hhs-test@example.com'
     process.env['SECURITY_STAKEHOLDERS'] = 'security-team@test-healthcare.com'
 
-    const auth = AuthService.getInstance()
+    const auth = MockAuthService.getInstance()
 
     // Create test users
     await auth.signUp('patient1@example.com', 'testpassword', {
@@ -106,7 +130,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
           if (request.method() === 'POST') {
             emailRequests.push({
               url: request.url(),
-              postData: JSON.parse((request.postData() as unknown) || '{}'),
+              postData: JSON.parse(request.postData() ?? '{}'),
             })
             await route.fulfill({ status: 200 })
           }
@@ -197,7 +221,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
         if (request.method() === 'POST') {
           emailRequests.push({
             url: request.url(),
-            postData: JSON.parse((request.postData() as unknown) || '{}'),
+            postData: JSON.parse(request.postData() ?? '{}'),
           })
           await route.fulfill({ status: 200 })
         }
@@ -305,7 +329,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
         ) {
           emailRequests.push({
             url: request.url(),
-            postData: JSON.parse((request.postData() as unknown) || '{}'),
+            postData: JSON.parse(request.postData() ?? '{}'),
           })
           await route.fulfill({ status: 200 })
         }

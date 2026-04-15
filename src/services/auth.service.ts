@@ -1,4 +1,3 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import { Repository } from 'typeorm'
@@ -6,7 +5,13 @@ import { Repository } from 'typeorm'
 import type { User } from '../entities/user.entity'
 import { RegisterDto } from '../validation/register-schema'
 
-@Injectable()
+class UnauthorizedException extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'UnauthorizedException'
+  }
+}
+
 export class AuthService {
   constructor(private readonly userRepository: Repository<User>) {}
 
