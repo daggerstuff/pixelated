@@ -20,9 +20,10 @@ export class MarketAnalyticsService {
     try {
       const segmentData = await this.fetchSegmentData(targetSegments)
       const penetrationAnalysis: MarketPenetration[] = []
+      const fallbackSegmentData = { current: 0, total: 1000 }
 
       for (const segment of targetSegments) {
-        const data = segmentData[segment]
+        const data = segmentData[segment] ?? fallbackSegmentData
         const penetration = (data.current / data.total) * 100
         const opportunity = data.total - data.current
 
