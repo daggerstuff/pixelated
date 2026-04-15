@@ -25,7 +25,7 @@ After installing foresight-mcp package:
   "mcpServers": {
     "foresight": {
       "command": "uv",
-      "args": ["run", "-m", "foresight_mcp"],
+      "args": ["run", "--active", "-m", "foresight_mcp"],
       "cwd": "/path/to/foresight-mcp",
       "env": {
         "FORESIGHT_DB_PATH": "/home/user/.foresight/memory.db",
@@ -35,6 +35,8 @@ After installing foresight-mcp package:
   }
 }
 ```
+
+**Important:** The `--active` flag is required to use the active virtual environment.
 
 ## Environment Variables
 
