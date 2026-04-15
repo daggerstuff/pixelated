@@ -3,7 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient, UserInfoClient } from 'auth0'
+import * as auth0 from 'auth0'
 
 interface JwtPayload {
   iss?: string
@@ -20,6 +20,11 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+
+type Auth0UserInfoClient = {
+  getUserInfo?: (accessToken: string) => Promise<{ data: Record<string, unknown> }>
+  getProfile?: (accessToken: string) => Promise<{ data: Record<string, unknown> }>
+}
 
 type Auth0RuntimeConfig = {
   domain: string
@@ -43,25 +48,54 @@ function isRuntimeAuth0Configured(config: Auth0RuntimeConfig): boolean {
 }
 
 // Initialize Auth0 authentication client
-let auth0Authentication: AuthenticationClient | null = null
-let auth0UserInfo: UserInfoClient | null = null
+let auth0Authentication: ReturnType<typeof auth0.AuthenticationClient> | null = null
+let auth0UserInfo: Auth0UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
  */
 function initializeAuth0Client() {
+  const UserInfoClient = (auth0 as {
+    UserInfoClient?: new (options: {
+      domain: string
+    }) => {
+      getUserInfo: (accessToken: string) => Promise<Auth0UserInfoResponse>
+      getProfile: (accessToken: string) => Promise<Auth0UserInfoResponse>
+    }
+  }).UserInfoClient
+
   const runtimeConfig = getRuntimeAuth0Config()
   if (!isRuntimeAuth0Configured(runtimeConfig)) {
     console.warn('Auth0 configuration incomplete')
     return
   }
 
-  auth0Authentication = new AuthenticationClient({
+  const Auth0AuthenticationClient = auth0.AuthenticationClient
+  auth0Authentication = new Auth0AuthenticationClient({
     domain: runtimeConfig.domain,
     clientId: runtimeConfig.clientId,
     clientSecret: runtimeConfig.clientSecret,
   })
-  auth0UserInfo = new UserInfoClient({ domain: runtimeConfig.domain })
+
+  const authenticationLikeClient = auth0Authentication as Auth0UserInfoClient
+  if (
+    typeof authenticationLikeClient.getUserInfo === 'function' ||
+    typeof authenticationLikeClient.getProfile === 'function'
+  ) {
+    auth0UserInfo = authenticationLikeClient
+    return
+  }
+
+  if (typeof UserInfoClient !== 'function') {
+    auth0UserInfo = null
+    return
+  }
+
+  try {
+    auth0UserInfo = new UserInfoClient({ domain: runtimeConfig.domain })
+  } catch {
+    auth0UserInfo = null
+  }
 }
 
 // Initialize the client
@@ -92,10 +126,6 @@ export interface TokenValidationResult {
 type UnknownRecord = Record<string, unknown>
 type Auth0UserInfoResponse = {
   data: UnknownRecord
-}
-type Auth0UserInfoClient = {
-  getUserInfo?: (accessToken: string) => Promise<Auth0UserInfoResponse>
-  getProfile?: (accessToken: string) => Promise<Auth0UserInfoResponse>
 }
 
 function isRecord(value: unknown): value is UnknownRecord {
@@ -377,16 +407,15 @@ export async function validateToken(
       )
     }
 
-    // Now verify with UserInfo (acts as online signature/revocation check)
-    const userInfo = await getAuth0UserInfo(token)
-    if (!userInfo) {
-      throw new AuthenticationError('Failed to get user info')
-    }
-
     // Decode token to check standard claims (aud, iss) before expensive response parsing
     const payload = decodeAuth0JwtPayload(token)
     if (!payload) {
       throw new AuthenticationError('Malformed token')
+    }
+
+    // Validate expiration locally before any network calls
+    if (payload.exp && payload.exp < currentTimestamp()) {
+      throw new AuthenticationError('Token has expired')
     }
 
     const currentConfig = getRuntimeAuth0Config()
@@ -421,9 +450,10 @@ export async function validateToken(
       }
     }
 
-    // Validate expiration locally first
-    if (payload.exp && payload.exp < currentTimestamp()) {
-      throw new AuthenticationError('Token has expired')
+    // Now verify with UserInfo (acts as online signature/revocation check)
+    const userInfo = await getAuth0UserInfo(token)
+    if (!userInfo) {
+      throw new AuthenticationError('Failed to get user info')
     }
 
     // Extract user information
