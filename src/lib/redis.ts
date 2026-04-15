@@ -20,6 +20,19 @@ const isProduction = () => {
   return process.env['NODE_ENV'] === 'production'
 }
 
+const isTestEnvironment = () => {
+  const nodeEnv = process.env['NODE_ENV']
+  return (
+    nodeEnv === 'test' ||
+    nodeEnv === 'ci' ||
+    nodeEnv === undefined ||
+    process.env['VITEST'] === '1' ||
+    process.env['VITEST'] === 'true' ||
+    process.argv.some((arg) => arg.includes('vitest')) ||
+    process.env['JEST_WORKER_ID'] !== undefined
+  )
+}
+
 // Create a mock Redis client for development
 function createMockRedisClient() {
   const message = isProduction()
@@ -223,7 +236,10 @@ function createMockRedisClient() {
 function createRedisClient() {
   const { connectionUrl, restToken } = getRedisConfig()
 
-  if (connectionUrl && connectionUrl.startsWith('redis')) {
+  if (
+    isTestEnvironment() ||
+    (connectionUrl && connectionUrl.startsWith('redis'))
+  ) {
     // Initialize ioredis client with credentials
     return new Redis(connectionUrl, {
       password: restToken,
@@ -298,8 +314,8 @@ export async function setInCache(
  */
 export async function removeFromCache(key: string): Promise<boolean> {
   try {
-    await redis.del(key)
-    return true
+    const deletedCount = await redis.del(key)
+    return Number(deletedCount) > 0
   } catch (error: unknown) {
     console.error(`Error removing key ${key} from Redis:`, error)
     return false

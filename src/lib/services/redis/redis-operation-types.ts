@@ -11,7 +11,7 @@ export interface RedisPipelineOperation {
 }
 
 export interface RedisPipeline {
-  del(key: string): Redis
+  del(key: string): RedisPipeline
   exec(): Promise<[Error | null, unknown][]>
 }
 
@@ -23,7 +23,7 @@ export interface RedisInfo {
 export type RedisEventHandler = (
   event: string,
   callback: (...args: unknown[]) => void,
-) => Redis
+) => Redis | RedisMockClient
 
 export interface RedisMockClient {
   get(key: string): Promise<string | null>

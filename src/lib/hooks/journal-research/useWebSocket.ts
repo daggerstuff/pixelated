@@ -258,7 +258,7 @@ export const useJournalResearchWebSocket = ({
         return
       }
 
-      const payload: string | ArrayBuffer | ArrayBufferView = (() => {
+      const payload: string | ArrayBuffer = (() => {
         if (typeof data === 'string') {
           return data
         }
@@ -266,9 +266,9 @@ export const useJournalResearchWebSocket = ({
           return data
         }
         if (ArrayBuffer.isView(data)) {
-          return data
+          return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
         }
-        return new TextEncoder().encode(String(data))
+        return new TextEncoder().encode(String(data)).buffer
       })()
 
       const socket = socketRef.current
