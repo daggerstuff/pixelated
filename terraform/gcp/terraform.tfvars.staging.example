@@ -12,7 +12,7 @@ network_cidr = "10.0.0.0/16"
 pods_secondary_cidr = "10.4.0.0/19"
 services_secondary_cidr = "10.4.32.0/20"
 
-postgres_version = "POSTGRES_15"
+postgres_version       = "POSTGRES_16"
 postgres_tier = "db-f1-micro"
 postgres_disk_size_gb = 20
 postgres_db_name = "pixelated_empathy_staging"

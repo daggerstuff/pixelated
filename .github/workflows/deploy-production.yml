@@ -125,12 +125,23 @@ jobs:
             kubectl get deployment pixelated-empathy-api -n pixelated-empathy -o wide || true
             echo "Current pods:"
             kubectl get pods -n pixelated-empathy -l app=pixelated-empathy-api -o wide || true
+            echo "Failed scheduling events:"
+            kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp --field-selector reason=FailedScheduling | tail -n 120 || true
+            echo "Recent deploy-related events:"
+            kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp | tail -n 200 || true
+            echo "Node capacity:"
+            kubectl get nodes -o wide || true
+            kubectl describe nodes | sed -n '1,220p' || true
             for pod in $(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy-api --no-headers -o custom-columns=":metadata.name"); do
               echo "=== Logs for ${pod} (previous) ==="
               kubectl logs "${pod}" -n pixelated-empathy --previous --tail=120 || true
               echo "=== Logs for ${pod} (current) ==="
               kubectl logs "${pod}" -n pixelated-empathy --tail=120 || true
+              echo "=== Pod events for ${pod} ==="
+              kubectl describe pod "${pod}" -n pixelated-empathy || true
             done
+            echo "Rolling back deployment to previous revision."
+            kubectl rollout undo deployment/pixelated-empathy-api -n pixelated-empathy || true
             exit 1
           fi
 
