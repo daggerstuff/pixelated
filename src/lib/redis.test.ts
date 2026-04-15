@@ -1,15 +1,5 @@
 import { describe, beforeEach, expect, it, vi } from "vitest";
 
-import {
-  checkRedisConnection,
-  getFromCache,
-  getRedisClient,
-  getRedisHealth,
-  redis,
-  removeFromCache,
-  setInCache,
-} from "./redis";
-
 // Mock Redis client
 const mockRedis = {
   get: vi.fn(),
@@ -53,6 +43,16 @@ vi.mock("ioredis", () => {
     default: vi.fn().mockImplementation(() => mockRedis),
   };
 });
+
+import {
+  checkRedisConnection,
+  getFromCache,
+  getRedisClient,
+  getRedisHealth,
+  redis,
+  removeFromCache,
+  setInCache,
+} from "./redis";
 
 describe("Redis Module", () => {
   beforeEach(() => {

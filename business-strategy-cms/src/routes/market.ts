@@ -5,6 +5,19 @@ import type { AuthenticatedRequest } from '@/middleware/auth'
 import { MarketDataService } from '@/services/marketDataService'
 import { logger } from '@/utils/logger'
 
+type MarketBulkRequest = AuthenticatedRequest<
+  Record<string, string>,
+  unknown,
+  { symbols?: unknown },
+  Record<string, string | string[] | undefined>
+>
+
+const parseSymbols = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return []
+
+  return value.filter((item): item is string => typeof item === 'string' && item.length > 0)
+}
+
 const router = Router()
 
 // All market data endpoints require authentication
@@ -59,9 +72,9 @@ router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
  * POST /api/market/bulk
  * Get comprehensive market data for multiple symbols
  */
-router.post('/bulk', async (req: AuthenticatedRequest, res) => {
+router.post('/bulk', async (req: MarketBulkRequest, res) => {
   try {
-    const { symbols } = req.body
+    const symbols = parseSymbols(req.body?.symbols)
 
     if (!Array.isArray(symbols) || symbols.length === 0) {
       return res.status(400).json({
