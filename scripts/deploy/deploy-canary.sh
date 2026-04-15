@@ -7,6 +7,25 @@ echo "Image: $CONTAINER_IMAGE"
 echo "Deployment: $GKE_DEPLOYMENT_NAME"
 echo "Namespace: $GKE_NAMESPACE"
 echo "Canary percentage: $CANARY_PERCENTAGE%"
+diagnose_rollout_failure() {
+  local deployment_name="$1"
+  local namespace="$2"
+
+  echo "Rollout failed or timed out for ${deployment_name}."
+  echo "Deployment details:"
+  kubectl describe deployment "${deployment_name}" -n "${namespace}" || true
+  echo "Deployment status:"
+  kubectl get deployment "${deployment_name}" -n "${namespace}" -o wide || true
+  echo "Current pods:"
+  kubectl get pods -l app="${GKE_DEPLOYMENT_NAME}" -n "${namespace}" -o wide || true
+
+  for pod in $(kubectl get pods -l app="${GKE_DEPLOYMENT_NAME}" -n "${namespace}" --no-headers -o custom-columns=":metadata.name"); do
+    echo "=== Logs for ${pod} (previous) ==="
+    kubectl logs "${pod}" -n "${namespace}" --previous --tail=120 || true
+    echo "=== Logs for ${pod} (current) ==="
+    kubectl logs "${pod}" -n "${namespace}" --tail=120 || true
+  done
+}
 
 # Apply Kubernetes manifests
 echo "📋 Applying Kubernetes manifests..."
@@ -52,7 +71,10 @@ EOF
 
 # Wait for canary to be ready
 echo "⏳ Waiting for canary deployment to be ready..."
-kubectl rollout status deployment/"${GKE_DEPLOYMENT_NAME}-canary" -n "$GKE_NAMESPACE" --timeout="${HEALTH_CHECK_TIMEOUT}s"
+if ! kubectl rollout status deployment/"${GKE_DEPLOYMENT_NAME}-canary" -n "$GKE_NAMESPACE" --timeout="${HEALTH_CHECK_TIMEOUT}s"; then
+  diagnose_rollout_failure "${GKE_DEPLOYMENT_NAME}-canary" "$GKE_NAMESPACE"
+  exit 1
+fi
 
 echo "✅ Canary deployment completed successfully"
 echo "📋 Monitor canary performance before full rollout"

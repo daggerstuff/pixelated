@@ -44,15 +44,25 @@ jobs:
         run: |
           # Generate a valid secure token for API authentication
           # Token payload: { purpose: 'ai-validation', scope: 'validation:read' }
-          TOKEN_PAYLOAD=$(echo -n '{"purpose":"ai-validation","scope":"validation:read"}' | base64)
+          TOKEN_PAYLOAD=$(echo -n '{"purpose":"ai-validation","scope":"validation:read"}' | base64 -w0 | tr -d '\n\r')
           if [[ -z "${AI_VALIDATION_SECRET}" ]]; then
             echo "::error::secrets.AI_VALIDATION_SECRET is required for AI validation token generation"
             exit 1
           fi
           SIGNING_KEY="${AI_VALIDATION_SECRET}"
-          SIGNATURE=$(echo -n "${TOKEN_PAYLOAD}${SIGNING_KEY}" | base64)
+          SIGNATURE=$(
+            printf '%s' "${TOKEN_PAYLOAD}${SIGNING_KEY}" \
+            | openssl dgst -sha256 -hmac "${SIGNING_KEY}" -binary \
+            | base64 -w0 \
+            | tr -d '\n\r'
+          )
           VALIDATION_TOKEN="${TOKEN_PAYLOAD}.${SIGNATURE}"
-          echo "token=${VALIDATION_TOKEN}" >> $GITHUB_OUTPUT
+          # Sanitize token in case any unexpected linebreak/space is introduced
+          VALIDATION_TOKEN=$(printf '%s' "${VALIDATION_TOKEN}" | tr -d '\n\r\t ')
+          echo "::add-mask::${TOKEN_PAYLOAD}"
+          echo "::add-mask::${SIGNATURE}"
+          echo "::add-mask::${VALIDATION_TOKEN}"
+          printf 'token=%s\n' "${VALIDATION_TOKEN}" >> "$GITHUB_OUTPUT"
         env:
           AI_VALIDATION_SECRET: ${{ secrets.AI_VALIDATION_SECRET }}
 
@@ -108,6 +118,7 @@ jobs:
         run: |
           # Generate webhook validation token
           WEBHOOK_TOKEN=$(openssl rand -base64 32)
+          echo "::add-mask::${WEBHOOK_TOKEN}"
           echo "WEBHOOK_TOKEN=${WEBHOOK_TOKEN}" >> $GITHUB_ENV
 
           # Trigger validation via webhook
