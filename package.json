@@ -233,7 +233,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.20",
     "devalue": "^5.7.1",
-    "dompurify": "^3.3.3",
+    "dompurify": "^3.4.0",
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "^2.0.0",
     "events": "^3.3.0",
