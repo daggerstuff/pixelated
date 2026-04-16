@@ -112,7 +112,9 @@ jobs:
 
       - name: Wait for rollout
         run: |
-          if ! kubectl rollout status deployment/pixelated-empathy-api -n pixelated-empathy --timeout=600s; then
+          if kubectl rollout status deployment/pixelated-empathy-api -n pixelated-empathy --timeout=600s; then
+            echo "Rollout succeeded."
+          else
             echo "Rollout failed or timed out."
             echo "Deployment details:"
             kubectl describe deployment pixelated-empathy-api -n pixelated-empathy || true
@@ -135,7 +137,27 @@ jobs:
               echo "=== Pod events for ${pod} ==="
               kubectl describe pod "${pod}" -n pixelated-empathy || true
             done
+
+            has_scheduling_issue=$(kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp | tail -n 260 | \
+              grep -iE 'FailedScheduling|FailedScaleUp|No nodes are available|Insufficient memory|untolerated taint|GCE quota exceeded|cluster-autoscaler_unhelpable' || true)
+
+            if [[ -n "$has_scheduling_issue" ]]; then
+              raw_scheduling_issue=$(echo "$has_scheduling_issue" | head -n 1 | tr '\n' ' ')
+              if ((${#raw_scheduling_issue} > 140)); then
+                first_scheduling_issue="${raw_scheduling_issue:0:137}..."
+              else
+                first_scheduling_issue="$raw_scheduling_issue"
+              fi
+              echo "::error title=Deployment rollout blocked::Scheduling/cluster capacity issue detected. Root cause likely infra-level (quota/memory/taints)."
+              echo "::error title=Deployment rollout blocked::Example event: ${first_scheduling_issue}"
+              echo "::error title=Deployment rollout blocked::Suggested remediation: scale node pool or increase max nodes, request higher CPU/memory/quota, or remove/adjust incompatible node taints."
+              echo "Detected scheduling/cluster capacity failure. Skipping automatic rollback."
+              echo "Root cause is likely infra-level (quota/memory/taints). Fix cluster capacity and rerun deployment."
+              exit 1
+            fi
+
             echo "Rolling back deployment to previous revision."
+            echo "::warning title=Deployment rollout failed::Attempting app-level rollback."
             kubectl rollout undo deployment/pixelated-empathy-api -n pixelated-empathy || true
             exit 1
           fi
