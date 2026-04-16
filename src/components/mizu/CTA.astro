@@ -87,16 +87,22 @@ const {
   .cta-shell {
     display: grid;
     gap: clamp(1.8rem, 4vw, 3.4rem);
+    text-align: center;
+    justify-items: center;
   }
 
   .cta-copy,
   .cta-decision {
     display: grid;
     gap: 1rem;
+    text-align: center;
+    justify-items: center;
   }
 
   .cta-copy {
-    max-width: 38rem; margin: 0 auto; text-align: center;
+    max-width: 38rem;
+    margin: 0 auto;
+    text-align: center;
   }
 
   .cta-verdict-copy {
@@ -119,6 +125,8 @@ const {
     gap: 0.45rem;
     padding: 0.95rem 0 0;
     border-top: 1px dotted rgba(253, 252, 252, 0.1);
+    text-align: center;
+    justify-items: center;
   }
 
   .cta-proof-item p,
@@ -169,6 +177,8 @@ const {
     margin: 0;
     padding: 0;
     list-style: none;
+    justify-items: center;
+    text-align: center;
   }
 
   .cta-rubric li {
@@ -231,6 +241,15 @@ const {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1rem;
       max-width: 34rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .cta-proof-item {
+      padding: 1rem;
+      border: 1px solid rgba(253, 252, 252, 0.14);
+      border-radius: 4px;
+      background: rgba(253, 252, 252, 0.018);
     }
   }
 </style>
