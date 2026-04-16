@@ -79,6 +79,7 @@ const artifactHighlights = artifact.context.slice(0, 2)
   .hero-artifact {
     width: 100%;
     min-height: 100%;
+    text-align: center;
     border: 1px solid rgba(253, 252, 252, 0.08);
     border-radius: 4px;
     background:
@@ -97,16 +98,19 @@ const artifactHighlights = artifact.context.slice(0, 2)
     display: grid;
     gap: 1rem;
     padding: clamp(1.2rem, 2vw, 1.5rem);
+    justify-items: center;
   }
 
   .hero-artifact__header {
     display: grid;
     gap: 0.7rem;
+    justify-items: center;
   }
 
   .hero-artifact__meta {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.65rem;
     flex-wrap: wrap;
   }
@@ -163,7 +167,8 @@ const artifactHighlights = artifact.context.slice(0, 2)
     border: 1px solid rgba(253, 252, 252, 0.08);
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.03);
-    text-align: left;
+    text-align: center;
+    justify-items: center;
   }
 
   .hero-artifact__readout-item span {
@@ -211,6 +216,7 @@ const artifactHighlights = artifact.context.slice(0, 2)
     gap: 0.45rem;
     padding: 0.75rem 0 0;
     border-top: 1px dotted rgba(253, 252, 252, 0.12);
+    justify-items: center;
   }
 
   .hero-artifact__highlight span {
