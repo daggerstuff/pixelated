@@ -1,5 +1,6 @@
 import { query } from "./index";
 import { randomBytes, createHash } from "crypto";
+import { logSecurityEvent, SecurityEventType } from "@/lib/security";
 
 export interface DeveloperApiKey {
   id: string;
@@ -11,6 +12,7 @@ export interface DeveloperApiKey {
   rate_limit: number;
   is_active: boolean;
   last_used_at: Date | null;
+  last_failed_at: Date | null;
   expires_at: Date | null;
   created_at: Date;
   updated_at: Date;
@@ -59,6 +61,7 @@ export class DeveloperApiKeyManager {
       rate_limit: number;
       is_active: boolean;
       last_used_at: Date | null;
+      last_failed_at: Date | null;
       expires_at: Date | null;
       created_at: Date;
       updated_at: Date;
@@ -66,7 +69,7 @@ export class DeveloperApiKeyManager {
       `INSERT INTO developer_api_keys (
         user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, expires_at
       ) VALUES ($1, $2, $3, $4, $5, $6, true, $7)
-      RETURNING id, user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, last_used_at, expires_at, created_at, updated_at`,
+      RETURNING id, user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, last_used_at, last_failed_at, expires_at, created_at, updated_at`,
       [input.user_id, keyHash, keyPrefix, input.name, scopes, rateLimit, expiresAt],
     );
 
@@ -89,7 +92,7 @@ export class DeveloperApiKeyManager {
     const keyPrefix = rawKey.substring(0, 8);
 
     const result = await query<DeveloperApiKey>(
-      `SELECT id, user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, last_used_at, expires_at, created_at, updated_at
+      `SELECT id, user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, last_used_at, last_failed_at, expires_at, created_at, updated_at
        FROM developer_api_keys
        WHERE key_prefix = $1 AND key_hash = $2 AND is_active = true`,
       [keyPrefix, keyHash],
@@ -102,11 +105,13 @@ export class DeveloperApiKeyManager {
     }
 
     if (apiKey.expires_at && new Date() > apiKey.expires_at) {
+      await this.recordFailedAttempt(apiKey.id, "expired");
       return { valid: false, error: "API key has expired" };
     }
 
     const rateLimitResult = await this.checkRateLimit(apiKey.id, apiKey.rate_limit);
     if (!rateLimitResult.allowed) {
+      await this.recordFailedAttempt(apiKey.id, "rate_limited");
       return {
         valid: false,
         error: "Rate limit exceeded",
@@ -115,13 +120,34 @@ export class DeveloperApiKeyManager {
       };
     }
 
-    await query(`UPDATE developer_api_keys SET last_used_at = NOW() WHERE id = $1`, [apiKey.id]);
+    await this.recordSuccessfulAttempt(apiKey.id);
 
     return {
       valid: true,
       api_key: apiKey,
       remainingRequests: rateLimitResult.remaining,
     };
+  }
+
+  private async recordSuccessfulAttempt(apiKeyId: string): Promise<void> {
+    try {
+      await query(`UPDATE developer_api_keys SET last_used_at = NOW() WHERE id = $1`, [apiKeyId]);
+    } catch {
+      // Non-critical, don't fail validation for audit logging errors
+    }
+  }
+
+  private async recordFailedAttempt(apiKeyId: string, reason: string): Promise<void> {
+    try {
+      await query(`UPDATE developer_api_keys SET last_failed_at = NOW() WHERE id = $1`, [apiKeyId]);
+
+      await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, apiKeyId, {
+        reason,
+        api_key_id: apiKeyId,
+      });
+    } catch {
+      // Non-critical
+    }
   }
 
   private async checkRateLimit(
@@ -167,7 +193,7 @@ export class DeveloperApiKeyManager {
 
   async listApiKeys(userId: string): Promise<Omit<DeveloperApiKey, "key_hash">[]> {
     const result = await query<Omit<DeveloperApiKey, "key_hash">>(
-      `SELECT id, user_id, key_prefix, name, scopes, rate_limit, is_active, last_used_at, expires_at, created_at, updated_at
+      `SELECT id, user_id, key_prefix, name, scopes, rate_limit, is_active, last_used_at, last_failed_at, expires_at, created_at, updated_at
        FROM developer_api_keys
        WHERE user_id = $1
        ORDER BY created_at DESC`,
@@ -181,7 +207,7 @@ export class DeveloperApiKeyManager {
     userId: string,
   ): Promise<Omit<DeveloperApiKey, "key_hash"> | null> {
     const result = await query<Omit<DeveloperApiKey, "key_hash">>(
-      `SELECT id, user_id, key_prefix, name, scopes, rate_limit, is_active, last_used_at, expires_at, created_at, updated_at
+      `SELECT id, user_id, key_prefix, name, scopes, rate_limit, is_active, last_used_at, last_failed_at, expires_at, created_at, updated_at
        FROM developer_api_keys
        WHERE id = $1 AND user_id = $2`,
       [apiKeyId, userId],

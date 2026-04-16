@@ -102,7 +102,40 @@ export const ROUTE_CONFIGS: RouteConfig[] = [
   { path: "/api/internal/*", strategy: "apiKeyOnly", family: "system" },
 ];
 
-const routeCache = new Map<string, RouteConfig>();
+const MAX_ROUTE_CACHE_SIZE = 500;
+
+class LRUCache<K, V> {
+  private cache = new Map<K, V>();
+
+  constructor(private maxSize: number) {}
+
+  get(key: K): V | undefined {
+    const value = this.cache.get(key);
+    if (value !== undefined) {
+      this.cache.delete(key);
+      this.cache.set(key, value);
+    }
+    return value;
+  }
+
+  set(key: K, value: V): void {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
+    }
+    this.cache.set(key, value);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+const routeCache = new LRUCache<string, RouteConfig>(MAX_ROUTE_CACHE_SIZE);
 
 function normalizePath(path: string): string {
   const parts = path.split("/").filter(Boolean);
@@ -125,7 +158,7 @@ function matchRoute(pattern: string, path: string): { matched: boolean; isWildca
     if (patternPart === "*") {
       if (i === patternParts.length - 1) {
         return {
-          matched: pathParts.length >= i,
+          matched: pathParts.length === patternParts.length,
           isWildcard: true,
         };
       }
@@ -148,8 +181,7 @@ function matchRoute(pattern: string, path: string): { matched: boolean; isWildca
 }
 
 export function getRouteConfig(path: string, _method: string): RouteConfig | null {
-  const cacheKey = path;
-  const cached = routeCache.get(cacheKey);
+  const cached = routeCache.get(path);
   if (cached) {
     return cached;
   }
@@ -159,7 +191,7 @@ export function getRouteConfig(path: string, _method: string): RouteConfig | nul
   for (const config of ROUTE_CONFIGS) {
     const { matched } = matchRoute(config.path, normalizedPath);
     if (matched) {
-      routeCache.set(cacheKey, config);
+      routeCache.set(path, config);
       return config;
     }
   }
