@@ -58,24 +58,17 @@ export const SCOPES: Record<string, ScopeDefinition> = {
 };
 
 export const ROUTE_CONFIGS: RouteConfig[] = [
-  // Public routes - no auth required
   { path: "/api/health", strategy: "either", family: "public" },
   { path: "/api/v1/health", strategy: "either", family: "public" },
-
-  // User routes - JWT only (sessions, profile)
   { path: "/api/session/*", strategy: "jwtOnly", family: "user" },
   { path: "/api/v1/profile", strategy: "jwtOnly", family: "user" },
   { path: "/api/v1/preferences", strategy: "jwtOnly", family: "user" },
-
-  // Memory routes - either JWT or API key
   {
     path: "/api/memory/*",
     strategy: "either",
     family: "user",
     requiredScopes: ["memory:read"],
   },
-
-  // Developer routes - API key preferred, JWT also allowed
   {
     path: "/api/developer/api-keys",
     strategy: "either",
@@ -88,16 +81,12 @@ export const ROUTE_CONFIGS: RouteConfig[] = [
     family: "developer",
     requiredScopes: ["developer:manage"],
   },
-
-  // Analytics routes - API key for external integrations
   {
     path: "/api/v1/analytics/*",
     strategy: "either",
     family: "developer",
     requiredScopes: ["analytics:read"],
   },
-
-  // Admin routes - JWT with admin role only
   {
     path: "/api/admin/*",
     strategy: "jwtOnly",
@@ -110,34 +99,72 @@ export const ROUTE_CONFIGS: RouteConfig[] = [
     family: "admin",
     requiredScopes: ["admin"],
   },
-
-  // System routes - API key only (for internal services)
   { path: "/api/internal/*", strategy: "apiKeyOnly", family: "system" },
 ];
 
-export function getRouteConfig(path: string, method: string): RouteConfig | null {
+const routeCache = new Map<string, RouteConfig>();
+
+function normalizePath(path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  return "/" + parts.join("/");
+}
+
+function matchRoute(pattern: string, path: string): { matched: boolean; isWildcard: boolean } {
+  const patternParts = pattern.split("/").filter(Boolean);
+  const pathParts = path.split("/").filter(Boolean);
+
+  const isTerminalWildcard =
+    patternParts[patternParts.length - 1] === "*" && patternParts.length === 1;
+  if (isTerminalWildcard) {
+    return { matched: true, isWildcard: true };
+  }
+
+  for (let i = 0; i < patternParts.length; i++) {
+    const patternPart = patternParts[i];
+
+    if (patternPart === "*") {
+      if (i === patternParts.length - 1) {
+        return {
+          matched: pathParts.length >= i,
+          isWildcard: true,
+        };
+      }
+      continue;
+    }
+
+    if (i >= pathParts.length) {
+      return { matched: false, isWildcard: false };
+    }
+
+    if (patternPart !== pathParts[i]) {
+      return { matched: false, isWildcard: false };
+    }
+  }
+
+  return {
+    matched: patternParts.length === pathParts.length,
+    isWildcard: false,
+  };
+}
+
+export function getRouteConfig(path: string, _method: string): RouteConfig | null {
+  const cacheKey = path;
+  const cached = routeCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const normalizedPath = normalizePath(path);
+
   for (const config of ROUTE_CONFIGS) {
-    if (matchRoute(config.path, path, method)) {
+    const { matched } = matchRoute(config.path, normalizedPath);
+    if (matched) {
+      routeCache.set(cacheKey, config);
       return config;
     }
   }
+
   return null;
-}
-
-function matchRoute(pattern: string, path: string, _method: string): boolean {
-  const patternParts = pattern.split("/");
-  const pathParts = path.split("/");
-
-  for (let i = 0; i < patternParts.length; i++) {
-    if (patternParts[i] === "*") {
-      return true;
-    }
-    if (patternParts[i] !== pathParts[i] && !patternParts[i].includes("*")) {
-      return false;
-    }
-  }
-
-  return patternParts.length === pathParts.length;
 }
 
 export const FAMILY_DEFAULTS: Record<
