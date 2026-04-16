@@ -1,4 +1,4 @@
-name: Deploy to Production (staging branch)
+name: Deploy to Kubernetes
 
 permissions:
   contents: read
@@ -55,9 +55,8 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v3
         with:
           cluster_name:
-            ${{ secrets.GKE_CLUSTER_NAME_STAGING || 'pixelated-empathy-staging'
-            }}
-          location: ${{ secrets.GKE_CLUSTER_LOCATION_STAGING || 'us-west1' }}
+            pixelated-empathy
+          location: us-west1
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Determine image tag
@@ -92,8 +91,21 @@ jobs:
           [[ -n "$JWT_SECRET" ]] || { echo "Missing secret: JWT_SECRET"; exit 1; }
           [[ -n "$API_KEY" ]] || { echo "Missing secret: API_KEY"; exit 1; }
 
-      - name: Apply production kustomize manifests
-        run: kubectl apply -k k8s/overlays/production
+      - name: Validate deployment kustomize overlay
+        run: |
+          KUSTOMIZATION_DIR="k8s/overlays/staging"
+          for file in "$KUSTOMIZATION_DIR/kustomization.yaml" "$KUSTOMIZATION_DIR/kustomization.yml" "$KUSTOMIZATION_DIR/Kustomization"; do
+            if [[ -f "$file" ]]; then
+              echo "Found kustomization file: $file"
+              exit 0
+            fi
+          done
+          echo "::error title=Missing kustomization::Could not find kustomization.yaml/yml/Kustomization in $KUSTOMIZATION_DIR"
+          ls -la "$KUSTOMIZATION_DIR" || true
+          exit 1
+
+      - name: Apply deployment kustomize manifests
+        run: kubectl apply -k k8s/overlays/staging
 
       - name: Update k8s deployment image
         run:
@@ -114,6 +126,23 @@ jobs:
         run: |
           if kubectl rollout status deployment/pixelated-empathy-api -n pixelated-empathy --timeout=600s; then
             echo "Rollout succeeded."
+            echo "Checking HPA metric sampling health (non-blocking)."
+            if kubectl wait --for=jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}'=True hpa/pixelated-empathy-api-hpa -n pixelated-empathy --timeout=60s; then
+              echo "HPA scaling condition is active."
+            else
+              echo "::warning title=HPA metrics warming up::HPA is still collecting metrics; rollout succeeded, continuing."
+            fi
+
+            CURRENT_UTIL=$(kubectl get hpa pixelated-empathy-api-hpa -n pixelated-empathy -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' 2>/dev/null || true)
+            CURRENT_METRIC_COUNT=$(kubectl get hpa pixelated-empathy-api-hpa -n pixelated-empathy -o jsonpath='{.status.currentMetrics[*].type}' 2>/dev/null | tr ' ' '\n' | grep -c . || true)
+            if [[ -n "$CURRENT_UTIL" ]]; then
+              echo "HPA current CPU utilization sample: ${CURRENT_UTIL}%"
+            elif [[ "$CURRENT_METRIC_COUNT" -eq 0 ]]; then
+              echo "::warning title=HPA has no current utilization sample::HPA is active but metrics are not yet available."
+            else
+              echo "HPA current metrics payload is empty; will be updated by next scrape."
+            fi
+            kubectl get hpa pixelated-empathy-api-hpa -n pixelated-empathy -o wide || true
           else
             echo "Rollout failed or timed out."
             echo "Deployment details:"
