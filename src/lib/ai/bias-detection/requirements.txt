@@ -330,7 +330,7 @@ jupyterlab-widgets==3.0.16
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   ipywidgets
-keras==3.13.2
+keras==3.14.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   tensorflow
@@ -707,7 +707,7 @@ pyflakes==3.4.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   flake8
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   ipython
@@ -880,7 +880,7 @@ tensorboard-data-server==0.7.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   tensorboard
-tensorflow==2.20.0
+tensorflow==2.21.0rc0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   witwidget
