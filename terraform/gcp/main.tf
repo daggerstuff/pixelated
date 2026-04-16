@@ -245,7 +245,7 @@ resource "google_kms_crypto_key_iam_member" "artifact_registry" {
 # --- Datastore ---
 resource "google_sql_database_instance" "postgres" {
   name                = local.sql_instance_name
-  database_version    = "POSTGRES_16"
+  database_version    = var.postgres_version
   region              = var.gcp_region
   deletion_protection = var.enable_deletion_protection
 
@@ -291,6 +291,11 @@ resource "google_sql_database_instance" "postgres" {
 
     database_flags {
       name  = "log_disconnections"
+      value = "on"
+    }
+
+    database_flags {
+      name  = "log_duration"
       value = "on"
     }
 

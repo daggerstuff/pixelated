@@ -6,7 +6,7 @@ variable "project_id" {
 variable "environment" {
   description = "Deployment environment label."
   type        = string
-  default     = "staging"
+  default     = "single"
 }
 
 variable "app_name" {
@@ -72,11 +72,11 @@ variable "services_secondary_cidr" {
 variable "postgres_version" {
   description = "Cloud SQL PostgreSQL version."
   type        = string
-  default     = "POSTGRES_16"
+  default     = "POSTGRES_17"
 
   validation {
-    condition     = var.postgres_version == "POSTGRES_16"
-    error_message = "Use the latest major PostgreSQL version. Set postgres_version to POSTGRES_16."
+    condition     = var.postgres_version == "POSTGRES_17"
+    error_message = "Use the latest major PostgreSQL version. Set postgres_version to POSTGRES_17."
   }
 }
 

@@ -1,11 +1,15 @@
 import { authenticateRequest, AuthenticatedRequest } from "./auth0-middleware";
-import { getRouteConfig, FAMILY_DEFAULTS, type RouteFamily } from "./route-config";
+import {
+  getRouteConfig,
+  FAMILY_DEFAULTS,
+  type AuthStrategy,
+  type RouteFamily,
+} from "./route-config";
 
-export type AuthMode = "jwt" | "api_key" | "either";
 export type RouteScope = string;
 
 export interface RouteProtectionOptions {
-  strategy: "jwtOnly" | "apiKeyOnly" | "either";
+  strategy: AuthStrategy;
   requiredScopes?: RouteScope[];
 }
 
@@ -55,18 +59,18 @@ function inferRouteFamily(path: string): RouteFamily {
   return "user";
 }
 
-export const jwtOnly = (requiredScopes?: RouteScope[]) => ({
-  strategy: "jwtOnly" as const,
+export const jwtOnly = (requiredScopes?: RouteScope[]): RouteProtectionOptions => ({
+  strategy: "jwtOnly",
   requiredScopes,
 });
 
-export const apiKeyOnly = (requiredScopes?: RouteScope[]) => ({
-  strategy: "apiKeyOnly" as const,
+export const apiKeyOnly = (requiredScopes?: RouteScope[]): RouteProtectionOptions => ({
+  strategy: "apiKeyOnly",
   requiredScopes,
 });
 
-export const eitherAuth = (requiredScopes?: RouteScope[]) => ({
-  strategy: "either" as const,
+export const eitherAuth = (requiredScopes?: RouteScope[]): RouteProtectionOptions => ({
+  strategy: "either",
   requiredScopes,
 });
 
@@ -106,4 +110,3 @@ export const ROUTE_FAMILIES = {
 } as const;
 
 export type RouteFamilyType = keyof typeof ROUTE_FAMILIES;
-export type RouteType = string;
