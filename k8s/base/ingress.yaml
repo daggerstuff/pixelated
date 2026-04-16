@@ -7,15 +7,17 @@ metadata:
     kubernetes.io/ingress.class: gce
     networking.gke.io/managed-certificates: pixelated-empathy-cert
     networking.gke.io/v1beta1.FrontendConfig: pixelated-empathy-frontend-config
+    ingress.gcp.kubernetes.io/health-check-path: /health
 spec:
   ingressClassName: gce
   rules:
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: pixelated-empathy-api
-                port:
-                  number: 80
+  - host: pixelatedempathy.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pixelated-empathy-api
+            port:
+              number: 80
