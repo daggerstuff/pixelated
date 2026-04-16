@@ -1,28 +1,15 @@
 import { z } from "zod";
 import { developerApiKeyManager } from "@/lib/db/developer-api-keys";
+import { VALID_API_KEY_SCOPES, DEFAULT_API_KEY_SCOPES } from "@/lib/auth/scopes";
 import { jsonError, jsonResponse } from "@/pages/api/memory/_shared";
 import { withAuth } from "@/middleware/auth";
 import { logSecurityEvent, SecurityEventType } from "@/lib/security";
 
-const VALID_SCOPES = [
-  "read",
-  "write",
-  "admin",
-  "memory:read",
-  "memory:write",
-  "developer:manage",
-  "analytics:read",
-] as const;
-
 const CreateApiKeySchema = z.object({
   name: z.string().min(1).max(255),
-  scopes: z.array(z.enum(VALID_SCOPES)).optional().default(["read", "write"]),
+  scopes: z.array(z.enum(VALID_API_KEY_SCOPES)).optional().default(DEFAULT_API_KEY_SCOPES),
   rate_limit: z.number().int().min(1).max(10000).optional().default(1000),
   expires_in_days: z.number().int().min(1).max(365).optional(),
-});
-
-const PatchApiKeySchema = z.object({
-  scopes: z.array(z.enum(VALID_SCOPES)).min(1),
 });
 
 const MAX_KEYS_PER_USER = 10;
