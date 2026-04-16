@@ -228,7 +228,11 @@ jobs:
 
       - name: Run security audit
         run: |
-          pnpm audit --json --omit=dev --audit-level moderate > audit-results.json || true
+          if pnpm audit --help 2>/dev/null | rg -q -- "--prod"; then
+            pnpm audit --json --prod --audit-level moderate > audit-results.json || true
+          else
+            pnpm audit --json --audit-level moderate > audit-results.json || true
+          fi
           if [ ! -s audit-results.json ]; then
             echo "pnpm audit returned an empty output." >&2
             exit 1
@@ -254,7 +258,41 @@ jobs:
 
           let audit;
           try {
-            audit = JSON.parse(data || '{}');
+            const normalized = data
+              .split('\n')
+              .map((line) => line.trim())
+              .filter(Boolean)
+              .map((line) => JSON.parse(line))
+              .filter((entry) => entry && typeof entry === 'object');
+
+            if (normalized.length === 1) {
+              audit = normalized[0];
+            } else if (normalized.length > 1) {
+              audit = {
+                metadata: {},
+                vulnerabilities: {},
+                advisories: {},
+                entries: normalized,
+              };
+              console.log(`Detected multi-line pnpm audit output with ${normalized.length} JSON records; normalized for compatibility.`);
+
+              const list = normalized.filter(
+                (entry) => entry.type === 'auditAdvisory' || entry.type === 'auditStart' || entry.type === 'auditSummary'
+              );
+              for (const entry of list) {
+                if (entry.type === 'auditSummary' && entry.metadata && typeof entry.metadata === 'object') {
+                  audit.metadata = entry.metadata;
+                }
+                if (entry.type === 'auditAdvisory' && entry.data && entry.data.advisory) {
+                  const advisory = entry.data.advisory;
+                  if (advisory.id != null) {
+                    audit.advisories[advisory.id] = advisory;
+                  }
+                }
+              }
+            } else {
+              audit = {};
+            }
           } catch (error) {
             console.error('Failed to parse pnpm audit JSON:', error.message);
             process.exit(1);

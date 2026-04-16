@@ -1,21 +1,12 @@
 import { z } from "zod";
 import { developerApiKeyManager } from "@/lib/db/developer-api-keys";
+import { VALID_API_KEY_SCOPES } from "@/lib/auth/scopes";
 import { jsonError, jsonResponse } from "@/pages/api/memory/_shared";
 import { withAuth } from "@/middleware/auth";
 import { logSecurityEvent, SecurityEventType } from "@/lib/security";
 
-const VALID_SCOPES = [
-  "read",
-  "write",
-  "admin",
-  "memory:read",
-  "memory:write",
-  "developer:manage",
-  "analytics:read",
-] as const;
-
 const PatchApiKeySchema = z.object({
-  scopes: z.array(z.enum(VALID_SCOPES)).min(1),
+  scopes: z.array(z.enum(VALID_API_KEY_SCOPES)).min(1),
 });
 
 function extractIdFromPath(request: Request): string {

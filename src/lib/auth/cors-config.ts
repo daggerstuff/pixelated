@@ -26,6 +26,28 @@ const EXPOSED_HEADERS = [
 
 const MAX_AGE = 86400;
 
+interface CorsValidationCache {
+  valid: boolean;
+  timestamp: number;
+}
+
+const CORS_CACHE_TTL_MS = 30 * 1000;
+const corsValidationCache = new Map<string, CorsValidationCache>();
+
+function getCachedCorsValidation(cacheKey: string): boolean | null {
+  const cached = corsValidationCache.get(cacheKey);
+  if (!cached) return null;
+  if (Date.now() - cached.timestamp > CORS_CACHE_TTL_MS) {
+    corsValidationCache.delete(cacheKey);
+    return null;
+  }
+  return cached.valid;
+}
+
+function setCachedCorsValidation(cacheKey: string, valid: boolean): void {
+  corsValidationCache.set(cacheKey, { valid, timestamp: Date.now() });
+}
+
 export function isDeveloperApiRequest(request: Request): boolean {
   const url = new URL(request.url);
   return url.pathname.startsWith("/api/developer/") || url.pathname.startsWith("/api/v1/");
@@ -76,9 +98,15 @@ export async function getDeveloperCorsHeadersWithApiKeyValidation(
   }
 
   const apiKey = request.headers.get("X-API-Key");
-  if (apiKey) {
-    const validation = await developerApiKeyManager.validateApiKey(apiKey);
-    if (validation.valid) {
+  if (!apiKey) {
+    return headers;
+  }
+
+  const cacheKey = `cors:${apiKey.substring(0, 8)}`;
+  const cachedResult = getCachedCorsValidation(cacheKey);
+
+  if (cachedResult !== null) {
+    if (cachedResult) {
       headers.set("Access-Control-Allow-Origin", origin);
       headers.set("Access-Control-Allow-Methods", ALLOWED_METHODS.join(", "));
       headers.set("Access-Control-Allow-Headers", ALLOWED_HEADERS.join(", "));
@@ -87,6 +115,22 @@ export async function getDeveloperCorsHeadersWithApiKeyValidation(
       headers.set("Access-Control-Max-Age", MAX_AGE.toString());
       headers.set("Vary", "Origin");
     }
+    return headers;
+  }
+
+  const validation = await developerApiKeyManager.validateApiKey(apiKey);
+  const isValid = validation.valid;
+
+  setCachedCorsValidation(cacheKey, isValid);
+
+  if (isValid) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Methods", ALLOWED_METHODS.join(", "));
+    headers.set("Access-Control-Allow-Headers", ALLOWED_HEADERS.join(", "));
+    headers.set("Access-Control-Expose-Headers", EXPOSED_HEADERS.join(", "));
+    headers.set("Access-Control-Allow-Credentials", "true");
+    headers.set("Access-Control-Max-Age", MAX_AGE.toString());
+    headers.set("Vary", "Origin");
   }
 
   return headers;
