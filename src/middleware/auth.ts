@@ -6,9 +6,6 @@
 import { getSession, isSessionValid } from "@/lib/auth/session";
 import type { Session } from "@/lib/auth/session";
 
-/**
- * API key session shape for developer authentication
- */
 export interface ApiKeySession {
   user: {
     id: string;
@@ -16,58 +13,14 @@ export interface ApiKeySession {
     name?: string;
     email?: string;
   };
-  /** ISO-8601 timestamp when the session expires */
   expires: string;
-  /** Indicates this is an API key session */
   authType: "api-key";
 }
 
-/**
- * Union type for all possible session types
- */
 export type ValidSession = Session | ApiKeySession;
 
-/**
- * Extended handler type that receives the validated Session alongside the
- * Request so inner handlers do not need a redundant token round-trip.
- */
 export type AuthenticatedHandler = (request: Request, session: ValidSession) => Promise<Response>;
 
-/**
- * API key session shape for developer authentication
- */
-export interface ApiKeySession {
-  user: {
-    id: string;
-    role: "developer" | "admin";
-    name?: string;
-    email?: string;
-  };
-  /** ISO-8601 timestamp when the session expires */
-  expires: string;
-  /** Indicates this is an API key session */
-  authType: "api-key";
-}
-
-/**
- * Union type for all possible session types
- */
-export type ValidSession = Session | ApiKeySession;
-
-/**
- * Wrap an Astro / fetch-API handler with authentication enforcement.
- * Supports both JWT (user) and API key (developer) authentication.
- *
- * The resolved Session is passed as a second argument to the inner handler
- * so callers never need to call getSession() again.
- *
- * Usage in Astro API routes:
- *   export const GET = withAuth(async (request, session) => { ... })
- *
- * @param handler  The inner handler to call when auth passes
- * @param options  Optional configuration
- * @returns        A standard (Request) => Promise<Response> handler
- */
 export function withAuth(
   handler: AuthenticatedHandler,
   options?: {
