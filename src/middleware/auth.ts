@@ -1,10 +1,15 @@
 /**
  * Authentication middleware for protecting routes.
  * Supports both JWT (for users) and API keys (for developers).
+ *
+ * IMPORTANT: API key validation uses DeveloperApiKeyManager which performs
+ * proper database lookups with SHA-256 hash verification. Never use
+ * environment variable validation or prefix-based pseudo-authentication.
  */
 
 import { getSession, isSessionValid } from "@/lib/auth/session";
 import type { Session } from "@/lib/auth/session";
+import { developerApiKeyManager } from "@/lib/db/developer-api-keys";
 
 export interface ApiKeySession {
   user: {
@@ -15,6 +20,7 @@ export interface ApiKeySession {
   };
   expires: string;
   authType: "api-key";
+  scopes: string[];
 }
 
 export type ValidSession = Session | ApiKeySession;
@@ -28,6 +34,8 @@ export function withAuth(
     allowPaths?: string[];
     /** Accept API key authentication in addition to JWT */
     allowApiKey?: boolean;
+    /** Required scopes for API key access */
+    requiredScopes?: string[];
   },
 ): (request: Request) => Promise<Response> {
   return async (request: Request): Promise<Response> => {
@@ -51,7 +59,7 @@ export function withAuth(
 
     // If JWT fails and API key is allowed, try API key authentication
     if (!isValidSession && options?.allowApiKey) {
-      const apiKeySession = await validateApiKey(request);
+      const apiKeySession = await validateApiKey(request, options.requiredScopes);
       if (apiKeySession) {
         session = apiKeySession;
         isValidSession = true;
@@ -71,11 +79,20 @@ export function withAuth(
 }
 
 /**
- * Validate API key from request headers
+ * Validate API key from request headers using proper database validation.
+ *
+ * SECURITY: This function performs actual database lookup with SHA-256 hash
+ * verification. Do NOT replace with environment variable checks or prefix-based
+ * pseudo-authentication.
+ *
  * @param request The incoming request
+ * @param requiredScopes Optional scopes that must be present on the key
  * @returns ApiKeySession if valid, null otherwise
  */
-async function validateApiKey(request: Request): Promise<ApiKeySession | null> {
+async function validateApiKey(
+  request: Request,
+  requiredScopes?: string[],
+): Promise<ApiKeySession | null> {
   // Extract API key from X-API-Key header
   const apiKey = request.headers.get("X-API-Key");
 
@@ -83,80 +100,35 @@ async function validateApiKey(request: Request): Promise<ApiKeySession | null> {
     return null;
   }
 
-  // Validate against environment variable or secure storage
-  // For now, we'll check against a predefined key in development
-  // In production, this should be validated against a secure store/database
-  const validApiKeys = [process.env.DEV_API_KEY, process.env.API_KEY].filter(
-    (key): key is string => key !== undefined && key !== "",
-  );
+  // Use DeveloperApiKeyManager for proper database-backed validation
+  // This performs SHA-256 hash lookup against stored keys
+  const validation = await developerApiKeyManager.validateApiKey(apiKey);
 
-  if (!validApiKeys.includes(apiKey)) {
+  if (!validation.valid || !validation.api_key) {
     return null;
   }
 
-  // For demonstration, we'll decode basic info from the API key
-  // In a real implementation, this would lookup the developer profile
-  const developerInfo = await getDeveloperInfoFromApiKey(apiKey);
+  const keyRecord = validation.api_key;
 
-  if (!developerInfo) {
-    return null;
+  // Check required scopes if specified
+  if (requiredScopes && requiredScopes.length > 0) {
+    const keyScopes = keyRecord.scopes || [];
+    const hasAllScopes = requiredScopes.every((scope) => keyScopes.includes(scope));
+    if (!hasAllScopes) {
+      return null;
+    }
   }
 
+  // Return properly constructed session from database record
   return {
     user: {
-      id: developerInfo.id,
-      role: developerInfo.role,
-      name: developerInfo.name,
-      email: developerInfo.email,
+      id: keyRecord.user_id,
+      role: keyRecord.scopes.includes("admin") ? "admin" : "developer",
     },
-    expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // API keys typically have longer expiry
+    expires:
+      keyRecord.expires_at?.toISOString() ||
+      new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
     authType: "api-key",
+    scopes: keyRecord.scopes,
   };
-}
-
-/**
- * Get developer information from API key
- * In production, this would query a database or secure store
- * @param apiKey The API key to lookup
- * @returns Developer information if found
- */
-async function getDeveloperInfoFromApiKey(apiKey: string): Promise<{
-  id: string;
-  role: "developer" | "admin";
-  name?: string;
-  email?: string;
-} | null> {
-  // This is a simplified implementation
-  // In reality, you'd query a developer/apikey table in your database
-
-  // For now, we'll simulate based on the API key format
-  if (apiKey.startsWith("dev_")) {
-    return {
-      id: "dev_" + apiKey.substring(4, 12), // Simplified ID generation
-      role: "developer",
-      name: "Developer",
-      email: "developer@pixelatedempathy.com",
-    };
-  }
-
-  if (apiKey.startsWith("admin_")) {
-    return {
-      id: "admin_" + apiKey.substring(6, 14), // Simplified ID generation
-      role: "admin",
-      name: "Administrator",
-      email: "admin@pixelatedempathy.com",
-    };
-  }
-
-  // Fallback for testing
-  if (apiKey === "test-dev-key-123") {
-    return {
-      id: "dev_001",
-      role: "developer",
-      name: "Test Developer",
-      email: "test@pixelatedempathy.com",
-    };
-  }
-
-  return null;
 }
