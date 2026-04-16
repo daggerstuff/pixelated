@@ -520,14 +520,14 @@ const isSupervisor = userRole === 'admin'
     type="application/json"
     id="session-data"
     is:inline
-    set:html={JSON.stringify(sessionData)}
+    set:html={JSON.stringify(sessionData).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
   />
 
   <script
     type="application/json"
     id="user-data"
     is:inline
-    set:html={JSON.stringify({ role: userRole, id: session.user.id })}
+    set:html={JSON.stringify({ role: userRole, id: session.user.id }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
   />
 </Layout>
 
