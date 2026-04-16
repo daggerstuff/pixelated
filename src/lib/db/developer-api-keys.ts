@@ -28,10 +28,13 @@ export interface ApiKeyValidationResult {
   valid: boolean;
   api_key?: DeveloperApiKey;
   error?: string;
+  rateLimited?: boolean;
+  remainingRequests?: number;
 }
 
 const DEFAULT_SCOPES = ["read", "write"];
 const DEFAULT_RATE_LIMIT = 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 export class DeveloperApiKeyManager {
   async createApiKey(
@@ -71,7 +74,7 @@ export class DeveloperApiKeyManager {
     return {
       api_key: {
         ...apiKey,
-        key_hash: "", // Don't return the hash
+        key_hash: "",
       },
       plain_key: rawKey,
     };
@@ -102,9 +105,55 @@ export class DeveloperApiKeyManager {
       return { valid: false, error: "API key has expired" };
     }
 
+    const rateLimitResult = await this.checkRateLimit(apiKey.id, apiKey.rate_limit);
+    if (!rateLimitResult.allowed) {
+      return {
+        valid: false,
+        error: "Rate limit exceeded",
+        rateLimited: true,
+        remainingRequests: 0,
+      };
+    }
+
     await query(`UPDATE developer_api_keys SET last_used_at = NOW() WHERE id = $1`, [apiKey.id]);
 
-    return { valid: true, api_key: apiKey };
+    return {
+      valid: true,
+      api_key: apiKey,
+      remainingRequests: rateLimitResult.remaining,
+    };
+  }
+
+  private async checkRateLimit(
+    apiKeyId: string,
+    maxRequests: number,
+  ): Promise<{ allowed: boolean; remaining: number }> {
+    const windowStart = new Date(
+      Math.floor(Date.now() / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS,
+    );
+
+    const countResult = await query<{ count: string }>(
+      `SELECT COALESCE(SUM(request_count), 0)::int as count
+       FROM api_key_rate_limits
+       WHERE api_key_id = $1 AND window_start >= $2`,
+      [apiKeyId, windowStart],
+    );
+
+    const currentCount = parseInt(countResult.rows[0]?.count || "0", 10);
+
+    if (currentCount >= maxRequests) {
+      return { allowed: false, remaining: 0 };
+    }
+
+    await query(
+      `INSERT INTO api_key_rate_limits (api_key_id, window_start, request_count)
+       VALUES ($1, $2, 1)
+       ON CONFLICT (api_key_id, window_start)
+       DO UPDATE SET request_count = api_key_rate_limits.request_count + 1`,
+      [apiKeyId, windowStart],
+    );
+
+    return { allowed: true, remaining: maxRequests - currentCount - 1 };
   }
 
   async revokeApiKey(apiKeyId: string, userId: string): Promise<boolean> {
@@ -161,34 +210,3 @@ export class DeveloperApiKeyManager {
 }
 
 export const developerApiKeyManager = new DeveloperApiKeyManager();
-
-export async function initializeDeveloperApiKeysTable(): Promise<void> {
-  await query(`
-    CREATE TABLE IF NOT EXISTS developer_api_keys (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      key_hash VARCHAR(64) NOT NULL UNIQUE,
-      key_prefix VARCHAR(8) NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      scopes TEXT[] NOT NULL DEFAULT '{"read", "write"}',
-      rate_limit INTEGER NOT NULL DEFAULT 1000,
-      is_active BOOLEAN NOT NULL DEFAULT true,
-      last_used_at TIMESTAMP,
-      expires_at TIMESTAMP,
-      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-    )
-  `);
-
-  await query(`
-    CREATE INDEX IF NOT EXISTS idx_developer_api_keys_user_id ON developer_api_keys(user_id)
-  `);
-
-  await query(`
-    CREATE INDEX IF NOT EXISTS idx_developer_api_keys_key_prefix ON developer_api_keys(key_prefix)
-  `);
-
-  await query(`
-    CREATE INDEX IF NOT EXISTS idx_developer_api_keys_is_active ON developer_api_keys(is_active)
-  `);
-}

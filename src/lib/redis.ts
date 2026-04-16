@@ -257,6 +257,14 @@ function createRedisClient() {
 }
 
 export const redis = createRedisClient()
+if (typeof (redis as { on?: (...args: unknown[]) => void }).on === 'function') {
+  ;(redis as { on: (event: string, handler: (...args: unknown[]) => void) => void }).on(
+    'error',
+    (error: unknown) => {
+      console.warn('Redis connection warning:', error)
+    },
+  )
+}
 
 // Backward-compatible helper for modules expecting a getter
 export function getRedisClient() {
@@ -321,6 +329,22 @@ export async function removeFromCache(key: string): Promise<boolean> {
     return false
   }
 }
+
+/**
+ * Attach safe error handling to the redis client to avoid unhandled error events.
+ */
+function attachRedisErrorHandling() {
+  if (redis && typeof (redis as { on: unknown }).on === 'function') {
+    ;(redis as { on: (event: string, handler: (...args: unknown[]) => void) => void }).on(
+      'error',
+      (err: unknown) => {
+        console.warn('Redis connection warning:', err)
+      },
+    )
+  }
+}
+
+attachRedisErrorHandling()
 
 /**
  * Check Redis connectivity

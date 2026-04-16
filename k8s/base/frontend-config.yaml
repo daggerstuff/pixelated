@@ -5,4 +5,4 @@ metadata:
   namespace: pixelated-empathy
 spec:
   redirectToHttps:
-    enabled: true
+    enabled: false
