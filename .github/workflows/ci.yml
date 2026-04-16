@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: [main, master, staging]
+    branches: [staging]
     paths:
       - 'src/**'
       - 'ai/**'
@@ -17,10 +17,9 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/ci.yml'
-      - '.github/workflows/deploy-staging.yml'
-      - '.github/workflows/deploy-production.yml'
+      - '.github/workflows/deploy-kubernetes.yml'
   pull_request:
-    branches: [main, master, staging]
+    branches: [staging]
   workflow_dispatch:
 
 jobs:
