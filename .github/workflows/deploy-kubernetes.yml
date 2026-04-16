@@ -27,6 +27,8 @@ jobs:
     env:
       ARTIFACT_REGISTRY_LOCATION: us-west1
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
+      GKE_CLUSTER_NAME: pixelated-empathy-staging
+      GKE_CLUSTER_LOCATION: us-west1
 
     steps:
       - uses: actions/checkout@v6
@@ -51,12 +53,29 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           install_components: 'kubectl'
 
+      - name: Verify GKE cluster exists
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          if ! gcloud container clusters describe "$GKE_CLUSTER_NAME" \
+            --project "$GCP_PROJECT_ID" \
+            --location "$GKE_CLUSTER_LOCATION" \
+            --format="value(name,location,status)" \
+            >/tmp/gke-cluster.txt; then
+            echo "::error title=Missing GKE cluster::Could not find cluster '${GKE_CLUSTER_NAME}' in project '${GCP_PROJECT_ID}' in location '${GKE_CLUSTER_LOCATION}'."
+            echo "Available clusters in '${GCP_PROJECT_ID}':"
+            gcloud container clusters list --project "$GCP_PROJECT_ID" --format="table(name,location,status)" || true
+            exit 1
+          fi
+          echo "Target GKE cluster found:"
+          cat /tmp/gke-cluster.txt
+
       - name: Authenticate to GKE
         uses: google-github-actions/get-gke-credentials@v3
         with:
-          cluster_name:
-            pixelated-empathy
-          location: us-west1
+          cluster_name: ${{ env.GKE_CLUSTER_NAME }}
+          location: ${{ env.GKE_CLUSTER_LOCATION }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Determine image tag
