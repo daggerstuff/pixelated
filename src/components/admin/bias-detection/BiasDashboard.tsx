@@ -127,6 +127,26 @@ interface AlertAction {
   notes?: string
 }
 
+// ⚡ Bolt: Extracted CustomTooltip to module level to prevent Recharts from recreating the function on every render.
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className='bg-white border-gray-200 rounded-lg border p-3 shadow-lg'>
+        <p className='font-medium'>{`${label}`}</p>
+        {payload.map((entry) => (
+          <p
+            key={`${entry.name}-${entry.value}`}
+            style={{ color: entry.color }}
+          >
+            {`${entry.name}: ${entry.value}${entry.payload?.percent ? ` (${entry.payload.percent}%)` : ''}`}
+          </p>
+        ))}
+      </div>
+    )
+  }
+  return null
+}
+
 // Type for filtered data
 interface BaseFilterableItem {
   timestamp?: string | Date
@@ -1101,25 +1121,6 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       return Math.min(defaultCols, 2)
     }
     return defaultCols
-  }
-
-  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className='bg-white border-gray-200 rounded-lg border p-3 shadow-lg'>
-          <p className='font-medium'>{`${label}`}</p>
-          {payload.map((entry) => (
-            <p
-              key={`${entry.name}-${entry.value}`}
-              style={{ color: entry.color }}
-            >
-              {`${entry.name}: ${entry.value}${entry.payload?.percent ? ` (${entry.payload.percent}%)` : ''}`}
-            </p>
-          ))}
-        </div>
-      )
-    }
-    return null
   }
 
   // Helper function to get connection status display
