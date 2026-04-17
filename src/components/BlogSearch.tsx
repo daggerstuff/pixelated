@@ -26,10 +26,10 @@ const isSearchResult = (value: unknown): value is SearchResult => {
   }
 
   return (
-    typeof value.id === 'string' &&
-    typeof value.title === 'string' &&
-    typeof value.description === 'string' &&
-    typeof value.slug === 'string'
+    typeof value['id'] === 'string' &&
+    typeof value['title'] === 'string' &&
+    typeof value['description'] === 'string' &&
+    typeof value['slug'] === 'string'
   )
 }
 
@@ -38,7 +38,7 @@ const isSearchResponse = (value: unknown): value is SearchResponse => {
     return false
   }
 
-  return Array.isArray(value.results) && value.results.every(isSearchResult)
+  return Array.isArray(value['results']) && value['results'].every(isSearchResult)
 }
 
 export function BlogSearch() {
@@ -105,16 +105,16 @@ export function BlogSearch() {
       {results.length > 0 && (
         <div className='mt-4 space-y-4'>
           {results.map((result) => (
-            <article key={result.id} className='bg-muted/50 rounded-lg p-4'>
+            <article key={result['id']} className='bg-muted/50 rounded-lg p-4'>
               <h3 className='mb-2 text-lg font-semibold'>
                 <a
-                  href={`/blog/${result.slug}`}
+                  href={`/blog/${result['slug']}`}
                   className='hover:text-primary transition-colors'
                 >
-                  {result.title}
+                  {result['title']}
                 </a>
               </h3>
-              <p className='text-muted-foreground'>{result.description}</p>
+              <p className='text-muted-foreground'>{result['description']}</p>
             </article>
           ))}
         </div>
