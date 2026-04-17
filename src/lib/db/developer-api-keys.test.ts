@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { query } from '../index'
 import {
   DeveloperApiKeyManager,
   initializeDeveloperApiKeysTable,
@@ -10,7 +11,7 @@ vi.mock('../index', () => ({
 
 describe('DeveloperApiKeyManager', () => {
   let manager: DeveloperApiKeyManager
-  const mockQuery = vi.mocked(await import('../index')).query
+  const mockQuery = vi.mocked(query)
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -18,7 +19,7 @@ describe('DeveloperApiKeyManager', () => {
   })
 
   describe('createApiKey', () => {
-    it('should generate a new API key with proper format', async () => {
+    it('should generate a new API key with proper format', () => {
       mockQuery.mockResolvedValueOnce({
         rows: [
           {
@@ -39,34 +40,36 @@ describe('DeveloperApiKeyManager', () => {
         rowCount: 1,
       } as any)
 
-      const result = await manager.createApiKey({
+      return manager.createApiKey({
         user_id: 'user-1',
         name: 'Test Key',
+      }).then((result) => {
+        expect(result.plain_key).toMatch(/^dev_/)
+        expect(result.api_key.name).toBe('Test Key')
       })
-
-      expect(result.plain_key).toMatch(/^dev_/)
-      expect(result.api_key.name).toBe('Test Key')
     })
   })
 
   describe('validateApiKey', () => {
-    it('should return invalid for empty key', async () => {
-      const result = await manager.validateApiKey('')
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe('API key is required')
+    it('should return invalid for empty key', () => {
+      return manager.validateApiKey('').then((result) => {
+        expect(result.valid).toBe(false)
+        expect(result.error).toBe('API key is required')
+      })
     })
 
-    it('should return invalid for non-existent key', async () => {
+    it('should return invalid for non-existent key', () => {
       mockQuery.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any)
 
-      const result = await manager.validateApiKey('dev_invalid')
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe('Invalid API key')
+      return manager.validateApiKey('dev_invalid').then((result) => {
+        expect(result.valid).toBe(false)
+        expect(result.error).toBe('Invalid API key')
+      })
     })
   })
 
   describe('listApiKeys', () => {
-    it('should return list of API keys for user', async () => {
+    it('should return list of API keys for user', () => {
       mockQuery.mockResolvedValueOnce({
         rows: [
           { id: 'key-1', name: 'Key 1' },
@@ -75,8 +78,9 @@ describe('DeveloperApiKeyManager', () => {
         rowCount: 2,
       } as any)
 
-      const keys = await manager.listApiKeys('user-1')
-      expect(keys).toHaveLength(2)
+      return manager.listApiKeys('user-1').then((keys) => {
+        expect(keys).toHaveLength(2)
+      })
     })
   })
 })

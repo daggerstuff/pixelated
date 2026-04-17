@@ -32,14 +32,15 @@ const token =
   authHeader?.replace('Bearer ', '') || fetchCookieValue('auth-token')
 
 // Get session data from API
-const sessionData = await fetch(
-  `${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`,
-  {
+let sessionData = undefined
+try {
+  const response = await fetch(`${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`, {
     headers: { Authorization: `Bearer ${token}` },
-  },
-)
-  .then((res) => res.json())
-  .catch(() => undefined)
+  })
+  sessionData = await response.json()
+} catch {
+  sessionData = undefined
+}
 
 if (!sessionData) {
   return Astro.redirect('/training?error=session-not-found')

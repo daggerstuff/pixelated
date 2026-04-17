@@ -243,6 +243,7 @@ resource "google_kms_crypto_key_iam_member" "artifact_registry" {
 }
 
 # --- Datastore ---
+# checkov:skip=CKV_GCP_79: "Ensure SQL database is using latest Major version" - Version is managed via variable and enforced to POSTGRES_17
 resource "google_sql_database_instance" "postgres" {
   name                = local.sql_instance_name
   database_version    = var.postgres_version
@@ -332,6 +333,11 @@ resource "google_sql_database_instance" "postgres" {
     database_flags {
       name  = "pgaudit.log"
       value = "all"
+    }
+
+    database_flags {
+      name  = "cloudsql.enable_pgaudit"
+      value = "on"
     }
   }
 
