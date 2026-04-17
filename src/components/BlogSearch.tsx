@@ -103,7 +103,7 @@ export function BlogSearch() {
       </form>
 
       {/* Screen reader only live region for search status */}
-      <div aria-live="polite" className="sr-only">
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {isSearching ? 'Searching...' : ''}
       </div>
 
