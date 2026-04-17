@@ -1,26 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { roleHasPermission, ROLES, type Role } from '../access-control'
-
-vi.mock('../audit', async (importActual) => {
-  const actual = await importActual<typeof import('../audit')>()
-  return {
-    ...actual,
-    createAuditLog: vi.fn(),
-    AuditEventType: {
-      ...(actual as any).AuditEventType,
-      ACCESS: 'ACCESS'
-    }
-  }
-})
-
-vi.mock('../auth', async (importActual) => {
-  const actual = await importActual<typeof import('../auth')>()
-  return {
-    ...actual,
-    getCurrentUser: vi.fn(),
-    hasRole: vi.fn()
-  }
-})
 
 describe('roleHasPermission', () => {
   it('correctly identifies when a role has a specific permission', () => {
