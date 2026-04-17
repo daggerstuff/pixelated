@@ -3,6 +3,7 @@ import path from 'path'
 
 import { Router } from 'express'
 
+import { authenticateToken } from '../middleware/auth'
 import { DocumentModelMongoose } from '../models/DocumentMongoose'
 import { AIStrategyReviewService } from '../services/aiStrategyReviewService'
 import { EdgeCaseMappingService } from '../services/edgeCaseMappingService'
@@ -54,7 +55,7 @@ function getSourceFile(
  * - Their AI feasibility scores
  * - Mapped technical edge cases (The "Reality")
  */
-router.get('/dashboard', async (_req, res) => {
+router.get('/dashboard', authenticateToken, async (_req, res) => {
   try {
     const documents = (await DocumentModelMongoose.find({}, undefined, {
       lean: true,
@@ -116,7 +117,7 @@ router.get('/dashboard', async (_req, res) => {
 })
 
 /** Returns list of imported source_file paths and last import timestamp (from import script). */
-router.get('/sources', (_req, res) => {
+router.get('/sources', authenticateToken, (_req, res) => {
   try {
     if (!fs.existsSync(LAST_IMPORT_FILE)) {
       return res.json({ sources: [], lastImport: null })
@@ -135,7 +136,7 @@ router.get('/sources', (_req, res) => {
 })
 
 // Trigger a fresh re-analysis (manual refresh)
-router.post('/refresh-analysis', async (_req, res) => {
+router.post('/refresh-analysis', authenticateToken, async (_req, res) => {
   try {
     const documents = await DocumentModelMongoose.find({})
 
