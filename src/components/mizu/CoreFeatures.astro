@@ -108,23 +108,17 @@ const {
     gap: 1rem;
     max-width: 38rem;
     margin: 0 auto;
-    text-align: center;
-    justify-items: center;
     margin-bottom: 2.4rem;
   }
 
   .core-feature-layout {
     display: grid;
     gap: 1.4rem;
-    text-align: center;
-    justify-items: center;
   }
 
   .core-feature-proof {
     display: grid;
     gap: 0.9rem;
-    text-align: center;
-    justify-items: center;
   }
 
   .core-feature-proof__list {
@@ -159,8 +153,6 @@ const {
     gap: 0.9rem;
     padding: 1rem 0 0;
     border-top: 1px dotted rgba(253, 252, 252, 0.1);
-    text-align: center;
-    justify-items: center;
   }
 
   .core-feature-card__caption {
@@ -189,8 +181,6 @@ const {
     display: grid;
     gap: 1.2rem;
     margin-top: 2.75rem;
-    text-align: center;
-    justify-items: center;
   }
 
   .core-feature-comparison__header {
@@ -198,8 +188,6 @@ const {
     gap: 0.9rem;
     max-width: 36rem;
     margin-inline: auto;
-    text-align: center;
-    justify-items: center;
   }
 
   .core-feature-comparison__grid {
@@ -212,8 +200,6 @@ const {
     gap: 0.65rem;
     padding: 0.95rem 0 0;
     border-top: 1px dotted rgba(253, 252, 252, 0.1);
-    text-align: center;
-    justify-items: center;
   }
 
   .core-feature-quote--accent {
@@ -245,14 +231,72 @@ const {
   }
 
   @media (min-width: 980px) {
+    .core-features-intro {
+      max-width: none;
+      margin: 0 0 2.4rem;
+      grid-template-columns: minmax(18rem, 0.55fr) minmax(0, 1fr);
+      align-items: end;
+      text-align: left;
+      justify-items: start;
+      column-gap: clamp(2rem, 4vw, 4rem);
+    }
+
+    .core-features-intro .pe-meta-label {
+      grid-column: 1 / -1;
+    }
+
+    .core-features-intro .pe-heading-l {
+      max-width: 13ch;
+    }
+
+    .core-features-intro .pe-home-copy {
+      align-self: end;
+      margin: 0;
+      text-align: left;
+    }
+
     .core-feature-layout {
-      grid-template-columns: minmax(18rem, 0.72fr) minmax(0, 1.28fr);
+      grid-template-columns: minmax(18rem, 0.48fr) minmax(0, 1.52fr);
       align-items: start;
+      gap: clamp(2rem, 4vw, 4rem);
+      text-align: left;
+      justify-items: stretch;
     }
 
     .core-feature-grid {
-      grid-template-columns: 1.1fr repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       align-items: start;
+      gap: 1rem;
+    }
+
+    .core-feature-proof,
+    .core-feature-card,
+    .core-feature-comparison,
+    .core-feature-comparison__header,
+    .core-feature-quote {
+      text-align: left;
+      justify-items: start;
+    }
+
+    .core-feature-proof,
+    .core-feature-card,
+    .core-feature-quote {
+      padding: 1.15rem;
+      border: 1px solid rgba(253, 252, 252, 0.1);
+      border-radius: 4px;
+      background: rgba(253, 252, 252, 0.016);
+    }
+
+    .core-feature-comparison {
+      margin-top: 3rem;
+      grid-template-columns: minmax(20rem, 0.72fr) minmax(0, 1.28fr);
+      gap: clamp(2rem, 4vw, 4rem);
+      align-items: start;
+    }
+
+    .core-feature-comparison__header {
+      margin: 0;
+      max-width: 28rem;
     }
 
     .core-feature-comparison__grid {
@@ -262,6 +306,17 @@ const {
   }
 
   @media (max-width: 720px) {
+    .core-features-intro,
+    .core-feature-layout,
+    .core-feature-proof,
+    .core-feature-card,
+    .core-feature-comparison,
+    .core-feature-comparison__header,
+    .core-feature-quote {
+      text-align: center;
+      justify-items: center;
+    }
+
     .core-feature-proof,
     .core-feature-card,
     .core-feature-quote {

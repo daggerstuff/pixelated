@@ -549,6 +549,7 @@ export interface HuntSchedule {
   enabled?: boolean
   scheduleId: string
   patternId: string
+  regions?: string[]
   scope?: string[]
   parameters?: Record<string, unknown>
   lastExecution?: Date | string
@@ -601,11 +602,11 @@ export interface HuntFinding {
 }
 
 export interface HuntMetadata {
-  executionTime: number
-  dataProcessed: number
-  falsePositives: number
-  truePositives: number
-  coverage: number
+  executionTime?: number
+  dataProcessed?: number
+  falsePositives?: number
+  truePositives?: number
+  coverage?: number
   [key: string]: unknown
 }
 
@@ -780,15 +781,36 @@ export interface HuntingConfig {
   maxHunts: number
   defaultTimeout: number
   autoEscalate: boolean
+  huntPatterns?: HuntPattern[]
 }
 
 export interface HuntPattern {
   patternId: string
   name: string
   description: string
-  type: 'behavioral' | 'signature' | 'anomaly'
+  type:
+    | 'behavioral'
+    | 'signature'
+    | 'anomaly'
+    | 'network'
+    | 'endpoint'
+    | 'user_behavior'
+    | 'malware'
+    | 'lateral_movement'
+  patternType?:
+    | 'network'
+    | 'endpoint'
+    | 'user_behavior'
+    | 'malware'
+    | 'lateral_movement'
+    | 'custom'
+  confidence: number
   query: string
   severity: 'low' | 'medium' | 'high' | 'critical'
+  indicators?: string[]
+  conditions?: string[]
+  actions?: string[]
+  metadata?: Record<string, unknown>
 }
 
 export interface ThreatResponse {
