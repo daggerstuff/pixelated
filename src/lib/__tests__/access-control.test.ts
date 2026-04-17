@@ -1,15 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
-
-// Mock dependencies that cause resolution errors
-vi.mock('../audit', () => ({
-  createAuditLog: vi.fn(),
-  AuditEventType: { ACCESS: 'ACCESS' }
-}))
-
-vi.mock('../auth', () => ({
-  getCurrentUser: vi.fn(),
-  hasRole: vi.fn()
-}))
+import { describe, it, expect } from 'vitest'
 
 import { roleHasPermission, ROLES, type Role } from '../access-control'
 
