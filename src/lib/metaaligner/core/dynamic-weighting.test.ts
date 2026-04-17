@@ -6,6 +6,7 @@ import {
   getDynamicWeightingEngine,
   resetDynamicWeightingEngine,
   type DynamicWeightingConfig,
+  type WeightUpdateResult,
 } from './dynamic-weighting'
 import { ContextType, type AlignmentContext } from './objectives'
 
@@ -456,7 +457,7 @@ describe('DynamicWeightingEngine', () => {
         ContextType.GENERAL,
       ]
 
-      const results = []
+      const results: WeightUpdateResult[] = []
 
       for (const contextType of transitions) {
         const context: AlignmentContext = {

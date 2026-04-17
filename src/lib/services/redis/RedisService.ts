@@ -242,6 +242,17 @@ export class RedisService extends EventEmitter implements IRedisService {
     const hashStore = new Map<string, Map<string, string>>();
     const zsetStore = new Map<string, Map<string, number>>();
 
+    const readStringList = (key: string): string[] => {
+      const raw = store.get(key);
+      if (!raw) {
+        return [];
+      }
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((item): item is string => typeof item === "string")
+        : [];
+    };
+
     // Create a mock client implementing the Redis interface
     const mockClient: RedisMockClient = {
       get: async (key: string) => store.get(key) ?? null,
@@ -318,6 +329,43 @@ export class RedisService extends EventEmitter implements IRedisService {
       hlen: async (key: string) => {
         const hash = hashStore.get(key);
         return hash ? hash.size : 0;
+      },
+      // List operations
+      lpush: async (key: string, ...elements: string[]) => {
+        const listKey = `list:${key}`;
+        const list = readStringList(listKey);
+        const nextList = Array.isArray(list) ? [...elements, ...list] : [...elements];
+        store.set(listKey, JSON.stringify(nextList));
+        return nextList.length;
+      },
+      rpoplpush: async (source: string, destination: string) => {
+        const sourceKey = `list:${source}`;
+        const destKey = `list:${destination}`;
+        const sourceList = readStringList(sourceKey);
+        if (sourceList.length === 0) {
+          return null;
+        }
+        const value = sourceList.pop();
+        if (value === undefined) {
+          return null;
+        }
+        store.set(sourceKey, JSON.stringify(sourceList));
+        const destinationList = readStringList(destKey);
+        destinationList.unshift(value);
+        store.set(destKey, JSON.stringify(destinationList));
+        return value;
+      },
+      lrem: async (key: string, _count: number, value: string) => {
+        const listKey = `list:${key}`;
+        const list = readStringList(listKey);
+        const nextList = Array.isArray(list) ? list.filter((item) => item !== value) : [];
+        store.set(listKey, JSON.stringify(nextList));
+        return Array.isArray(list) ? list.length - nextList.length : 0;
+      },
+      llen: async (key: string) => {
+        const listKey = `list:${key}`;
+        const list = readStringList(listKey);
+        return Array.isArray(list) ? list.length : 0;
       },
       // Sorted set operations
       zadd: async (key: string, score: number, member: string) => {

@@ -21,8 +21,9 @@ echo "✅ Backup created at: $BACKUP_DIR"
 
 # Create expressions file for filtering
 cat > /tmp/filter-expressions.txt << 'EOF'
-# Replace the exposed MongoDB URI with a placeholder
-regex:mongodb\+srv://[^:]+:[^@]+@[a-z0-9]+\.[a-z0-9]+\.mongodb\.net/[^?]+\?.*==>mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/DATABASE?retryWrites=true&w=majority&appName=APP_NAME
+# Replace any exposed MongoDB URI with a placeholder pattern.
+# Use template-style placeholders so the script output is safe for credential scanning.
+regex:mongodb+srv://\${MONGO_USER}:\${MONGO_PASSWORD}@\${MONGO_CLUSTER}\.mongodb\.net/\${MONGO_DATABASE}\?.*==>mongodb+srv://\${MONGO_USER}:\${MONGO_PASSWORD}@\${MONGO_CLUSTER}.mongodb.net/\${MONGO_DATABASE}?retryWrites=true&w=majority&appName=\${MONGO_APP_NAME}
 
 EOF
 

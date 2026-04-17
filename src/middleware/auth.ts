@@ -2,6 +2,8 @@ import { getSession, isSessionValid } from "@/lib/auth/session";
 import type { Session } from "@/lib/auth/session";
 import { developerApiKeyManager } from "@/lib/db/developer-api-keys";
 
+const DEFAULT_SESSION_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+
 export interface ApiKeySession {
   user: {
     id: string;
@@ -15,6 +17,7 @@ export interface ApiKeySession {
   rateLimit?: {
     remaining: number;
     limit: number;
+    resetTimeMs?: number;
   };
 }
 
@@ -28,10 +31,18 @@ interface WithAuthOptions {
   requiredScopes?: string[];
 }
 
-function setRateLimitHeaders(response: Response, remaining: number, limit: number): Response {
+function setRateLimitHeaders(
+  response: Response,
+  remaining: number,
+  limit: number,
+  resetTimeMs?: number,
+): Response {
   const headers = new Headers(response.headers);
   headers.set("X-RateLimit-Remaining", remaining.toString());
   headers.set("X-RateLimit-Limit", limit.toString());
+  if (resetTimeMs) {
+    headers.set("X-RateLimit-Reset", Math.ceil(resetTimeMs / 1000).toString());
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -49,7 +60,7 @@ export function withAuth(
       if (options.allowPaths.some((p) => url.pathname.startsWith(p))) {
         const guestSession: Session = {
           user: { id: "guest", role: "guest" },
-          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          expires: new Date(Date.now() + DEFAULT_SESSION_TTL_MS).toISOString(),
         };
         return handler(request, guestSession);
       }
@@ -76,7 +87,12 @@ export function withAuth(
     const response = await handler(request, session);
 
     if (isApiKeySession(session) && session.rateLimit) {
-      return setRateLimitHeaders(response, session.rateLimit.remaining, session.rateLimit.limit);
+      return setRateLimitHeaders(
+        response,
+        session.rateLimit.remaining,
+        session.rateLimit.limit,
+        session.rateLimit.resetTimeMs,
+      );
     }
 
     return response;
@@ -97,16 +113,27 @@ async function validateApiKey(
     return null;
   }
 
-  const validation = await developerApiKeyManager.validateApiKey(apiKey);
+  let validation;
+  try {
+    const timeoutPromise = new Promise<null>((_, reject) =>
+      setTimeout(() => reject(new Error("API key validation timeout")), 5000),
+    );
+    validation = await Promise.race([
+      developerApiKeyManager.validateApiKey(apiKey),
+      timeoutPromise,
+    ]);
+  } catch {
+    return null;
+  }
 
-  if (!validation.valid || !validation.api_key) {
+  if (!validation || !validation.valid || !validation.api_key) {
     return null;
   }
 
   const keyRecord = validation.api_key;
 
   if (requiredScopes?.length) {
-    const keyScopes = keyRecord.scopes || [];
+    const keyScopes: string[] = keyRecord.scopes || [];
     if (!requiredScopes.every((scope) => keyScopes.includes(scope))) {
       return null;
     }
@@ -119,7 +146,7 @@ async function validateApiKey(
     },
     expires:
       keyRecord.expires_at?.toISOString() ||
-      new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      new Date(Date.now() + DEFAULT_SESSION_TTL_MS).toISOString(),
     authType: "api-key",
     scopes: keyRecord.scopes,
     rateLimit:
@@ -127,6 +154,7 @@ async function validateApiKey(
         ? {
             remaining: validation.remainingRequests,
             limit: keyRecord.rate_limit,
+            resetTimeMs: validation.resetTimeMs,
           }
         : undefined,
   };

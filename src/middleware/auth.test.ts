@@ -47,7 +47,7 @@ describe("withAuth middleware", () => {
 
     const middleware = withAuth(mockHandler, { allowApiKey: true });
     const request = new Request("https://example.com/api/test", {
-      headers: { "X-API-Key": "test-dev-key-123" },
+      headers: { "X-API-Key": "x-api-key-placeholder" },
     });
 
     const response = await middleware(request);

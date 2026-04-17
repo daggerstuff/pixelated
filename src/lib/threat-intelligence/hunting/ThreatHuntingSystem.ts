@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events'
 
 import { Redis } from 'ioredis'
-import { MongoClient, Db } from 'mongodb'
+import { Document, MongoClient, Db, WithId } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
@@ -16,6 +16,7 @@ import {
   HuntPattern,
   HuntSchedule,
   HuntExecution,
+  HuntFinding,
   GlobalThreatIntelligence,
   ThreatIndicator,
 } from '../global/types'
@@ -54,6 +55,80 @@ export interface HealthStatus {
   successRate?: number
 }
 
+type DocumentRecord = Record<string, unknown>
+type TimeRange = { startTime: string; endTime: string }
+
+interface RawHuntFinding {
+  type: string
+  severity: string
+  confidence: number
+  data: DocumentRecord
+  timestamp: Date
+  [key: string]: unknown
+}
+
+interface PortScanAggregateResult extends DocumentRecord {
+  _id: { sourceIp?: string; hour?: string }
+  uniquePorts: unknown[]
+  connectionCount: number
+  timestamps: unknown[]
+}
+
+interface LoginAggregateResult extends DocumentRecord {
+  _id: string
+  loginCount: number
+  uniqueLocations: unknown[]
+  failureCount: number
+  timestamps: unknown[]
+}
+
+interface AccessAggregateResult extends DocumentRecord {
+  _id: string
+  accessCount: number
+  uniqueResources: unknown[]
+  accessTimes: unknown[]
+}
+
+interface LateralAggregateResult extends DocumentRecord {
+  _id: {
+    sourceIp?: string
+    destinationIp?: string
+    destinationPort?: number
+    hour?: string
+  }
+  sourceIp?: string
+  destinationIp?: string
+  destinationPort?: number
+  connectionCount: number
+  timestamps: unknown[]
+  totalBytes?: number
+  uniqueDestinations?: unknown[]
+  portsScanned?: unknown[]
+}
+
+interface PatternTypeCount {
+  patternType: string
+  count: number
+}
+
+interface MalwareSignature extends Document {
+  hash?: string
+}
+
+interface SeverityCount {
+  severity: string
+  count: number
+}
+
+interface ThreatNotification {
+  type: string
+  threatId: string
+  severity: string
+  confidence: number
+  indicatorCount: number
+  timestamp: Date
+}
+
 export class ThreatHuntingSystemCore
   extends EventEmitter
   implements ThreatHuntingSystem
@@ -61,17 +136,138 @@ export class ThreatHuntingSystemCore
   private redis!: Redis
   private mongoClient!: MongoClient
   private db!: Db
-  private huntPatterns: Map<string, HuntPattern> = new Map()
-  private activeHunts: Map<string, HuntExecution> = new Map()
-  private scheduledHunts: Map<string, NodeJS.Timeout> = new Map()
+  private readonly huntPatterns: Map<string, HuntPattern> = new Map()
+  private readonly activeHunts: Map<string, HuntExecution> = new Map()
+  private readonly scheduledHunts: Map<string, NodeJS.Timeout> = new Map()
 
-  constructor(private config: HuntingConfig) {
+  private getCollection<T extends Document = Document>(collectionName: string) {
+    return this.db.collection<T>(collectionName)
+  }
+
+  private mapStoredDocument<T extends Document>(
+    document: WithId<T>,
+  ): Omit<WithId<T>, '_id'> {
+    const { _id: _omitId, ...rest } = document
+    return rest
+  }
+
+  private toDate(value: unknown, fallback: Date = new Date()): Date {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return value
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      const parsed = new Date(value)
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed
+      }
+    }
+
+    return fallback
+  }
+
+  private getNestedValue(obj: unknown, path: string): unknown {
+    if (!this.isRecord(obj)) {
+      return undefined
+    }
+
+    return path.split('.').reduce<unknown>((current, key) => {
+      if (!this.isRecord(current)) {
+        return undefined
+      }
+
+      return current[key]
+    }, obj)
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value)
+    )
+  }
+
+  private toDocumentRecord(value: Document): DocumentRecord {
+    const result: DocumentRecord = {}
+    for (const [key, entry] of Object.entries(value)) {
+      result[key] = entry as unknown
+    }
+
+    return result
+  }
+
+  private parseDate(value: unknown): Date | undefined {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return value
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      const parsed = new Date(value)
+      return Number.isNaN(parsed.getTime()) ? undefined : parsed
+    }
+
+    return undefined
+  }
+
+  private parseTimeRange(value: unknown): TimeRange | undefined {
+    if (!this.isRecord(value)) {
+      return undefined
+    }
+
+    const startTime = this.parseDate(value.startTime)
+    const endTime = this.parseDate(value.endTime)
+
+    if (!startTime || !endTime) {
+      return undefined
+    }
+
+    return {
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+    }
+  }
+
+  private getExecutionTimeRange(execution: HuntExecution): TimeRange {
+    const configuredTimeRange = this.parseTimeRange(
+      this.getNestedValue(execution.parameters, 'timeRange'),
+    )
+    if (configuredTimeRange) {
+      return configuredTimeRange
+    }
+
+    const directTimeRange = this.parseTimeRange(execution.parameters)
+    if (directTimeRange) {
+      return directTimeRange
+    }
+
+    return this.getDefaultTimeRange()
+  }
+
+  private toStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return []
+    }
+
+    return value.filter((entry): entry is string => typeof entry === 'string')
+  }
+
+  private toStringValue(value: unknown): string | undefined {
+    return typeof value === 'string' ? value : undefined
+  }
+
+  private toConfidence(value: unknown): number {
+    return typeof value === 'number' ? value : 0.5
+  }
+
+  constructor(private readonly config: HuntingConfig) {
     super()
     this.initializePatterns()
   }
 
   private initializePatterns(): void {
-    for (const pattern of this.config.huntPatterns) {
+    const patterns = this.config.huntPatterns ?? []
+    for (const pattern of patterns) {
       this.huntPatterns.set(pattern.patternId, pattern)
     }
   }
@@ -106,7 +302,7 @@ export class ThreatHuntingSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+    this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat hunting')
     } catch (error: unknown) {
@@ -118,7 +314,7 @@ export class ThreatHuntingSystemCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_hunting',
+        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_hunting',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_hunting')
@@ -131,10 +327,13 @@ export class ThreatHuntingSystemCore
 
   private async loadHuntPatterns(): Promise<void> {
     try {
-      const patternsCollection = this.db.collection('hunt_patterns')
+      const patternsCollection = this.getCollection<HuntPattern>('hunt_patterns')
       const patterns = await patternsCollection.find({}).toArray()
+      const mappedPatterns = patterns.map((pattern) =>
+        this.mapStoredDocument(pattern),
+      )
 
-      for (const pattern of patterns) {
+      for (const pattern of mappedPatterns) {
         this.huntPatterns.set(pattern.patternId, pattern)
       }
 
@@ -196,15 +395,37 @@ export class ThreatHuntingSystemCore
       const threats = await this.generateThreatIntelligence(
         analyzedResults,
         pattern,
+        execution,
       )
 
-      // Step 7: Store hunt results
-      await this.storeHuntResults(execution, analyzedResults, threats)
-
-      // Step 8: Update hunt execution status
+      // Step 7: Update hunt execution status
       execution.status = 'completed'
       execution.completedTime = new Date()
       await this.updateHuntExecution(execution)
+
+      const huntResult: HuntResult = {
+        resultId: `result_${execution.executionId}_${Date.now()}`,
+        timestamp: this.toDate(execution.completedTime, execution.startTime),
+        huntId: execution.huntId,
+        executionId: execution.executionId,
+        patternId: pattern.patternId,
+        startTime: execution.startTime,
+        endTime: execution.completedTime,
+        status: 'completed',
+        findings: analyzedResults.map((result) => this.mapToHuntFinding(result)),
+        threatsDiscovered: threats.length,
+        confidence: this.calculateOverallConfidence(analyzedResults),
+        metadata: {
+          executionTime:
+            this.toDate(execution.completedTime).getTime() -
+            this.toDate(execution.startTime).getTime(),
+          dataSources: execution.dataSources,
+          regions: execution.regions,
+        },
+      }
+
+      // Step 8: Store hunt summary and discovered threats
+      await this.storeHuntResults(huntResult, threats)
 
       // Step 9: Send notifications for discovered threats
       if (threats.length > 0) {
@@ -213,24 +434,6 @@ export class ThreatHuntingSystemCore
 
       // Step 10: Integrate with global threat intelligence
       await this.integrateWithGlobalIntelligence(threats)
-
-      const huntResult: HuntResult = {
-        huntId: execution.huntId,
-        executionId: execution.executionId,
-        patternId: pattern.patternId,
-        startTime: execution.startTime,
-        endTime: execution.completedTime,
-        status: 'completed',
-        findings: analyzedResults,
-        threatsDiscovered: threats.length,
-        confidence: this.calculateOverallConfidence(analyzedResults),
-        metadata: {
-          executionTime:
-            execution.completedTime.getTime() - execution.startTime.getTime(),
-          dataSources: execution.dataSources,
-          regions: execution.regions,
-        },
-      }
 
       this.emit('hunt_completed', {
         huntId: huntResult.huntId,
@@ -262,7 +465,7 @@ export class ThreatHuntingSystemCore
       }
 
       // Validate scope
-      if (query.scope && query.scope.length === 0) {
+      if (query.scope?.length === 0) {
         throw new Error('Hunt scope cannot be empty')
       }
 
@@ -286,9 +489,9 @@ export class ThreatHuntingSystemCore
       // Set default values
       const validatedQuery: HuntQuery = {
         ...query,
-        priority: query.priority || 'medium',
-        timeout: query.timeout || 300000, // 5 minutes default
-        maxResults: query.maxResults || 1000,
+        priority: query.priority ?? 'medium',
+        timeout: query.timeout ?? 300000, // 5 minutes default
+        maxResults: query.maxResults ?? 1000,
       }
 
       return validatedQuery
@@ -306,6 +509,10 @@ export class ThreatHuntingSystemCore
       }
 
       // Find pattern by ID
+      if (!query.patternId) {
+        throw new Error('Hunt pattern ID is required')
+      }
+
       const pattern = this.huntPatterns.get(query.patternId)
       if (!pattern) {
         throw new Error(`Hunt pattern not found: ${query.patternId}`)
@@ -321,6 +528,7 @@ export class ThreatHuntingSystemCore
   private createCustomPattern(query: HuntQuery): HuntPattern {
     return {
       patternId: `custom_${Date.now()}`,
+      type: 'anomaly',
       name: 'Custom Hunt Pattern',
       description: 'User-defined custom hunt pattern',
       patternType: 'custom',
@@ -349,10 +557,10 @@ export class ThreatHuntingSystemCore
         patternId: pattern.patternId,
         startTime: new Date(),
         status: 'preparing',
-        scope: query.scope || ['global'],
+        scope: query.scope ?? ['global'],
         dataSources: this.determineDataSources(pattern, query),
-        regions: query.regions || ['all'],
-        parameters: query.parameters || {},
+        regions: query.regions ?? ['all'],
+        parameters: query.parameters ?? {},
         metadata: {
           patternType: pattern.patternType,
           severity: pattern.severity,
@@ -379,7 +587,8 @@ export class ThreatHuntingSystemCore
     const dataSources: string[] = []
 
     // Add pattern-specific data sources
-    switch (pattern.patternType) {
+    const resolvedPatternType = pattern.patternType ?? 'anomaly'
+    switch (resolvedPatternType) {
       case 'network':
         dataSources.push('network_logs', 'firewall_logs', 'dns_logs')
         break
@@ -403,7 +612,8 @@ export class ThreatHuntingSystemCore
           'process_creation',
         )
         break
-      default:
+      case 'anomaly':
+      case 'custom':
         dataSources.push('security_logs', 'system_logs')
     }
 
@@ -419,16 +629,17 @@ export class ThreatHuntingSystemCore
   private async executeHuntByPattern(
     execution: HuntExecution,
     pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing hunt by pattern', {
         executionId: execution.executionId,
         patternType: pattern.patternType,
       })
 
-      let results: any[] = []
+      let results: RawHuntFinding[] = []
 
-      switch (pattern.patternType) {
+      const resolvedPatternType = pattern.patternType ?? 'anomaly'
+      switch (resolvedPatternType) {
         case 'network':
           results = await this.executeNetworkHunt(execution, pattern)
           break
@@ -445,6 +656,7 @@ export class ThreatHuntingSystemCore
           results = await this.executeLateralMovementHunt(execution, pattern)
           break
         case 'custom':
+        case 'anomaly':
           results = await this.executeCustomHunt(execution, pattern)
           break
         default:
@@ -464,13 +676,13 @@ export class ThreatHuntingSystemCore
   private async executeNetworkHunt(
     execution: HuntExecution,
     _pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing network hunt', {
         executionId: execution.executionId,
       })
 
-      const results: any[] = []
+      const results: RawHuntFinding[] = []
 
       // Hunt for suspicious network connections
       const networkResults = await this.huntSuspiciousConnections(execution)
@@ -498,13 +710,13 @@ export class ThreatHuntingSystemCore
   private async executeEndpointHunt(
     execution: HuntExecution,
     _pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing endpoint hunt', {
         executionId: execution.executionId,
       })
 
-      const results: any[] = []
+      const results: RawHuntFinding[] = []
 
       // Hunt for suspicious processes
       const processResults = await this.huntSuspiciousProcesses(execution)
@@ -532,13 +744,13 @@ export class ThreatHuntingSystemCore
   private async executeUserBehaviorHunt(
     execution: HuntExecution,
     _pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing user behavior hunt', {
         executionId: execution.executionId,
       })
 
-      const results: any[] = []
+      const results: RawHuntFinding[] = []
 
       // Hunt for unusual login patterns
       const loginResults = await this.huntUnusualLoginPatterns(execution)
@@ -566,13 +778,13 @@ export class ThreatHuntingSystemCore
   private async executeMalwareHunt(
     execution: HuntExecution,
     _pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing malware hunt', {
         executionId: execution.executionId,
       })
 
-      const results: any[] = []
+      const results: RawHuntFinding[] = []
 
       // Hunt for known malware signatures
       const signatureResults = await this.huntKnownMalwareSignatures(execution)
@@ -601,13 +813,13 @@ export class ThreatHuntingSystemCore
   private async executeLateralMovementHunt(
     execution: HuntExecution,
     _pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing lateral movement hunt', {
         executionId: execution.executionId,
       })
 
-      const results: any[] = []
+      const results: RawHuntFinding[] = []
 
       // Hunt for credential dumping
       const credentialResults = await this.huntCredentialDumping(execution)
@@ -635,7 +847,7 @@ export class ThreatHuntingSystemCore
   private async executeCustomHunt(
     execution: HuntExecution,
     pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing custom hunt', {
         executionId: execution.executionId,
@@ -654,7 +866,7 @@ export class ThreatHuntingSystemCore
   private async executeDefaultHunt(
     execution: HuntExecution,
     _pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing default hunt', {
         executionId: execution.executionId,
@@ -673,11 +885,11 @@ export class ThreatHuntingSystemCore
   // Individual hunt methods for specific patterns
   private async huntSuspiciousConnections(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const networkLogs = this.db.collection('network_logs')
+      const networkLogs = this.getCollection('network_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const suspiciousConnections = await networkLogs
         .find({
@@ -697,7 +909,7 @@ export class ThreatHuntingSystemCore
             }, // Internal to external
           ],
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return suspiciousConnections.map((conn) => ({
@@ -705,7 +917,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.7,
         data: conn,
-        timestamp: conn.timestamp,
+        timestamp: this.toDate(conn.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Suspicious connections hunt failed:', { error })
@@ -715,11 +927,11 @@ export class ThreatHuntingSystemCore
 
   private async huntUnusualDNSQueries(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const dnsLogs = this.db.collection('dns_logs')
+      const dnsLogs = this.getCollection('dns_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const unusualQueries = await dnsLogs
         .find({
@@ -733,7 +945,7 @@ export class ThreatHuntingSystemCore
             { domainName: { $regex: /base64|hex|encode/ } }, // Encoded domains
           ],
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return unusualQueries.map((query) => ({
@@ -741,7 +953,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: query,
-        timestamp: query.timestamp,
+        timestamp: this.toDate(query.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Unusual DNS queries hunt failed:', { error })
@@ -749,15 +961,15 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async huntPortScanning(execution: HuntExecution): Promise<any[]> {
+  private async huntPortScanning(execution: HuntExecution): Promise<RawHuntFinding[]> {
     try {
-      const networkLogs = this.db.collection('network_logs')
+      const networkLogs = this.getCollection('network_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       // Look for rapid connection attempts to different ports from same source
       const portScanCandidates = await networkLogs
-        .aggregate([
+        .aggregate<PortScanAggregateResult>([
           {
             $match: {
               timestamp: {
@@ -788,15 +1000,15 @@ export class ThreatHuntingSystemCore
             },
           },
         ])
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return portScanCandidates.map((scan) => ({
         type: 'port_scanning',
         severity: 'high',
         confidence: 0.9,
-        data: scan,
-        timestamp: new Date(scan._id.hour),
+        data: this.toDocumentRecord(scan),
+        timestamp: this.toDate(scan._id.hour),
       }))
     } catch (error: unknown) {
       logger.error('Port scanning hunt failed:', { error })
@@ -804,11 +1016,13 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async huntDataExfiltration(execution: HuntExecution): Promise<any[]> {
+  private async huntDataExfiltration(
+    execution: HuntExecution,
+  ): Promise<RawHuntFinding[]> {
     try {
-      const networkLogs = this.db.collection('network_logs')
+      const networkLogs = this.getCollection('network_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const exfilPatterns = await networkLogs
         .find({
@@ -820,7 +1034,7 @@ export class ThreatHuntingSystemCore
           destinationIp: { $not: { $regex: /^10\.|^172\.|^192\.168\./ } }, // External destination
         })
         .sort({ bytesTransferred: -1 })
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return exfilPatterns.map((exfil) => ({
@@ -828,7 +1042,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 0.8,
         data: exfil,
-        timestamp: exfil.timestamp,
+        timestamp: this.toDate(exfil.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Data exfiltration hunt failed:', { error })
@@ -838,11 +1052,11 @@ export class ThreatHuntingSystemCore
 
   private async huntSuspiciousProcesses(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const processLogs = this.db.collection('process_logs')
+      const processLogs = this.getCollection('process_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const suspiciousProcesses = await processLogs
         .find({
@@ -859,7 +1073,7 @@ export class ThreatHuntingSystemCore
             }, // Executables from explorer
           ],
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return suspiciousProcesses.map((proc) => ({
@@ -867,7 +1081,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: proc,
-        timestamp: proc.timestamp,
+        timestamp: this.toDate(proc.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Suspicious processes hunt failed:', { error })
@@ -877,11 +1091,11 @@ export class ThreatHuntingSystemCore
 
   private async huntFileSystemAnomalies(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const fileLogs = this.db.collection('file_system_logs')
+      const fileLogs = this.getCollection('file_system_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const fileAnomalies = await fileLogs
         .find({
@@ -907,7 +1121,7 @@ export class ThreatHuntingSystemCore
             }, // Unsigned executables
           ],
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return fileAnomalies.map((file) => ({
@@ -915,7 +1129,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.7,
         data: file,
-        timestamp: file.timestamp,
+        timestamp: this.toDate(file.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('File system anomalies hunt failed:', { error })
@@ -925,11 +1139,11 @@ export class ThreatHuntingSystemCore
 
   private async huntRegistryModifications(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const registryLogs = this.db.collection('registry_logs')
+      const registryLogs = this.getCollection('registry_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const registryMods = await registryLogs
         .find({
@@ -946,7 +1160,7 @@ export class ThreatHuntingSystemCore
             }, // Suspicious values
           ],
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return registryMods.map((reg) => ({
@@ -954,7 +1168,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: reg,
-        timestamp: reg.timestamp,
+        timestamp: this.toDate(reg.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Registry modifications hunt failed:', { error })
@@ -964,11 +1178,11 @@ export class ThreatHuntingSystemCore
 
   private async huntPersistenceMechanisms(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const persistenceLogs = this.db.collection('persistence_logs')
+      const persistenceLogs = this.getCollection('persistence_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const persistenceMechanisms = await persistenceLogs
         .find({
@@ -980,7 +1194,7 @@ export class ThreatHuntingSystemCore
             $in: ['service', 'scheduled_task', 'registry', 'startup_folder'],
           },
         })
-        .limit(execution.maxResults || 500)
+        .limit(execution.maxResults ?? 500)
         .toArray()
 
       return persistenceMechanisms.map((persist) => ({
@@ -988,7 +1202,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.9,
         data: persist,
-        timestamp: persist.timestamp,
+        timestamp: this.toDate(persist.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Persistence mechanisms hunt failed:', { error })
@@ -998,14 +1212,14 @@ export class ThreatHuntingSystemCore
 
   private async huntUnusualLoginPatterns(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const authLogs = this.db.collection('authentication_logs')
+      const authLogs = this.getCollection('authentication_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const unusualLogins = await authLogs
-        .aggregate([
+        .aggregate<LoginAggregateResult>([
           {
             $match: {
               timestamp: {
@@ -1035,14 +1249,14 @@ export class ThreatHuntingSystemCore
             },
           },
         ])
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return unusualLogins.map((login) => ({
         type: 'unusual_login_pattern',
         severity: 'medium',
         confidence: 0.7,
-        data: login,
+        data: this.toDocumentRecord(login),
         timestamp: new Date(),
       }))
     } catch (error: unknown) {
@@ -1053,11 +1267,11 @@ export class ThreatHuntingSystemCore
 
   private async huntPrivilegeEscalation(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const authLogs = this.db.collection('authentication_logs')
+      const authLogs = this.getCollection('authentication_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const privilegeEscalations = await authLogs
         .find({
@@ -1071,7 +1285,7 @@ export class ThreatHuntingSystemCore
             { oldRole: { $in: ['guest', 'limited'] }, newRole: 'user' },
           ],
         })
-        .limit(execution.maxResults || 500)
+        .limit(execution.maxResults ?? 500)
         .toArray()
 
       return privilegeEscalations.map((escalation) => ({
@@ -1079,7 +1293,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: escalation,
-        timestamp: escalation.timestamp,
+        timestamp: this.toDate(escalation.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Privilege escalation hunt failed:', { error })
@@ -1089,14 +1303,14 @@ export class ThreatHuntingSystemCore
 
   private async huntUnusualAccessPatterns(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const accessLogs = this.db.collection('access_logs')
+      const accessLogs = this.getCollection('access_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const unusualAccess = await accessLogs
-        .aggregate([
+        .aggregate<AccessAggregateResult>([
           {
             $match: {
               timestamp: {
@@ -1122,14 +1336,14 @@ export class ThreatHuntingSystemCore
             },
           },
         ])
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return unusualAccess.map((access) => ({
         type: 'unusual_access_pattern',
         severity: 'low',
         confidence: 0.6,
-        data: access,
+        data: this.toDocumentRecord(access),
         timestamp: new Date(),
       }))
     } catch (error: unknown) {
@@ -1140,11 +1354,11 @@ export class ThreatHuntingSystemCore
 
   private async huntAccountCompromise(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const authLogs = this.db.collection('authentication_logs')
+      const authLogs = this.getCollection('authentication_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const compromisedAccounts = await authLogs
         .aggregate([
@@ -1175,7 +1389,7 @@ export class ThreatHuntingSystemCore
             },
           },
         ])
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return compromisedAccounts.map((account) => ({
@@ -1193,16 +1407,18 @@ export class ThreatHuntingSystemCore
 
   private async huntKnownMalwareSignatures(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const fileLogs = this.db.collection('file_system_logs')
+      const fileLogs = this.getCollection('file_system_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       // Get known malware signatures from threat intelligence
-      const malwareCollection = this.db.collection('malware_signatures')
+      const malwareCollection = this.getCollection('malware_signatures')
       const knownSignatures = await malwareCollection.find({}).toArray()
-      const signatureHashes = knownSignatures.map((sig) => sig.hash)
+      const signatureHashes = knownSignatures
+        .map((sig) => this.toStringValue(sig.hash))
+        .filter((hash): hash is string => typeof hash === 'string' && hash.length > 0)
 
       const malwareFiles = await fileLogs
         .find({
@@ -1213,7 +1429,7 @@ export class ThreatHuntingSystemCore
           fileHash: { $in: signatureHashes },
           operation: 'CREATE',
         })
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return malwareFiles.map((file) => ({
@@ -1221,7 +1437,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 1.0,
         data: file,
-        timestamp: file.timestamp,
+        timestamp: this.toDate(file.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Known malware signatures hunt failed:', { error })
@@ -1231,11 +1447,11 @@ export class ThreatHuntingSystemCore
 
   private async huntSuspiciousFileHashes(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const fileLogs = this.db.collection('file_system_logs')
+      const fileLogs = this.getCollection('file_system_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const suspiciousHashes = await fileLogs
         .find({
@@ -1250,7 +1466,7 @@ export class ThreatHuntingSystemCore
             { fileExtension: '.exe', filePath: { $regex: /temp|tmp/i } }, // Executables in temp
           ],
         })
-        .limit(execution.maxResults || 500)
+        .limit(execution.maxResults ?? 500)
         .toArray()
 
       return suspiciousHashes.map((file) => ({
@@ -1258,7 +1474,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.6,
         data: file,
-        timestamp: file.timestamp,
+        timestamp: this.toDate(file.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Suspicious file hashes hunt failed:', { error })
@@ -1268,11 +1484,11 @@ export class ThreatHuntingSystemCore
 
   private async huntMalwareBehavioralIndicators(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const processLogs = this.db.collection('process_logs')
+      const processLogs = this.getCollection('process_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const behavioralIndicators = await processLogs
         .find({
@@ -1292,15 +1508,15 @@ export class ThreatHuntingSystemCore
             }, // Unsigned executables
           ],
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return behavioralIndicators.map((indicator) => ({
         type: 'malware_behavioral_indicator',
         severity: 'high',
         confidence: 0.8,
-        data: indicator,
-        timestamp: indicator.timestamp,
+        data: this.toDocumentRecord(indicator),
+        timestamp: this.toDate(indicator.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Malware behavioral indicators hunt failed:', { error })
@@ -1308,15 +1524,17 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async huntC2Communications(execution: HuntExecution): Promise<any[]> {
+  private async huntC2Communications(
+    execution: HuntExecution,
+  ): Promise<RawHuntFinding[]> {
     try {
-      const networkLogs = this.db.collection('network_logs')
+      const networkLogs = this.getCollection('network_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       // Look for periodic beacons to external IPs
       const c2Communications = await networkLogs
-        .aggregate([
+        .aggregate<LateralAggregateResult>([
           {
             $match: {
               timestamp: {
@@ -1345,14 +1563,14 @@ export class ThreatHuntingSystemCore
             },
           },
         ])
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return c2Communications.map((comm) => ({
         type: 'c2_communication',
         severity: 'critical',
         confidence: 0.9,
-        data: comm,
+        data: this.toDocumentRecord(comm),
         timestamp: new Date(),
       }))
     } catch (error: unknown) {
@@ -1363,11 +1581,11 @@ export class ThreatHuntingSystemCore
 
   private async huntCredentialDumping(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const processLogs = this.db.collection('process_logs')
+      const processLogs = this.getCollection('process_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const credentialDumping = await processLogs
         .find({
@@ -1381,7 +1599,7 @@ export class ThreatHuntingSystemCore
             { processName: 'lsass.exe', accessType: { $regex: /read|full/i } },
           ],
         })
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return credentialDumping.map((dump) => ({
@@ -1389,7 +1607,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 0.95,
         data: dump,
-        timestamp: dump.timestamp,
+        timestamp: this.toDate(dump.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Credential dumping hunt failed:', { error })
@@ -1399,14 +1617,14 @@ export class ThreatHuntingSystemCore
 
   private async huntNetworkEnumeration(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const networkLogs = this.db.collection('network_logs')
+      const networkLogs = this.getCollection('network_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const networkEnumeration = await networkLogs
-        .aggregate([
+        .aggregate<LateralAggregateResult>([
           {
             $match: {
               timestamp: {
@@ -1440,15 +1658,15 @@ export class ThreatHuntingSystemCore
             },
           },
         ])
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return networkEnumeration.map((enumeration) => ({
         type: 'network_enumeration',
         severity: 'medium',
         confidence: 0.7,
-        data: enumeration,
-        timestamp: new Date(enumeration._id.hour),
+        data: this.toDocumentRecord(enumeration),
+        timestamp: this.toDate(enumeration._id.hour),
       }))
     } catch (error: unknown) {
       logger.error('Network enumeration hunt failed:', { error })
@@ -1458,11 +1676,11 @@ export class ThreatHuntingSystemCore
 
   private async huntServiceExploitation(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const systemLogs = this.db.collection('system_logs')
+      const systemLogs = this.getCollection('system_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const serviceExploitation = await systemLogs
         .find({
@@ -1479,7 +1697,7 @@ export class ThreatHuntingSystemCore
             },
           ],
         })
-        .limit(execution.maxResults || 200)
+        .limit(execution.maxResults ?? 200)
         .toArray()
 
       return serviceExploitation.map((exploit) => ({
@@ -1487,7 +1705,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 0.85,
         data: exploit,
-        timestamp: exploit.timestamp,
+        timestamp: this.toDate(exploit.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Service exploitation hunt failed:', { error })
@@ -1497,11 +1715,11 @@ export class ThreatHuntingSystemCore
 
   private async huntRemoteAccessTools(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const processLogs = this.db.collection('process_logs')
+      const processLogs = this.getCollection('process_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const remoteAccessTools = await processLogs
         .find({
@@ -1521,7 +1739,7 @@ export class ThreatHuntingSystemCore
             ],
           },
         })
-        .limit(execution.maxResults || 100)
+        .limit(execution.maxResults ?? 100)
         .toArray()
 
       return remoteAccessTools.map((tool) => ({
@@ -1529,7 +1747,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.8,
         data: tool,
-        timestamp: tool.timestamp,
+        timestamp: this.toDate(tool.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Remote access tools hunt failed:', { error })
@@ -1540,7 +1758,7 @@ export class ThreatHuntingSystemCore
   private async executeCustomQuery(
     execution: HuntExecution,
     query: string,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Executing custom query', {
         executionId: execution.executionId,
@@ -1570,11 +1788,11 @@ export class ThreatHuntingSystemCore
 
   private async executeBasicSecurityAnalysis(
     execution: HuntExecution,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
-      const securityLogs = this.db.collection('security_logs')
+      const securityLogs = this.getCollection('security_logs')
       const timeRange =
-        execution.parameters.timeRange || this.getDefaultTimeRange()
+        this.getExecutionTimeRange(execution)
 
       const securityEvents = await securityLogs
         .find({
@@ -1584,15 +1802,15 @@ export class ThreatHuntingSystemCore
           },
           severity: { $in: ['high', 'critical'] },
         })
-        .limit(execution.maxResults || 1000)
+        .limit(execution.maxResults ?? 1000)
         .toArray()
 
       return securityEvents.map((event) => ({
         type: 'security_event',
-        severity: event.severity,
+        severity: this.normalizeSeverity(event.severity),
         confidence: 0.8,
-        data: event,
-        timestamp: event.timestamp,
+        data: this.toDocumentRecord(event),
+        timestamp: this.toDate(event.timestamp),
       }))
     } catch (error: unknown) {
       logger.error('Basic security analysis failed:', { error })
@@ -1601,25 +1819,23 @@ export class ThreatHuntingSystemCore
   }
 
   private async analyzeHuntResults(
-    results: any[],
+    results: RawHuntFinding[],
     pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       logger.info('Analyzing hunt results', {
         resultCount: results.length,
         patternId: pattern.patternId,
       })
 
-      const analyzedResults: any[] = []
+      const analyzedResults: RawHuntFinding[] = []
 
       for (const result of results) {
         const analyzedResult = await this.analyzeIndividualResult(
           result,
           pattern,
         )
-        if (analyzedResult) {
-          analyzedResults.push(analyzedResult)
-        }
+      analyzedResults.push(analyzedResult)
       }
 
       // Apply pattern-specific analysis
@@ -1636,12 +1852,12 @@ export class ThreatHuntingSystemCore
   }
 
   private async analyzeIndividualResult(
-    result: any,
+    result: RawHuntFinding,
     pattern: HuntPattern,
-  ): Promise<any> {
+  ): Promise<RawHuntFinding> {
     try {
       // Calculate confidence based on pattern and result characteristics
-      let confidence = result.confidence || 0.5
+      let confidence = result.confidence
 
       // Adjust confidence based on severity
       if (result.severity === 'critical') {
@@ -1667,12 +1883,13 @@ export class ThreatHuntingSystemCore
   }
 
   private async applyPatternAnalysis(
-    results: any[],
+    results: RawHuntFinding[],
     pattern: HuntPattern,
-  ): Promise<any[]> {
+  ): Promise<RawHuntFinding[]> {
     try {
       // Apply pattern-specific analysis logic
-      switch (pattern.patternType) {
+    const resolvedPatternType = pattern.patternType ?? 'anomaly'
+    switch (resolvedPatternType) {
         case 'network':
           return await this.analyzeNetworkResults(results)
         case 'endpoint':
@@ -1683,16 +1900,20 @@ export class ThreatHuntingSystemCore
           return await this.analyzeMalwareResults(results)
         case 'lateral_movement':
           return await this.analyzeLateralMovementResults(results)
-        default:
+        case 'anomaly':
+        case 'custom':
           return results
       }
+    return results
     } catch (error: unknown) {
       logger.error('Pattern analysis failed:', { error })
       return results
     }
   }
 
-  private async analyzeNetworkResults(results: any[]): Promise<any[]> {
+  private async analyzeNetworkResults(
+    results: RawHuntFinding[],
+  ): Promise<RawHuntFinding[]> {
     try {
       // Group by source IP and analyze patterns
       const groupedBySource = this.groupBy(results, 'data.sourceIp')
@@ -1716,7 +1937,9 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async analyzeEndpointResults(results: any[]): Promise<any[]> {
+  private async analyzeEndpointResults(
+    results: RawHuntFinding[],
+  ): Promise<RawHuntFinding[]> {
     try {
       // Look for process chains and file system patterns
       const processResults = results.filter(
@@ -1731,7 +1954,7 @@ export class ThreatHuntingSystemCore
         const relatedFiles = fileResults.filter(
           (file) =>
             Math.abs(
-              file.timestamp.getTime() - processResult.timestamp.getTime(),
+              this.toDate(file.timestamp).getTime() - this.toDate(processResult.timestamp).getTime(),
             ) < 60000, // Within 1 minute
         )
 
@@ -1740,9 +1963,9 @@ export class ThreatHuntingSystemCore
             processResult.confidence * 1.2,
             1.0,
           )
-          processResult.relatedFindings = relatedFiles.map(
-            (f) => f.data.filePath,
-          )
+          processResult.relatedFindings = relatedFiles
+            .map((f) => this.toStringValue(f.data.filePath))
+            .filter((path): path is string => path !== undefined)
         }
       }
 
@@ -1753,7 +1976,9 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async analyzeUserBehaviorResults(results: any[]): Promise<any[]> {
+  private async analyzeUserBehaviorResults(
+    results: RawHuntFinding[],
+  ): Promise<RawHuntFinding[]> {
     try {
       // Look for behavioral patterns across time
       const loginResults = results.filter(
@@ -1763,10 +1988,10 @@ export class ThreatHuntingSystemCore
         (r) => r.type === 'unusual_access_pattern',
       )
 
-      // Correlate login anomalies with access anomalies
       for (const loginResult of loginResults) {
+        const loginDataId = this.toStringValue(loginResult.data._id)
         const userAccess = accessResults.filter(
-          (access) => access.data._id === loginResult.data._id,
+          (access) => this.toStringValue(access.data._id) === loginDataId,
         )
 
         if (userAccess.length > 0) {
@@ -1782,7 +2007,9 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async analyzeMalwareResults(results: any[]): Promise<any[]> {
+  private async analyzeMalwareResults(
+    results: RawHuntFinding[],
+  ): Promise<RawHuntFinding[]> {
     try {
       // Prioritize known malware signatures
       const signatureResults = results.filter(
@@ -1800,11 +2027,19 @@ export class ThreatHuntingSystemCore
 
       // Correlate behavioral indicators with signatures
       for (const behavioralResult of behavioralResults) {
-        const relatedSignatures = signatureResults.filter(
-          (sig) =>
-            sig.data.sourceIp === behavioralResult.data.sourceIp ||
-            sig.data.processId === behavioralResult.data.processId,
+        const behavioralSourceIp = this.toStringValue(
+          behavioralResult.data.sourceIp,
         )
+        const behavioralProcessId = this.toStringValue(
+          behavioralResult.data.processId,
+        )
+
+        const relatedSignatures = signatureResults.filter((sig) => {
+          if (this.toStringValue(sig.data.sourceIp) === behavioralSourceIp) {
+            return true
+          }
+          return this.toStringValue(sig.data.processId) === behavioralProcessId
+        })
 
         if (relatedSignatures.length > 0) {
           behavioralResult.confidence = Math.min(
@@ -1821,7 +2056,9 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async analyzeLateralMovementResults(results: any[]): Promise<any[]> {
+  private async analyzeLateralMovementResults(
+    results: RawHuntFinding[],
+  ): Promise<RawHuntFinding[]> {
     try {
       // Look for chains of lateral movement indicators
       const credentialResults = results.filter(
@@ -1838,12 +2075,15 @@ export class ThreatHuntingSystemCore
       for (const credentialResult of credentialResults) {
         const relatedEnumeration = enumerationResults.filter(
           (enumResult) =>
-            enumResult.data._id.sourceIp === credentialResult.data.sourceIp,
+            this.toStringValue(
+              this.getNestedValue(enumResult.data, '_id.sourceIp'),
+            ) === this.toStringValue(credentialResult.data.sourceIp),
         )
 
         const relatedRemote = remoteResults.filter(
           (remoteResult) =>
-            remoteResult.data.sourceIp === credentialResult.data.sourceIp,
+            this.toStringValue(remoteResult.data.sourceIp) ===
+              this.toStringValue(credentialResult.data.sourceIp),
         )
 
         if (relatedEnumeration.length > 0 || relatedRemote.length > 0) {
@@ -1862,22 +2102,22 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private groupBy(array: any[], keyPath: string): Record<string, any[]> {
-    return array.reduce(
-      (groups, item) => {
-        const key = this.getNestedValue(item, keyPath)
-        if (!groups[key]) {
-          groups[key] = []
-        }
-        groups[key].push(item)
-        return groups
-      },
-      {} as Record<string, any[]>,
-    )
-  }
+  private groupBy(
+    array: RawHuntFinding[],
+    keyPath: string,
+  ): Record<string, RawHuntFinding[]> {
+    const groups: Record<string, RawHuntFinding[]> = {}
 
-  private getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, key) => current?.[key], obj)
+    for (const item of array) {
+      const key = this.getNestedValue(item, keyPath)
+      if (typeof key !== 'string') {
+        continue
+      }
+
+      ;(groups[key] ??= []).push(item)
+    }
+
+    return groups
   }
 
   private increaseSeverity(severity: string): string {
@@ -1890,8 +2130,9 @@ export class ThreatHuntingSystemCore
   }
 
   private async generateThreatIntelligence(
-    results: any[],
+    results: RawHuntFinding[],
     pattern: HuntPattern,
+    execution: HuntExecution,
   ): Promise<GlobalThreatIntelligence[]> {
     try {
       logger.info('Generating threat intelligence from hunt results', {
@@ -1904,7 +2145,7 @@ export class ThreatHuntingSystemCore
       for (const result of results) {
         if (result.confidence >= 0.7) {
           // Only high-confidence results
-          const threat = await this.createThreatFromResult(result, pattern)
+          const threat = await this.createThreatFromResult(result, pattern, execution)
           if (threat) {
             threats.push(threat)
           }
@@ -1926,8 +2167,9 @@ export class ThreatHuntingSystemCore
   }
 
   private async createThreatFromResult(
-    result: any,
+    result: RawHuntFinding,
     pattern: HuntPattern,
+    execution: HuntExecution,
   ): Promise<GlobalThreatIntelligence | null> {
     try {
       const threatId = this.generateThreatId()
@@ -1940,14 +2182,42 @@ export class ThreatHuntingSystemCore
       }
 
       const threat: GlobalThreatIntelligence = {
+        intelligenceId: threatId,
         threatId,
         threatType: this.mapResultToThreatType(result),
-        severity: result.severity || 'medium',
+        severity: this.normalizeSeverity(result.severity),
         confidence: result.confidence,
         indicators,
-        firstSeen: result.timestamp || new Date(),
-        lastSeen: result.timestamp || new Date(),
-        regions: execution.regions || ['global'],
+        firstSeen: this.toDate(result.timestamp),
+        lastSeen: this.toDate(result.timestamp),
+        regions: execution.regions,
+        impactAssessment: {
+          geographicSpread: execution.regions.length,
+          affectedRegions: execution.regions,
+          affectedSectors: [],
+          potentialImpact: result.confidence * 100,
+        },
+        correlationData: {
+          correlationId: execution.executionId,
+          correlatedThreats: [],
+          correlationStrength: result.confidence,
+          correlationType: 'hunting',
+          confidence: result.confidence,
+          analysisMethod: 'pattern_match',
+          timestamp: this.toDate(result.timestamp),
+        },
+        validationStatus: {
+          validationId: `validation_${execution.executionId}`,
+          status: 'pending',
+          accuracy: result.confidence,
+          completeness: result.confidence,
+          consistency: 1,
+          timeliness: 1,
+          relevance: result.confidence,
+          validator: 'system',
+          validationDate: this.toDate(result.timestamp),
+          feedback: [],
+        },
         attribution: {
           family: pattern.name,
           campaign: `hunt_${pattern.patternId}`,
@@ -1969,72 +2239,78 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private extractIndicatorsFromResult(result: any): ThreatIndicator[] {
+  private extractIndicatorsFromResult(result: RawHuntFinding): ThreatIndicator[] {
     const indicators: ThreatIndicator[] = []
 
     try {
       // Extract IP addresses
-      if (result.data.sourceIp) {
+      const sourceIp = this.toStringValue(result.data.sourceIp)
+      if (sourceIp) {
         indicators.push({
           indicatorType: 'ip',
-          value: result.data.sourceIp,
+          value: sourceIp,
           confidence: result.confidence,
-          firstSeen: result.timestamp,
-          lastSeen: result.timestamp,
+          firstSeen: this.toDate(result.timestamp),
+          lastSeen: this.toDate(result.timestamp),
         })
       }
 
-      if (result.data.destinationIp) {
+      const destinationIp = this.toStringValue(result.data.destinationIp)
+      if (destinationIp) {
         indicators.push({
           indicatorType: 'ip',
-          value: result.data.destinationIp,
+          value: destinationIp,
           confidence: result.confidence,
-          firstSeen: result.timestamp,
-          lastSeen: result.timestamp,
+          firstSeen: this.toDate(result.timestamp),
+          lastSeen: this.toDate(result.timestamp),
         })
       }
 
       // Extract file hashes
-      if (result.data.fileHash) {
+      const fileHash = this.toStringValue(result.data.fileHash)
+      if (fileHash) {
         indicators.push({
           indicatorType: 'file_hash',
-          value: result.data.fileHash,
+          value: fileHash,
           confidence: result.confidence,
-          firstSeen: result.timestamp,
-          lastSeen: result.timestamp,
+          firstSeen: this.toDate(result.timestamp),
+          lastSeen: this.toDate(result.timestamp),
         })
       }
 
       // Extract domain names
-      if (result.data.domainName) {
+      const domainName = this.toStringValue(result.data.domainName)
+      if (domainName) {
         indicators.push({
           indicatorType: 'domain',
-          value: result.data.domainName,
+          value: domainName,
           confidence: result.confidence,
-          firstSeen: result.timestamp,
-          lastSeen: result.timestamp,
+          firstSeen: this.toDate(result.timestamp),
+          lastSeen: this.toDate(result.timestamp),
         })
       }
 
       // Extract URLs
-      if (result.data.url) {
+      const url = this.toStringValue(result.data.url)
+      if (url) {
         indicators.push({
           indicatorType: 'url',
-          value: result.data.url,
+          value: url,
           confidence: result.confidence,
-          firstSeen: result.timestamp,
-          lastSeen: result.timestamp,
+          firstSeen: this.toDate(result.timestamp),
+          lastSeen: this.toDate(result.timestamp),
         })
       }
 
       // Extract process names
-      if (result.data.processName) {
+      const processName = this.toStringValue(result.data.processName)
+      if (processName) {
         indicators.push({
           indicatorType: 'process',
-          value: result.data.processName,
+          value: processName,
           confidence: result.confidence,
-          firstSeen: result.timestamp,
-          lastSeen: result.timestamp,
+          firstSeen: this.toDate(result.timestamp),
+          lastSeen: this.toDate(result.timestamp),
         })
       }
 
@@ -2045,7 +2321,7 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private mapResultToThreatType(result: any): string {
+  private mapResultToThreatType(result: RawHuntFinding): string {
     const typeMap: Record<string, string> = {
       suspicious_connection: 'network_intrusion',
       unusual_dns_query: 'dns_tunneling',
@@ -2069,7 +2345,41 @@ export class ThreatHuntingSystemCore
       remote_access_tool: 'remote_access',
     }
 
-    return typeMap[result.type] || 'general'
+    return typeMap[result.type] ?? 'general'
+  }
+
+  private mapToHuntFinding(result: RawHuntFinding): HuntFinding {
+    const findingId =
+      this.toStringValue(result.data.findingId) ?? `finding_${Date.now()}`
+    const evidence = this.toStringArray(result.data.evidence)
+    const description = this.toStringValue(result.data.description)
+
+    return {
+      findingId,
+      severity: this.normalizeSeverity(result.severity),
+      confidence: this.toConfidence(result.confidence),
+      description:
+        `${result.type}: ${description ?? 'Threat hunting anomaly detected'}`,
+      evidence,
+      remediation:
+        this.toStringValue(result.data.remediation) ??
+        'Investigate and validate the alert.',
+    }
+  }
+
+  private normalizeSeverity(
+    severity: unknown,
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (
+      severity === 'low' ||
+      severity === 'medium' ||
+      severity === 'high' ||
+      severity === 'critical'
+    ) {
+      return severity
+    }
+
+    return 'medium'
   }
 
   private deduplicateThreats(
@@ -2103,39 +2413,31 @@ export class ThreatHuntingSystemCore
   }
 
   private async storeHuntResults(
-    execution: HuntExecution,
-    results: any[],
+    huntResult: HuntResult,
     threats: GlobalThreatIntelligence[],
   ): Promise<void> {
     try {
       // Store hunt execution results
-      const resultsCollection = this.db.collection('hunt_results')
-      await resultsCollection.insertMany(
-        results.map((result) => ({
-          ...result,
-          executionId: execution.executionId,
-          huntId: execution.huntId,
-          patternId: execution.patternId,
-          storedAt: new Date(),
-        })),
-      )
+      const resultsCollection = this.getCollection<HuntResult>('hunt_results')
+      await resultsCollection.insertOne(huntResult)
 
       // Store discovered threats
       if (threats.length > 0) {
-        const threatsCollection = this.db.collection('discovered_threats')
-        await threatsCollection.insertMany(
-          threats.map((threat) => ({
+        const threatsCollection = this.getCollection('discovered_threats')
+        const mappedThreats = threats.map((threat) => {
+          return {
             ...threat,
             discoveryMethod: 'hunting',
-            executionId: execution.executionId,
+            executionId: huntResult.executionId,
             storedAt: new Date(),
-          })),
-        )
+          }
+        })
+        await threatsCollection.insertMany(mappedThreats)
       }
 
       logger.info('Hunt results stored successfully', {
-        executionId: execution.executionId,
-        resultCount: results.length,
+        executionId: huntResult.executionId,
+        resultCount: 1,
         threatCount: threats.length,
       })
     } catch (error: unknown) {
@@ -2146,7 +2448,8 @@ export class ThreatHuntingSystemCore
 
   private async storeHuntExecution(execution: HuntExecution): Promise<void> {
     try {
-      const executionsCollection = this.db.collection('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       await executionsCollection.insertOne(execution)
 
       this.activeHunts.set(execution.executionId, execution)
@@ -2158,7 +2461,8 @@ export class ThreatHuntingSystemCore
 
   private async updateHuntExecution(execution: HuntExecution): Promise<void> {
     try {
-      const executionsCollection = this.db.collection('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       await executionsCollection.updateOne(
         { executionId: execution.executionId },
         { $set: execution },
@@ -2197,12 +2501,16 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async sendHighPriorityNotification(notification: any): Promise<void> {
+  private async sendHighPriorityNotification(
+    notification: ThreatNotification,
+  ): Promise<void> {
     logger.info('Sending high priority threat notification', notification)
     // Implement high priority notification logic (email, SMS, etc.)
   }
 
-  private async sendStandardNotification(notification: any): Promise<void> {
+  private async sendStandardNotification(
+    notification: ThreatNotification,
+  ): Promise<void> {
     logger.info('Sending standard threat notification', notification)
     // Implement standard notification logic
   }
@@ -2224,11 +2532,11 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private calculateOverallConfidence(results: any[]): number {
+  private calculateOverallConfidence(results: RawHuntFinding[]): number {
     if (results.length === 0) return 0
 
     const totalConfidence = results.reduce(
-      (sum, result) => sum + (result.confidence || 0),
+      (sum, result) => sum + result.confidence,
       0,
     )
     return totalConfidence / results.length
@@ -2309,12 +2617,12 @@ export class ThreatHuntingSystemCore
       monthly: 30 * 24 * 60 * 60 * 1000, // 30 days
     }
 
-    return intervals[frequency] || 24 * 60 * 60 * 1000
+    return intervals[frequency] ?? 24 * 60 * 60 * 1000
   }
 
   private async storeHuntSchedule(schedule: HuntSchedule): Promise<void> {
     try {
-      const schedulesCollection = this.db.collection('hunt_schedules')
+      const schedulesCollection = this.getCollection<HuntSchedule>('hunt_schedules')
       await schedulesCollection.replaceOne(
         { scheduleId: schedule.scheduleId },
         schedule,
@@ -2395,14 +2703,14 @@ export class ThreatHuntingSystemCore
     limit: number = 100,
   ): Promise<HuntResult[]> {
     try {
-      const resultsCollection = this.db.collection('hunt_results')
+      const resultsCollection = this.getCollection<HuntResult>('hunt_results')
       const results = await resultsCollection
         .find({ huntId })
         .sort({ timestamp: -1 })
         .limit(limit)
         .toArray()
 
-      return results
+      return results.map((result) => this.mapStoredDocument(result))
     } catch (error: unknown) {
       logger.error('Failed to get hunt results:', { error, huntId })
       throw error
@@ -2411,7 +2719,8 @@ export class ThreatHuntingSystemCore
 
   async getActiveHunts(): Promise<HuntExecution[]> {
     try {
-      const executionsCollection = this.db.collection('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       const activeHunts = await executionsCollection
         .find({ status: { $in: ['preparing', 'executing'] } })
         .sort({ startTime: -1 })
@@ -2435,7 +2744,7 @@ export class ThreatHuntingSystemCore
       this.huntPatterns.set(pattern.patternId, pattern)
 
       // Update in database
-      const patternsCollection = this.db.collection('hunt_patterns')
+      const patternsCollection = this.getCollection<HuntPattern>('hunt_patterns')
       await patternsCollection.replaceOne(
         { patternId: pattern.patternId },
         pattern,
@@ -2464,9 +2773,12 @@ export class ThreatHuntingSystemCore
 
   async getHuntMetrics(): Promise<HuntMetrics> {
     try {
-      const executionsCollection = this.db.collection('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
 
-      const threatsCollection = this.db.collection('discovered_threats')
+      const threatsCollection = this.getCollection<GlobalThreatIntelligence>(
+        'discovered_threats',
+      )
 
       const [
         totalHunts,
@@ -2513,7 +2825,8 @@ export class ThreatHuntingSystemCore
 
   private async calculateAverageExecutionTime(): Promise<number> {
     try {
-      const executionsCollection = this.db.collection('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       const completedExecutions = await executionsCollection
         .find({
           status: 'completed',
@@ -2530,8 +2843,9 @@ export class ThreatHuntingSystemCore
 
       let totalTime = 0
       for (const execution of completedExecutions) {
-        const timeDiff =
-          execution.completedTime.getTime() - execution.startTime.getTime()
+        const startTime = this.toDate(execution.startTime)
+        const completedTime = this.toDate(execution.completedTime)
+        const timeDiff = completedTime.getTime() - startTime.getTime()
         totalTime += timeDiff
       }
 
@@ -2544,7 +2858,7 @@ export class ThreatHuntingSystemCore
 
   private async calculateFalsePositives(): Promise<number> {
     try {
-      const resultsCollection = this.db.collection('hunt_results')
+      const resultsCollection = this.getCollection('hunt_results')
       const falsePositives = await resultsCollection.countDocuments({
         confidence: { $lt: 0.5 },
         timestamp: {
@@ -2561,13 +2875,16 @@ export class ThreatHuntingSystemCore
 
   private async getHuntsByType(): Promise<Record<string, number>> {
     try {
-      const executionsCollection = this.db.collection('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       const pipeline = [
         { $group: { _id: '$metadata.patternType', count: { $sum: 1 } } },
         { $project: { patternType: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await executionsCollection.aggregate(pipeline).toArray()
+      const results = await executionsCollection
+        .aggregate<PatternTypeCount>(pipeline)
+        .toArray()
 
       const huntsByType: Record<string, number> = {}
       for (const result of results) {
@@ -2583,13 +2900,16 @@ export class ThreatHuntingSystemCore
 
   private async getHuntsBySeverity(): Promise<Record<string, number>> {
     try {
-      const resultsCollection = this.db.collection('hunt_results')
+      const resultsCollection =
+        this.getCollection('hunt_results')
       const pipeline = [
         { $group: { _id: '$severity', count: { $sum: 1 } } },
         { $project: { severity: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await resultsCollection.aggregate(pipeline).toArray()
+      const results = await resultsCollection
+        .aggregate<SeverityCount>(pipeline)
+        .toArray()
 
       const huntsBySeverity: Record<string, number> = {}
       for (const result of results) {
@@ -2605,7 +2925,7 @@ export class ThreatHuntingSystemCore
 
   private async checkScheduledHunts(): Promise<void> {
     try {
-      const schedulesCollection = this.db.collection('hunt_schedules')
+      const schedulesCollection = this.getCollection<HuntSchedule>('hunt_schedules')
       const activeSchedules = await schedulesCollection
         .find({ enabled: true })
         .toArray()
@@ -2696,17 +3016,19 @@ export class ThreatHuntingSystemCore
       }
     } catch (error: unknown) {
       logger.error('Health check failed:', { error })
+      const message =
+        error instanceof Error ? error.message : 'Unknown health check failure'
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${message}`,
       }
     }
   }
 
   private async checkRedisHealth(): Promise<boolean> {
     try {
-      const result = await this.redis.ping()
-      return result === 'PONG'
+      await this.redis.ping()
+      return true
     } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
@@ -2738,13 +3060,9 @@ export class ThreatHuntingSystemCore
       }
 
       // Close database connections
-      if (this.mongoClient) {
-        await this.mongoClient.close()
-      }
+      await this.mongoClient.close()
 
-      if (this.redis) {
-        await this.redis.quit()
-      }
+      await this.redis.quit()
 
       this.emit('hunting_system_shutdown')
       logger.info('Threat Hunting System shutdown completed')

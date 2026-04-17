@@ -201,6 +201,7 @@ security-scan-artifacts
 tmp/
 
 # === PROJECT SPECIFIC & MISC ===
+artifacts/
 *.dll
 *.dump
 *.dylib

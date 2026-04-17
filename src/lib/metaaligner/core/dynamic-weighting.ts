@@ -127,6 +127,7 @@ export class DynamicWeightingEngine {
    */
   calculateDynamicWeights(context: AlignmentContext): WeightUpdateResult {
     const startTime = performance.now()
+    const contextConfidence = this.getContextConfidence(context)
     const reasoning: string[] = []
 
     // Check cache first
@@ -163,11 +164,11 @@ export class DynamicWeightingEngine {
     if (
       this.config.crisisOverrideEnabled &&
       context.detectedContext === ContextType.CRISIS &&
-      context.confidence >= this.config.crisisOverrideThreshold
+      contextConfidence >= this.config.crisisOverrideThreshold
     ) {
       // Crisis override bypasses smoothing and applies immediately
       reasoning.push(
-        `Crisis override applied (confidence: ${context.confidence.toFixed(2)})`,
+        `Crisis override applied (confidence: ${contextConfidence.toFixed(2)})`,
       )
       crisisOverrideApplied = true
 
@@ -179,7 +180,7 @@ export class DynamicWeightingEngine {
 
       logger.info('Crisis override applied', {
         updateTimeMs: updateTime,
-        confidence: context.confidence,
+        confidence: contextConfidence,
       })
 
       return {
@@ -465,7 +466,7 @@ export class DynamicWeightingEngine {
       timestamp: Date.now(),
       context: context.detectedContext,
       weights: { ...weights },
-      confidence: context.confidence,
+      confidence: this.getContextConfidence(context),
     })
 
     // Keep only recent history
@@ -514,6 +515,17 @@ export class DynamicWeightingEngine {
     }
 
     return true
+  }
+
+  /**
+   * Resolve context confidence from explicit or metadata-backed fields.
+   */
+  private getContextConfidence(context: AlignmentContext): number {
+    if (typeof context.confidence === 'number') {
+      return context.confidence
+    }
+
+    return context.sessionMetadata?.confidence ?? 0
   }
 
   /**

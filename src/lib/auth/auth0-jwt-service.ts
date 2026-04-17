@@ -48,7 +48,7 @@ function isRuntimeAuth0Configured(config: Auth0RuntimeConfig): boolean {
 }
 
 // Initialize Auth0 authentication client
-let auth0Authentication: ReturnType<typeof auth0.AuthenticationClient> | null = null
+let auth0Authentication: InstanceType<typeof auth0.AuthenticationClient> | null = null
 let auth0UserInfo: Auth0UserInfoClient | null = null
 
 /**
