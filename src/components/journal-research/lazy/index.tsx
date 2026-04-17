@@ -135,15 +135,6 @@ export const LazyDashboard = withLazyLoading(
   <LoadingFallback message='Loading dashboard...' />,
 )
 
-export const LazyProgressTracker = withLazyLoading(
-  lazy(() =>
-    import('../features/ProgressTracker').then((module) => ({
-      default: module.ProgressTracker,
-    })),
-  ),
-  <LoadingFallback message='Loading progress...' />,
-)
-
 export const LazyProgressCharts = withLazyLoading(
   lazy(() =>
     import('../charts/ProgressCharts').then((module) => ({
