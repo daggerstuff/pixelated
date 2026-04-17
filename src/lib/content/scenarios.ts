@@ -23,7 +23,7 @@ export const scenariosContent = {
     label: 'Who it is built for',
     title:
       'Use it anywhere therapists need repeatable practice before real care.',
-    body: 'The strongest fit is any training environment where supervisors need consistent client simulations, transcript evidence, and a shared rubric for feedback.',
+    body: 'The strongest fit is any training environment where supervisors need consistent client simulations, review evidence, and shared scoring criteria.',
     items: [
       { label: 'Graduate programs', value: 'Repeatable trainee rehearsal' },
       { label: 'Supervision teams', value: 'Concrete review and coaching' },

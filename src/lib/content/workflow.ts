@@ -15,11 +15,11 @@ export const workflowContent = {
     {
       number: '03',
       title: 'Score, coach, and repeat',
-      body: 'Supervisors use the transcript and rubric to give targeted feedback, then assign a retry or related case.',
+      body: 'Supervisors use the session record to give targeted feedback, then assign a retry or related case.',
     },
   ],
   bandLabel: 'What each session leaves behind',
-  bandTitle: 'A transcript, rubric signals, and supervisor-ready notes.',
+  bandTitle: 'A session record, scoring signals, and supervisor-ready notes.',
   bandBody:
     'The practice run becomes a record your team can teach from, compare across trainees, and revisit as skills improve.',
   outputs: [
@@ -35,7 +35,8 @@ export const workflowContent = {
     },
     {
       label: 'Shared standard',
-      value: 'One case the team can use to compare judgment across clinicians.',
+      value:
+        'One scenario the team can use to compare judgment across clinicians.',
     },
   ],
 } as const

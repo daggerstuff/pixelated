@@ -1,46 +1,46 @@
 export const featuresContent = {
-  label: 'Core workflow',
-  title: 'Simulate, transcribe, score, and coach.',
-  copy: 'The platform is built around a simple training loop: assign a realistic case, let the trainee respond, preserve the transcript, and turn the session into supervisor-ready feedback.',
-  proofLabel: 'What your team can do',
+  label: 'Product modules',
+  title: 'A case library, a practice room, and a review desk.',
+  copy: 'The product is not a generic chatbot. It is a training system with reusable scenarios, live therapeutic practice, and supervisor tools built around education workflows.',
+  proofLabel: 'What changes operationally',
   proofItems: [
-    'Create repeatable client scenarios for students, interns, associates, or staff clinicians.',
-    'Review the same transcript with rubric signals, instructor notes, and a clear retry path.',
+    'Faculty stop rebuilding roleplay prompts from scratch.',
+    'Trainees can repeat a scenario until a skill is visible, not just discussed.',
   ],
   cards: [
     {
-      title: 'AI client simulations',
+      title: 'Case library',
       description:
-        'Trainees talk with realistic client profiles that include presenting concerns, emotional shifts, and therapeutic constraints.',
+        'Build reusable client profiles around diagnosis, context, risk, affect, therapeutic goal, and the skill being taught.',
       icon: 'chat',
     },
     {
-      title: 'Transcript-backed review',
+      title: 'Practice room',
       description:
-        'Every session produces a record supervisors can inspect line by line instead of reconstructing the conversation from memory.',
+        'Let trainees interview an AI client that adapts to tone, timing, avoidance, disclosure, repair attempts, and escalation.',
       icon: 'chart',
     },
     {
-      title: 'Rubrics and coaching notes',
+      title: 'Review desk',
       description:
-        'Rubric markers and coaching prompts help faculty explain what worked, what missed, and what the trainee should try next.',
+        'Open the attempt afterward to inspect the exchange, mark competencies, leave notes, and decide what should be repeated.',
       icon: 'shield',
     },
   ],
   comparison: {
-    label: 'What changes in supervision',
-    title: 'Feedback moves from impression to evidence.',
-    body: 'Instead of saying a trainee seemed rushed or empathic, supervisors can point to the exact response, score the clinical move, and assign a focused retry.',
+    label: 'What it replaces',
+    title: 'Less theater. More teachable clinical behavior.',
+    body: 'Traditional roleplay can be useful, but it is hard to standardize. Pixelated Empathy keeps the useful parts of roleplay while adding consistency, repeatability, and review.',
     items: [
       {
-        label: 'Without the product',
+        label: 'Ad hoc roleplay',
         value:
-          '“I think the trainee moved too quickly, but I do not have the exact exchange.”',
+          'Different actors, different prompts, different feedback, hard to compare.',
       },
       {
-        label: 'With Pixelated Empathy',
+        label: 'Structured simulation',
         value:
-          '“At line 18, they reassured before assessing risk. Retry the same case and lead with immediacy.”',
+          'Consistent scenario, saved attempt, competency review, and repeatable practice.',
         accent: true,
       },
     ],

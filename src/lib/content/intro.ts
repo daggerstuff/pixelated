@@ -1,40 +1,40 @@
 export const introContent = {
-  label: 'What the product does',
-  title: 'Turn clinical roleplay into structured practice data.',
+  label: 'Why it exists',
+  title: 'Therapists need more reps than real patients can safely provide.',
   paragraphs: [
-    'Pixelated Empathy is a training environment for therapists. Trainees practice with AI clients, then supervisors review the conversation with transcript evidence, rubric markers, and coaching notes.',
-    'The product is for counseling programs, supervision groups, training clinics, and behavioral health organizations that need repeatable practice without putting real patients at risk.',
+    'Most training programs know which conversations scare new clinicians: risk, anger, silence, shame, boundary pressure, cultural misses, and disclosure. Those moments need practice before they become someone’s real session.',
+    'Pixelated Empathy gives teams a place to rehearse those moments repeatedly, with enough structure for faculty to teach skill instead of relying on charisma, memory, or one-off roleplay.',
   ],
-  panelLabel: 'Where it fits',
+  panelLabel: 'Who uses it',
   panelItems: [
     {
-      label: 'Before practicum',
-      body: 'Give students realistic intake, empathy, boundaries, and repair scenarios before they sit with real clients.',
+      label: 'Counseling programs',
+      body: 'Prepare students for practicum with standardized client encounters and a clearer readiness signal.',
     },
     {
-      label: 'During supervision',
-      body: 'Review the exact lines a trainee used, score the clinical move, and coach the next attempt from the same record.',
+      label: 'Supervision groups',
+      body: 'Give associates and interns focused practice between live cases without inventing ad hoc roleplays every week.',
     },
     {
-      label: 'Across cohorts',
-      body: 'Run the same case across trainees so faculty can compare decision-making and identify where instruction needs reinforcement.',
+      label: 'Care organizations',
+      body: 'Rehearse high-risk communication patterns before staff encounter them in intake, crisis, or retention workflows.',
     },
   ],
   evidenceCards: [
     {
-      title: 'What teams usually lack',
+      title: 'The old pattern',
       items: [
-        'A consistent way to rehearse difficult client conversations.',
-        'Transcript-level evidence for what the trainee actually said.',
-        'Repeatable scoring that helps supervisors compare growth over time.',
+        'Roleplay quality depends on who is in the room that day.',
+        'Feedback often arrives as a general impression.',
+        'Faculty cannot easily compare skill growth across trainees.',
       ],
     },
     {
-      title: 'What Pixelated Empathy provides',
+      title: 'The new pattern',
       items: [
-        'AI client simulations that can be assigned to a class or team.',
-        'Session records with transcript, rubric, and coaching context.',
-        'A safer practice loop before clinical judgment reaches real care.',
+        'The same scenario can be assigned, repeated, and revisited.',
+        'The actual language is available for teaching.',
+        'Progress is tied to observable clinical behavior.',
       ],
     },
   ],
