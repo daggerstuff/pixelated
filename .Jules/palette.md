@@ -1,0 +1,1 @@
+## 2024-06-03 - MentalHealthChat Demo A11y | Learning: Interactive chat demo inputs and buttons often miss critical ARIA labels and empty-state handling in prototype code. | Action: Always add explicit aria-labels and check for .trim() empty states on submission buttons even in prototype demos.
