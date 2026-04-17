@@ -879,6 +879,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             <div className='bg-gray-50 border-t p-4'>
               <div className='flex gap-3'>
                 <Input
+                  aria-label="Message Input"
                   placeholder={
                     mentalHealthService?.isInitialized
                       ? "Share what's on your mind... (encrypted & analyzed securely)"
@@ -1255,6 +1256,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </span>
                           <input
                             type='checkbox'
+                            aria-label='Mental Health Analysis'
                             checked={settings.enableAnalysis}
                             onChange={() =>
                               handleToggleSetting('enableAnalysis')
@@ -1275,6 +1277,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </span>
                           <input
                             type='checkbox'
+                            aria-label='Expert Clinical Guidance'
                             checked={settings.useExpertGuidance}
                             onChange={() =>
                               handleToggleSetting('useExpertGuidance')
@@ -1294,6 +1297,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </span>
                           <input
                             type='checkbox'
+                            aria-label='Crisis Detection'
                             checked={settings.enableCrisisDetection}
                             onChange={() =>
                               handleToggleSetting('enableCrisisDetection')
@@ -1312,6 +1316,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </span>
                           <input
                             type='checkbox'
+                            aria-label='Analysis Panel'
                             checked={settings.showAnalysisPanel}
                             onChange={() =>
                               handleToggleSetting('showAnalysisPanel')
@@ -1330,6 +1335,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </span>
                           <input
                             type='checkbox'
+                            aria-label='Mind Mirror UI'
                             checked={settings.enableMindMirrorUI}
                             onChange={() =>
                               handleToggleSetting('enableMindMirrorUI')
@@ -1348,6 +1354,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </span>
                           <input
                             type='checkbox'
+                            aria-label='Brain Visualization'
                             checked={settings.showBrainVisualization}
                             onChange={() =>
                               handleToggleSetting('showBrainVisualization')
@@ -1371,6 +1378,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                         </label>
                         <input
                           type='range'
+                          aria-label='Confidence Threshold'
                           min='0.1'
                           max='1.0'
                           step='0.1'
@@ -1392,6 +1400,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                         </label>
                         <input
                           type='range'
+                          aria-label='Intervention Threshold'
                           min='0.1'
                           max='1.0'
                           step='0.1'
