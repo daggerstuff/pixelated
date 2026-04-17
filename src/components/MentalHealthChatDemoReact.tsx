@@ -291,6 +291,7 @@ export default function MentalHealthChatDemoReact({
             <div className='flex gap-2'>
               <Input
                 placeholder='Type your message...'
+                aria-label='Type your message...'
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -302,7 +303,11 @@ export default function MentalHealthChatDemoReact({
                 disabled={processing}
               />
 
-              <Button onClick={handleSendMessage} disabled={processing}>
+              <Button
+                onClick={handleSendMessage}
+                disabled={processing || !input.trim()}
+                aria-label={processing ? 'Sending message...' : 'Send message'}
+              >
                 Send
               </Button>
             </div>
