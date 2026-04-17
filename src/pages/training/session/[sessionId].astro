@@ -29,6 +29,12 @@ const fetchCookieValue = (cookieName: string): string | undefined => {
   return undefined
 }
 const token =
+
+const escapeJsonForScriptTag = (value: any) =>
+  JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e")
+
+const escapeJsonForScriptTag = (value: any) =>
+  JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e")
   authHeader?.replace('Bearer ', '') || fetchCookieValue('auth-token')
 
 // Get session data from API
@@ -521,14 +527,14 @@ const isSupervisor = userRole === 'admin'
     type="application/json"
     id="session-data"
     is:inline
-    set:html={JSON.stringify(sessionData).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+    set:html={escapeJsonForScriptTag(sessionData)}
   />
 
   <script
     type="application/json"
     id="user-data"
     is:inline
-    set:html={JSON.stringify({ role: userRole, id: session.user.id }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+    set:html={escapeJsonForScriptTag({ role: userRole, id: session.user.id })}
   />
 </Layout>
 
