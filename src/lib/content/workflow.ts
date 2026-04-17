@@ -1,27 +1,27 @@
 export const workflowContent = {
-  label: 'How the coaching loop tightens',
-  title: 'One difficult case in. One clear coaching move out.',
+  label: 'How the training loop works',
+  title: 'Assign a scenario. Review the transcript. Coach the retry.',
   steps: [
     {
       number: '01',
-      title: 'Bring the session your team already struggles to coach',
-      body: 'Start with the conversation that keeps turning into vague feedback under pressure.',
+      title: 'Choose the clinical skill to practice',
+      body: 'Start with intake structure, empathy, rupture repair, crisis response, cultural humility, or another teachable skill.',
     },
     {
       number: '02',
-      title: 'Run it once without flattening the room into a script',
-      body: 'The clinician still has to respond live while the system keeps the transcript and review lane attached.',
+      title: 'Run a realistic AI client session',
+      body: 'The trainee responds in the moment while the system preserves the transcript, scenario context, and review data.',
     },
     {
       number: '03',
-      title: 'Use the record to name the next move clearly',
-      body: 'Review the turning point together and decide what should change on the next attempt.',
+      title: 'Score, coach, and repeat',
+      body: 'Supervisors use the transcript and rubric to give targeted feedback, then assign a retry or related case.',
     },
   ],
-  bandLabel: 'What one run should leave behind',
-  bandTitle: 'A saved record, a coaching moment, and a cleaner retry.',
+  bandLabel: 'What each session leaves behind',
+  bandTitle: 'A transcript, rubric signals, and supervisor-ready notes.',
   bandBody:
-    'The practice run should not disappear when the session ends. It should leave behind something the whole team can return to next week.',
+    'The practice run becomes a record your team can teach from, compare across trainees, and revisit as skills improve.',
   outputs: [
     {
       label: 'Durable record',
@@ -31,7 +31,7 @@ export const workflowContent = {
     {
       label: 'Specific feedback',
       value:
-        'A concrete read on where the room shifted and what should change next.',
+        'A concrete read on which intervention worked, which response missed, and what to practice next.',
     },
     {
       label: 'Shared standard',

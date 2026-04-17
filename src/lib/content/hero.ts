@@ -1,63 +1,63 @@
 export const heroContent = {
-  title: 'Coach the moment that changed the room.',
+  title: 'AI roleplay for therapist training teams.',
   subtitle:
-    'Run one difficult therapy case, keep the transcript and review lane attached, and leave supervision with one visible next move instead of a fuzzy recap.',
+    'Pixelated Empathy gives supervisors realistic client simulations, session transcripts, scoring rubrics, and coaching notes so trainees can practice high-stakes conversations before seeing real patients.',
   helperText:
-    'Bring a real case only if the review becomes sharper in the very next supervision.',
-  kicker: 'For clinical training teams that need sharper supervision',
+    'Built for counseling programs, clinical supervisors, training clinics, and behavioral health teams.',
+  kicker: 'Therapist training simulation platform',
   proofPoints: [
     {
-      label: 'Keep the turning point visible',
-      text: 'Save the intervention, miss, or repair that changed the room instead of rebuilding it from memory.',
+      label: 'Practice with realistic clients',
+      text: 'Assign simulated sessions for intake, rupture repair, crisis response, motivational interviewing, and other moments trainees need to rehearse.',
     },
     {
-      label: 'Coach from the actual exchange',
-      text: 'Review transcript, notes, and rationale together so the next move is specific before the room gets fuzzy.',
+      label: 'Review with evidence',
+      text: 'Supervisors see the transcript, rubric signals, and coaching notes in one record instead of relying on memory or generic roleplay feedback.',
     },
   ],
   primaryCTA: { text: 'Book a pilot', href: '/contact' },
   secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
   artifact: {
-    eyebrow: 'Product proof',
-    status: 'A review record your team can coach from next week.',
+    eyebrow: 'Product workflow',
+    status: 'Every practice session becomes a reviewable training record.',
     chip: 'Session record',
-    mode: 'Proof before pitch',
+    mode: 'Simulation + transcript + rubric',
     image: '/images/homepage/training-session-proof.png',
     imageAlt:
       'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
       {
-        label: 'What stays attached',
+        label: 'What the trainee does',
         value:
-          'The live conversation, saved transcript, and coaching lane stay tied to the same case.',
+          'Talks through a realistic AI client scenario with enough context to practice clinical judgment, not canned responses.',
       },
       {
-        label: 'Why it matters',
+        label: 'What the supervisor gets',
         value:
-          'A supervisor can point to the exact turn that needs work instead of reconstructing the room from memory.',
+          'A saved transcript, rubric highlights, and coaching notes that make feedback specific and repeatable.',
       },
     ],
     outputs: [
       {
-        label: 'Specific next move',
+        label: 'Supervisor note',
         value:
-          'Point to the intervention worth revisiting next, not a vague impression.',
+          'Highlight the clinical response that needs praise, correction, or another attempt.',
       },
       {
-        label: 'Shared review surface',
+        label: 'Training record',
         value:
-          'Keep transcript and notes attached to one difficult case the whole team can study.',
+          'Keep the transcript, rubric markers, and coaching notes attached to the same simulation.',
       },
       {
-        label: 'Cleaner retry',
+        label: 'Repeatable practice',
         value:
-          'Start the next attempt from a visible decision instead of a fuzzy recap.',
+          'Run the same client scenario again to see whether the trainee changes the response.',
       },
     ],
     readout: [
-      { label: 'Who it is for', value: 'Clinical training teams' },
-      { label: 'What stays', value: 'Transcript + coaching lane' },
-      { label: 'What changes', value: 'Sharper supervision' },
+      { label: 'For', value: 'Therapist training teams' },
+      { label: 'Includes', value: 'Simulation + transcript' },
+      { label: 'Output', value: 'Rubric-backed coaching' },
     ],
   },
 } as const

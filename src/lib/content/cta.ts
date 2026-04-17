@@ -1,28 +1,29 @@
 export const ctaContent = {
-  label: 'Run one hard case',
-  title: 'Bring one hard case. Decide fast whether the coaching gets sharper.',
+  label: 'Pilot the training loop',
+  title: 'See whether your team can use it in supervision this week.',
   intro:
-    'You do not need a long rollout to know whether the workflow helps. Bring one hard conversation, run it once, and judge whether the review got more precise.',
+    'Start with one training scenario your program already teaches. We will help configure the client profile, run a sample session, and show the transcript, rubric, and coaching workflow.',
   verdictCopy:
-    'Keep it only if supervisors can point to the exact moment to revisit and the next attempt gets cleaner.',
+    'The pilot is useful only if your supervisors can see how it fits into real teaching, feedback, and trainee improvement.',
   proofItems: [
     {
-      label: 'Bring one case',
+      label: 'Choose a scenario',
       value:
-        'Choose one conversation your team already struggles to coach clearly.',
+        'Use an intake, rupture, crisis, cultural humility, or motivational interviewing case your team already needs to practice.',
     },
     {
-      label: 'Decide from the evidence',
+      label: 'Review the output',
       value:
-        'Review one run together and keep it only if the feedback got more specific.',
+        'Look at the transcript, rubric markers, coaching notes, and retry workflow before deciding whether it belongs in your program.',
     },
   ],
-  decisionTitle: 'Keep it only if the coaching gets sharper.',
+  decisionTitle: 'A good pilot should answer three questions.',
   rubric: [
-    'Would you bring this transcript into next week’s supervision?',
-    'Did the review reveal one intervention worth changing on the next pass?',
+    'Can trainees practice scenarios they will actually face?',
+    'Can supervisors give clearer feedback with the transcript and rubric?',
+    'Can the team repeat the case to measure improvement over time?',
   ],
   primaryCTA: { text: 'Book a pilot', href: '/contact' },
   secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
-  meta: 'No long rollout required. One difficult case should tell you whether the workflow is clearer.',
+  meta: 'Designed for therapist education, clinical supervision, and behavioral health training teams.',
 } as const
