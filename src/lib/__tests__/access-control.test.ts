@@ -1,15 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
-
-// Mock dependencies that cause resolution errors
-vi.mock('../audit', () => ({
-  createAuditLog: vi.fn(),
-  AuditEventType: { ACCESS: 'ACCESS' }
-}))
-
-vi.mock('../auth', () => ({
-  getCurrentUser: vi.fn(),
-  hasRole: vi.fn()
-}))
+import { describe, it, expect } from 'vitest'
 
 import { roleHasPermission, ROLES, type Role } from '../access-control'
 
@@ -25,7 +14,9 @@ describe('roleHasPermission', () => {
   })
 
   it('handles gracefully when an invalid role is provided', () => {
-    const invalidRole = 'guest' as unknown as Role
+    // We intentionally bypass type checks for this test case
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion
+    const invalidRole = 'guest' as any as Role
     expect(roleHasPermission(invalidRole, 'read:conversations')).toBe(false)
   })
 })
