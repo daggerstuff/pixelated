@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+import { LRUCache } from "./lru-cache";
 import { developerApiKeyManager } from "@/lib/db/developer-api-keys";
 
 const ALLOWED_ORIGINS = [
@@ -17,12 +19,7 @@ const ALLOWED_HEADERS = [
   "X-Client-Version",
 ];
 
-const EXPOSED_HEADERS = [
-  "X-Request-ID",
-  "X-RateLimit-Limit",
-  "X-RateLimit-Remaining",
-  "X-RateLimit-Reset",
-];
+const EXPOSED_HEADERS = ["X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining"];
 
 const MAX_AGE = 86400;
 
@@ -32,13 +29,18 @@ interface CorsValidationCache {
 }
 
 const CORS_CACHE_TTL_MS = 30 * 1000;
-const corsValidationCache = new Map<string, CorsValidationCache>();
+const MAX_CORS_CACHE_SIZE = 1000;
+
+const corsValidationCache = new LRUCache<string, CorsValidationCache>(MAX_CORS_CACHE_SIZE);
+
+function hashCacheKey(apiKey: string): string {
+  return createHash("sha256").update(apiKey.substring(0, 8)).digest("hex").substring(0, 16);
+}
 
 function getCachedCorsValidation(cacheKey: string): boolean | null {
   const cached = corsValidationCache.get(cacheKey);
   if (!cached) return null;
   if (Date.now() - cached.timestamp > CORS_CACHE_TTL_MS) {
-    corsValidationCache.delete(cacheKey);
     return null;
   }
   return cached.valid;
@@ -102,7 +104,7 @@ export async function getDeveloperCorsHeadersWithApiKeyValidation(
     return headers;
   }
 
-  const cacheKey = `cors:${apiKey.substring(0, 8)}`;
+  const cacheKey = `cors:${hashCacheKey(apiKey)}`;
   const cachedResult = getCachedCorsValidation(cacheKey);
 
   if (cachedResult !== null) {

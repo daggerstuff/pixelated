@@ -114,14 +114,15 @@ const {
   .hero-prelude {
     display: flex;
     flex-wrap: wrap;
-    align-items: center; justify-content: center;
+    align-items: center;
     justify-content: center;
     gap: 0.75rem;
   }
 
   .hero-kicker-pill {
     display: inline-flex;
-    align-items: center; justify-content: center;
+    align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.46rem 0.82rem;
     border: 1px dotted rgba(253, 252, 252, 0.22);
@@ -154,7 +155,8 @@ const {
 
   .hero-title {
     margin: 0;
-    max-width: 11ch; margin: 0 auto;
+    max-width: 11ch;
+    margin: 0 auto;
     font-family: var(--font-mono);
     font-size: 42px;
     font-weight: 700;
@@ -166,7 +168,8 @@ const {
 
   .hero-subtitle {
     margin: 0;
-    max-width: 34rem; margin: 0 auto;
+    max-width: 34rem;
+    margin: 0 auto;
     font-family: var(--font-mono);
     font-size: 1rem;
     line-height: 1.72;
@@ -183,7 +186,8 @@ const {
     display: flex;
     flex-wrap: wrap;
     gap: 0.85rem;
-    align-items: center; justify-content: center;
+    align-items: center;
+    justify-content: center;
   }
 
   .hero-actions__context {
@@ -199,7 +203,7 @@ const {
   .btn-premium,
   .hero-secondary-link {
     display: inline-flex;
-    align-items: center; justify-content: center;
+    align-items: center;
     justify-content: center;
     min-height: 3.2rem;
     padding: 0.92rem 1.35rem;
@@ -280,6 +284,59 @@ const {
     .hero-title {
       max-width: 10ch;
       font-size: clamp(2.05rem, 9vw, 3.2rem);
+    }
+  }
+
+  @media (min-width: 921px) {
+    .hero-copy-wrap {
+      justify-content: flex-start;
+    }
+
+    .hero-copy {
+      width: 100%;
+      max-width: 39rem;
+      gap: 1.45rem;
+      text-align: left;
+      justify-items: start;
+    }
+
+    .hero-prelude,
+    .hero-actions__buttons {
+      justify-content: flex-start;
+    }
+
+    .hero-title {
+      max-width: 17ch;
+      margin: 0;
+      font-size: clamp(2.85rem, 3.65vw, 4rem);
+      line-height: 1.04;
+      letter-spacing: -0.06em;
+    }
+
+    .hero-subtitle,
+    .hero-actions__context {
+      margin: 0;
+      max-width: 38rem;
+      text-align: left;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.02rem, 1.1vw, 1.18rem);
+      line-height: 1.72;
+    }
+
+    .hero-proof-grid {
+      width: 100%;
+      gap: 1rem;
+    }
+
+    .hero-proof-card {
+      padding: 1rem 1rem 1.05rem;
+      border: 1px solid rgba(253, 252, 252, 0.1);
+      border-radius: 4px;
+      background: rgba(253, 252, 252, 0.018);
+      text-align: left;
+      justify-items: start;
     }
   }
 

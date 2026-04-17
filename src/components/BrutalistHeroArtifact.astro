@@ -79,7 +79,6 @@ const artifactHighlights = artifact.context.slice(0, 2)
   .hero-artifact {
     width: 100%;
     min-height: 100%;
-    text-align: center;
     border: 1px solid rgba(253, 252, 252, 0.08);
     border-radius: 4px;
     background:
@@ -98,19 +97,16 @@ const artifactHighlights = artifact.context.slice(0, 2)
     display: grid;
     gap: 1rem;
     padding: clamp(1.2rem, 2vw, 1.5rem);
-    justify-items: center;
   }
 
   .hero-artifact__header {
     display: grid;
     gap: 0.7rem;
-    justify-items: center;
   }
 
   .hero-artifact__meta {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.65rem;
     flex-wrap: wrap;
   }
@@ -167,8 +163,7 @@ const artifactHighlights = artifact.context.slice(0, 2)
     border: 1px solid rgba(253, 252, 252, 0.08);
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.03);
-    text-align: center;
-    justify-items: center;
+    text-align: left;
   }
 
   .hero-artifact__readout-item span {
@@ -216,7 +211,6 @@ const artifactHighlights = artifact.context.slice(0, 2)
     gap: 0.45rem;
     padding: 0.75rem 0 0;
     border-top: 1px dotted rgba(253, 252, 252, 0.12);
-    justify-items: center;
   }
 
   .hero-artifact__highlight span {
@@ -236,11 +230,58 @@ const artifactHighlights = artifact.context.slice(0, 2)
     }
   }
 
+  @media (min-width: 1040px) {
+    .hero-artifact__body {
+      gap: 0.75rem;
+      padding: 1.05rem;
+    }
+
+    .hero-artifact__title {
+      max-width: 18ch;
+      font-size: clamp(1.2rem, 1.4vw, 1.55rem);
+    }
+
+    .hero-artifact__summary {
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+
+    .hero-artifact__readout-item {
+      padding: 0.65rem;
+    }
+
+    .hero-artifact__figure {
+      max-height: 15.5rem;
+    }
+
+    .hero-artifact__image {
+      max-height: 15.5rem;
+      object-fit: cover;
+    }
+
+    .hero-artifact__highlight {
+      padding-top: 0.55rem;
+    }
+
+    .hero-artifact__highlight strong {
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+  }
+
   @media (max-width: 720px) {
+    .hero-artifact,
     .hero-artifact__header,
     .hero-artifact__meta {
       justify-content: center;
       text-align: center;
+    }
+
+    .hero-artifact__body,
+    .hero-artifact__header,
+    .hero-artifact__highlight,
+    .hero-artifact__readout-item {
+      justify-items: center;
     }
 
     .hero-artifact__readout {

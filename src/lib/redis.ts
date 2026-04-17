@@ -181,6 +181,30 @@ function createMockRedisClient() {
       mockStore.set(listKey, JSON.stringify(filtered))
       return list.length - filtered.length
     },
+    rpoplpush: async (source: string, destination: string) => {
+      const sourceKey = `list:${source}`
+      const destinationKey = `list:${destination}`
+      const sourceList = parseJsonArray(mockStore.get(sourceKey) || '[]')
+      if (sourceList.length === 0) {
+        return null
+      }
+      const value = sourceList.pop()
+      if (value === undefined) {
+        return null
+      }
+      mockStore.set(sourceKey, JSON.stringify(sourceList))
+      const destinationList = parseJsonArray(
+        mockStore.get(destinationKey) || '[]',
+      )
+      destinationList.unshift(value)
+      mockStore.set(destinationKey, JSON.stringify(destinationList))
+      return value
+    },
+    llen: async (key: string) => {
+      const listKey = `list:${key}`
+      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      return list.length
+    },
 
     // Sorted set operations
     zadd: async (key: string, score: number, member: string) => {
@@ -236,10 +260,7 @@ function createMockRedisClient() {
 function createRedisClient() {
   const { connectionUrl, restToken } = getRedisConfig()
 
-  if (
-    isTestEnvironment() ||
-    (connectionUrl && connectionUrl.startsWith('redis'))
-  ) {
+  if (connectionUrl && connectionUrl.startsWith('redis')) {
     // Initialize ioredis client with credentials
     return new Redis(connectionUrl, {
       password: restToken,

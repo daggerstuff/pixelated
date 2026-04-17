@@ -1,6 +1,10 @@
 import { query } from "./index";
 import { randomBytes, createHash } from "crypto";
 import { logSecurityEvent, SecurityEventType } from "@/lib/security";
+import { VALID_API_KEY_SCOPES, ApiKeyScope } from "@/lib/auth/scopes";
+
+const RATE_LIMIT_CLEANUP_DAYS = 7;
+const MAX_FAILED_ATTEMPTS = 10;
 
 export interface DeveloperApiKey {
   id: string;
@@ -8,7 +12,7 @@ export interface DeveloperApiKey {
   key_hash: string;
   key_prefix: string;
   name: string;
-  scopes: string[];
+  scopes: ApiKeyScope[];
   rate_limit: number;
   is_active: boolean;
   last_used_at: Date | null;
@@ -32,20 +36,23 @@ export interface ApiKeyValidationResult {
   error?: string;
   rateLimited?: boolean;
   remainingRequests?: number;
+  resetTimeMs?: number;
 }
 
-const DEFAULT_SCOPES = ["read", "write"];
+const DEFAULT_SCOPES: ApiKeyScope[] = ["read", "write"];
 const DEFAULT_RATE_LIMIT = 1000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 export class DeveloperApiKeyManager {
+  private failedAttempts = new Map<string, number>();
+
   async createApiKey(
     input: CreateApiKeyInput,
   ): Promise<{ api_key: DeveloperApiKey; plain_key: string }> {
     const rawKey = this.generateRawKey();
     const keyHash = this.hashKey(rawKey);
     const keyPrefix = rawKey.substring(0, 8);
-    const scopes = input.scopes || DEFAULT_SCOPES;
+    const validatedScopes = this.validateScopes(input.scopes);
     const rateLimit = input.rate_limit || DEFAULT_RATE_LIMIT;
     const expiresAt = input.expires_in_days
       ? new Date(Date.now() + input.expires_in_days * 24 * 60 * 60 * 1000)
@@ -70,7 +77,7 @@ export class DeveloperApiKeyManager {
         user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, expires_at
       ) VALUES ($1, $2, $3, $4, $5, $6, true, $7)
       RETURNING id, user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, last_used_at, last_failed_at, expires_at, created_at, updated_at`,
-      [input.user_id, keyHash, keyPrefix, input.name, scopes, rateLimit, expiresAt],
+      [input.user_id, keyHash, keyPrefix, input.name, validatedScopes, rateLimit, expiresAt],
     );
 
     const apiKey = result.rows[0];
@@ -78,7 +85,8 @@ export class DeveloperApiKeyManager {
       api_key: {
         ...apiKey,
         key_hash: "",
-      },
+        scopes: (apiKey.scopes as ApiKeyScope[]) || DEFAULT_SCOPES,
+      } as DeveloperApiKey,
       plain_key: rawKey,
     };
   }
@@ -117,6 +125,7 @@ export class DeveloperApiKeyManager {
         error: "Rate limit exceeded",
         rateLimited: true,
         remainingRequests: 0,
+        resetTimeMs: rateLimitResult.resetTimeMs,
       };
     }
 
@@ -126,12 +135,14 @@ export class DeveloperApiKeyManager {
       valid: true,
       api_key: apiKey,
       remainingRequests: rateLimitResult.remaining,
+      resetTimeMs: rateLimitResult.resetTimeMs,
     };
   }
 
   private async recordSuccessfulAttempt(apiKeyId: string): Promise<void> {
     try {
       await query(`UPDATE developer_api_keys SET last_used_at = NOW() WHERE id = $1`, [apiKeyId]);
+      this.failedAttempts.delete(apiKeyId);
     } catch {
       // Non-critical, don't fail validation for audit logging errors
     }
@@ -145,6 +156,8 @@ export class DeveloperApiKeyManager {
         reason,
         api_key_id: apiKeyId,
       });
+
+      await this.handleFailedAttempt(apiKeyId, reason);
     } catch {
       // Non-critical
     }
@@ -153,40 +166,55 @@ export class DeveloperApiKeyManager {
   private async checkRateLimit(
     apiKeyId: string,
     maxRequests: number,
-  ): Promise<{ allowed: boolean; remaining: number }> {
-    const windowStart = new Date(
-      Math.floor(Date.now() / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS,
-    );
+  ): Promise<{ allowed: boolean; remaining: number; resetTimeMs: number }> {
+    // Window boundaries align to minute marks (0, 60s, 120s, etc)
+    // This creates aligned rate limit windows for predictable limiting
+    const windowStartMs = Math.floor(Date.now() / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS;
+    const windowStart = new Date(windowStartMs);
+    const resetTimeMs = windowStartMs + RATE_LIMIT_WINDOW_MS;
 
     const countResult = await query<{ count: string }>(
       `SELECT COALESCE(SUM(request_count), 0)::int as count
-       FROM api_key_rate_limits
-       WHERE api_key_id = $1 AND window_start >= $2`,
+      FROM api_key_rate_limits
+      WHERE api_key_id = $1 AND window_start >= $2`,
       [apiKeyId, windowStart],
     );
 
     const currentCount = parseInt(countResult.rows[0]?.count || "0", 10);
 
     if (currentCount >= maxRequests) {
-      return { allowed: false, remaining: 0 };
+      return { allowed: false, remaining: 0, resetTimeMs };
     }
 
     await query(
       `INSERT INTO api_key_rate_limits (api_key_id, window_start, request_count)
-       VALUES ($1, $2, 1)
-       ON CONFLICT (api_key_id, window_start)
-       DO UPDATE SET request_count = api_key_rate_limits.request_count + 1`,
+      VALUES ($1, $2, 1)
+      ON CONFLICT (api_key_id, window_start)
+      DO UPDATE SET request_count = api_key_rate_limits.request_count + 1`,
       [apiKeyId, windowStart],
     );
 
-    return { allowed: true, remaining: maxRequests - currentCount - 1 };
+    return {
+      allowed: true,
+      remaining: maxRequests - currentCount - 1,
+      resetTimeMs,
+    };
   }
 
   async revokeApiKey(apiKeyId: string, userId: string): Promise<boolean> {
     const result = await query(
       `UPDATE developer_api_keys SET is_active = false, updated_at = NOW()
-       WHERE id = $1 AND user_id = $2`,
+      WHERE id = $1 AND user_id = $2`,
       [apiKeyId, userId],
+    );
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async revokeApiKeySystem(apiKeyId: string): Promise<boolean> {
+    const result = await query(
+      `UPDATE developer_api_keys SET is_active = false, updated_at = NOW()
+      WHERE id = $1`,
+      [apiKeyId],
     );
     return (result.rowCount ?? 0) > 0;
   }
@@ -216,15 +244,54 @@ export class DeveloperApiKeyManager {
   }
 
   async updateApiKeyScopes(apiKeyId: string, userId: string, scopes: string[]): Promise<boolean> {
+    const validatedScopes = this.validateScopes(scopes);
+    if (validatedScopes.length === 0) {
+      return false;
+    }
     const result = await query(
       `UPDATE developer_api_keys SET scopes = $3, updated_at = NOW()
-       WHERE id = $1 AND user_id = $2 AND is_active = true`,
-      [apiKeyId, userId, scopes],
+      WHERE id = $1 AND user_id = $2 AND is_active = true`,
+      [apiKeyId, userId, validatedScopes],
     );
     return (result.rowCount ?? 0) > 0;
   }
 
+  private validateScopes(scopes?: string[]): ApiKeyScope[] {
+    if (!scopes || scopes.length === 0) {
+      return DEFAULT_SCOPES;
+    }
+    return scopes.filter((scope): scope is ApiKeyScope =>
+      VALID_API_KEY_SCOPES.includes(scope as ApiKeyScope),
+    );
+  }
+
+  async cleanupOldRateLimits(): Promise<number> {
+    const cutoffDate = new Date(Date.now() - RATE_LIMIT_CLEANUP_DAYS * 24 * 60 * 60 * 1000);
+    const result = await query(`DELETE FROM api_key_rate_limits WHERE window_start < $1`, [
+      cutoffDate,
+    ]);
+    return result.rowCount ?? 0;
+  }
+
+  private async handleFailedAttempt(apiKeyId: string, reason: string): Promise<void> {
+    const attempts = this.failedAttempts.get(apiKeyId) || 0;
+    const newAttempts = attempts + 1;
+    this.failedAttempts.set(apiKeyId, newAttempts);
+
+    if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+      await this.revokeApiKeySystem(apiKeyId);
+      this.failedAttempts.delete(apiKeyId);
+      await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, apiKeyId, {
+        reason: "auto_revoked_exceeded_failed_attempts",
+        attempts: newAttempts,
+      });
+    }
+  }
+
   private generateRawKey(): string {
+    // Key format: dev_<43 chars base64url> = 47 total chars
+    // First 8 chars (dev_XXXX) stored as prefix for DB lookup
+    // Full key hash checked on validation - prefix is for indexing only
     const prefix = "dev_";
     const randomPart = randomBytes(32).toString("base64url");
     return `${prefix}${randomPart}`;

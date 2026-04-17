@@ -87,22 +87,17 @@ const {
   .cta-shell {
     display: grid;
     gap: clamp(1.8rem, 4vw, 3.4rem);
-    text-align: center;
-    justify-items: center;
   }
 
   .cta-copy,
   .cta-decision {
     display: grid;
     gap: 1rem;
-    text-align: center;
-    justify-items: center;
   }
 
   .cta-copy {
     max-width: 38rem;
     margin: 0 auto;
-    text-align: center;
   }
 
   .cta-verdict-copy {
@@ -125,8 +120,6 @@ const {
     gap: 0.45rem;
     padding: 0.95rem 0 0;
     border-top: 1px dotted rgba(253, 252, 252, 0.1);
-    text-align: center;
-    justify-items: center;
   }
 
   .cta-proof-item p,
@@ -177,8 +170,6 @@ const {
     margin: 0;
     padding: 0;
     list-style: none;
-    justify-items: center;
-    text-align: center;
   }
 
   .cta-rubric li {
@@ -233,18 +224,68 @@ const {
 
   @media (min-width: 980px) {
     .cta-shell {
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      grid-template-columns: minmax(0, 0.95fr) minmax(24rem, 0.72fr);
       align-items: start;
+      gap: clamp(3rem, 5vw, 5rem);
+      text-align: left;
+      justify-items: stretch;
+    }
+
+    .cta-copy {
+      max-width: 41rem;
+      margin: 0;
+      text-align: left;
+      justify-items: start;
+    }
+
+    .cta-copy .pe-heading-l {
+      max-width: 13ch;
+    }
+
+    .cta-copy .pe-home-copy {
+      margin: 0;
+      text-align: left;
     }
 
     .cta-proof-list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1rem;
-      max-width: 34rem;
+      max-width: 100%;
+    }
+
+    .cta-proof-item,
+    .cta-decision {
+      text-align: left;
+      justify-items: start;
+    }
+
+    .cta-proof-item {
+      padding: 1rem;
+      border: 1px solid rgba(253, 252, 252, 0.1);
+      border-radius: 4px;
+      background: rgba(253, 252, 252, 0.016);
+    }
+
+    .cta-rubric {
+      justify-items: stretch;
+      text-align: left;
+    }
+
+    .cta-action-cluster {
+      width: 100%;
     }
   }
 
   @media (max-width: 720px) {
+    .cta-shell,
+    .cta-copy,
+    .cta-proof-item,
+    .cta-decision,
+    .cta-rubric {
+      text-align: center;
+      justify-items: center;
+    }
+
     .cta-proof-item {
       padding: 1rem;
       border: 1px solid rgba(253, 252, 252, 0.14);
