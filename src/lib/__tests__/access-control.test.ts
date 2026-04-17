@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { roleHasPermission, ROLES, type Role } from '../access-control'
 
+// Note: Mocks for ../audit and ../auth should be centralized in vitest.setup.ts
+// to ensure consistent behavior across all tests that import access-control.
+// See: vitest.setup.ts for the shared mock implementations.
+
 describe('roleHasPermission', () => {
   it('correctly identifies when a role has a specific permission', () => {
     expect(roleHasPermission(ROLES.USER, 'read:conversations')).toBe(true)
