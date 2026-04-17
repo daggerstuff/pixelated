@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 
 // Use lazy-loaded chart components to reduce bundle size
 import {
@@ -63,7 +63,8 @@ const SCORE_LABELS = {
   panicDisorder: 'Panic Disorder',
 }
 
-export function MentalHealthHistoryChart({
+// ⚡ Bolt: Prevent expensive re-renders of Recharts SVG components on every keystroke in parent
+export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
   analysisHistory,
 }: MentalHealthHistoryChartProps) {
   const { timeSeriesData, latestScores, hasData } = useMemo(() => {
@@ -232,4 +233,4 @@ export function MentalHealthHistoryChart({
       )}
     </div>
   )
-}
+})
