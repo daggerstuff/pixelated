@@ -1,3 +1,5 @@
+import { LRUCache } from "./lru-cache";
+
 export type AuthStrategy = "jwtOnly" | "apiKeyOnly" | "either";
 
 export type RouteFamily = "public" | "user" | "developer" | "admin" | "system";
@@ -103,37 +105,6 @@ export const ROUTE_CONFIGS: RouteConfig[] = [
 ];
 
 const MAX_ROUTE_CACHE_SIZE = 500;
-
-class LRUCache<K, V> {
-  private cache = new Map<K, V>();
-
-  constructor(private maxSize: number) {}
-
-  get(key: K): V | undefined {
-    const value = this.cache.get(key);
-    if (value !== undefined) {
-      this.cache.delete(key);
-      this.cache.set(key, value);
-    }
-    return value;
-  }
-
-  set(key: K, value: V): void {
-    if (this.cache.has(key)) {
-      this.cache.delete(key);
-    } else if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      if (firstKey !== undefined) {
-        this.cache.delete(firstKey);
-      }
-    }
-    this.cache.set(key, value);
-  }
-
-  clear(): void {
-    this.cache.clear();
-  }
-}
 
 const routeCache = new LRUCache<string, RouteConfig>(MAX_ROUTE_CACHE_SIZE);
 

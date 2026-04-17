@@ -5,8 +5,10 @@
 
 set -e
 
-NAMESPACE="pixelated-prod"
-DEPLOYMENT_NAME="pixelated-app"
+NAMESPACE="pixelated-empathy"
+DEPLOYMENT_NAME="pixelated-empathy-api"
+SERVICE_NAME="pixelated-empathy-api"
+APP_LABEL="app=pixelated-empathy-api"
 
 echo "🏥 Kubernetes Health Monitor"
 echo "=========================="
@@ -14,7 +16,7 @@ echo "=========================="
 # Function to check pod health
 check_pod_health() {
     echo "📊 Pod Status:"
-    kubectl get pods -n "$NAMESPACE" -l app=pixelated -o wide
+    kubectl get pods -n "$NAMESPACE" -l "$APP_LABEL" -o wide
     echo ""
     
     echo "🔍 Pod Events (last 10):"
@@ -27,7 +29,7 @@ check_health_endpoints() {
     echo "🌐 Testing Health Endpoints:"
     
     # Get service endpoint
-    SERVICE_IP=$(kubectl get svc -n "$NAMESPACE" pixelated-service -o jsonpath='{.spec.clusterIP}' 2>/dev/null || echo "unknown")
+    SERVICE_IP=$(kubectl get svc -n "$NAMESPACE" "$SERVICE_NAME" -o jsonpath='{.spec.clusterIP}' 2>/dev/null || echo "unknown")
     
     if [ "$SERVICE_IP" != "unknown" ]; then
         echo "Service IP: $SERVICE_IP"
@@ -65,7 +67,7 @@ check_deployment_status() {
     echo ""
     
     echo "📈 Replica Set Status:"
-    kubectl get rs -n "$NAMESPACE" -l app=pixelated
+    kubectl get rs -n "$NAMESPACE" -l "$APP_LABEL"
     echo ""
 }
 
@@ -79,7 +81,7 @@ show_recent_events() {
 # Function to show resource usage
 show_resource_usage() {
     echo "💾 Resource Usage:"
-    kubectl top pods -n "$NAMESPACE" -l app=pixelated 2>/dev/null || echo "Metrics server not available"
+    kubectl top pods -n "$NAMESPACE" -l "$APP_LABEL" 2>/dev/null || echo "Metrics server not available"
     echo ""
 }
 

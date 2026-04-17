@@ -97,7 +97,7 @@ const {
   .hero-shell {
     position: relative;
     z-index: 1;
-    width: min(100%, var(--max-content-width));
+    width: min(100%, 76rem);
     margin: 0 auto;
     padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
   }
@@ -133,13 +133,22 @@ const {
   }
 
   @media (min-width: 1040px) {
+    .hero {
+      align-items: center;
+      min-height: min(86dvh, 46rem);
+      padding-top: clamp(3.8rem, 6vh, 5.5rem);
+      padding-bottom: clamp(3rem, 5vh, 4rem);
+    }
+
     .hero-layout {
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: clamp(2.25rem, 4vw, 4rem);
+      grid-template-columns: minmax(0, 1.12fr) minmax(22rem, 0.88fr);
+      gap: clamp(2.5rem, 4vw, 4.25rem);
+      align-items: center;
     }
 
     .hero-artifact-shell {
       justify-content: flex-end;
+      max-width: none;
     }
   }
 
