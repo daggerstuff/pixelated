@@ -1,44 +1,46 @@
 export const featuresContent = {
-  label: 'What the platform makes possible',
-  title: 'The product only earns its place when the next move becomes obvious.',
-  copy: 'Each part of the workflow exists to preserve the difficult turn, surface the coaching decision, and make the next review more concrete than memory ever could.',
-  proofLabel: 'What a useful first week looks like',
+  label: 'Core workflow',
+  title: 'Simulate, transcribe, score, and coach.',
+  copy: 'The platform is built around a simple training loop: assign a realistic case, let the trainee respond, preserve the transcript, and turn the session into supervisor-ready feedback.',
+  proofLabel: 'What your team can do',
   proofItems: [
-    'More confidence pointing to the line, question, or miss that mattered.',
-    'One shared case the whole team can learn from instead of five unrelated roleplays.',
+    'Create repeatable client scenarios for students, interns, associates, or staff clinicians.',
+    'Review the same transcript with rubric signals, instructor notes, and a clear retry path.',
   ],
   cards: [
     {
-      title: 'Keep the practice surface believable',
+      title: 'AI client simulations',
       description:
-        'The experience stays close to a live room so the clinician responds to the case instead of gaming a script.',
+        'Trainees talk with realistic client profiles that include presenting concerns, emotional shifts, and therapeutic constraints.',
       icon: 'chat',
     },
     {
-      title: 'Pinpoint the turn worth coaching',
+      title: 'Transcript-backed review',
       description:
-        'The review keeps the exact exchange that changed the room, so supervision can focus on one concrete next move.',
+        'Every session produces a record supervisors can inspect line by line instead of reconstructing the conversation from memory.',
       icon: 'chart',
     },
     {
-      title: 'Compare judgment across the same case',
+      title: 'Rubrics and coaching notes',
       description:
-        'Shared cases turn fuzzy supervision into side-by-side coaching because everyone is working against the same difficult moment.',
+        'Rubric markers and coaching prompts help faculty explain what worked, what missed, and what the trainee should try next.',
       icon: 'shield',
     },
   ],
   comparison: {
-    label: 'What clearer supervision sounds like',
-    title: 'The difference is whether your team can name the moment.',
-    body: 'Weak supervision circles around the session. Strong supervision points to the exact turn that changes the next attempt.',
+    label: 'What changes in supervision',
+    title: 'Feedback moves from impression to evidence.',
+    body: 'Instead of saying a trainee seemed rushed or empathic, supervisors can point to the exact response, score the clinical move, and assign a focused retry.',
     items: [
       {
-        label: 'Before',
-        value: '“I think they rushed it somewhere around the disclosure.”',
+        label: 'Without the product',
+        value:
+          '“I think the trainee moved too quickly, but I do not have the exact exchange.”',
       },
       {
-        label: 'After',
-        value: '“At the disclosure, they reassured before checking immediacy.”',
+        label: 'With Pixelated Empathy',
+        value:
+          '“At line 18, they reassured before assessing risk. Retry the same case and lead with immediacy.”',
         accent: true,
       },
     ],

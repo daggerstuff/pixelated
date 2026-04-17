@@ -1,40 +1,40 @@
 export const introContent = {
-  label: 'Why coaching gets fuzzy',
-  title: 'Most supervision loses the useful turn as soon as the room settles.',
+  label: 'What the product does',
+  title: 'Turn clinical roleplay into structured practice data.',
   paragraphs: [
-    'Teams usually know a session drifted, tightened, or ruptured. What they lose is the exact exchange that made it happen.',
-    'Pixelated Empathy keeps the case, transcript, and review lane attached long enough for a supervisor to name one concrete next move.',
+    'Pixelated Empathy is a training environment for therapists. Trainees practice with AI clients, then supervisors review the conversation with transcript evidence, rubric markers, and coaching notes.',
+    'The product is for counseling programs, supervision groups, training clinics, and behavioral health organizations that need repeatable practice without putting real patients at risk.',
   ],
-  panelLabel: 'What breaks in the usual workflow',
+  panelLabel: 'Where it fits',
   panelItems: [
     {
-      label: 'The evidence disappears',
-      body: 'A difficult roleplay runs once, then turns into shorthand notes, opinions, and partial recall.',
+      label: 'Before practicum',
+      body: 'Give students realistic intake, empathy, boundaries, and repair scenarios before they sit with real clients.',
     },
     {
-      label: 'Feedback gets vague',
-      body: 'The team can feel the shift, but cannot name the exact intervention, miss, or repair to revisit next.',
+      label: 'During supervision',
+      body: 'Review the exact lines a trainee used, score the clinical move, and coach the next attempt from the same record.',
     },
     {
-      label: 'Comparison falls apart',
-      body: 'When every trainee sees a different case, supervision stops comparing judgment against the same moment.',
+      label: 'Across cohorts',
+      body: 'Run the same case across trainees so faculty can compare decision-making and identify where instruction needs reinforcement.',
     },
   ],
   evidenceCards: [
     {
-      title: 'What teams are usually stuck with',
+      title: 'What teams usually lack',
       items: [
-        'The useful part of the conversation disappears after the roleplay ends.',
-        'Supervisors coach from recollection instead of a visible intervention.',
-        'Teams cannot compare clinicians against the same difficult moment.',
+        'A consistent way to rehearse difficult client conversations.',
+        'Transcript-level evidence for what the trainee actually said.',
+        'Repeatable scoring that helps supervisors compare growth over time.',
       ],
     },
     {
-      title: 'What your team gets instead',
+      title: 'What Pixelated Empathy provides',
       items: [
-        'The transcript, notes, and coaching lane stay tied to one run.',
-        'Supervisors can point at the exact turn that needs work.',
-        'The team can coach multiple clinicians against the same case.',
+        'AI client simulations that can be assigned to a class or team.',
+        'Session records with transcript, rubric, and coaching context.',
+        'A safer practice loop before clinical judgment reaches real care.',
       ],
     },
   ],

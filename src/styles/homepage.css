@@ -248,6 +248,7 @@
   .pe-home-section,
   .pe-page-section {
     overflow: visible;
+    padding: 4.5rem 0;
   }
 
   .pe-home-shell,

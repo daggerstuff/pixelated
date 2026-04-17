@@ -13,14 +13,14 @@ const { showTopCTA = true } = Astro.props
       showTopCTA && (
         <div class="marketing-footer__cta">
           <div>
-            <span class="marketing-eyebrow">Bring one hard case</span>
+            <span class="marketing-eyebrow">Therapist training AI</span>
             <h2 class="marketing-title marketing-title--medium">
-              Bring one hard case. Leave with something specific to coach.
+              Practice sessions your supervisors can actually review.
             </h2>
             <p class="marketing-lede">
-              Pixelated Empathy is for training teams that want clearer
-              supervision, not another abstract AI promise. Bring one difficult
-              case and decide whether the review actually gets sharper.
+              Pixelated Empathy helps training programs assign realistic AI
+              client simulations, preserve transcripts, and turn practice into
+              rubric-backed feedback.
             </p>
           </div>
           <div class="marketing-footer__cta-actions">
@@ -56,10 +56,7 @@ const { showTopCTA = true } = Astro.props
           </div>
           <div>
             <strong>Pixelated Empathy</strong>
-            <p>
-              Clinical simulation and transcript-backed coaching for therapist
-              training teams.
-            </p>
+            <p>AI roleplay, transcripts, and rubrics for therapist training.</p>
           </div>
         </div>
 
@@ -78,7 +75,7 @@ const { showTopCTA = true } = Astro.props
           >
           <a
             href="mailto:info@pixelatedempathy.com"
-            class="marketing-inline-link">info@pixelatedempathy.com</a
+            class="marketing-inline-link">Email</a
           >
         </div>
       </div>
@@ -117,7 +114,7 @@ const { showTopCTA = true } = Astro.props
 
     <div class="marketing-footer__bottom">
       <p>&copy; {currentYear} Pixelated Empathy. All rights reserved.</p>
-      <p>Clearer supervision for difficult sessions.</p>
+      <p>Therapist training simulation.</p>
     </div>
   </div>
 </footer>
@@ -171,12 +168,16 @@ const { showTopCTA = true } = Astro.props
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
     gap: 1.25rem;
+    align-items: start;
+    text-align: center;
   }
 
   .marketing-footer__brand {
     display: grid;
     gap: 1.25rem;
     max-width: 26rem;
+    justify-items: center;
+    text-align: center;
   }
 
   .marketing-footer__brand-row {
@@ -216,6 +217,8 @@ const { showTopCTA = true } = Astro.props
     margin: 1rem 0 0;
     padding: 0;
     list-style: none;
+    justify-items: center;
+    text-align: center;
   }
 
   .marketing-footer__list a {
@@ -262,6 +265,77 @@ const { showTopCTA = true } = Astro.props
     .marketing-footer__list {
       justify-items: center;
       text-align: center;
+    }
+
+    .marketing-footer__grid > div:not(.marketing-footer__brand) {
+      width: min(100%, 22rem);
+    }
+
+    .marketing-footer__list,
+    .marketing-inline-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.55rem 0.9rem;
+    }
+
+    .marketing-footer__list {
+      margin-top: 0.75rem;
+    }
+
+    .marketing-footer__list li,
+    .marketing-inline-link {
+      display: inline-flex;
+      white-space: nowrap;
+    }
+
+    .marketing-footer__brand-row {
+      max-width: 24rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .marketing-footer {
+      padding: 2rem 0 1.25rem;
+    }
+
+    .marketing-footer__grid {
+      gap: 1.05rem;
+    }
+
+    .marketing-footer__brand {
+      gap: 0.8rem;
+    }
+
+    .marketing-footer__brand-row {
+      gap: 0.65rem;
+    }
+
+    .marketing-footer__brand p,
+    .marketing-footer__list a,
+    .marketing-inline-link {
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .marketing-footer__brand p {
+      max-width: 19rem;
+    }
+
+    .marketing-footer__list,
+    .marketing-inline-links {
+      gap: 0.4rem 0.75rem;
+    }
+
+    .marketing-list-label {
+      font-size: 0.62rem;
+    }
+
+    .marketing-footer__bottom {
+      gap: 0.45rem;
+      margin-top: 0.9rem;
+      padding-top: 0.85rem;
+      font-size: 0.8rem;
     }
   }
 </style>
