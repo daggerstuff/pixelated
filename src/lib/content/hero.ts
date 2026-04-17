@@ -1,40 +1,40 @@
 export const heroContent = {
-  title: 'AI roleplay for therapist training teams.',
+  title: 'Train therapists with AI clients before live care.',
   subtitle:
-    'Pixelated Empathy gives supervisors realistic client simulations, session transcripts, scoring rubrics, and coaching notes so trainees can practice high-stakes conversations before seeing real patients.',
+    'Pixelated Empathy is a clinical simulation workspace for counseling programs, supervisors, and behavioral health teams that need safe, repeatable practice for the conversations therapists cannot afford to wing.',
   helperText:
     'Built for counseling programs, clinical supervisors, training clinics, and behavioral health teams.',
-  kicker: 'Therapist training simulation platform',
+  kicker: 'Clinical simulation for therapist education',
   proofPoints: [
     {
-      label: 'Practice with realistic clients',
-      text: 'Assign simulated sessions for intake, rupture repair, crisis response, motivational interviewing, and other moments trainees need to rehearse.',
+      label: 'For trainees',
+      text: 'Practice intake, rupture repair, crisis response, and motivational interviewing with AI clients that push back, shut down, disclose, and escalate.',
     },
     {
-      label: 'Review with evidence',
-      text: 'Supervisors see the transcript, rubric signals, and coaching notes in one record instead of relying on memory or generic roleplay feedback.',
+      label: 'For supervisors',
+      text: 'See what the trainee actually said, where the clinical decision landed, and what should be practiced again.',
     },
   ],
   primaryCTA: { text: 'Book a pilot', href: '/contact' },
   secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
   artifact: {
-    eyebrow: 'Product workflow',
-    status: 'Every practice session becomes a reviewable training record.',
+    eyebrow: 'Inside the product',
+    status: 'A practice room connected to a supervisor review desk.',
     chip: 'Session record',
-    mode: 'Simulation + transcript + rubric',
+    mode: 'Practice + review',
     image: '/images/homepage/training-session-proof.png',
     imageAlt:
       'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
       {
-        label: 'What the trainee does',
+        label: 'Practice room',
         value:
-          'Talks through a realistic AI client scenario with enough context to practice clinical judgment, not canned responses.',
+          'The trainee enters a scenario, speaks with an AI client, and has to make real clinical choices in the moment.',
       },
       {
-        label: 'What the supervisor gets',
+        label: 'Review desk',
         value:
-          'A saved transcript, rubric highlights, and coaching notes that make feedback specific and repeatable.',
+          'The supervisor opens the session record, reviews the exchange, and turns the attempt into targeted feedback.',
       },
     ],
     outputs: [
@@ -46,7 +46,7 @@ export const heroContent = {
       {
         label: 'Training record',
         value:
-          'Keep the transcript, rubric markers, and coaching notes attached to the same simulation.',
+          'Keep the conversation, scenario context, and instructor notes attached to the same simulation.',
       },
       {
         label: 'Repeatable practice',
@@ -55,9 +55,9 @@ export const heroContent = {
       },
     ],
     readout: [
-      { label: 'For', value: 'Therapist training teams' },
-      { label: 'Includes', value: 'Simulation + transcript' },
-      { label: 'Output', value: 'Rubric-backed coaching' },
+      { label: 'Users', value: 'Trainees + supervisors' },
+      { label: 'Core unit', value: 'Reusable scenarios' },
+      { label: 'Result', value: 'Practice evidence' },
     ],
   },
 } as const
