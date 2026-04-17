@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { Search, Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 import { cn } from '../lib/utils.js'
@@ -98,9 +98,14 @@ export function BlogSearch() {
           disabled={isSearching}
           aria-label={isSearching ? 'Searching...' : 'Search'}
         >
-          {isSearching ? 'Searching...' : 'Search'}
+          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : 'Search'}
         </Button>
       </form>
+
+      {/* Screen reader only live region for search status */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {isSearching ? 'Searching...' : ''}
+      </div>
 
       {results.length > 0 && (
         <div className='mt-4 space-y-4'>
