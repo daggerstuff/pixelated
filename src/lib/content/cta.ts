@@ -1,27 +1,27 @@
 export const ctaContent = {
-  label: 'Pilot the training loop',
-  title: 'See whether your team can use it in supervision this week.',
+  label: 'Pilot shape',
+  title: 'Test it with one cohort, one supervisor, and two scenarios.',
   intro:
-    'Start with one training scenario your program already teaches. We will help configure the client profile, run a sample session, and show the transcript, rubric, and coaching workflow.',
+    'A useful pilot should be concrete. Pick a course, practicum group, or supervision team. We configure a small scenario set, run trainees through practice, and review the output with your supervisor or faculty lead.',
   verdictCopy:
-    'The pilot is useful only if your supervisors can see how it fits into real teaching, feedback, and trainee improvement.',
+    'The question is not whether the demo looks clever. The question is whether it fits your teaching workflow well enough to use again next week.',
   proofItems: [
     {
-      label: 'Choose a scenario',
+      label: 'Pilot package',
       value:
-        'Use an intake, rupture, crisis, cultural humility, or motivational interviewing case your team already needs to practice.',
+        'Two to three client scenarios, one facilitator workflow, and a review session with your team.',
     },
     {
-      label: 'Review the output',
+      label: 'Decision point',
       value:
-        'Look at the transcript, rubric markers, coaching notes, and retry workflow before deciding whether it belongs in your program.',
+        'Keep it only if trainees get useful practice and supervisors can turn the attempt into better instruction.',
     },
   ],
-  decisionTitle: 'A good pilot should answer three questions.',
+  decisionTitle: 'What the pilot should prove.',
   rubric: [
-    'Can trainees practice scenarios they will actually face?',
-    'Can supervisors give clearer feedback with the transcript and rubric?',
-    'Can the team repeat the case to measure improvement over time?',
+    'Your team can define scenarios that reflect your training standards.',
+    'Trainees understand the practice task without a long onboarding process.',
+    'Supervisors can use the record to teach a specific skill.',
   ],
   primaryCTA: { text: 'Book a pilot', href: '/contact' },
   secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
