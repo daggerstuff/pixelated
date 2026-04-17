@@ -29,13 +29,10 @@ const fetchCookieValue = (cookieName: string): string | undefined => {
   return undefined
 }
 const token =
-
-const escapeJsonForScriptTag = (value: any) =>
-  JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e")
-
-const escapeJsonForScriptTag = (value: any) =>
-  JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e")
   authHeader?.replace('Bearer ', '') || fetchCookieValue('auth-token')
+
+const escapeJsonForScriptTag = (value: any) =>
+  JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
 
 // Get session data from API
 let sessionData = undefined
