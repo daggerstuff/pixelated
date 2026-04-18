@@ -1,12 +1,22 @@
 import { Router } from 'express'
 
+import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth'
 import { AuthService } from '@/services/authService'
 import { UserService } from '@/services/userService'
 
 const router = Router()
 
+router.use(authenticateToken)
+
+interface CompleteOnboardingBody {
+  userId?: string
+  firstName?: string
+  lastName?: string
+  newPassword?: string
+}
+
 // Complete user onboarding
-router.post('/complete', async (req, res) => {
+router.post('/complete', async (req: AuthenticatedRequest<Record<string, string>, unknown, CompleteOnboardingBody>, res) => {
   try {
     const { userId, firstName, lastName, newPassword } = req.body
 
@@ -14,6 +24,14 @@ router.post('/complete', async (req, res) => {
       res.status(400).json({
         success: false,
         error: { message: 'All fields are required' },
+      })
+      return
+    }
+
+    if (req.user?.userId !== userId) {
+      res.status(403).json({
+        success: false,
+        error: { message: 'Unauthorized' },
       })
       return
     }
@@ -55,9 +73,26 @@ router.post('/complete', async (req, res) => {
 })
 
 // Check if user needs onboarding
-router.get('/status/:userId', async (req, res) => {
+router.get('/status/:userId', async (req: AuthenticatedRequest, res) => {
   try {
     const { userId } = req.params
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        error: { message: 'User ID is required' },
+      })
+      return
+    }
+
+    if (req.user?.userId !== userId) {
+      res.status(403).json({
+        success: false,
+        error: { message: 'Unauthorized' },
+      })
+      return
+    }
+
     const user = await UserService.getUserById(userId)
 
     if (!user) {
