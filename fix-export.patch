@@ -1,0 +1,11 @@
+--- src/components/MentalHealthChatDemoReact.tsx
++++ src/components/MentalHealthChatDemoReact.tsx
+@@ -66,7 +66,7 @@
+ /**
+  * React component for the MentalLLaMA chat integration
+  */
+-export default function MentalHealthChatDemoReact({
++export function MentalHealthChatDemoReact({
+   initialTab = 'chat',
+   showSettingsPanel = true,
+   showAnalysisPanel = true,

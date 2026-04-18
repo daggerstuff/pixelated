@@ -443,5 +443,3 @@ export function MentalHealthChatDemoReact({
     </div>
   )
 }
-
-export default MentalHealthChatDemoReact

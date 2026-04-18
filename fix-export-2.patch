@@ -1,0 +1,8 @@
+--- src/components/MentalHealthChatDemoReact.tsx
++++ src/components/MentalHealthChatDemoReact.tsx
+@@ -512,3 +512,5 @@
+     </div>
+   )
+ }
++
++export default MentalHealthChatDemoReact

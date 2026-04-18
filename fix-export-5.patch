@@ -1,0 +1,11 @@
+--- src/components/MentalHealthChatDemo.tsx
++++ src/components/MentalHealthChatDemo.tsx
+@@ -511,5 +511,6 @@
+       )}
+     </div>
+   )
+-})
+-export default MentalHealthChatDemo
++}
++
++export default MentalHealthChatDemo
