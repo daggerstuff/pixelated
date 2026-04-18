@@ -1,6 +1,6 @@
 import { FC } from 'react'
 
-import MentalHealthChatDemo from './MentalHealthChatDemo'
+import MentalHealthChatDemoReact from './MentalHealthChatDemo'
 
 interface MindMirrorDemoProps {
   className?: string
@@ -9,7 +9,7 @@ interface MindMirrorDemoProps {
 export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = '' }) => {
   return (
     <div className={`w-full ${className}`}>
-      <MentalHealthChatDemo
+      <MentalHealthChatDemoReact
         showAnalysisPanel={true}
         showSettingsPanel={false}
         initialTab='analysis'

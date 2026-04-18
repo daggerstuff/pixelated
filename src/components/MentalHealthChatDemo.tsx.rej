@@ -1,0 +1,8 @@
+--- src/components/MentalHealthChatDemo.tsx
++++ src/components/MentalHealthChatDemo.tsx
+@@ -32,5 +32,5 @@
+   autoFocus?: boolean
+ }
+
+-export const MentalHealthChatDemo = MentalHealthChatDemoReact;
++export function MentalHealthChatDemo(props: MentalHealthChatDemoReactProps) { return <MentalHealthChatDemoReact {...props} />; }

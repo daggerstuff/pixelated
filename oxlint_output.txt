@@ -1,0 +1,6 @@
+
+  [38;2;244;191;117;1m⚠[0m [38;2;244;191;117;1mFile is too long to fit on the screen[0m
+[38;2;106;159;181m  help: [0msrc/components/MentalHealthChatDemo.tsx seems like a minified file
+
+Found 0 warnings and 1 error.
+Finished in 2.5s on 2 files with 147 rules using 4 threads.
