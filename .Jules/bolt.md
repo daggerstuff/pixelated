@@ -1,1 +1,2 @@
 ## 2024-06-01 - Extract Tooltip | Learning: Inline components in Recharts cause unnecessary re-renders. | Action: Extracted CustomTooltip to module level.
+## 2026-04-18 - ActiveStudiesList Optimization | Learning: Using Array.includes() inside a map creates an O(N²) bottleneck during renders. | Action: Converted the array to a Set with useMemo for O(1) lookups and memoized the initial filtered array.
