@@ -11,6 +11,7 @@
 .crush/
 .letta/
 .continue-here.md
+AGENTS.md
 .pnpm-store/
 
 # === VIRTUAL ENVIRONMENTS ===
