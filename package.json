@@ -581,6 +581,7 @@
     "@tootallnate/once": "^3.0.1",
     "undici": "^7.25.0",
     "lodash": "^4.18.0",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "qs": "^6.14.2",
     "h3": ">=1.15.9",
     "@hono/node-server": "^1.19.13",
@@ -588,7 +589,6 @@
     "diff": "^5.2.2",
     "wrangler": "^4.59.1",
     "kerberos": "^7.0.0",
-    "@modelcontextprotocol/sdk": "1.29.0",
     "esbuild": "^0.28.0",
     "tar": "^7.5.7",
     "langsmith": ">=0.4.6",
@@ -597,6 +597,8 @@
     "react-dom": "^19.2.4",
     "socket.io-parser": ">=4.2.6",
     "kysely": ">=0.28.14",
-    "effect": ">=3.20.0"
+    "effect": ">=3.20.0",
+    "@cloudflare/mcp-server-cloudflare@0.2.0 > @modelcontextprotocol/sdk": "^1.25.2",
+    "@cloudflare/mcp-server-cloudflare@0.2.0 > undici": "^7.25.0"
   }
 }
