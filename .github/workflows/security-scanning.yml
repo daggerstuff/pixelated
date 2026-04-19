@@ -256,14 +256,34 @@ jobs:
             process.exit(1);
           }
 
+          const parseJsonLine = (line) => {
+            try {
+              return JSON.parse(line);
+            } catch (error) {
+              return null;
+            }
+          };
+
           let audit;
           try {
-            const normalized = data
-              .split('\n')
-              .map((line) => line.trim())
-              .filter(Boolean)
-              .map((line) => JSON.parse(line))
-              .filter((entry) => entry && typeof entry === 'object');
+            let normalized = [];
+            const trimmedData = data.trim();
+            try {
+              const parsed = JSON.parse(trimmedData);
+              normalized = Array.isArray(parsed) ? parsed : [parsed];
+            } catch {
+              normalized = trimmedData
+                .split('\n')
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .map(parseJsonLine)
+                .filter((entry) => entry && typeof entry === 'object');
+            }
+
+            if (!normalized.length) {
+              console.error('pnpm audit output did not contain valid JSON records.');
+              process.exit(1);
+            }
 
             if (normalized.length === 1) {
               audit = normalized[0];
@@ -312,6 +332,7 @@ jobs:
           const advisoryList = Array.isArray(vulnerabilityMap) ? vulnerabilityMap : Object.values(advisories);
           const summaryFromAdvisories = advisoryList.reduce(
             (result, item) => {
+              if (!item) return result;
               const severity = (item.severity || '').toLowerCase();
               if (severity === 'low') result.low += 1;
               if (severity === 'moderate') result.moderate += 1;
@@ -322,7 +343,11 @@ jobs:
             { low: 0, moderate: 0, high: 0, critical: 0 }
           );
 
-          const uniqueAdvisories = new Set(Object.values(advisories).map((entry) => entry.id)).size;
+          const uniqueAdvisories = new Set(
+            Object.values(advisories)
+              .map((entry) => entry && entry.id)
+              .filter(Boolean)
+          ).size;
           const moderate = counts.moderate || 0;
           const high = counts.high || 0;
           const critical = counts.critical || 0;

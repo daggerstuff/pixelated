@@ -20,14 +20,13 @@ const router = Router()
 type DocumentRequest = AuthenticatedRequest<
   Record<string, string>,
   unknown,
-  Record<string, unknown>,
-  Record<string, string | string[] | undefined>
+  Record<string, unknown>
 >
 
 const parseStringArray = (value: unknown): string[] | undefined => {
   if (!Array.isArray(value)) return undefined
 
-  const items = value as unknown[]
+  const items = value
   const validItems: string[] = []
 
   for (const item of items) {
@@ -40,19 +39,28 @@ const parseStringArray = (value: unknown): string[] | undefined => {
 }
 
 const isDocumentCategory = (value: unknown): value is DocumentCategory =>
-  typeof value === 'string' &&
-  Object.values(DocumentCategory).includes(value as DocumentCategory)
+  value === DocumentCategory.BUSINESS_PLAN ||
+  value === DocumentCategory.MARKET_ANALYSIS ||
+  value === DocumentCategory.COMPETITIVE_ANALYSIS ||
+  value === DocumentCategory.MARKETING_STRATEGY ||
+  value === DocumentCategory.FINANCIAL_PROJECTION ||
+  value === DocumentCategory.OPERATIONS_PLAN ||
+  value === DocumentCategory.EXECUTIVE_SUMMARY ||
+  value === DocumentCategory.CUSTOM
 
 const isDocumentStatus = (value: unknown): value is DocumentStatus =>
-  typeof value === 'string' &&
-  Object.values(DocumentStatus).includes(value as DocumentStatus)
+  value === DocumentStatus.DRAFT ||
+  value === DocumentStatus.IN_REVIEW ||
+  value === DocumentStatus.APPROVED ||
+  value === DocumentStatus.PUBLISHED ||
+  value === DocumentStatus.ARCHIVED
 
 const parseMetadata = (value: unknown): Partial<DocumentMetadata> | undefined => {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return undefined
   }
 
-  return value as Partial<DocumentMetadata>
+  return value
 }
 
 const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
@@ -72,21 +80,41 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
     throw new Error('Category is required')
   }
 
-  return {
+  const createPayload: DocumentCreate = {
     title,
     content,
-    summary:
-      typeof body['summary'] === 'string' ? body['summary'].trim() : undefined,
     category,
-    tags: parseStringArray(body['tags']),
-    parentDocumentId:
-      typeof body['parentDocumentId'] === 'string'
-        ? body['parentDocumentId']
-        : undefined,
-    status: isDocumentStatus(body['status']) ? body['status'] : undefined,
-    collaborators: parseStringArray(body['collaborators']),
-    metadata: parseMetadata(body['metadata']),
   }
+
+  const summary = typeof body['summary'] === 'string' ? body['summary'].trim() : undefined
+  if (summary !== undefined) {
+    createPayload.summary = summary
+  }
+
+  const tags = parseStringArray(body['tags'])
+  if (tags !== undefined) {
+    createPayload.tags = tags
+  }
+
+  if (typeof body['parentDocumentId'] === 'string') {
+    createPayload.parentDocumentId = body['parentDocumentId']
+  }
+
+  if (isDocumentStatus(body['status'])) {
+    createPayload.status = body['status']
+  }
+
+  const collaborators = parseStringArray(body['collaborators'])
+  if (collaborators !== undefined) {
+    createPayload.collaborators = collaborators
+  }
+
+  const metadata = parseMetadata(body['metadata'])
+  if (metadata !== undefined) {
+    createPayload.metadata = metadata
+  }
+
+  return createPayload
 }
 
 const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
@@ -202,12 +230,12 @@ router.get('/', authenticateToken, async (req: DocumentRequest, res) => {
     const tags = getQueryString(req, 'tags')
     const searchTerm = getQueryString(req, 'search')
 
-    if (category) {
-      filters.category = category as DocumentCategory
+    if (isDocumentCategory(category)) {
+      filters.category = category
     }
 
-    if (status) {
-      filters.status = status as DocumentStatus
+    if (isDocumentStatus(status)) {
+      filters.status = status
     }
 
     if (authorId) {
