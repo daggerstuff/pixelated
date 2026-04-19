@@ -73,6 +73,17 @@ const parseSentiment = (
   return 'neutral'
 }
 
+const toDisplayString = (value: unknown): string => {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return String(value)
+  }
+  return ''
+}
+
 export interface AlphaVantageQuote {
   symbol: string
   price: number
@@ -183,7 +194,7 @@ export class AlphaVantageService {
       })
 
       const quote = response.data['Global Quote']
-      if (!quote || !quote['01. symbol']) {
+      if (!quote?.['01. symbol']) {
         this.logger.warn('No quote data found', { symbol })
         return null
       }
@@ -203,7 +214,7 @@ export class AlphaVantageService {
         symbol:
           typeof quote['01. symbol'] === 'string'
             ? quote['01. symbol']
-            : String(quote['01. symbol'] ?? ''),
+            : toDisplayString(quote['01. symbol']),
         price: parseNumber(quote['05. price']),
         change: parseNumber(quote['09. change']),
         changePercent: changePercentNumber,
@@ -410,13 +421,13 @@ export class AlphaVantageService {
       const data = Array.isArray(rawData) ? rawData : []
       const indicators: EconomicIndicator[] = data
         .slice(0, 12)
-        .map((item) => {
+        .map((item): EconomicIndicator | null => {
           if (!isRecord(item)) return null
 
           return {
             name: indicator,
-            value: String(item.value ?? 'N/A'),
-            date: String(item.date ?? ''),
+            value: toDisplayString(item['value']) || 'N/A',
+            date: toDisplayString(item['date']),
           }
         })
         .filter((item): item is EconomicIndicator => item !== null)
@@ -456,12 +467,12 @@ export class AlphaVantageService {
           if (!isRecord(item)) return null
 
           return {
-            title: String(item.title ?? ''),
-            url: String(item.url ?? ''),
-            summary: String(item.summary ?? ''),
-            sentiment: parseSentiment(item.overall_sentiment_label),
-            relevance: parseNumber(item.relevance_score),
-            timePublished: String(item.time_published ?? ''),
+            title: String(item['title'] ?? ''),
+            url: String(item['url'] ?? ''),
+            summary: String(item['summary'] ?? ''),
+            sentiment: parseSentiment(item['overall_sentiment_label']),
+            relevance: parseNumber(item['relevance_score']),
+            timePublished: String(item['time_published'] ?? ''),
           }
         })
         .filter((item): item is NewsSentiment => item !== null)
