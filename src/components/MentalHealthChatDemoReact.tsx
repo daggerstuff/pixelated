@@ -200,7 +200,7 @@ export default function MentalHealthChatDemoReact({
                 ? {
                     ...m,
                     mentalHealthAnalysis:
-                      processedMessage.mentalHealthAnalysis || undefined,
+                      processedMessage.mentalHealthAnalysis ?? undefined,
                   }
                 : m,
           ),

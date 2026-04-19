@@ -26,11 +26,18 @@ if ! command -v pnpm &>/dev/null; then
     exit 1
 fi
 cd "$ROOT_DIR"
-if pnpm audit --prod 2>&1; then
-    echo -e "${GREEN}✅ No Node.js vulnerabilities found.${NC}"
+AUDIT_RESULTS_FILE="audit-results.json"
+if pnpm audit --help 2>/dev/null | grep -q -- "--prod"; then
+  pnpm audit --json --prod --audit-level moderate > "$AUDIT_RESULTS_FILE" || true
 else
-    echo -e "${RED}⚠️  Node.js vulnerabilities detected above.${NC}"
-    EXIT_CODE=1
+  pnpm audit --json --audit-level moderate > "$AUDIT_RESULTS_FILE" || true
+fi
+
+if node scripts/utils/check-pnpm-audit.js "$AUDIT_RESULTS_FILE"; then
+  echo -e "${GREEN}✅ No Node.js vulnerabilities found.${NC}"
+else
+  echo -e "${RED}⚠️  Node.js vulnerabilities detected above.${NC}"
+  EXIT_CODE=1
 fi
 
 # ──────────────────────────────────────────

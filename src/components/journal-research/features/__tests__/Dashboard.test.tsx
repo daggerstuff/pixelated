@@ -22,10 +22,43 @@ vi.mock('@/lib/hooks/journal-research', () => ({
 
 // Mock store
 vi.mock('@/lib/stores/journal-research', () => ({
-  useJournalSessionStore: vi.fn(),
+  useJournalSessionStore: vi.fn<() => unknown>(),
 }))
 
 describe('Dashboard', () => {
+  type MockSessionStoreState = {
+    selectedSessionId: string | null
+    filters: {
+      searchTerm: string
+      phases: string[]
+    }
+    isCreateDrawerOpen: boolean
+    setSelectedSessionId: (sessionId: string | null) => void
+    togglePhaseFilter: (phase: string) => void
+    setSearchTerm: (searchTerm: string) => void
+    resetFilters: () => void
+    openCreateDrawer: () => void
+    closeCreateDrawer: () => void
+  }
+
+  const createMockSessionStoreState = (
+    overrides: Partial<MockSessionStoreState> = {},
+  ): MockSessionStoreState => ({
+    selectedSessionId: null as string | null,
+    filters: {
+      searchTerm: '',
+      phases: [],
+    },
+    isCreateDrawerOpen: false,
+    setSelectedSessionId: vi.fn<(sessionId: string | null) => void>(),
+    togglePhaseFilter: vi.fn<(phase: string) => void>(),
+    setSearchTerm: vi.fn<(searchTerm: string) => void>(),
+    resetFilters: vi.fn<() => void>(),
+    openCreateDrawer: vi.fn<() => void>(),
+    closeCreateDrawer: vi.fn<() => void>(),
+    ...overrides,
+  })
+
   const mockUseSessionListQuery = hooks.useSessionListQuery as ReturnType<
     typeof vi.fn
   >
@@ -35,20 +68,13 @@ describe('Dashboard', () => {
   >
   const mockUseProgressMetricsQuery =
     hooks.useProgressMetricsQuery as ReturnType<typeof vi.fn>
-  const mockUseJournalSessionStore = store.useJournalSessionStore as ReturnType<
-    typeof vi.fn
-  >
+  const mockUseJournalSessionStore = vi.mocked(store.useJournalSessionStore)
 
   beforeEach(() => {
     vi.clearAllMocks()
 
     // Default mock implementations
-    const storeState = {
-      selectedSessionId: null as string | null,
-      openCreateDrawer: vi.fn(),
-      closeCreateDrawer: vi.fn(),
-      setSelectedSessionId: vi.fn<(id: string | null) => void>(),
-    }
+    const storeState = createMockSessionStoreState()
     mockUseJournalSessionStore.mockImplementation(
       (selector?: (state: typeof storeState) => unknown) =>
         typeof selector === 'function' ? selector(storeState) : storeState,
@@ -128,12 +154,9 @@ describe('Dashboard', () => {
   })
 
   it('displays selected session progress when session is selected', () => {
-    const selectedStoreState = {
+    const selectedStoreState = createMockSessionStoreState({
       selectedSessionId: 'test-session-1',
-      openCreateDrawer: vi.fn(),
-      closeCreateDrawer: vi.fn(),
-      setSelectedSessionId: vi.fn<(id: string | null) => void>(),
-    }
+    })
     mockUseJournalSessionStore.mockImplementation(
       (selector?: (state: typeof selectedStoreState) => unknown) =>
         typeof selector === 'function'
@@ -178,12 +201,9 @@ describe('Dashboard', () => {
 
   it('handles quick action click for new session', () => {
     const openCreateDrawer = vi.fn()
-    const clickableStoreState = {
-      selectedSessionId: null as string | null,
+    const clickableStoreState = createMockSessionStoreState({
       openCreateDrawer,
-      closeCreateDrawer: vi.fn(),
-      setSelectedSessionId: vi.fn(),
-    }
+    })
     mockUseJournalSessionStore.mockImplementation(
       (selector?: (state: typeof clickableStoreState) => unknown) =>
         typeof selector === 'function'
