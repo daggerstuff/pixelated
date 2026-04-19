@@ -194,7 +194,8 @@ export class AlphaVantageService {
       })
 
       const quote = response.data['Global Quote']
-      if (!quote?.['01. symbol']) {
+      const resolvedSymbol = toDisplayString(quote?.['01. symbol'])
+      if (!resolvedSymbol) {
         this.logger.warn('No quote data found', { symbol })
         return null
       }
@@ -211,10 +212,7 @@ export class AlphaVantageService {
           : parseNumber(changePercent)
 
       const result: AlphaVantageQuote = {
-        symbol:
-          typeof quote['01. symbol'] === 'string'
-            ? quote['01. symbol']
-            : toDisplayString(quote['01. symbol']),
+        symbol: resolvedSymbol,
         price: parseNumber(quote['05. price']),
         change: parseNumber(quote['09. change']),
         changePercent: changePercentNumber,
@@ -419,18 +417,16 @@ export class AlphaVantageService {
 
       const rawData = response.data.data
       const data = Array.isArray(rawData) ? rawData : []
-      const indicators: EconomicIndicator[] = data
+      const indicators = data
+        .filter(isRecord)
         .slice(0, 12)
-        .map((item): EconomicIndicator | null => {
-          if (!isRecord(item)) return null
-
-          return {
+        .map(
+          (item): EconomicIndicator => ({
             name: indicator,
             value: toDisplayString(item['value']) || 'N/A',
-            date: toDisplayString(item['date']),
-          }
-        })
-        .filter((item): item is EconomicIndicator => item !== null)
+            date: toDisplayString(item['date']) || 'N/A',
+          }),
+        )
 
       this.setCache(cacheKey, indicators)
       return indicators
@@ -462,20 +458,18 @@ export class AlphaVantageService {
 
       const rawData = response.data.feed
       const data = Array.isArray(rawData) ? rawData : []
-      const sentiments: NewsSentiment[] = data
-        .map((item) => {
-          if (!isRecord(item)) return null
-
-          return {
-            title: String(item['title'] ?? ''),
-            url: String(item['url'] ?? ''),
-            summary: String(item['summary'] ?? ''),
+      const sentiments = data
+        .filter(isRecord)
+        .map(
+          (item): NewsSentiment => ({
+            title: toDisplayString(item['title']),
+            url: toDisplayString(item['url']),
+            summary: toDisplayString(item['summary']),
             sentiment: parseSentiment(item['overall_sentiment_label']),
             relevance: parseNumber(item['relevance_score']),
-            timePublished: String(item['time_published'] ?? ''),
-          }
-        })
-        .filter((item): item is NewsSentiment => item !== null)
+            timePublished: toDisplayString(item['time_published']),
+          }),
+        )
 
       this.setCache(cacheKey, sentiments)
       return sentiments
@@ -507,18 +501,16 @@ export class AlphaVantageService {
       const rawData = response.data.quarterlyEarnings
       const data = Array.isArray(rawData) ? rawData : []
       const earnings = data
-        .map((item) => {
-          if (!isRecord(item)) return null
-
-          return {
-            fiscalDateEnding: String(item.fiscalDateEnding ?? ''),
-            reportedEPS: parseNumber(item.reportedEPS),
-            estimatedEPS: parseNumber(item.estimatedEPS),
-            surprise: parseNumber(item.surprise),
-            surprisePercentage: parseNumber(item.surprisePercentage),
-          }
-        })
-        .filter((item): item is QuarterlyEarnings => item !== null)
+        .filter(isRecord)
+        .map(
+          (item): QuarterlyEarnings => ({
+            fiscalDateEnding: String(item['fiscalDateEnding'] ?? ''),
+            reportedEPS: parseNumber(item['reportedEPS']),
+            estimatedEPS: parseNumber(item['estimatedEPS']),
+            surprise: parseNumber(item['surprise']),
+            surprisePercentage: parseNumber(item['surprisePercentage']),
+          }),
+        )
 
       this.setCache(cacheKey, earnings)
       return earnings

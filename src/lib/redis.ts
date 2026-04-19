@@ -266,15 +266,17 @@ function createRedisClient() {
       password: restToken,
       // Add any additional options here if needed
     })
-  } else {
-    // Log appropriate warnings in production
-    if (isProduction()) {
-      console.error(
-        'CRITICAL: Missing Redis credentials in production environment',
-      )
-    }
+  }
+
+  if (isTestEnvironment()) {
     return createMockRedisClient()
   }
+
+  // Log appropriate warnings in production
+  if (isProduction()) {
+    console.error('CRITICAL: Missing Redis credentials in production environment')
+  }
+  return createMockRedisClient()
 }
 
 export const redis = createRedisClient()
