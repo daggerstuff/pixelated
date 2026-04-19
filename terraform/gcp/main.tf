@@ -243,10 +243,9 @@ resource "google_kms_crypto_key_iam_member" "artifact_registry" {
 }
 
 # --- Datastore ---
-#checkov:skip=CKV_GCP_79:Ensure SQL database is using latest Major version. Version is managed via variable and enforced to POSTGRES_17.
 resource "google_sql_database_instance" "postgres" {
   name                = local.sql_instance_name
-  database_version    = var.postgres_version
+  database_version    = local.postgres_major_version
   region              = var.gcp_region
   deletion_protection = var.enable_deletion_protection
 

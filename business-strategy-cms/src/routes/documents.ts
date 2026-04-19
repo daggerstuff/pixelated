@@ -19,7 +19,7 @@ const router = Router()
 
 type DocumentRequest = AuthenticatedRequest<
   Record<string, string>,
-  unknown,
+  Record<string, unknown>,
   Record<string, unknown>
 >
 

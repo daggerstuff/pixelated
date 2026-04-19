@@ -22,7 +22,13 @@ export function ReportsPage({ sessionId, reportId }: ReportsPageProps) {
             <CardTitle>Report Viewer</CardTitle>
           </CardHeader>
           <CardContent>
-            <ReportViewer reportId={reportId} />
+            {sessionId ? (
+              <ReportViewer reportId={reportId} sessionId={sessionId} />
+            ) : (
+              <div className='text-muted-foreground py-4 text-center'>
+                Select a session to view the report.
+              </div>
+            )}
           </CardContent>
         </Card>
       ) : (
