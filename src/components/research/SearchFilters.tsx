@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 export interface SearchFiltersState {
   yearFrom?: number
@@ -59,6 +59,9 @@ export default function SearchFilters({
       return { ...prev, topics: newTopics }
     })
   }
+
+  // ⚡ Bolt: Converted array to Set for O(1) lookups to prevent O(N²) performance bottlenecks
+  const selectedTopicsSet = useMemo(() => new Set(localFilters.topics), [localFilters.topics])
 
   return (
     <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
@@ -154,9 +157,9 @@ export default function SearchFilters({
               <button
                 key={topic}
                 onClick={() => toggleTopic(topic)}
-                aria-pressed={localFilters.topics.includes(topic)}
+              aria-pressed={selectedTopicsSet.has(topic)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  localFilters.topics.includes(topic)
+                selectedTopicsSet.has(topic)
                     ? 'bg-pink-600/20 text-pink-300 border-pink-600'
                     : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
                 }`}
