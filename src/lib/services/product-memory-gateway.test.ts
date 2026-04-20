@@ -1,15 +1,12 @@
 // @vitest-environment node
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   InternalMemoryServiceError,
   type InternalMemoryServiceClient,
-} from '@/lib/server/internal-memory-service-client'
-import {
-  ProductMemoryGateway,
-  ProductMemoryGatewayError,
-} from '@/lib/services/product-memory-gateway'
+} from "../server/internal-memory-service-client";
+import { ProductMemoryGateway, ProductMemoryGatewayError } from "./product-memory-gateway";
 
 function createClientMock() {
   return {
@@ -20,63 +17,64 @@ function createClientMock() {
     getMemory: vi.fn(),
     deleteMemory: vi.fn(),
     getMemoryStats: vi.fn(),
-  } satisfies Partial<InternalMemoryServiceClient>
+  } satisfies Partial<InternalMemoryServiceClient>;
 }
 
-describe('ProductMemoryGateway', () => {
+describe("ProductMemoryGateway", () => {
   const scope = {
-    userId: 'vivi',
-    orgId: 'pixelated',
-    projectId: 'memory',
+    userId: "vivi",
+    orgId: "pixelated",
+    projectId: "memory",
+    sessionId: "sess-123",
+    agentId: "agent-456",
+    runId: "run-789",
     includeShared: true,
-  }
+  };
 
-  let client: ReturnType<typeof createClientMock>
-  let gateway: ProductMemoryGateway
+  let client: ReturnType<typeof createClientMock>;
+  let gateway: ProductMemoryGateway;
 
   beforeEach(() => {
-    client = createClientMock()
-    gateway = new ProductMemoryGateway(
-      client as unknown as InternalMemoryServiceClient,
-    )
-  })
+    client = createClientMock();
+    gateway = new ProductMemoryGateway(client as unknown as InternalMemoryServiceClient);
+  });
 
-  it('creates a memory and preserves metadata on the product boundary', async () => {
-    client.addMemory.mockResolvedValue({ memory_id: 'mem-1' })
+  it("creates a memory and preserves metadata on the product boundary", async () => {
+    client.addMemory.mockResolvedValue({ memory_id: "mem-1" });
 
     await expect(
       gateway.createMemory({
         ...scope,
-        content: 'Vivi prefers direct summaries',
-        metadata: { category: 'preference', source: 'product' },
+        content: "Vivi prefers direct summaries",
+        metadata: { category: "preference", source: "product" },
       }),
     ).resolves.toEqual({
-      id: 'mem-1',
-      content: 'Vivi prefers direct summaries',
-      metadata: { category: 'preference', source: 'product' },
-    })
+      id: "mem-1",
+      content: "Vivi prefers direct summaries",
+      metadata: { category: "preference", source: "product" },
+    });
 
     expect(client.addMemory).toHaveBeenCalledWith({
       ...scope,
-      content: 'Vivi prefers direct summaries',
-      category: 'preference',
-      metadata: { category: 'preference', source: 'product' },
-    })
-  })
+      content: "Vivi prefers direct summaries",
+      category: "preference",
+      metadata: { category: "preference", source: "product" },
+    });
+  });
 
-  it('maps shared-service records into product records', async () => {
+  it("maps shared-service records into product records", async () => {
     client.listMemories.mockResolvedValue({
       count: 1,
       memories: [
         {
-          id: 'mem-2',
-          memory: 'Shared-service content',
-          metadata: { visibility: 'private' },
-          created_at: '2026-04-06T00:00:00.000Z',
-          updatedAt: '2026-04-06T01:00:00.000Z',
+          id: "mem-2",
+          memory: "Shared-service content",
+          metadata: { visibility: "private" },
+          created_at: "2026-04-06T00:00:00.000Z",
+          updatedAt: "2026-04-06T01:00:00.000Z",
         },
       ],
-    })
+    });
 
     await expect(
       gateway.listMemories({
@@ -88,77 +86,197 @@ describe('ProductMemoryGateway', () => {
       total: 1,
       memories: [
         {
-          id: 'mem-2',
-          content: 'Shared-service content',
-          metadata: { visibility: 'private' },
-          createdAt: '2026-04-06T00:00:00.000Z',
-          updatedAt: '2026-04-06T01:00:00.000Z',
+          id: "mem-2",
+          content: "Shared-service content",
+          metadata: { visibility: "private" },
+          createdAt: "2026-04-06T00:00:00.000Z",
+          updatedAt: "2026-04-06T01:00:00.000Z",
         },
       ],
-    })
-  })
+    });
+  });
 
-  it('checks ownership before updating a memory', async () => {
+  it("checks ownership before updating a memory", async () => {
     client.getMemory.mockResolvedValue({
-      id: 'mem-3',
-      content: 'existing',
+      id: "mem-3",
+      content: "existing",
       metadata: {},
-    })
-    client.updateMemory.mockResolvedValue(undefined)
+    });
+    client.updateMemory.mockResolvedValue(undefined);
 
     await gateway.updateMemory({
       ...scope,
-      memoryId: 'mem-3',
-      content: 'updated',
-      metadata: { source: 'product' },
-    })
+      memoryId: "mem-3",
+      content: "updated",
+      metadata: { source: "product" },
+    });
 
     expect(client.getMemory).toHaveBeenCalledWith({
       ...scope,
-      memoryId: 'mem-3',
-    })
+      memoryId: "mem-3",
+    });
     expect(client.updateMemory).toHaveBeenCalledWith({
       ...scope,
-      memoryId: 'mem-3',
-      content: 'updated',
-      metadata: { source: 'product' },
-    })
-  })
+      memoryId: "mem-3",
+      content: "updated",
+      metadata: { source: "product" },
+    });
+  });
 
-  it('surfaces a 404 when updating a memory outside the caller scope', async () => {
-    client.getMemory.mockResolvedValue(null)
+  it("surfaces a 404 when updating a memory outside the caller scope", async () => {
+    client.getMemory.mockResolvedValue(null);
 
     await expect(
       gateway.updateMemory({
         ...scope,
-        memoryId: 'missing',
-        content: 'updated',
+        memoryId: "missing",
+        content: "updated",
       }),
     ).rejects.toMatchObject({
-      name: 'ProductMemoryGatewayError',
+      name: "ProductMemoryGatewayError",
       status: 404,
-      message: 'Memory not found',
-    } satisfies Partial<ProductMemoryGatewayError>)
-  })
+      message: "Memory not found",
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
 
-  it('wraps shared-service failures in a ProductMemoryGatewayError', async () => {
+  it("wraps shared-service failures in a ProductMemoryGatewayError", async () => {
     client.searchMemories.mockRejectedValue(
-      new InternalMemoryServiceError('upstream failed', 502, {
-        error: 'bad gateway',
+      new InternalMemoryServiceError("upstream failed", 502, {
+        error: "bad gateway",
       }),
-    )
+    );
 
     await expect(
       gateway.searchMemories({
         ...scope,
-        query: 'hello',
+        query: "hello",
         limit: 10,
       }),
     ).rejects.toMatchObject({
-      name: 'ProductMemoryGatewayError',
+      name: "ProductMemoryGatewayError",
       status: 502,
-      message: 'upstream failed',
-      details: { error: 'bad gateway' },
-    } satisfies Partial<ProductMemoryGatewayError>)
-  })
-})
+      message: "upstream failed",
+      details: { error: "bad gateway" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("passes accountId and workspaceId to internal memory service", async () => {
+    const scopeWithIds = {
+      ...scope,
+      accountId: "acc-123",
+      workspaceId: "ws-456",
+    };
+
+    client.addMemory.mockResolvedValue({ memory_id: "mem-3" });
+
+    await gateway.createMemory({
+      ...scopeWithIds,
+      content: "Test memory with IDs",
+    });
+
+    expect(client.addMemory).toHaveBeenCalledWith({
+      userId: scope.userId,
+      orgId: scope.orgId,
+      projectId: scope.projectId,
+      sessionId: scope.sessionId,
+      agentId: scope.agentId,
+      runId: scope.runId,
+      includeShared: scope.includeShared,
+      content: "Test memory with IDs",
+      category: undefined,
+      metadata: {},
+      account_id: "acc-123",
+      workspace_id: "ws-456",
+    });
+  });
+
+  it("passes undefined accountId and workspaceId when not provided", async () => {
+    const scopeWithoutIds = {
+      ...scope,
+      accountId: undefined,
+      workspaceId: undefined,
+    };
+
+    client.addMemory.mockResolvedValue({ memory_id: "mem-4" });
+
+    await gateway.createMemory({
+      ...scopeWithoutIds,
+      content: "Test memory without IDs",
+    });
+
+    expect(client.addMemory).toHaveBeenCalledWith({
+      userId: scope.userId,
+      orgId: scope.orgId,
+      projectId: scope.projectId,
+      sessionId: scope.sessionId,
+      agentId: scope.agentId,
+      runId: scope.runId,
+      includeShared: scope.includeShared,
+      content: "Test memory without IDs",
+      category: undefined,
+      metadata: {},
+      account_id: undefined,
+      workspace_id: undefined,
+    });
+  });
+
+  it("passes only accountId when workspaceId is not provided", async () => {
+    const scopeWithAccountOnly = {
+      ...scope,
+      accountId: "acc-789",
+      workspaceId: undefined,
+    };
+
+    client.addMemory.mockResolvedValue({ memory_id: "mem-5" });
+
+    await gateway.createMemory({
+      ...scopeWithAccountOnly,
+      content: "Test memory with account only",
+    });
+
+    expect(client.addMemory).toHaveBeenCalledWith({
+      userId: scope.userId,
+      orgId: scope.orgId,
+      projectId: scope.projectId,
+      sessionId: scope.sessionId,
+      agentId: scope.agentId,
+      runId: scope.runId,
+      includeShared: scope.includeShared,
+      content: "Test memory with account only",
+      category: undefined,
+      metadata: {},
+      account_id: "acc-789",
+      workspace_id: undefined,
+    });
+  });
+
+  it("passes only workspaceId when accountId is not provided", async () => {
+    const scopeWithWorkspaceOnly = {
+      ...scope,
+      accountId: undefined,
+      workspaceId: "ws-012",
+    };
+
+    client.addMemory.mockResolvedValue({ memory_id: "mem-6" });
+
+    await gateway.createMemory({
+      ...scopeWithWorkspaceOnly,
+      content: "Test memory with workspace only",
+    });
+
+    expect(client.addMemory).toHaveBeenCalledWith({
+      userId: scope.userId,
+      orgId: scope.orgId,
+      projectId: scope.projectId,
+      sessionId: scope.sessionId,
+      agentId: scope.agentId,
+      runId: scope.runId,
+      includeShared: scope.includeShared,
+      content: "Test memory with workspace only",
+      category: undefined,
+      metadata: {},
+      account_id: undefined,
+      workspace_id: "ws-012",
+    });
+  });
+});
