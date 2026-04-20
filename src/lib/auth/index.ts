@@ -22,9 +22,12 @@ export type { User, AuthUser } from "./types";
  * Get the current user from the request or cookies
  * Supports both JWT (users) and API keys (developers)
  */
-export async function getCurrentUser(
-  context: Request | AstroCookies,
-): Promise<{ id: string; role: string } | null> {
+export async function getCurrentUser(context: Request | AstroCookies): Promise<{
+  id: string;
+  role: string;
+  accountId?: string;
+  workspaceId?: string;
+} | null> {
   let token: string | null = null;
   let isApiKey = false;
 
@@ -65,7 +68,12 @@ export async function getCurrentUser(
     try {
       const result = await validateToken(token, "access");
       if (result.valid && result.userId) {
-        return { id: result.userId, role: result.role || "guest" };
+        return {
+          id: result.userId,
+          role: result.role || "guest",
+          accountId: result.accountId,
+          workspaceId: result.workspaceId,
+        };
       }
     } catch {
       // Token validation failed
