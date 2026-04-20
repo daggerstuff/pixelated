@@ -228,7 +228,7 @@ jobs:
 
       - name: Run security audit
         run: |
-          if pnpm audit --help 2>/dev/null | rg -q -- "--prod"; then
+          if pnpm audit --help 2>/dev/null | grep -q -- "--prod"; then
             pnpm audit --json --prod --audit-level moderate > audit-results.json || true
           else
             pnpm audit --json --audit-level moderate > audit-results.json || true
