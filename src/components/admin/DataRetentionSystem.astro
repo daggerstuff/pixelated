@@ -209,14 +209,14 @@ const archivingActions = [
                       <button
                         type="button"
                         class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        aria-label="Edit policy"
+                        aria-label={`Edit ${category.name} policy`}
                       >
                         <IconPencil className="w-5 h-5" />
                       </button>
                       <button
                         type="button"
                         class="font-medium text-gray-600 dark:text-gray-500 hover:underline"
-                        aria-label="Archive now"
+                        aria-label={`Archive ${category.name} now`}
                       >
                         <IconArchive className="w-5 h-5" />
                       </button>
@@ -282,12 +282,14 @@ const archivingActions = [
                 <button
                   type="button"
                   class="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+                  aria-label={`Run ${action.name} now`}
                 >
                   Run Now
                 </button>
                 <button
                   type="button"
                   class="px-3 py-1 text-xs font-medium bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  aria-label={`Configure ${action.name}`}
                 >
                   Configure
                 </button>
