@@ -6,3 +6,4 @@
 
 ## 2026-04-18 - QA: Add test for template edge case
 | Pattern: Mocking internal loggers and testing HTML string outputs | Action: Ensure edge cases like empty objects are systematically tested.
+## 2026-04-20 - QA: Add tests for json-validator | Pattern: Testing basic utility files by defining unit tests for unhandled edge cases like malformed objects. | Action: Ensure validations handles null values to prevent runtime errors.
