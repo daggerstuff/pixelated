@@ -1,4 +1,5 @@
-import { vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mocked, MockedClass } from 'vitest'
 
 import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
@@ -21,10 +22,10 @@ import {
 vi.mock('./PatientProfileService')
 vi.mock('./BeliefConsistencyService')
 
-const MockPatientProfileService = PatientProfileService as vi.MockedClass<
+const MockPatientProfileService = PatientProfileService as MockedClass<
   typeof PatientProfileService
 >
-const MockBeliefConsistencyService = BeliefConsistencyService as vi.MockedClass<
+const MockBeliefConsistencyService = BeliefConsistencyService as MockedClass<
   typeof BeliefConsistencyService
 >
 
@@ -77,7 +78,13 @@ const createTestCognitiveModel = (
     resistanceLevel: 3,
     changeReadiness: 'contemplation',
     sessionProgressLog: [],
-    skillsAcquired: ['basic coping skills'],
+    skillsAcquired: [
+      {
+        skillName: 'basic coping skills',
+        dateAchieved: new Date().toISOString(),
+        proficiency: 0.5,
+      },
+    ] as TherapeuticProgress['skillsAcquired'],
     trustLevel: 5,
     rapportScore: 5,
     therapistPerception: 'neutral',
@@ -99,8 +106,8 @@ const createTestPatientProfile = (
 })
 
 describe('PatientResponseService', () => {
-  let mockProfileService: vi.Mocked<PatientProfileService>
-  let mockConsistencyService: vi.Mocked<BeliefConsistencyService>
+  let mockProfileService: Mocked<PatientProfileService>
+  let mockConsistencyService: Mocked<BeliefConsistencyService>
   let responseService: PatientResponseService
 
   // Base style config for tests, specific tests will override parts of this
@@ -127,8 +134,12 @@ describe('PatientResponseService', () => {
     // It's important that the constructor of the actual service gets *instances* of the mocked services.
     // Vitest's vi.mock() replaces the original class with a mock constructor.
     // So, new MockPatientProfileService() creates an instance of the mock.
-    mockProfileService = new MockPatientProfileService(null as unknown) // Pass null or valid mock for KVStore if its constructor is called
-    mockConsistencyService = new MockBeliefConsistencyService()
+    mockProfileService = new (MockPatientProfileService as unknown as new (
+      ...args: any[]
+    ) => Mocked<PatientProfileService>)() // No-op constructor args for mocked class
+    mockConsistencyService = new (MockBeliefConsistencyService as unknown as new (
+      ...args: any[]
+    ) => Mocked<BeliefConsistencyService>)() 
 
     responseService = new PatientResponseService(
       mockProfileService,

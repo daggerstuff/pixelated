@@ -8,8 +8,7 @@ import mongodb from '@/config/mongodb.config'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SecurityError } from '../security/errors'
-// Import shared types to avoid circular dependencies
-import type { SecurityBreach, BreachSeverity } from './types'
+import { type BreachSeverity } from './types'
 
 const logger = createBuildSafeLogger('breach-data')
 
@@ -24,6 +23,21 @@ if (!mongoUri || !mongoDbName) {
 }
 
 // MongoDB connection will be handled by the mongodb config singleton
+
+export interface SecurityBreach {
+  id: string
+  severity: BreachSeverity
+  timestamp: Date
+  type: string
+  description: string
+  affectedUsers: string[]
+  dataTypes: string[]
+  attackVector?: string
+  detectionTime: Date
+  responseTime: Date
+  remediationStatus: 'pending' | 'in_progress' | 'completed'
+  metadata: Record<string, unknown>
+}
 
 /**
  * Interface for breach data storage
@@ -50,18 +64,29 @@ interface StoredBreach {
 function toStoredBreach(
   breach: SecurityBreach,
 ): Omit<StoredBreach, 'created_at' | 'updated_at'> {
+  const detectionTime =
+    breach.detectionTime instanceof Date
+      ? breach.detectionTime
+      : new Date(breach.timestamp)
+  const responseTime =
+    breach.responseTime instanceof Date ? breach.responseTime : new Date()
+  const remediationStatus =
+    breach.remediationStatus ?? ('pending' as const)
+
   return {
     id: breach.id,
     severity: breach.severity,
     timestamp: breach.timestamp.toISOString(),
-    affected_users: breach.affectedUsers,
-    data_types: breach.dataTypes,
+    affected_users: Array.isArray(breach.affectedUsers)
+      ? breach.affectedUsers
+      : [],
+    data_types: Array.isArray(breach.dataTypes) ? breach.dataTypes : [],
     attack_vector: breach.attackVector || null,
-    detection_time: breach.detectionTime?.toISOString(),
-    response_time: breach.responseTime?.toISOString(),
-    remediation_status: breach.remediationStatus,
+    detection_time: detectionTime.toISOString(),
+    response_time: responseTime.toISOString(),
+    remediation_status: remediationStatus,
     description: breach.description,
-    metadata: breach.metadata || null,
+    metadata: breach.metadata ?? null,
   }
 }
 
@@ -69,18 +94,21 @@ function toStoredBreach(
  * Converts a StoredBreach to SecurityBreach format
  */
 function fromStoredBreach(stored: StoredBreach): SecurityBreach {
+  const detected = new Date(stored.detection_time || stored.timestamp)
+  const responded = new Date(stored.response_time || stored.timestamp)
   return {
     id: stored.id,
     severity: stored.severity,
     timestamp: new Date(stored.timestamp),
-    affectedUsers: stored.affected_users,
-    dataTypes: stored.data_types,
-    attackVector: stored.attack_vector || undefined,
-    detectionTime: new Date(stored.detection_time),
-    responseTime: new Date(stored.response_time),
-    remediationStatus: stored.remediation_status,
+    affectedUsers: stored.affected_users || [],
+    dataTypes: stored.data_types || [],
+    type: 'unknown',
     description: stored.description,
-    metadata: stored.metadata || undefined,
+    attackVector: stored.attack_vector || undefined,
+    detectionTime: detected,
+    responseTime: responded,
+    remediationStatus: stored.remediation_status ?? 'pending',
+    metadata: stored.metadata ?? {},
   }
 }
 
@@ -195,6 +223,15 @@ export async function getBreachById(
       cause: error,
     })
   }
+}
+
+// Backward-compatible facade for modules expecting a service object
+export const BreachDataService = {
+  createBreach,
+  getBreachesSince,
+  updateRemediationStatus,
+  getBreachById,
+  deleteBreach,
 }
 
 /**
