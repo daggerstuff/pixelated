@@ -9,7 +9,7 @@ describe('Authentication API', () => {
   const testEmail = `test-${generateTestId()}@test.com`
   const testPassword = 'SecurePassword123!'
   const testName = 'Test User'
-  let testUserId: string
+  let testUserId: string | undefined
   let authToken: string
 
   afterAll(async () => {

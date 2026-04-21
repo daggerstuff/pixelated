@@ -541,7 +541,11 @@
     "overrides": {
       "yaml": "2.8.3",
       "js-yaml": "4.1.1",
-      "yaml-language-server": "1.22.0"
+      "yaml-language-server": "1.22.0",
+      "@modelcontextprotocol/sdk": "^1.25.2",
+      "undici": "^7.25.0",
+      "@cloudflare/mcp-server-cloudflare>@modelcontextprotocol/sdk": "^1.25.2",
+      "@cloudflare/mcp-server-cloudflare>undici": "^7.25.0"
     }
   },
   "trustedDependencies": [
@@ -614,7 +618,7 @@
     "socket.io-parser": ">=4.2.6",
     "kysely": ">=0.28.14",
     "effect": ">=3.20.0",
-    "@cloudflare/mcp-server-cloudflare@0.2.0 > @modelcontextprotocol/sdk": "^1.25.2",
-    "@cloudflare/mcp-server-cloudflare@0.2.0 > undici": "^7.25.0"
+    "@cloudflare/mcp-server-cloudflare@0.2.0>@modelcontextprotocol/sdk": "^1.25.2",
+    "@cloudflare/mcp-server-cloudflare@0.2.0>undici": "^7.25.0"
   }
 }

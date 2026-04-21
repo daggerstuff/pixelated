@@ -482,7 +482,7 @@ export async function generateReport(
       },
       metrics: {
         ...metrics,
-        encryptedData,
+        encryptedData: String(encryptedData),
       },
       trends,
       predictions,
