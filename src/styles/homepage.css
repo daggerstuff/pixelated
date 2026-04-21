@@ -290,13 +290,14 @@
   }
 
   .pe-homepage :is(.core-feature-proof__list, .cta-rubric) {
-    justify-items: stretch;
-    text-align: left;
+    justify-items: center;
+    text-align: center;
   }
 
   .pe-homepage :is(.core-feature-proof__list li, .cta-rubric li) {
     width: 100%;
-    text-align: left;
+    padding-left: 0;
+    text-align: center;
   }
 
   .pe-homepage
@@ -310,7 +311,18 @@
       .cta-proof-item,
       .cta-decision
     ) {
-    text-align: left;
-    justify-items: start;
+    text-align: center;
+    justify-items: center;
+  }
+
+  .pe-homepage
+    :is(
+      .home-intro__evidence-list li,
+      .core-feature-proof__list li,
+      .cta-rubric li
+    )::before {
+    position: static;
+    display: block;
+    margin: 0 auto 0.65rem;
   }
 }
