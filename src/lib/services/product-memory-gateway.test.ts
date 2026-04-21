@@ -56,6 +56,8 @@ describe("ProductMemoryGateway", () => {
 
     expect(client.addMemory).toHaveBeenCalledWith({
       ...scope,
+      accountId: undefined,
+      workspaceId: undefined,
       content: "Vivi prefers direct summaries",
       category: "preference",
       metadata: { category: "preference", source: "product" },
@@ -113,10 +115,14 @@ describe("ProductMemoryGateway", () => {
 
     expect(client.getMemory).toHaveBeenCalledWith({
       ...scope,
+      accountId: undefined,
+      workspaceId: undefined,
       memoryId: "mem-3",
     });
     expect(client.updateMemory).toHaveBeenCalledWith({
       ...scope,
+      accountId: undefined,
+      workspaceId: undefined,
       memoryId: "mem-3",
       content: "updated",
       metadata: { source: "product" },
@@ -176,6 +182,8 @@ describe("ProductMemoryGateway", () => {
 
     expect(client.addMemory).toHaveBeenCalledWith({
       userId: scope.userId,
+      accountId: "acc-123",
+      workspaceId: "ws-456",
       orgId: scope.orgId,
       projectId: scope.projectId,
       sessionId: scope.sessionId,
@@ -185,8 +193,6 @@ describe("ProductMemoryGateway", () => {
       content: "Test memory with IDs",
       category: undefined,
       metadata: {},
-      account_id: "acc-123",
-      workspace_id: "ws-456",
     });
   });
 
@@ -206,6 +212,8 @@ describe("ProductMemoryGateway", () => {
 
     expect(client.addMemory).toHaveBeenCalledWith({
       userId: scope.userId,
+      accountId: undefined,
+      workspaceId: undefined,
       orgId: scope.orgId,
       projectId: scope.projectId,
       sessionId: scope.sessionId,
@@ -215,8 +223,6 @@ describe("ProductMemoryGateway", () => {
       content: "Test memory without IDs",
       category: undefined,
       metadata: {},
-      account_id: undefined,
-      workspace_id: undefined,
     });
   });
 
@@ -236,6 +242,8 @@ describe("ProductMemoryGateway", () => {
 
     expect(client.addMemory).toHaveBeenCalledWith({
       userId: scope.userId,
+      accountId: "acc-789",
+      workspaceId: undefined,
       orgId: scope.orgId,
       projectId: scope.projectId,
       sessionId: scope.sessionId,
@@ -245,8 +253,6 @@ describe("ProductMemoryGateway", () => {
       content: "Test memory with account only",
       category: undefined,
       metadata: {},
-      account_id: "acc-789",
-      workspace_id: undefined,
     });
   });
 
@@ -266,6 +272,8 @@ describe("ProductMemoryGateway", () => {
 
     expect(client.addMemory).toHaveBeenCalledWith({
       userId: scope.userId,
+      accountId: undefined,
+      workspaceId: "ws-012",
       orgId: scope.orgId,
       projectId: scope.projectId,
       sessionId: scope.sessionId,
@@ -275,8 +283,6 @@ describe("ProductMemoryGateway", () => {
       content: "Test memory with workspace only",
       category: undefined,
       metadata: {},
-      account_id: undefined,
-      workspace_id: "ws-012",
     });
   });
 });
