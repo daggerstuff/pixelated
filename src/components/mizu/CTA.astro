@@ -175,17 +175,17 @@ const {
   .cta-rubric li {
     position: relative;
     padding: 0.9rem 0 0;
-    padding-left: 1.25rem;
     border-top: 1px dotted rgba(253, 252, 252, 0.1);
+    text-align: center;
   }
 
   .cta-rubric li::before {
     content: '';
-    position: absolute;
-    top: 1.75rem;
-    left: 0;
+    position: static;
+    display: block;
     width: 0.38rem;
     height: 0.38rem;
+    margin: 0 auto 0.65rem;
     border-radius: 999px;
     background: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.12);
@@ -241,15 +241,15 @@ const {
       grid-template-columns: minmax(0, 0.95fr) minmax(24rem, 0.72fr);
       align-items: start;
       gap: clamp(3rem, 5vw, 5rem);
-      text-align: left;
+      text-align: center;
       justify-items: stretch;
     }
 
     .cta-copy {
       max-width: 41rem;
-      margin: 0;
-      text-align: left;
-      justify-items: start;
+      margin: 0 auto;
+      text-align: center;
+      justify-items: center;
     }
 
     .cta-copy .pe-heading-l {
@@ -257,8 +257,8 @@ const {
     }
 
     .cta-copy .pe-home-copy {
-      margin: 0;
-      text-align: left;
+      margin: 0 auto;
+      text-align: center;
     }
 
     .cta-proof-list {
@@ -269,8 +269,8 @@ const {
 
     .cta-proof-item,
     .cta-decision {
-      text-align: left;
-      justify-items: start;
+      text-align: center;
+      justify-items: center;
     }
 
     .cta-proof-item {
@@ -285,8 +285,8 @@ const {
     }
 
     .cta-rubric {
-      justify-items: stretch;
-      text-align: left;
+      justify-items: center;
+      text-align: center;
     }
 
     .cta-action-cluster {
@@ -305,8 +305,8 @@ const {
     }
 
     .cta-rubric {
-      justify-items: stretch;
-      text-align: left;
+      justify-items: center;
+      text-align: center;
     }
 
     .cta-proof-item {
