@@ -141,10 +141,27 @@ const { content } = Astro.props
 
   .home-intro__evidence-list {
     display: grid;
-    gap: 0.8rem;
+    gap: 0.85rem;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  .home-intro__evidence-list li {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+
+  .home-intro__evidence-list li::before {
+    content: '';
+    position: absolute;
+    top: 0.8em;
+    left: 0;
+    width: 0.38rem;
+    height: 0.38rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.12);
   }
 
   @media (min-width: 980px) {
@@ -174,7 +191,7 @@ const { content } = Astro.props
     }
 
     .home-intro__issue-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 1rem;
     }
 
@@ -193,6 +210,10 @@ const { content } = Astro.props
       background: rgba(253, 252, 252, 0.016);
     }
 
+    .home-intro__issue p {
+      max-width: 48rem;
+    }
+
     .home-intro__evidence-board {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1rem;
@@ -208,6 +229,11 @@ const { content } = Astro.props
     .home-intro__evidence-column {
       text-align: center;
       justify-items: center;
+    }
+
+    .home-intro__evidence-list {
+      justify-items: start;
+      text-align: left;
     }
 
     .home-intro__issue,

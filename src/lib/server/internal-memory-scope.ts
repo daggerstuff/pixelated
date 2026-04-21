@@ -1,17 +1,18 @@
 import type { InternalMemoryScopeInput } from "@/lib/server/internal-memory-service-client";
 
 export function buildScopePayload(scope: InternalMemoryScopeInput) {
-  return {
+  const payload: Record<string, unknown> = {
     user_id: scope.userId,
-    account_id: scope.accountId,
-    workspace_id: scope.workspaceId,
-    org_id: scope.orgId,
-    project_id: scope.projectId,
-    session_id: scope.sessionId,
-    agent_id: scope.agentId,
-    run_id: scope.runId,
     include_shared: scope.includeShared ?? true,
   };
+  if (scope.accountId) payload.account_id = scope.accountId;
+  if (scope.workspaceId) payload.workspace_id = scope.workspaceId;
+  if (scope.orgId) payload.org_id = scope.orgId;
+  if (scope.projectId) payload.project_id = scope.projectId;
+  if (scope.sessionId) payload.session_id = scope.sessionId;
+  if (scope.agentId) payload.agent_id = scope.agentId;
+  if (scope.runId) payload.run_id = scope.runId;
+  return payload;
 }
 
 export function buildScopeQuery(scope: InternalMemoryScopeInput): URLSearchParams {

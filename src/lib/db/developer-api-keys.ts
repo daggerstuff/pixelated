@@ -1,7 +1,7 @@
 import { query } from "./index";
 import { randomBytes, createHash } from "crypto";
-import { logSecurityEvent, SecurityEventType } from "@/lib/security";
-import { VALID_API_KEY_SCOPES, ApiKeyScope } from "@/lib/auth/scopes";
+import { logSecurityEvent, SecurityEventType } from "../security";
+import { VALID_API_KEY_SCOPES, ApiKeyScope } from "../auth/scopes";
 
 const RATE_LIMIT_CLEANUP_DAYS = 7;
 const MAX_FAILED_ATTEMPTS = 10;

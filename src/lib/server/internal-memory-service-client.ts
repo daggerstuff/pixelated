@@ -1,8 +1,8 @@
-import { buildScopePayload, buildScopeQuery } from "./internal-memory-scope";
+import { buildScopePayload, buildScopeQuery } from "@/lib/server/internal-memory-scope";
 import {
   MemoryServiceRequestSigner,
   type InternalMemoryServiceClientConfig,
-} from "./internal-memory-service-auth";
+} from "@/lib/server/internal-memory-service-auth";
 
 type JsonPrimitive = string | number | boolean | null;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };

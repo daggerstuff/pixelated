@@ -5,6 +5,7 @@ import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { createLogger } from 'vite'
 import UnoCSS from '@unocss/astro'
 import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
@@ -19,6 +20,16 @@ const isFlyioDeploy =
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+const viteLogger = createLogger()
+function shouldIgnoreEmptyMentalHealthWarning(warning) {
+  const message = warning.message || ''
+  const chunkName = warning.chunkName || ''
+  return (
+    message.includes('Generated an empty chunk') &&
+    (message.includes('MentalHealthChatDemo') || chunkName.includes('MentalHealthChatDemo'))
+  )
+}
 // Detect if we're running a build command (not dev server)
 const isBuildCommand =
   process.argv.includes('build') ||
@@ -77,7 +88,16 @@ function getChunkName(id) {
   if (normalizedId.includes('/src/components/')) {
     const componentSegments =
       normalizedId.split('/src/components/')[1]?.split('/') || []
-    const componentRoot = componentSegments[0]
+    const componentImport = componentSegments[0]?.split('?')[0]
+    const componentExtension = componentImport
+      ? path.extname(componentImport)
+      : ''
+    if (!['.ts', '.tsx', '.js', '.jsx'].includes(componentExtension)) {
+      return null
+    }
+    const componentRoot = componentImport
+      ? path.basename(componentImport, path.extname(componentImport))
+      : ''
     if (componentRoot) {
       return `components-${componentRoot}`
     }
@@ -236,6 +256,11 @@ export default defineConfig({
       },
     ],
     rollupOptions: {
+      onwarn(warning) {
+        if (shouldIgnoreEmptyMentalHealthWarning(warning)) {
+          return
+        }
+      },
       output: {
         // Manual chunk splitting for better caching
         manualChunks: getChunkName,
@@ -247,6 +272,21 @@ export default defineConfig({
     },
   },
   vite: {
+    customLogger: {
+      warn(msg, options) {
+        if (
+          msg.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
+          msg.includes('Generated an empty chunk: \'MentalHealthChatDemo\'') ||
+          msg.includes('Generated an empty chunk: MentalHealthChatDemo')
+        ) {
+          return
+        }
+        viteLogger.warn(msg, options)
+      },
+      error: viteLogger.error.bind(viteLogger),
+      warnOnce: viteLogger.warnOnce.bind(viteLogger),
+      clearScreen: viteLogger.clearScreen.bind(viteLogger),
+    },
     logLevel: 'error',
     environments: {
       client: {
@@ -340,10 +380,20 @@ export default defineConfig({
           'util',
         ],
         onwarn(warning, warn) {
+          if (shouldIgnoreEmptyMentalHealthWarning(warning)) {
+            return
+          }
           if (
             warning.code === 'SOURCEMAP_ERROR' ||
             (warning.message &&
               warning.message.includes("didn't generate a sourcemap"))
+          ) {
+            return
+          }
+          if (
+            warning.code === 'EMPTY_CHUNK' &&
+            (warning.message?.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
+              (warning.chunkName && warning.chunkName === 'MentalHealthChatDemo'))
           ) {
             return
           }

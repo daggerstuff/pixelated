@@ -4,6 +4,7 @@ import {
   InternalMemoryServiceError,
   type InternalMemoryMetadata,
   type InternalMemoryRecord,
+  type InternalMemoryScopeInput,
 } from "@/lib/server/internal-memory-service-client";
 import { assertOwnedMemoryAccessible } from "@/lib/services/product-memory-ownership";
 
@@ -80,13 +81,7 @@ export class ProductMemoryGateway {
     const metadata = normalizeMetadata(input.metadata);
     const response = await this.withGatewayError(() =>
       this.client.addMemory({
-        userId: input.userId,
-        orgId: input.orgId,
-        projectId: input.projectId,
-        sessionId: input.sessionId,
-        agentId: input.agentId,
-        runId: input.runId,
-        includeShared: input.includeShared,
+        ...toInternalScope(input),
         content: input.content,
         category: typeof metadata.category === "string" ? metadata.category : undefined,
         metadata,
@@ -227,17 +222,34 @@ export function getProductMemoryGateway(): ProductMemoryGateway {
   return gatewaySingleton;
 }
 
-function toInternalScope(scope: ProductMemoryScope) {
+/**
+ * Projects the public ProductMemoryScope into InternalMemoryScopeInput.
+ * Destructures out non-scope keys so that callers can pass extended inputs
+ * (e.g. ProductMemoryUpdateInput which carries memoryId/content/metadata)
+ * without leaking those fields into the scope object sent to the internal service.
+ */
+export function toInternalScope(input: ProductMemoryScope): InternalMemoryScopeInput {
+  const {
+    userId,
+    accountId,
+    workspaceId,
+    orgId,
+    projectId,
+    sessionId,
+    agentId,
+    runId,
+    includeShared,
+  } = input;
   return {
-    userId: scope.userId,
-    accountId: scope.accountId,
-    workspaceId: scope.workspaceId,
-    orgId: scope.orgId,
-    projectId: scope.projectId,
-    sessionId: scope.sessionId,
-    agentId: scope.agentId,
-    runId: scope.runId,
-    includeShared: scope.includeShared,
+    userId,
+    accountId,
+    workspaceId,
+    orgId,
+    projectId,
+    sessionId,
+    agentId,
+    runId,
+    includeShared,
   };
 }
 
