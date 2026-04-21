@@ -374,7 +374,7 @@ python-dateutil==2.9.0.post0
     #   celery
     #   matplotlib
     #   pandas
-python-dotenv==1.2.1
+python-dotenv==1.2.2
     # via
     #   bias-detection-service (pyproject.toml)
     #   pydantic-settings
