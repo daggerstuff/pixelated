@@ -290,12 +290,27 @@
   }
 
   .pe-homepage :is(.core-feature-proof__list, .cta-rubric) {
-    justify-items: center;
+    justify-items: stretch;
+    text-align: left;
   }
 
   .pe-homepage :is(.core-feature-proof__list li, .cta-rubric li) {
     width: 100%;
-    padding: 0.85rem 0 0;
-    text-align: center;
+    text-align: left;
+  }
+
+  .pe-homepage
+    :is(
+      .hero-proof-card,
+      .home-intro__issue,
+      .home-intro__evidence-column,
+      .core-feature-proof,
+      .core-feature-card,
+      .core-feature-quote,
+      .cta-proof-item,
+      .cta-decision
+    ) {
+    text-align: left;
+    justify-items: start;
   }
 }
