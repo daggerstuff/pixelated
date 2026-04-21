@@ -1,5 +1,5 @@
 // Use server-only helper for MongoDB types
-import type { ObjectId } from '@/lib/server-only/mongodb-types'
+import type { ObjectId } from '../server-only/mongodb-types'
 
 let ObjectId: unknown
 

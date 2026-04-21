@@ -173,8 +173,22 @@ const {
   }
 
   .cta-rubric li {
+    position: relative;
     padding: 0.9rem 0 0;
+    padding-left: 1.25rem;
     border-top: 1px dotted rgba(253, 252, 252, 0.1);
+  }
+
+  .cta-rubric li::before {
+    content: '';
+    position: absolute;
+    top: 1.75rem;
+    left: 0;
+    width: 0.38rem;
+    height: 0.38rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.12);
   }
 
   .cta-action-cluster {
@@ -266,6 +280,10 @@ const {
       background: rgba(253, 252, 252, 0.016);
     }
 
+    .cta-proof-item p {
+      max-width: 24rem;
+    }
+
     .cta-rubric {
       justify-items: stretch;
       text-align: left;
@@ -284,6 +302,11 @@ const {
     .cta-rubric {
       text-align: center;
       justify-items: center;
+    }
+
+    .cta-rubric {
+      justify-items: stretch;
+      text-align: left;
     }
 
     .cta-proof-item {

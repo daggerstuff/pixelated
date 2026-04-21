@@ -44,6 +44,10 @@ export function getGateway() {
   return getProductMemoryGateway();
 }
 
+/** The public product API scopes memory to user+account+workspace only.
+ *  Higher-level scope dimensions (orgId, projectId, sessionId, agentId, runId)
+ *  are intentionally omitted — they are internal-service concerns not exposed
+ *  to external API consumers. */
 export function toMemoryScope(
   userId: string,
   accountId?: string,
@@ -73,12 +77,11 @@ type MemoryRouteContext = {
   cookies?: unknown;
 };
 
+type AuthenticatedMemoryUser = NonNullable<Awaited<ReturnType<typeof requireMemoryUser>>>;
+
 export function withAuthenticatedMemoryRoute<TContext extends MemoryRouteContext>(
   action: string,
-  handler: (
-    context: TContext,
-    user: Awaited<ReturnType<typeof requireMemoryUser>>,
-  ) => Promise<Response>,
+  handler: (context: TContext, user: AuthenticatedMemoryUser) => Promise<Response>,
 ) {
   return async (context: TContext): Promise<Response> => {
     const user = await requireMemoryUser(context.request);
