@@ -845,7 +845,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 alerts: [newAlert as BiasAlert, ...(prev.alerts || [])],
                 summary: {
                   ...prev.summary,
-                  alertsLast24h: prev.summary.alertsLast24h + 1,
+                  alertsLast24h: (prev.summary.alertsLast24h ?? 0) + 1,
                 },
               }
             })
@@ -2478,9 +2478,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <div className='text-green-600 text-2xl font-bold'>
-              {(summary.complianceScore * 100).toFixed(1)}%
+              {((summary.complianceScore ?? 0) * 100).toFixed(1)}%
             </div>
-            <Progress value={summary.complianceScore * 100} className='mt-2' />
+            <Progress value={(summary.complianceScore ?? 0) * 100} className='mt-2' />
           </CardContent>
         </Card>
       </div>

@@ -77,7 +77,7 @@ const breachTest = test.extend<BreachTestFixtures>({
     await redis.del(pattern)
     await redis.disconnect()
   },
-  auth: async (_: {}, use: (a: AuthService) => Promise<void>) => {
+  auth: async (_: {}, use: (a: MockAuthService) => Promise<void>) => {
     // Setup environment
     process.env['ORGANIZATION_NAME'] = 'Test Healthcare'
     process.env['SECURITY_CONTACT'] = 'security@test-healthcare.com'

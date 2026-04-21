@@ -263,7 +263,7 @@ export class CrisisSessionFlaggingService {
         crisisId: request.crisisId,
       })
 
-      return this.mapFlagFromDb(flagData)
+      return this.mapFlagFromDb(flagData as CrisisSessionFlagDbData)
     } catch (error: unknown) {
       logger.error('Error flagging session for review', {
         error: error instanceof Error ? String(error) : String(error),
@@ -328,7 +328,7 @@ export class CrisisSessionFlaggingService {
       try {
         objectId = new ObjectId(request.flagId)
       } catch (e) {
-        throw new Error('flagId is not a valid ObjectId.', { cause: _e })
+        throw new Error('flagId is not a valid ObjectId.', { cause: e })
       }
       const updateResult = await db
         .collection('crisis_session_flags')
@@ -350,7 +350,7 @@ export class CrisisSessionFlaggingService {
         status: request.status,
       })
 
-      return this.mapFlagFromDb(updateResult['value'])
+      return this.mapFlagFromDb(updateResult['value'] as CrisisSessionFlagDbData)
     } catch (error: unknown) {
       logger.error('Error updating flag status', {
         error: error instanceof Error ? String(error) : String(error),
@@ -385,7 +385,7 @@ export class CrisisSessionFlaggingService {
         .sort({ flagged_at: -1 })
         .toArray()
 
-      return flags.map((flag) => this.mapFlagFromDb(flag))
+      return flags.map((flag) => this.mapFlagFromDb(flag as CrisisSessionFlagDbData))
     } catch (error: unknown) {
       logger.error('Error getting user crisis flags', {
         error: error instanceof Error ? String(error) : String(error),
