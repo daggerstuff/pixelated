@@ -16,7 +16,7 @@ export const DELETE = withAuthenticatedMemoryRoute("deleting memory", async ({ r
 
   // Delete memory
   await getGateway().deleteMemory({
-    ...toMemoryScope(user!.id, user!.accountId, user!.workspaceId),
+    ...toMemoryScope(user.id, user.accountId, user.workspaceId),
     memoryId,
   });
 

@@ -105,7 +105,7 @@ export function createMockRequest(overrides?: Partial<Request>): Request {
 /**
  * Create mock Express response
  */
-export function createMockResponse(): Response & { _json: any _status: number } {
+export function createMockResponse(): Response & { _json: any; _status: number } {
   const res = {
     _status: 200,
     _json: null,

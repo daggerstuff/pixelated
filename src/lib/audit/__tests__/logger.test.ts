@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuditEventType, AuditSeverity } from '../events'
 
 const mocks = vi.hoisted(() => ({
   info: vi.fn(),
@@ -47,9 +48,9 @@ describe('AuditLogger', () => {
 
     const payload = {
       userId: 'user-1',
-      type: 'security' as const,
+      type: AuditEventType.SECURITY,
       action: 'login',
-      severity: 'high' as const,
+      severity: AuditSeverity.HIGH,
       metadata: {
         patientName: 'Alice Example',
         email: 'alice@example.com',

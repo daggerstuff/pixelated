@@ -24,7 +24,7 @@ export const setupTwoFactorAuth = async (
   _deviceInfo: DeviceInfo,
 ) => {
   // Check if already enabled
-  const config = await getFromCache(`2fa:config:${userId}`)
+  const config = await getFromCache<{ enabled?: boolean }>(`2fa:config:${userId}`)
   if (config && config.enabled) {
     throw new Error('2FA is already enabled')
   }
@@ -66,7 +66,9 @@ export const verifyTwoFactorToken = async (
   verification: TwoFactorVerification,
 ) => {
   // Check for lockout
-  const attempts = await getFromCache(`2fa:attempts:${verification.userId}`)
+  const attempts = await getFromCache<{ count?: number }>(
+    `2fa:attempts:${verification.userId}`,
+  )
   if (attempts && attempts.count >= 3) {
     throw new Error('Account is locked')
   }

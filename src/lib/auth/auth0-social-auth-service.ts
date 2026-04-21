@@ -312,7 +312,7 @@ export class Auth0SocialAuthService {
     })
 
     // Update Phase 6 MCP server with authentication progress
-    await updatePhase6AuthenticationProgress(user.id, 'social_auth_completed')
+    await updatePhase6AuthenticationProgress(user.id, 'login_success')
 
     console.log('Social authentication successful', {
       userId: user.id,
@@ -340,14 +340,18 @@ export class Auth0SocialAuthService {
 
     try {
       // Link the social account to the user
-      await auth0Management.users.link(
-        { id: userId },
-        {
-          provider: connection,
-          connection_id: connection, // This would need to be the actual connection ID
-          user_id: accessToken, // This is simplified - in reality, you'd need the social provider's user ID
-        },
-      )
+      const usersClient = auth0Management.users as unknown as {
+        link: (userId: string, identity: {
+          provider: string
+          connection_id: string
+          user_id: string
+        }) => Promise<unknown>
+      }
+      await usersClient.link(userId, {
+        provider: connection,
+        connection_id: connection,
+        user_id: accessToken,
+      })
 
       // Log the linking event
       logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, null, {
@@ -386,13 +390,16 @@ export class Auth0SocialAuthService {
 
     try {
       // Unlink the social account from the user
-      await auth0Management.users.unlink(
-        { id: userId },
-        {
-          provider: connection,
-          user_id: providerUserId,
-        },
-      )
+      const usersClient = auth0Management.users as unknown as {
+        unlink: (userId: string, identity: {
+          provider: string
+          user_id: string
+        }) => Promise<unknown>
+      }
+      await usersClient.unlink(userId, {
+        provider: connection,
+        user_id: providerUserId,
+      })
 
       // Log the unlinking event
       logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, null, {
@@ -426,7 +433,10 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const response = await auth0Management.users.get({ id: userId })
+      const usersClient = auth0Management.users as unknown as {
+        get: (userId: string) => Promise<{ data: { identities?: any[] } }>
+      }
+      const response = await usersClient.get(userId)
       const user = response.data
       return user.identities || []
     } catch (error: unknown) {

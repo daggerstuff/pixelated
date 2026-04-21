@@ -15,7 +15,7 @@ const handleUpdate = withAuthenticatedMemoryRoute("updating memory", async ({ re
   }
 
   const result = await getGateway().updateMemory({
-    ...toMemoryScope(user!.id, user!.accountId, user!.workspaceId),
+    ...toMemoryScope(user.id, user.accountId, user.workspaceId),
     memoryId,
     content,
     metadata,

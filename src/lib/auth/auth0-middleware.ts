@@ -8,6 +8,7 @@ import { auth0AdaptiveMFAService } from "./auth0-adaptive-mfa-service";
 import { validateToken } from "./auth0-jwt-service";
 import { ROLE_DEFINITIONS, type UserRole } from "./auth0-rbac-service";
 import { type AuthStrategy } from "./route-config";
+import type { ApiKeyScope } from "./scopes";
 import { developerApiKeyManager } from "../db/developer-api-keys";
 
 export type { AuthStrategy };
@@ -520,7 +521,9 @@ export async function authenticateRequest(
 
         // Check scopes if required
         if (requiredScopes.length > 0) {
-          const hasAllScopes = requiredScopes.every((scope) => keyRecord.scopes.includes(scope));
+          const hasAllScopes = requiredScopes.every((scope) =>
+            keyRecord.scopes.includes(scope as ApiKeyScope),
+          );
           if (!hasAllScopes) {
             return {
               success: false,

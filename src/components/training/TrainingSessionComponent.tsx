@@ -79,7 +79,7 @@ export function TrainingSessionComponent() {
   const userId = session?.user?.id || 'demo-therapist'
   const sessionId = 'session-1'
   const [therapistResponse, setTherapistResponse] = useState('')
-  const [conversation, setConversation] = useState([
+  const [conversation, setConversation] = useState<ConversationEntry[]>([
     { id: `msg-${Date.now()}`, role: 'client', message: initialClientMessage },
   ])
   const [evaluation, setEvaluation] = useState<string | null>(null)
@@ -295,7 +295,7 @@ export function TrainingSessionComponent() {
         id: `note-${Date.now()}-${noteAuthorId}`,
         authorId: noteAuthorId,
         content: noteContent,
-        timestamp: msg.payload?.timestamp || new Date().toISOString(),
+        timestamp: String(msg.payload?.timestamp || new Date().toISOString()),
       }
 
       setCoachingNotes((prev) => [...prev, coachingNote])
@@ -469,7 +469,7 @@ export function TrainingSessionComponent() {
     setEvaluation(null)
 
     if (!ws.current) {
-      return
+      return undefined
     }
 
     if (ws.current.readyState === WebSocket.CONNECTING) {
@@ -491,7 +491,7 @@ export function TrainingSessionComponent() {
       ws.current.readyState === WebSocket.CLOSED ||
       ws.current.readyState === WebSocket.CLOSING
     ) {
-      return
+      return undefined
     }
 
     if (ws.current.readyState === WebSocket.OPEN) {
@@ -503,6 +503,7 @@ export function TrainingSessionComponent() {
         })
       }
     }
+    return undefined
   }, [role, sessionId, sendJoinSession, sendAuthentication])
 
   // Handle observer note submission
@@ -525,6 +526,7 @@ export function TrainingSessionComponent() {
       setCoachingNotes((prev) => [
         ...prev,
         {
+        id: `note-${Date.now()}-${userId}`,
           authorId: userId,
           content: noteContent,
           timestamp: new Date().toISOString(),

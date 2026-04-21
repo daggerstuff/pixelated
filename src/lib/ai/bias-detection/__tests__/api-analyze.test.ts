@@ -102,18 +102,18 @@ import type { TherapeuticSession } from "../index";
 
 // Type definitions for test mocks
 interface MockRequest {
-  json: ReturnType<typeof vi.fn>;
+  json: () => Promise<unknown>;
   headers: {
-    get: ReturnType<typeof vi.fn>;
+    get: (key: string) => string | null;
   };
   url?: string;
 }
 
 interface MockResponse {
   status: number;
-  json: ReturnType<typeof vi.fn>;
+  json: () => Promise<any>;
   headers: {
-    get: ReturnType<typeof vi.fn>;
+    get: (key: string) => string | null;
   };
 }
 
@@ -122,18 +122,24 @@ interface APIContext {
   url?: URL;
 }
 
-// Handler function types
-type PostHandler = (context: APIContext) => Promise<MockResponse>;
-type GetHandler = (context: APIContext) => Promise<MockResponse>;
+type HandlerFunction = (context: APIContext) => Promise<MockResponse>;
 
 // Import the actual handlers - using dynamic import inside test functions
-let POST: PostHandler, GET: GetHandler, resetRateLimits: () => void;
+let POST: unknown;
+let GET: unknown;
+let resetRateLimits: (() => void) | undefined;
+
+const invokePost = (request: MockRequest): Promise<MockResponse> =>
+  (POST as unknown as HandlerFunction)({ request })
+const invokeGet = (request: MockRequest): Promise<MockResponse> =>
+  (GET as unknown as HandlerFunction)({ request, url: undefined });
+
 beforeEach(async () => {
   if (!POST || !GET) {
     const module = await import("../../../../pages/api/bias-detection/analyze");
-    POST = module.POST as unknown as PostHandler;
-    GET = module.GET as unknown as GetHandler;
-    resetRateLimits = module.resetRateLimits;
+    POST = module.POST as unknown as HandlerFunction;
+    GET = module.GET as unknown as HandlerFunction;
+    resetRateLimits = (module as { resetRateLimits?: () => void }).resetRateLimits;
   }
   // Reset rate limits before each test
   if (resetRateLimits) {
@@ -143,7 +149,7 @@ beforeEach(async () => {
 
 // Helper function to serialize mock data like JSON.stringify does for dates
 function serializeForComparison(obj: unknown): unknown {
-  return JSON.parse(JSON.stringify(obj) as unknown);
+  return JSON.parse(JSON.stringify(obj) as string);
 }
 
 describe("Session Analysis API Endpoint", () => {
@@ -354,7 +360,7 @@ describe("Session Analysis API Endpoint", () => {
 
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.status).toBe(200);
 
@@ -372,7 +378,7 @@ describe("Session Analysis API Endpoint", () => {
       };
 
       const request = createMockRequest(requestBody);
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.status).toBe(200);
 
@@ -387,7 +393,7 @@ describe("Session Analysis API Endpoint", () => {
       };
 
       const request = createMockRequest(requestBody);
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.status).toBe(200);
 
@@ -404,7 +410,7 @@ describe("Session Analysis API Endpoint", () => {
       const requestBody = { therapistId: "test-therapist-123" };
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.status).toBe(400);
 
@@ -417,7 +423,7 @@ describe("Session Analysis API Endpoint", () => {
     it("should return 400 for empty body", async () => {
       const request = createMockRequest(null);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.status).toBe(400);
     });
@@ -431,7 +437,7 @@ describe("Session Analysis API Endpoint", () => {
         "content-type": "text/plain",
       });
 
-      const response = await POST({ request });
+      const response = await (POST as unknown as (context: { request: unknown }) => Promise<MockResponse>)({ request });
 
       expect(response.status).toBe(200);
 
@@ -447,7 +453,7 @@ describe("Session Analysis API Endpoint", () => {
       };
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await (POST as unknown as (context: { request: unknown }) => Promise<MockResponse>)({ request });
 
       expect(response.status).toBe(200);
     });
@@ -458,7 +464,7 @@ describe("Session Analysis API Endpoint", () => {
       };
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.status).toBe(400);
     });
@@ -477,7 +483,7 @@ describe("Session Analysis API Endpoint", () => {
         },
       };
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       // API returns 500 for all errors including JSON parse failures
       expect(response.status).toBe(500);
@@ -487,7 +493,7 @@ describe("Session Analysis API Endpoint", () => {
       const requestBody = { content: "Test content", therapistId: "t1" };
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
       const responseData = await response.json();
 
       expect(responseData.processingTime).toBeDefined();
@@ -499,7 +505,7 @@ describe("Session Analysis API Endpoint", () => {
       const requestBody = { content: "Test content", therapistId: "t1" };
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.headers.get("Content-Type")).toBe("application/json");
       expect(response.headers.get("X-Cache")).toBe("MISS");
@@ -529,16 +535,17 @@ describe("Session Analysis API Endpoint", () => {
 
       return {
         url: url.toString(),
+        json: vi.fn().mockResolvedValue({}),
         headers: {
           get: vi.fn((key: string) => defaultHeaders[key.toLowerCase()] || null),
         },
-      } as unknown as MockRequest;
+      };
     };
 
     it("should successfully retrieve bias summary", async () => {
       const request = createMockGetRequest({ days: "30" });
 
-      const response = await GET({ request });
+      const response = await invokeGet(request);
 
       expect(response.status).toBe(200);
 
@@ -557,7 +564,7 @@ describe("Session Analysis API Endpoint", () => {
     it("should use default 30 days when not specified", async () => {
       const request = createMockGetRequest({});
 
-      const response = await GET({ request });
+      const response = await invokeGet(request);
 
       expect(response.status).toBe(200);
     });
@@ -565,7 +572,7 @@ describe("Session Analysis API Endpoint", () => {
     it("should respect custom days parameter", async () => {
       const request = createMockGetRequest({ days: "7" });
 
-      const response = await GET({ request });
+      const response = await invokeGet(request);
 
       expect(response.status).toBe(200);
     });
@@ -575,6 +582,7 @@ describe("Session Analysis API Endpoint", () => {
 
       const request: MockRequest = {
         url: url.toString(),
+        json: vi.fn().mockResolvedValue({}),
         headers: {
           get: vi.fn((key: string) => {
             if (key.toLowerCase() === "authorization") return "Bearer valid-token";
@@ -583,7 +591,7 @@ describe("Session Analysis API Endpoint", () => {
         },
       };
 
-      const response = await GET({ request });
+      const response = await invokeGet(request);
 
       expect(response.status).toBe(400);
 
@@ -600,7 +608,7 @@ describe("Session Analysis API Endpoint", () => {
 
       const request = createMockGetRequest({});
 
-      const response = await GET({ request });
+      const response = await invokeGet(request);
 
       expect(response.status).toBe(500);
 
@@ -612,7 +620,7 @@ describe("Session Analysis API Endpoint", () => {
     it("should set appropriate response headers for GET", async () => {
       const request = createMockGetRequest({});
 
-      const response = await GET({ request });
+      const response = await invokeGet(request);
 
       expect(response.headers.get("Content-Type")).toBe("application/json");
       expect(response.headers.get("X-Processing-Time")).toBeDefined();
@@ -625,9 +633,7 @@ describe("Session Analysis API Endpoint", () => {
 
       // Make 61 requests (over the limit of 60)
       const requests = Array.from({ length: 61 }, () =>
-        POST({
-          request: createMockRequest(requestBody),
-        }),
+        invokePost(createMockRequest(requestBody)),
       );
 
       const responses = await Promise.all(requests);
@@ -648,7 +654,7 @@ describe("Session Analysis API Endpoint", () => {
       const requestBody = { session: mockSession };
       const request = createMockRequest(requestBody);
 
-      const response = await POST({ request });
+      const response = await invokePost(request);
 
       expect(response.headers.get("Content-Type")).toBe("application/json");
       expect(response.headers.get("X-Processing-Time")).toBeDefined();

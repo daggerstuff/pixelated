@@ -1,4 +1,5 @@
-import { vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { MockedClass, Mocked } from 'vitest'
 
 import { KVStore } from '../../db/KVStore'
 import type { PatientProfile, ConversationMessage } from '../models/patient'
@@ -7,6 +8,7 @@ import type {
   CoreBelief,
   DemographicInfo,
   DiagnosisInfo,
+  SkillAcquired,
   TherapeuticProgress,
   ConversationalStyle,
 } from '../types/CognitiveModel'
@@ -15,7 +17,7 @@ import { PatientProfileService } from './PatientProfileService' // Updated impor
 // Mock KVStore
 vi.mock('../../db/KVStore')
 
-const MockKVStore = KVStore as vi.MockedClass<typeof KVStore>
+const MockKVStore = KVStore as MockedClass<typeof KVStore>
 
 // Helper to create a basic CognitiveModel for testing (can remain the same)
 const createTestCognitiveModel = (
@@ -66,7 +68,13 @@ const createTestCognitiveModel = (
     resistanceLevel: 3,
     changeReadiness: 'contemplation',
     sessionProgressLog: [],
-    skillsAcquired: ['basic coping skills'],
+    skillsAcquired: [
+      {
+        skillName: 'basic coping skills',
+        dateAchieved: new Date().toISOString(),
+        proficiency: 0.5,
+      } as SkillAcquired,
+    ],
     trustLevel: 5,
     rapportScore: 5,
     therapistPerception: 'neutral',
@@ -89,12 +97,12 @@ const createTestPatientProfile = (
 
 describe('PatientProfileService', () => {
   // Updated describe block
-  let mockKvStoreInstance: vi.Mocked<KVStore> // Changed to vi.Mocked
+  let mockKvStoreInstance: Mocked<KVStore> // Changed to Mocked
   let service: PatientProfileService // Updated service type
 
   beforeEach(() => {
     MockKVStore.mockClear()
-    mockKvStoreInstance = new MockKVStore() as vi.Mocked<KVStore> // Changed to vi.Mocked
+    mockKvStoreInstance = new MockKVStore() as Mocked<KVStore> // Changed to Mocked
     service = new PatientProfileService(mockKvStoreInstance) // Instantiate new service
   })
 
@@ -154,7 +162,7 @@ describe('PatientProfileService', () => {
     })
 
     it('should delete a profile', async () => {
-      mockKvStoreInstance.delete.mockResolvedValue(undefined)
+      mockKvStoreInstance.delete.mockResolvedValue(true)
       const result = await service.deleteProfile('testDelete')
       expect(result).toBe(true)
       expect(mockKvStoreInstance.delete).toHaveBeenCalledWith(

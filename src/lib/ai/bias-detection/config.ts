@@ -812,6 +812,17 @@ export class BiasDetectionConfigManager {
 
   public getConfigSummary(): {
     isValid: boolean
+    environment?: string
+    thresholds?: BiasDetectionConfig["thresholds"]
+    layerWeights?: BiasDetectionConfig["layerWeights"]
+    cache?: BiasDetectionConfig["cacheConfig"]
+    security?: BiasDetectionConfig["securityConfig"]
+    performance?: BiasDetectionConfig["performanceConfig"]
+    features?: {
+      auditLogging: boolean
+      dataMasking: boolean
+      caching: boolean
+    }
     source: string
     loadedEnvVars: string[]
     errors: string[]
@@ -819,6 +830,9 @@ export class BiasDetectionConfigManager {
       aif360: { enabled: boolean }
       fairlearn: { enabled: boolean }
       tensorflow: { enabled: boolean }
+      huggingFace: { enabled: boolean }
+      interpretability: { enabled: boolean }
+      spacy: { enabled: boolean }
     }
   } {
     const errors = this.validateConfiguration()
@@ -848,6 +862,10 @@ export class BiasDetectionConfigManager {
         fairlearn: {
           enabled:
             this.config['mlToolkitConfig']?.['fairlearn']?.['enabled'] ?? true,
+        },
+        tensorflow: {
+          enabled:
+            this.config['mlToolkitConfig']?.['tensorflow']?.['enabled'] ?? true,
         },
         huggingFace: {
           enabled:

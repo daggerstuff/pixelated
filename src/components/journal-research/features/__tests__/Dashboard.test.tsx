@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import * as hooks from '@/lib/hooks/journal-research'
 import * as store from '@/lib/stores/journal-research'
+import type { SessionPhase } from '@/lib/stores/journal-research/sessionStore'
 
 import {
   renderWithProviders,
@@ -30,11 +31,11 @@ describe('Dashboard', () => {
     selectedSessionId: string | null
     filters: {
       searchTerm: string
-      phases: string[]
+      phases: SessionPhase[]
     }
     isCreateDrawerOpen: boolean
     setSelectedSessionId: (sessionId: string | null) => void
-    togglePhaseFilter: (phase: string) => void
+    togglePhaseFilter: (phase: SessionPhase) => void
     setSearchTerm: (searchTerm: string) => void
     resetFilters: () => void
     openCreateDrawer: () => void
@@ -47,7 +48,7 @@ describe('Dashboard', () => {
     selectedSessionId: null as string | null,
     filters: {
       searchTerm: '',
-      phases: [],
+      phases: [] as SessionPhase[],
     },
     isCreateDrawerOpen: false,
     setSelectedSessionId: vi.fn<(sessionId: string | null) => void>(),
@@ -68,16 +69,16 @@ describe('Dashboard', () => {
   >
   const mockUseProgressMetricsQuery =
     hooks.useProgressMetricsQuery as ReturnType<typeof vi.fn>
-  const mockUseJournalSessionStore = vi.mocked(store.useJournalSessionStore)
-
   beforeEach(() => {
     vi.clearAllMocks()
 
     // Default mock implementations
     const storeState = createMockSessionStoreState()
-    mockUseJournalSessionStore.mockImplementation(
-      (selector?: (state: typeof storeState) => unknown) =>
-        typeof selector === 'function' ? selector(storeState) : storeState,
+    ;(store.useJournalSessionStore as any).mockImplementation(
+      (...args: any[]) =>
+        typeof args[0] === 'function'
+          ? (args[0] as (state: any) => unknown)(storeState)
+          : storeState,
     )
     ;(
       store.useJournalSessionStore as typeof store.useJournalSessionStore & {
@@ -157,10 +158,10 @@ describe('Dashboard', () => {
     const selectedStoreState = createMockSessionStoreState({
       selectedSessionId: 'test-session-1',
     })
-    mockUseJournalSessionStore.mockImplementation(
-      (selector?: (state: typeof selectedStoreState) => unknown) =>
-        typeof selector === 'function'
-          ? selector(selectedStoreState)
+    ;(store.useJournalSessionStore as any).mockImplementation(
+      (...args: any[]) =>
+        typeof args[0] === 'function'
+          ? (args[0] as (state: any) => unknown)(selectedStoreState)
           : selectedStoreState,
     )
     ;(
@@ -204,10 +205,10 @@ describe('Dashboard', () => {
     const clickableStoreState = createMockSessionStoreState({
       openCreateDrawer,
     })
-    mockUseJournalSessionStore.mockImplementation(
-      (selector?: (state: typeof clickableStoreState) => unknown) =>
-        typeof selector === 'function'
-          ? selector(clickableStoreState)
+    ;(store.useJournalSessionStore as any).mockImplementation(
+      (...args: any[]) =>
+        typeof args[0] === 'function'
+          ? (args[0] as (state: any) => unknown)(clickableStoreState)
           : clickableStoreState,
     )
     ;(

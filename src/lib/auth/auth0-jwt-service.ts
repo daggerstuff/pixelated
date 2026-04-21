@@ -55,7 +55,7 @@ let auth0UserInfo: Auth0UserInfoClient | null = null;
  */
 function initializeAuth0Client() {
   const UserInfoClient = (
-    auth0 as {
+    auth0 as unknown as {
       UserInfoClient?: new (options: {
         domain: string;
       }) => {

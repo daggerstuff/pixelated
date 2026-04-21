@@ -193,19 +193,24 @@ interface Auth0RoleClaim extends UnknownRecord {
   roles?: unknown
 }
 
-type AuthenticatedUser = {
+export type AuthenticatedUser = {
   id: string
   email: string
-  emailVerified: boolean
-  role: AuthRole
+  emailVerified?: boolean
+  role: string
   name?: string
   fullName?: string
+  firstName?: string
+  lastName?: string
+  isActive?: boolean
+  medicalRecordNumber?: string
   avatarUrl?: string
   createdAt?: string
   updatedAt?: string
   lastLogin?: string
   appMetadata?: Record<string, unknown>
   userMetadata?: Record<string, unknown>
+  [key: string]: unknown
 }
 
 type Auth0PasswordGrantResponse = {

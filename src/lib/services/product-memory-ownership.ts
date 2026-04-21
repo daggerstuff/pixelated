@@ -6,8 +6,10 @@ import {
   toInternalScope,
 } from "@/lib/services/product-memory-gateway";
 
+type InternalMemoryServiceClientLike = Pick<InternalMemoryServiceClient, "getMemory">;
+
 export async function assertOwnedMemoryAccessible(
-  client: InternalMemoryServiceClient,
+  client: InternalMemoryServiceClientLike,
   input: ProductMemoryDeleteInput | ProductMemoryUpdateInput,
 ): Promise<void> {
   const memory = await client.getMemory({
