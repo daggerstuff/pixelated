@@ -603,7 +603,7 @@ python-dateutil==2.9.0.post0
     #   -r src/lib/ai/training/requirements.txt
     #   botocore
     #   pandas
-python-dotenv==1.2.1
+python-dotenv==1.2.2
     # via -r src/lib/ai/training/requirements.txt
 pytokens==0.4.0
     # via
