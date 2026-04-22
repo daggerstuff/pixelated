@@ -9,6 +9,15 @@ interface TrainingSessionProps {
   className?: string
 }
 
+const getMockClientResponse = (value: unknown): string => {
+  if (!value || typeof value !== 'object') {
+    return ''
+  }
+
+  const { response } = value as Record<string, unknown>
+  return typeof response === 'string' ? response : ''
+}
+
 function AIErrorBoundary({ children }: { children: React.ReactNode }) {
   const [hasError] = useState(false)
   const [error] = useState<Error | null>(null)
@@ -20,7 +29,7 @@ function AIErrorBoundary({ children }: { children: React.ReactNode }) {
         className='bg-destructive text-destructive-foreground rounded-md p-4'
       >
         <strong>AI Service Error:</strong>{' '}
-        {error?.message || 'The AI service is temporarily unavailable.'}
+        {error?.message ?? 'The AI service is temporarily unavailable.'}
       </div>
     )
   }
@@ -86,14 +95,15 @@ function TrainingSession({ className }: TrainingSessionProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message }),
       })
-      const data = await res.json()
+      const rawData = (await res.json()) as unknown
+      const response = getMockClientResponse(rawData)
 
       // Add client response to conversation memory
-      if (data.response) {
-        addMessage('client', data.response)
+      if (response) {
+        addMessage('client', response)
       }
 
-      setClientResponse(data.response || '')
+      setClientResponse(response)
 
       // Update progress based on conversation flow
       const newProgress = Math.min(100, memory.progress + 10)
@@ -226,7 +236,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
               <div className='mt-4'>
                 <strong>Client Response:</strong>
                 <div className='bg-muted mt-2 min-h-[60px] rounded-md p-3 text-sm'>
-                  {clientResponse || 'Waiting for client response...'}
+                {clientResponse ?? 'Waiting for client response...'}
                 </div>
               </div>
             </section>

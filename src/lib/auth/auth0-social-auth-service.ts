@@ -341,17 +341,22 @@ export class Auth0SocialAuthService {
     try {
       // Link the social account to the user
       const usersClient = auth0Management.users as unknown as {
-        link: (userId: string, identity: {
+        link: (params: { id: string }, identity: {
           provider: string
           connection_id: string
           user_id: string
         }) => Promise<unknown>
       }
-      await usersClient.link(userId, {
-        provider: connection,
-        connection_id: connection,
-        user_id: accessToken,
-      })
+      await usersClient.link(
+        {
+          id: userId,
+        },
+        {
+          provider: connection,
+          connection_id: connection,
+          user_id: accessToken,
+        },
+      )
 
       // Log the linking event
       logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, null, {
