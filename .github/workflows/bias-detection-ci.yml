@@ -286,6 +286,37 @@ jobs:
         with:
           service-dir: src/lib/ai/bias-detection/python-service
 
+      - name: Sync CI constraints from pinned requirements
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          req_text = Path("requirements.txt").read_text().splitlines()
+          wanted = {}
+          for line in req_text:
+              m = re.match(r"^([A-Za-z0-9_.-]+)==([^\s#]+)", line.strip())
+              if not m:
+                  continue
+              name = m.group(1).lower().replace("_", "-")
+              if name in {"numpy", "pandas"}:
+                  wanted[name] = line.strip()
+
+          missing = sorted({"numpy", "pandas"} - wanted.keys())
+          if missing:
+              raise SystemExit(
+                  "Missing pinned versions in requirements.txt: " + ", ".join(missing)
+              )
+
+          Path("constraints-ci.txt").write_text(
+              "# Auto-synced CI constraints from requirements.txt\n"
+              "# Generated during CI; keep requirements.txt as the source of truth.\n"
+              f"{wanted['numpy']}\n{wanted['pandas']}\n"
+          )
+          print("Wrote constraints-ci.txt:", wanted["numpy"], wanted["pandas"])
+          PY
+
       - name: Cache pip dependencies
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
@@ -419,6 +450,37 @@ jobs:
         uses: ./.github/actions/prepare-uv-venv
         with:
           service-dir: src/lib/ai/bias-detection/python-service
+
+      - name: Sync CI constraints from pinned requirements
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          req_text = Path("requirements.txt").read_text().splitlines()
+          wanted = {}
+          for line in req_text:
+              m = re.match(r"^([A-Za-z0-9_.-]+)==([^\s#]+)", line.strip())
+              if not m:
+                  continue
+              name = m.group(1).lower().replace("_", "-")
+              if name in {"numpy", "pandas"}:
+                  wanted[name] = line.strip()
+
+          missing = sorted({"numpy", "pandas"} - wanted.keys())
+          if missing:
+              raise SystemExit(
+                  "Missing pinned versions in requirements.txt: " + ", ".join(missing)
+              )
+
+          Path("constraints-ci.txt").write_text(
+              "# Auto-synced CI constraints from requirements.txt\n"
+              "# Generated during CI; keep requirements.txt as the source of truth.\n"
+              f"{wanted['numpy']}\n{wanted['pandas']}\n"
+          )
+          print("Wrote constraints-ci.txt:", wanted["numpy"], wanted["pandas"])
+          PY
 
       - name: Install Python ML dependencies
         run: |
