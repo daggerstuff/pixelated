@@ -17,6 +17,7 @@ from bias_detector import TherapeuticSession, analyze_session_bias
 from crisis_detection import detect_crisis_signals
 from database import DatabaseService
 from emotion_validator import EmotionData, validate_emotion_result
+from auth import authenticate
 from pii_scrubber import ScrubberOptions, scan_for_pii, scrub_pii
 
 # Configure logging
@@ -52,6 +53,7 @@ def health_check():
 
 
 @app.route("/api/security/scrub-pii", methods=["POST"])
+@authenticate
 def scrub_pii_endpoint():
     """
     Scrub PII from text
@@ -82,6 +84,7 @@ def scrub_pii_endpoint():
 
 
 @app.route("/api/security/detect-crisis", methods=["POST"])
+@authenticate
 def detect_crisis_endpoint():
     """
     Detect crisis signals in text
@@ -123,6 +126,7 @@ def detect_crisis_endpoint():
 
 
 @app.route("/api/emotion/validate", methods=["POST"])
+@authenticate
 def validate_emotion_endpoint():
     """
     Validate emotion detection result
@@ -144,6 +148,7 @@ def validate_emotion_endpoint():
 
 
 @app.route("/api/bias/analyze-session", methods=["POST"])
+@authenticate
 def analyze_bias_endpoint():
     """
     Analyze therapeutic session for bias
@@ -165,6 +170,7 @@ def analyze_bias_endpoint():
 
 
 @app.route("/api/combined/analyze-conversation", methods=["POST"])
+@authenticate
 def analyze_conversation_endpoint():
     """
     Combined analysis: PII, crisis, emotion, and bias
