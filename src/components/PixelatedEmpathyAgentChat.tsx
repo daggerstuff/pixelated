@@ -50,26 +50,28 @@ const isTherapeuticScenario = (
   const scenario = value
 
   if (
-    typeof scenario.scenario_id !== 'string' ||
-    typeof scenario.client_background !== 'string' ||
-    typeof scenario.presenting_problem !== 'string' ||
-    !hasStringArray(scenario.session_goals) ||
-    !hasStringArray(scenario.expected_challenges) ||
-    !isRecord(scenario.assessment_criteria)
+    typeof scenario['scenario_id'] !== 'string' ||
+    typeof scenario['client_background'] !== 'string' ||
+    typeof scenario['presenting_problem'] !== 'string' ||
+    !hasStringArray(scenario['session_goals']) ||
+    !hasStringArray(scenario['expected_challenges']) ||
+    !isRecord(scenario['assessment_criteria'])
+  ) {
+    return false
+  }
+
+  const assessmentCriteria = scenario['assessment_criteria']
+
+  if (
+    !hasStringArray(assessmentCriteria['therapeutic_alliance']) ||
+    !hasStringArray(assessmentCriteria['intervention_quality'])
   ) {
     return false
   }
 
   if (
-    !hasStringArray(scenario.assessment_criteria.therapeutic_alliance) ||
-    !hasStringArray(scenario.assessment_criteria.intervention_quality)
-  ) {
-    return false
-  }
-
-  if (
-    scenario.assessment_criteria.crisis_management !== undefined &&
-    !hasStringArray(scenario.assessment_criteria.crisis_management)
+    assessmentCriteria['crisis_management'] !== undefined &&
+    !hasStringArray(assessmentCriteria['crisis_management'])
   ) {
     return false
   }
