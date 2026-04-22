@@ -1,7 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-import { DocumentChangeEvent } from '../services/socketService.js'
 import { WebSocketClient } from '../services/websocketClient.js'
+
+interface DocumentChangeEvent {
+  type: 'insert' | 'delete' | 'format'
+  position: { line: number; column: number }
+  content?: string
+  userId: string
+}
 
 interface UseCollaborationProps {
   token: string

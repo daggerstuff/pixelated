@@ -69,7 +69,8 @@ export const verifyTwoFactorToken = async (
   const attempts = await getFromCache<{ count?: number }>(
     `2fa:attempts:${verification.userId}`,
   )
-  if (attempts && attempts.count >= 3) {
+  const attemptCount = attempts?.count ?? 0
+  if (attemptCount >= 3) {
     throw new Error('Account is locked')
   }
   return true

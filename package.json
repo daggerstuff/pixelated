@@ -543,6 +543,8 @@
       "js-yaml": "4.1.1",
       "yaml-language-server": "1.22.0",
       "@modelcontextprotocol/sdk": "^1.29.0",
+      "teeny-request": "10.1.2",
+      "@tootallnate/once": "^3.0.1",
       "undici": "^7.25.0",
       "@cloudflare/mcp-server-cloudflare>@modelcontextprotocol/sdk": "^1.29.0",
       "@cloudflare/mcp-server-cloudflare>undici": "^7.25.0"

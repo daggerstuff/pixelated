@@ -46,7 +46,7 @@ export default function useConversionTracking(
 
     // Send initial page view event
     const path = window.location.pathname
-    void trackEvent('page_view', { path })
+    void trackEvent({ type: 'page_view', properties: { path } })
 
     // Initialize any funnels
     funnels.forEach((funnel) => {
