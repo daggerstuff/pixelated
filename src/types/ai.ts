@@ -7,6 +7,19 @@ export interface SessionData {
   stressLevel: number
   effectiveness?: number
   riskScore?: number
+  transcript?: string
+  emotionAnalysis?: {
+    moodScore?: number
+    anxiety?: number
+    dominantEmotion?: string
+  }
+  therapeuticMetrics?: {
+    rapport?: number
+  }
+  homeworkAssigned?: boolean
+  homeworkCompleted?: boolean
+  medicationAdherence?: number
+  [key: string]: unknown
 }
 
 export interface PatientData {
@@ -31,19 +44,36 @@ export interface PatientProfile {
   currentMedications?: string[]
   riskFactors?: string[]
   preferences?: Record<string, unknown>
+  baselineMetrics?: {
+    anxiety?: number
+    mood?: number
+    stress?: number
+  }
+  sessionHistory?: Array<{
+    emotionAnalysis?: {
+      dominantEmotion?: string
+      moodScore?: number
+    }
+  }>
+  medication?: string | string[]
+  daysSinceLastSession?: number
 }
 
 // Intervention type for treatment
 export interface Intervention {
   id: string
-  type: 'therapy' | 'medication' | 'behavioral' | 'support'
+  type: 'therapy' | 'medication' | 'behavioral' | 'support' | string
   name: string
+  title?: string
   description?: string
-  startDate: Date
+  startDate?: Date
   endDate?: Date
+  category?: string
+  actions?: string[]
   frequency?: string
   dosage?: string
   notes?: string[]
+  priority?: 'low' | 'medium' | 'high' | 'critical'
 }
 
 // Model performance metrics
