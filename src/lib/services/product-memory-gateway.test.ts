@@ -29,6 +29,8 @@ describe("ProductMemoryGateway", () => {
     agentId: "agent-456",
     runId: "run-789",
     includeShared: true,
+    accountId: undefined,
+    workspaceId: undefined,
   };
 
   let client: ReturnType<typeof createClientMock>;
@@ -284,5 +286,225 @@ describe("ProductMemoryGateway", () => {
       category: undefined,
       metadata: {},
     });
+  });
+
+  it("handles createMemory failures from internal service", async () => {
+    client.addMemory.mockRejectedValue(
+      new InternalMemoryServiceError("Database error", 500, {
+        error: "connection failed",
+      }),
+    );
+
+    await expect(
+      gateway.createMemory({
+        ...scope,
+        content: "Test memory",
+      }),
+    ).rejects.toMatchObject({
+      name: "ProductMemoryGatewayError",
+      status: 500,
+      message: "Database error",
+      details: { error: "connection failed" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("handles listMemories failures from internal service", async () => {
+    client.listMemories.mockRejectedValue(
+      new InternalMemoryServiceError("Query timeout", 504, {
+        error: "timeout",
+      }),
+    );
+
+    await expect(
+      gateway.listMemories({
+        ...scope,
+        limit: 10,
+      }),
+    ).rejects.toMatchObject({
+      name: "ProductMemoryGatewayError",
+      status: 504,
+      message: "Query timeout",
+      details: { error: "timeout" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("handles getMemory failures from internal service (non-404)", async () => {
+    client.getMemory.mockRejectedValue(
+      new InternalMemoryServiceError("Not authorized", 403, {
+        error: "access denied",
+      }),
+    );
+
+    await expect(
+      gateway.getMemory({
+        ...scope,
+        memoryId: "mem-1",
+      }),
+    ).rejects.toMatchObject({
+      name: "ProductMemoryGatewayError",
+      status: 403,
+      message: "Not authorized",
+      details: { error: "access denied" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("handles updateMemory failures from internal service", async () => {
+    // Mock getMemory to return a valid memory so ownership check passes
+    client.getMemory.mockResolvedValue({
+      id: "mem-1",
+      content: "existing",
+      metadata: {},
+    });
+    client.updateMemory.mockRejectedValue(
+      new InternalMemoryServiceError("Validation failed", 422, {
+        error: "invalid content",
+      }),
+    );
+
+    await expect(
+      gateway.updateMemory({
+        ...scope,
+        memoryId: "mem-1",
+        content: "Test",
+      }),
+    ).rejects.toMatchObject({
+      name: "ProductMemoryGatewayError",
+      status: 422,
+      message: "Validation failed",
+      details: { error: "invalid content" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("handles deleteMemory failures from internal service", async () => {
+    // Mock getMemory to return a valid memory so ownership check passes
+    client.getMemory.mockResolvedValue({
+      id: "mem-1",
+      content: "existing",
+      metadata: {},
+    });
+    client.deleteMemory.mockRejectedValue(
+      new InternalMemoryServiceError("Foreign key constraint", 409, {
+        error: "referenced elsewhere",
+      }),
+    );
+
+    await expect(
+      gateway.deleteMemory({
+        ...scope,
+        memoryId: "mem-1",
+      }),
+    ).rejects.toMatchObject({
+      name: "ProductMemoryGatewayError",
+      status: 409,
+      message: "Foreign key constraint",
+      details: { error: "referenced elsewhere" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("handles getMemoryStats failures from internal service", async () => {
+    client.getMemoryStats.mockRejectedValue(
+      new InternalMemoryServiceError("Stats unavailable", 503, {
+        error: "service down",
+      }),
+    );
+
+    await expect(
+      gateway.getMemoryStats({
+        ...scope,
+      }),
+    ).rejects.toMatchObject({
+      name: "ProductMemoryGatewayError",
+      status: 503,
+      message: "Stats unavailable",
+      details: { error: "service down" },
+    } satisfies Partial<ProductMemoryGatewayError>);
+  });
+
+  it("preserves metadata when creating memory with complex nested objects", async () => {
+    const complexMetadata = {
+      preferences: {
+        theme: "dark",
+        notifications: {
+          email: true,
+          push: false,
+        },
+      },
+      tags: ["work", "personal", "important"],
+      scores: [8.5, 9.2, 7.8],
+    };
+
+    client.addMemory.mockResolvedValue({ memory_id: "mem-complex" });
+
+    await expect(
+      gateway.createMemory({
+        ...scope,
+        content: "Complex metadata test",
+        metadata: complexMetadata,
+      }),
+    ).resolves.toEqual({
+      id: "mem-complex",
+      content: "Complex metadata test",
+      metadata: complexMetadata,
+    });
+
+    expect(client.addMemory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: complexMetadata,
+      }),
+    );
+  });
+
+  it("respects includeShared flag when listing memories", async () => {
+    client.listMemories.mockResolvedValue({
+      count: 2,
+      memories: [
+        {
+          id: "mem-private",
+          memory: "Private memory",
+          metadata: { visibility: "private" },
+          created_at: "2026-04-06T00:00:00.000Z",
+          updatedAt: "2026-04-06T01:00:00.000Z",
+        },
+        {
+          id: "mem-shared",
+          memory: "Shared memory",
+          metadata: { visibility: "shared" },
+          created_at: "2026-04-05T00:00:00.000Z",
+          updatedAt: "2026-04-05T01:00:00.000Z",
+        },
+      ],
+    });
+
+    // Test with includeShared: true (default)
+    await gateway.listMemories({
+      ...scope,
+      includeShared: true,
+    });
+
+    expect(client.listMemories).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        ...scope,
+        includeShared: true,
+        limit: 10,
+        offset: 0,
+      }),
+    );
+
+    // Test with includeShared: false
+    await gateway.listMemories({
+      ...scope,
+      includeShared: false,
+    });
+
+    expect(client.listMemories).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        ...scope,
+        includeShared: false,
+        limit: 10,
+        offset: 0,
+      }),
+    );
   });
 });
