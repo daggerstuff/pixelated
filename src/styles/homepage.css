@@ -165,7 +165,6 @@
 .pe-home-copy,
 .pe-page-copy,
 .pe-home-prose p {
-  margin: 0;
   max-width: 58ch;
   font-family: var(--font-mono);
   font-size: 1rem;
