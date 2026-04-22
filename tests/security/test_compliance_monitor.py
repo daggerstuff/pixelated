@@ -2,7 +2,9 @@ import importlib.util
 import sys
 from pathlib import Path
 from unittest.mock import patch
+
 import pytest
+
 
 @pytest.fixture(scope="session")
 def compliance_module(request):
@@ -12,22 +14,22 @@ def compliance_module(request):
     """
     file_path = Path(request.config.rootpath) / "security" / "compliance-monitor.py"
     module_name = "_compliance_monitor_under_test"
-    
+
     # Remove if already exists to force reload
     if module_name in sys.modules:
         del sys.modules[module_name]
-        
+
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
         pytest.fail(f"Could not load compliance-monitor.py from {file_path}")
-    
+
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     try:
         spec.loader.exec_module(module)
     except Exception as e:
         pytest.fail(f"Execution of compliance-monitor.py failed: {e}")
-        
+
     return module
 
 @pytest.fixture
@@ -36,7 +38,7 @@ def monitor(compliance_module):
     return compliance_module.ComplianceMonitor()
 
 class TestComplianceMonitor:
-    
+
     def test_check_access_controls_compliant(self, monitor):
         """Should return True when both JWT_SECRET and ENCRYPTION_KEY are set."""
         with patch.dict("os.environ", {"JWT_SECRET": "secret", "ENCRYPTION_KEY": "key"}, clear=True):
@@ -47,11 +49,11 @@ class TestComplianceMonitor:
         # Test completely empty environment
         with patch.dict("os.environ", {}, clear=True):
             assert monitor.check_access_controls() is False
-            
+
         # Test missing ENCRYPTION_KEY
         with patch.dict("os.environ", {"JWT_SECRET": "secret"}, clear=True):
             assert monitor.check_access_controls() is False
-            
+
         # Test missing JWT_SECRET
         with patch.dict("os.environ", {"ENCRYPTION_KEY": "key"}, clear=True):
             assert monitor.check_access_controls() is False
@@ -75,14 +77,14 @@ class TestComplianceMonitor:
         """Should return False when FORCE_SSL is not true."""
         with patch.dict("os.environ", {"FORCE_SSL": "false"}, clear=True):
             assert monitor.check_data_encryption() is False
-        
+
         with patch.dict("os.environ", {}, clear=True):
             assert monitor.check_data_encryption() is False
 
     def test_generate_compliance_report_structure(self, monitor):
         """Should generate a report with the expected keys and types."""
         report = monitor.generate_compliance_report()
-        
+
         assert "timestamp" in report
         assert "overall_compliance_score" in report
         assert "compliance_monitoring" in report

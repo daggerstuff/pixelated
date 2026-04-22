@@ -10,15 +10,16 @@ Tests cover:
 
 import pytest
 
+from ai.memory.letta_crisis_handler import (
+    CrisisSeverity,
+    LettaCrisisHandler,
+)
+
 # Test imports
 from ai.memory.letta_pii_middleware import (
     LettaPIIMiddleware,
     PIIBlockedException,
     PIISeverity,
-)
-from ai.memory.letta_crisis_handler import (
-    LettaCrisisHandler,
-    CrisisSeverity,
 )
 
 
@@ -289,7 +290,6 @@ class TestCrisisHandlerBlocking:
         handler = LettaCrisisHandler(detector)
 
         # Create critical result manually
-        from dataclasses import replace
         result = await handler.check_message("I want to end my life")
 
         assert handler.should_block_operation(result, "file_write") is True

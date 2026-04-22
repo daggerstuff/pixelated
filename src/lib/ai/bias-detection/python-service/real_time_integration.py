@@ -13,28 +13,21 @@ Key Features:
 """
 
 import asyncio
-import json
 import logging
-import time
+from asyncio import Queue
 from collections import deque
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Callable
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any
 
 import numpy as np
-from asyncio import Queue
+from bias_detection.sentry_metrics import bias_metrics
 
 # Import existing bias detection components
-from bias_detection_service import BiasDetectionService, SessionData, BiasDetectionConfig
+from bias_detection_service import BiasDetectionConfig, BiasDetectionService, SessionData
 from real_ml_models import (
-    real_fairlearn_analyzer,
-    real_interpretability_analyzer,
-    real_hf_analyzer,
-    get_real_fairlearn_analysis,
-    get_real_interpretability_analysis,
     get_real_hf_analysis,
 )
-from bias_detection.sentry_metrics import bias_metrics, track_latency
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +38,10 @@ class StreamingSession:
     session_id: str
     user_id: str
     start_time: datetime
-    demographics: Dict[str, Any]
+    demographics: dict[str, Any]
     conversation_buffer: deque = field(default_factory=lambda: deque(maxlen=100))
-    bias_scores: List[float] = field(default_factory=list)
-    alert_history: List[Dict[str, Any]] = field(default_factory=list)
+    bias_scores: list[float] = field(default_factory=list)
+    alert_history: list[dict[str, Any]] = field(default_factory=list)
     last_analysis_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     analysis_interval: float = 5.0  # Analyze every 5 seconds
     streaming_active: bool = True
@@ -60,7 +53,7 @@ class RealTimeBiasDetector:
     def __init__(self, config: BiasDetectionConfig):
         self.config = config
         self.bias_service = BiasDetectionService(config)
-        self.active_sessions: Dict[str, StreamingSession] = {}
+        self.active_sessions: dict[str, StreamingSession] = {}
         self.analysis_queue: Queue = Queue()
         self.feedback_queue: Queue = Queue()
         self.memory_update_queue: Queue = Queue()
@@ -80,7 +73,7 @@ class RealTimeBiasDetector:
         self,
         session_id: str,
         user_id: str,
-        demographics: Dict[str, Any]
+        demographics: dict[str, Any]
     ) -> StreamingSession:
         """Start a new streaming bias detection session"""
         session = StreamingSession(
@@ -102,7 +95,7 @@ class RealTimeBiasDetector:
     async def process_conversation_chunk(
         self,
         session_id: str,
-        conversation_chunk: Dict[str, Any]
+        conversation_chunk: dict[str, Any]
     ) -> None:
         """Process a chunk of conversation data in real-time"""
         if session_id not in self.active_sessions:
@@ -113,10 +106,10 @@ class RealTimeBiasDetector:
 
         # Add to conversation buffer
         session.conversation_buffer.append({
-            'timestamp': datetime.now(timezone.utc),
-            'content': conversation_chunk.get('content', ''),
-            'speaker': conversation_chunk.get('speaker', 'unknown'),
-            'metadata': conversation_chunk.get('metadata', {})
+            "timestamp": datetime.now(timezone.utc),
+            "content": conversation_chunk.get("content", ""),
+            "speaker": conversation_chunk.get("speaker", "unknown"),
+            "metadata": conversation_chunk.get("metadata", {})
         })
 
         # Trigger immediate analysis if buffer is large enough
@@ -145,18 +138,18 @@ class RealTimeBiasDetector:
                 logger.error(f"Error monitoring conversation for session {session.session_id}: {e}")
                 await asyncio.sleep(5.0)
 
-    async def _quick_bias_check(self, conversation_chunk: List[Dict[str, Any]]) -> float:
+    async def _quick_bias_check(self, conversation_chunk: list[dict[str, Any]]) -> float:
         """Perform quick bias check on conversation chunk"""
         try:
             # Extract text content
-            text_content = " ".join([msg.get('content', '') for msg in conversation_chunk])
+            text_content = " ".join([msg.get("content", "") for msg in conversation_chunk])
 
             if not text_content.strip():
                 return 0.0
 
             # Use Hugging Face analyzer for quick check
             hf_result = await get_real_hf_analysis(text_content)
-            bias_score = hf_result.get('bias_score', 0.0)
+            bias_score = hf_result.get("bias_score", 0.0)
 
             # Track metric
             bias_metrics.linguistic_bias_detected("real_time", bias_score)
@@ -186,23 +179,23 @@ class RealTimeBiasDetector:
                         )
 
                     # Update session with results
-                    session.bias_scores.append(result['overall_bias_score'])
+                    session.bias_scores.append(result["overall_bias_score"])
                     session.last_analysis_time = current_time
 
                     # Check for alerts
-                    if result['alert_level'] != 'low':
+                    if result["alert_level"] != "low":
                         session.alert_history.append({
-                            'timestamp': current_time,
-                            'alert_level': result['alert_level'],
-                            'bias_score': result['overall_bias_score'],
-                            'recommendations': result['recommendations']
+                            "timestamp": current_time,
+                            "alert_level": result["alert_level"],
+                            "bias_score": result["overall_bias_score"],
+                            "recommendations": result["recommendations"]
                         })
 
                     # Send to feedback loop
                     await self.feedback_queue.put({
-                        'session_id': session.session_id,
-                        'analysis_result': result,
-                        'timestamp': current_time
+                        "session_id": session.session_id,
+                        "analysis_result": result,
+                        "timestamp": current_time
                     })
 
                     logger.info(f"Periodic analysis completed for session {session.session_id}")
@@ -217,34 +210,34 @@ class RealTimeBiasDetector:
         """Create SessionData from conversation buffer"""
         # Extract conversation content
         conversation_text = " ".join([
-            msg.get('content', '') for msg in session.conversation_buffer
+            msg.get("content", "") for msg in session.conversation_buffer
         ])
 
         # Create AI responses from conversation
         ai_responses = []
         for msg in session.conversation_buffer:
-            if msg.get('speaker') == 'ai':
+            if msg.get("speaker") == "ai":
                 ai_responses.append({
-                    'content': msg.get('content', ''),
-                    'response_time': 0.5,  # Placeholder
-                    'timestamp': msg.get('timestamp', datetime.now(timezone.utc)).isoformat()
+                    "content": msg.get("content", ""),
+                    "response_time": 0.5,  # Placeholder
+                    "timestamp": msg.get("timestamp", datetime.now(timezone.utc)).isoformat()
                 })
 
         return SessionData(
             session_id=session.session_id,
             participant_demographics=session.demographics,
-            training_scenario={'type': 'real_time_conversation'},
-            content={'conversation': conversation_text},
+            training_scenario={"type": "real_time_conversation"},
+            content={"conversation": conversation_text},
             ai_responses=ai_responses,
             expected_outcomes=[],
             transcripts=[{
-                'text': conversation_text,
-                'timestamp': datetime.now(timezone.utc).isoformat()
+                "text": conversation_text,
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }],
             metadata={
-                'streaming_session': True,
-                'buffer_size': len(session.conversation_buffer),
-                'analysis_count': len(session.bias_scores)
+                "streaming_session": True,
+                "buffer_size": len(session.conversation_buffer),
+                "analysis_count": len(session.bias_scores)
             }
         )
 
@@ -267,26 +260,26 @@ class RealTimeBiasDetector:
         # Here you could integrate with notification systems
         # For now, just log and update session
         session.alert_history.append({
-            'timestamp': datetime.now(timezone.utc),
-            'alert_level': alert_level,
-            'bias_score': bias_score,
-            'type': 'real_time'
+            "timestamp": datetime.now(timezone.utc),
+            "alert_level": alert_level,
+            "bias_score": bias_score,
+            "type": "real_time"
         })
 
     async def process_feedback(
         self,
         session_id: str,
-        feedback: Dict[str, Any]
+        feedback: dict[str, Any]
     ) -> None:
         """Process feedback for continuous learning"""
         try:
             # Validate feedback
-            if 'corrected_bias_score' not in feedback:
+            if "corrected_bias_score" not in feedback:
                 logger.warning("Feedback missing corrected_bias_score")
                 return
 
-            corrected_score = feedback['corrected_bias_score']
-            original_score = feedback.get('original_bias_score', 0.0)
+            corrected_score = feedback["corrected_bias_score"]
+            original_score = feedback.get("original_bias_score", 0.0)
 
             # Calculate adjustment
             adjustment = corrected_score - original_score
@@ -296,11 +289,11 @@ class RealTimeBiasDetector:
 
             # Send to memory update queue
             await self.memory_update_queue.put({
-                'type': 'feedback',
-                'session_id': session_id,
-                'feedback': feedback,
-                'adjustment': adjustment,
-                'timestamp': datetime.now(timezone.utc)
+                "type": "feedback",
+                "session_id": session_id,
+                "feedback": feedback,
+                "adjustment": adjustment,
+                "timestamp": datetime.now(timezone.utc)
             })
 
             logger.info(f"Processed feedback for session {session_id}: adjustment={adjustment}")
@@ -312,7 +305,7 @@ class RealTimeBiasDetector:
         self,
         session_id: str,
         adjustment: float,
-        feedback: Dict[str, Any]
+        feedback: dict[str, Any]
     ) -> None:
         """Update model weights based on feedback for continuous learning"""
         try:
@@ -343,7 +336,7 @@ class RealTimeBiasDetector:
         except Exception as e:
             logger.error(f"Error updating model weights: {e}")
 
-    async def get_session_insights(self, session_id: str) -> Dict[str, Any]:
+    async def get_session_insights(self, session_id: str) -> dict[str, Any]:
         """Get insights for a streaming session"""
         if session_id not in self.active_sessions:
             return {"error": "Session not found"}
@@ -373,7 +366,7 @@ class RealTimeBiasDetector:
             ).total_seconds()
         }
 
-    async def stop_streaming_session(self, session_id: str) -> Dict[str, Any]:
+    async def stop_streaming_session(self, session_id: str) -> dict[str, Any]:
         """Stop a streaming session and return final insights"""
         if session_id not in self.active_sessions:
             return {"error": "Session not found"}
@@ -407,9 +400,9 @@ class RealTimeBiasDetector:
             try:
                 update = await self.memory_update_queue.get()
 
-                if update['type'] == 'feedback':
+                if update["type"] == "feedback":
                     # Process feedback for memory updates
-                    feedback_data = update['feedback']
+                    feedback_data = update["feedback"]
 
                     # Here you would integrate with the memory system
                     # For now, just log the update
@@ -426,10 +419,10 @@ class RealTimeBiasDetector:
 
 
 # Global instance for easy access
-real_time_detector: Optional[RealTimeBiasDetector] = None
+real_time_detector: RealTimeBiasDetector | None = None
 
 
-async def initialize_real_time_detector(config: Optional[BiasDetectionConfig] = None) -> RealTimeBiasDetector:
+async def initialize_real_time_detector(config: BiasDetectionConfig | None = None) -> RealTimeBiasDetector:
     """Initialize the global real-time bias detector"""
     global real_time_detector
 
@@ -457,8 +450,8 @@ async def get_real_time_detector() -> RealTimeBiasDetector:
 async def start_real_time_session(
     session_id: str,
     user_id: str,
-    demographics: Dict[str, Any]
-) -> Dict[str, Any]:
+    demographics: dict[str, Any]
+) -> dict[str, Any]:
     """API endpoint to start real-time bias detection session"""
     detector = await get_real_time_detector()
     session = await detector.start_streaming_session(session_id, user_id, demographics)
@@ -473,8 +466,8 @@ async def start_real_time_session(
 
 async def process_conversation_chunk(
     session_id: str,
-    conversation_chunk: Dict[str, Any]
-) -> Dict[str, Any]:
+    conversation_chunk: dict[str, Any]
+) -> dict[str, Any]:
     """API endpoint to process conversation chunk in real-time"""
     detector = await get_real_time_detector()
     await detector.process_conversation_chunk(session_id, conversation_chunk)
@@ -488,8 +481,8 @@ async def process_conversation_chunk(
 
 async def submit_feedback(
     session_id: str,
-    feedback: Dict[str, Any]
-) -> Dict[str, Any]:
+    feedback: dict[str, Any]
+) -> dict[str, Any]:
     """API endpoint to submit feedback for continuous learning"""
     detector = await get_real_time_detector()
     await detector.process_feedback(session_id, feedback)
@@ -501,13 +494,13 @@ async def submit_feedback(
     }
 
 
-async def get_session_insights(session_id: str) -> Dict[str, Any]:
+async def get_session_insights(session_id: str) -> dict[str, Any]:
     """API endpoint to get session insights"""
     detector = await get_real_time_detector()
     return await detector.get_session_insights(session_id)
 
 
-async def stop_real_time_session(session_id: str) -> Dict[str, Any]:
+async def stop_real_time_session(session_id: str) -> dict[str, Any]:
     """API endpoint to stop real-time session"""
     detector = await get_real_time_detector()
     return await detector.stop_streaming_session(session_id)

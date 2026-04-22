@@ -12,7 +12,6 @@ Note: Some tests require NVIDIA_API_KEY for live API calls.
 These tests are skipped if the key is not available.
 """
 
-import asyncio
 import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -300,8 +299,9 @@ class TestQueryComplexity:
 
     def test_simple_query_classification(self, mock_config):
         """Test simple query detection."""
-        from ai.rag.nemotron_rag import QueryComplexity
         from unittest.mock import patch
+
+        from ai.rag.nemotron_rag import QueryComplexity
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
@@ -314,8 +314,9 @@ class TestQueryComplexity:
 
     def test_moderate_query_classification(self, mock_config):
         """Test moderate complexity query detection."""
-        from ai.rag.nemotron_rag import QueryComplexity
         from unittest.mock import patch
+
+        from ai.rag.nemotron_rag import QueryComplexity
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
@@ -327,8 +328,9 @@ class TestQueryComplexity:
 
     def test_complex_query_classification(self, mock_config):
         """Test complex query detection."""
-        from ai.rag.nemotron_rag import QueryComplexity
         from unittest.mock import patch
+
+        from ai.rag.nemotron_rag import QueryComplexity
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
@@ -342,8 +344,9 @@ class TestQueryComplexity:
 
     def test_crisis_query_classification(self, mock_config):
         """Test crisis query detection."""
-        from ai.rag.nemotron_rag import QueryComplexity
         from unittest.mock import patch
+
+        from ai.rag.nemotron_rag import QueryComplexity
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
@@ -357,8 +360,9 @@ class TestQueryComplexity:
 
     def test_model_selection_by_complexity(self, mock_config):
         """Test model selection based on complexity."""
-        from ai.rag.nemotron_rag import QueryComplexity
         from unittest.mock import patch
+
+        from ai.rag.nemotron_rag import QueryComplexity
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
@@ -530,7 +534,6 @@ class TestRAGPipelineIntegration:
     async def test_live_query(self, live_config):
         """Test live RAG query."""
         from ai.rag.nemotron_rag import (
-            KnowledgeCategory,
             TherapeuticRAGPipeline,
         )
 

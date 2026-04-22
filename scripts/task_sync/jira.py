@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from urllib import parse
 
-from .config import _strip_env, _load_internal_config, _write_internal_config
+from .config import _load_internal_config, _strip_env, _write_internal_config
 from .utils import _json_request, _object_view
 
 DEFAULT_JIRA_PROJECT_NAME = "Pixelated Empathy"

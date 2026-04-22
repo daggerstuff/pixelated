@@ -25,13 +25,12 @@ if scripts_path not in sys.path:
     sys.path.insert(0, scripts_path)
 
 # Import after path modification
-import extract_books
 from extract_books import (
+    CHAPTER_PATTERNS,
+    THERAPEUTIC_KEYWORDS,
+    BookSegment,
     BooksExtractionConfig,
     BooksExtractor,
-    BookSegment,
-    THERAPEUTIC_KEYWORDS,
-    CHAPTER_PATTERNS,
 )
 
 

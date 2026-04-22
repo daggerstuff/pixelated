@@ -27,7 +27,6 @@ import pytest
 from minio import Minio
 from minio.error import S3Error
 
-
 # Test configuration
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "localhost:9000")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")

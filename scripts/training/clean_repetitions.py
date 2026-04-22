@@ -16,12 +16,11 @@ import argparse
 import json
 import re
 import sys
-from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 
-def detect_ngram_repetitions(text: str, n: int = 3, threshold: int = 3) -> Tuple[bool, List[str]]:
+def detect_ngram_repetitions(text: str, n: int = 3, threshold: int = 3) -> tuple[bool, list[str]]:
     """
     Detect if text has n-gram repeated threshold+ times.
 
@@ -59,7 +58,7 @@ def detect_ngram_repetitions(text: str, n: int = 3, threshold: int = 3) -> Tuple
 
 def detect_char_repetitions(
     text: str, min_len: int = 4, threshold: int = 5
-) -> Tuple[bool, List[str]]:
+) -> tuple[bool, list[str]]:
     """
     Detect repeated character sequences (e.g., "aaaaaa", "!!!!!!").
 
@@ -88,7 +87,7 @@ def detect_char_repetitions(
     return len(sequences) > 0, sequences
 
 
-def detect_word_repetitions(text: str, threshold: int = 4) -> Tuple[bool, List[str]]:
+def detect_word_repetitions(text: str, threshold: int = 4) -> tuple[bool, list[str]]:
     """
     Detect same word repeated many times consecutively.
 
@@ -122,7 +121,7 @@ def detect_word_repetitions(text: str, threshold: int = 4) -> Tuple[bool, List[s
     return len(repeated_words) > 0, repeated_words
 
 
-def analyze_sample(sample: Dict[str, Any]) -> Dict[str, Any]:
+def analyze_sample(sample: dict[str, Any]) -> dict[str, Any]:
     """
     Analyze a training sample for repetition issues.
 
@@ -185,7 +184,7 @@ def analyze_sample(sample: Dict[str, Any]) -> Dict[str, Any]:
 
 def clean_jsonl_file(
     input_path: str, output_path: str, verbose: bool = False, dry_run: bool = False
-) -> Tuple[int, int, List[Dict]]:
+) -> tuple[int, int, list[dict]]:
     """
     Clean a JSONL file by removing samples with repetitions.
 

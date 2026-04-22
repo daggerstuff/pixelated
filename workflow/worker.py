@@ -13,13 +13,10 @@ Features:
 """
 
 import json
-import sqlite3
-import os
 import random
+import sqlite3
 import string
 from datetime import datetime, timezone
-import subprocess
-from collections import defaultdict
 from pathlib import Path
 
 # --------------------------- Paths ---------------------------
@@ -37,18 +34,18 @@ SAFETY_TRIGGERS = {"suicidal", "self-harm", "harm to others", "weapon", "plan"}
 def log_event(event_id: str, message: str):
     timestamp = datetime.now(timezone.utc).isoformat()
     entry = json.dumps({"event_id": event_id, "timestamp": timestamp, "message": message})
-    
+
     # Ensure log directory exists (Review suggestion)
     log_file = Path(LOG_PATH)
     log_file.parent.mkdir(parents=True, exist_ok=True)
-    
+
     with log_file.open("a") as f:
         f.write(entry + "\n")
 
 # --------------------------- Opaque IDs ---------------------------
 def generate_opaque_id(length: int = 8) -> str:
     alphabet = string.ascii_lowercase + string.digits
-    return ''.join(random.choice(alphabet) for _ in range(length))
+    return "".join(random.choice(alphabet) for _ in range(length))
 
 # --------------------------- Schema Setup ---------------------------
 CREATE_SCHEMA = """

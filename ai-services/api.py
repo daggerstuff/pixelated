@@ -13,11 +13,11 @@ from flask_cors import CORS
 # Add security module to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "security"))
 
+from auth import authenticate
 from bias_detector import TherapeuticSession, analyze_session_bias
 from crisis_detection import detect_crisis_signals
 from database import DatabaseService
 from emotion_validator import EmotionData, validate_emotion_result
-from auth import authenticate
 from pii_scrubber import ScrubberOptions, scan_for_pii, scrub_pii
 
 # Configure logging
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     # Control debug mode via environment variable for security
     # Set FLASK_DEBUG=1 or DEBUG=1 to enable debug mode in development
     debug_mode = os.environ.get("FLASK_DEBUG", "").lower() in ("1", "true", "yes") or os.environ.get("DEBUG", "").lower() in ("1", "true", "yes")
-    
+
     logger.info("Starting Pixelated Empathy Therapeutic AI API")
     logger.info(f"Mode: {'DEBUG' if debug_mode else 'PRODUCTION'}")
     logger.info("Listening on http://0.0.0.0:5000")

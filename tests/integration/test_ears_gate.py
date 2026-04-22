@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_ears_gate_class_exists():

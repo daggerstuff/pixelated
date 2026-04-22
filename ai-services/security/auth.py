@@ -4,11 +4,12 @@ Implements 401-Triggered JWKS cache invalidation.
 """
 
 import logging
-from dataclasses import dataclass
-from typing import Literal, Union, Optional, Dict
-from functools import wraps
-from flask import request, jsonify
 import time
+from dataclasses import dataclass
+from functools import wraps
+from typing import Literal, Union
+
+from flask import jsonify, request
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +64,8 @@ def authenticate(f):
         if not client_id:
              return jsonify({"error": "Missing X-Pixelated-Client header"}), 401
 
-        context: Optional[AuthContext] = None
-        
+        context: AuthContext | None = None
+
         try:
             if api_key:
                 # Developer path
@@ -72,19 +73,19 @@ def authenticate(f):
             elif auth_header:
                 # User path
                 context = UserContext(user_id="user_123")
-            
+
             if not context:
                 # Trigger cache flush on failure
                 jwks_cache.invalidate()
                 return jsonify({"error": "Unauthorized"}), 401
-                
+
             # Attach context to request for downstream use
             request.auth_context = context
             return f(*args, **kwargs)
-            
+
         except Exception as e:
             logger.error(f"Auth error: {e}")
             jwks_cache.invalidate()
             return jsonify({"error": "Authentication failed"}), 401
-            
+
     return decorated

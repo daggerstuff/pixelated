@@ -11,9 +11,11 @@ Usage:
 
 import argparse
 from pathlib import Path
+
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 def main():
     parser = argparse.ArgumentParser(description="Merge LoRA adapter into base model")
