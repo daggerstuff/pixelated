@@ -44,6 +44,7 @@
     "redis": "^4.7.1",
     "socket.io": "^4.8.3",
     "uuid": "^9.0.1",
+    "aws-sdk": "^2.1692.0",
     "winston": "^3.19.0"
   },
   "devDependencies": {
