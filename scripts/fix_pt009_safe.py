@@ -1,7 +1,7 @@
-import os
-import re
 import json
+import re
 import subprocess
+
 
 def fix_pt009_safe():
     # Get JSON output from ruff for PT009
@@ -10,7 +10,7 @@ def fix_pt009_safe():
         capture_output=True,
         text=True
     )
-    
+
     try:
         diagnostics = json.loads(result.stdout)
     except:
@@ -28,64 +28,64 @@ def fix_pt009_safe():
 
     files_modified = 0
     for fname, diags in file_map.items():
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
-            
+
         # Sort diagnostics by row descending
         diags.sort(key=lambda x: x["location"]["row"], reverse=True)
-        
+
         modified = False
         needs_pytest_approx = False
-        
+
         for diag in diags:
             row = diag["location"]["row"] - 1
             line = lines[row]
-            
+
             # Skip if it's not a simple one-liner
-            if line.strip().endswith('(') or row + 1 < len(lines) and lines[row+1].strip().startswith(')'):
+            if line.strip().endswith("(") or row + 1 < len(lines) and lines[row+1].strip().startswith(")"):
                 # Potential multiline, skip for safety in this batch
                 continue
 
             # 1. Handle assertTrue(x) -> assert x
-            if 'self.assertTrue' in line:
-                m = re.search(r'(\s+)self\.assertTrue\((.*)\)', line)
+            if "self.assertTrue" in line:
+                m = re.search(r"(\s+)self\.assertTrue\((.*)\)", line)
                 if m:
                     indent, expr = m.groups()
-                    if expr.count('(') == expr.count(')'): # Basic check for matched parens in one line
+                    if expr.count("(") == expr.count(")"): # Basic check for matched parens in one line
                          lines[row] = f"{indent}assert {expr.strip()}\n"
                          modified = True
                          continue
 
             # 2. Handle assertFalse(x) -> assert not x
-            if 'self.assertFalse' in line:
-                m = re.search(r'(\s+)self\.assertFalse\((.*)\)', line)
+            if "self.assertFalse" in line:
+                m = re.search(r"(\s+)self\.assertFalse\((.*)\)", line)
                 if m:
                     indent, expr = m.groups()
-                    if expr.count('(') == expr.count(')'):
+                    if expr.count("(") == expr.count(")"):
                          lines[row] = f"{indent}assert not {expr.strip()}\n"
                          modified = True
                          continue
 
             # 3. Handle assertEqual(a, b) -> assert a == b
-            if 'self.assertEqual' in line:
+            if "self.assertEqual" in line:
                 # This regex is a bit risky if there are commas in expressions
                 # but we can try for simple cases.
-                m = re.search(r'(\s+)self\.assertEqual\((.*)\)', line)
+                m = re.search(r"(\s+)self\.assertEqual\((.*)\)", line)
                 if m:
                     indent, content = m.groups()
-                    parts = content.rsplit(',', 1)
+                    parts = content.rsplit(",", 1)
                     if len(parts) == 2:
                         a, b = parts
-                        if a.count('(') == a.count(')') and b.count('(') == b.count(')'):
+                        if a.count("(") == a.count(")") and b.count("(") == b.count(")"):
                             lines[row] = f"{indent}assert {a.strip()} == {b.strip()}\n"
                             modified = True
                             continue
 
         if modified:
-            with open(fname, 'w') as f:
+            with open(fname, "w") as f:
                 f.writelines(lines)
             files_modified += 1
-            
+
     print(f"Safely fixed PT009 in {files_modified} files.")
 
 if __name__ == "__main__":

@@ -5,7 +5,6 @@ Example script demonstrating how to use the Kimi-k2.5 model via NVIDIA API
 import asyncio
 import json
 import sys
-from typing import Dict, List
 
 # Add the service path to sys.path so we can import the service
 sys.path.append("/home/vivi/pixelated/src/lib/ai/bias-detection/python-service")
@@ -56,7 +55,7 @@ async def streaming_example():
         response_generator = await service.chat_completion(messages, stream=True)
 
         # Handle the streaming response
-        if hasattr(response_generator, '__aiter__'):
+        if hasattr(response_generator, "__aiter__"):
             async for chunk in response_generator:
                 if isinstance(chunk, dict):
                     # Handle JSON chunks

@@ -2,7 +2,9 @@ import importlib.util
 import sys
 from pathlib import Path
 from unittest.mock import patch
+
 import pytest
+
 
 @pytest.fixture(scope="session")
 def compliance_module(request):
@@ -11,21 +13,21 @@ def compliance_module(request):
     """
     file_path = Path(request.config.rootpath) / "security" / "compliance-monitor.py"
     module_name = "_compliance_monitor_under_test_unified"
-    
+
     if module_name in sys.modules:
         del sys.modules[module_name]
-        
+
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
         pytest.fail(f"Could not load compliance-monitor.py from {file_path}")
-    
+
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     try:
         spec.loader.exec_module(module)
     except Exception as e:
         pytest.fail(f"Execution of compliance-monitor.py failed: {e}")
-        
+
     return module
 
 @pytest.fixture
@@ -34,7 +36,7 @@ def monitor(compliance_module):
     return compliance_module.ComplianceMonitor()
 
 class TestComplianceMonitorHIPAA:
-    
+
     @pytest.mark.parametrize("overrides, expected_score, expected_status", [
         # All pass
         ({
@@ -65,13 +67,13 @@ class TestComplianceMonitorHIPAA:
         """Test HIPAA compliance aggregation with various safeguard results."""
         with patch.multiple(monitor, 
                            **{k: (lambda x=v: x) for k, v in overrides.items()}):
-            
+
             result = monitor.monitor_hipaa_compliance()
 
             assert result["framework"] == "HIPAA"
             assert result["compliance_score"] == expected_score
             assert result["status"] == expected_status
-            
+
             for method, expected_val in overrides.items():
                 key = method.replace("check_", "")
                 if key == "baa":
@@ -79,7 +81,7 @@ class TestComplianceMonitorHIPAA:
                 assert result["checks"][key] == expected_val
 
 class TestComplianceMonitorSOC2:
-    
+
     @pytest.mark.parametrize("overrides, expected_score, expected_status", [
         # All pass
         ({
@@ -118,13 +120,13 @@ class TestComplianceMonitorSOC2:
         """Test SOC2 compliance aggregation with various safeguard results."""
         with patch.multiple(monitor, 
                            **{k: (lambda x=v: x) for k, v in overrides.items()}):
-            
+
             result = monitor.monitor_soc2_compliance()
 
             assert result["framework"] == "SOC2"
             assert result["compliance_score"] == expected_score
             assert result["status"] == expected_status
-            
+
             for method, expected_val in overrides.items():
                 key = method.replace("check_", "")
                 assert result["checks"][key] == expected_val

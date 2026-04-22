@@ -9,8 +9,8 @@ import re
 import shlex
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor
 from collections.abc import Iterable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,9 +18,9 @@ from typing import Any
 
 from scripts.task_sync.provider_bridge import (
     apply_provider_action,
-    extract_provider_target_id,
     export_asana_tasks,
     export_jira_issues,
+    extract_provider_target_id,
 )
 
 SYNC_BLOCK_START = "<!-- pixelated-sync"
