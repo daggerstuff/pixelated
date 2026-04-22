@@ -76,22 +76,29 @@ const artifactHighlights = artifact.context.slice(0, 2)
 </aside>
 
 <style>
-  .hero-artifact {
-    width: 100%;
-    min-height: 100%;
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 4px;
-    background:
-      radial-gradient(
-        circle at top right,
-        rgba(var(--accent-primary-rgb), 0.08),
-        transparent 34%
-      ),
-      linear-gradient(180deg, rgba(48, 44, 44, 0.82), rgba(35, 33, 33, 0.72));
-    overflow: hidden;
-    backdrop-filter: blur(14px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  }
+.hero-artifact {
+  width: 100%;
+  min-height: 100%;
+  border: 1px solid rgba(253, 252, 252, 0.08);
+  border-radius: 4px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(var(--accent-primary-rgb), 0.08),
+      transparent 34%
+    ),
+    linear-gradient(180deg, rgba(48, 44, 44, 0.82), rgba(35, 33, 33, 0.72));
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  text-align: center;
+}
+
+/* Override text-align for readout sections to keep them centered */
+.hero-artifact__readout,
+.hero-artifact__readout-item {
+  text-align: center !important;
+}
 
   .hero-artifact__body {
     display: grid;
