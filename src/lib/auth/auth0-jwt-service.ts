@@ -78,11 +78,26 @@ function initializeAuth0Client() {
     clientSecret: runtimeConfig.clientSecret,
   });
 
+  if (typeof UserInfoClient === "function") {
+    try {
+      const userInfoClient = new UserInfoClient({ domain: runtimeConfig.domain });
+      const hasUserInfoMethod =
+        typeof userInfoClient.getUserInfo === "function" ||
+        typeof userInfoClient.getProfile === "function";
+      if (hasUserInfoMethod) {
+        auth0UserInfo = userInfoClient;
+        return;
+      }
+    } catch {
+      auth0UserInfo = null;
+    }
+  }
+
   const authenticationLikeClient = auth0Authentication as Auth0UserInfoClient;
-  if (
+  const hasAuthenticationUserInfoMethod =
     typeof authenticationLikeClient.getUserInfo === "function" ||
-    typeof authenticationLikeClient.getProfile === "function"
-  ) {
+    typeof authenticationLikeClient.getProfile === "function";
+  if (hasAuthenticationUserInfoMethod) {
     auth0UserInfo = authenticationLikeClient;
     return;
   }

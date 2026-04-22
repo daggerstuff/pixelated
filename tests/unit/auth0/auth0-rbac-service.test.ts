@@ -3,22 +3,24 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import * as auth0RbacService from '../../../src/lib/auth/auth0-rbac-service'
 
 // Mock the auth0 module
+const mockManagementClient = {
+  getRoles: vi.fn(),
+  getPermissions: vi.fn(),
+  createRole: vi.fn(),
+  createPermission: vi.fn(),
+  assignRolestoUser: vi.fn(),
+  removeRolesFromUser: vi.fn(),
+  getUserRoles: vi.fn(),
+  addPermissionsInRole: vi.fn(),
+}
+
 vi.mock('auth0', () => {
   return {
-    ManagementClient: vi.fn().mockImplementation(() => {
-      return {
-        getRoles: vi.fn(),
-        getPermissions: vi.fn(),
-        createRole: vi.fn(),
-        createPermission: vi.fn(),
-        assignRolestoUser: vi.fn(),
-        removeRolesFromUser: vi.fn(),
-        getUserRoles: vi.fn(),
-        addPermissionsInRole: vi.fn(),
-      }
-    }),
+    ManagementClient: vi.fn(() => mockManagementClient),
   }
 })
+
+const getMockManagementClient = () => mockManagementClient
 
 // Mock security logging
 vi.mock('../../../src/lib/security/index', () => {
@@ -129,9 +131,7 @@ describe('Auth0 RBAC Service', () => {
 
   describe('assignRoleToUser', () => {
     it('should successfully assign a role to a user', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock role lookup
       mockManagementClient.getRoles.mockResolvedValue([
@@ -150,15 +150,12 @@ describe('Auth0 RBAC Service', () => {
         name_filter: 'therapist',
       })
       expect(mockManagementClient.assignRolestoUser).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
-        { roles: ['role-id-123'] },
+        { id: 'auth0|user123', roles: ['role-id-123'] },
       )
     })
 
     it('should throw error when role is not found', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock role lookup returning empty array
       mockManagementClient.getRoles.mockResolvedValue([])
@@ -169,9 +166,7 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should handle assignment errors', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock role lookup
       mockManagementClient.getRoles.mockResolvedValue([
@@ -194,9 +189,7 @@ describe('Auth0 RBAC Service', () => {
 
   describe('removeRoleFromUser', () => {
     it('should successfully remove a role from a user', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock role lookup
       mockManagementClient.getRoles.mockResolvedValue([
@@ -215,15 +208,12 @@ describe('Auth0 RBAC Service', () => {
         name_filter: 'therapist',
       })
       expect(mockManagementClient.removeRolesFromUser).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
-        { roles: ['role-id-123'] },
+        { id: 'auth0|user123', roles: ['role-id-123'] },
       )
     })
 
     it('should throw error when role is not found', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock role lookup returning empty array
       mockManagementClient.getRoles.mockResolvedValue([])
@@ -239,9 +229,7 @@ describe('Auth0 RBAC Service', () => {
 
   describe('getUserRoles', () => {
     it('should successfully retrieve user roles', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock user roles
       mockManagementClient.getUserRoles.mockResolvedValue([
@@ -258,9 +246,7 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return empty array when getUserRoles fails', async () => {
-      const auth0Module = require('auth0')
-      const mockManagementClient =
-        auth0Module.ManagementClient.mock.results[0].value
+      const mockManagementClient = getMockManagementClient()
 
       // Mock failure
       mockManagementClient.getUserRoles.mockRejectedValue(

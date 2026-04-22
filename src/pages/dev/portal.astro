@@ -79,17 +79,16 @@ const sdkVersion = "0.42.0-beta";
         <pre><code># Install the SDK
 pnpm add @pixelated/sdk
 
-# Initialize the client
-import { PixelatedClient } from '@pixelated/sdk';
-
-const client = new PixelatedClient({
+# Initialize your client using the package export available in your app.
+# Example (replace with your actual SDK binding):
+const client = new PixelatedClient(&#123;
   apiKey: 'YOUR_API_KEY',
-  clientId: 'your-app-id'
-});
+  clientId: 'your-app-id',
+&#125;);
 
-// Stream from the 133M corpus
-const audit = await client.training.stream({ family: 'therapeutic' });
-console.log(`Tracking ${audit.total_shards} shards...`);</code></pre>
+# Stream from the 133M corpus
+const audit = await client.training.stream(&#123; family: 'therapeutic' &#125;);
+console.log(`Tracking $&#123;audit.total_shards&#125; shards...`);</code></pre>
       </div>
     </div>
   </main>
