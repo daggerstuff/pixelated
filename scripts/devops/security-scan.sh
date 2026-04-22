@@ -20,23 +20,51 @@ EXIT_CODE=0
 # ──────────────────────────────────────────
 # 1. Node.js / pnpm audit
 # ──────────────────────────────────────────
-echo -e "\n${YELLOW}📦 [1/3] Running pnpm audit...${NC}"
+echo -e "\n${YELLOW}📦 [1/3] Running pnpm audit in all pnpm projects...${NC}"
 if ! command -v pnpm &>/dev/null; then
     echo -e "${RED}❌ pnpm is not installed.${NC}"
     exit 1
 fi
-cd "$ROOT_DIR"
-AUDIT_RESULTS_FILE="audit-results.json"
-if pnpm audit --help 2>/dev/null | grep -q -- "--prod"; then
-  pnpm audit --json --prod --audit-level moderate > "$AUDIT_RESULTS_FILE" || true
-else
-  pnpm audit --json --audit-level moderate > "$AUDIT_RESULTS_FILE" || true
-fi
 
-if node scripts/utils/check-pnpm-audit.js "$AUDIT_RESULTS_FILE"; then
-  echo -e "${GREEN}✅ No Node.js vulnerabilities found.${NC}"
-else
-  echo -e "${RED}⚠️  Node.js vulnerabilities detected above.${NC}"
+HAS_LOCKED_PNPM_PROJECT=0
+while IFS= read -r project; do
+  if [ -z "$project" ]; then
+    project="."
+  fi
+  project_dir="$ROOT_DIR/$project"
+  if [ "$project" = "." ]; then
+    project_dir="$ROOT_DIR"
+  fi
+
+  if [ ! -f "$project_dir/pnpm-lock.yaml" ]; then
+    continue
+  fi
+
+  HAS_LOCKED_PNPM_PROJECT=1
+  project_label="$project"
+  if [ "$project_label" = "." ]; then
+    project_label="root"
+  fi
+  echo -e "\n${BLUE}└─ Auditing: ${project_label}${NC}"
+
+  AUDIT_RESULTS_FILE="$(mktemp)"
+  if pnpm -C "$project_dir" audit --help 2>/dev/null | grep -q -- "--prod"; then
+    pnpm -C "$project_dir" audit --json --prod --audit-level moderate > "$AUDIT_RESULTS_FILE" || true
+  else
+    pnpm -C "$project_dir" audit --json --audit-level moderate > "$AUDIT_RESULTS_FILE" || true
+  fi
+
+  if node "$ROOT_DIR/scripts/utils/check-pnpm-audit.js" "$AUDIT_RESULTS_FILE"; then
+    echo -e "${GREEN}✅ No Node.js vulnerabilities found in ${project_label}.${NC}"
+  else
+    echo -e "${RED}⚠️  Node.js vulnerabilities detected above in ${project_label}.${NC}"
+    EXIT_CODE=1
+  fi
+  rm -f "$AUDIT_RESULTS_FILE"
+done < <(cd "$ROOT_DIR" && rg --files -g 'package.json' -g '!**/node_modules/**' -g '!**/.git/**' -g '!**/.opencode/**' -g '!**/.cursor/**' -g '!**/.cache/**' | sed -e 's#/package.json$##' -e 's#^package.json$#.#' | sort -u)
+
+if [ "$HAS_LOCKED_PNPM_PROJECT" -eq 0 ]; then
+  echo -e "${RED}❌ No pnpm lockfiles found under project roots.${NC}"
   EXIT_CODE=1
 fi
 
