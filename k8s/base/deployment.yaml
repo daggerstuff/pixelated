@@ -39,6 +39,8 @@ spec:
         env:
         - name: APP_NAME
           value: "pixelated-empathy"
+        - name: REDIS_URL
+          value: "redis://pixelated-empathy-redis:6379/0"
         resources:
           requests:
             cpu: "25m"
