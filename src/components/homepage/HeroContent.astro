@@ -126,7 +126,7 @@ const {
     gap: 0.5rem;
     padding: 0.46rem 0.82rem;
     border: 1px dotted rgba(253, 252, 252, 0.22);
-    border-radius: 4px;
+    border-radius: 8px;
     background: rgba(253, 252, 252, 0.02);
     backdrop-filter: blur(10px);
   }
@@ -140,7 +140,7 @@ const {
   }
 
   .hero-kicker {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-size: 0.66rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -157,11 +157,11 @@ const {
     margin: 0;
     max-width: 11ch;
     margin: 0 auto;
-    font-family: var(--font-mono);
-    font-size: 42px;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 3.2vw, 3.5rem);
     font-weight: 700;
-    line-height: 0.94;
-    letter-spacing: -0.055em;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
     color: var(--text-primary);
     text-wrap: balance;
   }
@@ -170,9 +170,9 @@ const {
     margin: 0;
     max-width: 34rem;
     margin: 0 auto;
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    line-height: 1.72;
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    line-height: 1.65;
     color: rgba(247, 243, 235, 0.82);
     text-wrap: pretty;
   }
@@ -193,7 +193,7 @@ const {
   .hero-actions__context {
     margin: 0;
     max-width: 30rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.8rem;
     line-height: 1.68;
     color: rgba(253, 252, 252, 0.64);
@@ -207,11 +207,11 @@ const {
     justify-content: center;
     min-height: 3.2rem;
     padding: 0.92rem 1.35rem;
-    border-radius: 4px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     text-decoration: none;
     transition:
@@ -256,11 +256,10 @@ const {
     gap: 0.55rem;
     min-width: 0;
     padding: 0.95rem 0 0;
-    border-top: 1px dotted rgba(253, 252, 252, 0.16);
   }
 
   .hero-proof-card__label {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-size: 0.64rem;
     font-weight: 700;
     letter-spacing: 0.15em;
@@ -271,7 +270,7 @@ const {
   .hero-proof-card p {
     margin: 0 auto;
     max-width: 22ch;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
     font-size: 0.9rem;
     line-height: 1.66;
     color: rgba(253, 252, 252, 0.82);
@@ -323,7 +322,7 @@ const {
 
     .hero-subtitle {
       font-size: clamp(1.02rem, 1.1vw, 1.18rem);
-      line-height: 1.72;
+      line-height: 1.65;
     }
 
     .hero-proof-grid {
@@ -334,7 +333,7 @@ const {
     .hero-proof-card {
       padding: 1rem 1rem 1.05rem;
       border: 1px solid rgba(253, 252, 252, 0.1);
-      border-radius: 4px;
+      border-radius: 8px;
       background: rgba(253, 252, 252, 0.018);
       text-align: center;
       justify-items: center;

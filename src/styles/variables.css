@@ -27,8 +27,8 @@
   --divider-dotted: rgba(253, 252, 252, 0.11); /* Dotted lines */
   --divider-weak: rgba(253, 252, 252, 0.05); /* Very subtle divider */
   --bg-surface-ghost: rgba(253, 252, 252, 0.02); /* Ghostly background */
-  --radius-sm: 4px; /* Standard components */
-  --radius-md: 6px; /* Inputs */
+  --radius-sm: 8px; /* Standard components */
+  --radius-md: 10px; /* Inputs */
 
   /* === ANIMATION === */
   --duration-fast: 0.15s;
