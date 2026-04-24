@@ -27,6 +27,7 @@ on:
       - .github/workflows/bias-detection-ci.yml
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
   TRACE_TRIVY_DEPRECATION: ${{ vars.TRACE_TRIVY_DEPRECATION || 'false' }}
   NODE_VERSION: 24.14.0
