@@ -27,7 +27,7 @@ flask-cors==6.0.2
 pydantic==2.13.2
 
 # Utilities
-cryptography==46.0.7
+cryptography==47.0.0
 python-dateutil==2.9.0
 pyyaml==6.0.3
 requests==2.33.1
