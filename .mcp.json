@@ -11,8 +11,8 @@
       }
     },
     "cloudflare": {
-      "command": "npx",
-      "args": ["@cloudflare/mcp-server-cloudflare"],
+      "command": "pnpm",
+      "args": ["dlx", "@cloudflare/mcp-server-cloudflare"],
       "env": {
         "CLOUDFLARE_API_KEY": "${CLOUDFLARE_API_KEY}",
         "CLOUDFLARE_EMAIL": "${CLOUDFLARE_EMAIL}",
@@ -20,8 +20,8 @@
       }
     },
     "solana": {
-      "command": "npx",
-      "args": ["mcp-remote", "https://mcp.solana.com/mcp"]
+      "command": "pnpm",
+      "args": ["dlx", "mcp-remote", "https://mcp.solana.com/mcp"]
     }
   }
 }

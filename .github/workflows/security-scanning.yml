@@ -5,6 +5,7 @@ permissions:
   security-events: write
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
 
 on:

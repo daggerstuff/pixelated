@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.33.0
