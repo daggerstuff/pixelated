@@ -45,6 +45,10 @@ on:
           'Optional baseline realism_evaluation.json path (relative to repo
           root)'
 
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   evaluate:
     name: Evaluate ConvApparel-style realism
