@@ -12,7 +12,7 @@ permissions:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
-  PNPM_VERSION: 10.33.0
+  PNPM_VERSION: 10.33.2
   NODE_ENV: production
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10.33.0
+          version: 10.33.2
 
       - name: Get pnpm store directory
         id: pnpm-store
