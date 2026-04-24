@@ -27,22 +27,4 @@ export const featuresContent = {
       icon: 'shield',
     },
   ],
-  comparison: {
-    label: 'What it replaces',
-    title: 'Less theater. More teachable clinical behavior.',
-    body: 'Traditional roleplay can be useful, but it is hard to standardize. Pixelated Empathy keeps the useful parts of roleplay while adding consistency, repeatability, and review.',
-    items: [
-      {
-        label: 'Ad hoc roleplay',
-        value:
-          'Different actors, different prompts, different feedback, hard to compare.',
-      },
-      {
-        label: 'Structured simulation',
-        value:
-          'Consistent scenario, saved attempt, competency review, and repeatable practice.',
-        accent: true,
-      },
-    ],
-  },
 } as const

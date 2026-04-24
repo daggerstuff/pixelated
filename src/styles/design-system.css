@@ -29,10 +29,14 @@
 
   /* === TYPOGRAPHY SYSTEM === */
   --font-family-mono: 'Berkeley Mono', monospace;
-  --font-family-sans: 'Berkeley Mono', monospace;
+  --font-family-sans: 'Source Sans 3', sans-serif;
+  --font-family-display: 'Lexend', sans-serif;
+  --font-family-label: 'Berkeley Mono', monospace;
 
   --font-mono: var(--font-family-mono);
   --font-sans: var(--font-family-sans);
+  --font-display: var(--font-family-display);
+  --font-label: var(--font-family-label);
 
   /* Font Scale */
   --text-xs: 0.75rem; /* 12px */

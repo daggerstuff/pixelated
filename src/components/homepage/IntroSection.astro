@@ -106,11 +106,10 @@ const { content } = Astro.props
     display: grid;
     gap: 0.55rem;
     padding: 1rem 1rem 1.05rem;
-    border-top: 1px dotted rgba(253, 252, 252, 0.1);
   }
 
   .home-intro__issue-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-label);
     font-size: 0.64rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -121,7 +120,7 @@ const { content } = Astro.props
   .home-intro__issue p,
   .home-intro__evidence-list li {
     margin: 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.94rem;
     line-height: 1.74;
     color: rgba(253, 252, 252, 0.8);
@@ -136,7 +135,6 @@ const { content } = Astro.props
     display: grid;
     gap: 0.85rem;
     padding: 1.1rem 0 0;
-    border-top: 1px dotted rgba(253, 252, 252, 0.1);
   }
 
   .home-intro__evidence-list {
@@ -150,7 +148,7 @@ const { content } = Astro.props
   .home-intro__evidence-list li {
     position: relative;
     padding-left: 0;
-    text-align: center;
+    text-align: left;
   }
 
   .home-intro__evidence-list li::before {
@@ -159,7 +157,7 @@ const { content } = Astro.props
     display: block;
     width: 0.38rem;
     height: 0.38rem;
-    margin: 0 auto 0.65rem;
+  margin: 0 0 0.65rem;
     border-radius: 999px;
     background: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.12);
@@ -170,7 +168,7 @@ const { content } = Astro.props
       grid-template-columns: minmax(22rem, 0.82fr) minmax(0, 1.18fr);
       gap: clamp(3rem, 5vw, 5.5rem);
       align-items: start;
-      text-align: center;
+      text-align: left;
     }
 
     .home-intro__lead {
@@ -178,8 +176,8 @@ const { content } = Astro.props
       top: 7rem;
       max-width: 31rem;
       margin: 0 auto;
-      text-align: center;
-      justify-items: center;
+      text-align: left;
+      justify-items: start;
     }
 
     .home-intro__lead .pe-heading-l {
@@ -188,7 +186,7 @@ const { content } = Astro.props
 
     .home-intro__lead .pe-home-copy {
       margin: 0 auto;
-      text-align: center;
+      text-align: left;
     }
 
     .home-intro__issue-grid {
@@ -199,15 +197,15 @@ const { content } = Astro.props
     .home-intro__diagnostic,
     .home-intro__issue,
     .home-intro__evidence-column {
-      text-align: center;
-      justify-items: center;
+      text-align: left;
+      justify-items: start;
     }
 
     .home-intro__issue,
     .home-intro__evidence-column {
       padding: 1.15rem;
       border: 1px solid rgba(253, 252, 252, 0.1);
-      border-radius: 4px;
+      border-radius: 8px;
       background: rgba(253, 252, 252, 0.016);
     }
 
@@ -247,7 +245,7 @@ const { content } = Astro.props
     .home-intro__evidence-column {
       padding: 1rem;
       border: 1px solid rgba(253, 252, 252, 0.14);
-      border-radius: 4px;
+      border-radius: 8px;
       background: rgba(253, 252, 252, 0.018);
     }
   }
