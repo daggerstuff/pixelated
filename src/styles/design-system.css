@@ -61,9 +61,9 @@
   --spacing-20: 80px;
 
   /* === COMPONENT DNA === */
-  --radius-button: var(--radius-sm); /* 4px */
-  --radius-input: var(--radius-md); /* 6px */
-  --radius-card: var(--radius-sm); /* 4px */
+  --radius-button: var(--radius-sm); /* 8px */
+  --radius-input: var(--radius-md); /* 10px */
+  --radius-card: var(--radius-sm); /* 8px */
 
   --glass-bg: var(--bg-glass);
   --glass-blur: blur(12px);
