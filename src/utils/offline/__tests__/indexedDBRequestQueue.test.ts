@@ -176,75 +176,6 @@ describe("IndexedDBRequestQueue", () => {
       });
 
       // Mock fetch to succeed
-      global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" }
-      }));
-
-      // Process queue
-      await queue.processQueue();
-
-      // Verify request was processed
-      expect(fetch).toHaveBeenCalledWith("/test", {
-        method: "GET",
-        headers: {},
-        body: undefined
-      });
-      // @ts-ignore
-      expect((queue as any).queue.length).toBe(0);
-    });
-
-    it("should retry failed requests", async () => {
-      // Add a request
-      queue.add({
-        url: "/test",
-        method: "GET" as const,
-        headers: {},
-        priority: "normal" as const,
-        maxRetries: 2,
-      });
-
-      // Mock fetch to fail first time, succeed second time
-      global.fetch = vi.fn()
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce(new Response(JSON.stringify({ success: true }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" }
-        }));
-
-      // Process queue
-      await queue.processQueue();
-
-      // Verify request was retried
-      expect(fetch).toHaveBeenCalledTimes(2);
-      // @ts-ignore
-      expect((queue as any).queue.length).toBe(0);
-    });
-
-    it("should remove requests after max retries", async () => {
-      // Add a request
-      queue.add({
-        url: "/test",
-        method: "GET" as const,
-        headers: {},
-        priority: "normal" as const,
-        maxRetries: 1,
-      });
-
-      // Mock fetch to always fail
-      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
-
-      // Process queue
-      await queue.processQueue();
-
-      // Verify request was removed after max retries
-      expect(fetch).toHaveBeenCalledTimes(2); // Initial + 1 retry
-      // @ts-ignore
-      expect((queue as any).queue.length).toBe(0);
-    });
-  });
-
-      // Mock fetch to succeed
       global.fetch = vi.fn().mockResolvedValue(
         new Response(JSON.stringify({ success: true }), {
           status: 200,
@@ -269,8 +200,9 @@ describe("IndexedDBRequestQueue", () => {
       // Add a request
       queue.add({
         url: "/test",
-        method: "GET",
+        method: "GET" as const,
         headers: {},
+        priority: "normal" as const,
         maxRetries: 2,
       });
 
@@ -298,8 +230,9 @@ describe("IndexedDBRequestQueue", () => {
       // Add a request
       queue.add({
         url: "/test",
-        method: "GET",
+        method: "GET" as const,
         headers: {},
+        priority: "normal" as const,
         maxRetries: 1,
       });
 
