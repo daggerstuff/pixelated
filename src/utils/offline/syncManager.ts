@@ -27,6 +27,9 @@ class SyncManager {
   private backoffMultiplier = 1;
   private syncTimeout: NodeJS.Timeout | null = null;
   private listeners: Map<string, Set<(payload?: unknown) => void>> = new Map();
+  private onlineHandler: () => void;
+  private offlineHandler: () => void;
+  private visibilityChangeHandler: () => void;
 
   constructor(options: SyncManagerOptions = {}) {
     this.options = {
@@ -39,22 +42,22 @@ class SyncManager {
       ...options,
     };
 
+    this.onlineHandler = () => this.handleOnline();
+    this.offlineHandler = () => this.handleOffline();
+    this.visibilityChangeHandler = () => {
+      if (document.visibilityState === "visible" && this.isOnline && this.options.enableAutoSync) {
+        this.attemptSync();
+      }
+    };
+
     this.initialize();
   }
 
   private initialize(): void {
     if (typeof window !== "undefined") {
-      window.addEventListener("online", () => this.handleOnline());
-      window.addEventListener("offline", () => this.handleOffline());
-      document.addEventListener("visibilitychange", () => {
-        if (
-          document.visibilityState === "visible" &&
-          this.isOnline &&
-          this.options.enableAutoSync
-        ) {
-          this.attemptSync();
-        }
-      });
+      window.addEventListener("online", this.onlineHandler);
+      window.addEventListener("offline", this.offlineHandler);
+      document.addEventListener("visibilitychange", this.visibilityChangeHandler);
     }
 
     if (this.options.enableAutoSync && this.isOnline) {
@@ -143,17 +146,9 @@ class SyncManager {
   stop(): void {
     this.clearSyncTimeout();
     if (typeof window !== "undefined") {
-      window.removeEventListener("online", () => this.handleOnline());
-      window.removeEventListener("offline", () => this.handleOffline());
-      document.removeEventListener("visibilitychange", () => {
-        if (
-          document.visibilityState === "visible" &&
-          this.isOnline &&
-          this.options.enableAutoSync
-        ) {
-          this.attemptSync();
-        }
-      });
+      window.removeEventListener("online", this.onlineHandler);
+      window.removeEventListener("offline", this.offlineHandler);
+      document.removeEventListener("visibilitychange", this.visibilityChangeHandler);
     }
   }
 

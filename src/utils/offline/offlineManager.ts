@@ -7,7 +7,6 @@ import { type OfflineState } from "@/hooks/useOfflineDetection";
 
 import { indexedDBRequestQueue } from "./indexedDBRequestQueue";
 import { type QueuedRequest } from "./indexedDBRequestQueue";
-import { syncManager } from "./syncManager";
 
 export interface OfflineManagerConfig {
   enableRequestQueue?: boolean;
@@ -46,10 +45,14 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
       // If offline or network error, queue the request
       if (enableRequestQueue && !navigator.onLine) {
         const priority = isCriticalPath ? "critical" : "normal";
+        const method =
+          options.method && ["GET", "POST", "PUT", "DELETE", "PATCH"].includes(options.method)
+            ? options.method
+            : "GET";
 
         const queued = indexedDBRequestQueue.add({
           url,
-          method: (options.method as any) || "GET",
+          method: method as "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
           headers: (options.headers as Record<string, string>) || {},
           body: options.body,
           priority,
@@ -58,9 +61,9 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
 
         if (queued && onRequestQueued) {
           onRequestQueued({
-            id: `req_${Date.now()}`,
+            id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             url,
-            method: (options.method as any) || "GET",
+            method: method as "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
             headers: (options.headers as Record<string, string>) || {},
             body: options.body,
             timestamp: Date.now(),
