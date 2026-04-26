@@ -1,11 +1,10 @@
 /* ================================================
-TYPOGRAPHY SYSTEM
-Lexend (headings) + Source Sans 3 (body) + Berkeley Mono (labels)
-================================================ */
+   FONT FALLBACKS
+   Primary web fonts are loaded from Head.astro.
+   ================================================ */
 
-/* Berkeley Mono — retained for labels and small uppercase accents */
 @font-face {
-  font-family: 'JetBrains Mono Fallback';
+  font-family: 'Pixelated Mono Fallback';
   src: url('/fonts/jetbrains-mono-400.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
@@ -13,47 +12,9 @@ Lexend (headings) + Source Sans 3 (body) + Berkeley Mono (labels)
 }
 
 @font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    local('Berkeley Mono'),
-    local('Berkeley Mono Regular'),
-    local('TX-02'),
-    url('/fonts/jetbrains-mono-400.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    local('Berkeley Mono Medium'),
-    local('Berkeley Mono Regular'),
-    local('TX-02 Medium'),
-    url('/fonts/jetbrains-mono-500.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    local('Berkeley Mono Semibold'),
-    local('TX-02 Semibold'),
-    url('/fonts/jetbrains-mono-600.ttf') format('truetype');
+  font-family: 'Pixelated Mono Fallback';
+  src: url('/fonts/jetbrains-mono-600.ttf') format('truetype');
   font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Berkeley Mono';
-  src:
-    local('Berkeley Mono Bold'),
-    local('TX-02 Bold'),
-    url('/fonts/jetbrains-mono-700.ttf') format('truetype');
-  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
