@@ -169,10 +169,11 @@ export default function SearchFilters({
 
         {/* Sort By */}
         <div>
-          <label className='text-slate-300 mb-2 block text-sm font-medium'>
+          <label htmlFor='sort-by' className='text-slate-300 mb-2 block text-sm font-medium'>
             Sort By
           </label>
           <select
+            id='sort-by'
             className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
             value={localFilters.sortBy}
             onChange={(e) =>
