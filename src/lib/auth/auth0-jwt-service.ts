@@ -35,10 +35,10 @@ type Auth0RuntimeConfig = {
 
 function getRuntimeAuth0Config(): Auth0RuntimeConfig {
   return {
-    domain: process.env.AUTH0_DOMAIN ?? auth0Config.domain,
-    clientId: process.env.AUTH0_CLIENT_ID ?? auth0Config.clientId,
-    clientSecret: process.env.AUTH0_CLIENT_SECRET ?? auth0Config.clientSecret,
-    audience: process.env.AUTH0_AUDIENCE ?? auth0Config.audience,
+    domain: process.env.AUTH0_DOMAIN || auth0Config.domain,
+    clientId: process.env.AUTH0_CLIENT_ID || auth0Config.clientId,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET || auth0Config.clientSecret,
+    audience: process.env.AUTH0_AUDIENCE || auth0Config.audience,
   };
 }
 
@@ -114,6 +114,9 @@ function initializeAuth0Client() {
   }
 }
 
+// Initialize the client
+initializeAuth0Client();
+
 // Types
 export interface TokenPair {
   accessToken: string;
@@ -152,12 +155,9 @@ async function getAuth0UserInfo(accessToken: string): Promise<Auth0UserInfoRespo
     throw new AuthenticationError("Auth0 user info client not initialized");
   }
 
-  const userInfoClient = auth0UserInfo;
+  const userInfoClient = auth0UserInfo as Auth0UserInfoClient;
   if (typeof userInfoClient.getUserInfo === "function") {
-    const response = await userInfoClient.getUserInfo(accessToken);
-    if (isRecord(response) && isRecord(response.data)) {
-      return response as Auth0UserInfoResponse;
-    }
+    return await userInfoClient.getUserInfo(accessToken);
   }
   if (typeof userInfoClient.getProfile === "function") {
     return await userInfoClient.getProfile(accessToken);
@@ -453,6 +453,9 @@ export async function validateToken(
 
     // Now verify with UserInfo (acts as online signature/revocation check)
     const userInfo = await getAuth0UserInfo(token);
+    if (!userInfo) {
+      throw new AuthenticationError("Failed to get user info");
+    }
 
     // Extract user information
     const userInfoData = toStringRecord(userInfo.data);
@@ -559,6 +562,9 @@ export async function refreshAccessToken(
 
     // Get user info from new access token
     const userResponse = await getAuth0UserInfo(accessToken);
+    if (!userResponse) {
+      throw new AuthenticationError("Failed to get refreshed user info");
+    }
 
     // Extract user information
     const userResponseData = toStringRecord(userResponse.data);

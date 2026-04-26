@@ -1,5 +1,0 @@
-# Bernstein workspace config
-server_port: 8052
-max_workers: 6
-default_model: sonnet
-default_effort: high

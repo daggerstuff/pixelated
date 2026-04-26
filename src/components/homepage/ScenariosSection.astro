@@ -1,0 +1,123 @@
+---
+import InfoStrip from '@/components/homepage/InfoStrip.astro'
+
+export interface Props {
+  content: {
+    label: string
+    title: string
+    cards: Array<{ kicker: string; title: string; body: string }>
+    strip: {
+      label: string
+      title: string
+      body: string
+      items: Array<{ label: string; value: string }>
+    }
+  }
+}
+
+const { content } = Astro.props
+---
+
+<section class="home-section home-section--scenarios">
+  <div class="container">
+    <span class="pe-meta-label">{content.label}</span>
+    <h2 class="pe-heading-l">{content.title}</h2>
+
+    <div class="home-card-grid home-card-grid--spaced">
+      {
+        content.cards.map((card, index) => (
+          <article
+            class:list={[
+              'home-card',
+              'glass-panel',
+              index === 0 && 'home-card--featured',
+              index === 2 && 'home-card--muted',
+            ]}
+          >
+            <span class="home-card-kicker">{card.kicker}</span>
+            <h3 class="pe-heading-s">{card.title}</h3>
+            <p>{card.body}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <InfoStrip
+      className="home-use-strip home-use-strip--spaced"
+      label={content.strip.label}
+      title={content.strip.title}
+      body={content.strip.body}
+      items={content.strip.items}
+      theme="dark"
+    />
+  </div>
+</section>
+
+<style>
+  .home-section--scenarios {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: var(--section-padding-y) 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-card-kicker {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    margin-bottom: var(--spacing-4);
+    opacity: 0.8;
+  }
+
+  .home-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-6);
+  }
+
+  .home-card-grid--spaced {
+    margin-top: var(--spacing-12);
+  }
+
+  .home-card {
+    padding: var(--spacing-8);
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .home-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--accent-primary-rgb), 0.25);
+  }
+
+  .home-card--featured {
+    background: rgba(var(--accent-primary-rgb), 0.035);
+    border-color: rgba(var(--accent-primary-rgb), 0.15);
+  }
+
+  .home-card--muted {
+    opacity: 0.85;
+  }
+
+  .home-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin: 0;
+  }
+
+  .home-use-strip--spaced {
+    margin-top: clamp(4rem, 8vw, 6.5rem);
+  }
+
+  @media (max-width: 880px) {
+    .home-card-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

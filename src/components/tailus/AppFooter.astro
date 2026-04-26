@@ -1,0 +1,83 @@
+---
+import BrandIcon from './BrandIcon.astro'
+import Container from './Container.astro'
+
+type Link = {
+  title: string
+  url: string
+}
+
+const internalLinks = [
+  { title: 'Home', url: '#' },
+  { title: 'About', url: '#' },
+  { title: 'Platform', url: '#' },
+  { title: 'Features', url: '#' },
+  { title: 'Contact', url: '#' },
+  { title: 'Privacy Policy', url: '#' },
+]
+
+const externalLinks = [
+  { title: 'Github', url: '#' },
+  { title: 'Twitter', url: '#' },
+  { title: 'LinkedIn', url: '#' },
+  { title: 'Documentation', url: '#' },
+  { title: 'Support', url: '#' },
+  { title: 'Community', url: '#' },
+]
+---
+
+<footer class="pb-6 sm:pb-12 lg:pb-20">
+  <Container>
+    <div
+      class="p-6 rounded-[--card-border-radius] bg-gray-50 mx-auto max-w-sm dark:bg-[--card-dark-bg] sm:p-12"
+    >
+      <div class="flex">
+        <BrandIcon />
+      </div>
+      <div class="mt-12 mb-6 flex justify-between gap-4">
+        <div>
+          <span class="text-gray-950 dark:text-white font-medium">Links</span>
+          <ul class="mt-6 space-y-2">
+            {
+              internalLinks.map((link: Link) => (
+                <li>
+                  <a
+                    href={link.url}
+                    class="text-gray-600 dark:text-gray-400 transition hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <span class="block w-px bg-gray-200 dark:bg-gray-800"></span>
+        <div>
+          <span class="text-gray-950 dark:text-white font-medium"
+            >Community</span
+          >
+          <ul class="mt-6 space-y-2">
+            {
+              externalLinks.map((link: Link) => (
+                <li>
+                  <a
+                    href={link.url}
+                    class="text-gray-600 dark:text-gray-400 transition hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+      <div
+        class="-mb-2 text-sm flex flex-wrap gap-1 overflow-hidden font-medium text-gray-700 dark:text-gray-300"
+      >
+        Designed for Mental Health Professionals • © 2025 Pixelated Empathy
+      </div>
+    </div>
+  </Container>
+</footer>

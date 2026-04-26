@@ -54,7 +54,7 @@ for (const { url, name } of TEST_URLS) {
     }
 
     // Check for main content
-    await expect(page.locator('main')).toBeVisible()
+    await expect(page.locator('main').first()).toBeVisible()
 
     // Create directory for screenshots in Node.js context
     try {

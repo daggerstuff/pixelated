@@ -1,5 +1,6 @@
 /* ================================================
-   DARK THEME UTILITIES
+   UNIFIED BLENDED THEME - UTILITY CLASSES
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
    ================================================ */
 
 /* TEXT GRADIENTS */
@@ -27,8 +28,8 @@
 }
 
 .status-dot--online {
-  background: var(--accent-secondary);
-  box-shadow: 0 0 8px rgba(var(--accent-secondary-rgb), 0.55);
+  background: var(--accent-primary);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
 }
 
 .status-dot--processing {
@@ -73,7 +74,7 @@
 /* CONTAINER SYSTEM */
 .container-refined {
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--spacing-6);
 }

@@ -17,17 +17,11 @@ interface Props {
   cspNonce?: string
 }
 
-const {
-  title,
-  description,
-  keywords,
-  ogImage,
-  pubDate,
-  lastModDate,
-  cspNonce,
-} = Astro.props
+const { title, description, keywords, ogImage, pubDate, lastModDate, cspNonce } =
+  Astro.props
 
-const pageKeywords = typeof keywords === 'string' ? keywords.trim() : undefined
+const pageKeywords =
+  typeof keywords === 'string' ? keywords.trim() : undefined
 
 const siteName = new URL(SITE.website).hostname
 
@@ -46,7 +40,9 @@ const generatedOgImage = withBasePath(
   `${basename(Astro.url.pathname)}.png`,
 )
 const assignedOgImage =
-  ogImage && ogImage !== true ? withBasePath('og-images', ogImage) : undefined
+  ogImage && ogImage !== true
+    ? withBasePath('og-images', ogImage)
+    : undefined
 
 const ogImageURL = new URL(
   assignedOgImage ||
@@ -99,8 +95,8 @@ const webPageData = {
 <meta name="author" content={SITE.author} />
 
 <!-- Color -->
-<meta name="theme-color" content="#070706" />
-<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="" />
+<meta name="color-scheme" content="light dark" />
 
 <!-- Open Graph & Facebook -->
 <meta property="og:type" content={pubDate ? 'article' : 'website'} />
@@ -154,7 +150,7 @@ const webPageData = {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@500;700;900&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap"
 />
 <link
   rel="stylesheet"
