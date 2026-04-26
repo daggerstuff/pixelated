@@ -1,0 +1,69 @@
+---
+const testimonials = [
+  {
+    quote:
+      'This platform has revolutionized how we train our therapists. The AI scenarios are incredibly realistic.',
+    author: 'Dr. Sarah Chen',
+    role: 'Director of Training, Metro Health',
+  },
+  {
+    quote:
+      'The immediate feedback loop allows our students to learn faster and more effectively than ever before.',
+    author: 'Mark Thompson',
+    role: 'Clinical Supervisor',
+  },
+  {
+    quote:
+      'A game-changer for continuing education. The variety of scenarios keeps my skills sharp.',
+    author: 'Dr. James Wilson',
+    role: 'Licensed Psychologist',
+  },
+  {
+    quote:
+      "We've seen a 40% reduction in training time and higher satisfaction rates among our staff.",
+    author: 'Elena Rodriguez',
+    role: 'HR Director, City Clinic',
+  },
+]
+---
+
+<section id="testimonials" class="py-24 bg-slate-950 relative">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-20">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white">
+        Loved by professionals
+      </h2>
+      <p class="text-slate-400 max-w-2xl mx-auto text-base">
+        See what others are saying about Pixelated Empathy.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {
+        testimonials.map((testimonial) => (
+          <div class="bg-slate-900/50 border border-white/5 p-8 rounded-2xl backdrop-blur-sm hover:bg-slate-800/50 transition-colors duration-300">
+            <svg
+              class="w-8 h-8 text-primary-500 mb-6 opacity-50"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V11C14.017 11.5523 13.5693 12 13.017 12H12.017V5H22.017V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM5.0166 21L5.0166 18C5.0166 16.8954 5.91203 16 7.0166 16H10.0166C10.5689 16 11.0166 15.5523 11.0166 15V9C11.0166 8.44772 10.5689 8 10.0166 8H6.0166C5.46432 8 5.0166 8.44772 5.0166 9V11C5.0166 11.5523 4.56889 12 4.0166 12H3.0166V5H13.0166V15C13.0166 18.3137 10.3303 21 7.0166 21H5.0166Z" />
+            </svg>
+            <p class="text-base text-slate-200 mb-6 leading-relaxed font-light">
+              "{testimonial.quote}"
+            </p>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold">
+                {testimonial.author.charAt(0)}
+              </div>
+              <div>
+                <div class="font-bold text-white">{testimonial.author}</div>
+                <div class="text-sm text-slate-400">{testimonial.role}</div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,108 @@
+---
+export interface Props {
+  stats: readonly { value: string; label: string }[]
+}
+
+const { stats } = Astro.props
+---
+
+<div class="hero-stats">
+  <div class="hero-stats__lead">
+    <span class="hero-stats__eyebrow pe-meta-label">What the pilot changes</span
+    >
+    <span class="hero-stats__caption"
+      >Review surface, supervision signal, and retry quality in one record.</span
+    >
+  </div>
+
+  <ul class="hero-stats-grid" aria-label="Proof points" role="list">
+    {
+      stats.map((stat) => (
+        <li class="stat-item">
+          <span class="stat-value">{stat.value}</span>
+          <span class="stat-label">{stat.label}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: var(--spacing-6);
+    align-items: stretch;
+    padding: var(--spacing-6);
+    border: 1px solid var(--border-glass);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .hero-stats__lead {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding-right: var(--spacing-6);
+    border-right: 1px solid var(--divider-subtle);
+  }
+
+  .hero-stats__caption {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.7;
+  }
+
+  .hero-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+    padding: 0;
+    list-style: none;
+    margin: 0;
+  }
+
+  .stat-item {
+    padding: var(--spacing-4);
+    border: 1px solid var(--divider-subtle);
+    background: var(--bg-ghost);
+    border-radius: 2px;
+    display: grid;
+    gap: var(--spacing-1);
+    min-height: 0;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 880px) {
+    .hero-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-stats__lead {
+      padding-right: 0;
+      padding-bottom: var(--spacing-4);
+      border-right: 0;
+      border-bottom: 1px solid var(--divider-subtle);
+    }
+
+    .hero-stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

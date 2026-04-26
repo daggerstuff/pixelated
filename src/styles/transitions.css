@@ -1,19 +1,26 @@
 /* ================================================
-   DARK THEME TRANSITIONS
+   UNIFIED BLENDED THEME - TRANSITION SYSTEM
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
    ================================================ */
 
 :root {
-  --transition-base: var(--transition-normal);
-  --transition-bounce: var(--transition-spring);
+  /* === TRANSITIONS - SMOOTH ELEGANCE === */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* GENERAL TRANSITIONS */
+*,
+*::before,
+*::after {
+  transition: all var(--transition-base);
 }
 
 /* BUTTON SYSTEM */
 .btn {
-  transition:
-    transform var(--transition-base),
-    background var(--transition-base),
-    border-color var(--transition-base),
-    color var(--transition-base);
+  transition: all var(--transition-base);
 }
 
 .btn--primary:hover {
@@ -34,11 +41,7 @@
 
 /* CARD SYSTEM */
 .card {
-  transition:
-    transform var(--transition-base),
-    background var(--transition-base),
-    border-color var(--transition-base),
-    box-shadow var(--transition-base);
+  transition: all var(--transition-base);
 }
 
 .card:hover {

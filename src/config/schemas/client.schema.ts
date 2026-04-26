@@ -4,10 +4,6 @@ export const clientEnvSchema = z.object({
   // VITE / PUBLIC variables exposed to the browser
   VITE_API_URL: z.string().url().optional(),
   VITE_MONGODB_CLUSTER: z.string().optional(),
-  PUBLIC_SENTRY_DSN: z.string().url().optional(),
-  PUBLIC_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
-  PUBLIC_SENTRY_PROFILES_SAMPLE_RATE: z.string().optional(),
-  PUBLIC_SENTRY_DEBUG: z.string().optional(),
   PUBLIC_TRAINING_WS_URL: z
     .string()
     .refine(
