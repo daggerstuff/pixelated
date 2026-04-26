@@ -33,6 +33,11 @@ recommendations:
   text: Use focused local verification after every edit to ensure safety and quality
     standards.
   applies_to: []
+- id: claude-hindsight-use-recall-and-reflect-at-the-start-of
+  category: coding
+  severity: suggestion
+  text: '**Hindsight**: Use `recall` and `reflect` at the start of every task.'
+  applies_to: []
 - id: claude-foresight-use-recall-and-reflect-at-the-start-of
   category: coding
   severity: suggestion

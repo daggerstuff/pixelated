@@ -1,4 +1,5 @@
 # === IDE & EDITORS ===
+.Jules/
 .claude/
 .cursor/
 .gemini/
@@ -199,24 +200,6 @@ security-scan-artifacts
 /.tmp
 /.trunk
 tmp/
-# Temporary agent scratch files generated during handoff/repair work
-/HANDOFF.md
-/OFFLINE_SYNC_HANDOFF.md
-/*_handoff.md
-/*_handoff.txt
-/one-off*.py
-/one_off*.py
-/repair*.py
-/fix*.py
-/hardening*.py
-/reconstruction*.py
-/structural*.py
-/resumption*.py
-/final*.py
-/update*.py
-/update_*.py
-/visual_inspection*.png
-/visual_inspection_*.png
 
 # === PROJECT SPECIFIC & MISC ===
 artifacts/
@@ -375,7 +358,3 @@ __mocks__
 ai/.moderne
 
 .mcp.json
-.superpowers/brainstorm/1231071-1777148436
-.sdd/runtime/
-
-templates

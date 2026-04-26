@@ -1,144 +1,61 @@
 /* ================================================
-   PIXELATED EMPATHY DARK THEME TOKENS
-   One canonical dark-only visual system.
+   TECHNICAL-HUMANIST DESIGN SYSTEM - CORE TOKENS
+   Fusing Opencode.ai Architecture with Mizu Fluidity
    ================================================ */
 
 :root {
-  color-scheme: dark;
+  /* === THE CANVAS (Warm Terminal) === */
+  --bg-primary: #201d1d; /* Warm Near-Black */
+  --bg-secondary: #302c2c; /* Elevated Dark Surface */
+  --bg-glass: rgba(48, 44, 44, 0.74); /* Glassmorphic Base */
+  --text-primary: #f7f3eb; /* Warm Off-White */
+  --text-secondary: #c7bfb7; /* Editorial secondary copy */
+  --text-muted: #a1958b; /* Muted labels */
 
-  /* Canvas */
-  --bg-primary: #101114;
-  --bg-secondary: #17191d;
-  --bg-tertiary: #202328;
-  --bg-elevated: #2a2e34;
-  --bg-inset: #0b0c0f;
-  --bg-glass: rgba(23, 25, 29, 0.84);
-  --bg-surface-ghost: rgba(246, 241, 232, 0.06);
+  /* === VIVID ACCENTS === */
+  --accent-primary: #ff6b00; /* Vivid Mizu Orange */
+  --accent-primary-rgb: 255, 107, 0;
+  --accent-secondary: #007aff; /* System Blue */
 
-  /* Text */
-  --text-primary: #f6f1e8;
-  --text-secondary: #cbc7bf;
-  --text-muted: #9a9da3;
-  --text-subtle: #73777f;
-  --text-link: #f0a35a;
-  --text-link-hover: #ffd0a0;
-  --text-inverse: #111216;
+  /* === SEMANTIC COLORS (Apple HIG) === */
+  --success: #30d158;
+  --warning: #ff9f0a;
+  --danger: #ff3b30;
 
-  /* Brand */
-  --accent-primary: #f0a35a;
-  --accent-primary-rgb: 240, 163, 90;
-  --accent-primary-hover: #f6bd7c;
-  --accent-primary-active: #c9793f;
-  --accent-primary-subtle: rgba(240, 163, 90, 0.16);
-  --accent-primary-muted: rgba(240, 163, 90, 0.28);
+  /* === STRUCTURAL === */
+  --border-subtle: rgba(253, 252, 252, 0.08); /* Hairline */
+  --divider-dotted: rgba(253, 252, 252, 0.11); /* Dotted lines */
+  --divider-weak: rgba(253, 252, 252, 0.05); /* Very subtle divider */
+  --bg-surface-ghost: rgba(253, 252, 252, 0.02); /* Ghostly background */
+  --radius-sm: 8px; /* Standard components */
+  --radius-md: 10px; /* Inputs */
 
-  --accent-secondary: #d4d0c8;
-  --accent-secondary-rgb: 212, 208, 200;
-  --accent-secondary-hover: #f6f1e8;
-  --accent-secondary-subtle: rgba(212, 208, 200, 0.14);
-
-  --accent-hot: #e58f4a;
-  --accent-cyan: #9ca3af;
-
-  /* Semantic */
-  --success: #d4d0c8;
-  --warning: #f0a35a;
-  --danger: #b23b1f;
-  --info: #9ca3af;
-
-  /* Structure */
-  --border-subtle: rgba(246, 241, 232, 0.11);
-  --border-primary: rgba(246, 241, 232, 0.2);
-  --border-strong: rgba(240, 163, 90, 0.54);
-  --divider-dotted: rgba(246, 241, 232, 0.12);
-  --divider-weak: rgba(246, 241, 232, 0.08);
-
-  /* Radius */
-  --radius-xs: 0.5rem;
-  --radius-sm: 0.75rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
-  --radius-xl: 2rem;
-  --radius-2xl: 2.5rem;
-  --radius-full: 999px;
-  --radius-button: var(--radius-full);
-  --radius-card: var(--radius-xl);
-  --radius-input: var(--radius-md);
-
-  /* Shadows and glow */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.28);
-  --shadow-md: 0 18px 50px rgba(0, 0, 0, 0.36);
-  --shadow-lg: 0 34px 90px rgba(0, 0, 0, 0.48);
-  --shadow-glow: 0 0 44px rgba(var(--accent-primary-rgb), 0.22);
-  --shadow-green-glow: 0 0 40px rgba(var(--accent-primary-rgb), 0.18);
-
-  /* Layout */
-  --max-content-width: 78rem;
-  --max-editorial-width: 58rem;
-  --container-max-width: 78rem;
-  --container-padding: clamp(1rem, 3vw, 2rem);
-  --grid-unit: 8px;
-  --section-padding-y: clamp(5rem, 10vw, 8rem);
-
-  /* Spacing aliases */
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-8: 2rem;
-  --spacing-10: 2.5rem;
-  --spacing-12: 3rem;
-  --spacing-16: 4rem;
-  --spacing-20: 5rem;
-  --spacing-24: 6rem;
-  --spacing-32: 8rem;
-
-  /* Animation */
-  --duration-fast: 150ms;
-  --duration-normal: 240ms;
-  --duration-slow: 320ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* === ANIMATION === */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.4s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* Apple-style ease-out */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-emphatic: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Legacy/Composite Transitions for Compatibility */
   --transition-fast: var(--duration-fast) var(--ease-out);
   --transition-normal: var(--duration-normal) var(--ease-out);
   --transition-slow: var(--duration-slow) var(--ease-out);
-  --transition-spring: var(--duration-normal) var(--ease-emphatic);
+  --transition-spring: var(--duration-normal) var(--ease-spring);
 
-  /* App compatibility */
-  --c-bg: var(--bg-primary);
-  --c-text: var(--text-primary);
-  --c-scrollbar: #30343b;
-  --c-scrollbar-hover: #4b515b;
-  --background: var(--bg-primary);
-  --foreground: var(--text-primary);
-  --card: var(--bg-elevated);
-  --card-foreground: var(--text-primary);
-  --popover: var(--bg-elevated);
-  --popover-foreground: var(--text-primary);
-  --primary: var(--accent-primary);
-  --primary-foreground: var(--text-inverse);
-  --secondary: var(--bg-tertiary);
-  --secondary-foreground: var(--text-primary);
-  --muted: var(--bg-tertiary);
-  --muted-foreground: var(--text-muted);
-  --accent: var(--accent-primary-subtle);
-  --accent-foreground: var(--text-primary);
-  --destructive: var(--danger);
-  --border: var(--border-subtle);
-  --input: var(--bg-elevated);
-  --ring: var(--accent-primary);
-  --chart-1: var(--accent-primary);
-  --chart-2: var(--accent-secondary);
-  --chart-3: var(--accent-hot);
-  --chart-4: var(--accent-cyan);
-  --chart-5: var(--warning);
+  /* === LAYOUT === */
+  --max-content-width: 76rem;
+  --max-editorial-width: 55rem;
+  --grid-unit: 8px;
+  --section-padding-y: 5rem; /* Mapping to var(--spacing-20) / 80px */
 
-  /* Z-index */
+  /* Additional Spacing */
+  --spacing-5: 20px;
+  --spacing-20: 80px;
+
+  /* === Z-INDEX === */
   --z-base: 1;
   --z-elevated: 10;
   --z-sticky: 50;

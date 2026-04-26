@@ -1,0 +1,11 @@
+---
+import Atmosphere from './Atmosphere.astro'
+
+export interface Props {
+  variant?: 'section' | 'section-soft' | 'cta'
+}
+
+const { variant = 'section' } = Astro.props
+---
+
+<Atmosphere {variant} />
