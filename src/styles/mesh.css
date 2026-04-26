@@ -1,36 +1,34 @@
 /* ================================================
-   UNIFIED BLENDED THEME - MESH BACKGROUNDS
-   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
+   DARK THEME MESH BACKGROUNDS
    ================================================ */
 
 :root {
-  /* === MESH BACKGROUNDS - BRUTALIST ELEGANCE === */
   --mesh-1:
     radial-gradient(
-      circle at 20% 50%,
-      rgba(16, 185, 129, 0.08) 0%,
+      circle at 18% 18%,
+      rgba(var(--accent-primary-rgb), 0.2) 0%,
       transparent 50%
     ),
     radial-gradient(
-      circle at 80% 80%,
-      rgba(59, 130, 246, 0.06) 0%,
+      circle at 82% 18%,
+      rgba(var(--accent-secondary-rgb), 0.11) 0%,
       transparent 50%
     ),
     radial-gradient(
-      circle at 40% 20%,
-      rgba(139, 92, 246, 0.04) 0%,
+      circle at 50% 100%,
+      rgba(244, 114, 182, 0.1) 0%,
       transparent 50%
     );
 
   --mesh-2:
     radial-gradient(
       circle at 60% 30%,
-      rgba(16, 185, 129, 0.06) 0%,
+      rgba(var(--accent-primary-rgb), 0.13) 0%,
       transparent 50%
     ),
     radial-gradient(
       circle at 20% 70%,
-      rgba(6, 182, 212, 0.05) 0%,
+      rgba(56, 189, 248, 0.09) 0%,
       transparent 50%
     );
 }
