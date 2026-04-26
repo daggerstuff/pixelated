@@ -1,6 +1,18 @@
 import { describe, it, expect } from 'vitest'
 
-import { formatDuration, isValidDate, getStartOf } from './formatDate'
+import { formatDate, formatDuration, isValidDate, getStartOf } from './formatDate'
+
+describe('formatDate', () => {
+  it('formats valid date string correctly with default options', () => {
+    const result = formatDate('2023-01-01T00:00:00.000Z')
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('throws an error for invalid date string', () => {
+    expect(() => formatDate('invalid-date')).toThrow('Failed to format date: Error: Invalid date string')
+  })
+})
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
