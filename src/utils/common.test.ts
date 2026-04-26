@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { unescapeHTML } from './common'
+import { unescapeHTML, slug } from './common'
+
+describe('common utilities - slug', () => {
+  it('handles edge cases like multiple spaces, special characters, and trailing hyphens', () => {
+    expect(slug('  Hello   World!  ')).toBe('hello-world')
+    expect(slug('Special @ Characters #1')).toBe('special-characters-1')
+    expect(slug('---Leading and Trailing---')).toBe('leading-and-trailing')
+  })
+})
 
 describe('common utilities - unescapeHTML', () => {
   it('unescapes all common HTML entities in string children', () => {
