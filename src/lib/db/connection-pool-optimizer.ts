@@ -7,7 +7,7 @@ import { EventEmitter } from 'events'
 
 import { Pool, PoolClient, PoolConfig } from 'pg'
 
-import { getLogger } from '@/lib/logging'
+import { getLogger } from '../logging'
 
 // Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
 

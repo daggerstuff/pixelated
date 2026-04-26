@@ -112,7 +112,7 @@ export function DiscoveryForm({
                 </label>
               ))}
             </div>
-            <FieldError error={errors.sources} />
+            <FieldError error={errors['sources']} />
             {sources.length === 0 && (
               <p className='text-yellow-500 text-sm'>
                 Please select at least one source
@@ -166,7 +166,7 @@ export function DiscoveryForm({
                 ))}
               </div>
             )}
-            <FieldError error={errors.keywords} />
+            <FieldError error={errors['keywords']} />
           </div>
 
           <ErrorMessage error={submitError} fieldErrors={errors} />

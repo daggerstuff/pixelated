@@ -16,10 +16,10 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from ai.rag.nemotron_benchmark import (
+    THERAPEUTIC_BENCHMARK_DATASET,
     BenchmarkConfig,
     NemotronBenchmark,
     TaskType,
-    THERAPEUTIC_BENCHMARK_DATASET,
 )
 
 

@@ -19,6 +19,10 @@ on:
 defaults:
   run:
     shell: 'bash'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   debugger:
     runs-on: 'ubuntu-latest'

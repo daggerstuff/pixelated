@@ -22,9 +22,12 @@ export type { User, AuthUser } from "./types";
  * Get the current user from the request or cookies
  * Supports both JWT (users) and API keys (developers)
  */
-export async function getCurrentUser(
-  context: Request | AstroCookies,
-): Promise<{ id: string; role: string } | null> {
+export async function getCurrentUser(context: Request | AstroCookies): Promise<{
+  id: string;
+  role: string;
+  accountId?: string;
+  workspaceId?: string;
+} | null> {
   let token: string | null = null;
   let isApiKey = false;
 
@@ -65,7 +68,12 @@ export async function getCurrentUser(
     try {
       const result = await validateToken(token, "access");
       if (result.valid && result.userId) {
-        return { id: result.userId, role: result.role || "guest" };
+        return {
+          id: result.userId,
+          role: result.role || "guest",
+          accountId: result.accountId,
+          workspaceId: result.workspaceId,
+        };
       }
     } catch {
       // Token validation failed
@@ -199,80 +207,28 @@ export async function getUserById(
 }
 
 /**
- * Validate API key and return developer user information
+ * Validate API key and return developer user information.
+ * Delegates to DeveloperApiKeyManager for proper database-backed validation.
+ *
  * @param apiKey The API key to validate
  * @returns User information if valid API key, null otherwise
  */
 async function validateApiKeyAndGetUser(
   apiKey: string,
 ): Promise<{ id: string; role: string } | null> {
-  // Validate against environment variable or secure storage
-  const validApiKeys = [process.env.DEV_API_KEY, process.env.API_KEY].filter(
-    (key): key is string => key !== undefined && key !== "",
-  );
+  const { developerApiKeyManager } = await import("@/lib/db/developer-api-keys");
 
-  if (!validApiKeys.includes(apiKey)) {
+  const validation = await developerApiKeyManager.validateApiKey(apiKey);
+
+  if (!validation.valid || !validation.api_key) {
     return null;
   }
 
-  // Get developer information from API key
-  const developerInfo = await getDeveloperInfoFromApiKey(apiKey);
-
-  if (!developerInfo) {
-    return null;
-  }
-
+  const keyRecord = validation.api_key;
   return {
-    id: developerInfo.id,
-    role: developerInfo.role,
+    id: keyRecord.user_id,
+    role: keyRecord.scopes.includes("admin") ? "admin" : "developer",
   };
-}
-
-/**
- * Get developer information from API key
- * In production, this would query a database or secure store
- * @param apiKey The API key to lookup
- * @returns Developer information if found
- */
-async function getDeveloperInfoFromApiKey(apiKey: string): Promise<{
-  id: string;
-  role: "developer" | "admin";
-  name?: string;
-  email?: string;
-} | null> {
-  // This is a simplified implementation
-  // In reality, you'd query a developer/apikey table in your database
-
-  // For now, we'll simulate based on the API key format
-  if (apiKey.startsWith("dev_")) {
-    return {
-      id: "dev_" + apiKey.substring(4, 12), // Simplified ID generation
-      role: "developer",
-      name: "Developer",
-      email: "developer@pixelatedempathy.com",
-    };
-  }
-
-  if (apiKey.startsWith("admin_")) {
-    return {
-      id: "admin_" + apiKey.substring(6, 14), // Simplified ID generation
-      role: "admin",
-      name: "Administrator",
-      email: "admin@pixelatedempathy.com",
-    };
-  }
-
-  // Fallback for testing
-  if (apiKey === "test-dev-key-123") {
-    return {
-      id: "dev_001",
-      role: "developer",
-      name: "Test Developer",
-      email: "test@pixelatedempathy.com",
-    };
-  }
-
-  return null;
 }
 
 export const auth = {
