@@ -823,8 +823,8 @@ export class BiasAnalysisCache {
     const key = `session:${session.sessionId}`
     const tags = [
       'session-data',
-      `participant:${session.participantDemographics.age}:${session.participantDemographics.gender}`,
-      `scenario:${session.scenario.type}`,
+      `participant:${session.participantDemographics?.age || 'unknown'}:${session.participantDemographics?.gender || 'unknown'}`,
+      `scenario:${session.scenario?.type || 'unknown'}`,
     ]
 
     await this.cache.set(key, session, { tags })

@@ -93,6 +93,7 @@ describe('TherapeuticProgressService', () => {
       conversationalStyle: {
         verbosity: 0.5,
         emotionalExpressiveness: 0.5,
+        resistance: 3,
         insightLevel: 0.5,
         preferredCommunicationModes: [],
       },
@@ -149,16 +150,16 @@ describe('TherapeuticProgressService', () => {
     })
 
     it('should throw an error if profile is invalid', () => {
-      expect(() => service.addInsight(null as unknown, 'insight')).toThrow(
-        'Invalid patient profile provided.',
-      )
+      expect(
+        () => service.addInsight(null as unknown as PatientProfile, 'insight'),
+      ).toThrow('Invalid patient profile provided.')
       const incompleteProfile = {
         ...mockPatientProfile,
         cognitiveModel: {
           ...mockPatientProfile.cognitiveModel,
           therapeuticProgress: undefined as unknown,
         },
-      }
+      } as PatientProfile
       expect(() => service.addInsight(incompleteProfile, 'insight')).toThrow(
         'Invalid patient profile provided.',
       )
@@ -236,7 +237,11 @@ describe('TherapeuticProgressService', () => {
 
     it('should throw an error if profile or coreBeliefs are invalid', () => {
       expect(() =>
-        service.updateBeliefStrength(null as unknown, targetBelief, 0.1),
+        service.updateBeliefStrength(
+          null as unknown as PatientProfile,
+          targetBelief,
+          0.1,
+        ),
       ).toThrow('Invalid patient profile or core beliefs missing.')
       const incompleteProfile = {
         ...mockPatientProfile,
@@ -244,7 +249,7 @@ describe('TherapeuticProgressService', () => {
           ...mockPatientProfile.cognitiveModel,
           coreBeliefs: undefined as unknown,
         },
-      }
+      } as PatientProfile
       expect(() =>
         service.updateBeliefStrength(incompleteProfile, targetBelief, 0.1),
       ).toThrow('Invalid patient profile or core beliefs missing.')

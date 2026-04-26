@@ -66,9 +66,19 @@ Provide a comprehensive clinical analysis in JSON format:
   /**
    * Parses clinical response from LLM.
    */
-  public parseClinicalResponse(content: string): void {
+  public parseClinicalResponse(content: string): {
+    explanation: string
+    confidence: number
+    supportingEvidence: string[]
+    clinicalReasoning?: string
+  } {
     try {
-      return JSON.parse(content) as unknown
+      return JSON.parse(content) as {
+        explanation: string
+        confidence: number
+        supportingEvidence: string[]
+        clinicalReasoning?: string
+      }
     } catch (error: unknown) {
       logger.error('Failed to parse clinical response', { error, content })
       return {

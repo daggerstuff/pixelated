@@ -554,3 +554,62 @@ export const treatmentPlanDAO = new TreatmentPlanDAO()
 export const crisisSessionFlagDAO = new CrisisSessionFlagDAO()
 export const consentManagementDAO = new ConsentManagementDAO()
 export const dataExportDAO = new DataExportDAO()
+
+export interface AgentActivityRecord {
+  id: string
+  turnId: string
+  userId: string
+  activities: any[]
+  timestamp: number
+}
+
+export class AgentActivityDAO {
+  private async getCollection(): Promise<MongoCollection<AgentActivityRecord>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<AgentActivityRecord>('agent_activities')
+  }
+
+  async saveActivities(record: AgentActivityRecord): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.updateOne(
+      { turnId: record.turnId },
+      { $set: record },
+      { upsert: true }
+    )
+  }
+
+  async getActivitiesByTurnId(turnId: string): Promise<AgentActivityRecord | null> {
+    const collection = await this.getCollection()
+    return collection.findOne({ turnId } as any)
+  }
+}
+
+export interface AgentFeedbackRecord {
+  id: string
+  activityId: string
+  turnId?: string
+  feedback: 'positive' | 'negative' | 'correction'
+  comment?: string
+  userId: string
+  timestamp: number
+}
+
+export class AgentFeedbackDAO {
+  private async getCollection(): Promise<MongoCollection<AgentFeedbackRecord>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<AgentFeedbackRecord>('agent_feedback')
+  }
+
+  async saveFeedback(record: AgentFeedbackRecord): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.insertOne(record)
+  }
+}

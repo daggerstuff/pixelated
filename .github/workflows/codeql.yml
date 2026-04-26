@@ -15,6 +15,7 @@ on:
     - cron: '0 2 * * 1'
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.13
 

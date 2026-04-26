@@ -41,28 +41,17 @@ describe('usePatternDetection', () => {
     },
   ]
 
-  const mockStreamResponse = new ReadableStream({
-    start(controller): void {
-      controller.enqueue(
-        new TextEncoder().encode(JSON.stringify(mockPatternResponse)),
-      )
-      controller.close()
-    },
-  })
-
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: vi.fn<() => Promise<unknown>>(),
+      getAIResponse: vi.fn<() => Promise<string>>(),
     })
   })
 
   it('should detect patterns from conversation history', async () => {
     const mockGetAIResponse = vi
-      .fn<() => Promise<{ content: string }>>()
-      .mockResolvedValue({
-        content: JSON.stringify(mockPatternResponse),
-      })
+      .fn<() => Promise<string>>()
+      .mockResolvedValue(JSON.stringify(mockPatternResponse))
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })
@@ -74,8 +63,8 @@ describe('usePatternDetection', () => {
 
   it('should handle streaming responses', async () => {
     const mockGetAIResponse = vi
-      .fn<() => Promise<ReadableStream>>()
-      .mockResolvedValue(mockStreamResponse)
+      .fn<() => Promise<string>>()
+      .mockResolvedValue(JSON.stringify(mockPatternResponse))
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })
@@ -110,8 +99,8 @@ describe('usePatternDetection', () => {
 
   it('should handle malformed JSON responses', async () => {
     const mockGetAIResponse = vi
-      .fn<() => Promise<{ content: string }>>()
-      .mockResolvedValue({ content: 'invalid json' })
+      .fn<() => Promise<string>>()
+      .mockResolvedValue('invalid json')
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })
@@ -133,7 +122,7 @@ describe('usePatternDetection', () => {
   it('should handle empty message array', async () => {
     // No mock needed or verify default behavior
     vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: vi.fn<() => Promise<unknown>>(),
+      getAIResponse: vi.fn<() => Promise<string>>(),
     })
     const { result } = renderHook(() => usePatternDetection())
     const patterns = await result.current.detectPatterns([])
@@ -143,8 +132,8 @@ describe('usePatternDetection', () => {
 
   it('should handle non-array responses', async () => {
     const mockGetAIResponse = vi
-      .fn<() => Promise<{ content: string }>>()
-      .mockResolvedValue({ content: JSON.stringify({}) })
+      .fn<() => Promise<string>>()
+      .mockResolvedValue(JSON.stringify({}))
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })

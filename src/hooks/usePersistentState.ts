@@ -44,7 +44,7 @@ export function usePersistentState<T>(
   } = options
   const [state, setState] = useState<T>(defaultValue)
   const [isLoaded, setIsLoaded] = useState(false)
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const lastStoredValueRef = useRef<T>(defaultValue)
 
   // Load initial value from storage
@@ -64,7 +64,8 @@ export function usePersistentState<T>(
     if (!syncAcrossTabs || typeof window === 'undefined') return
 
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === storageManager.getFullKey(key) && e.newValue) {
+      const storageKey = e.key
+      if (e.newValue && (storageKey === key || storageKey?.endsWith(`_${key}`))) {
         try {
           const newValue = JSON.parse(e.newValue)
           if (newValue.value !== undefined) {

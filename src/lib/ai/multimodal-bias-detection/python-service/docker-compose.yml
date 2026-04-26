@@ -96,7 +96,7 @@ services:
     container_name: pixelated-multimodal-redis
     restart: unless-stopped
     ports:
-      - '6380:6379' # Different port from text service
+      - '127.0.0.1:6380:6379' # Different port from text service
     volumes:
       - redis_multimodal_data:/data
     networks:

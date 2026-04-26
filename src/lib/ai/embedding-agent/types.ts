@@ -52,6 +52,8 @@ export interface EmbeddingRequest {
   metadata?: Record<string, unknown>
   /** Override the default embedding model */
   model?: EmbeddingModel
+
+  [key: string]: unknown
 }
 
 /**
@@ -88,6 +90,8 @@ export interface BatchEmbeddingRequest {
   metadataList?: Record<string, unknown>[]
   /** Override the default embedding model */
   model?: EmbeddingModel
+
+  [key: string]: unknown
 }
 
 /**
@@ -144,6 +148,8 @@ export interface SimilaritySearchRequest {
   minSimilarity?: number
   /** Whether to include metadata in results */
   includeMetadata?: boolean
+
+  [key: string]: unknown
 }
 
 /**

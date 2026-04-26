@@ -1,7 +1,6 @@
 import { Brain, Heart, Zap, Shield, User } from 'lucide-react'
 import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
-import type { FC } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,10 +70,7 @@ const ARCHETYPES = {
 }
 
 type ArchetypeKey = keyof typeof ARCHETYPES
-
-const isArchetypeKey = (key: string): key is ArchetypeKey => {
-  return key in ARCHETYPES
-}
+type ArchetypeInfo = (typeof ARCHETYPES)[ArchetypeKey]
 
 export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   analysis,
@@ -90,12 +86,7 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
     const archetypeKey = analysis.archetype.main_archetype
       .toLowerCase()
       .replace(' ', '_')
-
-    if (!isArchetypeKey(archetypeKey)) {
-      return null
-    }
-
-    return ARCHETYPES[archetypeKey] || null
+    return (ARCHETYPES as Record<string, ArchetypeInfo>)[archetypeKey] ?? null
   }, [analysis?.archetype])
 
   const moodMetrics = useMemo(() => {

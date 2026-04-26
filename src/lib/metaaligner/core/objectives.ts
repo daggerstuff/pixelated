@@ -22,6 +22,7 @@ export interface AlignmentContext {
   userQuery: string
   conversationHistory?: string[]
   detectedContext: ContextType
+  confidence?: number
   userProfile?: UserProfile
   sessionMetadata?: {
     confidence?: number

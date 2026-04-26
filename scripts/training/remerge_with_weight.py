@@ -15,10 +15,10 @@ Usage:
 
 import argparse
 from pathlib import Path
+
 import torch
+from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel, LoraConfig, get_peft_model
-import copy
 
 
 def scale_adapter_weights(model: PeftModel, scale: float) -> PeftModel:

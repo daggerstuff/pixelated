@@ -1,0 +1,37 @@
+---
+export const prerender = false
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
+import { AgentMonitorDemo } from '@/components/ai/AgentMonitorDemo'
+---
+
+<DashboardLayout
+  title="Agent Monitor | Pixelated Empathy"
+  description="Real-time multi-agent activity monitoring and reasoning visualization"
+>
+  <div class="container mx-auto py-6">
+    <div class="mb-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-2 text-gradient bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
+        Agent Monitor
+      </h1>
+      <p class="text-muted-foreground text-lg">
+        Watch multi-agent orchestration and reasoning chains in real-time.
+      </p>
+    </div>
+
+    <AgentMonitorDemo client:load />
+  </div>
+</DashboardLayout>
+
+<style>
+  .text-gradient {
+    background-size: 200% auto;
+    animation: shine 4s linear infinite;
+  }
+  
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
+</style>

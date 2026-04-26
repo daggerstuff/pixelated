@@ -1,0 +1,224 @@
+name: Deploy to Kubernetes
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types:
+      - completed
+    branches: [staging]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Optional image tag to deploy for rollback or redeploy.'
+        required: false
+        type: string
+
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if:
+      github.event_name == 'workflow_dispatch' || (github.event_name ==
+      'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    env:
+      ARTIFACT_REGISTRY_LOCATION: us-west1
+      ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
+      GKE_CLUSTER_NAME: pixelated-empathy-staging
+      GKE_CLUSTER_LOCATION: us-west1
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+          ref:
+            ${{ github.event_name == 'workflow_run' &&
+            github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Authenticate to Google Cloud (OIDC)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: 'kubectl'
+
+      - name: Verify GKE cluster exists
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          if ! gcloud container clusters describe "$GKE_CLUSTER_NAME" \
+            --project "$GCP_PROJECT_ID" \
+            --location "$GKE_CLUSTER_LOCATION" \
+            --format="value(name,location,status)" \
+            >/tmp/gke-cluster.txt; then
+            echo "::error title=Missing GKE cluster::Could not find cluster '${GKE_CLUSTER_NAME}' in project '${GCP_PROJECT_ID}' in location '${GKE_CLUSTER_LOCATION}'."
+            echo "Available clusters in '${GCP_PROJECT_ID}':"
+            gcloud container clusters list --project "$GCP_PROJECT_ID" --format="table(name,location,status)" || true
+            exit 1
+          fi
+          echo "Target GKE cluster found:"
+          cat /tmp/gke-cluster.txt
+
+      - name: Authenticate to GKE
+        uses: google-github-actions/get-gke-credentials@v3
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER_NAME }}
+          location: ${{ env.GKE_CLUSTER_LOCATION }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Determine image tag
+        run: |
+          if [[ -n "${{ inputs.image_tag }}" ]]; then
+            IMAGE_TAG="${{ inputs.image_tag }}"
+          elif [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            IMAGE_TAG="${{ github.event.workflow_run.head_sha }}"
+          else
+            IMAGE_TAG="${GITHUB_SHA}"
+          fi
+          IMAGE_TAG="${IMAGE_TAG:0:7}"
+          IMAGE_URI="${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/api:${IMAGE_TAG}"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+          echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_ENV"
+
+      - name: Validate workflow inputs
+        env:
+          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
+          GCP_WIF_PROVIDER: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+          DATABASE_URL: ${{ secrets['DATABASE_URL'] }}
+          REDIS_URL: ${{ secrets['REDIS_URL'] }}
+          JWT_SECRET: ${{ secrets['JWT_SECRET'] }}
+          API_KEY: ${{ secrets['API_KEY'] }}
+        run: |
+          [[ -n "$GCP_PROJECT_ID" ]] || { echo "Missing secret: GCP_PROJECT_ID"; exit 1; }
+          [[ -n "$GCP_WIF_PROVIDER" ]] || { echo "Missing secret: GCP_WIF_PROVIDER"; exit 1; }
+          [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || { echo "Missing secret: GCP_WIF_SERVICE_ACCOUNT"; exit 1; }
+          [[ -n "$DATABASE_URL" ]] || { echo "Missing secret: DATABASE_URL"; exit 1; }
+          [[ -n "$REDIS_URL" ]] || { echo "Missing secret: REDIS_URL"; exit 1; }
+          [[ -n "$JWT_SECRET" ]] || { echo "Missing secret: JWT_SECRET"; exit 1; }
+          [[ -n "$API_KEY" ]] || { echo "Missing secret: API_KEY"; exit 1; }
+
+      - name: Validate deployment kustomize overlay
+        run: |
+          KUSTOMIZATION_DIR="k8s/overlays/staging"
+          for file in "$KUSTOMIZATION_DIR/kustomization.yaml" "$KUSTOMIZATION_DIR/kustomization.yml" "$KUSTOMIZATION_DIR/Kustomization"; do
+            if [[ -f "$file" ]]; then
+              echo "Found kustomization file: $file"
+              exit 0
+            fi
+          done
+          echo "::error title=Missing kustomization::Could not find kustomization.yaml/yml/Kustomization in $KUSTOMIZATION_DIR"
+          ls -la "$KUSTOMIZATION_DIR" || true
+          exit 1
+
+      - name: Apply deployment kustomize manifests
+        run: kubectl apply -k k8s/overlays/staging
+
+      - name: Update k8s deployment image
+        run:
+          kubectl set image deployment/pixelated-empathy-api
+          "pixelated-empathy-api=$IMAGE_URI" -n pixelated-empathy
+
+      - name: Render and apply runtime secrets
+        run: |
+          chmod +x ./scripts/render-k8s-secrets.sh
+          DATABASE_URL="${{ secrets.DATABASE_URL }}"                   REDIS_URL="${{ secrets.REDIS_URL }}"                   JWT_SECRET="${{ secrets.JWT_SECRET }}"                   API_KEY="${{ secrets.API_KEY }}"                   ./scripts/render-k8s-secrets.sh
+
+      - name: Restart to apply updated runtime secrets
+        run:
+          kubectl rollout restart deployment/pixelated-empathy-api -n
+          pixelated-empathy
+
+      - name: Wait for rollout
+        run: |
+          if kubectl rollout status deployment/pixelated-empathy-api -n pixelated-empathy --timeout=600s; then
+            echo "Rollout succeeded."
+            echo "Checking HPA metric sampling health (non-blocking)."
+            if kubectl wait --for=jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}'=True hpa/pixelated-empathy-api-hpa -n pixelated-empathy --timeout=60s; then
+              echo "HPA scaling condition is active."
+            else
+              echo "::warning title=HPA metrics warming up::HPA is still collecting metrics; rollout succeeded, continuing."
+            fi
+
+            CURRENT_UTIL=$(kubectl get hpa pixelated-empathy-api-hpa -n pixelated-empathy -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' 2>/dev/null || true)
+            CURRENT_METRIC_COUNT=$(kubectl get hpa pixelated-empathy-api-hpa -n pixelated-empathy -o jsonpath='{.status.currentMetrics[*].type}' 2>/dev/null | tr ' ' '\n' | grep -c . || true)
+            if [[ -n "$CURRENT_UTIL" ]]; then
+              echo "HPA current CPU utilization sample: ${CURRENT_UTIL}%"
+            elif [[ "$CURRENT_METRIC_COUNT" -eq 0 ]]; then
+              echo "::warning title=HPA has no current utilization sample::HPA is active but metrics are not yet available."
+            else
+              echo "HPA current metrics payload is empty; will be updated by next scrape."
+            fi
+            kubectl get hpa pixelated-empathy-api-hpa -n pixelated-empathy -o wide || true
+          else
+            echo "Rollout failed or timed out."
+            echo "Deployment details:"
+            kubectl describe deployment pixelated-empathy-api -n pixelated-empathy || true
+            echo "Deployment status:"
+            kubectl get deployment pixelated-empathy-api -n pixelated-empathy -o wide || true
+            echo "Current pods:"
+            kubectl get pods -n pixelated-empathy -l app=pixelated-empathy-api -o wide || true
+            echo "Failed scheduling events:"
+            kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp --field-selector reason=FailedScheduling | tail -n 120 || true
+            echo "Recent deploy-related events:"
+            kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp | tail -n 200 || true
+            echo "Node capacity:"
+            kubectl get nodes -o wide || true
+            kubectl describe nodes | sed -n '1,220p' || true
+            for pod in $(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy-api --no-headers -o custom-columns=":metadata.name"); do
+              echo "=== Logs for ${pod} (previous) ==="
+              kubectl logs "${pod}" -n pixelated-empathy --previous --tail=120 || true
+              echo "=== Logs for ${pod} (current) ==="
+              kubectl logs "${pod}" -n pixelated-empathy --tail=120 || true
+              echo "=== Pod events for ${pod} ==="
+              kubectl describe pod "${pod}" -n pixelated-empathy || true
+            done
+
+            has_scheduling_issue=$(kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp | tail -n 260 | \
+              grep -iE 'FailedScheduling|FailedScaleUp|No nodes are available|Insufficient memory|untolerated taint|GCE quota exceeded|cluster-autoscaler_unhelpable' || true)
+
+            if [[ -n "$has_scheduling_issue" ]]; then
+              raw_scheduling_issue=$(echo "$has_scheduling_issue" | head -n 1 | tr '\n' ' ')
+              if ((${#raw_scheduling_issue} > 140)); then
+                first_scheduling_issue="${raw_scheduling_issue:0:137}..."
+              else
+                first_scheduling_issue="$raw_scheduling_issue"
+              fi
+              echo "::error title=Deployment rollout blocked::Scheduling/cluster capacity issue detected. Root cause likely infra-level (quota/memory/taints)."
+              echo "::error title=Deployment rollout blocked::Example event: ${first_scheduling_issue}"
+              echo "::error title=Deployment rollout blocked::Suggested remediation: scale node pool or increase max nodes, request higher CPU/memory/quota, or remove/adjust incompatible node taints."
+              echo "Detected scheduling/cluster capacity failure. Skipping automatic rollback."
+              echo "Root cause is likely infra-level (quota/memory/taints). Fix cluster capacity and rerun deployment."
+              exit 1
+            fi
+
+            echo "Rolling back deployment to previous revision."
+            echo "::warning title=Deployment rollout failed::Attempting app-level rollback."
+            kubectl rollout undo deployment/pixelated-empathy-api -n pixelated-empathy || true
+            exit 1
+          fi
+
+      - name: Verify deployment
+        run: |
+          echo "Checking pods..."
+          kubectl get pods -n pixelated-empathy -l app=pixelated-empathy-api
+          echo "Checking service..."
+          kubectl get svc -n pixelated-empathy
+          echo "Checking ingress..."
+          kubectl get ingress -n pixelated-empathy

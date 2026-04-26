@@ -35,6 +35,10 @@ export interface RedisMockClient {
   ): Promise<'OK'>
   del(key: string): Promise<number>
   exists(key: string): Promise<number>
+  lpush(key: string, ...elements: string[]): Promise<number>
+  rpoplpush(source: string, destination: string): Promise<string | null>
+  lrem(key: string, count: number, value: string): Promise<number>
+  llen(key: string): Promise<number>
   sadd(key: string, member: string): Promise<number>
   srem(key: string, member: string): Promise<number>
   smembers(key: string): Promise<string[]>

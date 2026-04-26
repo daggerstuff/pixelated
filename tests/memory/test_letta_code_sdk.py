@@ -9,26 +9,24 @@ Tests cover:
 - PII filtering integration
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Any, Dict
+
+import pytest
 
 from ai.memory.letta_code_client import (
     LettaCodeClient,
     LettaCodeConfig,
     LettaSession,
-    PermissionMode,
     ModelProvider,
+    PermissionMode,
 )
 from ai.memory.letta_tool_permissions import (
-    LettaToolRegistry,
     LettaPermissionHandler,
+    LettaToolRegistry,
     PermissionLevel,
-    CrisisContext,
-    ToolDefinition,
     PermissionResult,
+    ToolDefinition,
 )
-
 
 # ==================== Configuration Tests ====================
 
@@ -550,7 +548,7 @@ class TestErrorHandling:
         client = LettaCodeClient(config)
 
         # Simulate import error
-        with patch.dict('sys.modules', {'letta': None}):
+        with patch.dict("sys.modules", {"letta": None}):
             # Should not crash
             pass
 

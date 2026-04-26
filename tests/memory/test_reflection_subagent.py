@@ -7,36 +7,32 @@ import pytest
 pytestmark = pytest.mark.skip(reason="Module ai.memory.unified_memory not implemented")
 
 from unittest.mock import Mock
-from typing import Dict, Any, List
 
-from ai.memory.unified_memory import (
-    MemoryCategory,
-    CrisisSeverity,
-    MemoryMetadata,
-    Memory,
-    MemoryProvider,
-)
-from ai.memory.reflection_prompts import (
-    ReflectionPrompt,
-    CRISIS_AWARE_REFLECTION,
-    STANDARD_REFLECTION,
-    CRISIS_DETECTION_PROMPT,
-    get_reflection_prompt,
-    get_all_prompts,
-)
-from ai.memory.reflection_subagent import (
-    ReflectionSubagent,
-    ReflectionConfig,
-    ReflectionResult,
-    ReflectionTrigger,
-)
 from ai.memory.consolidation_rules import (
-    ConsolidationRules,
     ConsolidationConfig,
     ConsolidationRule,
-    RuleResult,
+    ConsolidationRules,
 )
-
+from ai.memory.reflection_prompts import (
+    CRISIS_AWARE_REFLECTION,
+    CRISIS_DETECTION_PROMPT,
+    STANDARD_REFLECTION,
+    get_all_prompts,
+    get_reflection_prompt,
+)
+from ai.memory.reflection_subagent import (
+    ReflectionConfig,
+    ReflectionResult,
+    ReflectionSubagent,
+    ReflectionTrigger,
+)
+from ai.memory.unified_memory import (
+    CrisisSeverity,
+    Memory,
+    MemoryCategory,
+    MemoryMetadata,
+    MemoryProvider,
+)
 
 # ============================================================================
 # Test Reflection Prompts
@@ -115,7 +111,7 @@ class MockMemoryProvider:
     """Mock memory provider for testing."""
 
     def __init__(self):
-        self._memories: Dict[str, Memory] = {}
+        self._memories: dict[str, Memory] = {}
 
     async def add_memory(self, content: str, metadata: MemoryMetadata) -> str:
         memory_id = f"mem-{len(self._memories)}"
@@ -149,7 +145,7 @@ class MockMemoryProvider:
         self,
         query: str,
         limit: int = 10,
-    ) -> List[Memory]:
+    ) -> list[Memory]:
         del query  # Mark as intentionally unused
         return list(self._memories.values())[:limit]
 
@@ -157,7 +153,7 @@ class MockMemoryProvider:
         self,
         user_id: str,
         limit: int = 100,
-    ) -> List[Memory]:
+    ) -> list[Memory]:
         del user_id  # Mark as intentionally unused
         return list(self._memories.values())[:limit]
 
@@ -165,7 +161,7 @@ class MockMemoryProvider:
         self,
         category: MemoryCategory,
         limit: int = 100,
-    ) -> List[Memory]:
+    ) -> list[Memory]:
         return [m for m in self._memories.values() if m.metadata.category == category][:limit]
 
 

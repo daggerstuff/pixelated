@@ -58,6 +58,13 @@ const createTestCognitiveModel = (
     resistanceLevel: 3,
     changeReadiness: 'contemplation',
     sessionProgressLog: [],
+    trustLevel: 5,
+    rapportScore: 5,
+    therapistPerception: 'neutral',
+    transferenceState: 'none',
+    skillsAcquired: [
+      { skillName: 'basic coping skills', dateAchieved: new Date().toISOString(), proficiency: 0.5 },
+    ],
   } as TherapeuticProgress,
 })
 

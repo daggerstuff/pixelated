@@ -104,7 +104,7 @@ echo "[CCR] Exported ANTHROPIC_API_KEY=(hidden)"
 
 # Start CCR
 echo "[CCR] Starting Claude Code Router..."
-nohup bunx @musistudio/claude-code-router@latest start --port "$CCR_PORT" >"$CCR_LOG_PATH" 2>&1 &
+nohup pnpm dlx @musistudio/claude-code-router@latest start --port "$CCR_PORT" >"$CCR_LOG_PATH" 2>&1 &
 CCR_PID=$!
 echo "[CCR] PID: $CCR_PID"
 

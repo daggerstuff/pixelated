@@ -13,6 +13,7 @@ from flask_cors import CORS
 # Add security module to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "security"))
 
+from auth import authenticate
 from bias_detector import TherapeuticSession, analyze_session_bias
 from crisis_detection import detect_crisis_signals
 from database import DatabaseService
@@ -52,6 +53,7 @@ def health_check():
 
 
 @app.route("/api/security/scrub-pii", methods=["POST"])
+@authenticate
 def scrub_pii_endpoint():
     """
     Scrub PII from text
@@ -82,6 +84,7 @@ def scrub_pii_endpoint():
 
 
 @app.route("/api/security/detect-crisis", methods=["POST"])
+@authenticate
 def detect_crisis_endpoint():
     """
     Detect crisis signals in text
@@ -123,6 +126,7 @@ def detect_crisis_endpoint():
 
 
 @app.route("/api/emotion/validate", methods=["POST"])
+@authenticate
 def validate_emotion_endpoint():
     """
     Validate emotion detection result
@@ -144,6 +148,7 @@ def validate_emotion_endpoint():
 
 
 @app.route("/api/bias/analyze-session", methods=["POST"])
+@authenticate
 def analyze_bias_endpoint():
     """
     Analyze therapeutic session for bias
@@ -165,6 +170,7 @@ def analyze_bias_endpoint():
 
 
 @app.route("/api/combined/analyze-conversation", methods=["POST"])
+@authenticate
 def analyze_conversation_endpoint():
     """
     Combined analysis: PII, crisis, emotion, and bias
@@ -222,7 +228,7 @@ if __name__ == "__main__":
     # Control debug mode via environment variable for security
     # Set FLASK_DEBUG=1 or DEBUG=1 to enable debug mode in development
     debug_mode = os.environ.get("FLASK_DEBUG", "").lower() in ("1", "true", "yes") or os.environ.get("DEBUG", "").lower() in ("1", "true", "yes")
-    
+
     logger.info("Starting Pixelated Empathy Therapeutic AI API")
     logger.info(f"Mode: {'DEBUG' if debug_mode else 'PRODUCTION'}")
     logger.info("Listening on http://0.0.0.0:5000")

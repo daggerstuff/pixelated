@@ -22,7 +22,7 @@ export interface UseSyncedStateOptions<T> {
    * - 'merge': Deep merge objects
    * - 'manual': Use onConflict callback
    */
-  conflictStrategy?: 'local-wins' | 'remote-wins' | 'merge' | 'manual'
+  conflictStrategy?: 'local-wins' | 'remote-wins' | 'remote' | 'merge' | 'manual'
   onSync?: (value: T, sourceTabId: string) => void
   /**
    * Conflict resolution handler.
@@ -43,7 +43,7 @@ class SyncLifecycleManager<T> {
   private enableSync: boolean
   private instanceId: string
   private conflictStrategy: NonNullable<
-    UseSyncedStateOptions<T>['conflictStrategy']
+    Exclude<UseSyncedStateOptions<T>['conflictStrategy'], 'remote'>
   >
   private defaultValue: T
   private debounceMs: number
@@ -75,7 +75,7 @@ class SyncLifecycleManager<T> {
     this.instanceId = instanceId
     this.key = options.key
     this.enableSync = options.enableSync ?? true
-    this.conflictStrategy = options.conflictStrategy || 'remote'
+    this.conflictStrategy = this.resolveConflictStrategy(options.conflictStrategy)
     this.defaultValue = options.defaultValue
     this.debounceMs = options.debounceMs ?? 300
     this.storageOptions = storageOptions
@@ -99,7 +99,7 @@ class SyncLifecycleManager<T> {
   ) {
     this.key = options.key
     this.enableSync = options.enableSync ?? true
-    this.conflictStrategy = options.conflictStrategy || 'remote'
+    this.conflictStrategy = this.resolveConflictStrategy(options.conflictStrategy)
     this.defaultValue = options.defaultValue
     this.debounceMs = options.debounceMs ?? 300
     this.storageOptions = storageOptions
@@ -200,6 +200,19 @@ class SyncLifecycleManager<T> {
     }
   }
 
+  private resolveConflictStrategy(
+    strategy?: UseSyncedStateOptions<T>['conflictStrategy'],
+  ):
+    | 'local-wins'
+    | 'remote-wins'
+    | 'merge'
+    | 'manual' {
+    if (!strategy || strategy === 'remote' || strategy === 'remote-wins') {
+      return 'remote-wins'
+    }
+    return strategy
+  }
+
   cleanup() {
     this.unsubscribers.forEach((unsub) => unsub())
     this.unsubscribers = []
@@ -258,7 +271,7 @@ export function useSyncedState<T>({
           defaultValue,
           debounceMs,
           enableSync,
-          conflictStrategy,
+          conflictStrategy: conflictStrategy || 'remote',
         },
         storageOptions,
         handleStateChange,
