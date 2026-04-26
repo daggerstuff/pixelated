@@ -2,8 +2,7 @@ recommendations:
 - id: claude-defer-to-nested-agents-md-files-e-g-ai-agents-md
   category: coding
   severity: suggestion
-  text: Defer to nested `AGENTS.md` files (e.g., `ai/AGENTS.md`) for directory-specific
-    constraints.
+  text: Defer to nested `AGENTS.md` files (e.g., `ai/AGENTS.md`) for directory-specific constraints.
   applies_to: []
 - id: claude-no-abstractions-for-single-use-code
   category: coding
@@ -18,20 +17,17 @@ recommendations:
 - id: claude-for-analysis-avoid-in-context-file-scans-use-san
   category: tool_usage
   severity: suggestion
-  text: For analysis, avoid in-context file scans; use sandboxed tools and print only
-    summaries.
+  text: For analysis, avoid in-context file scans; use sandboxed tools and print only summaries.
   applies_to: []
 - id: claude-if-scripts-context-window-check-sh-enforce-repor
   category: coding
   severity: suggestion
-  text: If `./scripts/context-window-check.sh --enforce` reports loop churn, stop
-    retries and run `/compact` before continuing.
+  text: If `./scripts/context-window-check.sh --enforce` reports loop churn, stop retries and run `/compact` before continuing.
   applies_to: []
 - id: claude-use-focused-local-verification-after-every-edit-
   category: coding
   severity: important
-  text: Use focused local verification after every edit to ensure safety and quality
-    standards.
+  text: Use focused local verification after every edit to ensure safety and quality standards.
   applies_to: []
 - id: claude-hindsight-use-recall-and-reflect-at-the-start-of
   category: coding
