@@ -216,7 +216,7 @@ export function EvaluationForm({
                 </option>
               ))}
             </select>
-            <FieldError error={errors.priorityTier} />
+            <FieldError error={errors['priorityTier']} />
           </div>
 
           <ErrorMessage error={submitError} fieldErrors={errors} />

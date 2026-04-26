@@ -8,6 +8,10 @@ permissions:
   issues: write
   contents: read
 
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   assign-work:
     # Only trigger on squad:{member} labels (not the base "squad" label)

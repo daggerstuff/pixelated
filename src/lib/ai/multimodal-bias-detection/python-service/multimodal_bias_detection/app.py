@@ -3,10 +3,9 @@ FastAPI application for multi-modal bias detection service
 """
 
 import time
-from typing import Optional
 
 import structlog
-from fastapi import FastAPI, HTTPException, Request, Response, status, UploadFile, File, Form
+from fastapi import FastAPI, File, Form, HTTPException, Request, Response, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
@@ -15,45 +14,45 @@ from pydantic import ValidationError
 
 from .config import settings
 from .models import (
-    ImageAnalysisRequest,
     AudioAnalysisRequest,
+    HealthResponse,
+    ImageAnalysisRequest,
+    MediaType,
     MultimodalAnalysisRequest,
     MultimodalAnalysisResponse,
-    HealthResponse,
-    MediaType
 )
-from .services import VisionBiasDetector, AudioBiasDetector
+from .services import AudioBiasDetector, VisionBiasDetector
 from .services.multimodal_service import MultimodalBiasDetector
 
 # Prometheus metrics
 request_count = Counter(
-    'multimodal_bias_detection_requests_total',
-    'Total number of multi-modal bias detection requests',
-    ['method', 'endpoint', 'status', 'media_type']
+    "multimodal_bias_detection_requests_total",
+    "Total number of multi-modal bias detection requests",
+    ["method", "endpoint", "status", "media_type"]
 )
 
 request_duration = Histogram(
-    'multimodal_bias_detection_request_duration_seconds',
-    'Request duration in seconds',
-    ['method', 'endpoint', 'media_type']
+    "multimodal_bias_detection_request_duration_seconds",
+    "Request duration in seconds",
+    ["method", "endpoint", "media_type"]
 )
 
 analysis_count = Counter(
-    'multimodal_bias_analysis_total',
-    'Total number of multi-modal bias analyses performed',
-    ['status', 'media_type', 'bias_types']
+    "multimodal_bias_analysis_total",
+    "Total number of multi-modal bias analyses performed",
+    ["status", "media_type", "bias_types"]
 )
 
 analysis_duration = Histogram(
-    'multimodal_bias_analysis_duration_seconds',
-    'Analysis duration in seconds',
-    ['media_type', 'model_framework']
+    "multimodal_bias_analysis_duration_seconds",
+    "Analysis duration in seconds",
+    ["media_type", "model_framework"]
 )
 
 file_upload_count = Counter(
-    'multimodal_file_uploads_total',
-    'Total number of file uploads',
-    ['media_type', 'status']
+    "multimodal_file_uploads_total",
+    "Total number of file uploads",
+    ["media_type", "status"]
 )
 
 # Global service instances
@@ -373,8 +372,8 @@ def create_app() -> FastAPI:
         file: UploadFile = File(...),
         analysis_type: str = Form("comprehensive"),
         sensitivity: str = Form("medium"),
-        user_id: Optional[str] = Form(None),
-        session_id: Optional[str] = Form(None)
+        user_id: str | None = Form(None),
+        session_id: str | None = Form(None)
     ):
         """Upload and analyze image file"""
         try:
@@ -513,8 +512,8 @@ def create_app() -> FastAPI:
         analysis_type: str = Form("comprehensive"),
         language: str = Form("auto"),
         sensitivity: str = Form("medium"),
-        user_id: Optional[str] = Form(None),
-        session_id: Optional[str] = Form(None)
+        user_id: str | None = Form(None),
+        session_id: str | None = Form(None)
     ):
         """Upload and analyze audio file"""
         try:

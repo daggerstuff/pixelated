@@ -52,6 +52,7 @@ const {
   mockSecurity: {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
+      USER_UPDATED: 'USER_UPDATED',
       user_created: 'user_created',
       user_login_success: 'user_login_success',
       user_logout: 'user_logout',

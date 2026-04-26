@@ -428,7 +428,7 @@ export class MarketAnalyticsService {
     const seasonalFactors = [
       1.0, 0.95, 1.05, 1.1, 1.05, 1.0, 0.9, 0.85, 0.9, 1.0, 1.1, 1.15,
     ]
-    return seasonalFactors[(month - 1) % 12]
+    return seasonalFactors[(month - 1) % 12] ?? 1
   }
 }
 
