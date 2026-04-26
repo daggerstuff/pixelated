@@ -1,25 +1,18 @@
 /* ================================================
-   PIXELATED EMPATHY DARK THEME ENTRY
+   TECHNICAL-HUMANIST MAIN ENTRY
    ================================================ */
 
 @import './variables.css';
 @import './fonts.css';
-@import './typography.css';
-@import './spacing.css';
-@import './borders.css';
-@import './shadows.css';
-@import './gradients.css';
-@import './mesh.css';
-@import './transitions.css';
-@import './utilities.css';
 @import './global.css';
 @import './design-system.css';
 @import './marketing.css';
 
 /* Core Application Logic Styles */
+/* Core Application Logic Styles */
 ::selection {
   background: var(--accent-primary);
-  color: var(--text-inverse);
+  color: var(--bg-primary);
 }
 
 /* NProgress */
@@ -34,7 +27,7 @@
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  background: var(--accent-primary);
   opacity: 1;
 }
 

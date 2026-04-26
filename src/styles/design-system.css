@@ -1,5 +1,6 @@
 /* ================================================
-   PIXELATED EMPATHY DARK DESIGN SYSTEM
+   TECHNICAL-HUMANIST DESIGN SYSTEM
+   Aligning with DESIGN.md Standards
    ================================================ */
 
 :root {
@@ -11,9 +12,9 @@
 
   /* Primary Accent Colors */
   --color-primary-600: var(--accent-primary);
-  --color-primary-500: var(--accent-primary-hover);
+  --color-primary-500: #ff8533; /* Lighter Orange for Hover */
   --color-secondary-600: var(--accent-secondary);
-  --color-secondary-500: var(--accent-secondary-hover);
+  --color-secondary-500: var(--accent-secondary);
 
   /* === DESIGN SYSTEM TOKENS === */
   --bg-ghost: var(--bg-surface-ghost);
@@ -27,10 +28,10 @@
   --noise-pattern: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
 
   /* === TYPOGRAPHY SYSTEM === */
-  --font-family-mono: var(--font-mono);
-  --font-family-sans: var(--font-sans);
-  --font-family-display: var(--font-display);
-  --font-family-label: var(--font-label);
+  --font-family-mono: 'Berkeley Mono', monospace;
+  --font-family-sans: 'Source Sans 3', sans-serif;
+  --font-family-display: 'Lexend', sans-serif;
+  --font-family-label: 'Berkeley Mono', monospace;
 
   --font-mono: var(--font-family-mono);
   --font-sans: var(--font-family-sans);
@@ -60,9 +61,9 @@
   --spacing-20: 80px;
 
   /* === COMPONENT DNA === */
-  --radius-button: var(--radius-full);
-  --radius-input: var(--radius-md);
-  --radius-card: var(--radius-xl);
+  --radius-button: var(--radius-sm); /* 8px */
+  --radius-input: var(--radius-md); /* 10px */
+  --radius-card: var(--radius-sm); /* 8px */
 
   --glass-bg: var(--bg-glass);
   --glass-blur: blur(12px);
@@ -120,34 +121,22 @@
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-card);
   padding: var(--spacing-6);
-  box-shadow: var(--shadow-sm);
-  transition:
-    transform var(--transition-fast),
-    border-color var(--transition-fast),
-    background var(--transition-fast),
-    box-shadow var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .card:hover {
   background: var(--bg-glass);
-  border-color: var(--border-strong);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.75rem;
   padding: 0.625rem 1.25rem;
   border-radius: var(--radius-button);
-  font-weight: 800;
-  transition:
-    transform var(--transition-fast),
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
+  font-weight: 510; /* Linear Influence */
+  transition: all 0.2s ease;
   cursor: pointer;
   border: none;
   text-decoration: none;
@@ -158,27 +147,26 @@
 }
 
 .button-primary {
-  background: var(--accent-secondary);
-  color: var(--text-inverse);
+  background: var(--color-primary-600);
+  color: var(--bg-primary);
 }
 
 .button-primary:hover {
-  background: var(--accent-secondary-hover);
-  transform: translateY(-2px);
+  background: var(--color-primary-500);
+  transform: translateY(-1px);
 }
 
 .button-secondary {
-  background: var(--bg-surface-ghost);
+  background: var(--bg-secondary-hex);
   color: var(--text-primary-hex);
   border: 1px solid var(--border-glass);
 }
 
 .button-secondary:hover {
-  border-color: var(--border-strong);
-  background: var(--accent-primary-subtle);
+  background: var(--bg-glass);
 }
 
-/* Editorial section utilities */
+/* Professional/Enterprise Aesthetic Classes */
 .enterprise-hero {
   min-height: 100vh;
   display: flex;
@@ -205,7 +193,7 @@
   bottom: 0;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(var(--accent-primary-rgb), 0.16) 0%,
+    rgba(var(--color-primary-600), 0.1) 0%,
     transparent 50%
   );
   pointer-events: none;
@@ -251,14 +239,14 @@ html {
 
 /* Focus Styles for Accessibility */
 :focus-visible {
-  outline: 2px solid var(--accent-primary-hover);
+  outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
 }
 
 /* Selection Styles */
 ::selection {
-  background: var(--accent-primary);
-  color: var(--text-inverse);
+  background: var(--color-primary-600);
+  color: white;
 }
 
 /* Custom Scrollbar */
