@@ -82,7 +82,7 @@ const { nprogress, mediumZoom } = FEATURES
                 'name': author,
               },
             ],
-          })}
+          }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
         />
       )
     }
