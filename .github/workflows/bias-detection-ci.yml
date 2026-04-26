@@ -32,7 +32,7 @@ env:
   TRACE_TRIVY_DEPRECATION: ${{ vars.TRACE_TRIVY_DEPRECATION || 'false' }}
   NODE_VERSION: 24.14.0
   PYTHON_VERSION: 3.13
-  PNPM_VERSION: 10.33.2
+  PNPM_VERSION: 10.33.0
 
 jobs:
   security-scan:

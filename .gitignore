@@ -356,5 +356,3 @@ __mocks__
 
 .goose/
 ai/.moderne
-
-.mcp.json

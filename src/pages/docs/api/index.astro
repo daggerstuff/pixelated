@@ -65,26 +65,16 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     </a>
   </div>
 
-<h2>Authentication</h2>
+  <h2>Authentication</h2>
 
-<p>
-  All API requests must be authenticated. You can authenticate using either:
-</p>
-<ul>
-  <li>Platform API keys obtained from the developer dashboard</li>
-  <li>OAuth tokens from your Pixelated Empathy application</li>
-</ul>
+  <p>
+    All API requests must be authenticated using an API key. You can obtain an
+    API key from the developer dashboard. API keys should be included in the <code
+      >Authorization</code
+    > header of all requests.
+  </p>
 
-<p>
-  API keys should be included in the <code>Authorization</code> header:
-</p>
-
-<pre><code>Authorization: Bearer YOUR_PLATFORM_API_KEY</code></pre>
-
-<p>
-  For application-based authentication, use OAuth 2.0 flows as documented in
-  the authentication guides.
-</p>
+  <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
 
   <div class="card">
     <div class="card-title">
@@ -109,21 +99,16 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     </p>
   </div>
 
-<h2>Base URL</h2>
+  <h2>Base URL</h2>
 
-<p>All API requests should be made to the following public gateway URL:</p>
+  <p>All API requests should be made to the following base URL:</p>
 
-<pre><code>https://api.pixelated.dev/api/v1</code></pre>
+  <pre><code>https://api.pixelated.dev/api/v1</code></pre>
 
-<p>
-  This gateway provides access to all Pixelated Empathy services through a unified
-  interface. Only the public gateway is accessible for security and compliance.
-</p>
-
-<p>
-  For example, to access the search endpoint, your full URL would be:
-  <code>https://api.pixelated.dev/api/v1/search</code>
-</p>
+  <p>
+    For example, to access the search endpoint, your full URL would be:
+    <code>https://api.pixelated.dev/api/v1/search</code>
+  </p>
 
   <h2>Request Format</h2>
 
@@ -143,16 +128,14 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     > field with details about the error.
   </p>
 
-<h3>Successful Response Example</h3>
+  <h3>Successful Response Example</h3>
 
-<pre><code class="language-json">&#123;
+  <pre><code class="language-json">&#123;
   "data": &#123;
-    "id": "mem_123",
-    "content": "User reported feeling anxious about work presentation",
-    "metadata": &#123;
-      "category": "therapeutic_insight",
-      "timestamp": "2023-01-01T10:30:00Z"
-    &#125;
+    "id": "user_123",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "created_at": "2023-01-01T00:00:00Z"
   &#125;
 &#125;</code></pre>
 

@@ -23,7 +23,7 @@ install_tools() {
 
     if ! command -v pnpm &> /dev/null; then
         echo "📦 [Runtime] Installing pnpm..."
-        curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.33.2 sh - > /dev/null 2>&1
+        curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.33.0 sh - > /dev/null 2>&1
     fi
 }
 

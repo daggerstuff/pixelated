@@ -163,13 +163,13 @@ const webPageData = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(blogPostingData).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(blogPostingData)}
     />
   ) : (
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(webPageData).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(webPageData)}
     />
   )
 }

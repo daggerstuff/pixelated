@@ -245,7 +245,6 @@
     "helmet": "latest",
     "html-escaper": "latest",
     "i18next": "latest",
-    "idb": "^8.0.3",
     "ioredis": "latest",
     "isomorphic-dompurify": "latest",
     "jigsawstack": "latest",

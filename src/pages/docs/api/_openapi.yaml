@@ -165,348 +165,72 @@ paths:
               schema: { $ref: '#/components/schemas/BiasAnalysisResult' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-   /memory:
-     get:
-       summary: List Memories
-       description: List all memories for the authenticated user with optional filtering and pagination.
-       operationId: listMemories
-       tags: [Memory]
-       parameters:
-         - name: limit
-           in: query
-           schema: { type: integer, default: 10, maximum: 100 }
-         - name: offset
-           in: query
-           schema: { type: integer, default: 0 }
-         - name: userId
-           in: query
-           schema: { type: string }
-         - name: category
-           in: query
-           schema: { type: string }
-         - name: tag
-           in: query
-           style: form
-           explode: false
-           schema: { type: array, items: { type: string } }
-       responses:
-         '200':
-           description: Memories listed successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   memories:
-                     type: array
-                     items: { $ref: '#/components/schemas/ProductMemoryRecord' }
-                   pagination:
-                     type: object
-                     properties:
-                       limit:
-                         type: integer
-                         example: 10
-                       offset:
-                         type: integer
-                         example: 0
-                       total:
-                         type: integer
-                         example: 42
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-   /memory/search:
-     get:
-       summary: Search Memories
-       description: Search memories by query string.
-       operationId: searchMemoriesGet
-       tags: [Memory]
-       parameters:
-         - name: q
-           in: query
-           required: true
-           schema: { type: string }
-         - name: limit
-           in: query
-           schema: { type: integer, default: 10, maximum: 100 }
-         - name: offset
-           in: query
-           schema: { type: integer, default: 0 }
-         - name: userId
-           in: query
-           schema: { type: string }
-       responses:
-         '200':
-           description: Search completed successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   memories:
-                     type: array
-                     items: { $ref: '#/components/schemas/ProductMemoryRecord' }
-                   query:
-                     type: string
-                     example: "anxiety coping strategies"
-                   pagination:
-                     type: object
-                     properties:
-                       limit:
-                         type: integer
-                         example: 10
-                       offset:
-                         type: integer
-                         example: 0
-                       total:
-                         type: integer
-                         example: 5
-                   user:
-                     type: object
-                     properties:
-                       id:
-                         type: string
-                         format: uuid
-                       role:
-                         type: string
-                         example: "therapist"
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-     post:
-       summary: Search Memories (POST)
-       description: Search memories using request body for complex queries.
-       operationId: searchMemoriesPost
-       tags: [Memory]
-       requestBody:
-         required: true
-         content:
-           application/json:
-             schema:
-               type: object
-               required:
-                 - query
-               properties:
-                 query:
-                   type: string
-                   example: "anxiety coping strategies"
-                 limit:
-                   type: integer
-                   default: 10
-                   maximum: 100
-                 offset:
-                   type: integer
-                   default: 0
-                 userId:
-                   type: string
-                   format: uuid
-       responses:
-         '200':
-           description: Search completed successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   memories:
-                     type: array
-                     items: { $ref: '#/components/schemas/ProductMemoryRecord' }
-                   query:
-                     type: string
-                     example: "anxiety coping strategies"
-                   pagination:
-                     type: object
-                     properties:
-                       limit:
-                         type: integer
-                         example: 10
-                       offset:
-                         type: integer
-                         example: 0
-                       total:
-                         type: integer
-                         example: 5
-                   user:
-                     type: object
-                     properties:
-                       id:
-                         type: string
-                         format: uuid
-                       role:
-                         type: string
-                         example: "therapist"
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-   /memory/{memoryId}:
-     get:
-       summary: Get Memory
-       description: Get a specific memory by ID.
-       operationId: getMemory
-       tags: [Memory]
-       parameters:
-         - name: memoryId
-           in: path
-           required: true
-           schema: { type: string }
-       responses:
-         '200':
-           description: Memory retrieved successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   memory:
-                     $ref: '#/components/schemas/ProductMemoryRecord'
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-         '404': { $ref: '#/components/responses/NotFound' }
-     put:
-       summary: Update Memory
-       description: Update an existing memory.
-       operationId: updateMemory
-       tags: [Memory]
-       parameters:
-         - name: memoryId
-           in: path
-           required: true
-           schema: { type: string }
-       requestBody:
-         required: true
-         content:
-           application/json:
-             schema:
-               type: object
-               required:
-                 - content
-               properties:
-                 content:
-                   type: string
-                   example: "Today I practiced deep breathing exercises and felt calmer."
-                 metadata:
-                   type: object
-                   example:
-                     category: "therapy-session"
-                     tags: ["breathing", "anxiety"]
-       responses:
-         '200':
-           description: Memory updated successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   memory:
-                     $ref: '#/components/schemas/ProductMemoryRecord'
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-         '404': { $ref: '#/components/responses/NotFound' }
-     delete:
-       summary: Delete Memory
-       description: Delete a memory by ID.
-       operationId: deleteMemory
-       tags: [Memory]
-       parameters:
-         - name: memoryId
-           in: path
-           required: true
-           schema: { type: string }
-       responses:
-         '204':
-           description: Memory deleted successfully
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-         '404': { $ref: '#/components/responses/NotFound' }
-   /memory/stats:
-     get:
-       summary: Get Memory Statistics
-       description: Get statistics about the authenticated user's memories.
-       operationId: getMemoryStats
-       tags: [Memory]
-       responses:
-         '200':
-           description: Memory statistics retrieved successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   stats:
-                     type: object
-                     properties:
-                       totalMemories:
-                         type: integer
-                         example: 127
-                       categoryCounts:
-                         type: object
-                         additionalProperties:
-                           type: integer
-                         example:
-                           therapy-session: 42
-                           daily-reflection: 38
-                           breakthrough: 18
-                           insight: 16
-                           challenge: 13
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
-   /memory:
-     post:
-       summary: Create Memory
-       description: Create a new memory.
-       operationId: createMemory
-       tags: [Memory]
-       requestBody:
-         required: true
-         content:
-           application/json:
-             schema:
-               type: object
-               required:
-                 - content
-               properties:
-                 content:
-                   type: string
-                   example: "Today I practiced deep breathing exercises and felt calmer."
-                 metadata:
-                   type: object
-                   example:
-                     category: "therapy-session"
-                     tags: ["breathing", "anxiety"]
-       responses:
-         '201':
-           description: Memory created successfully
-           content:
-             application/json:
-               schema:
-                 type: object
-                 properties:
-                   success:
-                     type: boolean
-                     example: true
-                   memory_id:
-                     type: string
-                     format: uuid
-                     example: "550e8400-e29b-41d4-a716-446655440000"
-                   memory:
-                     $ref: '#/components/schemas/ProductMemoryRecord'
-         '400': { $ref: '#/components/responses/BadRequest' }
-         '401': { $ref: '#/components/responses/Unauthorized' }
+  /memory/sessions:
+    get:
+      summary: List Memory Sessions
+      description: List all memory sessions for the authenticated user.
+      operationId: listSessions
+      tags: [Memory]
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+      responses:
+        '200':
+          description: Sessions listed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items: { $ref: '#/components/schemas/MemorySession' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /memory/sessions/{sessionId}:
+    get:
+      summary: Get Memory Session
+      description: Get a specific memory session by ID.
+      operationId: getSession
+      tags: [Memory]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Session retrieved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MemorySession' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /memory/sessions/{sessionId}/turns:
+    post:
+      summary: Add Turn to Session
+      description: Add a new turn to a memory session.
+      operationId: addTurn
+      tags: [Memory]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MemoryTurnCreate' }
+      responses:
+        '200':
+          description: Turn added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MemoryTurn' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /developer/api-keys:
     get:
       summary: List API Keys
@@ -615,30 +339,6 @@ components:
         version: { type: string }
         build: { type: string }
         timestamp: { type: string, format: date-time }
-    ProductMemoryRecord:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
-        content:
-          type: string
-          example: "Today I practiced deep breathing exercises and felt calmer."
-        metadata:
-          type: object
-          example:
-            category: "therapy-session"
-            tags: ["breathing", "anxiety"]
-            source: "user-input"
-        createdAt:
-          type: string
-          format: date-time
-          example: "2023-01-01T12:00:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          example: "2023-01-01T12:30:00Z"
     SearchResult:
       type: object
       properties:
