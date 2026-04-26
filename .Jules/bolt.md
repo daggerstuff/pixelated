@@ -1,1 +1,2 @@
 ## 2024-06-01 - Extract Tooltip | Learning: Inline components in Recharts cause unnecessary re-renders. | Action: Extracted CustomTooltip to module level.
+## 2026-04-20 - Array.includes() to Set.has() Optimization | Learning: Using Array.includes() inside loops within useMemo causes O(N²) bottlenecks during component re-renders when data sizes scale. | Action: Replaced Array.includes() with a Set and Set.has() to achieve O(1) lookups.

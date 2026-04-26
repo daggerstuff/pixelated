@@ -115,9 +115,11 @@ export function TherapeuticGoalsTracker({
     const map = new Map<string, typeof therapistInterventions>()
 
     goalInterventionsMap.forEach((relatedInterventionTypes, goalId) => {
+      // ⚡ Bolt: Convert array to Set for O(1) lookups instead of O(N) Array.includes()
+      const typeSet = new Set(relatedInterventionTypes)
       const matches = []
       for (const intervention of therapistInterventions) {
-        if (relatedInterventionTypes.includes(intervention.type)) {
+        if (typeSet.has(intervention.type)) {
           matches.push(intervention)
           if (matches.length === 3) break
         }
