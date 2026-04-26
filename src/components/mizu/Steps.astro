@@ -6,6 +6,7 @@ const steps = [
     description:
       'Start your journey with a simple signup process. Access our library of scenarios immediately.',
     link: 'Get Started',
+    href: '/signup',
     image: '/images/features/competency.jpg',
     gradient: 'from-indigo-500/20 to-purple-500/20',
   },
@@ -15,6 +16,7 @@ const steps = [
     description:
       'Browse through our diverse catalog of clinical cases. Filter by condition, difficulty, or therapeutic modality.',
     link: 'Browse Library',
+    href: '/scenarios',
     image: '/images/features/edge-case.jpg',
     gradient: 'from-pink-500/20 to-rose-500/20',
   },
@@ -24,6 +26,7 @@ const steps = [
     description:
       'Interact with the AI patient in real-time. Use your voice or text to conduct the therapy session.',
     link: 'View Demo',
+    href: '/demo',
     image: '/images/features/mental-health-therapy.jpg',
     gradient: 'from-emerald-500/20 to-teal-500/20',
   },
@@ -33,6 +36,7 @@ const steps = [
     description:
       'Receive instant, data-driven feedback on your performance. Identify strengths and areas for growth.',
     link: 'See Analytics',
+    href: '/analytics',
     image: '/images/features/bias-spike.jpg',
     gradient: 'from-orange-500/20 to-amber-500/20',
   },
@@ -68,10 +72,10 @@ const steps = [
               <p class="text-base text-slate-400 leading-relaxed mb-5">
                 {step.description}
               </p>
-              <a
-                href="#"
-                class="inline-flex items-center gap-2 text-white font-semibold border-b border-primary-500 pb-1 hover:text-primary-400 transition-colors text-sm"
-              >
+                <a
+                  href={step.href}
+                  class="inline-flex items-center gap-2 text-white font-semibold border-b border-primary-500 pb-1 hover:text-primary-400 transition-colors text-sm"
+                >
                 {step.link}
                 <svg
                   class="w-4 h-4"
