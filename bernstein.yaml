@@ -1,0 +1,14 @@
+# Bernstein orchestration config
+goal: "Improve this repo with a small, safe cleanup and summarize what changed."
+cli: auto
+team: auto
+max_agents: 2
+budget: "$10"
+
+internal_llm_provider: nvidia
+internal_llm_model: nvidia/nemotron-3-super-120b-a12b
+
+constraints:
+- "Python 3.12+"
+- "Keep behavior stable; no API-breaking changes unless explicitly requested"
+- "Prefer minimal, targeted edits over broad refactors"
