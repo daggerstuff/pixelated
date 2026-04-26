@@ -13,15 +13,15 @@ Usage:
     python clean_repetitions_aggressive.py <input_file> <output_file> [--report]
 """
 
+import argparse
 import json
 import re
-import argparse
-from pathlib import Path
-from typing import Tuple, List, Dict, Any
 from collections import Counter
+from pathlib import Path
+from typing import Any
 
 
-def detect_word_repetition(text: str) -> Tuple[bool, str]:
+def detect_word_repetition(text: str) -> tuple[bool, str]:
     """Detect consecutive word repetition (e.g., 'and and and')."""
     words = text.lower().split()
 
@@ -46,7 +46,7 @@ def detect_word_repetition(text: str) -> Tuple[bool, str]:
     return False, ""
 
 
-def detect_phrase_repetition(text: str) -> Tuple[bool, str]:
+def detect_phrase_repetition(text: str) -> tuple[bool, str]:
     """Detect phrase repetition (e.g., 'it is important to know that it is important to know')."""
     words = text.lower().split()
 
@@ -65,7 +65,7 @@ def detect_phrase_repetition(text: str) -> Tuple[bool, str]:
     return False, ""
 
 
-def detect_synonym_sequence(text: str) -> Tuple[bool, str]:
+def detect_synonym_sequence(text: str) -> tuple[bool, str]:
     """
     Detect mechanical synonym sequences that look like model degeneration.
     e.g., 'crystallize separate segregate purify'
@@ -96,7 +96,7 @@ def detect_synonym_sequence(text: str) -> Tuple[bool, str]:
     return False, ""
 
 
-def detect_character_repetition(text: str) -> Tuple[bool, str]:
+def detect_character_repetition(text: str) -> tuple[bool, str]:
     """Detect character repetition patterns (e.g., 'ssss ssss')."""
 
     # Single character repeated 4+ times
@@ -112,7 +112,7 @@ def detect_character_repetition(text: str) -> Tuple[bool, str]:
     return False, ""
 
 
-def detect_ngram_loop(text: str) -> Tuple[bool, str]:
+def detect_ngram_loop(text: str) -> tuple[bool, str]:
     """Detect n-gram loops within the text."""
 
     # Split into sentences
@@ -136,7 +136,7 @@ def detect_ngram_loop(text: str) -> Tuple[bool, str]:
     return False, ""
 
 
-def detect_generated_artifacts(text: str) -> Tuple[bool, str]:
+def detect_generated_artifacts(text: str) -> tuple[bool, str]:
     """Detect generated artifacts that indicate model degeneration."""
 
     artifacts = [
@@ -160,7 +160,7 @@ def detect_generated_artifacts(text: str) -> Tuple[bool, str]:
     return False, ""
 
 
-def clean_sample(sample: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def clean_sample(sample: dict[str, Any]) -> tuple[bool, list[str]]:
     """
     Check if a sample should be removed.
 
@@ -200,7 +200,7 @@ def clean_sample(sample: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return len(reasons) > 0, reasons
 
 
-def clean_file(input_path: str, output_path: str, report_path: str = None) -> Dict:
+def clean_file(input_path: str, output_path: str, report_path: str = None) -> dict:
     """
     Clean a training data file.
 

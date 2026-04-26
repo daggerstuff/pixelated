@@ -54,10 +54,7 @@ export default function SearchBox({
       setIsSearchReady(true)
     }
 
-    // Check if search is already initialized
-    if (typeof window !== 'undefined' && window.searchClient) {
-      setIsSearchReady(true)
-    }
+    setIsSearchReady(true)
 
     // Listen for search ready event
     window.addEventListener('search:ready', handleSearchReady)

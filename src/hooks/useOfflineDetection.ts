@@ -89,7 +89,7 @@ export function useOfflineDetection({
       }
       const connection = nav2.connection
       if (connection) {
-        connection.addEventListener('change', updateNetworkState)
+        connection.addEventListener?.('change', updateNetworkState)
       }
     }
 
@@ -103,7 +103,7 @@ export function useOfflineDetection({
         }
         const connection = nav2.connection
         if (connection) {
-          connection.removeEventListener('change', updateNetworkState)
+          connection.removeEventListener?.('change', updateNetworkState)
         }
       }
     }

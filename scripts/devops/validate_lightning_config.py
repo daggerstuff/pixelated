@@ -1,7 +1,7 @@
 import json
-import os
 import sys
 from pathlib import Path
+
 
 def validate_config(config_path):
     try:
@@ -18,7 +18,7 @@ def validate_config(config_path):
         "dataloader_num_workers",
         "precision",
     ]
-    
+
     for key in required_keys:
         print(f"KEY::{key}::{key in config}")
 

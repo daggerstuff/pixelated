@@ -134,6 +134,7 @@ describe('TreatmentPlanService', () => {
       conversationalStyle: {
         verbosity: 0.6,
         emotionalExpressiveness: 0.4,
+        resistance: 3,
         insightLevel: 0.5,
         preferredCommunicationModes: ['face-to-face'],
       },
@@ -282,6 +283,7 @@ describe('TreatmentPlanService', () => {
           conversationalStyle: {
             verbosity: 0,
             emotionalExpressiveness: 0,
+          resistance: 3,
             insightLevel: 0,
             preferredCommunicationModes: [],
           },

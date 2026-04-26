@@ -4,27 +4,24 @@ import {
   jsonResponse,
   toMemoryScope,
   withAuthenticatedMemoryRoute,
-} from './_shared'
+} from "./_shared";
 
-export const DELETE = withAuthenticatedMemoryRoute(
-  'deleting memory',
-  async ({ request }, user) => {
-    const body = await request.json()
-    const { memoryId } = body
+export const DELETE = withAuthenticatedMemoryRoute("deleting memory", async ({ request }, user) => {
+  const body = await request.json();
+  const { memoryId } = body;
 
-    if (!memoryId) {
-      return jsonError(400, 'Bad Request', 'memoryId parameter is required')
-    }
+  if (!memoryId) {
+    return jsonError(400, "Bad Request", "memoryId parameter is required");
+  }
 
-    // Delete memory
-    await getGateway().deleteMemory({
-      ...toMemoryScope(user.id),
-      memoryId,
-    })
+  // Delete memory
+  await getGateway().deleteMemory({
+    ...toMemoryScope(user.id, user.accountId, user.workspaceId),
+    memoryId,
+  });
 
-    return jsonResponse({
-      success: true,
-      message: 'Memory deleted successfully',
-    })
-  },
-)
+  return jsonResponse({
+    success: true,
+    message: "Memory deleted successfully",
+  });
+});

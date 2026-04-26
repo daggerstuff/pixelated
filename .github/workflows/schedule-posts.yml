@@ -10,8 +10,9 @@ permissions:
 
 # Environment variables can be defined here
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
-  PNPM_VERSION: 10.33.0
+  PNPM_VERSION: 10.33.2
   NODE_ENV: production
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10.33.0
+          version: 10.33.2
 
       - name: Get pnpm store directory
         id: pnpm-store
@@ -40,7 +41,7 @@ jobs:
         run: echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.store_path }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}

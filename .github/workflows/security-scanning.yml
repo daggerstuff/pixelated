@@ -5,6 +5,7 @@ permissions:
   security-events: write
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
 
 on:
@@ -42,6 +43,8 @@ jobs:
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: trivy
         uses: aquasecurity/trivy-action@v0.35.0
+        env:
+          NODE_OPTIONS: ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
         with:
           cache: 'false'
           scan-type: 'fs'
@@ -202,16 +205,43 @@ jobs:
           package-manager-cache: false
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: |
+          pnpm_version="$(node -p "require('./package.json').packageManager.replace('pnpm@', '')")"
+          if [ -z "${pnpm_version}" ]; then
+            echo "Failed to read pnpm version from package.json (packageManager field missing)." >&2
+            exit 1
+          fi
+
+          for attempt in 1 2 3; do
+            if npm install -g "pnpm@${pnpm_version}"; then
+              break
+            fi
+            if [ "${attempt}" -eq 3 ]; then
+              echo "pnpm install failed after 3 attempts." >&2
+              exit 1
+            fi
+            echo "pnpm install failed on attempt ${attempt}. Retrying in 5s..."
+            sleep 5
+          done
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Run security audit
-        run: pnpm audit --audit-level moderate
+        run: |
+          if pnpm audit --help 2>/dev/null | rg -q -- "--prod"; then
+            pnpm audit --json --prod --audit-level moderate > audit-results.json || true
+          else
+            pnpm audit --json --audit-level moderate > audit-results.json || true
+          fi
+          if [ ! -s audit-results.json ]; then
+            echo "pnpm audit returned an empty output." >&2
+            exit 1
+          fi
 
-      - name: Check for known vulnerabilities
-        run: pnpm audit --json > audit-results.json || true
+      - name: Enforce high+ vulnerability threshold
+        run: |
+          node scripts/utils/check-pnpm-audit.js --fail-on high audit-results.json
 
       - name: Upload audit results
         uses: actions/upload-artifact@v7

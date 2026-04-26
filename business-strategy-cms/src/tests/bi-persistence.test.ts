@@ -44,8 +44,8 @@ describe('Business Intelligence Persistence Tests', () => {
     expect(results).toHaveLength(1)
     const result = results[0]
     expect(result).toBeDefined()
-    expect(result.industry).toBe(marketData.industry)
-    expect(result.marketSize).toBe(marketData.marketSize)
+    expect(result!.industry).toBe(marketData.industry)
+    expect(result!.marketSize).toBe(marketData.marketSize)
   })
 
   it('should store and retrieve competitor analysis correctly in MongoDB', async () => {

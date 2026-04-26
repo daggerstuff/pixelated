@@ -1,40 +1,40 @@
 export const introContent = {
-  label: 'Why coaching gets fuzzy',
-  title: 'Most supervision loses the useful turn as soon as the room settles.',
+  label: 'Why it exists',
+  title: 'Therapists need more reps than real patients can safely provide.',
   paragraphs: [
-    'Teams usually know a session drifted, tightened, or ruptured. What they lose is the exact exchange that made it happen.',
-    'Pixelated Empathy keeps the case, transcript, and review lane attached long enough for a supervisor to name one concrete next move.',
+    'Most training programs know which conversations scare new clinicians: risk, anger, silence, shame, boundary pressure, cultural misses, and disclosure. Those moments need practice before they become someone’s real session.',
+    'Pixelated Empathy gives teams a place to rehearse those moments repeatedly, with enough structure for faculty to teach skill instead of relying on charisma, memory, or one-off roleplay.',
   ],
-  panelLabel: 'What breaks in the usual workflow',
+  panelLabel: 'Who uses it',
   panelItems: [
     {
-      label: 'The evidence disappears',
-      body: 'A difficult roleplay runs once, then turns into shorthand notes, opinions, and partial recall.',
+      label: 'Counseling programs',
+      body: 'Prepare students for practicum with standardized client encounters and a clearer readiness signal.',
     },
     {
-      label: 'Feedback gets vague',
-      body: 'The team can feel the shift, but cannot name the exact intervention, miss, or repair to revisit next.',
+      label: 'Supervision groups',
+      body: 'Give associates and interns focused practice between live cases without inventing ad hoc roleplays every week.',
     },
     {
-      label: 'Comparison falls apart',
-      body: 'When every trainee sees a different case, supervision stops comparing judgment against the same moment.',
+      label: 'Care organizations',
+      body: 'Rehearse high-risk communication patterns before staff encounter them in intake, crisis, or retention workflows.',
     },
   ],
   evidenceCards: [
     {
-      title: 'What teams are usually stuck with',
+      title: 'The old pattern',
       items: [
-        'The useful part of the conversation disappears after the roleplay ends.',
-        'Supervisors coach from recollection instead of a visible intervention.',
-        'Teams cannot compare clinicians against the same difficult moment.',
+        'Roleplay quality depends on who is in the room that day.',
+        'Feedback often arrives as a general impression.',
+        'Faculty cannot easily compare skill growth across trainees.',
       ],
     },
     {
-      title: 'What your team gets instead',
+      title: 'The new pattern',
       items: [
-        'The transcript, notes, and coaching lane stay tied to one run.',
-        'Supervisors can point at the exact turn that needs work.',
-        'The team can coach multiple clinicians against the same case.',
+        'The same scenario can be assigned, repeated, and revisited.',
+        'The actual language is available for teaching.',
+        'Progress is tied to observable clinical behavior.',
       ],
     },
   ],

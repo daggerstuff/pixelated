@@ -54,7 +54,7 @@ dependencies = [
   "openai>=1.107.2",
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
-  "authlib>=1.6.6", # Updated to latest secure version
+  "authlib>=1.6.11", # Updated to latest secure version
   "motor>=3.7.1",
   "structlog>=25.4.0",
   "redis>=6.4.0",
@@ -94,10 +94,11 @@ dependencies = [
   "minio>=7.2.20",
   "librosa>=0.11.0",
   "langsmith-fetch>=0.3.1",
-  "ray>=2.53.0",
+  "ray>=2.55.0",
   "pydantic>=2.12.5",
   "clickhouse-driver>=0.2.10",
-  "pydantic-ai>=1.56.0",
+  # pydantic-ai removed from core runtime dependencies to avoid incompatible telemetry resolver constraints
+  # until a compatible 1.82+ + traceloop/opentelemetry stack is adopted.
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
   "e2b>=2.6.1",
@@ -116,10 +117,10 @@ dependencies = [
   "GitPython>=3.1.43",
   "modal>=1.4.1",
   "gradient-adk>=0.2.11",
-  "honeyhive>=0.2.57",
+  # honeyhive removed from core runtime dependencies to avoid pinned traceloop/opentelemetry conflicts.
   "virtualenv>=21.2.0",
   "voyageai>=0.3.7",
-  "hindsight-litellm>=0.5.0",
+  "foresight-litellm>=0.5.0",
   "aiosqlite>=0.22.1",
   "semgrep>=1.79.0",
 ]

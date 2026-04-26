@@ -46,7 +46,7 @@ export function Skeleton({
 
   const shapeClasses = circle ? 'rounded-full' : rounded ? 'rounded' : ''
 
-  const items = []
+  const items: React.ReactElement[] = []
 
   const style: React.CSSProperties = {
     ...(width !== undefined && {
@@ -94,7 +94,7 @@ export function SkeletonText({
   // Convert spacing to proper CSS value
   const spacingPx = typeof spacing === 'number' ? `${spacing}px` : spacing
 
-  const items = []
+  const items: React.ReactElement[] = []
 
   for (let i = 0; i < lines; i++) {
     const isLastLine = i === lines - 1

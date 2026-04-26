@@ -252,34 +252,28 @@ export const useJournalResearchWebSocket = ({
 
   const send = useCallback(
     (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
-      if (socketRef.current?.readyState === WebSocket.OPEN) {
-        const payload = (() => {
-          if (typeof data === 'string') {
-            return data
-          }
+      if (data instanceof Blob) {
+        const blobUnsupportedError = new Error('Blob payloads are not supported')
+        onError?.(blobUnsupportedError)
+        return
+      }
 
-          if (ArrayBuffer.isView(data)) {
-            return data
-          }
-
-          if (data instanceof ArrayBuffer) {
-            return data
-          }
-
-          if (data instanceof Blob) {
-            return null
-          }
-
-          return new Uint8Array(data)
-        })()
-
-        if (payload === null) {
-          const blobUnsupportedError = new Error('Blob payloads are not supported')
-          onError?.(blobUnsupportedError)
-          return
+      const payload: string | ArrayBuffer = (() => {
+        if (typeof data === 'string') {
+          return data
         }
+        if (data instanceof ArrayBuffer) {
+          return data
+        }
+        if (ArrayBuffer.isView(data)) {
+          return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
+        }
+        return new TextEncoder().encode(String(data)).buffer
+      })()
 
-        socketRef.current.send(payload)
+      const socket = socketRef.current
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(payload)
       } else {
         const error = new Error('WebSocket is not connected')
         onError?.(error)

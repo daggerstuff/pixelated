@@ -515,8 +515,10 @@ describe('Data Transformation', () => {
     expectedOutcomes: [],
     transcripts: [
       {
+        speaker: 'therapist',
         speakerId: 'therapist',
         timestamp: new Date('2023-01-01T12:15:00Z'),
+        text: 'How are you feeling?',
         content: 'How are you feeling?',
         emotionalTone: 'neutral',
         confidenceLevel: 0.9,
@@ -738,7 +740,7 @@ describe('Utility Helpers', () => {
           sessionId: 'session-1',
           timestamp: new Date(),
           overallBiasScore: 0.3,
-          layerResults: {} as unknown,
+          layerResults: {} as BiasAnalysisResult['layerResults'],
           demographics: {} as unknown,
           recommendations: ['Improve diversity', 'Add training'],
           alertLevel: 'medium',
@@ -748,7 +750,7 @@ describe('Utility Helpers', () => {
           sessionId: 'session-2',
           timestamp: new Date(),
           overallBiasScore: 0.7,
-          layerResults: {} as unknown,
+          layerResults: {} as BiasAnalysisResult['layerResults'],
           demographics: {} as unknown,
           recommendations: ['Improve diversity', 'Review model'],
           alertLevel: 'high',

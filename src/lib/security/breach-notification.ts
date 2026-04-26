@@ -411,10 +411,17 @@ export async function updateMetrics(breach: BreachDetails): Promise<void> {
     }
 
     // Update monthly metrics
-    await redis.hset(monthKey, {
-      ...metrics,
+    const metricEntries = Object.entries({
+      totalBreaches: metrics.totalBreaches,
+      byType: JSON.stringify(metrics.byType),
+      bySeverity: JSON.stringify(metrics.bySeverity),
+      totalAffectedUsers: metrics.totalAffectedUsers,
+      averageNotificationTime: metrics.averageNotificationTime,
+      notificationEffectiveness: metrics.notificationEffectiveness,
       lastUpdated: Date.now(),
-    } as any)
+    }).flatMap(([key, value]) => [key, String(value)])
+
+    await redis.hset(monthKey, ...metricEntries)
 
     // Set retention period
     await redis.expire(monthKey, DOCUMENTATION_RETENTION)

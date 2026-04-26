@@ -6,7 +6,14 @@ metadata:
   labels:
     app: pixelated-empathy-api
 spec:
-  replicas: 3
+  # Replicas are managed by HPA (`pixelated-empathy-api-hpa`) and GitOps.
+  # Keep this unset so rollout/apply does not force a fixed replica count.
+  progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
   selector:
     matchLabels:
       app: pixelated-empathy-api
@@ -17,43 +24,54 @@ spec:
     spec:
       terminationGracePeriodSeconds: 30
       containers:
-        - name: pixelated-empathy-api
-          image: us-west1-docker.pkg.dev/grand-karma-492912-v1/pixelated-empathy/api:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 4321
-              name: http
-              protocol: TCP
-          envFrom:
-            - configMapRef:
-                name: pixelated-empathy-config
-            - secretRef:
-                name: pixelated-empathy-secrets
-          env:
-            - name: APP_NAME
-              value: "pixelated-empathy"
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "256Mi"
-            limits:
-              cpu: "300m"
-              memory: "512Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 20
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 5
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 5
+      - name: pixelated-empathy-api
+        image: us-west1-docker.pkg.dev/grand-karma-492912-v1/pixelated-empathy/api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5001
+          name: http
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: pixelated-empathy-config
+        - secretRef:
+            name: pixelated-empathy-secrets
+        env:
+        - name: APP_NAME
+          value: "pixelated-empathy"
+        - name: REDIS_URL
+          value: "redis://pixelated-empathy-redis:6379/0"
+        resources:
+          requests:
+            cpu: "25m"
+            memory: "64Mi"
+          limits:
+            cpu: "150m"
+            memory: "192Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 12
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 5

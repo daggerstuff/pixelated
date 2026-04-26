@@ -7,11 +7,8 @@ from typing import Annotated, cast
 
 from fastapi import Depends, HTTPException, status
 
-from .config import settings
-from .models import BiasAnalysisRequest
 from .services import BiasDetectionService, DatabaseService, database_service
 from .services.analysis_orchestrator import AnalysisOrchestrator
-from .services.cache_service import cache_service
 
 # Populated in create_app()
 bias_detection_service: BiasDetectionService = BiasDetectionService()

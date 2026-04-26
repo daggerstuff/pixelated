@@ -6,13 +6,19 @@ variable "project_id" {
 variable "environment" {
   description = "Deployment environment label."
   type        = string
-  default     = "staging"
+  default     = "single"
 }
 
 variable "app_name" {
   description = "Base name for all generated resources."
   type        = string
   default     = "pixelated-empathy"
+}
+
+variable "artifact_registry_kms_key_name" {
+  description = "Cloud KMS key resource name for Artifact Registry customer-managed encryption."
+  type        = string
+  default     = ""
 }
 
 variable "gcp_region" {
@@ -61,12 +67,6 @@ variable "services_secondary_cidr" {
   description = "Secondary CIDR range for service IPs."
   type        = string
   default     = "10.4.32.0/20"
-}
-
-variable "postgres_version" {
-  description = "Cloud SQL PostgreSQL version."
-  type        = string
-  default     = "POSTGRES_15"
 }
 
 variable "postgres_tier" {

@@ -34,10 +34,11 @@ volume = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
 )
 def remerge_with_scale(scale: float = 0.5):
     """Re-merge LoRA with scaled adapter weights."""
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    from peft import PeftModel
     from pathlib import Path
+
+    import torch
+    from peft import PeftModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
     base_model_name = "LatitudeGames/Wayfarer-2-12B"
     output_name = f"merged-scale-{scale}"

@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { cn } from '@/lib/utils'
 
 interface NavigationItem {
   name: string
   href: string
-  icon: JSX.Element
+  icon: React.ReactNode
   badge?: string | number
   children?: NavigationItem[]
   isExpanded?: boolean
@@ -26,11 +26,11 @@ export function Sidebar() {
 
   // Default to closed on mobile, only open by default on dashboard pages
   const isDashboardPage =
-    pathname?.startsWith('/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/simulator') ||
-    pathname?.startsWith('/analytics') ||
-    pathname?.startsWith('/journal-research')
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/simulator') ||
+    pathname.startsWith('/analytics') ||
+    pathname.startsWith('/journal-research')
 
   const [isOpen, setIsOpen] = useState(isDashboardPage)
   const [expandedSections, setExpandedSections] = useState<
@@ -91,6 +91,15 @@ export function Sidebar() {
                 d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h2v3.586L11.586 17H16a2 2 0 002-2V9.828a2 2 0 00-.586-1.414L15 6.586A2 2 0 0013.586 6H12V5a2 2 0 00-2-2H4zm8 2.414L14.586 8H13a1 1 0 01-1-1V4.414zM7 8h6a1 1 0 110 2H7a1 1 0 010-2zm0 4h6a1 1 0 110 2H7a1 1 0 110-2z'
                 clipRule='evenodd'
               />
+            </svg>
+          ),
+        },
+        {
+          name: 'Agent Monitor',
+          href: '/dashboard/agent-monitor',
+          icon: (
+            <svg className='h-5 w-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' />
             </svg>
           ),
         },

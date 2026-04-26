@@ -15,18 +15,16 @@ import asyncio
 import gc
 import logging
 import time
-from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from dataclasses import dataclass, field
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple, Callable
+from typing import Any, Callable
+
 import numpy as np
-import pandas as pd
-from functools import lru_cache
+from bias_detection.sentry_metrics import service_metrics, track_latency
 
 # Import existing components
-from bias_detection_service import BiasDetectionService, SessionData, BiasDetectionConfig
-from bias_detection.sentry_metrics import bias_metrics, service_metrics, track_latency
+from bias_detection_service import BiasDetectionConfig, BiasDetectionService, SessionData
 
 logger = logging.getLogger(__name__)
 
@@ -67,12 +65,12 @@ class SessionCache:
 
     def __init__(self, max_size: int = 1000):
         self.max_size = max_size
-        self.cache: Dict[str, Any] = {}
-        self.access_times: Dict[str, float] = {}
+        self.cache: dict[str, Any] = {}
+        self.access_times: dict[str, float] = {}
         self.hit_count = 0
         self.miss_count = 0
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Get cached result"""
         if key in self.cache:
             self.hit_count += 1
@@ -118,8 +116,8 @@ class BatchProcessor:
 
     def __init__(self, config: OptimizationConfig):
         self.config = config
-        self.current_batch: List[SessionData] = []
-        self.batch_start_time: Optional[float] = None
+        self.current_batch: list[SessionData] = []
+        self.batch_start_time: float | None = None
         self.processed_count = 0
 
     def add_session(self, session_data: SessionData) -> bool:
@@ -148,7 +146,7 @@ class BatchProcessor:
 
         return False
 
-    def get_batch(self) -> List[SessionData]:
+    def get_batch(self) -> list[SessionData]:
         """Get current batch and reset"""
         batch = self.current_batch.copy()
         self.current_batch = []
@@ -181,7 +179,7 @@ class MemoryManager:
         current_usage = self.check_memory_usage()
         return current_usage > self.cleanup_threshold_mb
 
-    def perform_cleanup(self) -> Dict[str, Any]:
+    def perform_cleanup(self) -> dict[str, Any]:
         """Perform memory cleanup"""
         before_usage = self.check_memory_usage()
 
@@ -197,10 +195,10 @@ class MemoryManager:
         logger.info(f"Memory cleanup completed: freed {freed_mb:.2f} MB")
 
         return {
-            'before_usage_mb': before_usage,
-            'after_usage_mb': after_usage,
-            'freed_mb': freed_mb,
-            'timestamp': datetime.now(timezone.utc).isoformat()
+            "before_usage_mb": before_usage,
+            "after_usage_mb": after_usage,
+            "freed_mb": freed_mb,
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
     def track_session_processing(self) -> None:
@@ -223,10 +221,10 @@ class ParallelProcessor:
 
     async def process_batch_parallel(
         self,
-        sessions: List[SessionData],
+        sessions: list[SessionData],
         analysis_func: Callable,
         use_processes: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Process batch of sessions in parallel"""
         if not sessions:
             return []
@@ -254,10 +252,10 @@ class ParallelProcessor:
                 logger.error(f"Parallel processing error for session {sessions[i].session_id}: {result}")
                 # Create error result
                 valid_results.append({
-                    'session_id': sessions[i].session_id,
-                    'error': str(result),
-                    'bias_score': 0.0,
-                    'confidence': 0.0
+                    "session_id": sessions[i].session_id,
+                    "error": str(result),
+                    "bias_score": 0.0,
+                    "confidence": 0.0
                 })
             else:
                 valid_results.append(result)
@@ -268,7 +266,7 @@ class ParallelProcessor:
         service_metrics.parallel_efficiency(
             len(valid_results),
             processing_time,
-            'process' if use_processes else 'thread'
+            "process" if use_processes else "thread"
         )
 
         return valid_results
@@ -284,11 +282,11 @@ class AdaptiveOptimizer:
 
     def __init__(self, config: OptimizationConfig):
         self.config = config
-        self.performance_history: List[PerformanceMetrics] = []
-        self.optimization_strategies: Dict[str, Callable] = {
-            'batch_size': self._optimize_batch_size,
-            'cache_size': self._optimize_cache_size,
-            'parallel_workers': self._optimize_parallel_workers,
+        self.performance_history: list[PerformanceMetrics] = []
+        self.optimization_strategies: dict[str, Callable] = {
+            "batch_size": self._optimize_batch_size,
+            "cache_size": self._optimize_cache_size,
+            "parallel_workers": self._optimize_parallel_workers,
         }
 
     def record_performance(self, metrics: PerformanceMetrics) -> None:
@@ -315,11 +313,11 @@ class AdaptiveOptimizer:
 
         # Apply optimization strategies based on trends
         if avg_processing_time > 2.0:  # Slow processing
-            self.optimization_strategies['batch_size']()
-            self.optimization_strategies['parallel_workers']()
+            self.optimization_strategies["batch_size"]()
+            self.optimization_strategies["parallel_workers"]()
 
         if avg_memory_usage > self.config.max_memory_usage_mb * 0.9:
-            self.optimization_strategies['cache_size']()
+            self.optimization_strategies["cache_size"]()
 
     def _optimize_batch_size(self) -> None:
         """Optimize batch size based on performance"""
@@ -358,7 +356,7 @@ class AdaptiveOptimizer:
 class PerformanceOptimizedBiasDetector:
     """Main performance-optimized bias detection service"""
 
-    def __init__(self, config: Optional[OptimizationConfig] = None):
+    def __init__(self, config: OptimizationConfig | None = None):
         self.config = config or OptimizationConfig()
         self.bias_service = BiasDetectionService(BiasDetectionConfig())
         self.cache = SessionCache(self.config.cache_size)
@@ -376,7 +374,7 @@ class PerformanceOptimizedBiasDetector:
         session_data: SessionData,
         user_id: str,
         use_cache: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze session with performance optimizations"""
         start_time = time.time()
 
@@ -415,18 +413,18 @@ class PerformanceOptimizedBiasDetector:
         except Exception as e:
             logger.error(f"Optimized analysis failed for session {session_data.session_id}: {e}")
             return {
-                'session_id': session_data.session_id,
-                'error': str(e),
-                'bias_score': 0.0,
-                'confidence': 0.0
+                "session_id": session_data.session_id,
+                "error": str(e),
+                "bias_score": 0.0,
+                "confidence": 0.0
             }
 
     async def analyze_batch_optimized(
         self,
-        sessions: List[SessionData],
+        sessions: list[SessionData],
         user_id: str,
         use_parallel: bool = True
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Analyze batch of sessions with optimizations"""
         if not sessions:
             return []
@@ -488,7 +486,7 @@ class PerformanceOptimizedBiasDetector:
 
         except Exception as e:
             logger.error(f"Batch analysis failed: {e}")
-            return [{'error': str(e)} for _ in sessions]
+            return [{"error": str(e)} for _ in sessions]
 
     def _generate_cache_key(self, session_data: SessionData) -> str:
         """Generate cache key for session data"""
@@ -498,10 +496,10 @@ class PerformanceOptimizedBiasDetector:
 
     async def process_large_dataset(
         self,
-        sessions: List[SessionData],
+        sessions: list[SessionData],
         user_id: str,
         chunk_size: int = 100
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process large dataset in chunks with optimizations"""
         total_sessions = len(sessions)
         processed_count = 0
@@ -522,7 +520,7 @@ class PerformanceOptimizedBiasDetector:
 
                 # Collect results
                 for result in chunk_results:
-                    if 'error' in result:
+                    if "error" in result:
                         errors.append(result)
                     else:
                         all_results.append(result)
@@ -549,50 +547,50 @@ class PerformanceOptimizedBiasDetector:
             )
 
             return {
-                'total_sessions': total_sessions,
-                'processed_sessions': processed_count,
-                'failed_sessions': len(errors),
-                'processing_time': total_time,
-                'average_time_per_session': total_time / processed_count if processed_count > 0 else 0,
-                'results': all_results,
-                'errors': errors,
-                'performance_metrics': {
-                    'cache_hit_rate': self.performance_metrics.cache_hit_rate,
-                    'batch_efficiency': self.performance_metrics.batch_efficiency,
-                    'memory_usage_mb': self.memory_manager.check_memory_usage()
+                "total_sessions": total_sessions,
+                "processed_sessions": processed_count,
+                "failed_sessions": len(errors),
+                "processing_time": total_time,
+                "average_time_per_session": total_time / processed_count if processed_count > 0 else 0,
+                "results": all_results,
+                "errors": errors,
+                "performance_metrics": {
+                    "cache_hit_rate": self.performance_metrics.cache_hit_rate,
+                    "batch_efficiency": self.performance_metrics.batch_efficiency,
+                    "memory_usage_mb": self.memory_manager.check_memory_usage()
                 }
             }
 
         except Exception as e:
             logger.error(f"Large dataset processing failed: {e}")
             return {
-                'error': str(e),
-                'processed_sessions': processed_count,
-                'total_sessions': total_sessions
+                "error": str(e),
+                "processed_sessions": processed_count,
+                "total_sessions": total_sessions
             }
 
-    def get_performance_stats(self) -> Dict[str, Any]:
+    def get_performance_stats(self) -> dict[str, Any]:
         """Get current performance statistics"""
         return {
-            'metrics': {
-                'total_sessions_processed': self.performance_metrics.total_sessions_processed,
-                'average_session_time': self.performance_metrics.average_session_time,
-                'cache_hit_rate': self.performance_metrics.cache_hit_rate,
-                'batch_efficiency': self.performance_metrics.batch_efficiency,
-                'parallel_efficiency': self.performance_metrics.parallel_efficiency,
-                'memory_usage_mb': self.memory_manager.check_memory_usage()
+            "metrics": {
+                "total_sessions_processed": self.performance_metrics.total_sessions_processed,
+                "average_session_time": self.performance_metrics.average_session_time,
+                "cache_hit_rate": self.performance_metrics.cache_hit_rate,
+                "batch_efficiency": self.performance_metrics.batch_efficiency,
+                "parallel_efficiency": self.performance_metrics.parallel_efficiency,
+                "memory_usage_mb": self.memory_manager.check_memory_usage()
             },
-            'cache_stats': {
-                'cache_size': len(self.cache.cache),
-                'hit_rate': self.cache.get_hit_rate(),
-                'hits': self.cache.hit_count,
-                'misses': self.cache.miss_count
+            "cache_stats": {
+                "cache_size": len(self.cache.cache),
+                "hit_rate": self.cache.get_hit_rate(),
+                "hits": self.cache.hit_count,
+                "misses": self.cache.miss_count
             },
-            'optimization_config': {
-                'max_batch_size': self.config.max_batch_size,
-                'cache_size': self.config.cache_size,
-                'parallel_workers': self.config.parallel_workers,
-                'max_memory_usage_mb': self.config.max_memory_usage_mb
+            "optimization_config": {
+                "max_batch_size": self.config.max_batch_size,
+                "cache_size": self.config.cache_size,
+                "parallel_workers": self.config.parallel_workers,
+                "max_memory_usage_mb": self.config.max_memory_usage_mb
             }
         }
 
@@ -604,11 +602,11 @@ class PerformanceOptimizedBiasDetector:
 
 
 # Global instance
-performance_optimizer: Optional[PerformanceOptimizedBiasDetector] = None
+performance_optimizer: PerformanceOptimizedBiasDetector | None = None
 
 
 async def initialize_performance_optimizer(
-    config: Optional[OptimizationConfig] = None
+    config: OptimizationConfig | None = None
 ) -> PerformanceOptimizedBiasDetector:
     """Initialize global performance optimizer"""
     global performance_optimizer
@@ -632,33 +630,33 @@ async def analyze_session_with_performance(
     session_data: SessionData,
     user_id: str,
     use_cache: bool = True
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """API endpoint for performance-optimized analysis"""
     optimizer = await get_performance_optimizer()
     return await optimizer.analyze_session_optimized(session_data, user_id, use_cache)
 
 
 async def analyze_batch_with_performance(
-    sessions: List[SessionData],
+    sessions: list[SessionData],
     user_id: str,
     use_parallel: bool = True
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """API endpoint for batch analysis with performance optimization"""
     optimizer = await get_performance_optimizer()
     return await optimizer.analyze_batch_optimized(sessions, user_id, use_parallel)
 
 
 async def process_large_dataset(
-    sessions: List[SessionData],
+    sessions: list[SessionData],
     user_id: str,
     chunk_size: int = 100
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """API endpoint for large dataset processing"""
     optimizer = await get_performance_optimizer()
     return await optimizer.process_large_dataset(sessions, user_id, chunk_size)
 
 
-async def get_performance_stats() -> Dict[str, Any]:
+async def get_performance_stats() -> dict[str, Any]:
     """API endpoint for performance statistics"""
     optimizer = await get_performance_optimizer()
     return optimizer.get_performance_stats()

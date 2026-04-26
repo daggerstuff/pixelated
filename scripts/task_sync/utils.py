@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 from typing import Any
-from urllib.error import HTTPError
 from urllib import request
+from urllib.error import HTTPError
+
 
 class _ObjectView:
     def __init__(self, payload: Mapping[str, Any]):

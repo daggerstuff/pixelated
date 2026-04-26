@@ -7,7 +7,10 @@
  */
 
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
-import type { AnalysisResult, SessionData } from '@/lib/ai/bias-detection/types'
+import type {
+  AnalysisResult,
+  TherapeuticSession,
+} from '@/lib/ai/bias-detection/types'
 import type {
   DatasetForAudit,
   DatasetAuditResult,
@@ -263,7 +266,9 @@ export class BiasAuditService {
 
     // Run batch analysis using BiasDetectionEngine
     const batchResult = await this.biasEngine.batchAnalyzeSessions(
-      sampleSessions,
+      sampleSessions as Parameters<
+        BiasDetectionEngine['batchAnalyzeSessions']
+      >[0],
       {
         concurrency: 4,
         batchSize: 50,
@@ -345,10 +350,13 @@ export class BiasAuditService {
   /**
    * Generate sample sessions for bias analysis
    */
-  private generateSampleSessions(dataset: DatasetForAudit, count: number): SessionData[] {
+  private generateSampleSessions(
+    dataset: DatasetForAudit,
+    count: number,
+  ): TherapeuticSession[] {
     // In production, this would read actual data from the dataset file
     // For now, generate synthetic samples for demonstration
-    const sessions: SessionData[] = []
+    const sessions: TherapeuticSession[] = []
     const ageGroups = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+']
     const genders = ['male', 'female', 'non-binary', 'prefer_not_to_say']
     const ethnicities = [
@@ -365,22 +373,70 @@ export class BiasAuditService {
         ethnicity: ethnicities[Math.floor(Math.random() * ethnicities.length)],
         primaryLanguage: 'en',
       }
+      const startedAt = new Date()
       sessions.push({
         sessionId: `${dataset.datasetId}_sample_${i}`,
-        sessionDate: new Date().toISOString(),
+        sessionDate: startedAt.toISOString(),
         sessionDuration: 120,
         sessionType: 'general-wellness',
         sessionNotes: `Sample session ${i} from dataset ${dataset.name}`,
-        sessionData: {
+        participantDemographics: demographic,
+        scenario: {
+          scenarioId: `${dataset.datasetId}_scenario_${i}`,
+          type: 'general-wellness',
+          description: `Bias audit sample session ${i} from ${dataset.name}`,
+          complexity: 'low',
+          tags: ['bias-audit', 'sample'],
+        },
+        content: {
           transcript: `Sample message ${i} from dataset ${dataset.name}. Sample response ${i}.`,
+          aiResponses: [
+            `Sample model reflection ${i}: reinforce empathy and safety checks`,
+          ],
+          userInputs: [`Sample user input ${i}`],
+          patientPresentation: dataset.name,
           metadata: {
-            age: demographic.age,
-            gender: demographic.gender,
-            race: demographic.ethnicity,
-            language: demographic.primaryLanguage,
+            sampleIndex: i,
+            datasetId: dataset.datasetId,
           },
         },
-        participantDemographics: demographic,
+        aiResponses: [
+          {
+            responseId: `${dataset.datasetId}_sample_response_${i}`,
+            text: `Sample model response ${i} for dataset ${dataset.name}`,
+            timestamp: startedAt,
+            type: 'recommendation',
+            metadata: { sampleIndex: i, source: 'bias-audit' },
+          },
+        ],
+        expectedOutcomes: [
+          {
+            outcomeId: `${dataset.datasetId}_outcome_${i}`,
+            description: 'Model maintains safety and rapport throughout the simulated session',
+            achieved: true,
+          },
+        ],
+        transcripts: [
+          {
+            speaker: 'user',
+            text: `Sample message ${i} from dataset ${dataset.name}`,
+            timestamp: startedAt,
+          },
+          {
+            speaker: 'therapist',
+            text: `Sample response to user message ${i}`,
+            timestamp: new Date(startedAt.getTime() + 45_000),
+          },
+        ],
+        userInputs: [`Sample user input ${i}`, `Sample follow-up input ${i}`],
+        metadata: {
+          sessionStartTime: startedAt,
+          sessionEndTime: new Date(startedAt.getTime() + 120_000),
+          sessionDuration: 120,
+          completionStatus: 'simulated',
+          tags: ['bias-audit'],
+          traineeId: 'system',
+        },
       })
     }
     return sessions

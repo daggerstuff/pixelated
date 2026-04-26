@@ -6,6 +6,8 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./src/*"],
@@ -46,7 +48,7 @@
     "allowArbitraryExtensions": true,
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
-    "types": ["node", "react", "react-dom", "vitest/globals"],
+    "types": ["node", "react", "react-dom"],
     "typeRoots": [
       "../node_modules/@types",
       "./node_modules/@types",

@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
-from pathlib import Path
-
-
 import os
+from pathlib import Path
 
 SCRIPT_PATH = (
     Path(os.environ.get("PIXELATED_ROOT", str(Path(__file__).parent.parent.parent)))

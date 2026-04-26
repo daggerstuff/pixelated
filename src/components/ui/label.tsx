@@ -2,11 +2,11 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface LabelProps extends React.ComponentPropsWithoutRef<'label'> {
+export interface LabelProps extends React.ComponentPropsWithoutRef<'label'> {
   htmlFor?: string // Make htmlFor explicit in the interface
 }
 
-const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
+export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, htmlFor, ...props }, ref) => {
     // Warn if no htmlFor is provided
     if (process.env['NODE_ENV'] !== 'production' && !htmlFor) {
@@ -29,5 +29,3 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   },
 )
 Label.displayName = 'Label'
-
-export { Label }

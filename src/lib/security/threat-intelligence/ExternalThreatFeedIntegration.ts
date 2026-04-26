@@ -7,7 +7,7 @@
 import { EventEmitter } from 'events'
 import https from 'https'
 
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosHeaderValue, AxiosHeaders, AxiosInstance, AxiosResponse } from 'axios'
 import { Redis } from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
@@ -24,6 +24,60 @@ function normalizeError(err: unknown): Error {
   } catch {
     return new Error(String(err))
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return isRecord(value) ? value : {}
+}
+
+function getString(
+  value: unknown,
+  fallback: string = '',
+): string {
+  return typeof value === 'string' ? value : fallback
+}
+
+function getNumber(value: unknown, fallback = 0): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) {
+      return parsed
+    }
+  }
+  return fallback
+}
+
+function getStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((entry): entry is string => typeof entry === 'string')
+}
+
+function getHeaderValue(value: unknown): AxiosHeaderValue | undefined {
+  if (value === undefined || value === null) return undefined
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value
+  }
+  return undefined
+}
+
+function isThreatIndicatorType(value: string): value is ThreatIndicator['type'] {
+  return ['ip', 'domain', 'hash', 'url', 'email', 'file', 'behavior', 'vulnerability'].includes(
+    value,
+  )
+}
+
+function clamp01(value: number, fallback = 0): number {
+  if (!Number.isFinite(value)) return fallback
+  if (value <= 0) return 0
+  if (value >= 1) return 1
+  return value
 }
 
 export interface ThreatFeed {
@@ -225,12 +279,12 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   private syncResultsCollection!: Collection<FeedSyncResult>
   private redis!: Redis
   private isInitialized = false
-  private feedClients = new Map<string, AxiosInstance>()
+  private readonly feedClients = new Map<string, AxiosInstance>()
   private syncQueue: string[] = []
   private isProcessing = false
-  private activeSyncs = new Map<string, Promise<void>>()
+  private readonly activeSyncs = new Map<string, Promise<FeedSyncResult>>()
 
-  constructor(private _config: ExternalThreatFeedIntegrationConfig) {
+  constructor(private readonly _config: ExternalThreatFeedIntegrationConfig) {
     super()
     this.setMaxListeners(0)
   }
@@ -345,10 +399,17 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       await subscriber.connect()
 
       // Subscribe to sync requests
-      await subscriber.subscribe('feed:sync', async (message) => {
+    await subscriber.subscribe('feed:sync', async (message) => {
         try {
-          const syncData = JSON.parse(message)
-          await this.syncFeed(syncData.feed_id)
+          if (typeof message !== 'string') return
+
+          const rawSyncData = asRecord(JSON.parse(message))
+          const feedId = getString(rawSyncData.feed_id)
+          if (!feedId) {
+            return
+          }
+
+          await this.syncFeed(feedId)
         } catch (error: unknown) {
           const normalized = normalizeError(error)
           logger.error('Failed to process feed sync request', {
@@ -358,10 +419,22 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       })
 
       // Subscribe to feed status updates
-      await subscriber.subscribe('feed:status', async (message) => {
+    await subscriber.subscribe('feed:status', async (message) => {
         try {
-          const statusData = JSON.parse(message)
-          await this.updateFeedStatus(statusData.feed_id, statusData.status)
+          if (typeof message !== 'string') return
+
+          const rawStatusData = asRecord(JSON.parse(message))
+          const feedId = getString(rawStatusData.feed_id)
+          const status = getString(rawStatusData.status)
+          if (
+            feedId &&
+            (status === 'active' ||
+              status === 'error' ||
+              status === 'inactive' ||
+              status === 'maintenance')
+          ) {
+            await this.updateFeedStatus(feedId, status)
+          }
         } catch (error: unknown) {
           const normalized = normalizeError(error)
           logger.error('Failed to process feed status update', {
@@ -425,7 +498,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     // Add response interceptors for error handling
     client.interceptors.response.use(
       (response) => response,
-      (error) => this.handleFeedError(error, feed.id),
+      async (error) => this.handleFeedError(error, feed.id),
     )
 
     return client
@@ -440,16 +513,20 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   ): void {
     switch (auth.type) {
       case 'api_key':
-        client.defaults.headers.common['X-API-Key'] = auth.credentials.api_key
+        client.defaults.headers.common['X-API-Key'] = getHeaderValue(
+          auth.credentials.api_key,
+        )
         break
       case 'oauth2':
         // Implement OAuth2 token management
         this.setupOAuth2Authentication(client, auth.credentials)
         break
       case 'basic_auth':
+        const username = getString(auth.credentials.username)
+        const password = getString(auth.credentials.password)
         client.defaults.auth = {
-          username: auth.credentials.username,
-          password: auth.credentials.password,
+          username,
+          password,
         }
         break
       case 'certificate':
@@ -477,7 +554,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     client.interceptors.request.use(async (config) => {
       // Check if token needs refresh
       const token = await this.getValidOAuth2Token(credentials)
-      config.headers.Authorization = `Bearer ${token}`
+      const headers = new AxiosHeaders(config.headers)
+      headers.set('Authorization', `Bearer ${token}`)
+      config.headers = headers
       return config
     })
   }
@@ -490,23 +569,35 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   ): Promise<string> {
     // Implement token refresh logic
     // This is a simplified implementation
-    const tokenKey = `oauth2_token:${credentials.client_id}`
+    const clientId = getString(credentials.client_id, 'default')
+    const tokenUrl = getString(credentials.token_url)
+    const tokenKey = `oauth2_token:${clientId}`
+
+    if (!tokenUrl) {
+      throw new Error('OAuth2 token URL is required for oauth2 authentication')
+    }
+
     let token = await this.redis.get(tokenKey)
 
     if (!token) {
       // Request new token
-      const response = await axios.post(credentials.token_url as string, {
+      const response = await axios.post(tokenUrl, {
         grant_type: 'client_credentials',
         client_id: credentials.client_id,
         client_secret: credentials.client_secret,
         scope: credentials.scope,
       })
 
-      token = response.data?.access_token
-      const expiresIn = response.data?.expires_in as number | undefined
+      const responseData = asRecord(response.data)
+      token = getString(responseData.access_token)
+      const expiresIn = getNumber(responseData.expires_in, 3600)
 
       // Store token with expiration
-      await this.redis.setex(tokenKey, expiresIn - 60, token) // Refresh 1 minute early
+      if (!token) {
+        throw new Error('OAuth2 token response missing access_token')
+      }
+
+      await this.redis.setex(tokenKey, Math.max(Math.floor(expiresIn) - 60, 1), token) // Refresh 1 minute early
     }
 
     return token
@@ -521,9 +612,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     // Implement certificate-based authentication
     // Use https.Agent when PEM strings or buffers are provided
     try {
-      const cert = credentials['certificate'] as string | undefined
-      const key = credentials['private_key'] as string | undefined
-      const ca = credentials['ca_certificate'] as string | undefined
+      const cert = getString(credentials.certificate)
+      const key = getString(credentials.private_key)
+      const ca = getString(credentials.ca_certificate)
 
       if (cert || key || ca) {
         return new https.Agent({ cert, key, ca })
@@ -598,9 +689,101 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   }
 
   /**
+   * Start background sync processing loop
+   */
+  private startSyncProcessing(): void {
+    const processQueue = async () => {
+      if (this.isProcessing) {
+        return
+      }
+
+      this.isProcessing = true
+      try {
+        await this.processSyncQueue()
+      } catch (error: unknown) {
+        logger.error('Failed to process sync queue', {
+          error: normalizeError(error).message,
+        })
+      } finally {
+        this.isProcessing = false
+      }
+    }
+
+    // Initial queue processing + regular polling every minute.
+    void processQueue()
+    const interval = setInterval(() => {
+      void processQueue()
+    }, 60_000)
+    interval.unref()
+  }
+
+  /**
+   * Process queued feed sync requests
+   */
+  private async processSyncQueue(): Promise<void> {
+    if (this.syncQueue.length > 0) {
+      const queuedFeedIds = [...this.syncQueue]
+      this.syncQueue = []
+
+      for (const feedId of queuedFeedIds) {
+        await this.scheduleFeedSync(feedId)
+      }
+    }
+
+    const now = new Date()
+    const activeFeeds = await this.feedsCollection
+      .find({ status: { $in: ['active', 'inactive'] } })
+      .toArray()
+
+    for (const feed of activeFeeds) {
+      if (this.activeSyncs.has(feed.id)) {
+        continue
+      }
+
+      if (feed.next_sync && feed.next_sync > now) {
+        continue
+      }
+
+      await this.scheduleFeedSync(feed.id)
+    }
+  }
+
+  /**
+   * Schedule an individual feed sync
+   */
+  private async scheduleFeedSync(feedId: string): Promise<void> {
+    if (this.activeSyncs.has(feedId)) {
+      return
+    }
+
+    if (
+      this.activeSyncs.size >= this._config.sync_settings.max_concurrent_syncs
+    ) {
+      this.syncQueue.push(feedId)
+      return
+    }
+
+    const syncPromise = this.syncFeed(feedId)
+      .catch((error: unknown): FeedSyncResult => {
+        logger.error('Scheduled sync failed', {
+          error: normalizeError(error).message,
+          feed_id: feedId,
+        })
+
+        return this.createSkippedResult(uuidv4(), feedId, Date.now())
+      })
+      .finally(() => {
+        this.activeSyncs.delete(feedId)
+      })
+
+    this.activeSyncs.set(feedId, syncPromise)
+    await syncPromise
+  }
+
+  /**
    * Handle feed errors
    */
-  private handleFeedError(error: unknown, feedId: string): Promise<never> {
+  private async handleFeedError(error: unknown, feedId: string): Promise<never> {
     const normalized = normalizeError(error)
     logger.error('Feed API error', {
       feed_id: feedId,
@@ -608,20 +791,22 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     })
 
     // Update feed status to error
-    this.updateFeedStatus(feedId, 'error').catch((err: unknown) => {
+    try {
+      await this.updateFeedStatus(feedId, 'error')
+    } catch (updateError: unknown) {
       logger.error('Failed to update feed status', {
-        error: normalizeError(err).message,
+        error: normalizeError(updateError).message,
       })
-    })
+    }
 
-    return Promise.reject(error)
+    throw error
   }
 
   /**
    * Add new threat feed
    */
   async addFeed(feedData: Partial<ThreatFeed>): Promise<string> {
-    if (!this.isInitialized) {
+      if (!this.isInitialized) {
       throw new Error('External threat feed integration system not initialized')
     }
 
@@ -629,27 +814,26 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       const feedId = uuidv4()
       const now = new Date()
 
-      const feed: ThreatFeed = {
+    const feed: ThreatFeed = {
         id: feedId,
-        name: feedData.name || 'Untitled Feed',
-        description: feedData.description || '',
-        type: (feedData.type as ThreatFeed['type']) || 'custom',
-        provider: feedData.provider || 'unknown',
-        endpoint: feedData.endpoint || '',
-        authentication: feedData.authentication || {
+        name: getString(feedData.name, 'Untitled Feed'),
+        description: getString(feedData.description, ''),
+        type: this.parseThreatFeedType(feedData.type),
+        provider: getString(feedData.provider, 'unknown'),
+        endpoint: getString(feedData.endpoint),
+        authentication: feedData.authentication ?? {
           type: 'none',
           credentials: {},
         },
-        configuration: feedData.configuration || {
+        configuration: feedData.configuration ?? {
           format: 'json',
           filters: {},
           transformations: [],
           deduplication_rules: [],
         },
         status: 'inactive',
-        sync_frequency:
-          (feedData.sync_frequency as ThreatFeed['sync_frequency']) || 'daily',
-        rate_limiting: feedData.rate_limiting || {},
+        sync_frequency: this.parseSyncFrequency(feedData.sync_frequency),
+        rate_limiting: feedData.rate_limiting ?? {},
         data_quality: {
           completeness: 0,
           accuracy: 0,
@@ -677,6 +861,35 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw error
+    }
+  }
+
+  private parseThreatFeedType(type: unknown): ThreatFeed['type'] {
+    const typeValue = getString(type)
+    switch (typeValue) {
+      case 'stix_taxii':
+      case 'misp':
+      case 'commercial_api':
+      case 'open_source':
+      case 'custom':
+        return typeValue
+      default:
+        return 'custom'
+    }
+  }
+
+  private parseSyncFrequency(
+    syncFrequency: unknown,
+  ): ThreatFeed['sync_frequency'] {
+    const frequencyValue = getString(syncFrequency)
+    switch (frequencyValue) {
+      case 'hourly':
+      case 'daily':
+      case 'weekly':
+      case 'real_time':
+        return frequencyValue
+      default:
+        return 'daily'
     }
   }
 
@@ -840,6 +1053,148 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   }
 
   /**
+   * Create a skipped sync result
+   */
+  private createSkippedResult(
+    resultId: string,
+    feedId: string,
+    startTime: number,
+  ): FeedSyncResult {
+    return {
+      id: resultId,
+      feed_id: feedId,
+      timestamp: new Date(),
+      status: 'skipped',
+      indicators_processed: 0,
+      indicators_added: 0,
+      indicators_updated: 0,
+      indicators_removed: 0,
+      errors: [],
+      performance_metrics: {
+        download_time: 0,
+        processing_time: 0,
+        total_time: Date.now() - startTime,
+        data_size: 0,
+        api_calls: 0,
+        rate_limit_hits: 0,
+      },
+      data_quality_assessment: {
+        completeness: 0,
+        accuracy: 0,
+        timeliness: 0,
+        uniqueness: 0,
+        validity: 0,
+      },
+    }
+  }
+
+  /**
+   * Update feed status in database
+   */
+  private async updateFeedStatus(
+    feedId: string,
+    status: ThreatFeed['status'],
+    additionalFields: Record<string, unknown> = {},
+  ): Promise<void> {
+    try {
+      await this.feedsCollection.updateOne(
+        { id: feedId },
+        { $set: { status, ...additionalFields, updated_at: new Date() } },
+      )
+
+      this.emit('feed:status_updated', {
+        feed_id: feedId,
+        status,
+        ...additionalFields,
+      })
+    } catch (error: unknown) {
+      logger.error('Failed to update feed status', {
+        error: normalizeError(error).message,
+        feed_id: feedId,
+      })
+    }
+  }
+
+  /**
+   * Evaluate whether quality metrics meet thresholds
+   */
+  private meetsQualityThresholds(metrics: DataQualityMetrics): boolean {
+    return (
+      metrics.completeness >= this._config.quality_thresholds.min_completeness &&
+      metrics.accuracy >= this._config.quality_thresholds.min_accuracy &&
+      metrics.timeliness >= this._config.quality_thresholds.min_timeliness &&
+      metrics.uniqueness >= this._config.quality_thresholds.min_uniqueness &&
+      metrics.validity >= this._config.quality_thresholds.min_validity
+    )
+  }
+
+  /**
+   * Update feed metadata after a sync result
+   */
+  private async updateFeedAfterSync(
+    feedId: string,
+    result: FeedSyncResult,
+  ): Promise<void> {
+    try {
+      const status = result.errors.length > 0 ? 'active' : 'active'
+      const nextSync = this.calculateNextSync(
+        this._config.sync_settings,
+        feedId,
+        result.timestamp,
+      )
+
+      await this.feedsCollection.updateOne(
+        { id: feedId },
+        {
+          $set: {
+            status,
+            last_sync: result.timestamp,
+            next_sync: nextSync,
+            data_quality: result.data_quality_assessment,
+            updated_at: new Date(),
+          },
+        },
+      )
+    } catch (error: unknown) {
+      logger.error('Failed to update feed after sync', {
+        error: normalizeError(error).message,
+        feed_id: feedId,
+      })
+    }
+  }
+
+  private calculateNextSync(
+    _syncSettings: ExternalThreatFeedIntegrationConfig['sync_settings'],
+    feedId: string,
+    baseDate: Date,
+  ): Date {
+    const next = new Date(baseDate)
+    const frequencies = this._config.feeds.find((feed) => feed.id === feedId)?.sync_frequency
+    if (!frequencies) {
+      next.setHours(next.getHours() + 1)
+      return next
+    }
+
+    switch (frequencies) {
+      case 'hourly':
+        next.setHours(next.getHours() + 1)
+        break
+      case 'daily':
+        next.setDate(next.getDate() + 1)
+        break
+      case 'weekly':
+        next.setDate(next.getDate() + 7)
+        break
+      case 'real_time':
+      default:
+        next.setMinutes(next.getMinutes() + 5)
+        break
+    }
+
+    return next
+  }
+
+  /**
    * Download data from threat feed
    */
   private async downloadFeedData(
@@ -894,7 +1249,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     return await client.get(taxiiEndpoint, {
       params: {
         'match[type]': 'indicator',
-        'match[spec_version]': feed.configuration.version || '2.1',
+        'match[spec_version]': feed.configuration.version ?? '2.1',
       },
     })
   }
@@ -986,10 +1341,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           indicators = await this.processJSONData(rawData, feed)
           break
         case 'csv':
-          indicators = await this.processCSVData(rawData, feed)
+          indicators = await this.processCSVData(getString(rawData), feed)
           break
         case 'xml':
-          indicators = await this.processXMLData(rawData, feed)
+          indicators = await this.processXMLData(getString(rawData), feed)
           break
         case 'custom':
           indicators = await this.processCustomData(rawData, feed)
@@ -1064,7 +1419,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     feed: ThreatFeed,
   ): ThreatIndicator | null {
     try {
-      const pattern = this.getNestedValue(stixObject, 'pattern') as string
+      const pattern = getString(this.getNestedValue(stixObject, 'pattern'))
       const indicatorType = this.extractIndicatorTypeFromSTIXPattern(pattern)
       const value = this.extractIndicatorValueFromSTIXPattern(pattern)
 
@@ -1077,35 +1432,31 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         feed_id: feed.id,
         type: indicatorType,
         value: value,
-        confidence: this.mapSTIXConfidence(
-          Number(this.getNestedValue(stixObject, 'confidence') ?? 50),
-        ),
+        confidence: this.mapSTIXConfidence(this.getNestedValue(stixObject, 'confidence')),
         severity: this.mapSTIXSeverity(
-          (this.getNestedValue(stixObject, 'labels') as string[]) || [],
+          this.getNestedValue(stixObject, 'labels'),
         ),
         threat_type: this.extractThreatTypeFromSTIX(stixObject),
-        description:
-          (this.getNestedValue(stixObject, 'description') as string) || '',
+        description: getString(this.getNestedValue(stixObject, 'description'), ''),
         first_seen: new Date(
-          String(
-            (this.getNestedValue(stixObject, 'created') as string | number) ??
-              Date.now(),
+          getString(
+            this.getNestedValue(stixObject, 'created'),
+            Date.now().toString(),
           ),
         ),
         last_seen: new Date(
-          String(
-            (this.getNestedValue(stixObject, 'modified') as string | number) ??
-              Date.now(),
+          getString(
+            this.getNestedValue(stixObject, 'modified'),
+            Date.now().toString(),
           ),
         ),
         expiration_date: this.getNestedValue(stixObject, 'valid_until')
-          ? new Date(String(this.getNestedValue(stixObject, 'valid_until')))
+          ? new Date(getString(this.getNestedValue(stixObject, 'valid_until')))
           : undefined,
         source_reliability: this.mapSTIXReliability(
-          String(this.getNestedValue(stixObject, 'created_by_ref') as string) ||
-            '',
+          getString(this.getNestedValue(stixObject, 'created_by_ref')),
         ),
-        tags: (this.getNestedValue(stixObject, 'labels') as string[]) || [],
+        tags: getStringArray(this.getNestedValue(stixObject, 'labels')),
         attributes: {
           stix_id: this.getNestedValue(stixObject, 'id'),
           pattern: pattern,
@@ -1115,7 +1466,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           ),
         },
         relationships: [],
-        raw_data: (stixObject as Record<string, unknown>) || {},
+        raw_data: asRecord(stixObject),
       }
     } catch (error: unknown) {
       logger.error('Failed to convert STIX to indicator', {
@@ -1128,7 +1479,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Extract indicator type from STIX pattern
    */
-  private extractIndicatorTypeFromSTIXPattern(pattern: string): string {
+  private extractIndicatorTypeFromSTIXPattern(pattern: string): ThreatIndicator['type'] | undefined {
+    if (!pattern) return undefined
     if (pattern.includes('file:hashes.MD5')) return 'hash'
     if (pattern.includes('ipv4-addr')) return 'ip'
     if (pattern.includes('domain-name')) return 'domain'
@@ -1140,9 +1492,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Extract indicator value from STIX pattern
    */
-  private extractIndicatorValueFromSTIXPattern(pattern: string): string {
+  private extractIndicatorValueFromSTIXPattern(pattern: string): string | undefined {
+    if (!pattern) return undefined
     const match = pattern.match(/'([^']+)'/)
-    return match ? match[1] : ''
+    return match ? match[1] : undefined
   }
 
   /**
@@ -1184,15 +1537,11 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     feed: ThreatFeed,
   ): ThreatIndicator | null {
     try {
-      const typeStr = String(
-        (this.getNestedValue(attribute, 'type') as string) || '',
-      )
+      const typeStr = getString(this.getNestedValue(attribute, 'type'))
       const indicatorType = this.mapMISPTypeToIndicatorType(typeStr)
       if (!indicatorType) return null
 
-      const value = String(
-        (this.getNestedValue(attribute, 'value') as string | number) ?? '',
-      )
+      const value = getString(this.getNestedValue(attribute, 'value'))
 
       const tagsA = this.getNestedValue(attribute, 'Tag')
       const tagsE = this.getNestedValue(event, 'Tag')
@@ -1216,27 +1565,24 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         confidence: this.mapMISPToConfidence(attribute),
         severity: this.mapMISPToSeverity(attribute),
         threat_type: this.mapMISPToThreatType(attribute),
-        description: String(
-          (this.getNestedValue(attribute, 'comment') as string) ??
-            (this.getNestedValue(event, 'info') as string) ??
-            '',
+        description: getString(
+          this.getNestedValue(attribute, 'comment'),
+          getString(this.getNestedValue(event, 'info'), ''),
         ),
         first_seen: new Date(
-          String(
-            (this.getNestedValue(attribute, 'first_seen') as string | number) ??
-              (this.getNestedValue(event, 'date') as string | number) ??
-              Date.now(),
+          getString(
+            this.getNestedValue(attribute, 'first_seen'),
+            getString(this.getNestedValue(event, 'date'), Date.now().toString()),
           ),
         ),
         last_seen: new Date(
-          String(
-            (this.getNestedValue(attribute, 'last_seen') as string | number) ??
-              (this.getNestedValue(event, 'date') as string | number) ??
-              Date.now(),
+          getString(
+            this.getNestedValue(attribute, 'last_seen'),
+            getString(this.getNestedValue(event, 'date'), Date.now().toString()),
           ),
         ),
         expiration_date: this.getNestedValue(attribute, 'expiration')
-          ? new Date(String(this.getNestedValue(attribute, 'expiration')))
+          ? new Date(getString(this.getNestedValue(attribute, 'expiration')))
           : undefined,
         source_reliability: 'b', // MISP default reliability
         tags: tagNames,
@@ -1247,7 +1593,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           to_ids: this.getNestedValue(attribute, 'to_ids'),
         },
         relationships: [],
-        raw_data: { attribute, event },
+        raw_data: {
+          attribute: asRecord(attribute),
+          event: asRecord(event),
+        },
       }
     } catch (error: unknown) {
       logger.error('Failed to convert MISP to indicator', {
@@ -1260,8 +1609,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Map MISP type to indicator type
    */
-  private mapMISPTypeToIndicatorType(mispType: string): string {
-    const typeMap: Record<string, string> = {
+  private mapMISPTypeToIndicatorType(
+    mispType: string,
+  ): ThreatIndicator['type'] | null {
+    const typeMap: Partial<Record<string, ThreatIndicator['type']>> = {
       'ip-dst': 'ip',
       'ip-src': 'ip',
       domain: 'domain',
@@ -1275,7 +1626,24 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       filename: 'file',
     }
 
-    return typeMap[mispType] || 'behavior'
+    const mapped = typeMap[mispType]
+    if (!mapped) return null
+    return mapped
+  }
+
+  /**
+   * Parse and normalize indicator type from raw data
+   */
+  private parseThreatIndicatorType(
+    ...rawTypes: unknown[]
+  ): ThreatIndicator['type'] {
+    for (const rawType of rawTypes) {
+      const typeCandidate = getString(rawType).toLowerCase()
+      if (isThreatIndicatorType(typeCandidate)) {
+        return typeCandidate
+      }
+    }
+    return 'behavior'
   }
 
   /**
@@ -1314,60 +1682,51 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     feed: ThreatFeed,
   ): ThreatIndicator | null {
     try {
-      const type = String(
-        (this.getNestedValue(data, 'type') as string) ??
-          (this.getNestedValue(data, 'indicator') as string) ??
-          'ip',
+      const type = this.parseThreatIndicatorType(
+        this.getNestedValue(data, 'type'),
+        this.getNestedValue(data, 'indicator'),
       )
-      const value = String(
-        (this.getNestedValue(data, 'value') as string | number) ??
-          (this.getNestedValue(data, 'indicator') as string | number) ??
-          '',
+      const value = getString(
+        this.getNestedValue(data, 'value'),
+        getString(this.getNestedValue(data, 'indicator')),
       )
-      const confidence = Number(this.getNestedValue(data, 'confidence') ?? 0.5)
-      const severity = String(
-        (this.getNestedValue(data, 'severity') as string) ?? 'medium',
-      ) as 'low' | 'medium' | 'high' | 'critical'
+      const confidence = clamp01(
+        this.mapConfidence(getNumber(this.getNestedValue(data, 'confidence'), 0.5), {}),
+      )
+      const severity = this.parseThreatSeverity(this.getNestedValue(data, 'severity'))
 
       return {
         id: uuidv4(),
         feed_id: feed.id,
-        type: type as ThreatIndicator['type'],
+        type,
         value,
         confidence,
         severity,
-        threat_type: String(
-          (this.getNestedValue(data, 'threat_type') as string) ?? 'unknown',
-        ),
-        description: String(
-          (this.getNestedValue(data, 'description') as string) ?? '',
-        ),
+        threat_type: getString(this.getNestedValue(data, 'threat_type'), 'unknown'),
+        description: getString(this.getNestedValue(data, 'description'), ''),
         first_seen: new Date(
-          String(
-            (this.getNestedValue(data, 'first_seen') as string | number) ??
-              Date.now(),
+          getString(
+            this.getNestedValue(data, 'first_seen'),
+            Date.now().toString(),
           ),
         ),
         last_seen: new Date(
-          String(
-            (this.getNestedValue(data, 'last_seen') as string | number) ??
-              Date.now(),
+          getString(
+            this.getNestedValue(data, 'last_seen'),
+            Date.now().toString(),
           ),
         ),
         expiration_date: this.getNestedValue(data, 'expiration_date')
-          ? new Date(String(this.getNestedValue(data, 'expiration_date')))
+          ? new Date(getString(this.getNestedValue(data, 'expiration_date')))
           : undefined,
-        source_reliability: String(
-          (this.getNestedValue(data, 'reliability') as string) ?? 'c',
-        ) as ThreatIndicator['source_reliability'],
-        tags: (this.getNestedValue(data, 'tags') as string[]) ?? [],
+        source_reliability: this.parseSourceReliability(
+          this.getNestedValue(data, 'reliability'),
+        ),
+        tags: getStringArray(this.getNestedValue(data, 'tags')),
         attributes:
-          (this.getNestedValue(data, 'attributes') as Record<
-            string,
-            unknown
-          >) ?? {},
+          asRecord(this.getNestedValue(data, 'attributes')),
         relationships: [],
-        raw_data: (data as Record<string, unknown>) ?? {},
+        raw_data: asRecord(data),
       }
     } catch (error: unknown) {
       logger.error('Failed to convert JSON to indicator', {
@@ -1471,12 +1830,11 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   private getNestedValue(obj: unknown, path: string): unknown {
     try {
       return path.split('.').reduce((current: unknown, key) => {
-        if (
-          current &&
-          typeof current === 'object' &&
-          key in (current as Record<string, unknown>)
-        ) {
-          return (current as Record<string, unknown>)[key]
+        if (current && typeof current === 'object') {
+          const currentRecord = asRecord(current)
+          if (Object.hasOwn(currentRecord, key)) {
+            return currentRecord[key]
+          }
         }
         return undefined
       }, obj)
@@ -1560,7 +1918,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     transformation: DataTransformation,
   ): ThreatIndicator[] {
     return indicators.filter((indicator) => {
-      const fieldValue = (indicator as Record<string, unknown>)[
+      const fieldValue = asRecord(indicator)[
         transformation.field
       ]
       return this.evaluateFilterCondition(fieldValue, transformation.parameters)
@@ -1617,6 +1975,239 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     return indicators.filter((indicator) => {
       return this.validateIndicator(indicator, transformation.parameters)
     })
+  }
+
+  /**
+   * Map STIX confidence to normalized [0,1] value
+   */
+  private mapSTIXConfidence(confidence: unknown, fallback = 0.5): number {
+    const parsed = getNumber(confidence, fallback)
+    if (parsed > 1) {
+      return clamp01(parsed / 100, fallback)
+    }
+    return clamp01(parsed, fallback)
+  }
+
+  /**
+   * Map STIX severity labels to ThreatIndicator severity
+   */
+  private mapSTIXSeverity(labels: unknown): ThreatIndicator['severity'] {
+    const normalized = getStringArray(labels).map((label) => label.toLowerCase())
+    if (normalized.includes('critical')) return 'critical'
+    if (normalized.includes('high')) return 'high'
+    if (normalized.includes('low')) return 'low'
+    return 'medium'
+  }
+
+  /**
+   * Map STIX threat indicator to threat type
+   */
+  private extractThreatTypeFromSTIX(stixObject: unknown): string {
+    const rawType = this.getNestedValue(stixObject, 'type')
+    if (typeof rawType === 'string' && rawType.trim()) return rawType
+    const labels = getStringArray(this.getNestedValue(stixObject, 'labels'))
+    return labels.find((label) => label.trim().length > 0) ?? 'unknown'
+  }
+
+  /**
+   * Map STIX reliability reference to internal scale
+   */
+  private mapSTIXReliability(rawReliability: unknown): ThreatIndicator['source_reliability'] {
+    const reliability = getString(rawReliability, 'c')
+      .toLowerCase()
+      .replace(/[^a-z]/g, '')
+    return this.parseSourceReliability(reliability)
+  }
+
+  /**
+   * Map MISP confidence to normalized [0,1] value
+   */
+  private mapMISPToConfidence(attribute: unknown): number {
+    return this.mapSTIXConfidence(this.getNestedValue(attribute, 'confidence'), 0.5)
+  }
+
+  /**
+   * Map MISP severity to threat indicator severity
+   */
+  private mapMISPToSeverity(attribute: unknown): ThreatIndicator['severity'] {
+    const severityRaw = this.getNestedValue(attribute, 'threat-level-id')
+    const fallback = this.getNestedValue(attribute, 'severity')
+    return this.parseThreatSeverity(severityRaw ?? fallback)
+  }
+
+  /**
+   * Map MISP type to threat type
+   */
+  private mapMISPToThreatType(attribute: unknown): string {
+    const category = getString(this.getNestedValue(attribute, 'category'))
+    const type = getString(this.getNestedValue(attribute, 'type'))
+    if (category) return category
+    if (type) return type
+    return 'unknown'
+  }
+
+  /**
+   * Map incoming confidence for transformation
+   */
+  private mapConfidence(
+    value: number,
+    parameters: Record<string, unknown>,
+  ): number {
+    const normalized = this.mapSTIXConfidence(value)
+    const multiplier = getNumber(parameters.multiplier, 1)
+    const offset = getNumber(parameters.offset, 0)
+    return clamp01(normalized * multiplier + offset)
+  }
+
+  /**
+   * Map severity transformation
+   */
+  private mapSeverity(
+    severity: ThreatIndicator['severity'],
+    parameters: Record<string, unknown>,
+  ): ThreatIndicator['severity'] {
+    const mappingRaw = this.getNestedValue(parameters, 'mapping')
+    const mappingRecord = asRecord(mappingRaw)
+    const mappedSeverity = getString(mappingRecord[severity])
+    if (mappedSeverity) {
+      const normalized = mappedSeverity.toLowerCase()
+      if (normalized === 'low') return 'low'
+      if (normalized === 'medium') return 'medium'
+      if (normalized === 'high') return 'high'
+      if (normalized === 'critical') return 'critical'
+    }
+    return severity
+  }
+
+  private parseThreatSeverity(rawSeverity: unknown): ThreatIndicator['severity'] {
+    const normalized = getString(rawSeverity, 'medium').toLowerCase()
+    if (normalized.includes('critical')) return 'critical'
+    if (normalized.includes('high')) return 'high'
+    if (normalized.includes('low')) return 'low'
+    return 'medium'
+  }
+
+  private parseSourceReliability(
+    rawReliability: unknown,
+  ): ThreatIndicator['source_reliability'] {
+    const normalized = getString(rawReliability, 'c').toLowerCase().replace(/[^a-z]/g, '')
+    switch (normalized) {
+      case 'a':
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'e':
+      case 'f':
+        return normalized
+      default:
+        return 'c'
+    }
+  }
+
+  /**
+   * Evaluate filter condition for transformation
+   */
+  private evaluateFilterCondition(
+    fieldValue: unknown,
+    parameters: Record<string, unknown>,
+  ): boolean {
+    const operator = getString(parameters.operator, 'eq')
+    const filterValue = this.getNestedValue(parameters, 'value')
+
+    switch (operator) {
+      case 'eq':
+        return fieldValue === filterValue
+      case 'neq':
+        return fieldValue !== filterValue
+      case 'gt':
+        return getNumber(fieldValue) > getNumber(filterValue)
+      case 'gte':
+        return getNumber(fieldValue) >= getNumber(filterValue)
+      case 'lt':
+        return getNumber(fieldValue) < getNumber(filterValue)
+      case 'lte':
+        return getNumber(fieldValue) <= getNumber(filterValue)
+      case 'contains':
+        return getString(fieldValue).includes(getString(filterValue))
+      case 'in':
+        return (
+          Array.isArray(filterValue) &&
+          filterValue.some((candidate) => candidate === fieldValue)
+        )
+      case 'truthy':
+        return Boolean(fieldValue)
+      default:
+        return true
+    }
+  }
+
+  /**
+   * Normalize indicator value depending on type
+   */
+  private normalizeIndicatorValue(
+    value: string,
+    type: ThreatIndicator['type'],
+  ): string {
+    const trimmed = value.trim()
+    if (type === 'ip' || type === 'hash' || type === 'url' || type === 'domain' || type === 'email') {
+      return trimmed.toLowerCase()
+    }
+    return trimmed
+  }
+
+  /**
+   * Enrich indicator with IP geolocation metadata
+   */
+  private async getIPGeolocation(value: string): Promise<Record<string, unknown>> {
+    if (!this.isValidIP(value)) {
+      return {}
+    }
+
+    return {
+      ip: value,
+      lookup_source: 'placeholder',
+      looked_up_at: new Date().toISOString(),
+    }
+  }
+
+  /**
+   * Validate an indicator after transformations
+   */
+  private validateIndicator(
+    indicator: ThreatIndicator,
+    _parameters: Record<string, unknown>,
+  ): boolean {
+    if (!indicator.value || !indicator.feed_id) {
+      return false
+    }
+
+    if (indicator.confidence < 0 || indicator.confidence > 1) {
+      return false
+    }
+
+    if (!isThreatIndicatorType(indicator.type)) {
+      return false
+    }
+
+    return this.isValidIndicatorValue(indicator.value, indicator.type)
+  }
+
+  private isValidHash(value: string): boolean {
+    const hashRegex = /^[a-f0-9]{32,64}$/i
+    return hashRegex.test(value)
+  }
+
+  private isValidURL(value: string): boolean {
+    try {
+      const parsed = new URL(value)
+      return Boolean(parsed.protocol && parsed.host)
+    } catch {
+      return false
+    }
+  }
+
+  private isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
   }
 
   /**
@@ -1797,7 +2388,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     }
 
     try {
-      const operations = []
+      const operations: Array<
+        { updateOne: { filter: { id: string }; update: { $set: Partial<ThreatIndicator> } } } |
+        { insertOne: { document: ThreatIndicator } }
+      > = []
 
       for (const indicator of batch) {
         // Check if indicator already exists
@@ -1880,7 +2474,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         })
       }
 
-      return { removed: result.deletedCount || 0 }
+      return { removed: result.deletedCount }
     } catch (error: unknown) {
       const normalized = normalizeError(error)
       logger.error('Failed to remove expired indicators', {
@@ -1922,9 +2516,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       for (const indicator of indicators) {
         // Completeness check
         if (
-          indicator.value &&
-          indicator.type &&
-          indicator.confidence !== undefined
+          indicator.value.length > 0 &&
+          indicator.type.length > 0 &&
+          Number.isFinite(indicator.confidence)
         ) {
           completeCount++
         }

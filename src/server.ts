@@ -9,6 +9,8 @@ import { Pool } from 'pg'
 import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
+import authRoutes from './api/routes/auth'
+import projectsRoutes from './api/routes/projects'
 
 const app = express()
 const server = createServer(app)
@@ -83,6 +85,10 @@ app.use(
 )
 app.use(express.json())
 
+// API Routes
+app.use('/api/auth', authRoutes)
+app.use('/api/projects', projectsRoutes)
+
 // Health check endpoint
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
@@ -103,10 +109,15 @@ process.on('SIGTERM', async () => {
   })
 })
 
-// Start server
-server.listen(PORT, () => {
-  console.log(`WebSocket server running on port ${PORT}`)
-  console.log(`Health check available at http://localhost:${PORT}/health`)
-})
+// Start server only if not in test mode
+const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST
 
-export { socketService, db, redis }
+if (!isTest) {
+  server.listen(PORT, () => {
+    console.log(`WebSocket server running on port ${PORT}`)
+    console.log(`Health check available at http://localhost:${PORT}/health`)
+  })
+}
+
+
+export { app, socketService, db, redis }

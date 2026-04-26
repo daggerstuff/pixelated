@@ -1,4 +1,4 @@
-import { Logger } from "../../utils/logger";
+import { Logger, getLogger } from "../../utils/logger";
 import { SessionContext, TherapeuticProgress, InterventionContext } from "../types/context";
 import { EmotionState, CrisisLevel } from "../types/emotional";
 import { PatientPsiProfile } from "../types/patient-psi";
@@ -12,7 +12,7 @@ export class ContextualEnhancer {
 
   constructor() {
     this.analyzer = new RealTimeAnalyzer();
-    this.logger = new Logger("ContextualEnhancer");
+    this.logger = getLogger("ContextualEnhancer");
   }
 
   /**
@@ -102,13 +102,14 @@ export class ContextualEnhancer {
     const baseline =
       this.progressTracker.get(patientProfile.id) || this.createBaselineProgress(patientProfile);
 
-    const currentProgress = {
+    const currentProgress: TherapeuticProgress = {
       emotionalRegulation: this.calculateEmotionalProgress(history, baseline),
       therapeuticAlliance: this.calculateAllianceProgress(history),
       treatmentEngagement: this.calculateEngagementProgress(history, patientProfile),
       crisisFrequency: this.calculateCrisisFrequency(history),
       goalAchievement: this.calculateGoalProgress(history, baseline.goals),
       sessionConsistency: this.calculateSessionConsistency(history),
+      goals: baseline.goals,
     };
 
     // Update progress tracker
@@ -266,6 +267,7 @@ export class ContextualEnhancer {
     return {
       primary: "neutral",
       intensity: 0.3,
+      confidence: 0.7,
       valence: 0.0,
       arousal: 0.2,
     };

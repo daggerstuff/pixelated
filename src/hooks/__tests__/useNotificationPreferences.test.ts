@@ -9,6 +9,15 @@ import { useNotificationPreferences } from '../useNotificationPreferences'
 const mockFetch = vi.fn<() => Promise<Response>>()
 global.fetch = mockFetch
 
+function createMockResponse<T>(body: T): Response {
+  return {
+    ok: true,
+    async json() {
+      return body
+    },
+  } as unknown as Response
+}
+
 describe('useNotificationPreferences', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -34,10 +43,7 @@ describe('useNotificationPreferences', () => {
       },
     }
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockPreferences),
-    })
+    mockFetch.mockResolvedValueOnce(createMockResponse(mockPreferences))
 
     const { result } = renderHook(() => useNotificationPreferences())
 
@@ -85,17 +91,15 @@ describe('useNotificationPreferences', () => {
       await new Promise((resolve) => setTimeout(resolve, 0))
     })
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          channels: {
-            ...result.current.preferences.channels,
-            [NotificationChannel.EMAIL]: false,
-          },
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        channels: {
+          ...result.current.preferences.channels,
+          [NotificationChannel.EMAIL]: false,
+        },
+      }),
+    )
 
     await act(async () => {
       await result.current.updateChannel(NotificationChannel.EMAIL, false)
@@ -121,14 +125,12 @@ describe('useNotificationPreferences', () => {
       await new Promise((resolve) => setTimeout(resolve, 0))
     })
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          frequency: 'daily',
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        frequency: 'daily',
+      }),
+    )
 
     await act(async () => {
       await result.current.updateFrequency('daily')
@@ -158,14 +160,12 @@ describe('useNotificationPreferences', () => {
       end: '08:00',
     }
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          quiet_hours: newQuietHours,
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        quiet_hours: newQuietHours,
+      }),
+    )
 
     await act(async () => {
       await result.current.updateQuietHours(newQuietHours)
@@ -191,17 +191,15 @@ describe('useNotificationPreferences', () => {
       await new Promise((resolve) => setTimeout(resolve, 0))
     })
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          categories: {
-            ...result.current.preferences.categories,
-            updates: false,
-          },
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        categories: {
+          ...result.current.preferences.categories,
+          updates: false,
+        },
+      }),
+    )
 
     await act(async () => {
       await result.current.updateCategory('updates', false)

@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import os
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 from urllib import parse
 
-from .config import _strip_env, _load_internal_config
+from .config import _load_internal_config, _strip_env
 from .utils import _json_request, _object_view
+
 
 def resolve_asana_token() -> str:
     token = _strip_env("ASANA_ACCESS_TOKEN") or _strip_env("ASANA_PAT")

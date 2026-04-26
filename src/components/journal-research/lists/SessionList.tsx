@@ -33,6 +33,17 @@ export function SessionList({
 
   const [searchTerm, setSearchTerm] = useState('')
   const [phaseFilter, setPhaseFilter] = useState<string>('all')
+  const getSessionProgress = (session: Session): number =>
+    session.progressMetrics?.['progress_percentage'] ?? 0
+
+  const handleTableStateChange: (newState: Partial<TableState>) => void = (
+    newState,
+  ) => {
+    setTableState((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
 
   const filteredAndSortedSessions = useMemo(() => {
     let filtered = sessions.items
@@ -78,8 +89,8 @@ export function SessionList({
             bValue = b.currentPhase
             break
           case 'progress':
-            aValue = a.progressMetrics?.['progress_percentage'] ?? 0
-            bValue = b.progressMetrics?.['progress_percentage'] ?? 0
+            aValue = getSessionProgress(a)
+            bValue = getSessionProgress(b)
             break
           default:
             return 0
@@ -125,7 +136,7 @@ export function SessionList({
       id: 'progress',
       header: 'Progress',
       accessor: (row) => {
-        const progress = row.progressMetrics?.progress_percentage ?? 0
+        const progress = getSessionProgress(row)
         return (
           <div className='flex items-center gap-2'>
             <div className='bg-muted h-2 w-24 overflow-hidden rounded-full'>
@@ -202,7 +213,7 @@ export function SessionList({
         columns={columns}
         dataSource={tableDataSource}
         tableState={tableState}
-        onStateChange={setTableState}
+        onStateChange={handleTableStateChange}
         hoverable
         striped
         bordered

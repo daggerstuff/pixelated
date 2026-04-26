@@ -28,6 +28,99 @@ interface AgentChatProps {
   onBiasAnalysis?: (analysis: BiasAnalysis) => void
 }
 
+const isAgentContext = (value: string): value is AgentContext =>
+  value === 'scenario_generation' ||
+  value === 'bias_detection' ||
+  value === 'training_recommendation' ||
+  value === 'general'
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const hasStringArray = (value: unknown): value is readonly string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === 'string')
+
+const isTherapeuticScenario = (
+  value: unknown,
+): value is TherapeuticScenario => {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  const scenario = value
+
+  if (
+    typeof scenario['scenario_id'] !== 'string' ||
+    typeof scenario['client_background'] !== 'string' ||
+    typeof scenario['presenting_problem'] !== 'string' ||
+    !hasStringArray(scenario['session_goals']) ||
+    !hasStringArray(scenario['expected_challenges']) ||
+    !isRecord(scenario['assessment_criteria'])
+  ) {
+    return false
+  }
+
+  const assessmentCriteria = scenario['assessment_criteria']
+
+  if (
+    !hasStringArray(assessmentCriteria['therapeutic_alliance']) ||
+    !hasStringArray(assessmentCriteria['intervention_quality'])
+  ) {
+    return false
+  }
+
+  if (
+    assessmentCriteria['crisis_management'] !== undefined &&
+    !hasStringArray(assessmentCriteria['crisis_management'])
+  ) {
+    return false
+  }
+
+  return true
+}
+
+const biasSeverityValues = ['low', 'medium', 'high'] as const
+
+const isBiasSeverity = (value: unknown): value is 'low' | 'medium' | 'high' =>
+  value === 'low' || value === 'medium' || value === 'high'
+
+const isBiasAnalysis = (value: unknown): value is BiasAnalysis => {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (
+    typeof value.overall_score !== 'number' ||
+    !Array.isArray(value.detected_biases) ||
+    typeof value.cultural_sensitivity_score !== 'number' ||
+    typeof value.inclusive_language_score !== 'number'
+  ) {
+    return false
+  }
+
+  return value.detected_biases.every((item) => {
+    if (!isRecord(item)) {
+      return false
+    }
+
+    if (
+      typeof item.type !== 'string' ||
+      typeof item.description !== 'string' ||
+      !Array.isArray(item.recommendations) ||
+      !item.recommendations.every(
+        (recommendation) => typeof recommendation === 'string',
+      )
+    ) {
+      return false
+    }
+
+    return (
+      isBiasSeverity(item.severity) &&
+      biasSeverityValues.includes(item.severity)
+    )
+  })
+}
+
 export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
   className = '',
   initialContext = 'general',
@@ -126,17 +219,15 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
   ): void => {
     if (
       currentContext === 'scenario_generation' &&
-      response.metadata?.['scenario']
+      isTherapeuticScenario(response.metadata?.['scenario'])
     ) {
-      onScenarioGenerated?.(
-        response.metadata['scenario'] as TherapeuticScenario,
-      )
+      onScenarioGenerated?.(response.metadata['scenario'])
     }
     if (
       currentContext === 'bias_detection' &&
-      response.metadata?.['bias_analysis']
+      isBiasAnalysis(response.metadata?.['bias_analysis'])
     ) {
-      onBiasAnalysis?.(response.metadata['bias_analysis'] as BiasAnalysis)
+      onBiasAnalysis?.(response.metadata['bias_analysis'])
     }
   }
 
@@ -229,7 +320,11 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
         </div>
         <select
           value={context}
-          onChange={(e) => setContext(e.target.value as AgentContext)}
+          onChange={(e) => {
+            if (isAgentContext(e.target.value)) {
+              setContext(e.target.value)
+            }
+          }}
           className='border-gray-300 focus:ring-blue-500 rounded border px-3 py-1 text-sm focus:outline-none focus:ring-2'
         >
           <option value='general'>General</option>
@@ -248,7 +343,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
             <button
               key={action.label}
               onClick={() => {
-                setContext(action.context as AgentContext)
+                setContext(action.context)
                 action.action()
               }}
               className='bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full px-3 py-1 text-xs transition-colors'
@@ -307,7 +402,11 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
             type='text'
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                void handleSend()
+              }
+            }}
             placeholder={`Ask about ${context.replace('_', ' ')}...`}
             className='border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2'
             disabled={!isConnected || isLoading}
@@ -335,6 +434,16 @@ type ConditionType =
   | 'personality_disorder'
   | 'crisis'
 
+const CONDITION_TYPES: ConditionType[] = [
+  'depression',
+  'anxiety',
+  'ptsd',
+  'bipolar',
+  'substance_use',
+  'personality_disorder',
+  'crisis',
+]
+
 const CONDITION_KEYWORDS: Record<ConditionType, readonly string[]> = {
   depression: ['depression', 'depressed'],
   anxiety: ['anxiety', 'anxious'],
@@ -347,9 +456,10 @@ const CONDITION_KEYWORDS: Record<ConditionType, readonly string[]> = {
 
 function extractCondition(input: string): ConditionType {
   const lower = input.toLowerCase()
-  for (const [condition, keywords] of Object.entries(CONDITION_KEYWORDS)) {
+  for (const condition of CONDITION_TYPES) {
+    const keywords = CONDITION_KEYWORDS[condition]
     if (keywords.some((keyword) => lower.includes(keyword))) {
-      return condition as ConditionType
+      return condition
     }
   }
   return 'depression' // default

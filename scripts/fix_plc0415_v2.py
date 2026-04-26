@@ -1,7 +1,6 @@
-import os
 import json
 import subprocess
-import re
+
 
 def fix_plc0415_batch():
     # Get JSON output from ruff for PLC0415
@@ -10,7 +9,7 @@ def fix_plc0415_batch():
         capture_output=True,
         text=True
     )
-    
+
     try:
         diagnostics = json.loads(result.stdout)
     except:
@@ -28,24 +27,24 @@ def fix_plc0415_batch():
 
     files_modified = 0
     for fname, diags in file_map.items():
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             lines = f.readlines()
-            
+
         # Sort diagnostics by row descending
         diags.sort(key=lambda x: (x["location"]["row"], x["location"]["column"]), reverse=True)
-        
+
         extracted_imports = []
         modified = False
-        
+
         for diag in diags:
             row = diag["location"]["row"] - 1
             line = lines[row]
-            
+
             # Extract the import line
-            if 'import ' in line:
+            if "import " in line:
                 import_line = line.strip() + "\n"
                 extracted_imports.append(import_line)
-                
+
                 # Replace with pass if needed to keep block non-empty
                 # Check if next non-empty line has smaller indentation or if it's the end of file
                 indent = len(line) - len(line.lstrip())
@@ -59,15 +58,15 @@ def fix_plc0415_batch():
                         else:
                             has_content_after = True
                             break
-                
+
                 # Check if previous line is a ':' (like 'if condition:' or 'def func():')
                 is_start_of_block = False
                 for i in range(row - 1, -1, -1):
                     if lines[i].strip():
-                        if lines[i].strip().endswith(':'):
+                        if lines[i].strip().endswith(":"):
                             is_start_of_block = True
                         break
-                
+
                 if is_start_of_block and not has_content_after:
                     # We are the only thing in the block, replace with pass
                     lines[row] = (" " * indent) + "pass\n"
@@ -81,7 +80,7 @@ def fix_plc0415_batch():
             insert_pos = 0
             if lines and lines[0].startswith("#!"):
                 insert_pos = 1
-            
+
             # Skip docstring
             if len(lines) > insert_pos:
                 doc_found = False
@@ -102,15 +101,15 @@ def fix_plc0415_batch():
                                     doc_found = True
                                     break
                             if doc_found: break
-                
+
             # Insert unique imports
             unique_imports = sorted(list(set(extracted_imports)))
             lines[insert_pos:insert_pos] = unique_imports + ["\n"]
-            
-            with open(fname, 'w') as f:
+
+            with open(fname, "w") as f:
                 f.writelines(lines)
             files_modified += 1
-            
+
     print(f"Fixed PLC0415 in {files_modified} files.")
 
 if __name__ == "__main__":

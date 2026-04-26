@@ -172,7 +172,7 @@ export class CrisisDetectionService {
         confidence: 0,
         category: 'analysis_error',
         content: text,
-        riskLevel: 'unknown',
+        riskLevel: 'low',
         urgency: 'low',
         detectedTerms: [],
         suggestedActions: ['Manual review recommended due to analysis error'],
@@ -330,24 +330,29 @@ export class CrisisDetectionService {
       // Parse AI response
       const { content } = response
       try {
-        const parsed = JSON.parse(content) as unknown
+        const parsed = JSON.parse(content) as Record<string, unknown>
 
         if (typeof parsed === 'object' && parsed !== null) {
           return {
             score: Math.min(Math.max(Number(parsed.score) || 0, 0), 1), // Clamp between 0-1
-            category: parsed.category || 'general_concern',
-            severity: parsed.severity || 'low',
+            category: typeof parsed.category === 'string' ? parsed.category : 'general_concern',
+            severity:
+              typeof parsed.severity === 'string'
+                ? (parsed.severity as 'low' | 'medium' | 'high' | 'critical')
+                : 'low',
             indicators: Array.isArray(parsed.indicators)
-              ? parsed.indicators
+              ? parsed.indicators.filter((indicator) => typeof indicator === 'string')
               : [],
             recommendations: Array.isArray(parsed.recommendations)
-              ? parsed.recommendations
+              ? parsed.recommendations.filter(
+                  (rec) => typeof rec === 'string',
+                )
               : [],
           }
         }
         // Throw an error if parsed content is not a valid object
         throw new Error('Parsed AI response is not a valid object.')
-      } catch {
+      } catch (error: unknown) {
         appLogger.error('AI response parsing failed', {
           error,
           responseContent: content,

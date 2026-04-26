@@ -54,7 +54,9 @@ export class Cache {
     // Enforce max size limit
     if (this.store.size >= this.maxSize) {
       const oldestKey = this.store.keys().next().value
-      this.store.delete(oldestKey)
+      if (oldestKey) {
+        this.store.delete(oldestKey)
+      }
     }
 
     this.store.set(key, {

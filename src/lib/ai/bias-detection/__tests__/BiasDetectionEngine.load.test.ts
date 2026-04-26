@@ -144,6 +144,9 @@ describe('Bias Detection Engine - Load Testing', () => {
     biasEngine = new BiasDetectionEngine({
       pythonServiceUrl: 'http://localhost:5000',
       thresholds: {
+        warning: 0.3,
+        high: 0.6,
+        critical: 0.8,
         warningLevel: 0.3,
         highLevel: 0.6,
         criticalLevel: 0.8,

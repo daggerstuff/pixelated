@@ -19,7 +19,10 @@ export interface SessionCardProps {
 }
 
 export function SessionCard({ session, onClick, className }: SessionCardProps) {
-  const progressPercentage = session.progressMetrics?.progress_percentage ?? 0
+  const progressMetrics = session.progressMetrics ?? {}
+  const getProgressMetric = (key: keyof Record<string, number>) =>
+    progressMetrics[key] ?? 0
+  const progressPercentage = getProgressMetric('progress_percentage')
 
   const phaseColors: Record<string, string> = {
     discovery: 'bg-blue-500',
@@ -92,25 +95,25 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
               <div>
                 Identified:{' '}
                 <span className='font-medium text-foreground'>
-                  {session.progressMetrics.sources_identified ?? 0}
+                  {getProgressMetric('sources_identified')}
                 </span>
               </div>
               <div>
                 Evaluated:{' '}
                 <span className='font-medium text-foreground'>
-                  {session.progressMetrics.datasets_evaluated ?? 0}
+                  {getProgressMetric('datasets_evaluated')}
                 </span>
               </div>
               <div>
                 Acquired:{' '}
                 <span className='font-medium text-foreground'>
-                  {session.progressMetrics.datasets_acquired ?? 0}
+                  {getProgressMetric('datasets_acquired')}
                 </span>
               </div>
               <div>
                 Integrated:{' '}
                 <span className='font-medium text-foreground'>
-                  {session.progressMetrics.integration_plans_created ?? 0}
+                  {getProgressMetric('integration_plans_created')}
                 </span>
               </div>
             </div>
