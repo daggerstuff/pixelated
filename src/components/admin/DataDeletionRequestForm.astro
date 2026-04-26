@@ -190,6 +190,7 @@ const deletionReasons = [
                     id={`category-${category.id}`}
                     name="data-categories"
                     value={category.id}
+                    aria-describedby={`desc-${category.id}`}
                     class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
                   />
                 </div>
@@ -200,7 +201,7 @@ const deletionReasons = [
                   >
                     {category.label}
                   </label>
-                  <p class="text-gray-500 dark:text-gray-400">
+                  <p id={`desc-${category.id}`} class="text-gray-500 dark:text-gray-400">
                     {category.description}
                   </p>
                 </div>
