@@ -467,6 +467,12 @@ export default defineConfig({
       },
     },
     plugins: [
+      {
+        name: 'increase-fswatcher-listener-limit',
+        configureServer(server) {
+          server.watcher.setMaxListeners(20)
+        },
+      },
       ...(hasSentryDSN
         ? [
             ...createScopedSentryVitePlugins({
@@ -722,6 +728,10 @@ export default defineConfig({
         // miscellaneous caches
         '**/.pnpm/**',
         '.pnpm/**',
+        '**/.pnpm-store/**',
+        '.pnpm-store/**',
+        '**/.local/share/pnpm/**',
+        '.local/share/pnpm/**',
         '**/.vite/**',
         '.vite/**',
         '**/.cache/**',
@@ -764,6 +774,12 @@ export default defineConfig({
         '.venv',
         '/.venv',
         '**/.venv/**',
+        '.pnpm-store',
+        '/.pnpm-store',
+        '**/.pnpm-store/**',
+        '.local/share/pnpm',
+        '/.local/share/pnpm',
+        '**/.local/share/pnpm/**',
       ],
     },
   },
