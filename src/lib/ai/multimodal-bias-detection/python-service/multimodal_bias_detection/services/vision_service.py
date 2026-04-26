@@ -5,22 +5,16 @@ Vision bias detection service using CLIP and computer vision models
 import base64
 import io
 import time
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import numpy as np
 import structlog
 import torch
 from PIL import Image
-from transformers import CLIPProcessor, CLIPModel, pipeline
+from transformers import CLIPModel, CLIPProcessor, pipeline
+
 from ..config import settings
-from ..models import (
-    BiasType,
-    ConfidenceLevel,
-    DetectedObject,
-    FaceDetection,
-    VisualBiasScore,
-    TextExtraction
-)
+from ..models import BiasType, ConfidenceLevel, DetectedObject, FaceDetection, TextExtraction, VisualBiasScore
 
 logger = structlog.get_logger(__name__)
 
@@ -90,7 +84,7 @@ class VisionBiasDetector:
         self,
         image_data: Union[str, bytes, Image.Image],
         analysis_type: str = "comprehensive",
-        bias_types: Optional[list[BiasType]] = None,
+        bias_types: list[BiasType] | None = None,
         sensitivity: str = "medium"
     ) -> dict[str, Any]:
         """Analyze image for bias"""
@@ -435,8 +429,8 @@ class VisionBiasDetector:
         self,
         text: str,
         bias_mappings: Dict[str, BiasType],
-        bias_types: Optional[List[BiasType]]
-    ) -> Optional[BiasType]:
+        bias_types: List[BiasType] | None
+    ) -> BiasType | None:
         """Find matching bias type from text"""
         text_lower = text.lower()
         for keyword, bias_type in bias_mappings.items():
@@ -451,8 +445,8 @@ class VisionBiasDetector:
         confidence: float,
         evidence: List[str],
         explanation: str,
-        objects_involved: Optional[List] = None,
-        affected_regions: Optional[List] = None
+        objects_involved: List | None = None,
+        affected_regions: List | None = None
     ) -> VisualBiasScore:
         """Create a VisualBiasScore object"""
         confidence_level = self._get_confidence_level(confidence)
@@ -471,10 +465,10 @@ class VisionBiasDetector:
         self,
         bias_indicators: List[str],
         bias_mappings: Dict[str, BiasType],
-        bias_types: Optional[List[BiasType]],
+        bias_types: List[BiasType] | None,
         sensitivity: str,
         explanation_template: str,
-        objects_involved: Optional[List] = None
+        objects_involved: List | None = None
     ) -> List[VisualBiasScore]:
         """Process bias indicators and create scores"""
         bias_scores = []
@@ -501,7 +495,7 @@ class VisionBiasDetector:
         self,
         top_matches: List[tuple],
         bias_mappings: Dict[str, BiasType],
-        bias_types: Optional[List[BiasType]],
+        bias_types: List[BiasType] | None,
         threshold: float = 0.5
     ) -> List[VisualBiasScore]:
         """Process semantic analysis matches"""
@@ -530,7 +524,7 @@ class VisionBiasDetector:
     async def _generate_bias_scores(
         self,
         analysis_results: Dict[str, Any],
-        bias_types: Optional[List[BiasType]],
+        bias_types: List[BiasType] | None,
         sensitivity: str
     ) -> List[VisualBiasScore]:
         """Generate bias scores from analysis results"""
@@ -626,7 +620,7 @@ class VisionBiasDetector:
         prompt: str,
         positive_words: List[str],
         negative_words: List[str]
-    ) -> Optional[str]:
+    ) -> str | None:
         """Categorize a prompt as positive, negative, or None"""
         prompt_lower = prompt.lower()
         if any(word in prompt_lower for word in positive_words):

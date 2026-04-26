@@ -193,6 +193,35 @@ function convertAnalysisToLegacyFormat(
   }
 }
 
+function toRecommendationAnalysis(
+  analysis: MHAnalysis | MentalHealthAnalysisResult,
+): MentalHealthAnalysisResult {
+  if ('indicators' in analysis) {
+    return {
+      hasMentalHealthIssue: analysis.hasMentalHealthIssue,
+      mentalHealthCategory: analysis.category || 'unknown',
+      confidence: analysis.confidence,
+      explanation: analysis.explanation,
+      supportingEvidence: analysis.supportingEvidence || [],
+      isCrisis:
+        analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
+      timestamp: new Date(analysis.timestamp).toISOString(),
+      stressLevel: analysis.riskLevel === 'high' ? 0.8 : 0.4,
+    }
+  }
+
+  return {
+    hasMentalHealthIssue: analysis.hasMentalHealthIssue,
+    mentalHealthCategory: analysis.mentalHealthCategory || 'unknown',
+    confidence: analysis.confidence,
+    explanation: analysis.explanation || '',
+    supportingEvidence: analysis.supportingEvidence || [],
+    isCrisis: analysis.isCrisis,
+    timestamp: analysis.timestamp,
+    stressLevel: analysis.stressLevel,
+  }
+}
+
 /**
  * Creates a new MentalHealthChat instance
  * Production-grade implementation with real AI analysis
@@ -437,15 +466,11 @@ export function createMentalHealthChat(
           return []
         }
 
-        // Type guard to ensure latestAnalysis is in the expected format
-        if ('indicators' in latestAnalysis) {
-          logger.warn('Cannot get recommendations from legacy analysis format.')
-          return []
-        }
+        const recommendationAnalysis = toRecommendationAnalysis(latestAnalysis)
 
         return await recommendationService.getRecommendationsFromAnalysis(
           config.userId,
-          latestAnalysis as MentalHealthAnalysisResult,
+          recommendationAnalysis,
         )
       } catch (error: unknown) {
         logger.error('Error generating recommendations', { error })

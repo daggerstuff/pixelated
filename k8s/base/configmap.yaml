@@ -6,7 +6,7 @@ metadata:
 data:
   APP_NAME: "pixelated-empathy"
   APP_ENV: "production"
-  LOG_LEVEL: "WARN"
+  LOG_LEVEL: "warn"
   PORT: "5001"
   CMS_PORT: "5001"
   METRICS_ENABLED: "true"

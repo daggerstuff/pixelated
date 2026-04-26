@@ -438,7 +438,7 @@ function TablePagination({
 }: TablePaginationProps) {
   // Calculate visible page range
   const getVisiblePages = () => {
-    const pages = []
+    const pages: number[] = []
     let startPage = Math.max(1, currentPage - 2)
     const endPage = Math.min(totalPages, startPage + 4)
 

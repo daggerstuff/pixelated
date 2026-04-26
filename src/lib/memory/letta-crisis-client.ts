@@ -5,7 +5,7 @@
  * Letta Crisis Client - TypeScript client for crisis detection.
  *
  * Provides crisis detection and monitoring for Letta agents
- * with Hindsight integration.
+ * with Foresight integration.
  */
 
 export interface CrisisResult {
@@ -35,7 +35,7 @@ export interface CrisisResources {
  * Letta Crisis Client for crisis detection and monitoring.
  *
  * Provides crisis detection capabilities for Letta agents
- * with Hindsight integration for clinically-safe AI agents.
+ * with Foresight integration for clinically-safe AI agents.
  */
 export class LettaCrisisClient {
   private readonly config: CrisisConfig

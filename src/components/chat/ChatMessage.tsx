@@ -1,23 +1,15 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 
 import { ThemeContext } from '@/components/theme/ThemeProvider'
+import { MultiAgentThoughtUI } from '@/components/ai/MultiAgentThoughtUI'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { formatTimestamp } from '@/lib/dates'
 import { simpleMarkdownToHtml } from '@/lib/markdown'
 import { cn } from '@/lib/utils'
+import { Brain, ChevronDown, ChevronUp } from 'lucide-react'
 import DOMPurify from 'isomorphic-dompurify'
-import type { Message } from '@/types/chat'
-
-// Define the MentalHealthAnalysis interface with the properties we need
-interface MentalHealthAnalysis {
-  category: string
-  hasMentalHealthIssue: boolean
-  [key: string]: unknown
-}
-
-interface ExtendedMessage extends Message {
-  mentalHealthAnalysis?: MentalHealthAnalysis
-}
+import type { Message, ExtendedMessage } from '@/types/chat'
 
 export interface ChatMessageProps {
   message: ExtendedMessage
@@ -37,6 +29,7 @@ export function ChatMessage({
   const isUser = message.role === 'user'
   const isBotMessage = message.role === 'assistant'
   const isSystemMessage = message.role === 'system'
+  const [showThoughts, setShowThoughts] = useState(false)
 
   // Format category name
   const formatCategoryName = (category: string): string => {
@@ -63,21 +56,25 @@ export function ChatMessage({
     return colors[category] || 'bg-gray-500'
   }
 
-  const hasAnalysis =
-    message.mentalHealthAnalysis &&
-    message.mentalHealthAnalysis.hasMentalHealthIssue
+  const hasAnalysis = !!message.mentalHealthAnalysis && (
+    ('hasMentalHealthIssue' in message.mentalHealthAnalysis && message.mentalHealthAnalysis.hasMentalHealthIssue) ||
+    ('category' in message.mentalHealthAnalysis && (message.mentalHealthAnalysis.category as string) !== 'none')
+  )
+
+  const analysis = message.mentalHealthAnalysis as any
+  const hasActivities = message.activities && message.activities.length > 0
 
   return (
     <div
       className={cn(
-        'flex w-full items-start',
-        isUser ? 'justify-end' : 'justify-start',
+        'flex w-full flex-col items-start gap-2',
+        isUser ? 'items-end' : 'items-start',
         className,
       )}
     >
       <div
         className={cn(
-          'relative mb-6 max-w-[80%] rounded-lg p-4 shadow-sm',
+          'relative mb-2 max-w-[80%] rounded-lg p-4 shadow-sm',
           isUser
             ? isDark
               ? 'bg-blue-600 text-white'
@@ -115,12 +112,12 @@ export function ChatMessage({
         </div>
 
         {/* Mental health badge (if applicable) */}
-        {hasAnalysis && (
+        {hasAnalysis && analysis && (
           <div className='absolute -top-3 right-3'>
             <Badge
-              className={`${getCategoryColor(message.mentalHealthAnalysis!.category)} text-white text-xs`}
+              className={`${getCategoryColor(analysis.category)} text-white text-xs`}
             >
-              {formatCategoryName(message.mentalHealthAnalysis!.category)}
+              {formatCategoryName(analysis.category)}
             </Badge>
           </div>
         )}
@@ -140,12 +137,36 @@ export function ChatMessage({
           )}
         </div>
 
-        {timestamp && (
-          <div className='mt-2 text-right text-xs opacity-60'>
-            {formatTimestamp(timestamp)}
-          </div>
-        )}
+        <div className='mt-2 flex items-center justify-between'>
+          {hasActivities && (
+            <button
+              onClick={() => setShowThoughts(!showThoughts)}
+              className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 transition-colors'
+            >
+              <Brain className='h-3 w-3' />
+              {showThoughts ? 'Hide reasoning' : 'Show reasoning'}
+              {showThoughts ? (
+                <ChevronUp className='h-3 w-3' />
+              ) : (
+                <ChevronDown className='h-3 w-3' />
+              )}
+            </button>
+          )}
+
+          {timestamp && (
+            <div className='ml-auto text-[10px] opacity-60'>
+              {formatTimestamp(timestamp)}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Reasoning chain display */}
+      {hasActivities && showThoughts && (
+        <div className='w-full max-w-[85%] animate-in fade-in slide-in-from-top-2 duration-300'>
+          <MultiAgentThoughtUI activities={message.activities!} className='mt-1 shadow-lg' />
+        </div>
+      )}
     </div>
   )
 }

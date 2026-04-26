@@ -88,6 +88,9 @@ describe('BiasDetectionEngine Integration Tests', () => {
       pythonServiceUrl: 'http://localhost:5000',
       pythonServiceTimeout: 10000,
       thresholds: {
+        warning: 0.3,
+        high: 0.6,
+        critical: 0.8,
         warningLevel: 0.3,
         highLevel: 0.6,
         criticalLevel: 0.8,
@@ -372,6 +375,9 @@ describe('BiasDetectionEngine Integration Tests', () => {
           format: 'json',
         },
       )
+      if (!report.summary) {
+        throw new Error('Expected report summary to be present')
+      }
 
       // Verify report structure
       expect(report).toBeDefined()

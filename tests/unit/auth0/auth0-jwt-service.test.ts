@@ -11,11 +11,19 @@ const mockAuthClient = vi.hoisted(() => ({
   },
 }));
 
+const mockUserInfoClient = vi.hoisted(() => ({
+  getUserInfo: vi.fn(),
+  getProfile: mockAuthClient.getProfile,
+}));
+
 // Mock the auth0 module
 vi.mock("auth0", () => {
   return {
     AuthenticationClient: vi.fn(function () {
       return mockAuthClient;
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient;
     }),
   };
 });

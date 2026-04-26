@@ -1,46 +1,30 @@
 export const featuresContent = {
-  label: 'What the platform makes possible',
-  title: 'The product only earns its place when the next move becomes obvious.',
-  copy: 'Each part of the workflow exists to preserve the difficult turn, surface the coaching decision, and make the next review more concrete than memory ever could.',
-  proofLabel: 'What a useful first week looks like',
+  label: 'Product modules',
+  title: 'A case library, a practice room, and a review desk.',
+  copy: 'The product is not a generic chatbot. It is a training system with reusable scenarios, live therapeutic practice, and supervisor tools built around education workflows.',
+  proofLabel: 'What changes operationally',
   proofItems: [
-    'More confidence pointing to the line, question, or miss that mattered.',
-    'One shared case the whole team can learn from instead of five unrelated roleplays.',
+    'Faculty stop rebuilding roleplay prompts from scratch.',
+    'Trainees can repeat a scenario until a skill is visible, not just discussed.',
   ],
   cards: [
     {
-      title: 'Keep the practice surface believable',
+      title: 'Case library',
       description:
-        'The experience stays close to a live room so the clinician responds to the case instead of gaming a script.',
+        'Build reusable client profiles around diagnosis, context, risk, affect, therapeutic goal, and the skill being taught.',
       icon: 'chat',
     },
     {
-      title: 'Pinpoint the turn worth coaching',
+      title: 'Practice room',
       description:
-        'The review keeps the exact exchange that changed the room, so supervision can focus on one concrete next move.',
+        'Let trainees interview an AI client that adapts to tone, timing, avoidance, disclosure, repair attempts, and escalation.',
       icon: 'chart',
     },
     {
-      title: 'Compare judgment across the same case',
+      title: 'Review desk',
       description:
-        'Shared cases turn fuzzy supervision into side-by-side coaching because everyone is working against the same difficult moment.',
+        'Open the attempt afterward to inspect the exchange, mark competencies, leave notes, and decide what should be repeated.',
       icon: 'shield',
     },
   ],
-  comparison: {
-    label: 'What clearer supervision sounds like',
-    title: 'The difference is whether your team can name the moment.',
-    body: 'Weak supervision circles around the session. Strong supervision points to the exact turn that changes the next attempt.',
-    items: [
-      {
-        label: 'Before',
-        value: '“I think they rushed it somewhere around the disclosure.”',
-      },
-      {
-        label: 'After',
-        value: '“At the disclosure, they reassured before checking immediacy.”',
-        accent: true,
-      },
-    ],
-  },
 } as const

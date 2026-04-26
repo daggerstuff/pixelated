@@ -11,7 +11,6 @@ Usage:
 """
 
 import json
-import os
 from pathlib import Path
 
 import torch
@@ -21,9 +20,9 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    TrainingArguments,
-    Trainer,
     DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
 )
 
 # ============================================================================

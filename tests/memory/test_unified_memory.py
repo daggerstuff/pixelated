@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from ai.memory.dual_storage_provider import DualStorageProvider
-from ai.memory.hindsight_provider import HindsightMemoryProvider
+from ai.memory.foresight_provider import ForesightMemoryProvider
 from ai.memory.letta_provider import LettaMemoryProvider
 from ai.memory.memory_sync_service import MemorySyncService, SyncDirection
 from ai.memory.unified_client import UnifiedMemoryClient, create_client
@@ -165,21 +165,21 @@ class MockMemoryProvider(MemoryProvider):
         return [m for m in self._memories.values() if m.metadata.category == category][:limit]
 
 
-class TestHindsightMemoryProvider:
-    """Test HindsightMemoryProvider."""
+class TestForesightMemoryProvider:
+    """Test ForesightMemoryProvider."""
 
     def test_init(self):
         """Test provider initialization."""
         mock_manager = Mock()
-        provider = HindsightMemoryProvider(mock_manager)
-        assert provider.hindsight == mock_manager
+        provider = ForesightMemoryProvider(mock_manager)
+        assert provider.foresight == mock_manager
         assert provider.bank_id == "pixelated"
 
     def test_init_with_config(self):
         """Test provider initialization with config."""
         mock_manager = Mock()
         config = {"bank_id": "custom_bank"}
-        provider = HindsightMemoryProvider(mock_manager, config)
+        provider = ForesightMemoryProvider(mock_manager, config)
         assert provider.bank_id == "custom_bank"
 
     @pytest.mark.asyncio
@@ -187,7 +187,7 @@ class TestHindsightMemoryProvider:
         """Test adding memory."""
         mock_manager = Mock()
         mock_manager.add_memory.return_value = "test-id"
-        provider = HindsightMemoryProvider(mock_manager)
+        provider = ForesightMemoryProvider(mock_manager)
 
         metadata = MemoryMetadata(user_id="user123")
         memory_id = await provider.add_memory("Test content", metadata)
@@ -203,7 +203,7 @@ class TestHindsightMemoryProvider:
             {"id": "1", "content": "Memory 1", "metadata": {}},
             {"id": "2", "content": "Memory 2", "metadata": {}},
         ]
-        provider = HindsightMemoryProvider(mock_manager)
+        provider = ForesightMemoryProvider(mock_manager)
 
         results = await provider.search_memories("query", "user123", limit=10)
 
@@ -239,40 +239,40 @@ class TestDualStorageProvider:
 
     def test_init(self):
         """Test provider initialization."""
-        mock_hindsight = Mock(spec=MemoryProvider)
+        mock_foresight = Mock(spec=MemoryProvider)
         mock_letta = Mock(spec=MemoryProvider)
-        provider = DualStorageProvider(mock_hindsight, mock_letta)
-        assert provider.hindsight == mock_hindsight
+        provider = DualStorageProvider(mock_foresight, mock_letta)
+        assert provider.foresight == mock_foresight
         assert provider.letta == mock_letta
 
     @pytest.mark.asyncio
-    async def test_add_memory_cisis_goes_to_hindsight_only(self):
-        """Test crisis content goes to Hindsight only."""
-        mock_hindsight = AsyncMock(spec=MemoryProvider)
-        mock_hindsight.add_memory.return_value = "hindsight-id"
+    async def test_add_memory_cisis_goes_to_foresight_only(self):
+        """Test crisis content goes to Foresight only."""
+        mock_foresight = AsyncMock(spec=MemoryProvider)
+        mock_foresight.add_memory.return_value = "foresight-id"
         mock_letta = AsyncMock(spec=MemoryProvider)
 
-        provider = DualStorageProvider(mock_hindsight, mock_letta)
+        provider = DualStorageProvider(mock_foresight, mock_letta)
 
-        # Crisis category should only write to Hindsight
+        # Crisis category should only write to Foresight
         metadata = MemoryMetadata(
             category=MemoryCategory.CRISIS_CONTEXT,
             user_id="user123",
         )
         memory_id = await provider.add_memory("Crisis content", metadata)
 
-        mock_hindsight.add_memory.assert_called_once()
+        mock_foresight.add_memory.assert_called_once()
         mock_letta.add_memory.assert_not_called()
-        assert memory_id == "hindsight-id"
+        assert memory_id == "foresight-id"
 
     @pytest.mark.asyncio
     async def test_add_memory_general_goes_to_both(self):
         """Test general content goes to both backends."""
-        mock_hindsight = AsyncMock(spec=MemoryProvider)
-        mock_hindsight.add_memory.return_value = "hindsight-id"
+        mock_foresight = AsyncMock(spec=MemoryProvider)
+        mock_foresight.add_memory.return_value = "foresight-id"
         mock_letta = AsyncMock(spec=MemoryProvider)
 
-        provider = DualStorageProvider(mock_hindsight, mock_letta)
+        provider = DualStorageProvider(mock_foresight, mock_letta)
 
         # General category should write to both
         metadata = MemoryMetadata(
@@ -281,27 +281,27 @@ class TestDualStorageProvider:
         )
         _memory_id = await provider.add_memory("General content", metadata)
 
-        mock_hindsight.add_memory.assert_called_once()
+        mock_foresight.add_memory.assert_called_once()
         mock_letta.add_memory.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_memory_uses_hindsight(self):
-        """Test get_memory uses Hindsight."""
-        mock_hindsight = AsyncMock(spec=MemoryProvider)
+    async def test_get_memory_uses_foresight(self):
+        """Test get_memory uses Foresight."""
+        mock_foresight = AsyncMock(spec=MemoryProvider)
         expected_memory = Memory(
             id="test-id",
             content="Test",
             metadata=MemoryMetadata(),
         )
-        mock_hindsight.get_memory.return_value = expected_memory
+        mock_foresight.get_memory.return_value = expected_memory
         mock_letta = AsyncMock(spec=MemoryProvider)
 
-        provider = DualStorageProvider(mock_hindsight, mock_letta)
+        provider = DualStorageProvider(mock_foresight, mock_letta)
 
         result = await provider.get_memory("test-id")
 
         assert result == expected_memory
-        mock_hindsight.get_memory.assert_called_once()
+        mock_foresight.get_memory.assert_called_once()
 
 
 class TestMemorySyncService:
@@ -309,36 +309,36 @@ class TestMemorySyncService:
 
     def test_init(self):
         """Test service initialization."""
-        mock_hindsight = Mock(spec=MemoryProvider)
+        mock_foresight = Mock(spec=MemoryProvider)
         mock_letta = Mock(spec=MemoryProvider)
-        service = MemorySyncService(mock_hindsight, mock_letta)
-        assert service.hindsight == mock_hindsight
+        service = MemorySyncService(mock_foresight, mock_letta)
+        assert service.foresight == mock_foresight
         assert service.letta == mock_letta
         assert service.sync_interval == 300
         assert not service.auto_sync
 
     def test_init_with_config(self):
         """Test initialization with config."""
-        mock_hindsight = Mock(spec=MemoryProvider)
+        mock_foresight = Mock(spec=MemoryProvider)
         mock_letta = Mock(spec=MemoryProvider)
         config = {"sync_interval": 600, "auto_sync": True}
-        service = MemorySyncService(mock_hindsight, mock_letta, config)
+        service = MemorySyncService(mock_foresight, mock_letta, config)
         assert service.sync_interval == 600
         assert service.auto_sync
 
     @pytest.mark.asyncio
     async def test_sync_now(self):
         """Test immediate sync."""
-        mock_hindsight = AsyncMock(spec=MemoryProvider)
-        mock_hindsight.get_memories_by_user.return_value = []
+        mock_foresight = AsyncMock(spec=MemoryProvider)
+        mock_foresight.get_memories_by_user.return_value = []
         mock_letta = AsyncMock(spec=MemoryProvider)
 
-        service = MemorySyncService(mock_hindsight, mock_letta)
+        service = MemorySyncService(mock_foresight, mock_letta)
 
-        result = await service.sync_now(SyncDirection.HINDSIGHT_TO_LETTA)
+        result = await service.sync_now(SyncDirection.FORESIGHT_TO_LETTA)
 
-        assert hasattr(result, "hindsight_to_letta")
-        assert hasattr(result, "letta_to_hindsight")
+        assert hasattr(result, "foresight_to_letta")
+        assert hasattr(result, "letta_to_foresight")
         assert hasattr(result, "conflicts_resolved")
         assert hasattr(result, "errors")
 
@@ -352,10 +352,10 @@ class TestUnifiedMemoryClient:
         assert client.mode == "dual"
         assert not client._initialized
 
-    def test_init_hindsight_mode(self):
-        """Test hindsight mode initialization."""
-        client = UnifiedMemoryClient(mode="hindsight")
-        assert client.mode == "hindsight"
+    def test_init_foresight_mode(self):
+        """Test foresight mode initialization."""
+        client = UnifiedMemoryClient(mode="foresight")
+        assert client.mode == "foresight"
 
     def test_init_letta_mode(self):
         """Test letta mode initialization."""
@@ -368,8 +368,8 @@ class TestUnifiedMemoryClient:
         mock_provider = AsyncMock(spec=MemoryProvider)
         mock_provider.add_memory.return_value = "test-id"
 
-        client = UnifiedMemoryClient(mode="hindsight")
-        client._hindsight_provider = mock_provider
+        client = UnifiedMemoryClient(mode="foresight")
+        client._foresight_provider = mock_provider
         client.provider = mock_provider
 
         memory_id = await client.retain(
@@ -388,7 +388,7 @@ class TestUnifiedMemoryClient:
             Memory(id="1", content="Memory 1", metadata=MemoryMetadata()),
         ]
 
-        client = UnifiedMemoryClient(mode="hindsight")
+        client = UnifiedMemoryClient(mode="foresight")
         client.provider = mock_provider
 
         memories = await client.recall("query", "user123")
@@ -400,7 +400,7 @@ class TestUnifiedMemoryClient:
         """Test deleting a memory."""
         mock_provider = AsyncMock(spec=MemoryProvider)
 
-        client = UnifiedMemoryClient(mode="hindsight")
+        client = UnifiedMemoryClient(mode="foresight")
         client.provider = mock_provider
 
         await client.delete("test-id")
@@ -410,8 +410,8 @@ class TestUnifiedMemoryClient:
 
 def test_create_client():
     """Test create_client convenience function."""
-    client = create_client(mode="hindsight")
-    assert client.mode == "hindsight"
+    client = create_client(mode="foresight")
+    assert client.mode == "foresight"
 
     client = create_client(mode="letta")
     assert client.mode == "letta"
@@ -428,13 +428,13 @@ class TestProviderIntegration:
     async def test_full_workflow(self):
         """Test full memory workflow."""
         # Create mock providers
-        mock_hindsight = AsyncMock(spec=MemoryProvider)
-        mock_hindsight.add_memory.return_value = "hind-id-1"
+        mock_foresight = AsyncMock(spec=MemoryProvider)
+        mock_foresight.add_memory.return_value = "hind-id-1"
         mock_letta = AsyncMock(spec=MemoryProvider)
         mock_letta.add_memory.return_value = "letta-id-1"
 
         # Create dual-storage provider
-        provider = DualStorageProvider(mock_hindsight, mock_letta)
+        provider = DualStorageProvider(mock_foresight, mock_letta)
 
         # Add general memory
         metadata = MemoryMetadata(
@@ -444,7 +444,7 @@ class TestProviderIntegration:
         memory_id = await provider.add_memory("Test content", metadata)
 
         # Both backends should be called
-        mock_hindsight.add_memory.assert_called_once()
+        mock_foresight.add_memory.assert_called_once()
         mock_letta.add_memory.assert_called_once()
 
         assert memory_id
@@ -455,12 +455,12 @@ class TestCrisisRoutinging:
 
     @pytest.mark.asyncio
     async def test_crisis_categories_routed_correctly(self):
-        """Test that all crisis categories go to Hindsight only."""
-        mock_hindsight = AsyncMock(spec=MemoryProvider)
-        mock_hindsight.add_memory.return_value = "hind-id"
+        """Test that all crisis categories go to Foresight only."""
+        mock_foresight = AsyncMock(spec=MemoryProvider)
+        mock_foresight.add_memory.return_value = "hind-id"
         mock_letta = AsyncMock(spec=MemoryProvider)
 
-        provider = DualStorageProvider(mock_hindsight, mock_letta)
+        provider = DualStorageProvider(mock_foresight, mock_letta)
 
         crisis_categories = [
             MemoryCategory.CRISIS_CONTEXT,
@@ -469,13 +469,13 @@ class TestCrisisRoutinging:
         ]
 
         for category in crisis_categories:
-            mock_hindsight.reset_mock()
+            mock_foresight.reset_mock()
             mock_letta.reset_mock()
 
             metadata = MemoryMetadata(category=category, user_id="user")
             await provider.add_memory(f"Test {category.value}", metadata)
 
-            mock_hindsight.add_memory.assert_called_once()
+            mock_foresight.add_memory.assert_called_once()
             mock_letta.add_memory.assert_not_called()
 
 

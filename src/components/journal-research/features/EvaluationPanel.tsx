@@ -80,8 +80,8 @@ export function EvaluationPanel({
           </CardHeader>
           <CardContent>
             <EvaluationForm
-              onSubmit={(payload) => {
-                initiateMutation.mutate(payload, {
+              onSubmit={() => {
+                initiateMutation.mutate({}, {
                   onSuccess: () => {
                     setIsInitiating(false)
                   },

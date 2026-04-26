@@ -6,7 +6,7 @@ import { stepCountIs, streamText } from 'ai'
 // Initialize Composio
 const composio = new Composio({
   // Note: For production use process.env.COMPOSIO_API_KEY
-  apiKey: 'as6i8wxkuoiym9fipxbmgq',
+  apiKey: process.env.COMPOSIO_API_KEY ?? "replace-with-api-key-for-local-testing",
 })
 
 const externalUserId = 'pg-test-cc64d9dd-3d45-4e10-a63d-4b64c4453cf5'
@@ -39,7 +39,7 @@ async function main() {
   const { textStream } = streamText({
     model: openai('gpt-4o'), // Replace with your model
     prompt: 'Can you briefly describe what repositories I have on my GitHub?',
-    tools: mcpTools as any,
+  tools: mcpTools,
     // Enable multi-step behavior to allow the model to call tools and use their results
     stopWhen: stepCountIs(5),
     onStepFinish: (step) => {

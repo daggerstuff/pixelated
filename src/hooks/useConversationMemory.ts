@@ -74,7 +74,7 @@ interface MemoryState extends ConversationMemory {
 const DEFAULT_MEMORY = {
   history: [],
   context: {},
-  sessionState: 'idle' as const,
+  sessionState: 'idle' as ConversationMemory['sessionState'],
   progress: 0,
   progressSnapshots: [] as Array<{ timestamp: string; value: number }>,
   progressMetrics: {
@@ -90,7 +90,7 @@ const DEFAULT_MEMORY = {
     milestonesReached: [],
     lastMilestoneTime: undefined,
   } as SessionProgressMetrics,
-} as const
+}
 
 export function useConversationMemory(initialState?: Partial<MemoryState>) {
   // Base memory state for history, context, and basic session state
@@ -142,19 +142,19 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
         (Date.now() - lastActiveTimeRef.current) / 1000,
       )
 
-      setProgressState((prev: any) => ({
+      setProgressState({
         progressMetrics: {
-          ...prev.progressMetrics,
+          ...progressMetrics,
           sessionDuration: duration,
-          activeTime: (prev.progressMetrics.activeTime ?? 0) + additionalActive,
+          activeTime: (progressMetrics.activeTime ?? 0) + additionalActive,
         },
-      }))
+      })
 
       lastActiveTimeRef.current = Date.now()
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [baseMemory.sessionState, setProgressState])
+  }, [baseMemory.sessionState, progressMetrics, setProgressState])
 
   /**
    * Adds a new message to the conversation history and updates progress metrics.
@@ -172,33 +172,32 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
         history: [...prev.history, { role, message }],
       }))
 
-      setProgressState((prevState: any) => {
-        const prevMetrics =
-          prevState?.progressMetrics ?? DEFAULT_MEMORY.progressMetrics
-        const prevResponses = (prevMetrics.responsesCount ?? 0) as number
-        const prevAvg = (prevMetrics.responseTime ?? 0) as number
+      const prevMetrics = progressMetrics
+      const prevResponses = (prevMetrics.responsesCount ?? 0) as number
+      const prevAvg = (prevMetrics.responseTime ?? 0) as number
 
-        const updatedMetrics = {
-          ...prevMetrics,
-          totalMessages: (prevMetrics.totalMessages ?? 0) + 1,
-          therapistMessages:
-            role === 'therapist'
-              ? (prevMetrics.therapistMessages ?? 0) + 1
-              : (prevMetrics.therapistMessages ?? 0),
-          clientMessages:
-            role === 'client'
-              ? (prevMetrics.clientMessages ?? 0) + 1
-              : (prevMetrics.clientMessages ?? 0),
-        } as SessionProgressMetrics
+      const updatedMetrics = {
+        ...prevMetrics,
+        totalMessages: (prevMetrics.totalMessages ?? 0) + 1,
+        therapistMessages:
+          role === 'therapist'
+            ? (prevMetrics.therapistMessages ?? 0) + 1
+            : (prevMetrics.therapistMessages ?? 0),
+        clientMessages:
+          role === 'client'
+            ? (prevMetrics.clientMessages ?? 0) + 1
+            : (prevMetrics.clientMessages ?? 0),
+      } as SessionProgressMetrics
 
-        if (responseTime !== null) {
-          const newResponses = prevResponses + 1
-          const newAvg = (prevAvg * prevResponses + responseTime) / newResponses
-          updatedMetrics.responseTime = newAvg
-          updatedMetrics.responsesCount = newResponses
-        }
+      if (responseTime !== null) {
+        const newResponses = prevResponses + 1
+        const newAvg = (prevAvg * prevResponses + responseTime) / newResponses
+        updatedMetrics.responseTime = newAvg
+        updatedMetrics.responsesCount = newResponses
+      }
 
-        return { progressMetrics: updatedMetrics }
+      setProgressState({
+        progressMetrics: updatedMetrics,
       })
 
       lastMessageTimeRef.current = currentTime

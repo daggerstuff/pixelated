@@ -5,7 +5,7 @@ Configuration management for multi-modal bias detection service
 from functools import lru_cache
 
 from pydantic import BaseSettings, Field, validator
-from pydantic.networks import RedisDsn, PostgresDsn
+from pydantic.networks import PostgresDsn, RedisDsn
 
 
 class Settings(BaseSettings):

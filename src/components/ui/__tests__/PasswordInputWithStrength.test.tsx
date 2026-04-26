@@ -10,13 +10,13 @@ describe('PasswordInputWithStrength', () => {
   afterEach(() => cleanup())
 
   it('renders password input with strength indicator', () => {
-    render(<PasswordInputWithStrength />)
+    render(<PasswordInputWithStrength label='Password' name='password' />)
     expect(screen.getByPlaceholderText(/password/i)).toBeInTheDocument()
     expect(screen.getByText(/password strength/i)).toBeInTheDocument()
   })
 
   it('updates strength meter on input change', () => {
-    render(<PasswordInputWithStrength />)
+    render(<PasswordInputWithStrength label='Password' name='password' />)
     const input = screen.getByPlaceholderText(/password/i)
 
     // Test with weak password

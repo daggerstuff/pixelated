@@ -116,8 +116,8 @@
       "sourceType": "github",
       "computedHash": "d72e91478541540aaaf0c30dc6caf40cabfae9305d1fa439df99d73458d925cc"
     },
-    "hindsight-local": {
-      "source": "vectorize-io/hindsight",
+    "foresight-local": {
+      "source": "vectorize-io/foresight",
       "sourceType": "github",
       "computedHash": "21aed53045c6dc844f7e13df11d79e6a983542bf51f0359bf845444264514de1"
     },

@@ -67,9 +67,8 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.9 + Math.random() * 0.1,
         }
       }),
-      analyze_session: vi
-        .fn<any>()
-        .mockImplementation(async (session: TherapeuticSession) => {
+      analyze_session: vi.fn().mockImplementation(async (...args: unknown[]) => {
+          const session = args[0] as TherapeuticSession
           await new Promise((resolve) =>
             setTimeout(resolve, Math.random() * 200 + 50),
           )
@@ -181,6 +180,11 @@ interface PerformanceMetrics {
     before: number
     after: number
     delta: number
+    memoryUsage?: {
+      before: number
+      after: number
+      delta: number
+    }
   }
   cpuUsage?: number
 }

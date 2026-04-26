@@ -2,73 +2,92 @@ import React, { Suspense, lazy } from 'react'
 import type { AreaProps, ResponsiveContainerProps } from 'recharts'
 
 // Lazy load chart components to reduce bundle size
-const LazyAreaChart = lazy(() =>
-  import('recharts').then((module) => ({ default: module.AreaChart })),
-)
-const LazyBarChart = lazy(() =>
-  import('recharts').then((module) => ({ default: module.BarChart })),
-)
-const LazyPieChart = lazy(() =>
-  import('recharts').then((module) => ({ default: module.PieChart })),
-)
-const LazyRadarChart = lazy(() =>
-  import('recharts').then((module) => ({ default: module.RadarChart })),
-)
-const LazyLineChart = lazy(() =>
-  import('recharts').then((module) => ({ default: module.LineChart })),
-)
-const LazyResponsiveContainer = lazy(() =>
-  import('recharts').then((module) => ({
-    default: module.ResponsiveContainer,
-  })),
-)
+const LazyAreaChart = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.AreaChart }
+})
+const LazyBarChart = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.BarChart }
+})
+const LazyPieChart = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.PieChart }
+})
+const LazyRadarChart = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.RadarChart }
+})
+const LazyLineChart = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.LineChart }
+})
+const LazyResponsiveContainer = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.ResponsiveContainer }
+})
 
 // Also lazy load chart components
-const LazyXAxis = lazy(() =>
-  import('recharts').then((module) => ({ default: module.XAxis })),
-)
-const LazyYAxis = lazy(() =>
-  import('recharts').then((module) => ({ default: module.YAxis })),
-)
-const LazyCartesianGrid = lazy(() =>
-  import('recharts').then((module) => ({ default: module.CartesianGrid })),
-)
-const LazyTooltip = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Tooltip })),
-)
-const LazyLegend = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Legend })),
-)
-const LazyBar = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Bar })),
-)
-const LazyArea = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Area })),
-)
-const LazyLine = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Line })),
-)
-const LazyPie = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Pie })),
-)
-const LazyCell = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Cell })),
-)
-const LazyRadar = lazy(() =>
-  import('recharts').then((module) => ({ default: module.Radar })),
-)
-const LazyPolarGrid = lazy(() =>
-  import('recharts').then((module) => ({ default: module.PolarGrid })),
-)
-const LazyPolarAngleAxis = lazy(() =>
-  import('recharts').then((module) => ({ default: module.PolarAngleAxis })),
-)
-const LazyPolarRadiusAxis = lazy(() =>
-  import('recharts').then((module) => ({ default: module.PolarRadiusAxis })),
-)
-const LazyReferenceLine = lazy(() =>
-  import('recharts').then((module) => ({ default: module.ReferenceLine })),
-)
+const LazyXAxis = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.XAxis }
+})
+const LazyYAxis = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.YAxis }
+})
+const LazyCartesianGrid = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.CartesianGrid }
+})
+const LazyTooltip = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Tooltip }
+})
+const LazyLegend = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Legend }
+})
+const LazyBar = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Bar }
+})
+const LazyArea = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Area }
+})
+const LazyLine = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Line }
+})
+const LazyPie = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Pie }
+})
+const LazyCell = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Cell }
+})
+const LazyRadar = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.Radar }
+})
+const LazyPolarGrid = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.PolarGrid }
+})
+const LazyPolarAngleAxis = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.PolarAngleAxis }
+})
+const LazyPolarRadiusAxis = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.PolarRadiusAxis }
+})
+const LazyReferenceLine = lazy(async () => {
+  const module = await import('recharts')
+  return { default: module.ReferenceLine }
+})
 
 interface ChartLoadingProps {
   height?: number

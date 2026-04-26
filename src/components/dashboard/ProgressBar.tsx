@@ -34,7 +34,7 @@ export function ProgressBar({
   // Determine accessible name: prioritize aria-labelledby, then aria-label, then label prop, then fallback
   const accessibleName = ariaLabelledBy
     ? undefined
-    : ariaLabel || label || 'Progress Bar'
+    : ariaLabel ?? label ?? 'Progress Bar'
 
   return (
     <div

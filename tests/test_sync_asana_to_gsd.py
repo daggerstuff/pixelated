@@ -1,12 +1,11 @@
 """Tests for sync_asana_to_gsd.py script."""
 
-import json
 import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 
 # Add script directory to path
 SCRIPT_DIR = Path(__file__).parent.parent / ".agent" / "internal" / "scripts"

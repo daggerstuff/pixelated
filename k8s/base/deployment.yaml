@@ -6,7 +6,8 @@ metadata:
   labels:
     app: pixelated-empathy-api
 spec:
-  replicas: 2
+  # Replicas are managed by HPA (`pixelated-empathy-api-hpa`) and GitOps.
+  # Keep this unset so rollout/apply does not force a fixed replica count.
   progressDeadlineSeconds: 600
   strategy:
     type: RollingUpdate
@@ -38,6 +39,8 @@ spec:
         env:
         - name: APP_NAME
           value: "pixelated-empathy"
+        - name: REDIS_URL
+          value: "redis://pixelated-empathy-redis:6379/0"
         resources:
           requests:
             cpu: "25m"

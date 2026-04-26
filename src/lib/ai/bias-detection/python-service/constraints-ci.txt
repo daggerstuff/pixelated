@@ -1,4 +1,6 @@
 # Pinned constraints for CI to avoid ABI mismatches
 # Keep these in sync with supported wheels on ubuntu-latest
-numpy==2.0.*
+# AUTO-SYNCED in CI from requirements.txt
+# DO NOT edit manually — update requirements.txt (uv pip compile) and let CI regenerate.
+numpy==2.3.5
 pandas==3.0.0

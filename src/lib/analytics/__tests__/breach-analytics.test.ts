@@ -9,6 +9,7 @@ import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
 import { redis } from '@/lib/redis'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
+import { type Mock } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/lib/redis', () => ({
@@ -152,7 +153,7 @@ describe('breachAnalytics', () => {
         complianceRate: 0.99,
       },
     })
-    ;(NotificationEffectiveness.calculateDaily as jest.Mock).mockResolvedValue({
+    ;(NotificationEffectiveness.calculateDaily as Mock).mockResolvedValue({
       overall: 0.92,
       delivery: 0.95,
       timing: 0.88,
@@ -168,21 +169,21 @@ describe('breachAnalytics', () => {
         complianceRate: 0.96,
       },
     })
-    ;(MachineLearning.detectAnomalies as unknown).mockResolvedValue([0.1, 0.2])
-    ;(MachineLearning.predictBreaches as unknown).mockResolvedValue([
+    ;(MachineLearning.detectAnomalies as Mock).mockResolvedValue([0.1, 0.2])
+    ;(MachineLearning.predictBreaches as Mock).mockResolvedValue([
       { value: 3, confidence: 0.8 },
       { value: 4, confidence: 0.7 },
     ])
-    ;(RiskScoring.getFactors as unknown).mockResolvedValue([
+    ;(RiskScoring.getFactors as Mock).mockResolvedValue([
       { name: 'factor1', weight: 0.8, score: 0.9 },
       { name: 'factor2', weight: 0.6, score: 0.7 },
     ])
-    ;(SecurityTrends.analyze as unknown).mockResolvedValue([
+    ;(SecurityTrends.analyze as Mock).mockResolvedValue([
       'increasing',
       'stable',
     ])
-    ;(StatisticalAnalysis.calculateTrend as unknown).mockReturnValue(0.15)
-    ;(fheService.encrypt as unknown).mockResolvedValue('encrypted_data')
+    ;(StatisticalAnalysis.calculateTrend as Mock).mockReturnValue(0.15)
+    ;(fheService.encrypt as Mock).mockResolvedValue('encrypted_data')
   })
 
   afterEach(() => {
@@ -333,11 +334,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should include notification effectiveness insights when below threshold', async () => {
-      ;(
-        NotificationEffectiveness.calculate as unknown as {
-          mockResolvedValue: (v: unknown) => Promise<unknown>
-        }
-      ).mockResolvedValue({
+      ;(NotificationEffectiveness.calculate as Mock).mockResolvedValue({
         overall: 0.94,
         delivery: 0.95,
         timing: 0.88,
@@ -368,11 +365,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should include compliance insights when below threshold', async () => {
-      ;(
-        ComplianceMetrics.calculateScore as unknown as {
-          mockResolvedValue: (v: unknown) => Promise<unknown>
-        }
-      ).mockResolvedValue(0.97)
+      ;(ComplianceMetrics.calculateScore as Mock).mockResolvedValue(0.97)
 
       const insights = await BreachAnalytics.generateInsights()
 
@@ -422,7 +415,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should handle errors during report generation', async () => {
-      ;(listRecentBreaches as unknown).mockRejectedValue(
+      ;(listRecentBreaches as Mock).mockRejectedValue(
         new Error('Failed to fetch breaches'),
       )
 

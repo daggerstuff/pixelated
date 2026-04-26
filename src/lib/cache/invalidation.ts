@@ -25,10 +25,14 @@ export class CacheInvalidation {
   private defaultTTL: number
 
   constructor(options: InvalidationOptions) {
-    this.redis =
+    const redisClient =
       options.redis instanceof RedisService
         ? options.redis.getClient()
         : options.redis
+    if (!redisClient) {
+      throw new Error('Redis client is not initialized')
+    }
+    this.redis = redisClient
     this.prefix = options.prefix || 'cache:'
     this.defaultTTL = options.defaultTTL || 3600 // 1 hour
   }
