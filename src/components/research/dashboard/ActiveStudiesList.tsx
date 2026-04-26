@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react'
+import React, { FC, memo, useMemo } from 'react'
 
 import { SlideUp } from '@/components/layout/AdvancedAnimations'
 
@@ -24,6 +24,9 @@ const ActiveStudiesList: FC<ActiveStudiesListProps> = memo(
   ({ studies, selectedStudies, onStudySelect }) => {
     const activeStudies = studies.filter((study) => study.status === 'active')
 
+    // ⚡ Bolt: Convert array to Set for O(1) lookups during render to prevent O(N²) scaling
+    const selectedStudiesSet = useMemo(() => new Set(selectedStudies), [selectedStudies])
+
     return (
       <SlideUp>
         <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
@@ -38,7 +41,7 @@ const ActiveStudiesList: FC<ActiveStudiesListProps> = memo(
               >
                 <input
                   type='checkbox'
-                  checked={selectedStudies.includes(study.id)}
+                  checked={selectedStudiesSet.has(study.id)}
                   onChange={() => onStudySelect(study.id)}
                   className='text-blue-600 h-4 w-4 rounded'
                 />
