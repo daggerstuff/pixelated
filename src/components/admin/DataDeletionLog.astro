@@ -336,7 +336,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
                   <button
                     type="button"
                     class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                    aria-label={`View details for request ${request.id}`}
+                    aria-label="View details"
                   >
                     <SafeIcon name="eye" class="w-5 h-5" />
                   </button>
@@ -345,7 +345,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
                     <button
                       type="button"
                       class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                      aria-label={`Approve request ${request.id}`}
+                      aria-label="Approve request"
                       data-request-id={request.id}
                       data-action="approve"
                     >
@@ -357,7 +357,7 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
                     <button
                       type="button"
                       class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                      aria-label={`Deny request ${request.id}`}
+                      aria-label="Deny request"
                       data-request-id={request.id}
                       data-action="deny"
                     >

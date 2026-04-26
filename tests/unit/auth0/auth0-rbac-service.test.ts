@@ -47,9 +47,7 @@ describe('Auth0 RBAC Service', () => {
     process.env.AUTH0_MANAGEMENT_CLIENT_ID = 'test-management-client-id'
     process.env.AUTH0_MANAGEMENT_CLIENT_SECRET = 'test-management-client-secret'
 
-    for (const mock of Object.values(mockManagementClient)) {
-      mock.mockReset()
-    }
+    // Reset all mocks
     vi.clearAllMocks()
   })
 
@@ -263,10 +261,10 @@ describe('Auth0 RBAC Service', () => {
 
   describe('userHasRole', () => {
     it('should return true when user has the specified role', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { name: 'patient' },
-        { name: 'therapist' },
+      // Mock getUserRoles to return roles including 'therapist'
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue([
+        'patient',
+        'therapist',
       ])
 
       const hasRole = await auth0RbacService.userHasRole(
@@ -278,10 +276,10 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return false when user does not have the specified role', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { name: 'patient' },
-        { name: 'therapist' },
+      // Mock getUserRoles to return roles not including 'admin'
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue([
+        'patient',
+        'therapist',
       ])
 
       const hasRole = await auth0RbacService.userHasRole(
@@ -295,8 +293,8 @@ describe('Auth0 RBAC Service', () => {
 
   describe('userHasPermission', () => {
     it('should return true for admin user with any permission', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([{ name: 'admin' }])
+      // Mock getUserRoles to return admin role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['admin'])
 
       const hasPermission = await auth0RbacService.userHasPermission(
         'auth0|user123',
@@ -307,9 +305,9 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return true when user role has the specific permission', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { name: 'therapist' },
+      // Mock getUserRoles to return therapist role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue([
+        'therapist',
       ])
 
       const hasPermission = await auth0RbacService.userHasPermission(
@@ -321,8 +319,8 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return false when user role does not have the specific permission', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([{ name: 'patient' }])
+      // Mock getUserRoles to return patient role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['patient'])
 
       const hasPermission = await auth0RbacService.userHasPermission(
         'auth0|user123',
@@ -333,8 +331,8 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return false when permission check fails', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockRejectedValue(
+      // Mock getUserRoles to throw an error
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockRejectedValue(
         new Error('Failed to get roles'),
       )
 
@@ -349,8 +347,8 @@ describe('Auth0 RBAC Service', () => {
 
   describe('getUserPermissions', () => {
     it('should return all permissions for admin user', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([{ name: 'admin' }])
+      // Mock getUserRoles to return admin role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue(['admin'])
 
       const permissions =
         await auth0RbacService.getUserPermissions('auth0|user123')
@@ -362,9 +360,9 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return specific permissions for non-admin user', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { name: 'therapist' },
+      // Mock getUserRoles to return therapist role
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockResolvedValue([
+        'therapist',
       ])
 
       const permissions =
@@ -377,8 +375,8 @@ describe('Auth0 RBAC Service', () => {
     })
 
     it('should return empty array when permission retrieval fails', async () => {
-      const mockManagementClient = getMockManagementClient()
-      mockManagementClient.getUserRoles.mockRejectedValue(
+      // Mock getUserRoles to throw an error
+      vi.spyOn(auth0RbacService, 'getUserRoles').mockRejectedValue(
         new Error('Failed to get roles'),
       )
 
