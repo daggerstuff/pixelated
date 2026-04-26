@@ -233,35 +233,28 @@ export interface GroupPerformanceComparison {
 
 export interface TherapeuticSession {
   sessionId: string
-  sessionDate: string
+  sessionDate?: string
   sessionDuration?: number
   sessionType?: string
   sessionNotes?: string
-  participantDemographics: ParticipantDemographics
-  scenario: TrainingScenario
-  content: SessionContent
-  aiResponses: AIResponse[]
-  expectedOutcomes: ExpectedOutcome[]
-  transcripts: SessionTranscript[]
-  userInputs: string[]
-  metadata: SessionMetadata
+  participantDemographics?: ParticipantDemographics
+  scenario?: TrainingScenario
+  content?: SessionContent
+  aiResponses?: AIResponse[]
+  expectedOutcomes?: ExpectedOutcome[]
+  transcripts?: SessionTranscript[]
+  userInputs?: string[]
+  metadata?: SessionMetadata
   timestamp?: Date
+  [key: string]: unknown
 }
 
-export interface ParticipantDemographics {
-  age: string // Age group: '18-25', '26-35', etc.
-  gender: string // 'male', 'female', 'non-binary', 'prefer-not-to-say'
-  ethnicity: string // 'white', 'black', 'hispanic', 'asian', 'other'
-  primaryLanguage: string // ISO language code
-  socioeconomicStatus?: string // 'low', 'middle', 'high', 'not-specified'
-  education?: string // Education level
-  region?: string // Geographic region
-  culturalBackground?: string[] // Cultural identifiers
-  disabilityStatus?: string // Disability information (if relevant)
-}
+export type ParticipantDemographics = any
 
 export interface TrainingScenario {
   scenarioId: string
+  learningObjectives?: string[]
+  [key: string]: unknown
   complexity?: 'low' | 'medium' | 'high' | 'intermediate' | 'advanced'
   description?: string
   type:
@@ -275,12 +268,14 @@ export interface TrainingScenario {
 }
 
 export interface SessionContent {
-  transcript: string
-  aiResponses: string[]
-  userInputs: string[]
+  transcript?: string
+  aiResponses?: string[]
+  userInputs?: string[]
   patientPresentation?: string
   patientResponses?: string[]
   therapeuticInterventions?: string[]
+  sessionNotes?: string
+  [key: string]: unknown
   metadata?: Record<string, any>
 }
 
@@ -397,7 +392,7 @@ export interface EvaluationLayerResult {
     patientSafety: number
   }
   temporalAnalysis: {
-    trendDirection: 'stable' | 'increasing' | 'decreasing'
+    trendDirection: 'stable' | 'increasing' | 'decreasing' | 'worsening'
     changeRate: number
     seasonalPatterns: any[]
     interventionEffectiveness: any[]
@@ -418,6 +413,7 @@ export type LayerResults = {
   modelLevel: ModelLevelAnalysisResult
   interactive: InteractiveAnalysisResult
   evaluation: EvaluationAnalysisResult
+  [key: string]: unknown
 }
 
 export interface BiasAnalysisResult {
@@ -438,9 +434,9 @@ export type AnalysisResult = BiasAnalysisResult
 export interface BiasAlert {
   alertId: string
   sessionId: string
-  timestamp: Date | string
+  timestamp?: Date | string
   level: AlertLevel
-  message: string
+  message?: string
   biasScore?: number
   acknowledged?: boolean
   status?: string
@@ -449,17 +445,18 @@ export interface BiasAlert {
 }
 
 export interface BiasDashboardSummary {
-  totalSessions: number
-  averageBiasScore: number
-  alertsLayerBreakdown: Record<string, number>
-  alertsLast24h: number
-  activeAlerts: number
+  totalSessions?: number
+  averageBiasScore?: number
+  alertsLayerBreakdown?: Record<string, number>
+  alertsLast24h?: number
+  activeAlerts?: number
   totalAlerts?: number
   highRiskSessions?: number
   criticalAlerts?: number
-  trendDirection: 'up' | 'down' | 'stable'
-  alerts: Record<AlertLevel, number>
-  complianceScore: number
+  trendDirection?: 'up' | 'down' | 'stable' | 'improving' | 'worsening'
+  alerts?: Record<AlertLevel, number>
+  complianceScore?: number
+  [key: string]: unknown
 }
 
 export interface DashboardRecommendation {
@@ -480,15 +477,21 @@ export interface BiasDashboardData {
     biasScore: number
     sessionCount: number
     alertCount: number
+    demographicBreakdown?: Record<string, number>
   }>
   alerts: BiasAlert[]
   demographics: {
-    [key: string]: {
-      [value: string]: {
-        count: number
-        averageBias: number
-      }
-    }
+    [key: string]:
+      | {
+          [value: string]:
+            | number
+            | {
+                count: number
+                averageBias: number
+              }
+            | Record<string, unknown>
+        }
+      | unknown[]
   }
   recentAnalyses: BiasAnalysisResult[]
   recommendations: DashboardRecommendation[]
@@ -498,11 +501,11 @@ export type DashboardData = BiasDashboardData
 
 export interface SessionData {
   sessionId: string
-  sessionDate: string
-  sessionDuration: number
-  sessionType: string
-  sessionNotes: string
-  sessionData: {
+  sessionDate?: string
+  sessionDuration?: number
+  sessionType?: string
+  sessionNotes?: string
+  sessionData?: {
     transcript: string
     metadata: {
       age: string
@@ -513,6 +516,7 @@ export interface SessionData {
   }
   participantDemographics?: ParticipantDemographics
   content?: SessionContent
+  [key: string]: unknown
 }
 
 // Define CacheEntry type
@@ -543,10 +547,10 @@ export interface CacheStats {
 
 // Define BiasReport type
 export interface BiasReport {
-  reportId: string
-  title: string
-  description: string
-  createdAt: Date
+  reportId?: string
+  title?: string
+  description?: string
+  createdAt?: Date
   generatedAt?: Date
   timeRange?: { start: Date; end: Date }
   overallFairnessScore?: number
@@ -564,13 +568,14 @@ export interface BiasReport {
     interventionAnalysis: any
   }
   appendices?: any[]
-  data: Record<string, any>
+  data?: Record<string, any>
   summary?: {
     sessionCount: number
     averageBiasScore: number
   }
   performance?: Record<string, unknown>
   alerts?: Record<string, number>
+  [key: string]: unknown
 }
 
 export interface PerformanceSnapshot {
@@ -708,7 +713,14 @@ export interface ComplianceReport {
 }
 
 export interface ConfigurationUpdate {
+  id?: string
+  timestamp?: Date
+  userId?: string
+  reason?: string
+  rollbackAvailable?: boolean
   section: string
+  user?: string
+  changesApplied?: boolean
   changes: Array<{
     field: string
     oldValue: any
@@ -716,6 +728,7 @@ export interface ConfigurationUpdate {
     impact: 'low' | 'medium' | 'high' | 'critical'
     requiresRestart: boolean
   }>
+  [key: string]: unknown
 }
 
 export interface BiasSummaryStats {

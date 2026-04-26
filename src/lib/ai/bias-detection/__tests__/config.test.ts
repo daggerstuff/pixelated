@@ -260,7 +260,7 @@ describe('BiasDetectionConfigManager', () => {
       }
 
       expect(() =>
-        configManager.updateConfig(invalidUpdates as unknown),
+        configManager.updateConfig(invalidUpdates as unknown as Partial<Record<string, unknown>>),
       ).toThrow()
     })
 
@@ -299,7 +299,7 @@ describe('BiasDetectionConfigManager', () => {
       }
 
       expect(() => {
-        configManager.updateConfig(invalidConfig as unknown)
+        configManager.updateConfig(invalidConfig as unknown as Partial<Record<string, unknown>>)
       }).toThrow('Configuration validation failed')
     })
   })
@@ -460,7 +460,7 @@ describe('BiasDetectionConfigManager', () => {
       const config = BiasDetectionConfigManager.getInstance().getConfig()
 
       expect(config.thresholds?.warning).toBe(0.35)
-      expect(config.layerWeights.preprocessing).toBe(0.3)
+      expect(config.layerWeights?.preprocessing).toBe(0.3)
     })
   })
 

@@ -15,7 +15,9 @@ export class ClinicalKnowledgeBase {
   /**
    * Gets clinical guidelines for a specific mental health category.
    */
-  public getClinicalGuidelines(category: string): void {
+  public getClinicalGuidelines(
+    category: string,
+  ): Array<{ category: string; rule: string; priority: 'low' | 'medium' | 'high'; source: string }> {
     const guidelinesMap: Record<
       string,
       Array<{
@@ -540,7 +542,9 @@ export class ClinicalKnowledgeBase {
   /**
    * Gets evidence base for recommendations based on category.
    */
-  public getEvidenceBase(category: string): void {
+  public getEvidenceBase(
+    category: string,
+  ): Array<{ source: string; reliability: 'low' | 'medium' | 'high'; summary: string }> {
     const evidenceMap: Record<
       string,
       Array<{

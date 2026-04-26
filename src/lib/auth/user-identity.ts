@@ -40,7 +40,7 @@ export interface Auth0UserProfile {
 
 export interface ResolvedIdentity {
   /** Internal Postgres UUID — use this for ALL downstream service calls */
-  internalId: string
+  internalId: string | null
   /** Auth0 sub — retained for audit logs and Auth0 Management API calls */
   auth0Sub: string
   email: string
@@ -50,6 +50,8 @@ export interface ResolvedIdentity {
   role: string
   /** True if this was the user's very first login (account just provisioned) */
   isNewUser: boolean
+  /** Optional activity flag used by upstream auth services */
+  isActive?: boolean
 }
 
 // ---------------------------------------------------------------------------

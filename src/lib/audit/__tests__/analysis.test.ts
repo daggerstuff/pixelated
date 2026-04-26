@@ -1,4 +1,4 @@
-import type { AuditLog } from '../../types/audit'
+import type { AuditLog } from '../types'
 import {
   detectHighFrequency,
   detectOddHours,
@@ -9,10 +9,9 @@ import {
 describe('Audit Analysis', () => {
   const baseLog: Omit<AuditLog, 'timestamp' | 'userId'> = {
     id: '1',
-    action: 'read',
+    action: 'view',
     resourceType: 'document',
     resourceId: 'doc1',
-    status: 'success',
     metadata: {},
   }
 
@@ -25,7 +24,7 @@ describe('Audit Analysis', () => {
           ...baseLog,
           id: `log${i}`,
           userId: 'user1',
-          timestamp: new Date(now.getTime() - i * 60000), // 1 minute apart
+          timestamp: new Date(now.getTime() - i * 60000).toISOString(), // 1 minute apart
         }))
 
       const patterns = detectHighFrequency(logs, 60)
@@ -49,7 +48,7 @@ describe('Audit Analysis', () => {
           ...baseLog,
           id: `log${i}`,
           userId: 'user1',
-          timestamp: new Date(now.getTime() - i * 60000),
+          timestamp: new Date(now.getTime() - i * 60000).toISOString(),
         }))
 
       const patterns = detectHighFrequency(logs, 60)
@@ -65,7 +64,13 @@ describe('Audit Analysis', () => {
           ...baseLog,
           id: `log${i}`,
           userId: 'user1',
-          timestamp: new Date(2024, 0, 1, 23 + Math.floor(i / 2), 30), // 11:30 PM - 1:30 AM
+          timestamp: new Date(
+            2024,
+            0,
+            1,
+            23 + Math.floor(i / 2),
+            30,
+          ).toISOString(), // 11:30 PM - 1:30 AM
         }))
 
       const patterns = detectOddHours(logs)
@@ -88,7 +93,7 @@ describe('Audit Analysis', () => {
           ...baseLog,
           id: `log${i}`,
           userId: 'user1',
-          timestamp: new Date(2024, 0, 1, 14, 30), // 2:30 PM
+          timestamp: new Date(2024, 0, 1, 14, 30).toISOString(), // 2:30 PM
         }))
 
       const patterns = detectOddHours(logs)
@@ -105,7 +110,7 @@ describe('Audit Analysis', () => {
           id: `log${i}`,
           userId: 'user1',
           resourceType: 'pii',
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(),
         }))
 
       const patterns = detectSensitiveAccess(logs)
@@ -129,7 +134,7 @@ describe('Audit Analysis', () => {
           id: `log${i}`,
           userId: 'user1',
           resourceType: 'public_doc',
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(),
         }))
 
       const patterns = detectSensitiveAccess(logs)
@@ -148,7 +153,7 @@ describe('Audit Analysis', () => {
             ...baseLog,
             id: `freq${i}`,
             userId: 'user1',
-            timestamp: new Date(now.getTime() - i * 60000),
+            timestamp: new Date(now.getTime() - i * 60000).toISOString(),
           })),
         // Odd hours logs
         ...Array(5)
@@ -157,7 +162,7 @@ describe('Audit Analysis', () => {
             ...baseLog,
             id: `odd${i}`,
             userId: 'user2',
-            timestamp: new Date(now.getTime() - i * 60000),
+            timestamp: new Date(now.getTime() - i * 60000).toISOString(),
           })),
         // Sensitive access logs
         ...Array(15)
@@ -167,7 +172,7 @@ describe('Audit Analysis', () => {
             id: `sens${i}`,
             userId: 'user3',
             resourceType: 'pii',
-            timestamp: new Date(now.getTime() - i * 60000),
+            timestamp: new Date(now.getTime() - i * 60000).toISOString(),
           })),
       ]
 

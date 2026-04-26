@@ -181,6 +181,30 @@ function createMockRedisClient() {
       mockStore.set(listKey, JSON.stringify(filtered))
       return list.length - filtered.length
     },
+    rpoplpush: async (source: string, destination: string) => {
+      const sourceKey = `list:${source}`
+      const destinationKey = `list:${destination}`
+      const sourceList = parseJsonArray(mockStore.get(sourceKey) || '[]')
+      if (sourceList.length === 0) {
+        return null
+      }
+      const value = sourceList.pop()
+      if (value === undefined) {
+        return null
+      }
+      mockStore.set(sourceKey, JSON.stringify(sourceList))
+      const destinationList = parseJsonArray(
+        mockStore.get(destinationKey) || '[]',
+      )
+      destinationList.unshift(value)
+      mockStore.set(destinationKey, JSON.stringify(destinationList))
+      return value
+    },
+    llen: async (key: string) => {
+      const listKey = `list:${key}`
+      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      return list.length
+    },
 
     // Sorted set operations
     zadd: async (key: string, score: number, member: string) => {
@@ -236,27 +260,34 @@ function createMockRedisClient() {
 function createRedisClient() {
   const { connectionUrl, restToken } = getRedisConfig()
 
-  if (
-    isTestEnvironment() ||
-    (connectionUrl && connectionUrl.startsWith('redis'))
-  ) {
+  if (connectionUrl && connectionUrl.startsWith('redis')) {
     // Initialize ioredis client with credentials
     return new Redis(connectionUrl, {
       password: restToken,
       // Add any additional options here if needed
     })
-  } else {
-    // Log appropriate warnings in production
-    if (isProduction()) {
-      console.error(
-        'CRITICAL: Missing Redis credentials in production environment',
-      )
-    }
+  }
+
+  if (isTestEnvironment()) {
     return createMockRedisClient()
   }
+
+  // Log appropriate warnings in production
+  if (isProduction()) {
+    console.error('CRITICAL: Missing Redis credentials in production environment')
+  }
+  return createMockRedisClient()
 }
 
 export const redis = createRedisClient()
+if (typeof (redis as { on?: (...args: unknown[]) => void }).on === 'function') {
+  ;(redis as { on: (event: string, handler: (...args: unknown[]) => void) => void }).on(
+    'error',
+    (error: unknown) => {
+      console.warn('Redis connection warning:', error)
+    },
+  )
+}
 
 // Backward-compatible helper for modules expecting a getter
 export function getRedisClient() {
@@ -321,6 +352,22 @@ export async function removeFromCache(key: string): Promise<boolean> {
     return false
   }
 }
+
+/**
+ * Attach safe error handling to the redis client to avoid unhandled error events.
+ */
+function attachRedisErrorHandling() {
+  if (redis && typeof (redis as { on: unknown }).on === 'function') {
+    ;(redis as { on: (event: string, handler: (...args: unknown[]) => void) => void }).on(
+      'error',
+      (err: unknown) => {
+        console.warn('Redis connection warning:', err)
+      },
+    )
+  }
+}
+
+attachRedisErrorHandling()
 
 /**
  * Check Redis connectivity

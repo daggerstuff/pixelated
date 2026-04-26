@@ -20,30 +20,25 @@ Features:
 
 import asyncio
 import contextlib
-import json
+import hashlib
 import logging
 import os
+import queue
+import threading
 import time
+import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Callable
 from pathlib import Path
-import hashlib
-import git
-import threading
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from typing import Any, Callable
+
 import schedule
-import uuid
-import queue
 
 # Import existing components
-from bias_detection.sentry_metrics import memory_metrics, track_latency
-from real_time_integration import RealTimeBiasDetector
-from performance_optimization import PerformanceOptimizedBiasDetector
-from ieee_xplore_integration import IEEEResearchPipeline
-from advanced_training_scenarios import AdvancedTrainingEngine
+from bias_detection.sentry_metrics import memory_metrics
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +69,7 @@ class MemoryUpdateEvent:
     event_type: str  # git_commit, file_change, training_complete, bias_detected, research_found
     source: str
     timestamp: datetime
-    data: Dict[str, Any]
+    data: dict[str, Any]
     priority: int = 1
     processed: bool = False
 
@@ -89,13 +84,13 @@ class MemoryEntry:
     memory_type: str  # component, implementation, debug, user_preference, project_info
     project_id: str
     user_preference: bool = False
-    namespace: Optional[str] = None
-    tags: List[str] = field(default_factory=list)
+    namespace: str | None = None
+    tags: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     version: int = 1
     hash: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class MemoryConflictResolver:
@@ -129,19 +124,19 @@ class MemoryConflictResolver:
     ) -> MemoryEntry:
         """Merge memory entries using decay weights."""
         now = datetime.now(timezone.utc)
-        
+
         # Age in days (preventing negative age just in case)
         existing_age_days = max(0.0, (now - existing_memory.created_at).total_seconds() / 86400.0)
         new_age_days = max(0.0, (now - new_memory.created_at).total_seconds() / 86400.0)
-        
+
         # Calculate decay-based relevance (1.0 at creation, halves every 7 days)
         existing_weight = 0.5 ** (existing_age_days / self.half_life_days)
         new_weight = 0.5 ** (new_age_days / self.half_life_days)
-        
+
         # Boost weight based on metadata-defined intensity if available (fallback to 0.2 for generic text)
         existing_intensity = existing_memory.metadata.get("emotional_intensity", 0.2)
         new_intensity = new_memory.metadata.get("emotional_intensity", 0.2)
-        
+
         # Compute final affective weight
         effective_existing_weight = (existing_weight * 0.7) + (existing_intensity * 0.3)
         effective_new_weight = (new_weight * 0.7) + (new_intensity * 0.3)
@@ -222,7 +217,7 @@ class GitWebhookHandler:
         self.config = config
         self.repo_path = Path.cwd()
 
-    async def handle_commit(self, commit_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
+    async def handle_commit(self, commit_data: dict[str, Any]) -> list[MemoryUpdateEvent]:
         """Handle Git commit event"""
 
         events = []
@@ -260,7 +255,7 @@ class GitWebhookHandler:
 
         return events
 
-    def _is_memory_worthy_commit(self, message: str, files: List[str]) -> bool:
+    def _is_memory_worthy_commit(self, message: str, files: list[str]) -> bool:
         """Determine if commit is worth creating memory for"""
 
         # Check for significant changes
@@ -294,7 +289,7 @@ class GitWebhookHandler:
 
         return has_significant_keyword and important_files
 
-    async def _create_commit_memories(self, commit_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
+    async def _create_commit_memories(self, commit_data: dict[str, Any]) -> list[MemoryUpdateEvent]:
         """Create specific memory entries from commit data"""
 
         events = []
@@ -339,7 +334,7 @@ class GitWebhookHandler:
 
         return events
 
-    def _generate_implementation_content(self, commit_data: Dict[str, Any]) -> str:
+    def _generate_implementation_content(self, commit_data: dict[str, Any]) -> str:
         """Generate implementation memory content"""
         message = commit_data.get("message", "")
         files = commit_data.get("files", [])
@@ -351,7 +346,7 @@ class GitWebhookHandler:
 
         return content
 
-    def _generate_debug_content(self, commit_data: Dict[str, Any]) -> str:
+    def _generate_debug_content(self, commit_data: dict[str, Any]) -> str:
         """Generate debug memory content"""
         message = commit_data.get("message", "")
 
@@ -431,8 +426,8 @@ class TrainingOutcomeProcessor:
     """Processes training outcomes for memory updates"""
 
     async def process_training_completion(
-        self, training_data: Dict[str, Any]
-    ) -> List[MemoryUpdateEvent]:
+        self, training_data: dict[str, Any]
+    ) -> list[MemoryUpdateEvent]:
         """Process completed training session"""
 
         # Extract training insights
@@ -461,7 +456,7 @@ class TrainingOutcomeProcessor:
 
         return [event]
 
-    def _generate_training_content(self, training_data: Dict[str, Any]) -> str:
+    def _generate_training_content(self, training_data: dict[str, Any]) -> str:
         """Generate training outcome content"""
 
         content = f"Training session completed with score: {training_data.get('final_assessment', {}).get('overall_score', 0):.2f}\n\n"
@@ -480,7 +475,7 @@ class TrainingOutcomeProcessor:
 class BiasDetectionProcessor:
     """Processes bias detection results for memory updates"""
 
-    async def process_bias_detection(self, bias_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
+    async def process_bias_detection(self, bias_data: dict[str, Any]) -> list[MemoryUpdateEvent]:
         """Process bias detection results"""
 
         # Extract bias insights
@@ -509,7 +504,7 @@ class BiasDetectionProcessor:
 
         return [event]
 
-    def _generate_bias_content(self, bias_data: Dict[str, Any]) -> str:
+    def _generate_bias_content(self, bias_data: dict[str, Any]) -> str:
         """Generate bias detection content"""
 
         content = f"Bias detected with score {bias_data.get('bias_score', 0):.2f} and confidence {bias_data.get('confidence', 0):.2f}\n"
@@ -525,8 +520,8 @@ class ResearchDiscoveryProcessor:
     """Processes research discoveries for memory updates"""
 
     async def process_research_discovery(
-        self, research_data: Dict[str, Any]
-    ) -> List[MemoryUpdateEvent]:
+        self, research_data: dict[str, Any]
+    ) -> list[MemoryUpdateEvent]:
         """Process new research discovery"""
 
         # Extract research insights
@@ -555,7 +550,7 @@ class ResearchDiscoveryProcessor:
 
         return [event]
 
-    def _generate_research_content(self, research_data: Dict[str, Any]) -> str:
+    def _generate_research_content(self, research_data: dict[str, Any]) -> str:
         """Generate research discovery content"""
 
         content = (
@@ -571,7 +566,7 @@ class ResearchDiscoveryProcessor:
 class AutomatedMemoryUpdater:
     """Main automated memory update system"""
 
-    def __init__(self, config: Optional[MemoryUpdateConfig] = None):
+    def __init__(self, config: MemoryUpdateConfig | None = None):
         self.config = config or MemoryUpdateConfig()
         self.conflict_resolver = MemoryConflictResolver(self.config.conflict_resolution_strategy)
         self.git_handler = GitWebhookHandler(self.config)
@@ -579,20 +574,20 @@ class AutomatedMemoryUpdater:
         self.bias_processor = BiasDetectionProcessor()
         self.research_processor = ResearchDiscoveryProcessor()
 
-        self.pending_events: List[MemoryUpdateEvent] = []
-        self.processed_events: Set[str] = set()
-        self.memory_cache: Dict[str, MemoryEntry] = {}
+        self.pending_events: list[MemoryUpdateEvent] = []
+        self.processed_events: set[str] = set()
+        self.memory_cache: dict[str, MemoryEntry] = {}
 
         # Locks
         self._worker_lock = threading.Lock()
 
         # File monitoring
-        self.file_observer: Optional[Observer] = None
-        self.file_handler: Optional[FileChangeHandler] = None
+        self.file_observer: Observer | None = None
+        self.file_handler: FileChangeHandler | None = None
 
         # Background worker for sync integration
         self._event_queue = queue.Queue()
-        self._worker_thread: Optional[threading.Thread] = None
+        self._worker_thread: threading.Thread | None = None
         self._worker_stop_event = threading.Event()
 
         logger.info("Automated memory updater initialized")
@@ -723,7 +718,7 @@ class AutomatedMemoryUpdater:
         for e in processed_events:
             await self._handle_memory_event(e)
 
-    async def _expand_event(self, event: MemoryUpdateEvent) -> List[MemoryUpdateEvent]:
+    async def _expand_event(self, event: MemoryUpdateEvent) -> list[MemoryUpdateEvent]:
         """Expand complex events into simple memory update events"""
         if event.event_type == "training_complete" and not event.data.get("_is_processed"):
             try:
@@ -747,7 +742,7 @@ class AutomatedMemoryUpdater:
 
         return [event]
 
-    async def handle_git_webhook(self, webhook_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def handle_git_webhook(self, webhook_data: dict[str, Any]) -> dict[str, Any]:
         """Handle Git webhook event"""
 
         if not self.config.git_webhook_enabled:
@@ -785,7 +780,7 @@ class AutomatedMemoryUpdater:
 
         self._event_queue.put(event)
 
-    def push_training_outcome(self, execution_id: str, outcome_data: Dict[str, Any], source: str):
+    def push_training_outcome(self, execution_id: str, outcome_data: dict[str, Any], source: str):
         """Unified method to push training outcomes to memory from sync code"""
         if not self.config.enabled:
             return
@@ -801,7 +796,7 @@ class AutomatedMemoryUpdater:
         self.process_event(event)
 
     async def push_training_outcome_async(
-        self, execution_id: str, outcome_data: Dict[str, Any], source: str
+        self, execution_id: str, outcome_data: dict[str, Any], source: str
     ):
         """Unified async method to push training outcomes to memory"""
         event = MemoryUpdateEvent(
@@ -814,7 +809,7 @@ class AutomatedMemoryUpdater:
         )
         await self._handle_memory_event(event)
 
-    async def handle_training_completion(self, training_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def handle_training_completion(self, training_data: dict[str, Any]) -> dict[str, Any]:
         """Handle training completion event"""
 
         try:
@@ -829,7 +824,7 @@ class AutomatedMemoryUpdater:
             logger.error(f"Error handling training completion: {e}")
             return {"status": "error", "message": str(e)}
 
-    async def handle_bias_detection(self, bias_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def handle_bias_detection(self, bias_data: dict[str, Any]) -> dict[str, Any]:
         """Handle bias detection event"""
 
         try:
@@ -844,7 +839,7 @@ class AutomatedMemoryUpdater:
             logger.error(f"Error handling bias detection: {e}")
             return {"status": "error", "message": str(e)}
 
-    async def handle_research_discovery(self, research_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def handle_research_discovery(self, research_data: dict[str, Any]) -> dict[str, Any]:
         """Handle research discovery event"""
 
         try:
@@ -917,7 +912,7 @@ class AutomatedMemoryUpdater:
             logger.error(f"Error processing memory event {event.event_id}: {e}")
 
     def _create_memory_entry(
-        self, memory_data: Dict[str, Any], event: MemoryUpdateEvent
+        self, memory_data: dict[str, Any], event: MemoryUpdateEvent
     ) -> MemoryEntry:
         """Create memory entry from event data"""
 
@@ -951,7 +946,7 @@ class AutomatedMemoryUpdater:
             },
         )
 
-    async def _find_existing_memory(self, memory_entry: MemoryEntry) -> Optional[MemoryEntry]:
+    async def _find_existing_memory(self, memory_entry: MemoryEntry) -> MemoryEntry | None:
         """Find existing memory that might conflict"""
 
         # Simple conflict detection based on title similarity
@@ -1056,7 +1051,7 @@ class AutomatedMemoryUpdater:
         # Track metrics
         memory_metrics.backup_completed(len(self.memory_cache))
 
-    def get_memory_stats(self) -> Dict[str, Any]:
+    def get_memory_stats(self) -> dict[str, Any]:
         """Get memory update statistics"""
 
         return {
@@ -1073,7 +1068,7 @@ class AutomatedMemoryUpdater:
             },
         }
 
-    def _get_memory_type_counts(self) -> Dict[str, int]:
+    def _get_memory_type_counts(self) -> dict[str, int]:
         """Get counts by memory type"""
 
         counts = defaultdict(int)
@@ -1081,7 +1076,7 @@ class AutomatedMemoryUpdater:
             counts[memory.memory_type] += 1
         return dict(counts)
 
-    def _get_event_type_counts(self) -> Dict[str, int]:
+    def _get_event_type_counts(self) -> dict[str, int]:
         """Get counts by event type"""
 
         counts = defaultdict(int)
@@ -1091,11 +1086,11 @@ class AutomatedMemoryUpdater:
 
 
 # Global updater instance
-memory_updater: Optional[AutomatedMemoryUpdater] = None
+memory_updater: AutomatedMemoryUpdater | None = None
 
 
 async def initialize_memory_updater(
-    config: Optional[MemoryUpdateConfig] = None,
+    config: MemoryUpdateConfig | None = None,
 ) -> AutomatedMemoryUpdater:
     """Initialize global memory updater"""
     global memory_updater
@@ -1116,31 +1111,31 @@ async def get_memory_updater() -> AutomatedMemoryUpdater:
 
 
 # API endpoints for memory updates
-async def handle_git_webhook(webhook_data: Dict[str, Any]) -> Dict[str, Any]:
+async def handle_git_webhook(webhook_data: dict[str, Any]) -> dict[str, Any]:
     """API endpoint for Git webhook"""
     updater = await get_memory_updater()
     return await updater.handle_git_webhook(webhook_data)
 
 
-async def handle_training_completion(training_data: Dict[str, Any]) -> Dict[str, Any]:
+async def handle_training_completion(training_data: dict[str, Any]) -> dict[str, Any]:
     """API endpoint for training completion"""
     updater = await get_memory_updater()
     return await updater.handle_training_completion(training_data)
 
 
-async def handle_bias_detection(bias_data: Dict[str, Any]) -> Dict[str, Any]:
+async def handle_bias_detection(bias_data: dict[str, Any]) -> dict[str, Any]:
     """API endpoint for bias detection"""
     updater = await get_memory_updater()
     return await updater.handle_bias_detection(bias_data)
 
 
-async def handle_research_discovery(research_data: Dict[str, Any]) -> Dict[str, Any]:
+async def handle_research_discovery(research_data: dict[str, Any]) -> dict[str, Any]:
     """API endpoint for research discovery"""
     updater = await get_memory_updater()
     return await updater.handle_research_discovery(research_data)
 
 
-async def get_memory_update_stats() -> Dict[str, Any]:
+async def get_memory_update_stats() -> dict[str, Any]:
     """API endpoint for memory update statistics"""
     updater = await get_memory_updater()
     return updater.get_memory_stats()

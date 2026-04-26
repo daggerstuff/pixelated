@@ -1,8 +1,9 @@
 /* ================================================
-   TECHNICAL-HUMANIST TYPOGRAPHY
-   Berkeley Mono as the Primary Voice
-   ================================================ */
+TYPOGRAPHY SYSTEM
+Lexend (headings) + Source Sans 3 (body) + Berkeley Mono (labels)
+================================================ */
 
+/* Berkeley Mono — retained for labels and small uppercase accents */
 @font-face {
   font-family: 'JetBrains Mono Fallback';
   src: url('/fonts/jetbrains-mono-400.ttf') format('truetype');

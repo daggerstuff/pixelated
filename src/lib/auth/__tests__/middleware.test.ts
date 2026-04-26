@@ -1024,9 +1024,10 @@ describe('Authentication Middleware', () => {
     })
 
     it('should enforce strict cache control for health data', async () => {
-      const response = new Response({
-        patient: { name: 'John Doe', condition: 'Anxiety' },
-      })
+      const response = new Response(
+        JSON.stringify({ patient: { name: 'John Doe', condition: 'Anxiety' } }),
+        { headers: { 'Content-Type': 'application/json' } },
+      )
 
       const result = await securityHeaders(mockRequest, response)
 
@@ -1065,7 +1066,9 @@ describe('Authentication Middleware', () => {
 
       await authenticateRequest(mockRequest)
 
-      const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2]
+      const loggedData = vi
+        .mocked(logSecurityEvent)
+        .mock.calls[0][2] as { clientInfo?: { ip?: string } }
 
       // IP should be masked or not included
       if (loggedData.clientInfo) {
