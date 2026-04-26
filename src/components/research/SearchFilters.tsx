@@ -60,9 +60,6 @@ export default function SearchFilters({
     })
   }
 
-  // ⚡ Bolt: Convert topics array to a Set to prevent O(N²) performance bottlenecks during renders when checking for inclusion in loops
-  const selectedTopics = React.useMemo(() => new Set(localFilters.topics), [localFilters.topics])
-
   return (
     <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
       <div className='mb-6 flex items-center justify-between'>
@@ -153,33 +150,29 @@ export default function SearchFilters({
             Therapeutic Topics
           </label>
           <div className='flex flex-wrap gap-2'>
-          {COMMON_TOPICS.map((topic) => {
-            const isSelected = selectedTopics.has(topic)
-            return (
+            {COMMON_TOPICS.map((topic) => (
               <button
                 key={topic}
                 onClick={() => toggleTopic(topic)}
-                aria-pressed={isSelected}
+                aria-pressed={localFilters.topics.includes(topic)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  isSelected
+                  localFilters.topics.includes(topic)
                     ? 'bg-pink-600/20 text-pink-300 border-pink-600'
                     : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
                 }`}
               >
                 {topic}
               </button>
-            )
-          })}
+            ))}
           </div>
         </div>
 
         {/* Sort By */}
         <div>
-          <label htmlFor='sort-by' className='text-slate-300 mb-2 block text-sm font-medium'>
+          <label className='text-slate-300 mb-2 block text-sm font-medium'>
             Sort By
           </label>
           <select
-            id='sort-by'
             className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
             value={localFilters.sortBy}
             onChange={(e) =>

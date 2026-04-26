@@ -1,0 +1,319 @@
+---
+import Container from './Container.astro'
+import { softVariant as card } from '@tailus/themer-card'
+import { cn } from '@lib/utils'
+---
+
+<section class="text-gray-600 dark:text-gray-300 scroll-mt-24" id="reviews">
+  <Container>
+    <div class="text-center">
+      <h2
+        class="text-3xl text-gray-950 dark:text-white font-semibold md:text-4xl"
+      >
+        Trusted by Mental Health Professionals
+      </h2>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">
+        Real testimonials from therapists, psychologists, and counselors using
+        our platform.
+      </p>
+    </div>
+    <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="space-y-3">
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Sarah Chen"
+                src="https://randomuser.me/api/portraits/women/1.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Sarah Chen
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Clinical Psychologist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  Pixelated Empathy has revolutionized how I approach therapy
+                  sessions. The real-time emotional analysis helps me identify
+                  subtle changes in patient affect that I might otherwise miss.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Michael Rodriguez"
+                src="https://randomuser.me/api/portraits/men/6.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Michael Rodriguez
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Licensed Therapist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  The AI-powered training modules have significantly improved my
+                  therapeutic interventions. I now feel more confident handling
+                  complex trauma cases with evidence-based guidance.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Emily Watson"
+                src="https://randomuser.me/api/portraits/women/7.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Emily Watson
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Cognitive Behavioral Therapist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  As someone new to digital health tools, I was amazed by how
+                  intuitive and helpful this platform is. The personalized
+                  recommendations are spot-on and evidence-based.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. James Thompson"
+                src="https://randomuser.me/api/portraits/men/4.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. James Thompson
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Psychiatrist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  The HIPAA compliance and security features give me complete
+                  confidence in using this platform with my patients. The
+                  analytics help me track treatment progress objectively.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Lisa Park"
+                src="https://randomuser.me/api/portraits/women/2.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Lisa Park
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Marriage & Family Therapist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  Pixelated Empathy has transformed my practice. The couple's
+                  therapy insights and family dynamics analysis have helped me
+                  provide more targeted and effective interventions.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Robert Kim"
+                src="https://randomuser.me/api/portraits/men/5.jpg"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Robert Kim
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Addiction Counselor</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  Working with addiction recovery patients requires precise
+                  timing and intervention. This AI platform helps me identify
+                  critical moments and provide timely support.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Maria Gonzalez"
+                src="https://randomuser.me/api/portraits/women/9.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Maria Gonzalez
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Child Psychologist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  Working with children requires special sensitivity. The
+                  platform's child-specific modules have enhanced my ability to
+                  connect with young patients and track their emotional
+                  development effectively.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. David Wilson"
+                src="https://randomuser.me/api/portraits/men/10.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. David Wilson
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Trauma Specialist</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  The evidence-based approach and real-time feedback have been
+                  invaluable in my trauma therapy sessions. Patient outcomes
+                  have improved significantly since implementing this platform.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+        <div class={cn(card)}>
+          <div class="flex gap-3">
+            <span
+              class="relative block rounded-[--avatar-border-radius] text-lg size-10"
+            >
+              <img
+                class="h-full w-full rounded-[--avatar-border-radius] object-cover"
+                alt="Dr. Jennifer Adams"
+                src="https://randomuser.me/api/portraits/women/13.jpg"
+                loading="lazy"
+                width="120"
+                height="120"
+              />
+            </span>
+            <div class="w-[calc(100%-3.25rem)]">
+              <h3 class="font-medium text-gray-950 dark:text-white">
+                Dr. Jennifer Adams
+              </h3>
+              <span
+                class="block text-sm tracking-wide text-gray-600 dark:text-gray-400"
+                >Group Therapy Coordinator</span
+              >
+              <blockquote class="mt-3">
+                <p class="text-gray-600 dark:text-gray-400">
+                  Managing group dynamics is complex, but this platform provides
+                  insights into individual and group progress that have
+                  revolutionized how I facilitate therapeutic groups.
+                </p>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

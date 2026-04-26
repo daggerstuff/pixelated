@@ -6,7 +6,7 @@
 import { type OfflineState } from "@/hooks/useOfflineDetection";
 
 import { indexedDBRequestQueue } from "./indexedDBRequestQueue";
-import { type QueuedRequest } from "./requestQueue";
+import { type QueuedRequest } from "./indexedDBRequestQueue";
 
 export interface OfflineManagerConfig {
   enableRequestQueue?: boolean;
