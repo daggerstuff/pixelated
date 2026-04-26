@@ -245,7 +245,7 @@ resource "google_kms_crypto_key_iam_member" "artifact_registry" {
 # --- Datastore ---
 resource "google_sql_database_instance" "postgres" {
   name                = local.sql_instance_name
-  database_version    = "POSTGRES_16"
+  database_version    = local.postgres_major_version
   region              = var.gcp_region
   deletion_protection = var.enable_deletion_protection
 
@@ -295,6 +295,11 @@ resource "google_sql_database_instance" "postgres" {
     }
 
     database_flags {
+      name  = "log_duration"
+      value = "on"
+    }
+
+    database_flags {
       name  = "log_checkpoints"
       value = "on"
     }
@@ -327,6 +332,11 @@ resource "google_sql_database_instance" "postgres" {
     database_flags {
       name  = "pgaudit.log"
       value = "all"
+    }
+
+    database_flags {
+      name  = "cloudsql.enable_pgaudit"
+      value = "on"
     }
   }
 

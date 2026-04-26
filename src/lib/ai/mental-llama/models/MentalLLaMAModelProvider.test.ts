@@ -27,7 +27,7 @@ describe('MentalLLaMAModelProvider', () => {
       MENTALLAMA_ENDPOINT_URL_7B: mockEndpoint7B,
       MENTALLAMA_ENDPOINT_URL_13B: mockEndpoint13B,
       // other env vars if needed by logger or other parts
-    } as unknown)
+    } as ReturnType<typeof getEnv>)
 
     // Stub global fetch
     global.fetch = vi.fn()
@@ -62,7 +62,7 @@ describe('MentalLLaMAModelProvider', () => {
   it('should create mock configuration if API key is missing', () => {
     vi.mocked(getEnv).mockReturnValue({
       MENTALLAMA_ENDPOINT_URL_7B: mockEndpoint7B,
-    } as unknown)
+    } as ReturnType<typeof getEnv>)
     const provider = new MentalLLaMAModelProvider()
     expect(provider.getModelConfig()).toEqual({
       modelId: 'mock-mentalllama-7B',
@@ -73,7 +73,7 @@ describe('MentalLLaMAModelProvider', () => {
   it('should create mock configuration if endpoint URL is missing for 7B model', () => {
     vi.mocked(getEnv).mockReturnValue({
       MENTALLAMA_API_KEY: mockApiKey,
-    } as unknown)
+    } as ReturnType<typeof getEnv>)
     const provider = new MentalLLaMAModelProvider('7B')
     expect(provider.getModelConfig()).toEqual({
       modelId: 'mock-mentalllama-7B',
@@ -85,7 +85,7 @@ describe('MentalLLaMAModelProvider', () => {
     vi.mocked(getEnv).mockReturnValue({
       MENTALLAMA_API_KEY: mockApiKey,
       MENTALLAMA_ENDPOINT_URL_7B: mockEndpoint7B, // Provide 7B but test 13B
-    } as unknown)
+    } as ReturnType<typeof getEnv>)
     const provider = new MentalLLaMAModelProvider('13B')
     expect(provider.getModelConfig()).toEqual({
       modelId: 'mock-mentalllama-13B',
@@ -164,9 +164,9 @@ describe('MentalLLaMAModelProvider', () => {
     })
 
     it('should throw error when chat method is called with mock configuration', async () => {
-      vi.mocked(getEnv).mockReturnValue({
+    vi.mocked(getEnv).mockReturnValue({
         MENTALLAMA_ENDPOINT_URL_7B: mockEndpoint7B,
-      } as unknown)
+    } as ReturnType<typeof getEnv>)
       const provider = new MentalLLaMAModelProvider()
       await expect(provider.chat(messages, options)).rejects.toThrow(
         'MentalLLaMA model mock-mentalllama-7B is not properly configured for actual API calls',
@@ -174,9 +174,9 @@ describe('MentalLLaMAModelProvider', () => {
     })
 
     it('should create a provider with mock configuration when constructor is called with missing API key', () => {
-      vi.mocked(getEnv).mockReturnValue({
+    vi.mocked(getEnv).mockReturnValue({
         MENTALLAMA_ENDPOINT_URL_7B: mockEndpoint7B,
-      } as unknown)
+    } as ReturnType<typeof getEnv>)
       const provider = new MentalLLaMAModelProvider()
       expect(provider.getModelConfig().modelId).toBe('mock-mentalllama-7B')
       expect(provider.getModelConfig().providerType).toBe('custom_api')

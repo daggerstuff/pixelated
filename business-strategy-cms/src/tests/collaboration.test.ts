@@ -205,9 +205,16 @@ describe('CollaborationService Property Tests', () => {
 
       const history = CollaborationService.getChanges(document.id)
       expect(history).toHaveLength(3)
-      expect(history[0].type).toBe('insert')
-      expect(history[1].type).toBe('delete')
-      expect(history[2].type).toBe('insert')
+      const firstHistory = history[0]
+      const secondHistory = history[1]
+      const thirdHistory = history[2]
+
+      expect(firstHistory).toBeDefined()
+      expect(secondHistory).toBeDefined()
+      expect(thirdHistory).toBeDefined()
+      expect(firstHistory!.type).toBe('insert')
+      expect(secondHistory!.type).toBe('delete')
+      expect(thirdHistory!.type).toBe('insert')
     })
 
     it('should maintain change attribution correctly', () => {
@@ -240,8 +247,12 @@ describe('CollaborationService Property Tests', () => {
 
       const history = CollaborationService.getChanges(document.id)
       expect(history).toHaveLength(2)
-      expect(history[0].userId).toBe(user1.user.id)
-      expect(history[1].userId).toBe(user2.user.id)
+      const firstHistory = history[0]
+      const secondHistory = history[1]
+      expect(firstHistory).toBeDefined()
+      expect(secondHistory).toBeDefined()
+      expect(firstHistory!.userId).toBe(user1.user.id)
+      expect(secondHistory!.userId).toBe(user2.user.id)
     })
 
     it('should handle concurrent changes with conflict resolution', () => {
@@ -381,11 +392,14 @@ describe('CollaborationService Property Tests', () => {
         userCount,
       )
 
+      const firstUser = users[0]
+      expect(firstUser).toBeDefined()
+
       const change = {
         type: 'insert' as const,
         position: 0,
         content: 'Mass update',
-        userId: users[0].user.id!,
+        userId: firstUser!.user.id!,
         timestamp: new Date(),
       }
 

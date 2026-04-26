@@ -542,6 +542,7 @@ export async function cancelRoleTransitionRequest(
   } catch (error: unknown) {
     await logSecurityEvent(
       SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
+      userId,
       {
         userId: userId,
         error:

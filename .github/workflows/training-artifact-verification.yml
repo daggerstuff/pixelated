@@ -20,6 +20,10 @@ name: Training Artifact Verification
       - ai/lightning/training_run_checklist.json
       - ai/training_data_consolidated/final/**
 
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   verify-stage-artifacts:
     runs-on: ubuntu-24.04

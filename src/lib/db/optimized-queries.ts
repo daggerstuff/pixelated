@@ -5,7 +5,7 @@
 
 import { PoolClient, QueryResult } from 'pg'
 
-import { getLogger } from '@/lib/logging'
+import { getLogger } from '../logging'
 
 import { getPool } from './index'
 

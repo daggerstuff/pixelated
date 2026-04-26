@@ -51,8 +51,8 @@ const {
         <span class="cta-decision__label">Decision rubric</span>
         <h3 class="pe-heading-s">{decisionTitle}</h3>
         <p class="cta-decision__context">
-          Keep the product only if one hard case gives your team a clearer
-          coaching move next week.
+          Keep the product only if it makes practice easier to assign, review,
+          and repeat inside your existing supervision workflow.
         </p>
 
         <ul class="cta-rubric">
@@ -79,10 +79,11 @@ const {
 </section>
 
 <style>
-  .cta-section {
-    background: transparent;
-    color: var(--text-primary);
-  }
+.cta-section {
+  background: rgba(var(--accent-primary-rgb), 0.04);
+  color: var(--text-primary);
+  border-top: 2px solid rgba(var(--accent-primary-rgb), 0.4);
+}
 
   .cta-shell {
     display: grid;
@@ -96,13 +97,14 @@ const {
   }
 
   .cta-copy {
-    max-width: 38rem; margin: 0 auto; text-align: center;
+    max-width: 38rem;
+    margin: 0 auto;
   }
 
   .cta-verdict-copy {
     margin: 0;
     max-width: 34rem;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.98rem;
     line-height: 1.76;
     color: rgba(253, 252, 252, 0.88);
@@ -116,16 +118,15 @@ const {
 
   .cta-proof-item {
     display: grid;
-    gap: 0.45rem;
+    gap: 0.85rem;
     padding: 0.95rem 0 0;
-    border-top: 1px dotted rgba(253, 252, 252, 0.1);
   }
 
   .cta-proof-item p,
   .cta-rubric li,
   .cta-meta {
     margin: 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.92rem;
     line-height: 1.74;
     color: rgba(253, 252, 252, 0.8);
@@ -133,8 +134,8 @@ const {
 
   .cta-proof-item__label,
   .cta-decision__label {
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
+    font-family: var(--font-label);
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -144,7 +145,7 @@ const {
   .cta-decision {
     padding: clamp(1.25rem, 2vw, 1.5rem);
     border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 4px;
+    border-radius: 8px;
     background:
       radial-gradient(
         circle at top right,
@@ -157,7 +158,7 @@ const {
 
   .cta-decision__context {
     margin: 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.9rem;
     line-height: 1.74;
     color: rgba(253, 252, 252, 0.82);
@@ -172,14 +173,27 @@ const {
   }
 
   .cta-rubric li {
+    position: relative;
     padding: 0.9rem 0 0;
-    border-top: 1px dotted rgba(253, 252, 252, 0.1);
+    text-align: left;
+  }
+
+  .cta-rubric li::before {
+    content: '';
+    position: static;
+    display: block;
+    width: 0.38rem;
+    height: 0.38rem;
+  margin: 0 0 0.65rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.12);
   }
 
   .cta-action-cluster {
     display: grid;
-    gap: 0.8rem;
-    margin-top: 0.25rem;
+    gap: 0.85rem;
+    margin-top: 1.5rem;
   }
 
   .cta-button {
@@ -188,11 +202,11 @@ const {
     justify-content: center;
     min-height: 3.2rem;
     padding: 0 1.05rem;
-    border-radius: 4px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     text-decoration: none;
     transition:
@@ -208,7 +222,7 @@ const {
   }
 
   .cta-button--secondary {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.05);
     color: rgba(253, 252, 252, 0.82);
     border: 1px solid rgba(253, 252, 252, 0.12);
   }
@@ -223,14 +237,97 @@ const {
 
   @media (min-width: 980px) {
     .cta-shell {
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      grid-template-columns: minmax(0, 0.95fr) minmax(24rem, 0.72fr);
       align-items: start;
+      gap: clamp(3rem, 5vw, 5rem);
+      text-align: left;
+      justify-items: stretch;
+    }
+
+    .cta-copy {
+      max-width: 41rem;
+      margin: 0;
+      text-align: left;
+      justify-items: start;
+    }
+
+    .cta-copy .pe-heading-l {
+      max-width: 13ch;
+    }
+
+    .cta-copy .pe-home-copy {
+      max-width: 34rem;
+      margin: 0 auto;
+      text-align: left;
     }
 
     .cta-proof-list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1rem;
-      max-width: 34rem;
+      max-width: 100%;
     }
+
+    .cta-proof-item,
+    .cta-decision {
+      text-align: left;
+      justify-items: start;
+    }
+
+    .cta-proof-item {
+      padding: 1rem;
+      border: 1px solid rgba(253, 252, 252, 0.1);
+      border-radius: 8px;
+      background: rgba(253, 252, 252, 0.05);
+    }
+
+    .cta-proof-item p {
+      max-width: 24rem;
+      margin-inline: auto;
+    }
+
+    .cta-rubric {
+      justify-items: start;
+      text-align: left;
+    }
+
+    .cta-action-cluster {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .cta-shell,
+    .cta-copy,
+    .cta-proof-item,
+    .cta-decision,
+    .cta-rubric {
+      text-align: center;
+      justify-items: center;
+    }
+
+    .cta-rubric {
+      justify-items: center;
+      text-align: center;
+    }
+
+    .cta-rubric li {
+      max-width: 28rem;
+      margin-inline: auto;
+    }
+
+    .cta-proof-item {
+      padding: 1rem;
+      border: 1px solid rgba(253, 252, 252, 0.14);
+      border-radius: 8px;
+      background: rgba(253, 252, 252, 0.05);
+    }
+
+.cta-action-cluster {
+  grid-template-columns: 1fr;
+}
+
+.cta-button {
+  width: 100%;
+}
   }
 </style>

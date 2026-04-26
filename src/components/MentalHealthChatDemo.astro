@@ -1,10 +1,13 @@
 ---
-import { MentalHealthChatDemo as MentalHealthChatDemoComponent } from './MentalHealthChatDemo.tsx'
+import MentalHealthChatDemoComponent from './MentalHealthChatDemoReact'
 
 export interface Props {
   conversationId?: string
   title?: string
   description?: string
+  showAnalysisPanel?: boolean
+  showSettingsPanel?: boolean
+  initialTab?: string
   initialConfig?: {
     enableAnalysis?: boolean
     confidenceThreshold?: number
@@ -18,6 +21,9 @@ const {
   conversationId: _conversationId = 'astro-demo',
   title = 'Mental Health Support Chat',
   description = 'Production-grade mental health analysis and therapeutic response system.',
+  showAnalysisPanel = true,
+  showSettingsPanel = true,
+  initialTab = 'analysis',
   initialConfig: _initialConfig = {},
 } = Astro.props
 ---
@@ -36,7 +42,12 @@ const {
     )
   }
 
-  <MentalHealthChatDemoComponent client:only="react" />
+  <MentalHealthChatDemoComponent
+    client:only="react"
+    showAnalysisPanel={showAnalysisPanel}
+    showSettingsPanel={showSettingsPanel}
+    initialTab={initialTab}
+  />
 </div>
 
 <style>

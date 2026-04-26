@@ -20,11 +20,12 @@ image = modal.Image.debian_slim(python_version="3.13").pip_install(
     memory=65536,  # 64GB memory
 )
 def merge_v2_adapter():
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    from peft import PeftModel
     import os
     import time
+
+    import torch
+    from peft import PeftModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
     base_model_name = "LatitudeGames/Wayfarer-2-12B"
     # Use correct adapter path from train_modal_v2.py
