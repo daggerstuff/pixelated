@@ -10,11 +10,11 @@ vi.mock('@/components/base/Head.astro', () => ({
     `<mock-head title="${title}" description="${description}"></mock-head>`,
 }))
 
-vi.mock('@/components/site/SiteNavbar.astro', () => ({
-  default: () => '<mock-navbar></mock-navbar>',
+vi.mock('@/components/layout/Header.astro', () => ({
+  default: () => '<mock-header></mock-header>',
 }))
 
-vi.mock('@/components/site/SiteFooter.astro', () => ({
+vi.mock('@/components/layout/Footer.astro', () => ({
   default: () => '<mock-footer></mock-footer>',
 }))
 
@@ -55,7 +55,7 @@ test('DocumentationLayout renders with correct title and content', async () => {
   )
   expect(renderedHtml).toContain('Test Documentation') // Check title usage within the body potentially
   // expect(renderedHtml).toContain('Test Description') // Description might only be in Head
-  expect(renderedHtml).toContain('<mock-navbar>')
+  expect(renderedHtml).toContain('<mock-header>')
   expect(renderedHtml).toContain('<mock-footer>')
   expect(renderedHtml).toContain('<mock-theme-toggle>')
   // Check for content passed via slot/children
