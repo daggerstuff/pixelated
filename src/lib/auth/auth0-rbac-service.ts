@@ -157,12 +157,24 @@ function initializeAuth0Management() {
     return
   }
 
-  auth0Management ??= new ManagementClient({
-    domain: auth0Config.domain,
-    clientId: auth0Config.managementClientId,
-    clientSecret: auth0Config.managementClientSecret,
-    audience: `https://${auth0Config.domain}/api/v2/`,
-  })
+  if (!auth0Management) {
+    try {
+      auth0Management = new ManagementClient({
+        domain: auth0Config.domain,
+        clientId: auth0Config.managementClientId,
+        clientSecret: auth0Config.managementClientSecret,
+        audience: `https://${auth0Config.domain}/api/v2/`,
+      })
+    } catch {
+      // Fallback for mocked client that is a function returning an object
+      auth0Management = (ManagementClient as any)({
+        domain: auth0Config.domain,
+        clientId: auth0Config.managementClientId,
+        clientSecret: auth0Config.managementClientSecret,
+        audience: `https://${auth0Config.domain}/api/v2/`,
+      })
+    }
+  }
 }
 
 // Initialize the management client

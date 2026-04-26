@@ -14,6 +14,9 @@ uv sync
 
 # Run the server
 uv run foresight-mcp
+
+# Or use the workspace wrapper script
+/home/vivi/pixelated/scripts/memory/foresight-mcp-server.sh
 ```
 
 ## Add to Claude Code
@@ -24,8 +27,8 @@ After installing foresight-mcp package:
 {
   "mcpServers": {
     "foresight": {
-      "command": "uv",
-      "args": ["run", "--active", "-m", "foresight_mcp"],
+      "command": "/home/vivi/pixelated/scripts/memory/foresight-mcp-server.sh",
+      "args": [],
       "cwd": "/path/to/foresight-mcp",
       "env": {
         "FORESIGHT_DB_PATH": "/home/user/.foresight/memory.db",
@@ -36,14 +39,12 @@ After installing foresight-mcp package:
 }
 ```
 
-**Important:** The `--active` flag is required to use the active virtual environment.
-
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `FORESIGHT_DB_PATH` | `~/.foresight/memory.db` | Database path |
-| `FORESIGHT_USER_ID` | System user | User identifier |
+| Variable              | Default                   | Description      |
+|-----------------------|--------------------------|------------------|
+| `FORESIGHT_DB_PATH`   | `~/.foresight/memory.db` | Database path    |
+| `FORESIGHT_USER_ID`   | System user              | User identifier  |
 
 ## Tools
 
