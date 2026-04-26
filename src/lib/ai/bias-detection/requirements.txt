@@ -330,7 +330,7 @@ jupyterlab-widgets==3.0.16
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   ipywidgets
-keras==3.13.2
+keras==3.14.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   tensorflow
