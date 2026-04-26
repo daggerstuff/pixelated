@@ -48,7 +48,7 @@
     "allowArbitraryExtensions": true,
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
-    "types": ["node", "react", "react-dom", "vitest/globals"],
+    "types": ["node", "react", "react-dom"],
     "typeRoots": [
       "../node_modules/@types",
       "./node_modules/@types",

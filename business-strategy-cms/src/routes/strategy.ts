@@ -1,8 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-
 import { Router } from 'express'
-
+import { authenticateToken, requireAdmin } from '../middleware/auth'
 import { DocumentModelMongoose } from '../models/DocumentMongoose'
 import { AIStrategyReviewService } from '../services/aiStrategyReviewService'
 import { EdgeCaseMappingService } from '../services/edgeCaseMappingService'
@@ -42,7 +41,6 @@ function getSourceFile(
   if (!customFields) {
     return undefined
   }
-
   const v = customFields['source_file']
   return typeof v === 'string' ? v : undefined
 }
@@ -54,7 +52,7 @@ function getSourceFile(
  * - Their AI feasibility scores
  * - Mapped technical edge cases (The "Reality")
  */
-router.get('/dashboard', async (_req, res) => {
+router.get('/dashboard', authenticateToken, async (_req, res) => {
   try {
     const documents = (await DocumentModelMongoose.find({}, undefined, {
       lean: true,
@@ -64,7 +62,6 @@ router.get('/dashboard', async (_req, res) => {
     // Since we ran the import script, metadata should be populated.
     // However, if new documents are added, we might want to trigger a check.
     // For this dashboard, we'll return the stored metadata + a summary.
-
     const dashboardData = documents.map((doc: LeanStrategyDoc) => {
       const metadata = getMetadataRecord(doc.metadata)
       const aiScore = getMetadataNumber(metadata, 'reviewScore')
@@ -116,13 +113,14 @@ router.get('/dashboard', async (_req, res) => {
 })
 
 /** Returns list of imported source_file paths and last import timestamp (from import script). */
-router.get('/sources', (_req, res) => {
+router.get('/sources', authenticateToken, (_req, res) => {
   try {
     if (!fs.existsSync(LAST_IMPORT_FILE)) {
       return res.json({ sources: [], lastImport: null })
     }
     const raw = fs.readFileSync(LAST_IMPORT_FILE, 'utf8')
     const data = JSON.parse(raw) as { sources?: string[]; lastImport?: string }
+
     return res.json({
       sources: Array.isArray(data.sources) ? data.sources : [],
       lastImport: typeof data.lastImport === 'string' ? data.lastImport : null,
@@ -135,7 +133,7 @@ router.get('/sources', (_req, res) => {
 })
 
 // Trigger a fresh re-analysis (manual refresh)
-router.post('/refresh-analysis', async (_req, res) => {
+router.post('/refresh-analysis', authenticateToken, requireAdmin, async (_req, res) => {
   try {
     const documents = await DocumentModelMongoose.find({})
 

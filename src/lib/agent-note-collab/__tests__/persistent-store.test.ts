@@ -98,6 +98,9 @@ describe('PersistentTurnLedger', () => {
     })
 
     expect(submitResult.ok).toBe(true)
+    if (!submitResult.ok) {
+      throw new Error('Expected submitResult to be ok')
+    }
     expect(inMemory.nextTurnIdForArtifact(artifactId)).toBe(
       `${artifactId}#turn-00002`,
     )

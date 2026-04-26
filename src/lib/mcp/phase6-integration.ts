@@ -59,6 +59,8 @@ export type AuthenticationEvent =
   | `risk_assessment_${number}`
   | `role_assigned_${string}`
   | `role_removed_${string}`
+  | `social_account_linked_${string}`
+  | `social_account_unlinked_${string}`
 
 /**
  * Update Phase 6 authentication progress

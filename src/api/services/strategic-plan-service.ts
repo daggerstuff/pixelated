@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 
-import { slug } from '@/utils/common'
+import { slug } from '../../utils/common'
 
 // Strategic Plans Service Layer
 import {

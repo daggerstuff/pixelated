@@ -69,7 +69,7 @@ describe('SessionCard', () => {
   it('handles missing progress metrics gracefully', () => {
     const sessionWithoutMetrics = {
       ...mockSession,
-      progressMetrics: undefined,
+      progressMetrics: {},
     }
     render(<SessionCard session={sessionWithoutMetrics} />)
 

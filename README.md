@@ -129,6 +129,36 @@ for complete details.
 
 <div style="text-align: center;">
 
+## System Architecture
+
+Pixelated Empathy is organized as a modular system with clearly separated
+concerns:
+
+### Core Components (This Repository)
+
+- **AI Services**: Python-based machine learning models and inference engines (`ai/`)
+- **Web Platform**: Astro + React frontend with Node.js/TypeScript backend (`src/`)
+- **Backend Services**: Express.js APIs, workers, and data processing services
+- **Integration Layer**: Model Context Protocol (MCP) servers for external connectivity
+- **Data Layer**: MongoDB, Redis, and specialized databases for research and operations
+- **Research Pipeline**: Tools for discovering, evaluating, and integrating therapeutic datasets
+
+### Related Systems (Separate Repositories)
+
+Blockchain components for Pixelated Empathy's multi-chain architecture are maintained in dedicated repositories:
+
+- **EVM Chain**: Smart contracts (EscrowRegistryV2.sol, UUPS upgradeable patterns)
+- **Solana Chain**: Anchor programs for on-chain functionality
+- **Infrastructure**: Deployment scripts, configuration, and DevOps tooling
+- **Cross-chain Communication**: Bridges and messaging systems between chains
+
+This repository focuses on the AI, web, and backend layers that provide the
+empathy-powered user experience and intelligent services.
+
+</div>
+
+<div style="text-align: center;">
+
 ## Enterprise-Grade. Enterprise-Focused.
 
 Built with the same technologies that power the world's most demanding
@@ -142,7 +172,7 @@ applications.
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker)
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest)
-![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright)
+![Playwright](https://img.shields.io/badge(Playwright-2EAD33?style=for-the-badge&logo=playwright)
 
 </div>
 
