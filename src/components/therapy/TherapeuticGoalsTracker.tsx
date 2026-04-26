@@ -115,9 +115,11 @@ export function TherapeuticGoalsTracker({
     const map = new Map<string, typeof therapistInterventions>()
 
     goalInterventionsMap.forEach((relatedInterventionTypes, goalId) => {
-      const matches: typeof therapistInterventions = []
+      // ⚡ Bolt: Convert array to Set for O(1) lookups instead of O(N) Array.includes()
+      const typeSet = new Set(relatedInterventionTypes)
+      const matches = []
       for (const intervention of therapistInterventions) {
-        if (relatedInterventionTypes.includes(intervention.type)) {
+        if (typeSet.has(intervention.type)) {
           matches.push(intervention)
           if (matches.length === 3) break
         }
@@ -879,13 +881,7 @@ function generateCheckpoints(
   completedAt?: number
   notes?: string
 }> {
-  const checkpoints: Array<{
-    id: string
-    description: string
-    isCompleted: boolean
-    completedAt?: number
-    notes?: string
-  }> = []
+  const checkpoints = []
   const lowerTopic = topic.toLowerCase()
 
   // Common checkpoints based on therapy frameworks
@@ -933,11 +929,7 @@ function generateProgressHistory(
   progressPercent: number
   notes: string
 }> {
-  const history: Array<{
-    timestamp: number
-    progressPercent: number
-    notes: string
-  }> = []
+  const history = []
 
   for (let i = 0; i < count; i++) {
     const weeksAgo = count - i
@@ -972,7 +964,7 @@ function generateInterventionTypes(_topic: string): string[] {
 
   // Pick 2-3 random interventions
   const count = 2 + Math.floor(Math.random() * 2)
-  const interventions: string[] = []
+  const interventions = []
 
   for (let i = 0; i < count; i++) {
     const randomIndex = Math.floor(Math.random() * commonInterventions.length)
