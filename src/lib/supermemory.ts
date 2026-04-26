@@ -1,4 +1,26 @@
-import { createClient } from '@supermemory/tools/ai-sdk'
+import * as supermemoryTools from '@supermemory/tools/ai-sdk'
+
+type SupermemoryModule = {
+  createClient?: (
+    apiKey: string | undefined,
+    options?: { containerTags?: string[] },
+  ) => {
+    profile: (params: { containerTag: string; q: string }) => Promise<{
+      profile: { static: string[]; dynamic: string[] }
+      searchResults: { results: Array<{ memory: string }> } | null
+    }>
+    add: (params: { content: string; containerTag: string }) => Promise<unknown>
+  }
+}
+
+const createClient =
+  (supermemoryTools as unknown as SupermemoryModule).createClient ?? null
+
+if (!createClient) {
+  throw new Error(
+    'Supermemory SDK missing createClient export; check @supermemory/tools/ai-sdk version.',
+  )
+}
 
 // Initialize Supermemory client with your API key
 export const supermemoryClient = createClient(process.env.SUPERMEMORY_API_KEY, {

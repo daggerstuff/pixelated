@@ -11,6 +11,31 @@ interface TodoProps {
   initialTodos?: TodoItem[]
 }
 
+const isTodoItem = (value: unknown): value is TodoItem => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const todo = value as {
+    id?: unknown
+    text?: unknown
+    completed?: unknown
+  }
+  return (
+    typeof todo.id === 'string' &&
+    typeof todo.text === 'string' &&
+    typeof todo.completed === 'boolean'
+  )
+}
+
+const parseTodoItems = (value: unknown): TodoItem[] | null => {
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  return value.filter(isTodoItem)
+}
+
 export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -19,7 +44,12 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
     const loadTodos = (): TodoItem[] => {
       try {
         const savedTodos = localStorage.getItem('todos')
-        return savedTodos ? JSON.parse(savedTodos) : initialTodos
+        if (!savedTodos) {
+          return initialTodos
+        }
+
+        const parsedTodos: unknown = JSON.parse(savedTodos)
+        return parseTodoItems(parsedTodos) ?? initialTodos
       } catch (err: unknown) {
         console.error('Error loading todos:', err)
         return initialTodos

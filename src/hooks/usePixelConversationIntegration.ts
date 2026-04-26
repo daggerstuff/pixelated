@@ -18,11 +18,11 @@ import {
   PixelConversationIntegration,
   createPixelIntegration,
   type PixelIntegrationConfig,
-  type PixelInferenceResponse,
   type EQMetricsAggregate,
   type CrisisDetectionStatus,
   type BiasFlag,
 } from '@/lib/pixel-conversation-integration'
+import { type PixelInferenceResponse } from '@/types/pixel'
 
 export interface UsePixelConversationIntegrationOptions extends PixelIntegrationConfig {
   sessionId: string

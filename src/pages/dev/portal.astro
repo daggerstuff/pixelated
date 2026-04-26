@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Card from '../../components/ui/Card.astro';
+import CardHeader from '../../components/ui/CardHeader.astro';
+import CardTitle from '../../components/ui/CardTitle.astro';
+import CardContent from '../../components/ui/CardContent.astro';
+import Button from '../../components/ui/Button.astro';
+
+// MANDATE: Live Registry Stats for Task D.1
+// In Astro, this server-side script runs at build/request time
+import sqlite3 from 'better-sqlite3';
+const db = new sqlite3('/home/vivi/pixelated/ai/training_corpus/assets/registry.db');
+const stats = db.prepare('SELECT COUNT(*) as shards, SUM(total_records) as records FROM sources').get();
+db.close();
+
+const totalShards = stats.shards;
+const totalRecords = stats.records;
+const sdkVersion = "0.42.0-beta";
+---
+
+<Layout title="Developer Portal | Pixelated">
+  <main class="max-w-6xl mx-auto p-8 space-y-12">
+    <div class="space-y-4">
+      <h1 class="text-4xl font-bold tracking-tight text-primary">Developer Portal</h1>
+      <p class="text-xl text-muted-foreground">Access the world's largest therapeutic dataset manifest.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Corpus Metrics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="text-3xl font-bold">{totalRecords.toLocaleString()}</div>
+          <p class="text-sm text-muted-foreground">Records Tracked</p>
+          <div class="mt-4 text-2xl font-semibold">{totalShards}</div>
+          <p class="text-sm text-muted-foreground">S3 Shards Linked</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>API Credentials</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div class="p-4 bg-muted rounded-md font-mono text-xs break-all">
+            pix_live_xxxxxxxxxxxxxxxxxxxxxxxx
+          </div>
+          <div class="flex gap-2">
+            <Button size="sm">Regenerate</Button>
+          </div>
+          <p class="text-[10px] text-muted-foreground">
+            MANDATE: All requests must include <code>X-Pixelated-Client</code>.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>SDK Status</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div class="flex justify-between items-center text-sm">
+            <span>Version</span>
+            <span class="badge bg-primary text-primary-foreground px-2 py-0.5 rounded text-[10px]">{sdkVersion}</span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span>Env</span>
+            <span class="text-green-500 font-medium">Production</span>
+          </div>
+          <Button variant="secondary" size="sm" class="w-full">Docs (PDF)</Button>
+        </CardContent>
+      </Card>
+    </div>
+
+    <div class="space-y-6">
+      <h2 class="text-2xl font-semibold">Quick Start</h2>
+      <div class="bg-zinc-950 text-zinc-50 p-6 rounded-xl font-mono text-sm overflow-x-auto shadow-2xl">
+        <pre><code># Install the SDK
+pnpm add @pixelated/sdk
+
+# Initialize your client using the package export available in your app.
+# Example (replace with your actual SDK binding):
+const client = new PixelatedClient(&#123;
+  apiKey: 'YOUR_API_KEY',
+  clientId: 'your-app-id',
+&#125;);
+
+# Stream from the 133M corpus
+const audit = await client.training.stream(&#123; family: 'therapeutic' &#125;);
+console.log(`Tracking $&#123;audit.total_shards&#125; shards...`);</code></pre>
+      </div>
+    </div>
+  </main>
+</Layout>

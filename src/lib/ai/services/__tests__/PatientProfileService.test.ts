@@ -1,8 +1,18 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  vi,
+  type Mocked,
+} from 'vitest'
 
 import { KVStore } from '../../../db/KVStore'
 import type { PatientProfile } from '../../models/patient'
-import type { TherapeuticProgress } from '../../types/CognitiveModel'
+import type {
+  SkillAcquired,
+  TherapeuticProgress,
+} from '../../types/CognitiveModel'
 import {
   PatientProfileService,
   type ProfileIdentifier,
@@ -12,13 +22,13 @@ import {
 vi.mock('../../../db/KVStore')
 
 describe('PatientProfileService', () => {
-  let mockKvStore: vi.Mocked<KVStore>
+  let mockKvStore: Mocked<KVStore>
   let patientProfileService: PatientProfileService
   let sampleProfile: PatientProfile
   const profilePrefix = 'profile_'
 
   beforeEach(() => {
-    mockKvStore = new KVStore('test_profiles', false) as vi.Mocked<KVStore>
+    mockKvStore = new KVStore('test_profiles', false) as Mocked<KVStore>
     patientProfileService = new PatientProfileService(mockKvStore)
 
     const initialTherapeuticProgress: TherapeuticProgress = {
@@ -30,7 +40,13 @@ describe('PatientProfileService', () => {
       rapportScore: 6, // Initial test value
       therapistPerception: 'neutral', // Initial test value
       transferenceState: 'none', // Initial test value
-      skillsAcquired: ['basic coping skills'], // Required property
+      skillsAcquired: [
+        {
+          skillName: 'basic coping skills',
+          dateAchieved: new Date().toISOString(),
+          proficiency: 0.5,
+        } as SkillAcquired,
+      ], // Required property
     }
 
     sampleProfile = {
@@ -70,6 +86,7 @@ describe('PatientProfileService', () => {
         conversationalStyle: {
           verbosity: 5,
           emotionalExpressiveness: 5,
+          resistance: 5,
           insightLevel: 5,
           preferredCommunicationModes: [],
         },
@@ -89,7 +106,7 @@ describe('PatientProfileService', () => {
 
   describe('saveProfile and getProfileById', () => {
     it('should save and retrieve a profile including new therapeutic alliance metrics', async () => {
-      mockKvStore.set.mockResolvedValue(undefined) // Simulate successful save
+    mockKvStore.set.mockResolvedValue(undefined)
       mockKvStore.get.mockResolvedValue(sampleProfile) // Simulate retrieval
 
       await patientProfileService.saveProfile(sampleProfile)
@@ -125,7 +142,7 @@ describe('PatientProfileService', () => {
       const oldTimestamp = new Date(Date.now() - 100000).toISOString()
       const profileToSave = { ...sampleProfile, lastUpdatedAt: oldTimestamp }
 
-      mockKvStore.set.mockResolvedValue(undefined)
+    mockKvStore.set.mockResolvedValue(undefined)
 
       await patientProfileService.saveProfile(profileToSave)
 

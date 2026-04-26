@@ -83,7 +83,8 @@ export interface MentalHealthAnalysis {
 }
 
 export interface ExtendedMessage extends Message {
-  mentalHealthAnalysis?: MentalHealthAnalysis | undefined
+  mentalHealthAnalysis?: MentalHealthAnalysis | MentalHealthChatAnalysis | undefined
+  activities?: AgentActivity[]
   metadata?: {
     interventionType?: 'immediate' | 'preventive' | 'supportive'
     requiresFollowUp?: boolean
@@ -122,4 +123,47 @@ export interface MentalHealthChatAnalysis {
 // Therapeutic interventions interface
 export interface TherapeuticInterventions {
   generateIntervention: (config: InterventionConfig) => Promise<string>
+}
+
+/**
+ * Agent activity status
+ */
+export type AgentActivityStatus = 'thinking' | 'acting' | 'completed' | 'error'
+
+/**
+ * Type of agent activity
+ */
+export type AgentActivityType = 'thought' | 'action' | 'observation' | 'tool_use'
+
+/**
+ * Represents a single activity from an agent in a multi-agent system
+ */
+export interface AgentActivity {
+  id: string
+  agentName: string
+  agentRole?: string
+  type: AgentActivityType
+  content: string
+  thought?: string
+  action?: string
+  observation?: string
+  status: AgentActivityStatus
+  timestamp: number
+  metadata?: Record<string, unknown>
+  shared_state?: Record<string, unknown>
+  conflict?: {
+    withAgent: string
+    severity: 'low' | 'medium' | 'high'
+    description: string
+  }
+}
+
+/**
+ * Collection of activities for a specific turn or task
+ */
+export interface AgentActivityStream {
+  activities: AgentActivity[]
+  overallStatus: AgentActivityStatus
+  startTime: number
+  endTime?: number
 }

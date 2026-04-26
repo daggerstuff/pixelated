@@ -48,7 +48,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     alerts: [
       {
         alertId: 'alert-1',
-        timestamp: '2024-01-15T09:30:00.000Z',
+        timestamp: new Date('2024-01-15T09:30:00.000Z'),
         level: 'high',
         type: 'high_bias',
         message: 'High bias detected in therapeutic session',
@@ -57,7 +57,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       },
       {
         alertId: 'alert-2',
-        timestamp: '2024-01-15T08:45:00.000Z',
+        timestamp: new Date('2024-01-15T08:45:00.000Z'),
         level: 'medium',
         type: 'medium_bias',
         message: 'Medium bias detected in therapeutic session',
@@ -111,7 +111,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     recentAnalyses: [
       {
         sessionId: 'session-123',
-        timestamp: '2024-01-15T09:30:00.000Z',
+        timestamp: new Date('2024-01-15T09:30:00.000Z'),
         overallBiasScore: 0.75,
         layerResults: {
           preprocessing: {
@@ -238,7 +238,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       headers: {
         get: vi.fn((key: string) => defaultHeaders[key.toLowerCase()] || null),
       },
-    }
+    } as unknown as Request
   }
 
   beforeEach(async () => {
@@ -552,7 +552,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
             return headers[key.toLowerCase()] || null
           }),
         },
-      }
+      } as unknown as Request
 
       const response = await GET({ request } as { request: Request })
 

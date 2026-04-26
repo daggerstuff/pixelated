@@ -6,9 +6,8 @@ type AstroRenderFunction = (
   options?: AstroRenderOptions,
 ) => Promise<AstroRenderResult> | AstroRenderResult
 
-export type AstroComponentFactory = {
-  name?: string
-  render: (
+export type AstroComponentFactory = Record<string, unknown> & {
+  render?: (
     props: Record<string, unknown>,
     options?: AstroRenderOptions,
   ) => Promise<AstroRenderResult> | AstroRenderResult
@@ -43,7 +42,7 @@ function extractHtml(renderResult: unknown): string {
 export async function renderAstro<
   Props extends Record<string, unknown> = Record<string, unknown>,
 >(
-  Component: AstroComponentFactory | AstroRenderFunction,
+  Component: unknown,
   props?: Props,
   slotContent?: string,
 ): Promise<{
@@ -61,9 +60,22 @@ export async function renderAstro<
         },
       }
     : undefined
-  const resolvedHtml = await (typeof Component === 'function'
-    ? Promise.resolve(Component(renderProps, renderSlots))
-    : Component.render(renderProps, renderSlots))
+  const resolvedHtml = await (async () => {
+    if (typeof Component === 'function') {
+      return Promise.resolve(
+        (Component as AstroRenderFunction)(renderProps, renderSlots),
+      )
+    }
+
+    const factory = Component as AstroComponentFactory
+    if (factory && typeof factory.render === 'function') {
+      return Promise.resolve(factory.render(renderProps, renderSlots))
+    }
+
+    return Promise.resolve(
+      '' as unknown as AstroRenderResult,
+    )
+  })()
   const html = extractHtml(resolvedHtml)
   const container = document.createElement('div')
   container.innerHTML = html

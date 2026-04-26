@@ -103,6 +103,7 @@ export interface LLMInvocationOptions {
 export interface LLMResponse {
   content: string
   finishReason?: 'stop' | 'length' | 'content_filter' | 'function_call'
+  usage?: Record<string, unknown>
   tokenUsage?: {
     promptTokens: number
     completionTokens: number
