@@ -89,7 +89,7 @@ describe("IndexedDBRequestQueue", () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
+          openRequest.onsuccess?.({ target: openRequest } as unknown as Event);
         }, 0);
         return openRequest;
       });
@@ -254,8 +254,10 @@ describe("IndexedDBRequestQueue", () => {
       // Add a request
       const request = {
         url: "/test",
-        method: "GET",
+        method: "GET" as const,
         headers: {},
+        priority: "normal" as const,
+        maxRetries: 3,
       };
       queue.add(request);
 
@@ -280,8 +282,20 @@ describe("IndexedDBRequestQueue", () => {
   describe("clear", () => {
     it("should clear all requests", () => {
       // Add some requests
-      queue.add({ url: "/test1", method: "GET", headers: {} });
-      queue.add({ url: "/test2", method: "POST", headers: {} });
+      queue.add({
+        url: "/test1",
+        method: "GET",
+        headers: {},
+        priority: "normal",
+        maxRetries: 3,
+      });
+      queue.add({
+        url: "/test2",
+        method: "POST",
+        headers: {},
+        priority: "normal",
+        maxRetries: 3,
+      });
 
       // Clear queue
       queue.clear();
@@ -299,21 +313,36 @@ describe("IndexedDBRequestQueue", () => {
         method: "GET",
         headers: {},
         priority: "critical",
+        maxRetries: 3,
       });
-      queue.add({ url: "/high", method: "GET", headers: {}, priority: "high" });
+      queue.add({
+        url: "/high",
+        method: "GET",
+        headers: {},
+        priority: "high",
+        maxRetries: 3,
+      });
       queue.add({
         url: "/normal1",
         method: "GET",
         headers: {},
         priority: "normal",
+        maxRetries: 3,
       });
       queue.add({
         url: "/normal2",
         method: "GET",
         headers: {},
         priority: "normal",
+        maxRetries: 3,
       });
-      queue.add({ url: "/low", method: "GET", headers: {}, priority: "low" });
+      queue.add({
+        url: "/low",
+        method: "GET",
+        headers: {},
+        priority: "low",
+        maxRetries: 3,
+      });
 
       const stats = queue.getStats();
 
@@ -323,13 +352,19 @@ describe("IndexedDBRequestQueue", () => {
       expect(stats.byPriority.normal).toBe(2);
       expect(stats.byPriority.low).toBe(1);
       expect(stats.oldestRequest).toBeGreaterThan(0);
-      expect(stats.newestRequest).toBeGreaterThan(stats.oldestRequest);
+      expect(stats.newestRequest).toBeGreaterThan(stats.oldestRequest ?? 0);
     });
   });
 
   describe("hasPendingRequests", () => {
     it("should return true when queue has items", () => {
-      queue.add({ url: "/test", method: "GET", headers: {} });
+      queue.add({
+        url: "/test",
+        method: "GET",
+        headers: {},
+        priority: "normal",
+        maxRetries: 3,
+      });
       expect(queue.hasPendingRequests()).toBe(true);
     });
 
