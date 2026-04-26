@@ -430,7 +430,7 @@ export function transformSessionForPython(session: TherapeuticSession): any {
     },
     scenario: session.scenario,
     content: session.content,
-    ai_responses: session.aiResponses.map((r) => ({
+    ai_responses: (session.aiResponses ?? []).map((r) => ({
       response_id: r.responseId,
       timestamp: r.timestamp.toISOString(),
       type: r.type,
@@ -439,7 +439,7 @@ export function transformSessionForPython(session: TherapeuticSession): any {
       model_used: r.modelUsed,
     })),
     expected_outcomes: session.expectedOutcomes,
-    transcripts: session.transcripts.map((t) => ({
+    transcripts: (session.transcripts ?? []).map((t) => ({
       speaker_id: t.speakerId,
       timestamp: t.timestamp.toISOString(),
       content: t.content,

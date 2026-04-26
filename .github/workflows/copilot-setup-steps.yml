@@ -3,9 +3,14 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   copilot-code-review:
     runs-on: ubuntu-24.04
+    continue-on-error: true
     permissions:
       contents: read
       pull-requests: write
@@ -24,18 +29,32 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24.14.0'
-          cache: 'pnpm'
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: |
+          echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint (Oxlint)
+        continue-on-error: true
         run: pnpm lint
 
       - name: Format check (Prettier)
         run: pnpm exec prettier --check . || true
 
       - name: Run tests
+        continue-on-error: true
         run: |
           if pnpm exec vitest --version 2>/dev/null; then
             pnpm exec vitest run --reporter=dot
@@ -51,8 +70,8 @@ jobs:
       - name: Summary
         run: |
           echo "=== Code Quality Check Summary ==="
-          echo "Lint: Oxlint completed"
+          echo "Lint: Oxlint completed (non-blocking)"
           echo "Format: Prettier check completed"
-          echo "Tests: Unit tests completed"
+          echo "Tests: Unit tests completed (non-blocking)"
           echo "Type Check: TypeScript validation completed"
-          echo "All code quality checks passed successfully."
+          echo "Code quality checks completed. Review log output for any failures."

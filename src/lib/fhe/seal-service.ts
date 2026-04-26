@@ -179,7 +179,7 @@ export interface ExtendedSerializedSealKeys extends SerializedSealKeys {
  * Main service for SEAL operations
  */
 export class SealService {
-  private static instance: SealService
+  private static instance: SealService | null = null
   private sealContext: SealContext | null = null
   private memoryManager = new SealMemoryManager()
 

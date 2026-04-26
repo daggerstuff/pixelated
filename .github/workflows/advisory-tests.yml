@@ -18,6 +18,10 @@ on:
   pull_request:
     branches: [main, master, staging]
 
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   advisory-test-suite:
     runs-on: ubuntu-latest
@@ -36,13 +40,25 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10.33.0
+          version: 10.33.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24.x'
-          cache: 'pnpm'
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: |
+          echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

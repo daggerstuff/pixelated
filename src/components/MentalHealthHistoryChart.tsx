@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 
 // Use lazy-loaded chart components to reduce bundle size
 import {
@@ -22,22 +22,30 @@ interface MentalHealthHistoryChartProps {
     hasMentalHealthIssue: boolean
     confidence: number
     supportingEvidence: string[]
-    scores: {
-      depression: number
-      anxiety: number
-      stress: number
-      anger: number
-      socialIsolation: number
-      bipolarDisorder: number
-      ocd: number
-      eatingDisorder: number
-      socialAnxiety: number
-      panicDisorder: number
-    }
+    scores: ScoreValues
   }>
 }
 
-const SCORE_COLORS = {
+const SCORE_KEYS = [
+  'anger',
+  'anxiety',
+  'bipolarDisorder',
+  'depression',
+  'eatingDisorder',
+  'ocd',
+  'panicDisorder',
+  'socialAnxiety',
+  'socialIsolation',
+  'stress',
+] as const
+
+type ScoreMetric = (typeof SCORE_KEYS)[number]
+
+type ScoreValues = {
+  [K in ScoreMetric]: number
+}
+
+const SCORE_COLORS: Record<ScoreMetric, string> = {
   depression: '#ef4444',
   anxiety: '#f97316',
   stress: '#eab308',
@@ -50,7 +58,7 @@ const SCORE_COLORS = {
   panicDisorder: '#6366f1',
 }
 
-const SCORE_LABELS = {
+const SCORE_LABELS: Record<ScoreMetric, string> = {
   depression: 'Depression',
   anxiety: 'Anxiety',
   stress: 'Stress',
@@ -63,7 +71,27 @@ const SCORE_LABELS = {
   panicDisorder: 'Panic Disorder',
 }
 
-export function MentalHealthHistoryChart({
+const isScoreMetric = (metric: string): metric is ScoreMetric =>
+  Object.prototype.hasOwnProperty.call(SCORE_LABELS, metric)
+
+const getScoreLabel = (metric: string): string =>
+  isScoreMetric(metric) ? SCORE_LABELS[metric] : metric
+
+const mapLatestScore = (
+  scoreMetric: ScoreMetric,
+  scoreValue: number,
+): {
+  metric: string
+  score: number
+  fullMark: number
+} => ({
+  metric: getScoreLabel(scoreMetric),
+  score: Math.round(scoreValue * 100),
+  fullMark: 100,
+})
+
+// ⚡ Bolt: Prevent expensive re-renders of Recharts SVG components on every keystroke in parent
+export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
   analysisHistory,
 }: MentalHealthHistoryChartProps) {
   const { timeSeriesData, latestScores, hasData } = useMemo(() => {
@@ -79,13 +107,8 @@ export function MentalHealthHistoryChart({
 
     const latest = analysisHistory[analysisHistory.length - 1]
     const latestScores = latest?.scores
-      ? Object.entries(latest.scores)
-          .filter(([, value]) => value > 0)
-          .map(([key, value]) => ({
-            metric: SCORE_LABELS[key as keyof typeof SCORE_LABELS] || key,
-            score: Math.round(value * 100),
-            fullMark: 100,
-          }))
+      ? SCORE_KEYS.map((key) => mapLatestScore(key, latest.scores[key]))
+          .filter((entry) => entry.score > 0)
           .sort((a, b) => b.score - a.score)
       : []
 
@@ -205,7 +228,7 @@ export function MentalHealthHistoryChart({
                 }}
                 formatter={(value: number, name: string) => [
                   `${Math.round(value * 100)}%`,
-                  SCORE_LABELS[name as keyof typeof SCORE_LABELS] || name,
+                  getScoreLabel(name),
                 ]}
                 labelFormatter={(label: string | number) => `Session ${label}`}
               />
@@ -222,9 +245,7 @@ export function MentalHealthHistoryChart({
               ))}
               <Legend
                 wrapperStyle={{ fontSize: '10px' }}
-                formatter={(value: string) =>
-                  SCORE_LABELS[value as keyof typeof SCORE_LABELS] || value
-                }
+                formatter={(value: string) => getScoreLabel(value)}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -232,4 +253,4 @@ export function MentalHealthHistoryChart({
       )}
     </div>
   )
-}
+})

@@ -35,7 +35,6 @@ export class MentalLLaMAAdapter {
   private expertGuidanceOrchestrator: ExpertGuidanceOrchestrator;
 
   // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
-  // @ts-expect-error: Module may not exist in all environments
   private crisisSessionFlaggingServiceImport?: Promise<unknown>;
 
   constructor(options: MentalLLaMAAdapterOptions) {
@@ -54,7 +53,6 @@ export class MentalLLaMAAdapter {
     );
     // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
     try {
-      // @ts-expect-error: Module may not exist in all environments
       this.crisisSessionFlaggingServiceImport = import(
         "../../crisis/CrisisSessionFlaggingService.ts"
       );
@@ -383,10 +381,17 @@ export class MentalLLaMAAdapter {
           explanation?: string;
           supportingEvidence?: string[];
         };
+        const parsedConfidence =
+          typeof parsedLlmResponse.confidence === "number"
+            ? parsedLlmResponse.confidence
+            : parseFloat(
+                typeof parsedLlmResponse.confidence === "string"
+                  ? parsedLlmResponse.confidence
+                  : String(analysisConfidence),
+              );
         llmAnalysisResult.mentalHealthCategory =
           parsedLlmResponse.mentalHealthCategory || categoryForPrompt;
-        llmAnalysisResult.confidence =
-          parseFloat(parsedLlmResponse.confidence) || analysisConfidence;
+        llmAnalysisResult.confidence = parsedConfidence || analysisConfidence;
         llmAnalysisResult.explanation =
           parsedLlmResponse.explanation || "No explanation provided by LLM.";
         llmAnalysisResult.supportingEvidence = parsedLlmResponse.supportingEvidence || [];
@@ -397,18 +402,22 @@ export class MentalLLaMAAdapter {
         if (categories === "auto_route" && routingDecisionStore) {
           if (
             parsedLlmResponse.mentalHealthCategory &&
-            parsedLlmResponse.mentalHealthCategory !== routingDecisionStore.targetAnalyzer &&
-            (parsedLlmResponse.confidence ?? 0) > routingDecisionStore.confidence
+            parsedLlmResponse.mentalHealthCategory !==
+              routingDecisionStore.targetAnalyzer &&
+            (parsedConfidence ?? 0) > routingDecisionStore.confidence
           ) {
             logger.info(
               `LLM analysis refined category from ${routingDecisionStore.targetAnalyzer} to ${parsedLlmResponse.mentalHealthCategory}`,
             );
             llmAnalysisResult.mentalHealthCategory = parsedLlmResponse.mentalHealthCategory;
           }
-          llmAnalysisResult.confidence = Math.max(analysisConfidence, parsedLlmResponse.confidence);
+          llmAnalysisResult.confidence = Math.max(
+            analysisConfidence,
+            parsedConfidence,
+          );
         } else if (parsedLlmResponse.mentalHealthCategory) {
           llmAnalysisResult.mentalHealthCategory = parsedLlmResponse.mentalHealthCategory;
-          llmAnalysisResult.confidence = parsedLlmResponse.confidence;
+          llmAnalysisResult.confidence = parsedConfidence;
         }
       } catch (parseError) {
         logger.error("Failed to parse LLM JSON response for analysis", {

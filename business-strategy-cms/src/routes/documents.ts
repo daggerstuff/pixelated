@@ -9,6 +9,7 @@ import { DocumentService } from '@/services/documentService'
 import {
   DocumentCreate,
   DocumentUpdate,
+  DocumentMetadata,
   DocumentCategory,
   DocumentStatus,
   DocumentSearchFilters,
@@ -16,8 +17,144 @@ import {
 
 const router = Router()
 
+type DocumentRequest = AuthenticatedRequest<
+  Record<string, string>,
+  Record<string, unknown>,
+  Record<string, unknown>
+>
+
+const parseStringArray = (value: unknown): string[] | undefined => {
+  if (!Array.isArray(value)) return undefined
+
+  const items = value
+  const validItems: string[] = []
+
+  for (const item of items) {
+    if (typeof item === 'string' && item.length > 0) {
+      validItems.push(item)
+    }
+  }
+
+  return validItems.length > 0 ? validItems : undefined
+}
+
+const isDocumentCategory = (value: unknown): value is DocumentCategory =>
+  value === DocumentCategory.BUSINESS_PLAN ||
+  value === DocumentCategory.MARKET_ANALYSIS ||
+  value === DocumentCategory.COMPETITIVE_ANALYSIS ||
+  value === DocumentCategory.MARKETING_STRATEGY ||
+  value === DocumentCategory.FINANCIAL_PROJECTION ||
+  value === DocumentCategory.OPERATIONS_PLAN ||
+  value === DocumentCategory.EXECUTIVE_SUMMARY ||
+  value === DocumentCategory.CUSTOM
+
+const isDocumentStatus = (value: unknown): value is DocumentStatus =>
+  value === DocumentStatus.DRAFT ||
+  value === DocumentStatus.IN_REVIEW ||
+  value === DocumentStatus.APPROVED ||
+  value === DocumentStatus.PUBLISHED ||
+  value === DocumentStatus.ARCHIVED
+
+const parseMetadata = (value: unknown): Partial<DocumentMetadata> | undefined => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return undefined
+  }
+
+  return value
+}
+
+const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
+  const title = typeof body['title'] === 'string' ? body['title'].trim() : ''
+  const content = typeof body['content'] === 'string' ? body['content'].trim() : ''
+  const category = isDocumentCategory(body['category']) ? body['category'] : undefined
+
+  if (!title) {
+    throw new Error('Title is required')
+  }
+
+  if (!content) {
+    throw new Error('Content is required')
+  }
+
+  if (!category) {
+    throw new Error('Category is required')
+  }
+
+  const createPayload: DocumentCreate = {
+    title,
+    content,
+    category,
+  }
+
+  const summary = typeof body['summary'] === 'string' ? body['summary'].trim() : undefined
+  if (summary !== undefined) {
+    createPayload.summary = summary
+  }
+
+  const tags = parseStringArray(body['tags'])
+  if (tags !== undefined) {
+    createPayload.tags = tags
+  }
+
+  if (typeof body['parentDocumentId'] === 'string') {
+    createPayload.parentDocumentId = body['parentDocumentId']
+  }
+
+  if (isDocumentStatus(body['status'])) {
+    createPayload.status = body['status']
+  }
+
+  const collaborators = parseStringArray(body['collaborators'])
+  if (collaborators !== undefined) {
+    createPayload.collaborators = collaborators
+  }
+
+  const metadata = parseMetadata(body['metadata'])
+  if (metadata !== undefined) {
+    createPayload.metadata = metadata
+  }
+
+  return createPayload
+}
+
+const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
+  const updates: DocumentUpdate = {}
+
+  if (typeof body['title'] === 'string' && body['title'].trim().length > 0) {
+    updates.title = body['title'].trim()
+  }
+
+  if (typeof body['content'] === 'string' && body['content'].trim().length > 0) {
+    updates.content = body['content'].trim()
+  }
+
+  if (typeof body['summary'] === 'string') {
+    updates.summary = body['summary'].trim()
+  }
+
+  if (isDocumentCategory(body['category'])) {
+    updates.category = body['category']
+  }
+
+  const tags = parseStringArray(body['tags'])
+  if (tags) {
+    updates.tags = tags
+  }
+
+  if (isDocumentStatus(body['status'])) {
+    updates.status = body['status']
+  }
+
+  const metadata = parseMetadata(body['metadata'])
+  if (metadata) {
+    updates.metadata = metadata
+  }
+
+  return updates
+}
+
 const getRouteParam = (
-  req: AuthenticatedRequest,
+  req: DocumentRequest,
   key: string,
 ): string | null => {
   const value = req.params[key]
@@ -25,15 +162,15 @@ const getRouteParam = (
 }
 
 const getBodyString = (
-  req: AuthenticatedRequest,
+  req: DocumentRequest,
   key: string,
 ): string | null => {
-  const value = req.body?.[key]
+  const value = req.body[key]
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
 const getQueryString = (
-  req: AuthenticatedRequest,
+  req: DocumentRequest,
   key: string,
 ): string | undefined => {
   const value = req.query[key]
@@ -56,9 +193,9 @@ router.post(
   '/',
   authenticateToken,
   requireCreator,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
-      const documentData: DocumentCreate = req.body
+      const documentData = parseDocumentCreate(req.body)
       const authorId = req.user!.userId
 
       const document = await DocumentService.createDocument(
@@ -84,7 +221,7 @@ router.post(
 )
 
 // Get all documents with filters
-router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
+router.get('/', authenticateToken, async (req: DocumentRequest, res) => {
   try {
     const filters: DocumentSearchFilters = {}
     const category = getQueryString(req, 'category')
@@ -93,12 +230,12 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
     const tags = getQueryString(req, 'tags')
     const searchTerm = getQueryString(req, 'search')
 
-    if (category) {
-      filters.category = category as DocumentCategory
+    if (isDocumentCategory(category)) {
+      filters.category = category
     }
 
-    if (status) {
-      filters.status = status as DocumentStatus
+    if (isDocumentStatus(status)) {
+      filters.status = status
     }
 
     if (authorId) {
@@ -133,7 +270,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
 router.get(
   '/:id',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -174,7 +311,7 @@ router.put(
   '/:id',
   authenticateToken,
   requireCreator,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -185,7 +322,7 @@ router.put(
         return
       }
 
-      const updates: DocumentUpdate = req.body
+      const updates = parseDocumentUpdate(req.body)
       const userId = req.user!.userId
 
       const document = await DocumentService.updateDocument(
@@ -223,7 +360,7 @@ router.put(
 router.delete(
   '/:id',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -267,7 +404,7 @@ router.delete(
 router.post(
   '/:id/collaborators',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -324,7 +461,7 @@ router.post(
 router.delete(
   '/:id/collaborators/:userId',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -381,7 +518,7 @@ router.delete(
 router.get(
   '/:id/versions',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -415,7 +552,7 @@ router.get(
 router.get(
   '/:id/versions/:version',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -480,7 +617,7 @@ router.put(
   '/:id/publish',
   authenticateToken,
   requireCreator,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {
@@ -524,7 +661,7 @@ router.put(
 router.put(
   '/:id/archive',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (req: DocumentRequest, res) => {
     try {
       const documentId = getRouteParam(req, 'id')
       if (!documentId) {

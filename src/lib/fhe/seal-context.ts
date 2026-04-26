@@ -36,7 +36,7 @@ export class SealContext {
     this.contextOptions = options // Store the full options object
     this.parameters = options.params
     this.scheme = options.scheme
-    this.securityLevel = options.params.securityLevel || 'tc128'
+    this.securityLevel = options.params.securityLevel ?? 'tc128'
   }
 
   /**
@@ -76,11 +76,12 @@ export class SealContext {
       } catch (err: unknown) {
         // If node-seal is not available, try loading from window if in browser
         logger.debug('Failed to load node-seal package', { error: err })
-        if (
-          typeof window !== 'undefined' &&
-          (window as unknown as { seal?: unknown }).seal
-        ) {
-          this.seal = (window as unknown as { seal: unknown }).seal
+        const browserSeal =
+          typeof window !== 'undefined'
+            ? (window as Window & { seal?: unknown }).seal
+            : undefined
+        if (browserSeal) {
+          this.seal = browserSeal
           logger.info('Using window.seal instance')
         } else {
           // No SEAL implementation available

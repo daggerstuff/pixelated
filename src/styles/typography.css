@@ -4,10 +4,11 @@
    ================================================ */
 
 :root {
-  /* === TYPOGRAPHY SYSTEM - ANTFU ELEGANCE === */
-  --font-sans: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  /* === TYPOGRAPHY SYSTEM === */
+  --font-sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
-  --font-display: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  --font-display: 'Lexend', 'Source Sans 3', sans-serif;
+  --font-label: 'Berkeley Mono', 'JetBrains Mono', 'SF Mono', monospace;
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
@@ -63,8 +64,8 @@ h5,
 h6 {
   font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   color: var(--text-primary);
   margin: 0;
 }

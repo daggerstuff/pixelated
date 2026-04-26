@@ -18,8 +18,8 @@ import numpy as np
 import torch
 from PIL import Image
 from transformers import (
-    ViTImageProcessor,
     VideoMAEImageProcessor,
+    ViTImageProcessor,
     Wav2Vec2Processor,
     WhisperProcessor,
 )

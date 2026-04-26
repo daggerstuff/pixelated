@@ -185,7 +185,15 @@ export class BiasDetectionEngine {
       thresholds.critical ?? thresholds.criticalLevel ?? DEFAULT_THRESHOLDS.critical;
 
     // Ensure thresholds are in valid range and properly ordered
-    if (validated.warning >= validated.high || validated.high >= validated.critical) {
+    const warning = validated.warning
+    const high = validated.high
+    const critical = validated.critical
+
+    if (warning === undefined || high === undefined || critical === undefined) {
+      throw new Error('Invalid threshold configuration')
+    }
+
+    if (warning >= high || high >= critical) {
       throw new Error("Invalid threshold configuration: warning < high < critical required");
     }
 
@@ -230,14 +238,18 @@ export class BiasDetectionEngine {
   }
 
   private computeAlertLevel(score: number): AlertLevel {
-    const t = this.config["thresholds"];
-    if (score >= t["critical"]) {
+    const thresholds = this.config.thresholds ?? DEFAULT_THRESHOLDS;
+    const warning = thresholds.warning;
+    const high = thresholds.high;
+    const critical = thresholds.critical;
+
+    if (score >= critical) {
       return "critical";
     }
-    if (score >= t["high"]) {
+    if (score >= high) {
       return "high";
     }
-    if (score >= t["warning"]) {
+    if (score >= warning) {
       return "medium";
     }
     return "low";
@@ -474,12 +486,14 @@ export class BiasDetectionEngine {
     ) as Partial<ParticipantDemographics> | undefined;
 
     // If any tool returned an explicit fallback flag, note limited analysis
-    const anyFallback = [
-      layerResults.preprocessing,
-      layerResults.modelLevel,
-      layerResults.interactive,
-      layerResults.evaluation,
-    ].some((r) => r && "fallback" in r && (r as Record<string, unknown>).fallback === true);
+    const anyFallback = [layerResults.preprocessing, layerResults.modelLevel, layerResults.interactive, layerResults.evaluation].some(
+      (r) =>
+        !!r &&
+        typeof r === "object" &&
+        r !== null &&
+        "fallback" in (r as Record<string, unknown>) &&
+        (r as Record<string, unknown>).fallback === true,
+    );
 
     // Enhanced fallback messages for error scenarios to satisfy various tests
     let recommendations: string[];

@@ -2,9 +2,15 @@ import { useState, useEffect } from 'react'
 
 import type { ProgressionAnalysis } from '@/lib/ai/temporal/types'
 
+type ProgressionSummary = ProgressionAnalysis & {
+  stabilityChange: number
+  positiveEmotionChange: number
+  negativeEmotionChange: number
+}
+
 export interface EmotionProgressData {
-  currentPeriod: ProgressionAnalysis
-  previousPeriod: ProgressionAnalysis
+  currentPeriod: ProgressionSummary
+  previousPeriod: ProgressionSummary
   historicalProgress: Array<{
     date: string
     overallImprovement: number
@@ -57,19 +63,49 @@ export default function useEmotionProgress({
         await new Promise((resolve) => setTimeout(resolve, 1000))
 
         // Mock data based on timeRange
+        const baseNow = Date.now()
+        const createSummary = (values: {
+          overallImprovement: number
+          stabilityChange: number
+          positiveEmotionChange: number
+          negativeEmotionChange: number
+        }): ProgressionSummary => ({
+          id: `mock-${baseNow}`,
+          sessionId: `session-${baseNow}`,
+          timestamp: new Date(),
+          timeRange: {
+            start: new Date(baseNow),
+            end: new Date(baseNow),
+          },
+          progress: {
+            overall: values.overallImprovement,
+            domains: {},
+          },
+          milestones: [],
+          predictions: {
+            confidence: 0.7,
+            factors: [],
+          },
+          recommendations: [],
+          overallImprovement: values.overallImprovement,
+          stabilityChange: values.stabilityChange,
+          positiveEmotionChange: values.positiveEmotionChange,
+          negativeEmotionChange: values.negativeEmotionChange,
+        })
+
         const mockData: EmotionProgressData = {
-          currentPeriod: {
+          currentPeriod: createSummary({
             overallImprovement: 0.15,
             stabilityChange: -0.08,
             positiveEmotionChange: 0.18,
             negativeEmotionChange: -0.12,
-          },
-          previousPeriod: {
+          }),
+          previousPeriod: createSummary({
             overallImprovement: 0.1,
             stabilityChange: -0.05,
             positiveEmotionChange: 0.12,
             negativeEmotionChange: -0.08,
-          },
+          }),
           historicalProgress: generateHistoricalData(timeRange),
           riskFactors: [
             {
@@ -155,7 +191,13 @@ export default function useEmotionProgress({
 // Helper function to generate mock historical data
 function generateHistoricalData(
   timeRange: 'week' | 'month' | 'quarter' | 'year',
-) {
+): Array<{
+  date: string
+  overallImprovement: number
+  stabilityChange: number
+  positiveEmotionChange: number
+  negativeEmotionChange: number
+}> {
   const dataPoints =
     timeRange === 'week'
       ? 7
@@ -167,7 +209,13 @@ function generateHistoricalData(
             ? 12
             : 7
 
-  const result = []
+  const result: Array<{
+    date: string
+    overallImprovement: number
+    stabilityChange: number
+    positiveEmotionChange: number
+    negativeEmotionChange: number
+  }> = []
 
   for (let i = 0; i < dataPoints; i++) {
     // Calculate date label based on time range

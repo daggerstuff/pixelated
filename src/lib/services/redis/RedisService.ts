@@ -8,6 +8,7 @@ import type {
   RedisPipeline,
   RedisPipelineOperation,
   RedisZSetMember,
+  RedisMockClient,
 } from "./redis-operation-types";
 import type { IRedisService, RedisServiceConfig } from "./types.js";
 import { RedisErrorCode, RedisServiceError } from "./types.js";
@@ -193,7 +194,11 @@ export class RedisService extends EventEmitter implements IRedisService {
         this.client = null;
       }
 
-      await Promise.all(Array.from(this.subscribers.values()).map((sub) => sub.quit()));
+      if (this.subscribers.size > 0) {
+        await Promise.all(
+          Array.from(this.subscribers.values(), async (subscriber) => subscriber.quit()),
+        );
+      }
       this.subscribers.clear();
     } catch (error: unknown) {
       throw new RedisServiceError(
@@ -204,7 +209,7 @@ export class RedisService extends EventEmitter implements IRedisService {
     }
   }
 
-  private async ensureConnection(): Promise<Redis> {
+  private async ensureConnection(): Promise<Redis | RedisMockClient> {
     if (!this.client) {
       await this.connect();
     }
@@ -230,15 +235,26 @@ export class RedisService extends EventEmitter implements IRedisService {
    * Mock client for development when no Redis URL is available
    * Return type implements Redis for compatibility with the service contract
    */
-  private createMockClient(): Redis {
+  private createMockClient(): RedisMockClient {
     // Create a simple in-memory store
     const store = new Map<string, string>();
     const setStore = new Map<string, Set<string>>();
     const hashStore = new Map<string, Map<string, string>>();
     const zsetStore = new Map<string, Map<string, number>>();
 
+    const readStringList = (key: string): string[] => {
+      const raw = store.get(key);
+      if (!raw) {
+        return [];
+      }
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((item): item is string => typeof item === "string")
+        : [];
+    };
+
     // Create a mock client implementing the Redis interface
-    const mockClient = {
+    const mockClient: RedisMockClient = {
       get: async (key: string) => store.get(key) ?? null,
       set: async (key: string, value: string) => {
         store.set(key, value);
@@ -314,6 +330,43 @@ export class RedisService extends EventEmitter implements IRedisService {
         const hash = hashStore.get(key);
         return hash ? hash.size : 0;
       },
+      // List operations
+      lpush: async (key: string, ...elements: string[]) => {
+        const listKey = `list:${key}`;
+        const list = readStringList(listKey);
+        const nextList = Array.isArray(list) ? [...elements, ...list] : [...elements];
+        store.set(listKey, JSON.stringify(nextList));
+        return nextList.length;
+      },
+      rpoplpush: async (source: string, destination: string) => {
+        const sourceKey = `list:${source}`;
+        const destKey = `list:${destination}`;
+        const sourceList = readStringList(sourceKey);
+        if (sourceList.length === 0) {
+          return null;
+        }
+        const value = sourceList.pop();
+        if (value === undefined) {
+          return null;
+        }
+        store.set(sourceKey, JSON.stringify(sourceList));
+        const destinationList = readStringList(destKey);
+        destinationList.unshift(value);
+        store.set(destKey, JSON.stringify(destinationList));
+        return value;
+      },
+      lrem: async (key: string, _count: number, value: string) => {
+        const listKey = `list:${key}`;
+        const list = readStringList(listKey);
+        const nextList = Array.isArray(list) ? list.filter((item) => item !== value) : [];
+        store.set(listKey, JSON.stringify(nextList));
+        return Array.isArray(list) ? list.length - nextList.length : 0;
+      },
+      llen: async (key: string) => {
+        const listKey = `list:${key}`;
+        const list = readStringList(listKey);
+        return Array.isArray(list) ? list.length : 0;
+      },
       // Sorted set operations
       zadd: async (key: string, score: number, member: string) => {
         if (!zsetStore.has(key)) {
@@ -386,14 +439,14 @@ export class RedisService extends EventEmitter implements IRedisService {
         if (["connect", "ready"].includes(event)) {
           setTimeout(() => callback(), 0);
         }
-        return {} as any;
+        return mockClient;
       }, // Basic event handling for mock
       pipeline: () => {
         const commands: RedisPipelineOperation[] = [];
-        const pipeline = {
+        const pipeline: RedisPipeline = {
           del: (key: string) => {
             commands.push({ cmd: "del", args: [key] });
-            return {} as any;
+            return pipeline;
           },
           exec: async () => {
             return commands.map((cmd) => {
@@ -405,11 +458,11 @@ export class RedisService extends EventEmitter implements IRedisService {
             });
           },
         };
-        return pipeline as any;
+        return pipeline;
       },
     };
 
-    return mockClient as any;
+    return mockClient;
   }
 
   private createClient(): Redis {
@@ -611,15 +664,11 @@ export class RedisService extends EventEmitter implements IRedisService {
       info.split("\n").forEach((line: string) => {
         if (line.startsWith("connected_clients:")) {
           const value = line.split(":")[1];
-          if (value !== undefined) {
-            stats.totalConnections = Number.parseInt(value, 10);
-          }
+          stats.totalConnections = Number.parseInt(value, 10);
         }
         if (line.startsWith("blocked_clients:")) {
           const value = line.split(":")[1];
-          if (value !== undefined) {
-            stats.waitingClients = Number.parseInt(value, 10);
-          }
+          stats.waitingClients = Number.parseInt(value, 10);
         }
       });
 

@@ -29,16 +29,16 @@ export class DocumentService {
       lastEditedBy: authorId,
       fileSize: new Blob([documentData.content]).size,
       mimeType: 'text/html',
-      customFields: documentData.metadata?.customFields || {},
+      customFields: documentData.metadata?.customFields ?? {},
       ...documentData.metadata,
     }
 
     const document = await DocumentModel.create({
       ...documentData,
       authorId,
-      status: documentData.status || DocumentStatus.DRAFT,
-      collaborators: documentData.collaborators || [],
-      tags: documentData.tags || [],
+      status: documentData.status ?? DocumentStatus.DRAFT,
+      collaborators: documentData.collaborators ?? [],
+      tags: documentData.tags ?? [],
       metadata,
     })
 

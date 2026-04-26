@@ -1,4 +1,5 @@
 import os
+
 import modal
 
 # Define the Modal App
@@ -35,10 +36,11 @@ volume = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
     ] if os.environ.get("HF_TOKEN") else []
 )
 def merge_lora_task(base_model_name: str, output_dir_name: str):
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    from peft import PeftModel
     from pathlib import Path
+
+    import torch
+    from peft import PeftModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
     print("🚀 Starting merge task on Modal GPU...")
     print(f"Base Model: {base_model_name}")
@@ -80,7 +82,7 @@ def merge_lora_task(base_model_name: str, output_dir_name: str):
 
     # Commit changes to Volume to ensure persistence and visibility for download
     volume.commit()
-    
+
     print(f"✅ Merge complete! Merged model is available in Modal Volume at: {output_path}")
     return str(output_path)
 

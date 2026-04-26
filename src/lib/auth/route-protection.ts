@@ -1,78 +1,112 @@
-// src/lib/auth/route-protection.ts
-/**
- * Route protection utilities for dual-mode authentication
- */
+import { authenticateRequest, AuthenticatedRequest } from "./auth0-middleware";
+import {
+  getRouteConfig,
+  FAMILY_DEFAULTS,
+  type AuthStrategy,
+  type RouteFamily,
+} from "./route-config";
 
-import { authenticateRequest, AuthenticatedRequest } from './auth0-middleware'
-
-export type AuthMode = 'jwt' | 'api_key' | 'either'
-export type RouteScope = string
+export type RouteScope = string;
 
 export interface RouteProtectionOptions {
-  strategy: 'jwtOnly' | 'apiKeyOnly' | 'either'
-  requiredScopes?: RouteScope[]
+  strategy: AuthStrategy;
+  requiredScopes?: RouteScope[];
 }
 
-/**
- * Protect an API route with specific authentication requirements
- */
 export async function protectRoute(
   request: Request,
-  options: RouteProtectionOptions
+  options?: RouteProtectionOptions,
 ): Promise<{
-  success: boolean
-  request?: AuthenticatedRequest
-  response?: Response
-  error?: string
+  success: boolean;
+  request?: AuthenticatedRequest;
+  response?: Response;
+  error?: string;
 }> {
+  if (options) {
+    return await authenticateRequest(request, {
+      strategy: options.strategy,
+      requiredScopes: options.requiredScopes || [],
+    });
+  }
+
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const method = request.method;
+
+  const routeConfig = getRouteConfig(path, method);
+
+  if (!routeConfig) {
+    const family = inferRouteFamily(path);
+    const defaults = FAMILY_DEFAULTS[family];
+
+    return await authenticateRequest(request, {
+      strategy: defaults.strategy,
+      requiredScopes: defaults.defaultScopes,
+    });
+  }
+
   return await authenticateRequest(request, {
-    strategy: options.strategy,
-    requiredScopes: options.requiredScopes || []
-  })
+    strategy: routeConfig.strategy,
+    requiredScopes: routeConfig.requiredScopes || [],
+  });
 }
 
-/**
- * Convenience functions for common route types
- */
+function inferRouteFamily(path: string): RouteFamily {
+  if (path.startsWith("/api/health")) return "public";
+  if (path.startsWith("/api/admin")) return "admin";
+  if (path.startsWith("/api/developer")) return "developer";
+  if (path.startsWith("/api/internal")) return "system";
+  return "user";
+}
 
-export const jwtOnly = (requiredScopes?: RouteScope[]) =>
-  ({ strategy: 'jwtOnly' as const, requiredScopes })
+export const jwtOnly = (requiredScopes?: RouteScope[]): RouteProtectionOptions => ({
+  strategy: "jwtOnly",
+  requiredScopes,
+});
 
-export const apiKeyOnly = (requiredScopes?: RouteScope[]) =>
-  ({ strategy: 'apiKeyOnly' as const, requiredScopes })
+export const apiKeyOnly = (requiredScopes?: RouteScope[]): RouteProtectionOptions => ({
+  strategy: "apiKeyOnly",
+  requiredScopes,
+});
 
-export const eitherAuth = (requiredScopes?: RouteScope[]) =>
-  ({ strategy: 'either' as const, requiredScopes })
+export const eitherAuth = (requiredScopes?: RouteScope[]): RouteProtectionOptions => ({
+  strategy: "either",
+  requiredScopes,
+});
 
-/**
- * Route families with their default protection
- */
+export function createProtectedHandler(
+  handler: (request: AuthenticatedRequest) => Promise<Response>,
+  options: RouteProtectionOptions,
+) {
+  return async (request: Request): Promise<Response> => {
+    const result = await protectRoute(request, options);
+
+    if (!result.success) {
+      return result.response!;
+    }
+
+    return handler(result.request!);
+  };
+}
+
 export const ROUTE_FAMILIES = {
-  // User-facing routes (require JWT)
   user: {
     auth: jwtOnly(),
     profile: jwtOnly(),
     conversations: jwtOnly(),
   },
-
-  // Developer API routes (require API key)
   developer: {
-    inference: apiKeyOnly(['read']),
-    training: apiKeyOnly(['write']),
-    admin: apiKeyOnly(['admin']),
+    inference: apiKeyOnly(["read"]),
+    training: apiKeyOnly(["write"]),
+    admin: apiKeyOnly(["admin"]),
   },
-
-  // Public routes (either auth)
   public: {
     health: eitherAuth(),
     docs: eitherAuth(),
   },
-
-  // Internal routes (special handling)
   internal: {
-    metrics: jwtOnly(['admin']),
-  }
-} as const
+    metrics: jwtOnly(["admin"]),
+  },
+} as const;
 
-export type RouteFamily = keyof typeof ROUTE_FAMILIES
-export type RouteType = string
+export type RouteFamilyType = keyof typeof ROUTE_FAMILIES;

@@ -55,7 +55,7 @@ export async function getCurrentUser(
       role: user.role as AuthRole,
       fullName: user.fullName,
       avatarUrl: user.avatarUrl,
-      lastLogin: user.lastLogin,
+      lastLogin: user.lastLogin ? new Date(user.lastLogin) : null,
       metadata: (user.userMetadata as Record<string, unknown>) || {},
     }
   } catch (error: unknown) {
