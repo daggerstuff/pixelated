@@ -57,11 +57,18 @@ export function useOfflineManager({
   // Enhanced fetch function that handles offline scenarios
   const offlineFetch = useCallback(
     async (url: string, options: RequestInit = {}) => {
+      const isEncryptedTransport = url.startsWith('https://');
+      const isCriticalPath = criticalPaths.some((path) => url.includes(path));
+
+      if (!isEncryptedTransport && isCriticalPath) {
+        throw new Error(
+          'Blocked unencrypted request to critical path — HTTPS required for PHI/EHR data (HIPAA)',
+        );
+      }
+
       if (!enableQueue) {
         return fetch(url, options);
       }
-
-      const isCriticalPath = criticalPaths.some((path) => url.includes(path));
 
       try {
         const response = await fetch(url, options);

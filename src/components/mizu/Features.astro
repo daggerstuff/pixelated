@@ -6,6 +6,7 @@ const features = [
       'Experience realistic patient interactions through advanced AI simulation that adapts to your responses in real-time.',
     image: '/images/features/mental-health-therapy.jpg',
     bullets: ['Adaptive AI responses', 'Real-time interaction'],
+    href: '/features#ai-scenarios',
   },
   {
     title: 'Real-Time Analytics',
@@ -13,6 +14,7 @@ const features = [
       'Track your progress with detailed analytics on empathy scores, response quality, and therapeutic effectiveness.',
     image: '/images/features/competency.jpg',
     bullets: ['Empathy scoring', 'Performance tracking'],
+    href: '/features#analytics',
   },
   {
     title: 'Bias Detection',
@@ -20,6 +22,7 @@ const features = [
       'Built-in bias detection helps identify and correct potential blind spots in your therapeutic approach.',
     image: '/images/features/bias-spike.jpg',
     bullets: ['Real-time detection', 'Actionable insights'],
+    href: '/features#bias-detection',
   },
   {
     title: 'Edge Case Training',
@@ -27,6 +30,7 @@ const features = [
       'Prepare for challenging scenarios with specialized edge case training that builds resilience and adaptability.',
     image: '/images/features/edge-case.jpg',
     bullets: ['Complex scenarios', 'Crisis preparation'],
+    href: '/features#edge-cases',
   },
 ]
 ---
@@ -78,10 +82,10 @@ const features = [
                   </li>
                 ))}
               </ul>
-              <a
-                href="#"
-                class="text-primary-400 font-semibold hover:text-primary-300 inline-flex items-center gap-2 group transition-colors text-sm"
-              >
+        <a
+          href={feature.href}
+          class="text-primary-400 font-semibold hover:text-primary-300 inline-flex items-center gap-2 group transition-colors text-sm"
+        >
                 Learn more
                 <svg
                   class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"

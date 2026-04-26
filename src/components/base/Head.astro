@@ -95,7 +95,7 @@ const webPageData = {
 <meta name="author" content={SITE.author} />
 
 <!-- Color -->
-<meta name="theme-color" content="" />
+<meta name="theme-color" content="#ff6b00" />
 <meta name="color-scheme" content="light dark" />
 
 <!-- Open Graph & Facebook -->
@@ -163,13 +163,13 @@ const webPageData = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(blogPostingData).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(blogPostingData).replace(/<\//g, '\\u003c/').replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
     />
   ) : (
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(webPageData).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(webPageData).replace(/<\//g, '\\u003c/').replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
     />
   )
 }
