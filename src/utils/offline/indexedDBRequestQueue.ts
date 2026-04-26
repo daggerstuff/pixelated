@@ -5,8 +5,19 @@
  */
 
 import { type IDBPDatabase } from "idb";
-import { type QueuedRequest } from "./requestQueue";
 import IndexedDBStorage from "../storage/indexedDBStorage";
+
+export interface QueuedRequest {
+  id: string;
+  url: string;
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  headers: Record<string, string>;
+  body?: unknown;
+  timestamp: number;
+  retryCount: number;
+  maxRetries: number;
+  priority: "low" | "normal" | "high" | "critical";
+}
 
 export interface RequestQueueOptions {
   maxQueueSize?: number;

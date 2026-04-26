@@ -1,0 +1,221 @@
+---
+import { cn } from '@lib/utils'
+import Container from './Container.astro'
+import { softGradientVariant as card } from '@tailus/themer-card'
+---
+
+<section id="features" class="scroll-mt-24">
+  <Container>
+    <div
+      class="space-y-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:space-y-0 sm:gap-4"
+    >
+      <div class={cn(card.outer)}>
+        <div class={cn(card.inner, 'flex flex-col justify-between h-full')}>
+          <div>
+            <svg
+              class="aspect-video w-full"
+              viewBox="0 0 342 159"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                width="342"
+                height="159"
+                rx="12"
+                fill="url(#paint0_linear_0_1)"
+                fill-opacity="0.1"></rect>
+              <path
+                class="text-primary-600"
+                d="M50 120L70 100L90 110L110 80L130 90L150 70L170 85L190 65L210 75L230 55L250 65L270 45L290 55"
+                stroke="currentColor"
+                stroke-width="3"
+                fill="none"></path>
+            </svg>
+          </div>
+          <div class="mt-6 space-y-2">
+            <h3 class="text-gray-950 dark:text-white text-lg font-medium">
+              Emotional Analytics
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              Real-time analysis of patient emotional states and therapeutic
+              progress using advanced machine learning algorithms.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class={cn(card.outer)}>
+        <div class={cn(card.inner, 'h-full flex flex-col justify-between')}>
+          <div>
+            <div
+              class="py-2 relative aspect-video bg-white border flex items-center justify-center dark:border-info-400/20 dark:bg-transparent"
+            >
+              <div class="absolute -inset-1 flex justify-between">
+                <div class="flex flex-col justify-between">
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                </div>
+                <div class="flex flex-col justify-between">
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                </div>
+              </div>
+              <svg
+                class="mx-auto w-1/2"
+                viewBox="0 0 100 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="currentColor"
+                  stroke-width="8"
+                  fill="none"
+                  class="text-primary-600"></circle>
+                <path
+                  d="M30 50 L45 65 L70 35"
+                  stroke="white"
+                  stroke-width="4"
+                  fill="none"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-6 space-y-2">
+            <h3 class="text-gray-950 dark:text-white text-lg font-medium">
+              HIPAA Compliance
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              Enterprise-grade security with full HIPAA compliance ensuring
+              patient data protection and privacy.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class={cn(card.outer, 'sm:col-span-2')}>
+        <div class={cn(card.inner, 'flex flex-col justify-between h-full')}>
+          <div>
+            <div
+              class="overflow-x-auto lg:overflow-visible py-6 relative bg-white border flex items-center justify-center dark:border-info-400/20 dark:bg-gray-950/25"
+            >
+              <div class="absolute -inset-1 flex justify-between">
+                <div class="flex flex-col justify-between">
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                </div>
+                <div class="flex flex-col justify-between">
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                  <div
+                    class="size-2 rounded-full border border-info-500 bg-white"
+                  >
+                  </div>
+                </div>
+              </div>
+              <div
+                class="relative flex gap-2 *:size-8 *:rounded-xl *:border *:border-gray-950/5 dark:*:border-white/5"
+              >
+                <div class="bg-primary-50"></div>
+                <div class="bg-primary-100"></div>
+                <div class="bg-primary-200"></div>
+                <div class="bg-primary-300"></div>
+                <div class="bg-primary-400"></div>
+                <div class="bg-primary-500"></div>
+                <div class="bg-primary-600"></div>
+                <div class="bg-primary-700"></div>
+                <div class="bg-primary-800"></div>
+                <div class="bg-primary-900"></div>
+                <div class="bg-primary-950"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 space-y-2">
+            <h3 class="text-gray-950 dark:text-white text-lg font-medium">
+              Personalized Training
+            </h3>
+            <p class="max-w-lg text-gray-600 dark:text-gray-400">
+              AI-powered therapy training modules customized to individual
+              learning styles and specializations in mental health care.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class={cn(card.outer, 'sm:row-start-2 lg:row-start-auto')}>
+        <div class={cn(card.inner, 'flex flex-col justify-between h-full')}>
+          <div>
+            <div
+              class="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-16 h-16 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-6 space-y-2">
+            <h3 class="text-gray-950 dark:text-white text-lg font-medium">
+              Evidence-Based
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              All interventions and recommendations are based on peer-reviewed
+              research and proven therapeutic methodologies.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class={cn(card.outer)}>
+        <div class={cn(card.inner, 'flex flex-col justify-between h-full')}>
+          <div>
+            <div
+              class="aspect-video bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-16 h-16 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="mt-6 space-y-2">
+            <h3 class="text-gray-950 dark:text-white text-lg font-medium">
+              Community Support
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400">
+              Connect with a network of mental health professionals,
+              researchers, and advocates worldwide.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

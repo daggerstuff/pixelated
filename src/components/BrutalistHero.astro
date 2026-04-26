@@ -1,0 +1,181 @@
+---
+/**
+ * Brutalist Hero Component
+ * Product-first homepage entry built around one coaching artifact.
+ */
+import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
+import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
+import HeroContent from '@/components/homepage/HeroContent.astro'
+import HeroStage from '@/components/homepage/HeroStage.astro'
+
+export interface Props {
+  kicker?: string
+  title?: string
+  subtitle?: string
+  helperText?: string
+  proofPoints?: readonly { label: string; text: string }[]
+  primaryCTA?: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
+  artifact?: {
+    eyebrow: string
+    status: string
+    chip: string
+    mode: string
+    image?: string
+    imageAlt?: string
+    context: readonly { label: string; value: string }[]
+    outputs: readonly { label: string; value: string }[]
+    readout: readonly { label: string; value: string }[]
+  }
+}
+
+const {
+  kicker,
+  title,
+  subtitle,
+  helperText,
+  proofPoints = [],
+  primaryCTA,
+  secondaryCTA,
+  artifact,
+} = Astro.props
+---
+
+<section class="hero hero-section" data-component="brutalist-hero">
+  <div class="hero-background">
+    <HeroAtmosphere />
+  </div>
+
+  <div class="container hero-shell">
+    <HeroStage>
+      <div class="hero-layout">
+        <HeroContent
+          {kicker}
+          {title}
+          {subtitle}
+          {helperText}
+          {proofPoints}
+          {primaryCTA}
+          {secondaryCTA}
+        />
+
+        {
+          artifact && (
+            <div class="hero-artifact-shell">
+              <BrutalistHeroArtifact artifact={artifact} />
+            </div>
+          )
+        }
+      </div>
+    </HeroStage>
+  </div>
+
+  <div class="hero-fadeout"></div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    overflow: hidden;
+    min-height: min(100dvh, 46rem);
+    padding: clamp(5.6rem, 9vh, 7.6rem) 0 clamp(3.8rem, 6vh, 4.8rem);
+    background: var(--bg-primary);
+  }
+
+  .hero-section {
+    border-top: 1px dotted rgba(253, 252, 252, 0.1);
+  }
+
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 76rem);
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.8rem, 3vw, 3rem);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-artifact-shell {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    min-width: 0;
+    isolation: isolate;
+    width: 100%;
+    max-width: 40rem;
+  }
+
+  .hero-fadeout {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 7rem;
+    background: linear-gradient(to top, var(--bg-primary), transparent);
+  }
+
+  @media (min-width: 1040px) {
+    .hero {
+      align-items: center;
+      min-height: min(86dvh, 46rem);
+      padding-top: clamp(3.8rem, 6vh, 5.5rem);
+      padding-bottom: clamp(3rem, 5vh, 4rem);
+    }
+
+    .hero-layout {
+      grid-template-columns: minmax(0, 1.12fr) minmax(22rem, 0.88fr);
+      gap: clamp(2.5rem, 4vw, 4.25rem);
+      align-items: center;
+    }
+
+    .hero-artifact-shell {
+      justify-content: flex-end;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      min-height: auto;
+      padding-top: 4.25rem;
+      padding-bottom: 3rem;
+    }
+
+    .hero-shell {
+      max-width: 100%;
+    }
+
+    .hero-artifact-shell {
+      max-width: 100%;
+    }
+
+    .hero-background {
+      opacity: 0.78;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding-top: 4.55rem;
+      padding-bottom: 2.8rem;
+    }
+  }
+</style>

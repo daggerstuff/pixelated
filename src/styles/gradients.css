@@ -1,27 +1,28 @@
 /* ================================================
-   DARK THEME GRADIENTS
+   UNIFIED BLENDED THEME - GRADIENT SYSTEM
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
    ================================================ */
 
 :root {
+  /* === GRADIENTS - ENTERPRISE POLISH === */
   --gradient-primary: linear-gradient(
     135deg,
-    #f6f1e8 0%,
-    #ffd0a0 34%,
-    #f0a35a 68%,
-    #8f969f 100%
+    #10b981 0%,
+    #059669 50%,
+    #047857 100%
   );
   --gradient-accent: linear-gradient(
     135deg,
-    #f6bd7c 0%,
-    #f0a35a 48%,
-    #9aa0aa 100%
+    #3b82f6 0%,
+    #6366f1 50%,
+    #8b5cf6 100%
   );
-  --gradient-text: linear-gradient(135deg, #f6f1e8 0%, #f6bd7c 100%);
+  --gradient-text: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
   --gradient-bg-subtle: linear-gradient(
     135deg,
-    var(--bg-primary) 0%,
-    var(--bg-secondary) 50%,
-    var(--bg-tertiary) 100%
+    #0a0a0a 0%,
+    #111111 50%,
+    #151515 100%
   );
   --gradient-overlay: linear-gradient(
     180deg,
