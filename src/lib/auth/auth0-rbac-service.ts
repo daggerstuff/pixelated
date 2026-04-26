@@ -854,8 +854,6 @@ export function canAssignRole(
  * Get assignable roles for a given role
  */
 export function getAssignableRoles(role: UserRole): UserRole[] {
-  const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-
   return AUTH0_ROLE_HIERARCHY.filter((targetRole) =>
     canAssignRole(role, targetRole),
   )
