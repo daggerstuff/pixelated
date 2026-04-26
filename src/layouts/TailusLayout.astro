@@ -1,0 +1,80 @@
+---
+import BaseHead from '@components/tailus/BaseHead.astro'
+import AppFooter from '@components/tailus/AppFooter.astro'
+import AppHeader from '@components/tailus/AppHeader.astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
+import { FEATURES } from '@/config'
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const {
+  title = 'Pixelated Empathy - AI-Powered Mental Health Support',
+  description = 'Experience personalized mental health support through our advanced AI platform. Get insights, therapy assistance, and emotional wellness tools designed for your unique journey.',
+} = Astro.props
+const { cspNonce } = Astro.locals
+const { nprogress, mediumZoom } = FEATURES
+---
+
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <BaseHead {title} {description} {cspNonce} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0f172a" />
+
+    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
+    <link rel="stylesheet" href="/css/design-system.css" />
+    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
+
+    <link rel="stylesheet" href="/css/fonts.css" />
+    <link rel="stylesheet" href="/css/font-fix.css" />
+
+    <link rel="stylesheet" href="/css/background-fixes.css" />
+
+    <script src="/js/polyfill-detector.js" is:inline></script>
+    <script src="/js/module-loader.js" defer is:inline></script>
+    <script src="/js/background-loader.js" defer is:inline></script>
+    {
+      (nprogress || mediumZoom) && (
+        <script src="/js/nprogress-and-zoom.js" type="module" />
+      )
+    }
+
+    <!-- GoatCounter Analytics -->
+    <script
+      is:inline
+      nonce={cspNonce}
+      data-goatcounter="https://pixelated.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"></script>
+  </head>
+  <body
+    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
+  >
+    <!-- Skip to content link for accessibility -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+    >
+      Skip to content
+    </a>
+
+    <AppHeader />
+    <main id="main-content">
+      <slot />
+    </main>
+    <AppFooter />
+    <SpeedInsights />
+    <Analytics />
+    <script is:inline nonce={cspNonce}>
+      function _speedInsightsBeforeSend(data: any) {
+        console.log('Speed Insights before send', data)
+        return data
+      }
+    </script>
+  </body>
+</html>

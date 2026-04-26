@@ -1,5 +1,10 @@
 ---
 import Layout from '@/layouts/Layout.astro'
+import BrutalistHero from '@/components/BrutalistHero.astro'
+import IntroSection from '@/components/homepage/IntroSection.astro'
+import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
+import CTA from '@/components/mizu/CTA.astro'
+import { homepageContent } from '@/lib/content'
 import '@/styles/homepage.css'
 
 const organizationSchema = {
@@ -9,7 +14,7 @@ const organizationSchema = {
   'url': 'https://pixelatedempathy.com',
   'logo': 'https://pixelatedempathy.com/favicon.svg',
   'description':
-    'AI client simulation and transcript-based supervision tools for therapist training teams.',
+    'Clinical simulation and transcript-based review for therapist training and supervision teams.',
   'foundingDate': '2025',
   'address': {
     '@type': 'PostalAddress',
@@ -25,153 +30,55 @@ const organizationSchema = {
     'https://github.com/nochadisfaction/pixelated',
   ],
 }
-
-const signalRows = [
-  {
-    id: 'A-014',
-    stressor: 'suicide disclosure',
-    failure: 'planned too soon',
-    reset: 'slow the room, retry silence',
-  },
-  {
-    id: 'R-229',
-    stressor: 'anger and mistrust',
-    failure: 'defended the frame',
-    reset: 'repair before rationale',
-  },
-  {
-    id: 'D-071',
-    stressor: 'trauma detail',
-    failure: 'over-questioned',
-    reset: 'consent language drill',
-  },
-]
-
-const loopSteps = [
-  ['01', 'Generate pressure', 'Build an AI client around the exact clinical behavior your team avoids.'],
-  ['02', 'Run the exchange', 'The client resists, escalates, shuts down, discloses, or breaks rapport.'],
-  ['03', 'Cut the transcript', 'Supervisors mark the moment that mattered instead of debating memory.'],
-  ['04', 'Retry the miss', 'Same pressure, tighter target, cleaner evidence.'],
-]
 ---
 
 <Layout
-  title="Pixelated Empathy | AI client simulation for therapist training"
-  description="Run realistic AI client simulations, review the transcript, and coach clinical judgment from evidence."
+  title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
+  description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
   keywords="clinical simulation, therapy training, clinical supervision, mental health"
   fullWidthMain
 >
-  <main class="signal-board">
+  <div class="pe-homepage">
     <script
       is:inline
       type="application/ld+json"
       set:html={JSON.stringify(organizationSchema)}
     />
 
-    <section class="signal-hero" aria-labelledby="hero-title">
-      <p class="signal-tag">Pixelated Empathy // clinical simulation engine</p>
-      <h1 id="hero-title">Rehearse the moment that wrecks the room.</h1>
-      <div class="signal-hero__brief">
-        <p>
-          AI clients for therapist training teams that need pressure, transcripts,
-          supervisor marks, and repeatable retries. No theater. No vibes. Just the
-          exchange, the miss, and the next attempt.
-        </p>
-        <div class="signal-actions">
-          <a href="/contact">Book pilot</a>
-          <a href="/demo-hub">Open demo file</a>
-        </div>
-      </div>
-    </section>
+    <BrutalistHero
+      kicker={homepageContent.hero.kicker}
+      title={homepageContent.hero.title}
+      subtitle={homepageContent.hero.subtitle}
+      helperText={homepageContent.hero.helperText}
+      proofPoints={homepageContent.hero.proofPoints}
+      primaryCTA={homepageContent.hero.primaryCTA}
+      secondaryCTA={homepageContent.hero.secondaryCTA}
+      artifact={homepageContent.hero.artifact}
+    />
 
-    <section class="signal-strip" aria-label="Training principles">
-      <article>
-        <span>01</span>
-        <strong>Pressure first</strong>
-        <p>Train the rupture, disclosure, silence, avoidance, and escalation.</p>
-      </article>
-      <article>
-        <span>02</span>
-        <strong>Evidence stays</strong>
-        <p>The transcript becomes the supervision object.</p>
-      </article>
-      <article>
-        <span>03</span>
-        <strong>Retry the exact miss</strong>
-        <p>The next run targets the failed move, not generic improvement.</p>
-      </article>
-    </section>
+    <IntroSection content={homepageContent.intro} />
 
-    <section class="signal-grid" aria-label="Case signal matrix">
-      <header class="signal-head">
-        <p class="signal-tag">Case signal matrix</p>
-        <h2>Roleplay disappears. Evidence does not.</h2>
-      </header>
+    <CoreFeatures
+      label={homepageContent.features.label}
+      title={homepageContent.features.title}
+      copy={homepageContent.features.copy}
+      proofLabel={homepageContent.features.proofLabel}
+      proofItems={homepageContent.features.proofItems}
+      cards={homepageContent.features.cards}
+      comparison={homepageContent.features.comparison}
+    />
 
-      <div class="signal-table">
-        <div class="signal-table__head" aria-hidden="true">
-          <span>case</span>
-          <span>stressor</span>
-          <span>miss</span>
-          <span>reset</span>
-        </div>
-        {
-          signalRows.map((row) => (
-            <article class="signal-row">
-              <strong>{row.id}</strong>
-              <span>{row.stressor}</span>
-              <span>{row.failure}</span>
-              <span>{row.reset}</span>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section class="signal-loop" aria-labelledby="loop-title">
-      <div class="signal-loop__title">
-        <p class="signal-tag">Training loop</p>
-        <h2 id="loop-title">Design the pressure. Capture the miss. Run it again.</h2>
-      </div>
-      <div class="signal-loop__steps">
-        {
-          loopSteps.map(([number, title, body]) => (
-            <article>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section class="signal-proof" aria-labelledby="proof-title">
-      <div>
-        <p class="signal-tag">Supervisor view</p>
-        <h2 id="proof-title">Mark the exchange, not the story about it.</h2>
-      </div>
-      <div class="signal-proof__cards">
-        <article>
-          <span>transcript</span>
-          <p>Client: "If I say it out loud, then I have to do something."</p>
-          <p>Trainee: "Let's focus on the coping plan."</p>
-        </article>
-        <article>
-          <span>supervisor cut</span>
-          <p>Too fast. Reflect fear before planning. Retry with a silence tolerance target.</p>
-        </article>
-        <article>
-          <span>next run</span>
-          <strong>hold the rupture</strong>
-        </article>
-      </div>
-    </section>
-
-    <section class="signal-final" aria-labelledby="final-title">
-      <p class="signal-tag">Pilot protocol</p>
-      <h2 id="final-title">Bring the two cases your trainees avoid.</h2>
-      <a href="/contact">Make them replayable</a>
-    </section>
-  </main>
+    <CTA
+      label={homepageContent.cta.label}
+      title={homepageContent.cta.title}
+      intro={homepageContent.cta.intro}
+      verdictCopy={homepageContent.cta.verdictCopy}
+      proofItems={homepageContent.cta.proofItems}
+      decisionTitle={homepageContent.cta.decisionTitle}
+      rubric={homepageContent.cta.rubric}
+      primaryCTA={homepageContent.cta.primaryCTA}
+      secondaryCTA={homepageContent.cta.secondaryCTA}
+      meta={homepageContent.cta.meta}
+    />
+  </div>
 </Layout>

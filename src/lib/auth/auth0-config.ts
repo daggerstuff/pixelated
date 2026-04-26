@@ -1,6 +1,4 @@
 import fs from 'node:fs'
-
-import dotenv from 'dotenv'
 /**
  * Auth0 Central Configuration Utility
  * Handles secrets from both environment variables and Docker secrets files.
@@ -17,31 +15,13 @@ export interface Auth0Config {
   publicClientId: string
 }
 
-if (process.env.NODE_ENV !== 'test') {
-  dotenv.config({ quiet: true })
-}
-
-function getEnvValue(envVar: string): string {
-  const processValue = process.env[envVar]
-  if (typeof processValue === 'string' && processValue.length > 0) {
-    return processValue
-  }
-
-  try {
-    const viteValue: unknown = import.meta.env[envVar as keyof ImportMetaEnv]
-    return typeof viteValue === 'string' ? viteValue : ''
-  } catch {
-    return ''
-  }
-}
-
 function getSecret(envVar: string, fileEnvVar: string): string {
   // Priority 1: Direct environment variable
-  const directValue = getEnvValue(envVar)
+  const directValue = process.env[envVar]
   if (directValue) return directValue
 
   // Priority 2: From file (Docker Secret)
-  const filePath = getEnvValue(fileEnvVar)
+  const filePath = process.env[fileEnvVar]
   if (filePath && fs.existsSync(filePath)) {
     try {
       return fs.readFileSync(filePath, 'utf8').trim()
@@ -70,11 +50,9 @@ export const auth0Config: Auth0Config = {
     'AUTH0_MANAGEMENT_CLIENT_SECRET_FILE',
   ),
   publicDomain:
-    getEnvValue('PUBLIC_AUTH0_DOMAIN') ||
-    getSecret('AUTH0_DOMAIN', 'AUTH0_DOMAIN_FILE'),
+    process.env.PUBLIC_AUTH0_DOMAIN || process.env.AUTH0_DOMAIN || '',
   publicClientId:
-    getEnvValue('PUBLIC_AUTH0_CLIENT_ID') ||
-    getSecret('AUTH0_CLIENT_ID', 'AUTH0_CLIENT_ID_FILE'),
+    process.env.PUBLIC_AUTH0_CLIENT_ID || process.env.AUTH0_CLIENT_ID || '',
 }
 
 /**

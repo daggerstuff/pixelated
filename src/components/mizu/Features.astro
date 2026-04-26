@@ -1,0 +1,116 @@
+---
+const features = [
+  {
+    title: 'AI-Powered Scenarios',
+    description:
+      'Experience realistic patient interactions through advanced AI simulation that adapts to your responses in real-time.',
+    image: '/images/features/mental-health-therapy.jpg',
+    bullets: ['Adaptive AI responses', 'Real-time interaction'],
+  },
+  {
+    title: 'Real-Time Analytics',
+    description:
+      'Track your progress with detailed analytics on empathy scores, response quality, and therapeutic effectiveness.',
+    image: '/images/features/competency.jpg',
+    bullets: ['Empathy scoring', 'Performance tracking'],
+  },
+  {
+    title: 'Bias Detection',
+    description:
+      'Built-in bias detection helps identify and correct potential blind spots in your therapeutic approach.',
+    image: '/images/features/bias-spike.jpg',
+    bullets: ['Real-time detection', 'Actionable insights'],
+  },
+  {
+    title: 'Edge Case Training',
+    description:
+      'Prepare for challenging scenarios with specialized edge case training that builds resilience and adaptability.',
+    image: '/images/features/edge-case.jpg',
+    bullets: ['Complex scenarios', 'Crisis preparation'],
+  },
+]
+---
+
+<section id="features" class="py-24 bg-slate-950 relative overflow-hidden">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white">
+        Platform Features
+      </h2>
+      <p class="text-slate-400 max-w-2xl mx-auto text-base">
+        Everything you need to master your therapeutic skills.
+      </p>
+    </div>
+
+    <div class="space-y-20 md:space-y-24">
+      {
+        features.map((feature, index) => (
+          <div
+            class={`flex flex-col md:flex-row items-center gap-10 md:gap-16 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+          >
+            <div class="flex-1">
+              <div class="inline-block px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-primary-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                Feature {index + 1}
+              </div>
+              <h3 class="text-xl md:text-2xl font-bold mb-3 text-white">
+                {feature.title}
+              </h3>
+              <p class="text-base text-slate-400 leading-relaxed mb-5">
+                {feature.description}
+              </p>
+              <ul class="space-y-3 mb-6">
+                {feature.bullets.map((bullet) => (
+                  <li class="flex items-center gap-3 text-slate-300 text-sm">
+                    <svg
+                      class="w-4 h-4 text-primary-500 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="#"
+                class="text-primary-400 font-semibold hover:text-primary-300 inline-flex items-center gap-2 group transition-colors text-sm"
+              >
+                Learn more
+                <svg
+                  class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </a>
+            </div>
+            <div class="flex-1 w-full">
+              <div class="aspect-[4/3] rounded-2xl border border-white/10 overflow-hidden relative group">
+                <img
+                  src={feature.image}
+                  alt={feature.title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

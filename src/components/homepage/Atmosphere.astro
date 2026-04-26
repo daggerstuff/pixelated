@@ -1,0 +1,237 @@
+---
+export interface Props {
+  variant?: 'hero' | 'section' | 'section-soft' | 'cta'
+}
+
+const { variant = 'section' } = Astro.props
+---
+
+<div class:list={['atmosphere', `atmosphere--${variant}`]} aria-hidden="true">
+  {variant === 'hero' && <div class="atmosphere__spine" />}
+  <div class="atmosphere__plane atmosphere__plane--left"></div>
+  <div class="atmosphere__plane atmosphere__plane--right"></div>
+  <div class="atmosphere__beam"></div>
+  <div class="atmosphere__glow atmosphere__glow--left"></div>
+  <div class="atmosphere__glow atmosphere__glow--right"></div>
+  <div class="atmosphere__grid"></div>
+</div>
+
+<style>
+  .atmosphere {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .atmosphere__plane,
+  .atmosphere__spine,
+  .atmosphere__beam,
+  .atmosphere__glow,
+  .atmosphere__grid {
+    position: absolute;
+  }
+
+  /* === SPINE (Hero Only) === */
+  .atmosphere__spine {
+    top: 0;
+    bottom: 0;
+    left: 20%;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(var(--accent-primary-rgb), 0.2) 20%,
+      rgba(var(--accent-primary-rgb), 0.4) 50%,
+      rgba(var(--accent-primary-rgb), 0.2) 80%,
+      transparent 100%
+    );
+    opacity: 0.3;
+  }
+
+  /* === PLANES === */
+  .atmosphere__plane--left {
+    top: -10%;
+    left: -8%;
+    width: min(48rem, 66vw);
+    height: min(34rem, 52vw);
+    background: linear-gradient(
+      140deg,
+      rgba(var(--accent-primary-rgb), 0.03),
+      transparent
+    );
+    opacity: 0.4;
+  }
+
+  .atmosphere--section .atmosphere__plane--left,
+  .atmosphere--section-soft .atmosphere__plane--left {
+    clip-path: polygon(0 0, 84% 0, 62% 100%, 0 100%);
+  }
+
+  .atmosphere--hero .atmosphere__plane--left {
+    top: -5%;
+    left: -5%;
+    width: 50%;
+    height: 60%;
+    background: radial-gradient(
+      circle at 0% 0%,
+      rgba(var(--accent-primary-rgb), 0.09),
+      transparent 70%
+    );
+    opacity: 0.7;
+  }
+
+  .atmosphere__plane--right {
+    right: -8%;
+    bottom: -16%;
+    width: min(34rem, 44vw);
+    height: min(34rem, 44vw);
+    background: linear-gradient(
+      160deg,
+      rgba(var(--accent-primary-rgb), 0.05),
+      transparent
+    );
+    opacity: 0.4;
+  }
+
+  .atmosphere--section .atmosphere__plane--right,
+  .atmosphere--section-soft .atmosphere__plane--right {
+    clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 82%);
+  }
+
+  .atmosphere--hero .atmosphere__plane--right {
+    bottom: -5%;
+    right: -5%;
+    width: 40%;
+    height: 50%;
+    background: radial-gradient(
+      circle at 100% 100%,
+      rgba(var(--accent-primary-rgb), 0.07),
+      transparent 70%
+    );
+    opacity: 0.56;
+  }
+
+  /* === BEAMS === */
+  .atmosphere__beam {
+    top: 18%;
+    right: 14%;
+    width: min(26rem, 34vw);
+    height: 1px;
+    transform: rotate(-22deg);
+    transform-origin: right center;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(var(--accent-primary-rgb), 0.3) 50%,
+      transparent 100%
+    );
+    opacity: 0.3;
+  }
+
+  .atmosphere--hero .atmosphere__beam {
+    top: 30%;
+    right: 10%;
+    width: 40%;
+    transform: rotate(-15deg);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--accent-primary-rgb), 0.3),
+      transparent
+    );
+    opacity: 0.4;
+  }
+
+  /* === GLOWS === */
+  .atmosphere__glow {
+    border-radius: 9999px;
+    filter: blur(120px);
+    transform: translateZ(0);
+    opacity: 0.15;
+  }
+
+  .atmosphere__glow--left {
+    top: 8%;
+    left: -10%;
+    width: min(40rem, 56vw);
+    height: min(40rem, 56vw);
+    background: radial-gradient(
+      circle,
+      rgba(var(--accent-primary-rgb), 0.08) 0%,
+      transparent 70%
+    );
+    opacity: 0.2;
+  }
+
+  .atmosphere--hero .atmosphere__glow--left {
+    top: 10%;
+    left: 5%;
+    width: 30vw;
+    height: 30vw;
+    background: radial-gradient(
+      circle,
+      rgba(255, 107, 0, 0.16) 0%,
+      rgba(255, 107, 0, 0.02) 70%
+    );
+  }
+
+  .atmosphere__glow--right {
+    right: -8%;
+    bottom: 4%;
+    width: min(34rem, 48vw);
+    height: min(34rem, 48vw);
+    background: radial-gradient(
+      circle,
+      rgba(var(--accent-primary-rgb), 0.05) 0%,
+      transparent 70%
+    );
+  }
+
+  .atmosphere--hero .atmosphere__glow--right {
+    bottom: 10%;
+    right: 5%;
+    width: 25vw;
+    height: 25vw;
+    background: radial-gradient(
+      circle,
+      rgba(255, 107, 0, 0.12) 0%,
+      rgba(255, 107, 0, 0.02) 70%
+    );
+  }
+
+  /* === GRID === */
+  .atmosphere__grid {
+    inset: 0;
+    background-image: var(--grid-pattern);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+    opacity: 0.08;
+  }
+
+  .atmosphere--hero .atmosphere__grid {
+    opacity: 0.22;
+  }
+
+  .atmosphere--section-soft .atmosphere__grid {
+    opacity: 0.04;
+  }
+
+  .atmosphere--cta .atmosphere__plane--left {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--accent-primary-rgb), 0.1),
+      transparent
+    );
+  }
+
+  @media (max-width: 880px) {
+    .atmosphere__grid {
+      background-size: 40px 40px;
+    }
+    .atmosphere--hero .atmosphere__spine {
+      left: 10%;
+    }
+  }
+</style>
