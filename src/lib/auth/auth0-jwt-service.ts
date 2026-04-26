@@ -114,8 +114,8 @@ function initializeAuth0Client() {
   }
 }
 
-// Initialize the client
-initializeAuth0Client();
+// Initialize the client (deferred)
+// initializeAuth0Client();
 
 // Types
 export interface TokenPair {
