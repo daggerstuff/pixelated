@@ -50,9 +50,9 @@ export const auth0Config: Auth0Config = {
     'AUTH0_MANAGEMENT_CLIENT_SECRET_FILE',
   ),
   publicDomain:
-    process.env.PUBLIC_AUTH0_DOMAIN || process.env.AUTH0_DOMAIN || '',
+    getSecret('PUBLIC_AUTH0_DOMAIN', 'PUBLIC_AUTH0_DOMAIN_FILE') || process.env.AUTH0_DOMAIN || '',
   publicClientId:
-    process.env.PUBLIC_AUTH0_CLIENT_ID || process.env.AUTH0_CLIENT_ID || '',
+    getSecret('PUBLIC_AUTH0_CLIENT_ID', 'PUBLIC_AUTH0_CLIENT_ID_FILE') || process.env.AUTH0_CLIENT_ID || '',
 }
 
 /**

@@ -11,8 +11,8 @@
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
   --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.8);
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.2);
-  --shadow-glow-strong: 0 0 30px rgba(16, 185, 129, 0.3);
+  --shadow-glow: 0 0 20px color-mix(in srgb, var(--color-accent, #10b981) 20%, transparent);
+  --shadow-glow-strong: 0 0 30px color-mix(in srgb, var(--color-accent, #10b981) 30%, transparent);
 }
 
 /* CARD SYSTEM */
@@ -39,7 +39,7 @@
 
 /* STATUS INDICATORS */
 .status-dot--online {
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent, #10b981) 50%, transparent);
 }
 
 /* GLASS PANELS */

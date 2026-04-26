@@ -121,7 +121,7 @@
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-card);
   padding: var(--spacing-6);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
 .card:hover {
@@ -136,7 +136,7 @@
   padding: 0.625rem 1.25rem;
   border-radius: var(--radius-button);
   font-weight: 510; /* Linear Influence */
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   cursor: pointer;
   border: none;
   text-decoration: none;
@@ -193,7 +193,7 @@
   bottom: 0;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(var(--color-primary-600), 0.1) 0%,
+      color-mix(in srgb, var(--color-primary-600) 10%, transparent) 0%,
     transparent 50%
   );
   pointer-events: none;
