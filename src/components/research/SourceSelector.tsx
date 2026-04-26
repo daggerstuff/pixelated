@@ -20,7 +20,8 @@ interface SourceSelectorProps {
   onChange: (sources: string[]) => void
 }
 
-export default function SourceSelector({
+// ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders when parent SearchInterface state updates during typing
+const SourceSelector = React.memo(function SourceSelector({
   selectedSources,
   onChange,
 }: SourceSelectorProps) {
@@ -110,4 +111,6 @@ export default function SourceSelector({
       </button>
     </div>
   )
-}
+})
+
+export default SourceSelector

@@ -107,10 +107,12 @@ main {
 }
 
 main.main--full-width {
+  flex: 0 0 auto;
   margin: 0;
   max-width: none;
   padding: 0;
   align-items: stretch;
+  overflow: visible;
 }
 
 /* Typography */

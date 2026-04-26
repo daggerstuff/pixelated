@@ -259,11 +259,12 @@ export async function initBrowserSearch(
           'Failed to load flexsearch Document from alternate path:',
           docErr,
         )
-        throw new Error(
-          'Cannot load flexsearch Document',
-          { cause: err },
-          { cause: docErr },
-        )
+        const error = new Error('Cannot load flexsearch Document')
+        ;(error as Error & { cause?: unknown }).cause = {
+          primary: err,
+          fallback: docErr,
+        }
+        throw error
       }
     }
 

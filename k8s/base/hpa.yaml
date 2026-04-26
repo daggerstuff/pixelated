@@ -9,24 +9,24 @@ spec:
     kind: Deployment
     name: pixelated-empathy-api
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 1
   metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 75
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
       policies:
-        - type: Percent
-          value: 100
-          periodSeconds: 15
+      - type: Percent
+        value: 100
+        periodSeconds: 15
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-        - type: Percent
-          value: 10
-          periodSeconds: 60
+      - type: Percent
+        value: 10
+        periodSeconds: 60

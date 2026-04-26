@@ -1,8 +1,10 @@
-import unittest
+import json
 import os
 import tempfile
-import json
+import unittest
+
 import worker
+
 
 class TestWorker(unittest.TestCase):
     def setUp(self):

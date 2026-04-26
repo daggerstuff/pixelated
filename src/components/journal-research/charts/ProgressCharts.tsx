@@ -24,6 +24,8 @@ export function ProgressCharts({
   metrics,
   className,
 }: ProgressChartsProps) {
+  const formatTickLabel = (value: string | number) => `${value}%`
+
   const progressData = useMemo(() => {
     const phases = ['discovery', 'evaluation', 'acquisition', 'integration']
     const phaseProgress = phases.map((phase) => {
@@ -156,7 +158,7 @@ export function ProgressCharts({
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: (value) => `${value}%`,
+                    callback: formatTickLabel,
                   },
                 },
               },
@@ -202,7 +204,7 @@ export function ProgressCharts({
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: (value) => `${value}%`,
+                    callback: formatTickLabel,
                   },
                 },
               },

@@ -304,18 +304,21 @@ export interface EncryptedData<T = unknown> {
   dataType: 'number' | 'string' | 'boolean' | 'array' | 'object'
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
 /**
  * Type guard for EncryptedData
  */
 export function isEncryptedData(obj: unknown): obj is EncryptedData {
-  if (!obj || typeof obj !== 'object') {
+  if (!isRecord(obj)) {
     return false
   }
 
-  const dataObj = obj as Record<string, unknown>
-  const id = dataObj.id
-  const dataType = dataObj.dataType
-  const data = dataObj.data
+  const id = obj.id
+  const dataType = obj.dataType
+  const data = obj.data
 
   return (
     typeof id === 'string' && typeof dataType === 'string' && data !== undefined
@@ -458,14 +461,14 @@ export interface FHEService {
    * @param value The value to encrypt
    * @returns The encrypted data
    */
-  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData>
+  encrypt(value: unknown, options?: unknown): Promise<EncryptedData>
 
   /**
    * Decrypt encrypted data
    * @param encryptedData The encrypted data to decrypt
    * @returns The decrypted value
    */
-  decrypt<T>(encryptedData: EncryptedData, options?: unknown): Promise<T>
+  decrypt<T>(encryptedData: EncryptedData<T>, options?: unknown): Promise<T>
 
   /**
    * Add two encrypted values

@@ -1,63 +1,63 @@
 export const heroContent = {
-  title: 'Coach the moment that changed the room.',
+  title: 'Train therapists with AI clients before live care.',
   subtitle:
-    'Run one difficult therapy case, keep the transcript and review lane attached, and leave supervision with one visible next move instead of a fuzzy recap.',
+    'Pixelated Empathy is a clinical simulation workspace for counseling programs, supervisors, and behavioral health teams that need safe, repeatable practice for the conversations therapists cannot afford to wing.',
   helperText:
-    'Bring a real case only if the review becomes sharper in the very next supervision.',
-  kicker: 'For clinical training teams that need sharper supervision',
+    'Built for counseling programs, clinical supervisors, training clinics, and behavioral health teams.',
+  kicker: 'Clinical simulation for therapist education',
   proofPoints: [
     {
-      label: 'Keep the turning point visible',
-      text: 'Save the intervention, miss, or repair that changed the room instead of rebuilding it from memory.',
+      label: 'For trainees',
+      text: 'Practice intake, rupture repair, crisis response, and motivational interviewing with AI clients that push back, shut down, disclose, and escalate.',
     },
     {
-      label: 'Coach from the actual exchange',
-      text: 'Review transcript, notes, and rationale together so the next move is specific before the room gets fuzzy.',
+      label: 'For supervisors',
+      text: 'See what the trainee actually said, where the clinical decision landed, and what should be practiced again.',
     },
   ],
   primaryCTA: { text: 'Book a pilot', href: '/contact' },
   secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
   artifact: {
-    eyebrow: 'Product proof',
-    status: 'A review record your team can coach from next week.',
+    eyebrow: 'Inside the product',
+    status: 'A practice room connected to a supervisor review desk.',
     chip: 'Session record',
-    mode: 'Proof before pitch',
+    mode: 'Practice + review',
     image: '/images/homepage/training-session-proof.png',
     imageAlt:
       'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
       {
-        label: 'What stays attached',
+        label: 'Practice room',
         value:
-          'The live conversation, saved transcript, and coaching lane stay tied to the same case.',
+          'The trainee enters a scenario, speaks with an AI client, and has to make real clinical choices in the moment.',
       },
       {
-        label: 'Why it matters',
+        label: 'Review desk',
         value:
-          'A supervisor can point to the exact turn that needs work instead of reconstructing the room from memory.',
+          'The supervisor opens the session record, reviews the exchange, and turns the attempt into targeted feedback.',
       },
     ],
     outputs: [
       {
-        label: 'Specific next move',
+        label: 'Supervisor note',
         value:
-          'Point to the intervention worth revisiting next, not a vague impression.',
+          'Highlight the clinical response that needs praise, correction, or another attempt.',
       },
       {
-        label: 'Shared review surface',
+        label: 'Training record',
         value:
-          'Keep transcript and notes attached to one difficult case the whole team can study.',
+          'Keep the conversation, scenario context, and instructor notes attached to the same simulation.',
       },
       {
-        label: 'Cleaner retry',
+        label: 'Repeatable practice',
         value:
-          'Start the next attempt from a visible decision instead of a fuzzy recap.',
+          'Run the same client scenario again to see whether the trainee changes the response.',
       },
     ],
     readout: [
-      { label: 'Who it is for', value: 'Clinical training teams' },
-      { label: 'What stays', value: 'Transcript + coaching lane' },
-      { label: 'What changes', value: 'Sharper supervision' },
+      { label: 'Users', value: 'Trainees + supervisors' },
+      { label: 'Core unit', value: 'Reusable scenarios' },
+      { label: 'Result', value: 'Practice evidence' },
     ],
   },
 } as const

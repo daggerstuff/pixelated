@@ -5,6 +5,25 @@
 
 import { ManagementClient, AuthenticationClient } from 'auth0'
 
+type GuardianEnrollment = {
+  id: string
+  type: string
+  name?: string
+  enrolled_at?: string
+  last_used_at?: string
+  status?: MFAFactorStatus
+}
+
+type GuardianFactor = {
+  name: string
+  type?: string
+  enabled: boolean
+}
+
+type EnrollmentTicketResponse = {
+  ticket_id: string
+}
+
 // Type alias for auth0 v5+ compatibility
 export type ManagementClientOptionsWithClientCredentials = {
   domain: string
@@ -13,23 +32,16 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-// Extend ManagementClient to include methods that may not be in the TypeScript definitions
-interface ExtendedManagementClient extends ManagementClient {
-  // Guardian methods
-  getGuardianEnrollments(params: { id: string }): Promise<any>
-  getGuardianFactors(): Promise<any>
-  createGuardianEnrollmentTicket(params: {
-    user_id: string
-    send_mail: boolean
-  }): Promise<any>
-  deleteGuardianEnrollment(params: { id: string }): Promise<void>
-  // Logs
-  getLogs(params: { per_page: number; q: string }): Promise<any>
-  // Roles
-  getRoles(params: { per_page?: number; page?: number }): Promise<any>
-  assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
-  removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
-  getUserRoles(params: { id: string }): Promise<any>
+declare module 'auth0' {
+  interface ManagementClient {
+    getGuardianEnrollments(params: { id: string }): Promise<GuardianEnrollment[]>
+    getGuardianFactors(): Promise<GuardianFactor[]>
+    createGuardianEnrollmentTicket(params: {
+      user_id: string
+      send_mail: boolean
+    }): Promise<EnrollmentTicketResponse>
+    deleteGuardianEnrollment(params: { id: string }): Promise<void>
+  }
 }
 
 type ExtendedAuthenticationClient = AuthenticationClient
@@ -40,7 +52,7 @@ import { auth0Config } from './auth0-config'
 
 // Initialize Auth0 clients
 let auth0Authentication: ExtendedAuthenticationClient | null = null
-let auth0Management: ExtendedManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 
 /**
  * Initialize Auth0 clients
@@ -55,13 +67,11 @@ function initializeAuth0Clients() {
     return
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
+  auth0Authentication ??= new AuthenticationClient({
       domain: auth0Config.domain,
       clientId: auth0Config.clientId,
       clientSecret: auth0Config.clientSecret,
     })
-  }
 
   if (
     !auth0Management &&
@@ -73,7 +83,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-    }) as unknown as ExtendedManagementClient
+    })
   }
 }
 
@@ -103,11 +113,70 @@ export interface MFAChallenge {
   oobCode?: string
 }
 
+type MFAFactorStatus = 'enabled' | 'disabled' | 'pending'
+
+type UnknownRecord = Record<string, unknown>
+
 export interface MFAVerification {
   challengeType: string
   oobCode?: string
   bindingCode?: string
   authenticatorCode?: string
+}
+
+type SupportedFactorType = Extract<
+  MFAFactor['factorType'],
+  'otp' | 'sms' | 'webauthn-roaming' | 'webauthn-platform'
+>
+
+function isGuardianEnrollment(value: unknown): value is GuardianEnrollment {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.type === 'string'
+  )
+}
+
+function isGuardianFactor(value: unknown): value is GuardianFactor {
+  return (
+    isRecord(value) &&
+    typeof value.name === 'string' &&
+    typeof value.enabled === 'boolean'
+  )
+}
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null
+}
+
+function parseGuardianEnrollments(value: unknown): GuardianEnrollment[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.filter(isGuardianEnrollment)
+}
+
+function parseGuardianFactors(value: unknown): GuardianFactor[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.filter(isGuardianFactor)
+}
+
+function parseEnrollmentTicket(
+  value: unknown,
+): EnrollmentTicketResponse | undefined {
+  if (!isRecord(value)) {
+    return undefined
+  }
+
+  if (typeof value.ticket_id === 'string') {
+    return { ticket_id: value.ticket_id }
+  }
+
+  return undefined
 }
 
 /**
@@ -130,24 +199,27 @@ export class Auth0MFAService {
     }
 
     try {
-      // Get user's enrolled factors
-      const enrolledFactors = await auth0Management.getGuardianEnrollments({
-        id: userId,
-      })
+      const enrolledFactors = parseGuardianEnrollments(
+        await auth0Management.getGuardianEnrollments({
+          id: userId,
+        }),
+      )
 
       // Get all available factors
-      const availableFactors = await auth0Management.getGuardianFactors()
+      const availableFactors = parseGuardianFactors(
+        await auth0Management.getGuardianFactors(),
+      )
 
       // Filter out already enrolled factors
       const enrolledFactorTypes = enrolledFactors.map(
-        (factor: any) => factor.type,
+        (factor: GuardianEnrollment) => factor.type,
       )
       const availableFactorTypes = availableFactors
         .filter(
-          (factor: any) =>
+          (factor: GuardianFactor) =>
             factor.enabled && !enrolledFactorTypes.includes(factor.name),
         )
-        .map((factor: any) => factor.name)
+        .map((factor: GuardianFactor) => factor.name)
 
       return availableFactorTypes
     } catch (error: unknown) {
@@ -175,11 +247,15 @@ export class Auth0MFAService {
       switch (factor.factorType) {
         case 'otp':
           // For OTP, we generate a QR code for authenticator apps
-          const otpEnrollment =
+          const otpEnrollment = parseEnrollmentTicket(
             await auth0Management.createGuardianEnrollmentTicket({
               user_id: userId,
               send_mail: false,
-            })
+            }),
+          )
+          if (!otpEnrollment?.ticket_id) {
+            throw new Error('Unable to initialize OTP enrollment ticket')
+          }
 
           challenge = {
             challengeType: 'otp',
@@ -212,10 +288,6 @@ export class Auth0MFAService {
           }
           break
 
-        default:
-          throw new Error(
-            `Unsupported factor type: ${(factor as any).factorType}`,
-          )
       }
 
       // Log enrollment start event
@@ -257,7 +329,7 @@ export class Auth0MFAService {
 
       const enrolledFactor: MFAFactor = {
         id: `factor-${Date.now()}`,
-        factorType: verification.challengeType as any,
+        factorType: this.resolveFactorType(verification.challengeType),
         enrolledAt: new Date().toISOString(),
         status: 'enabled',
       }
@@ -294,18 +366,24 @@ export class Auth0MFAService {
     }
 
     try {
-      const enrollments = await auth0Management.getGuardianEnrollments({
-        id: userId,
-      })
+      const enrollments = parseGuardianEnrollments(
+        await auth0Management.getGuardianEnrollments({
+          id: userId,
+        }),
+      )
 
-      const factors: MFAFactor[] = enrollments.map((enrollment: any) => ({
-        id: enrollment.id,
-        factorType: enrollment.type,
-        friendlyName: enrollment.name,
-        enrolledAt: enrollment.enrolled_at,
-        lastUsedAt: enrollment.last_used_at,
-        status: enrollment.status || 'enabled',
-      }))
+      const factors: MFAFactor[] = enrollments
+        .filter((enrollment: GuardianEnrollment) =>
+          this.isSupportedFactorType(enrollment.type),
+        )
+        .map((enrollment: GuardianEnrollment) => ({
+          id: enrollment.id,
+          factorType: this.resolveFactorType(enrollment.type),
+          friendlyName: enrollment.name,
+          enrolledAt: enrollment.enrolled_at ?? new Date(0).toISOString(),
+          lastUsedAt: enrollment.last_used_at,
+          status: this.normalizeFactorStatus(enrollment.status),
+        }))
 
       return factors
     } catch (error: unknown) {
@@ -478,6 +556,35 @@ export class Auth0MFAService {
       userId,
       `mfa_preferred_factor_set_${factorId}`,
     )
+  }
+
+  private resolveFactorType(value: string): SupportedFactorType {
+    switch (value) {
+      case 'otp':
+      case 'sms':
+      case 'webauthn-roaming':
+      case 'webauthn-platform':
+        return value
+      default:
+        throw new Error(`Unsupported factor type: ${value}`)
+    }
+  }
+
+  private isSupportedFactorType(value: string): value is SupportedFactorType {
+    return (
+      value === 'otp' ||
+      value === 'sms' ||
+      value === 'webauthn-roaming' ||
+      value === 'webauthn-platform'
+    )
+  }
+
+  private normalizeFactorStatus(value: unknown): MFAFactorStatus {
+    if (value === 'enabled' || value === 'disabled' || value === 'pending') {
+      return value
+    }
+
+    return 'enabled'
   }
 }
 

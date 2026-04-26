@@ -2,6 +2,88 @@ import axios, { AxiosInstance } from 'axios'
 
 import { Logger } from '../utils/logger'
 
+type AlphaVantagePayload = Record<string, unknown>
+
+interface AlphaVantageGlobalQuoteResponse extends AlphaVantagePayload {
+  'Global Quote'?: AlphaVantagePayload
+}
+
+interface AlphaVantageOverviewResponse extends AlphaVantagePayload {
+  Symbol?: string
+  Name?: string
+  Sector?: string
+  Industry?: string
+  MarketCapitalization?: string
+  PERatio?: string
+  PEGatio?: string
+  BookValue?: string
+  DividendPerShare?: string
+  DividendYield?: string
+  EPS?: string
+  RevenuePerShareTTM?: string
+  ProfitMargin?: string
+  OperatingMarginTTM?: string
+  ReturnOnAssetsTTM?: string
+  ReturnOnEquityTTM?: string
+  RevenueTTM?: string
+  GrossProfitTTM?: string
+  NetIncomeTTM?: string
+  TotalAssets?: string
+  TotalLiabilities?: string
+  TotalShareholderEquity?: string
+  CashAndCashEquivalentsAtCarryingValue?: string
+  LatestQuarter?: string
+  Beta?: string
+}
+
+interface AlphaVantageTechnicalResponse extends AlphaVantagePayload {
+  [key: string]: unknown
+}
+
+interface AlphaVantageEconomicResponse extends AlphaVantagePayload {
+  data?: unknown
+}
+
+interface AlphaVantageNewsResponse extends AlphaVantagePayload {
+  feed?: unknown
+}
+
+interface AlphaVantageEarningsResponse extends AlphaVantagePayload {
+  quarterlyEarnings?: unknown
+}
+
+const isRecord = (value: unknown): value is AlphaVantagePayload =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const parseNumber = (value: unknown): number => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+  if (typeof value === 'string') {
+    const parsed = Number.parseFloat(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+  return 0
+}
+
+const parseSentiment = (
+  value: unknown,
+): 'positive' | 'negative' | 'neutral' => {
+  if (value === 'positive' || value === 'negative' || value === 'neutral') {
+    return value
+  }
+  return 'neutral'
+}
+
+const toDisplayString = (value: unknown): string => {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return String(value)
+  }
+  return ''
+}
+
 export interface AlphaVantageQuote {
   symbol: string
   price: number
@@ -61,16 +143,24 @@ export interface NewsSentiment {
   timePublished: string
 }
 
+interface QuarterlyEarnings {
+  fiscalDateEnding: string
+  reportedEPS: number
+  estimatedEPS: number
+  surprise: number
+  surprisePercentage: number
+}
+
 export class AlphaVantageService {
   private logger: Logger
   private client: AxiosInstance
   private readonly API_KEY: string
-  private cache: Map<string, { data: any; timestamp: number }> = new Map()
+  private cache: Map<string, { data: unknown; timestamp: number }> = new Map()
   private readonly CACHE_TTL = 15 * 60 * 1000 // 15 minutes
 
   constructor() {
     this.logger = new Logger('AlphaVantageService')
-    this.API_KEY = process.env['ALPHA_VANTAGE_API_KEY'] || ''
+    this.API_KEY = process.env['ALPHA_VANTAGE_API_KEY'] ?? ''
 
     if (!this.API_KEY) {
       this.logger.error('Alpha Vantage API key not configured')
@@ -78,7 +168,7 @@ export class AlphaVantageService {
 
     this.client = axios.create({
       baseURL:
-        process.env['ALPHA_VANTAGE_API_URL'] ||
+        process.env['ALPHA_VANTAGE_API_URL'] ??
         'https://www.alphavantage.co/query',
       timeout: 30000, // Alpha Vantage can be slow
       params: {
@@ -93,10 +183,10 @@ export class AlphaVantageService {
   async getQuote(symbol: string): Promise<AlphaVantageQuote | null> {
     try {
       const cacheKey = `alpha_quote_${symbol}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<AlphaVantageQuote>(cacheKey)
       if (cached) return cached
 
-      const response = await this.client.get('', {
+      const response = await this.client.get<AlphaVantageGlobalQuoteResponse>('', {
         params: {
           function: 'GLOBAL_QUOTE',
           symbol: symbol.toUpperCase(),
@@ -104,17 +194,29 @@ export class AlphaVantageService {
       })
 
       const quote = response.data['Global Quote']
-      if (!quote || !quote['01. symbol']) {
+      const resolvedSymbol = toDisplayString(quote?.['01. symbol'])
+      if (!resolvedSymbol) {
         this.logger.warn('No quote data found', { symbol })
         return null
       }
 
+      if (!isRecord(quote)) {
+        this.logger.warn('Unexpected quote payload shape', { symbol, quote })
+        return null
+      }
+
+      const changePercent = quote['10. change percent']
+      const changePercentNumber =
+        typeof changePercent === 'string'
+          ? parseNumber(changePercent.replace('%', ''))
+          : parseNumber(changePercent)
+
       const result: AlphaVantageQuote = {
-        symbol: quote['01. symbol'],
-        price: parseFloat(quote['05. price']),
-        change: parseFloat(quote['09. change']),
-        changePercent: parseFloat(quote['10. change percent'].replace('%', '')),
-        volume: parseInt(quote['06. volume']),
+        symbol: resolvedSymbol,
+        price: parseNumber(quote['05. price']),
+        change: parseNumber(quote['09. change']),
+        changePercent: changePercentNumber,
+        volume: parseNumber(quote['06. volume']),
         timestamp: new Date(),
       }
 
@@ -135,11 +237,11 @@ export class AlphaVantageService {
   async getFundamentals(symbol: string): Promise<CompanyFundamentals | null> {
     try {
       const cacheKey = `alpha_fundamentals_${symbol}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<CompanyFundamentals>(cacheKey)
       if (cached) return cached
 
       // Get company overview
-      const response = await this.client.get('', {
+      const response = await this.client.get<AlphaVantageOverviewResponse>('', {
         params: {
           function: 'OVERVIEW',
           symbol: symbol.toUpperCase(),
@@ -147,39 +249,40 @@ export class AlphaVantageService {
       })
 
       const data = response.data
-      if (!data || data['Symbol'] !== symbol.toUpperCase()) {
+      if (!isRecord(data) || data['Symbol'] !== symbol.toUpperCase()) {
         this.logger.warn('No fundamentals data found', { symbol })
         return null
       }
 
       const fundamentals: CompanyFundamentals = {
         symbol: data.Symbol,
-        companyName: data.Name,
-        sector: data.Sector,
-        industry: data.Industry,
-        marketCap: parseInt(data.MarketCapitalization) || 0,
-        peRatio: parseFloat(data.PERatio) || 0,
-        pegRatio: parseFloat(data.PEGRatio) || 0,
-        bookValue: parseFloat(data.BookValue) || 0,
-        dividendPerShare: parseFloat(data.DividendPerShare) || 0,
-        dividendYield: parseFloat(data.DividendYield) || 0,
-        eps: parseFloat(data.EPS) || 0,
-        revenuePerShare: parseFloat(data.RevenuePerShareTTM) || 0,
-        profitMargin: parseFloat(data.ProfitMargin) || 0,
-        operatingMargin: parseFloat(data.OperatingMarginTTM) || 0,
-        returnOnAssets: parseFloat(data.ReturnOnAssetsTTM) || 0,
-        returnOnEquity: parseFloat(data.ReturnOnEquityTTM) || 0,
-        revenue: parseInt(data.RevenueTTM) || 0,
-        grossProfit: parseInt(data.GrossProfitTTM) || 0,
-        netIncome: parseInt(data.NetIncomeTTM) || 0,
-        totalAssets: parseInt(data.TotalAssets) || 0,
-        totalLiabilities: parseInt(data.TotalLiabilities) || 0,
-        totalShareholderEquity: parseInt(data.TotalShareholderEquity) || 0,
-        cashAndCashEquivalents:
-          parseInt(data.CashAndCashEquivalentsAtCarryingValue) || 0,
+        companyName: data.Name ?? '',
+        sector: data.Sector ?? '',
+        industry: data.Industry ?? '',
+        marketCap: parseNumber(data.MarketCapitalization),
+        peRatio: parseNumber(data.PERatio),
+        pegRatio: parseNumber(data.PEGatio),
+        bookValue: parseNumber(data.BookValue),
+        dividendPerShare: parseNumber(data.DividendPerShare),
+        dividendYield: parseNumber(data.DividendYield),
+        eps: parseNumber(data.EPS),
+        revenuePerShare: parseNumber(data.RevenuePerShareTTM),
+        profitMargin: parseNumber(data.ProfitMargin),
+        operatingMargin: parseNumber(data.OperatingMarginTTM),
+        returnOnAssets: parseNumber(data.ReturnOnAssetsTTM),
+        returnOnEquity: parseNumber(data.ReturnOnEquityTTM),
+        revenue: parseNumber(data.RevenueTTM),
+        grossProfit: parseNumber(data.GrossProfitTTM),
+        netIncome: parseNumber(data.NetIncomeTTM),
+        totalAssets: parseNumber(data.TotalAssets),
+        totalLiabilities: parseNumber(data.TotalLiabilities),
+        totalShareholderEquity: parseNumber(data.TotalShareholderEquity),
+        cashAndCashEquivalents: parseNumber(
+          data.CashAndCashEquivalentsAtCarryingValue,
+        ),
         quarterly: false,
-        fiscalDateEnding: data.LatestQuarter,
-        beta: parseFloat(data.Beta) || 0,
+        fiscalDateEnding: data.LatestQuarter ?? '',
+        beta: parseNumber(data.Beta),
       }
 
       this.setCache(cacheKey, fundamentals)
@@ -204,7 +307,7 @@ export class AlphaVantageService {
   ): Promise<TechnicalIndicator[]> {
     try {
       const cacheKey = `alpha_${indicator}_${symbol}_${interval}_${timePeriod}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<TechnicalIndicator[]>(cacheKey)
       if (cached) return cached
 
       let functionType = ''
@@ -223,7 +326,7 @@ export class AlphaVantageService {
           break
       }
 
-      const response = await this.client.get('', {
+      const response = await this.client.get<AlphaVantageTechnicalResponse>('', {
         params: {
           function: functionType,
           symbol: symbol.toUpperCase(),
@@ -244,19 +347,31 @@ export class AlphaVantageService {
       }
 
       const indicators: TechnicalIndicator[] = Object.entries(data).map(
-        ([date, values]: [string, any]) => ({
-          symbol: symbol.toUpperCase(),
-          date,
-          value:
-            indicator === 'MACD'
-              ? parseFloat(
-                  values.MACD || values.SMA || values.EMA || values.RSI,
-                )
-              : parseFloat(
-                  values[indicator] || values.SMA || values.EMA || values.RSI,
-                ),
-        }),
+        ([date, values]) => {
+          if (!isRecord(values)) return null
+
+          const valueKey = isRecord(values)
+            ? indicator === 'MACD'
+              ? 'MACD'
+              : indicator
+            : indicator
+          const fallbackValue = isRecord(values)
+            ? values['SMA'] ?? values['EMA'] ?? values['RSI']
+            : undefined
+          const value = parseNumber(
+            isRecord(values)
+              ? values[valueKey] ?? fallbackValue
+              : undefined,
+          )
+
+          return {
+            symbol: symbol.toUpperCase(),
+            date,
+            value,
+          }
+        },
       )
+        .filter((item): item is TechnicalIndicator => item !== null)
 
       this.setCache(cacheKey, indicators)
       return indicators.slice(0, 50) // Return last 50 data points
@@ -278,7 +393,7 @@ export class AlphaVantageService {
   ): Promise<EconomicIndicator[]> {
     try {
       const cacheKey = `alpha_economic_${indicator}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<EconomicIndicator[]>(cacheKey)
       if (cached) return cached
 
       let functionType = ''
@@ -294,20 +409,24 @@ export class AlphaVantageService {
           break
       }
 
-      const response = await this.client.get('', {
+      const response = await this.client.get<AlphaVantageEconomicResponse>('', {
         params: {
           function: functionType,
         },
       })
 
-      const data = response.data.data || []
-      const indicators: EconomicIndicator[] = data
+      const rawData = response.data.data
+      const data = Array.isArray(rawData) ? rawData : []
+      const indicators = data
+        .filter(isRecord)
         .slice(0, 12)
-        .map((item: any) => ({
-          name: indicator,
-          value: item.value || item.value.toString(),
-          date: item.date,
-        }))
+        .map(
+          (item): EconomicIndicator => ({
+            name: indicator,
+            value: toDisplayString(item['value']) || 'N/A',
+            date: toDisplayString(item['date']) || 'N/A',
+          }),
+        )
 
       this.setCache(cacheKey, indicators)
       return indicators
@@ -326,10 +445,10 @@ export class AlphaVantageService {
   async getNewsSentiment(symbol: string): Promise<NewsSentiment[]> {
     try {
       const cacheKey = `alpha_news_${symbol}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<NewsSentiment[]>(cacheKey)
       if (cached) return cached
 
-      const response = await this.client.get('', {
+      const response = await this.client.get<AlphaVantageNewsResponse>('', {
         params: {
           function: 'NEWS_SENTIMENT',
           tickers: symbol.toUpperCase(),
@@ -337,18 +456,20 @@ export class AlphaVantageService {
         },
       })
 
-      const data = response.data.feed || []
-      const sentiments: NewsSentiment[] = data.map((item: any) => ({
-        title: item.title,
-        url: item.url,
-        summary: item.summary,
-        sentiment: item.overall_sentiment_label as
-          | 'positive'
-          | 'negative'
-          | 'neutral',
-        relevance: parseFloat(item.relevance_score) || 0,
-        timePublished: item.time_published,
-      }))
+      const rawData = response.data.feed
+      const data = Array.isArray(rawData) ? rawData : []
+      const sentiments = data
+        .filter(isRecord)
+        .map(
+          (item): NewsSentiment => ({
+            title: toDisplayString(item['title']),
+            url: toDisplayString(item['url']),
+            summary: toDisplayString(item['summary']),
+            sentiment: parseSentiment(item['overall_sentiment_label']),
+            relevance: parseNumber(item['relevance_score']),
+            timePublished: toDisplayString(item['time_published']),
+          }),
+        )
 
       this.setCache(cacheKey, sentiments)
       return sentiments
@@ -364,27 +485,32 @@ export class AlphaVantageService {
   /**
    * Get quarterly earnings data
    */
-  async getQuarterlyEarnings(symbol: string): Promise<any[]> {
+  async getQuarterlyEarnings(symbol: string): Promise<QuarterlyEarnings[]> {
     try {
       const cacheKey = `alpha_earnings_${symbol}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<QuarterlyEarnings[]>(cacheKey)
       if (cached) return cached
 
-      const response = await this.client.get('', {
+      const response = await this.client.get<AlphaVantageEarningsResponse>('', {
         params: {
           function: 'EARNINGS',
           symbol: symbol.toUpperCase(),
         },
       })
 
-      const data = response.data.quarterlyEarnings || []
-      const earnings = data.map((item: any) => ({
-        fiscalDateEnding: item.fiscalDateEnding,
-        reportedEPS: parseFloat(item.reportedEPS) || 0,
-        estimatedEPS: parseFloat(item.estimatedEPS) || 0,
-        surprise: parseFloat(item.surprise) || 0,
-        surprisePercentage: parseFloat(item.surprisePercentage) || 0,
-      }))
+      const rawData = response.data.quarterlyEarnings
+      const data = Array.isArray(rawData) ? rawData : []
+      const earnings = data
+        .filter(isRecord)
+        .map(
+          (item): QuarterlyEarnings => ({
+            fiscalDateEnding: String(item['fiscalDateEnding'] ?? ''),
+            reportedEPS: parseNumber(item['reportedEPS']),
+            estimatedEPS: parseNumber(item['estimatedEPS']),
+            surprise: parseNumber(item['surprise']),
+            surprisePercentage: parseNumber(item['surprisePercentage']),
+          }),
+        )
 
       this.setCache(cacheKey, earnings)
       return earnings
@@ -448,15 +574,15 @@ export class AlphaVantageService {
     }
   }
 
-  private getFromCache(key: string): any {
+  private getFromCache<T>(key: string): T | null {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data
+      return cached.data as T
     }
     return null
   }
 
-  private setCache(key: string, data: any): void {
+  private setCache<T>(key: string, data: T): void {
     this.cache.set(key, { data, timestamp: Date.now() })
   }
 

@@ -33,7 +33,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>(undefined)
+  const animationRef = useRef<number | null>(null)
   const timeRef = useRef(0)
 
   // Generate brain regions based on mood vector
@@ -214,7 +214,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) {
-      return
+      return () => {}
     }
 
     // Set canvas size
@@ -225,7 +225,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
     animate()
 
     return () => {
-      if (animationRef.current) {
+      if (animationRef.current !== null) {
         cancelAnimationFrame(animationRef.current)
       }
     }

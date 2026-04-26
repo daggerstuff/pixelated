@@ -6,12 +6,12 @@ import base64
 import json
 import os
 import re
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections.abc import Mapping
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError
 from urllib import parse, request
+from urllib.error import HTTPError
 
 DEFAULT_CONFIG_PATH = Path(".agent/internal/config.json")
 DEFAULT_RUNTIME_STATE_PATH = Path(".agent/internal/task-sync-state.json")
