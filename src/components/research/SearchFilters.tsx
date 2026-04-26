@@ -60,6 +60,9 @@ export default function SearchFilters({
     })
   }
 
+  // ⚡ Bolt: Convert topics array to a Set to prevent O(N²) performance bottlenecks during renders when checking for inclusion in loops
+  const selectedTopics = React.useMemo(() => new Set(localFilters.topics), [localFilters.topics])
+
   return (
     <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
       <div className='mb-6 flex items-center justify-between'>
@@ -150,20 +153,23 @@ export default function SearchFilters({
             Therapeutic Topics
           </label>
           <div className='flex flex-wrap gap-2'>
-            {COMMON_TOPICS.map((topic) => (
+          {COMMON_TOPICS.map((topic) => {
+            const isSelected = selectedTopics.has(topic)
+            return (
               <button
                 key={topic}
                 onClick={() => toggleTopic(topic)}
-                aria-pressed={localFilters.topics.includes(topic)}
+                aria-pressed={isSelected}
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  localFilters.topics.includes(topic)
+                  isSelected
                     ? 'bg-pink-600/20 text-pink-300 border-pink-600'
                     : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
                 }`}
               >
                 {topic}
               </button>
-            ))}
+            )
+          })}
           </div>
         </div>
 
