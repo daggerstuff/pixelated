@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "mcpServers": {
     "foresight": {
-      "command": "uv",
-      "args": ["run", "--active", "-m", "foresight_mcp"],
+      "command": "/home/vivi/pixelated/scripts/memory/foresight-mcp-server.sh",
+      "args": [],
       "cwd": "/home/vivi/pixelated/foresight-mcp",
       "env": {
         "FORESIGHT_DB_PATH": "/home/vivi/.foresight/memory.db",
