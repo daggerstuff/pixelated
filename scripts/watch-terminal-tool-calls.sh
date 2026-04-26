@@ -3,7 +3,7 @@
 set -euo pipefail
 
 LOG_DIR="/home/vivi/.cursor/projects/home-vivi-pixelated/terminals"
-PATTERN="<(function|parameter|tool|tool_result|tool_choice|tool_call|argument)[^>]*>"
+PATTERN="<(think|function|parameter|tool|tool_result|tool_choice|tool_call|argument|functions)[^>\n]*"
 INTERVAL_SECONDS="${TOOL_CALL_WATCH_INTERVAL_SECONDS:-2}"
 MAX_FILES="${TOOL_CALL_WATCH_MAX_FILES:-10}"
 STATE_FILE="/tmp/terminal-tool-call-watch.state"
