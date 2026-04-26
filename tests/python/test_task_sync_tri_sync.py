@@ -3,13 +3,12 @@ from __future__ import annotations
 import json
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Any
 
 import scripts.task_sync.tri_sync as tri_sync
 from scripts.task_sync.tri_sync import (
     SyncAction,
-    SyncMetadata,
     SyncExecutionResult,
+    SyncMetadata,
     TaskRecord,
     apply_sync_action,
     apply_sync_plan,

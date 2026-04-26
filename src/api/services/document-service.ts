@@ -4,7 +4,7 @@
 import { Types } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 
-import { slug } from '@/utils/common'
+import { slug } from '../../utils/common'
 
 import { getPostgresPool } from '../../lib/database/connection'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'

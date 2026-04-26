@@ -22,8 +22,8 @@ export const scenariosContent = {
   strip: {
     label: 'Who it is built for',
     title:
-      'Use it anywhere one hard case needs to be run, reviewed, and compared.',
-    body: 'The strongest fit is any training environment where one difficult conversation needs to be run more than once and reviewed by more than one person.',
+      'Use it anywhere therapists need repeatable practice before real care.',
+    body: 'The strongest fit is any training environment where supervisors need consistent client simulations, review evidence, and shared scoring criteria.',
     items: [
       { label: 'Graduate programs', value: 'Repeatable trainee rehearsal' },
       { label: 'Supervision teams', value: 'Concrete review and coaching' },

@@ -20,7 +20,7 @@ export interface Disposable {
  * Tracks and manages SEAL objects to ensure proper cleanup
  */
 export class SealMemoryManager {
-  private objects: Map<string, Disposable> = new Map();
+  private readonly objects: Map<string, Disposable> = new Map();
   private objectCounter = 0;
 
   /**
@@ -81,13 +81,11 @@ export class SealMemoryManager {
   public releaseAll() {
     logger.info(`Releasing ${this.objects.size} SEAL objects`);
 
-    for (const [id, obj] of this.objects.entries()) {
+    for (const [, obj] of this.objects.entries()) {
       try {
-        if (obj && typeof obj.delete === "function") {
-          obj.delete();
-        }
+        obj.delete();
       } catch (error: unknown) {
-        logger.error(`Error releasing SEAL object ${id}`, { error });
+        logger.error("Error releasing SEAL object", { error });
       }
     }
 
@@ -124,7 +122,7 @@ export class SealMemoryManager {
  * Resource scope for automatic cleanup of SEAL objects
  */
 export class SealResourceScope {
-  private memoryManager = new SealMemoryManager();
+  private readonly memoryManager = new SealMemoryManager();
 
   /**
    * Track a SEAL object for cleanup when the scope ends

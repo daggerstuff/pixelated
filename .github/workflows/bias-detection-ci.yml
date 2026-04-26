@@ -27,10 +27,12 @@ on:
       - .github/workflows/bias-detection-ci.yml
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
+  TRACE_TRIVY_DEPRECATION: ${{ vars.TRACE_TRIVY_DEPRECATION || 'false' }}
   NODE_VERSION: 24.14.0
   PYTHON_VERSION: 3.13
-  PNPM_VERSION: 10.33.0
+  PNPM_VERSION: 10.33.2
 
 jobs:
   security-scan:
@@ -46,6 +48,8 @@ jobs:
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         uses: aquasecurity/trivy-action@v0.35.0
+        env:
+          NODE_OPTIONS: ${{ env.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
         with:
           cache: 'false'
           scan-type: fs
@@ -89,7 +93,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache for CodeQL
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -138,7 +142,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -211,7 +215,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -283,8 +287,39 @@ jobs:
         with:
           service-dir: src/lib/ai/bias-detection/python-service
 
+      - name: Sync CI constraints from pinned requirements
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          req_text = Path("requirements.txt").read_text().splitlines()
+          wanted = {}
+          for line in req_text:
+              m = re.match(r"^([A-Za-z0-9_.-]+)==([^\s#]+)", line.strip())
+              if not m:
+                  continue
+              name = m.group(1).lower().replace("_", "-")
+              if name in {"numpy", "pandas"}:
+                  wanted[name] = line.strip()
+
+          missing = sorted({"numpy", "pandas"} - wanted.keys())
+          if missing:
+              raise SystemExit(
+                  "Missing pinned versions in requirements.txt: " + ", ".join(missing)
+              )
+
+          Path("constraints-ci.txt").write_text(
+              "# Auto-synced CI constraints from requirements.txt\n"
+              "# Generated during CI; keep requirements.txt as the source of truth.\n"
+              f"{wanted['numpy']}\n{wanted['pandas']}\n"
+          )
+          print("Wrote constraints-ci.txt:", wanted["numpy"], wanted["pandas"])
+          PY
+
       - name: Cache pip dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ~/.cache/pip
           key:
@@ -386,7 +421,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -416,6 +451,37 @@ jobs:
         uses: ./.github/actions/prepare-uv-venv
         with:
           service-dir: src/lib/ai/bias-detection/python-service
+
+      - name: Sync CI constraints from pinned requirements
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          req_text = Path("requirements.txt").read_text().splitlines()
+          wanted = {}
+          for line in req_text:
+              m = re.match(r"^([A-Za-z0-9_.-]+)==([^\s#]+)", line.strip())
+              if not m:
+                  continue
+              name = m.group(1).lower().replace("_", "-")
+              if name in {"numpy", "pandas"}:
+                  wanted[name] = line.strip()
+
+          missing = sorted({"numpy", "pandas"} - wanted.keys())
+          if missing:
+              raise SystemExit(
+                  "Missing pinned versions in requirements.txt: " + ", ".join(missing)
+              )
+
+          Path("constraints-ci.txt").write_text(
+              "# Auto-synced CI constraints from requirements.txt\n"
+              "# Generated during CI; keep requirements.txt as the source of truth.\n"
+              f"{wanted['numpy']}\n{wanted['pandas']}\n"
+          )
+          print("Wrote constraints-ci.txt:", wanted["numpy"], wanted["pandas"])
+          PY
 
       - name: Install Python ML dependencies
         run: |

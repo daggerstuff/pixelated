@@ -2,7 +2,6 @@
 Tests for NVIDIA API service
 """
 
-import asyncio
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 

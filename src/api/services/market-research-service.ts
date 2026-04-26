@@ -13,9 +13,9 @@ import { ForbiddenError, NotFoundError } from "../middleware/error-handler";
 type MarketResearchPermissionLevel = "view" | "edit" | "comment";
 
 type MarketResearchPermissions = {
-  view?: string[];
-  edit?: string[];
-  comment?: string[];
+  view: string[];
+  edit: string[];
+  comment: string[];
 };
 
 const normalizePermissions = (
@@ -26,13 +26,18 @@ const normalizePermissions = (
   comment: permissions?.comment ?? [],
 });
 
+const getPermissionLevel = (
+  permissions: MarketResearchPermissions,
+  permissionLevel: MarketResearchPermissionLevel,
+): string[] => permissions[permissionLevel] ?? [];
+
 const hasPermission = (
   permissions: MarketResearchPermissions | null | undefined,
   permissionLevel: MarketResearchPermissionLevel,
   userId: string,
 ) => {
   const normalized = normalizePermissions(permissions);
-  return normalized[permissionLevel].includes(userId);
+  return getPermissionLevel(normalized, permissionLevel).includes(userId);
 };
 
 /**
@@ -317,12 +322,16 @@ export async function shareMarketResearch(
   }
 
   // Add to appropriate permission array
-  const permissionKey = permissionLevel;
-  const permissions = normalizePermissions(research.permissions);
-  if (!permissions[permissionKey].includes(targetUserId)) {
-    permissions[permissionKey].push(targetUserId);
-    research.permissions = permissions;
-    await research.save();
+  const permissionKey = permissionLevel
+  const normalizedPermissions = normalizePermissions(research.permissions)
+  const permissionList = getPermissionLevel(normalizedPermissions, permissionKey)
+  if (!permissionList.includes(targetUserId)) {
+    const nextPermissions: MarketResearchPermissions = {
+      ...normalizedPermissions,
+      [permissionKey]: [...permissionList, targetUserId],
+    }
+    research.set('permissions', nextPermissions)
+    await research.save()
   }
 
   return research;

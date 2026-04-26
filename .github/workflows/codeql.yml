@@ -15,6 +15,7 @@ on:
     - cron: '0 2 * * 1'
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.13
 
@@ -72,7 +73,7 @@ jobs:
 
       - name: Setup pnpm cache
         if: matrix.language == 'javascript'
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -148,12 +149,30 @@ jobs:
           # Configure output format
           output: sarif-latest
 
+      - name: Collect CodeQL SARIF results
+        id: codeql-sarif
+        if: always()
+        shell: bash
+        run: |
+          mapfile -t SARIF_FILES < <(find "${RUNNER_TEMP}/codeql_databases" -type f -name "*.sarif")
+          if [ "${#SARIF_FILES[@]}" -eq 0 ]; then
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            echo "No CodeQL SARIF files were found under ${RUNNER_TEMP}/codeql_databases."
+          else
+            echo "found=true" >> "${GITHUB_OUTPUT}"
+            {
+              echo "paths<<EOF"
+              printf "%s\n" "${SARIF_FILES[@]}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Upload SARIF results as artifact
         uses: actions/upload-artifact@v7
-        if: always()
+        if: always() && steps.codeql-sarif.outputs.found == 'true'
         with:
           name: codeql-sarif-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases/*/results/*.sarif
+          path: ${{ steps.codeql-sarif.outputs.paths }}
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
@@ -161,5 +180,5 @@ jobs:
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases
+          path: ${{ runner.temp }}/codeql_databases
           retention-days: 7

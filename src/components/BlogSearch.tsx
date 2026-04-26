@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { Search, Loader2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 import { cn } from '../lib/utils.js'
@@ -16,28 +16,29 @@ interface SearchResponse {
   results: SearchResult[]
 }
 
-const isSearchResponse = (value: unknown): value is SearchResponse => {
-  if (!value || typeof value !== 'object') {
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+const isSearchResult = (value: unknown): value is SearchResult => {
+  if (!isRecord(value)) {
     return false
   }
 
   return (
-    'results' in value &&
-    Array.isArray((value as { results?: unknown }).results) &&
-    (value as { results: unknown[] }).results.every((item) => {
-      if (!item || typeof item !== 'object') {
-        return false
-      }
-
-      const resultItem = item as Record<string, unknown>
-      return (
-        typeof resultItem['id'] === 'string' &&
-        typeof resultItem['title'] === 'string' &&
-        typeof resultItem['description'] === 'string' &&
-        typeof resultItem['slug'] === 'string'
-      )
-    })
+    typeof value['id'] === 'string' &&
+    typeof value['title'] === 'string' &&
+    typeof value['description'] === 'string' &&
+    typeof value['slug'] === 'string'
   )
+}
+
+const isSearchResponse = (value: unknown): value is SearchResponse => {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return Array.isArray(value['results']) && value['results'].every(isSearchResult)
 }
 
 export function BlogSearch() {
@@ -97,23 +98,28 @@ export function BlogSearch() {
           disabled={isSearching}
           aria-label={isSearching ? 'Searching...' : 'Search'}
         >
-          {isSearching ? 'Searching...' : 'Search'}
+          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : 'Search'}
         </Button>
       </form>
+
+      {/* Screen reader only live region for search status */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {isSearching ? 'Searching...' : ''}
+      </div>
 
       {results.length > 0 && (
         <div className='mt-4 space-y-4'>
           {results.map((result) => (
-            <article key={result.id} className='bg-muted/50 rounded-lg p-4'>
+            <article key={result['id']} className='bg-muted/50 rounded-lg p-4'>
               <h3 className='mb-2 text-lg font-semibold'>
                 <a
-                  href={`/blog/${result.slug}`}
+                  href={`/blog/${result['slug']}`}
                   className='hover:text-primary transition-colors'
                 >
-                  {result.title}
+                  {result['title']}
                 </a>
               </h3>
-              <p className='text-muted-foreground'>{result.description}</p>
+              <p className='text-muted-foreground'>{result['description']}</p>
             </article>
           ))}
         </div>

@@ -187,7 +187,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Sources Identified
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.sources_identified ?? 0}
+                      {session.progressMetrics['sources_identified'] ?? 0}
                     </p>
                   </div>
                   <div>
@@ -195,7 +195,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Datasets Evaluated
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.datasets_evaluated ?? 0}
+                      {session.progressMetrics['datasets_evaluated'] ?? 0}
                     </p>
                   </div>
                   <div>
@@ -203,7 +203,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Datasets Acquired
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.datasets_acquired ?? 0}
+                      {session.progressMetrics['datasets_acquired'] ?? 0}
                     </p>
                   </div>
                   <div>
@@ -211,7 +211,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Integration Plans
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.integration_plans_created ?? 0}
+                      {session.progressMetrics['integration_plans_created'] ?? 0}
                     </p>
                   </div>
                 </div>
