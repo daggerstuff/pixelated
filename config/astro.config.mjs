@@ -85,24 +85,7 @@ const preferredPort = (() => {
 function getChunkName(id) {
   const normalizedId = id.replace(/\\/g, '/')
 
-  if (normalizedId.includes('/src/components/')) {
-    const componentSegments =
-      normalizedId.split('/src/components/')[1]?.split('/') || []
-    const componentImport = componentSegments[0]?.split('?')[0]
-    const componentExtension = componentImport
-      ? path.extname(componentImport)
-      : ''
-    if (!['.ts', '.tsx', '.js', '.jsx'].includes(componentExtension)) {
-      return null
-    }
-    const componentRoot = componentImport
-      ? path.basename(componentImport, path.extname(componentImport))
-      : ''
-    if (componentRoot) {
-      return `components-${componentRoot}`
-    }
-  }
-
+  // Feature-specific chunk rules must run BEFORE the generic component check
   if (
     normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')
   ) {
@@ -140,6 +123,25 @@ function getChunkName(id) {
     )
   ) {
     return 'feature-emotion-temporal'
+  }
+
+  // Generic component check (runs after feature-specific rules)
+  if (normalizedId.includes('/src/components/')) {
+    const componentSegments =
+      normalizedId.split('/src/components/')[1]?.split('/') || []
+    const componentImport = componentSegments[0]?.split('?')[0]
+    const componentExtension = componentImport
+      ? path.extname(componentImport)
+      : ''
+    if (!['.ts', '.tsx', '.js', '.jsx'].includes(componentExtension)) {
+      return null
+    }
+    const componentRoot = componentImport
+      ? path.basename(componentImport, path.extname(componentImport))
+      : ''
+    if (componentRoot) {
+      return `components-${componentRoot}`
+    }
   }
 
   if (
