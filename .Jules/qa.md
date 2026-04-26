@@ -9,4 +9,4 @@
 
 ## 2026-04-19 - QA: Add test for isPartialBiasDashboardSummary
 | Pattern: Finding untested utility functions (like type guards) and creating new targeted test files specifically for them under `__tests__` directory. | Action: Ensure the new test file fully isolates its test logic, covers both positive and negative cases, and passes verification using localized execution `npx vitest run <file>`.
-## 2024-05-20 - QA: Add test for formatDate edge case | Pattern: Using `replace_with_git_merge_diff` to inject tests for untested functions in existing test files. | Action: Ensure missing exported functions are systematically tested.
+## 2026-04-26 - Fix localStorage tests in jsdom | Pattern: When using jsdom in Vitest, spying on window.localStorage may fail to intercept direct localStorage calls. | Action: Use vi.spyOn(Storage.prototype, 'getItem') to properly intercept these methods.

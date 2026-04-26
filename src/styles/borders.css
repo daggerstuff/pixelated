@@ -1,25 +1,27 @@
 /* ================================================
-   DARK THEME BORDER SYSTEM
+   UNIFIED BLENDED THEME - BORDER SYSTEM
+   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
    ================================================ */
 
 :root {
+  /* === BORDERS - SUBTLE BRUTALIST === */
   --border-none: 0;
-  --border-subtle-line: 1px solid var(--border-subtle);
-  --border-primary-line: 1px solid var(--border-primary);
-  --border-secondary: 1px solid rgba(248, 245, 255, 0.2);
-  --border-accent: 1px solid var(--border-strong);
-  --border-strong-line: 2px solid rgba(196, 181, 253, 0.42);
-  --border-brutalist: var(--border-strong-line);
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+  --border-primary: 1px solid rgba(255, 255, 255, 0.1);
+  --border-secondary: 1px solid rgba(255, 255, 255, 0.15);
+  --border-accent: 1px solid rgba(16, 185, 129, 0.3);
+  --border-strong: 2px solid rgba(255, 255, 255, 0.12);
+  --border-brutalist: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 /* CARD SYSTEM */
 .card {
-  border: var(--border-primary-line);
+  border: var(--border-primary);
   border-radius: var(--radius-lg);
 }
 
 .card--elegant {
-  border: var(--border-primary-line);
+  border: var(--border-primary);
 }
 
 .card--brutalist {
@@ -27,7 +29,7 @@
 }
 
 .card--elevated {
-  border: var(--border-primary-line);
+  border: var(--border-primary);
 }
 
 .card:hover {
@@ -36,7 +38,7 @@
 
 /* BUTTON SYSTEM */
 .btn {
-  border: var(--border-primary-line);
+  border: var(--border-primary);
 }
 
 .btn--outline {

@@ -18,7 +18,7 @@ vi.mock('@/components/layout/Header.astro', () => ({
   default: () => '<mock-header></mock-header>',
 }))
 
-vi.mock('@/components/site/SiteFooter.astro', () => ({
+vi.mock('@/components/layout/Footer.astro', () => ({
   default: () => '<mock-footer></mock-footer>',
 }))
 
