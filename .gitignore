@@ -200,6 +200,8 @@ security-scan-artifacts
 /.tmp
 /.trunk
 tmp/
+.sdd/
+templates/
 
 # === PROJECT SPECIFIC & MISC ===
 artifacts/
@@ -358,3 +360,4 @@ __mocks__
 ai/.moderne
 
 .mcp.json
+HANDOFF.md
