@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 export interface SearchFiltersState {
   yearFrom?: number
@@ -59,6 +59,9 @@ export default function SearchFilters({
       return { ...prev, topics: newTopics }
     })
   }
+
+  // ⚡ Bolt: Convert topics array to Set to prevent O(N^2) lookups inside rendering map loop
+  const selectedTopicsSet = useMemo(() => new Set(localFilters.topics), [localFilters.topics])
 
   return (
     <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
@@ -150,20 +153,23 @@ export default function SearchFilters({
             Therapeutic Topics
           </label>
           <div className='flex flex-wrap gap-2'>
-            {COMMON_TOPICS.map((topic) => (
-              <button
-                key={topic}
-                onClick={() => toggleTopic(topic)}
-                aria-pressed={localFilters.topics.includes(topic)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  localFilters.topics.includes(topic)
-                    ? 'bg-pink-600/20 text-pink-300 border-pink-600'
-                    : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
-                }`}
-              >
-                {topic}
-              </button>
-            ))}
+            {COMMON_TOPICS.map((topic) => {
+              const isSelected = selectedTopicsSet.has(topic)
+              return (
+                <button
+                  key={topic}
+                  onClick={() => toggleTopic(topic)}
+                  aria-pressed={isSelected}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    isSelected
+                      ? 'bg-pink-600/20 text-pink-300 border-pink-600'
+                      : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
+                  }`}
+                >
+                  {topic}
+                </button>
+              )
+            })}
           </div>
         </div>
 
