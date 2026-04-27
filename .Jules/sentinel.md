@@ -8,3 +8,4 @@
 
 ## 2026-04-18 - Fix XSS in Head.astro JSON-LD | Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify | Learning: JSON.stringify is unsafe for inline script blocks without escaping | Prevention: Always use replace(/</g, '<').replace(/>/g, '>') for JSON data within set:html
 ## 2026-04-26 - Fix XSS in BlogLayout JSON-LD | Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify | Learning: JSON.stringify is unsafe for inline script blocks without escaping | Prevention: Always use replace(/</g, '\u003c').replace(/>/g, '\u003e') for JSON data within set:html
+## 2024-05-18 - Fix XSS in About.astro | Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify | Learning: JSON.stringify is unsafe for inline script blocks without escaping | Prevention: Always use replace(/</g, '\u003c').replace(/>/g, '\u003e') for JSON data within set:html
