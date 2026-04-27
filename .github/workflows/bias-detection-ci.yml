@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         env:
           NODE_OPTIONS: ${{ env.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
         with:
