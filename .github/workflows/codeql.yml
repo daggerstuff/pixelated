@@ -80,6 +80,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install native build dependencies
+        if: matrix.language == 'javascript'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          pnpm add -g node-gyp
+
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
         run: pnpm install --no-frozen-lockfile --ignore-scripts

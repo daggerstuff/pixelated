@@ -100,6 +100,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          pnpm add -g node-gyp
+
       - name: Install dependencies for CodeQL
         run: pnpm install --no-frozen-lockfile
 
@@ -148,6 +154,12 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          pnpm add -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -221,6 +233,12 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          pnpm add -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -427,6 +445,12 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          pnpm add -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
