@@ -7,7 +7,7 @@ torchvision==0.26.0
 torchaudio==2.11.0
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
 
-transformers==5.5.4
+transformers==5.6.2
 sentence-transformers==5.4.1
 scikit-learn==1.8.0
 fairlearn==0.13.0
