@@ -52,7 +52,7 @@ updates:
     include: 'scope'
   labels:
   - 'dependencies'
-  - 'npm'
+  - 'pnpm'
   groups:
     # Group all production patch updates for easier management
     production-patches:

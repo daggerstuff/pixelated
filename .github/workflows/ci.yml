@@ -56,6 +56,12 @@ jobs:
         with:
           node-version: '24.x'
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          pnpm add -g node-gyp
+
       - name: Get pnpm store path
         id: pnpm-store
         run: |
