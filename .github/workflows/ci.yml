@@ -94,7 +94,7 @@ jobs:
 
       - name: Security scan
         id: trivy_scan
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         env:
           NODE_OPTIONS: ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
         continue-on-error: true
