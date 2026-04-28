@@ -452,7 +452,7 @@
       ],
       "allowedVersions": {
         "mongodb": "^7.1.1",
-        "eslint": "9",
+        "eslint": "10",
         "drizzle-orm": "^0.45.2",
         "zod": "*",
         "@opentelemetry/api": "*",
