@@ -13,5 +13,19 @@ describe('scenarios utility functions', () => {
 
       expect(result).toBeNull();
     });
+
+    it('returns a matching difficulty scenario if available', async () => {
+      const allScenarios = await getScenarios();
+      // Ensure we leave at least one beginner scenario uncompleted
+      const beginnerScenario = allScenarios.find(s => s.difficulty === 'beginner');
+      if (beginnerScenario) {
+        const completedIds = allScenarios
+          .filter(s => s.id !== beginnerScenario.id)
+          .map(s => s.id);
+        const result = await getRecommendedScenario(completedIds, 'beginner');
+        expect(result).not.toBeNull();
+        expect(result?.id).toBe(beginnerScenario.id);
+      }
+    });
   });
 });
