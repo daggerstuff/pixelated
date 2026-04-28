@@ -20,6 +20,7 @@ find_uv() {
     "${REPO_ROOT}/.venv/bin/uv"
     "${REPO_ROOT}/ai/.venv/bin/uv"
     "${HOME}/.venv/bin/uv"
+    "${HOME}/.gemini/tools/bin/uv"
     /usr/local/bin/uv
     /usr/bin/uv
   )
@@ -39,6 +40,8 @@ if [[ -z "${UV_BIN}" ]]; then
   echo "uv not found in PATH or standard install locations." >&2
   exit 1
 fi
+
+export UV_CACHE_DIR="/home/vivi/.gemini/tmp/uv-cache"
 
 cd "${FORESIGHT_ROOT}"
 exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --active -m foresight_mcp "$@"
