@@ -2,7 +2,6 @@
 import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -11,48 +10,38 @@ const organizationSchema = {
   'logo': 'https://pixelatedempathy.com/favicon.svg',
   'description': 'AI-powered training platform for mental health professionals',
   'foundingDate': '2025',
-  'address': {
+  address: {
     '@type': 'PostalAddress',
-    'addressCountry': 'US',
+    addressCountry: 'US',
   },
-  'contactPoint': {
+  contactPoint: {
     '@type': 'ContactPoint',
-    'email': 'info@pixelatedempathy.com',
-    'contactType': 'Customer Service',
+    email: 'info@pixelatedempathy.com',
+    contactType: 'Customer Service',
   },
 }
-
 const principles = [
   'Keep the case, transcript, and coaching lane attached to the same run.',
   'Make difficult sessions repeatable enough for teams to compare judgment.',
   'Treat privacy, retention, and review controls as product design decisions.',
 ]
-
 const shifts = [
   {
     label: 'Before',
-    quote:
-      'Supervision depends on memory, side notes, and whoever was in the room.',
+    quote: 'Supervision depends on memory, side notes, and whoever was in the room.',
   },
   {
     label: 'After',
-    quote:
-      'Supervisors can point at the exact intervention, miss, or repair that should change next.',
+    quote: 'Supervisors can point at the exact intervention, miss, or repair that should change next.',
   },
 ]
 ---
-
-<BaseLayout
-  title="About Pixelated Empathy"
-  description="Why Pixelated Empathy exists and how it helps therapist training teams run clearer, more specific supervision."
-  fullWidthMain
->
+<BaseLayout title="About Pixelated Empathy" description="Why Pixelated Empathy exists and how it helps therapist training teams run clearer, more specific supervision." fullWidthMain>
   <script
     is:inline
     type="application/ld+json"
     set:html={JSON.stringify(organizationSchema).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
   />
-
   <MarketingPageHero
     eyebrow="About"
     title="We built Pixelated Empathy to make supervision more specific."
@@ -83,7 +72,6 @@ const shifts = [
       },
     ]}
   />
-
   <section class="marketing-section">
     <div class="marketing-shell">
       <div class="marketing-grid marketing-grid--2">
@@ -93,12 +81,11 @@ const shifts = [
             Training breaks when the useful moment disappears.
           </h2>
           <p>
-            Roleplay often ends with a strong feeling that something mattered,
-            but without a reliable way to revisit the exact exchange that caused
-            it. That turns supervision into interpretation instead of coaching.
+            Roleplay often ends with a strong feeling that something mattered, but
+            without a reliable way to revisit the exact exchange that caused it. That
+            turns supervision into interpretation instead of coaching.
           </p>
         </article>
-
         <article class="marketing-card marketing-card--accent">
           <span class="marketing-card__label">What changes</span>
           <h2 class="marketing-title marketing-title--medium">
@@ -106,14 +93,13 @@ const shifts = [
           </h2>
           <p>
             Pixelated Empathy keeps the conversation believable, preserves the
-            record, and makes it easier for a supervisor to coach one concrete
-            next move instead of offering broad impressions.
+            record, and makes it easier for a supervisor to coach one concrete next
+            move instead of offering broad impressions.
           </p>
         </article>
       </div>
     </div>
   </section>
-
   <section class="marketing-section marketing-section--soft">
     <div class="marketing-shell">
       <div class="marketing-proof-band">
@@ -123,55 +109,44 @@ const shifts = [
             A coaching workflow that survives past the session.
           </h2>
           <p class="marketing-section-copy">
-            The product decisions are guided by whether a team can learn faster
-            from one difficult case, not by whether the interface sounds
-            impressive.
+            The product decisions are guided by whether a team can learn faster from
+            one difficult case, not by whether the interface sounds impressive.
           </p>
         </div>
-
         <div class="marketing-proof-band__items">
-          {
-            principles.map((item, index) => (
-              <div class="marketing-proof-item">
-                <span>Principle {String(index + 1).padStart(2, '0')}</span>
-                <strong>{item}</strong>
-              </div>
-            ))
-          }
+          {principles.map((item, index) => (
+            <div class="marketing-proof-item">
+              <span>Principle {String(index + 1).padStart(2, '0')}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   </section>
-
   <section class="marketing-section">
     <div class="marketing-shell">
       <div class="marketing-section-header">
-        <span class="marketing-eyebrow"
-          >What better supervision sounds like</span
-        >
+        <span class="marketing-eyebrow">What better supervision sounds like</span>
         <h2 class="marketing-title marketing-title--medium">
           The difference is whether the team can name the moment.
         </h2>
       </div>
-
       <div class="marketing-quote-grid">
-        {
-          shifts.map((item) => (
-            <article
-              class:list={[
-                'marketing-quote-card',
-                item.label === 'After' && 'marketing-card--accent',
-              ]}
-            >
-              <span class="marketing-quote-label">{item.label}</span>
-              <blockquote>{item.quote}</blockquote>
-            </article>
-          ))
-        }
+        {shifts.map((item) => (
+          <article
+            class:list={[
+              'marketing-quote-card',
+              item.label === 'After' && 'marketing-card--accent',
+            ]}
+          >
+            <span class="marketing-quote-label">{item.label}</span>
+            <blockquote>{item.quote}</blockquote>
+          </article>
+        ))}
       </div>
     </div>
   </section>
-
   <MarketingCTA
     eyebrow="Start with one case"
     title="If the review gets more specific, the product is doing its job."
