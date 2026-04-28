@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRecommendedScenario, getScenarios } from '../scenarios';
+import { getRecommendedScenario, getScenarios, ScenarioDifficulty } from '../scenarios';
 
 describe('scenarios utility functions', () => {
   describe('getRecommendedScenario', () => {
@@ -8,24 +8,20 @@ describe('scenarios utility functions', () => {
       // against data changes in the actual implementation.
       const allScenarios = await getScenarios();
       const allIds = allScenarios.map(s => s.id);
-
-      const result = await getRecommendedScenario(allIds, 'beginner');
-
+      const result = await getRecommendedScenario(allIds, ScenarioDifficulty.BEGINNER);
       expect(result).toBeNull();
     });
 
     it('returns a matching difficulty scenario if available', async () => {
       const allScenarios = await getScenarios();
-      // Ensure we leave at least one beginner scenario uncompleted
-      const beginnerScenario = allScenarios.find(s => s.difficulty === 'beginner');
-      if (beginnerScenario) {
-        const completedIds = allScenarios
-          .filter(s => s.id !== beginnerScenario.id)
-          .map(s => s.id);
-        const result = await getRecommendedScenario(completedIds, 'beginner');
-        expect(result).not.toBeNull();
-        expect(result?.id).toBe(beginnerScenario.id);
-      }
+      const beginnerScenario = allScenarios.find((s) => s.difficulty === ScenarioDifficulty.BEGINNER);
+      expect(beginnerScenario).toBeDefined();
+      const completedIds = allScenarios
+        .filter((s) => s.id !== beginnerScenario!.id)
+        .map((s) => s.id);
+      const result = await getRecommendedScenario(completedIds, ScenarioDifficulty.BEGINNER);
+      expect(result).not.toBeNull();
+      expect(result?.difficulty).toBe(ScenarioDifficulty.BEGINNER);
     });
   });
 });
