@@ -217,6 +217,7 @@ describe('notificationPreferences', () => {
        we'll skip the full interaction test here or mock the component if needed.
        However, verifying the aria-label was the main goal.
     */
+    expect(select).toBeInTheDocument()
   })
 
   it('calls updateQuietHours when toggling quiet hours', () => {

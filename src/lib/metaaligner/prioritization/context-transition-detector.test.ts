@@ -514,19 +514,15 @@ describe('ContextTransitionDetector', () => {
         },
       ]
 
-      let transitionDetected = false
-      events.forEach((event) => {
-        const transition = detector.addEvent(event)
-        if (transition && transition.detected) {
-          transitionDetected = true
-          expect(transition.from.contextType).toBe(ContextType.EDUCATIONAL)
-          expect(transition.to.contextType).toBe(
-            ContextType.CLINICAL_ASSESSMENT,
-          )
-        }
-      })
+      const transitions = events.map((event) => detector.addEvent(event)).filter(t => t && t.detected)
 
-      expect(transitionDetected).toBe(true)
+      expect(transitions.length).toBeGreaterThan(0)
+      const transition = transitions[0]!
+
+      expect(transition.from.contextType).toBe(ContextType.EDUCATIONAL)
+      expect(transition.to.contextType).toBe(
+        ContextType.CLINICAL_ASSESSMENT,
+      )
     })
 
     it('should handle support to crisis dialogue', () => {
@@ -549,7 +545,7 @@ describe('ContextTransitionDetector', () => {
       ]
 
       let crisisElevated = false
-      dialogue.forEach((turn, index) => {
+      const transitions = dialogue.map((turn, index) => {
         const event: ContextEvent = {
           turnId: index + 1,
           contextType: turn.context,
@@ -561,12 +557,15 @@ describe('ContextTransitionDetector', () => {
         const transition = detector.addEvent(event)
         if (transition && transition.transitionType === 'crisis_elevation') {
           crisisElevated = true
-          expect(transition.detected).toBe(true)
-          expect(transition.shouldSmooth).toBe(false)
         }
-      })
+        return transition
+      }).filter(t => t && t.transitionType === 'crisis_elevation')
 
       expect(crisisElevated).toBe(true)
+      expect(transitions.length).toBeGreaterThan(0)
+      const transition = transitions[0]!
+      expect(transition.detected).toBe(true)
+      expect(transition.shouldSmooth).toBe(false)
     })
 
     it('should handle complex multi-context dialogue', () => {
