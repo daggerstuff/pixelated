@@ -4,7 +4,6 @@ export const prerender = false
 import { LazyDashboardPage } from '@/components/journal-research/lazy'
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
-// @ts-ignore Astro.props is injected at runtime
 const { user: _user } = Astro.props as { user: any }
 ---
 

@@ -3,7 +3,6 @@
  * This file provides mock implementations of Redis functionality for testing
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* global vi, expect */
 
 // Create a mock implementation of Redis client
@@ -103,7 +102,7 @@ const arrayContaining = (received: unknown[], expected: unknown[]) => {
 }
 
 // Expose arrayContaining for tests
-expect.arrayContaining = arrayContaining as any
+;(expect as any).arrayContaining = arrayContaining
 
 // Extend expect with custom matchers
 expect.extend({
@@ -121,38 +120,4 @@ expect.extend({
   }),
   toBeInstanceOf: (received, expected) => ({
     pass: received instanceof expected,
-    message: () => `expected ${received} to be an instance of ${expected}`,
-  }),
-  toBeGreaterThanOrEqual: (received, expected) => ({
-    pass: received >= expected,
-    message: () =>
-      `expected ${received} to be greater than or equal to ${expected}`,
-  }),
-  toBeLessThanOrEqual: (received, expected) => ({
-    pass: received <= expected,
-    message: () =>
-      `expected ${received} to be less than or equal to ${expected}`,
-  }),
-})
-
-// Ensure we're in test environment
-if (process.env.NODE_ENV !== 'test') {
-  console.warn('Warning: Redis mock loaded outside of test environment')
-}
-
-// Setup and teardown exports
-export function setup() {
-  console.log('Setting up Redis mock environment')
-  process.env.SKIP_REDIS_TESTS = 'true'
-}
-
-export function teardown() {
-  console.log('Tearing down Redis mock environment')
-}
-
-export default {
-  mockRedisClient,
-  mockRedisService,
-  setup,
-  teardown,
-}
+    message: () => `expected ${received} to be a

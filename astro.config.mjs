@@ -126,11 +126,7 @@ function getChunkName(id) {
 
   // Split large vendor libraries into separate chunks for better caching
   if (
-    normalizedId.includes('/better-auth/') ||
-    normalizedId.includes('/node_modules/better-auth/') ||
-    normalizedId.includes('better-auth/')
   ) {
-    return 'better-auth-vendor'
   }
   if (
     normalizedId.includes('/p5/') ||
@@ -164,11 +160,7 @@ function getChunkName(id) {
     return 'opentelemetry-vendor'
   }
   if (
-    normalizedId.includes('/better-auth/') ||
-    normalizedId.includes('/node_modules/better-auth/') ||
-    normalizedId.includes('better-auth/')
   ) {
-    return 'better-auth-vendor'
   }
   if (
     normalizedId.includes('/express/') ||
@@ -283,10 +275,7 @@ function getChunkName(id) {
     return 'opentelemetry-vendor'
   }
   if (
-    normalizedId.includes('/node_modules/better-auth/') ||
-    normalizedId.includes('\\node_modules\\better-auth\\')
   ) {
-    return 'better-auth-vendor'
   }
   if (
     normalizedId.includes('/node_modules/express/') ||
@@ -418,10 +407,6 @@ export default defineConfig({
           'mysql2',
           'sqlite3',
           'better-sqlite3',
-          'better-auth',
-          'better-auth/adapters/mongodb',
-          'better-auth/adapters/drizzle',
-          'better-auth/react',
           'axios',
           'bcryptjs',
           'jsonwebtoken',
@@ -531,10 +516,6 @@ export default defineConfig({
         'mysql2',
         'sqlite3',
         'better-sqlite3',
-        'better-auth',
-        'better-auth/adapters/mongodb',
-        'better-auth/adapters/drizzle',
-        'better-auth/react',
         'axios',
         'bcryptjs',
         'jsonwebtoken',
@@ -576,10 +557,6 @@ export default defineConfig({
         'playwright',
         '@sentry/profiling-node',
         'pdfkit',
-        'better-auth',
-        'better-auth/adapters/mongodb',
-        'better-auth/adapters/drizzle',
-        'better-auth/react',
         'axios',
         'bcryptjs',
         'jsonwebtoken',

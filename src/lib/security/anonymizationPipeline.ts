@@ -127,7 +127,6 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
       })
     } else {
       // Node/server context
-      // eslint-disable-next-line no-console
       console.error('Anonymization pipeline error', {
         auditId,
         error: summary.errors[0],

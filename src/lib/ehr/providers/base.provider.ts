@@ -37,7 +37,6 @@ export abstract class BaseEHRProvider implements EHRProvider {
   }
 
   toJSON(): Record<string, unknown> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { clientSecret, client, logger, ...safeProperties } = this as any
     return safeProperties
   }

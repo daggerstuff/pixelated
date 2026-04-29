@@ -81,7 +81,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Definition question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -102,7 +101,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Explanation question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -123,7 +121,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Comparison question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -144,7 +141,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Symptom question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -173,7 +169,6 @@ describe('EducationalContextRecognizer', () => {
           )
           if (result.topicArea !== test.expectedTopic) {
             // Log actual topic area for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Topic mapping result:', {
               query: test.query,
               actual: result.topicArea,

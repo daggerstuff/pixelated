@@ -28,7 +28,6 @@ class Anonymizer {
   async anonymize(payload: unknown): Promise<{ text: string }> {
     // Safely extract text if payload is the expected shape
     if (typeof payload === 'object' && payload !== null && 'text' in payload) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const obj = payload as { text?: unknown }
       if (typeof obj.text === 'string') {
         return Promise.resolve({ text: obj.text })

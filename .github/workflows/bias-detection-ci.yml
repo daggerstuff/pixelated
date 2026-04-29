@@ -104,7 +104,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
-          pnpm add -g node-gyp
+          npm install -g node-gyp
 
       - name: Install dependencies for CodeQL
         run: pnpm install --no-frozen-lockfile
@@ -159,7 +159,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
-          pnpm add -g node-gyp
+          npm install -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -238,7 +238,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
-          pnpm add -g node-gyp
+          npm install -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -450,7 +450,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
-          pnpm add -g node-gyp
+          npm install -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

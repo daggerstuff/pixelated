@@ -67,4 +67,4 @@ async def metrics():
 @router.get("/sentry-debug")
 async def sentry_debug():
     """Trigger a test error for Sentry verification."""
-    1 / 0  # noqa: B018
+    raise ZeroDivisionError("Sentry debug error")

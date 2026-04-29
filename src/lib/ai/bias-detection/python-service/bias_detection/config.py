@@ -32,13 +32,13 @@ class Settings(BaseSettings):
 
     # Database settings
     database_url: PostgresDsn = Field(
-        default="postgresql://user:password@localhost:5432/bias_detection",  # type: ignore[assignment]
+        default="postgresql://user:password@localhost:5432/bias_detection",
         validation_alias="DATABASE_URL",
     )
 
     # Redis settings
     redis_url: RedisDsn = Field(
-        default="redis://localhost:6379/0",  # type: ignore[assignment]
+        default="redis://localhost:6379/0",
         validation_alias="REDIS_URL",
     )
 

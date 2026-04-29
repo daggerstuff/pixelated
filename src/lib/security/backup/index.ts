@@ -216,8 +216,6 @@ export class BackupSecurityManager {
   private encryptionKey!: Uint8Array // MODIFIED: Definite assignment assertion
   private isInitialized = false
   private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // private recoveryTestingManager!: RecoveryTestingManager
 
   constructor(config?: Partial<BackupConfig>) {
     // Default configuration

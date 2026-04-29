@@ -135,8 +135,7 @@ export class AuditLoggingService {
   }
 
   async queryLogs(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    __filters: {
+    _filters: {
       startDate?: Date
       endDate?: Date
       eventType?: string
@@ -145,17 +144,13 @@ export class AuditLoggingService {
     },
   ): Promise<AuditLogEntry[]> {
     // Implement your log querying mechanism here
-    // This could be reading from a file, querying a database,
-    // or fetching from a logging service
-
+    console.debug('queryLogs called with filters:', _filters)
     throw new Error('Log querying not implemented')
   }
 
   async exportLogs(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    __format: 'json' | 'csv',
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    __filters?: {
+    _format: 'json' | 'csv',
+    _filters?: {
       startDate?: Date
       endDate?: Date
       eventType?: string
@@ -164,9 +159,7 @@ export class AuditLoggingService {
     },
   ): Promise<string> {
     // Implement your log export mechanism here
-    // This could be generating a file in the specified format
-    // with the filtered log entries
-
+    console.debug('exportLogs called with:', { _format, _filters })
     throw new Error('Log export not implemented')
   }
 

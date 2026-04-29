@@ -119,8 +119,11 @@ export function registerPIIMiddleware(
 
     // Register the middleware with the app
     // Note: This is an example - the actual implementation will depend on your framework
-    // @ts-expect-error: We can't type the app object precisely without knowing the framework
-    app.use(middleware)
+    if (app && typeof (app as any).use === 'function') {
+      ;(app as any).use(middleware)
+    } else {
+      logger.warn('Could not register PII middleware: app object lacks .use() method')
+    }
 
     logger.info('PII detection middleware registered')
   } catch (error: unknown) {

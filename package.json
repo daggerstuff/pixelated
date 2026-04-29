@@ -1,6 +1,7 @@
 {
   "name": "pixelated",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.33.2",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -37,7 +38,7 @@
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:markdown": "pnpm exec markdownlint --config .markdownlint.json \"**/*.md\" \"**/*.mdx\"",
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
-    "lint:ci": "oxlint -c .oxlintrc.json . || exit 0",
+    "lint:ci": "oxlint -c .oxlintrc.json .",
     "lint:fix": "oxlint -c .oxlintrc.json --fix-dangerously .",
     "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
     "typecheck:strict": "NODE_OPTIONS='--max-old-space-size=8192' tsx scripts/validate-typescript.ts",
@@ -226,7 +227,6 @@
     "auth0": "latest",
     "axios": "latest",
     "bcryptjs": "latest",
-    "better-auth": "latest",
     "better-sqlite3": "latest",
     "browserify-zlib": "latest",
     "buffer": "latest",
@@ -444,7 +444,6 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@10.33.2",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [

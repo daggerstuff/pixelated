@@ -221,10 +221,16 @@ export default tseslint.config(
             'scale',
             'frustumCulled',
             'material',
+            'matrixAutoUpdate',
+            'emissive',
+            'roughness',
+            'metalness',
           ],
         },
       ],
       'react/no-array-index-key': 'warn',
+      'no-control-regex': 'off',
+      'no-console': ['warn', { allow: ['warn', 'error', 'debug', 'info'] }],
 
       // React Hooks rules
       'react-hooks/rules-of-hooks': 'error',

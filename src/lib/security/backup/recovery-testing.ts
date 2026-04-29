@@ -61,7 +61,6 @@ function tryRequireNode(moduleName: string): any | null {
   try {
     if (!isBrowser && typeof process !== 'undefined') {
       // Use eval to avoid bundlers rewriting/including the require call.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const globalRequire = (globalThis as any).require
       if (typeof globalRequire === 'function') {
         return globalRequire(moduleName)
@@ -71,8 +70,9 @@ function tryRequireNode(moduleName: string): any | null {
       const module = (globalThis as any)[moduleName]
       if (module) return module
     }
-  } catch {
-    // ignore failures and return null to trigger fallback logic
+  } catch (e) {
+    console.debug(`Failed to require ${moduleName}:`, e)
+    // return null to trigger fallback logic
   }
   return null
 }

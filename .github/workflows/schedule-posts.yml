@@ -52,7 +52,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
-          pnpm add -g node-gyp
+          npm install -g node-gyp
 
       - name: Clean pnpm cache
         run: pnpm store prune
