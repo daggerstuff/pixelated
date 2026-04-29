@@ -245,9 +245,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       expect(highConfidenceItem?.confidence).toBe(1) // Clamped to max
 
       // Low confidence item might be filtered out due to threshold, but if present, should be clamped
-      if (lowConfidenceItem) {
-        expect(lowConfidenceItem.confidence).toBe(0) // Clamped to min
-      }
+      expect(lowConfidenceItem ? lowConfidenceItem.confidence : 0).toBe(0) // Clamped to min
     })
 
     it('should validate clinical relevance enum values', async () => {
