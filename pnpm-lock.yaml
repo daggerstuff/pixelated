@@ -31,19 +31,19 @@ importers:
         version: 3.0.53(zod@4.3.6)
       '@astrojs/check':
         specifier: latest
-        version: 0.9.8(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
+        version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
       '@astrojs/netlify':
         specifier: latest
-        version: 7.0.8(@azure/storage-blob@12.31.0)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)
+        version: 7.0.8(@azure/storage-blob@12.31.0)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)
       '@astrojs/node':
         specifier: latest
-        version: 10.0.6(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))
+        version: 10.0.6(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))
       '@astrojs/react':
         specifier: latest
         version: 5.0.4(@types/node@25.6.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(jiti@2.6.1)(lightningcss@1.32.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)
       '@astrojs/vercel':
         specifier: latest
-        version: 10.0.5(@aws-sdk/credential-provider-web-identity@3.972.36)(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)(rollup@4.60.1)(vue@3.5.33(typescript@6.0.3))
+        version: 10.0.6(@aws-sdk/credential-provider-web-identity@3.972.36)(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)(rollup@4.60.1)(vue@3.5.33(typescript@6.0.3))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.16.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -79,10 +79,10 @@ importers:
         version: 4.20260426.1
       '@composio/core':
         specifier: latest
-        version: 0.6.11(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6)
+        version: 0.8.0(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6)
       '@composio/vercel':
         specifier: latest
-        version: 0.6.11(@composio/core@0.6.11(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6))(ai@6.0.168(zod@4.3.6))
+        version: 0.8.0(@composio/core@0.8.0(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6))(ai@6.0.168(zod@4.3.6))
       '@google-cloud/compute':
         specifier: latest
         version: 6.9.0
@@ -154,13 +154,13 @@ importers:
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@react-three/drei':
         specifier: latest
-        version: 10.7.7(@react-three/fiber@9.6.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.0)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)
+        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.0)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)
       '@react-three/fiber':
         specifier: latest
-        version: 9.6.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)
+        version: 9.6.1(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)
       '@sentry/astro':
         specifier: latest
-        version: 10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1)
+        version: 10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1)
       '@sentry/node':
         specifier: latest
         version: 10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))
@@ -175,13 +175,13 @@ importers:
         version: 5.2.0(rollup@4.60.1)
       '@spotlightjs/astro':
         specifier: latest
-        version: 3.2.6(@sentry/astro@10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))
+        version: 3.2.6(@sentry/astro@10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))
       '@supermemory/tools':
         specifier: latest
         version: 2.0.0(@ai-sdk/provider@3.0.8)(ws@8.20.0(utf-8-validate@6.0.6))
       '@tanstack/react-query':
         specifier: latest
-        version: 5.100.5(react@19.2.5)
+        version: 5.100.6(react@19.2.5)
       '@tarquinen/opencode-dcp':
         specifier: latest
         version: 3.1.9(@opencode-ai/plugin@1.4.11)
@@ -334,7 +334,7 @@ importers:
         version: 9.0.3
       lucide-react:
         specifier: latest
-        version: 1.11.0(react@19.2.5)
+        version: 1.12.0(react@19.2.5)
       medium-zoom:
         specifier: latest
         version: 1.1.0
@@ -346,7 +346,7 @@ importers:
         version: 7.0.0
       mongoose:
         specifier: latest
-        version: 9.5.0(mongodb-client-encryption@7.0.0)
+        version: 9.6.0(mongodb-client-encryption@7.0.0)
       multer:
         specifier: latest
         version: 2.1.1
@@ -482,7 +482,7 @@ importers:
     devDependencies:
       '@astrojs/markdoc':
         specifier: latest
-        version: 1.0.4(@types/react@19.2.14)(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)
+        version: 1.0.4(@types/react@19.2.14)(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)
       '@astrojs/rss':
         specifier: latest
         version: 4.0.18
@@ -587,7 +587,7 @@ importers:
         version: 4.1.5(vitest@4.1.5)
       astro:
         specifier: latest
-        version: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+        version: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
       astro-eslint-parser:
         specifier: latest
         version: 1.4.0
@@ -948,11 +948,11 @@ packages:
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
 
-  '@astrojs/check@0.9.8':
-    resolution: {integrity: sha512-LDng8446QLS5ToKjRHd3bgUdirvemVVExV7nRyJfW2wV36xuv7vDxwy5NWN9zqeSEDgg0Tv84sP+T3yEq+Zlkw==}
+  '@astrojs/check@0.9.9':
+    resolution: {integrity: sha512-A5UW8uIuErLWEoRQvzgXpO1gTjUFtK8r7nU2Z7GewAMxUb7bPvpk11qaKKgxqXlHJWlAvaaxy+Xg28A6bmQ1Tg==}
     hasBin: true
     peerDependencies:
-      typescript: ^5.0.0
+      typescript: ^5.0.0 || ^6.0.0
 
   '@astrojs/compiler@2.13.1':
     resolution: {integrity: sha512-f3FN83d2G/v32ipNClRKgYv30onQlMZX1vCeZMjPsMMPl1mDpmbl0+N5BYo4S/ofzqJyS5hvwacEo0CCVDn/Qg==}
@@ -963,8 +963,8 @@ packages:
   '@astrojs/internal-helpers@0.9.0':
     resolution: {integrity: sha512-GdYkzR26re8izmyYlBqf4z2s7zNngmWLFuxw0UKiPNqHraZGS6GKWIwSHgS22RDlu2ePFJ8bzmpBcUszut/SDg==}
 
-  '@astrojs/language-server@2.16.6':
-    resolution: {integrity: sha512-N990lu+HSFiG57owR0XBkr02BYMgiLCshLf+4QG4v6jjSWkBeQGnzqi+E1L08xFPPJ7eEeXnxPXGLaVv5pa4Ug==}
+  '@astrojs/language-server@2.16.7':
+    resolution: {integrity: sha512-b64bWT74Vq/ORcSqW7TdIjjpB6hcl+Ei/lMANIUaAGlLPiYNtPTRI/j2tzvugT+LoVwfJtE2Ukq/t2OGCyEtfQ==}
     hasBin: true
     peerDependencies:
       prettier: ^3.0.0
@@ -1017,8 +1017,8 @@ packages:
   '@astrojs/underscore-redirects@1.0.3':
     resolution: {integrity: sha512-cxnGSw+sJigBLdX4TMSZKkzV6C3gMLJMucDk2W+n281Xhie68T2/9f1+1NMNDCZsc5i0FED7Qt5I10g2O9wtZg==}
 
-  '@astrojs/vercel@10.0.5':
-    resolution: {integrity: sha512-oMUAc+9SQjcoL809YuP5qZc+je6vu33dGVVH1tWjkmliIkG9U4NmBm6/HPYotVOyiirEz9m8Lwpp7ICDfVFFRw==}
+  '@astrojs/vercel@10.0.6':
+    resolution: {integrity: sha512-Ubd1M77QWqXXluFNL8/ynmfyZCfIUVuL6QRpPXGYOIQ8Dv3QBXM34e0CMig3OgmihSIWNv9sqQHzEHDyDJV9QQ==}
     peerDependencies:
       astro: ^6.0.0
 
@@ -1251,6 +1251,7 @@ packages:
   '@aws-sdk/xml-builder@3.972.20':
     resolution: {integrity: sha512-MDcUfroaMAnDAHn29vN781t0wudR8zjfgg+r3s5otx8TJXFWg01NZB7HvHkBbOf7UUmKEwIZf5kHxiaVUgwjlQ==}
     engines: {node: '>=20.0.0'}
+    deprecated: 'upgrade to @aws-sdk/xml-builder@3.972.21+ to address a module compatibility issue: https://github.com/aws/aws-sdk-js-v3/issues/7967'
 
   '@aws/lambda-invoke-store@0.2.4':
     resolution: {integrity: sha512-iY8yvjE0y651BixKNPgmv1WrQc+GZ142sb0z4gYnChDDY2YqI4P/jsSopBWrKfAt7LOJAkOXt7rC/hms+WclQQ==}
@@ -1431,8 +1432,8 @@ packages:
   '@composio/client@0.1.0-alpha.66':
     resolution: {integrity: sha512-SDHcTWzz2dgdYAew/gQsRpjHpEzHKm6sW7KM4wCoJWNJuuMuey9Ahje91ZucNjfaqpI8CFW+pXY4nWkZf5LD7Q==}
 
-  '@composio/core@0.6.11':
-    resolution: {integrity: sha512-0uNA1DhHF0l3d51GVRw4CA8oYgqsps+aGMW6J4jA6Ut53HfBHwHJ4JAa9HU/2Psho8tCoprM6NR5DxWGD50H+A==}
+  '@composio/core@0.8.0':
+    resolution: {integrity: sha512-0wquulDnkJf+3FtoVdIAiwWzf4elOx9CzW4Z5mUe1crFDHf5qX7pwJrUvmw6gNfDRmYnAaweUZJjxMxrIUHPNw==}
     peerDependencies:
       zod: ^3.25 || ^4
 
@@ -1441,10 +1442,10 @@ packages:
     peerDependencies:
       zod: '>=3.25.76 <5'
 
-  '@composio/vercel@0.6.11':
-    resolution: {integrity: sha512-sNxU8Xurc63FKhuV8QcPr+MLiqo6iZ1RtwXm8dyRbS4fjWKFw/DfYw4+d2ChoNK7l+6XHNXmK7ayzmmovFnZiQ==}
+  '@composio/vercel@0.8.0':
+    resolution: {integrity: sha512-qWAB1UI1T0S92WwdVkLh43bfRq3mvX8rCxru/cRHcwF4iTAKzS8Q+KSQOGNs45DHA7bJYsdSIhUzsXRAYKszSQ==}
     peerDependencies:
-      '@composio/core': 0.6.11
+      '@composio/core': 0.8.0
       ai: ^5.0.0 || ^6.0.0
 
   '@csstools/color-helpers@6.0.2':
@@ -4660,8 +4661,8 @@ packages:
       react-dom:
         optional: true
 
-  '@react-three/fiber@9.6.0':
-    resolution: {integrity: sha512-90abYK2q5/qDM+GACs9zRvc5KhEEpEWqWlHSd64zTPNxg+9wCJvTfyD9x2so7hlQhjRYO1Fa6flR3BC/kpTFkA==}
+  '@react-three/fiber@9.6.1':
+    resolution: {integrity: sha512-zF0rsKcVYpcJwbFEnv2HkHX9cvOEgsfQo/X8lwmR2dn13S4qEQJXir9fxf5js2LQFoXqxOY7MDkOkYx2uZ4gSg==}
     peerDependencies:
       expo: '>=43.0'
       expo-asset: '>=8.4'
@@ -5492,11 +5493,11 @@ packages:
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
 
-  '@tanstack/query-core@5.100.5':
-    resolution: {integrity: sha512-t20KrhKkf0HXzqQkPbJ5erhFesup68BAbwFgYmTrS7bxMF7O5MdmL8jUkik4thsG7Hg00fblz30h6yF1d5TxGg==}
+  '@tanstack/query-core@5.100.6':
+    resolution: {integrity: sha512-Os2CPUr98to98RYm+D4qGqGkiffn7MGSyl2547a4MljVkHE30AMJRqTiyCqBfMwzAx/I91vCkAxp5tHSla6Twg==}
 
-  '@tanstack/react-query@5.100.5':
-    resolution: {integrity: sha512-aNwj1mi2v2bQ9IxkyR1grLOUkv3BYWoykHy9KDyLNbjC3tsahbOHJibK+Wjtr1wRhG59/AvJhiJG5OlthaCgJA==}
+  '@tanstack/react-query@5.100.6':
+    resolution: {integrity: sha512-uVSrps0PV16Cxmcn2rvL+dUhwTpTUtiRW347AEeYxMZXO2pZe9ja7E24PAMGoQ5u2g89DD8u4QhOviBk+RN8RA==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -6562,8 +6563,8 @@ packages:
   astro-robots-txt@1.0.0:
     resolution: {integrity: sha512-6JQSLid4gMhoWjOm85UHLkgrw0+hHIjnJVIUqxjU2D6feKlVyYukMNYjH44ZDZBK1P8hNxd33PgWlHzCASvedA==}
 
-  astro@6.1.9:
-    resolution: {integrity: sha512-NsAHzMzpznB281g2aM5qnBt2QjfH6ttKiZ3hSZw52If8JJ+62kbnBKbyKhR2glQcJLl7Jfe4GSl0DihFZ36rRQ==}
+  astro@6.1.10:
+    resolution: {integrity: sha512-jQAIki6c862oxRr7OXXC+h3n4wg1EpmKgCH3vv1FtXM9VFmD2iTjlaxrfb0I6eQCwtUjSBxfJBFBDSXHu7Wing==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -9474,8 +9475,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  lucide-react@1.11.0:
-    resolution: {integrity: sha512-UOhjdztXCgdBReRcIhsvz2siIBogfv/lhJEIViCpLt924dO+GDms9T7DNoucI23s6kEPpe988m5N0D2ajnzb2g==}
+  lucide-react@1.12.0:
+    resolution: {integrity: sha512-rTKR3RN6HIAxdNZALoPvqxd64vjL9nTThU0JF9q1Qg8yUnmo1r+d8baN72YNVK3RGxUmzBzbd77IWJq/fkm+Xw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -9866,33 +9867,6 @@ packages:
     resolution: {integrity: sha512-nUlKovSJZBh7q5hPsewFRam9H66D08Ne18nyknkNalfXMPtK1Og3kOcuqQhcX88x/pghSZPIJHrLbxNFW3OWiw==}
     engines: {node: '>=20.19.0'}
 
-  mongodb@7.1.1:
-    resolution: {integrity: sha512-067DXiMjcpYQl6bGjWQoTUEE9UoRViTtKFcoqX7z08I+iDZv/emH1g8XEFiO3qiDfXAheT5ozl1VffDTKhIW/w==}
-    engines: {node: '>=20.19.0'}
-    peerDependencies:
-      '@aws-sdk/credential-providers': ^3.806.0
-      '@mongodb-js/zstd': ^7.0.0
-      gcp-metadata: ^7.0.1
-      kerberos: ^7.0.0
-      mongodb-client-encryption: '>=7.0.0 <7.1.0'
-      snappy: ^7.3.2
-      socks: ^2.8.6
-    peerDependenciesMeta:
-      '@aws-sdk/credential-providers':
-        optional: true
-      '@mongodb-js/zstd':
-        optional: true
-      gcp-metadata:
-        optional: true
-      kerberos:
-        optional: true
-      mongodb-client-encryption:
-        optional: true
-      snappy:
-        optional: true
-      socks:
-        optional: true
-
   mongodb@7.2.0:
     resolution: {integrity: sha512-F/2+BMZtLVhY30ioZp0dAmZ+IRZMBqI+nrv6t5+9/1AIwCa8sMRC3jBf81lpxMhnZgqq8CoUD503Z1oZWq1/sw==}
     engines: {node: '>=20.19.0'}
@@ -9920,8 +9894,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@9.5.0:
-    resolution: {integrity: sha512-B4blGFkFL1s0G24URuMvx0qTlx+gRVLmfO7WcSz8NcmW/XHEJ3G69capdyW1iRsGKiycp1tkwKHnxHbnwjwmPw==}
+  mongoose@9.6.0:
+    resolution: {integrity: sha512-Xs7aN4fk4uHhDYltjQFqPQ+Z45eJscuIaw3EtP+NAmXLEm7z3xeJSgerLwyszALJNY9TvE0PMxCjQH9kCVTe5g==}
     engines: {node: '>=20.19.0'}
 
   motion-dom@12.38.0:
@@ -11564,10 +11538,6 @@ packages:
     resolution: {integrity: sha512-Kxl3KJGb/gxkaUMOjRsQ8IrXiGW75O4E3RPjFIINOVH8AMl2SQ/yWdTzWwF3FevIX9LcMAjJW+GRwAlAbTSXdg==}
     engines: {node: '>=20'}
 
-  string-width@8.2.0:
-    resolution: {integrity: sha512-6hJPQ8N0V0P3SNmP6h2J99RLuzrWz2gvT7VnK5tKvrNqJoyS9W4/Fb8mo31UiPvy00z7DQXkP2hnKBVav76thw==}
-    engines: {node: '>=20'}
-
   string-width@8.2.1:
     resolution: {integrity: sha512-IIaP0g3iy9Cyy18w3M9YcaDudujEAVHKt3a3QJg1+sr/oX96TbaGUubG0hJyCjCBThFH+tFpcIyoUHUn1ogaLA==}
     engines: {node: '>=20'}
@@ -13057,9 +13027,9 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@astrojs/check@0.9.8(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)':
+  '@astrojs/check@0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)':
     dependencies:
-      '@astrojs/language-server': 2.16.6(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
+      '@astrojs/language-server': 2.16.7(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
       chokidar: 4.0.3
       kleur: 4.1.5
       typescript: 6.0.3
@@ -13076,7 +13046,7 @@ snapshots:
     dependencies:
       picomatch: 4.0.4
 
-  '@astrojs/language-server@2.16.6(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)':
+  '@astrojs/language-server@2.16.7(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)':
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/yaml2ts': 0.2.3
@@ -13102,13 +13072,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdoc@1.0.4(@types/react@19.2.14)(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)':
+  '@astrojs/markdoc@1.0.4(@types/react@19.2.14)(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)':
     dependencies:
       '@astrojs/internal-helpers': 0.9.0
       '@astrojs/markdown-remark': 7.1.1
       '@astrojs/prism': 4.0.1
       '@markdoc/markdoc': 0.5.7(@types/react@19.2.14)(react@19.2.5)
-      astro: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+      astro: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
       esbuild: 0.27.7
       github-slugger: 2.0.0
       htmlparser2: 10.1.0
@@ -13143,7 +13113,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/netlify@7.0.8(@azure/storage-blob@12.31.0)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)':
+  '@astrojs/netlify@7.0.8(@azure/storage-blob@12.31.0)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)':
     dependencies:
       '@astrojs/internal-helpers': 0.9.0
       '@astrojs/underscore-redirects': 1.0.3
@@ -13151,7 +13121,7 @@ snapshots:
       '@netlify/functions': 5.2.0
       '@netlify/vite-plugin': 2.11.5(@azure/storage-blob@12.31.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(rollup@4.60.1)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3))
       '@vercel/nft': 1.5.0(rollup@4.60.1)
-      astro: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+      astro: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
       esbuild: 0.27.7
       tinyglobby: 0.2.16
       vite: 7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)
@@ -13194,10 +13164,10 @@ snapshots:
       - uploadthing
       - yaml
 
-  '@astrojs/node@10.0.6(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))':
+  '@astrojs/node@10.0.6(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))':
     dependencies:
       '@astrojs/internal-helpers': 0.9.0
-      astro: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+      astro: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -13249,14 +13219,14 @@ snapshots:
 
   '@astrojs/underscore-redirects@1.0.3': {}
 
-  '@astrojs/vercel@10.0.5(@aws-sdk/credential-provider-web-identity@3.972.36)(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)(rollup@4.60.1)(vue@3.5.33(typescript@6.0.3))':
+  '@astrojs/vercel@10.0.6(@aws-sdk/credential-provider-web-identity@3.972.36)(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(react@19.2.5)(rollup@4.60.1)(vue@3.5.33(typescript@6.0.3))':
     dependencies:
       '@astrojs/internal-helpers': 0.9.0
       '@vercel/analytics': 1.6.1(react@19.2.5)(vue@3.5.33(typescript@6.0.3))
       '@vercel/functions': 3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36)
       '@vercel/nft': 1.5.0(rollup@4.60.1)
       '@vercel/routing-utils': 5.3.3
-      astro: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+      astro: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
       esbuild: 0.27.7
       tinyglobby: 0.2.16
     transitivePeerDependencies:
@@ -14314,7 +14284,7 @@ snapshots:
 
   '@composio/client@0.1.0-alpha.66': {}
 
-  '@composio/core@0.6.11(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6)':
+  '@composio/core@0.8.0(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6)':
     dependencies:
       '@composio/client': 0.1.0-alpha.66
       '@composio/json-schema-to-zod': 0.1.20(zod@4.3.6)
@@ -14332,9 +14302,9 @@ snapshots:
     dependencies:
       zod: 4.3.6
 
-  '@composio/vercel@0.6.11(@composio/core@0.6.11(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6))(ai@6.0.168(zod@4.3.6))':
+  '@composio/vercel@0.8.0(@composio/core@0.8.0(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6))(ai@6.0.168(zod@4.3.6))':
     dependencies:
-      '@composio/core': 0.6.11(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6)
+      '@composio/core': 0.8.0(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.3.6)
       ai: 6.0.168(zod@4.3.6)
 
   '@csstools/color-helpers@6.0.2': {}
@@ -17536,12 +17506,12 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@react-three/drei@10.7.7(@react-three/fiber@9.6.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.0)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)':
+  '@react-three/drei@10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.0)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@mediapipe/tasks-vision': 0.10.17
       '@monogrid/gainmap-js': 3.4.0(three@0.184.0)
-      '@react-three/fiber': 9.6.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)
+      '@react-three/fiber': 9.6.1(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)
       '@use-gesture/react': 10.3.1(react@19.2.5)
       camera-controls: 3.1.2(three@0.184.0)
       cross-env: 7.0.3
@@ -17569,7 +17539,7 @@ snapshots:
       - '@types/three'
       - immer
 
-  '@react-three/fiber@9.6.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)':
+  '@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(three@0.184.0)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@types/webxr': 0.5.24
@@ -17784,13 +17754,13 @@ snapshots:
       '@sentry-internal/browser-utils': 10.50.0
       '@sentry/core': 10.50.0
 
-  '@sentry/astro@10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1)':
+  '@sentry/astro@10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1)':
     dependencies:
       '@sentry/browser': 10.50.0
       '@sentry/core': 10.50.0
       '@sentry/node': 10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))
       '@sentry/vite-plugin': 5.2.0(rollup@4.60.1)
-      astro: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+      astro: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
     transitivePeerDependencies:
       - '@opentelemetry/exporter-trace-otlp-http'
       - encoding
@@ -18415,11 +18385,11 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))':
+  '@spotlightjs/astro@3.2.6(@sentry/astro@10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))':
     dependencies:
-      '@sentry/astro': 10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1)
+      '@sentry/astro': 10.50.0(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))(rollup@4.60.1)
       '@spotlightjs/spotlight': 3.0.2
-      astro: 6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
+      astro: 6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -18479,11 +18449,11 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tanstack/query-core@5.100.5': {}
+  '@tanstack/query-core@5.100.6': {}
 
-  '@tanstack/react-query@5.100.5(react@19.2.5)':
+  '@tanstack/react-query@5.100.6(react@19.2.5)':
     dependencies:
-      '@tanstack/query-core': 5.100.5
+      '@tanstack/query-core': 5.100.6
       react: 19.2.5
 
   '@tarquinen/opencode-dcp@3.1.9(@opencode-ai/plugin@1.4.11)':
@@ -19850,7 +19820,7 @@ snapshots:
       valid-filename: 4.0.0
       zod: 3.25.76
 
-  astro@6.1.9(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3):
+  astro@6.1.10(@azure/storage-blob@12.31.0)(@netlify/blobs@10.7.4)(@types/node@25.6.0)(@upstash/redis@1.37.0)(@vercel/functions@3.4.3(@aws-sdk/credential-provider-web-identity@3.972.36))(ioredis@5.10.1)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(terser@5.46.2)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3):
     dependencies:
       '@astrojs/compiler': 3.0.1
       '@astrojs/internal-helpers': 0.9.0
@@ -20323,7 +20293,7 @@ snapshots:
   cli-truncate@5.2.0:
     dependencies:
       slice-ansi: 8.0.0
-      string-width: 8.2.0
+      string-width: 8.2.1
 
   cli-truncate@6.0.0:
     dependencies:
@@ -23166,7 +23136,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lucide-react@1.11.0(react@19.2.5):
+  lucide-react@1.12.0(react@19.2.5):
     dependencies:
       react: 19.2.5
 
@@ -23822,14 +23792,6 @@ snapshots:
       - socks
       - supports-color
 
-  mongodb@7.1.1(mongodb-client-encryption@7.0.0):
-    dependencies:
-      '@mongodb-js/saslprep': 1.4.8
-      bson: 7.2.0
-      mongodb-connection-string-url: 7.0.1
-    optionalDependencies:
-      mongodb-client-encryption: 7.0.0
-
   mongodb@7.2.0(mongodb-client-encryption@7.0.0):
     dependencies:
       '@mongodb-js/saslprep': 1.4.8
@@ -23838,10 +23800,10 @@ snapshots:
     optionalDependencies:
       mongodb-client-encryption: 7.0.0
 
-  mongoose@9.5.0(mongodb-client-encryption@7.0.0):
+  mongoose@9.6.0(mongodb-client-encryption@7.0.0):
     dependencies:
       kareem: 3.3.0
-      mongodb: 7.1.1(mongodb-client-encryption@7.0.0)
+      mongodb: 7.2.0(mongodb-client-encryption@7.0.0)
       mpath: 0.9.0
       mquery: 6.0.0
       ms: 2.1.3
@@ -25875,11 +25837,6 @@ snapshots:
       strip-ansi: 7.2.0
 
   string-width@8.1.0:
-    dependencies:
-      get-east-asian-width: 1.5.0
-      strip-ansi: 7.2.0
-
-  string-width@8.2.0:
     dependencies:
       get-east-asian-width: 1.5.0
       strip-ansi: 7.2.0
