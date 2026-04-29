@@ -66,7 +66,6 @@ export function WebSocketProgressBar(props: {
         }
       } catch (err) {
         // swallow parse errors
-        // eslint-disable-next-line no-console
         console.error('Failed to parse WebSocket message:', err)
       }
     }

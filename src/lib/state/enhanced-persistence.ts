@@ -19,7 +19,6 @@ function tryRequireNode(moduleName: string): any | null {
   try {
     if (typeof window === 'undefined' && typeof process !== 'undefined') {
       // Use eval to avoid bundlers rewriting/including the require call.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const globalRequire = (globalThis as any).require
       if (typeof globalRequire === 'function') {
         return globalRequire(moduleName)
@@ -29,8 +28,9 @@ function tryRequireNode(moduleName: string): any | null {
       const module = (globalThis as any)[moduleName]
       if (module) return module
     }
-  } catch {
-    // ignore failures and return null to trigger fallback logic
+  } catch (e) {
+    logger.debug(`Failed to require ${moduleName}:`, e)
+    // return null to trigger fallback logic
   }
   return null
 }
@@ -469,11 +469,9 @@ class EnhancedStatePersistence {
       // In case anything unexpected happens while generating secure suffix,
       // fall back to a non-cryptographic but unique-enough suffix.
       // This ensures the function remains robust in constrained environments.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const e: any = err
       logger.warn(
         'Secure suffix generation failed, falling back to timestamp+counter:',
-        e,
+        err instanceof Error ? err.message : 'Unknown error',
       )
       secureSuffix = `${Date.now().toString(36)}_${EnhancedStatePersistence.fallbackCounter++}`
     }

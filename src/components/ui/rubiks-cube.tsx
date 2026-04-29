@@ -299,9 +299,7 @@ const RubiksCubeModel = forwardRef<THREE.Group, RubiksCubeModelProps>(
         {cubes.map((cube: Cube) => (
           <group
             key={cube.id}
-            // eslint-disable-next-line react/no-unknown-property
             position={[cube.position.x, cube.position.y, cube.position.z]}
-            // eslint-disable-next-line react/no-unknown-property
             matrixAutoUpdate={false}
           >
             <RoundedBox
@@ -311,14 +309,10 @@ const RubiksCubeModel = forwardRef<THREE.Group, RubiksCubeModelProps>(
               castShadow
               receiveShadow
             >
-              {/* eslint-disable-next-line react/no-unknown-property */}
               <meshStandardMaterial
                 color='#ffffff'
-                // eslint-disable-next-line react/no-unknown-property
                 emissive='#111111'
-                // eslint-disable-next-line react/no-unknown-property
                 roughness={0.2}
-                // eslint-disable-next-line react/no-unknown-property
                 metalness={0.8}
               />
             </RoundedBox>

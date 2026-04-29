@@ -121,7 +121,6 @@ export class SessionAnalysisService {
         fn(stats)
       } catch (e) {
         // Non-blocking error for broken dashboard
-        // eslint-disable-next-line no-console
         console.error('SessionAnalysisService subscriber error:', e)
       }
     }

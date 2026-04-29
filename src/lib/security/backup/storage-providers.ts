@@ -813,7 +813,6 @@ export class AWSS3StorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    // eslint-disable-next-line no-control-regex
     const unsafeChars = /[<>:"|?*\u0000-\u001f]/
     if (unsafeChars.test(key)) {
       throw new Error('Key contains unsafe characters')
@@ -1033,7 +1032,6 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    // eslint-disable-next-line no-control-regex
     const unsafeChars = /[<>:"|?*\u0000-\u001f]/
     if (unsafeChars.test(key)) {
       throw new Error('Key contains unsafe characters')
@@ -1287,7 +1285,6 @@ export class AzureBlobStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    // eslint-disable-next-line no-control-regex
     const unsafeChars = /[<>:"|?*\u0000-\u001f]/
     if (unsafeChars.test(key)) {
       throw new Error('Key contains unsafe characters')

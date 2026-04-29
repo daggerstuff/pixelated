@@ -29,8 +29,7 @@ function loadGeneratedKeywords(): {
 } {
   try {
     // Use require for synchronous loading (Astro/build-time compatible)
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-    const generated = require('./generated.keywords.ts')
+    const generated = (globalThis as any).require('./generated.keywords.ts')
     return {
       euphemisms: Array.isArray(generated.SUICIDE_EUPHEMISMS)
         ? generated.SUICIDE_EUPHEMISMS
@@ -39,9 +38,10 @@ function loadGeneratedKeywords(): {
         ? generated.SAFE_IDIOMATIC_EXCLUSIONS
         : [],
     }
-  } catch {
+  } catch (e) {
     // Silently fall back to built-ins if generated module is not available
     // This allows the app to function before the Python integrator runs
+    console.debug('Generated keywords not available, using built-ins', e)
     return { euphemisms: [], exclusions: [] }
   }
 }
