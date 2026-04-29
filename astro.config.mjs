@@ -124,10 +124,6 @@ function getChunkName(id) {
     return 'feature-emotion-temporal'
   }
 
-  // Split large vendor libraries into separate chunks for better caching
-  if (
-  ) {
-  }
   if (
     normalizedId.includes('/p5/') ||
     normalizedId.includes('/node_modules/p5/') ||
@@ -158,9 +154,6 @@ function getChunkName(id) {
     normalizedId.includes('@opentelemetry/')
   ) {
     return 'opentelemetry-vendor'
-  }
-  if (
-  ) {
   }
   if (
     normalizedId.includes('/express/') ||
@@ -249,13 +242,6 @@ function getChunkName(id) {
   ) {
     return 'swiper-vendor'
   }
-  // Split large vendor libraries into separate chunks for better caching
-  if (
-    normalizedId.includes('/node_modules/@aws-sdk/') ||
-    normalizedId.includes('\\node_modules\\@aws-sdk\\')
-  ) {
-    return 'aws-sdk-vendor'
-  }
   if (
     normalizedId.includes('/node_modules/@azure/') ||
     normalizedId.includes('\\node_modules\\@azure\\')
@@ -273,9 +259,6 @@ function getChunkName(id) {
     normalizedId.includes('\\node_modules\\@opentelemetry\\')
   ) {
     return 'opentelemetry-vendor'
-  }
-  if (
-  ) {
   }
   if (
     normalizedId.includes('/node_modules/express/') ||
