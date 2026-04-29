@@ -7,8 +7,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-def categorize_record(record: dict) -> str:  # noqa: PLR0911
+def categorize_record(record: dict) -> str:
     """Attempt to categorize a record from various metadata sources."""
+    category = "uncategorized"
 
     # Check nested metadata.original_data.category (tier1 format)
     if "metadata" in record:
@@ -16,43 +17,36 @@ def categorize_record(record: dict) -> str:  # noqa: PLR0911
 
         # Nested in original_data
         if "original_data" in metadata and "category" in metadata["original_data"]:
-            return metadata["original_data"]["category"]
-
+            category = metadata["original_data"]["category"]
         # Direct in metadata
-        if "category" in metadata:
-            return metadata["category"]
+        elif "category" in metadata:
+            category = metadata["category"]
 
-    # Infer from source name
-    if "metadata" in record and "original_data" in record["metadata"]:
-        source = record["metadata"]["original_data"].get("source", "")
-        if "counseling" in source.lower():
-            return "therapeutic_conversation"
-        if "mental_health" in source.lower():
-            return "mental_health_support"
+    # Infer from source name if still uncategorized
+    if category == "uncategorized" and "metadata" in record and "original_data" in record["metadata"]:
+        source = record["metadata"]["original_data"].get("source", "").lower()
+        if "counseling" in source:
+            category = "therapeutic_conversation"
+        elif "mental_health" in source:
+            category = "mental_health_support"
 
-    # Infer from message content
-    if "messages" in record and len(record["messages"]) > 0:
+    # Infer from message content if still uncategorized
+    if category == "uncategorized" and "messages" in record and len(record["messages"]) > 0:
         first_msg = record["messages"][0].get("content", "").lower()
 
         # Therapeutic indicators
         therapeutic_keywords = [
-            "therapy",
-            "counseling",
-            "depression",
-            "anxiety",
-            "trauma",
-            "ptsd",
-            "abuse",
+            "therapy", "counseling", "depression", "anxiety", "trauma", "ptsd", "abuse"
         ]
         if any(kw in first_msg for kw in therapeutic_keywords):
-            return "therapeutic_conversation"
+            category = "therapeutic_conversation"
+        else:
+            # Crisis indicators
+            crisis_keywords = ["suicide", "kill myself", "end my life", "worthless"]
+            if any(kw in first_msg for kw in crisis_keywords):
+                category = "crisis_support"
 
-        # Crisis indicators
-        crisis_keywords = ["suicide", "kill myself", "end my life", "worthless"]
-        if any(kw in first_msg for kw in crisis_keywords):
-            return "crisis_support"
-
-    return "uncategorized"
+    return category
 
 
 def analyze_dataset(file_path: Path) -> dict:

@@ -15,9 +15,7 @@ export default defineConfig({
     presetAttributify(),
     presetIcons({
       collections: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         carbon: carbonIcons,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         mdi: mdiIcons,
       },
     }),

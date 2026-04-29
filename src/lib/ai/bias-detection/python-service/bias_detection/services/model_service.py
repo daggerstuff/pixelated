@@ -19,11 +19,11 @@ if TYPE_CHECKING:
 
 # Optional TensorFlow import
 try:
-    import tensorflow as tf  # type: ignore[assignment]
+    import tensorflow as tf
     TENSORFLOW_AVAILABLE = True
 except ImportError:
     TENSORFLOW_AVAILABLE = False
-    tf = None  # type: ignore[assignment]
+    tf: Any = None
 
 from bias_detection.config import settings
 from bias_detection.models import BiasType, ConfidenceLevel
@@ -198,7 +198,8 @@ class TensorFlowModelService(ModelService):
             if isinstance(encoded, dict) and "input_ids" in encoded:
                 # BERT-style input
                 predictions = self.model(encoded)
-                probabilities = tf.nn.softmax(predictions.logits, axis=-1)  # type: ignore[union-attr]
+                logits = getattr(predictions, "logits", predictions)
+                probabilities = tf.nn.softmax(logits, axis=-1)
             else:
                 # Custom model input
                 input_ids = np.array([encoded["input_ids"]])
@@ -557,11 +558,14 @@ class ModelEnsembleService:
 
         # NVIDIA API service for Kimi-k2.5 (optional)
         try:
-            from .nvidia_api_service import NvidiaAPIService  # noqa: PLC0415
+            from bias_detection.services.nvidia_api_service import NvidiaAPIService
             self.nvidia_service = NvidiaAPIService()
             # Note: We don't add this to services list automatically as it's a different type of service
-        except Exception as e:
+        except ImportError as e:
             logger.warning(f"NVIDIA API service not available: {e}")
+            self.nvidia_service = None
+        except Exception as e:
+            logger.warning(f"Error initializing NVIDIA API service: {e}")
             self.nvidia_service = None
 
     async def load_all_models(self) -> bool:

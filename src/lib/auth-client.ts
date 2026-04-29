@@ -25,7 +25,6 @@ class AuthClient {
   private _isLoading: boolean = false
 
   /**
-   * Hook-like method for React components (mimicking better-auth useSession)
    * Note: In a real React app, you should use a Context Provider to avoid duplicate fetches.
    */
   useSession() {
@@ -53,7 +52,6 @@ class AuthClient {
   }
 
   /**
-   * Get the current session (Promise-based, mimicking better-auth client)
    */
   async getSession() {
     if (this._session) {
@@ -202,7 +200,6 @@ class AuthClient {
   }
 
   /**
-   * Sign up getter for better-auth compatibility
    */
   get signUp() {
     return {
@@ -211,7 +208,6 @@ class AuthClient {
   }
 
   /**
-   * Mimic better-auth forgetPassword
    */
   async forgetPassword({ email, redirectTo }: any) {
     console.log(
@@ -222,7 +218,6 @@ class AuthClient {
   }
 
   /**
-   * Reset password getter for better-auth compatibility
    */
   get resetPassword() {
     return {

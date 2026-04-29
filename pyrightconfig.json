@@ -78,6 +78,8 @@
     "pixelated.egg-info"
   ],
   "extraPaths": ["stubs"],
+  "venvPath": "/home/vivi/pixelated/ai",
+  "venv": ".venv",
   "typeCheckingMode": "basic",
   "reportMissingTypeStubs": false,
   "reportMissingImports": false,

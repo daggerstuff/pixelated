@@ -45,14 +45,14 @@ if (!reactCompat.act || typeof reactCompat.act !== 'function') {
       configurable: true,
       enumerable: false,
     })
-  } catch {
+  } catch (e) {
     // React.act may already be defined in React 19.2.4 - safe to skip
+    console.debug('Failed to define reactCompat.act, might already exist', e)
   }
 }
 
 // Add type declarations for DOM testing matchers
 declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface Assertion<T = any> {
     toBeInTheDocument(): T
     toHaveAttribute(attr: string, value?: string): T

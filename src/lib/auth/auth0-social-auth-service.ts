@@ -173,8 +173,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      // @ts-ignore - Auth0 v5 types might be slightly mismatched with return expectations or method signatures in IDE but runtime works
-      const response = await auth0Authentication.oauth.authorizationCodeGrant({
+      const response = await (auth0Authentication.oauth as any).authorizationCodeGrant({
         code,
         redirect_uri: redirectUri,
       })
@@ -235,8 +234,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      // @ts-ignore
-      const response = await auth0Authentication.oauth.refreshTokenGrant({
+      const response = await (auth0Authentication.oauth as any).refreshTokenGrant({
         refresh_token: refreshToken,
       })
       const data = response.data
