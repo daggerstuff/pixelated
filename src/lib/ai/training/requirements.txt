@@ -519,7 +519,7 @@ propcache==0.4.1
     #   -r src/lib/ai/training/requirements.txt
     #   aiohttp
     #   yarl
-protobuf==6.33.5
+protobuf==7.34.1
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   databricks-sdk
@@ -774,7 +774,7 @@ tqdm==4.67.1
     #   pytorch-lightning
     #   spacy
     #   transformers
-transformers==5.5.3
+transformers==5.7.0
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   peft
