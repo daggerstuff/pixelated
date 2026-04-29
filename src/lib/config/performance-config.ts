@@ -546,11 +546,11 @@ export class PerformanceOptimizer {
     let createHash: ((algo: string) => import('crypto').Hash) | undefined
     try {
       // Use dynamic import to avoid top-level circular imports in some environments
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const utils = require('@/lib/utils') as typeof import('@/lib/utils')
       const crypto = utils.tryRequireNode('crypto')
       createHash = crypto?.createHash
-    } catch {
+    } catch (e) {
+      console.debug('Failed to dynamically require @/lib/utils or crypto', e)
       createHash = undefined
     }
 

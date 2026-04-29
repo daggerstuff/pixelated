@@ -34,10 +34,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install UV (preferred Python installer)
-        run: |
-          # Install uv for Python tooling
-          python3 -m pip install --no-cache-dir uv
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
 
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
@@ -228,7 +226,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
-          pnpm add -g node-gyp
+          npm install -g node-gyp
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

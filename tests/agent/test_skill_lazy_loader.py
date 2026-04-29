@@ -25,7 +25,7 @@ def load_loader(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, path_value: 
             "demo-skill": {
                 "category": "ai",
                 "summary": "Demo skill",
-                "path": path_value or ".agent/skills/demo-skill/SKILL.md",
+                "path": path_value or ".agents/skills/demo-skill/SKILL.md",
                 "status": "populated",
             }
         },

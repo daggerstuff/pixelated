@@ -70,11 +70,8 @@ describe("IndexedDBStorage", () => {
     it("should initialize with correct configuration", () => {
       expect(storage).toBeDefined();
       // Accessing private properties for testing (necessary for unit testing private fields)
-      // @ts-ignore
       expect((storage as any).dbName).toBe("test_db");
-      // @ts-ignore
       expect((storage as any).version).toBe(1);
-      // @ts-ignore
       expect((storage as any).storeName).toBe("test_store");
     });
   });
@@ -101,9 +98,7 @@ describe("IndexedDBStorage", () => {
 
       expect(mockIndexedDB.open).toHaveBeenCalledWith("test_db", 1);
       // Accessing private properties for testing
-      // @ts-ignore
       expect((storage as any).initialized).toBe(true);
-      // @ts-ignore
       expect((storage as any).db).toBe(mockDb);
     });
 
@@ -125,7 +120,6 @@ describe("IndexedDBStorage", () => {
       });
 
       // Mark as initialized
-      // @ts-ignore
       (storage as any).initialized = true;
       await storage["init"]();
 
@@ -186,9 +180,7 @@ describe("IndexedDBStorage", () => {
 
     it("should reject if database is not initialized", async () => {
       // Ensure not initialized
-      // @ts-ignore
       (storage as any).initialized = false;
-      // @ts-ignore
       (storage as any).db = null;
 
       await expect(storage.set("key", "value")).rejects.toThrow("Database not initialized");

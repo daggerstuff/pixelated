@@ -251,8 +251,6 @@ export class PythonBiasDetectionBridge {
           this.connectionPool &&
           typeof (this.connectionPool as any).acquireConnection === 'function'
         ) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - runtime check above ensures this exists
           pooledConnection = await (
             this.connectionPool as any
           ).acquireConnection()
@@ -269,8 +267,8 @@ export class PythonBiasDetectionBridge {
           timeoutId = setTimeout(() => {
             try {
               controller.abort()
-            } catch {
-              /* ignore */
+            } catch (e) {
+              logger.debug('Abort failed or already aborted', { error: e })
             }
           }, this.timeout)
 
@@ -322,8 +320,6 @@ export class PythonBiasDetectionBridge {
           this.connectionPool &&
           typeof (this.connectionPool as any).releaseConnection === 'function'
         ) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - runtime check above ensures this exists
           ;(this.connectionPool as any).releaseConnection(pooledConnection)
           pooledConnection = null
         }
@@ -889,8 +885,6 @@ export class PythonBiasDetectionBridge {
         this.connectionPool &&
         typeof (this.connectionPool as any).dispose === 'function'
       ) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore - runtime check above ensures this exists
         await (this.connectionPool as any).dispose()
       }
       logger.info('PythonBiasDetectionBridge disposed')

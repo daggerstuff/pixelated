@@ -67,11 +67,8 @@ describe("IndexedDBRequestQueue", () => {
   describe("Constructor", () => {
     it("should initialize with default options", () => {
       expect(queue).toBeDefined();
-      // @ts-ignore
       expect((queue as any).options.maxQueueSize).toBe(1000);
-      // @ts-ignore
       expect((queue as any).options.maxRetries).toBe(3);
-      // @ts-ignore
       expect((queue as any).options.retryDelay).toBe(1000);
     });
   });
@@ -95,13 +92,10 @@ describe("IndexedDBRequestQueue", () => {
       });
 
       // Access private method for testing
-      // @ts-ignore
       await (queue as any).initDB();
 
       expect(mockIndexedDB.open).toHaveBeenCalledWith("pixelated_offline_queue", 1);
-      // @ts-ignore
       expect((queue as any).initialized).toBe(true);
-      // @ts-ignore
       expect((queue as any).db).toBe(mockDb);
     });
   });
@@ -119,9 +113,7 @@ describe("IndexedDBRequestQueue", () => {
       const result = queue.add(request);
 
       expect(result).toBe(true);
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(1);
-      // @ts-ignore
       expect((queue as any).queue[0]).toMatchObject({
         url: "/test",
         method: "GET",
@@ -130,7 +122,6 @@ describe("IndexedDBRequestQueue", () => {
         maxRetries: 3,
         retryCount: 0,
       });
-      // @ts-ignore
       expect((queue as any).queue[0].id).toMatch(/^req_\d+_/);
     });
 
@@ -156,10 +147,8 @@ describe("IndexedDBRequestQueue", () => {
       });
 
       expect(result).toBe(true);
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(1000);
       // Should have removed a low priority item
-      // @ts-ignore
       expect((queue as any).queue.some((req: any) => req.url === "/overflow")).toBe(true);
     });
   });
@@ -192,7 +181,6 @@ describe("IndexedDBRequestQueue", () => {
         headers: {},
         body: undefined,
       });
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(0);
     });
 
@@ -222,7 +210,6 @@ describe("IndexedDBRequestQueue", () => {
 
       // Verify request was retried
       expect(fetch).toHaveBeenCalledTimes(2);
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(0);
     });
 
@@ -244,7 +231,6 @@ describe("IndexedDBRequestQueue", () => {
 
       // Verify request was removed after max retries
       expect(fetch).toHaveBeenCalledTimes(2); // Initial + 1 retry
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(0);
     });
   });
@@ -260,14 +246,12 @@ describe("IndexedDBRequestQueue", () => {
       queue.add(request);
 
       // Get the ID of the added request
-      // @ts-ignore
       const id = (queue as any).queue[0].id;
 
       // Remove the request
       const result = queue.remove(id);
 
       expect(result).toBe(true);
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(0);
     });
 
@@ -286,7 +270,6 @@ describe("IndexedDBRequestQueue", () => {
       // Clear queue
       queue.clear();
 
-      // @ts-ignore
       expect((queue as any).queue.length).toBe(0);
     });
   });
