@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 import type { SearchResult } from '../lib/search'
 import SearchBox from './ui/SearchBox'
@@ -10,18 +10,18 @@ export default function SearchDemoReact() {
     null,
   )
 
-  // Handle search events
-  const handleSearch = (query: string, results: SearchResult[]) => {
+  // ⚡ Bolt: Wrapped in useCallback to provide stable function reference and prevent unnecessary re-renders of the SearchBox child component
+  const handleSearch = useCallback((query: string, results: SearchResult[]) => {
     setLastQuery(query)
     setResultCount(results.length)
-  }
+  }, [])
 
-  // Handle result click
-  const handleResultClick = (result: SearchResult) => {
+  // ⚡ Bolt: Wrapped in useCallback to provide stable function reference and prevent unnecessary re-renders of the SearchBox child component
+  const handleResultClick = useCallback((result: SearchResult) => {
     setSelectedResult(result)
     // Normally you would navigate to the result URL, but for demo purposes
     // we'll just display the selected result
-  }
+  }, [])
 
   return (
     <div className='bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md'>
