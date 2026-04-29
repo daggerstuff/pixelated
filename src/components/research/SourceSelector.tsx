@@ -59,10 +59,11 @@ const SourceSelector = React.memo(function SourceSelector({
     (selectedSources.includes('all') && source === 'all')
 
   return (
-    <div className='flex flex-wrap justify-center gap-2'>
+    <div className='flex flex-wrap justify-center gap-2' role='group' aria-label='Filter by source'>
       <button
         className={`source-chip ${isSelected('all') ? 'active' : ''}`}
         onClick={() => toggleSource('all')}
+        aria-pressed={isSelected('all')}
       >
         All Sources
       </button>
@@ -71,12 +72,14 @@ const SourceSelector = React.memo(function SourceSelector({
       <button
         className={`source-chip ${isSelected('publisher') ? 'active' : ''}`}
         onClick={() => toggleSource('publisher')}
+        aria-pressed={isSelected('publisher')}
       >
         Publishers
       </button>
       <button
         className={`source-chip ${isSelected('api') ? 'active' : ''}`}
         onClick={() => toggleSource('api')}
+        aria-pressed={isSelected('api')}
       >
         APIs
       </button>
@@ -84,6 +87,7 @@ const SourceSelector = React.memo(function SourceSelector({
         className={`source-chip ${isSelected('dataset') ? 'active' : ''}`}
         onClick={() => toggleSource('dataset')}
         title='Therapy Datasets (HuggingFace, etc.)'
+        aria-pressed={isSelected('dataset')}
       >
         Datasets
       </button>
@@ -94,18 +98,21 @@ const SourceSelector = React.memo(function SourceSelector({
       <button
         className={`source-chip ${isSelected('arxiv') ? 'active' : ''}`}
         onClick={() => toggleSource('arxiv')}
+        aria-pressed={isSelected('arxiv')}
       >
         ArXiv
       </button>
       <button
         className={`source-chip ${isSelected('pubmed') ? 'active' : ''}`}
         onClick={() => toggleSource('pubmed')}
+        aria-pressed={isSelected('pubmed')}
       >
         PubMed
       </button>
       <button
         className={`source-chip ${isSelected('apa_publisher') ? 'active' : ''}`}
         onClick={() => toggleSource('apa_publisher')}
+        aria-pressed={isSelected('apa_publisher')}
       >
         APA
       </button>
