@@ -38,6 +38,7 @@ const ActiveStudiesList: FC<ActiveStudiesListProps> = memo(
               >
                 <input
                   type='checkbox'
+                  aria-label={"Select study " + study.title}
                   checked={selectedStudies.includes(study.id)}
                   onChange={() => onStudySelect(study.id)}
                   className='text-blue-600 h-4 w-4 rounded'
