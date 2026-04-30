@@ -10,6 +10,7 @@ interface CheckboxProps {
   onChange?: (checked: boolean) => void
   className?: string
   children?: React.ReactNode
+  'aria-describedby'?: string
 }
 
 export const Checkbox: FC<CheckboxProps> = ({
@@ -22,6 +23,7 @@ export const Checkbox: FC<CheckboxProps> = ({
   onChange,
   className = '',
   children,
+  'aria-describedby': ariaDescribedBy,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(e.target.checked)
@@ -40,6 +42,7 @@ export const Checkbox: FC<CheckboxProps> = ({
         name={name}
         value={value}
         onChange={handleChange}
+        aria-describedby={ariaDescribedBy}
         className='text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 mr-2 h-4 w-4 rounded focus:ring-2'
       />
       {children}
