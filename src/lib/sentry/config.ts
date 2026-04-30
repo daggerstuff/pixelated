@@ -53,8 +53,21 @@ export function resolveSentryRelease(fallback: string = '0.0.1'): string {
   return release ?? fallback
 }
 
+export function resolveSentryDsn(): string | undefined {
+  const candidates = [
+    import.meta.env['PUBLIC_SENTRY_DSN'],
+    import.meta.env['SENTRY_DSN'],
+    import.meta.env['SENTRY_PUBLIC_DSN'],
+    import.meta.env['VITE_SENTRY_DSN'],
+  ]
+
+  return candidates.find(
+    (value) => typeof value === 'string' && value.trim().length > 0,
+  )
+}
+
 export const SENTRY_CONFIG = {
-  dsn: import.meta.env['PUBLIC_SENTRY_DSN'] || import.meta.env['SENTRY_DSN'],
+  dsn: resolveSentryDsn(),
 
   environment: import.meta.env.MODE || 'production',
   release: resolveSentryRelease('0.0.1'),

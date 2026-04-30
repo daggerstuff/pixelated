@@ -8,6 +8,15 @@ import {
   resolveSsrEntryModuleUrl,
 } from './start-server-config.mjs'
 
+function resolveSentryDsn() {
+  return (
+    process.env.SENTRY_DSN ||
+    process.env.PUBLIC_SENTRY_DSN ||
+    process.env.SENTRY_PUBLIC_DSN ||
+    process.env.VITE_SENTRY_DSN
+  )
+}
+
 const { handler: ssrHandler } = await import(resolveSsrEntryModuleUrl())
 
 const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT
@@ -48,9 +57,9 @@ function redactValue(val, keepLast = 8) {
 }
 
 function logSentryStartupChecks() {
-  const serverDsn = process.env.SENTRY_DSN
+  const serverDsn = resolveSentryDsn()
   const publicDsn =
-    process.env.PUBLIC_SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
+    resolveSentryDsn() || process.env.NEXT_PUBLIC_SENTRY_DSN
   const release = process.env.SENTRY_RELEASE
   const authToken = process.env.SENTRY_AUTH_TOKEN
 
@@ -67,7 +76,7 @@ function logSentryStartupChecks() {
   console.log('  SENTRY_AUTH_TOKEN provided:', !!authToken)
   if (!serverDsn) {
     console.warn(
-      'Warning: SENTRY_DSN is not set — server-side events will not be sent to Sentry.',
+      'Warning: Sentry DSN is not set — server-side events will not be sent to Sentry.',
     )
   }
   if (!release) {

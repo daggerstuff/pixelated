@@ -13,6 +13,8 @@ Environment=HOME=/home/vivi
 Environment=RCLONE_CONFIG=/home/vivi/.config/rclone/rclone.conf
 Environment=SOURCE_DIR=/home/vivi
 Environment=BACKUP_DIR=/home/vivi/.local/share/home_backups
-Environment=RCLONE_TARGET=drive:vivi-home-backups
-Environment=BACKUP_RETENTION_COUNT=2
+Environment=RCLONE_TARGET=gdrive:vivi-home-backups
+# Optional: upload directly into a specific subfolder within RCLONE_TARGET.
+# Leave empty to sync directly into RCLONE_TARGET.
+Environment=RCLONE_SYNC_PATH=
 ExecStart=/usr/bin/env bash /home/vivi/pixelated/scripts/backup/backup-home-vivi.sh

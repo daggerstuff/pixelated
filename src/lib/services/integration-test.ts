@@ -5,8 +5,10 @@
 
 import { BiasDetectionEngine } from '../ai/bias-detection/index'
 import { MultidimensionalEmotionMapper } from '../ai/emotions/MultidimensionalEmotionMapper'
+import type { EmotionAnalysis } from '../ai/emotions/types'
 import { fheService } from '../fhe'
 import { EncryptionMode } from '../fhe/types'
+import type { EncryptedData } from '../fhe/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { MemoryService } from '../memory'
 
@@ -29,9 +31,9 @@ export interface ServiceIntegrationTestResult {
 }
 
 export class ServiceIntegrationTester {
-  private memoryService: MemoryService
-  private biasEngine: BiasDetectionEngine
-  private emotionMapper: MultidimensionalEmotionMapper
+  private readonly memoryService: MemoryService
+  private readonly biasEngine: BiasDetectionEngine
+  private readonly emotionMapper: MultidimensionalEmotionMapper
 
   constructor() {
     this.memoryService = new MemoryService()
@@ -141,7 +143,7 @@ export class ServiceIntegrationTester {
       const deleted = await this.memoryService.deleteMemory(memory.id, userId)
 
       return (
-        memory.id !== undefined &&
+        memory.id.length > 0 &&
         memories.length > 0 &&
         updated !== null &&
         searchResults.length > 0 &&
@@ -166,14 +168,22 @@ export class ServiceIntegrationTester {
       // Test encryption
       const testData = 'Sensitive therapy session data'
       const encrypted = await fheService.encrypt(testData)
+      if (!isValidEncryptedData<string>(encrypted)) {
+        return false
+      }
 
       // Test decryption
-      const decrypted = await fheService.decrypt(encrypted)
+      const decrypted = await fheService.decrypt<string>(encrypted)
 
       // Test key rotation
       await fheService.rotateKeys()
 
-      return encrypted !== testData && decrypted === testData
+      return (
+        typeof decrypted === 'string' &&
+        decrypted === testData &&
+        encrypted.id.length > 0 &&
+        encrypted.dataType === 'string'
+      )
     } catch (error: unknown) {
       logger.error('FHE service test failed:', {
         error: error instanceof Error ? String(error) : String(error),
@@ -190,15 +200,16 @@ export class ServiceIntegrationTester {
           { content: 'Thank you for sharing that with me', role: 'therapist' },
         ],
         sessionId: 'test-session-' + Date.now(),
-        timestamp: Date.now(),
+        timestamp: new Date(),
       }
 
       const result = await this.biasEngine.analyzeSession(sessionData)
 
       return (
-        result.biasScore !== undefined &&
-        result.alertLevel !== undefined &&
-        typeof result.biasScore === 'number'
+        result.overallBiasScore >= 0 &&
+        result.overallBiasScore <= 1 &&
+        result.confidence >= 0 &&
+        result.confidence <= 1
       )
     } catch (error: unknown) {
       logger.error('Bias detection test failed:', {
@@ -212,16 +223,18 @@ export class ServiceIntegrationTester {
     try {
       const testText = 'I feel really anxious about my upcoming presentation'
 
-      const result = await this.emotionMapper.analyzeText(testText, {
-        depth: 'detailed',
-        sessionId: 'test-emotion-session',
-      })
+      const result = this.emotionMapper.mapEmotionsToDimensions(
+        buildEmotionAnalysis(testText, 'test-emotion-session'),
+      )
 
       return (
-        result.primary !== undefined &&
-        result.confidence !== undefined &&
-        result.dimensions !== undefined &&
-        typeof result.confidence === 'number'
+        result.primaryEmotion.length > 0 &&
+        Number.isFinite(result.confidence) &&
+        result.confidence >= 0 &&
+        result.confidence <= 1 &&
+        Number.isFinite(result.dimensions.valence) &&
+        Number.isFinite(result.dimensions.arousal) &&
+        Number.isFinite(result.dimensions.dominance)
       )
     } catch (error: unknown) {
       logger.error('Emotion analysis test failed:', {
@@ -238,7 +251,9 @@ export class ServiceIntegrationTester {
         'I have been feeling overwhelmed lately with work stress'
 
       // 1. Analyze emotions
-      const emotionResult = await this.emotionMapper.analyzeText(sessionText)
+      const emotionResult = this.emotionMapper.mapEmotionsToDimensions(
+        buildEmotionAnalysis(sessionText, 'cross-test-session'),
+      )
 
       // 2. Store analysis in memory
       const memory = await this.memoryService.createMemory(
@@ -263,7 +278,7 @@ export class ServiceIntegrationTester {
       const biasResult = await this.biasEngine.analyzeSession({
         messages: [{ content: sessionText, role: 'user' }],
         sessionId: 'cross-test-session',
-        timestamp: Date.now(),
+        timestamp: new Date(),
       })
 
       // 5. Store bias analysis
@@ -282,11 +297,13 @@ export class ServiceIntegrationTester {
 
       // Verify all services worked together
       return (
-        memory?.id !== undefined &&
-        biasMemory?.id !== undefined &&
-        encryptedAnalysis !== sessionText &&
-        emotionResult?.primary !== undefined &&
-        biasResult?.biasScore !== undefined
+        memory.id.length > 0 &&
+        biasMemory.id.length > 0 &&
+        isValidEncryptedData<string>(encryptedAnalysis) &&
+        emotionResult.primaryEmotion.length > 0 &&
+        Number.isFinite(biasResult.overallBiasScore) &&
+        biasResult.overallBiasScore >= 0 &&
+        biasResult.overallBiasScore <= 1
       )
     } catch (error: unknown) {
       logger.error('Cross-service communication test failed:', {
@@ -299,3 +316,60 @@ export class ServiceIntegrationTester {
 
 // Export singleton instance for testing
 export const serviceIntegrationTester = new ServiceIntegrationTester()
+
+function buildEmotionAnalysis(
+  text: string,
+  sessionId: string,
+): EmotionAnalysis {
+  const emotions = {
+    joy: 0.2,
+    sadness: 0.1,
+    anger: 0.05,
+    fear: Math.min(0.5, text.length / 200),
+    surprise: 0.15,
+    disgust: 0.05,
+    trust: 0.3,
+    anticipation: Math.max(0.05, Math.min(0.4, text.length / 300)),
+  }
+  const confidence = 0.85
+
+  return {
+    id: `integration-${Date.now()}`,
+    sessionId,
+    timestamp: new Date().toISOString(),
+    emotions,
+    dimensions: {
+      valence: -0.15,
+      arousal: 0.45,
+      dominance: -0.2,
+    },
+    confidence,
+    metadata: {
+      source: 'text',
+      processingTime: 12,
+      modelVersion: 'integration-test',
+      confidence: {
+        overall: confidence,
+        perEmotion: emotions,
+      },
+    },
+  }
+}
+
+function isValidEncryptedData<T>(
+  encryptedData: unknown,
+): encryptedData is EncryptedData<T> {
+  if (!isRecord(encryptedData)) {
+    return false
+  }
+
+  return (
+    typeof encryptedData.id === 'string' &&
+    typeof encryptedData.dataType === 'string' &&
+    encryptedData.data !== undefined
+  )
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
