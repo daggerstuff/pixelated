@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { Sentry } from '../../../config/instrument.mjs'
+import { Sentry } from '../../../../config/instrument.mjs'
 
 type ProbeMode = 'message' | 'error'
 
@@ -124,4 +124,3 @@ const runProbe = async (request: Request): Promise<Response> => {
 
 export const GET: APIRoute = async ({ request }) => runProbe(request)
 export const POST: APIRoute = async ({ request }) => runProbe(request)
-*** End Patch

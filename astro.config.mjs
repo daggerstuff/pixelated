@@ -130,9 +130,6 @@ function getChunkName(id) {
 
   // Split large vendor libraries into separate chunks for better caching
   if (
-  ) {
-  }
-  if (
     normalizedId.includes('/p5/') ||
     normalizedId.includes('/node_modules/p5/') ||
     normalizedId.includes('p5/') ||
@@ -162,9 +159,6 @@ function getChunkName(id) {
     normalizedId.includes('@opentelemetry/')
   ) {
     return 'opentelemetry-vendor'
-  }
-  if (
-  ) {
   }
   if (
     normalizedId.includes('/express/') ||
@@ -277,9 +271,6 @@ function getChunkName(id) {
     normalizedId.includes('\\node_modules\\@opentelemetry\\')
   ) {
     return 'opentelemetry-vendor'
-  }
-  if (
-  ) {
   }
   if (
     normalizedId.includes('/node_modules/express/') ||
