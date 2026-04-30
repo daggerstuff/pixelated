@@ -2,8 +2,13 @@
 set -euo pipefail
 
 SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
-RCLONE_TARGET="${RCLONE_TARGET:-drive:vivi-home-backups}"
-RETENTION_COUNT="${BACKUP_RETENTION_COUNT:-2}"
+RCLONE_TARGET="${RCLONE_TARGET:-gdrive:vivi-home-backups}"
+RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
+LOCK_FILE_BASE="${HOME:-/home/vivi}"
+
+if [[ "$RCLONE_TARGET" == "drive:vivi-home-backups" ]]; then
+  RCLONE_TARGET="gdrive:vivi-home-backups"
+fi
 
 # Normalize home context because systemd Environment substitutions can be resolved incorrectly
 # in some deployment paths (for example, resolving %h as /root before service user switches).
@@ -11,21 +16,16 @@ if [[ -z "${HOME:-}" || ! -d "$HOME" || "$HOME" == "/root" ]]; then
   if [[ -d "/home/vivi" ]]; then
     export HOME="/home/vivi"
   elif [[ "${SOURCE_DIR%/*}" == "/home" && -d "$SOURCE_DIR" ]]; then
-    export HOME="${SOURCE_DIR}"
+    export HOME="$SOURCE_DIR"
   else
     export HOME="/home/$(id -un)"
   fi
 fi
 
+LOCK_FILE_BASE="$HOME"
 BACKUP_DIR="${BACKUP_DIR:-$HOME/.local/share/home_backups}"
-
-# Repair wrong defaults injected by systemd units that still resolve to root paths.
-if [[ "$BACKUP_DIR" == /root/* && "$HOME" == /home/* ]]; then
-  BACKUP_DIR="$HOME/.local/share/home_backups"
-fi
-
 LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
-LOCK_FILE="${HOME}/.cache/home-vivi-backup.lock"
+LOCK_FILE="${LOCK_FILE_BASE}/.cache/home-vivi-backup.lock"
 
 if [[ -n "${RCLONE_CONFIG:-}" && ! -r "$RCLONE_CONFIG" ]]; then
   RCLONE_CONFIG=""
@@ -36,7 +36,7 @@ if [[ -z "${RCLONE_CONFIG:-}" ]]; then
     export RCLONE_CONFIG="${HOME}/.config/rclone/rclone.conf"
   elif [[ "${SOURCE_DIR%/*}" == "/home" && -r "${SOURCE_DIR}/.config/rclone/rclone.conf" ]]; then
     export RCLONE_CONFIG="${SOURCE_DIR}/.config/rclone/rclone.conf"
-    export HOME="${SOURCE_DIR}"
+    export HOME="$SOURCE_DIR"
     LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
     LOCK_FILE="${HOME}/.cache/home-vivi-backup.lock"
   fi
@@ -58,120 +58,77 @@ log() {
   printf '%s [backup] %s\n' "$(date -Iseconds)" "$*" | tee -a "$LOG_FILE"
 }
 
-if ! command -v tar >/dev/null 2>&1; then
-  log "tar is required but not available"
-  exit 1
-fi
-
 if ! command -v rclone >/dev/null 2>&1; then
   log "rclone is required but not available"
   exit 1
 fi
 
-if ! [[ "$RETENTION_COUNT" =~ ^[0-9]+$ ]] || [ "$RETENTION_COUNT" -lt 1 ]; then
-  log "BACKUP_RETENTION_COUNT must be an integer >= 1"
+if [[ "$RCLONE_TARGET" == *:* ]]; then
+  RCLONE_REMOTE="${RCLONE_TARGET%%:*}"
+else
+  RCLONE_REMOTE=""
+fi
+if [[ -z "$RCLONE_REMOTE" ]]; then
+  log "Invalid RCLONE_TARGET value '$RCLONE_TARGET'. Expected format remote:path"
   exit 1
 fi
 
-cleanup_local_debris() {
-  find "$BACKUP_DIR" -maxdepth 1 -type f \
-    \( -name 'home-vivi-*.tar.gz.incomplete' -o -name 'home-vivi-*.part' \) -delete
-}
+if ! rclone listremotes | grep -Fxq "${RCLONE_REMOTE}:"; then
+  log "Rclone remote '$RCLONE_REMOTE' is not configured"
+  log "Run 'rclone config' as user 'vivi' and then retry."
+  exit 1
+fi
 
-cleanup_staging() {
-  if [ -n "${backup_tmp:-}" ] && [ -f "$backup_tmp" ]; then
-    rm -f "$backup_tmp"
+if [[ -n "$RCLONE_SYNC_PATH" ]]; then
+  if [[ "$RCLONE_TARGET" == *: ]]; then
+    RCLONE_DEST="$RCLONE_TARGET/$RCLONE_SYNC_PATH"
+  else
+    RCLONE_DEST="${RCLONE_TARGET%/}/$RCLONE_SYNC_PATH"
+  fi
+else
+  RCLONE_DEST="$RCLONE_TARGET"
+fi
+
+cleanup_lock() {
+  if [ -n "${lock_acquired:-}" ] && [ -f "$LOCK_FILE" ]; then
+    flock -u 9 || true
+    rm -f "$LOCK_FILE"
   fi
 }
 
-# Prune orphaned tarballs at startup (regardless of previous upload status)
-prune_orphaned_backups() {
-  local count
-  count=$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'home-vivi-*.tar.gz' 2>/dev/null | wc -l)
-  if [ "$count" -gt "$RETENTION_COUNT" ]; then
-    log "Found $count local backups (retention: $RETENTION_COUNT). Pruning orphaned tarballs..."
-    mapfile -t old_backups < <(ls -1t "$BACKUP_DIR"/home-vivi-*.tar.gz 2>/dev/null || true)
-    for ((i = RETENTION_COUNT; i < ${#old_backups[@]}; i++)); do
-      rm -f "${old_backups[$i]}"
-      log "Removed orphaned backup: ${old_backups[$i]}"
-    done
-  fi
-}
-
-cleanup_local_debris
-prune_orphaned_backups
+trap cleanup_lock EXIT
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
   log "Another backup is already running, exiting"
   exit 0
 fi
+lock_acquired=true
 
-trap 'cleanup_staging' EXIT
+mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
+  "--checksum" \
+  "--create-empty-src-dirs" \
+  "--transfers" "8" \
+  "--checkers" "16" \
+  "--ignore-errors" \
+  "--skip-links" \
+  "--retries" "5" \
+  "--low-level-retries" "10" \
+  "--exclude" ".cache/**" \
+  "--exclude" ".local/share/home_backups/**" \
+  "--exclude" ".claude-mem/**" \
+  "--exclude" ".cache/home-vivi-backup.lock" \
+  "--exclude" "**/node_modules/**" \
+  "--exclude" "**/.venv/**")
 
-timestamp="$(date +'%Y%m%d-%H%M%S')"
-backup_base="home-vivi-${timestamp}"
-backup_file="$BACKUP_DIR/${backup_base}.tar.gz"
-backup_tmp="${backup_file}.incomplete"
+log "Starting incremental stream sync from ${SOURCE_DIR} to ${RCLONE_DEST}"
+rclone copy "$SOURCE_DIR" "$RCLONE_DEST" "${RCLONE_COPY_ARGS[@]}"
+log "Incremental stream sync completed successfully"
 
-log "Creating archive: $backup_file"
-if ! tar -C "$SOURCE_DIR" -czf "$backup_tmp" \
-  --exclude='./.local/share/home_backups' \
-  --exclude='./.cache/home-vivi-backup.lock' \
-  --ignore-failed-read \
-  --warning=no-file-changed \
-  --warning=no-file-removed \
-  --exclude='*/node_modules' \
-  --exclude='*/.venv' \
-  .; then
-  tar_rc=$?
-  if [ "$tar_rc" -ne 1 ]; then
-    log "tar failed with exit code $tar_rc"
-    exit "$tar_rc"
+if ! rclone touch "${RCLONE_DEST}/.meta/last-successful-run-marker" >/dev/null 2>&1; then
+  if ! printf '%s\n' "$(date -Iseconds)" | rclone rcat "${RCLONE_DEST}/.meta/last-successful-run-marker"; then
+    log "Failed to write sync marker, but backup stream completed."
   fi
-  log "tar finished with warnings (exit code 1), continuing"
 fi
-mv "$backup_tmp" "$backup_file"
-
-log "Uploading archive to ${RCLONE_TARGET}"
-rclone_remote="${RCLONE_TARGET%%:*}"
-if [ "$rclone_remote" = "$RCLONE_TARGET" ]; then
-  log "Invalid RCLONE_TARGET value '$RCLONE_TARGET'. Expected format remote:path"
-  exit 1
-fi
-
-if ! rclone listremotes | grep -Fxq "${rclone_remote}:"; then
-  log "Rclone remote '$rclone_remote' is not configured"
-  log "Run 'rclone config' as user 'vivi' and then retry."
-  exit 1
-fi
-
-rclone copy "$backup_file" "$RCLONE_TARGET"
-
-log "Pruning local backups to keep last ${RETENTION_COUNT}"
-mapfile -t backup_candidates < <(ls -1t "$BACKUP_DIR"/home-vivi-*.tar.gz 2>/dev/null || true)
-for ((i = RETENTION_COUNT; i < ${#backup_candidates[@]}; i++)); do
-  stale="${backup_candidates[$i]}"
-  rm -f "$stale"
-done
-
-if (( ${#backup_candidates[@]} > RETENTION_COUNT )); then
-  log "Removed local backup debris beyond retention count"
-fi
-
-cleanup_local_debris
-
-log "Pruning remote backups in ${RCLONE_TARGET} to keep last ${RETENTION_COUNT}"
-rclone lsf "${RCLONE_TARGET%/}" --files-only --format p \
-  | grep -E '^home-vivi-[0-9]{8}-[0-9]{6}\.tar\.gz$' \
-  | sort \
-  | head -n "-$RETENTION_COUNT" \
-  | while IFS= read -r stale; do
-    [ -z "$stale" ] && continue
-    rclone delete "${RCLONE_TARGET%/}/$stale"
-    log "Deleted remote backup: $stale"
-  done
-
-cleanup_local_debris
 
 log "Backup completed successfully"

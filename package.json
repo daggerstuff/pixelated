@@ -182,7 +182,7 @@
     "@hookform/resolvers": "latest",
     "@iconify-json/lucide": "latest",
     "@microsoft/clarity": "latest",
-    "@modelcontextprotocol/sdk": "1.29.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@openai/codex": "latest",
     "@opentelemetry/api": "latest",
     "@opentelemetry/auto-instrumentations-node": "latest",

@@ -67,6 +67,8 @@ jobs:
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
           PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
+          SENTRY_PUBLIC_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
           SENTRY_RELEASE: ${{ github.sha }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
