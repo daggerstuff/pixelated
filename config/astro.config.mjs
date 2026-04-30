@@ -36,7 +36,11 @@ const isBuildCommand =
   process.env.CI === 'true' ||
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
-const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+const hasSentryDSN =
+  !!process.env.SENTRY_DSN ||
+  !!process.env.PUBLIC_SENTRY_DSN ||
+  !!process.env.SENTRY_PUBLIC_DSN ||
+  !!process.env.VITE_SENTRY_DSN
 const sentryRelease =
   process.env.SENTRY_RELEASE || process.env.npm_package_version || undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
