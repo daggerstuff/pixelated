@@ -6,8 +6,10 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 FORESIGHT_ROOT="${REPO_ROOT}/foresight-mcp"
 
 load_env() {
+  set -a
   [[ -f "${REPO_ROOT}/.env" ]] && source "${REPO_ROOT}/.env"
   [[ -f "${REPO_ROOT}/.env.local" ]] && source "${REPO_ROOT}/.env.local"
+  set +a
 }
 
 find_uv() {
