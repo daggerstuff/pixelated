@@ -42,6 +42,12 @@ let httpIntegration = () => null
 
 const SUPPORTED_PROFILING_NODE_MAJORS = new Set([16, 18, 20, 22, 24])
 
+const resolveSentryDsn = () =>
+  process.env.SENTRY_DSN ||
+  process.env.PUBLIC_SENTRY_DSN ||
+  process.env.SENTRY_PUBLIC_DSN ||
+  process.env.VITE_SENTRY_DSN
+
 const getNodeMajorVersion = () => {
   try {
     const [major = ''] = (process.versions?.node ?? '').split('.')
@@ -93,9 +99,16 @@ try {
   Sentry = createStubSentry()
 }
 
+const resolvedSentryDsn = resolveSentryDsn()
+if (!resolvedSentryDsn && process.env.NODE_ENV === 'production') {
+  console.warn(
+    '[Sentry] No DSN found via SENTRY_DSN, PUBLIC_SENTRY_DSN, SENTRY_PUBLIC_DSN, or VITE_SENTRY_DSN; Sentry will not send events.',
+  )
+}
+
 // Enhanced Sentry configuration with comprehensive instrumentation
 Sentry.init({
-  dsn: process.env.SENTRY_DSN, // Must be set in environment
+  dsn: resolvedSentryDsn, // Must be set in environment
   environment: process.env.NODE_ENV || 'production',
   release:
     process.env.SENTRY_RELEASE ||
