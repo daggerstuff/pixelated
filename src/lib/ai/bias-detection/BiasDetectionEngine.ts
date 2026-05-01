@@ -58,7 +58,7 @@ export class BiasDetectionEngine {
   private alertSystem: BiasAlertSystem;
   private performanceOptimizer: PerformanceOptimizer | null;
   private initialized = false;
-  private _isMonitoring = false;
+  private monitoringActive = false;
   private monitoringCallbacks: Array<(alert: { level: AlertLevel; sessionId: string }) => void> =
     [];
   // Remove local sessionCache; use distributed cache manager instead
@@ -205,7 +205,7 @@ export class BiasDetectionEngine {
   }
 
   public get isMonitoring(): boolean {
-    return this._isMonitoring;
+    return this.monitoringActive;
   }
 
   async initialize() {
@@ -804,7 +804,7 @@ export class BiasDetectionEngine {
     });
     return report;
   }
-  async getDashboardData(_opts: { timeRange?: string; includeDetails?: boolean } = {}): Promise<{
+  async getDashboardData(options: { timeRange?: string; includeDetails?: boolean } = {}): Promise<{
     summary: {
       totalSessions: number;
       averageBiasScore: number;
@@ -859,7 +859,7 @@ export class BiasDetectionEngine {
 
   async startMonitoring(callback: (alert: { level: AlertLevel; sessionId: string }) => void) {
     this.ensureInitialized();
-    this._isMonitoring = true;
+    this.monitoringActive = true;
     this.monitoringCallbacks.push(callback);
     // Adapt callback type expected by alert system
     this.alertSystem.addMonitoringCallback?.((a: unknown) => {
@@ -873,7 +873,7 @@ export class BiasDetectionEngine {
   }
 
   async stopMonitoring() {
-    this._isMonitoring = false;
+    this.monitoringActive = false;
     this.monitoringCallbacks = [];
   }
   async dispose() {
@@ -972,7 +972,7 @@ export class BiasDetectionEngine {
         ...performanceHealth.components,
         pythonService: pythonServiceHealth?.status === "healthy",
         engine: this.initialized,
-        monitoring: this._isMonitoring,
+        monitoring: this.monitoringActive,
         performanceOptimizer: this.performanceOptimizer !== null,
       },
       performance: await this.getPerformanceStats(),

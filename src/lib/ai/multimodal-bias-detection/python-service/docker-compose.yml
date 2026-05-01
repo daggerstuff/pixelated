@@ -16,7 +16,8 @@ services:
       - PORT=8001
       - WORKERS=4
       - DATABASE_URL=postgresql://multimodal_user:multimodal_password@postgres:5432/multimodal_bias_detection
-      - REDIS_URL=redis://redis:6379/1
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/1
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - MODEL_CACHE_DIR=/app/models
       - VISION_MODEL_PATH=/app/models/vision
       - AUDIO_MODEL_PATH=/app/models/audio
@@ -95,6 +96,9 @@ services:
     image: redis:7-alpine
     container_name: pixelated-multimodal-redis
     restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --protected-mode yes
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     ports:
       - '127.0.0.1:6380:6379' # Different port from text service
     volumes:
@@ -102,7 +106,7 @@ services:
     networks:
       - multimodal-network
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ['CMD-SHELL', 'redis-cli -a "${REDIS_PASSWORD}" ping | grep -q PONG']
       interval: 10s
       timeout: 3s
       retries: 5
