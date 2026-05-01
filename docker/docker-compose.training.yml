@@ -54,7 +54,11 @@ services:
     image: redis:7-alpine
     container_name: pixelated-redis-training
     restart: unless-stopped
-    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+    command:
+      redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --protected-mode yes
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - redis_training_data:/data
     ports:
