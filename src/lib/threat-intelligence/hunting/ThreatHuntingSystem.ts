@@ -1008,7 +1008,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.9,
         data: this.toDocumentRecord(scan),
-        timestamp: this.toDate(scan._id.hour),
+        timestamp: this.toDate(scan["_id"].hour),
       }))
     } catch (error: unknown) {
       logger.error('Port scanning hunt failed:', { error })

@@ -98,7 +98,7 @@ services:
     restart: unless-stopped
     command:
       sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis-password)"
-      --appendonly yes'
+      --protected-mode yes --appendonly yes --bind 0.0.0.0'
     secrets:
       - redis-password
     volumes:

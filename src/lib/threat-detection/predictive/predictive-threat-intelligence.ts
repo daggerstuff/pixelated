@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 
-function _secureId(prefix = ''): string {
+function generateSecureId(prefix = ''): string {
   try {
     const nodeCrypto = crypto as unknown as {
       randomUUID?: () => string

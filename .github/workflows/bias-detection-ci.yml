@@ -195,7 +195,7 @@ jobs:
       redis:
         image: redis:7
         options: >-
-          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
+          --health-cmd "redis-cli -a redis-ci-password ping | grep -q PONG" --health-interval 10s --health-timeout
           5s --health-retries 5
         ports:
           - 6379:6379
@@ -251,7 +251,7 @@ jobs:
             touch .env.test
           fi
           echo "DATABASE_URL=postgresql://${POSTGRES_USER}@localhost:5432/test_db" >> .env.test
-          echo "REDIS_URL=redis://localhost:6379" >> .env.test
+          echo "REDIS_URL=redis://:redis-ci-password@localhost:6379" >> .env.test
         env:
           POSTGRES_USER: postgres
 

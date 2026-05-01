@@ -237,10 +237,8 @@ describe('MultidimensionalEmotionMapper', () => {
           // Check if other fields are correctly populated from the map
           const originalMap = maps.find((m) => m.timestamp === member.timestamp)
           expect(originalMap).toBeDefined()
-          if (originalMap) {
-            expect(member.dimensions).toEqual(originalMap.dimensions)
-            expect(member.confidence).toEqual(originalMap.confidence)
-          }
+          expect(member.dimensions).toEqual(originalMap!.dimensions)
+          expect(member.confidence).toEqual(originalMap!.confidence)
         })
       })
 

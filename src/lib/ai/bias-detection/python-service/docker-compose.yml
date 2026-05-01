@@ -16,7 +16,8 @@ services:
       - PORT=8000
       - WORKERS=4
       - DATABASE_URL=postgresql://bias_user:bias_password@postgres:5432/bias_detection
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - MODEL_CACHE_DIR=/app/models
       - TENSORFLOW_MODEL_PATH=/app/models/tensorflow
       - PYTORCH_MODEL_PATH=/app/models/pytorch
@@ -77,6 +78,10 @@ services:
     image: redis:7-alpine
     container_name: pixelated-redis
     restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --protected-mode yes
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
     ports:
       - '127.0.0.1:6379:6379'
     volumes:
@@ -84,7 +89,7 @@ services:
     networks:
       - bias-detection-network
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ['CMD-SHELL', 'redis-cli -a "${REDIS_PASSWORD}" ping | grep -q PONG']
       interval: 10s
       timeout: 3s
       retries: 5

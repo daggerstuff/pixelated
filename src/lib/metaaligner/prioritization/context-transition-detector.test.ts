@@ -514,19 +514,19 @@ describe('ContextTransitionDetector', () => {
         },
       ]
 
-      let transitionDetected = false
+      const transitions: ReturnType<typeof detector.addEvent>[] = []
       events.forEach((event) => {
         const transition = detector.addEvent(event)
         if (transition && transition.detected) {
-          transitionDetected = true
-          expect(transition.from.contextType).toBe(ContextType.EDUCATIONAL)
-          expect(transition.to.contextType).toBe(
-            ContextType.CLINICAL_ASSESSMENT,
-          )
+          transitions.push(transition)
         }
       })
 
-      expect(transitionDetected).toBe(true)
+      expect(transitions).toHaveLength(1)
+      expect(transitions[0]!.from.contextType).toBe(ContextType.EDUCATIONAL)
+      expect(transitions[0]!.to.contextType).toBe(
+        ContextType.CLINICAL_ASSESSMENT,
+      )
     })
 
     it('should handle support to crisis dialogue', () => {
@@ -548,7 +548,7 @@ describe('ContextTransitionDetector', () => {
         },
       ]
 
-      let crisisElevated = false
+      const crisisTransitions: ReturnType<typeof detector.addEvent>[] = []
       dialogue.forEach((turn, index) => {
         const event: ContextEvent = {
           turnId: index + 1,
@@ -560,13 +560,13 @@ describe('ContextTransitionDetector', () => {
 
         const transition = detector.addEvent(event)
         if (transition && transition.transitionType === 'crisis_elevation') {
-          crisisElevated = true
-          expect(transition.detected).toBe(true)
-          expect(transition.shouldSmooth).toBe(false)
+          crisisTransitions.push(transition)
         }
       })
 
-      expect(crisisElevated).toBe(true)
+      expect(crisisTransitions).toHaveLength(1)
+      expect(crisisTransitions[0]!.detected).toBe(true)
+      expect(crisisTransitions[0]!.shouldSmooth).toBe(false)
     })
 
     it('should handle complex multi-context dialogue', () => {
