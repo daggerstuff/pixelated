@@ -3,13 +3,25 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
+<<<<<<< HEAD
 import {
   getUserConsentPreference,
   setUserConsentPreference,
   createPrivacyHash,
 } from './privacy'
+=======
+import { getUserConsentPreference, setUserConsentPreference, createPrivacyHash, createEphemeralSessionId } from './privacy'
+>>>>>>> 81f2fd0dc (🧪 QA: Add test for createEphemeralSessionId edge case)
 
 describe('privacy utilities', () => {
+  describe('createEphemeralSessionId', () => {
+    it('returns a correctly formatted ephemeral session ID', () => {
+      const id = createEphemeralSessionId()
+      expect(id.startsWith('sim_')).toBe(true)
+      expect(id.split('_').length).toBe(3)
+    })
+  })
+
   describe('createPrivacyHash', () => {
     it('returns consistent hash for same input', () => {
       expect(createPrivacyHash('hello')).toBe(createPrivacyHash('hello'))
