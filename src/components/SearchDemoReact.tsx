@@ -37,7 +37,7 @@ export default function SearchDemoReact() {
       </div>
 
       {lastQuery && (
-        <div className='text-gray-500 dark:text-gray-400 mt-4 text-sm'>
+        <div className='text-gray-500 dark:text-gray-400 mt-4 text-sm' role='status' aria-live='polite'>
           Found {resultCount} results for &ldquo;{lastQuery}&rdquo;
         </div>
       )}
