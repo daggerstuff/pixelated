@@ -73,6 +73,7 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
           <button
             key={option.value}
             type='button'
+            aria-pressed={value === option.value}
             onClick={() => onChange(option.value)}
             className={`rounded px-3 py-1 text-sm transition-colors ${
               value === option.value
