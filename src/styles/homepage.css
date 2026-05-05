@@ -325,3 +325,11 @@
     margin: 0 auto 0.65rem;
   }
 }
+
+@media (min-width: 721px) {
+  /* Center align all sections on desktop */
+  .pe-home-section {
+    text-align: center;
+    justify-items: center;
+  }
+}
