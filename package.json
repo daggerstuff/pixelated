@@ -312,7 +312,6 @@
   "devDependencies": {
     "@astrojs/markdoc": "latest",
     "@astrojs/rss": "latest",
-    "@cloudflare/mcp-server-cloudflare": "latest",
     "@eslint/css": "latest",
     "@eslint/js": "latest",
     "@eslint/json": "latest",
@@ -423,7 +422,7 @@
     "tsx": "latest",
     "tw-animate-css": "latest",
     "typeorm": "latest",
-    "typescript": "^6.0.3",
+    "typescript": "^5.9.2",
     "typescript-eslint": "latest",
     "unocss": "latest",
     "url-polyfill": "latest",
@@ -545,18 +544,7 @@
     ],
     "ignoredBuiltDependencies": [
       "libpg-query"
-    ],
-    "overrides": {
-      "yaml": "2.8.3",
-      "js-yaml": "4.1.1",
-      "yaml-language-server": "1.22.0",
-      "@modelcontextprotocol/sdk": "^1.29.0",
-      "teeny-request": "10.1.2",
-      "@tootallnate/once": "^3.0.1",
-      "undici": "^7.25.0",
-      "@cloudflare/mcp-server-cloudflare>@modelcontextprotocol/sdk": "^1.29.0",
-      "@cloudflare/mcp-server-cloudflare>undici": "^7.25.0"
-    }
+    ]
   },
   "trustedDependencies": [
     "aws-sdk",
@@ -573,11 +561,11 @@
     "node-forge": ">=1.4.0",
     "picomatch": ">=4.0.4",
     "express": ">=4.19.2",
-    "js-yaml": ">=4.1.1",
-    "yaml": ">=2.8.3",
+    "js-yaml": "4.1.1",
+    "yaml": "2.8.3",
     "@astrojs/check>yaml-language-server>yaml": ">=2.8.3",
     "yaml-language-server>yaml": ">=2.8.3",
-    "yaml-language-server": "1.23.1",
+    "yaml-language-server": "1.22.0",
     "volar-service-yaml>yaml-language-server": "1.23.1",
     "@astrojs/check>@astrojs/language-server>volar-service-yaml>yaml-language-server": "1.23.1",
     "yaml@2.7.1": "2.8.3",
@@ -628,7 +616,6 @@
     "socket.io-parser": ">=4.2.6",
     "kysely": ">=0.28.14",
     "effect": ">=3.20.0",
-    "@cloudflare/mcp-server-cloudflare@0.2.0>@modelcontextprotocol/sdk": "^1.29.0",
-    "@cloudflare/mcp-server-cloudflare@0.2.0>undici": "^7.25.0"
+    "teeny-request": "10.1.2"
   }
 }
