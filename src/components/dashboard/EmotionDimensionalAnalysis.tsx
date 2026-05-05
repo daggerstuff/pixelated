@@ -1,5 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { FC } from 'react'
+
+const getEmotionColor = (emotion: string): string => {
+  const colors: Record<string, string> = {
+    joy: '#FFC107',
+    anxiety: '#F44336',
+    calm: '#4CAF50',
+    excitement: '#FF9800',
+    sadness: '#2196F3',
+    anger: '#F44336',
+  }
+  return colors[emotion] || '#9E9E9E'
+}
 
 interface EmotionPoint {
   id: string
@@ -84,17 +96,26 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
     }))
   }
 
-  const getEmotionColor = (emotion: string): string => {
-    const colors: Record<string, string> = {
-      joy: '#FFC107',
-      anxiety: '#F44336',
-      calm: '#4CAF50',
-      excitement: '#FF9800',
-      sadness: '#2196F3',
-      anger: '#F44336',
+  // Memoize the calculation of averages to avoid O(N) recalculations on checkbox toggles
+  const averages = useMemo(() => {
+    if (emotionData.length === 0) {
+      return { valence: 0, arousal: 0, dominance: 0 }
     }
-    return colors[emotion] || '#9E9E9E'
-  }
+    const sum = emotionData.reduce(
+      (acc, p) => {
+        acc.valence += p.valence
+        acc.arousal += p.arousal
+        acc.dominance += p.dominance
+        return acc
+      },
+      { valence: 0, arousal: 0, dominance: 0 },
+    )
+    return {
+      valence: sum.valence / emotionData.length,
+      arousal: sum.arousal / emotionData.length,
+      dominance: sum.dominance / emotionData.length,
+    }
+  }, [emotionData])
 
   if (isLoading) {
     return (
@@ -268,28 +289,19 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
           <div className='bg-blue-50 rounded-lg p-4 text-center'>
             <div className='text-blue-600 text-2xl font-bold'>
-              {(
-                emotionData.reduce((sum, p) => sum + p.valence, 0) /
-                emotionData.length
-              ).toFixed(2)}
+              {averages.valence.toFixed(2)}
             </div>
             <div className='text-gray-600 text-sm'>Average Valence</div>
           </div>
           <div className='bg-green-50 rounded-lg p-4 text-center'>
             <div className='text-green-600 text-2xl font-bold'>
-              {(
-                emotionData.reduce((sum, p) => sum + p.arousal, 0) /
-                emotionData.length
-              ).toFixed(2)}
+              {averages.arousal.toFixed(2)}
             </div>
             <div className='text-gray-600 text-sm'>Average Arousal</div>
           </div>
           <div className='bg-purple-50 rounded-lg p-4 text-center'>
             <div className='text-purple-600 text-2xl font-bold'>
-              {(
-                emotionData.reduce((sum, p) => sum + p.dominance, 0) /
-                emotionData.length
-              ).toFixed(2)}
+              {averages.dominance.toFixed(2)}
             </div>
             <div className='text-gray-600 text-sm'>Average Dominance</div>
           </div>
