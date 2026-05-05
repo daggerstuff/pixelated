@@ -1,7 +1,7 @@
 {
   "name": "pixelated",
   "version": "0.0.1",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@10.33.3",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -359,7 +359,7 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "latest",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-node": "latest",
