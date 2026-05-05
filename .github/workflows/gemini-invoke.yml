@@ -61,6 +61,7 @@ defaults:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GEMINI_CLI_TRUST_WORKSPACE: true
 
 jobs:
   invoke:
@@ -80,7 +81,7 @@ jobs:
         uses: 'actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3'
         # ratchet:actions/create-github-app-token@v3
         with:
-          app-id:
+          client-id:
             ${{ inputs.app_id || fromJSON(env.WORKFLOW_VARS_JSON)['APP_ID'] }}
           private-key: '${{ secrets.APP_PRIVATE_KEY }}'
           permission-contents: 'read'
@@ -134,6 +135,7 @@ jobs:
         if: |-
           ${{ steps.validate_gemini_auth.outputs.has_gemini_auth == 'true' }}
         env:
+          GEMINI_CLI_TRUST_WORKSPACE: true
           TITLE:
             '${{ github.event.pull_request.title || github.event.issue.title }}'
           DESCRIPTION:
