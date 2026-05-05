@@ -359,7 +359,7 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "latest",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-node": "latest",
