@@ -10,7 +10,7 @@ stages:
 
 variables:
   NODE_VERSION: '24'
-  PNPM_VERSION: '10.33.2'
+  PNPM_VERSION: '10.33.3'
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   # Terraform configuration - must be set as GitLab CI/CD project variables
   # Required for terraform jobs:
