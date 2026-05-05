@@ -41,5 +41,5 @@ dashboard includes `source_file` per document for editor reference.
 
 ## Hetzner storage
 
-See [Hetzner-Setup.md](Hetzner-Setup.md) for Object Storage (S3-compatible)
+See [Hetzner-Setup.md](../.agent/internal/Hetzner-Setup.md) for Object Storage (S3-compatible)
 configuration.
