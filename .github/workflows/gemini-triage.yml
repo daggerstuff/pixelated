@@ -17,6 +17,7 @@ defaults:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GEMINI_CLI_TRUST_WORKSPACE: true
 
 jobs:
   triage:
@@ -104,6 +105,7 @@ jobs:
         # ratchet:exclude
         env:
           GITHUB_TOKEN: ''
+          GEMINI_CLI_TRUST_WORKSPACE: true
           # Do NOT pass any auth tokens here since this runs on untrusted inputs
           ISSUE_TITLE: '${{ github.event.issue.title }}'
           ISSUE_BODY: '${{ github.event.issue.body }}'
@@ -154,7 +156,7 @@ jobs:
         uses: 'actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3'
         # ratchet:actions/create-github-app-token@v3
         with:
-          app-id: '${{ vars.APP_ID }}'
+          client-id: '${{ vars.APP_ID }}'
           private-key: '${{ secrets.APP_PRIVATE_KEY }}'
           permission-contents: 'read'
           permission-issues: 'write'
