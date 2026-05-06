@@ -26,6 +26,11 @@ const artifactHighlights = artifact.context.slice(0, 2)
         <span class="hero-artifact__mode">{artifact.mode}</span>
       </div>
       <h2 class="hero-artifact__title">{artifact.status}</h2>
+      {
+        artifact.chip && (
+          <span class="hero-artifact__chip">{artifact.chip}</span>
+        )
+      }
       <p class="hero-artifact__summary">
         The trainee attempt, scenario context, and supervisor notes stay
         connected in one reviewable record.
@@ -62,6 +67,18 @@ const artifactHighlights = artifact.context.slice(0, 2)
         </div>
       )
     }
+    {
+      artifact.outputs.length > 0 && (
+        <div class="hero-artifact__outputs" aria-label="Session output summary">
+          {artifact.outputs.map((item) => (
+            <article class="hero-artifact__output">
+              <span>{item.label}</span>
+              <p>{item.value}</p>
+            </article>
+          ))}
+        </div>
+      )
+    }
     <div class="hero-artifact__highlights">
       {
         artifactHighlights.map((item) => (
@@ -79,32 +96,34 @@ const artifactHighlights = artifact.context.slice(0, 2)
   .hero-artifact {
     width: 100%;
     min-height: 100%;
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 8px;
+    border: 1px solid rgba(253, 252, 252, 0.1);
+    border-radius: 20px;
     background:
       radial-gradient(
         circle at top right,
-        rgba(var(--accent-primary-rgb), 0.08),
+        rgba(var(--accent-primary-rgb), 0.1),
         transparent 34%
       ),
-      linear-gradient(180deg, rgba(48, 44, 44, 0.82), rgba(35, 33, 33, 0.72));
+      linear-gradient(180deg, rgba(48, 44, 44, 0.84), rgba(35, 33, 33, 0.72));
     overflow: hidden;
-    backdrop-filter: blur(14px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 24px 50px rgba(0, 0, 0, 0.2);
     text-align: center;
   }
 
   .hero-artifact__body {
     display: grid;
-    gap: clamp(0.85rem, 1.5vw, 1.2rem);
-    padding: clamp(1.35rem, 2.4vw, 1.85rem);
+    gap: clamp(0.95rem, 1.5vw, 1.3rem);
+    padding: clamp(1.35rem, 2.4vw, 2rem);
     justify-items: center;
     min-width: 0;
   }
 
   .hero-artifact__header {
     display: grid;
-    gap: 0.85rem;
+    gap: 0.75rem;
     justify-items: center;
   }
 
@@ -138,18 +157,35 @@ const artifactHighlights = artifact.context.slice(0, 2)
     margin: 0;
     max-width: 20ch;
     font-family: var(--font-display);
-    font-size: clamp(1.2rem, 0.95rem + 0.7vw, 1.95rem);
-    line-height: 1.2;
-    letter-spacing: -0.03em;
+    font-size: clamp(1.25rem, 1rem + 0.85vw, 2rem);
+    line-height: 1.16;
+    letter-spacing: -0.04em;
     color: var(--text-primary);
     text-wrap: balance;
+  }
+
+  .hero-artifact__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(var(--accent-primary-rgb), 0.26);
+    background: rgba(var(--accent-primary-rgb), 0.08);
+    font-family: var(--font-label);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(253, 252, 252, 0.88);
   }
 
   .hero-artifact__summary {
     margin: 0;
     max-width: 100%;
     font-family: var(--font-sans);
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     line-height: 1.72;
     color: rgba(253, 252, 252, 0.78);
   }
@@ -164,11 +200,11 @@ const artifactHighlights = artifact.context.slice(0, 2)
 
   .hero-artifact__readout-item {
     display: grid;
-    gap: 0.85rem;
+    gap: 0.7rem;
     padding: clamp(0.85rem, 1.8vw, 1.1rem);
     border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.035);
     text-align: center;
     justify-items: center;
   }
@@ -193,8 +229,8 @@ const artifactHighlights = artifact.context.slice(0, 2)
     margin: 0;
     overflow: hidden;
     border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.48);
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.42);
   }
 
   .hero-artifact__image {
@@ -234,6 +270,41 @@ const artifactHighlights = artifact.context.slice(0, 2)
     color: rgba(253, 252, 252, 0.8);
   }
 
+  .hero-artifact__outputs {
+    display: grid;
+    gap: 0.85rem;
+    width: 100%;
+    padding-top: 0.1rem;
+  }
+
+  .hero-artifact__output {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(253, 252, 252, 0.08);
+    border-radius: 14px;
+    background: rgba(253, 252, 252, 0.03);
+    text-align: center;
+    justify-items: center;
+  }
+
+  .hero-artifact__output span {
+    font-family: var(--font-label);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+  }
+
+  .hero-artifact__output p {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    line-height: 1.68;
+    color: rgba(253, 252, 252, 0.82);
+  }
+
   @media (min-width: 720px) {
     .hero-artifact__highlights {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -242,14 +313,24 @@ const artifactHighlights = artifact.context.slice(0, 2)
 
   @media (min-width: 1040px) {
     .hero-artifact__body {
-      gap: 0.75rem;
-      padding: 1.05rem;
+      gap: 0.8rem;
+      padding: 1.15rem;
+      align-items: start;
+      justify-items: start;
+    }
+
+    .hero-artifact__header,
+    .hero-artifact__meta,
+    .hero-artifact__highlights,
+    .hero-artifact__output {
+      justify-items: start;
+      text-align: left;
     }
 
     .hero-artifact__title {
       max-width: 18ch;
       margin: 0;
-      font-size: clamp(1.2rem, 1.4vw, 1.55rem);
+      font-size: clamp(1.2rem, 1.4vw, 1.65rem);
     }
 
     .hero-artifact__summary {
@@ -269,7 +350,7 @@ const artifactHighlights = artifact.context.slice(0, 2)
     }
 
     .hero-artifact__figure {
-      max-height: 32rem;
+      max-height: 33rem;
     }
 
     .hero-artifact__image {
@@ -315,6 +396,10 @@ const artifactHighlights = artifact.context.slice(0, 2)
 
     .hero-artifact__readout-item {
       text-align: center;
+    }
+
+    .hero-artifact__outputs {
+      justify-items: stretch;
     }
   }
 </style>

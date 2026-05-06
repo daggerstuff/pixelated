@@ -2,6 +2,7 @@
 set -euo pipefail
 
 SCRIPT_PATH="$(realpath "$0")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$(dirname "$SCRIPT_PATH")/../.." && pwd)"
 cd "$REPO_ROOT"
 
@@ -35,6 +36,18 @@ if [[ -f .env ]]; then
   # shellcheck source=/dev/null
   source .env
   set +a
+fi
+
+if [[ -f "$SCRIPT_DIR/lib/nemo-vault-env.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "$SCRIPT_DIR/lib/nemo-vault-env.sh"
+else
+  warn "⚠️ Missing helper script: $SCRIPT_DIR/lib/nemo-vault-env.sh"
+  exit 1
+fi
+
+if ! load_nemo_vault_env; then
+  exit 1
 fi
 
 if [[ -z "${NVIDIA_API_KEY:-}" ]]; then
