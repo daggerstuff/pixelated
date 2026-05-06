@@ -115,6 +115,13 @@ mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
   "--retries" "5" \
   "--low-level-retries" "10" \
   "--exclude" ".cache/**" \
+  "--exclude" ".cursor/**" \
+  "--exclude" ".cursor-server/**" \
+  "--exclude" ".codex/**" \
+  "--exclude" "**/.cache/**" \
+  "--exclude" "*.sock" \
+  "--exclude" "**/terminals/**" \
+  "--exclude" ".local/share/zed/**" \
   "--exclude" ".local/share/home_backups/**" \
   "--exclude" ".claude-mem/**" \
   "--exclude" ".cache/home-vivi-backup.lock" \
