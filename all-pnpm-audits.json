@@ -1,0 +1,698 @@
+Auditing ./.agents/skills/playwright-skill...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./docker/alert-receiver...
+{
+  "actions": [],
+  "advisories": {},
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 77,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 77
+  }
+}
+Auditing ./.venv/lib/python3.13/site-packages/plotly/labextension...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.venv/lib/python3.13/site-packages/pyright/dist...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.venv/lib/python3.13/site-packages/jupyterlab_jupytext/labextension...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.venv/share/jupyter/labextensions/jupyterlab-jupytext...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.venv/share/jupyter/labextensions/jupyterlab-plotly...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./src/integrations/react...
+{
+  "actions": [],
+  "advisories": {},
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 388,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 388
+  }
+}
+Auditing ./tests/integration...
+{
+  "actions": [],
+  "advisories": {},
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 98,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 98
+  }
+}
+Auditing ./tests/security...
+{
+  "actions": [],
+  "advisories": {},
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 137,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 137
+  }
+}
+Auditing ./.gemini/sandbox.venv/lib/python3.13/site-packages/plotly/labextension...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.gemini/sandbox.venv/lib/python3.13/site-packages/jupyterlab_jupytext/labextension...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.gemini/sandbox.venv/share/jupyter/labextensions/jupyterlab-jupytext...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.gemini/sandbox.venv/share/jupyter/labextensions/jupyterlab-plotly...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./ai/.venv/lib/python3.13/site-packages/plotly/labextension...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./ai/.venv/share/jupyter/labextensions/jupyterlab-plotly...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./ai/training/ready_packages/datasets/wave5_authored_corpus...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.squad/templates...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./packages/pixelated-sdk...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./business-strategy-cms...
+{
+  "actions": [],
+  "advisories": {
+    "1117683": {
+      "findings": [
+        {
+          "version": "10.1.0",
+          "paths": [
+            ".>express-rate-limit>ip-address"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/beaugunderson/ip-address/security/advisories/GHSA-v2v4-37r5-5v8g\n- https://github.com/advisories/GHSA-v2v4-37r5-5v8g",
+      "created": "2026-05-05T21:50:58.000Z",
+      "id": 1117683,
+      "npm_advisory_id": null,
+      "overview": "### Summary\n\n`Address6.group()` and `Address6.link()` do not HTML-escape attacker-controlled content before embedding it in the HTML strings they return, and `AddressError.parseMessage` (emitted by the `Address6` constructor for invalid input) can contain unescaped attacker-controlled content in one branch. An application that (1) passes untrusted input to `Address6` and (2) renders the output of these methods, or the thrown error's `parseMessage`, as HTML (e.g. via `innerHTML`) is vulnerable to cross-site scripting. A related issue in `v6.helpers.spanAll()` produced malformed markup but was not exploitable; it is hardened in the same release for consistency.\n\n### Details\n\nFour related issues were identified and fixed together:\n\n1. **`Address6.group()`: zone ID injection.** The `Address6` constructor stores the raw input (including any IPv6 zone ID) in `this.address` before zone stripping. `group()` then passed `this.address` to `helpers.simpleGroup()`, which wrapped each `:`-separated segment in a `<span>` element without HTML-escaping the content. A zone ID containing HTML markup was embedded verbatim.\n2. **`Address6.link({ prefix, className })`: attribute-value injection.** `link()` concatenated user-supplied `prefix` and `className` into the `href=\"…\"` and `class=\"…\"` attributes without escaping. A caller passing untrusted content through these options could inject event handlers (e.g. `onmouseover`) and achieve XSS.\n3. **`Address6` constructor: leading-zero IPv4 error path.** The leading-zero branch in `parse4in6()` built `AddressError.parseMessage` by concatenating the raw address through `String.replace()`. Because `parse4in6()` runs before the bad-character check, any characters in the groups preceding the IPv4 suffix flowed into the error's HTML unescaped. Consumers who render `parseMessage` as HTML (its documented purpose — it already contains `<span class=\"parse-error\">` markup) could be XSS'd by a crafted input such as `<img src=x onerror=alert(1)>:10.0.01.1`.\n4. **`v6.helpers.spanAll()`: attribute-value injection (defense in depth).** `spanAll()` embedded each character of its input into a `class=\"digit value-${n} …\"` attribute without escaping. Because `split('')` limits `n` to a single character this was not exploitable in practice, but it produced malformed markup and is fixed for consistency.\n\n### Affected Versions\n\nAll versions up to and including `10.1.0`.\n\n### Patched Version\n\n`10.1.1`.\n\n### Impact\n\nReal-world exposure is believed to be extremely limited. Analysis of all 425 dependent npm packages as well as GitHub code search found zero consumers of `group()`, `link()`, or `spanAll()`: these HTML-emitting surfaces appear to be unused across published npm packages and public repositories. Applications using only the address-parsing and comparison APIs (`isValid`, `correctForm`, `isInSubnet`, `bigInt`, etc.) are not affected.\n\nConsumers who **do** render the output of `group()`, `link()`, `spanAll()`, or `AddressError.parseMessage` as HTML against untrusted input should upgrade.\n\n### PoC\n\n```javascript\nconst { Address6 } = require('ip-address');\nconst addr = new Address6('fe80::1%<img src=x onerror=alert(1)>');\ndocument.body.innerHTML = addr.group();  // fires the onerror handler in 10.1.0\n```\n\n### Workarounds\n\nIf users cannot upgrade immediately:\n\n- Do not pass untrusted input to the `Address6` constructor, or\n- Never render the output of `group()`, `link()`, or `spanAll()`, nor the `parseMessage` field of any thrown `AddressError`, as HTML; treat these values as text only, or run them through [DOMPurify](https://github.com/cure53/DOMPurify) before inserting into the DOM (DOMPurify's default configuration preserves the library's intended `<span>` wrapping while stripping any injected event handlers), or\n- Validate input with `Address6.isValid()` and reject anything that contains a zone identifier (a `%` character) or characters outside `[0-9a-fA-F:/]` before passing it to the constructor.\n\n### Lack of separate CVEs\n\nGiven the evidence that these methods are not used, and given that they are all of the same construction, maintainers do not think it's relevant or useful to create a separate CVE for each library method.\n\n### Credit\n\nip-address thanks @scovetta for reporting this issue.",
+      "reported_by": null,
+      "title": "ip-address has XSS in Address6 HTML-emitting methods",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-42338"
+      ],
+      "access": "public",
+      "severity": "moderate",
+      "module_name": "ip-address",
+      "vulnerable_versions": "<=10.1.0",
+      "github_advisory_id": "GHSA-v2v4-37r5-5v8g",
+      "recommendation": "Upgrade to version 10.1.1 or later",
+      "patched_versions": ">=10.1.1",
+      "updated": "2026-05-05T21:51:01.000Z",
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "cwe": [
+        "CWE-79"
+      ],
+      "url": "https://github.com/advisories/GHSA-v2v4-37r5-5v8g"
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 1,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 755,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 755
+  }
+}
+Auditing ./foresight-mcp/apps/docs...
+{
+  "actions": [],
+  "advisories": {},
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 1169,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 1169
+  }
+}
+Auditing ./foresight-mcp/packages/foresight-core...
+{
+  "actions": [],
+  "advisories": {},
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 246,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 246
+  }
+}
+Auditing ....
+{
+  "actions": [],
+  "advisories": {
+    "1113977": {
+      "findings": [
+        {
+          "version": "2.0.1",
+          "paths": [
+            ".>@google-cloud/storage>teeny-request>http-proxy-agent>@tootallnate/once"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2026-3449\n- https://github.com/TooTallNate/once/issues/8\n- https://github.com/TooTallNate/once/commit/b9f43cc5259bee2952d91ad3cdbd201a82df448a\n- https://security.snyk.io/vuln/SNYK-JS-TOOTALLNATEONCE-15250612\n- https://github.com/advisories/GHSA-vpq2-c234-7xj6",
+      "created": "2026-03-03T06:31:14.000Z",
+      "id": 1113977,
+      "npm_advisory_id": null,
+      "overview": "Versions of the package @tootallnate/once before 3.0.1 are vulnerable to Incorrect Control Flow Scoping in promise resolving when AbortSignal option is used. The Promise remains in a permanently pending state after the signal is aborted, causing any await or .then() usage to hang indefinitely. This can cause a control-flow leak that can lead to stalled requests, blocked workers, or degraded application availability.",
+      "reported_by": null,
+      "title": "@tootallnate/once vulnerable to Incorrect Control Flow Scoping",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-3449"
+      ],
+      "access": "public",
+      "severity": "low",
+      "module_name": "@tootallnate/once",
+      "vulnerable_versions": "<3.0.1",
+      "github_advisory_id": "GHSA-vpq2-c234-7xj6",
+      "recommendation": "Upgrade to version 3.0.1 or later",
+      "patched_versions": ">=3.0.1",
+      "updated": "2026-03-04T20:15:03.000Z",
+      "cvss": {
+        "score": 3.3,
+        "vectorString": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "cwe": [
+        "CWE-705"
+      ],
+      "url": "https://github.com/advisories/GHSA-vpq2-c234-7xj6"
+    },
+    "1115556": {
+      "findings": [
+        {
+          "version": "2.7.1",
+          "paths": [
+            ".>@astrojs/check>@astrojs/language-server>volar-service-yaml>yaml-language-server>yaml"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/eemeli/yaml/security/advisories/GHSA-48c2-rrv3-qjmp\n- https://github.com/eemeli/yaml/commit/1e84ebbea7ec35011a4c61bbb820a529ee4f359b\n- https://github.com/eemeli/yaml/releases/tag/v1.10.3\n- https://github.com/eemeli/yaml/releases/tag/v2.8.3\n- https://nvd.nist.gov/vuln/detail/CVE-2026-33532\n- https://github.com/advisories/GHSA-48c2-rrv3-qjmp",
+      "created": "2026-03-25T20:08:24.000Z",
+      "id": 1115556,
+      "npm_advisory_id": null,
+      "overview": "Parsing a YAML document with `yaml` may throw a RangeError due to a stack overflow.\n\nThe node resolution/composition phase uses recursive function calls without a depth bound. An attacker who can supply YAML for parsing can trigger a `RangeError: Maximum call stack size exceeded` with a small payload (~2–10 KB). The `RangeError` is not a `YAMLParseError`, so applications that only catch YAML-specific errors will encounter an unexpected exception type. Depending on the host application's exception handling, this can fail requests or terminate the Node.js process.\n\nFlow sequences allow deep nesting with minimal bytes (2 bytes per level: one `[` and one `]`). On the default Node.js stack, approximately 1,000–5,000 levels of nesting (2–10 KB input) exhaust the call stack. The exact threshold is environment-dependent (Node.js version, stack size, call stack depth at invocation).\n\nNote: the library's `Parser` (CST phase) uses a stack-based iterative approach and is not affected. Only the compose/resolve phase uses actual call-stack recursion.\n\nAll three public parsing APIs are affected: `YAML.parse()`, `YAML.parseDocument()`, and `YAML.parseAllDocuments()`.\n\n### PoC\n\n```javascript\nconst YAML = require('yaml');\n\n// ~10 KB payload: 5000 levels of nested flow sequences\nconst payload = '['.repeat(5000) + '1' + ']'.repeat(5000);\n\ntry {\n  YAML.parse(payload);\n} catch (e) {\n  console.log(e.constructor.name); // RangeError (NOT YAMLParseError)\n  console.log(e.message);          // Maximum call stack size exceeded\n}\n```\n\nTest environment: Node.js v24.12.0, macOS darwin arm64\n\n| Version | Nesting Depth | Input Size | Result |\n|---|---|---|---|\n| 1.0.0 | 5,000 | 10,001 B | RangeError |\n| 1.10.2 | 5,000 | 10,001 B | RangeError |\n| 2.0.0 | 5,000 | 10,001 B | RangeError |\n| 2.8.2 | 5,000 | 10,001 B | RangeError |\n| 2.8.3 | 5,000 | 10,001 B | YAMLParseError |\n\nDepth threshold on yaml 2.8.2:\n\n| Nesting Depth | Input Size | Result |\n|---|---|---|\n| 500 | 1,001 B | Parses successfully |\n| 1,000 | 2,001 B | RangeError (threshold varies by stack size) |\n| 5,000 | 10,001 B | RangeError |",
+      "reported_by": null,
+      "title": "yaml is vulnerable to Stack Overflow via deeply nested YAML collections",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-33532"
+      ],
+      "access": "public",
+      "severity": "moderate",
+      "module_name": "yaml",
+      "vulnerable_versions": ">=2.0.0 <2.8.3",
+      "github_advisory_id": "GHSA-48c2-rrv3-qjmp",
+      "recommendation": "Upgrade to version 2.8.3 or later",
+      "patched_versions": ">=2.8.3",
+      "updated": "2026-03-27T21:34:54.000Z",
+      "cvss": {
+        "score": 4.3,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "cwe": [
+        "CWE-674"
+      ],
+      "url": "https://github.com/advisories/GHSA-48c2-rrv3-qjmp"
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 1,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 2683,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 2683
+  }
+}
+Auditing ./.github/cookbook/copilot-sdk/nodejs/recipe...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_family_j_winner_from_packages_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_wave4_seed_build_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_wave2_seed_build_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_wave1_seed_build_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_family_l_winner_from_packages_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/G_G1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/G_G1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/E_E1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/L_L1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/release_candidate/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/D_D1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/I_I1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/C_C1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/A_A1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/B_B1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/C_C1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/A_A1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/F_F1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/D_D1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/K_K1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/B_B1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/K_K1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/G_G1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/K_K1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/H_H1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/E_E1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/D_D1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/J_J1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/H_H1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/A_A1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/J_J1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/C_C1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/F_F1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/I_I1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/J_J1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/B_B1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/L_L1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/L_L1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/H_H1_3/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/E_E1_1/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_experiments_2026-04-08/I_I1_2/build...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_wave3_seed_build_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_release_delta_over_wave1_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_family_k_winner_from_packages_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}
+Auditing ./.agent/internal/research/training_corpus_release_candidate_from_packages_2026-04-09...
+{
+  "error": {
+    "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+    "message": "No pnpm-lock.yaml found: Cannot audit a project without a lockfile"
+  }
+}

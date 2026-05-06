@@ -1,0 +1,1925 @@
+Legend: production dependency, optional only, dev only
+
+pixelated@0.0.1 /home/vivi/pixelated (PRIVATE)
+│
+│   dependencies:
+├─┬ @ai-sdk/anthropic@3.0.75
+│ ├── @ai-sdk/provider@3.0.10
+│ ├── @ai-sdk/provider-utils@4.0.26
+│ └── zod@4.4.3 peer
+├─┬ @ai-sdk/mcp@1.0.40
+│ ├── @ai-sdk/provider@3.0.10
+│ ├── @ai-sdk/provider-utils@4.0.26
+│ ├── pkce-challenge@5.0.1
+│ └── zod@4.4.3 peer
+├─┬ @ai-sdk/openai@3.0.61
+│ ├── @ai-sdk/provider@3.0.10
+│ ├── @ai-sdk/provider-utils@4.0.26
+│ └── zod@4.4.3 peer
+├─┬ @astrojs/check@0.9.9
+│ ├── @astrojs/language-server@2.16.7
+│ ├── chokidar@4.0.3
+│ ├── kleur@4.1.5
+│ ├── typescript@5.9.3 peer
+│ └── yargs@17.7.2
+├─┬ @astrojs/netlify@7.0.8
+│ ├── @astrojs/internal-helpers@0.9.0
+│ ├── @astrojs/underscore-redirects@1.0.3
+│ ├── @netlify/blobs@10.7.4
+│ ├── @netlify/functions@5.2.0
+│ ├── @netlify/vite-plugin@2.12.1
+│ ├── @vercel/nft@1.5.0
+│ ├── astro@6.2.2 peer
+│ ├── esbuild@0.27.7
+│ ├── tinyglobby@0.2.16
+│ └── vite@7.3.2
+├─┬ @astrojs/node@10.0.6
+│ ├── @astrojs/internal-helpers@0.9.0
+│ ├── astro@6.2.2 peer
+│ ├── send@1.2.1
+│ └── server-destroy@1.0.1
+├─┬ @astrojs/react@5.0.4
+│ ├── @astrojs/internal-helpers@0.9.0
+│ ├── @types/react@19.2.14 peer
+│ ├── @types/react-dom@19.2.3 peer
+│ ├── @vitejs/plugin-react@5.2.0
+│ ├── devalue@5.8.0
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ ├── ultrahtml@1.6.0
+│ └── vite@7.3.2
+├─┬ @astrojs/vercel@10.0.6
+│ ├── @astrojs/internal-helpers@0.9.0
+│ ├── @vercel/analytics@1.6.1
+│ ├── @vercel/functions@3.5.0
+│ ├── @vercel/nft@1.5.0
+│ ├── @vercel/routing-utils@5.3.3
+│ ├── astro@6.2.2 peer
+│ ├── esbuild@0.27.7
+│ └── tinyglobby@0.2.16
+├─┬ @auth0/auth0-react@2.16.2
+│ ├── @auth0/auth0-spa-js@2.19.2
+│ ├── react@19.2.5 peer
+│ └── react-dom@19.2.5 peer
+├─┬ @aws-sdk/client-dynamodb@3.1043.0
+│ ├── @aws-crypto/sha256-browser@5.2.0
+│ ├── @aws-crypto/sha256-js@5.2.0
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/credential-provider-node@3.972.39
+│ ├── @aws-sdk/dynamodb-codec@3.973.8
+│ ├── @aws-sdk/middleware-endpoint-discovery@3.972.11
+│ ├── @aws-sdk/middleware-host-header@3.972.10
+│ ├── @aws-sdk/middleware-logger@3.972.10
+│ ├── @aws-sdk/middleware-recursion-detection@3.972.11
+│ ├── @aws-sdk/middleware-user-agent@3.972.38
+│ ├── @aws-sdk/region-config-resolver@3.972.13
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-endpoints@3.996.8
+│ ├── @aws-sdk/util-user-agent-browser@3.972.10
+│ ├── @aws-sdk/util-user-agent-node@3.973.24
+│ ├── @smithy/config-resolver@4.4.17
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/fetch-http-handler@5.3.17
+│ ├── @smithy/hash-node@4.2.14
+│ ├── @smithy/invalid-dependency@4.2.14
+│ ├── @smithy/middleware-content-length@4.2.14
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/middleware-retry@4.5.7
+│ ├── @smithy/middleware-serde@4.2.20
+│ ├── @smithy/middleware-stack@4.2.14
+│ ├── @smithy/node-config-provider@4.3.14
+│ ├── @smithy/node-http-handler@4.6.1
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ ├── @smithy/url-parser@4.2.14
+│ ├── @smithy/util-base64@4.3.2
+│ ├── @smithy/util-body-length-browser@4.2.2
+│ ├── @smithy/util-body-length-node@4.2.3
+│ ├── @smithy/util-defaults-mode-browser@4.3.49
+│ ├── @smithy/util-defaults-mode-node@4.2.54
+│ ├── @smithy/util-endpoints@3.4.2
+│ ├── @smithy/util-middleware@4.2.14
+│ ├── @smithy/util-retry@4.3.8
+│ ├── @smithy/util-utf8@4.2.2
+│ ├── @smithy/util-waiter@4.3.0
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/client-ec2@3.1043.0
+│ ├── @aws-crypto/sha256-browser@5.2.0
+│ ├── @aws-crypto/sha256-js@5.2.0
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/credential-provider-node@3.972.39
+│ ├── @aws-sdk/middleware-host-header@3.972.10
+│ ├── @aws-sdk/middleware-logger@3.972.10
+│ ├── @aws-sdk/middleware-recursion-detection@3.972.11
+│ ├── @aws-sdk/middleware-sdk-ec2@3.972.22
+│ ├── @aws-sdk/middleware-user-agent@3.972.38
+│ ├── @aws-sdk/region-config-resolver@3.972.13
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-endpoints@3.996.8
+│ ├── @aws-sdk/util-user-agent-browser@3.972.10
+│ ├── @aws-sdk/util-user-agent-node@3.973.24
+│ ├── @smithy/config-resolver@4.4.17
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/fetch-http-handler@5.3.17
+│ ├── @smithy/hash-node@4.2.14
+│ ├── @smithy/invalid-dependency@4.2.14
+│ ├── @smithy/middleware-content-length@4.2.14
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/middleware-retry@4.5.7
+│ ├── @smithy/middleware-serde@4.2.20
+│ ├── @smithy/middleware-stack@4.2.14
+│ ├── @smithy/node-config-provider@4.3.14
+│ ├── @smithy/node-http-handler@4.6.1
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ ├── @smithy/url-parser@4.2.14
+│ ├── @smithy/util-base64@4.3.2
+│ ├── @smithy/util-body-length-browser@4.2.2
+│ ├── @smithy/util-body-length-node@4.2.3
+│ ├── @smithy/util-defaults-mode-browser@4.3.49
+│ ├── @smithy/util-defaults-mode-node@4.2.54
+│ ├── @smithy/util-endpoints@3.4.2
+│ ├── @smithy/util-middleware@4.2.14
+│ ├── @smithy/util-retry@4.3.8
+│ ├── @smithy/util-utf8@4.2.2
+│ ├── @smithy/util-waiter@4.3.0
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/client-eks@3.1043.0
+│ ├── @aws-crypto/sha256-browser@5.2.0
+│ ├── @aws-crypto/sha256-js@5.2.0
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/credential-provider-node@3.972.39
+│ ├── @aws-sdk/middleware-host-header@3.972.10
+│ ├── @aws-sdk/middleware-logger@3.972.10
+│ ├── @aws-sdk/middleware-recursion-detection@3.972.11
+│ ├── @aws-sdk/middleware-user-agent@3.972.38
+│ ├── @aws-sdk/region-config-resolver@3.972.13
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-endpoints@3.996.8
+│ ├── @aws-sdk/util-user-agent-browser@3.972.10
+│ ├── @aws-sdk/util-user-agent-node@3.973.24
+│ ├── @smithy/config-resolver@4.4.17
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/fetch-http-handler@5.3.17
+│ ├── @smithy/hash-node@4.2.14
+│ ├── @smithy/invalid-dependency@4.2.14
+│ ├── @smithy/middleware-content-length@4.2.14
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/middleware-retry@4.5.7
+│ ├── @smithy/middleware-serde@4.2.20
+│ ├── @smithy/middleware-stack@4.2.14
+│ ├── @smithy/node-config-provider@4.3.14
+│ ├── @smithy/node-http-handler@4.6.1
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ ├── @smithy/url-parser@4.2.14
+│ ├── @smithy/util-base64@4.3.2
+│ ├── @smithy/util-body-length-browser@4.2.2
+│ ├── @smithy/util-body-length-node@4.2.3
+│ ├── @smithy/util-defaults-mode-browser@4.3.49
+│ ├── @smithy/util-defaults-mode-node@4.2.54
+│ ├── @smithy/util-endpoints@3.4.2
+│ ├── @smithy/util-middleware@4.2.14
+│ ├── @smithy/util-retry@4.3.8
+│ ├── @smithy/util-utf8@4.2.2
+│ ├── @smithy/util-waiter@4.3.0
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/client-kms@3.1043.0
+│ ├── @aws-crypto/sha256-browser@5.2.0
+│ ├── @aws-crypto/sha256-js@5.2.0
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/credential-provider-node@3.972.39
+│ ├── @aws-sdk/middleware-host-header@3.972.10
+│ ├── @aws-sdk/middleware-logger@3.972.10
+│ ├── @aws-sdk/middleware-recursion-detection@3.972.11
+│ ├── @aws-sdk/middleware-user-agent@3.972.38
+│ ├── @aws-sdk/region-config-resolver@3.972.13
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-endpoints@3.996.8
+│ ├── @aws-sdk/util-user-agent-browser@3.972.10
+│ ├── @aws-sdk/util-user-agent-node@3.973.24
+│ ├── @smithy/config-resolver@4.4.17
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/fetch-http-handler@5.3.17
+│ ├── @smithy/hash-node@4.2.14
+│ ├── @smithy/invalid-dependency@4.2.14
+│ ├── @smithy/middleware-content-length@4.2.14
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/middleware-retry@4.5.7
+│ ├── @smithy/middleware-serde@4.2.20
+│ ├── @smithy/middleware-stack@4.2.14
+│ ├── @smithy/node-config-provider@4.3.14
+│ ├── @smithy/node-http-handler@4.6.1
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ ├── @smithy/url-parser@4.2.14
+│ ├── @smithy/util-base64@4.3.2
+│ ├── @smithy/util-body-length-browser@4.2.2
+│ ├── @smithy/util-body-length-node@4.2.3
+│ ├── @smithy/util-defaults-mode-browser@4.3.49
+│ ├── @smithy/util-defaults-mode-node@4.2.54
+│ ├── @smithy/util-endpoints@3.4.2
+│ ├── @smithy/util-middleware@4.2.14
+│ ├── @smithy/util-retry@4.3.8
+│ ├── @smithy/util-utf8@4.2.2
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/client-rds@3.1043.0
+│ ├── @aws-crypto/sha256-browser@5.2.0
+│ ├── @aws-crypto/sha256-js@5.2.0
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/credential-provider-node@3.972.39
+│ ├── @aws-sdk/middleware-host-header@3.972.10
+│ ├── @aws-sdk/middleware-logger@3.972.10
+│ ├── @aws-sdk/middleware-recursion-detection@3.972.11
+│ ├── @aws-sdk/middleware-sdk-rds@3.972.22
+│ ├── @aws-sdk/middleware-user-agent@3.972.38
+│ ├── @aws-sdk/region-config-resolver@3.972.13
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-endpoints@3.996.8
+│ ├── @aws-sdk/util-user-agent-browser@3.972.10
+│ ├── @aws-sdk/util-user-agent-node@3.973.24
+│ ├── @smithy/config-resolver@4.4.17
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/fetch-http-handler@5.3.17
+│ ├── @smithy/hash-node@4.2.14
+│ ├── @smithy/invalid-dependency@4.2.14
+│ ├── @smithy/middleware-content-length@4.2.14
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/middleware-retry@4.5.7
+│ ├── @smithy/middleware-serde@4.2.20
+│ ├── @smithy/middleware-stack@4.2.14
+│ ├── @smithy/node-config-provider@4.3.14
+│ ├── @smithy/node-http-handler@4.6.1
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ ├── @smithy/url-parser@4.2.14
+│ ├── @smithy/util-base64@4.3.2
+│ ├── @smithy/util-body-length-browser@4.2.2
+│ ├── @smithy/util-body-length-node@4.2.3
+│ ├── @smithy/util-defaults-mode-browser@4.3.49
+│ ├── @smithy/util-defaults-mode-node@4.2.54
+│ ├── @smithy/util-endpoints@3.4.2
+│ ├── @smithy/util-middleware@4.2.14
+│ ├── @smithy/util-retry@4.3.8
+│ ├── @smithy/util-utf8@4.2.2
+│ ├── @smithy/util-waiter@4.3.0
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/client-s3@3.1043.0
+│ ├── @aws-crypto/sha1-browser@5.2.0
+│ ├── @aws-crypto/sha256-browser@5.2.0
+│ ├── @aws-crypto/sha256-js@5.2.0
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/credential-provider-node@3.972.39
+│ ├── @aws-sdk/middleware-bucket-endpoint@3.972.10
+│ ├── @aws-sdk/middleware-expect-continue@3.972.10
+│ ├── @aws-sdk/middleware-flexible-checksums@3.974.16
+│ ├── @aws-sdk/middleware-host-header@3.972.10
+│ ├── @aws-sdk/middleware-location-constraint@3.972.10
+│ ├── @aws-sdk/middleware-logger@3.972.10
+│ ├── @aws-sdk/middleware-recursion-detection@3.972.11
+│ ├── @aws-sdk/middleware-sdk-s3@3.972.37
+│ ├── @aws-sdk/middleware-ssec@3.972.10
+│ ├── @aws-sdk/middleware-user-agent@3.972.38
+│ ├── @aws-sdk/region-config-resolver@3.972.13
+│ ├── @aws-sdk/signature-v4-multi-region@3.996.25
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-endpoints@3.996.8
+│ ├── @aws-sdk/util-user-agent-browser@3.972.10
+│ ├── @aws-sdk/util-user-agent-node@3.973.24
+│ ├── @smithy/config-resolver@4.4.17
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/eventstream-serde-browser@4.2.14
+│ ├── @smithy/eventstream-serde-config-resolver@4.3.14
+│ ├── @smithy/eventstream-serde-node@4.2.14
+│ ├── @smithy/fetch-http-handler@5.3.17
+│ ├── @smithy/hash-blob-browser@4.2.15
+│ ├── @smithy/hash-node@4.2.14
+│ ├── @smithy/hash-stream-node@4.2.14
+│ ├── @smithy/invalid-dependency@4.2.14
+│ ├── @smithy/md5-js@4.2.14
+│ ├── @smithy/middleware-content-length@4.2.14
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/middleware-retry@4.5.7
+│ ├── @smithy/middleware-serde@4.2.20
+│ ├── @smithy/middleware-stack@4.2.14
+│ ├── @smithy/node-config-provider@4.3.14
+│ ├── @smithy/node-http-handler@4.6.1
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ ├── @smithy/url-parser@4.2.14
+│ ├── @smithy/util-base64@4.3.2
+│ ├── @smithy/util-body-length-browser@4.2.2
+│ ├── @smithy/util-body-length-node@4.2.3
+│ ├── @smithy/util-defaults-mode-browser@4.3.49
+│ ├── @smithy/util-defaults-mode-node@4.2.54
+│ ├── @smithy/util-endpoints@3.4.2
+│ ├── @smithy/util-middleware@4.2.14
+│ ├── @smithy/util-retry@4.3.8
+│ ├── @smithy/util-stream@4.5.25
+│ ├── @smithy/util-utf8@4.2.2
+│ ├── @smithy/util-waiter@4.3.0
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/lib-dynamodb@3.1043.0
+│ ├── @aws-sdk/client-dynamodb@3.1043.0 peer
+│ ├── @aws-sdk/core@3.974.8
+│ ├── @aws-sdk/util-dynamodb@3.996.2
+│ ├── @smithy/core@3.23.17
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ └── tslib@2.8.1
+├─┬ @aws-sdk/s3-request-presigner@3.1043.0
+│ ├── @aws-sdk/signature-v4-multi-region@3.996.25
+│ ├── @aws-sdk/types@3.973.8
+│ ├── @aws-sdk/util-format-url@3.972.10
+│ ├── @smithy/middleware-endpoint@4.4.32
+│ ├── @smithy/protocol-http@5.3.14
+│ ├── @smithy/smithy-client@4.12.13
+│ ├── @smithy/types@4.14.1
+│ └── tslib@2.8.1
+├─┬ @azure/storage-blob@12.31.0
+│ ├── @azure/abort-controller@2.1.2
+│ ├── @azure/core-auth@1.10.1
+│ ├── @azure/core-client@1.10.1
+│ ├── @azure/core-http-compat@2.4.0
+│ ├── @azure/core-lro@2.7.2
+│ ├── @azure/core-paging@1.6.2
+│ ├── @azure/core-rest-pipeline@1.23.0
+│ ├── @azure/core-tracing@1.3.1
+│ ├── @azure/core-util@1.13.1
+│ ├── @azure/core-xml@1.5.1
+│ ├── @azure/logger@1.3.0
+│ ├── @azure/storage-common@12.3.0
+│ ├── events@3.3.0
+│ └── tslib@2.8.1
+├── @cloudflare/workers-types@4.20260505.1
+├─┬ @composio/core@0.8.1
+│ ├── @composio/client@0.1.0-alpha.68
+│ ├── @composio/json-schema-to-zod@0.1.20
+│ ├── @types/json-schema@7.0.15
+│ ├── chalk@4.1.2
+│ ├── openai@6.36.0
+│ ├── pusher-js@8.5.0
+│ ├── semver@7.7.4
+│ ├── zod@4.4.3 peer
+│ └── zod-to-json-schema@3.25.2
+├─┬ @composio/vercel@0.8.1
+│ ├── @composio/core@0.8.1 peer
+│ └── ai@6.0.175 peer
+├─┬ @google-cloud/compute@6.9.1
+│ └── google-gax@5.0.6
+├─┬ @google-cloud/storage@7.19.0
+│ ├── @google-cloud/paginator@5.0.2
+│ ├── @google-cloud/projectify@4.0.0
+│ ├── @google-cloud/promisify@4.0.0
+│ ├── abort-controller@3.0.0
+│ ├── async-retry@1.3.3
+│ ├── duplexify@4.1.3
+│ ├── fast-xml-parser@5.7.3
+│ ├── gaxios@6.7.1
+│ ├── google-auth-library@9.15.1
+│ ├── html-entities@2.6.0
+│ ├── mime@3.0.0
+│ ├── p-limit@3.1.0
+│ ├── retry-request@7.0.2
+│ ├── teeny-request@9.0.0
+│ └── uuid@8.3.2
+├─┬ @heroicons/react@2.2.0
+│ └── react@19.2.5 peer
+├─┬ @hookform/resolvers@5.2.2
+│ ├── @standard-schema/utils@0.3.0
+│ └── react-hook-form@7.75.0 peer
+├─┬ @iconify-json/lucide@1.2.105
+│ └── @iconify/types@2.0.0
+├── @microsoft/clarity@1.0.2
+├─┬ @modelcontextprotocol/sdk@1.29.0
+│ ├── @hono/node-server@1.19.14
+│ ├── ajv@8.20.0
+│ ├── ajv-formats@3.0.1
+│ ├── content-type@1.0.5
+│ ├── cors@2.8.6
+│ ├── cross-spawn@7.0.6
+│ ├── eventsource@3.0.7
+│ ├── eventsource-parser@3.0.8
+│ ├── express@5.2.1
+│ ├── express-rate-limit@8.5.0
+│ ├── hono@4.12.17
+│ ├── jose@6.2.3
+│ ├── json-schema-typed@8.0.2
+│ ├── pkce-challenge@5.0.1
+│ ├── raw-body@3.0.2
+│ ├── zod@4.4.3 peer
+│ └── zod-to-json-schema@3.25.2
+├─┬ @openai/codex@0.128.0
+│ ├── @openai/codex-darwin-arm64@npm:@openai/codex@0.128.0-darwin-arm64
+│ ├── @openai/codex-darwin-x64@npm:@openai/codex@0.128.0-darwin-x64
+│ ├── @openai/codex-linux-arm64@npm:@openai/codex@0.128.0-linux-arm64
+│ ├── @openai/codex-linux-x64@npm:@openai/codex@0.128.0-linux-x64
+│ ├── @openai/codex-win32-arm64@npm:@openai/codex@0.128.0-win32-arm64
+│ └── @openai/codex-win32-x64@npm:@openai/codex@0.128.0-win32-x64
+├── @opentelemetry/api@1.9.1
+├─┬ @opentelemetry/auto-instrumentations-node@0.74.0
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1 peer
+│ ├── @opentelemetry/instrumentation@0.216.0
+│ ├── @opentelemetry/instrumentation-amqplib@0.63.0
+│ ├── @opentelemetry/instrumentation-aws-lambda@0.68.0
+│ ├── @opentelemetry/instrumentation-aws-sdk@0.71.0
+│ ├── @opentelemetry/instrumentation-bunyan@0.61.0
+│ ├── @opentelemetry/instrumentation-cassandra-driver@0.61.0
+│ ├── @opentelemetry/instrumentation-connect@0.59.0
+│ ├── @opentelemetry/instrumentation-cucumber@0.32.0
+│ ├── @opentelemetry/instrumentation-dataloader@0.33.0
+│ ├── @opentelemetry/instrumentation-dns@0.59.0
+│ ├── @opentelemetry/instrumentation-express@0.64.0
+│ ├── @opentelemetry/instrumentation-fs@0.35.0
+│ ├── @opentelemetry/instrumentation-generic-pool@0.59.0
+│ ├── @opentelemetry/instrumentation-graphql@0.64.0
+│ ├── @opentelemetry/instrumentation-grpc@0.216.0
+│ ├── @opentelemetry/instrumentation-hapi@0.62.0
+│ ├── @opentelemetry/instrumentation-http@0.216.0
+│ ├── @opentelemetry/instrumentation-ioredis@0.64.0
+│ ├── @opentelemetry/instrumentation-kafkajs@0.25.0
+│ ├── @opentelemetry/instrumentation-knex@0.60.0
+│ ├── @opentelemetry/instrumentation-koa@0.64.0
+│ ├── @opentelemetry/instrumentation-lru-memoizer@0.60.0
+│ ├── @opentelemetry/instrumentation-memcached@0.59.0
+│ ├── @opentelemetry/instrumentation-mongodb@0.69.0
+│ ├── @opentelemetry/instrumentation-mongoose@0.62.0
+│ ├── @opentelemetry/instrumentation-mysql@0.62.0
+│ ├── @opentelemetry/instrumentation-mysql2@0.62.0
+│ ├── @opentelemetry/instrumentation-nestjs-core@0.62.0
+│ ├── @opentelemetry/instrumentation-net@0.60.0
+│ ├── @opentelemetry/instrumentation-openai@0.14.0
+│ ├── @opentelemetry/instrumentation-oracledb@0.41.0
+│ ├── @opentelemetry/instrumentation-pg@0.68.0
+│ ├── @opentelemetry/instrumentation-pino@0.62.0
+│ ├── @opentelemetry/instrumentation-redis@0.64.0
+│ ├── @opentelemetry/instrumentation-restify@0.61.0
+│ ├── @opentelemetry/instrumentation-router@0.60.0
+│ ├── @opentelemetry/instrumentation-runtime-node@0.29.0
+│ ├── @opentelemetry/instrumentation-socket.io@0.63.0
+│ ├── @opentelemetry/instrumentation-tedious@0.35.0
+│ ├── @opentelemetry/instrumentation-undici@0.26.0
+│ ├── @opentelemetry/instrumentation-winston@0.60.0
+│ ├── @opentelemetry/resource-detector-alibaba-cloud@0.33.6
+│ ├── @opentelemetry/resource-detector-aws@2.16.0
+│ ├── @opentelemetry/resource-detector-azure@0.24.0
+│ ├── @opentelemetry/resource-detector-container@0.8.7
+│ ├── @opentelemetry/resource-detector-gcp@0.51.0
+│ ├── @opentelemetry/resources@2.7.1
+│ └── @opentelemetry/sdk-node@0.216.0
+├─┬ @opentelemetry/context-async-hooks@2.7.1
+│ └── @opentelemetry/api@1.9.1 peer
+├─┬ @opentelemetry/exporter-metrics-otlp-http@0.216.0
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1
+│ ├── @opentelemetry/otlp-exporter-base@0.216.0
+│ ├── @opentelemetry/otlp-transformer@0.216.0
+│ ├── @opentelemetry/resources@2.7.1
+│ └── @opentelemetry/sdk-metrics@2.7.1
+├─┬ @opentelemetry/exporter-trace-otlp-grpc@0.216.0
+│ ├── @grpc/grpc-js@1.14.3
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1
+│ ├── @opentelemetry/otlp-exporter-base@0.216.0
+│ ├── @opentelemetry/otlp-grpc-exporter-base@0.216.0
+│ ├── @opentelemetry/otlp-transformer@0.216.0
+│ ├── @opentelemetry/resources@2.7.1
+│ └── @opentelemetry/sdk-trace-base@2.7.1
+├─┬ @opentelemetry/exporter-trace-otlp-http@0.216.0
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1
+│ ├── @opentelemetry/otlp-exporter-base@0.216.0
+│ ├── @opentelemetry/otlp-transformer@0.216.0
+│ ├── @opentelemetry/resources@2.7.1
+│ └── @opentelemetry/sdk-trace-base@2.7.1
+├─┬ @opentelemetry/resources@2.7.1
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1
+│ └── @opentelemetry/semantic-conventions@1.40.0
+├─┬ @opentelemetry/sdk-metrics@2.7.1
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1
+│ └── @opentelemetry/resources@2.7.1
+├─┬ @opentelemetry/sdk-node@0.216.0
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/api-logs@0.216.0
+│ ├── @opentelemetry/configuration@0.216.0
+│ ├── @opentelemetry/context-async-hooks@2.7.1
+│ ├── @opentelemetry/core@2.7.1
+│ ├── @opentelemetry/exporter-logs-otlp-grpc@0.216.0
+│ ├── @opentelemetry/exporter-logs-otlp-http@0.216.0
+│ ├── @opentelemetry/exporter-logs-otlp-proto@0.216.0
+│ ├── @opentelemetry/exporter-metrics-otlp-grpc@0.216.0
+│ ├── @opentelemetry/exporter-metrics-otlp-http@0.216.0
+│ ├── @opentelemetry/exporter-metrics-otlp-proto@0.216.0
+│ ├── @opentelemetry/exporter-prometheus@0.216.0
+│ ├── @opentelemetry/exporter-trace-otlp-grpc@0.216.0
+│ ├── @opentelemetry/exporter-trace-otlp-http@0.216.0
+│ ├── @opentelemetry/exporter-trace-otlp-proto@0.216.0
+│ ├── @opentelemetry/exporter-zipkin@2.7.1
+│ ├── @opentelemetry/instrumentation@0.216.0
+│ ├── @opentelemetry/otlp-exporter-base@0.216.0
+│ ├── @opentelemetry/propagator-b3@2.7.1
+│ ├── @opentelemetry/propagator-jaeger@2.7.1
+│ ├── @opentelemetry/resources@2.7.1
+│ ├── @opentelemetry/sdk-logs@0.216.0
+│ ├── @opentelemetry/sdk-metrics@2.7.1
+│ ├── @opentelemetry/sdk-trace-base@2.7.1
+│ ├── @opentelemetry/sdk-trace-node@2.7.1
+│ └── @opentelemetry/semantic-conventions@1.40.0
+├─┬ @opentelemetry/sdk-trace-base@2.7.1
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/core@2.7.1
+│ ├── @opentelemetry/resources@2.7.1
+│ └── @opentelemetry/semantic-conventions@1.40.0
+├─┬ @opentelemetry/sdk-trace-node@2.7.1
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @opentelemetry/context-async-hooks@2.7.1
+│ ├── @opentelemetry/core@2.7.1
+│ └── @opentelemetry/sdk-trace-base@2.7.1
+├── @opentelemetry/semantic-conventions@1.40.0
+├── @oslojs/encoding@1.1.0
+├─┬ @radix-ui/react-slot@1.2.4
+│ ├── @radix-ui/react-compose-refs@1.1.2
+│ ├── @types/react@19.2.14 peer
+│ └── react@19.2.5 peer
+├─┬ @radix-ui/react-tooltip@1.2.8
+│ ├── @radix-ui/primitive@1.1.3
+│ ├── @radix-ui/react-compose-refs@1.1.2
+│ ├── @radix-ui/react-context@1.1.2
+│ ├── @radix-ui/react-dismissable-layer@1.1.11
+│ ├── @radix-ui/react-id@1.1.1
+│ ├── @radix-ui/react-popper@1.2.8
+│ ├── @radix-ui/react-portal@1.1.9
+│ ├── @radix-ui/react-presence@1.1.5
+│ ├── @radix-ui/react-primitive@2.1.3
+│ ├── @radix-ui/react-slot@1.2.3
+│ ├── @radix-ui/react-use-controllable-state@1.2.2
+│ ├── @radix-ui/react-visually-hidden@1.2.3
+│ ├── @types/react@19.2.14 peer
+│ ├── @types/react-dom@19.2.3 peer
+│ ├── react@19.2.5 peer
+│ └── react-dom@19.2.5 peer
+├─┬ @react-three/drei@10.7.7
+│ ├── @babel/runtime@7.29.2
+│ ├── @mediapipe/tasks-vision@0.10.17
+│ ├── @monogrid/gainmap-js@3.4.0
+│ ├── @react-three/fiber@9.6.1 peer
+│ ├── @use-gesture/react@10.3.1
+│ ├── camera-controls@3.1.2
+│ ├── cross-env@7.0.3
+│ ├── detect-gpu@5.0.70
+│ ├── glsl-noise@0.0.0
+│ ├── hls.js@1.6.16
+│ ├── maath@0.10.8
+│ ├── meshline@3.3.1
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ ├── stats-gl@2.4.2
+│ ├── stats.js@0.17.0
+│ ├── suspend-react@0.1.3
+│ ├── three@0.184.0 peer
+│ ├── three-mesh-bvh@0.8.3
+│ ├── three-stdlib@2.36.1
+│ ├── troika-three-text@0.52.4
+│ ├── tunnel-rat@0.1.2
+│ ├── use-sync-external-store@1.6.0
+│ ├── utility-types@3.11.0
+│ └── zustand@5.0.13
+├─┬ @react-three/fiber@9.6.1
+│ ├── @babel/runtime@7.29.2
+│ ├── @types/webxr@0.5.24
+│ ├── base64-js@1.5.1
+│ ├── buffer@6.0.3
+│ ├── its-fine@2.0.0
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ ├── react-use-measure@2.1.7
+│ ├── scheduler@0.27.0
+│ ├── suspend-react@0.1.3
+│ ├── three@0.184.0 peer
+│ ├── use-sync-external-store@1.6.0
+│ └── zustand@5.0.13
+├─┬ @sentry/astro@10.51.0
+│ ├── @sentry/browser@10.51.0
+│ ├── @sentry/core@10.51.0
+│ ├── @sentry/node@10.51.0
+│ ├── @sentry/vite-plugin@5.2.1
+│ └── astro@6.2.2 peer
+├─┬ @sentry/node@10.51.0
+│ ├── @fastify/otel@0.18.0
+│ ├── @opentelemetry/api@1.9.1
+│ ├── @opentelemetry/core@2.7.1
+│ ├── @opentelemetry/instrumentation@0.214.0
+│ ├── @opentelemetry/instrumentation-amqplib@0.61.0
+│ ├── @opentelemetry/instrumentation-connect@0.57.0
+│ ├── @opentelemetry/instrumentation-dataloader@0.31.0
+│ ├── @opentelemetry/instrumentation-fs@0.33.0
+│ ├── @opentelemetry/instrumentation-generic-pool@0.57.0
+│ ├── @opentelemetry/instrumentation-graphql@0.62.0
+│ ├── @opentelemetry/instrumentation-hapi@0.60.0
+│ ├── @opentelemetry/instrumentation-http@0.214.0
+│ ├── @opentelemetry/instrumentation-ioredis@0.62.0
+│ ├── @opentelemetry/instrumentation-kafkajs@0.23.0
+│ ├── @opentelemetry/instrumentation-knex@0.58.0
+│ ├── @opentelemetry/instrumentation-koa@0.62.0
+│ ├── @opentelemetry/instrumentation-lru-memoizer@0.58.0
+│ ├── @opentelemetry/instrumentation-mongodb@0.67.0
+│ ├── @opentelemetry/instrumentation-mongoose@0.60.0
+│ ├── @opentelemetry/instrumentation-mysql@0.60.0
+│ ├── @opentelemetry/instrumentation-mysql2@0.60.0
+│ ├── @opentelemetry/instrumentation-pg@0.66.0
+│ ├── @opentelemetry/instrumentation-redis@0.62.0
+│ ├── @opentelemetry/instrumentation-tedious@0.33.0
+│ ├── @opentelemetry/sdk-trace-base@2.7.1
+│ ├── @opentelemetry/semantic-conventions@1.40.0
+│ ├── @prisma/instrumentation@7.6.0
+│ ├── @sentry/core@10.51.0
+│ ├── @sentry/node-core@10.51.0
+│ ├── @sentry/opentelemetry@10.51.0
+│ └── import-in-the-middle@3.0.1
+├─┬ @sentry/profiling-node@10.51.0
+│ ├── @sentry-internal/node-cpu-profiler@2.3.0
+│ ├── @sentry/core@10.51.0
+│ └── @sentry/node@10.51.0
+├─┬ @sentry/toolbar@1.0.0-beta.11
+│ └── react@19.2.5 peer
+├─┬ @sentry/vite-plugin@5.2.1
+│ ├── @sentry/bundler-plugin-core@5.2.1
+│ └── @sentry/rollup-plugin@5.2.1
+├─┬ @spotlightjs/astro@3.2.6
+│ ├── @sentry/astro@10.51.0 peer
+│ ├── @spotlightjs/spotlight@3.0.2
+│ └── astro@6.2.2 peer
+├─┬ @supermemory/tools@2.0.0
+│ ├── @ai-sdk/anthropic@2.0.79
+│ ├── @ai-sdk/openai@2.0.106
+│ ├── @ai-sdk/provider@3.0.10 peer
+│ ├── ai@5.0.185
+│ ├── lru-cache@11.3.6
+│ ├── openai@4.104.0
+│ ├── supermemory@3.14.0
+│ └── zod@4.4.3
+├─┬ @tanstack/react-query@5.100.9
+│ ├── @tanstack/query-core@5.100.9
+│ └── react@19.2.5 peer
+├─┬ @tarquinen/opencode-dcp@3.1.9
+│ ├── @anthropic-ai/tokenizer@0.0.4
+│ ├── @opencode-ai/plugin@1.4.11 peer
+│ ├── @opencode-ai/sdk@1.14.39
+│ ├── jsonc-parser@3.3.1
+│ └── zod@4.4.3
+├─┬ @tensorflow/tfjs@4.22.0
+│ ├── @tensorflow/tfjs-backend-cpu@4.22.0
+│ ├── @tensorflow/tfjs-backend-webgl@4.22.0
+│ ├── @tensorflow/tfjs-converter@4.22.0
+│ ├── @tensorflow/tfjs-core@4.22.0
+│ ├── @tensorflow/tfjs-data@4.22.0
+│ ├── @tensorflow/tfjs-layers@4.22.0
+│ ├── argparse@1.0.10
+│ ├── chalk@4.1.2
+│ ├── core-js@3.29.1
+│ ├── regenerator-runtime@0.13.11
+│ └── yargs@16.2.0
+├─┬ @tensorflow/tfjs-layers@4.22.0
+│ └── @tensorflow/tfjs-core@4.22.0 peer
+├─┬ @types/jsonwebtoken@9.0.10
+│ ├── @types/ms@2.1.0
+│ └── @types/node@25.6.0
+├─┬ @types/multer@2.1.0
+│ └── @types/express@5.0.6
+├─┬ @types/nodemailer@8.0.0
+│ └── @types/node@25.6.0
+├─┬ @types/three@0.184.0
+│ ├── @dimforge/rapier3d-compat@0.12.0
+│ ├── @tweenjs/tween.js@23.1.3
+│ ├── @types/stats.js@0.17.4
+│ ├── @types/webxr@0.5.24
+│ ├── fflate@0.8.2
+│ └── meshoptimizer@1.1.1
+├─┬ @types/ws@8.18.1
+│ └── @types/node@25.6.0
+├─┬ @upstash/ratelimit@2.0.8
+│ ├── @upstash/core-analytics@0.0.10
+│ └── @upstash/redis@1.38.0 peer
+├─┬ @upstash/redis@1.38.0
+│ └── uncrypto@0.1.3
+├─┬ @vercel/analytics@2.0.1
+│ ├── react@19.2.5 peer
+│ └── vue@3.5.33 peer
+├─┬ @vercel/speed-insights@2.0.0
+│ ├── react@19.2.5 peer
+│ └── vue@3.5.33 peer
+├─┬ ai@6.0.175
+│ ├── @ai-sdk/gateway@3.0.110
+│ ├── @ai-sdk/provider@3.0.10
+│ ├── @ai-sdk/provider-utils@4.0.26
+│ ├── @opentelemetry/api@1.9.0
+│ └── zod@4.4.3 peer
+├─┬ archiver@7.0.1
+│ ├── archiver-utils@5.0.2
+│ ├── async@3.2.6
+│ ├── buffer-crc32@1.0.0
+│ ├── readable-stream@4.7.0
+│ ├── readdir-glob@1.1.3
+│ ├── tar-stream@3.2.0
+│ └── zip-stream@6.0.1
+├─┬ astro-icon@1.1.5
+│ ├── @iconify/tools@4.2.0
+│ ├── @iconify/types@2.0.0
+│ └── @iconify/utils@2.3.0
+├─┬ auth0@5.9.1
+│ ├── auth0-legacy@npm:auth0@4.37.0
+│ ├── jose@4.15.9
+│ └── uuid@11.1.1
+├─┬ axios@1.16.0
+│ ├── follow-redirects@1.16.0
+│ ├── form-data@4.0.5
+│ └── proxy-from-env@2.1.0
+├── bcryptjs@3.0.3
+├─┬ better-sqlite3@12.9.0
+│ ├── bindings@1.5.0
+│ └── prebuild-install@7.1.3
+├─┬ browserify-zlib@0.2.0
+│ └── pako@1.0.11
+├─┬ buffer@6.0.3
+│ ├── base64-js@1.5.1
+│ └── ieee754@1.2.1
+├─┬ chart.js@4.5.1
+│ └── @kurkle/color@0.3.4
+├─┬ class-variance-authority@0.7.1
+│ └── clsx@2.1.1
+├── clsx@2.1.1
+├── commander@14.0.3
+├─┬ compression@1.8.1
+│ ├── bytes@3.1.2
+│ ├── compressible@2.0.18
+│ ├── debug@2.6.9
+│ ├── negotiator@0.6.4
+│ ├── on-headers@1.1.0
+│ ├── safe-buffer@5.2.1
+│ └── vary@1.1.2
+├── cookie@1.1.1
+├─┬ cors@2.8.6
+│ ├── object-assign@4.1.1
+│ └── vary@1.1.2
+├── crypto-js@4.2.0
+├── date-fns@4.1.0
+├── dayjs@1.11.20
+├── devalue@5.8.0
+├─┬ dompurify@3.4.2
+│ └── @types/trusted-types@2.0.7
+├─┬ drizzle-orm@0.45.2
+│ ├── @cloudflare/workers-types@4.20260505.1 peer
+│ ├── @electric-sql/pglite@0.3.16 peer
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @types/pg@8.20.0 peer
+│ ├── @upstash/redis@1.38.0 peer
+│ ├── better-sqlite3@12.9.0 peer
+│ ├── kysely@0.28.16 peer
+│ ├── pg@8.20.0 peer
+│ └── postgres@3.4.9 peer
+├── es-module-lexer@2.1.0
+├── events@3.3.0
+├─┬ express@5.2.1
+│ ├── accepts@2.0.0
+│ ├── body-parser@2.2.2
+│ ├── content-disposition@1.1.0
+│ ├── content-type@1.0.5
+│ ├── cookie@0.7.2
+│ ├── cookie-signature@1.2.2
+│ ├── debug@4.4.3
+│ ├── depd@2.0.0
+│ ├── encodeurl@2.0.0
+│ ├── escape-html@1.0.3
+│ ├── etag@1.8.1
+│ ├── finalhandler@2.1.1
+│ ├── fresh@2.0.0
+│ ├── http-errors@2.0.1
+│ ├── merge-descriptors@2.0.0
+│ ├── mime-types@3.0.2
+│ ├── on-finished@2.4.1
+│ ├── once@1.4.0
+│ ├── parseurl@1.3.3
+│ ├── proxy-addr@2.0.7
+│ ├── qs@6.15.1
+│ ├── range-parser@1.2.1
+│ ├── router@2.2.0
+│ ├── send@1.2.1
+│ ├── serve-static@2.2.1
+│ ├── statuses@2.0.2
+│ ├── type-is@2.0.1
+│ └── vary@1.1.2
+├─┬ express-openid-connect@2.20.2
+│ ├── base64url@3.0.1
+│ ├── clone@2.1.2
+│ ├── cookie@0.7.2
+│ ├── debug@4.4.3
+│ ├── express@5.2.1 peer
+│ ├── futoin-hkdf@1.5.3
+│ ├── http-errors@1.8.1
+│ ├── joi@17.13.3
+│ ├── jose@2.0.7
+│ ├── on-headers@1.1.0
+│ ├── openid-client@4.9.1
+│ ├── url-join@4.0.1
+│ └── util-promisify@3.0.0
+├─┬ express-rate-limit@8.5.0
+│ ├── express@5.2.1 peer
+│ └── ip-address@10.1.0
+├── flexsearch@0.8.212
+├─┬ framer-motion@12.38.0
+│ ├── motion-dom@12.38.0
+│ ├── motion-utils@12.36.0
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ └── tslib@2.8.1
+├── helmet@8.1.0
+├── html-escaper@3.0.3
+├─┬ i18next@26.0.8
+│ └── typescript@5.9.3 peer
+├── idb@8.0.3
+├─┬ ioredis@5.10.1
+│ ├── @ioredis/commands@1.5.1
+│ ├── cluster-key-slot@1.1.2
+│ ├── debug@4.4.3
+│ ├── denque@2.1.0
+│ ├── lodash.defaults@4.2.0
+│ ├── lodash.isarguments@3.1.0
+│ ├── redis-errors@1.2.0
+│ ├── redis-parser@3.0.0
+│ └── standard-as-callback@2.1.0
+├─┬ isomorphic-dompurify@3.12.0
+│ ├── dompurify@3.4.2
+│ └── jsdom@29.1.1
+├─┬ jigsawstack@0.4.3
+│ ├── isomorphic-fetch@3.0.0
+│ └── zod@3.25.76
+├─┬ jotai@2.19.1
+│ ├── @babel/core@7.29.0 peer
+│ ├── @babel/template@7.28.6 peer
+│ ├── @types/react@19.2.14 peer
+│ └── react@19.2.5 peer
+├─┬ jsonwebtoken@9.0.3
+│ ├── jws@4.0.1
+│ ├── lodash.includes@4.3.0
+│ ├── lodash.isboolean@3.0.3
+│ ├── lodash.isinteger@4.0.4
+│ ├── lodash.isnumber@3.0.3
+│ ├── lodash.isplainobject@4.0.6
+│ ├── lodash.isstring@4.0.1
+│ ├── lodash.once@4.1.1
+│ ├── ms@2.1.3
+│ └── semver@7.7.4
+├─┬ lucide-react@1.14.0
+│ └── react@19.2.5 peer
+├── medium-zoom@1.1.0
+├─┬ mongodb@7.2.0
+│ ├── @mongodb-js/saslprep@1.4.11
+│ ├── bson@7.2.0
+│ ├── mongodb-client-encryption@7.0.0 peer
+│ └── mongodb-connection-string-url@7.0.1
+├─┬ mongodb-client-encryption@7.0.0
+│ ├── node-addon-api@8.7.0
+│ └── prebuild-install@7.1.3
+├─┬ mongoose@9.6.1
+│ ├── kareem@3.3.0
+│ ├── mongodb@7.2.0
+│ ├── mpath@0.9.0
+│ ├── mquery@6.0.0
+│ ├── ms@2.1.3
+│ └── sift@17.1.3
+├─┬ multer@2.1.1
+│ ├── append-field@1.0.0
+│ ├── busboy@1.6.0
+│ ├── concat-stream@2.0.0
+│ └── type-is@1.6.18
+├── nanoid@5.1.11
+├── node-cron@4.2.1
+├── node-seal@7.0.0
+├── nodemailer@8.0.7
+├─┬ p5@2.2.3
+│ ├── @davepagurek/bezier-path@0.0.7
+│ ├── @japont/unicode-range@1.0.0
+│ ├── acorn@8.16.0
+│ ├── acorn-walk@8.3.5
+│ ├── colorjs.io@0.6.1
+│ ├── escodegen@2.1.0
+│ ├── gifenc@1.0.3
+│ ├── i18next@19.9.2
+│ ├── i18next-browser-languagedetector@4.3.1
+│ ├── libtess@1.2.2
+│ ├── omggif@1.0.10
+│ ├── pako@2.1.0
+│ └── zod@4.4.3
+├── path-browserify@1.0.1
+├─┬ pg@8.20.0
+│ ├── pg-cloudflare@1.3.0
+│ ├── pg-connection-string@2.12.0
+│ ├── pg-pool@3.13.0
+│ ├── pg-protocol@1.13.0
+│ ├── pg-types@2.2.0
+│ └── pgpass@1.0.5
+├── piccolore@0.1.3
+├── postgres@3.4.9
+├─┬ prop-types@15.8.1
+│ ├── loose-envify@1.4.0
+│ ├── object-assign@4.1.1
+│ └── react-is@16.13.1
+├── react@19.2.5
+├─┬ react-chartjs-2@5.3.1
+│ ├── chart.js@4.5.1 peer
+│ └── react@19.2.5 peer
+├─┬ react-dom@19.2.5
+│ ├── react@19.2.5 peer
+│ └── scheduler@0.27.0
+├─┬ react-hook-form@7.75.0
+│ └── react@19.2.5 peer
+├─┬ react-hot-toast@2.6.0
+│ ├── csstype@3.2.3
+│ ├── goober@2.1.18
+│ ├── react@19.2.5 peer
+│ └── react-dom@19.2.5 peer
+├─┬ react-i18next@17.0.6
+│ ├── @babel/runtime@7.29.2
+│ ├── html-parse-stringify@3.0.1
+│ ├── i18next@26.0.8 peer
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ ├── typescript@5.9.3 peer
+│ └── use-sync-external-store@1.6.0
+├─┬ react-router-dom@7.15.0
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ └── react-router@7.15.0
+├─┬ recharts@3.8.1
+│ ├── @reduxjs/toolkit@2.11.2
+│ ├── clsx@2.1.1
+│ ├── decimal.js-light@2.5.1
+│ ├── es-toolkit@1.46.1
+│ ├── eventemitter3@5.0.4
+│ ├── immer@10.2.0
+│ ├── react@19.2.5 peer
+│ ├── react-dom@19.2.5 peer
+│ ├── react-is@17.0.2 peer
+│ ├── react-redux@9.2.0
+│ ├── reselect@5.1.1
+│ ├── tiny-invariant@1.3.3
+│ ├── use-sync-external-store@1.6.0
+│ └── victory-vendor@37.3.6
+├─┬ redis@5.12.1
+│ ├── @redis/bloom@5.12.1
+│ ├── @redis/client@5.12.1
+│ ├── @redis/json@5.12.1
+│ ├── @redis/search@5.12.1
+│ └── @redis/time-series@5.12.1
+├─┬ rehype-sanitize@6.0.0
+│ ├── @types/hast@3.0.4
+│ └── hast-util-sanitize@5.0.2
+├─┬ rehype-stringify@10.0.1
+│ ├── @types/hast@3.0.4
+│ ├── hast-util-to-html@9.0.5
+│ └── unified@11.0.5
+├─┬ remark@15.0.1
+│ ├── @types/mdast@4.0.4
+│ ├── remark-parse@11.0.0
+│ ├── remark-stringify@11.0.0
+│ └── unified@11.0.5
+├─┬ remark-gfm@4.0.1
+│ ├── @types/mdast@4.0.4
+│ ├── mdast-util-gfm@3.1.0
+│ ├── micromark-extension-gfm@3.0.0
+│ ├── remark-parse@11.0.0
+│ ├── remark-stringify@11.0.0
+│ └── unified@11.0.5
+├─┬ remark-parse@11.0.0
+│ ├── @types/mdast@4.0.4
+│ ├── mdast-util-from-markdown@2.0.3
+│ ├── micromark-util-types@2.0.2
+│ └── unified@11.0.5
+├─┬ remark-rehype@11.1.2
+│ ├── @types/hast@3.0.4
+│ ├── @types/mdast@4.0.4
+│ ├── mdast-util-to-hast@13.2.1
+│ ├── unified@11.0.5
+│ └── vfile@6.0.3
+├─┬ resend@6.12.2
+│ ├── postal-mime@2.7.4
+│ └── svix@1.90.0
+├─┬ simple-git@3.36.0
+│ ├── @kwsites/file-exists@1.1.1
+│ ├── @kwsites/promise-deferred@1.1.1
+│ ├── @simple-git/args-pathspec@1.0.3
+│ ├── @simple-git/argv-parser@1.1.1
+│ └── debug@4.4.3
+├── slug@11.0.1
+├─┬ socket.io@4.8.3
+│ ├── accepts@1.3.8
+│ ├── base64id@2.0.0
+│ ├── cors@2.8.6
+│ ├── debug@4.4.3
+│ ├── engine.io@6.6.7
+│ ├── socket.io-adapter@2.5.6
+│ └── socket.io-parser@4.2.6
+├─┬ socket.io-client@4.8.3
+│ ├── @socket.io/component-emitter@3.1.2
+│ ├── debug@4.4.3
+│ ├── engine.io-client@6.6.4
+│ └── socket.io-parser@4.2.6
+├─┬ sonner@2.0.7
+│ ├── react@19.2.5 peer
+│ └── react-dom@19.2.5 peer
+├─┬ stream-browserify@3.0.0
+│ ├── inherits@2.0.4
+│ └── readable-stream@3.6.2
+├── swiper@12.1.4
+├── tailwind-merge@3.5.0
+├─┬ tar@7.5.13
+│ ├── @isaacs/fs-minipass@4.0.1
+│ ├── chownr@3.0.0
+│ ├── minipass@7.1.3
+│ ├── minizlib@3.1.0
+│ └── yallist@5.0.0
+├── three@0.184.0
+├─┬ three-stdlib@2.36.1
+│ ├── @types/draco3d@1.4.10
+│ ├── @types/offscreencanvas@2019.7.3
+│ ├── @types/webxr@0.5.24
+│ ├── draco3d@1.5.7
+│ ├── fflate@0.6.10
+│ ├── potpack@1.0.2
+│ └── three@0.184.0 peer
+├─┬ twilio@6.0.0
+│ ├── axios@1.16.0
+│ ├── dayjs@1.11.20
+│ ├── https-proxy-agent@5.0.1
+│ ├── jsonwebtoken@9.0.3
+│ ├── qs@6.15.1
+│ ├── scmp@2.1.0
+│ └── xmlbuilder@13.0.2
+├── uuid@14.0.0
+├─┬ vue@3.5.33
+│ ├── @vue/compiler-dom@3.5.33
+│ ├── @vue/compiler-sfc@3.5.33
+│ ├── @vue/runtime-dom@3.5.33
+│ ├── @vue/server-renderer@3.5.33
+│ ├── @vue/shared@3.5.33
+│ └── typescript@5.9.3 peer
+├─┬ ws@8.20.0
+│ └── utf-8-validate@6.0.6 peer
+├── zod@4.4.3
+├─┬ zustand@5.0.13
+│ ├── @types/react@19.2.14 peer
+│ ├── immer@11.1.6 peer
+│ ├── react@19.2.5 peer
+│ └── use-sync-external-store@1.6.0 peer
+│
+│   devDependencies:
+├─┬ @astrojs/markdoc@1.0.4
+│ ├── @astrojs/internal-helpers@0.9.0
+│ ├── @astrojs/markdown-remark@7.1.1
+│ ├── @astrojs/prism@4.0.1
+│ ├── @markdoc/markdoc@0.5.7
+│ ├── astro@6.2.2 peer
+│ ├── esbuild@0.27.7
+│ ├── github-slugger@2.0.0
+│ └── htmlparser2@10.1.0
+├─┬ @astrojs/rss@4.0.18
+│ ├── fast-xml-parser@5.7.3
+│ ├── piccolore@0.1.3
+│ └── zod@4.4.3
+├─┬ @eslint/css@1.2.0
+│ ├── @eslint/core@1.2.1
+│ ├── @eslint/css-tree@4.0.3
+│ └── @eslint/plugin-kit@0.7.1
+├─┬ @eslint/js@10.0.1
+│ └── eslint@10.3.0 peer
+├─┬ @eslint/json@1.2.0
+│ ├── @eslint/core@1.2.1
+│ ├── @eslint/plugin-kit@0.6.1
+│ ├── @humanwhocodes/momoa@3.3.10
+│ └── natural-compare@1.4.0
+├─┬ @eslint/markdown@8.0.1
+│ ├── @eslint/core@1.2.1
+│ ├── @eslint/plugin-kit@0.6.1
+│ ├── github-slugger@2.0.0
+│ ├── mdast-util-from-markdown@2.0.3
+│ ├── mdast-util-frontmatter@2.0.1
+│ ├── mdast-util-gfm@3.1.0
+│ ├── mdast-util-math@3.0.0
+│ ├── micromark-extension-frontmatter@2.0.0
+│ ├── micromark-extension-gfm@3.0.0
+│ ├── micromark-extension-math@3.1.0
+│ └── micromark-util-normalize-identifier@2.0.1
+├── @fontsource/inter@5.2.8
+├─┬ @iconify-json/ri@1.2.10
+│ └── @iconify/types@2.0.0
+├─┬ @iconify-json/uil@1.2.3
+│ └── @iconify/types@2.0.0
+├── @letta-ai/letta-client@1.10.3
+├─┬ @letta-ai/letta-code-sdk@0.1.14
+│ └── @letta-ai/letta-code@0.19.5
+├─┬ @playwright/test@1.59.1
+│ └── playwright@1.59.1
+├─┬ @testing-library/dom@10.4.1
+│ ├── @babel/code-frame@7.29.0
+│ ├── @babel/runtime@7.29.2
+│ ├── @types/aria-query@5.0.4
+│ ├── aria-query@5.3.0
+│ ├── dom-accessibility-api@0.5.16
+│ ├── lz-string@1.5.0
+│ ├── picocolors@1.1.1
+│ └── pretty-format@27.5.1
+├─┬ @testing-library/jest-dom@6.9.1
+│ ├── @adobe/css-tools@4.4.4
+│ ├── aria-query@5.3.2
+│ ├── css.escape@1.5.1
+│ ├── dom-accessibility-api@0.6.3
+│ ├── picocolors@1.1.1
+│ └── redent@3.0.0
+├─┬ @testing-library/react@16.3.2
+│ ├── @babel/runtime@7.29.2
+│ ├── @testing-library/dom@10.4.1 peer
+│ ├── @types/react@19.2.14 peer
+│ ├── @types/react-dom@19.2.3 peer
+│ ├── react@19.2.5 peer
+│ └── react-dom@19.2.5 peer
+├─┬ @testing-library/user-event@14.6.1
+│ └── @testing-library/dom@10.4.1 peer
+├─┬ @types/bcrypt@6.0.0
+│ └── @types/node@25.6.0
+├─┬ @types/compression@1.8.1
+│ ├── @types/express@5.0.6
+│ └── @types/node@25.6.0
+├─┬ @types/cors@2.8.19
+│ └── @types/node@25.6.0
+├─┬ @types/express@5.0.6
+│ ├── @types/body-parser@1.19.6
+│ ├── @types/express-serve-static-core@5.1.1
+│ └── @types/serve-static@2.2.0
+├─┬ @types/mdast@4.0.4
+│ └── @types/unist@3.0.3
+├─┬ @types/morgan@1.9.10
+│ └── @types/node@25.6.0
+├─┬ @types/node@25.6.0
+│ └── undici-types@7.19.2
+├── @types/nprogress@0.2.3
+├── @types/p5@1.7.7
+├─┬ @types/pg@8.20.0
+│ ├── @types/node@25.6.0
+│ ├── pg-protocol@1.13.0
+│ └── pg-types@2.2.0
+├─┬ @types/react@19.2.14
+│ └── csstype@3.2.3
+├─┬ @types/react-dom@19.2.3
+│ └── @types/react@19.2.14 peer
+├── @types/slug@5.0.9
+├─┬ @unocss/astro@66.6.8
+│ ├── @unocss/core@66.6.8
+│ ├── @unocss/reset@66.6.8
+│ ├── @unocss/vite@66.6.8
+│ └── vite@8.0.10 peer
+├── @unocss/core@66.6.8
+├── @unocss/reset@66.6.8
+├─┬ @vitejs/plugin-react@6.0.1
+│ ├── @rolldown/pluginutils@1.0.0-rc.7
+│ └── vite@8.0.10 peer
+├─┬ @vitest/coverage-v8@4.1.5
+│ ├── @bcoe/v8-coverage@1.0.2
+│ ├── @vitest/utils@4.1.5
+│ ├── ast-v8-to-istanbul@1.0.0
+│ ├── istanbul-lib-coverage@3.2.2
+│ ├── istanbul-lib-report@3.0.1
+│ ├── istanbul-reports@3.2.0
+│ ├── magicast@0.5.2
+│ ├── obug@2.1.1
+│ ├── std-env@4.1.0
+│ ├── tinyrainbow@3.1.0
+│ └── vitest@4.1.5 peer
+├─┬ astro@6.2.2
+│ ├── @astrojs/compiler@4.0.0
+│ ├── @astrojs/internal-helpers@0.9.0
+│ ├── @astrojs/markdown-remark@7.1.1
+│ ├── @astrojs/telemetry@3.3.1
+│ ├── @capsizecss/unpack@4.0.0
+│ ├── @clack/prompts@1.3.0
+│ ├── @oslojs/encoding@1.1.0
+│ ├── @rollup/pluginutils@5.3.0
+│ ├── aria-query@5.3.2
+│ ├── axobject-query@4.1.0
+│ ├── ci-info@4.4.0
+│ ├── clsx@2.1.1
+│ ├── common-ancestor-path@2.0.0
+│ ├── cookie@1.1.1
+│ ├── devalue@5.8.0
+│ ├── diff@8.0.4
+│ ├── dset@3.1.4
+│ ├── es-module-lexer@2.1.0
+│ ├── esbuild@0.27.7
+│ ├── flattie@1.1.1
+│ ├── fontace@0.4.1
+│ ├── get-tsconfig@5.0.0-beta.4
+│ ├── github-slugger@2.0.0
+│ ├── html-escaper@3.0.3
+│ ├── http-cache-semantics@4.2.0
+│ ├── js-yaml@4.1.1
+│ ├── jsonc-parser@3.3.1
+│ ├── magic-string@0.30.21
+│ ├── magicast@0.5.2
+│ ├── mrmime@2.0.1
+│ ├── neotraverse@0.6.18
+│ ├── obug@2.1.1
+│ ├── p-limit@7.3.0
+│ ├── p-queue@9.2.0
+│ ├── package-manager-detector@1.6.0
+│ ├── piccolore@0.1.3
+│ ├── picomatch@4.0.4
+│ ├── rehype@13.0.2
+│ ├── semver@7.7.4
+│ ├── sharp@0.34.5
+│ ├── shiki@4.0.2
+│ ├── smol-toml@1.6.1
+│ ├── svgo@4.0.1
+│ ├── tinyclip@0.1.12
+│ ├── tinyexec@1.1.2
+│ ├── tinyglobby@0.2.16
+│ ├── ultrahtml@1.6.0
+│ ├── unifont@0.7.4
+│ ├── unist-util-visit@5.1.0
+│ ├── unstorage@1.17.5
+│ ├── vfile@6.0.3
+│ ├── vite@7.3.2
+│ ├── vitefu@1.1.3
+│ ├── xxhash-wasm@1.1.0
+│ ├── yargs-parser@22.0.0
+│ └── zod@4.4.3
+├─┬ astro-eslint-parser@1.4.0
+│ ├── @astrojs/compiler@3.0.1
+│ ├── @typescript-eslint/scope-manager@8.59.2
+│ ├── @typescript-eslint/types@8.59.2
+│ ├── astrojs-compiler-sync@1.1.1
+│ ├── debug@4.4.3
+│ ├── entities@7.0.1
+│ ├── eslint-scope@8.4.0
+│ ├── eslint-visitor-keys@4.2.1
+│ ├── espree@10.4.0
+│ ├── fast-glob@3.3.3
+│ ├── is-glob@4.0.3
+│ └── semver@7.7.4
+├─┬ astro-robots-txt@1.0.0
+│ ├── valid-filename@4.0.0
+│ └── zod@3.25.76
+├─┬ autoprefixer@10.5.0
+│ ├── browserslist@4.28.2
+│ ├── caniuse-lite@1.0.30001791
+│ ├── fraction.js@5.3.4
+│ ├── picocolors@1.1.1
+│ ├── postcss@8.5.14 peer
+│ └── postcss-value-parser@4.2.0
+├── axe-core@4.11.4
+├── chalk@5.6.2
+├─┬ cheerio@1.2.0
+│ ├── cheerio-select@2.1.0
+│ ├── dom-serializer@2.0.0
+│ ├── domhandler@5.0.3
+│ ├── domutils@3.2.2
+│ ├── encoding-sniffer@0.2.1
+│ ├── htmlparser2@10.1.0
+│ ├── parse5@7.3.0
+│ ├── parse5-htmlparser2-tree-adapter@7.1.0
+│ ├── parse5-parser-stream@7.1.2
+│ ├── undici@7.25.0
+│ └── whatwg-mimetype@4.0.0
+├── class-transformer@0.5.1
+├─┬ class-validator@0.15.1
+│ ├── @types/validator@13.15.10
+│ ├── libphonenumber-js@1.12.42
+│ └── validator@13.15.35
+├─┬ concurrently@9.2.1
+│ ├── chalk@4.1.2
+│ ├── rxjs@7.8.2
+│ ├── shell-quote@1.8.3
+│ ├── supports-color@8.1.1
+│ ├── tree-kill@1.2.2
+│ └── yargs@17.7.2
+├─┬ cross-env@10.1.0
+│ ├── @epic-web/invariant@1.0.0
+│ └── cross-spawn@7.0.6
+├─┬ del-cli@7.0.0
+│ ├── del@8.0.1
+│ ├── meow@14.1.0
+│ └── presentable-error@0.0.1
+├── dotenv@17.4.2
+├─┬ esbuild@0.28.0
+│ ├── @esbuild/aix-ppc64@0.28.0
+│ ├── @esbuild/android-arm@0.28.0
+│ ├── @esbuild/android-arm64@0.28.0
+│ ├── @esbuild/android-x64@0.28.0
+│ ├── @esbuild/darwin-arm64@0.28.0
+│ ├── @esbuild/darwin-x64@0.28.0
+│ ├── @esbuild/freebsd-arm64@0.28.0
+│ ├── @esbuild/freebsd-x64@0.28.0
+│ ├── @esbuild/linux-arm@0.28.0
+│ ├── @esbuild/linux-arm64@0.28.0
+│ ├── @esbuild/linux-ia32@0.28.0
+│ ├── @esbuild/linux-loong64@0.28.0
+│ ├── @esbuild/linux-mips64el@0.28.0
+│ ├── @esbuild/linux-ppc64@0.28.0
+│ ├── @esbuild/linux-riscv64@0.28.0
+│ ├── @esbuild/linux-s390x@0.28.0
+│ ├── @esbuild/linux-x64@0.28.0
+│ ├── @esbuild/netbsd-arm64@0.28.0
+│ ├── @esbuild/netbsd-x64@0.28.0
+│ ├── @esbuild/openbsd-arm64@0.28.0
+│ ├── @esbuild/openbsd-x64@0.28.0
+│ ├── @esbuild/openharmony-arm64@0.28.0
+│ ├── @esbuild/sunos-x64@0.28.0
+│ ├── @esbuild/win32-arm64@0.28.0
+│ ├── @esbuild/win32-ia32@0.28.0
+│ └── @esbuild/win32-x64@0.28.0
+├─┬ eslint@10.3.0
+│ ├── @eslint-community/eslint-utils@4.9.1
+│ ├── @eslint-community/regexpp@4.12.2
+│ ├── @eslint/config-array@0.23.5
+│ ├── @eslint/config-helpers@0.5.5
+│ ├── @eslint/core@1.2.1
+│ ├── @eslint/plugin-kit@0.7.1
+│ ├── @humanfs/node@0.16.8
+│ ├── @humanwhocodes/module-importer@1.0.1
+│ ├── @humanwhocodes/retry@0.4.3
+│ ├── @types/estree@1.0.8
+│ ├── ajv@6.15.0
+│ ├── cross-spawn@7.0.6
+│ ├── debug@4.4.3
+│ ├── escape-string-regexp@4.0.0
+│ ├── eslint-scope@9.1.2
+│ ├── eslint-visitor-keys@5.0.1
+│ ├── espree@11.2.0
+│ ├── esquery@1.7.0
+│ ├── esutils@2.0.3
+│ ├── fast-deep-equal@3.1.3
+│ ├── file-entry-cache@8.0.0
+│ ├── find-up@5.0.0
+│ ├── glob-parent@6.0.2
+│ ├── ignore@5.3.2
+│ ├── imurmurhash@0.1.4
+│ ├── is-glob@4.0.3
+│ ├── jiti@2.7.0 peer
+│ ├── json-stable-stringify-without-jsonify@1.0.1
+│ ├── minimatch@10.2.5
+│ ├── natural-compare@1.4.0
+│ └── optionator@0.9.4
+├─┬ eslint-plugin-astro@1.7.0
+│ ├── @eslint-community/eslint-utils@4.9.1
+│ ├── @jridgewell/sourcemap-codec@1.5.5
+│ ├── @typescript-eslint/types@8.59.2
+│ ├── astro-eslint-parser@1.4.0
+│ ├── eslint@10.3.0 peer
+│ ├── eslint-compat-utils@0.6.5
+│ ├── globals@16.5.0
+│ ├── postcss@8.5.14
+│ └── postcss-selector-parser@7.1.1
+├─┬ eslint-plugin-jsx-a11y@6.10.2
+│ ├── aria-query@5.3.2
+│ ├── array-includes@3.1.9
+│ ├── array.prototype.flatmap@1.3.3
+│ ├── ast-types-flow@0.0.8
+│ ├── axe-core@4.11.4
+│ ├── axobject-query@4.1.0
+│ ├── damerau-levenshtein@1.0.8
+│ ├── emoji-regex@9.2.2
+│ ├── eslint@10.3.0 peer
+│ ├── hasown@2.0.3
+│ ├── jsx-ast-utils@3.3.5
+│ ├── language-tags@1.0.9
+│ ├── minimatch@3.1.5
+│ ├── object.fromentries@2.0.8
+│ ├── safe-regex-test@1.1.0
+│ └── string.prototype.includes@2.0.1
+├─┬ eslint-plugin-node@11.1.0
+│ ├── eslint@10.3.0 peer
+│ ├── eslint-plugin-es@3.0.1
+│ ├── eslint-utils@2.1.0
+│ ├── ignore@5.3.2
+│ ├── minimatch@3.1.5
+│ ├── resolve@1.22.12
+│ └── semver@6.3.1
+├─┬ eslint-plugin-react@7.37.5
+│ ├── array-includes@3.1.9
+│ ├── array.prototype.findlast@1.2.5
+│ ├── array.prototype.flatmap@1.3.3
+│ ├── array.prototype.tosorted@1.1.4
+│ ├── doctrine@2.1.0
+│ ├── es-iterator-helpers@1.3.2
+│ ├── eslint@10.3.0 peer
+│ ├── estraverse@5.3.0
+│ ├── hasown@2.0.3
+│ ├── jsx-ast-utils@3.3.5
+│ ├── minimatch@3.1.5
+│ ├── object.entries@1.1.9
+│ ├── object.fromentries@2.0.8
+│ ├── object.values@1.2.1
+│ ├── prop-types@15.8.1
+│ ├── resolve@2.0.0-next.6
+│ ├── semver@6.3.1
+│ ├── string.prototype.matchall@4.0.12
+│ └── string.prototype.repeat@1.0.0
+├─┬ eslint-plugin-react-hooks@7.1.1
+│ ├── @babel/core@7.29.0
+│ ├── @babel/parser@7.29.3
+│ ├── eslint@10.3.0 peer
+│ ├── hermes-parser@0.25.1
+│ ├── zod@4.4.3
+│ └── zod-validation-error@4.0.2
+├─┬ eslint-plugin-vitest@0.5.4
+│ ├── @typescript-eslint/utils@7.18.0
+│ ├── eslint@10.3.0 peer
+│ └── vitest@4.1.5 peer
+├── eslint-plugin-vitest-globals@1.6.1
+├─┬ espree@11.2.0
+│ ├── acorn@8.16.0
+│ ├── acorn-jsx@5.3.2
+│ └── eslint-visitor-keys@5.0.1
+├─┬ glob@13.0.6
+│ ├── minimatch@10.2.5
+│ ├── minipass@7.1.3
+│ └── path-scurry@2.0.2
+├── globals@17.6.0
+├─┬ globby@16.2.0
+│ ├── @sindresorhus/merge-streams@4.0.0
+│ ├── fast-glob@3.3.3
+│ ├── ignore@7.0.5
+│ ├── is-path-inside@4.0.0
+│ ├── slash@5.1.0
+│ └── unicorn-magic@0.4.0
+├─┬ gray-matter@4.0.3
+│ ├── js-yaml@3.14.2
+│ ├── kind-of@6.0.3
+│ ├── section-matter@1.0.0
+│ └── strip-bom-string@1.0.0
+├─┬ hastscript@9.0.1
+│ ├── @types/hast@3.0.4
+│ ├── comma-separated-tokens@2.0.3
+│ ├── hast-util-parse-selector@4.0.0
+│ ├── property-information@7.1.0
+│ └── space-separated-tokens@2.0.2
+├── hono@4.12.17
+├── html-entities@2.6.0
+├─┬ ioredis-mock@8.13.1
+│ ├── @ioredis/as-callback@3.0.0
+│ ├── @ioredis/commands@1.7.0
+│ ├── @types/ioredis-mock@8.2.7 peer
+│ ├── fengari@0.1.5
+│ ├── fengari-interop@0.1.4
+│ ├── ioredis@5.10.1 peer
+│ └── semver@7.7.4
+├── js-base64@3.7.8
+├─┬ jsdom@29.1.1
+│ ├── @asamuzakjp/css-color@5.1.11
+│ ├── @asamuzakjp/dom-selector@7.1.1
+│ ├── @bramus/specificity@2.4.2
+│ ├── @csstools/css-syntax-patches-for-csstree@1.1.3
+│ ├── @exodus/bytes@1.15.0
+│ ├── css-tree@3.2.1
+│ ├── data-urls@7.0.0
+│ ├── decimal.js@10.6.0
+│ ├── html-encoding-sniffer@6.0.0
+│ ├── is-potential-custom-element-name@1.0.1
+│ ├── lru-cache@11.3.6
+│ ├── parse5@8.0.1
+│ ├── saxes@6.0.0
+│ ├── symbol-tree@3.2.4
+│ ├── tough-cookie@6.0.1
+│ ├── undici@7.25.0
+│ ├── w3c-xmlserializer@5.0.0
+│ ├── webidl-conversions@8.0.1
+│ ├── whatwg-mimetype@5.0.0
+│ ├── whatwg-url@16.0.1
+│ └── xml-name-validator@5.0.0
+├─┬ launchdarkly-js-client-sdk@3.9.1
+│ ├── escape-string-regexp@4.0.0
+│ └── launchdarkly-js-sdk-common@5.8.0
+├─┬ lint-staged@16.4.0
+│ ├── commander@14.0.3
+│ ├── listr2@9.0.5
+│ ├── picomatch@4.0.4
+│ ├── string-argv@0.3.2
+│ ├── tinyexec@1.1.2
+│ └── yaml@2.8.4
+├─┬ markdownlint@0.40.0
+│ ├── micromark@4.0.2
+│ ├── micromark-core-commonmark@2.0.3
+│ ├── micromark-extension-directive@4.0.0
+│ ├── micromark-extension-gfm-autolink-literal@2.1.0
+│ ├── micromark-extension-gfm-footnote@2.1.0
+│ ├── micromark-extension-gfm-table@2.1.1
+│ ├── micromark-extension-math@3.1.0
+│ ├── micromark-util-types@2.0.2
+│ └── string-width@8.1.0
+├─┬ markdownlint-cli@0.48.0
+│ ├── commander@14.0.3
+│ ├── deep-extend@0.6.0
+│ ├── ignore@7.0.5
+│ ├── js-yaml@4.1.1
+│ ├── jsonc-parser@3.3.1
+│ ├── jsonpointer@5.0.1
+│ ├── markdown-it@14.1.1
+│ ├── markdownlint@0.40.0
+│ ├── minimatch@10.2.5
+│ ├── run-con@1.3.2
+│ ├── smol-toml@1.6.1
+│ └── tinyglobby@0.2.16
+├─┬ mcp-remote@0.1.38
+│ ├── express@4.22.1
+│ ├── open@10.2.0
+│ ├── strict-url-sanitise@0.0.1
+│ └── undici@7.25.0
+├─┬ mdast-util-directive@3.1.0
+│ ├── @types/mdast@4.0.4
+│ ├── @types/unist@3.0.3
+│ ├── ccount@2.0.1
+│ ├── devlop@1.1.0
+│ ├── mdast-util-from-markdown@2.0.3
+│ ├── mdast-util-to-markdown@2.1.2
+│ ├── parse-entities@4.0.2
+│ ├── stringify-entities@4.0.4
+│ └── unist-util-visit-parents@6.0.2
+├─┬ mdast-util-to-string@4.0.0
+│ └── @types/mdast@4.0.4
+├─┬ micromatch@4.0.8
+│ ├── braces@3.0.3
+│ └── picomatch@2.3.2
+├─┬ mongodb-memory-server@11.1.0
+│ ├── mongodb-memory-server-core@11.1.0
+│ └── tslib@2.8.1
+├─┬ msw@2.14.3
+│ ├── @inquirer/confirm@6.0.12
+│ ├── @mswjs/interceptors@0.41.8
+│ ├── @open-draft/deferred-promise@3.0.0
+│ ├── @types/statuses@2.0.6
+│ ├── cookie@1.1.1
+│ ├── graphql@16.13.2
+│ ├── headers-polyfill@5.0.1
+│ ├── is-node-process@1.2.0
+│ ├── outvariant@1.4.3
+│ ├── path-to-regexp@8.4.2
+│ ├── picocolors@1.1.1
+│ ├── rettime@0.11.11
+│ ├── statuses@2.0.2
+│ ├── strict-event-emitter@0.5.1
+│ ├── tough-cookie@6.0.1
+│ ├── type-fest@5.6.0
+│ ├── typescript@5.9.3 peer
+│ ├── until-async@3.0.2
+│ └── yargs@17.7.2
+├── nprogress@0.2.0
+├─┬ oxc-parser@0.129.0
+│ ├── @oxc-parser/binding-android-arm-eabi@0.129.0
+│ ├── @oxc-parser/binding-android-arm64@0.129.0
+│ ├── @oxc-parser/binding-darwin-arm64@0.129.0
+│ ├── @oxc-parser/binding-darwin-x64@0.129.0
+│ ├── @oxc-parser/binding-freebsd-x64@0.129.0
+│ ├── @oxc-parser/binding-linux-arm-gnueabihf@0.129.0
+│ ├── @oxc-parser/binding-linux-arm-musleabihf@0.129.0
+│ ├── @oxc-parser/binding-linux-arm64-gnu@0.129.0
+│ ├── @oxc-parser/binding-linux-arm64-musl@0.129.0
+│ ├── @oxc-parser/binding-linux-ppc64-gnu@0.129.0
+│ ├── @oxc-parser/binding-linux-riscv64-gnu@0.129.0
+│ ├── @oxc-parser/binding-linux-riscv64-musl@0.129.0
+│ ├── @oxc-parser/binding-linux-s390x-gnu@0.129.0
+│ ├── @oxc-parser/binding-linux-x64-gnu@0.129.0
+│ ├── @oxc-parser/binding-linux-x64-musl@0.129.0
+│ ├── @oxc-parser/binding-openharmony-arm64@0.129.0
+│ ├── @oxc-parser/binding-wasm32-wasi@0.129.0
+│ ├── @oxc-parser/binding-win32-arm64-msvc@0.129.0
+│ ├── @oxc-parser/binding-win32-ia32-msvc@0.129.0
+│ ├── @oxc-parser/binding-win32-x64-msvc@0.129.0
+│ └── @oxc-project/types@0.129.0
+├─┬ oxc-resolver@11.19.1
+│ ├── @oxc-resolver/binding-android-arm-eabi@11.19.1
+│ ├── @oxc-resolver/binding-android-arm64@11.19.1
+│ ├── @oxc-resolver/binding-darwin-arm64@11.19.1
+│ ├── @oxc-resolver/binding-darwin-x64@11.19.1
+│ ├── @oxc-resolver/binding-freebsd-x64@11.19.1
+│ ├── @oxc-resolver/binding-linux-arm-gnueabihf@11.19.1
+│ ├── @oxc-resolver/binding-linux-arm-musleabihf@11.19.1
+│ ├── @oxc-resolver/binding-linux-arm64-gnu@11.19.1
+│ ├── @oxc-resolver/binding-linux-arm64-musl@11.19.1
+│ ├── @oxc-resolver/binding-linux-ppc64-gnu@11.19.1
+│ ├── @oxc-resolver/binding-linux-riscv64-gnu@11.19.1
+│ ├── @oxc-resolver/binding-linux-riscv64-musl@11.19.1
+│ ├── @oxc-resolver/binding-linux-s390x-gnu@11.19.1
+│ ├── @oxc-resolver/binding-linux-x64-gnu@11.19.1
+│ ├── @oxc-resolver/binding-linux-x64-musl@11.19.1
+│ ├── @oxc-resolver/binding-openharmony-arm64@11.19.1
+│ ├── @oxc-resolver/binding-wasm32-wasi@11.19.1
+│ ├── @oxc-resolver/binding-win32-arm64-msvc@11.19.1
+│ ├── @oxc-resolver/binding-win32-ia32-msvc@11.19.1
+│ └── @oxc-resolver/binding-win32-x64-msvc@11.19.1
+├─┬ oxfmt@0.48.0
+│ ├── @oxfmt/binding-android-arm-eabi@0.48.0
+│ ├── @oxfmt/binding-android-arm64@0.48.0
+│ ├── @oxfmt/binding-darwin-arm64@0.48.0
+│ ├── @oxfmt/binding-darwin-x64@0.48.0
+│ ├── @oxfmt/binding-freebsd-x64@0.48.0
+│ ├── @oxfmt/binding-linux-arm-gnueabihf@0.48.0
+│ ├── @oxfmt/binding-linux-arm-musleabihf@0.48.0
+│ ├── @oxfmt/binding-linux-arm64-gnu@0.48.0
+│ ├── @oxfmt/binding-linux-arm64-musl@0.48.0
+│ ├── @oxfmt/binding-linux-ppc64-gnu@0.48.0
+│ ├── @oxfmt/binding-linux-riscv64-gnu@0.48.0
+│ ├── @oxfmt/binding-linux-riscv64-musl@0.48.0
+│ ├── @oxfmt/binding-linux-s390x-gnu@0.48.0
+│ ├── @oxfmt/binding-linux-x64-gnu@0.48.0
+│ ├── @oxfmt/binding-linux-x64-musl@0.48.0
+│ ├── @oxfmt/binding-openharmony-arm64@0.48.0
+│ ├── @oxfmt/binding-win32-arm64-msvc@0.48.0
+│ ├── @oxfmt/binding-win32-ia32-msvc@0.48.0
+│ ├── @oxfmt/binding-win32-x64-msvc@0.48.0
+│ └── tinypool@2.1.0
+├─┬ oxlint@1.63.0
+│ ├── @oxlint/binding-android-arm-eabi@1.63.0
+│ ├── @oxlint/binding-android-arm64@1.63.0
+│ ├── @oxlint/binding-darwin-arm64@1.63.0
+│ ├── @oxlint/binding-darwin-x64@1.63.0
+│ ├── @oxlint/binding-freebsd-x64@1.63.0
+│ ├── @oxlint/binding-linux-arm-gnueabihf@1.63.0
+│ ├── @oxlint/binding-linux-arm-musleabihf@1.63.0
+│ ├── @oxlint/binding-linux-arm64-gnu@1.63.0
+│ ├── @oxlint/binding-linux-arm64-musl@1.63.0
+│ ├── @oxlint/binding-linux-ppc64-gnu@1.63.0
+│ ├── @oxlint/binding-linux-riscv64-gnu@1.63.0
+│ ├── @oxlint/binding-linux-riscv64-musl@1.63.0
+│ ├── @oxlint/binding-linux-s390x-gnu@1.63.0
+│ ├── @oxlint/binding-linux-x64-gnu@1.63.0
+│ ├── @oxlint/binding-linux-x64-musl@1.63.0
+│ ├── @oxlint/binding-openharmony-arm64@1.63.0
+│ ├── @oxlint/binding-win32-arm64-msvc@1.63.0
+│ ├── @oxlint/binding-win32-ia32-msvc@1.63.0
+│ ├── @oxlint/binding-win32-x64-msvc@1.63.0
+│ └── oxlint-tsgolint@0.22.1 peer
+├─┬ oxlint-tsgolint@0.22.1
+│ ├── @oxlint-tsgolint/darwin-arm64@0.22.1
+│ ├── @oxlint-tsgolint/darwin-x64@0.22.1
+│ ├── @oxlint-tsgolint/linux-arm64@0.22.1
+│ ├── @oxlint-tsgolint/linux-x64@0.22.1
+│ ├── @oxlint-tsgolint/win32-arm64@0.22.1
+│ └── @oxlint-tsgolint/win32-x64@0.22.1
+├── path-to-regexp@8.4.2
+├─┬ postcss@8.5.14
+│ ├── nanoid@3.3.12
+│ ├── picocolors@1.1.1
+│ └── source-map-js@1.2.1
+├─┬ postcss-import@16.1.1
+│ ├── postcss@8.5.14 peer
+│ ├── postcss-value-parser@4.2.0
+│ ├── read-cache@1.0.0
+│ └── resolve@1.22.12
+├── postinstall-postinstall@2.1.0
+├── prettier@3.8.3
+├─┬ prettier-plugin-astro@0.14.1
+│ ├── @astrojs/compiler@2.13.1
+│ ├── prettier@3.8.3
+│ └── sass-formatter@0.7.9
+├── reading-time@1.5.0
+├─┬ rehype-autolink-headings@7.1.0
+│ ├── @types/hast@3.0.4
+│ ├── @ungap/structured-clone@1.3.0
+│ ├── hast-util-heading-rank@3.0.0
+│ ├── hast-util-is-element@3.0.0
+│ ├── unified@11.0.5
+│ └── unist-util-visit@5.1.0
+├─┬ rehype-callouts@2.1.2
+│ ├── @types/hast@3.0.4
+│ ├── hast-util-from-html@2.0.3
+│ ├── hast-util-is-element@3.0.0
+│ ├── hastscript@9.0.1
+│ └── unist-util-visit@5.1.0
+├─┬ rehype-external-links@3.0.0
+│ ├── @types/hast@3.0.4
+│ ├── @ungap/structured-clone@1.3.0
+│ ├── hast-util-is-element@3.0.0
+│ ├── is-absolute-url@4.0.1
+│ ├── space-separated-tokens@2.0.2
+│ └── unist-util-visit@5.1.0
+├─┬ rehype-katex@7.0.1
+│ ├── @types/hast@3.0.4
+│ ├── @types/katex@0.16.8
+│ ├── hast-util-from-html-isomorphic@2.0.0
+│ ├── hast-util-to-text@4.0.2
+│ ├── katex@0.16.45
+│ ├── unist-util-visit-parents@6.0.2
+│ └── vfile@6.0.3
+├─┬ remark-code-import@1.2.0
+│ ├── strip-indent@4.1.1
+│ ├── to-gatsby-remark-plugin@0.1.0
+│ └── unist-util-visit@4.1.2
+├─┬ remark-directive@4.0.0
+│ ├── @types/mdast@4.0.4
+│ ├── mdast-util-directive@3.1.0
+│ ├── micromark-extension-directive@4.0.0
+│ └── unified@11.0.5
+├── remark-imgattr@1.1.1
+├─┬ remark-math@6.0.0
+│ ├── @types/mdast@4.0.4
+│ ├── mdast-util-math@3.0.0
+│ ├── micromark-extension-math@3.1.0
+│ └── unified@11.0.5
+├─┬ remark-toc@9.0.0
+│ ├── @types/mdast@4.0.4
+│ └── mdast-util-toc@7.1.0
+├─┬ rollup-plugin-visualizer@7.0.1
+│ ├── open@11.0.0
+│ ├── picomatch@4.0.4
+│ ├── rolldown@1.0.0-rc.17 peer
+│ ├── rollup@4.60.3 peer
+│ ├── source-map@0.7.6
+│ └── yargs@18.0.0
+├─┬ satori@0.26.0
+│ ├── @shuding/opentype.js@1.4.0-beta.0
+│ ├── css-background-parser@0.1.0
+│ ├── css-box-shadow@1.0.0-3
+│ ├── css-gradient-parser@0.0.17
+│ ├── css-to-react-native@3.2.0
+│ ├── emoji-regex-xs@2.0.1
+│ ├── escape-html@1.0.3
+│ ├── linebreak@1.1.0
+│ ├── parse-css-color@0.2.1
+│ ├── postcss-value-parser@4.2.0
+│ └── yoga-layout@3.2.1
+├─┬ satori-html@0.3.2
+│ └── ultrahtml@1.6.0
+├── scheduler@0.27.0
+├─┬ sharp@0.34.5
+│ ├── @img/colour@1.1.0
+│ ├── @img/sharp-darwin-arm64@0.34.5
+│ ├── @img/sharp-darwin-x64@0.34.5
+│ ├── @img/sharp-libvips-darwin-arm64@1.2.4
+│ ├── @img/sharp-libvips-darwin-x64@1.2.4
+│ ├── @img/sharp-libvips-linux-arm@1.2.4
+│ ├── @img/sharp-libvips-linux-arm64@1.2.4
+│ ├── @img/sharp-libvips-linux-ppc64@1.2.4
+│ ├── @img/sharp-libvips-linux-riscv64@1.2.4
+│ ├── @img/sharp-libvips-linux-s390x@1.2.4
+│ ├── @img/sharp-libvips-linux-x64@1.2.4
+│ ├── @img/sharp-libvips-linuxmusl-arm64@1.2.4
+│ ├── @img/sharp-libvips-linuxmusl-x64@1.2.4
+│ ├── @img/sharp-linux-arm@0.34.5
+│ ├── @img/sharp-linux-arm64@0.34.5
+│ ├── @img/sharp-linux-ppc64@0.34.5
+│ ├── @img/sharp-linux-riscv64@0.34.5
+│ ├── @img/sharp-linux-s390x@0.34.5
+│ ├── @img/sharp-linux-x64@0.34.5
+│ ├── @img/sharp-linuxmusl-arm64@0.34.5
+│ ├── @img/sharp-linuxmusl-x64@0.34.5
+│ ├── @img/sharp-wasm32@0.34.5
+│ ├── @img/sharp-win32-arm64@0.34.5
+│ ├── @img/sharp-win32-ia32@0.34.5
+│ ├── @img/sharp-win32-x64@0.34.5
+│ ├── detect-libc@2.1.2
+│ └── semver@7.7.4
+├─┬ shiki@4.0.2
+│ ├── @shikijs/core@4.0.2
+│ ├── @shikijs/engine-javascript@4.0.2
+│ ├── @shikijs/engine-oniguruma@4.0.2
+│ ├── @shikijs/langs@4.0.2
+│ ├── @shikijs/themes@4.0.2
+│ ├── @shikijs/types@4.0.2
+│ ├── @shikijs/vscode-textmate@10.0.2
+│ └── @types/hast@3.0.4
+├─┬ supertest@7.2.2
+│ ├── cookie-signature@1.2.2
+│ ├── methods@1.1.2
+│ └── superagent@10.3.0
+├─┬ terser@5.46.2
+│ ├── @jridgewell/source-map@0.3.11
+│ ├── acorn@8.16.0
+│ ├── commander@2.20.3
+│ └── source-map-support@0.5.21
+├─┬ tsconfig@7.0.0
+│ ├── @types/strip-bom@3.0.0
+│ ├── @types/strip-json-comments@0.0.30
+│ ├── strip-bom@3.0.0
+│ └── strip-json-comments@2.0.1
+├─┬ tsconfig-paths@4.2.0
+│ ├── json5@2.2.3
+│ ├── minimist@1.2.8
+│ └── strip-bom@3.0.0
+├─┬ tsx@4.21.0
+│ ├── esbuild@0.27.7
+│ ├── fsevents@2.3.3
+│ └── get-tsconfig@4.14.0
+├── tw-animate-css@1.4.0
+├─┬ typeorm@0.3.28
+│ ├── @sqltools/formatter@1.2.5
+│ ├── ansis@4.2.0
+│ ├── app-root-path@3.1.0
+│ ├── better-sqlite3@12.9.0 peer
+│ ├── buffer@6.0.3
+│ ├── dayjs@1.11.20
+│ ├── debug@4.4.3
+│ ├── dedent@1.7.2
+│ ├── dotenv@16.6.1
+│ ├── glob@10.5.0
+│ ├── ioredis@5.10.1 peer
+│ ├── mongodb@7.2.0 peer
+│ ├── pg@8.20.0 peer
+│ ├── redis@5.12.1 peer
+│ ├── reflect-metadata@0.2.2
+│ ├── sha.js@2.4.12
+│ ├── sql-highlight@6.1.0
+│ ├── tslib@2.8.1
+│ ├── uuid@11.1.1
+│ └── yargs@17.7.2
+├── typescript@5.9.3
+├─┬ typescript-eslint@8.59.2
+│ ├── @typescript-eslint/eslint-plugin@8.59.2
+│ ├── @typescript-eslint/parser@8.59.2
+│ ├── @typescript-eslint/typescript-estree@8.59.2
+│ ├── @typescript-eslint/utils@8.59.2
+│ ├── eslint@10.3.0 peer
+│ └── typescript@5.9.3 peer
+├─┬ unocss@66.6.8
+│ ├── @unocss/astro@66.6.8 peer
+│ ├── @unocss/cli@66.6.8
+│ ├── @unocss/core@66.6.8
+│ ├── @unocss/preset-attributify@66.6.8
+│ ├── @unocss/preset-icons@66.6.8
+│ ├── @unocss/preset-mini@66.6.8
+│ ├── @unocss/preset-tagify@66.6.8
+│ ├── @unocss/preset-typography@66.6.8
+│ ├── @unocss/preset-uno@66.6.8
+│ ├── @unocss/preset-web-fonts@66.6.8
+│ ├── @unocss/preset-wind@66.6.8
+│ ├── @unocss/preset-wind3@66.6.8
+│ ├── @unocss/preset-wind4@66.6.8
+│ ├── @unocss/transformer-attributify-jsx@66.6.8
+│ ├── @unocss/transformer-compile-class@66.6.8
+│ ├── @unocss/transformer-directives@66.6.8
+│ ├── @unocss/transformer-variant-group@66.6.8
+│ └── @unocss/vite@66.6.8
+├── url-polyfill@1.1.14
+├─┬ utf-8-validate@6.0.6
+│ └── node-gyp-build@4.8.4
+├─┬ vfile@6.0.3
+│ ├── @types/unist@3.0.3
+│ └── vfile-message@4.0.3
+├── viewerjs@1.11.7
+├─┬ vite@8.0.10
+│ ├── @types/node@25.6.0 peer
+│ ├── esbuild@0.28.0 peer
+│ ├── fsevents@2.3.3
+│ ├── jiti@2.7.0 peer
+│ ├── lightningcss@1.32.0
+│ ├── picomatch@4.0.4
+│ ├── postcss@8.5.14
+│ ├── rolldown@1.0.0-rc.17
+│ ├── terser@5.46.2 peer
+│ ├── tinyglobby@0.2.16
+│ ├── tsx@4.21.0 peer
+│ └── yaml@2.8.4 peer
+├─┬ vite-tsconfig-paths@6.1.1
+│ ├── debug@4.4.3
+│ ├── globrex@0.1.2
+│ ├── tsconfck@3.1.6
+│ └── vite@8.0.10 peer
+├─┬ vitest@4.1.5
+│ ├── @opentelemetry/api@1.9.1 peer
+│ ├── @types/node@25.6.0 peer
+│ ├── @vitest/coverage-v8@4.1.5 peer
+│ ├── @vitest/expect@4.1.5
+│ ├── @vitest/mocker@4.1.5
+│ ├── @vitest/pretty-format@4.1.5
+│ ├── @vitest/runner@4.1.5
+│ ├── @vitest/snapshot@4.1.5
+│ ├── @vitest/spy@4.1.5
+│ ├── @vitest/utils@4.1.5
+│ ├── es-module-lexer@2.1.0
+│ ├── expect-type@1.3.0
+│ ├── jsdom@29.1.1 peer
+│ ├── magic-string@0.30.21
+│ ├── obug@2.1.1
+│ ├── pathe@2.0.3
+│ ├── picomatch@4.0.4
+│ ├── std-env@4.1.0
+│ ├── tinybench@2.9.0
+│ ├── tinyexec@1.1.2
+│ ├── tinyglobby@0.2.16
+│ ├── tinyrainbow@3.1.0
+│ ├── vite@8.0.10 peer
+│ └── why-is-node-running@2.3.0
+└─┬ wait-on@9.0.5
+  ├── axios@1.16.0
+  ├── joi@18.2.1
+  ├── lodash@4.18.1
+  ├── minimist@1.2.8
+  └── rxjs@7.8.2
+
+1916 packages

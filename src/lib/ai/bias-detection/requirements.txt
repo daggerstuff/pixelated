@@ -106,7 +106,7 @@ contourpy==1.3.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   matplotlib
-cryptography==46.0.7
+cryptography==47.0.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
@@ -690,7 +690,7 @@ pycparser==3.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   cffi
-pydantic==2.12.5
+pydantic==2.13.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   confection
@@ -932,7 +932,7 @@ traitlets==5.14.3
     #   ipython
     #   ipywidgets
     #   matplotlib-inline
-transformers==5.0.0rc3
+transformers==5.8.0
     # via -r src/lib/ai/bias-detection/requirements.txt
 triton==3.6.0
     # via
