@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-05-06T17:40:01.691177+00:00",
+  "scenario": "niche_category",
+  "category": "cultural_religious_contexts",
+  "target_count": 10,
+  "generated_count": 10,
+  "filtered_count": 0,
+  "filter_rate": 0.0,
+  "iterations": 11,
+  "max_iterations": 30
+}
