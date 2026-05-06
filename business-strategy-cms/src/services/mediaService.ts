@@ -366,30 +366,26 @@ class MediaRepository {
 
     const concurrencyLimit = Math.min(maxConcurrent, total)
     const enriched = [...files]
-    let nextIndex = 0
-
-    const worker = async (): Promise<void> => {
-      while (nextIndex < total) {
-        const currentIndex = nextIndex
-        nextIndex += 1
-        const file = files[currentIndex]
+    const worker = async (workerIndex: number): Promise<void> => {
+      for (let index = workerIndex; index < total; index += concurrencyLimit) {
+        const file = files[index]
 
         try {
           const signedUrl = await this.getSignedUrl(file.key, 3600, userId)
-          enriched[currentIndex] = { ...file, url: signedUrl }
+          enriched[index] = { ...file, url: signedUrl }
         } catch (error) {
           console.warn(
             'Failed to generate signed URL for file:',
             file.key,
             error,
           )
-          enriched[currentIndex] = { ...file, url: null }
+          enriched[index] = { ...file, url: null }
         }
       }
     }
 
     await Promise.all(
-      Array.from({ length: concurrencyLimit }, () => worker()),
+      Array.from({ length: concurrencyLimit }, (_, workerIndex) => worker(workerIndex)),
     )
 
     return enriched
