@@ -176,7 +176,8 @@ class MediaRepository {
     return signS3Url(this.storageClientFactory.getS3Client(), command, { expiresIn })
   }
 
-  async deleteFile(key: string): Promise<void> {
+  async deleteFile(key: string, userId: string): Promise<void> {
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
     await this.storageClientFactory.getS3Client().send(
       new DeleteObjectCommand({
         Bucket: this.storageClientFactory.getBucketName(),
@@ -437,8 +438,7 @@ export class MediaService {
   }
 
   async deleteFile(key: string, userId: string): Promise<void> {
-    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
-    await this.mediaRepository.deleteFile(key)
+    await this.mediaRepository.deleteFile(key, userId)
   }
 
   async listFiles(
