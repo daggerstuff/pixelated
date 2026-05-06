@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-06T17:40:01.691177+00:00",
+  "generated_at": "2026-05-06T18:17:32.402170+00:00",
   "scenario": "niche_category",
-  "category": "cultural_religious_contexts",
-  "target_count": 10,
-  "generated_count": 10,
-  "filtered_count": 0,
-  "filter_rate": 0.0,
-  "iterations": 11,
+  "category": "personality_disorders",
+  "target_count": 20,
+  "generated_count": 2,
+  "filtered_count": 28,
+  "filter_rate": 0.9333333333333333,
+  "iterations": 30,
   "max_iterations": 30
 }
