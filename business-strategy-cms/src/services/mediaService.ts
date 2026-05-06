@@ -419,7 +419,7 @@ class MediaRepository {
 
 export class MediaService {
   constructor(
-    private readonly storageClientFactory: StorageClientFactory = new StorageClientFactory(),
+    private readonly storageClientFactory: StorageClientFactory,
     private readonly mediaRepository: MediaRepository = new MediaRepository(
       storageClientFactory,
     ),
@@ -480,4 +480,4 @@ export class MediaService {
   }
 }
 
-export const mediaService = new MediaService()
+export const mediaService = new MediaService(new StorageClientFactory())
