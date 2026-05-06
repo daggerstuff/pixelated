@@ -73,7 +73,7 @@ export const GET: APIRoute = async ({ request }) => {
         status: 'active',
         authentication: 'required',
         supportedModels: [
-          'mistralai/Mixtral-8x7B-Instruct-v0.2',
+          'minimaxai/minimax-m2.7',
           'gpt-4',
           'claude-3',
         ],
@@ -92,7 +92,7 @@ export const GET: APIRoute = async ({ request }) => {
           'audit logging',
           'token usage tracking',
         ],
-        defaultModel: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        defaultModel: 'minimaxai/minimax-m2.7',
         maxTokens: 1024,
       }),
       {
@@ -194,7 +194,7 @@ export const POST: APIRoute = async ({ request }) => {
     })
 
     // Use the model from the request or the default
-    const modelId = model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+    const modelId = model || 'minimaxai/minimax-m2.7'
 
     // Create an adapter for the AI service
     const serviceAdapter: AIService = {

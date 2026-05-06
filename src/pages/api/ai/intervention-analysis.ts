@@ -58,7 +58,7 @@ export const POST = async ({ request }) => {
     )
 
     // Use the model from the request or the default model
-    const modelId = model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+    const modelId = model || 'minimaxai/minimax-m2.7'
 
     // Create intervention analysis service
     const interventionService = new InterventionAnalysisService({

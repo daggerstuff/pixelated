@@ -46,7 +46,7 @@ export class InterventionAnalysisService {
   constructor(config: InterventionAnalysisServiceConfig) {
     const {
       aiService,
-      model = 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      model = 'minimaxai/minimax-m2.7',
       systemPrompt = 'You are an expert mental-health assistant. Return ONLY valid JSON with the requested keys, no markdown or additional commentary.',
     } = config
 

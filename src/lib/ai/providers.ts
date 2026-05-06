@@ -59,7 +59,7 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
   together: {
     name: 'Together AI',
     baseUrl: 'https://api.together.xyz',
-    defaultModel: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+    defaultModel: 'minimaxai/minimax-m2.7',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
   huggingface: {
