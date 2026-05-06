@@ -268,6 +268,7 @@ class MediaRepository {
 
   async getFileMetadata(
     key: string,
+    userId: string,
   ): Promise<{
     key: string
     size: number
@@ -278,6 +279,8 @@ class MediaRepository {
     originalName: string
     metadata: Record<string, string>
   }> {
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
+
     const result = await this.storageClientFactory.getS3Client().send(
       new HeadObjectCommand({
         Bucket: this.storageClientFactory.getBucketName(),
@@ -360,7 +363,7 @@ class MediaRepository {
   private async enrichWithSignedUrls(
     files: MediaListItem[],
     userId?: string,
-    maxConcurrent = 16,
+    maxConcurrent = 10,
   ): Promise<MediaListItem[]> {
     const total = files.length
     if (total === 0) return []
@@ -468,8 +471,7 @@ export class MediaService {
     originalName: string
     metadata: Record<string, string>
   }> {
-    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
-    return this.mediaRepository.getFileMetadata(key)
+    return this.mediaRepository.getFileMetadata(key, userId)
   }
 
   async ensureBucketExists(): Promise<void> {
