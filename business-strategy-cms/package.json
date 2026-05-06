@@ -25,15 +25,15 @@
     "security:scan": "snyk test"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1044.0",
+    "@aws-sdk/s3-request-presigner": "^3.1044.0",
     "axios": "^1.16.0",
     "bcryptjs": "^3.0.3",
-    "@aws-sdk/client-s3": "^3.835.0",
-    "@aws-sdk/s3-request-presigner": "^3.835.0",
     "cors": "^2.8.6",
     "digest-fetch": "^3.1.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.5.0",
+    "express-rate-limit": "^8.5.1",
     "gray-matter": "^4.0.3",
     "helmet": "^8.1.0",
     "joi": "^18.2.1",
