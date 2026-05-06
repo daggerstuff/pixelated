@@ -55,19 +55,28 @@ export interface MediaUpload {
 }
 
 class StorageClientFactory {
-  private static s3Client: S3Client | null = null
-  private static bucketName: string | null = null
+  private s3Client: S3Client | null = null
 
-  static getS3Client(): S3Client {
+  constructor(
+    private readonly endpoint: string =
+      process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com',
+    private readonly bucketName: string =
+      process.env['HETZNER_BUCKET_NAME'] || 'business-strategy-cms-uploads',
+    private readonly region: string = process.env['HETZNER_REGION'] || 'hel1',
+    private readonly accessKeyId: string = process.env['HETZNER_ACCESS_KEY_ID'] || '',
+    private readonly secretAccessKey: string =
+      process.env['HETZNER_SECRET_ACCESS_KEY'] || '',
+  ) {}
+
+  getS3Client(): S3Client {
     if (!this.s3Client) {
-      const endpoint = this.getEndpoint()
       this.s3Client = new S3Client({
-        endpoint,
+        endpoint: this.getEndpoint(),
         credentials: {
-          accessKeyId: process.env['HETZNER_ACCESS_KEY_ID'] || '',
-          secretAccessKey: process.env['HETZNER_SECRET_ACCESS_KEY'] || '',
+          accessKeyId: this.accessKeyId,
+          secretAccessKey: this.secretAccessKey,
         },
-        region: process.env['HETZNER_REGION'] || 'hel1',
+        region: this.region,
         forcePathStyle: true,
       })
     }
@@ -75,30 +84,14 @@ class StorageClientFactory {
     return this.s3Client
   }
 
-  static getBucketName(): string {
-    if (!this.bucketName) {
-      this.bucketName = process.env['HETZNER_BUCKET_NAME'] || 'business-strategy-cms-uploads'
-    }
+  getBucketName(): string {
     return this.bucketName
   }
 
-  static getEndpoint(): string {
-    return (
-      process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com'
-    )
+  getEndpoint(): string {
+    return this.endpoint
   }
 
-  /**
-   * Build URL for file
-   */
-  static buildUrl(key: string): string {
-    const endpoint = this.getEndpoint()
-
-    // Remove protocol from endpoint if present
-    const cleanEndpoint = endpoint.replace(/^https?:\/\//, '')
-
-    return `https://${cleanEndpoint}/${this.getBucketName()}/${key}`
-  }
 }
 
 class MediaAuthorizationGuard {
@@ -113,7 +106,11 @@ class MediaAuthorizationGuard {
 }
 
 class MediaRepository {
-  private static getUploadedFileSize(file: UploadedFile): number {
+  constructor(
+    private readonly storageClientFactory: StorageClientFactory = new StorageClientFactory(),
+  ) {}
+
+  private getUploadedFileSize(file: UploadedFile): number {
     if (Number.isFinite(file.size)) {
       return file.size
     }
@@ -123,7 +120,7 @@ class MediaRepository {
     throw new Error('Uploaded file missing a valid size value.')
   }
 
-  static async uploadFile(
+  async uploadFile(
     file: UploadedFile,
     userId: string,
     folder?: string,
@@ -135,9 +132,9 @@ class MediaRepository {
     const key = `${userId}/${uploadFolder}/${filename}`
     const fileSize = this.getUploadedFileSize(file)
 
-    await StorageClientFactory.getS3Client().send(
+    await this.storageClientFactory.getS3Client().send(
       new PutObjectCommand({
-        Bucket: StorageClientFactory.getBucketName(),
+        Bucket: this.storageClientFactory.getBucketName(),
         Key: key,
         Body: file.buffer,
         ContentType: file.mimetype,
@@ -148,7 +145,7 @@ class MediaRepository {
         },
       }),
     )
-    const url = await this.getSignedUrl(key, 3600)
+    const url = await this.getSignedUrl(key, 3600, userId)
 
     return {
       id: uniqueSuffix,
@@ -162,28 +159,33 @@ class MediaRepository {
     }
   }
 
-  static async getSignedUrl(
+  async getSignedUrl(
     key: string,
     expiresIn = 3600,
+    userId?: string,
   ): Promise<string> {
+    if (userId) {
+      MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
+    }
+
     const command = new GetObjectCommand({
-      Bucket: StorageClientFactory.getBucketName(),
+      Bucket: this.storageClientFactory.getBucketName(),
       Key: key,
     })
 
-    return signS3Url(StorageClientFactory.getS3Client(), command, { expiresIn })
+    return signS3Url(this.storageClientFactory.getS3Client(), command, { expiresIn })
   }
 
-  static async deleteFile(key: string): Promise<void> {
-    await StorageClientFactory.getS3Client().send(
+  async deleteFile(key: string): Promise<void> {
+    await this.storageClientFactory.getS3Client().send(
       new DeleteObjectCommand({
-        Bucket: StorageClientFactory.getBucketName(),
+        Bucket: this.storageClientFactory.getBucketName(),
         Key: key,
       }),
     )
   }
 
-  static async listFiles(
+  async listFiles(
     userId: string,
     options: string | ListFilesOptions = {},
   ): Promise<PaginatedListFilesResult> {
@@ -193,9 +195,9 @@ class MediaRepository {
         : options
 
     const listPrefix = this.getListPrefix(userId, listOptions.prefix)
-    const result = await StorageClientFactory.getS3Client().send(
+    const result = await this.storageClientFactory.getS3Client().send(
       new ListObjectsV2Command({
-        Bucket: StorageClientFactory.getBucketName(),
+        Bucket: this.storageClientFactory.getBucketName(),
         ...(listPrefix ? { Prefix: listPrefix } : {}),
         MaxKeys: Math.min(Math.max(listOptions.pageSize ?? 1000, 1), 1000),
         ...(listOptions.continuationToken
@@ -212,8 +214,11 @@ class MediaRepository {
     }
 
     const files = result.Contents
-      .filter(this.isFileWithKey)
-      .map(this.toMediaListItem)
+      .filter(
+        (file): file is { Key: string; LastModified?: Date; Size?: number } =>
+          this.isFileWithKey(file),
+      )
+      .map((file) => this.toMediaListItem(file))
 
     const paginatedResult: PaginatedListFilesResult = {
       files,
@@ -230,11 +235,11 @@ class MediaRepository {
       )
     }
 
-    const enrichedFiles = await this.enrichWithSignedUrls(files)
+    const enrichedFiles = await this.enrichWithSignedUrls(files, userId)
     return { ...paginatedResult, files: enrichedFiles }
   }
 
-  static async listPublicFiles(
+  async listPublicFiles(
     prefix?: string,
     options: MediaListOptions = {},
   ): Promise<MediaListItem[]> {
@@ -243,19 +248,24 @@ class MediaRepository {
     }
 
     const listPrefix = this.normalizePrefix(prefix)
-    const result = await StorageClientFactory.getS3Client().send(
+    const result = await this.storageClientFactory.getS3Client().send(
       new ListObjectsV2Command({
-        Bucket: StorageClientFactory.getBucketName(),
+        Bucket: this.storageClientFactory.getBucketName(),
         ...(listPrefix ? { Prefix: listPrefix } : {}),
       }),
     )
 
     if (!result.Contents) return []
 
-    return result.Contents.filter(this.isFileWithKey).map(this.toMediaListItem)
+    return result.Contents
+      .filter(
+        (file): file is { Key: string; LastModified?: Date; Size?: number } =>
+          this.isFileWithKey(file),
+      )
+      .map((file) => this.toMediaListItem(file))
   }
 
-  static async getFileMetadata(
+  async getFileMetadata(
     key: string,
   ): Promise<{
     key: string
@@ -267,9 +277,9 @@ class MediaRepository {
     originalName: string
     metadata: Record<string, string>
   }> {
-    const result = await StorageClientFactory.getS3Client().send(
+    const result = await this.storageClientFactory.getS3Client().send(
       new HeadObjectCommand({
-        Bucket: StorageClientFactory.getBucketName(),
+        Bucket: this.storageClientFactory.getBucketName(),
         Key: key,
       }),
     )
@@ -294,18 +304,18 @@ class MediaRepository {
     }
   }
 
-  static async ensureBucketExists(): Promise<void> {
+  async ensureBucketExists(): Promise<void> {
     try {
-      await StorageClientFactory.getS3Client().send(
-        new HeadBucketCommand({ Bucket: StorageClientFactory.getBucketName() }),
+      await this.storageClientFactory.getS3Client().send(
+        new HeadBucketCommand({ Bucket: this.storageClientFactory.getBucketName() }),
       )
     } catch (error: unknown) {
       const httpStatusCode = (error as { $metadata?: { httpStatusCode?: number } })
         .$metadata?.httpStatusCode
 
       if (httpStatusCode === 404) {
-        await StorageClientFactory.getS3Client().send(
-          new CreateBucketCommand({ Bucket: StorageClientFactory.getBucketName() }),
+        await this.storageClientFactory.getS3Client().send(
+          new CreateBucketCommand({ Bucket: this.storageClientFactory.getBucketName() }),
         )
       } else {
         throw error
@@ -313,12 +323,12 @@ class MediaRepository {
     }
   }
 
-  private static normalizePrefix(prefix?: string): string | undefined {
+  private normalizePrefix(prefix?: string): string | undefined {
     if (!prefix) return undefined
     return prefix.replace(/^\/+/, '')
   }
 
-  private static getListPrefix(
+  private getListPrefix(
     userId?: string,
     prefix?: string,
   ): string | undefined {
@@ -327,13 +337,13 @@ class MediaRepository {
     return normalizedPrefix ? `${userId}/${normalizedPrefix}` : `${userId}/`
   }
 
-  private static isFileWithKey(file: {
+  private isFileWithKey(file: {
     Key?: string | null
   }): file is { Key: string; LastModified?: Date; Size?: number } {
     return Boolean(file.Key)
   }
 
-  private static toMediaListItem(file: {
+  private toMediaListItem(file: {
     Key: string
     LastModified?: Date
     Size?: number
@@ -346,43 +356,46 @@ class MediaRepository {
     }
   }
 
-  private static async enrichWithSignedUrls(
+  private async enrichWithSignedUrls(
     files: MediaListItem[],
-    maxConcurrent = 8,
+    userId?: string,
+    maxConcurrent = 16,
   ): Promise<MediaListItem[]> {
+    const total = files.length
+    if (total === 0) return []
+
+    const concurrencyLimit = Math.min(maxConcurrent, total)
     const enriched = [...files]
     let nextIndex = 0
-    const workers = Array.from(
-      { length: Math.min(maxConcurrent, files.length) },
-      async () => {
-        while (nextIndex < files.length) {
-          const fileIndex = nextIndex
-          nextIndex += 1
-          if (fileIndex >= files.length) break
-          const file = files[fileIndex]
 
-          try {
-            enriched[fileIndex] = {
-              ...file,
-              url: await this.getSignedUrl(file.key, 3600),
-            }
-          } catch (error: unknown) {
-            console.warn(
-              'Failed to generate signed URL for file:',
-              file.key,
-              error,
-            )
-            enriched[fileIndex] = { ...file, url: null }
-          }
+    const worker = async (): Promise<void> => {
+      while (nextIndex < total) {
+        const currentIndex = nextIndex
+        nextIndex += 1
+        const file = files[currentIndex]
+
+        try {
+          const signedUrl = await this.getSignedUrl(file.key, 3600, userId)
+          enriched[currentIndex] = { ...file, url: signedUrl }
+        } catch (error) {
+          console.warn(
+            'Failed to generate signed URL for file:',
+            file.key,
+            error,
+          )
+          enriched[currentIndex] = { ...file, url: null }
         }
-      },
+      }
+    }
+
+    await Promise.all(
+      Array.from({ length: concurrencyLimit }, () => worker()),
     )
 
-    await Promise.all(workers)
     return enriched
   }
 
-  private static getFolderByFileType(mimetype: string): string {
+  private getFolderByFileType(mimetype: string): string {
     if (!mimetype || typeof mimetype !== 'string') return 'misc'
 
     const normalized = mimetype.toLowerCase()
@@ -407,40 +420,100 @@ class MediaRepository {
 }
 
 export class MediaService {
-  static async uploadFile(
+  private static readonly defaultService = new MediaService()
+
+  constructor(
+    private readonly mediaRepository: MediaRepository = new MediaRepository(),
+  ) {}
+
+  async uploadFile(
     file: UploadedFile,
     userId: string,
     folder?: string,
   ): Promise<MediaUpload> {
-    return MediaRepository.uploadFile(file, userId, folder)
+    return this.mediaRepository.uploadFile(file, userId, folder)
   }
 
-  static async getSignedUrl(
+  async getSignedUrl(
     key: string,
     expiresIn = 3600,
     userId: string,
   ): Promise<string> {
+    return this.mediaRepository.getSignedUrl(key, expiresIn, userId)
+  }
+
+  async deleteFile(key: string, userId: string): Promise<void> {
     MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
-    return MediaRepository.getSignedUrl(key, expiresIn)
+    await this.mediaRepository.deleteFile(key)
+  }
+
+  async listFiles(
+    userId: string,
+    options: string | ListFilesOptions = {},
+  ): Promise<PaginatedListFilesResult> {
+    return this.mediaRepository.listFiles(userId, options)
+  }
+
+  async listPublicFiles(
+    prefix?: string,
+    options: MediaListOptions = {},
+  ): Promise<MediaListItem[]> {
+    return this.mediaRepository.listPublicFiles(prefix, options)
+  }
+
+  async getFileMetadata(
+    key: string,
+    userId: string,
+  ): Promise<{
+    key: string
+    size: number
+    lastModified: Date
+    contentType: string
+    etag: string
+    uploadedBy: string
+    originalName: string
+    metadata: Record<string, string>
+  }> {
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
+    return this.mediaRepository.getFileMetadata(key)
+  }
+
+  async ensureBucketExists(): Promise<void> {
+    await this.mediaRepository.ensureBucketExists()
+  }
+
+  static uploadFile(
+    file: UploadedFile,
+    userId: string,
+    folder?: string,
+  ): Promise<MediaUpload> {
+    return MediaService.defaultService.uploadFile(file, userId, folder)
+  }
+
+  static getSignedUrl(
+    key: string,
+    expiresIn = 3600,
+    userId: string,
+  ): Promise<string> {
+    return MediaService.defaultService.getSignedUrl(key, expiresIn, userId)
   }
 
   static async deleteFile(key: string, userId: string): Promise<void> {
-    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
-    await MediaRepository.deleteFile(key)
+    return MediaService.defaultService.deleteFile(key, userId)
   }
 
   static async listFiles(
     userId: string,
     options: string | ListFilesOptions = {},
   ): Promise<PaginatedListFilesResult> {
-    return MediaRepository.listFiles(userId, options)
+    return MediaService.defaultService.listFiles(userId, options)
   }
 
   static async listPublicFiles(
     prefix?: string,
     options: MediaListOptions = {},
   ): Promise<MediaListItem[]> {
-    return MediaRepository.listPublicFiles(prefix, options)
+    return MediaService.defaultService.listPublicFiles(prefix, options)
   }
 
   static async getFileMetadata(
@@ -456,11 +529,10 @@ export class MediaService {
     originalName: string
     metadata: Record<string, string>
   }> {
-    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
-    return MediaRepository.getFileMetadata(key)
+    return MediaService.defaultService.getFileMetadata(key, userId)
   }
 
   static async ensureBucketExists(): Promise<void> {
-    await MediaRepository.ensureBucketExists()
+    return MediaService.defaultService.ensureBucketExists()
   }
 }
