@@ -112,7 +112,7 @@ const { content } = Astro.props
     gap: 0.7rem;
     padding: 1.15rem;
     border: 1px solid rgba(253, 252, 252, 0.1);
-    border-radius: 8px;
+    border-radius: 16px;
     background: rgba(253, 252, 252, 0.035);
     justify-items: center;
     text-align: center;
@@ -146,7 +146,7 @@ const { content } = Astro.props
     gap: 0.85rem;
     padding: 1.15rem;
     border: 1px solid rgba(253, 252, 252, 0.1);
-    border-radius: 8px;
+    border-radius: 16px;
     background: rgba(253, 252, 252, 0.035);
     justify-items: center;
     text-align: center;
@@ -194,6 +194,10 @@ const { content } = Astro.props
 
     .home-intro__evidence-board {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-intro__lead {
+      max-width: 50rem;
     }
   }
 

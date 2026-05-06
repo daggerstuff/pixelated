@@ -42,6 +42,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$REPO_ROOT"
 
+if [[ -f "${SCRIPT_DIR}/lib/vault-env.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "${SCRIPT_DIR}/lib/vault-env.sh"
+  load_vault_env 0 || true
+else
+  echo "⚠️ Missing helper script: ${SCRIPT_DIR}/lib/vault-env.sh"
+fi
+
 if ! command -v uv >/dev/null 2>&1; then
   echo "ERROR: uv is required for this launch flow."
   exit 1

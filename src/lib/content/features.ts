@@ -1,7 +1,7 @@
 export const featuresContent = {
   label: 'Product modules',
-  title: 'A case library, a practice room, and a review desk.',
-  copy: 'The product is not a generic chatbot. It is a training system with reusable scenarios, live therapeutic practice, and supervisor tools built around education workflows.',
+  title: 'A case library, a practice room, and a review desk built for supervision.',
+  copy: 'The product is not a generic chatbot. It is a training system for scenario design, repeated practice, and evidence-based review.',
   proofLabel: 'What changes operationally',
   proofItems: [
     'Faculty stop rebuilding roleplay prompts from scratch.',
