@@ -42,7 +42,7 @@
 .pe-home-shell,
 .pe-page-shell {
   width: 100%;
-  max-width: min(76rem, calc(100vw - 3rem));
+  max-width: min(78rem, calc(100vw - 2.5rem));
   margin: 0 auto;
   padding: 0 clamp(1.25rem, 2.8vw, 2.5rem);
   display: flex;
@@ -53,7 +53,7 @@
 .pe-home-section,
 .pe-page-section {
   position: relative;
-  padding: clamp(80px, 8vw, 120px) 0;
+  padding: clamp(88px, 9vw, 136px) 0;
   overflow: hidden;
 }
 
@@ -165,7 +165,7 @@
 .pe-home-copy,
 .pe-page-copy,
 .pe-home-prose p {
-  max-width: 58ch;
+  max-width: 56ch;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   line-height: 1.65;
