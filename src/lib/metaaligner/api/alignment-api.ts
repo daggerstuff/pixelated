@@ -109,7 +109,7 @@ export class MetaAlignerAPI {
       enableResponseEnhancement: true,
       enhancementThreshold: 0.7,
       maxEnhancementAttempts: 2,
-      model: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      model: 'minimaxai/minimax-m2.7',
       temperature: 0.7,
       ...config,
     }

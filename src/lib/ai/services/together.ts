@@ -372,7 +372,7 @@ export function createTogetherAIService(
             }
 
             const model =
-              options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+              options?.model || 'minimaxai/minimax-m2.7'
             const requestBody = {
               model,
               messages,
@@ -473,7 +473,7 @@ export function createTogetherAIService(
       return {
         id: `together-${Date.now()}`,
         created: Date.now(),
-        model: options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: options?.model || 'minimaxai/minimax-m2.7',
         choices: [
           {
             message: {
@@ -503,7 +503,7 @@ export function createTogetherAIService(
           throw new TogetherAIError('Together AI API key is not configured')
         }
 
-        const model = options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+        const model = options?.model || 'minimaxai/minimax-m2.7'
         const requestBody = {
           model,
           messages,
