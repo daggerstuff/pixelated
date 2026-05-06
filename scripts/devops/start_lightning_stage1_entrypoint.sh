@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ -f "${SCRIPT_DIR}/lib/vault-env.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "${SCRIPT_DIR}/lib/vault-env.sh"
+  load_vault_env 0 || true
+else
+  echo "⚠️ Missing helper script: ${SCRIPT_DIR}/lib/vault-env.sh"
+fi
+
 STAGE1_TRAINING_SCRIPT="${STAGE1_TRAINING_SCRIPT:-ai/lightning/production/train_therapeutic_ai.py}"
 STAGE="${STAGE1_STAGE:-1}"
 MAX_STEPS="${STAGE1_MAX_STEPS:-100000}"
