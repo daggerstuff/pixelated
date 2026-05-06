@@ -105,7 +105,7 @@ class MediaAuthorizationGuard {
   }
 }
 
-class MediaRepository {
+export class MediaService {
   constructor(
     private readonly storageClientFactory: StorageClientFactory,
   ) {}
@@ -414,69 +414,6 @@ class MediaRepository {
     }
 
     return 'misc'
-  }
-}
-
-export class MediaService {
-  constructor(
-    private readonly storageClientFactory: StorageClientFactory,
-    private readonly mediaRepository: MediaRepository = new MediaRepository(
-      storageClientFactory,
-    ),
-  ) {}
-
-  async uploadFile(
-    file: UploadedFile,
-    userId: string,
-    folder?: string,
-  ): Promise<MediaUpload> {
-    return this.mediaRepository.uploadFile(file, userId, folder)
-  }
-
-  async getSignedUrl(
-    key: string,
-    expiresIn = 3600,
-    userId: string,
-  ): Promise<string> {
-    return this.mediaRepository.getSignedUrl(key, expiresIn, userId)
-  }
-
-  async deleteFile(key: string, userId: string): Promise<void> {
-    await this.mediaRepository.deleteFile(key, userId)
-  }
-
-  async listFiles(
-    userId: string,
-    options: string | ListFilesOptions = {},
-  ): Promise<PaginatedListFilesResult> {
-    return this.mediaRepository.listFiles(userId, options)
-  }
-
-  async listPublicFiles(
-    prefix?: string,
-    options: MediaListOptions = {},
-  ): Promise<MediaListItem[]> {
-    return this.mediaRepository.listPublicFiles(prefix, options)
-  }
-
-  async getFileMetadata(
-    key: string,
-    userId: string,
-  ): Promise<{
-    key: string
-    size: number
-    lastModified: Date
-    contentType: string
-    etag: string
-    uploadedBy: string
-    originalName: string
-    metadata: Record<string, string>
-  }> {
-    return this.mediaRepository.getFileMetadata(key, userId)
-  }
-
-  async ensureBucketExists(): Promise<void> {
-    await this.mediaRepository.ensureBucketExists()
   }
 }
 
