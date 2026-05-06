@@ -107,7 +107,7 @@ class MediaAuthorizationGuard {
 
 class MediaRepository {
   constructor(
-    private readonly storageClientFactory: StorageClientFactory = new StorageClientFactory(),
+    private readonly storageClientFactory: StorageClientFactory,
   ) {}
 
   private getUploadedFileSize(file: UploadedFile): number {
@@ -162,11 +162,9 @@ class MediaRepository {
   async getSignedUrl(
     key: string,
     expiresIn = 3600,
-    userId?: string,
+    userId: string,
   ): Promise<string> {
-    if (userId) {
-      MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
-    }
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
 
     const command = new GetObjectCommand({
       Bucket: this.storageClientFactory.getBucketName(),
@@ -421,7 +419,10 @@ class MediaRepository {
 
 export class MediaService {
   constructor(
-    private readonly mediaRepository: MediaRepository = new MediaRepository(),
+    private readonly storageClientFactory: StorageClientFactory = new StorageClientFactory(),
+    private readonly mediaRepository: MediaRepository = new MediaRepository(
+      storageClientFactory,
+    ),
   ) {}
 
   async uploadFile(
