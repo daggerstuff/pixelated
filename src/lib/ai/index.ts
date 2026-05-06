@@ -30,7 +30,7 @@ export const aiLogger = createBuildSafeLogger('ai')
 
 // Default configurations
 export const AI_CONFIG = {
-  defaultModel: 'gpt-4',
+  defaultModel: 'minimaxai/minimax-m2.7',
   maxTokens: 2048,
   temperature: 0.7,
   timeout: 30000,
