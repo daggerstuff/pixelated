@@ -118,9 +118,12 @@ mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
   "--exclude" ".cursor/**" \
   "--exclude" ".cursor-server/**" \
   "--exclude" ".codex/**" \
+  "--exclude" ".claude/**" \
   "--exclude" "**/.cache/**" \
   "--exclude" "*.sock" \
   "--exclude" "**/terminals/**" \
+  "--exclude" "free-claude-code/**" \
+  "--exclude" "**/*.log" \
   "--exclude" ".local/share/zed/**" \
   "--exclude" ".local/share/home_backups/**" \
   "--exclude" ".claude-mem/**" \
