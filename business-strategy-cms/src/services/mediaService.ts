@@ -416,8 +416,6 @@ class MediaRepository {
 }
 
 export class MediaService {
-  private static readonly defaultService = new MediaService()
-
   constructor(
     private readonly mediaRepository: MediaRepository = new MediaRepository(),
   ) {}
@@ -477,58 +475,6 @@ export class MediaService {
   async ensureBucketExists(): Promise<void> {
     await this.mediaRepository.ensureBucketExists()
   }
-
-  static uploadFile(
-    file: UploadedFile,
-    userId: string,
-    folder?: string,
-  ): Promise<MediaUpload> {
-    return MediaService.defaultService.uploadFile(file, userId, folder)
-  }
-
-  static getSignedUrl(
-    key: string,
-    expiresIn = 3600,
-    userId: string,
-  ): Promise<string> {
-    return MediaService.defaultService.getSignedUrl(key, expiresIn, userId)
-  }
-
-  static async deleteFile(key: string, userId: string): Promise<void> {
-    return MediaService.defaultService.deleteFile(key, userId)
-  }
-
-  static async listFiles(
-    userId: string,
-    options: string | ListFilesOptions = {},
-  ): Promise<PaginatedListFilesResult> {
-    return MediaService.defaultService.listFiles(userId, options)
-  }
-
-  static async listPublicFiles(
-    prefix?: string,
-    options: MediaListOptions = {},
-  ): Promise<MediaListItem[]> {
-    return MediaService.defaultService.listPublicFiles(prefix, options)
-  }
-
-  static async getFileMetadata(
-    key: string,
-    userId: string,
-  ): Promise<{
-    key: string
-    size: number
-    lastModified: Date
-    contentType: string
-    etag: string
-    uploadedBy: string
-    originalName: string
-    metadata: Record<string, string>
-  }> {
-    return MediaService.defaultService.getFileMetadata(key, userId)
-  }
-
-  static async ensureBucketExists(): Promise<void> {
-    return MediaService.defaultService.ensureBucketExists()
-  }
 }
+
+export const mediaService = new MediaService()
