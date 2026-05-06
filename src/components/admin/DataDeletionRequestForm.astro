@@ -170,6 +170,7 @@ const deletionReasons = [
             id="scope-specific"
             name="deletion-scope"
             value="specific"
+            aria-controls="data-categories-container"
             class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
           />
           <label
@@ -205,6 +206,7 @@ const deletionReasons = [
                     id={`category-${category.id}`}
                     name="data-categories"
                     value={category.id}
+                    aria-describedby={`category-desc-${category.id}`}
                     class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
                   />
                 </div>
@@ -215,7 +217,7 @@ const deletionReasons = [
                   >
                     {category.label}
                   </label>
-                  <p class="text-gray-500 dark:text-gray-400">
+                  <p id={`category-desc-${category.id}`} class="text-gray-500 dark:text-gray-400">
                     {category.description}
                   </p>
                 </div>
@@ -279,7 +281,7 @@ const deletionReasons = [
     >
       <div class="flex">
         <div class="flex-shrink-0">
-          <Icon name="alert-triangle" class="h-5 w-5 text-yellow-400" />
+          <Icon name="alert-triangle" class="h-5 w-5 text-yellow-400" aria-hidden="true" />
         </div>
         <div class="ml-3">
           <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-400">
@@ -331,7 +333,7 @@ const deletionReasons = [
         type="submit"
         class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
       >
-        <Icon name="trash" class="w-4 h-4 mr-2" />
+        <Icon name="trash" class="w-4 h-4 mr-2" aria-hidden="true" />
         Submit Deletion Request
       </button>
     </div>
