@@ -97,19 +97,22 @@ services:
     container_name: pixelated-redis
     restart: unless-stopped
     command:
-      sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis-password)"
-      --protected-mode yes --appendonly yes --bind 0.0.0.0'
+      - sh
+      - -c
+      - |
+        { printf 'requirepass '; cat /run/secrets/redis-password; printf '\n'; } > /tmp/redis-password.conf
+        redis-server /tmp/redis-password.conf --protected-mode yes --appendonly yes --bind 0.0.0.0
     secrets:
       - redis-password
     volumes:
       - redis_data:/data
     healthcheck:
       test:
-        [
-          'CMD-SHELL',
-          'redis-cli -a "$$(cat /run/secrets/redis-password)" ping | grep -q
-          PONG',
-        ]
+        - CMD-SHELL
+        - >
+          read -r REDISCLI_AUTH < /run/secrets/redis-password
+          export REDISCLI_AUTH
+          redis-cli ping | grep -q PONG
       interval: 10s
       timeout: 5s
       retries: 3

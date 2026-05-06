@@ -27,13 +27,40 @@ while [[ $# -gt 0 ]]; do
 		;;
 	esac
 done
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+filter_agent_output() {
+	local raw_output="$1"
+	AGENT_OUTPUT_SANITIZE_INPUT="${raw_output}" python3 "${SCRIPT_DIR}/../utils/sanitize_agent_output.py"
+}
+
+is_task_complete() {
+	local filtered_output="$1"
+	local raw_output="$2"
+
+	if echo "${filtered_output}" | grep -q "__RALPH_PROMISE_COMPLETE__"; then
+		return 0
+	fi
+	if echo "${filtered_output}" | grep -qiE "^[[:space:]]*COMPLETE[[:space:]]*$"; then
+		return 0
+	fi
+	echo "${raw_output}" | grep -qiE "<[Pp][Rr][Oo][Mm][Ii][Ss][Ee]>[[:space:]]*COMPLETE[[:space:]]*</[Pp][Rr][Oo][Mm][Ii][Ss][Ee]>"
+}
+
+log_completion() {
+	local iteration="$1"
+	local max_iterations="$2"
+
+	echo ""
+	echo "Ralph completed all tasks!"
+	echo "Completed at iteration ${iteration} of ${max_iterations}"
+}
 
 # Validate tool choice
 if [[ ${TOOL} != "amp" && ${TOOL} != "claude" ]]; then
 	echo "Error: Invalid tool '${TOOL}'. Must be 'amp' or 'claude'."
 	exit 1
 fi
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PRD_FILE="${SCRIPT_DIR}/prd.json"
 PROGRESS_FILE="${SCRIPT_DIR}/progress.txt"
 ARCHIVE_DIR="${SCRIPT_DIR}/archive"
@@ -84,6 +111,11 @@ if [[ ! -f ${PROGRESS_FILE} ]]; then
 		echo "---"
 	} >"${PROGRESS_FILE}"
 fi
+AMP_PROFILE="${SCRIPT_DIR}/amp-permission-profile.json"
+AMP_ARGS=()
+if [[ -f ${AMP_PROFILE} ]]; then
+	AMP_ARGS+=(--permission-profile "${AMP_PROFILE}")
+fi
 
 echo "Starting Ralph - Tool: ${TOOL} - Max iterations: ${MAX_ITERATIONS}"
 
@@ -95,19 +127,19 @@ for i in $(seq 1 "${MAX_ITERATIONS}"); do
 
 	# Run the selected tool with the ralph prompt
 	if [[ ${TOOL} == "amp" ]]; then
-		OUTPUT=$(amp --dangerously-allow-all <"${SCRIPT_DIR}/prompt.md" 2>&1) || true
-		echo "${OUTPUT}"
+		OUTPUT=$(amp "${AMP_ARGS[@]}" <"${SCRIPT_DIR}/prompt.md" 2>&1) || true
+		FILTERED_OUTPUT="$(filter_agent_output "${OUTPUT}")"
+		printf '%s\n' "${FILTERED_OUTPUT}"
 	else
 		# Claude Code: use --dangerously-skip-permissions for autonomous operation, --print for output
 		OUTPUT=$(claude --dangerously-skip-permissions --print <"${SCRIPT_DIR}/CLAUDE.md" 2>&1) || true
-		echo "${OUTPUT}"
+		FILTERED_OUTPUT="$(filter_agent_output "${OUTPUT}")"
+		printf '%s\n' "${FILTERED_OUTPUT}"
 	fi
 
 	# Check for completion signal
-	if echo "${OUTPUT}" | grep -q "<promise>COMPLETE</promise>"; then
-		echo ""
-		echo "Ralph completed all tasks!"
-		echo "Completed at iteration ${i} of ${MAX_ITERATIONS}"
+	if is_task_complete "${FILTERED_OUTPUT}" "${OUTPUT}"; then
+		log_completion "${i}" "${MAX_ITERATIONS}"
 		exit 0
 	fi
 
