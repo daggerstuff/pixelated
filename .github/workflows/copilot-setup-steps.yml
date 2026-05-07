@@ -52,9 +52,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Lint (Oxlint)
+      - name: Lint code and markdown
         continue-on-error: true
-        run: pnpm lint
+        run: pnpm lint:ci:with-markdown
 
       - name: Format check (Prettier)
         run: pnpm exec prettier --check . || true
@@ -71,12 +71,13 @@ jobs:
           fi
 
       - name: Run oxlint type-aware
-        run: pnpm exec oxlint --type-aware -c .oxlintrc.json . || true
+        run: pnpm lint:ci:type-aware || true
 
       - name: Summary
         run: |
           echo "=== Code Quality Check Summary ==="
           echo "Lint: Oxlint completed (non-blocking)"
+          echo "Markdown lint completed (non-blocking)"
           echo "Format: Prettier check completed"
           echo "Tests: Unit tests completed (non-blocking)"
           echo "Type Check: TypeScript validation completed"

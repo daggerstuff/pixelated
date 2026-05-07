@@ -79,8 +79,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Lint code
-        run: pnpm lint:ci
+      - name: Lint code and markdown
+        run: pnpm lint:ci:with-markdown
 
       - name: Format check
         run: pnpm format
