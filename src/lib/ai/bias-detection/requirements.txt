@@ -392,7 +392,7 @@ mdurl==0.1.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   markdown-it-py
-mistune==3.2.0
+mistune==3.2.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
@@ -651,7 +651,7 @@ proto-plus==1.27.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   google-api-core
-protobuf==6.33.5
+protobuf==7.34.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   google-api-core
