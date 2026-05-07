@@ -164,11 +164,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Run ESLint
-        run: pnpm lint
+      - name: Run ESLint and markdown lint
+        run: pnpm lint:ci:with-markdown
 
       - name: Run oxlint type-aware
-        run: pnpm exec oxlint --type-aware -c .oxlintrc.json .
+        run: pnpm lint:ci:type-aware
 
       - name: Check formatting
         run: pnpm format:check
