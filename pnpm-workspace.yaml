@@ -1,0 +1,20 @@
+allowBuilds:
+  '@letta-ai/letta-code': true
+  '@modelcontextprotocol/ext-apps': true
+  '@parcel/watcher': true
+  '@sentry-internal/node-cpu-profiler': true
+  '@sentry/cli': true
+  '@vscode/ripgrep': true
+  better-sqlite3: true
+  browser-tabs-lock: true
+  core-js: true
+  esbuild: true
+  mongodb-client-encryption: true
+  mongodb-memory-server: true
+  msgpackr-extract: true
+  msw: true
+  node-pty: true
+  postinstall-postinstall: true
+  protobufjs: true
+  sharp: true
+  utf-8-validate: true
