@@ -121,6 +121,8 @@ dependencies = [
   "voyageai>=0.3.7",
   "aiosqlite>=0.22.1",
   "semgrep>=1.79.0",
+  "webdriver-manager>=4.0.2",
+  "selenium>=4.43.0",
 ]
 [project.optional-dependencies]
 test = [
