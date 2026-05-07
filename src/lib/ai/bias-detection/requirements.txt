@@ -392,7 +392,7 @@ mdurl==0.1.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   markdown-it-py
-mistune==3.2.0
+mistune==3.2.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
