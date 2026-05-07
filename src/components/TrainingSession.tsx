@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 
 import { useConversationMemory } from '../hooks/useConversationMemory'
 import { tokens } from '../lib/design-tokens'
@@ -51,6 +51,18 @@ function TrainingSession({ className }: TrainingSessionProps) {
   const [feedback, setFeedback] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
+  // ⚡ Bolt: Store hook-returned setters in refs to maintain stable references
+  const setSessionStateRef = useRef(setSessionState)
+  const setProgressRef = useRef(setProgress)
+  const addProgressSnapshotRef = useRef(addProgressSnapshot)
+
+  // ⚡ Bolt: Keep refs updated with latest setter functions
+  useEffect(() => {
+    setSessionStateRef.current = setSessionState
+    setProgressRef.current = setProgress
+    addProgressSnapshotRef.current = addProgressSnapshot
+  }, [setSessionState, setProgress, addProgressSnapshot])
+
   // ⚡ Bolt: Moved static SESSION_CONTROLS outside component rendering scope (or memoized it) to prevent unnecessary array allocations on every render
   const SESSION_CONTROLS = [
     { key: 'start', label: 'Start Session' },
@@ -60,29 +72,29 @@ function TrainingSession({ className }: TrainingSessionProps) {
   ]
 
   // Control handlers
-  // ⚡ Bolt: Wrapped handleControl in useCallback to provide a stable function reference
+  // ⚡ Bolt: Wrapped handleControl in useCallback with stable ref dependencies
   const handleControl = useCallback((control: string) => {
     switch (control) {
       case 'start':
-        setSessionState('active')
-        setProgress(0)
-        addProgressSnapshot(0)
+        setSessionStateRef.current('active')
+        setProgressRef.current(0)
+        addProgressSnapshotRef.current(0)
         break
       case 'pause':
-        setSessionState('paused')
+        setSessionStateRef.current('paused')
         break
       case 'resume':
-        setSessionState('active')
+        setSessionStateRef.current('active')
         break
       case 'end':
-        setSessionState('ended')
-        setProgress(100)
-        addProgressSnapshot(100)
+        setSessionStateRef.current('ended')
+        setProgressRef.current(100)
+        addProgressSnapshotRef.current(100)
         break
       default:
         break
     }
-  }, [setSessionState, setProgress, addProgressSnapshot])
+  }, [])
 
   // Send therapist message to mock client API
   const sendToMockClient = async (message: string) => {
