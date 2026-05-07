@@ -1,3 +1,4 @@
 ## 2024-06-01 - Extract Tooltip | Learning: Inline components in Recharts cause unnecessary re-renders. | Action: Extracted CustomTooltip to module level.
 ## 2024-06-03 - O(N^2) React Rendering | Learning: Array.includes() inside .map() loops causes O(N^2) bottlenecks during React renders. | Action: Replaced Array.includes() with a Set generated via useMemo for O(1) lookups.
+
 ## 2026-04-29 - Array Re-allocation Optimization | Learning: Static arrays defined inside React components are re-allocated on every render, which can cause performance issues when passed to children or mapped over. | Action: Moved SESSION_CONTROLS outside the component rendering scope to prevent unnecessary array allocations, and wrapped handleControl in useCallback for a stable function reference.
