@@ -48,7 +48,9 @@ const emitProbeEvent = (mode: ProbeMode, message: string) => {
   return typeof eventId === 'string' ? eventId : undefined
 }
 
-const readProbeBody = async (request: Request): Promise<Record<string, unknown>> => {
+const readProbeBody = async (
+  request: Request,
+): Promise<Record<string, unknown>> => {
   if (!request.body) {
     return {}
   }
@@ -97,13 +99,17 @@ const runProbe = async (request: Request): Promise<Response> => {
 
   const body = await readProbeBody(request)
   const url = new URL(request.url)
-  const mode = (body.mode as ProbeMode) || (url.searchParams.get('mode') as ProbeMode)
+  const mode =
+    (body.mode as ProbeMode) || (url.searchParams.get('mode') as ProbeMode)
   const eventMessage =
     (body.message as string) ||
     url.searchParams.get('message') ||
     'Sentry server probe event'
 
-  const eventId = emitProbeEvent(mode === 'error' ? 'error' : 'message', eventMessage)
+  const eventId = emitProbeEvent(
+    mode === 'error' ? 'error' : 'message',
+    eventMessage,
+  )
 
   return new Response(
     JSON.stringify({

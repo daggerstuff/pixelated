@@ -114,9 +114,9 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     session = validatedSession
 
     // 2. Initialize and configure AI service
-    const togetherApiKey = import.meta.env['TOGETHER_API_KEY']
-    if (!togetherApiKey) {
-      logger.error('TOGETHER_API_KEY is not configured')
+    const llmApiKey = import.meta.env['LLM_API_KEY']
+    if (!llmApiKey) {
+      logger.error('LLM API key is not configured')
       return new Response(
         JSON.stringify({
           error: 'Configuration error',
@@ -130,9 +130,12 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     const completionService = new CompletionService({
-      apiKey: togetherApiKey,
-      togetherApiKey: togetherApiKey,
-      togetherBaseUrl: import.meta.env['TOGETHER_BASE_URL'],
+      apiKey: llmApiKey,
+      providerApiKey: llmApiKey,
+      providerBaseUrl:
+        import.meta.env['LLM_BASE_URL'] ||
+        import.meta.env['LLM_API_URL'] ||
+        import.meta.env['OPENAI_BASE_URL'],
     })
 
     const formattedMessages = completionService.formatMessages(data?.messages || [])

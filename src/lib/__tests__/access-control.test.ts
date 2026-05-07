@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { roleHasPermission, ROLES, type Role } from '../access-control'
 
 describe('roleHasPermission', () => {
@@ -18,7 +19,9 @@ describe('roleHasPermission', () => {
     // STAFF should also inherit USER permissions
     expect(roleHasPermission(ROLES.STAFF, 'read:conversations')).toBe(true)
     // Explicitly verify ADMIN inherits USER's permissions (hierarchy proof)
-    expect(roleHasPermission(ROLES.ADMIN, 'read:conversations')).toBe(roleHasPermission(ROLES.USER, 'read:conversations'))
+    expect(roleHasPermission(ROLES.ADMIN, 'read:conversations')).toBe(
+      roleHasPermission(ROLES.USER, 'read:conversations'),
+    )
   })
 
   it('handles gracefully when an invalid role is provided', () => {

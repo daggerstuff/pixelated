@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
 import React, { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { researchAPI, type BookMetadata } from '@/lib/api/research'
+
 import ExportPanel from './ExportPanel'
 import ResultsGrid from './ResultsGrid'
 import SearchFilters, { type SearchFiltersState } from './SearchFilters'

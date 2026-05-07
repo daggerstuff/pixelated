@@ -136,18 +136,25 @@ concerns:
 
 ### Core Components (This Repository)
 
-- **AI Services**: Python-based machine learning models and inference engines (`ai/`)
-- **Web Platform**: Astro + React frontend with Node.js/TypeScript backend (`src/`)
+- **AI Services**: Python-based machine learning models and inference engines
+  (`ai/`)
+- **Web Platform**: Astro + React frontend with Node.js/TypeScript backend
+  (`src/`)
 - **Backend Services**: Express.js APIs, workers, and data processing services
-- **Integration Layer**: Model Context Protocol (MCP) servers for external connectivity
-- **Data Layer**: MongoDB, Redis, and specialized databases for research and operations
-- **Research Pipeline**: Tools for discovering, evaluating, and integrating therapeutic datasets
+- **Integration Layer**: Model Context Protocol (MCP) servers for external
+  connectivity
+- **Data Layer**: MongoDB, Redis, and specialized databases for research and
+  operations
+- **Research Pipeline**: Tools for discovering, evaluating, and integrating
+  therapeutic datasets
 
 ### Related Systems (Separate Repositories)
 
-Blockchain components for Pixelated Empathy's multi-chain architecture are maintained in dedicated repositories:
+Blockchain components for Pixelated Empathy's multi-chain architecture are
+maintained in dedicated repositories:
 
-- **EVM Chain**: Smart contracts (EscrowRegistryV2.sol, UUPS upgradeable patterns)
+- **EVM Chain**: Smart contracts (EscrowRegistryV2.sol, UUPS upgradeable
+  patterns)
 - **Solana Chain**: Anchor programs for on-chain functionality
 - **Infrastructure**: Deployment scripts, configuration, and DevOps tooling
 - **Cross-chain Communication**: Bridges and messaging systems between chains

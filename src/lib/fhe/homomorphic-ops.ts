@@ -62,9 +62,7 @@ function parseSerializedCiphertextInput(
   }
 }
 
-function isSerializedSealObject(
-  value: unknown,
-): value is SerializedSealObject {
+function isSerializedSealObject(value: unknown): value is SerializedSealObject {
   return (
     isRecord(value) &&
     typeof value.save === 'function' &&
@@ -343,8 +341,8 @@ export class HomomorphicOperations {
 
         // Perform the operation using SEAL
         switch (operation) {
-        case FHEOperation.Rescale:
-          return this.simulateOperation(encryptedData, operation, params)
+          case FHEOperation.Rescale:
+            return this.simulateOperation(encryptedData, operation, params)
 
           case FHEOperation.SENTIMENT:
             // For sentiment analysis, we apply a polynomial approximation of a sigmoid function
@@ -355,7 +353,9 @@ export class HomomorphicOperations {
             )
 
             if (sentimentResult.success && sentimentResult.result) {
-              const serializedResult = resolveSerializedResult(sentimentResult.result)
+              const serializedResult = resolveSerializedResult(
+                sentimentResult.result,
+              )
               result = JSON.stringify({
                 serializedCiphertext: serializedResult,
                 operation: 'sentiment',
@@ -531,7 +531,12 @@ export class HomomorphicOperations {
           const res = resolveSerializedResult(multResult.result)
           return { result: res, success: true, operation }
         }
-        return { result: '', success: false, error: multResult.error, operation }
+        return {
+          result: '',
+          success: false,
+          error: multResult.error,
+          operation,
+        }
 
       case FHEOperation.Negation:
         // Negate the value
@@ -552,7 +557,12 @@ export class HomomorphicOperations {
           const res = resolveSerializedResult(polyResult.result)
           return { result: res, success: true, operation }
         }
-        return { result: '', success: false, error: polyResult.error, operation }
+        return {
+          result: '',
+          success: false,
+          error: polyResult.error,
+          operation,
+        }
 
       case FHEOperation.Rotation:
         // Rotate the ciphertext
@@ -573,7 +583,12 @@ export class HomomorphicOperations {
           const res = resolveSerializedResult(squareResult.result)
           return { result: res, success: true, operation }
         }
-        return { result: '', success: false, error: squareResult.error, operation }
+        return {
+          result: '',
+          success: false,
+          error: squareResult.error,
+          operation,
+        }
 
       case FHEOperation.Rescale:
       case FHEOperation.SENTIMENT:
@@ -669,8 +684,7 @@ export class HomomorphicOperations {
           decodedData,
           getNumericValue(params?.['maxLength'], 100),
         )
-        metadata.maxLength =
-          getNumericValue(params?.['maxLength'], 100)
+        metadata.maxLength = getNumericValue(params?.['maxLength'], 100)
         break
 
       case FHEOperation.TOKENIZE:

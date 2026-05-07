@@ -578,11 +578,13 @@ export class AgentActivityDAO {
     await collection.updateOne(
       { turnId: record.turnId },
       { $set: record },
-      { upsert: true }
+      { upsert: true },
     )
   }
 
-  async getActivitiesByTurnId(turnId: string): Promise<AgentActivityRecord | null> {
+  async getActivitiesByTurnId(
+    turnId: string,
+  ): Promise<AgentActivityRecord | null> {
     const collection = await this.getCollection()
     return collection.findOne({ turnId } as any)
   }

@@ -34,7 +34,9 @@ export type ManagementClientOptionsWithClientCredentials = {
 
 declare module 'auth0' {
   interface ManagementClient {
-    getGuardianEnrollments(params: { id: string }): Promise<GuardianEnrollment[]>
+    getGuardianEnrollments(params: {
+      id: string
+    }): Promise<GuardianEnrollment[]>
     getGuardianFactors(): Promise<GuardianFactor[]>
     createGuardianEnrollmentTicket(params: {
       user_id: string
@@ -68,10 +70,10 @@ function initializeAuth0Clients() {
   }
 
   auth0Authentication ??= new AuthenticationClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret,
-    })
+    domain: auth0Config.domain,
+    clientId: auth0Config.clientId,
+    clientSecret: auth0Config.clientSecret,
+  })
 
   if (
     !auth0Management &&
@@ -287,7 +289,6 @@ export class Auth0MFAService {
             oobCode: `webauthn-${userId}`, // Placeholder - actual implementation would get this from Auth0
           }
           break
-
       }
 
       // Log enrollment start event

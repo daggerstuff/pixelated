@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 
-import { createTogetherAIService } from '../ai/AIService'
+import { createLLMService } from '../ai/AIService'
 import { AIRepository } from '../db/ai/repository'
 import { createFHIRClient } from '../ehr/services/fhir.client'
 import type { FHIRClient } from '../ehr/types'
@@ -70,21 +70,24 @@ const getAIRepositoryInstance = (): AIRepository => {
 const getDocumentationSystemInstance =
   async (): Promise<DocumentationSystem> => {
     if (!documentationSystemInstance) {
-      const togetherService = createTogetherAIService({
-        togetherApiKey: process.env['TOGETHER_API_KEY'] || '',
-        apiKey: process.env['TOGETHER_API_KEY'] || '',
+      const llmService = createLLMService({
+        apiKey: process.env['LLM_API_KEY'] || '',
+        baseUrl:
+          process.env['LLM_BASE_URL'] ||
+          process.env['LLM_API_URL'] ||
+          process.env['OPENAI_BASE_URL'] ||
+          '',
       })
 
       const aiService = {
-        createChatCompletion:
-          togetherService.createChatCompletion.bind(togetherService),
+        createChatCompletion: llmService.createChatCompletion.bind(llmService),
         createStreamingChatCompletion:
-          togetherService.createStreamingChatCompletion.bind(togetherService),
-        dispose: togetherService.dispose.bind(togetherService),
+          llmService.createStreamingChatCompletion.bind(llmService),
+        dispose: llmService.dispose.bind(llmService),
         getModelInfo: (model: string) => ({
           id: model,
           name: model,
-          provider: 'together',
+          provider: 'llm',
           capabilities: ['chat', 'completion'],
           contextWindow: 32768,
           maxTokens: 4096,

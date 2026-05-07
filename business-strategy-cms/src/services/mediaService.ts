@@ -58,14 +58,17 @@ class StorageClientFactory {
   private s3Client: S3Client | null = null
 
   constructor(
-    private readonly endpoint: string =
-      process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com',
-    private readonly bucketName: string =
-      process.env['HETZNER_BUCKET_NAME'] || 'business-strategy-cms-uploads',
+    private readonly endpoint: string = process.env['HETZNER_ENDPOINT'] ||
+      'https://hel1.your-objectstorage.com',
+    private readonly bucketName: string = process.env['HETZNER_BUCKET_NAME'] ||
+      'business-strategy-cms-uploads',
     private readonly region: string = process.env['HETZNER_REGION'] || 'hel1',
-    private readonly accessKeyId: string = process.env['HETZNER_ACCESS_KEY_ID'] || '',
-    private readonly secretAccessKey: string =
-      process.env['HETZNER_SECRET_ACCESS_KEY'] || '',
+    private readonly accessKeyId: string = process.env[
+      'HETZNER_ACCESS_KEY_ID'
+    ] || '',
+    private readonly secretAccessKey: string = process.env[
+      'HETZNER_SECRET_ACCESS_KEY'
+    ] || '',
   ) {}
 
   getS3Client(): S3Client {
@@ -91,7 +94,6 @@ class StorageClientFactory {
   getEndpoint(): string {
     return this.endpoint
   }
-
 }
 
 class MediaAuthorizationGuard {
@@ -106,9 +108,7 @@ class MediaAuthorizationGuard {
 }
 
 export class MediaService {
-  constructor(
-    private readonly storageClientFactory: StorageClientFactory,
-  ) {}
+  constructor(private readonly storageClientFactory: StorageClientFactory) {}
 
   private getUploadedFileSize(file: UploadedFile): number {
     if (Number.isFinite(file.size)) {
@@ -171,7 +171,9 @@ export class MediaService {
       Key: key,
     })
 
-    return signS3Url(this.storageClientFactory.getS3Client(), command, { expiresIn })
+    return signS3Url(this.storageClientFactory.getS3Client(), command, {
+      expiresIn,
+    })
   }
 
   async deleteFile(key: string, userId: string): Promise<void> {
@@ -212,12 +214,10 @@ export class MediaService {
       }
     }
 
-    const files = result.Contents
-      .filter(
-        (file): file is { Key: string; LastModified?: Date; Size?: number } =>
-          this.isFileWithKey(file),
-      )
-      .map((file) => this.toMediaListItem(file))
+    const files = result.Contents.filter(
+      (file): file is { Key: string; LastModified?: Date; Size?: number } =>
+        this.isFileWithKey(file),
+    ).map((file) => this.toMediaListItem(file))
 
     const paginatedResult: PaginatedListFilesResult = {
       files,
@@ -256,12 +256,10 @@ export class MediaService {
 
     if (!result.Contents) return []
 
-    return result.Contents
-      .filter(
-        (file): file is { Key: string; LastModified?: Date; Size?: number } =>
-          this.isFileWithKey(file),
-      )
-      .map((file) => this.toMediaListItem(file))
+    return result.Contents.filter(
+      (file): file is { Key: string; LastModified?: Date; Size?: number } =>
+        this.isFileWithKey(file),
+    ).map((file) => this.toMediaListItem(file))
   }
 
   async getFileMetadata(
@@ -308,17 +306,26 @@ export class MediaService {
 
   async ensureBucketExists(): Promise<void> {
     try {
-      await this.storageClientFactory.getS3Client().send(
-        new HeadBucketCommand({ Bucket: this.storageClientFactory.getBucketName() }),
-      )
+      await this.storageClientFactory
+        .getS3Client()
+        .send(
+          new HeadBucketCommand({
+            Bucket: this.storageClientFactory.getBucketName(),
+          }),
+        )
     } catch (error: unknown) {
-      const httpStatusCode = (error as { $metadata?: { httpStatusCode?: number } })
-        .$metadata?.httpStatusCode
+      const httpStatusCode = (
+        error as { $metadata?: { httpStatusCode?: number } }
+      ).$metadata?.httpStatusCode
 
       if (httpStatusCode === 404) {
-        await this.storageClientFactory.getS3Client().send(
-          new CreateBucketCommand({ Bucket: this.storageClientFactory.getBucketName() }),
-        )
+        await this.storageClientFactory
+          .getS3Client()
+          .send(
+            new CreateBucketCommand({
+              Bucket: this.storageClientFactory.getBucketName(),
+            }),
+          )
       } else {
         throw error
       }
@@ -330,10 +337,7 @@ export class MediaService {
     return prefix.replace(/^\/+/, '')
   }
 
-  private getListPrefix(
-    userId?: string,
-    prefix?: string,
-  ): string | undefined {
+  private getListPrefix(userId?: string, prefix?: string): string | undefined {
     const normalizedPrefix = this.normalizePrefix(prefix)
     if (!userId) return normalizedPrefix
     return normalizedPrefix ? `${userId}/${normalizedPrefix}` : `${userId}/`
@@ -387,7 +391,9 @@ export class MediaService {
     }
 
     await Promise.all(
-      Array.from({ length: concurrencyLimit }, (_, workerIndex) => worker(workerIndex)),
+      Array.from({ length: concurrencyLimit }, (_, workerIndex) =>
+        worker(workerIndex),
+      ),
     )
 
     return enriched

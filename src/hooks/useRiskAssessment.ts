@@ -30,7 +30,8 @@ export const useRiskAssessment = () => {
       Message: "${content}"`
 
         const response = await getAIResponse(prompt)
-        const analysisText = typeof response === 'string' ? response : String(response)
+        const analysisText =
+          typeof response === 'string' ? response : String(response)
         const parsed = JSON.parse(analysisText) as {
           category?: string
           factors?: string[]
@@ -40,7 +41,9 @@ export const useRiskAssessment = () => {
 
         return {
           category:
-            parsed.category === 'low' || parsed.category === 'medium' || parsed.category === 'high'
+            parsed.category === 'low' ||
+            parsed.category === 'medium' ||
+            parsed.category === 'high'
               ? parsed.category
               : 'low',
           factors: parsed.factors || [],

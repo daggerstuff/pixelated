@@ -444,7 +444,10 @@ export const prerender = false
       const avgBiasScore =
         historical.length > 0
           ? (
-              (historical.reduce((sum: any, day: any) => sum + day.biasScore, 0) /
+              (historical.reduce(
+                (sum: any, day: any) => sum + day.biasScore,
+                0,
+              ) /
                 historical.length) *
               100
             ).toFixed(1)
@@ -457,7 +460,8 @@ export const prerender = false
 
       // Update DOM
       const totalAnalysesEl = document.getElementById('total-analyses')
-      if (totalAnalysesEl) totalAnalysesEl.textContent = totalAnalyses.toString()
+      if (totalAnalysesEl)
+        totalAnalysesEl.textContent = totalAnalyses.toString()
 
       const avgBiasScoreEl = document.getElementById('avg-bias-score')
       if (avgBiasScoreEl) avgBiasScoreEl.textContent = avgBiasScore + '%'
@@ -465,7 +469,9 @@ export const prerender = false
       const highAlertsEl = document.getElementById('high-alerts')
       if (highAlertsEl) highAlertsEl.textContent = highAlerts.toString()
 
-      const uniqueDemographicsEl = document.getElementById('unique-demographics')
+      const uniqueDemographicsEl = document.getElementById(
+        'unique-demographics',
+      )
       if (uniqueDemographicsEl)
         uniqueDemographicsEl.textContent = uniqueDemographics.toString()
 

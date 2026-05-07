@@ -1,14 +1,14 @@
+import DOMPurify from 'isomorphic-dompurify'
+import { Brain, ChevronDown, ChevronUp } from 'lucide-react'
 import { useContext, useState } from 'react'
 
-import { ThemeContext } from '@/components/theme/ThemeProvider'
 import { MultiAgentThoughtUI } from '@/components/ai/MultiAgentThoughtUI'
+import { ThemeContext } from '@/components/theme/ThemeProvider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatTimestamp } from '@/lib/dates'
 import { simpleMarkdownToHtml } from '@/lib/markdown'
 import { cn } from '@/lib/utils'
-import { Brain, ChevronDown, ChevronUp } from 'lucide-react'
-import DOMPurify from 'isomorphic-dompurify'
 import type { Message, ExtendedMessage } from '@/types/chat'
 
 export interface ChatMessageProps {
@@ -56,10 +56,12 @@ export function ChatMessage({
     return colors[category] || 'bg-gray-500'
   }
 
-  const hasAnalysis = !!message.mentalHealthAnalysis && (
-    ('hasMentalHealthIssue' in message.mentalHealthAnalysis && message.mentalHealthAnalysis.hasMentalHealthIssue) ||
-    ('category' in message.mentalHealthAnalysis && (message.mentalHealthAnalysis.category as string) !== 'none')
-  )
+  const hasAnalysis =
+    !!message.mentalHealthAnalysis &&
+    (('hasMentalHealthIssue' in message.mentalHealthAnalysis &&
+      message.mentalHealthAnalysis.hasMentalHealthIssue) ||
+      ('category' in message.mentalHealthAnalysis &&
+        (message.mentalHealthAnalysis.category as string) !== 'none'))
 
   const analysis = message.mentalHealthAnalysis as any
   const hasActivities = message.activities && message.activities.length > 0
@@ -131,7 +133,9 @@ export function ChatMessage({
             <div
               className='prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none'
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(simpleMarkdownToHtml(message.content)),
+                __html: DOMPurify.sanitize(
+                  simpleMarkdownToHtml(message.content),
+                ),
               }}
             />
           )}
@@ -141,7 +145,7 @@ export function ChatMessage({
           {hasActivities && (
             <button
               onClick={() => setShowThoughts(!showThoughts)}
-              className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 transition-colors'
+              className='text-blue-400 hover:text-blue-300 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors'
             >
               <Brain className='h-3 w-3' />
               {showThoughts ? 'Hide reasoning' : 'Show reasoning'}
@@ -163,8 +167,11 @@ export function ChatMessage({
 
       {/* Reasoning chain display */}
       {hasActivities && showThoughts && (
-        <div className='w-full max-w-[85%] animate-in fade-in slide-in-from-top-2 duration-300'>
-          <MultiAgentThoughtUI activities={message.activities!} className='mt-1 shadow-lg' />
+        <div className='animate-in fade-in slide-in-from-top-2 w-full max-w-[85%] duration-300'>
+          <MultiAgentThoughtUI
+            activities={message.activities!}
+            className='mt-1 shadow-lg'
+          />
         </div>
       )}
     </div>

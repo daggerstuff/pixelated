@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react'
 
-import offlineManager from "@/utils/offline/offlineManager";
-import { indexedDBRequestQueue } from "@/utils/offline/indexedDBRequestQueue";
+import { indexedDBRequestQueue } from '@/utils/offline/indexedDBRequestQueue'
+import offlineManager from '@/utils/offline/offlineManager'
 
-import { useOfflineDetection } from "./useOfflineDetection";
+import { useOfflineDetection } from './useOfflineDetection'
 
 export interface UseOfflineManagerOptions {
-  enableQueue?: boolean;
-  criticalPaths?: string[];
-  onRequestQueued?: (request: any) => void;
-  onSyncComplete?: () => void;
+  enableQueue?: boolean
+  criticalPaths?: string[]
+  onRequestQueued?: (request: any) => void
+  onSyncComplete?: () => void
 }
 
 /**
@@ -22,128 +22,132 @@ export function useOfflineManager({
   onRequestQueued,
   onSyncComplete,
 }: UseOfflineManagerOptions = {}) {
-  const networkState = useOfflineDetection();
-  const [queueStats, setQueueStats] = useState(() => indexedDBRequestQueue.getStats());
-  const [isSyncing, setIsSyncing] = useState(false);
+  const networkState = useOfflineDetection()
+  const [queueStats, setQueueStats] = useState(() =>
+    indexedDBRequestQueue.getStats(),
+  )
+  const [isSyncing, setIsSyncing] = useState(false)
 
   // Update queue stats
   const updateQueueStats = useCallback(() => {
-    setQueueStats(indexedDBRequestQueue.getStats());
-  }, []);
+    setQueueStats(indexedDBRequestQueue.getStats())
+  }, [])
 
   // Set up event listeners
   useEffect(() => {
-    const unsubscribeOnline = offlineManager.on("online", updateQueueStats);
-    const unsubscribeOffline = offlineManager.on("offline", updateQueueStats);
-    const unsubscribeSyncStart = offlineManager.on("syncStart", () => setIsSyncing(true));
-    const unsubscribeSyncComplete = offlineManager.on("syncComplete", () => {
-      setIsSyncing(false);
-      updateQueueStats();
-      onSyncComplete?.();
-    });
+    const unsubscribeOnline = offlineManager.on('online', updateQueueStats)
+    const unsubscribeOffline = offlineManager.on('offline', updateQueueStats)
+    const unsubscribeSyncStart = offlineManager.on('syncStart', () =>
+      setIsSyncing(true),
+    )
+    const unsubscribeSyncComplete = offlineManager.on('syncComplete', () => {
+      setIsSyncing(false)
+      updateQueueStats()
+      onSyncComplete?.()
+    })
 
     // Update stats periodically
-    const interval = setInterval(updateQueueStats, 1000);
+    const interval = setInterval(updateQueueStats, 1000)
 
     return () => {
-      unsubscribeOnline();
-      unsubscribeOffline();
-      unsubscribeSyncStart();
-      unsubscribeSyncComplete();
-      clearInterval(interval);
-    };
-  }, [updateQueueStats, onSyncComplete]);
+      unsubscribeOnline()
+      unsubscribeOffline()
+      unsubscribeSyncStart()
+      unsubscribeSyncComplete()
+      clearInterval(interval)
+    }
+  }, [updateQueueStats, onSyncComplete])
 
   // Enhanced fetch function that handles offline scenarios
   const offlineFetch = useCallback(
     async (url: string, options: RequestInit = {}) => {
-      const isEncryptedTransport = url.startsWith('https://');
-      const isCriticalPath = criticalPaths.some((path) => url.includes(path));
+      const isEncryptedTransport = url.startsWith('https://')
+      const isCriticalPath = criticalPaths.some((path) => url.includes(path))
 
       if (!isEncryptedTransport && isCriticalPath) {
         throw new Error(
           'Blocked unencrypted request to critical path — HTTPS required for PHI/EHR data (HIPAA)',
-        );
+        )
       }
 
       if (!enableQueue) {
-        return fetch(url, options);
+        return fetch(url, options)
       }
 
       try {
-        const response = await fetch(url, options);
+        const response = await fetch(url, options)
 
         if (response.ok) {
-          return response;
+          return response
         }
 
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       } catch (error: unknown) {
         if (!networkState.isOnline) {
           // Queue the request for later
-          const priority = isCriticalPath ? "critical" : "normal";
+          const priority = isCriticalPath ? 'critical' : 'normal'
 
           const queued = indexedDBRequestQueue.add({
             url,
-            method: (options.method as any) || "GET",
+            method: (options.method as any) || 'GET',
             headers: (options.headers as Record<string, string>) || {},
             body: options.body,
             priority,
             maxRetries: isCriticalPath ? 5 : 3,
-          });
+          })
 
           if (queued) {
             onRequestQueued?.({
               id: `req_${Date.now()}`,
               url,
-              method: (options.method as any) || "GET",
+              method: (options.method as any) || 'GET',
               headers: (options.headers as Record<string, string>) || {},
               body: options.body,
               timestamp: Date.now(),
               retryCount: 0,
               priority,
               maxRetries: isCriticalPath ? 5 : 3,
-            });
+            })
           }
 
           // Return a mock response indicating the request was queued
           return new Response(
             JSON.stringify({
-              error: "Request queued for offline sync",
+              error: 'Request queued for offline sync',
               queued: true,
               willRetry: true,
             }),
             {
               status: 202,
-              statusText: "Queued",
-              headers: { "Content-Type": "application/json" },
+              statusText: 'Queued',
+              headers: { 'Content-Type': 'application/json' },
             },
-          );
+          )
         }
 
-        throw error;
+        throw error
       }
     },
     [enableQueue, criticalPaths, networkState.isOnline, onRequestQueued],
-  );
+  )
 
   // Manual sync trigger
   const sync = useCallback(async () => {
-    if (!networkState.isOnline || !queueStats.total) return;
+    if (!networkState.isOnline || !queueStats.total) return
 
-    setIsSyncing(true);
+    setIsSyncing(true)
     try {
-      await offlineManager.sync();
+      await offlineManager.sync()
     } finally {
-      setIsSyncing(false);
+      setIsSyncing(false)
     }
-  }, [networkState.isOnline, queueStats.total]);
+  }, [networkState.isOnline, queueStats.total])
 
   // Clear all queued requests
   const clearQueue = useCallback(() => {
-    indexedDBRequestQueue.clear();
-    updateQueueStats();
-  }, [updateQueueStats]);
+    indexedDBRequestQueue.clear()
+    updateQueueStats()
+  }, [updateQueueStats])
 
   return {
     // Network state
@@ -162,9 +166,10 @@ export function useOfflineManager({
 
     // Utilities
     isOfflineMode:
-      networkState.isOffline || (networkState.isSlowConnection && networkState.saveData),
+      networkState.isOffline ||
+      (networkState.isSlowConnection && networkState.saveData),
     canMakeRequests: networkState.isOnline && !networkState.isSlowConnection,
-  };
+  }
 }
 
-export default useOfflineManager;
+export default useOfflineManager

@@ -42,7 +42,9 @@ jobs:
         id: trivy
         uses: aquasecurity/trivy-action@v0.36.0
         env:
-          NODE_OPTIONS: ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
+          NODE_OPTIONS:
+            ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
+            || '--no-deprecation' }}
         with:
           cache: 'false'
           scan-type: 'fs'

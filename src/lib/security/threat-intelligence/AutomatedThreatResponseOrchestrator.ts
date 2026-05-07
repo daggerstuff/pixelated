@@ -1436,7 +1436,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
 
       const byStatusMap = byStatus.reduce(
         (acc, item) => {
-          acc[item["_id"]] = item.count
+          acc[item['_id']] = item.count
           return acc
         },
         {} as Record<string, number>,
@@ -1444,7 +1444,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
 
       const byTypeMap = byType.reduce(
         (acc, item) => {
-          acc[item["_id"]] = item.count
+          acc[item['_id']] = item.count
           return acc
         },
         {} as Record<string, number>,

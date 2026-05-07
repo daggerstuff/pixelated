@@ -6,8 +6,6 @@
   "failed": 3,
   "skipped_existing": 0,
   "output_directory": "training/data/transcripts/YouTube_Mix",
-  "languages_attempted": [
-    "en"
-  ],
+  "languages_attempted": ["en"],
   "method": "selenium-undetected-chromedriver"
 }

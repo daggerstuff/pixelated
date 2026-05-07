@@ -1,10 +1,10 @@
-import type { AuditLog } from '../types'
 import {
   detectHighFrequency,
   detectOddHours,
   detectSensitiveAccess,
   detectUnusualPatterns,
 } from '../analysis'
+import type { AuditLog } from '../types'
 
 describe('Audit Analysis', () => {
   const baseLog: Omit<AuditLog, 'timestamp' | 'userId'> = {
