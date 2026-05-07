@@ -4,4 +4,4 @@
 
 ## 2026-04-19 - Dynamic aria-labels in Admin Lists | Learning: Repeated icon and text buttons inside loops create ambiguous announcements for screen reader users. | Action: Use loop variables to provide specific, dynamically generated aria-labels (e.g., `Edit ${item.name}`).
 
-## 2026-05-18 - Checkbox Accessibility | Learning: Checkboxes with secondary text require aria-describedby for proper screen reader announcement. | Action: Added aria-describedby prop support to Checkbox component.
+## 2026-04-30 - Checkbox Accessibility | Learning: Checkboxes with secondary text require aria-describedby for proper screen reader announcement. | Action: Added aria-describedby prop support to Checkbox component.
