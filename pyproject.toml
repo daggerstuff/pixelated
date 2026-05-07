@@ -123,6 +123,7 @@ dependencies = [
   "semgrep>=1.79.0",
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
+  "undetected-chromedriver>=3.5.5",
 ]
 [project.optional-dependencies]
 test = [

@@ -8,6 +8,3 @@
 [submodule "foresight-mcp"]
 	path = foresight-mcp
 	url = https://github.com/daggerstuff/foresight-mcp.git
-[submodule "tinker-atropos"]
-	path = tinker-atropos
-	url = https://github.com/NousResearch/tinker-atropos.git
