@@ -18,7 +18,13 @@ describe('privacy utilities', () => {
     it('returns a correctly formatted ephemeral session ID', () => {
       const id = createEphemeralSessionId()
       expect(id.startsWith('sim_')).toBe(true)
-      expect(id.split('_').length).toBe(3)
+      const parts = id.split('_')
+      expect(parts.length).toBe(3)
+      expect(parts[1]?.length).toBeGreaterThan(0)
+      expect(parts[2]?.length).toBeGreaterThan(0)
+      // Check that the segments contain only alphanumeric characters (base36)
+      expect(/^[0-9a-z]+$/.test(parts[1] as string)).toBe(true)
+      expect(/^[0-9a-z]+$/.test(parts[2] as string)).toBe(true)
     })
   })
 
