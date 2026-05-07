@@ -1,6 +1,9 @@
 import { sequence, defineMiddleware } from 'astro:middleware'
 
-import { authenticateRequest, type AuthOptions } from './lib/auth/auth0-middleware'
+import {
+  authenticateRequest,
+  type AuthOptions,
+} from './lib/auth/auth0-middleware'
 import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
 import { securityHeaders } from './lib/middleware/securityHeaders'
@@ -14,7 +17,11 @@ interface RouteConfig extends AuthOptions {
 // Route authentication configuration
 // Defines which routes require authentication and what strategy/scopes to use
 const routeAuthConfig: RouteConfig[] = [
-  { pattern: /\/api\/v1\/(.*)/, strategy: 'either', requiredScopes: ['api:read'] },
+  {
+    pattern: /\/api\/v1\/(.*)/,
+    strategy: 'either',
+    requiredScopes: ['api:read'],
+  },
   { pattern: /\/api\/protected(.*)/, strategy: 'jwtOnly' },
   { pattern: /\/api\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research API endpoints
   { pattern: /\/api\/agent-notes(.*)/, strategy: 'jwtOnly' }, // Protect agent note collaboration APIs
@@ -36,7 +43,9 @@ function getRouteConfig(request: Request): RouteConfig | null {
       return null
     }
 
-    return routeAuthConfig.find((config) => config.pattern.test(pathname)) || null
+    return (
+      routeAuthConfig.find((config) => config.pattern.test(pathname)) || null
+    )
   } catch (err) {
     // If URL parsing fails, be conservative and treat as not protected
     // Log the error for observability without exposing PII

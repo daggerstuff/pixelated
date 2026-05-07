@@ -253,7 +253,9 @@ export const useJournalResearchWebSocket = ({
   const send = useCallback(
     (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
       if (data instanceof Blob) {
-        const blobUnsupportedError = new Error('Blob payloads are not supported')
+        const blobUnsupportedError = new Error(
+          'Blob payloads are not supported',
+        )
         onError?.(blobUnsupportedError)
         return
       }
@@ -266,7 +268,10 @@ export const useJournalResearchWebSocket = ({
           return data
         }
         if (ArrayBuffer.isView(data)) {
-          return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
+          return data.buffer.slice(
+            data.byteOffset,
+            data.byteOffset + data.byteLength,
+          )
         }
         return new TextEncoder().encode(String(data)).buffer
       })()

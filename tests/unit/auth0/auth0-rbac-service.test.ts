@@ -149,9 +149,10 @@ describe('Auth0 RBAC Service', () => {
       expect(mockManagementClient.getRoles).toHaveBeenCalledWith({
         name_filter: 'therapist',
       })
-      expect(mockManagementClient.assignRolestoUser).toHaveBeenCalledWith(
-        { id: 'auth0|user123', roles: ['role-id-123'] },
-      )
+      expect(mockManagementClient.assignRolestoUser).toHaveBeenCalledWith({
+        id: 'auth0|user123',
+        roles: ['role-id-123'],
+      })
     })
 
     it('should throw error when role is not found', async () => {
@@ -207,9 +208,10 @@ describe('Auth0 RBAC Service', () => {
       expect(mockManagementClient.getRoles).toHaveBeenCalledWith({
         name_filter: 'therapist',
       })
-      expect(mockManagementClient.removeRolesFromUser).toHaveBeenCalledWith(
-        { id: 'auth0|user123', roles: ['role-id-123'] },
-      )
+      expect(mockManagementClient.removeRolesFromUser).toHaveBeenCalledWith({
+        id: 'auth0|user123',
+        roles: ['role-id-123'],
+      })
     })
 
     it('should throw error when role is not found', async () => {

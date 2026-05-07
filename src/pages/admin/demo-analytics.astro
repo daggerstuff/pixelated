@@ -465,7 +465,8 @@ export const prerender = false // Enable SSR for real-time data
         const variantEvents = data.events.filter(
           (e: any) => e.ab_variant === variant,
         )
-        const sessions = new Set(variantEvents.map((e: any) => e.session_id)).size
+        const sessions = new Set(variantEvents.map((e: any) => e.session_id))
+          .size
         const conversions = variantEvents.filter(
           (e: any) => e.event === 'demo_cta_click',
         ).length

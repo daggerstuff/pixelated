@@ -71,7 +71,9 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
-          key: ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
+          key:
+            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
+            hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
@@ -99,7 +101,9 @@ jobs:
         id: trivy_scan
         uses: aquasecurity/trivy-action@v0.36.0
         env:
-          NODE_OPTIONS: ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
+          NODE_OPTIONS:
+            ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
+            || '--no-deprecation' }}
         continue-on-error: true
         with:
           image-ref:
@@ -149,7 +153,9 @@ jobs:
           fi
 
       - name: Authenticate to Google Cloud (OIDC)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
@@ -157,18 +163,24 @@ jobs:
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
       - name: Configure Google Cloud SDK
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
         uses: google-github-actions/setup-gcloud@v3
         with:
           project_id: ${{ secrets['GCP_PROJECT_ID'] }}
 
       - name: Authenticate Docker to Artifact Registry
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
         run: |
           gcloud auth configure-docker "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev" --quiet
 
       - name: Push Docker image to Google Artifact Registry
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
         env:
           GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
         run: |

@@ -6,11 +6,11 @@ import express from 'express'
 import Redis from 'ioredis'
 import { Pool } from 'pg'
 
+import authRoutes from './api/routes/auth'
+import projectsRoutes from './api/routes/projects'
 import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
-import authRoutes from './api/routes/auth'
-import projectsRoutes from './api/routes/projects'
 
 const app = express()
 const server = createServer(app)
@@ -118,6 +118,5 @@ if (!isTest) {
     console.log(`Health check available at http://localhost:${PORT}/health`)
   })
 }
-
 
 export { app, socketService, db, redis }

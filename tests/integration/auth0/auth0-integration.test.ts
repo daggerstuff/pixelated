@@ -460,9 +460,7 @@ describe('Auth0 Integration Tests', () => {
         appMetadata: { roles: ['User'] },
         userMetadata: { role: 'user', created_at: expect.any(String) },
       })
-      expect(result.createdAt).toMatch(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
-      )
+      expect(result.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
       expect(result.userMetadata?.created_at).toMatch(
         /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
       )

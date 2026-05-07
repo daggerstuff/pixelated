@@ -162,5 +162,7 @@ export async function ensureTestResultsDir(subDir?: string) {
 }
 
 export function getLoginFormLocator(page: Page) {
-  return page.locator('[data-testid="login-form"], form[data-testid="login-form"]')
+  return page.locator(
+    '[data-testid="login-form"], form[data-testid="login-form"]',
+  )
 }

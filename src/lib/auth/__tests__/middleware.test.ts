@@ -1066,9 +1066,9 @@ describe('Authentication Middleware', () => {
 
       await authenticateRequest(mockRequest)
 
-      const loggedData = vi
-        .mocked(logSecurityEvent)
-        .mock.calls[0][2] as { clientInfo?: { ip?: string } }
+      const loggedData = vi.mocked(logSecurityEvent).mock.calls[0][2] as {
+        clientInfo?: { ip?: string }
+      }
 
       // IP should be masked or not included
       if (loggedData.clientInfo) {

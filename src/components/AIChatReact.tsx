@@ -56,7 +56,7 @@ export default function AIChatReact({
         const assistantMessage: Message = {
           id: generateId(), // Generate unique ID
           role: 'assistant',
-          content: `I'm a demo AI assistant using ${selectedModel}. You said: "${userMessage.content}". In a real implementation, this would connect to the TogetherAI API.`,
+          content: `I'm a demo AI assistant using ${selectedModel}. You said: "${userMessage.content}". In a real implementation, this would connect to the LLM API.`,
         }
 
         setMessages((prev) => [...prev, assistantMessage])

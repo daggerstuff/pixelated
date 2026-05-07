@@ -134,15 +134,13 @@ export class AuditLoggingService {
     }
   }
 
-  async queryLogs(
-    _filters: {
-      startDate?: Date
-      endDate?: Date
-      eventType?: string
-      userId?: string
-      status?: 'success' | 'failure'
-    },
-  ): Promise<AuditLogEntry[]> {
+  async queryLogs(_filters: {
+    startDate?: Date
+    endDate?: Date
+    eventType?: string
+    userId?: string
+    status?: 'success' | 'failure'
+  }): Promise<AuditLogEntry[]> {
     // Implement your log querying mechanism here
     console.debug('queryLogs called with filters:', _filters)
     throw new Error('Log querying not implemented')

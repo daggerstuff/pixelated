@@ -2480,7 +2480,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             <div className='text-green-600 text-2xl font-bold'>
               {((summary.complianceScore ?? 0) * 100).toFixed(1)}%
             </div>
-            <Progress value={(summary.complianceScore ?? 0) * 100} className='mt-2' />
+            <Progress
+              value={(summary.complianceScore ?? 0) * 100}
+              className='mt-2'
+            />
           </CardContent>
         </Card>
       </div>

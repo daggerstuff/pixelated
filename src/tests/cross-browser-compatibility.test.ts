@@ -127,24 +127,32 @@ testGroup('Cross-Browser Compatibility', () => {
     console.log('📱 Testing responsive navigation - Desktop mode...')
     // Test responsive navigation - Desktop
     await page.setViewportSize({ width: 768, height: 1024 })
-    const desktopNavVisible = await page.locator('nav.marketing-nav__links').isVisible()
+    const desktopNavVisible = await page
+      .locator('nav.marketing-nav__links')
+      .isVisible()
     expect(desktopNavVisible).toBe(true)
     console.log('  ✓ Desktop navigation visible')
 
     // Hamburger should be hidden on desktop
-    const hamburgerHiddenDesktop = await page.locator('#mobile-menu-button').isVisible()
+    const hamburgerHiddenDesktop = await page
+      .locator('#mobile-menu-button')
+      .isVisible()
     expect(hamburgerHiddenDesktop).toBe(false)
     console.log('  ✓ Hamburger menu hidden on desktop')
 
     console.log('📱 Testing responsive navigation - Mobile mode...')
     // Test responsive navigation - Mobile
     await page.setViewportSize({ width: 375, height: 667 })
-    const desktopNavHidden = await page.locator('nav.marketing-nav__links').isHidden()
+    const desktopNavHidden = await page
+      .locator('nav.marketing-nav__links')
+      .isHidden()
     expect(desktopNavHidden).toBe(true)
     console.log('  ✓ Mobile navigation hidden by default')
 
     // Hamburger should be visible on mobile
-    const hamburgerVisibleMobile = await page.locator('#mobile-menu-button').isVisible()
+    const hamburgerVisibleMobile = await page
+      .locator('#mobile-menu-button')
+      .isVisible()
     expect(hamburgerVisibleMobile).toBe(true)
     console.log('  ✓ Hamburger menu visible on mobile')
 
