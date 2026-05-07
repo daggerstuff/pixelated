@@ -36,11 +36,9 @@ export default function SearchDemoReact() {
         />
       </div>
 
-      {lastQuery && (
-        <div className='text-gray-500 dark:text-gray-400 mt-4 text-sm' role='status' aria-live='polite'>
-          Found {resultCount} results for &ldquo;{lastQuery}&rdquo;
-        </div>
-      )}
+      <div className='text-gray-500 dark:text-gray-400 mt-4 text-sm' role='status' aria-live='polite' aria-atomic='true'>
+        {lastQuery ? `Found ${resultCount} results for "${lastQuery}"` : ''}
+      </div>
 
       {selectedResult && (
         <div className='border-gray-200 dark:border-gray-700 mt-6 border-t pt-4'>
