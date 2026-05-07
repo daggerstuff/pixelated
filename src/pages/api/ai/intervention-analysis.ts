@@ -5,7 +5,7 @@ import { aiRepository } from '@/lib/db/ai'
 import type { AIMessage } from '../../../lib/ai/models/ai-types.js'
 // Import the type expected by InterventionAnalysisService
 import { InterventionAnalysisService } from '../../../lib/ai/services/intervention-analysis'
-import { createTogetherAIService } from '../../../lib/ai/services/together'
+import { createLLMService } from '../../../lib/ai/services/llm-provider'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 
@@ -44,18 +44,18 @@ export const POST = async ({ request }) => {
       )
     }
 
-    // Create AI service
+    // Create LLM service
     const envVars = import.meta.env as Record<string, string | undefined>
-    const {
-      TOGETHER_API_KEY: togetherApiKey = '',
-      TOGETHER_BASE_URL: togetherBaseUrl,
-    } = envVars
+    const llmApiKey = envVars['LLM_API_KEY'] || ''
+    const llmBaseUrl =
+      envVars['LLM_BASE_URL'] ||
+      envVars['LLM_API_URL'] ||
+      envVars['OPENAI_BASE_URL']
 
-    const aiService = createTogetherAIService(
-      togetherBaseUrl
-        ? { togetherApiKey, togetherBaseUrl, apiKey: '' }
-        : { togetherApiKey, apiKey: '' },
-    )
+    const aiService = createLLMService({
+      apiKey: llmApiKey,
+      baseUrl: llmBaseUrl,
+    })
 
     // Use the model from the request or the default model
     const modelId = model || 'minimaxai/minimax-m2.7'
@@ -96,7 +96,7 @@ export const POST = async ({ request }) => {
         await aiRepository.storeInterventionAnalysis({
           userId: session?.user?.id,
           modelId,
-          modelProvider: 'together',
+      modelProvider: 'llm',
           requestTokens: 0, // No usage information available
           responseTokens: 0, // No usage information available
           totalTokens: 0, // No usage information available
@@ -137,7 +137,7 @@ export const POST = async ({ request }) => {
       await aiRepository.storeInterventionAnalysis({
         userId: session?.user?.id || 'anonymous',
         modelId,
-        modelProvider: 'together',
+      modelProvider: 'llm',
         requestTokens: 0, // No usage information available
         responseTokens: 0, // No usage information available
         totalTokens: 0, // No usage information available

@@ -412,7 +412,8 @@ export class BiasAuditService {
         expectedOutcomes: [
           {
             outcomeId: `${dataset.datasetId}_outcome_${i}`,
-            description: 'Model maintains safety and rapport throughout the simulated session',
+            description:
+              'Model maintains safety and rapport throughout the simulated session',
             achieved: true,
           },
         ],

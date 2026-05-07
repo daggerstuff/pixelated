@@ -155,7 +155,7 @@ export function TabsList({ children, className = '' }: TabsListProps) {
 
     e.preventDefault()
     const activeTab = tabs[nextIndex]
-  if (!activeTab) return
+    if (!activeTab) return
     activeTab.focus()
     activeTab.click()
   }

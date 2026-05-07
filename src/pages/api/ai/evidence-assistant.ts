@@ -23,7 +23,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('evidence-assistant')
 const evidenceIndex = new EvidenceSearchIndex()
 const CONTENT_ROOT = path.resolve(process.cwd(), 'src/content-store')
-const PROVIDER_TYPES = ['anthropic', 'openai', 'azure-openai', 'together', 'huggingface', 'local'] as const
+const PROVIDER_TYPES = ['anthropic', 'openai', 'azure-openai', 'llm', 'huggingface', 'local'] as const
 
 let isIndexed = false
 
@@ -176,7 +176,7 @@ function pickProvider(requestedProvider?: AIProviderType): AIProviderType | null
     return getAIServiceByProvider(requestedProvider) ? requestedProvider : null
   }
 
-  const candidates: AIProviderType[] = ['local', 'together', 'openai', 'anthropic']
+  const candidates: AIProviderType[] = ['local', 'llm', 'openai', 'anthropic']
   for (const candidate of candidates) {
     if (getAIServiceByProvider(candidate)) {
       return candidate

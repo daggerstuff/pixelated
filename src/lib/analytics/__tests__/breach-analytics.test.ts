@@ -1,3 +1,5 @@
+import { type Mock } from 'vitest'
+
 import * as BreachAnalytics from '@/lib/analytics/breach-analytics'
 /// <reference types="vitest/globals" />
 import * as ComplianceMetrics from '@/lib/analytics/compliance'
@@ -9,7 +11,6 @@ import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
 import { redis } from '@/lib/redis'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
-import { type Mock } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/lib/redis', () => ({

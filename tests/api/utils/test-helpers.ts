@@ -1,6 +1,6 @@
+import type { Express } from 'express'
 // Test utilities for API integration tests
 import request from 'supertest'
-import type { Express } from 'express'
 
 interface TestUser {
   email: string
@@ -28,13 +28,13 @@ export async function createTestUserForTest(
     name: 'Test User',
   }
   const user = { ...defaultUser, ...userData }
-  
+
   // For OAuth-based auth, we simulate an authenticated session
   // by generating a mock token. In real tests, you'd use actual OAuth tokens.
   const mockToken = `mock-token-${Date.now()}-${Math.random().toString(36).substring(7)}`
   const mockUserId = `user-${Date.now()}`
-  
-  return { 
+
+  return {
     token: mockToken,
     userId: mockUserId,
   }
@@ -105,7 +105,10 @@ export function createMockRequest(overrides?: Partial<Request>): Request {
 /**
  * Create mock Express response
  */
-export function createMockResponse(): Response & { _json: any; _status: number } {
+export function createMockResponse(): Response & {
+  _json: any
+  _status: number
+} {
   const res = {
     _status: 200,
     _json: null,

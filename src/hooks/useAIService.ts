@@ -1,16 +1,20 @@
 import { useCallback } from 'react'
 
 import type { AIMessage, AIServiceOptions } from '@/lib/ai/models/ai-types'
-import { createTogetherAIService } from '@/lib/ai/services/together'
+import { createLLMService } from '@/lib/ai/services/llm-provider'
 
 export function useAIService() {
   const getAIResponse = useCallback(
     async (prompt: string, options?: AIServiceOptions) => {
       try {
-        // Create AI service with Together provider
-        const aiService = createTogetherAIService({
-          togetherApiKey: process.env['TOGETHER_API_KEY'] || '',
-          apiKey: process.env['TOGETHER_API_KEY'] || '',
+        // Create AI service
+        const aiService = createLLMService({
+          apiKey: process.env['LLM_API_KEY'] || '',
+          baseUrl:
+            process.env['LLM_BASE_URL'] ||
+            process.env['LLM_API_URL'] ||
+            process.env['OPENAI_BASE_URL'] ||
+            '',
         })
 
         // Format the prompt as a message

@@ -49,7 +49,9 @@ jobs:
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         uses: aquasecurity/trivy-action@v0.36.0
         env:
-          NODE_OPTIONS: ${{ env.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
+          NODE_OPTIONS:
+            ${{ env.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
+            || '--no-deprecation' }}
         with:
           cache: 'false'
           scan-type: fs
@@ -195,8 +197,8 @@ jobs:
       redis:
         image: redis:7
         options: >-
-          --health-cmd "redis-cli -a redis-ci-password ping | grep -q PONG" --health-interval 10s --health-timeout
-          5s --health-retries 5
+          --health-cmd "redis-cli -a redis-ci-password ping | grep -q PONG"
+          --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 6379:6379
     steps:
@@ -308,11 +310,17 @@ jobs:
       - name: Sync CI constraints from pinned requirements
         run: |
           cd src/lib/ai/bias-detection/python-service
+          REQUIREMENTS_FILE="../requirements.txt"
+          if [ ! -f "${REQUIREMENTS_FILE}" ]; then
+            echo "Error: ${REQUIREMENTS_FILE} not found"
+            ls -la ../
+            exit 1
+          fi
           python - <<'PY'
           import re
           from pathlib import Path
 
-          req_text = Path("requirements.txt").read_text().splitlines()
+          req_text = Path("../requirements.txt").read_text().splitlines()
           wanted = {}
           for line in req_text:
               m = re.match(r"^([A-Za-z0-9_.-]+)==([^\s#]+)", line.strip())
@@ -364,7 +372,7 @@ jobs:
           uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
           # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
           uv pip install ${USE_SYSTEM} --only-binary=:all: -c constraints-ci.txt numpy pandas
-          uv pip install ${USE_SYSTEM} -r requirements.txt -c constraints-ci.txt
+          uv pip install ${USE_SYSTEM} -r ../requirements.txt -c constraints-ci.txt
           uv pip install ${USE_SYSTEM} pytest pytest-cov pytest-asyncio httpx
 
       - name: Run Python linting
@@ -479,11 +487,17 @@ jobs:
       - name: Sync CI constraints from pinned requirements
         run: |
           cd src/lib/ai/bias-detection/python-service
+          REQUIREMENTS_FILE="../requirements.txt"
+          if [ ! -f "${REQUIREMENTS_FILE}" ]; then
+            echo "Error: ${REQUIREMENTS_FILE} not found"
+            ls -la ../
+            exit 1
+          fi
           python - <<'PY'
           import re
           from pathlib import Path
 
-          req_text = Path("requirements.txt").read_text().splitlines()
+          req_text = Path("../requirements.txt").read_text().splitlines()
           wanted = {}
           for line in req_text:
               m = re.match(r"^([A-Za-z0-9_.-]+)==([^\s#]+)", line.strip())
@@ -516,7 +530,7 @@ jobs:
           uv pip install ${USE_SYSTEM} --upgrade pip setuptools wheel
           # Constrain numpy/pandas to compatible binaries to avoid ABI mismatch
           uv pip install ${USE_SYSTEM} --only-binary=:all: -c constraints-ci.txt numpy pandas
-          uv pip install ${USE_SYSTEM} -r requirements.txt -c constraints-ci.txt
+          uv pip install ${USE_SYSTEM} -r ../requirements.txt -c constraints-ci.txt
 
       - name: Setup test database
         run: |

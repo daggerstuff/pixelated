@@ -186,12 +186,15 @@ export class AlphaVantageService {
       const cached = this.getFromCache<AlphaVantageQuote>(cacheKey)
       if (cached) return cached
 
-      const response = await this.client.get<AlphaVantageGlobalQuoteResponse>('', {
-        params: {
-          function: 'GLOBAL_QUOTE',
-          symbol: symbol.toUpperCase(),
+      const response = await this.client.get<AlphaVantageGlobalQuoteResponse>(
+        '',
+        {
+          params: {
+            function: 'GLOBAL_QUOTE',
+            symbol: symbol.toUpperCase(),
+          },
         },
-      })
+      )
 
       const quote = response.data['Global Quote']
       const resolvedSymbol = toDisplayString(quote?.['01. symbol'])
@@ -326,15 +329,18 @@ export class AlphaVantageService {
           break
       }
 
-      const response = await this.client.get<AlphaVantageTechnicalResponse>('', {
-        params: {
-          function: functionType,
-          symbol: symbol.toUpperCase(),
-          interval,
-          time_period: timePeriod,
-          series_type: 'close',
+      const response = await this.client.get<AlphaVantageTechnicalResponse>(
+        '',
+        {
+          params: {
+            function: functionType,
+            symbol: symbol.toUpperCase(),
+            interval,
+            time_period: timePeriod,
+            series_type: 'close',
+          },
         },
-      })
+      )
 
       const dataKey = `Technical Analysis: ${indicator}`
       const data = response.data[dataKey]
@@ -346,8 +352,8 @@ export class AlphaVantageService {
         return []
       }
 
-      const indicators: TechnicalIndicator[] = Object.entries(data).map(
-        ([date, values]) => {
+      const indicators: TechnicalIndicator[] = Object.entries(data)
+        .map(([date, values]) => {
           if (!isRecord(values)) return null
 
           const valueKey = isRecord(values)
@@ -356,12 +362,10 @@ export class AlphaVantageService {
               : indicator
             : indicator
           const fallbackValue = isRecord(values)
-            ? values['SMA'] ?? values['EMA'] ?? values['RSI']
+            ? (values['SMA'] ?? values['EMA'] ?? values['RSI'])
             : undefined
           const value = parseNumber(
-            isRecord(values)
-              ? values[valueKey] ?? fallbackValue
-              : undefined,
+            isRecord(values) ? (values[valueKey] ?? fallbackValue) : undefined,
           )
 
           return {
@@ -369,8 +373,7 @@ export class AlphaVantageService {
             date,
             value,
           }
-        },
-      )
+        })
         .filter((item): item is TechnicalIndicator => item !== null)
 
       this.setCache(cacheKey, indicators)
@@ -458,18 +461,16 @@ export class AlphaVantageService {
 
       const rawData = response.data.feed
       const data = Array.isArray(rawData) ? rawData : []
-      const sentiments = data
-        .filter(isRecord)
-        .map(
-          (item): NewsSentiment => ({
-            title: toDisplayString(item['title']),
-            url: toDisplayString(item['url']),
-            summary: toDisplayString(item['summary']),
-            sentiment: parseSentiment(item['overall_sentiment_label']),
-            relevance: parseNumber(item['relevance_score']),
-            timePublished: toDisplayString(item['time_published']),
-          }),
-        )
+      const sentiments = data.filter(isRecord).map(
+        (item): NewsSentiment => ({
+          title: toDisplayString(item['title']),
+          url: toDisplayString(item['url']),
+          summary: toDisplayString(item['summary']),
+          sentiment: parseSentiment(item['overall_sentiment_label']),
+          relevance: parseNumber(item['relevance_score']),
+          timePublished: toDisplayString(item['time_published']),
+        }),
+      )
 
       this.setCache(cacheKey, sentiments)
       return sentiments
@@ -500,17 +501,15 @@ export class AlphaVantageService {
 
       const rawData = response.data.quarterlyEarnings
       const data = Array.isArray(rawData) ? rawData : []
-      const earnings = data
-        .filter(isRecord)
-        .map(
-          (item): QuarterlyEarnings => ({
-            fiscalDateEnding: String(item['fiscalDateEnding'] ?? ''),
-            reportedEPS: parseNumber(item['reportedEPS']),
-            estimatedEPS: parseNumber(item['estimatedEPS']),
-            surprise: parseNumber(item['surprise']),
-            surprisePercentage: parseNumber(item['surprisePercentage']),
-          }),
-        )
+      const earnings = data.filter(isRecord).map(
+        (item): QuarterlyEarnings => ({
+          fiscalDateEnding: String(item['fiscalDateEnding'] ?? ''),
+          reportedEPS: parseNumber(item['reportedEPS']),
+          estimatedEPS: parseNumber(item['estimatedEPS']),
+          surprise: parseNumber(item['surprise']),
+          surprisePercentage: parseNumber(item['surprisePercentage']),
+        }),
+      )
 
       this.setCache(cacheKey, earnings)
       return earnings

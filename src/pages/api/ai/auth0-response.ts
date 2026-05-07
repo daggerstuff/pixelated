@@ -8,7 +8,7 @@ import type {
   TherapeuticResponse,
 } from '@/lib/ai/models/ai-types'
 import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
-import { createTogetherAIService } from '@/lib/ai/services/together'
+import { createLLMService } from '@/lib/ai/services/llm-provider'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { aiRepository } from '@/lib/db/ai'
@@ -185,12 +185,14 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    // Create Together AI service
-    const togetherService = createTogetherAIService({
-      togetherApiKey: import.meta.env['TOGETHER_API_KEY'] || '',
-      togetherBaseUrl:
-        import.meta.env['TOGETHER_BASE_URL'] || 'https://api.together.xyz',
-      apiKey: '',
+    // Create LLM service
+    const llmService = createLLMService({
+      apiKey:
+        import.meta.env['LLM_API_KEY'] || '',
+      baseUrl:
+        import.meta.env['LLM_BASE_URL'] ||
+        import.meta.env['LLM_API_URL'] ||
+        import.meta.env['OPENAI_BASE_URL'],
     })
 
     // Use the model from the request or the default
@@ -202,12 +204,12 @@ export const POST: APIRoute = async ({ request }) => {
         messages: AIMessage[],
         options?: AIServiceOptions,
       ) => {
-        const response = await togetherService.generateCompletion(
+        const response = await llmService.generateCompletion(
           messages,
           options,
         )
         return {
-          id: `together${Date.now()}`,
+          id: `llm-${Date.now()}`,
           created: Date.now(),
           model: options?.model || modelId,
           choices: [
@@ -248,7 +250,7 @@ export const POST: APIRoute = async ({ request }) => {
                   completionTokens: 0,
                   totalTokens: 0,
                 },
-          provider: 'together',
+          provider: 'llm',
           content:
             typeof response === 'object' &&
             response !== null &&
@@ -264,7 +266,7 @@ export const POST: APIRoute = async ({ request }) => {
         const generator = async function* () {
           // Minimal implementation - streaming not fully supported
           yield {
-            id: `together_${Date.now()}`,
+            id: `llm_${Date.now()}`,
             model: options?.model || modelId,
             created: Date.now(),
             content: '',
@@ -277,7 +279,7 @@ export const POST: APIRoute = async ({ request }) => {
       getModelInfo: (model: string) => ({
         id: model,
         name: model,
-        provider: 'together',
+          provider: 'llm',
         capabilities: ['chat'],
         contextWindow: 8192,
         maxTokens: 8192,
@@ -286,12 +288,12 @@ export const POST: APIRoute = async ({ request }) => {
         messages: AIMessage[],
         options?: AIServiceOptions,
       ) => {
-        const response = await togetherService.generateCompletion(
+        const response = await llmService.generateCompletion(
           messages,
           options,
         )
         return {
-          id: `together${Date.now()}`,
+          id: `llm-${Date.now()}`,
           created: Date.now(),
           model: options?.model || modelId,
           choices: [
@@ -332,7 +334,7 @@ export const POST: APIRoute = async ({ request }) => {
                   completionTokens: 0,
                   totalTokens: 0,
                 },
-          provider: 'together',
+          provider: 'llm',
           content:
             typeof response === 'object' &&
             response !== null &&
@@ -343,7 +345,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
       // generateCompletion is not required for this adapter in current usage. Omitting to simplify typing.
       dispose: () => {
-        togetherService.dispose()
+        llmService.dispose()
       },
     }
 
@@ -392,7 +394,7 @@ export const POST: APIRoute = async ({ request }) => {
     apiMetrics.responseTime(endpoint, latencyMs, 'POST')
     countMetric('ai.response.generated', 1, {
       model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      provider: 'together',
+      provider: 'llm',
       success: true,
     })
 
@@ -400,7 +402,7 @@ export const POST: APIRoute = async ({ request }) => {
     await aiRepository.storeResponseGeneration({
       userId: userId || 'anonymous',
       modelId: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      modelProvider: 'together',
+      modelProvider: 'llm',
       latencyMs,
       success: true,
       error: null,

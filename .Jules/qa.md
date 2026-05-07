@@ -1,9 +1,17 @@
 ## 2026-04-14 - QA: Added tests for createPrivacyHash edge case | Pattern: Using `replace_with_git_merge_diff` to inject tests into pre-existing describe blocks where testing gaps exist. | Action: Ensure edge cases like empty inputs are systematically tested.
+
 ## 2026-04-15 - access-control testing | Pattern: Mocking internal dependencies to resolve vite config import errors | Action: Use `vi.mock` with explicit relative path to replace module that has broken aliased imports
+
 ## 2026-04-17 - Add comprehensive test suite for Express error-handler | Pattern: When testing Express asyncHandler wrappers, the wrapped function executes asynchronously but the wrapper itself may return a non-promise or a promise that is not easily awaited in the test. To properly assert on the `next()` callback, await `process.nextTick` to flush microtasks. | Action: Use `await new Promise((resolve) => process.nextTick(resolve))` after invoking the wrapped handler to ensure asynchronous errors are caught and passed to next before making assertions.
+
 ## 2026-04-18 - QA: Add test for template edge case | Pattern: Mocking internal loggers and testing HTML string outputs | Action: Ensure edge cases like empty objects are systematically tested.
+
 ## 2026-04-19 - QA: Add test for isPartialBiasDashboardSummary | Pattern: Finding untested utility functions (like type guards) and creating new targeted test files specifically for them under `__tests__` directory. | Action: Ensure the new test file fully isolates its test logic, covers both positive and negative cases, and passes verification using localized execution `npx vitest run <file>`.
+
 ## 2026-04-26 - Fix localStorage tests in jsdom | Pattern: When using jsdom in Vitest, spying on window.localStorage may fail to intercept direct localStorage calls. | Action: Use vi.spyOn(Storage.prototype, 'getItem') to properly intercept these methods.
+
 ## 2026-04-27 - QA: Add test for analyzeTherapeuticTechniques edge case | Pattern: Finding untested utility functions lacking a .test.ts file and creating isolated tests. | Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution node ./scripts/testing/local-test-runner.cjs.
+
 ## 2026-04-28 - QA: Add test for getRecommendedScenario edge case | Pattern: Finding untested branches in utility functions and adding targeted tests. | Action: Ensure both positive and negative branches for scenario recommendation are systematically tested.
-## 2026-04-29 - QA: Fix privacy.test.ts jsdom environment | Pattern: When a test uses browser globals like window.localStorage but the test environment lacks jsdom, Vitest will throw ReferenceError: window is not defined. Furthermore, spying on window.localStorage may fail to intercept direct localStorage calls. | Action: Add /** @vitest-environment jsdom */ at the top of the test file and use vi.spyOn(Storage.prototype, "getItem") to properly intercept these methods.
+
+## 2026-04-29 - QA: Fix privacy.test.ts jsdom environment | Pattern: When a test uses browser globals like window.localStorage but the test environment lacks jsdom, Vitest will throw ReferenceError: window is not defined. Furthermore, spying on window.localStorage may fail to intercept direct localStorage calls. | Action: Add /\*_ @vitest-environment jsdom _/ at the top of the test file and use vi.spyOn(Storage.prototype, "getItem") to properly intercept these methods.

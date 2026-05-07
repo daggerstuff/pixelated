@@ -11,6 +11,12 @@ interface Props {
 const { title, description, keywords, fullWidthMain = false } = Astro.props
 ---
 
-<BaseLayout {title} {description} {keywords} showBackLink={false} {fullWidthMain}>
+<BaseLayout
+  {title}
+  {description}
+  {keywords}
+  showBackLink={false}
+  {fullWidthMain}
+>
   <slot />
 </BaseLayout>

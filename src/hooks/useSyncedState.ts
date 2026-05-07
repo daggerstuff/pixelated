@@ -22,7 +22,12 @@ export interface UseSyncedStateOptions<T> {
    * - 'merge': Deep merge objects
    * - 'manual': Use onConflict callback
    */
-  conflictStrategy?: 'local-wins' | 'remote-wins' | 'remote' | 'merge' | 'manual'
+  conflictStrategy?:
+    | 'local-wins'
+    | 'remote-wins'
+    | 'remote'
+    | 'merge'
+    | 'manual'
   onSync?: (value: T, sourceTabId: string) => void
   /**
    * Conflict resolution handler.
@@ -75,7 +80,9 @@ class SyncLifecycleManager<T> {
     this.instanceId = instanceId
     this.key = options.key
     this.enableSync = options.enableSync ?? true
-    this.conflictStrategy = this.resolveConflictStrategy(options.conflictStrategy)
+    this.conflictStrategy = this.resolveConflictStrategy(
+      options.conflictStrategy,
+    )
     this.defaultValue = options.defaultValue
     this.debounceMs = options.debounceMs ?? 300
     this.storageOptions = storageOptions
@@ -99,7 +106,9 @@ class SyncLifecycleManager<T> {
   ) {
     this.key = options.key
     this.enableSync = options.enableSync ?? true
-    this.conflictStrategy = this.resolveConflictStrategy(options.conflictStrategy)
+    this.conflictStrategy = this.resolveConflictStrategy(
+      options.conflictStrategy,
+    )
     this.defaultValue = options.defaultValue
     this.debounceMs = options.debounceMs ?? 300
     this.storageOptions = storageOptions
@@ -202,11 +211,7 @@ class SyncLifecycleManager<T> {
 
   private resolveConflictStrategy(
     strategy?: UseSyncedStateOptions<T>['conflictStrategy'],
-  ):
-    | 'local-wins'
-    | 'remote-wins'
-    | 'merge'
-    | 'manual' {
+  ): 'local-wins' | 'remote-wins' | 'merge' | 'manual' {
     if (!strategy || strategy === 'remote' || strategy === 'remote-wins') {
       return 'remote-wins'
     }

@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk } from './models/ai-types'
-import { createTogetherAIService } from './services/together'
+import { createLLMService } from './services/llm-provider'
 
 const appLogger = createBuildSafeLogger('ai-providers')
 
@@ -9,7 +9,7 @@ export type AIProviderType =
   | 'anthropic'
   | 'openai'
   | 'azure-openai'
-  | 'together'
+  | 'llm'
   | 'huggingface'
   | 'local'
 
@@ -56,9 +56,8 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
     defaultModel: 'gpt-4',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
-  together: {
-    name: 'Together AI',
-    baseUrl: 'https://api.together.xyz',
+  llm: {
+    name: 'LLM API',
     defaultModel: 'minimaxai/minimax-m2.7',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
@@ -81,12 +80,17 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
  */
 export function initializeProviders() {
   try {
-    // Together AI (primary provider)
-    const togetherApiKey = getEnvVar('TOGETHER_API_KEY')
-    if (togetherApiKey) {
-      providers.set('together', {
-        ...defaultConfigs.together,
-        apiKey: togetherApiKey,
+    // Primary LLM provider key
+    const providerApiKey = getEnvVar('LLM_API_KEY')
+    const providerBaseUrl =
+      getEnvVar('LLM_BASE_URL') ||
+      getEnvVar('LLM_API_URL') ||
+      getEnvVar('OPENAI_BASE_URL')
+    if (providerApiKey && providerBaseUrl) {
+      providers.set('llm', {
+        ...defaultConfigs.llm,
+        apiKey: providerApiKey,
+        ...(providerBaseUrl ? { baseUrl: providerBaseUrl } : {}),
       } as AIProviderConfig)
     }
 
@@ -164,8 +168,8 @@ export function getAIServiceByProvider(
 
     let service: AIService | null = null
     switch (providerType) {
-      case 'together':
-        service = createTogetherServiceAdapter(config)
+      case 'llm':
+        service = createLLMServiceAdapter(config)
         break
       case 'anthropic':
         service = createAnthropicServiceAdapter(config)
@@ -222,33 +226,32 @@ export function getProviderConfig(
 
 // Provider-specific service adapters
 
-function createTogetherServiceAdapter(config: AIProviderConfig): AIService {
-  const togetherService = createTogetherAIService({
-    togetherApiKey: config.apiKey,
+function createLLMServiceAdapter(config: AIProviderConfig): AIService {
+  const llmService = createLLMService({
     apiKey: config.apiKey,
-    ...(config.baseUrl ? { togetherBaseUrl: config.baseUrl } : {}),
+    ...(config.baseUrl ? { baseUrl: config.baseUrl } : {}),
   })
 
   return {
     createChatCompletion: async (messages, options) => {
-      return (await togetherService.generateCompletion(
+      return (await llmService.generateCompletion(
         messages,
         options,
       )) as AICompletion
     },
     createStreamingChatCompletion: async (_messages, _options) =>
       Promise.reject(
-        new Error('Streaming not implemented for Together AI'),
+        new Error('Streaming not implemented for LLM service'),
       ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
-      provider: 'together',
+      provider: 'llm',
       capabilities: config.capabilities,
       contextWindow: 8192,
       maxTokens: 8192,
     }),
-    dispose: togetherService.dispose.bind(togetherService),
+    dispose: llmService.dispose.bind(llmService),
   }
 }
 

@@ -4,14 +4,18 @@ description: Therapeutic responses for dissociation cases
 columns:
   - name: instruction
     column_type: llm-text
-    prompt: "A client describes experiencing dissociation. How should a therapist respond with validation and grounding techniques?"
+    prompt:
+      'A client describes experiencing dissociation. How should a therapist
+      respond with validation and grounding techniques?'
     model_alias: nvidia-text
 
   - name: output
     column_type: llm-text
-    prompt: "Provide a clinically appropriate, empathetic therapeutic response to: {{instruction}}"
+    prompt:
+      'Provide a clinically appropriate, empathetic therapeutic response to:
+      {{instruction}}'
     model_alias: nvidia-text
 
   - name: category
     column_type: category
-    values: ["dissociation"]
+    values: ['dissociation']

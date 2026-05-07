@@ -1,10 +1,11 @@
 // Health Endpoints Test Suite
 // Tests for health check endpoints (basic, detailed, ready, live)
 
-import { describe, it, expect, beforeEach } from 'vitest'
-import request from 'supertest'
-import healthRoutes from '../health'
 import express from 'express'
+import request from 'supertest'
+import { describe, it, expect, beforeEach } from 'vitest'
+
+import healthRoutes from '../health'
 
 describe('Health Endpoints', () => {
   let app: express.Express
@@ -29,7 +30,9 @@ describe('Health Endpoints', () => {
     it('should include ISO timestamp', async () => {
       const response = await request(app).get('/')
 
-      expect(response.body.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
+      expect(response.body.timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+      )
     })
 
     it('should return environment information', async () => {

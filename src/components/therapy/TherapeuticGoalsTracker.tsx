@@ -136,9 +136,12 @@ export function TherapeuticGoalsTracker({
 
   // Handle category tab click
   // ⚡ Bolt: Memoize category selection handler to prevent unnecessary re-renders
-  const handleCategoryClick = useCallback((category: GoalCategory | 'all') => {
-    setActiveTab(category)
-  }, [setActiveTab])
+  const handleCategoryClick = useCallback(
+    (category: GoalCategory | 'all') => {
+      setActiveTab(category)
+    },
+    [setActiveTab],
+  )
 
   // Create a new goal
   async function createGoal(

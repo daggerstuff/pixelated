@@ -122,7 +122,9 @@ export function registerPIIMiddleware(
     if (app && typeof (app as any).use === 'function') {
       ;(app as any).use(middleware)
     } else {
-      logger.warn('Could not register PII middleware: app object lacks .use() method')
+      logger.warn(
+        'Could not register PII middleware: app object lacks .use() method',
+      )
     }
 
     logger.info('PII detection middleware registered')

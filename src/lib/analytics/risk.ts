@@ -92,8 +92,9 @@ const RISK_FACTORS: RiskFactor[] = [
     description: 'Frequency of similar breaches',
     calculateScore: async (breach: SecurityBreach): Promise<number> => {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-      const recentBreaches =
-        await (await getBreachDataService()).getBreachesSince(thirtyDaysAgo)
+      const recentBreaches = await (
+        await getBreachDataService()
+      ).getBreachesSince(thirtyDaysAgo)
       const similarBreaches = recentBreaches.filter(
         (b: SecurityBreach) => b.attackVector === breach.attackVector,
       )

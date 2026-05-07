@@ -59,7 +59,11 @@ const SourceSelector = React.memo(function SourceSelector({
     (selectedSources.includes('all') && source === 'all')
 
   return (
-    <div className='flex flex-wrap justify-center gap-2' role='group' aria-label='Filter by source'>
+    <div
+      className='flex flex-wrap justify-center gap-2'
+      role='group'
+      aria-label='Filter by source'
+    >
       <button
         className={`source-chip ${isSelected('all') ? 'active' : ''}`}
         onClick={() => toggleSource('all')}

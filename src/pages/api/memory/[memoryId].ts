@@ -4,47 +4,49 @@ import {
   jsonResponse,
   toMemoryScope,
   withAuthenticatedMemoryRoute,
-} from "./_shared";
+} from './_shared'
 
-function resolveMemoryId(params: Record<string, string | undefined>): string | undefined {
-  return params.memoryId;
+function resolveMemoryId(
+  params: Record<string, string | undefined>,
+): string | undefined {
+  return params.memoryId
 }
 
 export const GET = withAuthenticatedMemoryRoute(
-  "fetching memory",
+  'fetching memory',
   async ({ params, request }, user) => {
-    const memoryId = resolveMemoryId(params);
+    const memoryId = resolveMemoryId(params)
     if (!memoryId) {
-      return jsonError(400, "Bad Request", "memoryId parameter is required");
+      return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }
 
     const memory = await getGateway().getMemory({
       ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       memoryId,
-    });
+    })
     if (!memory) {
-      return jsonError(404, "Not Found", "Memory not found");
+      return jsonError(404, 'Not Found', 'Memory not found')
     }
 
     return jsonResponse({
       success: true,
       memory,
-    });
+    })
   },
-);
+)
 
 const handlePatch = withAuthenticatedMemoryRoute(
-  "updating memory",
+  'updating memory',
   async ({ params, request }, user) => {
-    const memoryId = resolveMemoryId(params);
+    const memoryId = resolveMemoryId(params)
     if (!memoryId) {
-      return jsonError(400, "Bad Request", "memoryId parameter is required");
+      return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }
 
-    const body = await request.json();
-    const content = typeof body.content === "string" ? body.content : body.text;
+    const body = await request.json()
+    const content = typeof body.content === 'string' ? body.content : body.text
     if (!content) {
-      return jsonError(400, "Bad Request", "content parameter is required");
+      return jsonError(400, 'Bad Request', 'content parameter is required')
     }
 
     const result = await getGateway().updateMemory({
@@ -52,33 +54,33 @@ const handlePatch = withAuthenticatedMemoryRoute(
       memoryId,
       content,
       metadata: body.metadata,
-    });
+    })
 
     return jsonResponse({
       success: true,
       memory: result,
-    });
+    })
   },
-);
+)
 
-export const PATCH = handlePatch;
+export const PATCH = handlePatch
 
 export const DELETE = withAuthenticatedMemoryRoute(
-  "deleting memory",
+  'deleting memory',
   async ({ params, request }, user) => {
-    const memoryId = resolveMemoryId(params);
+    const memoryId = resolveMemoryId(params)
     if (!memoryId) {
-      return jsonError(400, "Bad Request", "memoryId parameter is required");
+      return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }
 
     await getGateway().deleteMemory({
       ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       memoryId,
-    });
+    })
 
     return jsonResponse({
       success: true,
-      message: "Memory deleted successfully",
-    });
+      message: 'Memory deleted successfully',
+    })
   },
-);
+)

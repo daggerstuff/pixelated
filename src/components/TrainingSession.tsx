@@ -236,7 +236,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
               <div className='mt-4'>
                 <strong>Client Response:</strong>
                 <div className='bg-muted mt-2 min-h-[60px] rounded-md p-3 text-sm'>
-                {clientResponse ?? 'Waiting for client response...'}
+                  {clientResponse ?? 'Waiting for client response...'}
                 </div>
               </div>
             </section>

@@ -4,29 +4,32 @@ import {
   jsonResponse,
   toMemoryScope,
   withAuthenticatedMemoryRoute,
-} from "./_shared";
+} from './_shared'
 
-export const POST = withAuthenticatedMemoryRoute("creating memory", async ({ request }, user) => {
-  const body = await request.json();
-  const { content, metadata } = body;
+export const POST = withAuthenticatedMemoryRoute(
+  'creating memory',
+  async ({ request }, user) => {
+    const body = await request.json()
+    const { content, metadata } = body
 
-  if (!content) {
-    return jsonError(400, "Bad Request", "content parameter is required");
-  }
+    if (!content) {
+      return jsonError(400, 'Bad Request', 'content parameter is required')
+    }
 
-  // Create memory
-  const result = await getGateway().createMemory({
-    ...toMemoryScope(user.id, user.accountId, user.workspaceId),
-    content,
-    metadata,
-  });
+    // Create memory
+    const result = await getGateway().createMemory({
+      ...toMemoryScope(user.id, user.accountId, user.workspaceId),
+      content,
+      metadata,
+    })
 
-  return jsonResponse(
-    {
-      success: true,
-      memory_id: result.id,
-      memory: result,
-    },
-    201,
-  );
-});
+    return jsonResponse(
+      {
+        success: true,
+        memory_id: result.id,
+        memory: result,
+      },
+      201,
+    )
+  },
+)

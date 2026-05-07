@@ -81,11 +81,14 @@ export function EvaluationPanel({
           <CardContent>
             <EvaluationForm
               onSubmit={() => {
-                initiateMutation.mutate({}, {
-                  onSuccess: () => {
-                    setIsInitiating(false)
+                initiateMutation.mutate(
+                  {},
+                  {
+                    onSuccess: () => {
+                      setIsInitiating(false)
+                    },
                   },
-                })
+                )
               }}
               onCancel={() => setIsInitiating(false)}
             />

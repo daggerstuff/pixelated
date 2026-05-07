@@ -17,11 +17,17 @@ interface Props {
   cspNonce?: string
 }
 
-const { title, description, keywords, ogImage, pubDate, lastModDate, cspNonce } =
-  Astro.props
+const {
+  title,
+  description,
+  keywords,
+  ogImage,
+  pubDate,
+  lastModDate,
+  cspNonce,
+} = Astro.props
 
-const pageKeywords =
-  typeof keywords === 'string' ? keywords.trim() : undefined
+const pageKeywords = typeof keywords === 'string' ? keywords.trim() : undefined
 
 const siteName = new URL(SITE.website).hostname
 
@@ -40,9 +46,7 @@ const generatedOgImage = withBasePath(
   `${basename(Astro.url.pathname)}.png`,
 )
 const assignedOgImage =
-  ogImage && ogImage !== true
-    ? withBasePath('og-images', ogImage)
-    : undefined
+  ogImage && ogImage !== true ? withBasePath('og-images', ogImage) : undefined
 
 const ogImageURL = new URL(
   assignedOgImage ||
@@ -163,13 +167,19 @@ const webPageData = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(blogPostingData).replace(/<\//g, '\\u003c/').replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(blogPostingData)
+        .replace(/<\//g, '\\u003c/')
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')}
     />
   ) : (
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(webPageData).replace(/<\//g, '\\u003c/').replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(webPageData)
+        .replace(/<\//g, '\\u003c/')
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')}
     />
   )
 }

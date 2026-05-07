@@ -1,27 +1,28 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import IndexedDBStorage from "../indexedDBStorage";
-import { type IDBPDatabase } from "idb";
+import { type IDBPDatabase } from 'idb'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+import IndexedDBStorage from '../indexedDBStorage'
 
 // Mock indexedDB for testing
 const mockIndexedDB = {
   open: vi.fn(),
   deleteDatabase: vi.fn(),
   cmp: vi.fn(),
-};
+}
 
-describe("IndexedDBStorage", () => {
-  let storage: IndexedDBStorage;
-  let mockDb: IDBPDatabase<any>;
-  let mockTransaction: IDBTransaction;
-  let mockObjectStore: IDBObjectStore;
-  let mockRequest: IDBRequest<any>;
+describe('IndexedDBStorage', () => {
+  let storage: IndexedDBStorage
+  let mockDb: IDBPDatabase<any>
+  let mockTransaction: IDBTransaction
+  let mockObjectStore: IDBObjectStore
+  let mockRequest: IDBRequest<any>
 
   beforeEach(() => {
     // Reset mocks
-    vi.clearAllMocks();
+    vi.clearAllMocks()
 
     // Setup mock indexedDB
-    global.indexedDB = mockIndexedDB as any;
+    global.indexedDB = mockIndexedDB as any
 
     // Setup mock database objects
     mockRequest = {
@@ -30,7 +31,7 @@ describe("IndexedDBStorage", () => {
       onsuccess: null,
       onerror: null,
       onupgradeneeded: null,
-    } as unknown as IDBRequest<any>;
+    } as unknown as IDBRequest<any>
 
     mockObjectStore = {
       put: vi.fn(),
@@ -39,99 +40,99 @@ describe("IndexedDBStorage", () => {
       clear: vi.fn(),
       getAllKeys: vi.fn(),
       count: vi.fn(),
-    } as unknown as IDBObjectStore;
+    } as unknown as IDBObjectStore
 
     mockTransaction = {
       objectStore: vi.fn(() => mockObjectStore),
       oncomplete: null,
       onerror: null,
-    } as unknown as IDBTransaction;
+    } as unknown as IDBTransaction
 
     mockDb = {
       transaction: vi.fn(() => mockTransaction),
       createObjectStore: vi.fn(),
       close: vi.fn(),
-    } as unknown as IDBPDatabase<any>;
+    } as unknown as IDBPDatabase<any>
 
     // Create storage instance
     storage = new IndexedDBStorage({
-      dbName: "test_db",
+      dbName: 'test_db',
       version: 1,
-      storeName: "test_store",
-    });
-  });
+      storeName: 'test_store',
+    })
+  })
 
   afterEach(() => {
     // Clean up
-    vi.restoreAllMocks();
-  });
+    vi.restoreAllMocks()
+  })
 
-  describe("Constructor", () => {
-    it("should initialize with correct configuration", () => {
-      expect(storage).toBeDefined();
+  describe('Constructor', () => {
+    it('should initialize with correct configuration', () => {
+      expect(storage).toBeDefined()
       // Accessing private properties for testing (necessary for unit testing private fields)
-      expect((storage as any).dbName).toBe("test_db");
-      expect((storage as any).version).toBe(1);
-      expect((storage as any).storeName).toBe("test_store");
-    });
-  });
+      expect((storage as any).dbName).toBe('test_db')
+      expect((storage as any).version).toBe(1)
+      expect((storage as any).storeName).toBe('test_store')
+    })
+  })
 
-  describe("init", () => {
-    it("should initialize the database connection", async () => {
+  describe('init', () => {
+    it('should initialize the database connection', async () => {
       // Setup the mock to resolve the open request
       const openRequest = {
         result: mockDb,
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
-      expect(mockIndexedDB.open).toHaveBeenCalledWith("test_db", 1);
+      expect(mockIndexedDB.open).toHaveBeenCalledWith('test_db', 1)
       // Accessing private properties for testing
-      expect((storage as any).initialized).toBe(true);
-      expect((storage as any).db).toBe(mockDb);
-    });
+      expect((storage as any).initialized).toBe(true)
+      expect((storage as any).db).toBe(mockDb)
+    })
 
-    it("should not reinitialize if already initialized", async () => {
+    it('should not reinitialize if already initialized', async () => {
       // Setup the mock to resolve the open request
       const openRequest = {
         result: mockDb,
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
       // Mark as initialized
-      (storage as any).initialized = true;
-      await storage["init"]();
+      ;(storage as any).initialized = true
+      await storage['init']()
 
       // Should only be called once
-      expect(mockIndexedDB.open).toHaveBeenCalledTimes(1);
-    });
-  });
+      expect(mockIndexedDB.open).toHaveBeenCalledTimes(1)
+    })
+  })
 
-  describe("set", () => {
-    it("should store a value", async () => {
-      const testKey = "test-key";
-      const testValue = { foo: "bar" };
+  describe('set', () => {
+    it('should store a value', async () => {
+      const testKey = 'test-key'
+      const testValue = { foo: 'bar' }
 
       // Setup the mock to resolve the open request
       const openRequest = {
@@ -139,17 +140,17 @@ describe("IndexedDBStorage", () => {
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the put operation
       const putRequest = {
@@ -157,41 +158,46 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<any>;
+      } as unknown as IDBRequest<any>
 
-      mockObjectStore.put.mockReturnValue(putRequest);
+      mockObjectStore.put.mockReturnValue(putRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        putRequest.onsuccess?.();
-      }, 0);
+        putRequest.onsuccess?.()
+      }, 0)
 
-      await storage.set(testKey, testValue);
+      await storage.set(testKey, testValue)
 
       // Verify transaction was created
-      expect(mockDb.transaction).toHaveBeenCalledWith(["test_store"], "readwrite");
-      expect(mockTransaction.objectStore).toHaveBeenCalledWith("test_store");
+      expect(mockDb.transaction).toHaveBeenCalledWith(
+        ['test_store'],
+        'readwrite',
+      )
+      expect(mockTransaction.objectStore).toHaveBeenCalledWith('test_store')
       expect(mockObjectStore.put).toHaveBeenCalledWith({
         id: testKey,
         value: testValue,
-      });
-      expect(mockObjectStore.put).toHaveBeenCalled();
-    });
+      })
+      expect(mockObjectStore.put).toHaveBeenCalled()
+    })
 
-    it("should reject if database is not initialized", async () => {
+    it('should reject if database is not initialized', async () => {
       // Ensure not initialized
-      (storage as any).initialized = false;
-      (storage as any).db = null;
+      ;(storage as any).initialized = false
+      ;(storage as any).db = null
 
-      await expect(storage.set("key", "value")).rejects.toThrow("Database not initialized");
-    });
-  });
+      await expect(storage.set('key', 'value')).rejects.toThrow(
+        'Database not initialized',
+      )
+    })
+  })
 
-  describe("get", () => {
-    it("should retrieve a value", async () => {
-      const testKey = "test-key";
-      const testValue = { foo: "bar" };
-      const mockResult = { id: testKey, value: testValue };
+  describe('get', () => {
+    it('should retrieve a value', async () => {
+      const testKey = 'test-key'
+      const testValue = { foo: 'bar' }
+      const mockResult = { id: testKey, value: testValue }
 
       // Setup the mock to resolve the open request
       const openRequest = {
@@ -199,17 +205,17 @@ describe("IndexedDBStorage", () => {
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the get operation
       const getRequest = {
@@ -217,39 +223,39 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<any>;
+      } as unknown as IDBRequest<any>
 
-      mockObjectStore.get.mockReturnValue(getRequest);
+      mockObjectStore.get.mockReturnValue(getRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        getRequest.onsuccess?.();
-      }, 0);
+        getRequest.onsuccess?.()
+      }, 0)
 
-      const result = await storage.get(testKey);
+      const result = await storage.get(testKey)
 
-      expect(result).toEqual(testValue);
-      expect(mockObjectStore.get).toHaveBeenCalledWith(testKey);
-    });
+      expect(result).toEqual(testValue)
+      expect(mockObjectStore.get).toHaveBeenCalledWith(testKey)
+    })
 
-    it("should return undefined for non-existent key", async () => {
+    it('should return undefined for non-existent key', async () => {
       // Setup the mock to resolve the open request
       const openRequest = {
         result: mockDb,
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the get operation to return undefined
       const getRequest = {
@@ -257,24 +263,24 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<any>;
+      } as unknown as IDBRequest<any>
 
-      mockObjectStore.get.mockReturnValue(getRequest);
+      mockObjectStore.get.mockReturnValue(getRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        getRequest.onsuccess?.();
-      }, 0);
+        getRequest.onsuccess?.()
+      }, 0)
 
-      const result = await storage.get("non-existent-key");
+      const result = await storage.get('non-existent-key')
 
-      expect(result).toBeUndefined();
-    });
-  });
+      expect(result).toBeUndefined()
+    })
+  })
 
-  describe("remove", () => {
-    it("should remove a value", async () => {
-      const testKey = "test-key";
+  describe('remove', () => {
+    it('should remove a value', async () => {
+      const testKey = 'test-key'
 
       // Setup the mock to resolve the open request
       const openRequest = {
@@ -282,17 +288,17 @@ describe("IndexedDBStorage", () => {
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the delete operation
       const deleteRequest = {
@@ -300,43 +306,46 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<any>;
+      } as unknown as IDBRequest<any>
 
-      mockObjectStore.delete.mockReturnValue(deleteRequest);
+      mockObjectStore.delete.mockReturnValue(deleteRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        deleteRequest.onsuccess?.();
-      }, 0);
+        deleteRequest.onsuccess?.()
+      }, 0)
 
-      await storage.remove(testKey);
+      await storage.remove(testKey)
 
-      expect(mockDb.transaction).toHaveBeenCalledWith(["test_store"], "readwrite");
-      expect(mockTransaction.objectStore).toHaveBeenCalledWith("test_store");
-      expect(mockObjectStore.delete).toHaveBeenCalledWith(testKey);
-      expect(mockObjectStore.delete).toHaveBeenCalled();
-    });
-  });
+      expect(mockDb.transaction).toHaveBeenCalledWith(
+        ['test_store'],
+        'readwrite',
+      )
+      expect(mockTransaction.objectStore).toHaveBeenCalledWith('test_store')
+      expect(mockObjectStore.delete).toHaveBeenCalledWith(testKey)
+      expect(mockObjectStore.delete).toHaveBeenCalled()
+    })
+  })
 
-  describe("clear", () => {
-    it("should clear all values", async () => {
+  describe('clear', () => {
+    it('should clear all values', async () => {
       // Setup the mock to resolve the open request
       const openRequest = {
         result: mockDb,
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the clear operation
       const clearRequest = {
@@ -344,27 +353,30 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<any>;
+      } as unknown as IDBRequest<any>
 
-      mockObjectStore.clear.mockReturnValue(clearRequest);
+      mockObjectStore.clear.mockReturnValue(clearRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        clearRequest.onsuccess?.();
-      }, 0);
+        clearRequest.onsuccess?.()
+      }, 0)
 
-      await storage.clear();
+      await storage.clear()
 
-      expect(mockDb.transaction).toHaveBeenCalledWith(["test_store"], "readwrite");
-      expect(mockTransaction.objectStore).toHaveBeenCalledWith("test_store");
-      expect(mockObjectStore.clear).toHaveBeenCalled();
-      expect(mockObjectStore.clear).toHaveBeenCalled();
-    });
-  });
+      expect(mockDb.transaction).toHaveBeenCalledWith(
+        ['test_store'],
+        'readwrite',
+      )
+      expect(mockTransaction.objectStore).toHaveBeenCalledWith('test_store')
+      expect(mockObjectStore.clear).toHaveBeenCalled()
+      expect(mockObjectStore.clear).toHaveBeenCalled()
+    })
+  })
 
-  describe("getAllKeys", () => {
-    it("should return all keys", async () => {
-      const testKeys = ["key1", "key2", "key3"];
+  describe('getAllKeys', () => {
+    it('should return all keys', async () => {
+      const testKeys = ['key1', 'key2', 'key3']
 
       // Setup the mock to resolve the open request
       const openRequest = {
@@ -372,17 +384,17 @@ describe("IndexedDBStorage", () => {
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the getAllKeys operation
       const getAllKeysRequest = {
@@ -390,25 +402,25 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<IDBValidKey[]>;
+      } as unknown as IDBRequest<IDBValidKey[]>
 
-      mockObjectStore.getAllKeys.mockReturnValue(getAllKeysRequest);
+      mockObjectStore.getAllKeys.mockReturnValue(getAllKeysRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        getAllKeysRequest.onsuccess?.();
-      }, 0);
+        getAllKeysRequest.onsuccess?.()
+      }, 0)
 
-      const result = await storage.getAllKeys();
+      const result = await storage.getAllKeys()
 
-      expect(result).toEqual(testKeys);
-      expect(mockObjectStore.getAllKeys).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(testKeys)
+      expect(mockObjectStore.getAllKeys).toHaveBeenCalled()
+    })
+  })
 
-  describe("count", () => {
-    it("should return the count of items", async () => {
-      const testCount = 5;
+  describe('count', () => {
+    it('should return the count of items', async () => {
+      const testCount = 5
 
       // Setup the mock to resolve the open request
       const openRequest = {
@@ -416,17 +428,17 @@ describe("IndexedDBStorage", () => {
         onsuccess: null,
         onerror: null,
         onupgradeneeded: null,
-      } as unknown as IDBOpenDBRequest;
+      } as unknown as IDBOpenDBRequest
 
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.();
-        }, 0);
-        return openRequest;
-      });
+          openRequest.onsuccess?.()
+        }, 0)
+        return openRequest
+      })
 
-      await storage["init"]();
+      await storage['init']()
 
       // Setup the mock for the count operation
       const countRequest = {
@@ -434,19 +446,19 @@ describe("IndexedDBStorage", () => {
         error: null,
         onsuccess: null,
         onerror: null,
-      } as unknown as IDBRequest<number>;
+      } as unknown as IDBRequest<number>
 
-      mockObjectStore.count.mockReturnValue(countRequest);
+      mockObjectStore.count.mockReturnValue(countRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        countRequest.onsuccess?.();
-      }, 0);
+        countRequest.onsuccess?.()
+      }, 0)
 
-      const result = await storage.count();
+      const result = await storage.count()
 
-      expect(result).toBe(testCount);
-      expect(mockObjectStore.count).toHaveBeenCalled();
-    });
-  });
-});
+      expect(result).toBe(testCount)
+      expect(mockObjectStore.count).toHaveBeenCalled()
+    })
+  })
+})

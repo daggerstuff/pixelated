@@ -38,7 +38,9 @@ const isSearchResponse = (value: unknown): value is SearchResponse => {
     return false
   }
 
-  return Array.isArray(value['results']) && value['results'].every(isSearchResult)
+  return (
+    Array.isArray(value['results']) && value['results'].every(isSearchResult)
+  )
 }
 
 export function BlogSearch() {
@@ -98,12 +100,21 @@ export function BlogSearch() {
           disabled={isSearching}
           aria-label={isSearching ? 'Searching...' : 'Search'}
         >
-          {isSearching ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : 'Search'}
+          {isSearching ? (
+            <Loader2 className='h-4 w-4 animate-spin' aria-hidden='true' />
+          ) : (
+            'Search'
+          )}
         </Button>
       </form>
 
       {/* Screen reader only live region for search status */}
-      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+      <div
+        role='status'
+        aria-live='polite'
+        aria-atomic='true'
+        className='sr-only'
+      >
         {isSearching ? 'Searching...' : ''}
       </div>
 
