@@ -13,6 +13,11 @@
 .vscode/
 AGENTS.md
 .kiro/
+.claude-octopus
+.geminiignore
+.kiro_tmp
+.oxlintignore
+.superpowers
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -135,25 +140,25 @@ wandb_ver.txt
 zthgquiz_history.json
 
 # === SECRETS & ENVIRONMENT ===
+!.env.example
 !.env.project
 !.env.vault
-!/.env.example
 !config/secrets/*.example
-*.key
-*.p12
-*.pem
-*.pfx
-*service-connection*.json
 .env*
 .env.sentry-build-plugin
 .flaskenv*
-/*.env.*
 /.env
 /.env.development
 /.env.local
 /.env.production
 /.env.staging
 /.env.test
+/*.env.*
+*.key
+*.p12
+*.pem
+*.pfx
+*service-connection*.json
 /secrets.*.json
 sp-cert.pem
 sp-key.pem
@@ -161,13 +166,17 @@ sp-key.pem
 # === TERRAFORM, INFRA & CLOUD ===
 !terraform/gcp/terraform.tfvars.example
 /.azure-artifacts/
+terraform/
+terraform/.terraform.lock.hcl
+terraform/.terraform/
 terraform/*.tfplan
 terraform/*.tfstate
 terraform/*.tfstate.backup
-terraform/.terraform.lock.hcl
-terraform/.terraform/
-terraform/gcp/**/*.tfstate*
+terraform/gcp/
+terraform/gcp/.terraform.lock.hcl
+terraform/gcp/.terraform/
 terraform/gcp/*.tfplan
+terraform/gcp/*.tfstate*
 terraform/gcp/*.tfvars*
 terraform/gcp/.terraform.lock.hcl
 terraform/gcp/.terraform/
@@ -178,40 +187,31 @@ k8s/base/secrets.generated.yaml
 k8s/base/secrets.local.yaml
 
 # === REPORTS, SCANS & MONITORING ===
+.build-errors.md
 .codacy
 .osv-scanner.toml
-/build-errors.md
 /credential-scan-results.json
+/reports/
 /secret-scan-report.md
 /security-report.md
 /security-reports/
 /test-results/
-reports/
 security-scan-artifacts
 
 # === TEMP & CACHES ===
+.cache
+.local
 .mypy_cache
 .pytest_cache
 .sdd/
+.temp
+.tmp
+.trunk
 .webassets-cache
-/.cache
-/.local
-/.temp
-/.tmp
-/.trunk
 templates/
 tmp/
 
 # === PROJECT SPECIFIC & MISC ===
-*.dll
-*.dump
-*.dylib
-*.manifest
-*.node
-*.pyd
-*.pyo
-*.spec
-*.sql.gz
 .agent/internal/
 .brv
 .endgame
@@ -221,24 +221,32 @@ tmp/
 .sisyphus/
 .trunk
 .windsurf
-/*.iml
-/*.tsbuildinfo
-/.DS_Store*
+/*.DS_Store*
 /.astro
+/.bin
 /.output
 /.python
-/bin/
-/browser-compatibility/
-/bundle-analysis.html
-/coverage/
-/drive/
-/stats.html
+/.tsbuildinfo
+/*.iml
+*.dll
+*.dump
+*.dylib
+*.manifest
+*.node
+*.pyd
+*.pyo
+*.spec
+*.sql.gz
 artifacts/
 backups/
+browser-compatibility/
+bundle-analysis.html
 codemap.md
 cover/
+coverage/
 deployment-backup
 deployment-backup*/
+drive/
 external/
 instance/
 launch_ovh_job.sh
@@ -248,19 +256,30 @@ patches
 performance-results
 postgres-sts.yaml
 run_all.sh
+run_all.py
 screenshot_context.png
 scripts/backup-home.sh
 scripts/home-backup.service
 scripts/home-backup.timer
 scripts/install-backup.sh
+stats.html
 values.yaml
 volumes/
 
 # === INTERNAL & PRIVATE ===
 /security/
-business-strategy/
-metrics/
-scripts/*.ipynb
+.ai/internal/plans
+.business-strategy/
+.goose/
+.local-memory
+.metrics/
+.playwright-mcp
+.reports
+.uv-cache
+.NOTES.md
+memory.db-shm
+memory.db-wal
+scripts/colab
 scripts/data/extract_youtube_transcripts.py
 scripts/data/run_pix30_academic_pulls.py
 scripts/generate_dual_persona_data.py
@@ -268,34 +287,25 @@ scripts/memory/run-shared-memory-service.sh
 scripts/run-simple-dataset-integration.py
 scripts/run-simple-integrated-pipeline.py
 scripts/run-standalone-integrated-pipeline.py
+scripts/*.ipynb
 tests/scripts/
 # Beads / Dolt files (added by bd init)
 .beads-credential-key
 .beads/
-
-.swarm/
-
 .scannerwork
-TEST-COVERAGE-ANALYSIS.md
-security-audit-report.md
+.swarm/
+.test-coverage-analysis.md
+.security-audit-report.md
 
 # OpenMemory - IDE/Assistant specific rules
 CLAUDE.md
-scripts/colab
-
 gha-creds-*.json
 
 # Playwright
 /blob-report/
 /playwright/.auth/
-
-.local-memory
-.playwright-mcp
-.reports
-.uv-cache
-NOTES.md
-memory.db-shm
-memory.db-wal
+/playwright-report/
+/playwright-report-browser-compat
 
 # === COPILOT CLI ===
 .copilot/
@@ -323,16 +333,9 @@ __mocks__
 .squad/sessions/
 # Squad: SubSquad activation file (local to this machine)
 .squad-workstream
-
+.ai/internal/plans
 .goose/
 ai/.moderne
 
 .mcp.json
 HANDOFF.md
-
-.claude-octopus
-.superpowers
-.mcp.json.2026-04-27T07-24-16-431Z.bak
-.kiro_tmp
-.geminiignore
-.oxlintignore

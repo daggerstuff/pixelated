@@ -47,7 +47,7 @@
   // related to #45
   const chooseFill = (): FillMode => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uach = (navigator).userAgentData
+    const uach = navigator.userAgentData
 
     if (uach?.brands?.length) {
       const brands: { brand: string; version: string }[] = uach.brands

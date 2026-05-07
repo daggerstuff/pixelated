@@ -8,7 +8,7 @@ draft: false
 toc: true
 ---
 
-# AI System Security Best Practices
+## AI System Security Best Practices
 
 ## Introduction
 
@@ -118,12 +118,13 @@ guidelines are designed to ensure HIPAA compliance and protect sensitive data.
 
 1. **Content Security Policy**
 
-   ```
-   Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self' https://api.together.xyz; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self';
+   ```text
+   Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self' https://api.openai.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self';
    ```
 
 2. **Additional Security Headers**
-   ```
+
+   ```text
    X-Content-Type-Options: nosniff
    X-Frame-Options: DENY
    X-XSS-Protection: 1; mode=block
@@ -201,7 +202,7 @@ guidelines are designed to ensure HIPAA compliance and protect sensitive data.
     // Apply Content Security Policy
     response.headers.set(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self'; connect-src 'self' https://api.together.xyz; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self';",
+      "default-src 'self'; script-src 'self'; connect-src 'self' https://api.openai.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self';",
     )
 
     return response
@@ -216,7 +217,7 @@ guidelines are designed to ensure HIPAA compliance and protect sensitive data.
 
 const CompletionSchema = z.object({
   prompt: z.string().min(1).max(4000),
-  model: z.string().default('togethercomputer/llama-3-8b-instruct'),
+  model: z.string().default('minimaxai/minimax-m2.7'),
   temperature: z.number().min(0).max(1).default(0.7),
   maxTokens: z.number().min(1).max(2048).default(512),
 })

@@ -7,7 +7,12 @@
 import { EventEmitter } from 'events'
 import https from 'https'
 
-import axios, { AxiosHeaderValue, AxiosHeaders, AxiosInstance, AxiosResponse } from 'axios'
+import axios, {
+  AxiosHeaderValue,
+  AxiosHeaders,
+  AxiosInstance,
+  AxiosResponse,
+} from 'axios'
 import { Redis } from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
@@ -34,10 +39,7 @@ function asRecord(value: unknown): Record<string, unknown> {
   return isRecord(value) ? value : {}
 }
 
-function getString(
-  value: unknown,
-  fallback: string = '',
-): string {
+function getString(value: unknown, fallback: string = ''): string {
   return typeof value === 'string' ? value : fallback
 }
 
@@ -61,16 +63,29 @@ function getStringArray(value: unknown): string[] {
 
 function getHeaderValue(value: unknown): AxiosHeaderValue | undefined {
   if (value === undefined || value === null) return undefined
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
     return value
   }
   return undefined
 }
 
-function isThreatIndicatorType(value: string): value is ThreatIndicator['type'] {
-  return ['ip', 'domain', 'hash', 'url', 'email', 'file', 'behavior', 'vulnerability'].includes(
-    value,
-  )
+function isThreatIndicatorType(
+  value: string,
+): value is ThreatIndicator['type'] {
+  return [
+    'ip',
+    'domain',
+    'hash',
+    'url',
+    'email',
+    'file',
+    'behavior',
+    'vulnerability',
+  ].includes(value)
 }
 
 function clamp01(value: number, fallback = 0): number {
@@ -399,7 +414,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       await subscriber.connect()
 
       // Subscribe to sync requests
-    await subscriber.subscribe('feed:sync', async (message) => {
+      await subscriber.subscribe('feed:sync', async (message) => {
         try {
           if (typeof message !== 'string') return
 
@@ -419,7 +434,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       })
 
       // Subscribe to feed status updates
-    await subscriber.subscribe('feed:status', async (message) => {
+      await subscriber.subscribe('feed:status', async (message) => {
         try {
           if (typeof message !== 'string') return
 
@@ -597,7 +612,11 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         throw new Error('OAuth2 token response missing access_token')
       }
 
-      await this.redis.setex(tokenKey, Math.max(Math.floor(expiresIn) - 60, 1), token) // Refresh 1 minute early
+      await this.redis.setex(
+        tokenKey,
+        Math.max(Math.floor(expiresIn) - 60, 1),
+        token,
+      ) // Refresh 1 minute early
     }
 
     return token
@@ -783,7 +802,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Handle feed errors
    */
-  private async handleFeedError(error: unknown, feedId: string): Promise<never> {
+  private async handleFeedError(
+    error: unknown,
+    feedId: string,
+  ): Promise<never> {
     const normalized = normalizeError(error)
     logger.error('Feed API error', {
       feed_id: feedId,
@@ -806,7 +828,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    * Add new threat feed
    */
   async addFeed(feedData: Partial<ThreatFeed>): Promise<string> {
-      if (!this.isInitialized) {
+    if (!this.isInitialized) {
       throw new Error('External threat feed integration system not initialized')
     }
 
@@ -814,7 +836,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       const feedId = uuidv4()
       const now = new Date()
 
-    const feed: ThreatFeed = {
+      const feed: ThreatFeed = {
         id: feedId,
         name: getString(feedData.name, 'Untitled Feed'),
         description: getString(feedData.description, ''),
@@ -1120,7 +1142,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    */
   private meetsQualityThresholds(metrics: DataQualityMetrics): boolean {
     return (
-      metrics.completeness >= this._config.quality_thresholds.min_completeness &&
+      metrics.completeness >=
+        this._config.quality_thresholds.min_completeness &&
       metrics.accuracy >= this._config.quality_thresholds.min_accuracy &&
       metrics.timeliness >= this._config.quality_thresholds.min_timeliness &&
       metrics.uniqueness >= this._config.quality_thresholds.min_uniqueness &&
@@ -1169,7 +1192,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     baseDate: Date,
   ): Date {
     const next = new Date(baseDate)
-    const frequencies = this._config.feeds.find((feed) => feed.id === feedId)?.sync_frequency
+    const frequencies = this._config.feeds.find(
+      (feed) => feed.id === feedId,
+    )?.sync_frequency
     if (!frequencies) {
       next.setHours(next.getHours() + 1)
       return next
@@ -1432,12 +1457,17 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         feed_id: feed.id,
         type: indicatorType,
         value: value,
-        confidence: this.mapSTIXConfidence(this.getNestedValue(stixObject, 'confidence')),
+        confidence: this.mapSTIXConfidence(
+          this.getNestedValue(stixObject, 'confidence'),
+        ),
         severity: this.mapSTIXSeverity(
           this.getNestedValue(stixObject, 'labels'),
         ),
         threat_type: this.extractThreatTypeFromSTIX(stixObject),
-        description: getString(this.getNestedValue(stixObject, 'description'), ''),
+        description: getString(
+          this.getNestedValue(stixObject, 'description'),
+          '',
+        ),
         first_seen: new Date(
           getString(
             this.getNestedValue(stixObject, 'created'),
@@ -1479,7 +1509,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Extract indicator type from STIX pattern
    */
-  private extractIndicatorTypeFromSTIXPattern(pattern: string): ThreatIndicator['type'] | undefined {
+  private extractIndicatorTypeFromSTIXPattern(
+    pattern: string,
+  ): ThreatIndicator['type'] | undefined {
     if (!pattern) return undefined
     if (pattern.includes('file:hashes.MD5')) return 'hash'
     if (pattern.includes('ipv4-addr')) return 'ip'
@@ -1492,7 +1524,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Extract indicator value from STIX pattern
    */
-  private extractIndicatorValueFromSTIXPattern(pattern: string): string | undefined {
+  private extractIndicatorValueFromSTIXPattern(
+    pattern: string,
+  ): string | undefined {
     if (!pattern) return undefined
     const match = pattern.match(/'([^']+)'/)
     return match ? match[1] : undefined
@@ -1572,13 +1606,19 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         first_seen: new Date(
           getString(
             this.getNestedValue(attribute, 'first_seen'),
-            getString(this.getNestedValue(event, 'date'), Date.now().toString()),
+            getString(
+              this.getNestedValue(event, 'date'),
+              Date.now().toString(),
+            ),
           ),
         ),
         last_seen: new Date(
           getString(
             this.getNestedValue(attribute, 'last_seen'),
-            getString(this.getNestedValue(event, 'date'), Date.now().toString()),
+            getString(
+              this.getNestedValue(event, 'date'),
+              Date.now().toString(),
+            ),
           ),
         ),
         expiration_date: this.getNestedValue(attribute, 'expiration')
@@ -1691,9 +1731,14 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         getString(this.getNestedValue(data, 'indicator')),
       )
       const confidence = clamp01(
-        this.mapConfidence(getNumber(this.getNestedValue(data, 'confidence'), 0.5), {}),
+        this.mapConfidence(
+          getNumber(this.getNestedValue(data, 'confidence'), 0.5),
+          {},
+        ),
       )
-      const severity = this.parseThreatSeverity(this.getNestedValue(data, 'severity'))
+      const severity = this.parseThreatSeverity(
+        this.getNestedValue(data, 'severity'),
+      )
 
       return {
         id: uuidv4(),
@@ -1702,7 +1747,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         value,
         confidence,
         severity,
-        threat_type: getString(this.getNestedValue(data, 'threat_type'), 'unknown'),
+        threat_type: getString(
+          this.getNestedValue(data, 'threat_type'),
+          'unknown',
+        ),
         description: getString(this.getNestedValue(data, 'description'), ''),
         first_seen: new Date(
           getString(
@@ -1723,8 +1771,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           this.getNestedValue(data, 'reliability'),
         ),
         tags: getStringArray(this.getNestedValue(data, 'tags')),
-        attributes:
-          asRecord(this.getNestedValue(data, 'attributes')),
+        attributes: asRecord(this.getNestedValue(data, 'attributes')),
         relationships: [],
         raw_data: asRecord(data),
       }
@@ -1918,9 +1965,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     transformation: DataTransformation,
   ): ThreatIndicator[] {
     return indicators.filter((indicator) => {
-      const fieldValue = asRecord(indicator)[
-        transformation.field
-      ]
+      const fieldValue = asRecord(indicator)[transformation.field]
       return this.evaluateFilterCondition(fieldValue, transformation.parameters)
     })
   }
@@ -1992,7 +2037,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    * Map STIX severity labels to ThreatIndicator severity
    */
   private mapSTIXSeverity(labels: unknown): ThreatIndicator['severity'] {
-    const normalized = getStringArray(labels).map((label) => label.toLowerCase())
+    const normalized = getStringArray(labels).map((label) =>
+      label.toLowerCase(),
+    )
     if (normalized.includes('critical')) return 'critical'
     if (normalized.includes('high')) return 'high'
     if (normalized.includes('low')) return 'low'
@@ -2012,7 +2059,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Map STIX reliability reference to internal scale
    */
-  private mapSTIXReliability(rawReliability: unknown): ThreatIndicator['source_reliability'] {
+  private mapSTIXReliability(
+    rawReliability: unknown,
+  ): ThreatIndicator['source_reliability'] {
     const reliability = getString(rawReliability, 'c')
       .toLowerCase()
       .replace(/[^a-z]/g, '')
@@ -2023,7 +2072,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    * Map MISP confidence to normalized [0,1] value
    */
   private mapMISPToConfidence(attribute: unknown): number {
-    return this.mapSTIXConfidence(this.getNestedValue(attribute, 'confidence'), 0.5)
+    return this.mapSTIXConfidence(
+      this.getNestedValue(attribute, 'confidence'),
+      0.5,
+    )
   }
 
   /**
@@ -2079,7 +2131,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     return severity
   }
 
-  private parseThreatSeverity(rawSeverity: unknown): ThreatIndicator['severity'] {
+  private parseThreatSeverity(
+    rawSeverity: unknown,
+  ): ThreatIndicator['severity'] {
     const normalized = getString(rawSeverity, 'medium').toLowerCase()
     if (normalized.includes('critical')) return 'critical'
     if (normalized.includes('high')) return 'high'
@@ -2090,7 +2144,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   private parseSourceReliability(
     rawReliability: unknown,
   ): ThreatIndicator['source_reliability'] {
-    const normalized = getString(rawReliability, 'c').toLowerCase().replace(/[^a-z]/g, '')
+    const normalized = getString(rawReliability, 'c')
+      .toLowerCase()
+      .replace(/[^a-z]/g, '')
     switch (normalized) {
       case 'a':
       case 'b':
@@ -2149,7 +2205,13 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     type: ThreatIndicator['type'],
   ): string {
     const trimmed = value.trim()
-    if (type === 'ip' || type === 'hash' || type === 'url' || type === 'domain' || type === 'email') {
+    if (
+      type === 'ip' ||
+      type === 'hash' ||
+      type === 'url' ||
+      type === 'domain' ||
+      type === 'email'
+    ) {
       return trimmed.toLowerCase()
     }
     return trimmed
@@ -2158,7 +2220,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   /**
    * Enrich indicator with IP geolocation metadata
    */
-  private async getIPGeolocation(value: string): Promise<Record<string, unknown>> {
+  private async getIPGeolocation(
+    value: string,
+  ): Promise<Record<string, unknown>> {
     if (!this.isValidIP(value)) {
       return {}
     }
@@ -2389,8 +2453,13 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
     try {
       const operations: Array<
-        { updateOne: { filter: { id: string }; update: { $set: Partial<ThreatIndicator> } } } |
-        { insertOne: { document: ThreatIndicator } }
+        | {
+            updateOne: {
+              filter: { id: string }
+              update: { $set: Partial<ThreatIndicator> }
+            }
+          }
+        | { insertOne: { document: ThreatIndicator } }
       > = []
 
       for (const indicator of batch) {

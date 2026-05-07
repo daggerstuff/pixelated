@@ -37,9 +37,12 @@ const escapeJsonForScriptTag = (value: any) =>
 // Get session data from API
 let sessionData = undefined
 try {
-  const response = await fetch(`${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const response = await fetch(
+    `${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  )
   sessionData = await response.json()
 } catch {
   sessionData = undefined
@@ -474,9 +477,7 @@ const isSupervisor = userRole === 'admin'
                   Live Feedback
                 </h3>
                 <div id="feedback-messages" class="space-y-2 text-sm">
-                  <p class="text-gray-500">
-                    Feedback will appear here.
-                  </p>
+                  <p class="text-gray-500">Feedback will appear here.</p>
                 </div>
               </div>
 

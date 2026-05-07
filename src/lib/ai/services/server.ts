@@ -53,7 +53,7 @@ class AIServer {
       return preference.split(',').map((p) => p.trim() as AIProviderType)
     }
     // Default fallback order
-    return ['local', 'together', 'openai', 'anthropic', 'huggingface']
+    return ['local', 'llm', 'openai', 'anthropic', 'huggingface']
   }
 
   private async handleHealthCheck(res: any): Promise<void> {
@@ -132,7 +132,7 @@ class AIServer {
           this.sendJsonResponse(res, 503, {
             success: false,
             error:
-              'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
+              'No AI providers are currently available. Please configure API keys for the LLM API, OpenAI, Anthropic, or Hugging Face.',
           })
           return
         }
@@ -209,7 +209,7 @@ class AIServer {
           this.sendJsonResponse(res, 503, {
             success: false,
             error:
-              'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
+              'No AI providers are currently available. Please configure API keys for the LLM API, OpenAI, Anthropic, or Hugging Face.',
           })
           return
         }
@@ -315,7 +315,7 @@ Respond in JSON format with the following structure:
           this.sendJsonResponse(res, 503, {
             success: false,
             error:
-              'No AI providers are currently available. Please configure API keys for Together, OpenAI, Anthropic, or Hugging Face.',
+              'No AI providers are currently available. Please configure API keys for the LLM API, OpenAI, Anthropic, or Hugging Face.',
           })
           return
         }

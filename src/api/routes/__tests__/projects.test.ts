@@ -1,10 +1,14 @@
 // API Integration Tests for Projects Routes
 // Tests for full CRUD operations on projects
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import request from 'supertest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
+
+import {
+  createTestUserForTest,
+  cleanupTestData,
+} from '../../../../tests/api/utils/test-helpers'
 import { app } from '../../../server'
-import { createTestUserForTest, cleanupTestData } from '../../../../tests/api/utils/test-helpers'
 
 describe('Projects API', () => {
   let authToken: string
@@ -58,10 +62,7 @@ describe('Projects API', () => {
         description: 'This should fail',
       }
 
-      await request(app)
-        .post('/api/projects')
-        .send(projectData)
-        .expect(401)
+      await request(app).post('/api/projects').send(projectData).expect(401)
     })
 
     it('should validate required fields', async () => {
@@ -313,7 +314,8 @@ describe('Projects API', () => {
       expect(response.body.data).toBeInstanceOf(Array)
       // Results should contain the search term
       response.body.data.forEach((project: any) => {
-        const searchText = `${project.name} ${project.description}`.toLowerCase()
+        const searchText =
+          `${project.name} ${project.description}`.toLowerCase()
         expect(searchText).toContain('test'.toLowerCase())
       })
     })

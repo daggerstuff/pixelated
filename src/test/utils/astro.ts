@@ -72,9 +72,7 @@ export async function renderAstro<
       return Promise.resolve(factory.render(renderProps, renderSlots))
     }
 
-    return Promise.resolve(
-      '' as unknown as AstroRenderResult,
-    )
+    return Promise.resolve('' as unknown as AstroRenderResult)
   })()
   const html = extractHtml(resolvedHtml)
   const container = document.createElement('div')

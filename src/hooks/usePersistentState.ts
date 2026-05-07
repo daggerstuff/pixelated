@@ -65,7 +65,10 @@ export function usePersistentState<T>(
 
     const handleStorageChange = (e: StorageEvent) => {
       const storageKey = e.key
-      if (e.newValue && (storageKey === key || storageKey?.endsWith(`_${key}`))) {
+      if (
+        e.newValue &&
+        (storageKey === key || storageKey?.endsWith(`_${key}`))
+      ) {
         try {
           const newValue = JSON.parse(e.newValue)
           if (newValue.value !== undefined) {

@@ -245,9 +245,9 @@
       .cta-proof-item,
       .cta-decision
     ) {
-      text-align: center;
-      justify-items: center;
-    }
+    text-align: center;
+    justify-items: center;
+  }
 
   .pe-home-section,
   .pe-page-section {

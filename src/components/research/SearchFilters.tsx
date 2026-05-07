@@ -61,7 +61,10 @@ export default function SearchFilters({
   }
 
   // ⚡ Bolt: Convert topics array to Set to prevent O(N^2) lookups inside rendering map loop
-  const selectedTopicsSet = useMemo(() => new Set(localFilters.topics), [localFilters.topics])
+  const selectedTopicsSet = useMemo(
+    () => new Set(localFilters.topics),
+    [localFilters.topics],
+  )
 
   return (
     <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
@@ -175,7 +178,10 @@ export default function SearchFilters({
 
         {/* Sort By */}
         <div>
-          <label htmlFor='sort-by' className='text-slate-300 mb-2 block text-sm font-medium'>
+          <label
+            htmlFor='sort-by'
+            className='text-slate-300 mb-2 block text-sm font-medium'
+          >
             Sort By
           </label>
           <select

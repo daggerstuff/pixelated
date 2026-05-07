@@ -1,4 +1,4 @@
-import { createTogetherAIService } from './together'
+import { createLLMService } from './llm-provider'
 import type { AIMessage, AIUsage } from '@/lib/ai/models/ai-types'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 
@@ -9,8 +9,8 @@ import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 
 export interface CompletionServiceConfig {
   apiKey: string
-  togetherApiKey?: string
-  togetherBaseUrl?: string
+  providerApiKey?: string
+  providerBaseUrl?: string
 }
 
 export interface CompletionRequest {
@@ -31,17 +31,16 @@ export interface CompletionResult {
  * Service class for AI completions
  */
 export class CompletionService {
-  private aiService: ReturnType<typeof createTogetherAIService>
+  private aiService: ReturnType<typeof createLLMService>
 
   constructor(config: CompletionServiceConfig) {
     if (!config.apiKey) {
       throw new Error('CompletionService initialization failed: apiKey is required')
     }
 
-    this.aiService = createTogetherAIService({
-      apiKey: config.apiKey,
-      togetherApiKey: config.togetherApiKey || config.apiKey,
-      togetherBaseUrl: config.togetherBaseUrl,
+    this.aiService = createLLMService({
+      apiKey: config.apiKey || config.providerApiKey || '',
+      baseUrl: config.providerBaseUrl,
     })
   }
 

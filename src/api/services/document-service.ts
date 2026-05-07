@@ -4,10 +4,9 @@
 import { Types } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 
-import { slug } from '../../utils/common'
-
 import { getPostgresPool } from '../../lib/database/connection'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
+import { slug } from '../../utils/common'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 
 type DocumentStatus = 'approved' | 'archived' | 'draft' | 'published' | 'review'

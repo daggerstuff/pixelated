@@ -6,7 +6,6 @@
 import { PoolClient, QueryResult } from 'pg'
 
 import { getLogger } from '../logging'
-
 import { getPool } from './index'
 
 const logger = getLogger('optimized-queries')

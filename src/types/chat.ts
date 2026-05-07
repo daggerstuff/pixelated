@@ -83,7 +83,10 @@ export interface MentalHealthAnalysis {
 }
 
 export interface ExtendedMessage extends Message {
-  mentalHealthAnalysis?: MentalHealthAnalysis | MentalHealthChatAnalysis | undefined
+  mentalHealthAnalysis?:
+    | MentalHealthAnalysis
+    | MentalHealthChatAnalysis
+    | undefined
   activities?: AgentActivity[]
   metadata?: {
     interventionType?: 'immediate' | 'preventive' | 'supportive'
@@ -133,7 +136,11 @@ export type AgentActivityStatus = 'thinking' | 'acting' | 'completed' | 'error'
 /**
  * Type of agent activity
  */
-export type AgentActivityType = 'thought' | 'action' | 'observation' | 'tool_use'
+export type AgentActivityType =
+  | 'thought'
+  | 'action'
+  | 'observation'
+  | 'tool_use'
 
 /**
  * Represents a single activity from an agent in a multi-agent system

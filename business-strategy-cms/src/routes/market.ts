@@ -15,7 +15,9 @@ type MarketBulkRequest = AuthenticatedRequest<
 const parseSymbols = (value: unknown): string[] => {
   if (!Array.isArray(value)) return []
 
-  return value.filter((item): item is string => typeof item === 'string' && item.length > 0)
+  return value.filter(
+    (item): item is string => typeof item === 'string' && item.length > 0,
+  )
 }
 
 const router = Router()

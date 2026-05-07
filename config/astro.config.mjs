@@ -5,11 +5,11 @@ import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
-import { createLogger } from 'vite'
 import UnoCSS from '@unocss/astro'
 import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { createLogger } from 'vite'
 
 const isRailwayDeploy =
   process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT
@@ -27,7 +27,8 @@ function shouldIgnoreEmptyMentalHealthWarning(warning) {
   const chunkName = warning.chunkName || ''
   return (
     message.includes('Generated an empty chunk') &&
-    (message.includes('MentalHealthChatDemo') || chunkName.includes('MentalHealthChatDemo'))
+    (message.includes('MentalHealthChatDemo') ||
+      chunkName.includes('MentalHealthChatDemo'))
   )
 }
 // Detect if we're running a build command (not dev server)
@@ -280,7 +281,7 @@ export default defineConfig({
       warn(msg, options) {
         if (
           msg.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
-          msg.includes('Generated an empty chunk: \'MentalHealthChatDemo\'') ||
+          msg.includes("Generated an empty chunk: 'MentalHealthChatDemo'") ||
           msg.includes('Generated an empty chunk: MentalHealthChatDemo')
         ) {
           return
@@ -396,8 +397,11 @@ export default defineConfig({
           }
           if (
             warning.code === 'EMPTY_CHUNK' &&
-            (warning.message?.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
-              (warning.chunkName && warning.chunkName === 'MentalHealthChatDemo'))
+            (warning.message?.includes(
+              'Generated an empty chunk: "MentalHealthChatDemo"',
+            ) ||
+              (warning.chunkName &&
+                warning.chunkName === 'MentalHealthChatDemo'))
           ) {
             return
           }

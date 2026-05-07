@@ -6,8 +6,6 @@
   "failed": 1,
   "skipped_existing": 0,
   "output_directory": "training/data/transcripts/Tim Fletcher",
-  "languages_attempted": [
-    "en"
-  ],
+  "languages_attempted": ["en"],
   "method": "youtube-transcript-api"
 }

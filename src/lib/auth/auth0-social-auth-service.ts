@@ -173,7 +173,9 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const response = await (auth0Authentication.oauth as any).authorizationCodeGrant({
+      const response = await (
+        auth0Authentication.oauth as any
+      ).authorizationCodeGrant({
         code,
         redirect_uri: redirectUri,
       })
@@ -234,7 +236,9 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const response = await (auth0Authentication.oauth as any).refreshTokenGrant({
+      const response = await (
+        auth0Authentication.oauth as any
+      ).refreshTokenGrant({
         refresh_token: refreshToken,
       })
       const data = response.data
@@ -339,11 +343,14 @@ export class Auth0SocialAuthService {
     try {
       // Link the social account to the user
       const usersClient = auth0Management.users as unknown as {
-        link: (params: { id: string }, identity: {
-          provider: string
-          connection_id: string
-          user_id: string
-        }) => Promise<unknown>
+        link: (
+          params: { id: string },
+          identity: {
+            provider: string
+            connection_id: string
+            user_id: string
+          },
+        ) => Promise<unknown>
       }
       await usersClient.link(
         {
@@ -394,10 +401,13 @@ export class Auth0SocialAuthService {
     try {
       // Unlink the social account from the user
       const usersClient = auth0Management.users as unknown as {
-        unlink: (userId: string, identity: {
-          provider: string
-          user_id: string
-        }) => Promise<unknown>
+        unlink: (
+          userId: string,
+          identity: {
+            provider: string
+            user_id: string
+          },
+        ) => Promise<unknown>
       }
       await usersClient.unlink(userId, {
         provider: connection,
