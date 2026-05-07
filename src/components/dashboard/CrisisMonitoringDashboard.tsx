@@ -10,7 +10,7 @@ import {
   Eye,
   BarChart3,
 } from 'lucide-react'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
 import Alert from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -106,14 +106,44 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Auto-refresh effect
   useEffect(() => {
-    return undefined
     void fetchDashboardData()
 
     if (autoRefresh) {
       const interval = setInterval(fetchDashboardData, refreshInterval)
       return () => clearInterval(interval)
     }
+    return undefined
   }, [fetchDashboardData, autoRefresh, refreshInterval])
+
+  // Performance optimization: Memoize derived alert values to prevent unnecessary O(N) filtering on every render
+  const unacknowledgedAlertsCount = useMemo(() => {
+    return alerts.filter((a) => !a.acknowledged).length
+  }, [alerts])
+
+  const criticalUnacknowledgedAlerts = useMemo(() => {
+    return alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
+  }, [alerts])
+
+  // Performance optimization: Memoize derived patient risk data to prevent O(N) operations on every render
+  const highRiskPatients = useMemo(() => {
+    return patients.filter((p) => p.currentRisk === 'high' || p.currentRisk === 'imminent')
+  }, [patients])
+
+  const riskDistribution = useMemo(() => {
+    const distribution = {
+      imminent: 0,
+      high: 0,
+      moderate: 0,
+      low: 0,
+      minimal: 0,
+    }
+    patients.forEach((p) => {
+      if (p.currentRisk in distribution) {
+        distribution[p.currentRisk]++
+      }
+    })
+    return distribution
+  }, [patients])
 
   // Get risk color for styling
   const getRiskColor = (risk: string): string => {
@@ -278,7 +308,7 @@ export const CrisisMonitoringDashboard: React.FC<
         <TabsList className='grid w-full grid-cols-4'>
           <TabsTrigger value='overview'>Overview</TabsTrigger>
           <TabsTrigger value='alerts'>
-            Alerts ({alerts.filter((a) => !a.acknowledged).length})
+            Alerts ({unacknowledgedAlertsCount})
           </TabsTrigger>
           <TabsTrigger value='patients'>Patients</TabsTrigger>
           <TabsTrigger value='analytics'>Analytics</TabsTrigger>
@@ -287,15 +317,13 @@ export const CrisisMonitoringDashboard: React.FC<
         {/* Overview Tab */}
         <TabsContent value='overview' className='space-y-6'>
           {/* Critical Alerts Section */}
-          {alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
-            .length > 0 && (
+          {criticalUnacknowledgedAlerts.length > 0 && (
             <Alert variant='error'>
               <AlertTriangle className='h-4 w-4' />
               <div>
                 <strong>Critical Alerts Requiring Immediate Attention</strong>
                 <div className='mt-2 space-y-1'>
-                  {alerts
-                    .filter((a) => a.severity === 'critical' && !a.acknowledged)
+                  {criticalUnacknowledgedAlerts
                     .slice(0, 3)
                     .map((alert) => (
                       <div key={alert.id} className='text-sm'>
@@ -317,11 +345,7 @@ export const CrisisMonitoringDashboard: React.FC<
             </CardHeader>
             <CardContent>
               <div className='space-y-4'>
-                {patients
-                  .filter(
-                    (p) =>
-                      p.currentRisk === 'high' || p.currentRisk === 'imminent',
-                  )
+                {highRiskPatients
                   .slice(0, 5)
                   .map((patient) => (
                     <div
@@ -364,10 +388,7 @@ export const CrisisMonitoringDashboard: React.FC<
                     </div>
                   ))}
 
-                {patients.filter(
-                  (p) =>
-                    p.currentRisk === 'high' || p.currentRisk === 'imminent',
-                ).length === 0 && (
+                {highRiskPatients.length === 0 && (
                   <div className='text-gray-500 py-8 text-center'>
                     <CheckCircle className='text-green-500 mx-auto mb-2 h-12 w-12' />
                     No high-risk patients at this time
@@ -613,9 +634,7 @@ export const CrisisMonitoringDashboard: React.FC<
                 <div className='space-y-3'>
                   {['imminent', 'high', 'moderate', 'low', 'minimal'].map(
                     (risk) => {
-                      const count = patients.filter(
-                        (p) => p.currentRisk === risk,
-                      ).length
+                      const count = riskDistribution[risk as keyof typeof riskDistribution]
                       const percentage =
                         patients.length > 0
                           ? (count / patients.length) * 100
