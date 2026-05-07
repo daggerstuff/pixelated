@@ -428,7 +428,7 @@
     "tsx": "latest",
     "tw-animate-css": "latest",
     "typeorm": "latest",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "latest",
     "unocss": "latest",
     "url-polyfill": "latest",
