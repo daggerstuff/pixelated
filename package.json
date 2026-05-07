@@ -449,7 +449,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@10.33.3",
+  "packageManager": "pnpm@11.0.8",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
