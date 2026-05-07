@@ -5016,6 +5016,7 @@ dependencies = [
     { name = "torch" },
     { name = "tqdm" },
     { name = "transformers" },
+    { name = "undetected-chromedriver" },
     { name = "urllib3" },
     { name = "uvicorn" },
     { name = "virtualenv" },
@@ -5197,6 +5198,7 @@ requires-dist = [
     { name = "transformers", specifier = ">=5.0.0rc3" },
     { name = "types-requests", marker = "extra == 'dev'" },
     { name = "types-requests", marker = "extra == 'test'" },
+    { name = "undetected-chromedriver", specifier = ">=3.5.5" },
     { name = "urllib3", specifier = ">=2.6.2" },
     { name = "uvicorn", specifier = ">=0.44.0" },
     { name = "virtualenv", specifier = ">=21.2.0" },
@@ -7649,6 +7651,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/b5/82/345cc927f7fbdae60
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3b/25/2c87754f3a9e692315f7b811244090e68f362979fc8886b3fbd2985a1d8c/uncalled_for-0.3.2-py3-none-any.whl", hash = "sha256:0ff60b142c7d1f8070bde9d42afaa70aedc77dcc10998c227687e9c15713418e", size = 11444, upload-time = "2026-05-06T13:38:24.025Z" },
 ]
+
+[[package]]
+name = "undetected-chromedriver"
+version = "3.5.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+    { name = "selenium" },
+    { name = "websockets" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1f/98/7ab46625ce2317756e4e857fe6ac24b6378c3e8f477da26c95226ed8ccb7/undetected-chromedriver-3.5.5.tar.gz", hash = "sha256:9f945e1435005247abe17de316bcfda85b284a4177fd5f25167c78ced33b65ec", size = 65409, upload-time = "2024-02-17T17:18:36.855Z" }
 
 [[package]]
 name = "uritemplate"

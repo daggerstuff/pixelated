@@ -12,7 +12,7 @@ set -e
 
 # Configuration
 BATCH_SIZE=25
-MAX_RETRIES=3
+MAX_RETRIES=5
 BATCH_DELAY=8
 CATEGORY_DELAY=20
 OUTPUT_DIR="/home/vivi/pixelated/data/therapeutic"
@@ -34,7 +34,7 @@ CATEGORIES=(
 )
 
 # Target per category (slightly higher to account for ~5-10% filtering)
-TARGET_PER_CATEGORY=110
+TARGET_PER_CATEGORY=160
 
 # Get API key
 export NVIDIA_API_KEY="${NVIDIA_API_KEY:-$(grep NVIDIA_API_KEY .env 2>/dev/null | head -1 | cut -d"'" -f2)}"
@@ -104,9 +104,10 @@ generate_batch() {
     if uv run python -m ai.training.sdg_pipeline \
         --scenario niche_category \
         --category "$cat" \
-        --count "$batch" \
+        --target_count "$batch" \
         --output_path "$output_file" \
-        --model nvidia-text \
+        --nemo_endpoint https://integrate.api.nvidia.com/v1 --nemo_api_key "$NVIDIA_API_KEY" --nemo_model nvidia/llama-3.3-nemotron-super-49b-v1 \
+	--max_iterations 50 \
         2>&1 | tee -a "$LOG_FILE"; then
 
         # Verify the output file was created and has content
