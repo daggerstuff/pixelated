@@ -20,7 +20,7 @@ jobs:
 
       - uses: pnpm/action-setup@v6
         with:
-          version: 10.33.3
+          version: 11.0.8
 
       - name: Install native build dependencies
         run: |

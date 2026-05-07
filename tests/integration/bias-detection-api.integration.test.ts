@@ -93,6 +93,122 @@ interface ApiResponse<T = Record<string, unknown>> {
   cacheHit?: boolean
 }
 
+interface ExportData {
+  recentAnalyses: Array<Record<string, unknown>>
+}
+
+type MockedFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+type GlobalWithFetch = {
+  fetch: MockedFetch
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value)
+  )
+}
+
+async function parseJsonResponse(response: Response): Promise<unknown> {
+  return response.json()
+}
+
+function isApiResponse<T>(
+  value: unknown,
+  isData?: (data: unknown) => data is T,
+): value is ApiResponse<T> {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (typeof value.success !== 'boolean') {
+    return false
+  }
+
+  if (value.error !== undefined && typeof value.error !== 'string') {
+    return false
+  }
+
+  if (value.message !== undefined && typeof value.message !== 'string') {
+    return false
+  }
+
+  if (value.processingTime !== undefined && typeof value.processingTime !== 'number') {
+    return false
+  }
+
+  if (value.cacheHit !== undefined && typeof value.cacheHit !== 'boolean') {
+    return false
+  }
+
+  if (!isData) {
+    return true
+  }
+
+  if (value.data === undefined) {
+    return true
+  }
+
+  return isData(value.data)
+}
+
+function isBiasAnalysisData(value: unknown): value is BiasAnalysisData {
+  return (
+    isRecord(value) &&
+    typeof value.sessionId === 'string' &&
+    typeof value.overallBiasScore === 'number' &&
+    typeof value.alertLevel === 'string' &&
+    typeof value.confidence === 'number' &&
+    isRecord(value.analysis) &&
+    isRecord(value.analysis.linguistic) &&
+    isRecord(value.analysis.contextual) &&
+    isRecord(value.analysis.interactive) &&
+    isRecord(value.analysis.evaluation) &&
+    isRecord(value.demographics) &&
+    typeof value.demographics.age === 'string' &&
+    typeof value.demographics.gender === 'string' &&
+    typeof value.demographics.ethnicity === 'string' &&
+    typeof value.demographics.primaryLanguage === 'string' &&
+    Array.isArray(value.recommendations)
+  )
+}
+
+function isDashboardData(value: unknown): value is DashboardData {
+  return (
+    isRecord(value) &&
+    isRecord(value.summary) &&
+    typeof value.summary.totalSessions === 'number' &&
+    typeof value.summary.averageBiasScore === 'number' &&
+    typeof value.summary.totalAlerts === 'number' &&
+    typeof value.summary.lastUpdated === 'string' &&
+    Array.isArray(value.alerts) &&
+    Array.isArray(value.trends) &&
+    isRecord(value.demographics) &&
+    Array.isArray(value.recentAnalyses)
+  )
+}
+
+async function parseApiResponse<T>(
+  response: Response,
+  isData?: (data: unknown) => data is T,
+): Promise<ApiResponse<T>> {
+  const payload = await parseJsonResponse(response)
+  if (!isApiResponse(payload, isData)) {
+    throw new Error('Response does not match expected API schema')
+  }
+
+  return payload
+}
+
+function isExportData(value: unknown): value is ExportData {
+  return (
+    isRecord(value) &&
+    'recentAnalyses' in value &&
+    Array.isArray(value.recentAnalyses)
+  )
+}
+
 describe('Bias Detection API Integration Tests', () => {
   let testServer: TestServer
   let authToken: string
@@ -156,7 +272,8 @@ describe('Bias Detection API Integration Tests', () => {
   // Mock state
   const requestHistory: Record<string, number> = {}
   const analysisCache = new Map<string, BiasAnalysisData>()
-  const originalFetch = global.fetch
+  const globalWithFetch = globalThis as GlobalWithFetch
+  const originalFetch: MockedFetch = globalWithFetch.fetch
 
   beforeAll(async () => {
     // Setup test server mock
@@ -167,14 +284,19 @@ describe('Bias Detection API Integration Tests', () => {
         console.log('Test server started on port', testServer.port)
 
         // Mock global.fetch
-        global.fetch = vi
+        globalWithFetch.fetch = vi
           .fn()
           .mockImplementation(
             async (input: RequestInfo | URL, init?: RequestInit) => {
-              const urlStr = String(input)
+              const urlStr =
+                input instanceof URL
+                  ? input.href
+                  : typeof input === 'string'
+                    ? input
+                    : input.url
               const url = new URL(urlStr)
               const path = url.pathname
-              const method = init?.method || 'GET'
+              const method = init?.method ?? 'GET'
               const headers = new Headers(init?.headers)
               const authHeader = headers.get('Authorization')
 
@@ -245,9 +367,14 @@ describe('Bias Detection API Integration Tests', () => {
               if (path === '/api/bias-detection/analyze' && method === 'POST') {
                 try {
                   if (!init?.body) throw new Error('Missing body')
-                  const body = JSON.parse(init.body || '{}')
+                  const parsedBody: unknown =
+                    typeof init.body === 'string' ? JSON.parse(init.body) : {}
+                  const body =
+                    isRecord(parsedBody) && isRecord(parsedBody.session)
+                      ? parsedBody
+                      : undefined
 
-                  if (!body.session) {
+                  if (!body?.session) {
                     return new Response(
                       JSON.stringify({
                         success: false,
@@ -261,15 +388,54 @@ describe('Bias Detection API Integration Tests', () => {
                     )
                   }
 
-                  const session = body.session
+                  const bodySession = body.session
+                  if (!isRecord(bodySession)) {
+                    return new Response(
+                      JSON.stringify({
+                        success: false,
+                        error: 'Validation Error',
+                        message: 'Missing required fields',
+                      }),
+                      {
+                        status: 400,
+                        headers: { 'Content-Type': 'application/json' },
+                      },
+                    )
+                  }
+
+                  const session = bodySession
+                  const demographics = isRecord(session.participantDemographics)
+                    ? session.participantDemographics
+                    : undefined
+                  if (!demographics) {
+                    return new Response(
+                      JSON.stringify({
+                        success: false,
+                        error: 'Validation Error',
+                        message: 'Missing required fields',
+                      }),
+                      {
+                        status: 400,
+                        headers: { 'Content-Type': 'application/json' },
+                      },
+                    )
+                  }
+                  const sessionId =
+                    typeof session.sessionId === 'string'
+                      ? session.sessionId
+                      : ''
+                  const sessionTimestamp =
+                    typeof session.timestamp === 'string'
+                      ? session.timestamp
+                      : ''
                   // Strict UUID validation
                   const uuidRegex =
                     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
                   if (
-                    !session.sessionId ||
-                    !uuidRegex.test(session.sessionId) ||
-                    session.sessionId === 'invalid-uuid'
+                    !sessionId ||
+                    !uuidRegex.test(sessionId) ||
+                    sessionId === 'invalid-uuid'
                   ) {
                     return new Response(
                       JSON.stringify({
@@ -285,7 +451,7 @@ describe('Bias Detection API Integration Tests', () => {
                   }
 
                   // Required fields check
-                  if (!session.timestamp || !session.participantDemographics) {
+                  if (!sessionTimestamp) {
                     return new Response(
                       JSON.stringify({
                         success: false,
@@ -300,9 +466,9 @@ describe('Bias Detection API Integration Tests', () => {
                   }
 
                   if (
-                    session.sessionId === 'invalid-uuid' ||
-                    session.timestamp === 'invalid-date' ||
-                    session.participantDemographics?.age === 'invalid-age'
+                    sessionId === 'invalid-uuid' ||
+                    sessionTimestamp === 'invalid-date' ||
+                    demographics.age === 'invalid-age'
                   ) {
                     return new Response(
                       JSON.stringify({
@@ -319,7 +485,7 @@ describe('Bias Detection API Integration Tests', () => {
 
                   // Create mock response
                   const responseData: BiasAnalysisData = {
-                    sessionId: session.sessionId,
+                    sessionId,
                     overallBiasScore: 0.15,
                     alertLevel: 'low',
                     confidence: 0.85,
@@ -329,15 +495,36 @@ describe('Bias Detection API Integration Tests', () => {
                       interactive: {},
                       evaluation: {},
                     },
-                    demographics: session.participantDemographics,
+                  demographics: {
+                    age:
+                      typeof demographics.age === 'string'
+                        ? demographics.age
+                        : '',
+                    gender:
+                      typeof demographics.gender === 'string'
+                        ? demographics.gender
+                        : '',
+                    ethnicity:
+                      typeof demographics.ethnicity === 'string'
+                        ? demographics.ethnicity
+                        : '',
+                    primaryLanguage:
+                      typeof demographics.primaryLanguage === 'string'
+                        ? demographics.primaryLanguage
+                        : '',
+                  },
                     recommendations: [
                       { type: 'check-in', message: 'Good job' },
                     ],
                   }
 
                   // Simulate cache usage logic (mock only)
-                  const skipCache = body.options?.skipCache
-                  const cacheKey = session.sessionId
+                  const options = isRecord(body) ? body.options : undefined
+                  const skipCache =
+                    isRecord(options) && typeof options.skipCache === 'boolean'
+                      ? options.skipCache
+                      : false
+                  const cacheKey = sessionId
                   let isCacheHit = false
 
                   if (!skipCache && analysisCache.has(cacheKey)) {
@@ -496,7 +683,7 @@ describe('Bias Detection API Integration Tests', () => {
 
               // 4. GET /api/bias-detection/export
               if (path === '/api/bias-detection/export' && method === 'GET') {
-                const format = url.searchParams.get('format') || 'json'
+                const format = url.searchParams.get('format') ?? 'json'
 
                 let contentType = 'application/json'
                 let ext = '.json'
@@ -556,7 +743,7 @@ describe('Bias Detection API Integration Tests', () => {
 
   afterAll(async () => {
     await testServer.stop()
-    global.fetch = originalFetch
+    globalWithFetch.fetch = originalFetch
   })
 
   beforeEach(() => {
@@ -604,7 +791,7 @@ describe('Bias Detection API Integration Tests', () => {
       expect(response.status).toBe(200)
       expect(response.headers.get('Content-Type')).toContain('application/json')
 
-      const data: ApiResponse<BiasAnalysisData> = await response.json()
+      const data = await parseApiResponse(response, isBiasAnalysisData)
       expect(data.success).toBe(true)
       expect(data.data).toBeDefined()
 
@@ -652,7 +839,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(firstResponse.status).toBe(200)
-      const firstData: ApiResponse = await firstResponse.json()
+      const firstData = await parseApiResponse(firstResponse)
       expect(firstData.success).toBe(true)
       expect(firstData.cacheHit).toBe(false)
 
@@ -667,7 +854,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(secondResponse.status).toBe(200)
-      const secondData: ApiResponse = await secondResponse.json()
+      const secondData = await parseApiResponse(secondResponse)
       expect(secondData.success).toBe(true)
       expect(secondData.cacheHit).toBe(true)
       expect(secondData.processingTime).toBeLessThan(
@@ -691,7 +878,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(true)
       expect(data.cacheHit).toBe(false)
     })
@@ -709,7 +896,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(401)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Unauthorized')
     })
@@ -727,7 +914,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(401)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Unauthorized')
     })
@@ -745,7 +932,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(400)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Invalid Content Type')
     })
@@ -763,7 +950,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(400)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Validation Error')
       expect(data.message).toContain('Session ID must be a valid UUID')
@@ -787,7 +974,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(400)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Validation Error')
     })
@@ -803,7 +990,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(400)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Validation Error')
     })
@@ -840,7 +1027,7 @@ describe('Bias Detection API Integration Tests', () => {
 
       // Check rate limit response format
       if (rateLimitedResponses.length > 0) {
-        const rateLimitData: ApiResponse = await rateLimitedResponses[0].json()
+        const rateLimitData = await parseApiResponse(rateLimitedResponses[0])
         expect(rateLimitData.success).toBe(false)
         expect(rateLimitData.error).toBe('Rate Limit Exceeded')
       }
@@ -894,7 +1081,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse<BiasAnalysisData> = await response.json()
+      const data = await parseApiResponse(response, isBiasAnalysisData)
       expect(data.success).toBe(true)
       expect(data.data).toBeDefined()
       expect(data.data!.sessionId).toBe(testSession.sessionId)
@@ -913,7 +1100,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(true)
       expect(data.cacheHit).toBe(true)
     })
@@ -931,7 +1118,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse<BiasAnalysisData> = await response.json()
+      const data = await parseApiResponse(response, isBiasAnalysisData)
       expect(data.success).toBe(true)
       const analysisData = data.data!
       expect(analysisData.demographics.ethnicity).toBe('[ANONYMIZED]')
@@ -955,7 +1142,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(400)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Validation Error')
       expect(data.message).toContain('Session ID must be a valid UUID')
@@ -973,7 +1160,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(404)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(false)
       expect(data.error).toBe('Not Found')
       expect(data.message).toBe('Session analysis not found')
@@ -996,7 +1183,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse<DashboardData> = await response.json()
+      const data = await parseApiResponse(response, isDashboardData)
       expect(data.success).toBe(true)
       expect(data.data).toBeDefined()
 
@@ -1028,7 +1215,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(true)
       expect(data.data).toBeDefined()
     })
@@ -1045,7 +1232,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(true)
       expect(data.data).toBeDefined()
     })
@@ -1063,7 +1250,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(true)
       expect(data.data).toBeDefined()
     })
@@ -1083,7 +1270,7 @@ describe('Bias Detection API Integration Tests', () => {
         })
 
         expect(response.status).toBe(200)
-        const data: ApiResponse = await response.json()
+        const data = await parseApiResponse(response)
         expect(data.success).toBe(true)
       }
     })
@@ -1100,7 +1287,7 @@ describe('Bias Detection API Integration Tests', () => {
       })
 
       expect(response.status).toBe(200)
-      const data: ApiResponse = await response.json()
+      const data = await parseApiResponse(response)
       expect(data.success).toBe(true)
     })
 
@@ -1118,7 +1305,7 @@ describe('Bias Detection API Integration Tests', () => {
     })
 
     it('should handle concurrent requests properly', async () => {
-      const requests = Array.from({ length: 5 }, () =>
+      const requests = Array.from({ length: 5 }, async () =>
         fetch(dashboardEndpoint, {
           method: 'GET',
           headers: {
@@ -1329,8 +1516,7 @@ describe('Bias Detection API Integration Tests', () => {
       )
 
       expect(analyzeResponse.status).toBe(200)
-      const analyzeData: ApiResponse<BiasAnalysisData> =
-        await analyzeResponse.json()
+      const analyzeData = await parseApiResponse(analyzeResponse, isBiasAnalysisData)
       expect(analyzeData.success).toBe(true)
 
       // Get dashboard data
@@ -1345,8 +1531,7 @@ describe('Bias Detection API Integration Tests', () => {
       )
 
       expect(dashboardResponse.status).toBe(200)
-      const dashboardData: ApiResponse<DashboardData> =
-        await dashboardResponse.json()
+      const dashboardData = await parseApiResponse(dashboardResponse, isDashboardData)
 
       // Verify the analyzed session appears in recent analyses
       const dashboardResult = dashboardData.data!
@@ -1384,7 +1569,10 @@ describe('Bias Detection API Integration Tests', () => {
 
       expect(exportResponse.status).toBe(200)
       const exportText = await exportResponse.text()
-      const exportData = JSON.parse(exportText)
+      const exportPayload: unknown = JSON.parse(exportText)
+      const exportData = isExportData(exportPayload)
+        ? exportPayload
+        : { recentAnalyses: [] }
 
       // Verify the analyzed session is included in the export
       const { recentAnalyses } = exportData
@@ -1459,7 +1647,7 @@ describe('Bias Detection API Integration Tests', () => {
     it('should handle concurrent requests across multiple endpoints', async () => {
       const concurrentRequests = [
         // Analyze requests
-        ...Array.from({ length: 5 }, (_, i) =>
+        ...Array.from({ length: 5 }, async (_, i) =>
           fetch(`${testServer.baseUrl}/api/bias-detection/analyze`, {
             method: 'POST',
             headers: {
@@ -1475,7 +1663,7 @@ describe('Bias Detection API Integration Tests', () => {
           }),
         ),
         // Dashboard requests
-        ...Array.from({ length: 3 }, () =>
+        ...Array.from({ length: 3 }, async () =>
           fetch(`${testServer.baseUrl}/api/bias-detection/dashboard`, {
             method: 'GET',
             headers: {
@@ -1484,7 +1672,7 @@ describe('Bias Detection API Integration Tests', () => {
           }),
         ),
         // Export requests
-        ...Array.from({ length: 2 }, () =>
+        ...Array.from({ length: 2 }, async () =>
           fetch(`${testServer.baseUrl}/api/bias-detection/export`, {
             method: 'GET',
             headers: {
@@ -1508,7 +1696,7 @@ describe('Bias Detection API Integration Tests', () => {
     it('should maintain reasonable response times under load', async () => {
       const startTime = Date.now()
 
-      const requests = Array.from({ length: 10 }, () =>
+      const requests = Array.from({ length: 10 }, async () =>
         fetch(`${testServer.baseUrl}/api/bias-detection/dashboard`, {
           method: 'GET',
           headers: {
@@ -1527,7 +1715,7 @@ describe('Bias Detection API Integration Tests', () => {
       // Check individual response times
       for (const response of responses) {
         if (response.status === 200) {
-          const data: ApiResponse = await response.json()
+          const data = await parseApiResponse(response)
           expect(data.processingTime).toBeLessThan(5000) // 5 seconds per request
         }
       }
@@ -1554,7 +1742,7 @@ describe('Bias Detection API Integration Tests', () => {
       // Should either succeed or fail gracefully with proper error response
       if (response.status !== 200) {
         expect([500, 503]).toContain(response.status)
-        const data: ApiResponse = await response.json()
+        const data = await parseApiResponse(response)
         expect(data.success).toBe(false)
         expect(data.error).toBeDefined()
       }
@@ -1593,7 +1781,7 @@ describe('Bias Detection API Integration Tests', () => {
         )
 
         expect(response.status).toBe(request.expectedStatus)
-        const data: ApiResponse = await response.json()
+        const data = await parseApiResponse(response)
         expect(data.success).toBe(false)
         expect(data.error).toBeDefined()
       }
