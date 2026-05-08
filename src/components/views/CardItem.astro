@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets'
+import DOMPurify from 'isomorphic-dompurify'
 
 import Link from '@/components/base/Link.astro'
 import SwiperCarousel from '@/components/widgets/SwiperCarousel.astro'
@@ -72,6 +73,10 @@ const MAX_DETAILS = 3
 const { date, text, html, link, images, video, external, quote, details } = item
 const MediaContainer = link ? Link : 'div'
 const Content = details ? 'collapsible-content' : 'div'
+
+// ⚡ Bolt: Sanitize HTML in the frontmatter instead of inline to reduce SSR overhead
+const sanitizedHtml = html ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) : undefined
+const sanitizedDetails = details ? details.map(d => DOMPurify.sanitize(d, { USE_PROFILES: { html: true } })) : undefined
 ---
 
 <section class={className}>
@@ -176,16 +181,16 @@ const Content = details ? 'collapsible-content' : 'div'
       )
     }
     <Content class="p-4 pb-3">
-      {html && <div class="prose card-item-prose" set:html={html} />}
+      {sanitizedHtml && <div class="prose card-item-prose" set:html={sanitizedHtml} />}
       {text && <p class="prose card-item-prose">{text}</p>}
       {
-        details && (
+        sanitizedDetails && (
           <div
             class="card-item-details"
             style="max-height: 0; overflow-y: clip;"
           >
             <ol class="relative border-s border-gray-200 dark:border-gray-700">
-              {details
+              {sanitizedDetails
                 .slice(0, MAX_DETAILS + 1)
                 .map((detail: string, idx: number) => (
                   <li class="ms-4 mb-6 last:mb-0">
@@ -214,7 +219,7 @@ const Content = details ? 'collapsible-content' : 'div'
             ) : (
               <p class="op-60">{formatDate(date, false)}</p>
             )}
-            {details && (
+            {sanitizedDetails && (
               <button
                 type="button"
                 aria-expanded="false"
