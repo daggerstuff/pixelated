@@ -1,12 +1,12 @@
 Already up to date
-Done in 252ms using pnpm v11.0.8
+Done in 246ms using pnpm v11.0.8
 $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit
 🟢 Using Node adapter for standard deployment
-18:45:21 [@astrojs/node] Enabling sessions with filesystem storage
-18:45:22 [content] Syncing content
-18:45:22 [content] Synced content
-18:45:22 [types] Generated 1.03s
-18:45:22 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
+18:35:08 [@astrojs/node] Enabling sessions with filesystem storage
+18:35:09 [content] Syncing content
+18:35:09 [content] Synced content
+18:35:09 [types] Generated 1.01s
+18:35:09 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
 [96msrc/content.config.ts[0m:[93m103[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
 
 [7m103[0m       'sponsor.to-suport': z.string().optional(),
