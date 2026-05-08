@@ -9,4 +9,10 @@
 
 ## 2026-04-28 - Fix XSS in Contact.astro | Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify | Learning: JSON.stringify is unsafe for inline script blocks without escaping | Prevention: Always use replace(/</g, "\u003c").replace(/>/g, "\u003e") for JSON data within set:html
 
-## 2026-04-28 - Missing Auth on Treatment Plans | Vulnerability: Unauthenticated access to sensitive treatment plans endpoints because of missing verifyAuthToken middleware | Learning: Relying solely on locals.user without proper middleware setup can leave endpoints exposed | Prevention: Always use verifyAuthToken to explicitly validate the Authorization header on sensitive API routes
+## 2026-04-28 - Fix XSS in CardItem.astro via unsanitized set:html
+
+Vulnerability: HTML content and details from collections were injected directly via set:html without sanitization
+
+Learning: Any user-provided or CMS-sourced HTML passed to set:html must be sanitized to prevent XSS
+
+Prevention: Always sanitize HTML strings with DOMPurify before using set:html in Astro components
