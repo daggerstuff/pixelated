@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest'
 
-import { formatDuration, isValidDate, getStartOf } from './formatDate'
+import { formatDate, formatDuration, isValidDate, getStartOf } from './formatDate'
+
+describe('formatDate', () => {
+  it('formats custom string correctly', () => {
+    // Tests YYYY-MM-DD custom formatting via tokens
+    expect(formatDate('2023-01-01T12:00:00Z', { formatString: 'YYYY-MM-DD' })).toBe('2023-01-01')
+  })
+})
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
