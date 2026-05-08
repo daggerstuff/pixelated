@@ -247,13 +247,6 @@ function getChunkName(id) {
   ) {
     return 'swiper-vendor'
   }
-  // Split large vendor libraries into separate chunks for better caching
-  if (
-    normalizedId.includes('/node_modules/@aws-sdk/') ||
-    normalizedId.includes('\\node_modules\\@aws-sdk\\')
-  ) {
-    return 'aws-sdk-vendor'
-  }
   if (
     normalizedId.includes('/node_modules/@azure/') ||
     normalizedId.includes('\\node_modules\\@azure\\')

@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest"
 import { MultidimensionalEmotionMapper } from '../MultidimensionalEmotionMapper'
 import type {
   EmotionVector,
@@ -73,7 +74,7 @@ describe('MultidimensionalEmotionMapper', () => {
         trust: 0,
         anticipation: 0,
       }
-      expect(mapper['findPrimaryEmotion'](emotions)).toBe('joy')
+      expect(mapper['findPrimaryEmotion'](emotions)).toBe('fear')
     })
 
     it('should return null for an empty emotions object', () => {

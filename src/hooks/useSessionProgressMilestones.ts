@@ -1,6 +1,6 @@
 // src/hooks/useSessionProgressMilestones.ts
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 import type { SessionProgressMetrics } from '@/types/dashboard'
 
@@ -48,17 +48,17 @@ export function useSessionProgressMilestones(
       ...initialState?.progressMetrics,
     })
 
-  const setProgress = (value: number) => {
+  const setProgress = useCallback((value: number) => {
     setProgressValue(Math.max(0, Math.min(100, value)))
-  }
+  }, [])
 
-  const addProgressSnapshot = (value: number) => {
+  const addProgressSnapshot = useCallback((value: number) => {
     const clamped = Math.max(0, Math.min(100, value))
     setProgressSnapshots((prev) => [
       ...prev,
       { timestamp: new Date().toISOString(), value: clamped },
     ])
-  }
+  }, [])
 
   const updateSkillScore = (skill: string, score: number) => {
     setProgressMetrics((prev) => ({
@@ -88,13 +88,13 @@ export function useSessionProgressMilestones(
     ])
   }
 
-  const resetProgress = () => {
+  const resetProgress = useCallback(() => {
     setProgressValue(0)
     setProgressSnapshots([])
     setProgressMetrics({ ...initialProgressMetrics })
-  }
+  }, [])
 
-  const setProgressState = (state: Partial<ProgressMilestoneState>) => {
+  const setProgressState = useCallback((state: Partial<ProgressMilestoneState>) => {
     if (state.progress !== undefined) {
       setProgressValue(state.progress)
     }
@@ -107,7 +107,7 @@ export function useSessionProgressMilestones(
     if (state.progressMetrics !== undefined) {
       setProgressMetrics(state.progressMetrics)
     }
-  }
+  }, [])
 
   return {
     progress,
