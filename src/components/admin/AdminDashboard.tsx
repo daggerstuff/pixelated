@@ -659,7 +659,10 @@ const TherapistsTab: FC<{
                     </div>
                   </div>
                 </div>
-                <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
+                <button
+                  aria-label={`View details for ${therapist.name}`}
+                  className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'
+                >
                   View Details
                 </button>
               </div>
@@ -752,7 +755,10 @@ const InstitutionsTab: FC<{
                     {dept.therapists} therapists • {dept.patients} patients
                   </p>
                 </div>
-                <button className='text-blue-600 dark:text-blue-400 text-sm hover:underline'>
+                <button
+                  aria-label={`Manage ${dept.name} department`}
+                  className='text-blue-600 dark:text-blue-400 text-sm hover:underline'
+                >
                   Manage
                 </button>
               </div>
