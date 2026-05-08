@@ -1,10 +1,19 @@
 import { describe, it, expect } from 'vitest'
 
+<<<<<<< HEAD
 import { formatDuration, isValidDate, getStartOf, formatDate } from './formatDate'
 
 describe('formatDate', () => {
   it('throws an error when provided an invalid date string', () => {
     expect(() => formatDate('not-a-date')).toThrow('Failed to format date: Error: Invalid date string')
+=======
+import { formatDate, formatDuration, isValidDate, getStartOf } from './formatDate'
+
+describe('formatDate', () => {
+  it('formats custom string correctly', () => {
+    // Tests YYYY-MM-DD custom formatting via tokens
+    expect(formatDate('2023-01-01T12:00:00Z', { formatString: 'YYYY-MM-DD' })).toBe('2023-01-01')
+>>>>>>> 06d96a598 (🧪 QA: Add test for formatDate edge case)
   })
 })
 
