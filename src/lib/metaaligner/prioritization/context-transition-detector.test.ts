@@ -549,21 +549,23 @@ describe('ContextTransitionDetector', () => {
       ]
 
       const crisisTransitions: ReturnType<typeof detector.addEvent>[] = []
-      dialogue.forEach((turn, index) => {
-        const event: ContextEvent = {
-          turnId: index + 1,
-          contextType: turn.context,
-          confidence: turn.confidence,
-          urgency: turn.urgency,
-          timestamp: Date.now() + index * 1000,
-        }
+      dialogue
+        .forEach((turn, index) => {
+          const event: ContextEvent = {
+            turnId: index + 1,
+            contextType: turn.context,
+            confidence: turn.confidence,
+            urgency: turn.urgency,
+            timestamp: Date.now() + index * 1000,
+          }
 
-        const transition = detector.addEvent(event)
-        if (transition && transition.transitionType === 'crisis_elevation') {
-          crisisTransitions.push(transition)
-        }
-        return transition
-      }).filter(t => t && t.transitionType === 'crisis_elevation')
+          const transition = detector.addEvent(event)
+          if (transition && transition.transitionType === 'crisis_elevation') {
+            crisisTransitions.push(transition)
+          }
+          return transition
+        })
+        .filter((t) => t && t.transitionType === 'crisis_elevation')
 
       expect(crisisTransitions).toHaveLength(1)
       expect(crisisTransitions[0]!.detected).toBe(true)

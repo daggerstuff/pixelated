@@ -120,10 +120,7 @@ function remarkImageContainer() {
 
           // node.children.splice(0, 1, node.children[0].children[0])
         } else {
-          file.fail(
-            'The `image-*` directive failed to match a valid tag.',
-            d,
-          )
+          file.fail('The `image-*` directive failed to match a valid tag.', d)
         }
       }
     })

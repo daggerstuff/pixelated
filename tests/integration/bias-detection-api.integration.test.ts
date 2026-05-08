@@ -97,17 +97,16 @@ interface ExportData {
   recentAnalyses: Array<Record<string, unknown>>
 }
 
-type MockedFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+type MockedFetch = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>
 type GlobalWithFetch = {
   fetch: MockedFetch
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value)
-  )
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 async function parseJsonResponse(response: Response): Promise<unknown> {
@@ -134,7 +133,10 @@ function isApiResponse<T>(
     return false
   }
 
-  if (value.processingTime !== undefined && typeof value.processingTime !== 'number') {
+  if (
+    value.processingTime !== undefined &&
+    typeof value.processingTime !== 'number'
+  ) {
     return false
   }
 
@@ -495,24 +497,24 @@ describe('Bias Detection API Integration Tests', () => {
                       interactive: {},
                       evaluation: {},
                     },
-                  demographics: {
-                    age:
-                      typeof demographics.age === 'string'
-                        ? demographics.age
-                        : '',
-                    gender:
-                      typeof demographics.gender === 'string'
-                        ? demographics.gender
-                        : '',
-                    ethnicity:
-                      typeof demographics.ethnicity === 'string'
-                        ? demographics.ethnicity
-                        : '',
-                    primaryLanguage:
-                      typeof demographics.primaryLanguage === 'string'
-                        ? demographics.primaryLanguage
-                        : '',
-                  },
+                    demographics: {
+                      age:
+                        typeof demographics.age === 'string'
+                          ? demographics.age
+                          : '',
+                      gender:
+                        typeof demographics.gender === 'string'
+                          ? demographics.gender
+                          : '',
+                      ethnicity:
+                        typeof demographics.ethnicity === 'string'
+                          ? demographics.ethnicity
+                          : '',
+                      primaryLanguage:
+                        typeof demographics.primaryLanguage === 'string'
+                          ? demographics.primaryLanguage
+                          : '',
+                    },
                     recommendations: [
                       { type: 'check-in', message: 'Good job' },
                     ],
@@ -1516,7 +1518,10 @@ describe('Bias Detection API Integration Tests', () => {
       )
 
       expect(analyzeResponse.status).toBe(200)
-      const analyzeData = await parseApiResponse(analyzeResponse, isBiasAnalysisData)
+      const analyzeData = await parseApiResponse(
+        analyzeResponse,
+        isBiasAnalysisData,
+      )
       expect(analyzeData.success).toBe(true)
 
       // Get dashboard data
@@ -1531,7 +1536,10 @@ describe('Bias Detection API Integration Tests', () => {
       )
 
       expect(dashboardResponse.status).toBe(200)
-      const dashboardData = await parseApiResponse(dashboardResponse, isDashboardData)
+      const dashboardData = await parseApiResponse(
+        dashboardResponse,
+        isDashboardData,
+      )
 
       // Verify the analyzed session appears in recent analyses
       const dashboardResult = dashboardData.data!
