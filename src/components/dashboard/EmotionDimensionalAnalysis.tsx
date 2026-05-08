@@ -147,9 +147,10 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
                   )
                 }
                 className='form-checkbox text-blue-600 h-4 w-4'
+                aria-describedby={`desc-${dimension}`}
               />
               <span className='font-medium capitalize'>{dimension}</span>
-              <span className='text-gray-500 text-sm'>
+              <span id={`desc-${dimension}`} className='text-gray-500 text-sm'>
                 {dimension === 'valence' && '(Positive/Negative)'}
                 {dimension === 'arousal' && '(Energized/Calm)'}
                 {dimension === 'dominance' && '(Control/Submissive)'}
