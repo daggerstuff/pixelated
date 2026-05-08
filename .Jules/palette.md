@@ -4,4 +4,4 @@
 
 ## 2026-04-19 - Dynamic aria-labels in Admin Lists | Learning: Repeated icon and text buttons inside loops create ambiguous announcements for screen reader users. | Action: Use loop variables to provide specific, dynamically generated aria-labels (e.g., `Edit ${item.name}`).
 
-## 2026-05-01 - Search Result Announcements | Learning: Live updates to search results count require an aria-live region to notify screen reader users when content dynamically updates. | Action: Added role='status' and aria-live='polite' to the result count div.
+## 2026-05-01 - Search Result Announcements | Learning: Updating the search result count requires an aria-live region to notify screen reader users when content dynamically updates. | Action: Added role='status' and aria-live='polite' to the result count div.
