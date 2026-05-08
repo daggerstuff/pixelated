@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest'
 
-import { formatDuration, isValidDate, getStartOf } from './formatDate'
+import { formatDuration, isValidDate, getStartOf, formatDate } from './formatDate'
+
+describe('formatDate', () => {
+  it('throws an error when provided an invalid date string', () => {
+    expect(() => formatDate('not-a-date')).toThrow('Failed to format date: Error: Invalid date string')
+  })
+})
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
