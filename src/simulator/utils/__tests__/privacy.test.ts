@@ -36,27 +36,19 @@ describe('privacy utils', () => {
   describe('checkBrowserCompatibility', () => {
     afterEach(() => {
       vi.restoreAllMocks()
+      vi.unstubAllGlobals()
     })
 
     it('should accurately report compatibility issues when missing WebRTC', () => {
-      // Mock missing getUserMedia
-      const originalDescriptor = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');
-      Object.defineProperty(navigator, 'mediaDevices', {
-        value: { getUserMedia: undefined },
-        configurable: true
+      // Mock missing getUserMedia using vi.stubGlobal
+      vi.stubGlobal('navigator', {
+        ...navigator,
+        mediaDevices: { getUserMedia: undefined }
       });
 
       const result = checkBrowserCompatibility();
       expect(result.compatible).toBe(false);
       expect(result.missingFeatures).toContain('WebRTC/getUserMedia');
-
-      // Restore
-      if (originalDescriptor) {
-        Object.defineProperty(navigator, 'mediaDevices', originalDescriptor);
-      } else {
-        // @ts-expect-error - clean up the mock if there was no original descriptor
-        delete navigator.mediaDevices;
-      }
     })
   })
 })
