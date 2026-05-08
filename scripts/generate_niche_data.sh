@@ -7,17 +7,27 @@
 # - Auto-restart on failure
 # - Post-processing to create clean consolidated dataset
 
-set -e
+set -euo pipefail
 
 # Configuration
-BATCH_SIZE=25
-MAX_RETRIES=5
-BATCH_DELAY=8
-CATEGORY_DELAY=20
+SDG_RUN_MODE="${SDG_RUN_MODE:-stable}"
+BATCH_SIZE="${SDG_BATCH_SIZE:-25}"
+MAX_RETRIES="${SDG_MAX_RETRIES:-6}"
+BATCH_DELAY="${SDG_BATCH_DELAY:-8}"
+CATEGORY_DELAY="${SDG_CATEGORY_DELAY:-20}"
+API_RETRY_BASE_DELAY="${SDG_API_RETRY_BASE_DELAY:-8}"
+API_RETRY_MAX_DELAY="${SDG_API_RETRY_MAX_DELAY:-120}"
+COMMAND_TIMEOUT="${SDG_COMMAND_TIMEOUT:-900}"
+NEMO_ENDPOINTS="${NVIDIA_API_ENDPOINTS:-https://integrate.api.nvidia.com/v1}"
+NEMO_MODELS="${NVIDIA_MODEL_LIST:-nvidia/llama-3.3-nemotron-super-49b-v1}"
+SDG_THERAPIST_STYLE_PROFILE="${SDG_THERAPIST_STYLE_PROFILE:-warm_professional}"
+SDG_STYLE_AUDIT_PROFILES="${SDG_STYLE_AUDIT_PROFILES:-$SDG_THERAPIST_STYLE_PROFILE}"
+SDG_STYLE_AUDIT_LIMIT="${SDG_STYLE_AUDIT_LIMIT:-120}"
+SDG_RUN_STYLE_AUDIT="${SDG_RUN_STYLE_AUDIT:-true}"
 OUTPUT_DIR="/home/vivi/pixelated/data/therapeutic"
+SDG_STYLE_AUDIT_SUMMARY_PATH="${SDG_STYLE_AUDIT_SUMMARY_PATH:-${OUTPUT_DIR}/style_audit_summary.json}"
 LOG_FILE="/home/vivi/pixelated/data/therapeutic/generation.log"
 AI_DIR="/home/vivi/pixelated/ai"
-REPO_DIR="/home/vivi/pixelated"
 STATE_FILE="/home/vivi/pixelated/data/therapeutic/.generation_state"
 
 # Categories to generate
@@ -38,7 +48,10 @@ CATEGORIES=(
 TARGET_PER_CATEGORY=160
 
 # Get API key
-export NVIDIA_API_KEY="${NVIDIA_API_KEY:-$(grep NVIDIA_API_KEY .env 2>/dev/null | head -1 | cut -d"'" -f2)}"
+if [ -z "${NVIDIA_API_KEY:-}" ] && [ -f .env ]; then
+  export NVIDIA_API_KEY="$(grep -m1 -E '^NVIDIA_API_KEY=' .env 2>/dev/null | sed -E "s/^NVIDIA_API_KEY=//; s/^['\"]//; s/['\"]$//")"
+fi
+export NVIDIA_API_KEY="${NVIDIA_API_KEY:-}"
 
 if [ -z "$NVIDIA_API_KEY" ]; then
   echo "ERROR: NVIDIA_API_KEY not set"
@@ -50,6 +63,88 @@ log() {
   local msg="[$(date '+%Y-%m-%d %H:%M:%S')] $1"
   echo "$msg"
   echo "$msg" >> "$LOG_FILE"
+}
+
+_split_csv() {
+  local input="$1"
+  local -n out="$2"
+  local entry
+  IFS=',' read -ra out <<< "$input"
+  for i in "${!out[@]}"; do
+    entry="${out[$i]}"
+    entry="${entry#"${entry%%[![:space:]]*}"}"
+    out[$i]="${entry%"${entry##*[![:space:]]}"}"
+  done
+}
+
+_split_csv "$NEMO_ENDPOINTS" API_ENDPOINTS
+_split_csv "$NEMO_MODELS" API_MODELS
+
+UV_CMD=(uv run --active --project "$AI_DIR")
+
+apply_run_profile() {
+  case "$SDG_RUN_MODE" in
+    throughput)
+      if [ -z "${SDG_BATCH_SIZE:-}" ]; then
+        BATCH_SIZE=30
+      fi
+      if [ -z "${SDG_MAX_RETRIES:-}" ]; then
+        MAX_RETRIES=4
+      fi
+      if [ -z "${SDG_BATCH_DELAY:-}" ]; then
+        BATCH_DELAY=4
+      fi
+      if [ -z "${SDG_CATEGORY_DELAY:-}" ]; then
+        CATEGORY_DELAY=8
+      fi
+      if [ -z "${SDG_API_RETRY_BASE_DELAY:-}" ]; then
+        API_RETRY_BASE_DELAY=5
+      fi
+      if [ -z "${SDG_API_RETRY_MAX_DELAY:-}" ]; then
+        API_RETRY_MAX_DELAY=60
+      fi
+      if [ -z "${SDG_COMMAND_TIMEOUT:-}" ]; then
+        COMMAND_TIMEOUT=900
+      fi
+      ;;
+    conservative)
+      if [ -z "${SDG_BATCH_SIZE:-}" ]; then
+        BATCH_SIZE=20
+      fi
+      if [ -z "${SDG_MAX_RETRIES:-}" ]; then
+        MAX_RETRIES=8
+      fi
+      if [ -z "${SDG_BATCH_DELAY:-}" ]; then
+        BATCH_DELAY=12
+      fi
+      if [ -z "${SDG_CATEGORY_DELAY:-}" ]; then
+        CATEGORY_DELAY=30
+      fi
+      if [ -z "${SDG_API_RETRY_BASE_DELAY:-}" ]; then
+        API_RETRY_BASE_DELAY=12
+      fi
+      if [ -z "${SDG_API_RETRY_MAX_DELAY:-}" ]; then
+        API_RETRY_MAX_DELAY=240
+      fi
+      if [ -z "${SDG_COMMAND_TIMEOUT:-}" ]; then
+        COMMAND_TIMEOUT=1200
+      fi
+      ;;
+    stable|*)
+      ;;
+  esac
+}
+
+api_backoff_sleep() {
+  local attempt="$1"
+  local delay=$((API_RETRY_BASE_DELAY * (2 ** (attempt - 1))))
+  if ((delay > API_RETRY_MAX_DELAY)); then
+    delay=$API_RETRY_MAX_DELAY
+  fi
+  local jitter=$((RANDOM % 10))
+  delay=$((delay + jitter))
+  log "Retrying in ${delay}s (attempt ${attempt}/${MAX_RETRIES})"
+  sleep "$delay"
 }
 
 # Initialize state file if not exists
@@ -83,6 +178,30 @@ is_complete() {
 }
 
 # Generate a batch for a category
+run_generation_command() {
+  local cat=$1
+  local batch=$2
+  local output_file=$3
+  local endpoint=$4
+  local model=$5
+
+  (cd "$AI_DIR" && timeout "$COMMAND_TIMEOUT" "${UV_CMD[@]}" python -m training.sdg_pipeline \
+    --scenario niche_category \
+    --category "$cat" \
+    --target_count "$batch" \
+    --output_path "$output_file" \
+    --nemo_endpoint "$endpoint" \
+    --nemo_api_key "$NVIDIA_API_KEY" \
+    --nemo_model "$model" \
+    --max_iterations 50 \
+    --style_profile "$SDG_THERAPIST_STYLE_PROFILE") 2>&1 | tee -a "$LOG_FILE"
+  local status="${PIPESTATUS[0]}"
+  if [ "$status" -eq 124 ]; then
+    log "Timeout after ${COMMAND_TIMEOUT}s for ${cat} with endpoint=${endpoint}, model=${model}"
+  fi
+  return "$status"
+}
+
 generate_batch() {
   local cat=$1
   local current=$(get_count "$cat")
@@ -101,23 +220,38 @@ generate_batch() {
 
   log "Generating batch for ${cat}: ${current}/${TARGET_PER_CATEGORY} (batch size: ${batch})"
 
-  # Run the generation from ai/ subproject directory
-  cd "$AI_DIR"
-  uv run python -m training.sdg_pipeline \
-    --scenario niche_category \
-    --category "$cat" \
-    --target_count "$batch" \
-    --output_path "$output_file" \
-    --nemo_endpoint https://integrate.api.nvidia.com/v1 \
-    --nemo_api_key "$NVIDIA_API_KEY" \
-    --nemo_model nvidia/llama-3.3-nemotron-super-49b-v1 \
-    --max_iterations 50 \
-    2>&1 | tee -a "$LOG_FILE"
-  local gen_exit=$?
-  cd "$REPO_DIR"
+  local gen_exit=1
+  local success=false
+  local endpoint
+  local model
+  local attempt
+
+  for endpoint in "${API_ENDPOINTS[@]}"; do
+    for model in "${API_MODELS[@]}"; do
+      for ((attempt = 1; attempt <= MAX_RETRIES; attempt += 1)); do
+        if run_generation_command "$cat" "$batch" "$output_file" "$endpoint" "$model"; then
+          gen_exit=0
+          success=true
+          break 3
+        fi
+
+        log "Generation attempt ${attempt}/${MAX_RETRIES} failed for ${cat} with endpoint=${endpoint}, model=${model}"
+        api_backoff_sleep "$attempt"
+      done
+      if [ "$success" = true ]; then
+        break
+      fi
+    done
+    if [ "$success" = true ]; then
+      break
+    fi
+  done
+
+  if [ "$success" = false ]; then
+    log "ERROR: Generation failed for ${cat} across all configured endpoints/models"
+  fi
 
   if [ "$gen_exit" -ne 0 ]; then
-    log "ERROR: Generation failed for ${cat}"
     return 1
   fi
 
@@ -146,13 +280,12 @@ post_process() {
   log "Raw dataset: ${total} samples"
 
   # Create final clean dataset — apply upgraded validation and deduplication
-  cd "$AI_DIR"
-  uv run python -c "
-import json, sys
+  (cd "$AI_DIR" && "${UV_CMD[@]}" python - << PYEOF
+import json
 from training.sdg_pipeline import validate_sample, _check_deduplication
 
-raw_path = '${OUTPUT_DIR}/niche_categories_raw.jsonl'
-out_path = '${OUTPUT_DIR}/niche_categories_1000.jsonl'
+raw_path = "${OUTPUT_DIR}/niche_categories_raw.jsonl"
+out_path = "${OUTPUT_DIR}/niche_categories_1000.jsonl"
 
 with open(raw_path) as f:
     records = [json.loads(l) for l in f if l.strip()]
@@ -176,14 +309,35 @@ with open(out_path, 'w') as f:
     for r in valid:
         f.write(json.dumps(r) + chr(10))
 
-print(f'Filtered: {len(records)} -> {len(valid)} ({len(records)-len(valid)} rejected)')
+print("Filtered: {} -> {} ({} rejected)".format(len(records), len(valid), len(records) - len(valid)))
 for reason, count in sorted(rejected.items(), key=lambda x: -x[1])[:5]:
-    print(f'  {reason}: {count}')
-" 2>&1 | tee -a "$LOG_FILE"
-  cd "$REPO_DIR"
+    print("  {}: {}".format(reason, count))
+PYEOF
+  ) 2>&1 | tee -a "$LOG_FILE"
+
+  # Style audit on final dataset
+  if [ "$SDG_RUN_STYLE_AUDIT" = "true" ]; then
+    _split_csv "$SDG_STYLE_AUDIT_PROFILES" STYLE_AUDIT_PROFILES
+    for profile in "${STYLE_AUDIT_PROFILES[@]}"; do
+      if [ -z "$profile" ]; then
+        continue
+      fi
+
+      local audit_output="${OUTPUT_DIR}/style_audit_${profile}.json"
+      (cd "$AI_DIR" && "${UV_CMD[@]}" python -m training.sdg_pipeline \
+        --scenario niche_category \
+        --output_path "${OUTPUT_DIR}/niche_categories_1000.jsonl" \
+        --style_audit \
+        --style_profile "$profile" \
+        --style_audit_limit "$SDG_STYLE_AUDIT_LIMIT" \
+        --style_audit_output "$audit_output") 2>&1 | tee -a "$LOG_FILE"
+    done
+  fi
+
+  summarize_style_audits
 
   # Create category distribution report
-  python3 << 'PYEOF'
+  (cd "$AI_DIR" && "${UV_CMD[@]}" python - << 'PYEOF'
 import json
 from collections import Counter
 
@@ -200,12 +354,88 @@ print(f"Final dataset: {total} samples across {len(categories)} categories")
 for cat, count in sorted(categories.items()):
     print(f"  {cat}: {count}")
 PYEOF
+) 2>&1 | tee -a "$LOG_FILE"
 
   log "Post-processing complete"
 }
 
+summarize_style_audits() {
+  if [ "$SDG_RUN_STYLE_AUDIT" != "true" ]; then
+    return 0
+  fi
+
+  _split_csv "$SDG_STYLE_AUDIT_PROFILES" STYLE_AUDIT_PROFILES
+  if [ ${#STYLE_AUDIT_PROFILES[@]} -eq 1 ] && [ -z "${STYLE_AUDIT_PROFILES[0]}" ]; then
+    log "Skipping style audit summary: no profiles configured"
+    return 0
+  fi
+
+  (cd "$AI_DIR" && OUTPUT_DIR="$OUTPUT_DIR" \
+    SDG_STYLE_AUDIT_PROFILES="$SDG_STYLE_AUDIT_PROFILES" \
+    SDG_STYLE_AUDIT_SUMMARY_PATH="$SDG_STYLE_AUDIT_SUMMARY_PATH" \
+    "${UV_CMD[@]}" python - << PYEOF
+import json
+import os
+
+from pathlib import Path
+
+output_dir = Path(os.environ["OUTPUT_DIR"])
+profiles = [p.strip() for p in os.environ.get("SDG_STYLE_AUDIT_PROFILES", "").split(",") if p.strip()]
+summary_path = Path(os.environ.get("SDG_STYLE_AUDIT_SUMMARY_PATH", str(output_dir / "style_audit_summary.json")))
+
+leaderboard = []
+missing = []
+
+for profile in profiles:
+    path = output_dir / f"style_audit_{profile}.json"
+    if not path.exists():
+        missing.append(profile)
+        continue
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+        leaderboard.append(report)
+    except json.JSONDecodeError:
+        missing.append(profile)
+
+leaderboard.sort(key=lambda item: item.get("pass_rate", 0), reverse=True)
+
+for rank, report in enumerate(leaderboard, start=1):
+    profile = report.get("style_profile", "")
+    pass_rate = report.get("pass_rate", 0)
+    total = report.get("total_samples", 0)
+    failed = report.get("failed", 0)
+    passed = report.get("passed", 0)
+    print(f"[{rank}] {profile}: pass_rate={pass_rate:.2%}, passed={passed}, failed={failed}, total={total}")
+    for top in report.get("top_rejections", [])[:3]:
+        reason = top.get("reason", "")
+        count = top.get("count", 0)
+        if reason:
+            print(f"    - {reason}: {count}")
+
+for profile in missing:
+    print(f"[missing] {profile}: no valid audit report found")
+
+summary = {
+    "profiles": profiles,
+    "leaderboard": leaderboard,
+    "missing_profiles": missing,
+}
+
+summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+print(f"Style audit summary written: {summary_path}")
+print("Style audit leaderboard (pass rate):")
+for rank, report in enumerate(leaderboard, start=1):
+    print(f"{rank}. {report.get('style_profile', 'unknown')} — {report.get('pass_rate', 0):.2%}")
+PYEOF
+  ) 2>&1 | tee -a "$LOG_FILE"
+}
+
 # Main loop with retry logic
 main() {
+  mkdir -p "$OUTPUT_DIR"
+  touch "$LOG_FILE"
+  apply_run_profile
+  log "Run profile: ${SDG_RUN_MODE}"
   init_state
 
   log "Starting data generation..."
@@ -216,8 +446,8 @@ main() {
   local max_stalls=5
 
   while true; do
-    local all_complete=true
-    local made_progress=false
+  local all_complete=true
+  local made_progress=false
 
     for cat in "${CATEGORIES[@]}"; do
       if is_complete "$cat"; then
@@ -226,23 +456,11 @@ main() {
 
       all_complete=false
 
-      local retries=0
-      local success=false
-
-      while [ $retries -lt $MAX_RETRIES ] && [ "$success" = false ]; do
-        if generate_batch "$cat"; then
-          success=true
-          made_progress=true
-          stall_count=0
-        else
-          retries=$((retries + 1))
-          log "Retry ${retries}/${MAX_RETRIES} for ${cat}"
-          sleep 5
-        fi
-      done
-
-      if [ "$success" = false ]; then
-        log "ERROR: Max retries exceeded for ${cat}"
+      if generate_batch "$cat"; then
+        made_progress=true
+        stall_count=0
+      else
+        log "ERROR: Batch failed for ${cat} after trying all configured providers"
         stall_count=$((stall_count + 1))
       fi
 

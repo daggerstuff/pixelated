@@ -5032,7 +5032,7 @@ requires-dist = [
     { name = "mypy", marker = "extra == 'dev'" },
     { name = "nbqa", marker = "extra == 'dev'" },
     { name = "nemo-microservices", extras = ["data-designer"], specifier = ">=1.0.0" },
-    { name = "neo4j", specifier = "~=6.1.0" },
+    { name = "neo4j", specifier = ">=6.1,<6.3" },
     { name = "nest-asyncio", specifier = ">=1.6.0" },
     { name = "ngcsdk", specifier = ">=4.16.0" },
     { name = "nltk", specifier = ">=3.9.3" },

@@ -1,21 +1,13 @@
-import { AuthenticationClient } from 'auth0'
-
 try {
-  const client = new AuthenticationClient({
-    domain: 'test.auth0.com',
-    clientId: 'test',
-    clientSecret: 'test',
-  })
+  const response = await fetch('https://test.auth0.com/.well-known/openid-configuration')
+  const payload = await response.json()
 
-  console.log('--- Methods on client instance ---')
-  console.log(Object.keys(client))
-
-  console.log('--- Methods on prototype ---')
-  let proto = Object.getPrototypeOf(client)
-  while (proto && proto !== Object.prototype) {
-    console.log(Object.getOwnPropertyNames(proto))
-    proto = Object.getPrototypeOf(proto)
+  if (!response.ok) {
+    throw new Error(`Failed to load OpenID configuration: ${response.status}`)
   }
+
+  console.log('--- OpenID configuration keys ---')
+  console.log(Object.keys(payload))
 } catch (e) {
   console.error(e)
 }
