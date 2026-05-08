@@ -6,6 +6,7 @@
 
 import type { Root } from 'mdast'
 import type { Directives } from 'mdast-util-directive'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 

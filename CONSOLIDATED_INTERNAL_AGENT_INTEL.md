@@ -32,7 +32,7 @@ The "Canonical" dataset family framing:
 This list merges the 68-task breakdown from April 29 with the updated priorities from May 8.
 
 ### Phase 1: Infrastructure & Infrastructure (May 8 Priority: Safety Removal)
-- [ ] **Remove Safety Filters**: Modify `shared_config.py`, `youtube_ingestion.py`, `book_pdf_converter.py`, `sdg_pipeline.py`, and `grpo_trainer.py` to strip safety filtering logic.
+- [x] **Remove Safety Filters**: Completed — `shared_config.py` (no safety fields), `youtube_ingestion.py` (done), `book_pdf_converter.py` (DONE 2026-05-08), `sdg_pipeline.py` (done), `dpo_trainer.py` (done), `grpo_trainer.py` (done), `mental_health_eval.py` (done).
 - [ ] **Infrastructure Setup**: Complete `ai/training/shared_config.py` with QLoRA/LoRA configs and token length distribution logging.
 - [ ] **Multilingual Content Checker**: Implement language detection for English, Spanish, French, Portuguese, and German.
 

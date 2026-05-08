@@ -29,7 +29,7 @@ const EmotionProgressDemo: FC = () => {
 
       {data ? (
         <EmotionProgressDashboard
-          progressData={data}
+          data={data}
           timeRange={timeRange}
           onTimeRangeChange={setTimeRange}
           isLoading={isLoading}
