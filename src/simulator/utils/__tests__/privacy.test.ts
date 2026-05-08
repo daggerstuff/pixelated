@@ -40,7 +40,7 @@ describe('privacy utils', () => {
 
     it('should accurately report compatibility issues when missing WebRTC', () => {
       // Mock missing getUserMedia
-      const originalMediaDevices = navigator.mediaDevices;
+      const originalDescriptor = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');
       Object.defineProperty(navigator, 'mediaDevices', {
         value: { getUserMedia: undefined },
         configurable: true
@@ -51,10 +51,12 @@ describe('privacy utils', () => {
       expect(result.missingFeatures).toContain('WebRTC/getUserMedia');
 
       // Restore
-      Object.defineProperty(navigator, 'mediaDevices', {
-        value: originalMediaDevices,
-        configurable: true
-      });
+      if (originalDescriptor) {
+        Object.defineProperty(navigator, 'mediaDevices', originalDescriptor);
+      } else {
+        // @ts-expect-error - clean up the mock if there was no original descriptor
+        delete navigator.mediaDevices;
+      }
     })
   })
 })
