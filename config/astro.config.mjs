@@ -490,7 +490,9 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
-        'astro-icon/components': path.resolve('./src/components/ui/astro-icon-components.ts'),
+        'astro-icon/components': path.resolve(
+          './src/components/ui/astro-icon-components.ts',
+        ),
         'stream-browserify': 'node:stream',
         'path-browserify': 'node:path',
         'crypto-browserify': 'node:crypto',

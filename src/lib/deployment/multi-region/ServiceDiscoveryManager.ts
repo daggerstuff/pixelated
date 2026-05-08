@@ -60,7 +60,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
 
   private registerHealthCheck(
     name: string,
-    check: () => Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; message: string }>,
+    check: () => Promise<{
+      status: 'healthy' | 'unhealthy' | 'degraded'
+      message: string
+    }>,
   ): void {
     void check().then((result) => {
       if (result.status !== 'healthy') {
@@ -229,9 +232,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
     config: any,
   ): Promise<void> {
     try {
-      const zookeeper = new (ZooKeeper as new (
-        ...args: unknown[]
-      ) => any)({
+      const zookeeper = new (ZooKeeper as new (...args: unknown[]) => any)({
         connect: config.connect.replace('{region}', region),
         timeout: config.timeout,
         debug_level: config.debugLevel,
@@ -413,7 +414,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Start background processes
    */
   private startBackgroundProcesses(): void {
-      const config = this.getServiceDiscoveryConfig()
+    const config = this.getServiceDiscoveryConfig()
 
     // Start heartbeat process
     this.heartbeatInterval = setInterval(() => {
@@ -617,17 +618,14 @@ export class ServiceDiscoveryManager extends EventEmitter {
     await zk.create(
       instancePath,
       Buffer.from(data),
-      (zk.CreateMode?.EPHEMERAL || 'EPHEMERAL'),
+      zk.CreateMode?.EPHEMERAL || 'EPHEMERAL',
     )
   }
 
   /**
    * Create ZooKeeper path recursively
    */
-  private async createZookeeperPath(
-    zk: any,
-    path: string,
-  ): Promise<void> {
+  private async createZookeeperPath(zk: any, path: string): Promise<void> {
     const parts = path.split('/').filter((p) => p)
     let currentPath = ''
 

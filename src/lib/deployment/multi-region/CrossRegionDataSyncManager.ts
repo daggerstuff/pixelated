@@ -19,7 +19,10 @@ export class CrossRegionDataSyncManager extends EventEmitter {
   private config: ConfigurationManager
   private healthMonitor: HealthMonitor
   private cockroachClient: {
-    query: (sql: string, params?: unknown[]) => Promise<{
+    query: (
+      sql: string,
+      params?: unknown[],
+    ) => Promise<{
       rows: Array<Record<string, unknown>>
       rowCount?: number
     }>
@@ -102,7 +105,8 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       }
     } catch {
       return {
-        sslMode: typeof secrets.sslMode === 'string' ? secrets.sslMode : undefined,
+        sslMode:
+          typeof secrets.sslMode === 'string' ? secrets.sslMode : undefined,
         ...secrets,
         host: 'localhost',
         port: 26257,
@@ -120,8 +124,8 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private getMongoDBConfig(_region = ''): Record<string, any> {
     const secrets =
-      (this.config.getConfig()?.secrets?.databases as Record<string, any>)?.mongo ||
-      {}
+      (this.config.getConfig()?.secrets?.databases as Record<string, any>)
+        ?.mongo || {}
     return {
       connectionString:
         process.env.MONGODB_CONNECTION_STRING ||
@@ -135,8 +139,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Get Redis configuration for region
    */
   private getRedisConfig(_region = ''): Record<string, any> {
-    const secrets =
-      this.config.getConfig()?.secrets?.databases?.redis || {}
+    const secrets = this.config.getConfig()?.secrets?.databases?.redis || {}
     const typedSecrets = secrets as {
       database?: unknown
       password?: unknown
@@ -147,17 +150,22 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       ...secrets,
       host:
         process.env.REDIS_HOST ||
-        (typeof typedSecrets.host === 'string' ? typedSecrets.host : 'localhost'),
+        (typeof typedSecrets.host === 'string'
+          ? typedSecrets.host
+          : 'localhost'),
       port: Number.parseInt(
         process.env.REDIS_PORT ||
-          (typeof typedSecrets.port === 'string' || typeof typedSecrets.port === 'number'
+          (typeof typedSecrets.port === 'string' ||
+          typeof typedSecrets.port === 'number'
             ? String(typedSecrets.port)
             : '6379'),
         10,
       ),
       password:
         process.env.REDIS_PASSWORD ||
-        (typeof typedSecrets.password === 'string' ? typedSecrets.password : ''),
+        (typeof typedSecrets.password === 'string'
+          ? typedSecrets.password
+          : ''),
       database:
         typeof typedSecrets.database === 'number' ? typedSecrets.database : 0,
     }
@@ -168,8 +176,8 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private getClickHouseConfig(): Record<string, any> {
     const secrets =
-      (this.config.getConfig()?.secrets?.databases as Record<string, any>)?.clickhouse ||
-      {}
+      (this.config.getConfig()?.secrets?.databases as Record<string, any>)
+        ?.clickhouse || {}
     return {
       host: process.env.CLICKHOUSE_HOST || 'localhost',
       port: Number.parseInt(process.env.CLICKHOUSE_PORT || '8123', 10),
@@ -207,17 +215,19 @@ export class CrossRegionDataSyncManager extends EventEmitter {
   ): void {
     this.healthChecks.set(name, check)
 
-    void check().then((result) => {
-      if (result.status !== 'healthy') {
-        this.healthMonitor.emit('health-check-failed', {
-          component: name,
-          message: result.message,
-          status: result.status,
-        })
-      }
-    }).catch((error: unknown) => {
-      this.logger.error(`Health check failed for ${name}`, { error })
-    })
+    void check()
+      .then((result) => {
+        if (result.status !== 'healthy') {
+          this.healthMonitor.emit('health-check-failed', {
+            component: name,
+            message: result.message,
+            status: result.status,
+          })
+        }
+      })
+      .catch((error: unknown) => {
+        this.logger.error(`Health check failed for ${name}`, { error })
+      })
   }
 
   /**
@@ -275,9 +285,11 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     try {
       const cockroachConfig = this.getCockroachDBConfig()
 
-      this.cockroachClient = new (cockroach as unknown as {
-        Client: new (options: Record<string, unknown>) => any
-      }).Client({
+      this.cockroachClient = new (
+        cockroach as unknown as {
+          Client: new (options: Record<string, unknown>) => any
+        }
+      ).Client({
         host: cockroachConfig.host,
         port: cockroachConfig.port,
         database: cockroachConfig.database,
@@ -294,7 +306,10 @@ export class CrossRegionDataSyncManager extends EventEmitter {
 
       const cockroachClient = this.cockroachClient as {
         connect: () => Promise<void>
-        query: (sql: string, params?: unknown[]) => Promise<{
+        query: (
+          sql: string,
+          params?: unknown[],
+        ) => Promise<{
           rows: Array<Record<string, unknown>>
           rowCount?: number
         }>

@@ -21,10 +21,13 @@ human wellbeing.
 
 This repo is the core workspace for the Pixelated Empathy product direction:
 
-- **AI services** (`ai/`): training, inference, and emotional intelligence models
+- **AI services** (`ai/`): training, inference, and emotional intelligence
+  models
 - **Product application** (`src/`): Astro + React web and API surfaces
-- **Operational tooling** (`scripts/`): pipelines, automation, and developer workflows
-- **Research workflow interface** (`/journal-research`): dataset discovery and curation
+- **Operational tooling** (`scripts/`): pipelines, automation, and developer
+  workflows
+- **Research workflow interface** (`/journal-research`): dataset discovery and
+  curation
 - **Integration interfaces**: MCP and service connectors used by partner tools
 
 If you are looking for blockchain or on-chain components, those run in separate
@@ -32,7 +35,7 @@ repositories and integrate with this core stack.
 
 ## 🎯 What problem we are solving
 
-Most AI tooling can parse text; much less can interpret *why* a conversation
+Most AI tooling can parse text; much less can interpret _why_ a conversation
 changes direction, escalates, calms down, or leaves someone unsupported.
 
 Pixelated Empathy focuses on:
@@ -44,12 +47,12 @@ Pixelated Empathy focuses on:
 
 ## 🧠 Core principles
 
-- **Human-centered first**: emotional context, timing, and relational cues matter as
-  much as words.
+- **Human-centered first**: emotional context, timing, and relational cues
+  matter as much as words.
 - **Safe rehearsal**: teams can practice rare, high-impact interactions in a
   protected environment.
-- **Interpretability over opacity**: outputs are designed to inform decisions, not
-  replace professional judgment.
+- **Interpretability over opacity**: outputs are designed to inform decisions,
+  not replace professional judgment.
 - **Modular design**: each layer can evolve independently while sharing a common
   conversation intelligence foundation.
 
@@ -90,9 +93,9 @@ Detailed process documentation:
 
 ## 📝 Notes for readers
 
-This README is intentionally informational and strategic. It is written to answer:
-"Who are we?", "What are we building?", and "Why does this work matter?" before
-you look for implementation details.
+This README is intentionally informational and strategic. It is written to
+answer: "Who are we?", "What are we building?", and "Why does this work matter?"
+before you look for implementation details.
 
 ---
 
