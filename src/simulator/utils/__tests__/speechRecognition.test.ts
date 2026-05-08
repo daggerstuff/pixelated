@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest'
-<<<<<<< HEAD
 
-import { analyzeTherapeuticTechniques } from '../speechRecognition'
-=======
-import { analyzeTherapeuticTechniques, getTherapeuticPrompts } from '../speechRecognition'
->>>>>>> 1ed0e6a0f (🧪 QA: Add test for getTherapeuticPrompts edge case)
+import {
+  analyzeTherapeuticTechniques,
+  getTherapeuticPrompts,
+} from '../speechRecognition'
 
 describe('analyzeTherapeuticTechniques', () => {
   it('returns empty object when no therapeutic techniques are detected', () => {

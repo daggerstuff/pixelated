@@ -3,15 +3,12 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-<<<<<<< HEAD
 import {
   getUserConsentPreference,
   setUserConsentPreference,
   createPrivacyHash,
+  createEphemeralSessionId,
 } from './privacy'
-=======
-import { getUserConsentPreference, setUserConsentPreference, createPrivacyHash, createEphemeralSessionId } from './privacy'
->>>>>>> 81f2fd0dc (🧪 QA: Add test for createEphemeralSessionId edge case)
 
 describe('privacy utilities', () => {
   describe('createEphemeralSessionId', () => {

@@ -36,7 +36,12 @@ export default function SearchDemoReact() {
         />
       </div>
 
-      <div className='text-gray-500 dark:text-gray-400 mt-4 text-sm' role='status' aria-live='polite' aria-atomic='true'>
+      <div
+        className='text-gray-500 dark:text-gray-400 mt-4 text-sm'
+        role='status'
+        aria-live='polite'
+        aria-atomic='true'
+      >
         {lastQuery ? `Found ${resultCount} results for "${lastQuery}"` : ''}
       </div>
 
