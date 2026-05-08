@@ -114,7 +114,7 @@ export default function SessionDocumentationComponent({
         'Work performance concerns are primary stressor',
         'Family conflict with spouse about division of household duties',
       ],
-      recommendations: [
+      recommendedFollowUp: [
         'Practice PMR daily',
         'Maintain anxiety log',
         'Schedule sleep assessment',
