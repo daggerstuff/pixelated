@@ -3,6 +3,26 @@ import { useCallback } from 'react'
 import type { AIMessage, AIServiceOptions } from '@/lib/ai/models/ai-types'
 import { createLLMService } from '@/lib/ai/services/llm-provider'
 
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string {
+  const baseUrl =
+    process.env['LLM_BASE_URL'] ||
+    process.env['LLM_API_URL'] ||
+    process.env['OPENAI_BASE_URL'] ||
+    ''
+
+  if (isOpenRouterBaseUrl(baseUrl)) {
+    return ''
+  }
+
+  return baseUrl
+}
+
 export function useAIService() {
   const getAIResponse = useCallback(
     async (prompt: string, options?: AIServiceOptions) => {
@@ -10,11 +30,7 @@ export function useAIService() {
         // Create AI service
         const aiService = createLLMService({
           apiKey: process.env['LLM_API_KEY'] || '',
-          baseUrl:
-            process.env['LLM_BASE_URL'] ||
-            process.env['LLM_API_URL'] ||
-            process.env['OPENAI_BASE_URL'] ||
-            '',
+          baseUrl: resolveSafeLlmBaseUrl(),
         })
 
         // Format the prompt as a message

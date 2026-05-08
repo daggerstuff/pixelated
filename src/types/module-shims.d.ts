@@ -1,0 +1,55 @@
+declare module "astro-icon/components";
+declare module "auth0";
+declare module "supertest";
+declare module "typeorm";
+declare module "better-sqlite3";
+declare module "@tailus/themer-button";
+declare module "@tailus/themer-card";
+declare module "@tailus/themer-progress";
+declare module "@supermemory/tools/ai-sdk";
+declare module "twilio";
+declare module "launchdarkly-js-client-sdk";
+declare module "ioredis-mock";
+declare module "eslint-plugin-node";
+declare module "eslint-plugin-jsx-a11y";
+declare module "crypto-js/hmac-sha256";
+declare module "crypto-js/enc-base64";
+declare module "archiver";
+declare module "@opentelemetry/auto-instrumentations-node";
+declare module "@google-cloud/storage";
+declare module "@google-cloud/compute";
+declare module "@/*";
+
+declare module "../audit-logging";
+declare module "../encryption";
+declare module "../index";
+declare module "../health";
+declare module "../developer-api-keys";
+declare module "../components/ui/progress-bar";
+declare module "../components/demo/ScenarioGenerationDemo";
+declare module "../app";
+declare module "../analytics/engagement/types";
+declare module "../skills";
+declare module "../progress";
+declare module "../integration/ExternalThreatFeedIntegration";
+
+declare module "./types";
+declare module "./Todo";
+declare module "./operations";
+declare module "./objectives";
+declare module "./key-manager";
+declare module "./indexedDBRequestQueue";
+declare module "./encryption";
+declare module "./OllamaCheckInService";
+declare module "./NotificationProvider";
+declare module "./AnalyticsProvider";
+
+declare module "@/lib/database/redis";
+declare module "@/lib/database/postgres";
+declare module "@/lib/database/mongodb";
+
+declare module "../../node_modules/react/index.js";
+declare module "../../simulator/types";
+declare module "../../lib/ai/mental-llama/MentalLLaMAAdapter";
+declare module "../../config/mongodb.config";
+declare module "../../config/azure.config";

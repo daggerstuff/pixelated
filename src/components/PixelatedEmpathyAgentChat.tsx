@@ -116,7 +116,7 @@ const isBiasAnalysis = (value: unknown): value is BiasAnalysis => {
 
     return (
       isBiasSeverity(item.severity) &&
-      biasSeverityValues.includes(item.severity)
+      biasSeverityValues.includes(item.severity as any)
     )
   })
 }
@@ -278,7 +278,11 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     }
   }
 
-  const quickActions = [
+  const quickActions: {
+    label: string
+    action: () => void
+    context: AgentContext
+  }[] = [
     {
       label: 'Generate Depression Scenario',
       action: () =>
@@ -294,7 +298,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     {
       label: 'Training Recommendation',
       action: () =>
-        setInput('Recommend training modules for a beginner therapist'),
+        setInput('Provide training recommendations based on my performance'),
       context: 'training_recommendation',
     },
     {
