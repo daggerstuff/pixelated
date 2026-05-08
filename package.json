@@ -319,6 +319,7 @@
     "@eslint/json": "latest",
     "@eslint/markdown": "latest",
     "@fontsource/inter": "latest",
+    "@github/copilot-sdk": "0.1.33-unstable.1",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
     "@letta-ai/letta-client": "latest",
@@ -431,6 +432,7 @@
     "vite": "latest",
     "vite-tsconfig-paths": "latest",
     "vitest": "latest",
+    "vscode-jsonrpc": "9.0.0-next.11",
     "wait-on": "latest"
   },
   "peerDependencies": {
