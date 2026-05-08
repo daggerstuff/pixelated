@@ -1,2 +1,5 @@
-## 2024-06-01 - Extract Tooltip | Learning: Inline components in Recharts cause unnecessary re-renders. | Action: Extracted CustomTooltip to module level.
-## 2024-06-03 - O(N^2) React Rendering | Learning: Array.includes() inside .map() loops causes O(N^2) bottlenecks during React renders. | Action: Replaced Array.includes() with a Set generated via useMemo for O(1) lookups.
+## 2024-06-01 - Extract Tooltip | Learning: Inline components in Recharts render. | Action: Extracted CustomTooltip
+
+## 2024-06-03 - O(N^2) React Rendering | Learning: Array.includes() bottleneck. | Action: Replaced with Set
+
+## 2024-06-05 - Derived State Optimization | Learning: useEffect causes re-renders. | Action: Replaced with useMemo
