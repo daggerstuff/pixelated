@@ -1,13 +1,13 @@
 src/integrations/react                   | [WARN] Unsupported engine: wanted: {"node":"24.13.0"} (current: {"node":"v24.14.1","pnpm":"11.0.8"})
 Already up to date
-Done in 247ms using pnpm v11.0.8
+Done in 239ms using pnpm v11.0.8
 $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit
 🟢 Using Node adapter for standard deployment
-06:01:46 [@astrojs/node] Enabling sessions with filesystem storage
-06:01:47 [content] Syncing content
-06:01:47 [content] Synced content
-06:01:47 [types] Generated 971ms
-06:01:47 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
+15:28:07 [@astrojs/node] Enabling sessions with filesystem storage
+15:28:08 [content] Syncing content
+15:28:08 [content] Synced content
+15:28:08 [types] Generated 1.03s
+15:28:08 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
 [96msrc/content.config.ts[0m:[93m103[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
 
 [7m103[0m       'sponsor.to-suport': z.string().optional(),
@@ -11702,11 +11702,10 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m2[0m import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 [7m [0m [93m         ~~~~~~~~~[0m
 
-[96msrc/components/pages/EmotionProgressDemo.tsx[0m:[93m32[0m:[93m11[0m - [91merror[0m[90m ts(2322): [0mType '{ progressData: EmotionProgressData; timeRange: "week" | "month" | "quarter" | "year"; onTimeRangeChange: Dispatch<SetStateAction<"week" | "month" | "quarter" | "year">>; isLoading: boolean; className: string; }' is not assignable to type 'IntrinsicAttributes & EmotionProgressDashboardProps'.
-  Property 'progressData' does not exist on type 'IntrinsicAttributes & EmotionProgressDashboardProps'.
+[96msrc/components/pages/EmotionProgressDemo.tsx[0m:[93m32[0m:[93m11[0m - [91merror[0m[90m ts(2740): [0mType 'EmotionProgressData' is missing the following properties from type 'EmotionProgressData[]': length, pop, push, concat, and 35 more.
 
-[7m32[0m           progressData={data}
-[7m  [0m [91m          ~~~~~~~~~~~~[0m
+[7m32[0m           data={data}
+[7m  [0m [91m          ~~~~[0m
 [96msrc/components/pages/EmotionProgressDemo.tsx[0m:[93m1[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'React' is declared but its value is never read.
 
 [7m1[0m import React, { useState } from 'react'
@@ -13135,18 +13134,26 @@ Add the `is:inline` directive explicitly to silence this hint.
 [7m61[0m         visit(el, 'element', (childNode) => {
 [7m  [0m [93m                              ~~~~~~~~~[0m
 
-[96mplugins/remark-directive-sugar.ts[0m:[93m177[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'_isOrg' is declared but its value is never read.
+[96mplugins/remark-directive-sugar.ts[0m:[93m9[0m:[93m27[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'unist' or its corresponding type declarations.
 
-[7m177[0m           let _isOrg = false
+[7m9[0m import type { Node } from 'unist'
+[7m [0m [91m                          ~~~~~~~[0m
+[96mplugins/remark-directive-sugar.ts[0m:[93m178[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'_isOrg' is declared but its value is never read.
+
+[7m178[0m           let _isOrg = false
 [7m   [0m [93m              ~~~~~~[0m
-[96mplugins/remark-directive-sugar.ts[0m:[93m176[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'_resolvedTab' is declared but its value is never read.
+[96mplugins/remark-directive-sugar.ts[0m:[93m177[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'_resolvedTab' is declared but its value is never read.
 
-[7m176[0m           let _resolvedTab = ''
+[7m177[0m           let _resolvedTab = ''
 [7m   [0m [93m              ~~~~~~~~~~~~[0m
-[96mplugins/remark-directive-sugar.ts[0m:[93m80[0m:[93m18[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'node' implicitly has an 'any' type, but a better type may be inferred from usage.
+[96mplugins/remark-directive-sugar.ts[0m:[93m81[0m:[93m18[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'node' implicitly has an 'any' type, but a better type may be inferred from usage.
 
-[7m80[0m     visit(tree, (node) => {
+[7m81[0m     visit(tree, (node) => {
 [7m  [0m [93m                 ~~~~[0m
+[96mplugins/remark-directive-sugar.ts[0m:[93m9[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'Node' is declared but its value is never read.
+
+[7m9[0m import type { Node } from 'unist'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96mplugins/remark-image-container.ts[0m:[93m38[0m:[93m18[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'node' implicitly has an 'any' type, but a better type may be inferred from usage.
 
@@ -13154,8 +13161,8 @@ Add the `is:inline` directive explicitly to silence this hint.
 [7m  [0m [93m                 ~~~~[0m
 
 Result (2323 files): 
-- 1774 errors
+- 1775 errors
 - 0 warnings
-- 979 hints
+- 980 hints
 
 [ELIFECYCLE] Command failed with exit code 1.
