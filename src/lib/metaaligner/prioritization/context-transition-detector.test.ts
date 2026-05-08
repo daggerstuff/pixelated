@@ -562,7 +562,8 @@ describe('ContextTransitionDetector', () => {
         if (transition && transition.transitionType === 'crisis_elevation') {
           crisisTransitions.push(transition)
         }
-      })
+        return transition
+      }).filter(t => t && t.transitionType === 'crisis_elevation')
 
       expect(crisisTransitions).toHaveLength(1)
       expect(crisisTransitions[0]!.detected).toBe(true)
