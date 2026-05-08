@@ -68,12 +68,13 @@ interface TimeRangeSelectorProps {
 const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
   ({ value, onChange }) => {
     return (
-      <div className='flex space-x-2'>
+      <div className='flex space-x-2' role='group' aria-label='Time range selection'>
         {TIME_RANGE_OPTIONS.map((option) => (
           <button
             key={option.value}
             type='button'
             onClick={() => onChange(option.value)}
+            aria-pressed={value === option.value}
             className={`rounded px-3 py-1 text-sm transition-colors ${
               value === option.value
                 ? 'bg-blue-600 text-white'
