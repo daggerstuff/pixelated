@@ -70,7 +70,7 @@ importers:
         version: 0.8.1(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.4.3)
       '@composio/vercel':
         specifier: latest
-        version: 0.8.1(@composio/core@0.8.1(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.175(zod@4.4.3))
+        version: 0.8.1(@composio/core@0.8.1(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.176(zod@4.4.3))
       '@google-cloud/compute':
         specifier: latest
         version: 6.9.1
@@ -142,7 +142,7 @@ importers:
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@react-three/drei':
         specifier: latest
-        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.0)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0)
+        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.1)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0)
       '@react-three/fiber':
         specifier: latest
         version: 9.6.1(@types/react@19.2.14)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0)
@@ -190,7 +190,7 @@ importers:
         version: 8.0.0
       '@types/three':
         specifier: latest
-        version: 0.184.0
+        version: 0.184.1
       '@types/ws':
         specifier: latest
         version: 8.18.1
@@ -208,7 +208,7 @@ importers:
         version: 2.0.0(react@19.2.6)(vue@3.5.34(typescript@6.0.3))
       ai:
         specifier: latest
-        version: 6.0.175(zod@4.4.3)
+        version: 6.0.176(zod@4.4.3)
       archiver:
         specifier: latest
         version: 7.0.1
@@ -908,8 +908,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/gateway@3.0.110':
-    resolution: {integrity: sha512-sbv8+1L9/BRKydn8dMNwoMQKupA4iLJ9N+yvxgW6wMQ/94UepDf3FeYWMj/dLdzolAHZ6izRUP4s5WqQkmJ2Zg==}
+  '@ai-sdk/gateway@3.0.111':
+    resolution: {integrity: sha512-gzdRuEH9Mqeuu8zG6j4of3EH3fFJUI0UIubyeaA8gep6KzhCJF7uaTfagSE7x2vLAf381g/NrxsXhhH7Hon9iA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -940,6 +940,12 @@ packages:
 
   '@ai-sdk/provider-utils@4.0.26':
     resolution: {integrity: sha512-CsKNLKsOpvPujRlIYvoz+Ybw+kGn7J4/fIZa/58+R7iWLLfwn6ifE2G6Yq8K9XvH/I/3bzaDAJ3NhRwEMsLBKQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider-utils@4.0.27':
+    resolution: {integrity: sha512-ubkAJ+xODouwtmN1tYlvTPphH1hPOBfZaEQe8U7skGvFAnIRs9PPpsq57bC2+Ky/MB4yzhd6YOsxTAx9sGpazw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -5960,8 +5966,8 @@ packages:
   '@types/tedious@4.0.14':
     resolution: {integrity: sha512-KHPsfX/FoVbUGbyYvk1q9MMQHLPeRZhRJZdO45Q4YjvFkv4hMNghCWTvy7rdKessBsmtz4euWCWAB6/tVpI1Iw==}
 
-  '@types/three@0.184.0':
-    resolution: {integrity: sha512-4mY2tZAu0y0B0567w7013BBXSpsP0+Z48NJvmNo4Y/Pf76yCyz6Jw4P3tUVs10WuYNXXZ+wmHyGWpCek3amJxA==}
+  '@types/three@0.184.1':
+    resolution: {integrity: sha512-6q4VdiqVsrTRqmk62/BnlcAvIrnDM0zf2ZDVKI5kZiniWrSaOHaQzmbp+BNzoggc/8tgW412pL//wZIxu2PPTA==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -6505,8 +6511,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  ai@6.0.175:
-    resolution: {integrity: sha512-6fFFHzbh6FIZnYc31V6osOxq25ABJYCShfG0O6ajHiA4FB/DgnPi1mP8cO5aAU3HNSbQHiMazdlh9bIsp97mVA==}
+  ai@6.0.176:
+    resolution: {integrity: sha512-dhxDef3VCIxaFr6tKyG0BrkkCelmnporlen8nHajIwCk7S4PvIaSVI/iyJenhFOZ9KBoKjCAoUs6TzZ3yrSjxw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -13188,10 +13194,10 @@ snapshots:
       '@vercel/oidc': 3.1.0
       zod: 4.4.3
 
-  '@ai-sdk/gateway@3.0.110(zod@4.4.3)':
+  '@ai-sdk/gateway@3.0.111(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.26(zod@4.4.3)
+      '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
@@ -13222,6 +13228,13 @@ snapshots:
       zod: 4.4.3
 
   '@ai-sdk/provider-utils@4.0.26(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.10
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.0.8
+      zod: 4.4.3
+
+  '@ai-sdk/provider-utils@4.0.27(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
       '@standard-schema/spec': 1.1.0
@@ -14544,10 +14557,10 @@ snapshots:
     dependencies:
       zod: 4.4.3
 
-  '@composio/vercel@0.8.1(@composio/core@0.8.1(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.175(zod@4.4.3))':
+  '@composio/vercel@0.8.1(@composio/core@0.8.1(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.176(zod@4.4.3))':
     dependencies:
       '@composio/core': 0.8.1(ws@8.20.0(utf-8-validate@6.0.6))(zod@4.4.3)
-      ai: 6.0.175(zod@4.4.3)
+      ai: 6.0.176(zod@4.4.3)
 
   '@csstools/color-helpers@6.0.2': {}
 
@@ -17815,7 +17828,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@react-three/drei@10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.0)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0)':
+  '@react-three/drei@10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.14)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0))(@types/react@19.2.14)(@types/three@0.184.1)(immer@11.1.7)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(three@0.184.0)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@mediapipe/tasks-vision': 0.10.17
@@ -17827,10 +17840,10 @@ snapshots:
       detect-gpu: 5.0.70
       glsl-noise: 0.0.0
       hls.js: 1.6.16
-      maath: 0.10.8(@types/three@0.184.0)(three@0.184.0)
+      maath: 0.10.8(@types/three@0.184.1)(three@0.184.0)
       meshline: 3.3.1(three@0.184.0)
       react: 19.2.6
-      stats-gl: 2.4.2(@types/three@0.184.0)(three@0.184.0)
+      stats-gl: 2.4.2(@types/three@0.184.1)(three@0.184.0)
       stats.js: 0.17.0
       suspend-react: 0.1.3(react@19.2.6)
       three: 0.184.0
@@ -19183,7 +19196,7 @@ snapshots:
     dependencies:
       '@types/node': 18.19.130
 
-  '@types/three@0.184.0':
+  '@types/three@0.184.1':
     dependencies:
       '@dimforge/rapier3d-compat': 0.12.0
       '@tweenjs/tween.js': 23.1.3
@@ -19899,11 +19912,11 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       zod: 4.4.3
 
-  ai@6.0.175(zod@4.4.3):
+  ai@6.0.176(zod@4.4.3):
     dependencies:
-      '@ai-sdk/gateway': 3.0.110(zod@4.4.3)
+      '@ai-sdk/gateway': 3.0.111(zod@4.4.3)
       '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.26(zod@4.4.3)
+      '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
       '@opentelemetry/api': 1.9.0
       zod: 4.4.3
 
@@ -23500,9 +23513,9 @@ snapshots:
 
   lz-string@1.5.0: {}
 
-  maath@0.10.8(@types/three@0.184.0)(three@0.184.0):
+  maath@0.10.8(@types/three@0.184.1)(three@0.184.0):
     dependencies:
-      '@types/three': 0.184.0
+      '@types/three': 0.184.1
       three: 0.184.0
 
   magic-regexp@0.10.0:
@@ -26169,9 +26182,9 @@ snapshots:
       '@stablelib/base64': 1.0.1
       fast-sha256: 1.3.0
 
-  stats-gl@2.4.2(@types/three@0.184.0)(three@0.184.0):
+  stats-gl@2.4.2(@types/three@0.184.1)(three@0.184.0):
     dependencies:
-      '@types/three': 0.184.0
+      '@types/three': 0.184.1
       three: 0.184.0
 
   stats.js@0.17.0: {}
