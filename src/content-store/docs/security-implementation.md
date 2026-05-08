@@ -8,7 +8,7 @@ draft: false
 toc: true
 ---
 
-# Security Implementation Guide
+## Security Implementation Guide
 
 This document outlines the security measures implemented in the application to
 ensure data protection, prevent common web vulnerabilities, and maintain
@@ -150,7 +150,7 @@ const securityHeadersMiddleware: MiddlewareHandler = async (
     style-src 'self' 'unsafe-inline' https://trusted-cdn.com;
     img-src 'self' data: https://*;
     font-src 'self' https://trusted-cdn.com;
-    connect-src 'self' https://api.together.xyz;
+    connect-src 'self' https://api.openai.com;
     frame-ancestors 'none';
     form-action 'self';
     base-uri 'self';
@@ -340,7 +340,7 @@ The application uses Zod schemas for request validation:
 ```typescript
 // Example of a request validation schema
 export const CompletionRequestSchema = z.object({
-  model: z.string().default('Together-ai-default'),
+  model: z.string().default('llm-default'),
   messages: z.array(ChatMessageSchema).min(1).max(100),
   temperature: z.number().min(0).max(2).default(0.7),
   max_tokens: z.number().min(1).max(4096).default(1024),

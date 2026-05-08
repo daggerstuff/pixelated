@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-05-07T20:51:33.745947",
+  "scenario": "niche_category",
+  "category": "dissociation",
+  "target_count": 25,
+  "generated_count": 25,
+  "filtered_count": 20,
+  "filter_rate": 0.4444444444444444,
+  "iterations": 47,
+  "max_iterations": 50
+}

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import {
   parseJsonSafely,
   validateAnalysisResults,
@@ -38,9 +39,12 @@ describe('json-validator', () => {
       const mockResponse = {
         ok: false,
         status: 404,
-        statusText: 'Not Found'
+        statusText: 'Not Found',
       } as Response
-      const result = await parseApiResponse(mockResponse, () => ({ success: true, data: {} }))
+      const result = await parseApiResponse(mockResponse, () => ({
+        success: true,
+        data: {},
+      }))
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.error).toBe('HTTP 404: Not Found')
@@ -50,9 +54,12 @@ describe('json-validator', () => {
     it('returns error for empty body', async () => {
       const mockResponse = {
         ok: true,
-        text: async () => '  '
+        text: async () => '  ',
       } as Response
-      const result = await parseApiResponse(mockResponse, () => ({ success: true, data: {} }))
+      const result = await parseApiResponse(mockResponse, () => ({
+        success: true,
+        data: {},
+      }))
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.error).toBe('Empty response body')

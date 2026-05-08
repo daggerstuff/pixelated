@@ -149,7 +149,7 @@ scanning tools, please contact the security team.
 | Variable          | Development | Production | Test | Description                        |
 | ----------------- | ----------- | ---------- | ---- | ---------------------------------- |
 | API_KEY           | ✅          | ❌         | ❌   | API key for general authentication |
-| TOGETHER_API_KEY  | ✅          | ✅         | ❌   | API key for Together.ai services   |
+| LLM_API_KEY  | ✅          | ✅         | ❌   | API key for LLM API service   |
 | ANTHROPIC_API_KEY | ❌          | ❌         | ❌   | API key for Anthropic AI services  |
 | OPENAI_API_KEY    | ❌          | ❌         | ❌   | API key for OpenAI services        |
 

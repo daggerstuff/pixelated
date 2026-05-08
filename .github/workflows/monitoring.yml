@@ -11,7 +11,7 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
-  PNPM_VERSION: 10.33.2
+  PNPM_VERSION: 11.0.8
 
 jobs:
   health-check:
@@ -47,7 +47,7 @@ jobs:
 
       - name: Notify on failure (optional)
         if: failure() && env.HAS_SLACK_WEBHOOK == 'true'
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3.0.3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:

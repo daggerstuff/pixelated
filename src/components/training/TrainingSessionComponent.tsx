@@ -526,7 +526,7 @@ export function TrainingSessionComponent() {
       setCoachingNotes((prev) => [
         ...prev,
         {
-        id: `note-${Date.now()}-${userId}`,
+          id: `note-${Date.now()}-${userId}`,
           authorId: userId,
           content: noteContent,
           timestamp: new Date().toISOString(),

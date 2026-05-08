@@ -26,7 +26,7 @@
     height: 1px;
     background-image: linear-gradient(
       to right,
-      rgba(253, 252, 252, 0.2) 1px,
+      rgba(253, 252, 252, 0.14) 1px,
       transparent 1px
     );
     background-size: 6px 1px;
@@ -46,20 +46,20 @@
     inset: 0;
     left: -1.25rem;
     right: -1.25rem;
-    border-radius: 8px;
+    border-radius: 20px;
     background:
       radial-gradient(
         circle at top left,
         rgba(var(--accent-primary-rgb), 0.08),
-        transparent 34%
+        transparent 36%
       ),
-      linear-gradient(180deg, rgba(62, 44, 34, 0.2), rgba(48, 44, 44, 0.02));
+      linear-gradient(180deg, rgba(62, 44, 34, 0.16), rgba(48, 44, 44, 0.02));
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 92%);
     z-index: 0;
   }
 
-.hero-stage > :not(.hero-stage__rule):not(.hero-stage__wash) {
-  position: relative;
-  z-index: 1;
-}
+  .hero-stage > :not(.hero-stage__rule):not(.hero-stage__wash) {
+    position: relative;
+    z-index: 1;
+  }
 </style>

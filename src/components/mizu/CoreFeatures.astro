@@ -73,9 +73,11 @@ const {
   .core-features-intro {
     display: grid;
     gap: 1rem;
-    max-width: 38rem;
+    max-width: 46rem;
     margin: 0 auto;
     margin-bottom: 2.4rem;
+    text-align: center;
+    justify-items: center;
   }
 
   .core-feature-layout {
@@ -86,6 +88,8 @@ const {
   .core-feature-proof {
     display: grid;
     gap: 0.9rem;
+    justify-items: center;
+    text-align: center;
   }
 
   .core-feature-proof__list {
@@ -108,7 +112,7 @@ const {
     display: block;
     width: 0.38rem;
     height: 0.38rem;
-  margin: 0 0 0.65rem;
+    margin: 0 0 0.65rem;
     border-radius: 999px;
     background: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.12);
@@ -135,7 +139,12 @@ const {
   .core-feature-card {
     display: grid;
     gap: 0.9rem;
-    padding: 1rem 0 0;
+    padding: 1rem;
+    border: 1px solid rgba(253, 252, 252, 0.1);
+    border-radius: 16px;
+    background: rgba(253, 252, 252, 0.035);
+    justify-items: center;
+    text-align: center;
   }
 
   .core-feature-card__caption {
@@ -155,42 +164,23 @@ const {
         transparent 42%
       ),
       rgba(253, 252, 252, 0.02);
-    padding: 1.2rem 1.1rem 1.25rem;
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 8px;
+    border-color: rgba(253, 252, 252, 0.14);
   }
 
   @media (min-width: 980px) {
     .core-features-intro {
-      max-width: none;
-      margin: 0 0 2.4rem;
-      grid-template-columns: minmax(18rem, 0.55fr) minmax(0, 1fr);
-      align-items: end;
-      text-align: left;
-      justify-items: start;
-      column-gap: clamp(2rem, 4vw, 4rem);
+      max-width: 46rem;
+      margin: 0 auto 2.6rem;
     }
 
     .core-features-intro .pe-meta-label {
-      grid-column: 1 / -1;
-    }
-
-    .core-features-intro .pe-heading-l {
-      max-width: 13ch;
-    }
-
-    .core-features-intro .pe-home-copy {
-      align-self: end;
-      max-width: 34rem;
-      margin: 0 auto;
-      text-align: left;
+      grid-column: auto;
     }
 
     .core-feature-layout {
       grid-template-columns: 1fr;
       align-items: start;
       gap: 1.25rem;
-      text-align: left;
       justify-items: stretch;
     }
 
@@ -198,6 +188,10 @@ const {
       grid-template-columns: minmax(14rem, 0.36fr) minmax(0, 0.64fr);
       gap: 1.25rem;
       align-items: start;
+      padding: 1.15rem;
+      border: 1px solid rgba(253, 252, 252, 0.1);
+      border-radius: 18px;
+      background: rgba(253, 252, 252, 0.04);
     }
 
     .core-feature-proof__list {
@@ -211,35 +205,17 @@ const {
       gap: 1rem;
     }
 
-.core-feature-proof,
-.core-feature-card {
-  text-align: left;
-  justify-items: start;
-}
-
-.core-feature-proof,
-.core-feature-card {
-  padding: 1.15rem;
-  border: 1px solid rgba(253, 252, 252, 0.1);
-  border-radius: 8px;
-  background: rgba(253, 252, 252, 0.04);
-}
-
     .core-feature-card p {
-      max-width: 20rem;
+      max-width: 22rem;
       margin-inline: auto;
     }
-
-
-
   }
 
   @media (max-width: 720px) {
     .core-features-intro,
     .core-feature-layout,
     .core-feature-proof,
-    .core-feature-card
-{
+    .core-feature-card {
       text-align: center;
       justify-items: center;
     }
@@ -248,15 +224,5 @@ const {
       justify-items: center;
       text-align: center;
     }
-
-
-
-.core-feature-proof,
-.core-feature-card {
-  padding: 1rem;
-  border: 1px solid rgba(253, 252, 252, 0.14);
-  border-radius: 8px;
-  background: rgba(253, 252, 252, 0.04);
-}
-}
+  }
 </style>

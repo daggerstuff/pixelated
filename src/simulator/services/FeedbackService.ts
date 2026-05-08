@@ -5,8 +5,8 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'
 import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/MentalLLaMAAdapter'
-import { createTogetherAIService } from '../../lib/ai/services/together'
-import type { TogetherAIService } from '../../lib/ai/services/together'
+import { createLLMService } from '../../lib/ai/services/llm-provider'
+import type { LLMService } from '../../lib/ai/services/llm-provider'
 import type {
   FeedbackServiceInterface,
   RealTimeFeedback,
@@ -81,7 +81,7 @@ export class FeedbackService implements FeedbackServiceInterface {
   private modelLoadingPromise: Promise<void> | null = null
   private mentalLLaMAAdapter: MentalLLaMAAdapter | null = null
   // Remove unused mentalArenaAdapter
-  private togetherAIService: TogetherAIService | null = null
+  private llmService: LLMService | null = null
   private isEnhancedModelLoaded = false
   private isUsingEnhancedModels = true
   private lastTranscribedText = ''
@@ -248,12 +248,14 @@ export class FeedbackService implements FeedbackServiceInterface {
       const { adapter: mentalLLaMAAdapter } = await createMentalLLaMAFromEnv()
       this.mentalLLaMAAdapter = mentalLLaMAAdapter
 
-      // Initialize TogetherAI service for inference
-      this.togetherAIService = createTogetherAIService({
-        apiKey: process.env['TOGETHER_API_KEY'] || '',
-        togetherApiKey: process.env['TOGETHER_API_KEY'] || '',
-        togetherBaseUrl:
-          process.env['TOGETHER_API_URL'] || 'https://api.together.xyz/v1',
+      // Initialize the shared LLM service for inference
+      this.llmService = createLLMService({
+        apiKey: process.env['LLM_API_KEY'] || '',
+        baseUrl:
+          process.env['LLM_BASE_URL'] ||
+          process.env['LLM_API_URL'] ||
+          process.env['OPENAI_BASE_URL'] ||
+          'http://localhost:8000/v1',
       })
 
       this.isEnhancedModelLoaded = true
@@ -310,12 +312,9 @@ export class FeedbackService implements FeedbackServiceInterface {
       // Generate therapeutic suggestions based on the analysis
       let therapeuticSuggestions = null
 
-      if (
-        mentalHealthAnalysis?.hasMentalHealthIssue &&
-        this.togetherAIService
-      ) {
-        // Use TogetherAI with the fine-tuned model to generate therapeutic suggestions
-        const response = await this.togetherAIService.createChatCompletion(
+      if (mentalHealthAnalysis?.hasMentalHealthIssue && this.llmService) {
+        // Use LLM service with the fine-tuned model to generate therapeutic suggestions
+        const response = await this.llmService.createChatCompletion(
           [
             {
               role: 'system',

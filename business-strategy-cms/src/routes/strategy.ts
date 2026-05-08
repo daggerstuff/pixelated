@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
+
 import { Router } from 'express'
+
 import { authenticateToken, requireAdmin } from '../middleware/auth'
 import { DocumentModelMongoose } from '../models/DocumentMongoose'
 import { AIStrategyReviewService } from '../services/aiStrategyReviewService'
@@ -133,46 +135,51 @@ router.get('/sources', authenticateToken, (_req, res) => {
 })
 
 // Trigger a fresh re-analysis (manual refresh)
-router.post('/refresh-analysis', authenticateToken, requireAdmin, async (_req, res) => {
-  try {
-    const documents = await DocumentModelMongoose.find({})
+router.post(
+  '/refresh-analysis',
+  authenticateToken,
+  requireAdmin,
+  async (_req, res) => {
+    try {
+      const documents = await DocumentModelMongoose.find({})
 
-    // ⚡ Bolt: Use Promise.all to fetch AI reviews and edge case mappings concurrently,
-    // and replace sequential findByIdAndUpdate calls with a single bulkWrite operation to reduce N+1 queries.
-    const bulkOps = await Promise.all(
-      documents.map(async (doc) => {
-        const idStr = doc._id.toString()
-        const [review, mapping] = await Promise.all([
-          AIStrategyReviewService.reviewDocument(idStr),
-          EdgeCaseMappingService.mapStrategyToEdgeCases(idStr),
-        ])
+      // ⚡ Bolt: Use Promise.all to fetch AI reviews and edge case mappings concurrently,
+      // and replace sequential findByIdAndUpdate calls with a single bulkWrite operation to reduce N+1 queries.
+      const bulkOps = await Promise.all(
+        documents.map(async (doc) => {
+          const idStr = doc._id.toString()
+          const [review, mapping] = await Promise.all([
+            AIStrategyReviewService.reviewDocument(idStr),
+            EdgeCaseMappingService.mapStrategyToEdgeCases(idStr),
+          ])
 
-        return {
-          updateOne: {
-            filter: { _id: doc._id },
-            update: {
-              $set: {
-                'metadata.reviewScore': review.overallScore,
-                'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
-                'metadata.aiReview': review,
+          return {
+            updateOne: {
+              filter: { _id: doc._id },
+              update: {
+                $set: {
+                  'metadata.reviewScore': review.overallScore,
+                  'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
+                  'metadata.aiReview': review,
+                },
               },
             },
-          },
-        }
-      }),
-    )
+          }
+        }),
+      )
 
-    if (bulkOps.length > 0) {
-      await DocumentModelMongoose.bulkWrite(bulkOps)
+      if (bulkOps.length > 0) {
+        await DocumentModelMongoose.bulkWrite(bulkOps)
+      }
+
+      const updatedCount = bulkOps.length
+      return res.json({
+        message: `Successfully refreshed analysis for ${updatedCount} documents.`,
+      })
+    } catch {
+      return res.status(500).json({ error: 'Analysis refresh failed' })
     }
-
-    const updatedCount = bulkOps.length
-    return res.json({
-      message: `Successfully refreshed analysis for ${updatedCount} documents.`,
-    })
-  } catch {
-    return res.status(500).json({ error: 'Analysis refresh failed' })
-  }
-})
+  },
+)
 
 export { router as strategyRouter }

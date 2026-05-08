@@ -1,4 +1,14 @@
-import * as AWS from 'aws-sdk'
+import {
+  CreateBucketCommand,
+  DeleteObjectCommand,
+  HeadBucketCommand,
+  HeadObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
+import { getSignedUrl as signS3Url } from '@aws-sdk/s3-request-presigner'
 import { v4 as uuidv4 } from 'uuid'
 
 interface UploadedFile {
@@ -8,20 +18,31 @@ interface UploadedFile {
   size: number
 }
 
+interface MediaListOptions {
+  includeSignedUrls?: boolean
+}
+
+interface ListFilesOptions {
+  includeSignedUrls?: boolean
+  prefix?: string
+  pageSize?: number
+  continuationToken?: string
+}
+
+interface MediaListItem {
+  key: string
+  lastModified: Date
+  size: number
+  url: string | null
+}
+
+interface PaginatedListFilesResult {
+  files: MediaListItem[]
+  isTruncated: boolean
+  nextContinuationToken?: string
+}
+
 // Hetzner Object Storage configuration (S3-compatible)
-const s3Client = new AWS.S3({
-  endpoint:
-    process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com',
-  accessKeyId: process.env['HETZNER_ACCESS_KEY_ID'] || '',
-  secretAccessKey: process.env['HETZNER_SECRET_ACCESS_KEY'] || '',
-  region: process.env['HETZNER_REGION'] || 'hel1',
-  s3ForcePathStyle: true,
-  signatureVersion: 'v4',
-})
-
-const BUCKET_NAME =
-  process.env['HETZNER_BUCKET_NAME'] || 'business-strategy-cms-uploads'
-
 export interface MediaUpload {
   id: string
   key: string
@@ -33,11 +54,73 @@ export interface MediaUpload {
   uploadedBy: string
 }
 
+class StorageClientFactory {
+  private s3Client: S3Client | null = null
+
+  constructor(
+    private readonly endpoint: string = process.env['HETZNER_ENDPOINT'] ||
+      'https://hel1.your-objectstorage.com',
+    private readonly bucketName: string = process.env['HETZNER_BUCKET_NAME'] ||
+      'business-strategy-cms-uploads',
+    private readonly region: string = process.env['HETZNER_REGION'] || 'hel1',
+    private readonly accessKeyId: string = process.env[
+      'HETZNER_ACCESS_KEY_ID'
+    ] || '',
+    private readonly secretAccessKey: string = process.env[
+      'HETZNER_SECRET_ACCESS_KEY'
+    ] || '',
+  ) {}
+
+  getS3Client(): S3Client {
+    if (!this.s3Client) {
+      this.s3Client = new S3Client({
+        endpoint: this.getEndpoint(),
+        credentials: {
+          accessKeyId: this.accessKeyId,
+          secretAccessKey: this.secretAccessKey,
+        },
+        region: this.region,
+        forcePathStyle: true,
+      })
+    }
+
+    return this.s3Client
+  }
+
+  getBucketName(): string {
+    return this.bucketName
+  }
+
+  getEndpoint(): string {
+    return this.endpoint
+  }
+}
+
+class MediaAuthorizationGuard {
+  static assertUserOwnsKey(key: string, userId: string): void {
+    if (!userId) {
+      throw new Error('Authentication is required to access file operations.')
+    }
+    if (!key.startsWith(`${userId}/`)) {
+      throw new Error('Access to this file is not authorized.')
+    }
+  }
+}
+
 export class MediaService {
-  /**
-   * Upload file to Hetzner Object Storage
-   */
-  static async uploadFile(
+  constructor(private readonly storageClientFactory: StorageClientFactory) {}
+
+  private getUploadedFileSize(file: UploadedFile): number {
+    if (Number.isFinite(file.size)) {
+      return file.size
+    }
+    if (Buffer.isBuffer(file.buffer)) {
+      return file.buffer.length
+    }
+    throw new Error('Uploaded file missing a valid size value.')
+  }
+
+  async uploadFile(
     file: UploadedFile,
     userId: string,
     folder?: string,
@@ -46,27 +129,29 @@ export class MediaService {
     const fileExtension = file.originalname.split('.').pop() || ''
     const filename = `${uniqueSuffix}.${fileExtension}`
     const uploadFolder = folder || this.getFolderByFileType(file.mimetype)
-    const key = `${uploadFolder}/${filename}`
+    const key = `${userId}/${uploadFolder}/${filename}`
+    const fileSize = this.getUploadedFileSize(file)
 
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: 'private',
-      Metadata: {
-        'uploaded-by': userId,
-        'original-name': file.originalname,
-      },
-    }
-
-    const result = await s3Client.upload(params).promise()
+    await this.storageClientFactory.getS3Client().send(
+      new PutObjectCommand({
+        Bucket: this.storageClientFactory.getBucketName(),
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ACL: 'private',
+        Metadata: {
+          'uploaded-by': userId,
+          'original-name': file.originalname,
+        },
+      }),
+    )
+    const url = await this.getSignedUrl(key, 3600, userId)
 
     return {
       id: uniqueSuffix,
-      key: result.Key || key,
-      url: result.Location || this.buildUrl(key),
-      size: file.size,
+      key,
+      url,
+      size: fileSize,
       type: file.mimetype,
       originalName: file.originalname,
       uploadedAt: new Date(),
@@ -74,98 +159,134 @@ export class MediaService {
     }
   }
 
-  /**
-   * Get signed URL for secure file access
-   */
-  static async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: key,
-      Expires: expiresIn,
-    }
+  async getSignedUrl(
+    key: string,
+    expiresIn = 3600,
+    userId: string,
+  ): Promise<string> {
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
 
-    return s3Client.getSignedUrl('getObject', params)
+    const command = new GetObjectCommand({
+      Bucket: this.storageClientFactory.getBucketName(),
+      Key: key,
+    })
+
+    return signS3Url(this.storageClientFactory.getS3Client(), command, {
+      expiresIn,
+    })
   }
 
-  /**
-   * Delete file from Hetzner
-   */
-  static async deleteFile(key: string): Promise<void> {
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: key,
-    }
-
-    await s3Client.deleteObject(params).promise()
-  }
-
-  /**
-   * List files in a folder
-   */
-  static async listFiles(prefix?: string): Promise<
-    {
-      key: string
-      lastModified: Date
-      size: number
-      url: string | null
-    }[]
-  > {
-    const params: any = {
-      Bucket: BUCKET_NAME,
-    }
-
-    if (prefix) {
-      params.Prefix = prefix
-    }
-
-    const result = await s3Client.listObjectsV2(params).promise()
-
-    if (!result.Contents) return []
-
-    return await Promise.all(
-      result.Contents.map(async (file: any) => {
-        try {
-          const url = await this.getSignedUrl(file.Key || '')
-          return {
-            key: file.Key || '',
-            lastModified: file.LastModified || new Date(),
-            size: file.Size || 0,
-            url,
-          }
-        } catch (error: unknown) {
-          console.warn(
-            'Failed to generate signed URL for file:',
-            file.Key,
-            error,
-          )
-          return {
-            key: file.Key || '',
-            lastModified: file.LastModified || new Date(),
-            size: file.Size || 0,
-            url: null,
-          }
-        }
+  async deleteFile(key: string, userId: string): Promise<void> {
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
+    await this.storageClientFactory.getS3Client().send(
+      new DeleteObjectCommand({
+        Bucket: this.storageClientFactory.getBucketName(),
+        Key: key,
       }),
     )
   }
 
-  /**
-   * Get file metadata
-   */
-  static async getFileMetadata(key: string): Promise<{
+  async listFiles(
+    userId: string,
+    options: string | ListFilesOptions = {},
+  ): Promise<PaginatedListFilesResult> {
+    const listOptions =
+      typeof options === 'string'
+        ? { prefix: this.normalizePrefix(options) }
+        : options
+
+    const listPrefix = this.getListPrefix(userId, listOptions.prefix)
+    const result = await this.storageClientFactory.getS3Client().send(
+      new ListObjectsV2Command({
+        Bucket: this.storageClientFactory.getBucketName(),
+        ...(listPrefix ? { Prefix: listPrefix } : {}),
+        MaxKeys: Math.min(Math.max(listOptions.pageSize ?? 1000, 1), 1000),
+        ...(listOptions.continuationToken
+          ? { ContinuationToken: listOptions.continuationToken }
+          : {}),
+      }),
+    )
+
+    if (!result.Contents) {
+      return {
+        files: [],
+        isTruncated: false,
+      }
+    }
+
+    const files = result.Contents.filter(
+      (file): file is { Key: string; LastModified?: Date; Size?: number } =>
+        this.isFileWithKey(file),
+    ).map((file) => this.toMediaListItem(file))
+
+    const paginatedResult: PaginatedListFilesResult = {
+      files,
+      isTruncated: result.IsTruncated === true,
+      ...(result.NextContinuationToken
+        ? { nextContinuationToken: result.NextContinuationToken }
+        : {}),
+    }
+
+    if (!listOptions.includeSignedUrls) return paginatedResult
+    if (!userId) {
+      throw new Error(
+        'Signed URLs require a userId context in this request path.',
+      )
+    }
+
+    const enrichedFiles = await this.enrichWithSignedUrls(files, userId)
+    return { ...paginatedResult, files: enrichedFiles }
+  }
+
+  async listPublicFiles(
+    prefix?: string,
+    options: MediaListOptions = {},
+  ): Promise<MediaListItem[]> {
+    if (options.includeSignedUrls) {
+      throw new Error('Global listing cannot generate signed URLs.')
+    }
+
+    const listPrefix = this.normalizePrefix(prefix)
+    const result = await this.storageClientFactory.getS3Client().send(
+      new ListObjectsV2Command({
+        Bucket: this.storageClientFactory.getBucketName(),
+        ...(listPrefix ? { Prefix: listPrefix } : {}),
+      }),
+    )
+
+    if (!result.Contents) return []
+
+    return result.Contents.filter(
+      (file): file is { Key: string; LastModified?: Date; Size?: number } =>
+        this.isFileWithKey(file),
+    ).map((file) => this.toMediaListItem(file))
+  }
+
+  async getFileMetadata(
+    key: string,
+    userId: string,
+  ): Promise<{
     key: string
     size: number
     lastModified: Date
     contentType: string
     etag: string
+    uploadedBy: string
+    originalName: string
     metadata: Record<string, string>
   }> {
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: key,
-    }
+    MediaAuthorizationGuard.assertUserOwnsKey(key, userId)
 
-    const result = await s3Client.headObject(params).promise()
+    const result = await this.storageClientFactory.getS3Client().send(
+      new HeadObjectCommand({
+        Bucket: this.storageClientFactory.getBucketName(),
+        Key: key,
+      }),
+    )
+
+    const metadata = result.Metadata || {}
+    const uploadedBy = metadata['uploaded-by'] || ''
+    const originalName = metadata['original-name'] || ''
 
     return {
       key,
@@ -173,62 +294,133 @@ export class MediaService {
       lastModified: result.LastModified || new Date(),
       contentType: result.ContentType || 'application/octet-stream',
       etag: result.ETag || '',
-      metadata: result.Metadata || {},
+      uploadedBy,
+      originalName,
+      metadata: {
+        ...metadata,
+        uploadedBy,
+        originalName,
+      },
     }
   }
 
-  /**
-   * Create bucket if it doesn't exist
-   */
-  static async ensureBucketExists(): Promise<void> {
+  async ensureBucketExists(): Promise<void> {
     try {
-      await s3Client.headBucket({ Bucket: BUCKET_NAME }).promise()
-    } catch (error: any) {
-      if (error.statusCode === 404) {
-        await s3Client.createBucket({ Bucket: BUCKET_NAME }).promise()
+      await this.storageClientFactory
+        .getS3Client()
+        .send(
+          new HeadBucketCommand({
+            Bucket: this.storageClientFactory.getBucketName(),
+          }),
+        )
+    } catch (error: unknown) {
+      const httpStatusCode = (
+        error as { $metadata?: { httpStatusCode?: number } }
+      ).$metadata?.httpStatusCode
+
+      if (httpStatusCode === 404) {
+        await this.storageClientFactory
+          .getS3Client()
+          .send(
+            new CreateBucketCommand({
+              Bucket: this.storageClientFactory.getBucketName(),
+            }),
+          )
       } else {
         throw error
       }
     }
   }
 
-  /**
-   * Build URL for file
-   */
-  private static buildUrl(key: string): string {
-    const endpoint =
-      process.env['HETZNER_ENDPOINT'] || 'https://hel1.your-objectstorage.com'
-
-    // Remove protocol from endpoint if present
-    const cleanEndpoint = endpoint.replace(/^https?:\/\//, '')
-
-    return `https://${BUCKET_NAME}.${cleanEndpoint}/${key}`
+  private normalizePrefix(prefix?: string): string | undefined {
+    if (!prefix) return undefined
+    return prefix.replace(/^\/+/, '')
   }
 
-  /**
-   * Get folder by file type
-   */
-  private static getFolderByFileType(mimetype: string): string {
+  private getListPrefix(userId?: string, prefix?: string): string | undefined {
+    const normalizedPrefix = this.normalizePrefix(prefix)
+    if (!userId) return normalizedPrefix
+    return normalizedPrefix ? `${userId}/${normalizedPrefix}` : `${userId}/`
+  }
+
+  private isFileWithKey(file: {
+    Key?: string | null
+  }): file is { Key: string; LastModified?: Date; Size?: number } {
+    return Boolean(file.Key)
+  }
+
+  private toMediaListItem(file: {
+    Key: string
+    LastModified?: Date
+    Size?: number
+  }): MediaListItem {
+    return {
+      key: file.Key,
+      lastModified: file.LastModified || new Date(),
+      size: file.Size || 0,
+      url: null,
+    }
+  }
+
+  private async enrichWithSignedUrls(
+    files: MediaListItem[],
+    userId?: string,
+    maxConcurrent = 10,
+  ): Promise<MediaListItem[]> {
+    const total = files.length
+    if (total === 0) return []
+
+    const concurrencyLimit = Math.min(maxConcurrent, total)
+    const enriched = [...files]
+    const worker = async (workerIndex: number): Promise<void> => {
+      for (let index = workerIndex; index < total; index += concurrencyLimit) {
+        const file = files[index]
+
+        try {
+          const signedUrl = await this.getSignedUrl(file.key, 3600, userId)
+          enriched[index] = { ...file, url: signedUrl }
+        } catch (error) {
+          console.warn(
+            'Failed to generate signed URL for file:',
+            file.key,
+            error,
+          )
+          enriched[index] = { ...file, url: null }
+        }
+      }
+    }
+
+    await Promise.all(
+      Array.from({ length: concurrencyLimit }, (_, workerIndex) =>
+        worker(workerIndex),
+      ),
+    )
+
+    return enriched
+  }
+
+  private getFolderByFileType(mimetype: string): string {
     if (!mimetype || typeof mimetype !== 'string') return 'misc'
 
-    if (mimetype.startsWith('image/')) return 'images'
-    if (mimetype === 'application/pdf') return 'documents'
+    const normalized = mimetype.toLowerCase()
+
+    if (normalized.startsWith('image/')) return 'images'
     if (
-      mimetype.includes('wordprocessingml') ||
-      mimetype === 'application/msword'
-    )
+      normalized.startsWith('text/') ||
+      normalized.includes('document') ||
+      normalized.includes('msword') ||
+      normalized.includes('wordprocessingml') ||
+      normalized.includes('spreadsheetml') ||
+      normalized.includes('presentationml') ||
+      normalized.includes('application/pdf') ||
+      normalized.includes('officedocument') ||
+      normalized.includes('openxmlformats')
+    ) {
       return 'documents'
-    if (
-      mimetype.includes('spreadsheetml') ||
-      mimetype === 'application/vnd.ms-excel'
-    )
-      return 'documents'
-    if (
-      mimetype.includes('presentationml') ||
-      mimetype === 'application/vnd.ms-powerpoint'
-    )
-      return 'documents'
-    if (mimetype.startsWith('text/')) return 'documents'
+    }
+
     return 'misc'
   }
 }
+
+export const mediaService = new MediaService(new StorageClientFactory())

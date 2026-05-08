@@ -30,9 +30,9 @@ const STUB_MODELS: AIModel[] = [
     available: true,
   },
   {
-    id: 'together-llama-3-8b',
+    id: 'llm-llama-3-8b',
     name: 'Llama 3 8B',
-    provider: 'together',
+    provider: 'llm',
     capabilities: ['text-generation', 'conversation'],
     maxTokens: 8192,
     available: true,

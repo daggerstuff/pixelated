@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { query } from '../index'
+
 import {
   DeveloperApiKeyManager,
   initializeDeveloperApiKeysTable,
 } from '../developer-api-keys'
+import { query } from '../index'
 
 vi.mock('../index', () => ({
   query: vi.fn(),
@@ -40,13 +41,15 @@ describe('DeveloperApiKeyManager', () => {
         rowCount: 1,
       } as any)
 
-      return manager.createApiKey({
-        user_id: 'user-1',
-        name: 'Test Key',
-      }).then((result) => {
-        expect(result.plain_key).toMatch(/^dev_/)
-        expect(result.api_key.name).toBe('Test Key')
-      })
+      return manager
+        .createApiKey({
+          user_id: 'user-1',
+          name: 'Test Key',
+        })
+        .then((result) => {
+          expect(result.plain_key).toMatch(/^dev_/)
+          expect(result.api_key.name).toBe('Test Key')
+        })
     })
   })
 

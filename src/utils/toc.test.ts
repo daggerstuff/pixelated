@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
+
 import type { HeadingLevel } from '@/types'
+
 import { generateToc, type MarkdownHeading } from './toc'
 
 describe('generateToc', () => {

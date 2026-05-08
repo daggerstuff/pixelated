@@ -4,7 +4,8 @@
  * If using TypeScript, ensure your tsconfig includes "types": ["@playwright/test"]
  */
 import { test, expect } from '@playwright/test'
-import { getLoginFormLocator } from "../helpers/test-utils";
+
+import { getLoginFormLocator } from '../helpers/test-utils'
 
 // Define common breakpoints to test
 const breakpoints = [

@@ -4,12 +4,23 @@
  * Uses new Pixelated Brutalism design tokens
  */
 export interface Props {
-  variant?: 'default' | 'accent' | 'lined' | 'outline' | 'metric' | 'elevated' | 'security'
+  variant?:
+    | 'default'
+    | 'accent'
+    | 'lined'
+    | 'outline'
+    | 'metric'
+    | 'elevated'
+    | 'security'
   class?: string
   hover?: boolean
 }
 
-const { variant = 'default', class: className = '', hover = false } = Astro.props
+const {
+  variant = 'default',
+  class: className = '',
+  hover = false,
+} = Astro.props
 
 const baseClasses = 'card'
 const variantClasses = {

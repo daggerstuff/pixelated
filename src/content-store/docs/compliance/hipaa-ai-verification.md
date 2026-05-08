@@ -89,13 +89,13 @@ validating that our AI implementation meets all necessary HIPAA requirements.
 
 ## 5. Business Associate Agreements
 
-### TogetherAI Provider
+### LLM provider Provider
 
-- [ ] Verify that a BAA is in place with TogetherAI
+- [ ] Verify that a BAA is in place with LLM provider
 - [ ] Confirm that the BAA covers all required HIPAA provisions
-- [ ] Review TogetherAI's security practices and compliance documentation
-- [ ] Verify that TogetherAI does not store or use patient data for training
-- [ ] Confirm that TogetherAI's data handling practices meet HIPAA requirements
+- [ ] Review LLM provider's security practices and compliance documentation
+- [ ] Verify that LLM provider does not store or use patient data for training
+- [ ] Confirm that LLM provider's data handling practices meet HIPAA requirements
 
 ### Other Service Providers
 

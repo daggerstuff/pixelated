@@ -42,7 +42,9 @@ const organizationSchema = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(organizationSchema).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
+      set:html={JSON.stringify(organizationSchema)
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')}
     />
 
     <BrutalistHero

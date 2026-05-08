@@ -9,7 +9,7 @@ groups:
   - healthcare
 
 dependencies:
-  codeql/javascript-all: ">=2.0.0 <3.0.0"
-  codeql/javascript-queries: ">=2.0.0 <3.0.0"
+  codeql/javascript-all: '>=2.0.0 <3.0.0'
+  codeql/javascript-queries: '>=2.0.0 <3.0.0'
 
 extractor: javascript

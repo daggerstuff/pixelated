@@ -1,5 +1,4 @@
 import mongodb from '../../config/mongodb.config'
-
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger

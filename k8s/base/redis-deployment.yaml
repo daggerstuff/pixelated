@@ -16,6 +16,13 @@ spec:
       containers:
       - name: redis
         image: redis:7-alpine
+        command:
+        - sh
+        - -c
+        - redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
+        envFrom:
+        - secretRef:
+            name: pixelated-empathy-secrets
         ports:
         - containerPort: 6379
           name: redis

@@ -83,24 +83,41 @@ export default function DatasetSearch() {
                 id='dataset-search'
                 type='text'
                 disabled={loading}
-                className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed w-full rounded-lg border px-4 py-3 outline-none focus:ring-2'
+                className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 focus:border-transparent w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50'
                 placeholder='e.g., cbt therapy, depression, multi-turn'
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !loading && void handleSearch()}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' && !loading && void handleSearch()
+                }
                 aria-label='Search therapeutic datasets'
               />
               <div className='absolute right-2 top-1/2 -translate-y-1/2 transform'>
                 <button
                   onClick={() => void handleSearch()}
                   disabled={loading}
-                  className='bg-pink-600 hover:bg-pink-700 focus:ring-pink-500 text-white disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-md p-2 transition-colors'
+                  className='bg-pink-600 hover:bg-pink-700 focus:ring-pink-500 text-white focus:ring-offset-slate-900 rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                   aria-label={loading ? 'Searching datasets' : 'Run search'}
                 >
                   {loading ? (
-                    <svg className='h-5 w-5 animate-spin' fill='none' viewBox='0 0 24 24'>
-                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                    <svg
+                      className='h-5 w-5 animate-spin'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='4'
+                      ></circle>
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                      ></path>
                     </svg>
                   ) : (
                     <svg
@@ -171,9 +188,11 @@ export default function DatasetSearch() {
 
         {/* Results Area */}
         <div>
-          <div aria-live="polite" className="sr-only">
+          <div aria-live='polite' className='sr-only'>
             {loading && 'Searching datasets...'}
-            {!loading && hasSearched && `Search completed. Found ${results.length} datasets.`}
+            {!loading &&
+              hasSearched &&
+              `Search completed. Found ${results.length} datasets.`}
           </div>
           {loading && (
             <div

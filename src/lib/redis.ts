@@ -274,19 +274,22 @@ function createRedisClient() {
 
   // Log appropriate warnings in production
   if (isProduction()) {
-    console.error('CRITICAL: Missing Redis credentials in production environment')
+    console.error(
+      'CRITICAL: Missing Redis credentials in production environment',
+    )
   }
   return createMockRedisClient()
 }
 
 export const redis = createRedisClient()
 if (typeof (redis as { on?: (...args: unknown[]) => void }).on === 'function') {
-  ;(redis as { on: (event: string, handler: (...args: unknown[]) => void) => void }).on(
-    'error',
-    (error: unknown) => {
-      console.warn('Redis connection warning:', error)
-    },
-  )
+  ;(
+    redis as {
+      on: (event: string, handler: (...args: unknown[]) => void) => void
+    }
+  ).on('error', (error: unknown) => {
+    console.warn('Redis connection warning:', error)
+  })
 }
 
 // Backward-compatible helper for modules expecting a getter
@@ -358,12 +361,13 @@ export async function removeFromCache(key: string): Promise<boolean> {
  */
 function attachRedisErrorHandling() {
   if (redis && typeof (redis as { on: unknown }).on === 'function') {
-    ;(redis as { on: (event: string, handler: (...args: unknown[]) => void) => void }).on(
-      'error',
-      (err: unknown) => {
-        console.warn('Redis connection warning:', err)
-      },
-    )
+    ;(
+      redis as {
+        on: (event: string, handler: (...args: unknown[]) => void) => void
+      }
+    ).on('error', (err: unknown) => {
+      console.warn('Redis connection warning:', err)
+    })
   }
 }
 

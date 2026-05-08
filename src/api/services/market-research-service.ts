@@ -1,22 +1,22 @@
-import { v4 as uuid } from "uuid";
+import { v4 as uuid } from 'uuid'
 
-import { slug } from "@/utils/common";
+import { slug } from '@/utils/common'
 
 // Market Research Service Layer
-import { getPostgresPool } from "../../lib/database/connection";
+import { getPostgresPool } from '../../lib/database/connection'
 import {
   MarketResearchDocument,
   MarketResearch as MarketResearchModel,
-} from "../../lib/database/mongodb/schemas";
-import { ForbiddenError, NotFoundError } from "../middleware/error-handler";
+} from '../../lib/database/mongodb/schemas'
+import { ForbiddenError, NotFoundError } from '../middleware/error-handler'
 
-type MarketResearchPermissionLevel = "view" | "edit" | "comment";
+type MarketResearchPermissionLevel = 'view' | 'edit' | 'comment'
 
 type MarketResearchPermissions = {
-  view: string[];
-  edit: string[];
-  comment: string[];
-};
+  view: string[]
+  edit: string[]
+  comment: string[]
+}
 
 const normalizePermissions = (
   permissions?: MarketResearchPermissions | null,
@@ -24,51 +24,51 @@ const normalizePermissions = (
   view: permissions?.view ?? [],
   edit: permissions?.edit ?? [],
   comment: permissions?.comment ?? [],
-});
+})
 
 const getPermissionLevel = (
   permissions: MarketResearchPermissions,
   permissionLevel: MarketResearchPermissionLevel,
-): string[] => permissions[permissionLevel] ?? [];
+): string[] => permissions[permissionLevel] ?? []
 
 const hasPermission = (
   permissions: MarketResearchPermissions | null | undefined,
   permissionLevel: MarketResearchPermissionLevel,
   userId: string,
 ) => {
-  const normalized = normalizePermissions(permissions);
-  return getPermissionLevel(normalized, permissionLevel).includes(userId);
-};
+  const normalized = normalizePermissions(permissions)
+  return getPermissionLevel(normalized, permissionLevel).includes(userId)
+}
 
 /**
  * Create a new market research document
  */
 export async function createMarketResearch(data: {
-  title: string;
-  description?: string;
-  ownerId: string;
-  targetMarkets?: string[];
-  researchType?: string;
-  timeline?: { startDate: Date; endDate: Date };
+  title: string
+  description?: string
+  ownerId: string
+  targetMarkets?: string[]
+  researchType?: string
+  timeline?: { startDate: Date; endDate: Date }
   // Additional fields accepted but not stored
-  industry?: string;
-  targetMarket?: string;
-  methodology?: string;
-  budget?: string;
+  industry?: string
+  targetMarket?: string
+  methodology?: string
+  budget?: string
 }) {
-  const pool = getPostgresPool();
+  const pool = getPostgresPool()
 
-  const researchId = uuid();
-  const researchSlug = slug(data.title);
+  const researchId = uuid()
+  const researchSlug = slug(data.title)
 
   const research = new MarketResearchModel({
     _id: researchId,
     title: data.title,
     slug: researchSlug,
-    description: data.description || "",
+    description: data.description || '',
     owner: data.ownerId,
-    status: "active",
-    researchType: data.researchType || "market_analysis",
+    status: 'active',
+    researchType: data.researchType || 'market_analysis',
     targetMarkets: data.targetMarkets || [],
     findings: [],
     competitiveAnalysis: [],
@@ -84,37 +84,40 @@ export async function createMarketResearch(data: {
     },
     createdAt: new Date(),
     updatedAt: new Date(),
-  });
+  })
 
-  await research.save();
+  await research.save()
 
   // Record in PostgreSQL
   await pool.query(
     `INSERT INTO market_research (id, title, slug, owner_id, status, created_at)
      VALUES ($1, $2, $3, $4, $5, NOW())`,
-    [researchId, data.title, researchSlug, data.ownerId, "active"],
-  );
+    [researchId, data.title, researchSlug, data.ownerId, 'active'],
+  )
 
-  return research;
+  return research
 }
 
 /**
  * Get market research document
  */
 export async function getMarketResearch(researchId: string, userId: string) {
-  const research = await MarketResearchModel.findById(researchId);
+  const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
-    throw new NotFoundError("market research", researchId);
+    throw new NotFoundError('market research', researchId)
   }
 
   // Check permissions
-  const researchDoc = research as any;
-  if (!hasPermission(research.permissions, "view", userId) && researchDoc.owner !== userId) {
-    throw new ForbiddenError("Cannot access this research");
+  const researchDoc = research as any
+  if (
+    !hasPermission(research.permissions, 'view', userId) &&
+    researchDoc.owner !== userId
+  ) {
+    throw new ForbiddenError('Cannot access this research')
   }
 
-  return research;
+  return research
 }
 
 /**
@@ -124,41 +127,44 @@ export async function addFinding(
   researchId: string,
   userId: string,
   finding: {
-    title: string;
-    description?: string;
-    impactLevel?: "high" | "medium" | "low";
-    supportingData?: any;
-    source?: string;
+    title: string
+    description?: string
+    impactLevel?: 'high' | 'medium' | 'low'
+    supportingData?: any
+    source?: string
   },
 ) {
-  const research = await MarketResearchModel.findById(researchId);
+  const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
-    throw new NotFoundError("market research", researchId);
+    throw new NotFoundError('market research', researchId)
   }
 
   // Check edit permission
-  if (!hasPermission(research.permissions, "edit", userId) && research.owner !== userId) {
-    throw new ForbiddenError("Cannot edit this research");
+  if (
+    !hasPermission(research.permissions, 'edit', userId) &&
+    research.owner !== userId
+  ) {
+    throw new ForbiddenError('Cannot edit this research')
   }
 
-  const findingId = uuid();
+  const findingId = uuid()
 
   research.findings.push({
     _id: findingId,
     title: finding.title,
-    description: finding.description || "",
-    impactLevel: finding.impactLevel || "medium",
+    description: finding.description || '',
+    impactLevel: finding.impactLevel || 'medium',
     supportingData: finding.supportingData || {},
-    source: finding.source || "",
+    source: finding.source || '',
     createdAt: new Date(),
     updatedAt: new Date(),
-  });
+  })
 
-  research.updatedAt = new Date();
-  await research.save();
+  research.updatedAt = new Date()
+  await research.save()
 
-  return research;
+  return research
 }
 
 /**
@@ -168,26 +174,29 @@ export async function addCompetitiveAnalysis(
   researchId: string,
   userId: string,
   analysis: {
-    competitorName: string;
-    strengths?: string[];
-    weaknesses?: string[];
-    opportunities?: string[];
-    threats?: string[];
-    marketShare?: number;
+    competitorName: string
+    strengths?: string[]
+    weaknesses?: string[]
+    opportunities?: string[]
+    threats?: string[]
+    marketShare?: number
   },
 ) {
-  const research = await MarketResearchModel.findById(researchId);
+  const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
-    throw new NotFoundError("market research", researchId);
+    throw new NotFoundError('market research', researchId)
   }
 
   // Check edit permission
-  if (!hasPermission(research.permissions, "edit", userId) && research.owner !== userId) {
-    throw new ForbiddenError("Cannot edit this research");
+  if (
+    !hasPermission(research.permissions, 'edit', userId) &&
+    research.owner !== userId
+  ) {
+    throw new ForbiddenError('Cannot edit this research')
   }
 
-  const analysisId = uuid();
+  const analysisId = uuid()
 
   research.competitiveAnalysis.push({
     _id: analysisId,
@@ -199,12 +208,12 @@ export async function addCompetitiveAnalysis(
     marketShare: analysis.marketShare || 0,
     createdAt: new Date(),
     updatedAt: new Date(),
-  });
+  })
 
-  research.updatedAt = new Date();
-  await research.save();
+  research.updatedAt = new Date()
+  await research.save()
 
-  return research;
+  return research
 }
 
 /**
@@ -214,40 +223,43 @@ export async function addRecommendation(
   researchId: string,
   userId: string,
   recommendation: {
-    title: string;
-    description?: string;
-    priority?: "high" | "medium" | "low";
-    expectedImpact?: string;
+    title: string
+    description?: string
+    priority?: 'high' | 'medium' | 'low'
+    expectedImpact?: string
   },
 ) {
-  const research = await MarketResearchModel.findById(researchId);
+  const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
-    throw new NotFoundError("market research", researchId);
+    throw new NotFoundError('market research', researchId)
   }
 
   // Check edit permission
-  if (!hasPermission(research.permissions, "edit", userId) && research.owner !== userId) {
-    throw new ForbiddenError("Cannot edit this research");
+  if (
+    !hasPermission(research.permissions, 'edit', userId) &&
+    research.owner !== userId
+  ) {
+    throw new ForbiddenError('Cannot edit this research')
   }
 
-  const recommendationId = uuid();
+  const recommendationId = uuid()
 
   research.recommendations.push({
     _id: recommendationId,
     title: recommendation.title,
-    description: recommendation.description || "",
-    priority: recommendation.priority || "medium",
-    expectedImpact: recommendation.expectedImpact || "",
-    status: "pending",
+    description: recommendation.description || '',
+    priority: recommendation.priority || 'medium',
+    expectedImpact: recommendation.expectedImpact || '',
+    status: 'pending',
     createdAt: new Date(),
     updatedAt: new Date(),
-  });
+  })
 
-  research.updatedAt = new Date();
-  await research.save();
+  research.updatedAt = new Date()
+  await research.save()
 
-  return research;
+  return research
 }
 
 /**
@@ -256,49 +268,53 @@ export async function addRecommendation(
 export async function listMarketResearch(
   userId: string,
   options: {
-    page?: number;
-    limit?: number;
-    researchType?: string;
-    status?: string;
-    industry?: string;
+    page?: number
+    limit?: number
+    researchType?: string
+    status?: string
+    industry?: string
   } = {},
 ) {
-  const page = options.page || 1;
-  const limit = options.limit || 50;
+  const page = options.page || 1
+  const limit = options.limit || 50
 
   let query: any = {
-    $or: [{ owner: userId }, { "permissions.view": userId }],
-  };
+    $or: [{ owner: userId }, { 'permissions.view': userId }],
+  }
 
   if (options.researchType) {
-    query.researchType = options.researchType;
+    query.researchType = options.researchType
   }
 
   if (options.status) {
-    query.status = options.status;
+    query.status = options.status
   }
 
   const research = await MarketResearchModel.find(query)
     .limit(limit)
     .skip((page - 1) * limit)
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
 
-  const total = await MarketResearchModel.countDocuments(query);
+  const total = await MarketResearchModel.countDocuments(query)
 
   return {
     data: research,
     pagination: { page, limit, total },
-  };
+  }
 }
 
 /**
  * Search market research
  */
-export async function searchMarketResearch(query: string, userId: string, limit: number = 50) {
+export async function searchMarketResearch(
+  query: string,
+  userId: string,
+  limit: number = 50,
+) {
   return await MarketResearchModel.find({
     $text: { $search: query },
-    $or: [{ owner: userId }, { "permissions.view": userId }],
-  }).limit(limit);
+    $or: [{ owner: userId }, { 'permissions.view': userId }],
+  }).limit(limit)
 }
 
 /**
@@ -308,23 +324,26 @@ export async function shareMarketResearch(
   researchId: string,
   ownerId: string,
   targetUserId: string,
-  permissionLevel: "view" | "edit" | "comment",
+  permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const research = await MarketResearchModel.findById(researchId);
+  const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
-    throw new NotFoundError("market research", researchId);
+    throw new NotFoundError('market research', researchId)
   }
 
   // Check ownership
   if (research.owner !== ownerId) {
-    throw new ForbiddenError("Only research owner can share");
+    throw new ForbiddenError('Only research owner can share')
   }
 
   // Add to appropriate permission array
   const permissionKey = permissionLevel
   const normalizedPermissions = normalizePermissions(research.permissions)
-  const permissionList = getPermissionLevel(normalizedPermissions, permissionKey)
+  const permissionList = getPermissionLevel(
+    normalizedPermissions,
+    permissionKey,
+  )
   if (!permissionList.includes(targetUserId)) {
     const nextPermissions: MarketResearchPermissions = {
       ...normalizedPermissions,
@@ -334,5 +353,5 @@ export async function shareMarketResearch(
     await research.save()
   }
 
-  return research;
+  return research
 }

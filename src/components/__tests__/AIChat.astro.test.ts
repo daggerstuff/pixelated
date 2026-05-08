@@ -130,7 +130,7 @@ describe('AIChat.astro', () => {
 
     // expect(h2Element?.textContent).toBe('AI Chat')
     // expect(pElement?.textContent?.trim()).toBe(
-    //   'Interact with our AI assistant powered by TogetherAI.',
+    //   'Interact with our AI assistant powered by the LLM API.',
     // )
 
     // // Check if client component placeholder exists

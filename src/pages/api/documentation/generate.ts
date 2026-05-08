@@ -4,7 +4,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   AIMessage,
   AIServiceOptions,
-  createTogetherAIService,
+  createLLMService,
 } from '../../../lib/ai/AIService'
 import { AIRepository } from '../../../lib/db/ai/repository'
 import { DocumentationService } from '../../../lib/documentation'
@@ -13,19 +13,23 @@ const logger = createBuildSafeLogger('documentation-api')
 
 // Instantiate dependencies for DocumentationService
 const repository = new AIRepository()
-const togetherConfig = {
-  togetherApiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key',
-  apiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key',
+const llmConfig = {
+  apiKey: process.env['LLM_API_KEY'] || 'dummy-key',
+  baseUrl:
+    process.env['LLM_BASE_URL'] ||
+    process.env['LLM_API_URL'] ||
+    process.env['OPENAI_BASE_URL'] ||
+    'https://api.openai.com/v1',
 }
 // Create the base service
-const baseAiService = createTogetherAIService(togetherConfig)
+const baseAiService = createLLMService(llmConfig)
 // Add a stub getModelInfo to satisfy the AIService interface
 const aiService = {
   ...baseAiService,
   getModelInfo: () => ({
     id: 'dummy-model',
     name: 'Dummy Model',
-    provider: 'together',
+    provider: 'llm',
     capabilities: ['chat'],
     contextWindow: 2048,
     maxTokens: 1024,
@@ -57,7 +61,7 @@ const aiService = {
         completionTokens: 0,
         totalTokens: 0,
       },
-      provider: 'together',
+      provider: 'llm',
       content: result.content,
     } as import('../../../lib/ai/models/ai-types').AICompletion
   },

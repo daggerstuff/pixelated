@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-05-07T02:29:20.797927+00:00",
+  "channel": "YouTube_Mix",
+  "total_urls_processed": 3,
+  "successful": 0,
+  "failed": 3,
+  "skipped_existing": 0,
+  "output_directory": "training/data/transcripts/YouTube_Mix",
+  "languages_attempted": ["en"],
+  "method": "selenium-undetected-chromedriver"
+}

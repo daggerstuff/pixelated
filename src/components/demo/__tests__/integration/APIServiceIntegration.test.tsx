@@ -100,7 +100,9 @@ describe('APIService Integration Tests', () => {
     it('handles knowledge balancer API errors', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Service unavailable'))
 
-      await expect(safeFetch('/api/knowledge-balancer/status')).rejects.toThrow('Service unavailable')
+      await expect(safeFetch('/api/knowledge-balancer/status')).rejects.toThrow(
+        'Service unavailable',
+      )
     })
 
     it('syncs category data with knowledge balancer', async () => {

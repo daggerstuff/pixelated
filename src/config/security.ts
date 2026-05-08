@@ -68,7 +68,6 @@ export const cspConfig: CSPConfig = {
   'connect-src': [
     "'self'",
     // AI/ML API endpoints
-    'https://api.together.xyz',
     'https://api.nebius.ai',
     'https://api.openai.com',
     'https://api.replicate.com',

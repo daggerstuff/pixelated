@@ -103,7 +103,7 @@ const API_ENDPOINTS = [
     path: '/api/ai/completion',
     method: 'POST',
     payload: {
-      model: 'Together-ai-default',
+      model: 'llm-default',
       messages: [{ role: 'user', content: 'Hello' }],
     },
   },

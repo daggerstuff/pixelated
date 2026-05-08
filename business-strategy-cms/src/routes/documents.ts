@@ -55,7 +55,9 @@ const isDocumentStatus = (value: unknown): value is DocumentStatus =>
   value === DocumentStatus.PUBLISHED ||
   value === DocumentStatus.ARCHIVED
 
-const parseMetadata = (value: unknown): Partial<DocumentMetadata> | undefined => {
+const parseMetadata = (
+  value: unknown,
+): Partial<DocumentMetadata> | undefined => {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return undefined
   }
@@ -65,8 +67,11 @@ const parseMetadata = (value: unknown): Partial<DocumentMetadata> | undefined =>
 
 const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
   const title = typeof body['title'] === 'string' ? body['title'].trim() : ''
-  const content = typeof body['content'] === 'string' ? body['content'].trim() : ''
-  const category = isDocumentCategory(body['category']) ? body['category'] : undefined
+  const content =
+    typeof body['content'] === 'string' ? body['content'].trim() : ''
+  const category = isDocumentCategory(body['category'])
+    ? body['category']
+    : undefined
 
   if (!title) {
     throw new Error('Title is required')
@@ -86,7 +91,8 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
     category,
   }
 
-  const summary = typeof body['summary'] === 'string' ? body['summary'].trim() : undefined
+  const summary =
+    typeof body['summary'] === 'string' ? body['summary'].trim() : undefined
   if (summary !== undefined) {
     createPayload.summary = summary
   }
@@ -124,7 +130,10 @@ const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
     updates.title = body['title'].trim()
   }
 
-  if (typeof body['content'] === 'string' && body['content'].trim().length > 0) {
+  if (
+    typeof body['content'] === 'string' &&
+    body['content'].trim().length > 0
+  ) {
     updates.content = body['content'].trim()
   }
 
@@ -153,18 +162,12 @@ const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
   return updates
 }
 
-const getRouteParam = (
-  req: DocumentRequest,
-  key: string,
-): string | null => {
+const getRouteParam = (req: DocumentRequest, key: string): string | null => {
   const value = req.params[key]
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
-const getBodyString = (
-  req: DocumentRequest,
-  key: string,
-): string | null => {
+const getBodyString = (req: DocumentRequest, key: string): string | null => {
   const value = req.body[key]
   return typeof value === 'string' && value.length > 0 ? value : null
 }
@@ -267,44 +270,40 @@ router.get('/', authenticateToken, async (req: DocumentRequest, res) => {
 })
 
 // Get document by ID
-router.get(
-  '/:id',
-  authenticateToken,
-  async (req: DocumentRequest, res) => {
-    try {
-      const documentId = getRouteParam(req, 'id')
-      if (!documentId) {
-        res.status(400).json({
-          success: false,
-          error: { message: 'Document ID is required' },
-        })
-        return
-      }
-
-      const document = await DocumentService.getDocument(documentId)
-      if (!document) {
-        res.status(404).json({
-          success: false,
-          error: { message: 'Document not found' },
-        })
-        return
-      }
-
-      res.json({
-        success: true,
-        data: document,
-      })
-    } catch (error: unknown) {
-      res.status(500).json({
+router.get('/:id', authenticateToken, async (req: DocumentRequest, res) => {
+  try {
+    const documentId = getRouteParam(req, 'id')
+    if (!documentId) {
+      res.status(400).json({
         success: false,
-        error: {
-          message:
-            error instanceof Error ? error.message : 'Failed to fetch document',
-        },
+        error: { message: 'Document ID is required' },
       })
+      return
     }
-  },
-)
+
+    const document = await DocumentService.getDocument(documentId)
+    if (!document) {
+      res.status(404).json({
+        success: false,
+        error: { message: 'Document not found' },
+      })
+      return
+    }
+
+    res.json({
+      success: true,
+      data: document,
+    })
+  } catch (error: unknown) {
+    res.status(500).json({
+      success: false,
+      error: {
+        message:
+          error instanceof Error ? error.message : 'Failed to fetch document',
+      },
+    })
+  }
+})
 
 // Update document
 router.put(
@@ -357,48 +356,42 @@ router.put(
 )
 
 // Delete document
-router.delete(
-  '/:id',
-  authenticateToken,
-  async (req: DocumentRequest, res) => {
-    try {
-      const documentId = getRouteParam(req, 'id')
-      if (!documentId) {
-        res.status(400).json({
-          success: false,
-          error: { message: 'Document ID is required' },
-        })
-        return
-      }
-
-      const userId = req.user!.userId
-      const success = await DocumentService.deleteDocument(documentId, userId)
-
-      if (!success) {
-        res.status(404).json({
-          success: false,
-          error: { message: 'Document not found' },
-        })
-        return
-      }
-
-      res.json({
-        success: true,
-        message: 'Document deleted successfully',
-      })
-    } catch (error: unknown) {
+router.delete('/:id', authenticateToken, async (req: DocumentRequest, res) => {
+  try {
+    const documentId = getRouteParam(req, 'id')
+    if (!documentId) {
       res.status(400).json({
         success: false,
-        error: {
-          message:
-            error instanceof Error
-              ? error.message
-              : 'Failed to delete document',
-        },
+        error: { message: 'Document ID is required' },
       })
+      return
     }
-  },
-)
+
+    const userId = req.user!.userId
+    const success = await DocumentService.deleteDocument(documentId, userId)
+
+    if (!success) {
+      res.status(404).json({
+        success: false,
+        error: { message: 'Document not found' },
+      })
+      return
+    }
+
+    res.json({
+      success: true,
+      message: 'Document deleted successfully',
+    })
+  } catch (error: unknown) {
+    res.status(400).json({
+      success: false,
+      error: {
+        message:
+          error instanceof Error ? error.message : 'Failed to delete document',
+      },
+    })
+  }
+})
 
 // Add collaborator to document
 router.post(

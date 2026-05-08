@@ -5,11 +5,11 @@ import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
-import { createLogger } from 'vite'
 import UnoCSS from '@unocss/astro'
 import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { createLogger } from 'vite'
 
 const isRailwayDeploy =
   process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT
@@ -21,13 +21,25 @@ const isFlyioDeploy =
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
+/**
+ * @typedef {{ code: string, message: string, chunkName: string }} RollupWarningShape
+ */
+/**
+ * @typedef {{ ssr: boolean, assets: string[], filesToDeleteAfterUpload: string[] }} SentryPluginOptions
+ */
 const viteLogger = createLogger()
+
+/**
+ * @param {RollupWarningShape} warning
+ * @returns {boolean}
+ */
 function shouldIgnoreEmptyMentalHealthWarning(warning) {
-  const message = warning.message || ''
-  const chunkName = warning.chunkName || ''
+  const message = warning.message
+  const chunkName = warning.chunkName
   return (
     message.includes('Generated an empty chunk') &&
-    (message.includes('MentalHealthChatDemo') || chunkName.includes('MentalHealthChatDemo'))
+    (message.includes('MentalHealthChatDemo') ||
+      chunkName.includes('MentalHealthChatDemo'))
   )
 }
 // Detect if we're running a build command (not dev server)
@@ -36,19 +48,27 @@ const isBuildCommand =
   process.env.CI === 'true' ||
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
-const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+const hasSentryDSN =
+  !!process.env.SENTRY_DSN ||
+  !!process.env.PUBLIC_SENTRY_DSN ||
+  !!process.env.SENTRY_PUBLIC_DSN ||
+  !!process.env.VITE_SENTRY_DSN
 const sentryRelease =
-  process.env.SENTRY_RELEASE || process.env.npm_package_version || undefined
+  process.env.SENTRY_RELEASE ?? process.env.npm_package_version ?? undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 
+/**
+ * @param {SentryPluginOptions} opts
+ * @returns {Array<import('vite').Plugin>}
+ */
 function createScopedSentryVitePlugins({
   ssr,
   assets,
   filesToDeleteAfterUpload,
 }) {
   return sentryVitePlugin({
-    org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-    project: process.env.SENTRY_PROJECT || 'pixel-astro',
+    org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
     authToken: process.env.SENTRY_AUTH_TOKEN,
     telemetry: false,
     release: sentryRelease ? { name: sentryRelease } : undefined,
@@ -59,8 +79,16 @@ function createScopedSentryVitePlugins({
     },
   }).map((plugin) => ({
     ...plugin,
+    /**
+     * @param {{build?: { ssr?: boolean }}} config
+     * @param {{ command: string }} env
+     * @returns {boolean}
+     */
     apply(config, env) {
-      return env.command === 'build' && Boolean(config.build?.ssr) === ssr
+      if (env.command !== 'build') {
+        return false
+      }
+      return Boolean(config.build?.ssr) === ssr
     },
   }))
 }
@@ -82,12 +110,19 @@ const preferredPort = (() => {
   return 4321
 })()
 
+/**
+ * @param {string} id
+ * @returns {string | null}
+ */
 function getChunkName(id) {
   const normalizedId = id.replace(/\\/g, '/')
 
   if (normalizedId.includes('/src/components/')) {
-    const componentSegments =
-      normalizedId.split('/src/components/')[1]?.split('/') || []
+    const componentSubPath = normalizedId.split('/src/components/')[1]
+    if (!componentSubPath) {
+      return null
+    }
+    const componentSegments = componentSubPath.split('/')
     const componentImport = componentSegments[0]?.split('?')[0]
     const componentExtension = componentImport
       ? path.extname(componentImport)
@@ -241,7 +276,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://pixelatedempathy.com',
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -256,6 +291,9 @@ export default defineConfig({
       },
     ],
     rollupOptions: {
+      /**
+       * @param {RollupWarningShape} warning
+       */
       onwarn(warning) {
         if (shouldIgnoreEmptyMentalHealthWarning(warning)) {
           return
@@ -276,7 +314,7 @@ export default defineConfig({
       warn(msg, options) {
         if (
           msg.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
-          msg.includes('Generated an empty chunk: \'MentalHealthChatDemo\'') ||
+          msg.includes("Generated an empty chunk: 'MentalHealthChatDemo'") ||
           msg.includes('Generated an empty chunk: MentalHealthChatDemo')
         ) {
           return
@@ -379,34 +417,38 @@ export default defineConfig({
           'crypto-browserify',
           'util',
         ],
+        /**
+         * @param {RollupWarningShape} warning
+         * @param {(warning: RollupWarningShape) => void} warn
+         */
         onwarn(warning, warn) {
           if (shouldIgnoreEmptyMentalHealthWarning(warning)) {
             return
           }
           if (
             warning.code === 'SOURCEMAP_ERROR' ||
-            (warning.message &&
-              warning.message.includes("didn't generate a sourcemap"))
+            warning.message.includes("didn't generate a sourcemap")
           ) {
             return
           }
           if (
             warning.code === 'EMPTY_CHUNK' &&
-            (warning.message?.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
-              (warning.chunkName && warning.chunkName === 'MentalHealthChatDemo'))
+            (warning.message.includes(
+              'Generated an empty chunk: "MentalHealthChatDemo"',
+            ) ||
+              warning.chunkName === 'MentalHealthChatDemo')
           ) {
             return
           }
           if (
-            warning.message &&
-            (warning.message.includes(
+            warning.message.includes(
               'externalized for browser compatibility',
             ) ||
-              warning.message.includes('experimentalDisableStreaming') ||
-              (warning.message.includes('dynamically imported') &&
-                warning.message.includes('statically imported')) ||
-              warning.message.includes('icon "-"') ||
-              warning.message.includes("failed to load icon '-'"))
+            warning.message.includes('experimentalDisableStreaming') ||
+            (warning.message.includes('dynamically imported') &&
+              warning.message.includes('statically imported')) ||
+            warning.message.includes('icon "-"') ||
+            warning.message.includes("failed to load icon '-'")
           ) {
             return
           }
@@ -615,13 +657,17 @@ export default defineConfig({
       followSymlinks: false,
       ignored: [
         // Hard guard first: function ignore for node_modules and .venv anywhere
-        (p) =>
-          p.includes('/node_modules/') ||
-          p.includes('\\node_modules\\') ||
-          p.includes('/.venv/') ||
-          p.includes('\\.venv\\') ||
-          p.includes('/ai/') ||
-          p.includes('\\ai\\'),
+        (p) => {
+          const normalizedPath = String(p)
+          return (
+            normalizedPath.includes('/node_modules/') ||
+            normalizedPath.includes('\\node_modules\\') ||
+            normalizedPath.includes('/.venv/') ||
+            normalizedPath.includes('\\.venv\\') ||
+            normalizedPath.includes('/ai/') ||
+            normalizedPath.includes('\\ai\\')
+          )
+        },
         // Python virtual environments and cache
         '**/.venv/**',
         '.venv/**',

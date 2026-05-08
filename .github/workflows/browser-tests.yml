@@ -15,7 +15,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
   NODE_VERSION: 24.14.0
-  PNPM_VERSION: 10.33.2
+  PNPM_VERSION: 11.0.8
   NODE_ENV: test
   DISABLE_AUTH: 'true'
 
@@ -39,7 +39,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10.33.2
+          version: 11.0.8
 
       - name: Setup pnpm cache
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae

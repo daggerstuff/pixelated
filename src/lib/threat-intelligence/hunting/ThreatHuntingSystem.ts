@@ -181,11 +181,7 @@ export class ThreatHuntingSystemCore
   }
 
   private isRecord(value: unknown): value is Record<string, unknown> {
-    return (
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value)
-    )
+    return typeof value === 'object' && value !== null && !Array.isArray(value)
   }
 
   private toDocumentRecord(value: Document): DocumentRecord {
@@ -302,7 +298,7 @@ export class ThreatHuntingSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-    this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat hunting')
     } catch (error: unknown) {
@@ -327,7 +323,8 @@ export class ThreatHuntingSystemCore
 
   private async loadHuntPatterns(): Promise<void> {
     try {
-      const patternsCollection = this.getCollection<HuntPattern>('hunt_patterns')
+      const patternsCollection =
+        this.getCollection<HuntPattern>('hunt_patterns')
       const patterns = await patternsCollection.find({}).toArray()
       const mappedPatterns = patterns.map((pattern) =>
         this.mapStoredDocument(pattern),
@@ -412,7 +409,9 @@ export class ThreatHuntingSystemCore
         startTime: execution.startTime,
         endTime: execution.completedTime,
         status: 'completed',
-        findings: analyzedResults.map((result) => this.mapToHuntFinding(result)),
+        findings: analyzedResults.map((result) =>
+          this.mapToHuntFinding(result),
+        ),
         threatsDiscovered: threats.length,
         confidence: this.calculateOverallConfidence(analyzedResults),
         metadata: {
@@ -888,8 +887,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const networkLogs = this.getCollection('network_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const suspiciousConnections = await networkLogs
         .find({
@@ -930,8 +928,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const dnsLogs = this.getCollection('dns_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const unusualQueries = await dnsLogs
         .find({
@@ -961,11 +958,12 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async huntPortScanning(execution: HuntExecution): Promise<RawHuntFinding[]> {
+  private async huntPortScanning(
+    execution: HuntExecution,
+  ): Promise<RawHuntFinding[]> {
     try {
       const networkLogs = this.getCollection('network_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       // Look for rapid connection attempts to different ports from same source
       const portScanCandidates = await networkLogs
@@ -1008,7 +1006,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.9,
         data: this.toDocumentRecord(scan),
-        timestamp: this.toDate(scan._id.hour),
+        timestamp: this.toDate(scan['_id'].hour),
       }))
     } catch (error: unknown) {
       logger.error('Port scanning hunt failed:', { error })
@@ -1021,8 +1019,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const networkLogs = this.getCollection('network_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const exfilPatterns = await networkLogs
         .find({
@@ -1055,8 +1052,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const processLogs = this.getCollection('process_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const suspiciousProcesses = await processLogs
         .find({
@@ -1094,8 +1090,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const fileLogs = this.getCollection('file_system_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const fileAnomalies = await fileLogs
         .find({
@@ -1142,8 +1137,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const registryLogs = this.getCollection('registry_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const registryMods = await registryLogs
         .find({
@@ -1181,8 +1175,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const persistenceLogs = this.getCollection('persistence_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const persistenceMechanisms = await persistenceLogs
         .find({
@@ -1215,8 +1208,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const authLogs = this.getCollection('authentication_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const unusualLogins = await authLogs
         .aggregate<LoginAggregateResult>([
@@ -1270,8 +1262,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const authLogs = this.getCollection('authentication_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const privilegeEscalations = await authLogs
         .find({
@@ -1306,8 +1297,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const accessLogs = this.getCollection('access_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const unusualAccess = await accessLogs
         .aggregate<AccessAggregateResult>([
@@ -1357,8 +1347,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const authLogs = this.getCollection('authentication_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const compromisedAccounts = await authLogs
         .aggregate([
@@ -1410,15 +1399,16 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const fileLogs = this.getCollection('file_system_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       // Get known malware signatures from threat intelligence
       const malwareCollection = this.getCollection('malware_signatures')
       const knownSignatures = await malwareCollection.find({}).toArray()
       const signatureHashes = knownSignatures
         .map((sig) => this.toStringValue(sig.hash))
-        .filter((hash): hash is string => typeof hash === 'string' && hash.length > 0)
+        .filter(
+          (hash): hash is string => typeof hash === 'string' && hash.length > 0,
+        )
 
       const malwareFiles = await fileLogs
         .find({
@@ -1450,8 +1440,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const fileLogs = this.getCollection('file_system_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const suspiciousHashes = await fileLogs
         .find({
@@ -1487,8 +1476,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const processLogs = this.getCollection('process_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const behavioralIndicators = await processLogs
         .find({
@@ -1529,8 +1517,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const networkLogs = this.getCollection('network_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       // Look for periodic beacons to external IPs
       const c2Communications = await networkLogs
@@ -1584,8 +1571,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const processLogs = this.getCollection('process_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const credentialDumping = await processLogs
         .find({
@@ -1620,8 +1606,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const networkLogs = this.getCollection('network_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const networkEnumeration = await networkLogs
         .aggregate<LateralAggregateResult>([
@@ -1679,8 +1664,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const systemLogs = this.getCollection('system_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const serviceExploitation = await systemLogs
         .find({
@@ -1718,8 +1702,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const processLogs = this.getCollection('process_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const remoteAccessTools = await processLogs
         .find({
@@ -1791,8 +1774,7 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       const securityLogs = this.getCollection('security_logs')
-      const timeRange =
-        this.getExecutionTimeRange(execution)
+      const timeRange = this.getExecutionTimeRange(execution)
 
       const securityEvents = await securityLogs
         .find({
@@ -1835,7 +1817,7 @@ export class ThreatHuntingSystemCore
           result,
           pattern,
         )
-      analyzedResults.push(analyzedResult)
+        analyzedResults.push(analyzedResult)
       }
 
       // Apply pattern-specific analysis
@@ -1888,8 +1870,8 @@ export class ThreatHuntingSystemCore
   ): Promise<RawHuntFinding[]> {
     try {
       // Apply pattern-specific analysis logic
-    const resolvedPatternType = pattern.patternType ?? 'anomaly'
-    switch (resolvedPatternType) {
+      const resolvedPatternType = pattern.patternType ?? 'anomaly'
+      switch (resolvedPatternType) {
         case 'network':
           return await this.analyzeNetworkResults(results)
         case 'endpoint':
@@ -1904,7 +1886,7 @@ export class ThreatHuntingSystemCore
         case 'custom':
           return results
       }
-    return results
+      return results
     } catch (error: unknown) {
       logger.error('Pattern analysis failed:', { error })
       return results
@@ -1954,7 +1936,8 @@ export class ThreatHuntingSystemCore
         const relatedFiles = fileResults.filter(
           (file) =>
             Math.abs(
-              this.toDate(file.timestamp).getTime() - this.toDate(processResult.timestamp).getTime(),
+              this.toDate(file.timestamp).getTime() -
+                this.toDate(processResult.timestamp).getTime(),
             ) < 60000, // Within 1 minute
         )
 
@@ -2083,7 +2066,7 @@ export class ThreatHuntingSystemCore
         const relatedRemote = remoteResults.filter(
           (remoteResult) =>
             this.toStringValue(remoteResult.data.sourceIp) ===
-              this.toStringValue(credentialResult.data.sourceIp),
+            this.toStringValue(credentialResult.data.sourceIp),
         )
 
         if (relatedEnumeration.length > 0 || relatedRemote.length > 0) {
@@ -2145,7 +2128,11 @@ export class ThreatHuntingSystemCore
       for (const result of results) {
         if (result.confidence >= 0.7) {
           // Only high-confidence results
-          const threat = await this.createThreatFromResult(result, pattern, execution)
+          const threat = await this.createThreatFromResult(
+            result,
+            pattern,
+            execution,
+          )
           if (threat) {
             threats.push(threat)
           }
@@ -2239,7 +2226,9 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private extractIndicatorsFromResult(result: RawHuntFinding): ThreatIndicator[] {
+  private extractIndicatorsFromResult(
+    result: RawHuntFinding,
+  ): ThreatIndicator[] {
     const indicators: ThreatIndicator[] = []
 
     try {
@@ -2358,8 +2347,7 @@ export class ThreatHuntingSystemCore
       findingId,
       severity: this.normalizeSeverity(result.severity),
       confidence: this.toConfidence(result.confidence),
-      description:
-        `${result.type}: ${description ?? 'Threat hunting anomaly detected'}`,
+      description: `${result.type}: ${description ?? 'Threat hunting anomaly detected'}`,
       evidence,
       remediation:
         this.toStringValue(result.data.remediation) ??
@@ -2622,7 +2610,8 @@ export class ThreatHuntingSystemCore
 
   private async storeHuntSchedule(schedule: HuntSchedule): Promise<void> {
     try {
-      const schedulesCollection = this.getCollection<HuntSchedule>('hunt_schedules')
+      const schedulesCollection =
+        this.getCollection<HuntSchedule>('hunt_schedules')
       await schedulesCollection.replaceOne(
         { scheduleId: schedule.scheduleId },
         schedule,
@@ -2744,7 +2733,8 @@ export class ThreatHuntingSystemCore
       this.huntPatterns.set(pattern.patternId, pattern)
 
       // Update in database
-      const patternsCollection = this.getCollection<HuntPattern>('hunt_patterns')
+      const patternsCollection =
+        this.getCollection<HuntPattern>('hunt_patterns')
       await patternsCollection.replaceOne(
         { patternId: pattern.patternId },
         pattern,
@@ -2776,9 +2766,8 @@ export class ThreatHuntingSystemCore
       const executionsCollection =
         this.getCollection<HuntExecution>('hunt_executions')
 
-      const threatsCollection = this.getCollection<GlobalThreatIntelligence>(
-        'discovered_threats',
-      )
+      const threatsCollection =
+        this.getCollection<GlobalThreatIntelligence>('discovered_threats')
 
       const [
         totalHunts,
@@ -2900,8 +2889,7 @@ export class ThreatHuntingSystemCore
 
   private async getHuntsBySeverity(): Promise<Record<string, number>> {
     try {
-      const resultsCollection =
-        this.getCollection('hunt_results')
+      const resultsCollection = this.getCollection('hunt_results')
       const pipeline = [
         { $group: { _id: '$severity', count: { $sum: 1 } } },
         { $project: { severity: '$_id', count: 1, _id: 0 } },
@@ -2925,7 +2913,8 @@ export class ThreatHuntingSystemCore
 
   private async checkScheduledHunts(): Promise<void> {
     try {
-      const schedulesCollection = this.getCollection<HuntSchedule>('hunt_schedules')
+      const schedulesCollection =
+        this.getCollection<HuntSchedule>('hunt_schedules')
       const activeSchedules = await schedulesCollection
         .find({ enabled: true })
         .toArray()

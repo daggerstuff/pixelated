@@ -211,7 +211,8 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Integration Plans
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics['integration_plans_created'] ?? 0}
+                      {session.progressMetrics['integration_plans_created'] ??
+                        0}
                     </p>
                   </div>
                 </div>

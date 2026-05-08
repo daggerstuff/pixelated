@@ -70,8 +70,7 @@ function toStoredBreach(
       : new Date(breach.timestamp)
   const responseTime =
     breach.responseTime instanceof Date ? breach.responseTime : new Date()
-  const remediationStatus =
-    breach.remediationStatus ?? ('pending' as const)
+  const remediationStatus = breach.remediationStatus ?? ('pending' as const)
 
   return {
     id: breach.id,

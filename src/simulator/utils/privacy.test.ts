@@ -3,7 +3,11 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { getUserConsentPreference, setUserConsentPreference, createPrivacyHash } from './privacy'
+import {
+  getUserConsentPreference,
+  setUserConsentPreference,
+  createPrivacyHash,
+} from './privacy'
 
 describe('privacy utilities', () => {
   describe('createPrivacyHash', () => {

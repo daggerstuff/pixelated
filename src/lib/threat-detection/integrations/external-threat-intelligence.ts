@@ -643,8 +643,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
           if (existing) {
             // Update existing intelligence
+            const existingId = existing['_id']
             await db.collection('threat_intelligence').updateOne(
-              { _id: existing._id },
+              { ['_id']: existingId },
               {
                 $set: {
                   lastSeen: intel.lastSeen,
