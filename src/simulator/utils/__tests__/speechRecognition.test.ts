@@ -24,6 +24,6 @@ describe('getTherapeuticPrompts', () => {
       'How has anxiety been affecting you lately?',
       'What situations typically trigger your anxiety?',
     ]
-    expect(validPrompts.includes(prompts[0])).toBe(true)
+    expect(prompts.every((p) => validPrompts.includes(p))).toBe(true)
   })
 })
