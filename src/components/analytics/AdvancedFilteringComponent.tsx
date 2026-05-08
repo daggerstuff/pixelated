@@ -5,7 +5,7 @@ import { format } from 'date-fns'
  * and @types/react are up to date and compatible with your React version.
  */
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -113,6 +113,11 @@ export function AdvancedFilteringComponent({
   const [activeTab, setActiveTab] = useState<
     'time' | 'emotions' | 'patterns' | 'visualization'
   >('time')
+
+  // ⚡ Bolt: Convert option arrays to Sets to prevent O(N^2) lookups inside rendering map loops
+  const emotionTypesSet = useMemo(() => new Set(options.emotions?.types || []), [options.emotions?.types])
+  const patternTypesSet = useMemo(() => new Set(options.patterns?.types || []), [options.patterns?.types])
+  const patternCategoriesSet = useMemo(() => new Set(options.patterns?.categories || []), [options.patterns?.categories])
 
   // Handle changes to individual filter options
   const handleChange = <K extends keyof AdvancedFilterOptions>(
@@ -277,7 +282,7 @@ export function AdvancedFilteringComponent({
                   <div key={type} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`emotion-${type}`}
-                      checked={(options.emotions?.types || []).includes(type)}
+                      checked={emotionTypesSet.has(type)}
                       onChange={() =>
                         handleArrayToggle('emotions', 'types', type)
                       }
@@ -561,7 +566,7 @@ export function AdvancedFilteringComponent({
                   <div key={type} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`pattern-${type}`}
-                      checked={(options.patterns?.types || []).includes(type)}
+                      checked={patternTypesSet.has(type)}
                       onChange={() =>
                         handleArrayToggle('patterns', 'types', type)
                       }
@@ -626,9 +631,7 @@ export function AdvancedFilteringComponent({
                     <div key={category} className='flex items-center space-x-2'>
                       <Checkbox
                         id={`category-${category}`}
-                        checked={(options.patterns?.categories || []).includes(
-                          category,
-                        )}
+                        checked={patternCategoriesSet.has(category)}
                         onChange={() =>
                           handleArrayToggle('patterns', 'categories', category)
                         }
