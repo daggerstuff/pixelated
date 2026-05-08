@@ -43,12 +43,12 @@ describe('privacy utils', () => {
       // Mock missing getUserMedia using vi.stubGlobal
       vi.stubGlobal('navigator', {
         ...navigator,
-        mediaDevices: { getUserMedia: undefined }
-      });
+        mediaDevices: { getUserMedia: undefined },
+      })
 
-      const result = checkBrowserCompatibility();
-      expect(result.compatible).toBe(false);
-      expect(result.missingFeatures).toContain('WebRTC/getUserMedia');
+      const result = checkBrowserCompatibility()
+      expect(result.compatible).toBe(false)
+      expect(result.missingFeatures).toContain('WebRTC/getUserMedia')
     })
   })
 })
