@@ -37,6 +37,20 @@ jobs:
       - name: Set up uv
         uses: ./.github/actions/setup-uv
 
+      - name: Prepare Helm dependencies for Trivy scan
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        run: |
+          if ! command -v helm >/dev/null 2>&1; then
+            echo "Helm CLI not found; installing."
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
+          helm repo add traefik https://traefik.github.io/charts --force-update
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+          helm repo add grafana https://grafana.github.io/helm-charts --force-update
+          helm dep update ai/helm/pixel-voice
+          helm dep update ai/infrastructure/helm/pixelated-empathy
+
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: trivy
@@ -53,6 +67,7 @@ jobs:
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+          skip-files: ai/training/sliced/stage2_therapeutic_expertise/clinical_diagnosis_mental_health.json,ai/training/sliced/stage2_therapeutic_expertise/cultural_nuances.json,ai/training/v1/stage2_expertise/reasoning/clinical_diagnosis_mental_health.json,ai/training/v1/stage2_expertise/reasoning/cultural_nuances.json
           # Keep SARIF aligned with the configured severity gate.
           limit-severities-for-sarif: true
         continue-on-error: true

@@ -5,6 +5,7 @@ SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
 RCLONE_TARGET="${RCLONE_TARGET:-gdrive:vivi-home-backups}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
 LOCK_FILE_BASE="${HOME:-/home/vivi}"
+BACKUP_MODE="${BACKUP_MODE:-incremental}"
 
 if [[ "$RCLONE_TARGET" == "drive:vivi-home-backups" ]]; then
   RCLONE_TARGET="gdrive:vivi-home-backups"
@@ -63,6 +64,11 @@ if ! command -v rclone >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v tar >/dev/null 2>&1 && [[ "$BACKUP_MODE" == "full" ]]; then
+  log "tar is required for full backup mode but is not available"
+  exit 1
+fi
+
 if [[ "$RCLONE_TARGET" == *:* ]]; then
   RCLONE_REMOTE="${RCLONE_TARGET%%:*}"
 else
@@ -96,7 +102,20 @@ cleanup_lock() {
   fi
 }
 
-trap cleanup_lock EXIT
+cleanup_staging() {
+  if [ -n "${ARCHIVE_STAGING_TMP:-}" ] && [ -f "$ARCHIVE_STAGING_TMP" ]; then
+    rm -f "$ARCHIVE_STAGING_TMP"
+  fi
+
+  if [ -n "${ARCHIVE_STAGING_DIR:-}" ] && [ -d "$ARCHIVE_STAGING_DIR" ]; then
+    rm -f "$ARCHIVE_STAGING_DIR"/home-vivi-*.tar.gz.tmp 2>/dev/null || true
+    if [ -z "${lock_acquired:-}" ]; then
+      rmdir "$ARCHIVE_STAGING_DIR" 2>/dev/null || true
+    fi
+  fi
+}
+
+trap 'cleanup_lock; cleanup_staging' EXIT
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
@@ -105,52 +124,100 @@ if ! flock -n 9; then
 fi
 lock_acquired=true
 
-mapfile -t TAR_EXCLUDE_ARGS < <(printf '%s\n' \
-  "--exclude=.cache/**" \
-  "--exclude=.cursor/**" \
-  "--exclude=.cursor-server/**" \
-  "--exclude=.codex/**" \
-  "--exclude=.claude/**" \
-  "--exclude=pixelated/dist/**" \
-  "--exclude=pixelated/build/**" \
-  "--exclude=pixelated/.next/**" \
-  "--exclude=pixelated/.turbo/**" \
-  "--exclude=pixelated/.cache/**" \
-  "--exclude=**/coverage/**" \
-  "--exclude=**/.cache/**" \
-  "--exclude=**/terminals/**" \
-  "--exclude=free-claude-code/**" \
-  "--exclude=*.sock" \
-  "--exclude=**/*.log" \
-  "--exclude=.local/share/zed/**" \
-  "--exclude=.local/share/home_backups/**" \
-  "--exclude=.claude-mem/**" \
-  "--exclude=.cache/home-vivi-backup.lock" \
-  "--exclude=**/node_modules/**" \
-  "--exclude=**/.venv/**")
+case "$BACKUP_MODE" in
+  incremental)
+    mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
+      "--checksum" \
+      "--create-empty-src-dirs" \
+      "--transfers" "8" \
+      "--checkers" "16" \
+      "--ignore-errors" \
+      "--skip-links" \
+      "--retries" "5" \
+      "--low-level-retries" "10" \
+      "--stats" "10s" \
+      "--stats-one-line" \
+      "--exclude" ".cache/**" \
+      "--exclude" ".cursor/**" \
+      "--exclude" ".cursor-server/**" \
+      "--exclude" ".codex/**" \
+      "--exclude" ".claude/**" \
+      "--exclude" "pixelated/dist/**" \
+      "--exclude" "pixelated/build/**" \
+      "--exclude" "pixelated/.next/**" \
+      "--exclude" "pixelated/.turbo/**" \
+      "--exclude" "pixelated/.cache/**" \
+      "--exclude" "**/coverage/**" \
+      "--exclude" "**/.cache/**" \
+      "--exclude" "**/terminals/**" \
+      "--exclude" "free-claude-code/**" \
+      "--exclude" "*.sock" \
+      "--exclude" "**/*.log" \
+      "--exclude" ".local/share/zed/**" \
+      "--exclude" ".local/share/home_backups/**" \
+      "--exclude" ".claude-mem/**" \
+      "--exclude" ".cache/home-vivi-backup.lock" \
+      "--exclude" "**/node_modules/**" \
+      "--exclude" "**/.venv/**")
 
-BACKUP_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
-ARCHIVE_FILE="$BACKUP_DIR/home-vivi-${BACKUP_TIMESTAMP}.tar.gz"
-ARCHIVE_STAGING_DIR="${TMPDIR:-/tmp}/home-vivi-backup-staging"
-ARCHIVE_STAGING_FILE="$ARCHIVE_STAGING_DIR/home-vivi-${BACKUP_TIMESTAMP}.tar.gz"
+    log "Starting incremental stream sync from ${SOURCE_DIR} to ${RCLONE_DEST}"
+    rclone copy "$SOURCE_DIR" "$RCLONE_DEST" "${RCLONE_COPY_ARGS[@]}"
+    log "Incremental stream sync completed successfully"
+    ;;
+  full)
+    BACKUP_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+    ARCHIVE_FILE="$BACKUP_DIR/home-vivi-${BACKUP_TIMESTAMP}.tar.gz"
+    ARCHIVE_STAGING_DIR="${TMPDIR:-/tmp}/home-vivi-backup-staging"
+    ARCHIVE_STAGING_TMP="$ARCHIVE_STAGING_DIR/home-vivi-${BACKUP_TIMESTAMP}.tar.gz.tmp"
 
-mkdir -p "$ARCHIVE_STAGING_DIR"
-log "Starting full backup archive from ${SOURCE_DIR} to ${ARCHIVE_FILE}"
-tar -czf "$ARCHIVE_STAGING_FILE" -C "$SOURCE_DIR" . "${TAR_EXCLUDE_ARGS[@]}"
-mv "$ARCHIVE_STAGING_FILE" "$ARCHIVE_FILE"
-log "Local archive created: ${ARCHIVE_FILE}"
+    mapfile -t TAR_EXCLUDE_ARGS < <(printf '%s\n' \
+      "--exclude=.cache/**" \
+      "--exclude=.cursor/**" \
+      "--exclude=.cursor-server/**" \
+      "--exclude=.codex/**" \
+      "--exclude=.claude/**" \
+      "--exclude=pixelated/dist/**" \
+      "--exclude=pixelated/build/**" \
+      "--exclude=pixelated/.next/**" \
+      "--exclude=pixelated/.turbo/**" \
+      "--exclude=pixelated/.cache/**" \
+      "--exclude=**/coverage/**" \
+      "--exclude=**/.cache/**" \
+      "--exclude=**/terminals/**" \
+      "--exclude=free-claude-code/**" \
+      "--exclude=*.sock" \
+      "--exclude=**/*.log" \
+      "--exclude=.local/share/zed/**" \
+      "--exclude=.local/share/home_backups/**" \
+      "--exclude=.claude-mem/**" \
+      "--exclude=.cache/home-vivi-backup.lock" \
+      "--exclude=**/node_modules/**" \
+      "--exclude=**/.venv/**")
 
-log "Uploading archive to ${RCLONE_DEST}"
-rclone copy "$ARCHIVE_FILE" "$RCLONE_DEST" --checksum --create-empty-src-dirs --ignore-errors
-log "Archive upload completed"
+    mkdir -p "$ARCHIVE_STAGING_DIR"
+    cleanup_staging
+    log "Starting full backup archive from ${SOURCE_DIR} to ${ARCHIVE_FILE}"
+    tar -czf "$ARCHIVE_STAGING_TMP" -C "$SOURCE_DIR" . "${TAR_EXCLUDE_ARGS[@]}"
+    mv "$ARCHIVE_STAGING_TMP" "$ARCHIVE_FILE"
+    log "Local archive created: ${ARCHIVE_FILE}"
 
-mapfile -t BACKUP_ARCHIVES < <(printf '%s\n' "$BACKUP_DIR"/home-vivi-*.tar.gz 2>/dev/null | sort)
-if (( ${#BACKUP_ARCHIVES[@]} > 2 )); then
-  for archive in "${BACKUP_ARCHIVES[@]:0:$(( ${#BACKUP_ARCHIVES[@]} - 2 ))}"; do
-    rm -f "$archive"
-    log "Removed old local backup: ${archive}"
-  done
-fi
+    log "Uploading archive to ${RCLONE_DEST}"
+    rclone copy "$ARCHIVE_FILE" "$RCLONE_DEST" --checksum --create-empty-src-dirs --ignore-errors
+    log "Archive upload completed"
+
+    mapfile -t BACKUP_ARCHIVES < <(printf '%s\n' "$BACKUP_DIR"/home-vivi-*.tar.gz 2>/dev/null | sort)
+    if (( ${#BACKUP_ARCHIVES[@]} > 2 )); then
+      for archive in "${BACKUP_ARCHIVES[@]:0:$(( ${#BACKUP_ARCHIVES[@]} - 2 ))}"; do
+        rm -f "$archive"
+        log "Removed old local backup: ${archive}"
+      done
+    fi
+    ;;
+  *)
+    log "Invalid BACKUP_MODE '$BACKUP_MODE'. Expected 'incremental' or 'full'."
+    exit 1
+    ;;
+esac
 
 if ! rclone touch "${RCLONE_DEST}/.meta/last-successful-run-marker" >/dev/null 2>&1; then
   if ! printf '%s\n' "$(date -Iseconds)" | rclone rcat "${RCLONE_DEST}/.meta/last-successful-run-marker"; then
