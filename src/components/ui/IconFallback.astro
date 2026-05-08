@@ -1,0 +1,17 @@
+---
+interface Props {
+  name?: string
+  [key: string]: any
+}
+
+const { name = 'icon', ...rest } = Astro.props as Props
+
+const rawName = typeof name === 'string' ? name : 'icon'
+const shortName = rawName.includes(':')
+  ? rawName.split(':').slice(-1)[0]
+  : rawName
+---
+
+<span class="icon-fallback" aria-hidden="true" {...rest}>
+  {shortName}
+</span>

@@ -6,7 +6,6 @@ import react from '@astrojs/react'
 import sentry from '@sentry/astro'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
-import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
 
@@ -481,6 +480,7 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'astro-icon/components': path.resolve('./src/components/ui/astro-icon-components.ts'),
         stream: 'stream-browserify',
         zlib: 'browserify-zlib',
         buffer: 'buffer',
@@ -585,23 +585,6 @@ export default defineConfig({
     return [
       ...base,
       UnoCSS({ injectReset: true }),
-      icon({
-        include: {
-          lucide: [
-            'calendar',
-            'user',
-            'settings',
-            'heart',
-            'brain',
-            'shield-check',
-            'info',
-            'arrow-left',
-            'shield',
-            'user-plus',
-          ],
-        },
-        svgdir: './src/icons',
-      }),
       ...(hasSentryDSN
         ? [
             sentry({
