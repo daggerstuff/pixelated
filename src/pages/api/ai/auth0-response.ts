@@ -22,6 +22,28 @@ import {
   AuditEventStatus,
 } from '../../../lib/audit'
 
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string | undefined {
+  const llmBaseUrl =
+    import.meta.env['LLM_BASE_URL'] ||
+    import.meta.env['LLM_API_URL'] ||
+    import.meta.env['OPENAI_BASE_URL']
+
+  if (isOpenRouterBaseUrl(llmBaseUrl)) {
+    console.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return undefined
+  }
+
+  return llmBaseUrl
+}
+
 /**
  * GET handler - returns information about the AI response endpoint
  */
@@ -189,10 +211,7 @@ export const POST: APIRoute = async ({ request }) => {
     const llmService = createLLMService({
       apiKey:
         import.meta.env['LLM_API_KEY'] || '',
-      baseUrl:
-        import.meta.env['LLM_BASE_URL'] ||
-        import.meta.env['LLM_API_URL'] ||
-        import.meta.env['OPENAI_BASE_URL'],
+      baseUrl: resolveSafeLlmBaseUrl(),
     })
 
     // Use the model from the request or the default

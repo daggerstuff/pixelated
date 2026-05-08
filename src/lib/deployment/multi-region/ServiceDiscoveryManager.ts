@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events'
 
-import { Consul, ConsulOptions } from 'consul'
+import Consul from 'consul'
 import { Etcd3 } from 'etcd3'
 import { v4 as uuidv4 } from 'uuid'
-import { ZooKeeperClient } from 'zookeeper'
+import ZooKeeper from 'zookeeper'
 
 import { Logger } from '../../utils/logger'
 import { ConfigurationManager } from './ConfigurationManager'
@@ -18,9 +18,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private logger: Logger
   private config: ConfigurationManager
   private healthMonitor: HealthMonitor
-  private consulClients: Map<string, Consul> = new Map()
-  private etcdClients: Map<string, Etcd3> = new Map()
-  private zookeeperClients: Map<string, ZooKeeperClient> = new Map()
+  private consulClients: Map<string, any> = new Map()
+  private etcdClients: Map<string, any> = new Map()
+  private zookeeperClients: Map<string, any> = new Map()
   private dnsClient: DNSClient
   private serviceRegistry: Map<string, ServiceInstance[]> = new Map()
   private discoveryBackends: Map<string, DiscoveryBackend> = new Map()
@@ -34,8 +34,43 @@ export class ServiceDiscoveryManager extends EventEmitter {
     super()
     this.config = config
     this.healthMonitor = healthMonitor
-    this.logger = new Logger('ServiceDiscoveryManager')
+    this.logger = new Logger({ prefix: 'ServiceDiscoveryManager' })
     this.dnsClient = new DNSClient(config)
+  }
+
+  private getRegions(): string[] {
+    return (this.config.getConfig()?.deployment?.regions || [])
+      .map((region) => region.id)
+      .filter((regionId): regionId is string => Boolean(regionId))
+  }
+
+  private getServiceDiscoveryConfig(): Record<string, any> {
+    return (
+      (this.config.getConfig() as Record<string, any>)?.serviceDiscovery || {}
+    )
+  }
+
+  private getServices(): any[] {
+    return (
+      (this.config.getConfig() as Record<string, any>)?.services ||
+      (this.config.getConfig() as Record<string, any>)?.deployment?.services ||
+      []
+    )
+  }
+
+  private registerHealthCheck(
+    name: string,
+    check: () => Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; message: string }>,
+  ): void {
+    void check().then((result) => {
+      if (result.status !== 'healthy') {
+        this.healthMonitor.emit('health-check-failed', {
+          component: name,
+          status: result.status,
+          message: result.message,
+        })
+      }
+    })
   }
 
   /**
@@ -76,8 +111,8 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Initialize discovery backends
    */
   private async initializeDiscoveryBackends(): Promise<void> {
-    const regions = this.config.getRegions()
-    const discoveryConfig = this.config.getServiceDiscoveryConfig()
+    const regions = this.getRegions()
+    const discoveryConfig = this.getServiceDiscoveryConfig()
 
     for (const region of regions) {
       try {
@@ -112,7 +147,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    */
   private async initializeConsul(region: string, config: any): Promise<void> {
     try {
-      const consulConfig: ConsulOptions = {
+      const consulConfig: Record<string, any> = {
         host: config.host.replace('{region}', region),
         port: config.port,
         secure: config.secure,
@@ -122,10 +157,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
         },
       }
 
-      const consul = new Consul(consulConfig)
+      const consul = new (Consul as (opts?: Record<string, unknown>) => any)(
+        consulConfig,
+      )
 
       // Test connection
-      await consul.agent.self()
+      await (consul as any).agent.self()
 
       this.consulClients.set(region, consul)
       this.discoveryBackends.set(`${region}:consul`, {
@@ -166,7 +203,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       // Test connection
-      await etcd.get('/').string()
+      await (etcd as any).get('/').string()
 
       this.etcdClients.set(region, etcd)
       this.discoveryBackends.set(`${region}:etcd`, {
@@ -192,7 +229,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
     config: any,
   ): Promise<void> {
     try {
-      const zookeeper = new ZooKeeperClient({
+      const zookeeper = new (ZooKeeper as new (
+        ...args: unknown[]
+      ) => any)({
         connect: config.connect.replace('{region}', region),
         timeout: config.timeout,
         debug_level: config.debugLevel,
@@ -221,7 +260,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Initialize load balancers
    */
   private async initializeLoadBalancers(): Promise<void> {
-    const services = this.config.getServices()
+    const services = this.getServices()
 
     for (const service of services) {
       const loadBalancer = new LoadBalancer({
@@ -242,7 +281,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    */
   private async setupServiceRegistration(): Promise<void> {
     // Register health checks for service discovery
-    this.healthMonitor.registerCheck('service-discovery', async () => {
+    this.registerHealthCheck('service-discovery', async () => {
       try {
         const healthyBackends = await this.getHealthyBackends()
         const totalBackends = this.discoveryBackends.size
@@ -307,17 +346,17 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       switch (backend.type) {
         case 'consul': {
-          const consul = backend.client as Consul
+          const consul = backend.client as any
           await consul.agent.self()
           return true
         }
         case 'etcd': {
-          const etcd = backend.client as Etcd3
+          const etcd = backend.client as any
           await etcd.get('/').string()
           return true
         }
         case 'zookeeper': {
-          const zk = backend.client as ZooKeeperClient
+          const zk = backend.client as any
           return zk.connected
         }
         default: {
@@ -335,7 +374,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private async setupHealthChecking(): Promise<void> {
     // Register health checks for registered services
     for (const [serviceName, instances] of this.serviceRegistry) {
-      this.healthMonitor.registerCheck(`service-${serviceName}`, async () => {
+      this.registerHealthCheck(`service-${serviceName}`, async () => {
         try {
           const healthyInstances = instances.filter(
             (instance) => instance.status === 'healthy',
@@ -374,7 +413,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Start background processes
    */
   private startBackgroundProcesses(): void {
-    const config = this.config.getServiceDiscoveryConfig()
+      const config = this.getServiceDiscoveryConfig()
 
     // Start heartbeat process
     this.heartbeatInterval = setInterval(() => {
@@ -478,18 +517,15 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       switch (backend.type) {
         case 'consul': {
-          await this.registerWithConsul(backend.client as Consul, instance)
+          await this.registerWithConsul(backend.client as any, instance)
           break
         }
         case 'etcd': {
-          await this.registerWithEtcd(backend.client as Etcd3, instance)
+          await this.registerWithEtcd(backend.client as any, instance)
           break
         }
         case 'zookeeper': {
-          await this.registerWithZookeeper(
-            backend.client as ZooKeeperClient,
-            instance,
-          )
+          await this.registerWithZookeeper(backend.client as any, instance)
           break
         }
       }
@@ -508,7 +544,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Register with Consul
    */
   private async registerWithConsul(
-    consul: Consul,
+    consul: any,
     instance: ServiceInstance,
   ): Promise<void> {
     const service = {
@@ -533,7 +569,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Register with etcd
    */
   private async registerWithEtcd(
-    etcd: Etcd3,
+    etcd: any,
     instance: ServiceInstance,
   ): Promise<void> {
     const key = `/services/${instance.name}/${instance.region}/${instance.id}`
@@ -558,7 +594,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Register with ZooKeeper
    */
   private async registerWithZookeeper(
-    zk: ZooKeeperClient,
+    zk: any,
     instance: ServiceInstance,
   ): Promise<void> {
     const basePath = `/services/${instance.name}/${instance.region}`
@@ -581,7 +617,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
     await zk.create(
       instancePath,
       Buffer.from(data),
-      ZooKeeperClient.CreateMode.EPHEMERAL,
+      (zk.CreateMode?.EPHEMERAL || 'EPHEMERAL'),
     )
   }
 
@@ -589,7 +625,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Create ZooKeeper path recursively
    */
   private async createZookeeperPath(
-    zk: ZooKeeperClient,
+    zk: any,
     path: string,
   ): Promise<void> {
     const parts = path.split('/').filter((p) => p)
@@ -601,10 +637,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
         await zk.create(
           currentPath,
           Buffer.from(''),
-          ZooKeeperClient.CreateMode.PERSISTENT,
+          zk.CreateMode?.PERSISTENT || 'PERSISTENT',
         )
       } catch (error: any) {
-        if (error.code !== ZooKeeperClient.Exception.NODE_EXISTS) {
+        if ((error as { code?: unknown }).code !== zk.Exception?.NODE_EXISTS) {
           throw error
         }
       }
@@ -718,21 +754,21 @@ export class ServiceDiscoveryManager extends EventEmitter {
       switch (backend.type) {
         case 'consul': {
           return await this.discoverFromConsul(
-            backend.client as Consul,
+            backend.client as any,
             serviceName,
             options,
           )
         }
         case 'etcd': {
           return await this.discoverFromEtcd(
-            backend.client as Etcd3,
+            backend.client as any,
             serviceName,
             options,
           )
         }
         case 'zookeeper': {
           return await this.discoverFromZookeeper(
-            backend.client as ZooKeeperClient,
+            backend.client as any,
             serviceName,
             options,
           )
@@ -756,7 +792,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Discover from Consul
    */
   private async discoverFromConsul(
-    consul: Consul,
+    consul: any,
     serviceName: string,
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
@@ -798,12 +834,15 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Discover from etcd
    */
   private async discoverFromEtcd(
-    etcd: Etcd3,
+    etcd: any,
     serviceName: string,
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const keyPrefix = `/services/${serviceName}/`
-    const response = await etcd.getAll().prefix(keyPrefix)
+    const response = (await etcd.getAll().prefix(keyPrefix)) as Record<
+      string,
+      string
+    >
 
     const instances: ServiceInstance[] = []
 
@@ -840,7 +879,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Discover from ZooKeeper
    */
   private async discoverFromZookeeper(
-    zk: ZooKeeperClient,
+    zk: any,
     serviceName: string,
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
@@ -887,7 +926,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         }
       }
     } catch (error: any) {
-      if (error.code !== ZooKeeperClient.Exception.NO_NODE) {
+      if ((error as { code?: unknown }).code !== zk.Exception?.NO_NODE) {
         throw error
       }
     }
@@ -1038,9 +1077,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
         }
         case 'etcd': {
           // Update lease for etcd
-          const etcd = backend.client as Etcd3
+          const etcd = backend.client as any
           const key = `/services/${instance.name}/${instance.region}/${instance.id}`
-          await etcd.get(key).string() // Touch the key to renew lease
+          await (etcd.get(key) as any).string() // Touch the key to renew lease
           break
         }
         case 'zookeeper': {
@@ -1293,18 +1332,18 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       switch (backend.type) {
         case 'consul': {
-          const consul = backend.client as Consul
+          const consul = backend.client as any
           await consul.agent.service.deregister(instanceId)
           break
         }
         case 'etcd': {
-          const etcd = backend.client as Etcd3
+          const etcd = backend.client as any
           const key = `/services/${serviceName}/${backend.region}/${instanceId}`
           await etcd.delete().key(key)
           break
         }
         case 'zookeeper': {
-          const zk = backend.client as ZooKeeperClient
+          const zk = backend.client as any
           const path = `/services/${serviceName}/${backend.region}/${instanceId}`
           await zk.delete(path, -1)
           break
