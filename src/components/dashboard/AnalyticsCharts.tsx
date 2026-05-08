@@ -36,7 +36,7 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
         <h4 className='text-red-800 font-medium'>
           Unable to load analytics data
         </h4>
-        <p className='text-red-600 mt-1 text-sm'>{String(error)}</p>
+        <p className='text-red-600 mt-1 text-sm'>{error instanceof Error ? error.message : String(error)}</p>
       </div>
       <button
         onClick={onRetry}
@@ -151,6 +151,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
       case 'down':
         return '↘'
       case 'stable':
+      default:
         return '→'
     }
   }
@@ -162,6 +163,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
       case 'down':
         return 'text-red-600'
       case 'stable':
+      default:
         return 'text-gray-600'
     }
   }
@@ -322,13 +324,13 @@ export const AnalyticsCharts: FC = () => {
       </div>
 
       {/* Summary Statistics */}
-      <SummaryStats data={data?.summaryStats || []} isLoading={isLoading} />
+      <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
 
       {/* Session Activity Chart */}
-      <SessionChart data={data?.sessionMetrics || []} isLoading={isLoading} />
+      <SessionChart data={data?.sessionMetrics ?? []} isLoading={isLoading} />
 
       {/* Skill Progress */}
-      <SkillProgress data={data?.skillProgress || []} isLoading={isLoading} />
+      <SkillProgress data={data?.skillProgress ?? []} isLoading={isLoading} />
 
       {/* Data freshness indicator */}
       {data && !isLoading && (
