@@ -13,13 +13,31 @@ const logger = createBuildSafeLogger('documentation-api')
 
 // Instantiate dependencies for DocumentationService
 const repository = new AIRepository()
-const llmConfig = {
-  apiKey: process.env['LLM_API_KEY'] || 'dummy-key',
-  baseUrl:
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string | undefined {
+  const baseUrl =
     process.env['LLM_BASE_URL'] ||
     process.env['LLM_API_URL'] ||
     process.env['OPENAI_BASE_URL'] ||
-    'https://api.openai.com/v1',
+    'https://api.openai.com/v1'
+
+  if (isOpenRouterBaseUrl(baseUrl)) {
+    console.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return 'https://api.openai.com/v1'
+  }
+
+  return baseUrl
+}
+const llmConfig = {
+  apiKey: process.env['LLM_API_KEY'] || 'dummy-key',
+  baseUrl: resolveSafeLlmBaseUrl(),
 }
 // Create the base service
 const baseAiService = createLLMService(llmConfig)

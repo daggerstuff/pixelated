@@ -5,6 +5,7 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Paragraph, PhrasingContent, Root } from 'mdast'
+import type { Directives } from 'mdast-util-directive'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -35,15 +36,21 @@ function remarkImageContainer() {
    */
   return (tree: Root, file: VFile) => {
     visit(tree, (node) => {
-      if (node.type !== 'containerDirective') {
+      if (
+        node.type !== 'containerDirective' &&
+        node.type !== 'leafDirective' &&
+        node.type !== 'textDirective'
+      ) {
         return
       }
 
-      if (node.name === 'image-figure') {
+      const d = node as Directives
+
+      if (d.name === 'image-figure') {
         /* image-figure */
-        const data = node.data || (node.data = {})
-        const attributes = node.attributes || {}
-        const { children } = node
+        const data = d.data || (d.data = {})
+        const attributes = d.attributes || {}
+        const { children } = d
 
         // add figure node
         data.hName = 'figure'
@@ -53,26 +60,31 @@ function remarkImageContainer() {
         let content: PhrasingContent[]
         if (
           children[0]?.type === 'paragraph' &&
-          children[0]?.data?.directiveLabel &&
-          children[0]?.children[0]?.type === 'text'
+          (children[0] as Paragraph).data?.directiveLabel &&
+          (children[0] as Paragraph).children[0]?.type === 'text'
         ) {
-          content = children[0].children
+          content = (children[0] as Paragraph).children
           children.shift()
         } else if (
           children[0]?.type === 'paragraph' &&
-          children[0]?.children[0]?.type === 'image' &&
-          children[0]?.children[0]?.alt
+          (children[0] as Paragraph).children[0]?.type === 'image' &&
+          ((children[0] as Paragraph).children[0] as any).alt
         ) {
-          content = [{ type: 'text', value: children[0].children[0].alt }]
+          content = [
+            {
+              type: 'text',
+              value: ((children[0] as Paragraph).children[0] as any).alt,
+            },
+          ]
         } else {
           file.fail(
             'The figcaption text is missing in the `image-figure` directive. Specify it in the `[]` of `:::image-figure[]{}` or `![]()`.',
-            node,
+            d,
           )
         }
 
         // add figcaption node
-        const figcaptionNode: Paragraph = {
+        const figcaptionNode: any = {
           type: 'paragraph',
           data: {
             hName: 'figcaption',
@@ -82,26 +94,26 @@ function remarkImageContainer() {
         }
 
         children.push(figcaptionNode)
-      } else if (node.name === 'image-a') {
+      } else if (d.name === 'image-a') {
         /* image-a */
-        if (!node.attributes || !node.attributes['href']) {
+        if (!d.attributes || !d.attributes['href']) {
           file.fail(
             'Unexpectedly missing `href` in the `image-a` directive.',
-            node,
+            d,
           )
         }
 
-        const data = node.data || (node.data = {})
-        const attributes = node.attributes || {}
+        const data = d.data || (d.data = {})
+        const attributes = d.attributes || {}
 
         data.hName = 'a'
         data.hProperties = attributes
-      } else if (node.name.match(IMAGE_DIR_REGEXP)) {
+      } else if (d.name.match(IMAGE_DIR_REGEXP)) {
         /* image-* */
-        const match = node.name.match(IMAGE_DIR_REGEXP)
+        const match = d.name.match(IMAGE_DIR_REGEXP)
         if (match && match[1] && VALID_TAGS_FOR_IMG.has(match[1])) {
-          const data = node.data || (node.data = {})
-          const attributes = node.attributes || {}
+          const data = d.data || (d.data = {})
+          const attributes = d.attributes || {}
 
           data.hName = match[1]
           data.hProperties = attributes
@@ -110,7 +122,7 @@ function remarkImageContainer() {
         } else {
           file.fail(
             'The `image-*` directive failed to match a valid tag.',
-            node,
+            d,
           )
         }
       }

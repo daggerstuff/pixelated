@@ -5,6 +5,7 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Root } from 'mdast'
+import type { Directives } from 'mdast-util-directive'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -82,23 +83,24 @@ function remarkDirectiveSugar() {
         node.type === 'leafDirective' ||
         node.type === 'textDirective'
       ) {
-        const data = node.data || (node.data = {})
-        const attributes = node.attributes || {}
-        const { children } = node
+        const d = node as Directives
+        const data = d.data || (d.data = {})
+        const attributes = d.attributes || {}
+        const { children } = d
 
-        if (node.name === 'video') {
+        if (d.name === 'video') {
           /* ::video */
-          if (node.type === 'textDirective') {
+          if (d.type === 'textDirective') {
             file.fail(
               'Unexpected `:video` text directive. Use double colons (`::`) for an `video` leaf directive.',
-              node,
+              d,
             )
           }
 
-          if (node.type === 'containerDirective') {
+          if (d.type === 'containerDirective') {
             file.fail(
               'Unexpected `:::video` container directive. Use double colons (`::`) for an `video` leaf directive.',
-              node,
+              d,
             )
           }
 
@@ -109,7 +111,7 @@ function remarkDirectiveSugar() {
           if (!youtubeId && !bilibiliId && !vimeoId && !iframeSrc) {
             file.fail(
               'Invalid `video` directive. Unexpectedly missing one of the following: `youtubeId`, `bilibiliId`, `iframeSrc`.',
-              node,
+              d,
             )
           } else {
             for (const [key, id] of Object.entries({
@@ -152,19 +154,19 @@ function remarkDirectiveSugar() {
               children: [],
             },
           ]
-        } else if (node.name === 'link') {
+        } else if (d.name === 'link') {
           /* :link */
-          if (node.type === 'leafDirective') {
+          if (d.type === 'leafDirective') {
             file.fail(
               'Unexpected `::link` text directive. Use single colon (`:`) for an `link` text directive.',
-              node,
+              d,
             )
           }
 
-          if (node.type === 'containerDirective') {
+          if (d.type === 'containerDirective') {
             file.fail(
               'Unexpected `:::link` container directive. Use single colon (`:`) for an `link` text directive.',
-              node,
+              d,
             )
           }
 
@@ -178,11 +180,11 @@ function remarkDirectiveSugar() {
 
           // check label
           if (children.length > 0 && children[0]?.type === 'text') {
-            _resolvedText = children[0].value
+            _resolvedText = (children[0] as any).value
           } else if (!id) {
             file.fail(
               'Invalid `link` directive. The text in the `[]` of `:link[]{}` is required if `id` attribute is not specified.',
-              node,
+              d,
             )
           }
 
@@ -195,7 +197,7 @@ function remarkDirectiveSugar() {
           ) {
             file.fail(
               'Invalid `link` directive. The `style` must be one of "square", "rounded", or "github".',
-              node,
+              d,
             )
           }
 
@@ -203,7 +205,7 @@ function remarkDirectiveSugar() {
           if (tab && !GITHUB_TAB.includes(tab)) {
             file.fail(
               'Invalid `link` directive. The `tab` must be one of the following: "repositories", "projects", "packages", "stars", "sponsoring", "sponsors", "org-repositories", "org-projects", "org-packages", "org-sponsoring", or "org-people".',
-              node,
+              d,
             )
           } else if (tab) {
             const match = tab.match(TAB_ORG_REGEXP)
@@ -229,19 +231,19 @@ function remarkDirectiveSugar() {
               _resolvedText = _resolvedText || id.substring(1)
             }
           }
-        } else if (node.name === 'badge') {
+        } else if (d.name === 'badge') {
           /* :badge */
-          if (node.type === 'textDirective') {
+          if (d.type === 'textDirective') {
             file.fail(
               'Unexpected `:badge` text directive. Use single colon (`:`) for an `badge` text directive.',
-              node,
+              d,
             )
           }
 
-          if (node.type === 'containerDirective') {
+          if (d.type === 'containerDirective') {
             file.fail(
               'Unexpected `:::badge` container directive. Use single colon (`:`) for an `badge` text directive.',
-              node,
+              d,
             )
           }
 
@@ -259,7 +261,7 @@ function remarkDirectiveSugar() {
           } else if (!badgeId) {
             file.fail(
               'Invalid `badge` directive. The text in the `[]` of `:badge[]{}` is required if `id` attribute is not specified.',
-              node,
+              d,
             )
           }
 

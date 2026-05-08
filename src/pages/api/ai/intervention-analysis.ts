@@ -9,6 +9,28 @@ import { createLLMService } from '../../../lib/ai/services/llm-provider'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(envVars: Record<string, string | undefined>): string | undefined {
+  const llmBaseUrl =
+    envVars['LLM_BASE_URL'] ||
+    envVars['LLM_API_URL'] ||
+    envVars['OPENAI_BASE_URL']
+
+  if (isOpenRouterBaseUrl(llmBaseUrl)) {
+    console.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return undefined
+  }
+
+  return llmBaseUrl
+}
+
 /**
  * API route for intervention effectiveness analysis
  */
@@ -47,10 +69,7 @@ export const POST = async ({ request }) => {
     // Create LLM service
     const envVars = import.meta.env as Record<string, string | undefined>
     const llmApiKey = envVars['LLM_API_KEY'] || ''
-    const llmBaseUrl =
-      envVars['LLM_BASE_URL'] ||
-      envVars['LLM_API_URL'] ||
-      envVars['OPENAI_BASE_URL']
+    const llmBaseUrl = resolveSafeLlmBaseUrl(envVars)
 
     const aiService = createLLMService({
       apiKey: llmApiKey,
