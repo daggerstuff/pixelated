@@ -22,6 +22,26 @@ export interface MentalHealthInsights {
 }
 
 const logger = createBuildSafeLogger('default')
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string {
+  const baseUrl =
+    process.env['LLM_BASE_URL'] ||
+    process.env['LLM_API_URL'] ||
+    process.env['OPENAI_BASE_URL'] ||
+    'http://localhost:8000/v1'
+
+  if (isOpenRouterBaseUrl(baseUrl)) {
+    logger.warn('Ignoring LLM base URL from OpenRouter for FeedbackService')
+    return 'http://localhost:8000/v1'
+  }
+
+  return baseUrl
+}
 
 // Dynamic TensorFlow.js imports to reduce bundle size
 async function loadTensorFlow() {
@@ -251,11 +271,7 @@ export class FeedbackService implements FeedbackServiceInterface {
       // Initialize the shared LLM service for inference
       this.llmService = createLLMService({
         apiKey: process.env['LLM_API_KEY'] || '',
-        baseUrl:
-          process.env['LLM_BASE_URL'] ||
-          process.env['LLM_API_URL'] ||
-          process.env['OPENAI_BASE_URL'] ||
-          'http://localhost:8000/v1',
+        baseUrl: resolveSafeLlmBaseUrl(),
       })
 
       this.isEnhancedModelLoaded = true

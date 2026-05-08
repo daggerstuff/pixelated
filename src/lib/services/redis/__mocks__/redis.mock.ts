@@ -120,4 +120,6 @@ expect.extend({
   }),
   toBeInstanceOf: (received, expected) => ({
     pass: received instanceof expected,
-    message: () => `expected ${received} to be a
+    message: () => `expected ${received} to be an instance of ${expected}`,
+  }),
+})

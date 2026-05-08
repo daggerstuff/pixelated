@@ -163,8 +163,11 @@ export default function SessionDocumentationComponent({
             'Physical manifestation of stress affecting sleep quality',
         },
       ],
-      recommendedFollowUp:
-        'Schedule sleep assessment, continue practicing PMR daily, maintain anxiety log for next session',
+      recommendedFollowUp: [
+        'Schedule sleep assessment',
+        'Continue practicing PMR daily',
+        'Maintain anxiety log for next session',
+      ],
       treatmentProgress: {
         goals: [
           {
@@ -924,7 +927,7 @@ export default function SessionDocumentationComponent({
               <button
                 onClick={() => {
                   handleChange('emotionalPatterns', [
-                    ...editableDocumentation.emotionalPatterns,
+                    ...(editableDocumentation.emotionalPatterns || []),
                     {
                       pattern: '',
                       significance: '',

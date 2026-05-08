@@ -37,8 +37,10 @@ import type {
   UpdateTreatmentPlanData,
   TreatmentGoal,
   NewTreatmentGoalData,
+  TreatmentGoalStatus,
   TreatmentObjective,
   NewTreatmentObjectiveData,
+  TreatmentObjectiveStatus,
 } from '@/types/treatment'
 
 const formatDate = (dateString?: string | Date) => {
@@ -83,12 +85,17 @@ interface FormNewPlanData extends Omit<
 }
 
 type EditableObjective =
-  | (TreatmentObjective & { tempId?: undefined })
+  | (Partial<TreatmentObjective> & {
+      description: string
+      status: TreatmentObjectiveStatus
+      tempId?: string
+    })
   | ClientSideNewObjective
 
 type EditableGoal =
-  | (Omit<TreatmentGoal, 'objectives' | 'id'> & {
-      id?: string
+  | (Partial<TreatmentGoal> & {
+      description: string
+      status: TreatmentGoalStatus
       objectives: EditableObjective[]
       tempId?: string
     })

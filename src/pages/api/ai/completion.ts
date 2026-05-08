@@ -27,6 +27,28 @@ const RATE_LIMIT_CONFIG = {
 
 const MAX_PAYLOAD_SIZE = 1024 * 50 // 50KB
 
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string | undefined {
+  const providerBaseUrl =
+    import.meta.env['LLM_BASE_URL'] ||
+    import.meta.env['LLM_API_URL'] ||
+    import.meta.env['OPENAI_BASE_URL']
+
+  if (isOpenRouterBaseUrl(providerBaseUrl)) {
+    logger.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return undefined
+  }
+
+  return providerBaseUrl
+}
+
 /**
  * API route for AI chat completions
  * Secured by authentication and input validation
@@ -132,10 +154,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     const completionService = new CompletionService({
       apiKey: llmApiKey,
       providerApiKey: llmApiKey,
-      providerBaseUrl:
-        import.meta.env['LLM_BASE_URL'] ||
-        import.meta.env['LLM_API_URL'] ||
-        import.meta.env['OPENAI_BASE_URL'],
+      providerBaseUrl: resolveSafeLlmBaseUrl(),
     })
 
     const formattedMessages = completionService.formatMessages(data?.messages || [])
