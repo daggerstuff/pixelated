@@ -75,8 +75,12 @@ const MediaContainer = link ? Link : 'div'
 const Content = details ? 'collapsible-content' : 'div'
 
 // ⚡ Bolt: Sanitize HTML in the frontmatter instead of inline to reduce SSR overhead
-const sanitizedHtml = html ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } }) : undefined
-const sanitizedDetails = details ? details.map(d => DOMPurify.sanitize(d, { USE_PROFILES: { html: true } })) : undefined
+const sanitizedHtml = html
+  ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
+  : undefined
+const sanitizedDetails = details
+  ? details.map((d) => DOMPurify.sanitize(d, { USE_PROFILES: { html: true } }))
+  : undefined
 ---
 
 <section class={className}>
@@ -181,7 +185,11 @@ const sanitizedDetails = details ? details.map(d => DOMPurify.sanitize(d, { USE_
       )
     }
     <Content class="p-4 pb-3">
-      {sanitizedHtml && <div class="prose card-item-prose" set:html={sanitizedHtml} />}
+      {
+        sanitizedHtml && (
+          <div class="prose card-item-prose" set:html={sanitizedHtml} />
+        )
+      }
       {text && <p class="prose card-item-prose">{text}</p>}
       {
         sanitizedDetails && (

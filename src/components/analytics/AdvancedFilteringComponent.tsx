@@ -115,9 +115,18 @@ export function AdvancedFilteringComponent({
   >('time')
 
   // ⚡ Bolt: Convert option arrays to Sets to prevent O(N^2) lookups inside rendering map loops
-  const emotionTypesSet = useMemo(() => new Set(options.emotions?.types || []), [options.emotions?.types])
-  const patternTypesSet = useMemo(() => new Set(options.patterns?.types || []), [options.patterns?.types])
-  const patternCategoriesSet = useMemo(() => new Set(options.patterns?.categories || []), [options.patterns?.categories])
+  const emotionTypesSet = useMemo(
+    () => new Set(options.emotions?.types || []),
+    [options.emotions?.types],
+  )
+  const patternTypesSet = useMemo(
+    () => new Set(options.patterns?.types || []),
+    [options.patterns?.types],
+  )
+  const patternCategoriesSet = useMemo(
+    () => new Set(options.patterns?.categories || []),
+    [options.patterns?.categories],
+  )
 
   // Handle changes to individual filter options
   const handleChange = <K extends keyof AdvancedFilterOptions>(

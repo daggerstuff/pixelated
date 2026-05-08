@@ -61,28 +61,31 @@ function TrainingSession({ className }: TrainingSessionProps) {
 
   // Control handlers
   // ⚡ Bolt: Wrapped handleControl in useCallback to provide a stable function reference
-  const handleControl = useCallback((control: string) => {
-    switch (control) {
-      case 'start':
-        setSessionState('active')
-        setProgress(0)
-        addProgressSnapshot(0)
-        break
-      case 'pause':
-        setSessionState('paused')
-        break
-      case 'resume':
-        setSessionState('active')
-        break
-      case 'end':
-        setSessionState('ended')
-        setProgress(100)
-        addProgressSnapshot(100)
-        break
-      default:
-        break
-    }
-  }, [setSessionState, setProgress, addProgressSnapshot])
+  const handleControl = useCallback(
+    (control: string) => {
+      switch (control) {
+        case 'start':
+          setSessionState('active')
+          setProgress(0)
+          addProgressSnapshot(0)
+          break
+        case 'pause':
+          setSessionState('paused')
+          break
+        case 'resume':
+          setSessionState('active')
+          break
+        case 'end':
+          setSessionState('ended')
+          setProgress(100)
+          addProgressSnapshot(100)
+          break
+        default:
+          break
+      }
+    },
+    [setSessionState, setProgress, addProgressSnapshot],
+  )
 
   // Send therapist message to mock client API
   const sendToMockClient = async (message: string) => {
