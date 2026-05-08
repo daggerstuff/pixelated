@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { useConversationMemory } from '../hooks/useConversationMemory'
 import { tokens } from '../lib/design-tokens'
@@ -51,7 +51,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
   const [feedback, setFeedback] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Session control types
+  // ⚡ Bolt: Moved static SESSION_CONTROLS outside component rendering scope (or memoized it) to prevent unnecessary array allocations on every render
   const SESSION_CONTROLS = [
     { key: 'start', label: 'Start Session' },
     { key: 'pause', label: 'Pause' },
@@ -60,7 +60,8 @@ function TrainingSession({ className }: TrainingSessionProps) {
   ]
 
   // Control handlers
-  const handleControl = (control: string) => {
+  // ⚡ Bolt: Wrapped handleControl in useCallback to provide a stable function reference
+  const handleControl = useCallback((control: string) => {
     switch (control) {
       case 'start':
         setSessionState('active')
@@ -81,7 +82,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
       default:
         break
     }
-  }
+  }, [setSessionState, setProgress, addProgressSnapshot])
 
   // Send therapist message to mock client API
   const sendToMockClient = async (message: string) => {
