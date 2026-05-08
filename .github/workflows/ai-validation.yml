@@ -67,9 +67,6 @@ jobs:
         env:
           AI_VALIDATION_SECRET: ${{ secrets.AI_VALIDATION_SECRET }}
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
@@ -89,6 +86,9 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Clean pnpm workspace artifacts
+        run: rm -rf node_modules
 
       - name: Install native build dependencies
         run: |

@@ -54,10 +54,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        if: matrix.language == 'javascript'
-        run: corepack enable
-
       - name: Setup pnpm
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@v6
@@ -79,6 +75,10 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Clean pnpm workspace artifacts
+        if: matrix.language == 'javascript'
+        run: rm -rf node_modules
 
       - name: Install native build dependencies
         if: matrix.language == 'javascript'
