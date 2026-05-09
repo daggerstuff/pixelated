@@ -1,5 +1,4 @@
 ---
-title: 'Live Region System'
 description: 'Live Region System documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

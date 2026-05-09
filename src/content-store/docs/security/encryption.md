@@ -1,6 +1,7 @@
 ---
 title: 'Encryption & Zero-Knowledge System'
 description:
+---
   'Learn about Pixelated Healths encryption architecture and zero-knowledge
   implementation'
 pubDate: '2025-01-01'

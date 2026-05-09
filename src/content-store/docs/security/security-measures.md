@@ -1,6 +1,6 @@
 ---
-title: 'Comprehensive Security Measures'
 description:
+---
   'Detailed documentation of all security measures implemented in the
   application'
 pubDate: '2025-01-01'

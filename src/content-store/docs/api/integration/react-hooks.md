@@ -1,5 +1,4 @@
 ---
-title: 'React Hooks for API Integration'
 description: 'React Hooks for API Integration documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

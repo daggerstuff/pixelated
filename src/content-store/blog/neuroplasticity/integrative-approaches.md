@@ -1,6 +1,7 @@
 ---
 title: Integrative Trauma Treatment Across Modern Modalities
 description: >-
+---
   Exploring how combining neuroscience-informed, somatic, psychedelic, and
   technology-enhanced approaches creates more effective trauma healing pathways
 author: Dr. Sara Michaels

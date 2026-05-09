@@ -1,6 +1,7 @@
 ---
 title: Therapy Approaches
 description:
+---
   'Comprehensive guide for mental health professionals and individuals in
   recovery'
 author: 'Resource Team'

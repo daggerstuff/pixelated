@@ -4,7 +4,7 @@ FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS base
 
 # Install Python 3.11 and system dependencies
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install --no-install-recommends -y \
     python3.11 \
     python3.11-venv \
     python3.11-dev \

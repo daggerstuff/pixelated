@@ -1,6 +1,6 @@
 ---
-title: 'Understanding the Scapegoat Dynamic'
 description:
+---
   'Explore the complex role of the scapegoat in family systems and how this
   dynamic affects personal development and relationships'
 author: 'Dr. James Wilson'

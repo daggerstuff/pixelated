@@ -1,6 +1,6 @@
 ---
-title: 'Testing Best Practices'
 description:
+---
   'Comprehensive best practices for testing in the Pixelated platform'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

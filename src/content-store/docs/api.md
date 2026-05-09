@@ -1,6 +1,6 @@
 ---
-title: 'API Documentation'
 description:
+---
   'Complete API documentation for Pixelated Empathy backend endpoints'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

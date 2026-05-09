@@ -1,5 +1,4 @@
 ---
-title: 'Sample Blog Post'
 description: 'A sample blog post to fix collection warnings'
 pubDate: 2023-10-15
 author: 'Sample Author'

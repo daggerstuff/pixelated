@@ -1,5 +1,4 @@
 ---
-title: 'Disaster Recovery Plan'
 description: 'Disaster Recovery Plan documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'
@@ -31,7 +30,7 @@ types of failures and outages.
 3. **Initial Recovery Steps**
    - If the issue is with the latest deployment, initiate a rollback:
      ```bash
-     # Trigger rollback workflow in GitHub Actions
+# Trigger rollback workflow in GitHub Actions
      gh workflow run rollback.yml -f environment=production
      ```
    - If DNS issue, check domain registrar DNS settings
@@ -50,14 +49,14 @@ types of failures and outages.
    - If database corruption is suspected, restore from the latest backup:
 
      ```bash
-     # List available backups in MongoDB Atlas
-     # Use Atlas CLI or web interface
+# List available backups in MongoDB Atlas
+# Use Atlas CLI or web interface
 
-     # Download the latest backup
-     # mongorestore command for local restoration
+# Download the latest backup
+# mongorestore command for local restoration
      mongorestore --uri="mongodb+srv://username:password@cluster.mongodb.net/dbname" /path/to/backup
 
-     # Or use Atlas automated backup restoration via web interface
+# Or use Atlas automated backup restoration via web interface
      ```
 
 ### API Issues
@@ -97,17 +96,17 @@ If an immediate backup is needed:
 2. Or create a manual backup:
 
    ```bash
-   # Set environment variables
+# Set environment variables
    export PGPASSWORD=[PASSWORD]
    export TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-   # Create backup
+# Create backup
    pg_dump -h [HOST] -U [USER] -d [DATABASE] -F p > supabase_backup_${TIMESTAMP}.sql
 
-   # Compress
+# Compress
    gzip supabase_backup_${TIMESTAMP}.sql
 
-   # Upload to S3
+# Upload to S3
    aws s3 cp supabase_backup_${TIMESTAMP}.sql.gz s3://[BACKUP_BUCKET]/database-backups/ --profile gradiant
    ```
 
@@ -124,13 +123,13 @@ To restore a database from backup:
 2. Download and restore:
 
    ```bash
-   # Download
+# Download
    aws s3 cp s3://[BACKUP_BUCKET]/database-backups/[BACKUP_FILENAME] ./ --profile gradiant
 
-   # Decompress
+# Decompress
    gunzip [BACKUP_FILENAME]
 
-   # Restore
+# Restore
    PGPASSWORD=[PASSWORD] psql -h [HOST] -U [USER] -d [DATABASE] < [BACKUP_SQL_FILE]
    ```
 
@@ -168,13 +167,13 @@ If GitHub Actions is unavailable:
 4. Build and deploy manually:
 
    ```bash
-   # Install dependencies
+# Install dependencies
    pnpm install --no-frozen-lockfile
 
-   # Build
+# Build
    NODE_ENV=production pnpm build
 
-   # Deploy using AWS CLI
+# Deploy using AWS CLI
    ./scripts/deploy-aws.sh
    ```
 

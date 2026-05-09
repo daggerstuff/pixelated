@@ -3,6 +3,7 @@ title: 'Introducing Pixelated Empathy'
 date: '2025-01-29'
 duration: 5min
 description:
+---
   'Announcing our new platform for advancing mental health through AI and
   technology'
 ---

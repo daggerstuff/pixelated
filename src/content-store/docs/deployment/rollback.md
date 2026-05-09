@@ -1,5 +1,4 @@
 ---
-title: 'Deployment Rollback Guide'
 description: 'Deployment Rollback Guide documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

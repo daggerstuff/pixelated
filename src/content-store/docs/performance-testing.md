@@ -1,5 +1,4 @@
 ---
-title: 'Performance Testing Guide'
 description: 'Performance Testing Guide documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

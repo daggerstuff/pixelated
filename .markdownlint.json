@@ -20,5 +20,37 @@
   "MD031": true,
   "MD033": false,
   "MD041": false,
-  "MD046": false
+  "MD046": false,
+  "ignores": [
+    "node_modules/@testing-library/dom/README.md",
+    "node_modules/@testing-library/jest-dom/README.md",
+    "node_modules/@testing-library/react/README.md",
+    "node_modules/react-i18next/README.md"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "tests/security/node_modules/ts-node/README.md",
+        "tests/security/node_modules/typescript/README.md",
+        "tests/security/node_modules/typescript/SECURITY.md",
+        "tests/security/node_modules/zod/README.md"
+      ],
+      "options": {
+        "MD007": false,
+        "MD009": false,
+        "MD012": false,
+        "MD025": false,
+        "MD030": false,
+        "MD031": false,
+        "MD032": false,
+        "MD034": false,
+        "MD039": false,
+        "MD051": false,
+        "MD060": false,
+        "MD013": {
+          "line_length": 400
+        }
+      }
+    }
+  ]
 }

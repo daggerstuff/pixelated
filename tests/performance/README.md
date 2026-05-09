@@ -32,7 +32,7 @@ sudo apt-get install k6
 choco install k6
 ```
 
-Or download from: https://k6.io/docs/get-started/installation/
+Or download from: <https://k6.io/docs/get-started/installation/>
 
 ## Test Files
 

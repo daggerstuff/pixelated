@@ -1,5 +1,4 @@
 ---
-title: 'Code Blocks'
 description: 'Display inline code and code blocks'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

@@ -63,6 +63,7 @@ jobs:
           cache: 'false'
           scan-type: 'fs'
           scanners: 'vuln,secret,misconfig'
+          trivy-config: .github/security/trivy/trivy.yaml
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'

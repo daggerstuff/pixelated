@@ -1,5 +1,4 @@
 ---
-title: 'Astro API Integration'
 description: 'Astro API Integration documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

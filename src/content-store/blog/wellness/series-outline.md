@@ -1,6 +1,6 @@
 ---
-title: 'Everyday Joy: Simple Practices for Mental Wellness'
 description:
+---
   'A heartwarming exploration of practical, accessible approaches to nurturing
   mental health and finding joy in daily life'
 author: 'Wellness Team'

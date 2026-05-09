@@ -1,5 +1,4 @@
 ---
-title: 'Deployment Guide'
 description: 'Deployment Guide documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

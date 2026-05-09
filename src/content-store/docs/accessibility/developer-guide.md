@@ -1,6 +1,6 @@
 ---
-title: 'Accessibility Developer Guide'
 description:
+---
   'Best practices and standards for implementing accessible components'
 pubDate: '2025-01-01'
 author: 'Accessibility Team'

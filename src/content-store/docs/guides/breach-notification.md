@@ -1,5 +1,4 @@
 ---
-title: 'Breach Notification Guide'
 description: 'User guide for implementing and managing breach notifications'
 pubDate: 2025-03-25
 share: true

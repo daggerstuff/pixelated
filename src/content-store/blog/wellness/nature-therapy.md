@@ -1,6 +1,6 @@
 ---
-title: "Nature's Therapy: Outdoor Wellness Practices"
 description: >-
+---
   Discover how connecting with nature can transform your mental wellbeing
   through simple, accessible outdoor practices
 author: Wellness Team
