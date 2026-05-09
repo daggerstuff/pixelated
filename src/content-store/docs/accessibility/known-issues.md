@@ -1,6 +1,6 @@
 ---
-title: 'Known Accessibility Issues'
 description:
+---
   'Documentation of known accessibility issues and their resolution status'
 pubDate: '2025-01-01'
 author: 'Accessibility Team'

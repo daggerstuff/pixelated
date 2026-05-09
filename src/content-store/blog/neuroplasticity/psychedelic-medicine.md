@@ -1,6 +1,6 @@
 ---
-title: Psychedelic Medicine & Neuroplasticity in Trauma Treatment
 description: >-
+---
   Exploring the revolutionary potential of psychedelic-assisted therapy in
   healing trauma through enhanced neuroplasticity and neural network
   reorganization

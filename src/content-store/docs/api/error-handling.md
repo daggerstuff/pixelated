@@ -1,5 +1,4 @@
 ---
-title: 'API Error Handling'
 description: 'Standardized error handling for API endpoints'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

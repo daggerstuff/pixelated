@@ -1,5 +1,4 @@
 ---
-title: 'Security Monitoring and Logging'
 description: 'Security Monitoring and Logging documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

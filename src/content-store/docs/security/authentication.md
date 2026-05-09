@@ -1,6 +1,7 @@
 ---
 title: 'Authentication'
 description:
+---
   "Learn about Pixelated Health's authentication system and security features"
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

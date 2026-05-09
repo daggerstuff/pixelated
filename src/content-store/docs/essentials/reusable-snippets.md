@@ -1,5 +1,4 @@
 ---
-title: 'Reusable Snippets'
 description: 'Reusable, custom snippets to keep content in sync'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

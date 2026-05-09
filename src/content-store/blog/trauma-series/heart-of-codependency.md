@@ -1,6 +1,6 @@
 ---
-title: 'The Heart of Codependency'
 description:
+---
   'Explore the deep connection between trauma and codependent relationships,
   understanding how early experiences shape our attachment patterns'
 author: 'Dr. Sarah Chen'

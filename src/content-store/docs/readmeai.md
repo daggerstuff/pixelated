@@ -1,5 +1,4 @@
 ---
-title: 'ReadmeAI (Truncated Version)'
 description: 'ReadmeAI (Truncated Version) documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

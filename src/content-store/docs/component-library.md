@@ -1,5 +1,4 @@
 ---
-title: 'Astro Component Library'
 description: 'Astro Component Library documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

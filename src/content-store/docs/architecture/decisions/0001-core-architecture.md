@@ -1,5 +1,4 @@
 ---
-title: '[ADR-0001] Core Architecture Decisions'
 description: '[ADR-0001] Core Architecture Decisions documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

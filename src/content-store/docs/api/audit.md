@@ -1,5 +1,4 @@
 ---
-title: 'Security Audit API'
 description: 'API documentation for security audit logging and monitoring'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

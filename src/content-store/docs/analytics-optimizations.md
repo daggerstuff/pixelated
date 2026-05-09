@@ -1,6 +1,6 @@
 ---
-title: 'Thread Analytics Optimizations'
 description:
+---
   'Comprehensive optimizations for the thread analytics system including
   materialized views, caching strategies, and performance improvements'
 pubDate: 2024-12-01

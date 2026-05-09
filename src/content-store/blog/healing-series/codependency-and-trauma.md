@@ -1,6 +1,6 @@
 ---
-title: 'Codependency & Complex Trauma'
 description:
+---
   'Exploring the intricate connection between codependency and complex trauma,
   and its impact on relationships and personal growth'
 author: 'Dr. Michael Rivera'

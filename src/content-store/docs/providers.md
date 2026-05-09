@@ -1,6 +1,6 @@
 ---
-title: 'Provider System'
 description:
+---
   'Comprehensive guide to Pixelated Healths provider system for managing global
   state and functionality'
 pubDate: 2025-03-24

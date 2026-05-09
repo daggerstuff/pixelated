@@ -1,5 +1,4 @@
 ---
-title: 'Progressive Loading Implementation'
 description: 'Progressive Loading Implementation documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

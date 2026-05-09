@@ -1,5 +1,4 @@
 ---
-title: 'Integration Test Plan'
 description: 'Integration Test Plan documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

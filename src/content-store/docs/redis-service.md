@@ -1,5 +1,4 @@
 ---
-title: 'Redis Service'
 description: 'Core Redis service implementation details and usage examples'
 pubDate: 2025-03-25
 share: true

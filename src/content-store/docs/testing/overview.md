@@ -1,6 +1,6 @@
 ---
-title: 'Testing Overview'
 description:
+---
   'Comprehensive guide to Pixelated testing infrastructure and practices'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

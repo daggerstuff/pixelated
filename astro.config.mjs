@@ -35,6 +35,24 @@ const sentryRelease =
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 
 /**
+ * Astro's `site` config must be a valid absolute URL.
+ * Some CI environments provide hostnames without protocol; normalize safely.
+ * @param {string | undefined} value
+ */
+function normalizeSiteUrl(value) {
+  if (!value) return 'https://pixelatedempathy.com'
+  try {
+    return new URL(value).toString()
+  } catch {
+    try {
+      return new URL(`https://${value}`).toString()
+    } catch {
+      return 'https://pixelatedempathy.com'
+    }
+  }
+}
+
+/**
  * @param {{ ssr: boolean; assets: string[]; filesToDeleteAfterUpload: string[] }} params
  */
 function createScopedSentryVitePlugins({
@@ -283,7 +301,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL ?? 'https://pixelatedempathy.com',
+  site: normalizeSiteUrl(process.env.PUBLIC_SITE_URL),
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -439,6 +457,10 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'framer-motion': path.resolve('./src/lib/shims/framer-motion.tsx'),
+        '@radix-ui/react-tooltip': path.resolve(
+          './src/lib/shims/radix-tooltip.tsx',
+        ),
         'astro-icon/components': path.resolve(
           './src/components/ui/astro-icon-components.ts',
         ),

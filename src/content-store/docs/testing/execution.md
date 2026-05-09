@@ -1,5 +1,4 @@
 ---
-title: 'Test Execution'
 description: 'Guide to running and managing tests in Pixelated'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

@@ -1,6 +1,6 @@
 ---
-title: 'Understanding Trauma Series'
 description:
+---
   'A deep dive into the complex dynamics of trauma and its effects on
   relationships'
 author: 'Pixelated Empathy Team'

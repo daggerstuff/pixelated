@@ -1,6 +1,7 @@
 ---
 title: Finding Your Emotional Balance
 description:
+---
   'Comprehensive guide for mental health professionals and individuals in
   recovery'
 author: 'Resource Team'
