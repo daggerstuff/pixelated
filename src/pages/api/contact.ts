@@ -16,6 +16,40 @@ interface SubmissionContext {
   timestamp: string
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const parseJsonBody = (bodyText: string): unknown => {
+  if (!bodyText) {
+    return null
+  }
+
+  try {
+    return JSON.parse(bodyText)
+  } catch {
+    return null
+  }
+}
+
+const toContactFormData = (
+  value: Record<string, unknown>,
+): ContactFormData | null => {
+  const { name, email, subject, message } = value
+  if (
+    typeof name !== 'string' ||
+    typeof email !== 'string' ||
+    typeof subject !== 'string' ||
+    typeof message !== 'string'
+  ) {
+    return null
+  }
+
+  return { name, email, subject, message }
+}
+
+const getHeaderValue = (request: Request, headerName: string): string =>
+  request.headers.get(headerName) ?? ''
+
 class MockContactService {
   async submitContactForm(
     _contactFormData: ContactFormData,
@@ -33,25 +67,22 @@ const contactService = new MockContactService()
 // Helper function to get client IP address
 function getClientIP(request: Request): string {
   // Check for forwarded headers (common in production with load balancers)
-  const forwardedFor = request.headers.get('x-forwarded-for')
+  const forwardedFor = getHeaderValue(request, 'x-forwarded-for')
   if (forwardedFor) {
-    const ip =
-      (typeof forwardedFor === 'string' ? forwardedFor : '')
-        .split(',')[0]
-        ?.trim?.() || ''
+    const ip = forwardedFor.split(',')[0]?.trim() ?? ''
     logger.debug('Extracted IP from x-forwarded-for', { forwardedFor, ip })
     return ip
   } else {
     logger.debug('No x-forwarded-for header present', { forwardedFor })
   }
 
-  const realIP = request.headers.get('x-real-ip')
+  const realIP = getHeaderValue(request, 'x-real-ip')
   if (realIP) {
     logger.debug('Extracted IP from x-real-ip', { realIP })
     return realIP
   }
 
-  const remoteAddr = request.headers.get('x-remote-addr')
+  const remoteAddr = getHeaderValue(request, 'x-remote-addr')
   if (remoteAddr) {
     logger.debug('Extracted IP from x-remote-addr', { remoteAddr })
     return remoteAddr
@@ -66,22 +97,13 @@ export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {
-    // Parse request data
-    let formData: Record<string, unknown>
-    try {
-      formData = await request.json()
-    } catch (error: unknown) {
-      logger.warn('Invalid JSON in contact form request', {
-        error: error instanceof Error ? String(error) : 'Unknown error',
-        userAgent: request.headers.get('user-agent'),
-        ip: getClientIP(request),
-      })
-
+    const requestBodyText = await request.text()
+    const requestBody = parseJsonBody(requestBodyText)
+    if (!isRecord(requestBody)) {
       return new Response(
         JSON.stringify({
           success: false,
-          message:
-            'Invalid request format. Please check your data and try again.',
+          message: 'Invalid request format. Please check your data and try again.',
         }),
         {
           status: 400,
@@ -91,13 +113,11 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Validate required fields exist
+    const formData = requestBody
     const requiredFields = ['name', 'email', 'subject', 'message']
     for (const field of requiredFields) {
-      if (
-        !formData[field] ||
-        typeof formData[field] !== 'string' ||
-        !formData[field].trim()
-      ) {
+      const value = formData[field]
+      if (typeof value !== 'string' || !value.trim()) {
         return new Response(
           JSON.stringify({
             success: false,
@@ -111,20 +131,26 @@ export const POST = async ({ request }: APIContext) => {
       }
     }
 
-    // Prepare contact form data
-    const contactFormData = {
-      name: formData['name'] as string,
-      email: formData['email'] as string,
-      subject: formData['subject'] as string,
-      message: formData['message'] as string,
+    const contactFormData = toContactFormData(formData)
+    if (!contactFormData) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Invalid request payload format.',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Prepare submission context
-    const submissionContext = {
-      ipAddress: getClientIP(request),
-      userAgent: request.headers.get('user-agent') || 'Unknown',
-      timestamp: new Date().toISOString(),
-    }
+  const submissionContext = {
+    ipAddress: getClientIP(request),
+    userAgent: request.headers.get('user-agent') ?? 'Unknown',
+    timestamp: new Date().toISOString(),
+  }
 
     // Submit contact form through service
     const result = await contactService.submitContactForm(
@@ -152,8 +178,8 @@ export const POST = async ({ request }: APIContext) => {
 
     logger.error('Contact form submission failed with unexpected error', {
       error: error instanceof Error ? String(error) : 'Unknown error',
-      stack: error instanceof Error ? error?.stack : undefined,
-      userAgent: request.headers.get('user-agent'),
+      stack: error instanceof Error ? error.stack : undefined,
+      userAgent: getHeaderValue(request, 'user-agent'),
       ip: getClientIP(request),
       duration: `${duration}ms`,
     })
