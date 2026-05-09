@@ -11,23 +11,28 @@ import {
   verifyRedisConnection,
 } from './test-utils'
 
+// Conditionally skip Redis integration tests in CI or when explicitly requested
+const SKIP_REDIS_TESTS =
+  process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
 const hasRedisUrl = Boolean(process.env['REDIS_URL'])
-const hasRedisAccess = await (async () => {
-  if (!hasRedisUrl) {
-    return false
-  }
+const hasRedisAccess = SKIP_REDIS_TESTS
+  ? false
+  : await (async () => {
+      if (!hasRedisUrl) {
+        return false
+      }
 
-  try {
-    const redis = new Redis(process.env['REDIS_URL']!)
-    await redis.ping()
-    await redis.quit()
-    return true
-  } catch {
-    return false
-  }
-})()
+      try {
+        const redis = new Redis(process.env['REDIS_URL']!)
+        await redis.ping()
+        await redis.quit()
+        return true
+      } catch {
+        return false
+      }
+    })()
 
-;(hasRedisAccess ? describe : describe.skip)(
+;(SKIP_REDIS_TESTS || !hasRedisAccess ? describe.skip : describe)(
   'cacheInvalidation Integration',
   () => {
     let redis: RedisService
