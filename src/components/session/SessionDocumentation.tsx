@@ -114,11 +114,6 @@ export default function SessionDocumentationComponent({
         'Work performance concerns are primary stressor',
         'Family conflict with spouse about division of household duties',
       ],
-      recommendedFollowUp: [
-        'Practice PMR daily',
-        'Maintain anxiety log',
-        'Schedule sleep assessment',
-      ],
       emotionSummary:
         'Client presented with moderate anxiety, mild frustration, and occasional sadness throughout the session.',
       interventions: [
@@ -162,11 +157,6 @@ export default function SessionDocumentationComponent({
           significance:
             'Physical manifestation of stress affecting sleep quality',
         },
-      ],
-      recommendedFollowUp: [
-        'Schedule sleep assessment',
-        'Continue practicing PMR daily',
-        'Maintain anxiety log for next session',
       ],
       treatmentProgress: {
         goals: [
@@ -227,14 +217,14 @@ export default function SessionDocumentationComponent({
   // Show loading state
   if (isLoading || isGenerating) {
     return (
-      <div className='bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm'>
-        <h3 className='text-gray-800 text-xl font-medium'>
+      <div className="bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm">
+        <h3 className="text-gray-800 text-xl font-medium">
           {isGenerating
             ? 'Generating Documentation...'
             : 'Loading Documentation...'}
         </h3>
-        <div className='border-gray-200 border-t-blue-600 h-12 w-12 animate-spin rounded-full border-4'></div>
-        <p className='text-gray-600 max-w-md text-center'>
+        <div className="border-gray-200 border-t-blue-600 h-12 w-12 animate-spin rounded-full border-4"></div>
+        <p className="text-gray-600 max-w-md text-center">
           {isGenerating
             ? 'Creating comprehensive clinical documentation based on session data. This may take a moment...'
             : 'Loading session documentation...'}
@@ -246,24 +236,24 @@ export default function SessionDocumentationComponent({
   // Show error state
   if (error) {
     return (
-      <div className='bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm'>
-        <h3 className='text-red-600 text-xl font-medium'>
+      <div className="bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm">
+        <h3 className="text-red-600 text-xl font-medium">
           Error Loading Documentation
         </h3>
-        <p className='text-gray-600 max-w-md text-center'>
+        <p className="text-gray-600 max-w-md text-center">
           {error?.['message'] ||
             'An error occurred while loading session documentation.'}
         </p>
-        <div className='mt-4 flex gap-3'>
+        <div className="mt-4 flex gap-3">
           <button
             onClick={() => loadDocumentation(true)}
-            className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition'
+            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
           >
             Retry
           </button>
           <button
             onClick={loadMockDocumentation}
-            className='bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition'
+            className="bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition"
           >
             Load Sample Documentation
           </button>
@@ -275,27 +265,27 @@ export default function SessionDocumentationComponent({
   // If no documentation is available yet, show generate button
   if (!editableDocumentation) {
     return (
-      <div className='bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm'>
-        <h3 className='text-gray-800 text-xl font-medium'>
+      <div className="bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm">
+        <h3 className="text-gray-800 text-xl font-medium">
           Session Documentation
         </h3>
-        <p className='text-gray-600 max-w-md text-center'>
+        <p className="text-gray-600 max-w-md text-center">
           Generate comprehensive clinical documentation based on this sessions
           data, including emotion analysis, therapeutic techniques, and progress
           tracking.
         </p>
 
-        <div className='mt-4 flex gap-3'>
+        <div className="mt-4 flex gap-3">
           <button
             onClick={handleGenerateDocumentation}
-            className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition'
+            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
           >
             Generate Documentation
           </button>
 
           <button
             onClick={loadMockDocumentation}
-            className='bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition'
+            className="bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition"
           >
             Load Sample Documentation
           </button>
@@ -305,20 +295,20 @@ export default function SessionDocumentationComponent({
   }
 
   return (
-    <div className='bg-white overflow-hidden rounded-lg shadow-sm'>
+    <div className="bg-white overflow-hidden rounded-lg shadow-sm">
       {/* Header with client info and duration */}
-      <div className='bg-gray-50 border-gray-200 border-b p-4'>
-        <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
+      <div className="bg-gray-50 border-gray-200 border-b p-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className='text-gray-800 text-lg font-medium'>
+            <h3 className="text-gray-800 text-lg font-medium">
               Session Documentation
             </h3>
-            <p className='text-gray-600 text-sm'>
+            <p className="text-gray-600 text-sm">
               Client ID: {clientId} | Session ID: {sessionId}
             </p>
           </div>
           {sessionDuration && (
-            <div className='text-gray-600 mt-2 text-sm md:mt-0'>
+            <div className="text-gray-600 mt-2 text-sm md:mt-0">
               Duration: {formatDuration(sessionDuration)}
             </div>
           )}
@@ -326,8 +316,8 @@ export default function SessionDocumentationComponent({
       </div>
 
       {/* Tabs */}
-      <div className='border-gray-200 border-b'>
-        <nav className='flex overflow-x-auto'>
+      <div className="border-gray-200 border-b">
+        <nav className="flex overflow-x-auto">
           <button
             onClick={() => setActiveTab('summary')}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
@@ -382,11 +372,11 @@ export default function SessionDocumentationComponent({
       </div>
 
       {/* Content based on active tab */}
-      <div className='p-4'>
+      <div className="p-4">
         {activeTab === 'summary' && (
-          <div className='space-y-4'>
+          <div className="space-y-4">
             <section>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Session Summary
               </h4>
               {!readOnly ? (
@@ -395,26 +385,26 @@ export default function SessionDocumentationComponent({
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('summary', e.target.value)
                   }
-                  className='border-gray-300 min-h-[100px] w-full rounded-md border p-2'
+                  className="border-gray-300 min-h-[100px] w-full rounded-md border p-2"
                 />
               ) : (
-                <p className='text-gray-700'>
+                <p className="text-gray-700">
                   {editableDocumentation?.['summary']}
                 </p>
               )}
             </section>
 
             <section>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Key Insights
               </h4>
-              <ul className='list-disc space-y-1 pl-5'>
+              <ul className="list-disc space-y-1 pl-5">
                 {editableDocumentation?.['keyInsights']?.map(
                   (insight: string, index: number) => (
-                    <li key={`insight-${index}`} className='text-gray-700'>
+                    <li key={`insight-${index}`} className="text-gray-700">
                       {!readOnly ? (
                         <input
-                          type='text'
+                          type="text"
                           value={insight}
                           onChange={(
                             e: React.ChangeEvent<HTMLInputElement>,
@@ -426,7 +416,7 @@ export default function SessionDocumentationComponent({
                             newInsights[index] = e.target.value
                             handleChange('keyInsights', newInsights)
                           }}
-                          className='border-gray-300 w-full rounded-md border p-1'
+                          className="border-gray-300 w-full rounded-md border p-1"
                         />
                       ) : (
                         insight
@@ -443,7 +433,7 @@ export default function SessionDocumentationComponent({
                       '',
                     ])
                   }}
-                  className='text-blue-600 hover:text-blue-800 mt-2 text-sm'
+                  className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
                 >
                   + Add Insight
                 </button>
@@ -451,7 +441,7 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Recommended Follow-Up
               </h4>
               {!readOnly ? (
@@ -460,17 +450,17 @@ export default function SessionDocumentationComponent({
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('recommendedFollowUp', e.target.value)
                   }
-                  className='border-gray-300 min-h-[80px] w-full rounded-md border p-2'
+                  className="border-gray-300 min-h-[80px] w-full rounded-md border p-2"
                 />
               ) : (
-                <p className='text-gray-700'>
+                <p className="text-gray-700">
                   {editableDocumentation?.['recommendedFollowUp']}
                 </p>
               )}
             </section>
 
             <section>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Next Session Plan
               </h4>
               {!readOnly ? (
@@ -479,10 +469,10 @@ export default function SessionDocumentationComponent({
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('nextSessionPlan', e.target.value)
                   }
-                  className='border-gray-300 min-h-[80px] w-full rounded-md border p-2'
+                  className="border-gray-300 min-h-[80px] w-full rounded-md border p-2"
                 />
               ) : (
-                <p className='text-gray-700'>
+                <p className="text-gray-700">
                   {editableDocumentation?.['nextSessionPlan']}
                 </p>
               )}
@@ -491,11 +481,11 @@ export default function SessionDocumentationComponent({
         )}
 
         {activeTab === 'techniques' && (
-          <div className='space-y-4'>
-            <h4 className='text-md text-gray-800 mb-2 font-medium'>
+          <div className="space-y-4">
+            <h4 className="text-md text-gray-800 mb-2 font-medium">
               Therapeutic Techniques Used
             </h4>
-            <div className='space-y-3'>
+            <div className="space-y-3">
               {editableDocumentation?.['therapeuticTechniques']?.map(
                 (
                   technique: {
@@ -507,13 +497,13 @@ export default function SessionDocumentationComponent({
                 ) => (
                   <div
                     key={`technique-${index}`}
-                    className='border-gray-200 rounded-md border p-3'
+                    className="border-gray-200 rounded-md border p-3"
                   >
-                    <div className='mb-2'>
-                      <h5 className='text-gray-800 font-medium'>
+                    <div className="mb-2">
+                      <h5 className="text-gray-800 font-medium">
                         {!readOnly ? (
                           <input
-                            type='text'
+                            type="text"
                             value={technique?.['name'] || ''}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
@@ -533,14 +523,14 @@ export default function SessionDocumentationComponent({
                                 newTechniques,
                               )
                             }}
-                            className='border-gray-300 w-full rounded-md border p-1'
+                            className="border-gray-300 w-full rounded-md border p-1"
                           />
                         ) : (
                           technique?.['name']
                         )}
                       </h5>
                     </div>
-                    <div className='mb-2'>
+                    <div className="mb-2">
                       {!readOnly ? (
                         <textarea
                           value={technique?.['description'] || ''}
@@ -559,21 +549,21 @@ export default function SessionDocumentationComponent({
                             }
                             handleChange('therapeuticTechniques', newTechniques)
                           }}
-                          className='border-gray-300 w-full rounded-md border p-1'
+                          className="border-gray-300 w-full rounded-md border p-1"
                         />
                       ) : (
-                        <p className='text-gray-700'>{technique.description}</p>
+                        <p className="text-gray-700">{technique.description}</p>
                       )}
                     </div>
-                    <div className='flex items-center'>
-                      <span className='text-gray-600 mr-2 text-sm'>
+                    <div className="flex items-center">
+                      <span className="text-gray-600 mr-2 text-sm">
                         Effectiveness:
                       </span>
                       {!readOnly ? (
                         <input
-                          type='range'
-                          min='1'
-                          max='10'
+                          type="range"
+                          min="1"
+                          max="10"
                           value={technique.effectiveness}
                           onChange={(
                             e: React.ChangeEvent<HTMLInputElement>,
@@ -588,19 +578,19 @@ export default function SessionDocumentationComponent({
                             }
                             handleChange('therapeuticTechniques', newTechniques)
                           }}
-                          className='mr-2 w-32'
+                          className="mr-2 w-32"
                         />
                       ) : (
-                        <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
+                        <div className="bg-gray-200 mr-2 h-2 w-32 rounded-full">
                           <div
-                            className='bg-blue-600 h-full rounded-full'
+                            className="bg-blue-600 h-full rounded-full"
                             style={{
                               width: `${(technique.effectiveness / 10) * 100}%`,
                             }}
                           ></div>
                         </div>
                       )}
-                      <span className='text-sm font-medium'>
+                      <span className="text-sm font-medium">
                         {technique.effectiveness}/10
                       </span>
                     </div>
@@ -612,7 +602,7 @@ export default function SessionDocumentationComponent({
               <button
                 onClick={() => {
                   handleChange('therapeuticTechniques', [
-                    ...editableDocumentation.therapeuticTechniques,
+                    ...(editableDocumentation.therapeuticTechniques ?? []),
                     {
                       name: '',
                       description: '',
@@ -620,7 +610,7 @@ export default function SessionDocumentationComponent({
                     },
                   ])
                 }}
-                className='text-blue-600 hover:text-blue-800 mt-2 text-sm'
+                className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
               >
                 + Add Technique
               </button>
@@ -629,14 +619,14 @@ export default function SessionDocumentationComponent({
         )}
 
         {activeTab === 'progress' && (
-          <div className='space-y-4'>
+          <div className="space-y-4">
             <section>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Treatment Progress
               </h4>
 
-              <div className='mt-3 space-y-4'>
-                <h5 className='text-gray-700 text-sm font-medium'>
+              <div className="mt-3 space-y-4">
+                <h5 className="text-gray-700 text-sm font-medium">
                   Treatment Goals
                 </h5>
                 {editableDocumentation.treatmentProgress?.goals.map(
@@ -650,9 +640,9 @@ export default function SessionDocumentationComponent({
                   ) => (
                     <div
                       key={`goal-${index}`}
-                      className='border-gray-200 rounded-md border p-3'
+                      className="border-gray-200 rounded-md border p-3"
                     >
-                      <div className='mb-2'>
+                      <div className="mb-2">
                         {!readOnly ? (
                           <textarea
                             value={goal.description}
@@ -673,23 +663,23 @@ export default function SessionDocumentationComponent({
                                 goals: newGoals,
                               })
                             }}
-                            className='border-gray-300 w-full rounded-md border p-1'
+                            className="border-gray-300 w-full rounded-md border p-1"
                           />
                         ) : (
-                          <p className='text-gray-800 font-medium'>
+                          <p className="text-gray-800 font-medium">
                             {goal.description}
                           </p>
                         )}
                       </div>
-                      <div className='mb-2 flex items-center'>
-                        <span className='text-gray-600 mr-2 text-sm'>
+                      <div className="mb-2 flex items-center">
+                        <span className="text-gray-600 mr-2 text-sm">
                           Progress:
                         </span>
                         {!readOnly ? (
                           <input
-                            type='range'
-                            min='0'
-                            max='100'
+                            type="range"
+                            min="0"
+                            max="100"
                             value={goal.progress}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
@@ -708,17 +698,17 @@ export default function SessionDocumentationComponent({
                                 goals: newGoals,
                               })
                             }}
-                            className='mr-2 w-32'
+                            className="mr-2 w-32"
                           />
                         ) : (
-                          <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
+                          <div className="bg-gray-200 mr-2 h-2 w-32 rounded-full">
                             <div
-                              className='bg-blue-600 h-full rounded-full'
+                              className="bg-blue-600 h-full rounded-full"
                               style={{ width: `${goal.progress}%` }}
                             ></div>
                           </div>
                         )}
-                        <span className='text-sm font-medium'>
+                        <span className="text-sm font-medium">
                           {goal.progress}%
                         </span>
                       </div>
@@ -743,11 +733,11 @@ export default function SessionDocumentationComponent({
                                 goals: newGoals,
                               })
                             }}
-                            className='border-gray-300 w-full rounded-md border p-1'
-                            placeholder='Notes on goal progress'
+                            className="border-gray-300 w-full rounded-md border p-1"
+                            placeholder="Notes on goal progress"
                           />
                         ) : (
-                          <p className='text-gray-700 text-sm'>{goal.notes}</p>
+                          <p className="text-gray-700 text-sm">{goal.notes}</p>
                         )}
                       </div>
                     </div>
@@ -771,15 +761,15 @@ export default function SessionDocumentationComponent({
                         goals: newGoals,
                       })
                     }}
-                    className='text-blue-600 hover:text-blue-800 text-sm'
+                    className="text-blue-600 hover:text-blue-800 text-sm"
                   >
                     + Add Goal
                   </button>
                 )}
               </div>
 
-              <div className='mt-4'>
-                <h5 className='text-gray-700 mb-2 text-sm font-medium'>
+              <div className="mt-4">
+                <h5 className="text-gray-700 mb-2 text-sm font-medium">
                   Overall Assessment
                 </h5>
                 {!readOnly ? (
@@ -794,10 +784,10 @@ export default function SessionDocumentationComponent({
                         overallAssessment: e.target.value,
                       })
                     }}
-                    className='border-gray-300 min-h-[100px] w-full rounded-md border p-2'
+                    className="border-gray-300 min-h-[100px] w-full rounded-md border p-2"
                   />
                 ) : (
-                  <p className='text-gray-700'>
+                  <p className="text-gray-700">
                     {editableDocumentation.treatmentProgress?.overallAssessment}
                   </p>
                 )}
@@ -805,16 +795,16 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Client Strengths
               </h4>
-              <ul className='list-disc space-y-1 pl-5'>
+              <ul className="list-disc space-y-1 pl-5">
                 {editableDocumentation.clientStrengths?.map(
                   (strength: string, index: number) => (
-                    <li key={`strength-${index}`} className='text-gray-700'>
+                    <li key={`strength-${index}`} className="text-gray-700">
                       {!readOnly ? (
                         <input
-                          type='text'
+                          type="text"
                           value={strength}
                           onChange={(
                             e: React.ChangeEvent<HTMLInputElement>,
@@ -826,7 +816,7 @@ export default function SessionDocumentationComponent({
                             newStrengths[index] = e.target.value
                             handleChange('clientStrengths', newStrengths)
                           }}
-                          className='border-gray-300 w-full rounded-md border p-1'
+                          className="border-gray-300 w-full rounded-md border p-1"
                         />
                       ) : (
                         strength
@@ -843,7 +833,7 @@ export default function SessionDocumentationComponent({
                       '',
                     ])
                   }}
-                  className='text-blue-600 hover:text-blue-800 mt-2 text-sm'
+                  className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
                 >
                   + Add Strength
                 </button>
@@ -853,11 +843,11 @@ export default function SessionDocumentationComponent({
         )}
 
         {activeTab === 'patterns' && (
-          <div className='space-y-4'>
-            <h4 className='text-md text-gray-800 mb-2 font-medium'>
+          <div className="space-y-4">
+            <h4 className="text-md text-gray-800 mb-2 font-medium">
               Emotional Patterns Observed
             </h4>
-            <div className='space-y-3'>
+            <div className="space-y-3">
               {Array.isArray(editableDocumentation.emotionalPatterns) &&
                 editableDocumentation.emotionalPatterns.map(
                   (
@@ -866,13 +856,13 @@ export default function SessionDocumentationComponent({
                   ) => (
                     <div
                       key={`pattern-${index}`}
-                      className='border-gray-200 rounded-md border p-3'
+                      className="border-gray-200 rounded-md border p-3"
                     >
-                      <div className='mb-2'>
-                        <h5 className='text-gray-800 font-medium'>
+                      <div className="mb-2">
+                        <h5 className="text-gray-800 font-medium">
                           {!readOnly ? (
                             <input
-                              type='text'
+                              type="text"
                               value={pattern.pattern}
                               onChange={(
                                 e: React.ChangeEvent<HTMLInputElement>,
@@ -887,7 +877,7 @@ export default function SessionDocumentationComponent({
                                 }
                                 handleChange('emotionalPatterns', newPatterns)
                               }}
-                              className='border-gray-300 w-full rounded-md border p-1'
+                              className="border-gray-300 w-full rounded-md border p-1"
                             />
                           ) : (
                             pattern.pattern
@@ -902,7 +892,8 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newPatterns = [
-                                ...editableDocumentation.emotionalPatterns,
+                                ...(editableDocumentation.emotionalPatterns ??
+                                  []),
                               ]
 
                               newPatterns[index] = {
@@ -911,10 +902,10 @@ export default function SessionDocumentationComponent({
                               }
                               handleChange('emotionalPatterns', newPatterns)
                             }}
-                            className='border-gray-300 w-full rounded-md border p-1'
+                            className="border-gray-300 w-full rounded-md border p-1"
                           />
                         ) : (
-                          <p className='text-gray-700'>
+                          <p className="text-gray-700">
                             {pattern.significance}
                           </p>
                         )}
@@ -934,23 +925,23 @@ export default function SessionDocumentationComponent({
                     },
                   ])
                 }}
-                className='text-blue-600 hover:text-blue-800 mt-2 text-sm'
+                className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
               >
                 + Add Pattern
               </button>
             )}
 
-            <section className='mt-4'>
-              <h4 className='text-md text-gray-800 mb-2 font-medium'>
+            <section className="mt-4">
+              <h4 className="text-md text-gray-800 mb-2 font-medium">
                 Emergent Issues to Address
               </h4>
-              <ul className='list-disc space-y-1 pl-5'>
+              <ul className="list-disc space-y-1 pl-5">
                 {editableDocumentation.emergentIssues?.map(
                   (issue: string, index: number) => (
-                    <li key={`issue-${index}`} className='text-gray-700'>
+                    <li key={`issue-${index}`} className="text-gray-700">
                       {!readOnly ? (
                         <input
-                          type='text'
+                          type="text"
                           value={issue}
                           onChange={(
                             e: React.ChangeEvent<HTMLInputElement>,
@@ -962,7 +953,7 @@ export default function SessionDocumentationComponent({
                             newIssues[index] = e.target.value
                             handleChange('emergentIssues', newIssues)
                           }}
-                          className='border-gray-300 w-full rounded-md border p-1'
+                          className="border-gray-300 w-full rounded-md border p-1"
                         />
                       ) : (
                         issue
@@ -979,7 +970,7 @@ export default function SessionDocumentationComponent({
                       '',
                     ])
                   }}
-                  className='text-blue-600 hover:text-blue-800 mt-2 text-sm'
+                  className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
                 >
                   + Add Emergent Issue
                 </button>
@@ -989,25 +980,25 @@ export default function SessionDocumentationComponent({
         )}
 
         {activeTab === 'full' && (
-          <div className='space-y-6'>
+          <div className="space-y-6">
             <section>
-              <h4 className='text-gray-800 mb-3 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-3 text-lg font-medium">
                 Session Summary
               </h4>
-              <p className='text-gray-700 mb-4'>
+              <p className="text-gray-700 mb-4">
                 {editableDocumentation.summary}
               </p>
 
-              <h5 className='text-md text-gray-800 mb-2 font-medium'>
+              <h5 className="text-md text-gray-800 mb-2 font-medium">
                 Key Insights
               </h5>
-              <ul className='mb-4 list-disc space-y-1 pl-5'>
+              <ul className="mb-4 list-disc space-y-1 pl-5">
                 {Array.isArray(editableDocumentation.keyInsights) &&
                   editableDocumentation.keyInsights.map(
                     (insight: string, index: number) => (
                       <li
                         key={`insight-full-${index}`}
-                        className='text-gray-700'
+                        className="text-gray-700"
                       >
                         {insight}
                       </li>
@@ -1017,10 +1008,10 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-gray-800 mb-3 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-3 text-lg font-medium">
                 Therapeutic Techniques Used
               </h4>
-              <div className='mb-4 space-y-3'>
+              <div className="mb-4 space-y-3">
                 {Array.isArray(editableDocumentation?.therapeuticTechniques) &&
                   editableDocumentation.therapeuticTechniques.map(
                     (
@@ -1031,14 +1022,14 @@ export default function SessionDocumentationComponent({
                       },
                       index: number,
                     ) => (
-                      <div key={`technique-full-${index}`} className='mb-3'>
-                        <h5 className='text-gray-800 font-medium'>
+                      <div key={`technique-full-${index}`} className="mb-3">
+                        <h5 className="text-gray-800 font-medium">
                           {technique.name}{' '}
-                          <span className='text-gray-600 text-sm font-normal'>
+                          <span className="text-gray-600 text-sm font-normal">
                             (Effectiveness: {technique.effectiveness}/10)
                           </span>
                         </h5>
-                        <p className='text-gray-700'>{technique.description}</p>
+                        <p className="text-gray-700">{technique.description}</p>
                       </div>
                     ),
                   )}
@@ -1046,21 +1037,21 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-gray-800 mb-3 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-3 text-lg font-medium">
                 Emotional Patterns Observed
               </h4>
-              <div className='mb-4 space-y-3'>
+              <div className="mb-4 space-y-3">
                 {Array.isArray(editableDocumentation?.emotionalPatterns) &&
                   editableDocumentation.emotionalPatterns.map(
                     (
                       pattern: { pattern: string; significance: string },
                       index: number,
                     ) => (
-                      <div key={`pattern-full-${index}`} className='mb-3'>
-                        <h5 className='text-gray-800 font-medium'>
+                      <div key={`pattern-full-${index}`} className="mb-3">
+                        <h5 className="text-gray-800 font-medium">
                           {pattern.pattern}
                         </h5>
-                        <p className='text-gray-700'>{pattern.significance}</p>
+                        <p className="text-gray-700">{pattern.significance}</p>
                       </div>
                     ),
                   )}
@@ -1068,11 +1059,11 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-gray-800 mb-3 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-3 text-lg font-medium">
                 Treatment Progress
               </h4>
 
-              <h5 className='text-md text-gray-700 mb-2 font-medium'>
+              <h5 className="text-md text-gray-700 mb-2 font-medium">
                 Treatment Goals
               </h5>
               {editableDocumentation.treatmentProgress?.goals?.map(
@@ -1084,47 +1075,47 @@ export default function SessionDocumentationComponent({
                   },
                   index: number,
                 ) => (
-                  <div key={`goal-full-${index}`} className='mb-3'>
-                    <p className='text-gray-800 font-medium'>
+                  <div key={`goal-full-${index}`} className="mb-3">
+                    <p className="text-gray-800 font-medium">
                       {goal.description}
                     </p>
-                    <div className='mb-1 mt-1 flex items-center'>
-                      <span className='text-gray-600 mr-2 text-sm'>
+                    <div className="mb-1 mt-1 flex items-center">
+                      <span className="text-gray-600 mr-2 text-sm">
                         Progress:
                       </span>
-                      <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
+                      <div className="bg-gray-200 mr-2 h-2 w-32 rounded-full">
                         <div
-                          className='bg-blue-600 h-full rounded-full'
+                          className="bg-blue-600 h-full rounded-full"
                           style={{ width: `${goal.progress}%` }}
                         ></div>
                       </div>
-                      <span className='text-sm font-medium'>
+                      <span className="text-sm font-medium">
                         {goal.progress}%
                       </span>
                     </div>
-                    <p className='text-gray-700 text-sm'>{goal.notes}</p>
+                    <p className="text-gray-700 text-sm">{goal.notes}</p>
                   </div>
                 ),
               )}
 
-              <h5 className='text-md text-gray-700 mb-2 mt-4 font-medium'>
+              <h5 className="text-md text-gray-700 mb-2 mt-4 font-medium">
                 Overall Assessment
               </h5>
-              <p className='text-gray-700 mb-4'>
+              <p className="text-gray-700 mb-4">
                 {editableDocumentation.treatmentProgress?.overallAssessment}
               </p>
             </section>
 
             <section>
-              <h4 className='text-gray-800 mb-2 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-2 text-lg font-medium">
                 Client Strengths
               </h4>
-              <ul className='mb-4 list-disc space-y-1 pl-5'>
+              <ul className="mb-4 list-disc space-y-1 pl-5">
                 {editableDocumentation.clientStrengths?.map(
                   (strength: string, index: number) => (
                     <li
                       key={`strength-full-${index}`}
-                      className='text-gray-700'
+                      className="text-gray-700"
                     >
                       {strength}
                     </li>
@@ -1134,13 +1125,13 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-gray-800 mb-2 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-2 text-lg font-medium">
                 Emergent Issues to Address
               </h4>
-              <ul className='mb-4 list-disc space-y-1 pl-5'>
+              <ul className="mb-4 list-disc space-y-1 pl-5">
                 {editableDocumentation.emergentIssues?.map(
                   (issue: string, index: number) => (
-                    <li key={`issue-full-${index}`} className='text-gray-700'>
+                    <li key={`issue-full-${index}`} className="text-gray-700">
                       {issue}
                     </li>
                   ),
@@ -1149,22 +1140,22 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className='text-gray-800 mb-2 text-lg font-medium'>
+              <h4 className="text-gray-800 mb-2 text-lg font-medium">
                 Follow-Up and Planning
               </h4>
-              <div className='bg-gray-50 mb-3 rounded-md p-3'>
-                <h5 className='text-md text-gray-800 mb-1 font-medium'>
+              <div className="bg-gray-50 mb-3 rounded-md p-3">
+                <h5 className="text-md text-gray-800 mb-1 font-medium">
                   Recommended Follow-Up
                 </h5>
-                <p className='text-gray-700'>
+                <p className="text-gray-700">
                   {editableDocumentation.recommendedFollowUp}
                 </p>
               </div>
-              <div className='bg-gray-50 rounded-md p-3'>
-                <h5 className='text-md text-gray-800 mb-1 font-medium'>
+              <div className="bg-gray-50 rounded-md p-3">
+                <h5 className="text-md text-gray-800 mb-1 font-medium">
                   Next Session Plan
                 </h5>
-                <p className='text-gray-700'>
+                <p className="text-gray-700">
                   {editableDocumentation.nextSessionPlan}
                 </p>
               </div>
@@ -1172,24 +1163,24 @@ export default function SessionDocumentationComponent({
 
             {editableDocumentation?.outcomePredictions &&
               editableDocumentation.outcomePredictions.length > 0 && (
-                <section className='mt-8'>
-                  <h4 className='text-blue-800 mb-3 text-lg font-semibold'>
+                <section className="mt-8">
+                  <h4 className="text-blue-800 mb-3 text-lg font-semibold">
                     Outcome Predictions
                   </h4>
-                  <div className='overflow-x-auto'>
-                    <table className='border-gray-200 bg-white min-w-full rounded-lg border'>
+                  <div className="overflow-x-auto">
+                    <table className="border-gray-200 bg-white min-w-full rounded-lg border">
                       <thead>
-                        <tr className='bg-blue-50'>
-                          <th className='text-gray-700 px-4 py-2 text-left text-sm font-medium'>
+                        <tr className="bg-blue-50">
+                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
                             Technique
                           </th>
-                          <th className='text-gray-700 px-4 py-2 text-left text-sm font-medium'>
+                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
                             Predicted Efficacy
                           </th>
-                          <th className='text-gray-700 px-4 py-2 text-left text-sm font-medium'>
+                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
                             Confidence
                           </th>
-                          <th className='text-gray-700 px-4 py-2 text-left text-sm font-medium'>
+                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
                             Rationale
                           </th>
                         </tr>
@@ -1210,18 +1201,18 @@ export default function SessionDocumentationComponent({
                             ) => (
                               <tr
                                 key={`prediction-${idx}`}
-                                className='border-gray-100 hover:bg-blue-50 border-t transition-colors'
+                                className="border-gray-100 hover:bg-blue-50 border-t transition-colors"
                               >
-                                <td className='text-gray-900 px-4 py-2 font-semibold'>
+                                <td className="text-gray-900 px-4 py-2 font-semibold">
                                   {pred.technique}
                                 </td>
-                                <td className='px-4 py-2'>
+                                <td className="px-4 py-2">
                                   {(pred.predictedEfficacy * 100).toFixed(1)}%
                                 </td>
-                                <td className='px-4 py-2'>
+                                <td className="px-4 py-2">
                                   {(pred.confidence * 100).toFixed(0)}%
                                 </td>
-                                <td className='text-gray-700 px-4 py-2'>
+                                <td className="text-gray-700 px-4 py-2">
                                   {pred.rationale}
                                 </td>
                               </tr>
@@ -1237,10 +1228,10 @@ export default function SessionDocumentationComponent({
       </div>
 
       {!readOnly && showControls && (
-        <div className='border-gray-200 flex justify-end space-x-3 border-t p-4 pt-4'>
+        <div className="border-gray-200 flex justify-end space-x-3 border-t p-4 pt-4">
           <button
             onClick={handleSaveChanges}
-            className='bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 transition'
+            className="bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 transition"
             disabled={isLoading}
           >
             Save Changes
@@ -1248,7 +1239,7 @@ export default function SessionDocumentationComponent({
 
           <button
             onClick={handleGenerateDocumentation}
-            className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition'
+            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
             disabled={isGenerating}
           >
             Regenerate
@@ -1259,7 +1250,7 @@ export default function SessionDocumentationComponent({
               /* Export functionality could be implemented here */
               alert('Export functionality will be implemented soon!')
             }}
-            className='bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition'
+            className="bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition"
           >
             Export
           </button>

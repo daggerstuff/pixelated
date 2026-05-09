@@ -261,11 +261,27 @@ function createRedisClient() {
   const { connectionUrl, restToken } = getRedisConfig()
 
   if (connectionUrl && connectionUrl.startsWith('redis')) {
-    // Initialize ioredis client with credentials
-    return new Redis(connectionUrl, {
-      password: restToken,
-      // Add any additional options here if needed
-    })
+    try {
+      const parsed = new URL(connectionUrl)
+      if (!parsed.hostname) {
+        throw new Error('Missing Redis host')
+      }
+      // Initialize ioredis client with credentials
+      return new Redis(connectionUrl, {
+        password: restToken,
+        // Add any additional options here if needed
+      })
+    } catch (error: unknown) {
+      if (isTestEnvironment()) {
+        console.warn('Invalid REDIS_URL; using mock Redis client for tests.')
+        return createMockRedisClient()
+      }
+      console.error(
+        'Invalid REDIS_URL configuration in non-test environment:',
+        error,
+      )
+      throw error
+    }
   }
 
   if (isTestEnvironment()) {

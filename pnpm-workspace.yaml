@@ -1,6 +1,6 @@
 allowBuilds:
   '@letta-ai/letta-code': true
-  '@modelcontextprotocol/ext-apps': true
+  '@modelcontextprotocol/ext-apps': false
   '@parcel/watcher': true
   '@sentry-internal/node-cpu-profiler': true
   '@sentry/cli': true

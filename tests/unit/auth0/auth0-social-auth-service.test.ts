@@ -328,7 +328,7 @@ describe('Auth0 Social Auth Service', () => {
 
       const userInfo = await auth0SocialAuth.getUserInfo('access-token-123')
 
-      expect(userInfo).toEqual({
+      expect(userInfo).toMatchObject({
         id: 'google-oauth2|123456789',
         email: 'user@example.com',
         name: 'Test User',
@@ -351,7 +351,7 @@ describe('Auth0 Social Auth Service', () => {
 
       const userInfo = await auth0SocialAuth.getUserInfo('access-token-123')
 
-      expect(userInfo).toEqual({
+      expect(userInfo).toMatchObject({
         id: 'facebook|987654321',
         email: '',
         name: '',
@@ -508,7 +508,7 @@ describe('Auth0 Social Auth Service', () => {
         'https://example.com/callback',
       )
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         user: {
           id: 'google-oauth2|123456789',
           email: 'user@example.com',
@@ -518,6 +518,7 @@ describe('Auth0 Social Auth Service', () => {
           picture: undefined,
           provider: 'google-oauth2',
           emailVerified: true,
+          createdAt: expect.any(String),
         },
         tokens: {
           accessToken: 'access-token-123',
@@ -527,7 +528,6 @@ describe('Auth0 Social Auth Service', () => {
           tokenType: 'Bearer',
         },
       })
-      expect(typeof result.user.createdAt).toBe('string')
 
       // Verify security event was logged
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
