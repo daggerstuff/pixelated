@@ -3,6 +3,7 @@ import {
   motion,
   useAnimation,
   type Variants,
+  type TargetAndTransition,
 } from 'framer-motion'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -100,9 +101,7 @@ export function AnimationOrchestrator({
         animate: {
           ...baseVariants['animate'],
           transition: {
-            ...(baseVariants['animate'] as Record<string, unknown>)[
-              'transition'
-            ],
+            ...(baseVariants['animate'] as { transition?: Record<string, unknown> }).transition,
             staggerChildren: staggerDelay,
           },
         },
@@ -288,7 +287,7 @@ export function AdvancedSequence({
       setCurrentStep(i)
 
       await controls.start({
-        ...step.variants['animate'],
+        ...(step.variants['animate'] as TargetAndTransition),
         transition: {
           duration: step.duration || TIMING.normal,
           ease: typeof step.ease === 'string' ? EASING[step.ease] : step.ease,
@@ -317,7 +316,7 @@ export function AdvancedSequence({
   return (
     <motion.div
       className={className}
-      initial={currentVariants['initial'] || {}}
+      initial={(currentVariants['initial'] as TargetAndTransition) || {}}
       animate={controls}
     >
       {children}
@@ -362,7 +361,7 @@ export function Choreography({
   return (
     <motion.div
       className={className}
-      initial={masterSequence?.['initial'] || {}}
+      initial={(masterSequence?.['initial'] as TargetAndTransition) || {}}
       animate={masterControls}
     >
       <AnimatePresence>
