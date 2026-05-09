@@ -1,12 +1,7 @@
 ---
-description:
----
-  'Complete API documentation for Pixelated Empathy backend endpoints'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['api', 'documentation']
-draft: false
-toc: true
+description: Complete API documentation for Pixelated Empathy backend endpoints
+title: API Documentation
+pubDate: '2026-05-09'
 ---
 
 # API Documentation

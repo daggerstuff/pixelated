@@ -1,8 +1,8 @@
 ---
-title: 'Quick Start Guide'
-description: 'Get started with Pixelated in minutes'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: Quick Start Guide
+description: Get started with Pixelated in minutes
+pubDate: '2026-03-01'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true

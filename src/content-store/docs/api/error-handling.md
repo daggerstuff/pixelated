@@ -1,10 +1,11 @@
 ---
-description: 'Standardized error handling for API endpoints'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Standardized error handling for API endpoints
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: API Error Handling
 ---
 
 # API Error Handling

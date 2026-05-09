@@ -1,5 +1,5 @@
 # Production Dockerfile for Business Strategy CMS
-FROM node:20-alpine AS base
+FROM node:24.14.1-alpine AS base
 
 # Install build dependencies for sharp and other native modules
 RUN apk add --no-cache \

@@ -74,6 +74,7 @@ describe('SimulatorContext', () => {
     const { result } = renderHook(() => useSimulator(), { wrapper })
 
     const pattern: SpeechPattern = {
+      type: 'verbal',
       pattern: 'pattern1',
       confidence: 0.8,
       timestamp: Date.now(),
@@ -89,8 +90,8 @@ describe('SimulatorContext', () => {
     const { result } = renderHook(() => useSimulator(), { wrapper })
 
     const technique: DetectedTechnique = {
+      technique: 'technique1',
       name: 'technique1',
-      description: 'Test technique',
       confidence: 0.9,
       timestamp: Date.now(),
     }

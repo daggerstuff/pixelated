@@ -89,10 +89,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
     null,
   )
   const tabIcons: Record<TabItem['icon'], JSX.Element> = {
-    chart: <ChartBar className='h-5 w-5' />,
-    search: <Search className='h-5 w-5' />,
-    trending: <TrendingUp className='h-5 w-5' />,
-    save: <Save className='h-5 w-5' />,
+    chart: <ChartBar className="h-5 w-5" />,
+    search: <Search className="h-5 w-5" />,
+    trending: <TrendingUp className="h-5 w-5" />,
+    save: <Save className="h-5 w-5" />,
   }
 
   // Simulate analysis progress
@@ -337,20 +337,20 @@ export const EnhancedBiasDetectionInterface: React.FC<
   return (
     <div className={`enhanced-bias-detection-interface ${className}`}>
       {/* Enhanced Header with Progress */}
-      <div className='bg-white border-gray-100 mb-6 rounded-2xl border p-6 shadow-lg'>
-        <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+      <div className="bg-white border-gray-100 mb-6 rounded-2xl border p-6 shadow-lg">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className='text-gray-900 mb-2 text-3xl font-bold'>
+            <h1 className="text-gray-900 mb-2 text-3xl font-bold">
               Enhanced Bias Detection
             </h1>
-            <p className='text-gray-600'>
+            <p className="text-gray-600">
               Advanced AI-powered analysis with real-time insights and
               recommendations
             </p>
           </div>
 
           {/* Step Indicator */}
-          <div className='flex items-center space-x-2'>
+          <div className="flex items-center space-x-2">
             {analysisStepOrder.map((step, index) => (
               <div
                 key={step}
@@ -383,14 +383,14 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
         {/* Progress Bar for Analysis */}
         {isAnalyzing && (
-          <div className='mt-4'>
-            <div className='text-gray-600 mb-2 flex items-center justify-between text-sm'>
+          <div className="mt-4">
+            <div className="text-gray-600 mb-2 flex items-center justify-between text-sm">
               <span>Analyzing bias patterns...</span>
               <span>{Math.round(progressPercent)}%</span>
             </div>
-            <div className='bg-gray-200 h-2 w-full rounded-full'>
+            <div className="bg-gray-200 h-2 w-full rounded-full">
               <div
-                className='from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r'
+                className="from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -400,409 +400,409 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
       {/* Main Content Area */}
       {currentStep === 'input' && (
-        <div className='space-y-6'>
-            {/* Quick Filters */}
-            <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
-              <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
-                Quick Start Options
-              </h3>
+        <div className="space-y-6">
+          {/* Quick Filters */}
+          <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
+            <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+              Quick Start Options
+            </h3>
 
-              <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-2'>
-                <div>
-                  <label className='text-gray-700 mb-2 block text-sm font-medium'>
-                    Risk Level Filter
-                  </label>
-                  <select
-                    value={quickFilters.riskLevel}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      if (
-                        value === 'all' ||
-                        value === 'low' ||
-                        value === 'medium' ||
-                        value === 'high' ||
-                        value === 'critical'
-                      ) {
-                        setQuickFilters((prev) => ({
-                          ...prev,
-                          riskLevel: value,
-                        }))
-                      }
-                    }}
-                    className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2'
-                  >
-                    <option value='all'>All Risk Levels</option>
-                    <option value='low'>Low Risk</option>
-                    <option value='medium'>Medium Risk</option>
-                    <option value='high'>High Risk</option>
-                    <option value='critical'>Critical Risk</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className='text-gray-700 mb-2 block text-sm font-medium'>
-                    Bias Category Filter
-                  </label>
-                  <select
-                    value={quickFilters.category}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      if (
-                        value === 'all' ||
-                        value === 'cultural' ||
-                        value === 'gender' ||
-                        value === 'age' ||
-                        value === 'linguistic' ||
-                        value === 'intersectional'
-                      ) {
-                        setQuickFilters((prev) => ({
-                          ...prev,
-                          category: value,
-                        }))
-                      }
-                    }}
-                    className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2'
-                  >
-                    <option value='all'>All Categories</option>
-                    <option value='cultural'>Cultural Bias</option>
-                    <option value='gender'>Gender Bias</option>
-                    <option value='age'>Age Bias</option>
-                    <option value='linguistic'>Linguistic Bias</option>
-                    <option value='intersectional'>Intersectional</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Advanced Settings Toggle */}
-              <div className='border-t pt-4'>
-                <button
-                  onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-                  className='text-blue-600 hover:text-blue-700 flex items-center gap-2 text-sm font-medium transition-colors'
+            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="text-gray-700 mb-2 block text-sm font-medium">
+                  Risk Level Filter
+                </label>
+                <select
+                  value={quickFilters.riskLevel}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (
+                      value === 'all' ||
+                      value === 'low' ||
+                      value === 'medium' ||
+                      value === 'high' ||
+                      value === 'critical'
+                    ) {
+                      setQuickFilters((prev) => ({
+                        ...prev,
+                        riskLevel: value,
+                      }))
+                    }
+                  }}
+                  className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2"
                 >
-                  <span>Advanced Settings</span>
-                  <svg
-                    className='h-4 w-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                    style={{
-                      transform: `rotate(${showAdvancedSettings ? 180 : 0}deg)`,
-                      transition: 'transform 150ms ease',
+                  <option value="all">All Risk Levels</option>
+                  <option value="low">Low Risk</option>
+                  <option value="medium">Medium Risk</option>
+                  <option value="high">High Risk</option>
+                  <option value="critical">Critical Risk</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-gray-700 mb-2 block text-sm font-medium">
+                  Bias Category Filter
+                </label>
+                <select
+                  value={quickFilters.category}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (
+                      value === 'all' ||
+                      value === 'cultural' ||
+                      value === 'gender' ||
+                      value === 'age' ||
+                      value === 'linguistic' ||
+                      value === 'intersectional'
+                    ) {
+                      setQuickFilters((prev) => ({
+                        ...prev,
+                        category: value,
+                      }))
+                    }
+                  }}
+                  className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="cultural">Cultural Bias</option>
+                  <option value="gender">Gender Bias</option>
+                  <option value="age">Age Bias</option>
+                  <option value="linguistic">Linguistic Bias</option>
+                  <option value="intersectional">Intersectional</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Advanced Settings Toggle */}
+            <div className="border-t pt-4">
+              <button
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                className="text-blue-600 hover:text-blue-700 flex items-center gap-2 text-sm font-medium transition-colors"
+              >
+                <span>Advanced Settings</span>
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{
+                    transform: `rotate(${showAdvancedSettings ? 180 : 0}deg)`,
+                    transition: 'transform 150ms ease',
+                  }}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              {showAdvancedSettings && (
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-gray-700 mb-2 block text-sm font-medium">
+                      Sensitivity: {analysisSettings.sensitivity.toFixed(1)}
+                    </label>
+                    <input
+                      type="range"
+                      min="0.3"
+                      max="1.0"
+                      step="0.1"
+                      value={analysisSettings.sensitivity}
+                      onChange={(e) =>
+                        setAnalysisSettings((prev) => ({
+                          ...prev,
+                          sensitivity: parseFloat(e.target.value),
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-gray-700 mb-2 block text-sm font-medium">
+                      Confidence Threshold:{' '}
+                      {analysisSettings.confidenceThreshold.toFixed(1)}
+                    </label>
+                    <input
+                      type="range"
+                      min="0.4"
+                      max="0.9"
+                      step="0.1"
+                      value={analysisSettings.confidenceThreshold}
+                      onChange={(e) =>
+                        setAnalysisSettings((prev) => ({
+                          ...prev,
+                          confidenceThreshold: parseFloat(e.target.value),
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="includeCounterfactuals"
+                      checked={analysisSettings.includeCounterfactuals}
+                      onChange={(e) =>
+                        setAnalysisSettings((prev) => ({
+                          ...prev,
+                          includeCounterfactuals: e.target.checked,
+                        }))
+                      }
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="includeCounterfactuals"
+                      className="text-gray-700 text-sm"
+                    >
+                      Include Counterfactual Analysis
+                    </label>
+                  </div>
+
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="includeHistorical"
+                      checked={analysisSettings.includeHistorical}
+                      onChange={(e) =>
+                        setAnalysisSettings((prev) => ({
+                          ...prev,
+                          includeHistorical: e.target.checked,
+                        }))
+                      }
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="includeHistorical"
+                      className="text-gray-700 text-sm"
+                    >
+                      Include Historical Comparison
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Enhanced Preset Scenarios */}
+          <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
+            <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+              Preset Scenarios ({filteredPresets.length} available)
+            </h3>
+            <PresetScenarioSelector
+              scenarios={filteredPresets}
+              selectedScenario={selectedPreset}
+              onScenarioSelect={handleLoadPreset}
+              disabled={isAnalyzing}
+            />
+          </div>
+
+          {/* Custom Session Input */}
+          <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
+            <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+              Custom Analysis
+            </h3>
+            <SessionInputForm
+              onSubmit={handleSessionSubmit}
+              disabled={isAnalyzing}
+            />
+          </div>
+
+          {/* Session History */}
+          {savedSessions.length > 0 && (
+            <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
+              <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+                Recent Sessions
+              </h3>
+              <div className="space-y-2">
+                {savedSessions.slice(0, 5).map((session, _index) => (
+                  <div
+                    key={session.sessionId}
+                    className="bg-gray-50 hover:bg-gray-100 flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors"
+                    onClick={() => {
+                      void handleAnalyze(session)
                     }}
                   >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M19 9l-7 7-7-7'
-                    />
-                  </svg>
-                </button>
-
-                {showAdvancedSettings && (
-                  <div className='mt-4 grid grid-cols-1 gap-4 md:grid-cols-2'>
-                      <div>
-                        <label className='text-gray-700 mb-2 block text-sm font-medium'>
-                          Sensitivity: {analysisSettings.sensitivity.toFixed(1)}
-                        </label>
-                        <input
-                          type='range'
-                          min='0.3'
-                          max='1.0'
-                          step='0.1'
-                          value={analysisSettings.sensitivity}
-                          onChange={(e) =>
-                            setAnalysisSettings((prev) => ({
-                              ...prev,
-                              sensitivity: parseFloat(e.target.value),
-                            }))
-                          }
-                          className='w-full'
-                        />
+                    <div>
+                      <div className="text-sm font-medium">
+                        {session.scenario || 'Custom Session'}
                       </div>
-
-                      <div>
-                        <label className='text-gray-700 mb-2 block text-sm font-medium'>
-                          Confidence Threshold:{' '}
-                          {analysisSettings.confidenceThreshold.toFixed(1)}
-                        </label>
-                        <input
-                          type='range'
-                          min='0.4'
-                          max='0.9'
-                          step='0.1'
-                          value={analysisSettings.confidenceThreshold}
-                          onChange={(e) =>
-                            setAnalysisSettings((prev) => ({
-                              ...prev,
-                              confidenceThreshold: parseFloat(e.target.value),
-                            }))
-                          }
-                          className='w-full'
-                        />
+                      <div className="text-gray-500 text-xs">
+                        {session.timestamp.toLocaleDateString()} -
+                        {session.demographics.age},{' '}
+                        {session.demographics.gender},{' '}
+                        {session.demographics.ethnicity}
                       </div>
-
-                      <div className='flex items-center'>
-                        <input
-                          type='checkbox'
-                          id='includeCounterfactuals'
-                          checked={analysisSettings.includeCounterfactuals}
-                          onChange={(e) =>
-                            setAnalysisSettings((prev) => ({
-                              ...prev,
-                              includeCounterfactuals: e.target.checked,
-                            }))
-                          }
-                          className='mr-2'
-                        />
-                        <label
-                          htmlFor='includeCounterfactuals'
-                          className='text-gray-700 text-sm'
-                        >
-                          Include Counterfactual Analysis
-                        </label>
-                      </div>
-
-                      <div className='flex items-center'>
-                        <input
-                          type='checkbox'
-                          id='includeHistorical'
-                          checked={analysisSettings.includeHistorical}
-                          onChange={(e) =>
-                            setAnalysisSettings((prev) => ({
-                              ...prev,
-                              includeHistorical: e.target.checked,
-                            }))
-                          }
-                          className='mr-2'
-                        />
-                        <label
-                          htmlFor='includeHistorical'
-                          className='text-gray-700 text-sm'
-                        >
-                          Include Historical Comparison
-                        </label>
-                      </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Enhanced Preset Scenarios */}
-            <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
-              <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
-                Preset Scenarios ({filteredPresets.length} available)
-              </h3>
-              <PresetScenarioSelector
-                scenarios={filteredPresets}
-                selectedScenario={selectedPreset}
-                onScenarioSelect={handleLoadPreset}
-                disabled={isAnalyzing}
-              />
-            </div>
-
-            {/* Custom Session Input */}
-            <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
-              <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
-                Custom Analysis
-              </h3>
-              <SessionInputForm
-                onSubmit={handleSessionSubmit}
-                disabled={isAnalyzing}
-              />
-            </div>
-
-            {/* Session History */}
-            {savedSessions.length > 0 && (
-              <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
-                <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
-                  Recent Sessions
-                </h3>
-                <div className='space-y-2'>
-                  {savedSessions.slice(0, 5).map((session, _index) => (
-                    <div
-                      key={session.sessionId}
-                      className='bg-gray-50 hover:bg-gray-100 flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors'
-                      onClick={() => {
-                        void handleAnalyze(session)
-                      }}
-                    >
-                      <div>
-                        <div className='text-sm font-medium'>
-                          {session.scenario || 'Custom Session'}
-                        </div>
-                        <div className='text-gray-500 text-xs'>
-                          {session.timestamp.toLocaleDateString()} -
-                          {session.demographics.age},{' '}
-                          {session.demographics.gender},{' '}
-                          {session.demographics.ethnicity}
-                        </div>
-                      </div>
-                      <button className='text-blue-600 hover:text-blue-700 text-sm font-medium'>
-                        Re-analyze
-                      </button>
                     </div>
-                  ))}
-                </div>
+                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                      Re-analyze
+                    </button>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          )}
         </div>
       )}
 
       {currentStep === 'analyzing' && (
-        <div className='bg-white border-gray-100 rounded-xl border p-12 text-center shadow-sm'>
-            <div className='mx-auto mb-6 h-16 w-16'>
-              <svg
-                className='text-blue-600 h-full w-full animate-spin'
-                fill='none'
-                viewBox='0 0 24 24'
-              >
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
+        <div className="bg-white border-gray-100 rounded-xl border p-12 text-center shadow-sm">
+          <div className="mx-auto mb-6 h-16 w-16">
+            <svg
+              className="text-blue-600 h-full w-full animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-gray-900 mb-2 text-xl font-semibold">
+            Analyzing Bias Patterns
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Running comprehensive analysis across multiple bias detection
+            layers...
+          </p>
+          <div className="mx-auto max-w-md">
+            <div className="text-gray-600 mb-2 flex items-center justify-between text-sm">
+              <span>Progress</span>
+              <span>{Math.round(progressPercent)}%</span>
             </div>
-            <h3 className='text-gray-900 mb-2 text-xl font-semibold'>
-              Analyzing Bias Patterns
-            </h3>
-            <p className='text-gray-600 mb-4'>
-              Running comprehensive analysis across multiple bias detection
-              layers...
-            </p>
-            <div className='mx-auto max-w-md'>
-              <div className='text-gray-600 mb-2 flex items-center justify-between text-sm'>
-                <span>Progress</span>
-                <span>{Math.round(progressPercent)}%</span>
-              </div>
-              <div className='bg-gray-200 h-2 w-full rounded-full'>
-                <div
-                  className='from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r'
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
+            <div className="bg-gray-200 h-2 w-full rounded-full">
+              <div
+                className="from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
+          </div>
         </div>
       )}
 
       {(currentStep === 'results' || currentStep === 'insights') &&
         analysisResults &&
         sessionData && (
-          <div className='space-y-6'>
-              {/* Results Header */}
-              <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
-                <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-                  <div>
-                    <h2 className='text-gray-900 text-2xl font-bold'>
-                      Analysis Results
-                    </h2>
-                    <p className='text-gray-600'>
-                      Session ID: {analysisResults.sessionId} • Confidence:{' '}
-                      {(analysisResults.confidence * 100).toFixed(1)}%
-                    </p>
-                  </div>
-                  <div className='flex gap-2'>
-                    <button
-                      onClick={handleExport}
-                      className='bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 rounded-lg px-4 py-2 transition-colors'
-                    >
-                      <svg
-                        className='h-4 w-4'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                        />
-                      </svg>
-                      Export
-                    </button>
-                    <button
-                      onClick={resetAnalysis}
-                      className='bg-gray-600 text-white hover:bg-gray-700 rounded-lg px-4 py-2 transition-colors'
-                    >
-                      New Analysis
-                    </button>
-                  </div>
+          <div className="space-y-6">
+            {/* Results Header */}
+            <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-gray-900 text-2xl font-bold">
+                    Analysis Results
+                  </h2>
+                  <p className="text-gray-600">
+                    Session ID: {analysisResults.sessionId} • Confidence:{' '}
+                    {(analysisResults.confidence * 100).toFixed(1)}%
+                  </p>
                 </div>
-
-                {/* Enhanced Tab Navigation */}
-                <div className='border-gray-200 mt-6 border-b'>
-                  <div className='flex space-x-8'>
-                    {tabConfig.map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
-                          activeTab === tab.id
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        }`}
-                      >
-                        {tabIcons[tab.icon]}
-                        <span>{tab.label}</span>
-                        {tab.badge && (
-                          <span className='bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 text-xs'>
-                            {tab.badge}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleExport}
+                    className="bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 rounded-lg px-4 py-2 transition-colors"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    Export
+                  </button>
+                  <button
+                    onClick={resetAnalysis}
+                    className="bg-gray-600 text-white hover:bg-gray-700 rounded-lg px-4 py-2 transition-colors"
+                  >
+                    New Analysis
+                  </button>
                 </div>
               </div>
 
-              {/* Tab Content */}
-              {activeTab === 'analysis' && (
-                <div>
-                    <BiasAnalysisDisplay
-                      results={analysisResults}
-                      sessionData={sessionData}
-                    />
+              {/* Enhanced Tab Navigation */}
+              <div className="border-gray-200 mt-6 border-b">
+                <div className="flex space-x-8">
+                  {tabConfig.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
+                        activeTab === tab.id
+                          ? 'border-blue-500 text-blue-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      {tabIcons[tab.icon]}
+                      <span>{tab.label}</span>
+                      {tab.badge && (
+                        <span className="bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 text-xs">
+                          {tab.badge}
+                        </span>
+                      )}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
+            </div>
 
-              {activeTab === 'counterfactual' && (
-                <div>
-                    <CounterfactualAnalysis
-                      scenarios={counterfactualScenarios}
-                      originalSession={sessionData}
-                    />
-                </div>
-              )}
+            {/* Tab Content */}
+            {activeTab === 'analysis' && (
+              <div>
+                <BiasAnalysisDisplay
+                  results={analysisResults}
+                  sessionData={sessionData}
+                />
+              </div>
+            )}
 
-              {activeTab === 'historical' && historicalComparison && (
-                <div>
-                    <HistoricalProgressTracker
-                      comparison={historicalComparison}
-                      currentScore={analysisResults.overallBiasScore}
-                    />
-                </div>
-              )}
+            {activeTab === 'counterfactual' && (
+              <div>
+                <CounterfactualAnalysis
+                  scenarios={counterfactualScenarios}
+                  originalSession={sessionData}
+                />
+              </div>
+            )}
 
-              {activeTab === 'export' && (
-                <div>
-                    <ExportControls
-                      analysisResults={analysisResults}
-                      counterfactualScenarios={counterfactualScenarios}
-                      historicalComparison={historicalComparison}
-                      onExport={handleExport}
-                    />
-                </div>
-              )}
+            {activeTab === 'historical' && historicalComparison && (
+              <div>
+                <HistoricalProgressTracker
+                  comparison={historicalComparison}
+                  currentScore={analysisResults.overallBiasScore}
+                />
+              </div>
+            )}
+
+            {activeTab === 'export' && (
+              <div>
+                <ExportControls
+                  analysisResults={analysisResults}
+                  counterfactualScenarios={counterfactualScenarios}
+                  historicalComparison={historicalComparison}
+                  onExport={handleExport}
+                />
+              </div>
+            )}
           </div>
         )}
     </div>

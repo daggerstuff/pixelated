@@ -32,7 +32,9 @@ export class RateLimitAnalyticsService {
   }
 
   private parseAlertDetailsValue(value: unknown, fallback = 0): number {
-    return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+    return typeof value === 'number' && Number.isFinite(value)
+      ? value
+      : fallback
   }
 
   private isRateLimitAlert(value: unknown): value is RateLimitAlert {
@@ -50,7 +52,12 @@ export class RateLimitAnalyticsService {
 
     return (
       typeof candidate.type === 'string' &&
-      ['attack_detected', 'ddos_detected', 'rate_limit_exceeded', 'system_error'].includes(candidate.type) &&
+      [
+        'attack_detected',
+        'ddos_detected',
+        'rate_limit_exceeded',
+        'system_error',
+      ].includes(candidate.type) &&
       typeof candidate.severity === 'string' &&
       typeof candidate.message === 'string' &&
       typeof candidate.timestamp === 'number' &&
@@ -142,8 +149,8 @@ export class RateLimitAnalyticsService {
 
           // Get hourly data if requested
           if (includeHourly) {
-        const hourlyData = await this.getHourlyAnalytics(ruleName, dateStr)
-        analyticsEntry.hourlyData = hourlyData
+            const hourlyData = await this.getHourlyAnalytics(ruleName, dateStr)
+            analyticsEntry.hourlyData = hourlyData
           }
 
           analytics.push(analyticsEntry)
@@ -384,7 +391,8 @@ export class RateLimitAnalyticsService {
       case 'rate_limit_exceeded':
         return (
           !thresholds.rps ||
-          this.parseAlertDetailsValue(alert.details.blockedRate, 0) > thresholds.rps
+          this.parseAlertDetailsValue(alert.details.blockedRate, 0) >
+            thresholds.rps
         )
       case 'attack_detected':
         return true // Always trigger for attack detection
@@ -397,7 +405,8 @@ export class RateLimitAnalyticsService {
       case 'system_error':
         return (
           !thresholds.errorRate ||
-          this.parseAlertDetailsValue(alert.details.errorRate, 0) > thresholds.errorRate
+          this.parseAlertDetailsValue(alert.details.errorRate, 0) >
+            thresholds.errorRate
         )
       default:
         return false
@@ -495,10 +504,12 @@ export class RateLimitAnalyticsService {
       trends: [] as Array<{ date: string; requests: number; blocked: number }>,
     }
 
-    const ruleStats: Partial<Record<string, { requests: number; blocked: number }>> =
-      {}
-    const dailyTrends: Partial<Record<string, { requests: number; blocked: number }>> =
-      {}
+    const ruleStats: Partial<
+      Record<string, { requests: number; blocked: number }>
+    > = {}
+    const dailyTrends: Partial<
+      Record<string, { requests: number; blocked: number }>
+    > = {}
 
     for (const analytics of allAnalytics) {
       summary.totalRequests += analytics.totalRequests
@@ -528,31 +539,33 @@ export class RateLimitAnalyticsService {
           100
         : 0
 
-    summary.topRules = Object.entries(ruleStats).flatMap(([date, stats]) =>
-      stats
-        ? [
-            {
-              rule: date,
-              requests: stats.requests,
-              blocked: stats.blocked,
-            },
-          ]
-        : [],
-    )
+    summary.topRules = Object.entries(ruleStats)
+      .flatMap(([date, stats]) =>
+        stats
+          ? [
+              {
+                rule: date,
+                requests: stats.requests,
+                blocked: stats.blocked,
+              },
+            ]
+          : [],
+      )
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 10)
 
-    summary.trends = Object.entries(dailyTrends).flatMap(([date, stats]) =>
-      stats
-        ? [
-            {
-              date,
-              requests: stats.requests,
-              blocked: stats.blocked,
-            },
-          ]
-        : [],
-    )
+    summary.trends = Object.entries(dailyTrends)
+      .flatMap(([date, stats]) =>
+        stats
+          ? [
+              {
+                date,
+                requests: stats.requests,
+                blocked: stats.blocked,
+              },
+            ]
+          : [],
+      )
       .sort((a, b) => a.date.localeCompare(b.date))
 
     return summary

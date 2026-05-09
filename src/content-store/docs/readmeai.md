@@ -1,10 +1,12 @@
 ---
-description: 'ReadmeAI (Truncated Version) documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: ReadmeAI (Truncated Version) documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: ReadmeAI (Truncated Version)
 ---
 
 # ReadmeAI (Truncated Version)
@@ -31,7 +33,6 @@ toc: true
 
 </div>
 <br>
-
 ---
 
 ## Table of Contents
@@ -39,22 +40,20 @@ toc: true
 - [Table of Contents](#table-of-contents)
 - [Overview](#overview)
 - [Features](#features)
-- [Project Structure](#project-structure)
-  - [Project Index](#project-index)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Testing](#testing)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-
+- [Project Structure](#features)
+  - [Project Index](#features)
+- [Getting Started](#overview)
+  - [Prerequisites](#overview)
+  - [Installation](#overview)
+  - [Usage](#overview)
+  - [Testing](#overview)
+- [Roadmap](#features)
+- [Contributing](#features)
+- [License](#features)
+- [Acknowledgments](#features)
 ---
 
 ## Overview
-
 ---
 
 ## Features

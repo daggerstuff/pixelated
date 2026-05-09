@@ -1,14 +1,7 @@
 ---
-title: 'Encryption & Zero-Knowledge System'
-description:
----
-  'Learn about Pixelated Healths encryption architecture and zero-knowledge
-  implementation'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
-draft: false
-toc: true
-share: true
+title: Encryption & Zero-Knowledge System
+description: Learn about Pixelated Healths encryption architecture and zero-knowledge implementation
+pubDate: '2026-05-09'
 ---
 
 ## Encryption & Zero-Knowledge System

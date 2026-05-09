@@ -1,5 +1,192 @@
 declare module 'astro-icon/components'
-declare module 'auth0'
+declare module 'auth0' {
+  export interface Auth0ClientOptions {
+    domain: string
+    clientId?: string
+    clientSecret?: string
+    client_id?: string
+    client_secret?: string
+    audience?: string
+  }
+
+  export interface AuthenticationClientOptions extends Auth0ClientOptions {
+    clientSecret: string
+  }
+
+  export interface Auth0TokenData {
+    access_token: string
+    refresh_token?: string
+    id_token?: string
+    expires_in: number
+    token_type: string
+  }
+
+  export interface ManagementUserClient {
+    create: (params: Record<string, unknown>) => Promise<{ data: unknown }>
+    get: (
+      params: string | { id: string },
+    ) => Promise<{ data: Record<string, unknown> & { identities?: unknown[] } }>
+    list: (params: { [key: string]: unknown }) => Promise<{ data: unknown[] }>
+    listUsersByEmail: (params: {
+      email: string
+    }) => Promise<{ data: unknown[] }>
+    update: (
+      userId: string,
+      data: Record<string, unknown>,
+    ) => Promise<{ data: unknown }>
+    delete: (params: { id: string }) => Promise<void>
+    getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
+    link: (
+      params: { id: string },
+      identity: {
+        provider: string
+        connection_id?: string
+        user_id: string
+      },
+    ) => Promise<unknown>
+    unlink: (
+      userId: string,
+      identity: {
+        provider: string
+        user_id: string
+      },
+    ) => Promise<unknown>
+    getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
+  }
+
+  export interface ManagementTicketsClient {
+    changePassword: (params: {
+      user_id: string
+      result_url?: string
+      ttl_sec?: number
+      mark_email_as_verified?: boolean
+      includeEmailInRedirect?: boolean
+    }) => Promise<{ data: unknown }>
+  }
+
+  export interface ManagementRolesClient {
+    list: (params: {
+      per_page?: number
+      page?: number
+      name_filter?: string
+    }) => Promise<{ data: unknown[] }>
+    create: (params: { name: string; description?: string }) => Promise<unknown>
+    assignRolestoUser: (params: {
+      id: string
+      roles: string[]
+    }) => Promise<unknown>
+    removeRolesFromUser: (params: {
+      id: string
+      roles: string[]
+    }) => Promise<unknown>
+    getUserRoles: (params: { id: string }) => Promise<unknown[]>
+  }
+
+  export class ManagementClient {
+    constructor(options: Auth0ClientOptions)
+
+    users: ManagementUserClient
+    roles: ManagementRolesClient
+    tickets: ManagementTicketsClient
+
+    getRoles: (params: {
+      per_page?: number
+      page?: number
+      name_filter?: string
+    }) => Promise<unknown[]>
+    createRole: (params: {
+      name: string
+      description?: string
+    }) => Promise<unknown>
+    updateRole: (params: {
+      id: string
+      name?: string
+      description?: string
+    }) => Promise<unknown>
+    deleteRole: (params: { id: string }) => Promise<void>
+    getRoleUsers: (params: { id: string }) => Promise<unknown>
+    assignRolestoUser: (params: {
+      id: string
+      roles: string[]
+    }) => Promise<void>
+    removeRolesFromUser: (params: {
+      id: string
+      roles: string[]
+    }) => Promise<void>
+    getUserRoles: (params: { id: string }) => Promise<unknown[]>
+    getGuardianFactors: () => Promise<unknown>
+    createGuardianEnrollmentTicket: (params: {
+      user_id: string
+      send_mail: boolean
+    }) => Promise<unknown>
+    deleteGuardianEnrollment: (params: { id: string }) => Promise<void>
+    getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
+  }
+
+  export interface OAuthClient {
+    authorizationCodeGrant: (params: {
+      code: string
+      redirect_uri: string
+    }) => Promise<{ data: Auth0TokenData }>
+    refreshTokenGrant: (params: {
+      refresh_token: string
+    }) => Promise<{ data: Auth0TokenData }>
+    passwordGrant: (params: {
+      username: string
+      password: string
+      realm: string
+      scope: string
+      audience: string
+    }) => Promise<{ data: Auth0TokenData }>
+    revokeRefreshToken: (params: { token: string }) => Promise<void>
+    refreshToken: (params: {
+      [key: string]: unknown
+    }) => Promise<{ data: Auth0TokenData }>
+  }
+
+  export class AuthenticationClient {
+    constructor(options: AuthenticationClientOptions)
+
+    oauth: OAuthClient
+    getProfile?: (
+      accessToken: string,
+    ) => Promise<{ data: Record<string, unknown> }>
+    refreshToken?: (params: {
+      [key: string]: unknown
+    }) => Promise<{ data: Auth0TokenData }>
+    passwordGrant?: (params: {
+      username: string
+      password: string
+      realm: string
+      scope: string
+      audience: string
+    }) => Promise<{ data: Auth0TokenData }>
+    refreshTokenGrant?: (params: {
+      refresh_token: string
+    }) => Promise<{ data: Auth0TokenData }>
+    revokeRefreshToken?: (params: { token: string }) => Promise<void>
+  }
+
+  export interface UserInfoResponse {
+    data: {
+      sub?: string
+      email?: string
+      name?: string
+      given_name?: string
+      family_name?: string
+      picture?: string
+      email_verified?: boolean
+    }
+  }
+
+  export class UserInfoClient {
+    constructor(options: { domain: string })
+
+    getProfile: (accessToken: string) => Promise<UserInfoResponse>
+    getUserInfo: (accessToken: string) => Promise<UserInfoResponse>
+  }
+}
+
 declare module 'supertest'
 declare module 'typeorm'
 declare module 'better-sqlite3'

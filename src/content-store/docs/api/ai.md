@@ -1,10 +1,12 @@
 ---
-description: 'AI API Reference documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: AI API Reference documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: AI API Reference
 ---
 
 # AI API Reference

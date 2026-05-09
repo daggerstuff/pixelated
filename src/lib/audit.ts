@@ -54,7 +54,8 @@ const isAuditLogEntry = (value: unknown): value is AuditLogEntry => {
     (value.ipAddress === undefined || typeof value.ipAddress === 'string') &&
     (value.userAgent === undefined || typeof value.userAgent === 'string') &&
     (value.sessionId === undefined || typeof value.sessionId === 'string') &&
-    (value.organizationId === undefined || typeof value.organizationId === 'string') &&
+    (value.organizationId === undefined ||
+      typeof value.organizationId === 'string') &&
     (value.patientId === undefined || typeof value.patientId === 'string') &&
     (value.notes === undefined || typeof value.notes === 'string')
   )
@@ -251,7 +252,7 @@ async function processBatch(): Promise<void> {
     } catch (error: unknown) {
       logger.error(
         'Failed to send audit logs to remote endpoint',
-      normalizeError(error),
+        normalizeError(error),
       )
 
       // Put the logs back in the queue for retry
@@ -292,10 +293,7 @@ async function sendLogsToRemoteEndpoint(logs: AuditLogEntry[]): Promise<void> {
       logger.debug(`Sent ${logs.length} audit logs to remote endpoint`)
     }
   } catch (error: unknown) {
-    logger.error(
-      'Error sending logs to remote endpoint',
-      normalizeError(error),
-    )
+    logger.error('Error sending logs to remote endpoint', normalizeError(error))
     throw error
   }
 }
@@ -359,7 +357,9 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
   try {
     // Get existing logs
     const existingLogsJson = localStorage.getItem('hipaa-audit-logs')
-    const parsedLogs = existingLogsJson ? parseJsonSafely(existingLogsJson) : null
+    const parsedLogs = existingLogsJson
+      ? parseJsonSafely(existingLogsJson)
+      : null
     const existingLogs: AuditLogEntry[] =
       parsedLogs && Array.isArray(parsedLogs)
         ? parsedLogs.filter(isAuditLogEntry)
@@ -381,10 +381,7 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
     // Save back to localStorage
     localStorage.setItem('hipaa-audit-logs', JSON.stringify(filteredLogs))
   } catch (error: unknown) {
-    logger.error(
-      'Failed to store audit log locally',
-      normalizeError(error),
-    )
+    logger.error('Failed to store audit log locally', normalizeError(error))
   }
 }
 
@@ -527,10 +524,7 @@ export function getAuditLogs(): AuditLogEntry[] {
       ? parsedLogs.filter(isAuditLogEntry)
       : []
   } catch (error: unknown) {
-    logger.error(
-      'Failed to retrieve audit logs',
-      normalizeError(error),
-    )
+    logger.error('Failed to retrieve audit logs', normalizeError(error))
     return []
   }
 }

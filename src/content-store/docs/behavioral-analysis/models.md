@@ -1,10 +1,12 @@
 ---
-description: 'Behavioral Analysis Models in Therapy documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Behavioral Analysis Models in Therapy documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Behavioral Analysis Models in Therapy
 ---
 
 # Behavioral Analysis Models in Therapy
