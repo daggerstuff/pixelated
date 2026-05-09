@@ -21,12 +21,12 @@
   background:
     radial-gradient(
       circle at 16% 12%,
-      rgba(255, 107, 0, 0.09),
+      rgba(13, 148, 136, 0.09),
       transparent 26rem
     ),
     radial-gradient(
       circle at 82% 18%,
-      rgba(255, 107, 0, 0.05),
+      rgba(13, 148, 136, 0.05),
       transparent 22rem
     ),
     linear-gradient(180deg, rgba(58, 39, 28, 0.14), transparent 28%);
@@ -120,7 +120,7 @@
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--accent-primary, #ff6b00);
+  color: var(--accent-primary, #0d9488);
   margin: 0;
 }
 
