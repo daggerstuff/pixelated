@@ -1,5 +1,5 @@
 // import type { APIRoute } from 'astro'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
@@ -44,7 +44,7 @@ export const put = async ({ request }) => {
     const { user } = sessionData
 
     // Check if user has permission to update export requests
-    if (!user.app_metadata?.permissions?.includes('update:data_exports')) {
+    if (!user.permissions?.includes('update:data_exports')) {
       return new Response(
         JSON.stringify({ success: false, message: 'Insufficient permissions' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } },
@@ -56,8 +56,9 @@ export const put = async ({ request }) => {
     const validationResult = updateExportSchema.safeParse(requestData)
 
     if (!validationResult.success) {
+      const zodError = validationResult.error as ZodError
       logger.warn('Invalid export update data', {
-        errors: validationResult.error.errors,
+        errors: zodError.issues,
         userId: user.id,
       })
 
@@ -65,7 +66,7 @@ export const put = async ({ request }) => {
         JSON.stringify({
           success: false,
           message: 'Invalid request data',
-          errors: validationResult.error.errors,
+          errors: zodError.issues,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

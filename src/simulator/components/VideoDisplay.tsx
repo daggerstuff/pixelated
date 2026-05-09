@@ -178,7 +178,12 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     } finally {
       setIsReconnecting(false)
     }
-  }, [sessionId, createAndSendOffer])
+  }, [
+    createAndSendOffer,
+    initializePeerConnection,
+    sessionId,
+    setupMediaStream,
+  ])
 
   // Initialize WebRTC peer connection
   const initializePeerConnection = useCallback(() => {

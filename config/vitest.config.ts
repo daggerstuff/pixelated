@@ -12,6 +12,7 @@ const baseNodeTestGlobs = [
   'src/pages/api/**/__tests__/**/*.test.ts',
   'src/lib/auth/**/*.test.ts',
   'src/lib/services/product-memory-gateway.test.ts',
+  'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
   'tests/unit/auth0/**/*.test.ts',
   'tests/integration/auth0/**/*.test.ts',
   'src/lib/redis.test.ts',
@@ -31,6 +32,12 @@ const ciNodeTestGlobs = process.env['CI']
   : []
 
 const nodeTestGlobs: string[] = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
+const coverageEnabled =
+  process.env['VITEST_COVERAGE_ENABLED'] === 'true'
+    ? true
+    : process.env['VITEST_COVERAGE_ENABLED'] === 'false'
+      ? false
+      : !process.env['CI']
 
 export default defineConfig({
   plugins: [react()],
@@ -158,8 +165,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      enabled:
-        !process.env['CI'] || process.env['VITEST_COVERAGE_ENABLED'] === 'true',
+      enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
       thresholds: {

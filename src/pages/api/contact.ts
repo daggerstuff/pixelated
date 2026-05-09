@@ -1,13 +1,25 @@
 import type { APIContext } from 'astro'
 
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
-import { ContactService } from '../../lib/services/contact/ContactService'
 
 // Mock ContactService
-class ContactService {
+interface ContactFormData {
+  name: string
+  email: string
+  subject: string
+  message: string
+}
+
+interface SubmissionContext {
+  ipAddress: string
+  userAgent: string
+  timestamp: string
+}
+
+class MockContactService {
   async submitContactForm(
-    _contactFormData: any,
-    _submissionContext: any,
+    _contactFormData: ContactFormData,
+    _submissionContext: SubmissionContext,
   ): Promise<{ success: boolean; submissionId: string }> {
     return { success: true, submissionId: 'mock-submission-id' }
   }
@@ -16,7 +28,7 @@ class ContactService {
 const logger = createBuildSafeLogger('api/contact')
 
 // Initialize contact service
-const contactService = new ContactService()
+const contactService = new MockContactService()
 
 // Helper function to get client IP address
 function getClientIP(request: Request): string {

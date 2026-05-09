@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 
 import { useSimulator } from '../context/SimulatorContext'
 import type {
@@ -35,7 +35,7 @@ export function SimulationContainer({
 
   const isProcessing = state.isProcessing
   const isConnected = state.connectionStatus === 'connected'
-  const realtimeFeedback: RealTimeFeedback[] = []
+  const realtimeFeedback: RealTimeFeedback[] = useMemo(() => [], [])
 
   // Conversation history for the current session
   const [conversation, setConversation] = useState<

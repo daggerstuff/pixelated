@@ -21,10 +21,15 @@ const vitestBin = path.resolve(
   '../../node_modules/.bin',
   process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
 )
+const forwardedArgs = process.argv.slice(2)
+const hasPositionalArg = forwardedArgs.some((arg) => !arg.startsWith('-'))
+if (hasPositionalArg && !process.env.VITEST_COVERAGE_ENABLED) {
+  process.env.VITEST_COVERAGE_ENABLED = 'false'
+}
 const args = [
   '--config',
   path.resolve(__dirname, '../../config/vitest.config.ts'),
-  ...process.argv.slice(2),
+  ...forwardedArgs,
 ]
 
 const child = spawn(vitestBin, args, {
