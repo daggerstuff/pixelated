@@ -17,19 +17,14 @@ import {
 
 const router = Router()
 
-type DocumentRequest = AuthenticatedRequest<
-  Record<string, string>,
-  Record<string, unknown>,
-  Record<string, unknown>
->
+type DocumentRequest = AuthenticatedRequest
 
 const parseStringArray = (value: unknown): string[] | undefined => {
   if (!Array.isArray(value)) return undefined
 
-  const items = value
   const validItems: string[] = []
 
-  for (const item of items) {
+  for (const item of value) {
     if (typeof item === 'string' && item.length > 0) {
       validItems.push(item)
     }
@@ -39,21 +34,12 @@ const parseStringArray = (value: unknown): string[] | undefined => {
 }
 
 const isDocumentCategory = (value: unknown): value is DocumentCategory =>
-  value === DocumentCategory.BUSINESS_PLAN ||
-  value === DocumentCategory.MARKET_ANALYSIS ||
-  value === DocumentCategory.COMPETITIVE_ANALYSIS ||
-  value === DocumentCategory.MARKETING_STRATEGY ||
-  value === DocumentCategory.FINANCIAL_PROJECTION ||
-  value === DocumentCategory.OPERATIONS_PLAN ||
-  value === DocumentCategory.EXECUTIVE_SUMMARY ||
-  value === DocumentCategory.CUSTOM
+  typeof value === 'string' &&
+  Object.values(DocumentCategory).includes(value as DocumentCategory)
 
 const isDocumentStatus = (value: unknown): value is DocumentStatus =>
-  value === DocumentStatus.DRAFT ||
-  value === DocumentStatus.IN_REVIEW ||
-  value === DocumentStatus.APPROVED ||
-  value === DocumentStatus.PUBLISHED ||
-  value === DocumentStatus.ARCHIVED
+  typeof value === 'string' &&
+  Object.values(DocumentStatus).includes(value as DocumentStatus)
 
 const parseMetadata = (
   value: unknown,
@@ -62,13 +48,16 @@ const parseMetadata = (
     return undefined
   }
 
-  return value
+  return value as Partial<DocumentMetadata>
 }
 
 const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
-  const title = typeof body['title'] === 'string' ? body['title'].trim() : ''
-  const content =
-    typeof body['content'] === 'string' ? body['content'].trim() : ''
+  const titleValue = body['title']
+  const title = typeof titleValue === 'string' ? titleValue.trim() : ''
+
+  const contentValue = body['content']
+  const content = typeof contentValue === 'string' ? contentValue.trim() : ''
+
   const category = isDocumentCategory(body['category'])
     ? body['category']
     : undefined
@@ -91,8 +80,8 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
     category,
   }
 
-  const summary =
-    typeof body['summary'] === 'string' ? body['summary'].trim() : undefined
+  const summaryValue = body['summary']
+  const summary = typeof summaryValue === 'string' ? summaryValue.trim() : undefined
   if (summary !== undefined) {
     createPayload.summary = summary
   }
@@ -102,8 +91,9 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
     createPayload.tags = tags
   }
 
-  if (typeof body['parentDocumentId'] === 'string') {
-    createPayload.parentDocumentId = body['parentDocumentId']
+  const parentIdValue = body['parentDocumentId']
+  if (typeof parentIdValue === 'string') {
+    createPayload.parentDocumentId = parentIdValue
   }
 
   if (isDocumentStatus(body['status'])) {
@@ -126,19 +116,22 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
 const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
   const updates: DocumentUpdate = {}
 
-  if (typeof body['title'] === 'string' && body['title'].trim().length > 0) {
-    updates.title = body['title'].trim()
+  const titleValue = body['title']
+  if (typeof titleValue === 'string' && titleValue.trim().length > 0) {
+    updates.title = titleValue.trim()
   }
 
+  const contentValue = body['content']
   if (
-    typeof body['content'] === 'string' &&
-    body['content'].trim().length > 0
+    typeof contentValue === 'string' &&
+    contentValue.trim().length > 0
   ) {
-    updates.content = body['content'].trim()
+    updates.content = contentValue.trim()
   }
 
-  if (typeof body['summary'] === 'string') {
-    updates.summary = body['summary'].trim()
+  const summaryValue = body['summary']
+  if (typeof summaryValue === 'string') {
+    updates.summary = summaryValue.trim()
   }
 
   if (isDocumentCategory(body['category'])) {
@@ -168,7 +161,8 @@ const getRouteParam = (req: DocumentRequest, key: string): string | null => {
 }
 
 const getBodyString = (req: DocumentRequest, key: string): string | null => {
-  const value = req.body[key]
+  const body = req.body as Record<string, unknown>
+  const value = body[key]
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
@@ -198,7 +192,8 @@ router.post(
   requireCreator,
   async (req: DocumentRequest, res) => {
     try {
-      const documentData = parseDocumentCreate(req.body)
+      const body = req.body as Record<string, unknown>
+      const documentData = parseDocumentCreate(body)
       const authorId = req.user!.userId
 
       const document = await DocumentService.createDocument(
@@ -321,7 +316,8 @@ router.put(
         return
       }
 
-      const updates = parseDocumentUpdate(req.body)
+      const body = req.body as Record<string, unknown>
+      const updates = parseDocumentUpdate(body)
       const userId = req.user!.userId
 
       const document = await DocumentService.updateDocument(

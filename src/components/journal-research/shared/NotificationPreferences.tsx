@@ -321,8 +321,8 @@ export function NotificationPreferences({
             <h3 className='mb-3 text-sm font-medium'>Notification Frequency</h3>
             <Select
               value={preferences.frequency}
-              onValueChange={(value: NotificationFrequency) =>
-                setPreferences({ frequency: value })
+              onValueChange={(value) =>
+                setPreferences({ frequency: value as NotificationFrequency })
               }
             >
               <SelectTrigger>

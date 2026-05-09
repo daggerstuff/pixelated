@@ -121,6 +121,20 @@ export default function SessionDocumentationComponent({
         'Cognitive restructuring worksheet',
         'Mindfulness breathing practice',
       ],
+      outcomes: [
+        'Reduced self-reported anxiety score from 7 to 5',
+        'Client demonstrated improved breathing technique',
+      ],
+      nextSteps: [
+        'Continue weekly sessions with focus on boundary setting',
+        'Practice 4-7-8 breathing daily',
+      ],
+      riskAssessment: {
+        level: 'low',
+        factors: ['Mild sleep disruption', 'Work-related stress'],
+        recommendations: ['Monitor sleep quality', 'Continue current treatment plan'],
+        requiresImmediateAttention: false,
+      },
       notes:
         'Session focused on identifying stressors and practicing relaxation techniques. Client engaged well and was receptive to interventions.',
       metadata: {},
@@ -569,7 +583,7 @@ export default function SessionDocumentationComponent({
                             e: React.ChangeEvent<HTMLInputElement>,
                           ) => {
                             const newTechniques = [
-                              ...editableDocumentation.therapeuticTechniques,
+                              ...(editableDocumentation.therapeuticTechniques ?? []),
                             ]
 
                             newTechniques[index] = {
@@ -868,7 +882,7 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLInputElement>,
                               ) => {
                                 const newPatterns = [
-                                  ...editableDocumentation.emotionalPatterns,
+                                  ...(editableDocumentation.emotionalPatterns ?? []),
                                 ]
 
                                 newPatterns[index] = {

@@ -420,11 +420,11 @@ export const modalSequences: Record<string, Variants> = {
  */
 export const interactiveSequences: Record<string, Variants> = {
   buttonHover: {
-    rest: { scale: 1, rotate: 0, filter: 'brightness(1)' },
+    rest: { scale: 1, rotate: 0, opacity: 0.95 },
     hover: {
       scale: 1.05,
       rotate: 1,
-      filter: 'brightness(1.1)',
+      opacity: 1,
       transition: {
         duration: TIMING.fast,
         ease: EASING.easeOut,
@@ -665,11 +665,13 @@ export function getReducedMotionVariant(variants: Variants): Variants {
 
   Object.keys(variants).forEach((key) => {
     const variant = variants[key]
-    if (typeof variant === 'object') {
-      reducedVariants[key] = {
-        opacity: variant['opacity'] ?? 1,
-        transition: { duration: 0.1 },
-      }
+    if (typeof variant === 'function') {
+      return
+    }
+
+    reducedVariants[key] = {
+      opacity: variant['opacity'] ?? 1,
+      transition: { duration: 0.1 },
     }
   })
 
