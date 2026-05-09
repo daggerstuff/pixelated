@@ -1,5 +1,4 @@
 ---
-title: 'API Overview'
 description: 'Learn about Pixelated API architecture and capabilities'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

@@ -1,5 +1,4 @@
 ---
-title: 'Browser Compatibility Requirements'
 description: 'Browser Compatibility Requirements documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

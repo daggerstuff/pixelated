@@ -1,5 +1,4 @@
 ---
-title: 'Development'
 description: 'Preview changes locally to update your docs'
 pubDate: 2024-01-15
 author: Pixelated Empathy Team

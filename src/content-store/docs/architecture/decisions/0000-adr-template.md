@@ -1,5 +1,4 @@
 ---
-title: '[ADR-0000] ADR Template'
 description: '[ADR-0000] ADR Template documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

@@ -1,6 +1,6 @@
 ---
-title: 'Digital Therapeutics: AI-Enhanced Mental Health Tools'
 description: >-
+---
   Exploring the revolutionary landscape of AI-powered digital therapeutics and
   their growing impact on mental healthcare accessibility and effectiveness
 author: AI & Psychology Team

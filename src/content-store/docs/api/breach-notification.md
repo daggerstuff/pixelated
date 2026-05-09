@@ -1,5 +1,4 @@
 ---
-title: 'Breach Notification API'
 description: 'API documentation for the breach notification system'
 pubDate: 2025-03-25
 share: true

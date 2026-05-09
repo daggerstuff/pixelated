@@ -1,5 +1,4 @@
 ---
-title: 'Audit Logging System'
 description: 'Audit Logging System documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

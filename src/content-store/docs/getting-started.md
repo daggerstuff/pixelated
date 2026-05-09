@@ -1,5 +1,4 @@
 ---
-title: 'Tutorial'
 description: 'Quick start guide for the Pixelated Empathy platform'
 pubDate: 2025-01-01
 author: Pixelated Empathy Team

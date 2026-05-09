@@ -1,5 +1,4 @@
 ---
-title: 'AI System Penetration Test Results'
 description: 'AI System Penetration Test Results documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

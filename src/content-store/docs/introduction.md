@@ -1,6 +1,6 @@
 ---
-title: 'Introduction to Pixelated Empathy'
 description:
+---
   'Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental
   health research and innovation'
 pubDate: 2025-01-01

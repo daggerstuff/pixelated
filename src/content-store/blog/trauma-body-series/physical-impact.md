@@ -1,6 +1,6 @@
 ---
-title: 'The Physical Impact of Trauma'
 description:
+---
   'Understanding how trauma affects the nervous system and manifests in physical
   symptoms'
 author: 'Dr. Maya Patel'

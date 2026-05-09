@@ -1,6 +1,7 @@
 ---
 title: 'Core Infrastructure'
 description:
+---
   'Documentation of Pixelated Healths core infrastructure components, security,
   and configuration'
 pubDate: 2025-03-24

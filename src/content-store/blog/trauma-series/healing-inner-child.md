@@ -1,6 +1,6 @@
 ---
-title: 'Healing Your Inner Child: A Path to Wholeness'
 description:
+---
   'Discover how inner child work can help heal childhood wounds and transform
   your adult relationships and self-concept'
 author: 'Dr. Sarah Chen'

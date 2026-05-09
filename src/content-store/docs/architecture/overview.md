@@ -1,5 +1,4 @@
 ---
-title: 'Pixelated Empathy Architecture'
 description: 'Pixelated Empathy Architecture documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'
@@ -101,7 +100,7 @@ created_at TIMESTAMPTZ DEFAULT NOW()
 ## Security Architecture
 
 <Steps>
-  ### 1. Authentication Flow
+### 1. Authentication Flow
   - User registration/login via Supabase Auth
   - JWT token generation and validation
   - Secure session management

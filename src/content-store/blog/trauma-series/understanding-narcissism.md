@@ -1,6 +1,6 @@
 ---
-title: 'Understanding Narcissism and Complex Trauma'
 description:
+---
   'Exploring the connection between narcissistic behaviors, codependency, and
   complex trauma'
 author: 'Dr. Sarah Chen'

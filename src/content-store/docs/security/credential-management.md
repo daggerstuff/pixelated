@@ -1,5 +1,4 @@
 ---
-title: 'Credential and PHI Management Guide'
 description: 'Credential and PHI Management Guide documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

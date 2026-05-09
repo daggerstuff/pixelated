@@ -1,6 +1,6 @@
 ---
-title: 'Pixelated Empathy Architecture'
 description:
+---
   'Technical architecture overview of the Pixelated Empathy mental health
   platform'
 pubDate: 2024-01-15

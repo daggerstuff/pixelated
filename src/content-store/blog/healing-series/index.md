@@ -1,6 +1,7 @@
 ---
 title: 'Healing Journey Series'
 description:
+---
   'Exploring the path to recovery and personal growth through understanding and
   self-discovery'
 author: 'Pixelated Empathy Team'

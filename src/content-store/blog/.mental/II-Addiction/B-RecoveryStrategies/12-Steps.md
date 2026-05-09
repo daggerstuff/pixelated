@@ -1,6 +1,7 @@
 ---
 title: 12-Step Programs and Alternatives
 description:
+---
   'Comprehensive guide for mental health professionals and individuals in
   recovery'
 author: 'Resource Team'

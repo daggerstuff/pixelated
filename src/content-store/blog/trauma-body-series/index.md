@@ -1,6 +1,6 @@
 ---
-title: 'Trauma and the Body Series'
 description:
+---
   'Understanding the physical manifestations of trauma and body-based approaches
   to healing'
 author: 'Dr. Maya Patel'

@@ -1,4 +1,4 @@
-# Therapeutic AI API - Status Dashboard
+<!-- markdownlint-disable -->\n\n# Therapeutic AI API - Status Dashboard
 
 **Status**: 🟢 **ONLINE**  
 **Host**: `${THERAPEUTIC_API_HOST}`  

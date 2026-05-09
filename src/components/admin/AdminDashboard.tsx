@@ -34,6 +34,16 @@ interface TherapistPerformance {
   riskLevelDistribution: Record<string, number>
 }
 
+type DiagnosticIssueSeverity = 'critical' | 'warning' | 'info'
+
+interface DiagnosticIssue {
+  id: string
+  title: string
+  message: string
+  action: string
+  severity: DiagnosticIssueSeverity
+}
+
 interface SystemHealth {
   apiResponseTime: number
   databasePerformance: number
@@ -776,11 +786,122 @@ const InstitutionsTab: FC<{
 const SystemTab: FC<{
   health: SystemHealth
 }> = ({ health }) => {
+  const [diagnosticIssues, setDiagnosticIssues] = React.useState<
+    DiagnosticIssue[]
+  >([])
+  const [isRunningDiagnostics, setIsRunningDiagnostics] =
+    React.useState<boolean>(false)
+  const [lastDiagnosticsRun, setLastDiagnosticsRun] = React.useState<
+    Date | null
+  >(null)
+
+  const runDiagnostics = React.useCallback(async () => {
+    setIsRunningDiagnostics(true)
+
+    const issues: DiagnosticIssue[] = []
+
+    if (health.apiResponseTime > 75) {
+      issues.push({
+        id: 'api-response-time',
+        title: 'API latency elevated',
+        message: `Current API response time is ${health.apiResponseTime}ms, above the recommended 75ms threshold.`,
+        action: 'Inspect upstream service dependencies and database query plans.',
+        severity: 'critical',
+      })
+    }
+
+    if (health.databasePerformance < 90) {
+      issues.push({
+        id: 'database-performance',
+        title: 'Database health warning',
+        message: `Database performance is ${health.databasePerformance}%, below target range.`,
+        action: 'Review connection pools and slow query logs.',
+        severity: 'warning',
+      })
+    }
+
+    if (health.memoryUsage > 80) {
+      issues.push({
+        id: 'memory-usage',
+        title: 'High memory pressure',
+        message: `Memory usage is ${health.memoryUsage}%, which may increase restart risk.`,
+        action: 'Scale memory resources or trim background worker cache retention.',
+        severity: 'warning',
+      })
+    }
+
+    if (health.errorRate > 0.02) {
+      issues.push({
+        id: 'error-rate',
+        title: 'Error rate spike',
+        message: `Current error rate is ${(health.errorRate * 100).toFixed(2)}%, above the 2% alert threshold.`,
+        action: 'Review recent error logs and isolate failing service dependencies.',
+        severity: 'critical',
+      })
+    }
+
+    if (health.uptime < 99.5) {
+      issues.push({
+        id: 'uptime',
+        title: 'Suboptimal uptime',
+        message: `Uptime is ${health.uptime}%, indicating recent instability.`,
+        action: 'Correlate deployment events with service restarts and incident logs.',
+        severity: 'warning',
+      })
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 450))
+
+    setDiagnosticIssues(
+      issues.length > 0
+        ? issues
+        : [
+            {
+              id: 'no-issues',
+              title: 'No diagnostic concerns',
+              message: 'All checks are within normal operating thresholds.',
+              action: 'Continue scheduled monitoring.',
+              severity: 'info',
+            },
+          ],
+    )
+    setLastDiagnosticsRun(new Date())
+    setIsRunningDiagnostics(false)
+  }, [health])
+
+  const getIssueClasses = (severity: DiagnosticIssueSeverity) => {
+    switch (severity) {
+      case 'critical':
+        return {
+          wrapper:
+            'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
+          label: 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-100',
+        }
+      case 'warning':
+        return {
+          wrapper:
+            'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-100',
+          label:
+            'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-100',
+        }
+      default:
+        return {
+          wrapper:
+            'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
+          label: 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
+        }
+    }
+  }
+
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <h2 className='text-xl font-semibold'>System Health & Performance</h2>
-        <button className='bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors'>
+        <button
+          onClick={runDiagnostics}
+          disabled={isRunningDiagnostics}
+          className='bg-green-500 disabled:opacity-60 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors'
+        >
           Run Diagnostics
         </button>
       </div>
@@ -857,6 +978,52 @@ const SystemTab: FC<{
             </div>
           </div>
         </div>
+      </div>
+
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+        <div className='mb-4 flex items-center justify-between'>
+          <h3 className='text-lg font-semibold'>Diagnostic Problems</h3>
+          {lastDiagnosticsRun ? (
+            <p className='text-gray-500 text-sm'>
+              Last run: {lastDiagnosticsRun.toLocaleTimeString()}
+            </p>
+          ) : (
+            <p className='text-gray-500 text-sm'>Not run yet</p>
+          )}
+        </div>
+
+        {isRunningDiagnostics ? (
+          <div className='text-gray-600 dark:text-gray-300 text-sm'>
+            Running diagnostics...
+          </div>
+        ) : diagnosticIssues.length === 0 ? (
+          <div className='text-gray-600 dark:text-gray-300 text-sm'>
+            Run diagnostics to scan for current system issues.
+          </div>
+        ) : (
+          <div className='space-y-3'>
+            {diagnosticIssues.map((issue) => {
+              const styles = getIssueClasses(issue.severity)
+              return (
+                <div
+                  key={issue.id}
+                  className={`rounded-lg border p-3 ${styles.wrapper}`}
+                >
+                  <div className='flex items-center justify-between'>
+                    <p className='font-medium'>{issue.title}</p>
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${styles.label}`}
+                    >
+                      {issue.severity.toUpperCase()}
+                    </span>
+                  </div>
+                  <p className='mt-1 text-sm'>{issue.message}</p>
+                  <p className='text-gray-500 mt-2 text-sm'>{issue.action}</p>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )

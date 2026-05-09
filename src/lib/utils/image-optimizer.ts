@@ -6,7 +6,7 @@
 import { existsSync, statSync } from 'fs'
 import { readFile, mkdir } from 'fs/promises'
 
-import { getLogger } from '@/lib/logging'
+import { getLogger } from '../logging'
 
 import {
   ALLOWED_DIRECTORIES,
@@ -112,7 +112,7 @@ export class ImageOptimizer {
       validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
     } catch (error: unknown) {
       throw new Error(
-        `Invalid image path: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+        `Invalid image path: ${error instanceof Error ? error.message : String(error)}`,
       )
     }
 
@@ -203,12 +203,7 @@ export class ImageOptimizer {
     } catch (error: unknown) {
       logger.error('Image optimization failed', {
         imagePath,
-        error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : String(error),
+        error: error instanceof Error ? error.message : String(error),
       })
 
       throw error
@@ -280,12 +275,7 @@ export class ImageOptimizer {
     } catch (error: unknown) {
       logger.warn('WebP generation failed', {
         imagePath,
-        error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : String(error),
+        error: error instanceof Error ? error.message : String(error),
       })
       return null
     }
@@ -323,12 +313,7 @@ export class ImageOptimizer {
     } catch (error: unknown) {
       logger.warn('AVIF generation failed', {
         imagePath,
-        error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : String(error),
+        error: error instanceof Error ? error.message : String(error),
       })
       return null
     }
