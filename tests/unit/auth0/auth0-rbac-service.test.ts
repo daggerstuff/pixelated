@@ -224,7 +224,7 @@ describe('Auth0 RBAC Service', () => {
 
       await expect(
         auth0RbacService.removeRoleFromUser('auth0|user123', 'guest'),
-      ).rejects.toThrow('Role nonexistent-role not found')
+      ).rejects.toThrow('Role guest not found')
     })
   })
 
