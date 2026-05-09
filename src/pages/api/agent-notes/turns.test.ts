@@ -9,7 +9,7 @@ type RouteModule = typeof import('./turns')
 const loadRoutes = async (filePath: string): Promise<RouteModule> => {
   process.env['AGENT_NOTE_COLLAB_LEDGER_PATH'] = filePath
   vi.resetModules()
-  return (await import('./turns')) as RouteModule
+  return import('./turns')
 }
 
 const createJsonRequest = (payload: unknown) => ({
@@ -328,7 +328,7 @@ describe('Agent note turns API', () => {
           openQuestions: ['Open question two'],
           decision: 'Collect related notes.',
           evidence: ['e2'],
-          requestedAction: 'defer',
+          requestedAction: 'ask-human',
         }),
         locals: asActor('agent-alpha'),
       } as any)

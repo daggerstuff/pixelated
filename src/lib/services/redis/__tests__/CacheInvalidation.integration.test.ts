@@ -11,302 +11,328 @@ import {
   verifyRedisConnection,
 } from './test-utils'
 
-describe('cacheInvalidation Integration', () => {
-  let redis: RedisService
-  let cacheInvalidation: CacheInvalidation
-  let pubClient: Redis
-  let subClient: Redis
+const hasRedisUrl = Boolean(process.env['REDIS_URL'])
+const hasRedisAccess = await (async () => {
+  if (!hasRedisUrl) {
+    return false
+  }
 
-  beforeEach(async () => {
-    await verifyRedisConnection()
+  try {
+    const redis = new Redis(process.env['REDIS_URL']!)
+    await redis.ping()
+    await redis.quit()
+    return true
+  } catch {
+    return false
+  }
+})()
 
-    // Set up Redis pub/sub clients
-    pubClient = new Redis(process.env['REDIS_URL']!)
-    subClient = new Redis(process.env['REDIS_URL']!)
+;(hasRedisAccess ? describe : describe.skip)(
+  'cacheInvalidation Integration',
+  () => {
+    let redis: RedisService
+    let cacheInvalidation: CacheInvalidation
+    let pubClient: Redis
+    let subClient: Redis
 
-    redis = new RedisService({
-      url: process.env['REDIS_URL']!,
-      keyPrefix: process.env.REDIS_KEY_PREFIX!,
-      maxRetries: 3,
-      retryDelay: 100,
-      connectTimeout: 5000,
-      maxConnections: 10,
-      minConnections: 2,
-    })
-    await redis.connect()
+    beforeEach(async () => {
+      await verifyRedisConnection()
 
-    cacheInvalidation = new CacheInvalidation({
-      redis: redis.getClient() as Redis,
-    })
-  })
+      // Set up Redis pub/sub clients
+      pubClient = new Redis(process.env['REDIS_URL']!)
+      subClient = new Redis(process.env['REDIS_URL']!)
 
-  afterEach(async () => {
-    await cleanupTestKeys()
-    await redis.disconnect()
-  })
+      redis = new RedisService({
+        url: process.env['REDIS_URL']!,
+        keyPrefix: process.env.REDIS_KEY_PREFIX!,
+        maxRetries: 3,
+        retryDelay: 100,
+        connectTimeout: 5000,
+        maxConnections: 10,
+        minConnections: 2,
+      })
+      await redis.connect()
 
-  afterAll(async () => {
-    await pubClient.quit()
-    await subClient.quit()
-  })
-
-  describe('cache Pattern Invalidation', () => {
-    it('should invalidate all keys matching a pattern', async () => {
-      // Set up test data
-      const pattern = generateTestKey('test-pattern')
-      const keys = Array.from({ length: 5 }, (_, i) => `${pattern}:${i}`)
-      const value = JSON.stringify({ data: 'test' })
-
-      // Set test keys
-      await Promise.all(keys.map((key) => redis.set(key, value)))
-
-      // Verify keys exist
-      for (const key of keys) {
-        await expect(key)['toExistInRedis']()
-      }
-
-      // Invalidate keys matching pattern
-      await cacheInvalidation.invalidatePattern(`${pattern}:*`)
-      await sleep(100) // Allow time for invalidation to propagate
-
-      // Verify keys are removed
-      for (const key of keys) {
-        expect(key).not.toEqual(expect.objectContaining({ exists: true }))
-      }
+      cacheInvalidation = new CacheInvalidation({
+        redis: redis.getClient() as Redis,
+      })
     })
 
-    it('should handle concurrent pattern invalidations', async () => {
-      // Set up test data
-      const patterns = Array.from({ length: 3 }, () =>
-        generateTestKey('concurrent'),
-      )
-      const keysPerPattern = 5
-      const value = JSON.stringify({ data: 'test' })
+    afterEach(async () => {
+      await cleanupTestKeys()
+      await redis.disconnect()
+    })
 
-      // Create test keys for each pattern
-      for (const pattern of patterns) {
-        await Promise.all(
-          Array.from({ length: keysPerPattern }, (_, i) =>
-            redis.set(`${pattern}:${i}`, value),
-          ),
-        )
-      }
+    afterAll(async () => {
+      await pubClient.quit()
+      await subClient.quit()
+    })
 
-      // Run concurrent invalidations
-      const operations = patterns.map(
-        (pattern) => () => cacheInvalidation.invalidatePattern(`${pattern}:*`),
-      )
+    describe('cache Pattern Invalidation', () => {
+      it('should invalidate all keys matching a pattern', async () => {
+        // Set up test data
+        const pattern = generateTestKey('test-pattern')
+        const keys = Array.from({ length: 5 }, (_, i) => `${pattern}:${i}`)
+        const value = JSON.stringify({ data: 'test' })
 
-      await runConcurrentOperations(operations, {
-        description: 'Concurrent pattern invalidations',
-        expectedDuration: 1000,
+        // Set test keys
+        await Promise.all(keys.map((key) => redis.set(key, value)))
+
+        // Verify keys exist
+        for (const key of keys) {
+          await expect(key)['toExistInRedis']()
+        }
+
+        // Invalidate keys matching pattern
+        await cacheInvalidation.invalidatePattern(`${pattern}:*`)
+        await sleep(100) // Allow time for invalidation to propagate
+
+        // Verify keys are removed
+        for (const key of keys) {
+          expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+        }
       })
 
-      await sleep(100) // Allow time for invalidation to propagate
+      it('should handle concurrent pattern invalidations', async () => {
+        // Set up test data
+        const patterns = Array.from({ length: 3 }, () =>
+          generateTestKey('concurrent'),
+        )
+        const keysPerPattern = 5
+        const value = JSON.stringify({ data: 'test' })
 
-      // Verify all keys are removed
-      for (const pattern of patterns) {
+        // Create test keys for each pattern
+        for (const pattern of patterns) {
+          await Promise.all(
+            Array.from({ length: keysPerPattern }, (_, i) =>
+              redis.set(`${pattern}:${i}`, value),
+            ),
+          )
+        }
+
+        // Run concurrent invalidations
+        const operations = patterns.map(
+          (pattern) => () =>
+            cacheInvalidation.invalidatePattern(`${pattern}:*`),
+        )
+
+        await runConcurrentOperations(operations, {
+          description: 'Concurrent pattern invalidations',
+          expectedDuration: 1000,
+        })
+
+        await sleep(100) // Allow time for invalidation to propagate
+
+        // Verify all keys are removed
+        for (const pattern of patterns) {
+          const client = redis.getClient() as Redis
+          const keys = await client.keys(`${pattern}:*`)
+          expect(keys).toHaveLength(0)
+        }
+      })
+    })
+
+    describe('cache Tag Invalidation', () => {
+      it('should invalidate keys by tag', async () => {
+        // Set up test data
+        const tag = generateTestKey('tag')
+        const keys = Array.from({ length: 3 }, () => generateTestKey('tagged'))
+        const value = JSON.stringify({ data: 'test' })
+
+        // Set keys with tags
+        await Promise.all(
+          keys.map(async (key) => {
+            await redis.set(key, value)
+            await cacheInvalidation.set(key, value, {
+              pattern: key,
+              tags: [tag],
+            })
+          }),
+        )
+
+        // Verify keys exist
+        for (const key of keys) {
+          expect(key).toEqual(expect.objectContaining({ exists: true }))
+        }
+
+        // Invalidate by tag
+        await cacheInvalidation.invalidateTag(tag)
+        await sleep(100) // Allow time for invalidation to propagate
+
+        // Verify keys are removed
+        for (const key of keys) {
+          expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+        }
+      })
+
+      it('should handle multiple tags per key', async () => {
+        const tags = Array.from({ length: 3 }, () =>
+          generateTestKey('multi-tag'),
+        )
+        const key = generateTestKey('multi-tagged')
+        const value = JSON.stringify({ data: 'test' })
+
+        // Set key with multiple tags
+        await redis.set(key, value)
+        await cacheInvalidation.set(key, value, { pattern: key, tags })
+
+        // Verify key exists
+        expect(key).toEqual(expect.objectContaining({ exists: true }))
+
+        // Invalidate using each tag
+        for (const tag of tags) {
+          await cacheInvalidation.invalidateTag(tag)
+          await sleep(100) // Allow time for invalidation to propagate
+          expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+
+          // Reset key for next tag test
+          if (tag !== tags[tags.length - 1]) {
+            await redis.set(key, value)
+            await cacheInvalidation.set(key, value, { pattern: key, tags })
+          }
+        }
+      })
+    })
+
+    describe('cache Events', () => {
+      it('should emit invalidation events', async () => {
+        const pattern = generateTestKey('event-test')
+        const value = JSON.stringify({ data: 'test' })
+
+        // Set a test key
+        await redis.set(pattern, value)
+
+        // Invalidate and verify
+        await cacheInvalidation.invalidatePattern(`${pattern}:*`)
+        await sleep(100)
+
         const client = redis.getClient() as Redis
         const keys = await client.keys(`${pattern}:*`)
         expect(keys).toHaveLength(0)
-      }
-    })
-  })
+      })
 
-  describe('cache Tag Invalidation', () => {
-    it('should invalidate keys by tag', async () => {
-      // Set up test data
-      const tag = generateTestKey('tag')
-      const keys = Array.from({ length: 3 }, () => generateTestKey('tagged'))
-      const value = JSON.stringify({ data: 'test' })
+      it('should handle invalidation event subscribers', async () => {
+        const pattern = generateTestKey('subscriber-test')
+        const value = JSON.stringify({ data: 'test' })
+        const keys = Array.from({ length: 2 }, (_, i) => `${pattern}:${i}`)
 
-      // Set keys with tags
-      await Promise.all(
-        keys.map(async (key) => {
-          await redis.set(key, value)
-          await cacheInvalidation.set(key, value, { pattern: key, tags: [tag] })
-        }),
-      )
+        // Set test keys
+        await Promise.all(keys.map((key) => redis.set(key, value)))
 
-      // Verify keys exist
-      for (const key of keys) {
-        expect(key).toEqual(expect.objectContaining({ exists: true }))
-      }
+        // Invalidate pattern
+        await cacheInvalidation.invalidatePattern(`${pattern}:*`)
+        await sleep(100)
 
-      // Invalidate by tag
-      await cacheInvalidation.invalidateTag(tag)
-      await sleep(100) // Allow time for invalidation to propagate
-
-      // Verify keys are removed
-      for (const key of keys) {
-        expect(key).not.toEqual(expect.objectContaining({ exists: true }))
-      }
+        // Verify all keys are removed
+        const client = redis.getClient() as Redis
+        const remainingKeys = await client.keys(`${pattern}:*`)
+        expect(remainingKeys).toHaveLength(0)
+      })
     })
 
-    it('should handle multiple tags per key', async () => {
-      const tags = Array.from({ length: 3 }, () => generateTestKey('multi-tag'))
-      const key = generateTestKey('multi-tagged')
-      const value = JSON.stringify({ data: 'test' })
+    describe('error Handling', () => {
+      it('should handle Redis connection failures during invalidation', async () => {
+        const pattern = generateTestKey('error-test')
 
-      // Set key with multiple tags
-      await redis.set(key, value)
-      await cacheInvalidation.set(key, value, { pattern: key, tags })
+        // Force Redis disconnection
+        await redis.disconnect()
 
-      // Verify key exists
-      expect(key).toEqual(expect.objectContaining({ exists: true }))
+        // Attempt invalidation
+        await expect(
+          cacheInvalidation.invalidatePattern(`${pattern}:*`),
+        ).rejects.toThrow()
 
-      // Invalidate using each tag
-      for (const tag of tags) {
-        await cacheInvalidation.invalidateTag(tag)
+        // Reconnect for cleanup
+        await redis.connect()
+      })
+
+      it('should handle Redis connection recovery', async () => {
+        const pattern = generateTestKey('recovery-test')
+        const key = `${pattern}:1`
+        const value = JSON.stringify({ data: 'test' })
+
+        // Set test key
+        await redis.set(key, value)
+
+        // Force Redis disconnection and reconnection
+        await redis.disconnect()
+        await redis.connect()
+
+        // Attempt invalidation after recovery
+        await cacheInvalidation.invalidatePattern(`${pattern}:*`)
         await sleep(100) // Allow time for invalidation to propagate
+
         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
-
-        // Reset key for next tag test
-        if (tag !== tags[tags.length - 1]) {
-          await redis.set(key, value)
-          await cacheInvalidation.set(key, value, { pattern: key, tags })
-        }
-      }
-    })
-  })
-
-  describe('cache Events', () => {
-    it('should emit invalidation events', async () => {
-      const pattern = generateTestKey('event-test')
-      const value = JSON.stringify({ data: 'test' })
-
-      // Set a test key
-      await redis.set(pattern, value)
-
-      // Invalidate and verify
-      await cacheInvalidation.invalidatePattern(`${pattern}:*`)
-      await sleep(100)
-
-      const client = redis.getClient() as Redis
-      const keys = await client.keys(`${pattern}:*`)
-      expect(keys).toHaveLength(0)
+      })
     })
 
-    it('should handle invalidation event subscribers', async () => {
-      const pattern = generateTestKey('subscriber-test')
-      const value = JSON.stringify({ data: 'test' })
-      const keys = Array.from({ length: 2 }, (_, i) => `${pattern}:${i}`)
+    describe('performance', () => {
+      it('should handle large-scale invalidations', async () => {
+        const pattern = generateTestKey('perf-test')
+        const keyCount = 1000
+        const value = JSON.stringify({ data: 'test' })
 
-      // Set test keys
-      await Promise.all(keys.map((key) => redis.set(key, value)))
-
-      // Invalidate pattern
-      await cacheInvalidation.invalidatePattern(`${pattern}:*`)
-      await sleep(100)
-
-      // Verify all keys are removed
-      const client = redis.getClient() as Redis
-      const remainingKeys = await client.keys(`${pattern}:*`)
-      expect(remainingKeys).toHaveLength(0)
-    })
-  })
-
-  describe('error Handling', () => {
-    it('should handle Redis connection failures during invalidation', async () => {
-      const pattern = generateTestKey('error-test')
-
-      // Force Redis disconnection
-      await redis.disconnect()
-
-      // Attempt invalidation
-      await expect(
-        cacheInvalidation.invalidatePattern(`${pattern}:*`),
-      ).rejects.toThrow()
-
-      // Reconnect for cleanup
-      await redis.connect()
-    })
-
-    it('should handle Redis connection recovery', async () => {
-      const pattern = generateTestKey('recovery-test')
-      const key = `${pattern}:1`
-      const value = JSON.stringify({ data: 'test' })
-
-      // Set test key
-      await redis.set(key, value)
-
-      // Force Redis disconnection and reconnection
-      await redis.disconnect()
-      await redis.connect()
-
-      // Attempt invalidation after recovery
-      await cacheInvalidation.invalidatePattern(`${pattern}:*`)
-      await sleep(100) // Allow time for invalidation to propagate
-
-      expect(key).not.toEqual(expect.objectContaining({ exists: true }))
-    })
-  })
-
-  describe('performance', () => {
-    it('should handle large-scale invalidations', async () => {
-      const pattern = generateTestKey('perf-test')
-      const keyCount = 1000
-      const value = JSON.stringify({ data: 'test' })
-
-      // Create many test keys
-      await Promise.all(
-        Array.from({ length: keyCount }, (_, i) =>
-          redis.set(`${pattern}:${i}`, value),
-        ),
-      )
-
-      const startTime = Date.now()
-      await cacheInvalidation.invalidatePattern(`${pattern}:*`)
-      const duration = Date.now() - startTime
-
-      // Verify performance
-      expect(duration).toBeLessThan(5000) // Should complete within 5 seconds
-
-      await sleep(100) // Allow time for invalidation to propagate
-
-      // Verify all keys are removed
-      const client = redis.getClient() as Redis
-      const remainingKeys = await client.keys(`${pattern}:*`)
-      expect(remainingKeys).toHaveLength(0)
-    })
-
-    it('should maintain performance under concurrent load', async () => {
-      const basePattern = generateTestKey('concurrent-perf')
-      const patterns = Array.from(
-        { length: 10 },
-        (_, i) => `${basePattern}:${i}`,
-      )
-      const keysPerPattern = 100
-      const value = JSON.stringify({ data: 'test' })
-
-      // Create test keys for each pattern
-      for (const pattern of patterns) {
+        // Create many test keys
         await Promise.all(
-          Array.from({ length: keysPerPattern }, (_, i) =>
+          Array.from({ length: keyCount }, (_, i) =>
             redis.set(`${pattern}:${i}`, value),
           ),
         )
-      }
 
-      // Run concurrent invalidations
-      const operations = patterns.map(
-        (pattern) => () => cacheInvalidation.invalidatePattern(`${pattern}:*`),
-      )
+        const startTime = Date.now()
+        await cacheInvalidation.invalidatePattern(`${pattern}:*`)
+        const duration = Date.now() - startTime
 
-      const { duration } = await runConcurrentOperations(operations, {
-        description: 'Large-scale concurrent invalidations',
-        expectedDuration: 10000, // Should complete within 10 seconds
+        // Verify performance
+        expect(duration).toBeLessThan(5000) // Should complete within 5 seconds
+
+        await sleep(100) // Allow time for invalidation to propagate
+
+        // Verify all keys are removed
+        const client = redis.getClient() as Redis
+        const remainingKeys = await client.keys(`${pattern}:*`)
+        expect(remainingKeys).toHaveLength(0)
       })
 
-      // Verify performance
-      expect(duration).toBeLessThan(10000)
+      it('should maintain performance under concurrent load', async () => {
+        const basePattern = generateTestKey('concurrent-perf')
+        const patterns = Array.from(
+          { length: 10 },
+          (_, i) => `${basePattern}:${i}`,
+        )
+        const keysPerPattern = 100
+        const value = JSON.stringify({ data: 'test' })
 
-      await sleep(100) // Allow time for invalidation to propagate
+        // Create test keys for each pattern
+        for (const pattern of patterns) {
+          await Promise.all(
+            Array.from({ length: keysPerPattern }, (_, i) =>
+              redis.set(`${pattern}:${i}`, value),
+            ),
+          )
+        }
 
-      // Verify all keys are removed
-      const client = redis.getClient() as Redis
-      const remainingKeys = await client.keys(`${basePattern}:*`)
-      expect(remainingKeys).toHaveLength(0)
+        // Run concurrent invalidations
+        const operations = patterns.map(
+          (pattern) => () =>
+            cacheInvalidation.invalidatePattern(`${pattern}:*`),
+        )
+
+        const { duration } = await runConcurrentOperations(operations, {
+          description: 'Large-scale concurrent invalidations',
+          expectedDuration: 10000, // Should complete within 10 seconds
+        })
+
+        // Verify performance
+        expect(duration).toBeLessThan(10000)
+
+        await sleep(100) // Allow time for invalidation to propagate
+
+        // Verify all keys are removed
+        const client = redis.getClient() as Redis
+        const remainingKeys = await client.keys(`${basePattern}:*`)
+        expect(remainingKeys).toHaveLength(0)
+      })
     })
-  })
-})
+  },
+)

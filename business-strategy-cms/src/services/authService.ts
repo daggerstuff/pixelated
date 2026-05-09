@@ -69,29 +69,30 @@ const verifyJwtPayload = (token: string, secret: string): JwtPayload => {
   return decoded
 }
 
-const JWT_EXPIRES_IN = parseDurationToSeconds(
-  process.env['JWT_EXPIRES_IN'] ?? '15m',
-  15 * 60,
-)
-const JWT_REFRESH_EXPIRES_IN = parseDurationToSeconds(
-  process.env['JWT_REFRESH_EXPIRES_IN'] ?? '7d',
+const JWT_EXPIRES_IN = process.env['JWT_EXPIRES_IN'] ?? '15m'
+const JWT_REFRESH_EXPIRES_IN = process.env['JWT_REFRESH_EXPIRES_IN'] ?? '7d'
+
+const JWT_EXPIRES_IN_SECONDS = parseDurationToSeconds(JWT_EXPIRES_IN, 15 * 60)
+const JWT_REFRESH_EXPIRES_IN_SECONDS = parseDurationToSeconds(
+  JWT_REFRESH_EXPIRES_IN,
   7 * 24 * 60 * 60,
 )
+
 const BCRYPT_ROUNDS = Number.parseInt(process.env['BCRYPT_ROUNDS'] ?? '12', 10)
 
 export class AuthService {
   public static generateTokens(payload: JwtPayload): AuthTokens {
     const accessToken = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
+      expiresIn: JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     })
     const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET, {
-      expiresIn: JWT_REFRESH_EXPIRES_IN,
+      expiresIn: JWT_REFRESH_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     })
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: JWT_EXPIRES_IN * 1000,
+      expiresIn: JWT_EXPIRES_IN_SECONDS * 1000,
     }
   }
 
@@ -121,8 +122,12 @@ export class AuthService {
       isEmailVerified: false,
     })
 
+    if (!user.id) {
+      throw new Error('Failed to create user')
+    }
+
     const payload: JwtPayload = {
-      userId: user.id!,
+      userId: user.id,
       email: user.email,
       role: user.role,
     }
@@ -130,8 +135,8 @@ export class AuthService {
     const tokens = this.generateTokens(payload)
 
     await redisClient.setEx(
-      `refresh_token:${user.id!}`,
-      7 * 24 * 60 * 60,
+      `refresh_token:${user.id}`,
+      JWT_REFRESH_EXPIRES_IN_SECONDS,
       tokens.refreshToken,
     )
 
@@ -154,6 +159,11 @@ export class AuthService {
     if (!user.password) {
       throw new Error('Invalid credentials')
     }
+
+    if (!user.id) {
+      throw new Error('User ID missing')
+    }
+
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
       user.password,
@@ -162,10 +172,10 @@ export class AuthService {
       throw new Error('Invalid credentials')
     }
 
-    await UserModel.update(user.id!, { lastLoginAt: new Date() })
+    await UserModel.update(user.id, { lastLoginAt: new Date() })
 
     const payload: JwtPayload = {
-      userId: user.id!,
+      userId: user.id,
       email: user.email,
       role: user.role,
     }
@@ -173,8 +183,8 @@ export class AuthService {
     const tokens = this.generateTokens(payload)
 
     await redisClient.setEx(
-      `refresh_token:${user.id!}`,
-      7 * 24 * 60 * 60,
+      `refresh_token:${user.id}`,
+      JWT_REFRESH_EXPIRES_IN_SECONDS,
       tokens.refreshToken,
     )
 
@@ -198,8 +208,12 @@ export class AuthService {
         throw new Error('User not found or inactive')
       }
 
+      if (!user.id) {
+        throw new Error('User ID missing')
+      }
+
       const newPayload: JwtPayload = {
-        userId: user.id!,
+        userId: user.id,
         email: user.email,
         role: user.role,
       }
@@ -207,8 +221,8 @@ export class AuthService {
       const tokens = this.generateTokens(newPayload)
 
       await redisClient.setEx(
-        `refresh_token:${user.id!}`,
-        7 * 24 * 60 * 60,
+        `refresh_token:${user.id}`,
+        JWT_REFRESH_EXPIRES_IN_SECONDS,
         tokens.refreshToken,
       )
 
@@ -236,8 +250,12 @@ export class AuthService {
         return null
       }
 
+      if (!user.id) {
+        return null
+      }
+
       return {
-        userId: user.id!,
+        userId: user.id,
         email: user.email,
         role: user.role,
       }

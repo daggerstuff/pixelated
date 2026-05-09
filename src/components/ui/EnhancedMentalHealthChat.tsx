@@ -1,5 +1,5 @@
 import { Send, Brain, User, Bot, Sparkles, Activity } from 'lucide-react'
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, type FC } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -7,9 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 
 import BrainVisualization from './BrainVisualization'
-import MindMirrorDashboard, {
-  type MindMirrorAnalysis,
-} from './MindMirrorDashboard'
+import MindMirrorDashboard from './MindMirrorDashboard'
+import type { MindMirrorAnalysis } from '@/lib/mental-health/types'
 
 interface Message {
   id: string
