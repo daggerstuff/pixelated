@@ -36,4 +36,3 @@ Learning: Any external data passed to set:html must be sanitized
 to prevent XSS
 
 Prevention: Always sanitize HTML strings with DOMPurify before using
-set:html in Astro components
