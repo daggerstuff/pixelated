@@ -86,6 +86,18 @@ export const TherapistDashboard: FC = () => {
     patientSatisfaction: 4.2, // out of 5
   }
 
+  // ⚡ Bolt: Memoize the patient selection handler to prevent unnecessary re-renders of child tabs
+  const handlePatientSelect = React.useCallback(
+    (patientId: string) => {
+      setSelectedPatients((prev) =>
+        prev.includes(patientId)
+          ? prev.filter((id) => id !== patientId)
+          : [...prev, patientId],
+      )
+    },
+    [setSelectedPatients],
+  )
+
   const analyticsData = patients.map((patient, _index) => ({
     patientId: patient.id,
     patientName: patient.name,
@@ -178,15 +190,7 @@ export const TherapistDashboard: FC = () => {
             <OverviewTab
               patients={patients}
               metrics={sessionMetrics}
-              onPatientSelect={(patientId) => {
-                if (selectedPatients.includes(patientId)) {
-                  setSelectedPatients((prev) =>
-                    prev.filter((id) => id !== patientId),
-                  )
-                } else {
-                  setSelectedPatients((prev) => [...prev, patientId])
-                }
-              }}
+              onPatientSelect={handlePatientSelect}
               selectedPatients={selectedPatients}
               timeRange={timeRange}
             />
@@ -195,15 +199,7 @@ export const TherapistDashboard: FC = () => {
           {dashboardView === 'patients' && (
             <PatientsTab
               patients={patients}
-              onPatientSelect={(patientId) => {
-                if (selectedPatients.includes(patientId)) {
-                  setSelectedPatients((prev) =>
-                    prev.filter((id) => id !== patientId),
-                  )
-                } else {
-                  setSelectedPatients((prev) => [...prev, patientId])
-                }
-              }}
+              onPatientSelect={handlePatientSelect}
               selectedPatients={selectedPatients}
             />
           )}
