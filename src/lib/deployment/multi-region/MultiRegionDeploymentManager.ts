@@ -18,7 +18,10 @@ import {
   ConfigurationManager,
   type MultiRegionConfig,
 } from './ConfigurationManager'
-import { DeploymentOrchestrator, type DeploymentOrchestratorConfig } from './DeploymentOrchestrator'
+import {
+  DeploymentOrchestrator,
+  type DeploymentOrchestratorConfig,
+} from './DeploymentOrchestrator'
 import { HealthMonitor, type HealthCheckConfig } from './HealthMonitor'
 
 export interface RegionConfig {
@@ -102,8 +105,7 @@ const isHealthCheckFailureEvent = (
     return false
   }
   return (
-    typeof data.regionId === 'string' &&
-    typeof data.failureReason === 'string'
+    typeof data.regionId === 'string' && typeof data.failureReason === 'string'
   )
 }
 
