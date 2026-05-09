@@ -1,6 +1,7 @@
 ---
 title: Books on CPTSD and Addiction
 description:
+---
   'Comprehensive guide for mental health professionals and individuals in
   recovery'
 author: 'Resource Team'

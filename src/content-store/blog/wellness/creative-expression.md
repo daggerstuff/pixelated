@@ -1,6 +1,6 @@
 ---
-title: Creative Expression for Mental Wellness
 description: >-
+---
   Discover how integrating simple creative practices into daily life can
   transform your mental wellbeing and emotional resilience
 author: Wellness Team

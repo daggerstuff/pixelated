@@ -1,6 +1,6 @@
 ---
-title: Quantum Biology & Trauma
 description: >-
+---
   Exploring the emerging field of quantum biology and its revolutionary
   implications for understanding and treating trauma
 author: Research & Clinical Team

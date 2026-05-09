@@ -72,7 +72,8 @@ process.on('SIGPIPE', () => {
 })
 
 // Spawn the actual Astro build
-const build = spawn('astro', ['build'], {
+const pnpmCmd = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
+const build = spawn(pnpmCmd, ['exec', 'astro', 'build'], {
   stdio: 'inherit',
 })
 

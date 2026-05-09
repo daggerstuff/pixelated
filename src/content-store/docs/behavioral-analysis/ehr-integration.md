@@ -1,5 +1,4 @@
 ---
-title: 'EHR Integration for Behavioral Analysis'
 description: 'EHR Integration for Behavioral Analysis documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

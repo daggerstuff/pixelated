@@ -1,6 +1,6 @@
 ---
-title: The Neuroscience Revolution in Trauma Treatment
 description: >-
+---
   Exploring groundbreaking advances in neuroscience that are transforming our
   understanding and treatment of trauma
 author: Research & Clinical Team

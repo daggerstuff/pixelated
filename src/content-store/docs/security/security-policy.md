@@ -1,5 +1,4 @@
 ---
-title: 'Security Policy'
 description: 'Security Policy documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

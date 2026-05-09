@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from 'framer-motion'
 import { ChartBar, Search, TrendingUp, Save } from 'lucide-react'
 import React, { useState, useCallback, useEffect, JSX } from 'react'
 
@@ -338,11 +337,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
   return (
     <div className={`enhanced-bias-detection-interface ${className}`}>
       {/* Enhanced Header with Progress */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className='bg-white border-gray-100 mb-6 rounded-2xl border p-6 shadow-lg'
-      >
+      <div className='bg-white border-gray-100 mb-6 rounded-2xl border p-6 shadow-lg'>
         <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
           <div>
             <h1 className='text-gray-900 mb-2 text-3xl font-bold'>
@@ -388,37 +383,24 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
         {/* Progress Bar for Analysis */}
         {isAnalyzing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className='mt-4'
-          >
+          <div className='mt-4'>
             <div className='text-gray-600 mb-2 flex items-center justify-between text-sm'>
               <span>Analyzing bias patterns...</span>
               <span>{Math.round(progressPercent)}%</span>
             </div>
             <div className='bg-gray-200 h-2 w-full rounded-full'>
-              <motion.div
+              <div
                 className='from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r'
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercent}%` }}
-                transition={{ duration: 0.3 }}
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Main Content Area */}
-      <AnimatePresence mode='wait'>
-        {currentStep === 'input' && (
-          <motion.div
-            key='input'
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className='space-y-6'
-          >
+      {currentStep === 'input' && (
+        <div className='space-y-6'>
             {/* Quick Filters */}
             <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
               <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
@@ -498,12 +480,15 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   className='text-blue-600 hover:text-blue-700 flex items-center gap-2 text-sm font-medium transition-colors'
                 >
                   <span>Advanced Settings</span>
-                  <motion.svg
-                    animate={{ rotate: showAdvancedSettings ? 180 : 0 }}
+                  <svg
                     className='h-4 w-4'
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
+                    style={{
+                      transform: `rotate(${showAdvancedSettings ? 180 : 0}deg)`,
+                      transition: 'transform 150ms ease',
+                    }}
                   >
                     <path
                       strokeLinecap='round'
@@ -511,17 +496,11 @@ export const EnhancedBiasDetectionInterface: React.FC<
                       strokeWidth={2}
                       d='M19 9l-7 7-7-7'
                     />
-                  </motion.svg>
+                  </svg>
                 </button>
 
-                <AnimatePresence>
-                  {showAdvancedSettings && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className='mt-4 grid grid-cols-1 gap-4 md:grid-cols-2'
-                    >
+                {showAdvancedSettings && (
+                  <div className='mt-4 grid grid-cols-1 gap-4 md:grid-cols-2'>
                       <div>
                         <label className='text-gray-700 mb-2 block text-sm font-medium'>
                           Sensitivity: {analysisSettings.sensitivity.toFixed(1)}
@@ -604,9 +583,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
                           Include Historical Comparison
                         </label>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -668,17 +646,11 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 </div>
               </div>
             )}
-          </motion.div>
-        )}
+        </div>
+      )}
 
-        {currentStep === 'analyzing' && (
-          <motion.div
-            key='analyzing'
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className='bg-white border-gray-100 rounded-xl border p-12 text-center shadow-sm'
-          >
+      {currentStep === 'analyzing' && (
+        <div className='bg-white border-gray-100 rounded-xl border p-12 text-center shadow-sm'>
             <div className='mx-auto mb-6 h-16 w-16'>
               <svg
                 className='text-blue-600 h-full w-full animate-spin'
@@ -713,26 +685,19 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 <span>{Math.round(progressPercent)}%</span>
               </div>
               <div className='bg-gray-200 h-2 w-full rounded-full'>
-                <motion.div
+                <div
                   className='from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r'
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercent}%` }}
+                  style={{ width: `${progressPercent}%` }}
                 />
               </div>
             </div>
-          </motion.div>
-        )}
+        </div>
+      )}
 
-        {(currentStep === 'results' || currentStep === 'insights') &&
-          analysisResults &&
-          sessionData && (
-            <motion.div
-              key='results'
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className='space-y-6'
-            >
+      {(currentStep === 'results' || currentStep === 'insights') &&
+        analysisResults &&
+        sessionData && (
+          <div className='space-y-6'>
               {/* Results Header */}
               <div className='bg-white border-gray-100 rounded-xl border p-6 shadow-sm'>
                 <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
@@ -801,68 +766,45 @@ export const EnhancedBiasDetectionInterface: React.FC<
               </div>
 
               {/* Tab Content */}
-              <AnimatePresence mode='wait'>
-                {activeTab === 'analysis' && (
-                  <motion.div
-                    key='analysis-tab'
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+              {activeTab === 'analysis' && (
+                <div>
                     <BiasAnalysisDisplay
                       results={analysisResults}
                       sessionData={sessionData}
                     />
-                  </motion.div>
-                )}
+                </div>
+              )}
 
-                {activeTab === 'counterfactual' && (
-                  <motion.div
-                    key='counterfactual-tab'
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+              {activeTab === 'counterfactual' && (
+                <div>
                     <CounterfactualAnalysis
                       scenarios={counterfactualScenarios}
                       originalSession={sessionData}
                     />
-                  </motion.div>
-                )}
+                </div>
+              )}
 
-                {activeTab === 'historical' && historicalComparison && (
-                  <motion.div
-                    key='historical-tab'
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+              {activeTab === 'historical' && historicalComparison && (
+                <div>
                     <HistoricalProgressTracker
                       comparison={historicalComparison}
                       currentScore={analysisResults.overallBiasScore}
                     />
-                  </motion.div>
-                )}
+                </div>
+              )}
 
-                {activeTab === 'export' && (
-                  <motion.div
-                    key='export-tab'
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+              {activeTab === 'export' && (
+                <div>
                     <ExportControls
                       analysisResults={analysisResults}
                       counterfactualScenarios={counterfactualScenarios}
                       historicalComparison={historicalComparison}
                       onExport={handleExport}
                     />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )}
-      </AnimatePresence>
+                </div>
+              )}
+          </div>
+        )}
     </div>
   )
 }

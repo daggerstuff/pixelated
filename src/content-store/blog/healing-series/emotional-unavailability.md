@@ -1,6 +1,6 @@
 ---
-title: Emotional Unavail
 description:
+---
   Understanding and breaking free from patterns of emotional unavailability in
   relationships
 author: Dr. Sarah Jensen

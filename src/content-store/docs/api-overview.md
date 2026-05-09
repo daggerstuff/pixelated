@@ -1,5 +1,4 @@
 ---
-title: 'API Overview'
 description: 'Overview of the Pixelated Empathy API endpoints and usage'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

@@ -1,5 +1,4 @@
 ---
-title: 'Test Patterns Documentation'
 description: 'Test Patterns Documentation documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

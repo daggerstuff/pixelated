@@ -1,6 +1,7 @@
 ---
 title: 'Symptoms and Manifestations of CPTSD'
 description:
+---
   'Understanding the various ways Complex PTSD manifests in daily life and
   relationships'
 author: 'Dr. James Wilson'

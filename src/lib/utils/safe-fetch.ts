@@ -1,4 +1,4 @@
-import { ALLOWED_DOMAINS } from '@/lib/constants'
+import { ALLOWED_DOMAINS } from '../constants'
 
 // Build hostname to IP mapping at runtime or use a static list
 const hostnameToIPMap: Record<string, string[]> = {

@@ -1,5 +1,4 @@
 ---
-title: 'Introduction'
 description: 'Example section for showcasing API endpoints'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

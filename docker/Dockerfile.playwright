@@ -25,6 +25,9 @@ COPY --chown=pwuser:pwuser . .
 # Expose port for development
 EXPOSE 3000
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD node -e "process.exit(0)"
+
 # Set environment variable to skip browser download (not needed since browsers are pre-installed)
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 

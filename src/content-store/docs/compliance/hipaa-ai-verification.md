@@ -1,6 +1,6 @@
 ---
-title: 'HIPAA Compliance Verification Checklist for AI Components'
 description:
+---
   'HIPAA Compliance Verification Checklist for AI Components documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

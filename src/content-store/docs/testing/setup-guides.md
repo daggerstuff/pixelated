@@ -1,6 +1,6 @@
 ---
-title: 'Testing Environment Setup Guides'
 description:
+---
   'Comprehensive guides for setting up testing environments for Pixelated'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

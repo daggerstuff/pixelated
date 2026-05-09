@@ -3,6 +3,7 @@ title: 'Building AI Models for Emotion Detection in Mental Health'
 date: '2025-01-28'
 duration: 8min
 description:
+---
   'Deep dive into the technical challenges and solutions for detecting emotions
   from text in mental health contexts'
 ---
@@ -127,7 +128,7 @@ class TemporalEmotionTracker:
             'context': self.get_context()
         })
 
-        # Detect concerning patterns
+# Detect concerning patterns
         patterns = self.pattern_detector.analyze(self.emotion_history)
         if patterns.risk_level > threshold:
             self.alert_clinician(patterns)
@@ -153,7 +154,7 @@ class MentalHealthEmotionBERT:
         inputs = self.tokenizer(text, return_tensors='pt')
         outputs = self.model(**inputs)
 
-        # Use CLS token for classification
+# Use CLS token for classification
         cls_embedding = outputs.last_hidden_state[:, 0, :]
         emotion_logits = self.classifier(cls_embedding)
 
@@ -231,12 +232,12 @@ class FederatedEmotionModel:
 
     def federated_training(self, participants):
         for round in range(num_rounds):
-            # Send global model to participants
+# Send global model to participants
             for participant in participants:
                 participant.update_local_model(self.global_model)
                 participant.train_locally()
 
-            # Aggregate updates
+# Aggregate updates
             updates = [p.get_model_update() for p in participants]
             self.global_model = self.aggregate(updates)
 ```
@@ -333,7 +334,7 @@ Making model decisions interpretable for clinicians:
 
 ```python
 def explain_emotion_prediction(model, input_text):
-    # Use attention weights to identify important words
+# Use attention weights to identify important words
     attention_weights = model.get_attention_weights(input_text)
 
     explanations = []

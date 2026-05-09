@@ -70,6 +70,7 @@ jobs:
           cache: 'false'
           scan-type: fs
           scan-ref: .
+          trivy-config: .github/security/trivy/trivy.yaml
           format: sarif
           output: trivy-results.sarif
           severity: CRITICAL,HIGH

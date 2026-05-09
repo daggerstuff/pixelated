@@ -1,5 +1,4 @@
 ---
-title: 'API Security Features'
 description: 'API Security Features documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

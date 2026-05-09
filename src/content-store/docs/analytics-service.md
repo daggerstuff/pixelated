@@ -1,6 +1,7 @@
 ---
 title: 'Analytics Service'
 description:
+---
   'Guide to Pixelated Healths analytics service for data processing and insights'
 pubDate: 2025-03-24
 share: true

@@ -9,7 +9,7 @@ import React from 'react'
 import { Suspense } from 'react'
 import type { ComponentProps } from 'react'
 
-import type EmotionTemporalAnalysisChartComponent from '@/components/session/EmotionTemporalAnalysisChart'
+import type EmotionTemporalAnalysisChartComponent from '../../components/session/EmotionTemporalAnalysisChart'
 
 type EmotionTemporalAnalysisChartProps = ComponentProps<
   typeof EmotionTemporalAnalysisChartComponent

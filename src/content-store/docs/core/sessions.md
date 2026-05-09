@@ -1,5 +1,4 @@
 ---
-title: 'Session Management'
 description: 'Real-time session handling and WebSocket communication'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

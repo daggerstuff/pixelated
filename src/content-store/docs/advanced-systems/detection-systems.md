@@ -1,5 +1,4 @@
 ---
-title: 'Advanced Detection Systems in Therapy'
 description: 'Advanced Detection Systems in Therapy documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'
