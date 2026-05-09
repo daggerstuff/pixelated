@@ -1,8 +1,5 @@
 name: 'Prepare uv venv'
-description:
-  'Ensure uv is available and create a uv virtual environment in the given
-  service directory. Outputs `use-system` which will be "--system" when venv
-  creation failed, or empty when venv succeeded.'
+description: 'Ensure uv is available and create a uv virtual environment in the given service directory. Outputs `use-system` which will be "--system" when venv creation failed, or empty when venv succeeded.'
 inputs:
   service-dir:
     description: 'Path to the Python service directory (relative to repo root)'
@@ -10,8 +7,7 @@ inputs:
     default: '.'
 outputs:
   use-system:
-    description:
-      'If non-empty, contains the --system flag to use for uv pip installs'
+    description: 'If non-empty, contains the --system flag to use for uv pip installs'
     value: ${{ steps.create_venv.outputs.use-system }}
 runs:
   using: 'composite'
@@ -36,7 +32,7 @@ runs:
         cd "${{ inputs.service-dir }}"
 
         # Try to create a uv venv. If it fails, return --system as output.
-        if uv venv; then
+        if uv venv --seed; then
           echo "use-system=" >> "$GITHUB_OUTPUT"
           echo "Created uv virtual environment in ${PWD}"
           # Ensure pip is upgraded to secure version in the venv

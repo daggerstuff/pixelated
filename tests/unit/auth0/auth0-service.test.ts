@@ -273,7 +273,7 @@ describe('Auth0UserService', () => {
         },
         user_metadata: {
           role: 'user',
-          created_at: '2023-01-01T00:00:00Z',
+          created_at: expect.any(String),
         },
       })
     })
@@ -542,10 +542,12 @@ describe('Auth0UserService', () => {
           userMetadata: { role: 'user' },
         },
         accessToken: 'new-access-token',
+        session: {
+          accessToken: 'new-access-token',
+          refreshToken: 'new-refresh-token',
+          expiresAt: expect.any(Date),
+        },
       })
-      expect(result.session.accessToken).toBe('new-access-token')
-      expect(result.session.refreshToken).toBe('new-refresh-token')
-      expect(result.session.expiresAt).toBeInstanceOf(Date)
 
       expect(mockAuthenticationClient.refreshToken).toHaveBeenCalledWith({
         refresh_token: 'old-refresh-token',

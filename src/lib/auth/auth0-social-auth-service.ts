@@ -9,12 +9,37 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
-const AUTH0_CONFIG = {
-  domain: auth0Config.domain,
-  clientId: auth0Config.clientId,
-  clientSecret: auth0Config.clientSecret,
-  managementClientId: auth0Config.managementClientId,
-  managementClientSecret: auth0Config.managementClientSecret,
+type Auth0RuntimeConfig = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  managementClientId: string
+  managementClientSecret: string
+}
+
+function getAuth0RuntimeConfig(): Auth0RuntimeConfig {
+  return {
+    domain:
+      process.env.AUTH0_DOMAIN ||
+      process.env.PUBLIC_AUTH0_DOMAIN ||
+      auth0Config.domain ||
+      '',
+    clientId:
+      process.env.AUTH0_CLIENT_ID ||
+      process.env.PUBLIC_AUTH0_CLIENT_ID ||
+      auth0Config.clientId ||
+      '',
+    clientSecret:
+      process.env.AUTH0_CLIENT_SECRET || auth0Config.clientSecret || '',
+    managementClientId:
+      process.env.AUTH0_MANAGEMENT_CLIENT_ID ||
+      auth0Config.managementClientId ||
+      '',
+    managementClientSecret:
+      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
+      auth0Config.managementClientSecret ||
+      '',
+  }
 }
 
 interface Auth0UserInfo {
@@ -48,6 +73,7 @@ let auth0UserInfo: UserInfoClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
+  const AUTH0_CONFIG = getAuth0RuntimeConfig()
   if (
     !AUTH0_CONFIG.domain ||
     !AUTH0_CONFIG.clientId ||
@@ -57,32 +83,27 @@ function initializeAuth0Clients() {
     return
   }
 
-  auth0Authentication ??= new AuthenticationClient({
+  auth0Authentication = new AuthenticationClient({
     domain: AUTH0_CONFIG.domain,
     clientId: AUTH0_CONFIG.clientId,
     clientSecret: AUTH0_CONFIG.clientSecret,
   })
 
-  auth0UserInfo ??= new UserInfoClient({
+  auth0UserInfo = new UserInfoClient({
     domain: AUTH0_CONFIG.domain,
   })
 
-  if (
-    !auth0Management &&
-    AUTH0_CONFIG.managementClientId &&
-    AUTH0_CONFIG.managementClientSecret
-  ) {
+  if (AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
     auth0Management = new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
     })
+  } else {
+    auth0Management = null
   }
 }
-
-// Initialize the clients
-initializeAuth0Clients()
 
 // Types
 export interface SocialUser {
@@ -115,10 +136,14 @@ export interface SocialAuthResult {
  * Handles OAuth2 flow with Auth0 for social providers
  */
 export class Auth0SocialAuthService {
-  private readonly domain = AUTH0_CONFIG.domain
-  private readonly clientId = AUTH0_CONFIG.clientId
+  private readonly domain: string
+  private readonly clientId: string
 
   constructor() {
+    const config = getAuth0RuntimeConfig()
+    this.domain = config.domain
+    this.clientId = config.clientId
+
     if (!this.domain || !this.clientId) {
       console.warn('Auth0 is not properly configured')
     }

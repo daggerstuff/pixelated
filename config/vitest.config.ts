@@ -1,7 +1,6 @@
 import path from 'node:path'
 
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config'
 
@@ -34,7 +33,7 @@ const ciNodeTestGlobs = process.env['CI']
 const nodeTestGlobs: string[] = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
 
 export default defineConfig({
-  plugins: [react(), tsconfigPaths({ root: path.resolve(__dirname, '..') })],
+  plugins: [react()],
   define: {
     global: 'globalThis',
   },
@@ -46,6 +45,7 @@ export default defineConfig({
     noExternal: ['msw'],
   },
   resolve: {
+    tsconfigPaths: true,
     alias: [
       { find: '@', replacement: path.resolve(__dirname, '../src') },
       {
@@ -139,11 +139,11 @@ export default defineConfig({
           environment: 'node',
         },
         resolve: {
+          tsconfigPaths: true,
           alias: [
             { find: '@', replacement: path.resolve(__dirname, '../src') },
           ],
         },
-        plugins: [tsconfigPaths({ root: path.resolve(__dirname, '..') })],
       },
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
