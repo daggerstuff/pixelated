@@ -14,9 +14,12 @@ import {
   CloudProviderManager,
   type DeploymentResult,
 } from './CloudProviderManager'
-import { ConfigurationManager } from './ConfigurationManager'
-import { DeploymentOrchestrator } from './DeploymentOrchestrator'
-import { HealthMonitor } from './HealthMonitor'
+import {
+  ConfigurationManager,
+  type MultiRegionConfig,
+} from './ConfigurationManager'
+import { DeploymentOrchestrator, type DeploymentOrchestratorConfig } from './DeploymentOrchestrator'
+import { HealthMonitor, type HealthCheckConfig } from './HealthMonitor'
 
 export interface RegionConfig {
   id: string
@@ -80,22 +83,279 @@ export interface DeploymentStatus {
   }
 }
 
+type HealthCheckFailureEvent = {
+  regionId: string
+  failureReason: string
+}
+
+type HealthCheckRecoveryEvent = {
+  regionId: string
+}
+
+const isHealthCheckFailureEvent = (
+  data: unknown,
+): data is HealthCheckFailureEvent => {
+  if (typeof data !== 'object' || data === null) {
+    return false
+  }
+  if (!('regionId' in data) || !('failureReason' in data)) {
+    return false
+  }
+  return (
+    typeof data.regionId === 'string' &&
+    typeof data.failureReason === 'string'
+  )
+}
+
+const isHealthCheckRecoveryEvent = (
+  data: unknown,
+): data is HealthCheckRecoveryEvent => {
+  if (typeof data !== 'object' || data === null) {
+    return false
+  }
+  return 'regionId' in data && typeof data.regionId === 'string'
+}
+
 export class MultiRegionDeploymentManager extends EventEmitter {
-  private config: DeploymentConfig
-  private configurationManager: ConfigurationManager
-  private cloudProviderManager: CloudProviderManager
-  private healthMonitor: HealthMonitor
-  private deploymentOrchestrator: DeploymentOrchestrator
-  private deploymentStatuses: Map<string, DeploymentStatus> = new Map()
+  private readonly config: DeploymentConfig
+  private readonly configurationManager: ConfigurationManager
+  private readonly cloudProviderManager: CloudProviderManager
+  private readonly healthMonitor: HealthMonitor
+  private readonly deploymentOrchestrator: DeploymentOrchestrator
+  private readonly deploymentStatuses: Map<string, DeploymentStatus> = new Map()
   private isInitialized = false
 
   constructor(config: DeploymentConfig) {
     super()
     this.config = config
-    this.configurationManager = new ConfigurationManager(config)
+    this.configurationManager = new ConfigurationManager(
+      this.createMultiRegionConfig(config),
+    )
     this.cloudProviderManager = new CloudProviderManager()
-    this.healthMonitor = new HealthMonitor()
-    this.deploymentOrchestrator = new DeploymentOrchestrator()
+    this.healthMonitor = new HealthMonitor(this.createHealthCheckConfig())
+    this.deploymentOrchestrator = new DeploymentOrchestrator(
+      this.createDeploymentOrchestratorConfig(),
+      this.cloudProviderManager,
+    )
+  }
+
+  private createMultiRegionConfig(
+    deploymentConfig: DeploymentConfig,
+  ): MultiRegionConfig {
+    const environmentTemplate = {
+      regions: deploymentConfig.regions,
+      scaling: {
+        autoScaling: true,
+        minInstances: 2,
+        maxInstances: 20,
+        targetCpuUtilization: 70,
+        targetMemoryUtilization: 80,
+      },
+      resources: {
+        cpu: '4',
+        memory: '8Gi',
+        storage: '100Gi',
+      },
+      networking: {
+        vpcCidr: '10.0.0.0/16',
+        subnetCidrs: ['10.0.1.0/24'],
+        securityGroups: ['default'],
+        loadBalancers: ['primary'],
+      },
+      monitoring: {
+        enabled: true,
+        samplingRate: 0.1,
+        alertThresholds: {},
+      },
+    } satisfies MultiRegionConfig['environments']['development']
+
+    return {
+      deployment: deploymentConfig,
+      edgeComputing: {
+        locations: [],
+        services: {
+          threatDetection: false,
+          biasDetection: false,
+          cacheService: false,
+          apiGateway: true,
+          staticContent: true,
+        },
+        aiModels: {
+          threatDetection: 'none',
+          biasDetection: 'none',
+          behavioralAnalysis: 'none',
+        },
+        cacheStrategies: ['LRU'],
+        healthCheck: {
+          interval: 30_000,
+          timeout: 5_000,
+          retries: 3,
+        },
+      },
+      trafficRouting: {
+        strategy: 'health-based',
+        healthThreshold: 95,
+        latencyThreshold: 500,
+        complianceRequirements: ['HIPAA'],
+        weights: {},
+        fallbackRegions: ['us-east-1'],
+        cacheTtl: 300,
+      },
+      environments: {
+        development: environmentTemplate,
+        staging: {
+          ...environmentTemplate,
+          scaling: {
+            ...environmentTemplate.scaling,
+            minInstances: 3,
+          },
+        },
+        production: {
+          ...environmentTemplate,
+          scaling: {
+            ...environmentTemplate.scaling,
+            minInstances: 4,
+          },
+        },
+      },
+      featureFlags: {
+        multiRegionDeployment: true,
+        edgeComputing: false,
+        intelligentRouting: true,
+        autoFailover: true,
+        threatDetection: true,
+        biasDetection: true,
+        complianceChecking: true,
+        performanceMonitoring: true,
+        aiModelServing: true,
+        cacheOptimization: true,
+      },
+      secrets: {
+        cloudProviders: {
+          aws: {
+            accessKeyId: '',
+            secretAccessKey: '',
+            region: 'us-east-1',
+          },
+          gcp: {
+            projectId: '',
+            keyFilename: '',
+          },
+          azure: {
+            subscriptionId: '',
+            clientId: '',
+            clientSecret: '',
+            tenantId: '',
+          },
+        },
+        databases: {
+          cockroachdb: {
+            connectionString: '',
+            sslMode: 'require',
+          },
+          redis: {
+            url: '',
+            password: '',
+          },
+        },
+        aiServices: {
+          openai: {
+            apiKey: '',
+            organization: '',
+          },
+          google: {
+            apiKey: '',
+            projectId: '',
+          },
+        },
+        monitoring: {
+          sentry: {
+            dsn: '',
+            authToken: '',
+          },
+          datadog: {
+            apiKey: '',
+            appKey: '',
+          },
+        },
+      },
+      monitoring: {
+        metrics: {
+          enabled: true,
+          interval: 30_000,
+          retention: 604_800,
+          aggregation: 'mean',
+        },
+        alerting: {
+          enabled: true,
+          channels: ['email'],
+          severityLevels: ['critical', 'warning'],
+          escalationRules: {},
+        },
+        logging: {
+          level: 'info',
+          format: 'json',
+          destinations: ['console'],
+          sampling: 0.1,
+        },
+      },
+      compliance: {
+        gdpr: {
+          enabled: true,
+          dataResidency: ['US'],
+          retentionPeriods: {},
+          subjectRights: ['access', 'erasure'],
+        },
+        hipaa: {
+          enabled: true,
+          encryptionRequired: true,
+          auditLogging: true,
+          accessControls: ['mfa'],
+        },
+        soc2: {
+          enabled: true,
+          auditFrequency: 'weekly',
+          controls: ['CCM', 'CC7'],
+        },
+        pci: {
+          enabled: false,
+          requirements: [],
+          scanningFrequency: 'monthly',
+        },
+      },
+    }
+  }
+
+  private createHealthCheckConfig(): HealthCheckConfig {
+    return {
+      interval: 30_000,
+      timeout: 5_000,
+      retries: 3,
+      thresholds: {
+        cpu: 80,
+        memory: 85,
+        disk: 90,
+        responseTime: 500,
+        errorRate: 5,
+        availability: 95,
+      },
+    }
+  }
+
+  private createDeploymentOrchestratorConfig(): DeploymentOrchestratorConfig {
+    return {
+      maxParallelDeployments: 3,
+      rollbackOnFailure: true,
+      healthCheckTimeout: 5_000,
+      deploymentTimeout: 120_000,
+      retryAttempts: 2,
+      retryDelay: 1_000,
+      dependencies: {
+        infrastructure: ['network', 'dns', 'iam'],
+        services: ['api', 'worker'],
+        monitoring: ['metrics', 'alerts'],
+      },
+    }
   }
 
   /**
@@ -147,7 +407,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
         regions: this.config.regions.length,
       })
 
-      const deploymentPromises = this.config.regions.map((region) =>
+      const deploymentPromises = this.config.regions.map(async (region) =>
         this.deployRegion(region),
       )
 
@@ -165,7 +425,11 @@ export class MultiRegionDeploymentManager extends EventEmitter {
             lastDeployment: new Date(),
             healthScore: 0,
             activeInstances: 0,
-            errors: [result.reason.message],
+            errors: [
+              result.reason instanceof Error
+                ? result.reason.message
+                : 'Deployment failed',
+            ],
             metrics: { latency: 0, throughput: 0, errorRate: 1 },
           })
         }
@@ -261,7 +525,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       errors.push('Region ID and name are required')
     }
 
-    if (!region.availabilityZones || region.availabilityZones.length === 0) {
+    if (region.availabilityZones.length === 0) {
       errors.push('At least one availability zone is required')
     }
 
@@ -269,7 +533,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
       errors.push('VPC CIDR is required')
     }
 
-    if (!region.capacity || region.capacity.minInstances < 1) {
+    if (region.capacity.minInstances < 1) {
       errors.push('Minimum instances must be at least 1')
     }
 
@@ -410,17 +674,8 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    * Handle health check failure
    */
   private async handleHealthCheckFailure(data: unknown): Promise<void> {
-    if (
-      typeof data === 'object' &&
-      data !== null &&
-      'regionId' in data &&
-      'failureReason' in data
-    ) {
-      const { regionId, failureReason } = data as {
-        regionId: string
-        failureReason: string
-      }
-
+    if (isHealthCheckFailureEvent(data)) {
+      const { regionId, failureReason } = data
       const status = this.deploymentStatuses.get(regionId)
       if (status) {
         status.status = 'degraded'
@@ -435,14 +690,8 @@ export class MultiRegionDeploymentManager extends EventEmitter {
    * Handle health check recovery
    */
   private async handleHealthCheckRecovery(data: unknown): Promise<void> {
-    if (
-      typeof data === 'object' &&
-      data !== null &&
-      'regionId' in data &&
-      typeof (data as { regionId: unknown }).regionId === 'string'
-    ) {
-      const { regionId } = data as { regionId: string }
-
+    if (isHealthCheckRecoveryEvent(data)) {
+      const { regionId } = data
       const status = this.deploymentStatuses.get(regionId)
       if (status) {
         status.status = 'healthy'

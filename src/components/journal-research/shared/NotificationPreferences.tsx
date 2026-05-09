@@ -98,6 +98,17 @@ interface NotificationPreferencesProps {
   className?: string
 }
 
+const isNotificationFrequency = (
+  value: string,
+): value is NotificationFrequency => {
+  return (
+    value === 'immediate' ||
+    value === 'batched' ||
+    value === 'daily' ||
+    value === 'never'
+  )
+}
+
 export function NotificationPreferences({
   className,
 }: NotificationPreferencesProps) {
@@ -141,12 +152,12 @@ export function NotificationPreferences({
       }
 
       // Register service worker
-      const registration = await navigator.serviceWorker
-        .register('/sw.js')
-        .catch(() => {
-          // Fallback: try to get existing registration
-          return navigator.serviceWorker.getRegistration()
-        })
+      let registration: ServiceWorkerRegistration | null = null
+      try {
+        registration = await navigator.serviceWorker.register('/sw.js')
+      } catch {
+        registration = (await navigator.serviceWorker.getRegistration()) ?? null
+      }
 
       if (!registration) {
         setError('Failed to register service worker')
@@ -157,7 +168,7 @@ export function NotificationPreferences({
       // Subscribe to push notifications
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        applicationServerKey: process.env['NEXT_PUBLIC_VAPID_PUBLIC_KEY'],
       })
 
       setPushSubscription(subscription)
@@ -321,9 +332,11 @@ export function NotificationPreferences({
             <h3 className='mb-3 text-sm font-medium'>Notification Frequency</h3>
             <Select
               value={preferences.frequency}
-              onValueChange={(value) =>
-                setPreferences({ frequency: value as NotificationFrequency })
-              }
+              onValueChange={(value) => {
+                if (isNotificationFrequency(value)) {
+                  setPreferences({ frequency: value })
+                }
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
