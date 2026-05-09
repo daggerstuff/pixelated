@@ -4,6 +4,10 @@ import { TurnSubmissionResult } from '../../../../lib/agent-note-collab'
 import { getLedger } from '../../../../lib/agent-note-collab/server'
 import { GET, POST } from '../turns'
 
+vi.mock('../../../../lib/auth/auth0-middleware', () => ({
+  authenticateRequest: vi.fn(async () => ({ success: true })),
+}))
+
 vi.mock('../../../../lib/agent-note-collab/server', () => ({
   getLedger: vi.fn(),
 }))

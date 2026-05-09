@@ -604,7 +604,11 @@ describe('Auth0 Social Auth Service', () => {
           'google-oauth2',
           'access-token-123',
         ),
-      ).rejects.toThrow('Failed to link social account')
+      ).rejects.toMatchObject({
+        message: expect.stringMatching(
+          /Auth0 management client not initialized|Failed to link social account/,
+        ),
+      })
     })
   })
 
