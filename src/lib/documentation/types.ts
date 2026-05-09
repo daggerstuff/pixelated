@@ -46,6 +46,7 @@ export interface SessionDocumentation {
   readonly metadata: Partial<SessionMetadata>
   // Additional properties used in SessionDocumentation component
   readonly summary?: string
+  readonly emotionSummary?: string
   readonly keyInsights?: readonly string[]
   readonly therapeuticTechniques?: readonly TherapeuticTechnique[]
   readonly treatmentProgress?: TreatmentProgress

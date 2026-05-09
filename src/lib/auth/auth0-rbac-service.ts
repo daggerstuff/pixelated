@@ -131,15 +131,30 @@ function getPermissionDefinition(permission: string): Permission | undefined {
 // Initialize Auth0 management client
 let auth0Management: Auth0ManagementClient | null = null
 
+function getAuth0ManagementConfig() {
+  return {
+    domain: process.env['AUTH0_DOMAIN'] || auth0Config.domain,
+    managementClientId:
+      process.env['AUTH0_MANAGEMENT_CLIENT_ID'] ||
+      auth0Config.managementClientId,
+    managementClientSecret:
+      process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'] ||
+      auth0Config.managementClientSecret,
+  }
+}
+
 /**
  * Initialize Auth0 management client
  */
 function initializeAuth0Management() {
-  if (
-    !auth0Config.domain ||
-    !auth0Config.managementClientId ||
-    !auth0Config.managementClientSecret
-  ) {
+  if (auth0Management) {
+    return
+  }
+
+  const { domain, managementClientId, managementClientSecret } =
+    getAuth0ManagementConfig()
+
+  if (!domain || !managementClientId || !managementClientSecret) {
     console.warn(
       'Auth0 management configuration is incomplete. RBAC features may not work.',
     )
@@ -147,11 +162,19 @@ function initializeAuth0Management() {
   }
 
   auth0Management ??= new ManagementClient({
-    domain: auth0Config.domain,
-    clientId: auth0Config.managementClientId,
-    clientSecret: auth0Config.managementClientSecret,
-    audience: `https://${auth0Config.domain}/api/v2/`,
+    domain,
+    clientId: managementClientId,
+    clientSecret: managementClientSecret,
+    audience: `https://${domain}/api/v2/`,
   })
+}
+
+function requireAuth0ManagementClient() {
+  initializeAuth0Management()
+  if (!auth0Management) {
+    throw new Error('Auth0 management client not initialized')
+  }
+  return auth0Management
 }
 
 // Initialize the management client
@@ -563,14 +586,12 @@ export async function assignRoleToUser(
   userId: string,
   roleName: UserRole,
 ): Promise<void> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  const management = requireAuth0ManagementClient()
 
   try {
     // Get role ID
     const roles = toAuth0ManagementRoles(
-      await auth0Management.getRoles({
+      await management.getRoles({
         name_filter: roleName,
       }),
     )
@@ -584,7 +605,7 @@ export async function assignRoleToUser(
     }
 
     // Assign role to user
-    await auth0Management.assignRolestoUser({ id: userId, roles: [roleId] })
+    await management.assignRolestoUser({ id: userId, roles: [roleId] })
 
     // Log role assignment
     logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, null, {
@@ -611,14 +632,12 @@ export async function removeRoleFromUser(
   userId: string,
   roleName: UserRole,
 ): Promise<void> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  const management = requireAuth0ManagementClient()
 
   try {
     // Get role ID
     const roles = toAuth0ManagementRoles(
-      await auth0Management.getRoles({
+      await management.getRoles({
         name_filter: roleName,
       }),
     )
@@ -632,7 +651,7 @@ export async function removeRoleFromUser(
     }
 
     // Remove role from user
-    await auth0Management.removeRolesFromUser({ id: userId, roles: [roleId] })
+    await management.removeRolesFromUser({ id: userId, roles: [roleId] })
 
     // Log role removal
     logSecurityEvent(SecurityEventType.ROLE_REMOVED, null, {
@@ -656,13 +675,11 @@ export async function removeRoleFromUser(
  * Get user roles from Auth0
  */
 export async function getUserRoles(userId: string): Promise<UserRole[]> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  const management = requireAuth0ManagementClient()
 
   try {
     const userRoles = toAuth0UserRoles(
-      await auth0Management.getUserRoles({ id: userId }),
+      await management.getUserRoles({ id: userId }),
     )
     return userRoles
       .map((role) => (typeof role.name === 'string' ? role.name : undefined))
@@ -691,9 +708,7 @@ export async function userHasPermission(
   userId: string,
   permission: string,
 ): Promise<boolean> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  requireAuth0ManagementClient()
 
   try {
     // Get user's roles
@@ -729,9 +744,7 @@ export async function userHasPermission(
  * Get all permissions for a user
  */
 export async function getUserPermissions(userId: string): Promise<string[]> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  requireAuth0ManagementClient()
 
   try {
     // Get user's roles
