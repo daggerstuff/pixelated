@@ -1,20 +1,19 @@
 ---
-description: 'Understanding Narcissism and Codependency in Relationships'
+title: dark side of love
+description: >-
+  As we navigate the complexities of relationships, it's essential to recognize
 author: 'Dr. Sarah Chen'
 pubDate: 2024-02-20
-readingTime: 8
-tags: ['narcissism', 'codependency', 'relationships', 'trauma']
+tags:
+  - narcissism
+  - codependency
+  - relationships
+  - trauma
 series: 'Understanding Trauma'
 seriesOrder: 4
-image:
----
-  {
-    url: 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Two silhouettes symbolizing complex relationship dynamics',
-  }
 ---
 
-# The Dark Side of Love: Understanding Narcissism and Codependency
+## The Dark Side of Love: Understanding Narcissism and Codependency
 
 As we navigate the complexities of relationships, it's essential to recognize
 the warning signs of narcissistic behavior and codependency. These traits can be
@@ -78,7 +77,7 @@ Breaking free from a narcissistic relationship can be challenging, but it's not
 impossible. With the right support and mindset, you can emerge stronger, wiser,
 and more resilient than ever before.
 
-### And I'll Leave You With...
+### And I'll Leave You With
 
 Narcissism and codependency are complex issues that require empathy,
 understanding, and self-awareness to address. By recognizing the signs of these

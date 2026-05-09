@@ -169,14 +169,18 @@ export type ResponseContext = {
   sessionNumber: number
 }
 
+export type ResponseContextInput = Omit<ResponseContext, 'profile'> & {
+  profile?: PatientProfile
+}
+
 /**
  * Service for generating patient responses, managing response context,
  * and ensuring response consistency.
  */
 export class PatientResponseService {
-  private profileService: PatientProfileService
-  private consistencyService: BeliefConsistencyService
-  private emotionSynthesizer: EmotionSynthesizer // Added dependency
+  private readonly profileService: PatientProfileService
+  private readonly consistencyService: BeliefConsistencyService
+  private readonly emotionSynthesizer: EmotionSynthesizer // Added dependency
 
   constructor(
     profileService: PatientProfileService,
@@ -186,7 +190,7 @@ export class PatientResponseService {
     this.profileService = profileService
     this.consistencyService = consistencyService
     this.emotionSynthesizer =
-      emotionSynthesizer || EmotionSynthesizer.getInstance()
+      emotionSynthesizer ?? EmotionSynthesizer.getInstance()
   }
 
   /**
@@ -228,7 +232,7 @@ export class PatientResponseService {
     return result
   }
 
-  private _determineContextFromTherapistMessage(
+  private determineContextFromTherapistMessage(
     therapistMessageContent?: string,
   ): EmotionTransitionContext {
     if (!therapistMessageContent || therapistMessageContent.trim() === '') {
@@ -272,7 +276,7 @@ export class PatientResponseService {
     return 'general_conversation'
   }
 
-  private async _updateAndRetrieveEmotionalState(
+  private async updateAndRetrieveEmotionalState(
     profile: PatientProfile,
     styleConfig: PatientResponseStyleConfig, // To potentially get base emotion/intensity hints
     therapistLastMessage?: string,
@@ -287,10 +291,7 @@ export class PatientResponseService {
     // TECHDEBT(priority:medium): Replace this placeholder with actual retrieval of current emotional state if available
     // For example, from profile.cognitiveModel.therapeuticProgress.latestEmotionProfile?.emotions
     // If not available, start with a mix based on emotionalPatterns or a default neutral state.
-    if (
-      profile.cognitiveModel.emotionalPatterns &&
-      profile.cognitiveModel.emotionalPatterns.length > 0
-    ) {
+    if (profile.cognitiveModel.emotionalPatterns.length > 0) {
       currentEmotions = {}
       profile.cognitiveModel.emotionalPatterns.forEach((p) => {
         // Initialize with a baseline intensity, scaling down from their typical pattern intensity
@@ -300,7 +301,7 @@ export class PatientResponseService {
     }
 
     const context =
-      this._determineContextFromTherapistMessage(therapistLastMessage)
+      this.determineContextFromTherapistMessage(therapistLastMessage)
     logger.debug(`Determined emotion transition context: ${context}`, {
       profileId: profile.id,
     })
@@ -328,10 +329,7 @@ export class PatientResponseService {
       // Even when synthesis fails, EmotionSynthesizer provides a default profile in the result
       // Fallback to getCurrentProfile() or the public default method as safety nets
       // NOTE: Always use getDefaultEmotionProfile() - never access private methods directly
-      const fallbackProfile =
-        synthesisResult.profile ||
-        this.emotionSynthesizer.getCurrentProfile() ||
-        this.emotionSynthesizer.getDefaultEmotionProfile()
+      const fallbackProfile = synthesisResult.profile
       return {
         updatedStyleConfig: styleConfig,
         newEmotionProfile: fallbackProfile,
@@ -347,10 +345,7 @@ export class PatientResponseService {
     // Determine primary emotion and intensity from the new profile to update styleConfig
     let primaryEmotionFromSynth = 'neutral'
     let maxIntensity = 0
-    if (
-      newEmotionProfile.emotions &&
-      Object.keys(newEmotionProfile.emotions).length > 0
-    ) {
+    if (Object.keys(newEmotionProfile.emotions).length > 0) {
       for (const [emotion, intensity] of Object.entries(
         newEmotionProfile.emotions,
       )) {
@@ -394,7 +389,7 @@ export class PatientResponseService {
       const currentEmotions =
         this.emotionSynthesizer.getCurrentProfile()?.emotions
       const synthesisResult = await this.emotionSynthesizer.synthesizeEmotion({
-        baseEmotion: styleConfig.primaryEmotion || baseEmotion,
+        baseEmotion: styleConfig.primaryEmotion ?? baseEmotion,
         baseIntensity: styleConfig.emotionalIntensity,
         context: 'general_conversation',
         ...(currentEmotions && { currentEmotions }),
@@ -477,7 +472,7 @@ export class PatientResponseService {
 
     // Update emotional state and get updated styleConfig
     // Ensure initialStyleConfig is used here, and updatedStyleConfig is used later for the prompt
-    const { updatedStyleConfig } = await this._updateAndRetrieveEmotionalState(
+    const { updatedStyleConfig } = await this.updateAndRetrieveEmotionalState(
       profile,
       initialStyleConfig,
       therapistLastMessage,
@@ -498,7 +493,7 @@ export class PatientResponseService {
 
     // Incorporate new emotional authenticity fields
     prompt += `Your emotional expression should be ${updatedStyleConfig.emotionalNuance}. `
-    prompt += `The intensity of your expressed emotion should be around ${Number(updatedStyleConfig.emotionalIntensity * 10).toFixed(1)}/10. ` // Use Number().toFixed() for better float representation
+    prompt += `The intensity of your expressed emotion should be around ${(updatedStyleConfig.emotionalIntensity * 10).toFixed(1)}/10. `
     if (updatedStyleConfig.primaryEmotion) {
       prompt += `Focus on conveying ${updatedStyleConfig.primaryEmotion}. `
     }
@@ -514,18 +509,14 @@ export class PatientResponseService {
       if (updatedStyleConfig.activeDefensiveMechanism === 'deflection') {
         prompt +=
           'Try to subtly change the subject or avoid direct answers if the topic feels uncomfortable. '
-      } else if (
-        updatedStyleConfig.activeDefensiveMechanism === 'intellectualization'
-      ) {
+      } else if (updatedStyleConfig.activeDefensiveMechanism === 'intellectualization') {
         prompt +=
           'Focus on abstract concepts and avoid expressing direct feelings. '
-      } else if (
-        updatedStyleConfig.activeDefensiveMechanism === 'minimization'
-      ) {
+      } else if (updatedStyleConfig.activeDefensiveMechanism === 'minimization') {
         prompt += 'Downplay the importance of concerns raised. '
       } else if (updatedStyleConfig.activeDefensiveMechanism === 'denial') {
         prompt += 'Refuse to acknowledge uncomfortable truths or realities. '
-      } else if (updatedStyleConfig.activeDefensiveMechanism === 'projection') {
+      } else {
         prompt +=
           'Attribute your own unacceptable feelings or thoughts to others, especially the therapist. '
       }
@@ -592,12 +583,12 @@ export class PatientResponseService {
    * @returns Promise<string> The final patient response, potentially modified for consistency.
    */
   async generateConsistentResponse(
-    context: ResponseContext,
+    context: ResponseContextInput,
     getCandidateResponse: () => Promise<string> | string,
   ): Promise<string> {
     const candidateResponse = await getCandidateResponse()
 
-    if (!context || !context.profile) {
+    if (!context.profile) {
       console.error('Invalid context provided to generateConsistentResponse.')
       return candidateResponse // Fallback or throw error
     }
@@ -617,14 +608,6 @@ export class PatientResponseService {
       }
 
       const firstContradiction = consistencyResult.contradictionsFound[0]
-
-      // Add null check for firstContradiction
-      if (!firstContradiction) {
-        console.warn(
-          'No contradiction details available, returning candidate response.',
-        )
-        return candidateResponse
-      }
 
       let therapeuticResponse = `I find myself wanting to say, "${candidateResponse}". `
       therapeuticResponse += `It's interesting, because I also recall `
@@ -899,15 +882,6 @@ export class PatientResponseService {
     therapistUtterance: string,
     patientUtterance: string,
   ): PatientProfile {
-    if (
-      !profile ||
-      !profile.cognitiveModel ||
-      !profile.cognitiveModel.therapeuticProgress
-    ) {
-      console.error('Invalid profile for updateTherapeuticAllianceMetrics')
-      return profile
-    }
-
     // Create a deep copy to prevent mutation of the input profile
     const { therapeuticProgress } = profile.cognitiveModel
     const updatedTherapeuticProgress = { ...therapeuticProgress }

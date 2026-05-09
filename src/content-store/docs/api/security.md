@@ -1,13 +1,16 @@
 ---
-description: 'API Security Features documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'security']
+description: API Security Features documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - security
 draft: false
 toc: true
+title: Rate Limiting
 ---
 
-# API Security Features
+## Security Feature Overview
 
 This document outlines the security features implemented in our API endpoints.
 

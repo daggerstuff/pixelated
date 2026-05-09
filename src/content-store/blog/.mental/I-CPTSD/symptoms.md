@@ -118,6 +118,6 @@ Understanding these symptoms is crucial for both diagnosis and treatment.
 
 ## Related Resources
 
-- [Treatment Options](/mental/I-CPTSD/treatment)
-- [Support Resources](/mental/I-CPTSD/resources)
-- [Management Strategies](/mental/IV-Management/strategies)
+- [Treatment Options](./treatment.md)
+- [Support Resources](./resources.md)
+- [Management Strategies](../IV-Management/strategies.md)

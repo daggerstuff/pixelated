@@ -24,10 +24,89 @@ interface IceServer {
   credential?: string
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+const isSdpType = (value: string): value is RTCSdpType => {
+  return (
+    value === 'offer' ||
+    value === 'pranswer' ||
+    value === 'answer' ||
+    value === 'rollback'
+  )
+}
+
+const toSessionDescription = (
+  data: unknown,
+): RTCSessionDescriptionInit | null => {
+  if (!isRecord(data)) {
+    return null
+  }
+
+  const rawType = data.type
+  const rawSdp = data.sdp
+
+  if (
+    typeof rawType !== 'string' ||
+    !isSdpType(rawType) ||
+    typeof rawSdp !== 'string'
+  ) {
+    return null
+  }
+
+  return { type: rawType, sdp: rawSdp }
+}
+
+const toIceCandidate = (data: unknown): RTCIceCandidateInit | null => {
+  if (!isRecord(data)) {
+    return null
+  }
+
+  const rawCandidate = data.candidate
+  if (typeof rawCandidate !== 'string') {
+    return null
+  }
+
+  const rawSdpMid = data.sdpMid
+  const rawSdpMLineIndex = data.sdpMLineIndex
+  const rawUsernameFragment = data.usernameFragment
+
+  if (
+    rawSdpMLineIndex !== undefined &&
+    (typeof rawSdpMLineIndex !== 'number' ||
+      !Number.isInteger(rawSdpMLineIndex))
+  ) {
+    return null
+  }
+
+  if (rawSdpMid !== undefined && typeof rawSdpMid !== 'string') {
+    return null
+  }
+
+  if (
+    rawUsernameFragment !== undefined &&
+    typeof rawUsernameFragment !== 'string'
+  ) {
+    return null
+  }
+
+  return {
+    candidate: rawCandidate,
+    ...(rawSdpMid !== undefined ? { sdpMid: rawSdpMid } : {}),
+    ...(rawSdpMLineIndex !== undefined
+      ? { sdpMLineIndex: rawSdpMLineIndex }
+      : {}),
+    ...(rawUsernameFragment !== undefined
+      ? { usernameFragment: rawUsernameFragment }
+      : {}),
+  }
+}
+
 const ICE_SERVERS: IceServer[] = [
   {
     urls: [
-      process.env.TURN_SERVER_URL || 'turn:turn.pixelatedempathy.com:3478',
+      process.env.TURN_SERVER_URL ?? 'turn:turn.pixelatedempathy.com:3478',
     ],
 
     username: process.env.TURN_SERVER_USERNAME,
@@ -55,6 +134,51 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
   const [isReconnecting, setIsReconnecting] = useState(false)
   const [hasPermissionError, setHasPermissionError] = useState(false)
+
+  // Refs to break circular dependencies between callbacks
+  const handleConnectionFailureRef = useRef<(() => Promise<void>) | null>(null)
+
+  // Create and send an offer to the peer
+  const createAndSendOffer = useCallback(async () => {
+    const peerConnection = peerConnectionRef.current
+    if (!peerConnection) {
+      return
+    }
+
+    try {
+      const offer = await peerConnection.createOffer()
+      await peerConnection.setLocalDescription(offer)
+      await signalingService.sendOffer(sessionId, userId, offer)
+    } catch (error: unknown) {
+      logger.error('Failed to create and send offer', { error, sessionId })
+      toast.error('Failed to establish connection')
+    }
+  }, [sessionId, userId])
+
+  // Handle connection failures and reconnection
+  const handleConnectionFailure = useCallback(async () => {
+    logger.warn('Connection failed, attempting reconnection', { sessionId })
+    setIsReconnecting(true)
+
+    try {
+      // Clean up existing connection
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close()
+      }
+
+      // Reinitialize connection
+      const newPeerConnection = initializePeerConnection()
+      if (newPeerConnection) {
+        await setupMediaStream()
+        await createAndSendOffer()
+      }
+    } catch (error: unknown) {
+      logger.error('Reconnection failed', { error, sessionId })
+      toast.error('Failed to reconnect video call')
+    } finally {
+      setIsReconnecting(false)
+    }
+  }, [sessionId, createAndSendOffer])
 
   // Initialize WebRTC peer connection
   const initializePeerConnection = useCallback(() => {
@@ -89,7 +213,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         onConnectionStateChange?.(peerConnection.connectionState)
 
         if (peerConnection.connectionState === 'failed') {
-          handleConnectionFailure()
+          void handleConnectionFailureRef.current?.()
         }
       }
 
@@ -108,7 +232,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
       toast.error('Failed to establish video connection')
       return null
     }
-  }, [sessionId, userId, onConnectionStateChange, handleConnectionFailure])
+  }, [sessionId, userId, onConnectionStateChange])
 
   // Handle media stream setup
   const setupMediaStream = useCallback(async () => {
@@ -145,52 +269,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     }
   }, [sessionId])
 
-  // Handle connection failures and reconnection
-  const handleConnectionFailure = useCallback(async () => {
-    logger.warn('Connection failed, attempting reconnection', { sessionId })
-    setIsReconnecting(true)
-
-    try {
-      // Clean up existing connection
-      if (peerConnectionRef.current) {
-        peerConnectionRef.current.close()
-      }
-
-      // Reinitialize connection
-      const newPeerConnection = initializePeerConnection()
-      if (newPeerConnection) {
-        await setupMediaStream()
-        await createAndSendOffer()
-      }
-    } catch (error: unknown) {
-      logger.error('Reconnection failed', { error, sessionId })
-      toast.error('Failed to reconnect video call')
-    } finally {
-      setIsReconnecting(false)
-    }
-  }, [
-    sessionId,
-    initializePeerConnection,
-    setupMediaStream,
-    createAndSendOffer,
-  ])
-
-  // Create and send an offer to the peer
-  const createAndSendOffer = useCallback(async () => {
-    const peerConnection = peerConnectionRef.current
-    if (!peerConnection) {
-      return
-    }
-
-    try {
-      const offer = await peerConnection.createOffer()
-      await peerConnection.setLocalDescription(offer)
-      await signalingService.sendOffer(sessionId, userId, offer)
-    } catch (error: unknown) {
-      logger.error('Failed to create and send offer', { error, sessionId })
-      toast.error('Failed to establish connection')
-    }
-  }, [sessionId, userId])
+  handleConnectionFailureRef.current = handleConnectionFailure
 
   // Handle incoming signaling messages
   const handleSignalingMessage = useCallback(
@@ -204,32 +283,37 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         switch (message.type) {
           case 'offer':
             if (message.data) {
-              await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(
-                  message.data as RTCSessionDescriptionInit,
-                ),
-              )
-              const answer = await peerConnection.createAnswer()
-              await peerConnection.setLocalDescription(answer)
-              await signalingService.sendAnswer(sessionId, userId, answer)
+              const description = toSessionDescription(message.data)
+              if (description) {
+                await peerConnection.setRemoteDescription(
+                  new RTCSessionDescription(description),
+                )
+                const answer = await peerConnection.createAnswer()
+                await peerConnection.setLocalDescription(answer)
+                await signalingService.sendAnswer(sessionId, userId, answer)
+              }
             }
             break
 
           case 'answer':
             if (message.data) {
-              await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(
-                  message.data as RTCSessionDescriptionInit,
-                ),
-              )
+              const description = toSessionDescription(message.data)
+              if (description) {
+                await peerConnection.setRemoteDescription(
+                  new RTCSessionDescription(description),
+                )
+              }
             }
             break
 
           case 'ice-candidate':
             if (message.data) {
-              await peerConnection.addIceCandidate(
-                new RTCIceCandidate(message.data as RTCIceCandidateInit),
-              )
+              const candidate = toIceCandidate(message.data)
+              if (candidate) {
+                await peerConnection.addIceCandidate(
+                  new RTCIceCandidate(candidate),
+                )
+              }
             }
             break
         }
@@ -307,8 +391,8 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     <div
       className={`video-display bg-gray-800 relative overflow-hidden rounded-lg ${className}`}
       style={{ aspectRatio: '16/9' }}
-      role='region'
-      aria-label='Video chat interface'
+      role="region"
+      aria-label="Video chat interface"
     >
       {/* Remote video (patient/client feed) */}
       <video
@@ -319,43 +403,43 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         autoPlay
         playsInline
       >
-        <track kind='captions' src='' label='English captions' />
+        <track kind="captions" src="" label="English captions" />
       </video>
 
       {/* Connection error or permission denied state */}
       {(hasPermissionError || !isConnected) && (
-        <div className='bg-gray-800 text-white absolute inset-0 flex flex-col items-center justify-center'>
+        <div className="bg-gray-800 text-white absolute inset-0 flex flex-col items-center justify-center">
           <svg
-            xmlns='http://www.w3.org/2000/svg'
+            xmlns="http://www.w3.org/2000/svg"
             className={`mb-3 h-16 w-16 ${
               hasPermissionError ? 'text-red-500' : 'text-gray-500'
             }`}
-            fill='none'
-            viewBox='0 0 24 24'
-            stroke='currentColor'
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
             {hasPermissionError ? (
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={1.5}
-                d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             ) : (
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={1.5}
-                d='M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z'
+                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
               />
             )}
           </svg>
-          <p className='text-gray-300 text-lg font-medium'>
+          <p className="text-gray-300 text-lg font-medium">
             {hasPermissionError
               ? 'Camera Access Required'
               : 'Practice Simulation'}
           </p>
-          <p className='text-gray-400 mt-1 text-sm'>
+          <p className="text-gray-400 mt-1 text-sm">
             {hasPermissionError
               ? 'Please allow access to your camera and microphone'
               : 'Click Start to begin a therapeutic interaction'}
@@ -372,7 +456,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
               ? 'bg-yellow-100 text-yellow-800 animate-pulse'
               : 'bg-gray-100 text-gray-800'
         }`}
-        role='status'
+        role="status"
       >
         <span
           className={`mr-1.5 h-2 w-2 rounded-full ${
@@ -389,38 +473,38 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
       {/* Local video preview */}
       <div
-        className='md:h-30 bg-gray-900 border-gray-700 absolute bottom-4 right-4 h-24 w-32 overflow-hidden rounded border-2 md:w-40'
-        role='region'
-        aria-label='Your video preview'
+        className="md:h-30 bg-gray-900 border-gray-700 absolute bottom-4 right-4 h-24 w-32 overflow-hidden rounded border-2 md:w-40"
+        role="region"
+        aria-label="Your video preview"
       >
         <video
           ref={localVideoRef}
-          className='h-full w-full object-cover'
+          className="h-full w-full object-cover"
           autoPlay
           playsInline
           muted
         >
-          <track kind='captions' src='' label='English captions' />
+          <track kind="captions" src="" label="English captions" />
         </video>
       </div>
 
       {/* Privacy indicator */}
       <div
-        className='bg-green-900 text-green-100 absolute right-4 top-4 flex items-center rounded-md bg-opacity-70 px-2 py-1 text-xs'
-        role='status'
+        className="bg-green-900 text-green-100 absolute right-4 top-4 flex items-center rounded-md bg-opacity-70 px-2 py-1 text-xs"
+        role="status"
       >
         <svg
-          xmlns='http://www.w3.org/2000/svg'
-          className='mr-1 h-3.5 w-3.5'
-          fill='none'
-          viewBox='0 0 24 24'
-          stroke='currentColor'
+          xmlns="http://www.w3.org/2000/svg"
+          className="mr-1 h-3.5 w-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
           <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
+            strokeLinecap="round"
+            strokeLinejoin="round"
             strokeWidth={2}
-            d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
           />
         </svg>
         End-to-End Encrypted

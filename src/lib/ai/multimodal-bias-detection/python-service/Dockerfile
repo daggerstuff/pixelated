@@ -1,7 +1,7 @@
 # Multi-stage Docker build for multi-modal bias detection service
 
 # Build stage
-FROM python:3.11-slim as builder
+FROM python:3.13-slim as builder
 
 # Set build arguments
 ARG APP_USER=appuser
@@ -39,7 +39,7 @@ COPY pyproject.toml ./
 RUN uv pip install --system --no-cache-dir -e .
 
 # Runtime stage
-FROM python:3.11-slim as runtime
+FROM python:3.13-slim as runtime
 
 # Set runtime arguments
 ARG APP_USER=appuser
@@ -67,7 +67,7 @@ RUN groupadd -g $APP_GID $APP_USER && \
 WORKDIR /app
 
 # Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code

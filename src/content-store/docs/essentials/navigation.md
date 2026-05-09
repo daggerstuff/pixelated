@@ -1,15 +1,7 @@
 ---
-title: 'Navigation'
-description:
----
-  'The navigation field in mint.json defines the pages that go in the navigation
-  menu'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
-draft: false
-toc: true
-share: true
-icon: 'map'
+title: Navigation
+description: The navigation field in mint.json defines the pages that go in the navigation menu
+pubDate: '2026-05-09'
 ---
 
 The navigation menu is the list of links on every website.

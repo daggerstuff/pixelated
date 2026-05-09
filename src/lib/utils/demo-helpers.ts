@@ -564,16 +564,16 @@ export function determineAlertLevel(
  */
 const hasBrowserCrypto = (): boolean => {
   const browserCrypto = globalThis.crypto
-  return (
-    typeof browserCrypto.getRandomValues === 'function'
-  )
+  return typeof browserCrypto.getRandomValues === 'function'
 }
 
 /**
  * Check if Node.js crypto is available
  */
 const hasNodeCrypto = (): boolean => {
-  return typeof process !== 'undefined' && typeof process.versions.node === 'string'
+  return (
+    typeof process !== 'undefined' && typeof process.versions.node === 'string'
+  )
 }
 
 /**
@@ -614,8 +614,9 @@ const generateNodeRandomValues = (array: Uint32Array): void => {
   if (crypto === null || typeof crypto !== 'object') {
     return
   }
-  const isCallable = (value: unknown): value is (...args: unknown[]) => unknown =>
-    typeof value === 'function'
+  const isCallable = (
+    value: unknown,
+  ): value is (...args: unknown[]) => unknown => typeof value === 'function'
   const randomBytes: unknown = Reflect.get(crypto, 'randomBytes')
   if (!isCallable(randomBytes)) {
     return
@@ -630,19 +631,20 @@ const generateNodeRandomValues = (array: Uint32Array): void => {
   if (!(bytesBuffer instanceof ArrayBuffer)) {
     return
   }
-  if (typeof bytesByteOffset !== 'number' || typeof bytesByteLength !== 'number') {
+  if (
+    typeof bytesByteOffset !== 'number' ||
+    typeof bytesByteLength !== 'number'
+  ) {
     return
   }
-  const buffer = new Uint8Array(
-    bytesBuffer,
-    bytesByteOffset,
-    bytesByteLength,
-  )
+  const buffer = new Uint8Array(bytesBuffer, bytesByteOffset, bytesByteLength)
   if (buffer.length < 8) {
     return
   }
-  array[0] = buffer[0] * 16777216 + buffer[1] * 65536 + buffer[2] * 256 + buffer[3]
-  array[1] = buffer[4] * 16777216 + buffer[5] * 65536 + buffer[6] * 256 + buffer[7]
+  array[0] =
+    buffer[0] * 16777216 + buffer[1] * 65536 + buffer[2] * 256 + buffer[3]
+  array[1] =
+    buffer[4] * 16777216 + buffer[5] * 65536 + buffer[6] * 256 + buffer[7]
 }
 
 /**

@@ -1,12 +1,7 @@
 ---
-description:
----
-  'Comprehensive guides for setting up testing environments for Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
-draft: false
-toc: true
-share: true
+description: Comprehensive guides for setting up testing environments for Pixelated
+title: Test Database Configuration
+pubDate: '2026-05-09'
 ---
 
 ## Testing Environment Setup Guides

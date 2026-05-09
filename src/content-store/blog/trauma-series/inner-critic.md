@@ -1,24 +1,19 @@
 ---
-description:
----
-  'Learn how to identify, understand, and transform your inner critic into a
-  supportive ally for personal growth and healing'
+title: inner critic
+description: >-
+  We all have that voice inside our heads—the one that judges, criticizes, and
 author: 'Dr. Sarah Chen'
 pubDate: 2024-03-12
-readingTime: 10
-tags: ['trauma', 'inner-critic', 'self-compassion', 'healing']
+tags:
+  - trauma
+  - inner-critic
+  - self-compassion
+  - healing
 series: 'Understanding Trauma'
 seriesOrder: 4
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt:
-      'Silhouette of a person finding their voice and silencing negative
-      thoughts',
-  }
 ---
 
-# Silencing the Inner Critic: Finding Your Authentic Voice
+## Silencing the Inner Critic: Finding Your Authentic Voice
 
 We all have that voice inside our heads—the one that judges, criticizes, and
 often holds us to impossible standards. This "inner critic" can be relentless,

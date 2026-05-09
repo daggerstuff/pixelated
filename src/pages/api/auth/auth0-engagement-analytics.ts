@@ -20,9 +20,8 @@ import type {
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
-const isServerError = (
-  value: unknown,
-): value is Record<string, unknown> => isObject(value) && 'status' in value
+const isServerError = (value: unknown): value is Record<string, unknown> =>
+  isObject(value) && 'status' in value
 
 // Disable prerendering since this API route uses request.headers
 export const prerender = false
@@ -202,7 +201,7 @@ export const GET: APIRoute = async ({ request }) => {
         'Cache-Control': 'private, max-age=60',
       },
     })
-    } catch (error: unknown) {
+  } catch (error: unknown) {
     // Log error securely (avoid leaking sensitive info)
     console.error('Engagement metrics API error:', error)
 
@@ -234,7 +233,9 @@ export const GET: APIRoute = async ({ request }) => {
       },
     }
 
-    const errorStatus = isServerError(error) ? Reflect.get(error, 'status') : undefined
+    const errorStatus = isServerError(error)
+      ? Reflect.get(error, 'status')
+      : undefined
     const status = typeof errorStatus === 'number' ? errorStatus : 500
 
     return new Response(JSON.stringify(apiError), {

@@ -15,18 +15,14 @@ import '@testing-library/jest-dom'
 // Keep auth-config imports from exploding in test/bootstrap contexts.
 process.env.JWT_SECRET ??= 'test-jwt-secret'
 
-const reactCompat = React as typeof React & {
-  act?: typeof act
-}
-
 vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react')>()
+  const actual = await importOriginal<typeof React>()
   const patchedAct = typeof actual.act === 'function' ? actual.act : act
   return {
     ...actual,
     act: patchedAct,
     default: {
-      ...(actual.default ?? actual),
+      ...actual,
       act: patchedAct,
     },
   }
@@ -36,42 +32,20 @@ vi.mock('react-dom/test-utils', () => ({
   act,
 }))
 
-// Make act available on React for components that import it directly
-if (!reactCompat.act || typeof reactCompat.act !== 'function') {
-  try {
-    Object.defineProperty(reactCompat, 'act', {
-      value: act,
-      writable: true,
-      configurable: true,
-      enumerable: false,
-    })
-  } catch (e) {
-    // React.act may already be defined in React 19.2.4 - safe to skip
-    console.debug('Failed to define reactCompat.act, might already exist', e)
-  }
-}
+try {
+  const reactCompat: {
+    act?: typeof act
+  } & typeof React = React
 
-// Add type declarations for DOM testing matchers
-declare module 'vitest' {
-  interface Assertion<T = any> {
-    toBeInTheDocument(): T
-    toHaveAttribute(attr: string, value?: string): T
-    toHaveClass(...classNames: string[]): T
-    toHaveValue(value?: string | number): T
-    toBeVisible(): T
-    toBeDisabled(): T
-    toBeEnabled(): T
-    toHaveTextContent(text: string | RegExp): T
-    toHaveDisplayValue(value: string | RegExp | Array<string | RegExp>): T
-    toBeChecked(): T
-    toHaveFocus(): T
-    toBeRequired(): T
-    toBeInvalid(): T
-    toBeValid(): T
-    toHaveStyle(css: string | Record<string, unknown>): T
-    toHaveAccessibleName(name?: string | RegExp): T
-    toHaveAccessibleDescription(description?: string | RegExp): T
-  }
+  Object.defineProperty(reactCompat, 'act', {
+    value: act,
+    writable: true,
+    configurable: true,
+    enumerable: false,
+  })
+} catch (error: unknown) {
+  // React.act may already be defined in some React versions - safe to skip
+  console.debug('Failed to define React act helper', error)
 }
 
 // Mock window.matchMedia
@@ -133,7 +107,11 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class MockIntersectionObserver {
+const MockIntersectionObserver = class {
+  constructor(
+    _callback: IntersectionObserverCallback,
+    _options?: IntersectionObserverInit,
+  ) {}
   root: Element | Document | null = null
   rootMargin = '0px'
   thresholds: ReadonlyArray<number> = [0]
@@ -144,7 +122,13 @@ global.IntersectionObserver = class MockIntersectionObserver {
   takeRecords(): IntersectionObserverEntry[] {
     return []
   }
-} as unknown as typeof IntersectionObserver
+}
+
+Object.defineProperty(globalThis, 'IntersectionObserver', {
+  value: MockIntersectionObserver,
+  writable: true,
+  configurable: true,
+})
 
 // Mock localStorage
 const localStorageMock = {

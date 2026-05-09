@@ -1,15 +1,9 @@
 ---
-title: 'Core Infrastructure'
-description:
----
-  'Documentation of Pixelated Healths core infrastructure components, security,
-  and configuration'
-pubDate: 2025-03-24
-share: true
-toc: true
-lastModDate: 2025-03-25
-tags: ['infrastructure', 'security', 'configuration', 'deployment']
-author: 'Pixelated Team'
+title: Core Infrastructure
+description: >-
+  Documentation of Pixelated Healths core infrastructure components, security, and configuration' share: true
+  lastModDate: 2025-0
+pubDate: '2026-05-09'
 ---
 
 ## Core Infrastructure Documentation

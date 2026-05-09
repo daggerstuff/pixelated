@@ -21,14 +21,16 @@ Environment=RCLONE_SYNC_PATH=
 Environment=BACKUP_KEEP_RUNS=6
 Environment=BACKUP_RUN_PREFIX=home-vivi-run
 Environment=BACKUP_SECTION_STRICT_ERRORS=false
+Environment=BACKUP_SKIP_SECTIONS=.cache,.cargo
+Environment=BACKUP_HEARTBEAT_INTERVAL=30
 # Optional: comma/newline-separated list of sections; defaults to all top-level home folders.
 Environment=BACKUP_SECTIONS=
 ExecStart=/usr/bin/env bash /home/vivi/pixelated/scripts/backup/backup-home-vivi.sh
-Restart=no
-RestartSec=30s
+Restart=on-failure
+RestartSec=3m
 StandardOutput=journal
 StandardError=journal
-TimeoutStartSec=3h
+TimeoutStartSec=8h
 TimeoutStopSec=10m
 KillMode=control-group
 KillSignal=SIGINT

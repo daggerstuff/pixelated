@@ -1,94 +1,13 @@
 ---
-description: 'Real-time session handling and WebSocket communication'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Real-time session handling and WebSocket communication
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Sessions
 ---
 
-## Overview
-
-The session management system handles real-time communication between clients
-and the AI therapy platform. It manages WebSocket connections, message routing,
-and session state.
-
-## Features
-
-    WebSocket-based instant communication
-    Persistent session tracking and management
-    Integrated AI analysis and response generation
-    Automatic connection recovery and error handling
-
-## Session Lifecycle
-
-## WebSocket Communication
-
-### Connection Setup
-
-```typescript
-const socket = new WebSocket('wss://api.gemcity.xyz/ws', {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-})
-
-socket.onopen = () => {
-  console.log('Connected to session')
-}
-
-socket.onmessage = (event) => {
-  const message = JSON.parse(event.data)
-  handleMessage(message)
-}
-```
-
-### Message Types
-
-```typescript
-interface Message {
-  type: 'text' | 'system' | 'ai' | 'action'
-  content: string
-  metadata?: {
-    sentiment?: number
-    topics?: string[]
-    suggestions?: string[]
-  }
-  timestamp: string
-}
-```
-
-### Heartbeat Mechanism
-
-```typescript
-// Send heartbeat every 30 seconds
-setInterval(() => {
-  if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ type: 'ping' }))
-  }
-}, 30000)
-
-// Handle heartbeat response
-socket.onmessage = (event) => {
-  const message = JSON.parse(event.data)
-  if (message.type === 'pong') {
-    updateLastHeartbeat()
-  }
-}
-```
-
-## Session Data Model
-
-```typescript
-interface Session {
-  id: string
-  clientId: exampleId
-  mode: 'chat' | 'voice' | 'video'
-  status: 'active' | 'completed' | 'cancelled'
-  startTime: string
-  endTime?: string
-  metrics?: {
-    duration: number
     messageCount: number
     responseTime: number
   }

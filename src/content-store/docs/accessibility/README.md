@@ -1,10 +1,12 @@
 ---
-description: 'Accessibility Implementation documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Accessibility Implementation documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Accessibility Implementation
 ---
 
 # Accessibility Implementation

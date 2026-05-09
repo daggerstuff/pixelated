@@ -1,10 +1,14 @@
 ---
-description: 'Integration Guide: Therapy Analysis System documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: >-
+  This guide demonstrates how to integrate the Advanced Detection Systems, Mistral-7B RAG, and Behavioral Analysis
+  Models into a cohesive therapy analysis
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: 'Integration Guide: Therapy Analysis System'
 ---
 
 # Integration Guide: Therapy Analysis System

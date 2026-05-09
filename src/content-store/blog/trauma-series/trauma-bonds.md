@@ -1,22 +1,20 @@
 ---
-description:
----
-  'Understand the powerful psychological attachments that form in abusive
-  relationships and learn strategies to recognize and heal from trauma bonds'
+title: trauma bonds
+description: >-
+  Why don't they just leave?" It's a question often asked about people in abusive
 author: 'Dr. Sarah Chen'
 pubDate: 2024-03-19
-readingTime: 11
-tags: ['trauma', 'relationships', 'healing', 'abuse', 'recovery']
+tags:
+  - trauma
+  - relationships
+  - healing
+  - abuse
+  - recovery
 series: 'Understanding Trauma'
 seriesOrder: 5
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1516410529446-2c777cb7366d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Broken chain symbolizing freedom from trauma bonds',
-  }
 ---
 
-# Breaking Free from Trauma Bonds: The Path to Emotional Liberation
+## Breaking Free from Trauma Bonds: The Path to Emotional Liberation
 
 "Why don't they just leave?" It's a question often asked about people in abusive
 or toxic relationships. From the outside, the solution seems simple. Yet for

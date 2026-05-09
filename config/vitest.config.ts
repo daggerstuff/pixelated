@@ -31,7 +31,7 @@ const ciNodeTestGlobs = process.env['CI']
     ]
   : []
 
-const nodeTestGlobs = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
+const nodeTestGlobs: string[] = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths({ root: path.resolve(__dirname, '..') })],
@@ -100,11 +100,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: [
-      './src/test/setup.ts',
-      './src/test/setup-react19.ts',
-      './vitest.setup.ts',
-    ],
+    setupFiles: ['./src/test/setup.ts', './src/test/setup-react19.ts'],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -136,8 +132,10 @@ export default defineConfig({
     projects: [
       {
         test: {
+          globals: true,
+          setupFiles: ['./src/test/setup-node.ts'],
           name: 'node',
-          include: nodeTestGlobs as unknown as string[],
+          include: nodeTestGlobs,
           environment: 'node',
         },
         resolve: {

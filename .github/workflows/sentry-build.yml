@@ -33,7 +33,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: 24.14.1
 
       - name: Get pnpm store path
         id: pnpm-store
@@ -103,6 +103,5 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags:
-            ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false

@@ -29,6 +29,7 @@ Options:
   --run-prefix <prefix>                 Override BACKUP_RUN_PREFIX.
   --strict-errors <true|false>           Override BACKUP_SECTION_STRICT_ERRORS.
   --sections <comma/newline-separated>   Override BACKUP_SECTIONS.
+  --no-block                           Restart timer without blocking.
 
 All environment overrides can also be provided via environment variables:
   BACKUP_MODE, BACKUP_KEEP_RUNS, BACKUP_RUN_PREFIX,
@@ -73,6 +74,7 @@ BACKUP_KEEP_RUNS_OVERRIDE="${BACKUP_KEEP_RUNS:-}"
 BACKUP_RUN_PREFIX_OVERRIDE="${BACKUP_RUN_PREFIX:-}"
 BACKUP_SECTION_STRICT_ERRORS_OVERRIDE="${BACKUP_SECTION_STRICT_ERRORS:-}"
 BACKUP_SECTIONS_OVERRIDE="${BACKUP_SECTIONS:-}"
+NO_BLOCK_RESTART=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -95,6 +97,14 @@ while [[ $# -gt 0 ]]; do
     --sections)
       BACKUP_SECTIONS_OVERRIDE="$(parse_arg "$1" "${@:2}")"
       shift 2
+      ;;
+    --no-block)
+      NO_BLOCK_RESTART=1
+      shift
+      ;;
+    --block)
+      NO_BLOCK_RESTART=0
+      shift
       ;;
     -h|--help)
       usage
@@ -152,7 +162,12 @@ build_override_file
 echo "[info] Reloading systemd and restarting timer..."
 "${SUDO[@]}" systemctl daemon-reload
 "${SUDO[@]}" systemctl enable backup-home-vivi.timer
-"${SUDO[@]}" systemctl restart backup-home-vivi.timer
+RESTART_CMD=( "${SUDO[@]}" systemctl restart )
+if (( NO_BLOCK_RESTART == 1 )); then
+  RESTART_CMD+=(--no-block)
+fi
+RESTART_CMD+=(backup-home-vivi.timer)
+"${RESTART_CMD[@]}"
 
 echo "[info] Current timer status:"
 "${SUDO[@]}" systemctl status backup-home-vivi.timer --no-pager --full
