@@ -272,12 +272,13 @@ const TreatmentPlanManager: FC = () => {
         if (!prev || !prev.goals) return prev
         const updatedGoals = [...prev.goals]
         if (updatedGoals[goalIndex]) {
+          const newObjectives: EditableObjective[] = [
+            ...(updatedGoals[goalIndex].objectives || []),
+            newObjective,
+          ]
           updatedGoals[goalIndex] = {
             ...updatedGoals[goalIndex],
-            objectives: [
-              ...(updatedGoals[goalIndex].objectives || []),
-              newObjective,
-            ],
+            objectives: newObjectives,
           }
           return { ...prev, goals: updatedGoals }
         }
@@ -311,7 +312,7 @@ const TreatmentPlanManager: FC = () => {
         const updatedGoals = [...prev.goals]
         const goal = updatedGoals[goalIndex]
         if (goal && goal.objectives && goal.objectives[objIndex]) {
-          const updatedObjectives = [...goal.objectives]
+          const updatedObjectives: EditableObjective[] = [...goal.objectives]
           updatedObjectives[objIndex] = {
             ...updatedObjectives[objIndex],
             [field]: value,
@@ -326,7 +327,7 @@ const TreatmentPlanManager: FC = () => {
         const updatedGoals = [...prev.goals]
         const goal = updatedGoals[goalIndex]
         if (goal && goal.objectives && goal.objectives[objIndex]) {
-          const updatedObjectives = [...goal.objectives]
+          const updatedObjectives: EditableObjective[] = [...goal.objectives]
           updatedObjectives[objIndex] = {
             ...updatedObjectives[objIndex],
             [field]: value,
@@ -350,7 +351,7 @@ const TreatmentPlanManager: FC = () => {
         const updatedGoals = [...prev.goals]
         const goal = updatedGoals[goalIndex]
         if (goal && goal.objectives) {
-          const updatedObjectives = [...goal.objectives]
+          const updatedObjectives: EditableObjective[] = [...goal.objectives]
           updatedObjectives.splice(objIndex, 1)
           updatedGoals[goalIndex] = { ...goal, objectives: updatedObjectives }
           return { ...prev, goals: updatedGoals }
@@ -362,7 +363,7 @@ const TreatmentPlanManager: FC = () => {
         const updatedGoals = [...prev.goals]
         const goal = updatedGoals[goalIndex]
         if (goal && goal.objectives) {
-          const updatedObjectives = [...goal.objectives]
+          const updatedObjectives: EditableObjective[] = [...goal.objectives]
           updatedObjectives.splice(objIndex, 1)
           updatedGoals[goalIndex] = { ...goal, objectives: updatedObjectives }
           return { ...prev, goals: updatedGoals }
