@@ -1,16 +1,9 @@
 ---
-description:
----
-  'Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental
-  health research and innovation'
-pubDate: 2025-01-01
-tags: ['introduction', 'overview', 'platform']
-author: 'Pixelated Team'
-category: 'Tutorial'
-order: 1
-draft: false
-toc: true
-share: true
+description: >-
+  Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental health research and innovation' tags:
+  ['introduction', 'ove
+title: Welcome to Pixelated Empathy
+pubDate: '2026-05-09'
 ---
 
 # Welcome to Pixelated Empathy

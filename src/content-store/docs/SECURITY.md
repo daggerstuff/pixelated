@@ -1,11 +1,13 @@
 ---
-description:
----
-  'Security guidelines, vulnerability reporting procedures, and compliance
-  requirements for the Pixelated project'
-pubDate: 2025-03-01
-author: 'Security Team'
-tags: ['security', 'compliance', 'hipaa', 'vulnerability']
+title: Security Policy
+description: Security guidelines, vulnerability reporting procedures, and compliance requirements for the Pixelated project.
+pubDate: '2025-03-01'
+author: Security Team
+tags:
+  - security
+  - compliance
+  - hipaa
+  - vulnerability
 toc: true
 share: false
 draft: false
@@ -143,3 +145,8 @@ on:
 - Team feedback
 
 Last Updated: March 2025
+
+[SECURITY_EMAIL]: mailto:security@pixelated.example
+[SECURITY_TEAM_EMAIL]: mailto:security-team@pixelated.example
+[COMPLIANCE_OFFICER_EMAIL]: mailto:compliance-officer@pixelated.example
+[EMERGENCY_CONTACT]: mailto:security-emergency@pixelated.example

@@ -1,10 +1,11 @@
 ---
-description: 'Guide to running and managing tests in Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Guide to running and managing tests in Pixelated
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Test Execution
 ---
 
 # Test Execution

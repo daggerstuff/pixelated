@@ -1,10 +1,12 @@
 ---
-description: 'CI/CD Pipeline documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: CI/CD Pipeline documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: CI/CD Pipeline
 ---
 
 # CI/CD Pipeline

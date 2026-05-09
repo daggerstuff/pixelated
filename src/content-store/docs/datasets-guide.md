@@ -1,10 +1,12 @@
 ---
-description: 'Mental Health Datasets Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Mental Health Datasets Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Mental Health Datasets Guide
 ---
 
 # Mental Health Datasets Guide

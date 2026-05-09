@@ -67,7 +67,6 @@
     "./src/types/**/*.d.ts",
     "./*.config.js",
     "./*.config.ts",
-    "./vitest.setup.ts",
     "./api/**/*.ts",
     "./plugins/**/*.ts",
     "./types/**/*.d.ts",

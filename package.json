@@ -34,6 +34,7 @@
     "analyze:bundle": "npx astro-bundle-analyzer dist",
     "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
     "format:check": "oxfmt --check . && prettier --check \"**/*.astro\"",
+    "format:check:changed": "node scripts/ci/format-changed.mjs",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:markdown": "pnpm exec markdownlint --config .markdownlint.json --ignore node_modules/@testing-library/dom/README.md --ignore node_modules/@testing-library/jest-dom/README.md --ignore node_modules/@testing-library/react/README.md --ignore node_modules/react-i18next/README.md \"**/*.md\" \"**/*.mdx\"",
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
@@ -311,8 +312,8 @@
   },
   "devDependencies": {
     "@aaif/goose": "^0.19.1",
-    "@astrojs/markdoc": "latest",
     "@astrojs/check": "latest",
+    "@astrojs/markdoc": "latest",
     "@astrojs/rss": "latest",
     "@eslint/css": "latest",
     "@eslint/js": "^10.0.1",

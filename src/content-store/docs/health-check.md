@@ -1,10 +1,12 @@
 ---
-description: 'Website Health Check Documentation documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Website Health Check Documentation documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Website Health Check Documentation
 ---
 
 # Website Health Check Documentation

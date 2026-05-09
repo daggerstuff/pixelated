@@ -1,11 +1,12 @@
 ---
-description: 'Display inline code and code blocks'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Display inline code and code blocks
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
-icon: 'code'
+icon: code
+title: Code
 ---
 
 ## Basic

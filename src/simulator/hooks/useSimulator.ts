@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 
 import { getScenarioById } from '../data/scenarios'
 import type { SimulationFeedback, Scenario } from '../types'
-import { TherapeuticTechnique, FeedbackType } from '../types'
+import { TherapeuticTechnique, FeedbackType, TherapeuticDomain } from '../types'
 import {
   getUserConsentPreference,
   setUserConsentPreference,
@@ -218,7 +218,7 @@ function generateFeedbackType(
   scenario: Scenario,
 ): FeedbackType {
   // Check if the user applied appropriate techniques for this scenario
-  const recommendedTechniques = scenario.techniques
+  const recommendedTechniques = scenario.techniques ?? []
   const usedRecommendedTechnique = techniques.some((t) =>
     recommendedTechniques.includes(t),
   )
@@ -276,7 +276,7 @@ function generateFeedbackMessage(
       } case, consider being more specific in addressing the client's underlying needs. Try building on what you've started.`
 
     case FeedbackType.TECHNIQUE_SUGGESTION:
-      suggestedTechnique = scenario.techniques.find(
+      suggestedTechnique = (scenario.techniques ?? []).find(
         (t) => !techniques.includes(t),
       )
       return `You're on the right track with ${techniques[0].replace(
@@ -296,9 +296,18 @@ function generateFeedbackMessage(
         scenario.domain
       } needs.`
 
-    default:
+    case FeedbackType.EMPATHETIC_RESPONSE:
+    case FeedbackType.TECHNIQUE_APPLICATION:
+    case FeedbackType.THERAPEUTIC_ALLIANCE:
+    case FeedbackType.QUESTION_FORMULATION:
+    case FeedbackType.COMMUNICATION_STYLE:
+    case FeedbackType.ACTIVE_LISTENING:
+    case FeedbackType.FRAMEWORK_ADHERENCE:
+    case FeedbackType.INTERVENTION_TIMING:
       return `Thank you for your response. Continue practicing different techniques to develop your skills.`
   }
+
+  return 'Thank you for your response. Continue practicing different techniques to develop your skills.'
 }
 
 /**
@@ -308,8 +317,10 @@ function suggestTechniques(
   currentTechniques: TherapeuticTechnique[],
   scenario: Scenario,
 ): TherapeuticTechnique[] {
+  const scenarioTechniques = scenario.techniques ?? []
+
   // Find techniques in the scenario that weren't used
-  const unusedRecommendedTechniques = scenario.techniques.filter(
+  const unusedRecommendedTechniques = scenarioTechniques.filter(
     (t) => !currentTechniques.includes(t),
   )
 
@@ -317,7 +328,7 @@ function suggestTechniques(
   if (unusedRecommendedTechniques.length === 0) {
     const allTechniques = Object.values(TherapeuticTechnique)
     const otherTechniques = allTechniques.filter(
-      (t) => !currentTechniques.includes(t) && !scenario.techniques.includes(t),
+      (t) => !currentTechniques.includes(t) && !scenarioTechniques.includes(t),
     )
 
     // Return one random technique from the unused ones
@@ -344,22 +355,40 @@ function generateAlternativeResponses(
 
   // For demo purposes, return static alternatives based on scenario domain
   switch (scenario.domain) {
-    case 'depression':
+    case TherapeuticDomain.DEPRESSION:
       return [
         "I notice you've been feeling down for several weeks. Could you tell me more about when you first started noticing these feelings?",
         'It sounds like these feelings have been really difficult to manage. What kinds of things have you tried so far to cope with them?',
       ]
 
-    case 'anxiety':
+    case TherapeuticDomain.ANXIETY:
       return [
         'I can hear how overwhelming these anxious thoughts are for you. Would it be helpful to explore some grounding techniques we could practice together?',
         'When you notice these anxious feelings coming up, what happens in your body? Understanding these physical sensations can help us develop targeted coping strategies.',
       ]
 
-    default:
+    case TherapeuticDomain.TRAUMA:
+    case TherapeuticDomain.SUBSTANCE_USE:
+    case TherapeuticDomain.GRIEF:
+    case TherapeuticDomain.RELATIONSHIP:
+    case TherapeuticDomain.STRESS_MANAGEMENT:
+    case TherapeuticDomain.CRISIS_INTERVENTION:
+    case TherapeuticDomain.EATING_DISORDERS:
+    case TherapeuticDomain.SELF_HARM:
+    case TherapeuticDomain.PERSONALITY_DISORDERS:
+    case TherapeuticDomain.DEVELOPMENTAL_DISORDERS:
+    case TherapeuticDomain.PSYCHOSIS:
+    case TherapeuticDomain.BIPOLAR_DISORDER:
+    case TherapeuticDomain.SOMATIC_DISORDERS:
+    case TherapeuticDomain.SLEEP_DISORDERS:
       return [
         "I hear that this has been challenging for you. Could you share more about how it's affecting your daily life?",
         'Thank you for sharing that with me. What would be most helpful for us to focus on today regarding this concern?',
       ]
   }
+
+  return [
+    "I hear that this has been challenging for you. Could you share more about how it's affecting your daily life?",
+    'Thank you for sharing that with me. What would be most helpful for us to focus on today regarding this concern?',
+  ]
 }

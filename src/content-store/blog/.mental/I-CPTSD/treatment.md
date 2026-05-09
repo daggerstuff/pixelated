@@ -137,6 +137,6 @@ addresses both trauma processing and skill development.
 
 ## Related Resources
 
-- [Symptoms Guide](/mental/I-CPTSD/symptoms)
-- [Support Resources](/mental/I-CPTSD/resources)
-- [Crisis Planning](/mental/IV-Management/crisis-planning)
+- [Symptoms Guide](./symptoms.md)
+- [Support Resources](./resources.md)
+- [Crisis Planning](../IV-Management/overview.md)

@@ -1,14 +1,9 @@
 ---
-description:
----
-  'Comprehensive guide to Pixelated Healths provider system for managing global
-  state and functionality'
-pubDate: 2025-03-24
-share: true
-toc: true
-lastModDate: 2025-03-25
-tags: ['providers', 'state-management', 'architecture']
-author: 'Pixelated Team'
+description: >-
+  Comprehensive guide to Pixelated Healths provider system for managing global state and functionality' share: true
+  lastModDate:
+title: Provider System
+pubDate: '2026-05-09'
 ---
 
 # Provider System

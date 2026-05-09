@@ -15,7 +15,7 @@ functionality expanded for greater flexibility.
 This live demo will guide you through setup and customization, offering helpful
 insights along the way. Enjoy exploring all the features this theme provides! âœ¨
 
-**Optimized Infrastructure**
+## Optimized Infrastructure
 
 - Zero UI Framework
 - [SEO-friendly](./blog/faqs-and-known-issues/#about-seo-and-accessibility)
@@ -27,7 +27,7 @@ insights along the way. Enjoy exploring all the features this theme provides! âœ
 - Outstanding
   [Lighthouse Performance](./blog/faqs-and-known-issues/#lighthouse-scores)
 
-**Content Management**
+## Content Management
 
 - Type Safety
 - Markdown & MDX Support
@@ -40,7 +40,7 @@ insights along the way. Enjoy exploring all the features this theme provides! âœ
 - Customizable Animated Backgrounds (Take a look around!)
 - [Showcase Your GitHub Releases and PRs](./blog/customizing-github-activity-pages)
 
-**User Experience**
+## User Experience
 
 - Responsive Layout
 - Full-platform TOC support

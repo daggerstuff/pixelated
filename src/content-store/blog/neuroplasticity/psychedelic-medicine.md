@@ -1,9 +1,7 @@
 ---
+title: Psychedelic Medicine & Neuroplasticity in Trauma Treatment
 description: >-
----
-  Exploring the revolutionary potential of psychedelic-assisted therapy in
-  healing trauma through enhanced neuroplasticity and neural network
-  reorganization
+  _Next in our series, we'll explore Integrative Approaches to Trauma Treatment,
 author: Research & Clinical Team
 pubDate: 2025-05-22T00:00:00.000Z
 draft: false
@@ -15,9 +13,8 @@ tags:
   - mental-health
 series: Neuroplasticity & Trauma
 seriesOrder: 4
-category: Research
----
 
+---
 # Psychedelic Medicine & Neuroplasticity in Trauma Treatment
 
 ## Introduction

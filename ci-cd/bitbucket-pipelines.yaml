@@ -1,4 +1,4 @@
-image: node:24-bullseye-slim
+image: node:24.14.1-bullseye-slim
 
 clone:
   depth: full
@@ -13,7 +13,7 @@ definitions:
   steps:
     - step: &governance-validate
         name: Governance Matrix Validation
-        image: python:3.11-bookworm
+        image: python:3.13.13-bookworm
         caches:
           - sonar
         script:
@@ -22,7 +22,7 @@ definitions:
           - uv run python scripts/governance/validate_data_source_matrix.py
     - step: &ingestion-stub-check
         name: Ingestion Stub Check
-        image: python:3.11-bookworm
+        image: python:3.13.13-bookworm
         script:
           - python --version
           - pip install --no-input --quiet uv
@@ -30,14 +30,14 @@ definitions:
           - uv run python scripts/ingestion/run_stub.py
     - step: &quality-scoring-test
         name: Quality Scoring Stub Test
-        image: python:3.11-bookworm
+        image: python:3.13.13-bookworm
         script:
           - python --version
           - pip install --no-input --quiet uv pytest
           - uv run pytest -q tests/python/test_quality_scoring_stub.py
     - step: &lint-oxlint
         name: Lint & Oxlint
-        image: node:24-bullseye-slim
+        image: node:24.14.1-bullseye-slim
         caches:
           - pnpm
         script:
@@ -48,7 +48,7 @@ definitions:
           - pnpm exec oxlint --type-aware -c .oxlintrc.json .
     - step: &security-scan
         name: Security Scan
-        image: node:24-bullseye-slim
+        image: node:24.14.1-bullseye-slim
         caches:
           - pnpm
         script:
@@ -58,7 +58,7 @@ definitions:
           - pnpm security:scan
     - step: &playwright-e2e
         name: Playwright Smoke E2E
-        image: node:24-bullseye-slim
+        image: node:24.14.1-bullseye-slim
         caches:
           - pnpm
         script:
