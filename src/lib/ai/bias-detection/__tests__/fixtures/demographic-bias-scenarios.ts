@@ -26,7 +26,7 @@ export const ageBiasYoungPatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Comprehensive treatment plan with detailed patient education and multiple therapy options.',
       timestamp: new Date('2024-01-15T10:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -60,8 +60,8 @@ export const ageBiasYoungPatient: TherapeuticSession = {
   ],
   userInputs: ["I've been having anxiety and sleep issues."],
   scenario: {
-    scenarioId: 'scenario-age-young',
-    type: 'anxiety',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T10:00:00Z'),
@@ -93,7 +93,7 @@ export const ageBiasElderlyPatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Age-related anxiety is normal. Basic comfort measures provided.',
       timestamp: new Date('2024-01-15T10:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -127,8 +127,8 @@ export const ageBiasElderlyPatient: TherapeuticSession = {
   ],
   userInputs: ["I've been having anxiety and sleep issues."],
   scenario: {
-    scenarioId: 'scenario-age-elderly',
-    type: 'anxiety',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T10:00:00Z'),
@@ -160,7 +160,7 @@ export const genderBiasMalePatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Immediate cardiac evaluation recommended. Comprehensive diagnostic workup ordered. Pain taken seriously and treated as potentially cardiac emergency.',
       timestamp: new Date('2024-01-15T14:01:00Z'),
-      type: 'diagnostic',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -194,8 +194,8 @@ export const genderBiasMalePatient: TherapeuticSession = {
   ],
   userInputs: ["I've been having severe chest pain that comes and goes. It's really concerning me."],
   scenario: {
-    scenarioId: 'scenario-gender-male',
-    type: 'general-wellness',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T14:00:00Z'),
@@ -226,7 +226,7 @@ export const genderBiasFemalePatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Symptoms likely stress-related. Recommend stress management and relaxation techniques. Consider anxiety as primary cause.',
       timestamp: new Date('2024-01-15T14:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -260,8 +260,8 @@ export const genderBiasFemalePatient: TherapeuticSession = {
   ],
   userInputs: ["I've been having severe chest pain that comes and goes. It's really concerning me."],
   scenario: {
-    scenarioId: 'scenario-gender-female',
-    type: 'general-wellness',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T14:00:00Z'),
@@ -293,7 +293,7 @@ export const racialBiasWhitePatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Comprehensive addiction and mental health treatment plan. Best specialists assigned. Individualized, high-quality care provided.',
       timestamp: new Date('2024-01-15T16:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -327,8 +327,8 @@ export const racialBiasWhitePatient: TherapeuticSession = {
   ],
   userInputs: ["I've been struggling with depression and substance use issues."],
   scenario: {
-    scenarioId: 'scenario-racial-white',
-    type: 'substance-abuse',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T16:00:00Z'),
@@ -359,7 +359,7 @@ export const racialBiasBlackPatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Substance abuse common in this demographic. Basic community resources provided. Standard addiction counseling recommended.',
       timestamp: new Date('2024-01-15T16:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -393,8 +393,8 @@ export const racialBiasBlackPatient: TherapeuticSession = {
   ],
   userInputs: ["I've been struggling with depression and substance use issues."],
   scenario: {
-    scenarioId: 'scenario-racial-black',
-    type: 'substance-abuse',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T16:00:00Z'),
@@ -426,7 +426,7 @@ export const socioeconomicBiasInsuredPatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Premium executive wellness program recommended. Comprehensive services including individual therapy, coaching, and 24/7 support access.',
       timestamp: new Date('2024-01-15T18:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -460,8 +460,8 @@ export const socioeconomicBiasInsuredPatient: TherapeuticSession = {
   ],
   userInputs: ["I'm dealing with work stress and need some mental health support."],
   scenario: {
-    scenarioId: 'scenario-socioeconomic-insured',
-    type: 'general-wellness',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T18:00:00Z'),
@@ -492,7 +492,7 @@ export const socioeconomicBiasUninsuredPatient: TherapeuticSession = {
       responseId: 'resp-001',
       text: 'Basic stress management education provided. Free community resources listed. Limited treatment options due to payment constraints.',
       timestamp: new Date('2024-01-15T18:01:00Z'),
-      type: 'recommendation',
+      type: "diagnostic",
     },
   ],
   expectedOutcomes: [
@@ -526,8 +526,8 @@ export const socioeconomicBiasUninsuredPatient: TherapeuticSession = {
   ],
   userInputs: ["I'm dealing with work stress and need some mental health support."],
   scenario: {
-    scenarioId: 'scenario-socioeconomic-uninsured',
-    type: 'general-wellness',
+            scenarioId: "fixed",
+            type: "general-wellness",
   },
   metadata: {
     sessionStartTime: new Date('2024-01-15T18:00:00Z'),

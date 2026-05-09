@@ -89,20 +89,9 @@ function getChunkName(id) {
   const normalizedId = id.replace(/\\/g, '/')
 
   if (
-    normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')
-  ) {
-    return 'feature-three-emotion'
-  }
-  if (normalizedId.includes('/src/components/three/Particle')) {
-    return 'feature-three-particle'
-  }
-  if (
     normalizedId.includes('/src/components/analytics/EnhancedChartComponent')
   ) {
     return 'feature-enhanced-chart'
-  }
-  if (normalizedId.includes('/src/components/ui/SwiperCarousel')) {
-    return 'feature-swiper'
   }
   if (
     normalizedId.includes('/src/components/treatment/TreatmentPlanManager') ||
@@ -184,9 +173,6 @@ function getChunkName(id) {
     return 'react-vendor'
   }
   if (
-    normalizedId.includes('framer-motion') ||
-    normalizedId.includes('/node_modules/framer-motion/') ||
-    normalizedId.includes('framer-motion/') ||
     normalizedId.includes('@radix-ui/react-virtualizer') ||
     normalizedId.includes('/node_modules/@radix-ui/react-virtualizer/') ||
     normalizedId.includes('@radix-ui/react-virtualizer/') ||
@@ -228,23 +214,6 @@ function getChunkName(id) {
     normalizedId.includes('chart.js')
   ) {
     return 'chartjs-vendor'
-  }
-  if (
-    normalizedId.includes('three') ||
-    normalizedId.includes('/node_modules/three/') ||
-    normalizedId.includes('three/') ||
-    normalizedId.includes('@react-three') ||
-    normalizedId.includes('/node_modules/@react-three/') ||
-    normalizedId.includes('@react-three/')
-  ) {
-    return 'three-vendor'
-  }
-  if (
-    normalizedId.includes('/swiper/') ||
-    normalizedId.includes('/node_modules/swiper/') ||
-    normalizedId.includes('swiper/')
-  ) {
-    return 'swiper-vendor'
   }
   if (
     normalizedId.includes('/node_modules/@azure/') ||
@@ -400,9 +369,6 @@ export default defineConfig({
           'pdfkit',
           '@tensorflow/tfjs',
           '@tensorflow/tfjs-layers',
-          'three',
-          '@react-three/fiber',
-          '@react-three/drei',
           'mongodb',
           'recharts',
           'chart.js',
@@ -517,9 +483,6 @@ export default defineConfig({
         '@sentry/profiling-node',
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
-        'three',
-        '@react-three/fiber',
-        '@react-three/drei',
         'mongodb',
         'recharts',
         'chart.js',
@@ -554,14 +517,10 @@ export default defineConfig({
         'lucide-react',
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
-        'three',
-        '@react-three/fiber',
-        '@react-three/drei',
         'mongodb',
         'recharts',
         'chart.js',
         '@spotlightjs/astro',
-        'framer-motion',
         'zustand',
         'jotai',
         '@tanstack/react-query',

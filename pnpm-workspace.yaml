@@ -18,5 +18,3 @@ allowBuilds:
   protobufjs: true
   sharp: true
   utf-8-validate: true
-patchedDependencies:
-  '@supermemory/tools@2.0.0': patches/@supermemory+tools@2.0.0.patch
