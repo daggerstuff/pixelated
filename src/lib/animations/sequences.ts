@@ -679,7 +679,19 @@ export function getReducedMotionVariant(variants: Variants): Variants {
 /**
  * Animation presets for common use cases
  */
-export const animationPresets = {
+export type AnimationPreset =
+  | 'fadeIn'
+  | 'slideUp'
+  | 'scaleIn'
+  | 'stagger'
+  | 'cascade'
+  | 'button'
+  | 'card'
+  | 'modal'
+  | 'toast'
+  | 'loading'
+
+export const animationPresets: Record<AnimationPreset, Variants> = {
   // Quick access to most commonly used sequences
   fadeIn: pageTransitionSequences.fadeSlide,
   slideUp: pageTransitionSequences.slideUp,
@@ -701,9 +713,7 @@ export const animationPresets = {
 
   // Loading
   loading: loadingSequences.pulse,
-} as const
-
-export type AnimationPreset = keyof typeof animationPresets
+}
 export type SequenceType =
   | 'page'
   | 'list'
