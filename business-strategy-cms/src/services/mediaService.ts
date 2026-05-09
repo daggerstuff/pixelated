@@ -19,14 +19,14 @@ interface UploadedFile {
 }
 
 interface MediaListOptions {
-  includeSignedUrls?: boolean
+  includeSignedUrls?: boolean | undefined
 }
 
 interface ListFilesOptions {
-  includeSignedUrls?: boolean
-  prefix?: string
-  pageSize?: number
-  continuationToken?: string
+  includeSignedUrls?: boolean | undefined
+  prefix?: string | undefined
+  pageSize?: number | undefined
+  continuationToken?: string | undefined
 }
 
 interface MediaListItem {
@@ -39,7 +39,7 @@ interface MediaListItem {
 interface PaginatedListFilesResult {
   files: MediaListItem[]
   isTruncated: boolean
-  nextContinuationToken?: string
+  nextContinuationToken?: string | undefined
 }
 
 // Hetzner Object Storage configuration (S3-compatible)
@@ -190,7 +190,7 @@ export class MediaService {
     userId: string,
     options: string | ListFilesOptions = {},
   ): Promise<PaginatedListFilesResult> {
-    const listOptions =
+    const listOptions: ListFilesOptions =
       typeof options === 'string'
         ? { prefix: this.normalizePrefix(options) }
         : options
@@ -340,9 +340,9 @@ export class MediaService {
   }
 
   private isFileWithKey(file: {
-    Key?: string | null
+    Key?: string | undefined
   }): file is { Key: string; LastModified?: Date; Size?: number } {
-    return Boolean(file.Key)
+    return typeof file.Key === 'string' && file.Key.length > 0
   }
 
   private toMediaListItem(file: {
@@ -360,7 +360,7 @@ export class MediaService {
 
   private async enrichWithSignedUrls(
     files: MediaListItem[],
-    userId?: string,
+    userId: string,
     maxConcurrent = 10,
   ): Promise<MediaListItem[]> {
     const total = files.length
@@ -371,6 +371,7 @@ export class MediaService {
     const worker = async (workerIndex: number): Promise<void> => {
       for (let index = workerIndex; index < total; index += concurrencyLimit) {
         const file = files[index]
+        if (!file) continue
 
         try {
           const signedUrl = await this.getSignedUrl(file.key, 3600, userId)

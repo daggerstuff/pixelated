@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { ToastOptions } from 'react-hot-toast'
+import type { ToastOptions, DefaultToastOptions } from 'react-hot-toast'
 import { toast as hotToast, Toaster } from 'react-hot-toast'
 
 import { cn } from '../../lib/utils'
@@ -24,7 +24,7 @@ export function Toast({
   className,
 }: {
   position?: ToastOptions['position']
-  toastOptions?: Partial<ToastOptions>
+  toastOptions?: DefaultToastOptions
   className?: string
 }) {
   return (

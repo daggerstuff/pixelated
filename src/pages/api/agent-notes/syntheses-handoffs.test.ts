@@ -17,10 +17,10 @@ const buildJsonRequest = (payload: unknown) => ({
   json: vi.fn().mockResolvedValue(payload),
 })
 
-const asActor = (actorId: string) => ({
+const asActor = (actorId: string, role = 'therapist') => ({
   user: {
     id: actorId,
-    role: 'therapist',
+    role,
   },
 })
 
@@ -47,7 +47,7 @@ describe('Agent note syntheses and handoffs APIs', () => {
           evidence: ['e1'],
           requestedAction: 'ask-human',
         }),
-        locals: asActor('agent-alpha'),
+        locals: asActor('agent-admin', 'admin'),
       } as any)
 
       await submitTurn({
@@ -64,7 +64,7 @@ describe('Agent note syntheses and handoffs APIs', () => {
           evidence: ['e2'],
           requestedAction: 'defer',
         }),
-        locals: asActor('agent-beta'),
+        locals: asActor('agent-admin', 'admin'),
       } as any)
 
       const response = await POST({
@@ -73,7 +73,7 @@ describe('Agent note syntheses and handoffs APIs', () => {
           maxTurns: 10,
           includeResolvedOpenQuestions: false,
         }),
-        locals: asActor('agent-alpha'),
+        locals: asActor('agent-alpha', 'admin'),
       } as any)
       const body = await response.json()
 
@@ -99,7 +99,7 @@ describe('Agent note syntheses and handoffs APIs', () => {
           maxTurns: 5,
           includeResolvedOpenQuestions: false,
         }),
-        locals: asActor('agent-alpha'),
+        locals: asActor('agent-admin', 'admin'),
       } as any)
 
       const body = await response.json()

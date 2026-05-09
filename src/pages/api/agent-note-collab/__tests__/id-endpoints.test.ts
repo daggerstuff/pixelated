@@ -4,6 +4,10 @@ import { getLedger } from '../../../../lib/agent-note-collab/server'
 import { GET as replay } from '../artifacts/[id]/replay'
 import { GET as getById } from '../turns/[id]'
 
+vi.mock('../../../../lib/auth/auth0-middleware', () => ({
+  authenticateRequest: vi.fn(async () => ({ success: true })),
+}))
+
 vi.mock('../../../../lib/agent-note-collab/server', () => ({
   getLedger: vi.fn(),
 }))

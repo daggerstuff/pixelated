@@ -44,7 +44,7 @@ function visit(
 
 export function remarkDirectiveSugar() {
   return (tree: Root) => {
-    visit(tree, (node: any) => {
+    visit(tree, () => true, (node: any) => {
       // Process directive nodes
       if (node.type && node.type.includes('Directive')) {
         const directiveNode = node as DirectiveNode
@@ -54,7 +54,7 @@ export function remarkDirectiveSugar() {
           case 'note':
             // Transform note directives
             if (directiveNode.children) {
-              directiveNode.type = 'paragraph'
+              ;(directiveNode as Node).type = 'paragraph'
               directiveNode.data = {
                 hName: 'div',
                 hProperties: {
@@ -67,7 +67,7 @@ export function remarkDirectiveSugar() {
           case 'warning':
             // Transform warning directives
             if (directiveNode.children) {
-              directiveNode.type = 'paragraph'
+              ;(directiveNode as Node).type = 'paragraph'
               directiveNode.data = {
                 hName: 'div',
                 hProperties: {
@@ -80,7 +80,7 @@ export function remarkDirectiveSugar() {
           case 'tip':
             // Transform tip directives
             if (directiveNode.children) {
-              directiveNode.type = 'paragraph'
+              ;(directiveNode as Node).type = 'paragraph'
               directiveNode.data = {
                 hName: 'div',
                 hProperties: {

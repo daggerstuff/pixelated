@@ -122,7 +122,7 @@ export default function EmotionTemporalAnalysisChart({
   const prepareProgressionData = () => {
     const progression =
       typeof data === 'object' && data !== null && 'progression' in data
-        ? (data as { progression?: Record<string, unknown> }).progression
+        ? (data as { progression?: Record<string, number> }).progression
         : undefined
 
     return [
