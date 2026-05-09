@@ -6,7 +6,7 @@ import {
   CalendarIcon,
   BoltIcon,
 } from '@heroicons/react/24/outline'
-import type { FC } from 'react'
+import type { FC, ComponentProps, ReactElement } from 'react'
 import React from 'react'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
@@ -50,6 +50,15 @@ const DASHBOARD_TABS: readonly DashboardTab[] = [
 ]
 
 const TIME_RANGES: readonly TimeRange[] = ['week', 'month', 'quarter', 'year']
+const DASHBOARD_TAB_ICONS: Record<
+  DashboardTab['icon'],
+  (props: ComponentProps<'svg'>) => ReactElement
+> = {
+  chart: (props) => <ChartBarIcon {...props} />,
+  trending: (props) => <ArrowTrendingUpIcon {...props} />,
+  users: (props) => <UserGroupIcon {...props} />,
+  calendar: (props) => <CalendarIcon {...props} />,
+}
 
 const isTimeRange = (value: string): value is TimeRange =>
   (TIME_RANGES as readonly string[]).includes(value)
@@ -147,10 +156,12 @@ export const TherapistDashboard: FC = () => {
                 <select
                   aria-label='Select time range'
                   value={timeRange}
-                  onChange={(event) =>
-                    isTimeRange(event.target.value) &&
-                    setTimeRange(event.target.value)
-                  }
+                  onChange={(event) => {
+                    const nextRange = event.target.value
+                    if (isTimeRange(nextRange)) {
+                      setTimeRange(nextRange)
+                    }
+                  }}
                   className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
                   {TIME_RANGES.map((range) => (
@@ -182,17 +193,7 @@ export const TherapistDashboard: FC = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  <>
-                    {tab.icon === 'chart' ? (
-                      <ChartBarIcon className='h-5 w-5' />
-                    ) : tab.icon === 'trending' ? (
-                      <ArrowTrendingUpIcon className='h-5 w-5' />
-                    ) : tab.icon === 'users' ? (
-                      <UserGroupIcon className='h-5 w-5' />
-                    ) : tab.icon === 'calendar' ? (
-                      <CalendarIcon className='h-5 w-5' />
-                    ) : null}
-                  </>
+                  {DASHBOARD_TAB_ICONS[tab.icon]({ className: 'h-5 w-5' })}
                   {tab.label}
                 </button>
               ))}
