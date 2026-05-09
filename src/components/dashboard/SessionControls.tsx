@@ -68,7 +68,7 @@ export function SessionControls({
     <section className='space-y-4' aria-label='Session Controls'>
       <h3 className='text-lg font-semibold'>Session Controls</h3>
 
-      <div className='flex gap-2' role='group'>
+      <div className='flex gap-2' role='group' aria-label='Session Action Controls'>
         <button
           type='button'
           ref={(el) => {
@@ -80,9 +80,11 @@ export function SessionControls({
           disabled={!activeSession}
           className={cn(
             activeSession
-              ? 'bg-blue-600 text-white'
+              ? 'bg-blue-600 text-white hover:opacity-90'
               : 'bg-gray-200 text-gray-500',
-            'px-3 py-2 rounded',
+            'px-3 py-2 rounded transition-opacity',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
           Pause Session
@@ -99,9 +101,11 @@ export function SessionControls({
           disabled={!pausedSession}
           className={cn(
             pausedSession
-              ? 'bg-green-600 text-white'
+              ? 'bg-green-600 text-white hover:opacity-90'
               : 'bg-gray-200 text-gray-500',
-            'px-3 py-2 rounded',
+            'px-3 py-2 rounded transition-opacity',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
           Resume Session
@@ -118,9 +122,11 @@ export function SessionControls({
           disabled={!activeSession}
           className={cn(
             activeSession
-              ? 'bg-red-600 text-white'
+              ? 'bg-red-600 text-white hover:opacity-90'
               : 'bg-gray-200 text-gray-500',
-            'px-3 py-2 rounded',
+            'px-3 py-2 rounded transition-opacity',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
           End Session

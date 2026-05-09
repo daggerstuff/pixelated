@@ -5,3 +5,5 @@
 ## 2026-04-19 - Dynamic aria-labels in Admin Lists | Learning: Repeated icon and text buttons inside loops create ambiguous announcements for screen reader users. | Action: Use loop variables to provide specific, dynamically generated aria-labels (e.g., `Edit ${item.name}`).
 
 ## 2024-05-15 - Time Range Selectors | Learning: Custom time range buttons visually act as toggle buttons, but without `aria-pressed`, screen reader users cannot perceive the active state. | Action: Added `aria-pressed={true/false}` and grouped them with `role="group"` and an explicit `aria-label`.
+
+## 2026-04-20 - Group roles and interactive button feedback | Learning: Elements with role="group" need an accessible name (aria-label), and interactive buttons require explicit focus-visible rings and disabled states for both mouse (cursor-not-allowed) and keyboard users. | Action: Added aria-label to role="group" and comprehensive hover/focus-visible/disabled styling to SessionControls buttons.
