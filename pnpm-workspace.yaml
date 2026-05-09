@@ -18,3 +18,9 @@ allowBuilds:
   protobufjs: true
   sharp: true
   utf-8-validate: true
+minimumReleaseAgeExclude:
+  - path-to-regexp@6.3.0
+  - yaml@2.8.3
+overrides:
+  path-to-regexp@>=4.0.0 <6.3.0: ^6.3.0
+  yaml@>=2.0.0 <2.8.3: ^2.8.3
