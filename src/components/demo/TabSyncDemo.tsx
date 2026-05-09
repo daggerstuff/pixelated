@@ -11,10 +11,11 @@ import { useSyncedState, useSyncedObject } from '@/hooks/useSyncedState'
 import tabSyncManager from '@/utils/sync/tabSyncManager'
 
 interface SyncedPreferences {
-  theme: 'light' | 'dark'
-  fontSize: 'small' | 'medium' | 'large'
-  notifications: boolean
-  language: string
+   theme: 'light' | 'dark'
+   fontSize: 'small' | 'medium' | 'large'
+   notifications: boolean
+   language: string
+   [key: string]: unknown
 }
 
 /**

@@ -352,7 +352,7 @@ librt==0.7.8
     #   mypy
 lime==0.2.0.1
     # via -r src/lib/ai/bias-detection/requirements.txt
-llvmlite==0.36.0
+llvmlite>=0.47.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   numba
@@ -451,7 +451,7 @@ nltk==3.9.4
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   textblob
-numba==0.53.1
+numba>=0.65.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   shap

@@ -258,12 +258,14 @@ export default function SessionDocumentationComponent({
           Error Loading Documentation
         </h3>
         <p className="text-gray-600 max-w-md text-center">
-          {error?.['message'] ||
+          {error.message ||
             'An error occurred while loading session documentation.'}
         </p>
         <div className="mt-4 flex gap-3">
           <button
-            onClick={() => loadDocumentation(true)}
+            onClick={() => {
+              void loadDocumentation(true)
+            }}
             className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
           >
             Retry
@@ -398,7 +400,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation?.['summary'] || ''}
+                  value={editableDocumentation.summary ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('summary', e.target.value)
                   }
@@ -406,7 +408,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className="text-gray-700">
-                  {editableDocumentation?.['summary']}
+                  {editableDocumentation.summary}
                 </p>
               )}
             </section>
@@ -416,8 +418,8 @@ export default function SessionDocumentationComponent({
                 Key Insights
               </h4>
               <ul className="list-disc space-y-1 pl-5">
-                {editableDocumentation?.['keyInsights']?.map(
-                  (insight: string) => {
+                {editableDocumentation.keyInsights?.map(
+                  (insight: string, index: number) => {
                     const key = `insight-${insight
                       .trim()
                       .toLowerCase()
@@ -436,7 +438,7 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newInsights = [
-                                ...(editableDocumentation?.['keyInsights'] ||
+                                ...(editableDocumentation.keyInsights ??
                                   []),
                               ]
 
@@ -451,13 +453,13 @@ export default function SessionDocumentationComponent({
                       </li>
                     )
                   },
-                ) || []}
+                ) ?? []}
               </ul>
               {!readOnly && (
                 <button
                   onClick={() => {
                     handleChange('keyInsights', [
-                      ...(editableDocumentation?.['keyInsights'] || []),
+                      ...(editableDocumentation.keyInsights ?? []),
                       '',
                     ])
                   }}
@@ -474,7 +476,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation?.['recommendedFollowUp'] || ''}
+                  value={editableDocumentation.recommendedFollowUp ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('recommendedFollowUp', e.target.value)
                   }
@@ -482,7 +484,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className="text-gray-700">
-                  {editableDocumentation?.['recommendedFollowUp']}
+                  {editableDocumentation.recommendedFollowUp}
                 </p>
               )}
             </section>
@@ -493,7 +495,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation?.['nextSessionPlan'] || ''}
+                  value={editableDocumentation.nextSessionPlan ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('nextSessionPlan', e.target.value)
                   }
@@ -501,7 +503,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className="text-gray-700">
-                  {editableDocumentation?.['nextSessionPlan']}
+                  {editableDocumentation.nextSessionPlan}
                 </p>
               )}
             </section>
@@ -514,7 +516,7 @@ export default function SessionDocumentationComponent({
               Therapeutic Techniques Used
             </h4>
             <div className="space-y-3">
-              {editableDocumentation?.['therapeuticTechniques']?.map(
+              {editableDocumentation.therapeuticTechniques?.map(
                 (
                   technique: {
                     name: string
@@ -538,14 +540,13 @@ export default function SessionDocumentationComponent({
                           {!readOnly ? (
                             <input
                               type="text"
-                              value={technique?.['name'] || ''}
+                              value={technique.name}
                               onChange={(
                                 e: React.ChangeEvent<HTMLInputElement>,
                               ) => {
                                 const newTechniques = [
-                                  ...(editableDocumentation?.[
-                                    'therapeuticTechniques'
-                                  ] || []),
+                                  ...(editableDocumentation.therapeuticTechniques ??
+                                    []),
                                 ]
 
                                 newTechniques[index] = {
@@ -560,21 +561,20 @@ export default function SessionDocumentationComponent({
                               className="border-gray-300 w-full rounded-md border p-1"
                             />
                           ) : (
-                            technique?.['name']
+                            technique.name
                           )}
                         </h5>
                       </div>
                       <div className="mb-2">
                         {!readOnly ? (
                           <textarea
-                            value={technique?.['description'] || ''}
+                            value={technique.description}
                             onChange={(
                               e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newTechniques = [
-                                ...(editableDocumentation?.[
-                                  'therapeuticTechniques'
-                                ] || []),
+                                ...(editableDocumentation.therapeuticTechniques ??
+                                  []),
                               ]
 
                               newTechniques[index] = {
@@ -674,11 +674,14 @@ export default function SessionDocumentationComponent({
                   Treatment Goals
                 </h5>
                 {editableDocumentation.treatmentProgress?.goals.map(
-                  (goal: {
-                    description: string
-                    progress: number
-                    notes: string
-                  }) => {
+                  (
+                    goal: {
+                      description: string
+                      progress: number
+                      notes: string
+                    },
+                    index: number,
+                  ) => {
                     const key = `goal-${goal.description
                       .trim()
                       .toLowerCase()
@@ -697,8 +700,8 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLTextAreaElement>,
                               ) => {
                                 const newGoals = [
-                                  ...(editableDocumentation.treatmentProgress
-                                    ?.goals || []),
+                                  ...(editableDocumentation.treatmentProgress?.goals ??
+                                    []),
                                 ]
 
                                 newGoals[index] = {
@@ -732,8 +735,8 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLInputElement>,
                               ) => {
                                 const newGoals = [
-                                  ...(editableDocumentation.treatmentProgress
-                                    ?.goals || []),
+                                  ...(editableDocumentation.treatmentProgress?.goals ??
+                                    []),
                                 ]
 
                                 newGoals[index] = {
@@ -767,8 +770,8 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLTextAreaElement>,
                               ) => {
                                 const newGoals = [
-                                  ...(editableDocumentation.treatmentProgress
-                                    ?.goals || []),
+                                  ...(editableDocumentation.treatmentProgress?.goals ??
+                                    []),
                                 ]
 
                                 newGoals[index] = {
@@ -797,8 +800,7 @@ export default function SessionDocumentationComponent({
                   <button
                     onClick={() => {
                       const newGoals = [
-                        ...(editableDocumentation.treatmentProgress?.goals ||
-                          []),
+                        ...(editableDocumentation.treatmentProgress?.goals ?? []),
                         {
                           description: '',
                           progress: 0,
@@ -825,8 +827,8 @@ export default function SessionDocumentationComponent({
                 {!readOnly ? (
                   <textarea
                     value={
-                      editableDocumentation.treatmentProgress
-                        ?.overallAssessment || ''
+                      editableDocumentation.treatmentProgress?.overallAssessment ??
+                      ''
                     }
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       handleChange('treatmentProgress', {
@@ -850,7 +852,7 @@ export default function SessionDocumentationComponent({
               </h4>
               <ul className="list-disc space-y-1 pl-5">
                 {editableDocumentation.clientStrengths?.map(
-                  (strength: string) => {
+                  (strength: string, index: number) => {
                     const key = `strength-${strength
                       .trim()
                       .toLowerCase()
@@ -869,8 +871,7 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newStrengths = [
-                                ...(editableDocumentation.clientStrengths ||
-                                  []),
+                                ...(editableDocumentation.clientStrengths ?? []),
                               ]
 
                               newStrengths[index] = e.target.value
@@ -890,7 +891,7 @@ export default function SessionDocumentationComponent({
                 <button
                   onClick={() => {
                     handleChange('clientStrengths', [
-                      ...(editableDocumentation.clientStrengths || []),
+                      ...(editableDocumentation.clientStrengths ?? []),
                       '',
                     ])
                   }}
@@ -911,7 +912,10 @@ export default function SessionDocumentationComponent({
             <div className="space-y-3">
               {Array.isArray(editableDocumentation.emotionalPatterns) &&
                 editableDocumentation.emotionalPatterns.map(
-                  (pattern: { pattern: string; significance: string }) => {
+                  (
+                    pattern: { pattern: string; significance: string },
+                    index: number,
+                  ) => {
                     const key = `pattern-${pattern.pattern
                       .trim()
                       .toLowerCase()
@@ -931,8 +935,8 @@ export default function SessionDocumentationComponent({
                                   e: React.ChangeEvent<HTMLInputElement>,
                                 ) => {
                                   const newPatterns = [
-                                    ...(editableDocumentation.emotionalPatterns ??
-                                      []),
+                                ...(editableDocumentation.emotionalPatterns ??
+                                  []),
                                   ]
 
                                   newPatterns[index] = {
@@ -983,7 +987,7 @@ export default function SessionDocumentationComponent({
               <button
                 onClick={() => {
                   handleChange('emotionalPatterns', [
-                    ...(editableDocumentation.emotionalPatterns || []),
+                    ...(editableDocumentation.emotionalPatterns ?? []),
                     {
                       pattern: '',
                       significance: '',
@@ -1001,7 +1005,8 @@ export default function SessionDocumentationComponent({
                 Emergent Issues to Address
               </h4>
               <ul className="list-disc space-y-1 pl-5">
-                {editableDocumentation.emergentIssues?.map((issue: string) => {
+                {editableDocumentation.emergentIssues?.map(
+                  (issue: string, index: number) => {
                   const key = `issue-${issue
                     .trim()
                     .toLowerCase()
@@ -1017,7 +1022,7 @@ export default function SessionDocumentationComponent({
                             e: React.ChangeEvent<HTMLInputElement>,
                           ) => {
                             const newIssues = [
-                              ...(editableDocumentation.emergentIssues || []),
+                              ...(editableDocumentation.emergentIssues ?? []),
                             ]
 
                             newIssues[index] = e.target.value
@@ -1030,13 +1035,14 @@ export default function SessionDocumentationComponent({
                       )}
                     </li>
                   )
-                })}
+                  },
+                )}
               </ul>
               {!readOnly && (
                 <button
                   onClick={() => {
                     handleChange('emergentIssues', [
-                      ...(editableDocumentation.emergentIssues || []),
+                      ...(editableDocumentation.emergentIssues ?? []),
                       '',
                     ])
                   }}
@@ -1087,7 +1093,7 @@ export default function SessionDocumentationComponent({
                 Therapeutic Techniques Used
               </h4>
               <div className="mb-4 space-y-3">
-                {Array.isArray(editableDocumentation?.therapeuticTechniques) &&
+                {Array.isArray(editableDocumentation.therapeuticTechniques) &&
                   editableDocumentation.therapeuticTechniques.map(
                     (technique: {
                       name: string
@@ -1124,25 +1130,25 @@ export default function SessionDocumentationComponent({
                 Emotional Patterns Observed
               </h4>
               <div className="mb-4 space-y-3">
-                {Array.isArray(editableDocumentation?.emotionalPatterns) &&
-                  editableDocumentation.emotionalPatterns.map(
-                    (pattern: { pattern: string; significance: string }) => {
-                      const key = `pattern-full-${pattern.pattern
-                        .trim()
-                        .toLowerCase()
-                        .replace(/\\W+/g, '-')}`
-                      return (
-                        <div key={key || 'pattern-full-empty'} className="mb-3">
-                          <h5 className="text-gray-800 font-medium">
-                            {pattern.pattern}
-                          </h5>
-                          <p className="text-gray-700">
-                            {pattern.significance}
-                          </p>
-                        </div>
-                      )
-                    },
-                  )}
+               {Array.isArray(editableDocumentation.emotionalPatterns) &&
+                   editableDocumentation.emotionalPatterns.map(
+                     (pattern: { pattern: string; significance: string }, index: number) => {
+                       const key = `pattern-full-${pattern.pattern
+                         .trim()
+                         .toLowerCase()
+                         .replace(/\\W+/g, '-')}`
+                       return (
+                         <div key={key || 'pattern-full-empty'} className="mb-3">
+                           <h5 className="text-gray-800 font-medium">
+                             {pattern.pattern}
+                           </h5>
+                           <p className="text-gray-700">
+                             {pattern.significance}
+                           </p>
+                         </div>
+                       )
+                     },
+                   )}
               </div>
             </section>
 
@@ -1154,7 +1160,7 @@ export default function SessionDocumentationComponent({
               <h5 className="text-md text-gray-700 mb-2 font-medium">
                 Treatment Goals
               </h5>
-              {editableDocumentation.treatmentProgress?.goals?.map(
+              {editableDocumentation.treatmentProgress?.goals.map(
                 (goal: {
                   description: string
                   progress: number
@@ -1265,7 +1271,7 @@ export default function SessionDocumentationComponent({
               </div>
             </section>
 
-            {editableDocumentation?.outcomePredictions &&
+            {editableDocumentation.outcomePredictions &&
               editableDocumentation.outcomePredictions.length > 0 && (
                 <section className="mt-8">
                   <h4 className="text-blue-800 mb-3 text-lg font-semibold">
@@ -1291,7 +1297,7 @@ export default function SessionDocumentationComponent({
                       </thead>
                       <tbody>
                         {Array.isArray(
-                          editableDocumentation?.outcomePredictions,
+                        editableDocumentation.outcomePredictions,
                         ) &&
                           editableDocumentation.outcomePredictions.map(
                             (
