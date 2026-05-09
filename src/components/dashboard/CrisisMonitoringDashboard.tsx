@@ -126,7 +126,9 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Performance optimization: Memoize derived patient risk data to prevent O(N) operations on every render
   const highRiskPatients = useMemo(() => {
-    return patients.filter((p) => p.currentRisk === 'high' || p.currentRisk === 'imminent')
+    return patients.filter(
+      (p) => p.currentRisk === 'high' || p.currentRisk === 'imminent',
+    )
   }, [patients])
 
   const riskDistribution = useMemo(() => {
@@ -323,13 +325,11 @@ export const CrisisMonitoringDashboard: React.FC<
               <div>
                 <strong>Critical Alerts Requiring Immediate Attention</strong>
                 <div className='mt-2 space-y-1'>
-                  {criticalUnacknowledgedAlerts
-                    .slice(0, 3)
-                    .map((alert) => (
-                      <div key={alert.id} className='text-sm'>
-                        {alert.message}
-                      </div>
-                    ))}
+                  {criticalUnacknowledgedAlerts.slice(0, 3).map((alert) => (
+                    <div key={alert.id} className='text-sm'>
+                      {alert.message}
+                    </div>
+                  ))}
                 </div>
               </div>
             </Alert>
@@ -345,48 +345,46 @@ export const CrisisMonitoringDashboard: React.FC<
             </CardHeader>
             <CardContent>
               <div className='space-y-4'>
-                {highRiskPatients
-                  .slice(0, 5)
-                  .map((patient) => (
-                    <div
-                      key={patient.id}
-                      className='flex items-center justify-between rounded-lg border p-3'
-                    >
-                      <div className='flex items-center space-x-3'>
-                        <div
-                          className={`h-3 w-3 rounded-full ${
-                            patient.currentRisk === 'imminent'
-                              ? 'bg-red-500'
-                              : 'bg-orange-500'
-                          }`}
-                        />
-                        <div>
-                          <div className='font-medium'>{patient.name}</div>
-                          <div className='text-gray-500 text-sm'>
-                            Last contact:{' '}
-                            {new Date(patient.lastContact).toLocaleDateString()}
-                          </div>
+                {highRiskPatients.slice(0, 5).map((patient) => (
+                  <div
+                    key={patient.id}
+                    className='flex items-center justify-between rounded-lg border p-3'
+                  >
+                    <div className='flex items-center space-x-3'>
+                      <div
+                        className={`h-3 w-3 rounded-full ${
+                          patient.currentRisk === 'imminent'
+                            ? 'bg-red-500'
+                            : 'bg-orange-500'
+                        }`}
+                      />
+                      <div>
+                        <div className='font-medium'>{patient.name}</div>
+                        <div className='text-gray-500 text-sm'>
+                          Last contact:{' '}
+                          {new Date(patient.lastContact).toLocaleDateString()}
                         </div>
                       </div>
-
-                      <div className='flex items-center space-x-2'>
-                        <Badge className={getRiskColor(patient.currentRisk)}>
-                          {patient.currentRisk.toUpperCase()}
-                        </Badge>
-
-                        {showEmergencyControls && (
-                          <Button
-                            size='sm'
-                            variant='outline'
-                            onClick={() => triggerManualEscalation(patient.id)}
-                          >
-                            <Phone className='mr-1 h-4 w-4' />
-                            Escalate
-                          </Button>
-                        )}
-                      </div>
                     </div>
-                  ))}
+
+                    <div className='flex items-center space-x-2'>
+                      <Badge className={getRiskColor(patient.currentRisk)}>
+                        {patient.currentRisk.toUpperCase()}
+                      </Badge>
+
+                      {showEmergencyControls && (
+                        <Button
+                          size='sm'
+                          variant='outline'
+                          onClick={() => triggerManualEscalation(patient.id)}
+                        >
+                          <Phone className='mr-1 h-4 w-4' />
+                          Escalate
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
 
                 {highRiskPatients.length === 0 && (
                   <div className='text-gray-500 py-8 text-center'>
@@ -634,7 +632,8 @@ export const CrisisMonitoringDashboard: React.FC<
                 <div className='space-y-3'>
                   {['imminent', 'high', 'moderate', 'low', 'minimal'].map(
                     (risk) => {
-                      const count = riskDistribution[risk as keyof typeof riskDistribution]
+                      const count =
+                        riskDistribution[risk as keyof typeof riskDistribution]
                       const percentage =
                         patients.length > 0
                           ? (count / patients.length) * 100

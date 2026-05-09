@@ -306,26 +306,22 @@ export class MediaService {
 
   async ensureBucketExists(): Promise<void> {
     try {
-      await this.storageClientFactory
-        .getS3Client()
-        .send(
-          new HeadBucketCommand({
-            Bucket: this.storageClientFactory.getBucketName(),
-          }),
-        )
+      await this.storageClientFactory.getS3Client().send(
+        new HeadBucketCommand({
+          Bucket: this.storageClientFactory.getBucketName(),
+        }),
+      )
     } catch (error: unknown) {
       const httpStatusCode = (
         error as { $metadata?: { httpStatusCode?: number } }
       ).$metadata?.httpStatusCode
 
       if (httpStatusCode === 404) {
-        await this.storageClientFactory
-          .getS3Client()
-          .send(
-            new CreateBucketCommand({
-              Bucket: this.storageClientFactory.getBucketName(),
-            }),
-          )
+        await this.storageClientFactory.getS3Client().send(
+          new CreateBucketCommand({
+            Bucket: this.storageClientFactory.getBucketName(),
+          }),
+        )
       } else {
         throw error
       }

@@ -36,7 +36,9 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
         <h4 className='text-red-800 font-medium'>
           Unable to load analytics data
         </h4>
-        <p className='text-red-600 mt-1 text-sm'>{error instanceof Error ? error.message : String(error)}</p>
+        <p className='text-red-600 mt-1 text-sm'>
+          {error instanceof Error ? error.message : String(error)}
+        </p>
       </div>
       <button
         onClick={onRetry}
@@ -68,7 +70,11 @@ interface TimeRangeSelectorProps {
 const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
   ({ value, onChange }) => {
     return (
-      <div className='flex space-x-2' role='radiogroup' aria-label='Select time range'>
+      <div
+        className='flex space-x-2'
+        role='radiogroup'
+        aria-label='Select time range'
+      >
         {TIME_RANGE_OPTIONS.map((option) => (
           <button
             key={option.value}

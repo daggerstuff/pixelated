@@ -94,20 +94,23 @@ export function useSessionProgressMilestones(
     setProgressMetrics({ ...initialProgressMetrics })
   }, [])
 
-  const setProgressState = useCallback((state: Partial<ProgressMilestoneState>) => {
-    if (state.progress !== undefined) {
-      setProgressValue(state.progress)
-    }
-    if (
-      state.progressSnapshots !== undefined &&
-      state.progressMetrics !== undefined
-    ) {
-      setProgressMetrics(state.progressMetrics)
-    }
-    if (state.progressMetrics !== undefined) {
-      setProgressMetrics(state.progressMetrics)
-    }
-  }, [])
+  const setProgressState = useCallback(
+    (state: Partial<ProgressMilestoneState>) => {
+      if (state.progress !== undefined) {
+        setProgressValue(state.progress)
+      }
+      if (
+        state.progressSnapshots !== undefined &&
+        state.progressMetrics !== undefined
+      ) {
+        setProgressMetrics(state.progressMetrics)
+      }
+      if (state.progressMetrics !== undefined) {
+        setProgressMetrics(state.progressMetrics)
+      }
+    },
+    [],
+  )
 
   return {
     progress,
