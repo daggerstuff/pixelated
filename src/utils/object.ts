@@ -2,27 +2,6 @@ function isPrimitive(value: any): boolean {
   return value === null || typeof value !== 'object'
 }
 
-type IdentityStrategy = (item: any) => string
-
-/**
- * Generate a stable identity key for an item so array merge can deduplicate by
- * value identity rather than reference.
- *
- * Priority (fastest → slowest):
- *  1. `id` property — O(1), most reliable for domain objects.
- *  2. Shallow hash of own properties — O(K) where K = own key count.
- *     Primitive values are included verbatim; non-primitive values contribute
- *     their key name + typeof tag, so objects whose leaves are all nested
- *     still get a stable, cheap key.
- *  3. JSON.stringify with circular-reference protection — only reached for
- *     objects that are completely empty (zero own keys). Deterministic fallback.
- *  4. 'fallback_unique' — only when serialisation throws (e.g. BigInt values);
- *     items with this key are always appended (never deduplicated).
- *
- * Performance note: callers should ensure frequently-updated domain objects
- * carry an `id` property to stay in the O(1) fast path and avoid hashing cost
- * entirely.
- */
 const COMMON_IDENTITY_FIELDS = [
   'id',
   '_id',
@@ -47,12 +26,13 @@ const COMMON_IDENTITY_FIELDS = [
  *     a type marker to keep hashing cheap.
  *  3. JSON.stringify with circular-reference protection — only reached for
  *     objects that are completely empty (zero own keys). Deterministic fallback.
- *  4. 'fallback_unique' — only when serialisation throws (e.g. BigInt values).
+ *  4. 'fallback_unique' — only when serialisation throws (e.g. BigInt values);
+ *     items with this key are always appended (never deduplicated).
  *
  * Performance note: callers should ensure frequently-updated domain objects
  * carry an `id` or other common identity field to stay in the O(1) fast path.
  */
-const getIdentityKey: IdentityStrategy = (item) => {
+const getIdentityKey = (item: any): string => {
   if (isPrimitive(item)) {
     return `prim:${String(item)}`
   }
@@ -226,19 +206,17 @@ export function mergeValues<T>(
     return mergeArrayElements<T>(local, remote, depth, visited)
   }
 
-  if (local && remote && !isPrimitive(local) && !isPrimitive(remote)) {
-    const merged = { ...local } as Record<string, any>
-    for (const [key, value] of Object.entries(remote as object)) {
-      if (merged[key] && !isPrimitive(merged[key]) && !isPrimitive(value)) {
-        merged[key] = mergeValues(merged[key], value, depth + 1, visited)
-      } else {
-        merged[key] = value
-      }
+  // Both sides are non-null, non-array objects (the early primitive check
+  // already filtered out null/non-objects).
+  const merged = { ...(local as object) } as Record<string, any>
+  for (const [key, value] of Object.entries(remote as object)) {
+    if (merged[key] && !isPrimitive(merged[key]) && !isPrimitive(value)) {
+      merged[key] = mergeValues(merged[key], value, depth + 1, visited)
+    } else {
+      merged[key] = value
     }
-    return merged as T
   }
-
-  return remote
+  return merged as T
 }
 
 /**
