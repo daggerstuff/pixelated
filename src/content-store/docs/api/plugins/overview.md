@@ -1,10 +1,12 @@
 ---
-description: 'Plugin System Overview documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Plugin System Overview documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Plugin System Overview
 ---
 
 # Plugin System Overview

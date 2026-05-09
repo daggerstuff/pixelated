@@ -1,10 +1,12 @@
 ---
-description: 'Disaster Recovery Plan documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Disaster Recovery Plan documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Disaster Recovery Plan
 ---
 
 # Disaster Recovery Plan
@@ -33,7 +35,7 @@ types of failures and outages.
 # Trigger rollback workflow in GitHub Actions
      gh workflow run rollback.yml -f environment=production
      ```
-   - If DNS issue, check domain registrar DNS settings
+- If DNS issue, check domain registrar DNS settings
 
 ### Database Issues
 
@@ -296,3 +298,4 @@ For planned maintenance:
 3. Implement changes during low-traffic periods
 4. Have rollback plan prepared
 5. Verify all systems after maintenance
+

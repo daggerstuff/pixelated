@@ -1,22 +1,19 @@
 ---
-description:
----
-  'Discover how inner child work can help heal childhood wounds and transform
-  your adult relationships and self-concept'
+title: healing inner child
+description: >-
+  Within each of us lives the child we once were—carrying all the joy, wonder, and
 author: 'Dr. Sarah Chen'
 pubDate: 2024-03-05
-readingTime: 12
-tags: ['trauma', 'inner-child', 'healing', 'self-compassion']
+tags:
+  - trauma
+  - inner-child
+  - healing
+  - self-compassion
 series: 'Understanding Trauma'
 seriesOrder: 3
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'A child playing in nature, representing inner child healing',
-  }
 ---
 
-# Healing Your Inner Child: A Path to Wholeness
+## Healing Your Inner Child: A Path to Wholeness
 
 Within each of us lives the child we once were—carrying all the joy, wonder, and
 creativity of childhood, but also the hurts, fears, and unmet needs. This "inner

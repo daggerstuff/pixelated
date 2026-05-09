@@ -1,14 +1,13 @@
 ---
-description:
----
+title: Emotional Unavailability
+description: >-
   Understanding and breaking free from patterns of emotional unavailability in
   relationships
 author: Dr. Sarah Jensen
 pubDate: 2024-03-15
-generated: 1726987605935
 ---
 
-**The Tricky Trap of Emotional Unavailability**
+## The Tricky Trap of Emotional Unavailability
 
 We've all been there - drawn to someone who's a bit of an enigma, someone who's
 intense and exciting at first, but ultimately leaves you feeling empty and
@@ -21,7 +20,7 @@ unavailable, often because they represent a familiar pattern from our past.
 Maybe we grew up with a parent or caregiver who was distant or unresponsive, and
 now we're repeating that same dynamic in our adult relationships.
 
-**Why We Keep Coming Back**
+## Why We Keep Coming Back
 
 It's easy to get caught up in the excitement of a new relationship, especially
 if it feels intense or passionate at first. But as time goes on, you may start
@@ -35,7 +34,7 @@ rejected or hurt ourselves, so we attract partners who are similarly
 unavailable - people who can't "do" emotions in the way that would actually help
 us heal.
 
-**Breaking Free**
+## Breaking Free
 
 So how do you escape this tricky trap? The first step is to become aware of it -
 to recognize that your pattern of attracting emotionally unavailable partners
@@ -48,7 +47,7 @@ insecurities. This is where self-reflection comes in - it's essential to develop
 a greater understanding of yourself and how your past experiences have shaped
 your behavior today.
 
-**The Dangers of Recovery**
+## The Dangers of Recovery
 
 Recovery from emotional unavailability isn't always easy. You might find that
 you're drawn to partners who initially seem warm and open, only to realize later
@@ -60,7 +59,7 @@ Another danger is the tendency to idealize these individuals - to see them as
 can be transformative, it's essential to prioritize your own emotional safety
 and well-being in the process.
 
-**Conclusion**
+## Conclusion
 
 The prison of emotional unavailability might feel like a trap that's impossible
 to escape. But with self-awareness, patience, and a willingness to confront your

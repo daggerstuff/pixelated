@@ -2,12 +2,12 @@
 title: 'Building AI Models for Emotion Detection in Mental Health'
 date: '2025-01-28'
 duration: 8min
-description:
----
-  'Deep dive into the technical challenges and solutions for detecting emotions
-  from text in mental health contexts'
----
+description: >-
+  Deep dive into the technical challenges and solutions for detecting emotions
+  from text in mental health contexts
 
+
+---
 [[toc]]
 
 Emotion detection is one of the core technologies powering modern mental health

@@ -1,10 +1,13 @@
 ---
-description: 'Browser Compatibility Testing Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'testing']
+description: Browser Compatibility Testing Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - testing
 draft: false
 toc: true
+title: Browser Compatibility Testing Guide
 ---
 
 # Browser Compatibility Testing Guide

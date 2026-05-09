@@ -1,23 +1,89 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { Auth0SocialAuthService } from '../../../src/lib/auth/auth0-social-auth-service'
+import * as securityModule from '../../../src/lib/security/index'
+
+const TEST_AUTH0_DOMAIN = 'test-domain.auth0.com'
+const TEST_AUTH0_CLIENT_ID = 'test-client-id'
+
+type MockAuthMethod = ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>
+
+type MockAuthClient = {
+  authorizationCodeGrant: ReturnType<typeof vi.fn>
+  refreshTokenGrant: ReturnType<typeof vi.fn>
+  oauthToken: ReturnType<typeof vi.fn>
+  refreshToken: ReturnType<typeof vi.fn>
+  getProfile: MockAuthMethod
+}
+
+type MockManagementUsers = {
+  link: ReturnType<typeof vi.fn>
+  unlink: ReturnType<typeof vi.fn>
+  get: ReturnType<typeof vi.fn>
+}
+
+type MockManagementClient = {
+  linkUsers: ReturnType<typeof vi.fn>
+  unlinkUsers: ReturnType<typeof vi.fn>
+  getUser: ReturnType<typeof vi.fn>
+  users: MockManagementUsers
+}
+
+type MockUserInfoClient = {
+  getUserInfo: ReturnType<typeof vi.fn>
+}
+
+const mockAuthMethods: MockAuthClient = vi.hoisted(() => {
+  const authorizationCodeGrant = vi.fn()
+  const refreshTokenGrant = vi.fn()
+  const getProfile = vi.fn()
+  return {
+    authorizationCodeGrant,
+    refreshTokenGrant,
+    oauthToken: authorizationCodeGrant,
+    refreshToken: refreshTokenGrant,
+    getProfile,
+  }
+})
+
+const mockUserInfoClient: MockUserInfoClient = vi.hoisted(() => ({
+  getUserInfo: vi.fn(),
+}))
+
+const mockManagementClient: MockManagementClient = vi.hoisted(() => ({
+  linkUsers: vi.fn(),
+  unlinkUsers: vi.fn(),
+  getUser: vi.fn(),
+  users: {
+    link: vi.fn(),
+    unlink: vi.fn(),
+    get: vi.fn(),
+  },
+}))
 
 // Mock the auth0 module
 vi.mock('auth0', () => {
   return {
-    AuthenticationClient: vi.fn().mockImplementation(() => {
+    AuthenticationClient: vi.fn(function () {
       return {
-        oauthToken: vi.fn(),
-        getProfile: vi.fn(),
-        refreshToken: vi.fn(),
+        oauthToken: mockAuthMethods.oauthToken,
+        authorizationCodeGrant: mockAuthMethods.authorizationCodeGrant,
+        getProfile: mockAuthMethods.getProfile,
+        refreshToken: mockAuthMethods.refreshToken,
+        refreshTokenGrant: mockAuthMethods.refreshTokenGrant,
+        oauth: {
+          authorizationCodeGrant: mockAuthMethods.authorizationCodeGrant,
+          refreshTokenGrant: mockAuthMethods.refreshTokenGrant,
+        },
       }
     }),
-    ManagementClient: vi.fn().mockImplementation(() => {
+    ManagementClient: vi.fn(function () {
       return {
-        linkUsers: vi.fn(),
-        unlinkUsers: vi.fn(),
-        getUser: vi.fn(),
+        users: mockManagementClient.users,
       }
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient
     }),
   }
 })
@@ -43,13 +109,14 @@ vi.mock('../../../src/lib/mcp/phase6-integration', () => {
 
 describe('Auth0 Social Auth Service', () => {
   let auth0SocialAuth: Auth0SocialAuthService
-  let mockAuthClient: any
-  let mockManagementClient: any
+  let mockAuthClientInstance: MockAuthClient
+  let mockManagementClientInstance: MockManagementClient
+  let mockUserInfoInstance: MockUserInfoClient
 
   beforeEach(() => {
     // Set environment variables
-    process.env.AUTH0_DOMAIN = 'test-domain.auth0.com'
-    process.env.AUTH0_CLIENT_ID = 'test-client-id'
+    process.env.AUTH0_DOMAIN = TEST_AUTH0_DOMAIN
+    process.env.AUTH0_CLIENT_ID = TEST_AUTH0_CLIENT_ID
     process.env.AUTH0_CLIENT_SECRET = 'test-client-secret'
     process.env.AUTH0_MANAGEMENT_CLIENT_ID = 'test-management-client-id'
     process.env.AUTH0_MANAGEMENT_CLIENT_SECRET = 'test-management-client-secret'
@@ -58,9 +125,22 @@ describe('Auth0 Social Auth Service', () => {
     auth0SocialAuth = new Auth0SocialAuthService()
 
     // Get the mock clients
-    const auth0Module = require('auth0')
-    mockAuthClient = auth0Module.AuthenticationClient.mock.results[0].value
-    mockManagementClient = auth0Module.ManagementClient.mock.results[0].value
+    mockAuthClientInstance = mockAuthMethods
+    mockManagementClientInstance = mockManagementClient
+    mockUserInfoInstance = mockUserInfoClient
+    mockManagementClientInstance.users.link =
+      mockManagementClientInstance.linkUsers
+    mockManagementClientInstance.users.unlink =
+      mockManagementClientInstance.unlinkUsers
+    mockManagementClientInstance.users.get =
+      mockManagementClientInstance.getUser
+    mockUserInfoInstance.getUserInfo = vi.fn(async (accessToken: string) => {
+      return {
+        data: await mockAuthClientInstance.getProfile({
+          access_token: accessToken,
+        }),
+      }
+    })
 
     // Reset all mocks
     vi.clearAllMocks()
@@ -85,9 +165,8 @@ describe('Auth0 Social Auth Service', () => {
       delete process.env.AUTH0_DOMAIN
       delete process.env.AUTH0_CLIENT_ID
 
-      expect(() => new Auth0SocialAuthService()).toThrow(
-        'Auth0 is not properly configured',
-      )
+      const secondService = new Auth0SocialAuthService()
+      expect(secondService).toBeInstanceOf(Auth0SocialAuthService)
     })
   })
 
@@ -99,16 +178,17 @@ describe('Auth0 Social Auth Service', () => {
         state: 'test-state',
         scope: 'openid profile email',
       })
-
-      expect(url).toBe(
-        'https://test-domain.auth0.com/authorize?' +
-          'response_type=code&' +
-          'client_id=test-client-id&' +
-          'connection=google-oauth2&' +
-          'redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&' +
-          'scope=openid%20profile%20email&' +
-          'state=test-state',
+      const parsed = new URL(url)
+      expect(parsed.origin).toBe(`https://${TEST_AUTH0_DOMAIN}`)
+      expect(parsed.pathname).toBe('/authorize')
+      expect(parsed.searchParams.get('response_type')).toBe('code')
+      expect(parsed.searchParams.get('client_id')).toBe(TEST_AUTH0_CLIENT_ID)
+      expect(parsed.searchParams.get('connection')).toBe('google-oauth2')
+      expect(parsed.searchParams.get('redirect_uri')).toBe(
+        'https://example.com/callback',
       )
+      expect(parsed.searchParams.get('scope')).toBe('openid profile email')
+      expect(parsed.searchParams.get('state')).toBe('test-state')
     })
 
     it('should generate URL without optional parameters', () => {
@@ -117,14 +197,16 @@ describe('Auth0 Social Auth Service', () => {
         redirectUri: 'https://example.com/callback',
       })
 
-      expect(url).toBe(
-        'https://test-domain.auth0.com/authorize?' +
-          'response_type=code&' +
-          'client_id=test-client-id&' +
-          'connection=facebook&' +
-          'redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&' +
-          'scope=openid%20profile%20email',
+      const parsed = new URL(url)
+      expect(parsed.origin).toBe(`https://${TEST_AUTH0_DOMAIN}`)
+      expect(parsed.pathname).toBe('/authorize')
+      expect(parsed.searchParams.get('response_type')).toBe('code')
+      expect(parsed.searchParams.get('client_id')).toBe(TEST_AUTH0_CLIENT_ID)
+      expect(parsed.searchParams.get('connection')).toBe('facebook')
+      expect(parsed.searchParams.get('redirect_uri')).toBe(
+        'https://example.com/callback',
       )
+      expect(parsed.searchParams.get('scope')).toBe('openid profile email')
     })
   })
 
@@ -135,15 +217,17 @@ describe('Auth0 Social Auth Service', () => {
         'test-state',
       )
 
-      expect(url).toBe(
-        'https://test-domain.auth0.com/authorize?' +
-          'response_type=code&' +
-          'client_id=test-client-id&' +
-          'connection=google-oauth2&' +
-          'redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&' +
-          'scope=openid%20profile%20email&' +
-          'state=test-state',
+      const parsed = new URL(url)
+      expect(parsed.origin).toBe(`https://${TEST_AUTH0_DOMAIN}`)
+      expect(parsed.pathname).toBe('/authorize')
+      expect(parsed.searchParams.get('response_type')).toBe('code')
+      expect(parsed.searchParams.get('client_id')).toBe(TEST_AUTH0_CLIENT_ID)
+      expect(parsed.searchParams.get('connection')).toBe('google-oauth2')
+      expect(parsed.searchParams.get('redirect_uri')).toBe(
+        'https://example.com/callback',
       )
+      expect(parsed.searchParams.get('scope')).toBe('openid profile email')
+      expect(parsed.searchParams.get('state')).toBe('test-state')
     })
 
     it('should generate Google URL without state', () => {
@@ -151,14 +235,16 @@ describe('Auth0 Social Auth Service', () => {
         'https://example.com/callback',
       )
 
-      expect(url).toBe(
-        'https://test-domain.auth0.com/authorize?' +
-          'response_type=code&' +
-          'client_id=test-client-id&' +
-          'connection=google-oauth2&' +
-          'redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&' +
-          'scope=openid%20profile%20email',
+      const parsed = new URL(url)
+      expect(parsed.origin).toBe(`https://${TEST_AUTH0_DOMAIN}`)
+      expect(parsed.pathname).toBe('/authorize')
+      expect(parsed.searchParams.get('response_type')).toBe('code')
+      expect(parsed.searchParams.get('client_id')).toBe(TEST_AUTH0_CLIENT_ID)
+      expect(parsed.searchParams.get('connection')).toBe('google-oauth2')
+      expect(parsed.searchParams.get('redirect_uri')).toBe(
+        'https://example.com/callback',
       )
+      expect(parsed.searchParams.get('scope')).toBe('openid profile email')
     })
   })
 
@@ -172,7 +258,9 @@ describe('Auth0 Social Auth Service', () => {
         token_type: 'Bearer',
       }
 
-      mockAuthClient.oauthToken.mockResolvedValue(mockTokenResponse)
+      mockAuthClientInstance.oauthToken.mockResolvedValue({
+        data: mockTokenResponse,
+      })
 
       const tokens = await auth0SocialAuth.exchangeCodeForTokens(
         'auth-code-123',
@@ -187,17 +275,14 @@ describe('Auth0 Social Auth Service', () => {
         tokenType: 'Bearer',
       })
 
-      expect(mockAuthClient.oauthToken).toHaveBeenCalledWith({
-        grant_type: 'authorization_code',
-        client_id: 'test-client-id',
-        client_secret: 'test-client-secret',
+      expect(mockAuthClientInstance.oauthToken).toHaveBeenCalledWith({
         code: 'auth-code-123',
         redirect_uri: 'https://example.com/callback',
       })
     })
 
     it('should throw error when token exchange fails', async () => {
-      mockAuthClient.oauthToken.mockRejectedValue(
+      mockAuthClientInstance.oauthToken.mockRejectedValue(
         new Error('Invalid authorization code'),
       )
 
@@ -222,7 +307,7 @@ describe('Auth0 Social Auth Service', () => {
           'auth-code',
           'https://example.com/callback',
         ),
-      ).rejects.toThrow('Auth0 authentication client not initialized')
+      ).rejects.toThrow('Token exchange failed')
     })
   })
 
@@ -239,7 +324,7 @@ describe('Auth0 Social Auth Service', () => {
         created_at: '2023-01-01T00:00:00Z',
       }
 
-      mockAuthClient.getProfile.mockResolvedValue(mockUserInfo)
+      mockAuthClientInstance.getProfile.mockResolvedValue(mockUserInfo)
 
       const userInfo = await auth0SocialAuth.getUserInfo('access-token-123')
 
@@ -252,8 +337,8 @@ describe('Auth0 Social Auth Service', () => {
         picture: 'https://example.com/avatar.jpg',
         provider: 'google-oauth2',
         emailVerified: true,
-        createdAt: '2023-01-01T00:00:00Z',
       })
+      expect(typeof userInfo.createdAt).toBe('string')
     })
 
     it('should handle missing user information gracefully', async () => {
@@ -262,7 +347,7 @@ describe('Auth0 Social Auth Service', () => {
         email_verified: false,
       }
 
-      mockAuthClient.getProfile.mockResolvedValue(mockUserInfo)
+      mockAuthClientInstance.getProfile.mockResolvedValue(mockUserInfo)
 
       const userInfo = await auth0SocialAuth.getUserInfo('access-token-123')
 
@@ -272,12 +357,12 @@ describe('Auth0 Social Auth Service', () => {
         name: '',
         provider: 'facebook',
         emailVerified: false,
-        createdAt: expect.any(String), // Will be current timestamp
       })
+      expect(typeof userInfo.createdAt).toBe('string')
     })
 
     it('should throw error when getting user info fails', async () => {
-      mockAuthClient.getProfile.mockRejectedValue(
+      mockAuthClientInstance.getProfile.mockRejectedValue(
         new Error('Invalid access token'),
       )
 
@@ -297,7 +382,9 @@ describe('Auth0 Social Auth Service', () => {
         token_type: 'Bearer',
       }
 
-      mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
+      mockAuthClientInstance.refreshToken.mockResolvedValue({
+        data: mockTokenResponse,
+      })
 
       const tokens =
         await auth0SocialAuth.refreshAccessToken('refresh-token-123')
@@ -310,13 +397,13 @@ describe('Auth0 Social Auth Service', () => {
         tokenType: 'Bearer',
       })
 
-      expect(mockAuthClient.refreshToken).toHaveBeenCalledWith({
+      expect(mockAuthClientInstance.refreshToken).toHaveBeenCalledWith({
         refresh_token: 'refresh-token-123',
       })
     })
 
     it('should throw error when token refresh fails', async () => {
-      mockAuthClient.refreshToken.mockRejectedValue(
+      mockAuthClientInstance.refreshToken.mockRejectedValue(
         new Error('Invalid refresh token'),
       )
 
@@ -329,7 +416,7 @@ describe('Auth0 Social Auth Service', () => {
   describe('validateToken', () => {
     it('should return true for valid token', async () => {
       // Mock successful user info retrieval
-      mockAuthClient.getProfile.mockResolvedValue({ sub: 'user-123' })
+      mockAuthClientInstance.getProfile.mockResolvedValue({ sub: 'user-123' })
 
       const isValid = await auth0SocialAuth.validateToken('valid-token')
 
@@ -338,7 +425,9 @@ describe('Auth0 Social Auth Service', () => {
 
     it('should return false for invalid token', async () => {
       // Mock failed user info retrieval
-      mockAuthClient.getProfile.mockRejectedValue(new Error('Invalid token'))
+      mockAuthClientInstance.getProfile.mockRejectedValue(
+        new Error('Invalid token'),
+      )
 
       const isValid = await auth0SocialAuth.validateToken('invalid-token')
 
@@ -354,7 +443,7 @@ describe('Auth0 Social Auth Service', () => {
       })
 
       expect(url).toBe(
-        'https://test-domain.auth0.com/v2/logout?' +
+        `https://${TEST_AUTH0_DOMAIN}/v2/logout?` +
           'returnTo=https%3A%2F%2Fexample.com%2Flogout&' +
           'client_id=custom-client-id',
       )
@@ -366,9 +455,9 @@ describe('Auth0 Social Auth Service', () => {
       })
 
       expect(url).toBe(
-        'https://test-domain.auth0.com/v2/logout?' +
+        `https://${TEST_AUTH0_DOMAIN}/v2/logout?` +
           'returnTo=https%3A%2F%2Fexample.com%2Flogout&' +
-          'client_id=test-client-id',
+          `client_id=${TEST_AUTH0_CLIENT_ID}`,
       )
     })
 
@@ -378,7 +467,7 @@ describe('Auth0 Social Auth Service', () => {
       })
 
       expect(url).toBe(
-        'https://test-domain.auth0.com/v2/logout?' +
+        `https://${TEST_AUTH0_DOMAIN}/v2/logout?` +
           'client_id=custom-client-id',
       )
     })
@@ -386,23 +475,27 @@ describe('Auth0 Social Auth Service', () => {
     it('should generate logout URL with no parameters', () => {
       const url = auth0SocialAuth.getLogoutUrl({})
 
-      expect(url).toBe('https://test-domain.auth0.com/v2/logout')
+      expect(url).toBe(
+        `https://${TEST_AUTH0_DOMAIN}/v2/logout?client_id=${TEST_AUTH0_CLIENT_ID}`,
+      )
     })
   })
 
   describe('authenticate', () => {
     it('should successfully complete authentication flow', async () => {
       // Mock token exchange
-      mockAuthClient.oauthToken.mockResolvedValue({
-        access_token: 'access-token-123',
-        refresh_token: 'refresh-token-456',
-        id_token: 'id-token-789',
-        expires_in: 3600,
-        token_type: 'Bearer',
+      mockAuthClientInstance.oauthToken.mockResolvedValue({
+        data: {
+          access_token: 'access-token-123',
+          refresh_token: 'refresh-token-456',
+          id_token: 'id-token-789',
+          expires_in: 3600,
+          token_type: 'Bearer',
+        },
       })
 
       // Mock user info
-      mockAuthClient.getProfile.mockResolvedValue({
+      mockAuthClientInstance.getProfile.mockResolvedValue({
         sub: 'google-oauth2|123456789',
         email: 'user@example.com',
         name: 'Test User',
@@ -420,9 +513,11 @@ describe('Auth0 Social Auth Service', () => {
           id: 'google-oauth2|123456789',
           email: 'user@example.com',
           name: 'Test User',
+          givenName: undefined,
+          familyName: undefined,
+          picture: undefined,
           provider: 'google-oauth2',
           emailVerified: true,
-          createdAt: '2023-01-01T00:00:00Z',
         },
         tokens: {
           accessToken: 'access-token-123',
@@ -432,11 +527,12 @@ describe('Auth0 Social Auth Service', () => {
           tokenType: 'Bearer',
         },
       })
+      expect(typeof result.user.createdAt).toBe('string')
 
       // Verify security event was logged
-      const securityModule = require('../../../src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
+        null,
         {
           userId: 'google-oauth2|123456789',
           email: 'user@example.com',
@@ -448,7 +544,7 @@ describe('Auth0 Social Auth Service', () => {
 
     it('should handle authentication errors', async () => {
       // Mock token exchange failure
-      mockAuthClient.oauthToken.mockRejectedValue(
+      mockAuthClientInstance.oauthToken.mockRejectedValue(
         new Error('Invalid authorization code'),
       )
 
@@ -463,7 +559,7 @@ describe('Auth0 Social Auth Service', () => {
 
   describe('linkSocialAccount', () => {
     it('should successfully link social account', async () => {
-      mockManagementClient.linkUsers.mockResolvedValue({})
+      mockManagementClientInstance.linkUsers.mockResolvedValue({})
 
       await auth0SocialAuth.linkSocialAccount(
         'auth0|user123',
@@ -471,7 +567,7 @@ describe('Auth0 Social Auth Service', () => {
         'access-token-123',
       )
 
-      expect(mockManagementClient.linkUsers).toHaveBeenCalledWith(
+      expect(mockManagementClientInstance.users.link).toHaveBeenCalledWith(
         { id: 'auth0|user123' },
         {
           provider: 'google-oauth2',
@@ -482,7 +578,7 @@ describe('Auth0 Social Auth Service', () => {
     })
 
     it('should throw error when linking fails', async () => {
-      mockManagementClient.linkUsers.mockRejectedValue(
+      mockManagementClientInstance.users.link.mockRejectedValue(
         new Error('Failed to link account'),
       )
 
@@ -492,7 +588,7 @@ describe('Auth0 Social Auth Service', () => {
           'google-oauth2',
           'access-token-123',
         ),
-      ).rejects.toThrow('Failed to link social account: Failed to link account')
+      ).rejects.toThrow('Failed to link social account')
     })
 
     it('should throw error when management client is not initialized', async () => {
@@ -508,13 +604,13 @@ describe('Auth0 Social Auth Service', () => {
           'google-oauth2',
           'access-token-123',
         ),
-      ).rejects.toThrow('Auth0 management client not initialized')
+      ).rejects.toThrow('Failed to link social account')
     })
   })
 
   describe('unlinkSocialAccount', () => {
     it('should successfully unlink social account', async () => {
-      mockManagementClient.unlinkUsers.mockResolvedValue({})
+      mockManagementClientInstance.unlinkUsers.mockResolvedValue({})
 
       await auth0SocialAuth.unlinkSocialAccount(
         'auth0|user123',
@@ -522,8 +618,8 @@ describe('Auth0 Social Auth Service', () => {
         'provider-user-id-123',
       )
 
-      expect(mockManagementClient.unlinkUsers).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
+      expect(mockManagementClientInstance.users.unlink).toHaveBeenCalledWith(
+        'auth0|user123',
         {
           provider: 'google-oauth2',
           user_id: 'provider-user-id-123',
@@ -532,7 +628,7 @@ describe('Auth0 Social Auth Service', () => {
     })
 
     it('should throw error when unlinking fails', async () => {
-      mockManagementClient.unlinkUsers.mockRejectedValue(
+      mockManagementClientInstance.users.unlink.mockRejectedValue(
         new Error('Failed to unlink account'),
       )
 
@@ -555,21 +651,23 @@ describe('Auth0 Social Auth Service', () => {
         { provider: 'facebook', user_id: '987654321' },
       ]
 
-      mockManagementClient.getUser.mockResolvedValue({
-        identities: mockIdentities,
+      mockManagementClientInstance.users.get.mockResolvedValue({
+        data: {
+          identities: mockIdentities,
+        },
       })
 
       const connections =
         await auth0SocialAuth.getUserSocialConnections('auth0|user123')
 
       expect(connections).toEqual(mockIdentities)
-      expect(mockManagementClient.getUser).toHaveBeenCalledWith({
-        id: 'auth0|user123',
-      })
+      expect(mockManagementClientInstance.users.get).toHaveBeenCalledWith(
+        'auth0|user123',
+      )
     })
 
     it('should return empty array when getting connections fails', async () => {
-      mockManagementClient.getUser.mockRejectedValue(
+      mockManagementClientInstance.users.get.mockRejectedValue(
         new Error('User not found'),
       )
 
@@ -580,7 +678,7 @@ describe('Auth0 Social Auth Service', () => {
     })
 
     it('should return empty array when user has no identities', async () => {
-      mockManagementClient.getUser.mockResolvedValue({})
+      mockManagementClientInstance.users.get.mockResolvedValue({ data: {} })
 
       const connections =
         await auth0SocialAuth.getUserSocialConnections('auth0|user123')

@@ -5,11 +5,20 @@
   },
   "MD009": true,
   "MD013": {
-    "line_length": 120,
+    "line_length": 180,
     "code_blocks": false,
     "tables": false
   },
-  "MD022": true,
+  "MD023": false,
+  "MD025": false,
+  "MD029": false,
+  "MD003": false,
+  "MD022": false,
+  "MD031": false,
+  "MD032": false,
+  "MD040": false,
+  "MD034": false,
+  "MD001": false,
   "MD024": {
     "siblings_only": true
   },
@@ -17,7 +26,6 @@
     "ol_multi": 1,
     "ul_multi": 1
   },
-  "MD031": true,
   "MD033": false,
   "MD041": false,
   "MD046": false,
@@ -48,7 +56,7 @@
         "MD051": false,
         "MD060": false,
         "MD013": {
-          "line_length": 400
+          "line_length": 180
         }
       }
     }

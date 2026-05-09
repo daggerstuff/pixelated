@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import { fheService } from '@/lib/fhe'
+import { createFHESystem } from '@/lib/fhe'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
@@ -24,7 +24,7 @@ const logger = createBuildSafeLogger('useEmotionDetection')
  */
 export const useEmotionDetection = () => {
   const providerRef = useRef<EmotionLlamaProvider | null>(null)
-  const { updateEmotionState } = useSimulatorContext()
+  const { dispatch: updateEmotionState } = useSimulatorContext()
 
   // Initialize the provider
   useEffect(() => {
@@ -40,10 +40,12 @@ export const useEmotionDetection = () => {
           return
         }
 
+        const fheSystem = createFHESystem()
+
         providerRef.current = new EmotionLlamaProvider(
           baseUrl,
           apiKey,
-          fheService,
+          fheSystem,
         )
       } catch (error: unknown) {
         logger.error('Failed to initialize EmotionLlamaProvider:', error)
@@ -72,15 +74,16 @@ export const useEmotionDetection = () => {
         const analysis = await providerRef.current.analyzeEmotions(text)
 
         // Update the simulator context with the pre-computed PAD emotion state from dimensions
-        if (analysis.dimensions) {
-          const { valence, energy, dominance } = analysis.dimensions
-          updateEmotionState({
+        const { valence, arousal: energy, dominance } = analysis.dimensions
+        updateEmotionState({
+          type: 'UPDATE_EMOTION_STATE',
+          payload: {
             valence,
             energy,
             dominance,
             timestamp: Date.now(),
-          })
-        }
+          },
+        })
 
         return analysis
       } catch (error: unknown) {

@@ -104,7 +104,9 @@ const parseJsonSafely = (value: string): unknown => {
   }
 }
 
-const parseMetadata = (metadata: SessionAnalyticsRow['metadata']): SessionAnalyticsMetadata => {
+const parseMetadata = (
+  metadata: SessionAnalyticsRow['metadata'],
+): SessionAnalyticsMetadata => {
   if (typeof metadata === 'string') {
     const parsed = parseJsonSafely(metadata)
     if (isRecord(parsed)) {
@@ -172,9 +174,10 @@ export const POST: APIRoute = async ({ request }) => {
     const sessionQuery = `
       SELECT therapist_id FROM sessions WHERE id = $1
     `
-    const sessionResult = await client.query<SessionOwnershipRow>(sessionQuery, [
-      sessionId,
-    ])
+    const sessionResult = await client.query<SessionOwnershipRow>(
+      sessionQuery,
+      [sessionId],
+    )
 
     if (sessionResult.rows.length === 0) {
       return new Response(JSON.stringify({ error: 'Session not found' }), {
@@ -352,9 +355,10 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionQuery = `
       SELECT therapist_id FROM sessions WHERE id = $1
     `
-    const sessionResult = await client.query<SessionOwnershipRow>(sessionQuery, [
-      sessionId,
-    ])
+    const sessionResult = await client.query<SessionOwnershipRow>(
+      sessionQuery,
+      [sessionId],
+    )
 
     if (sessionResult.rows.length === 0) {
       return new Response(JSON.stringify({ error: 'Session not found' }), {

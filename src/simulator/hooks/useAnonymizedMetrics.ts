@@ -21,6 +21,32 @@ export interface SimpleMetrics {
   updateMetrics: (event: MetricsEvent) => void
 }
 
+type PersistedMetrics = Omit<SimpleMetrics, 'updateMetrics'>
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+}
+
+function isPersistedMetrics(value: unknown): value is PersistedMetrics {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  if (!('sessionCount' in value) || !('averageScore' in value)) {
+    return false
+  }
+
+  const metrics = value as Record<string, unknown>
+  return (
+    typeof metrics.sessionCount === 'number' &&
+    typeof metrics.averageScore === 'number' &&
+    isStringArray(metrics.skillsImproving) &&
+    isStringArray(metrics.skillsNeeding) &&
+    (metrics.lastSessionDate === null ||
+      typeof metrics.lastSessionDate === 'number')
+  )
+}
+
 /**
  * Simplified hook for anonymized metrics that provides data for the MetricsDialog.
  *
@@ -48,8 +74,10 @@ export function useAnonymizedMetrics(): SimpleMetrics {
 
       if (storedMetrics) {
         // Use stored metrics if available
-        const parsedMetrics = JSON.parse(storedMetrics) as unknown
-        setMetrics(parsedMetrics)
+        const parsedMetrics: unknown = JSON.parse(storedMetrics)
+        if (isPersistedMetrics(parsedMetrics)) {
+          setMetrics(parsedMetrics)
+        }
       } else {
         // Generate demo data for first-time users
         const demoMetrics = {

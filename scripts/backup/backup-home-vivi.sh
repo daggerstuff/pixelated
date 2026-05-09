@@ -11,8 +11,11 @@ BACKUP_RUN_PREFIX="${BACKUP_RUN_PREFIX:-home-vivi-run}"
 BACKUP_SECTION_STRICT_ERRORS="${BACKUP_SECTION_STRICT_ERRORS:-false}"
 BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 BACKUP_SECTIONS="${BACKUP_SECTIONS:-}"
+BACKUP_SKIP_SECTIONS="${BACKUP_SKIP_SECTIONS:-.cache .cargo}"
+BACKUP_HEARTBEAT_INTERVAL="${BACKUP_HEARTBEAT_INTERVAL:-120}"
 SECTION_BACKUP_PATHS=()
 SECTION_FAIL_COUNT=0
+BACKUP_HEARTBEAT_PID=""
 
 if [[ "$RCLONE_TARGET" == "drive:vivi-home-backups" ]]; then
   RCLONE_TARGET="gdrive:vivi-home-backups"
@@ -158,6 +161,20 @@ load_rclone_args() {
   done
 }
 
+is_skipped_section() {
+  local section_name="$1"
+  local skip_section
+  local skip_candidates
+
+  skip_candidates="$(printf '%s' "${BACKUP_SKIP_SECTIONS:-}" | tr ',;' ' ')"
+  for skip_section in ${skip_candidates}; do
+    if [[ "${section_name}" == "${skip_section}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 collect_section_paths() {
   local source_sections
   source_sections="${BACKUP_SECTIONS:-}"
@@ -179,8 +196,10 @@ collect_section_paths() {
   fi
 
   while IFS= read -r -d '' section_path; do
-    if [[ "$(basename "$section_path")" == ".cache" ]]; then
-      log "Skipping auto section (cache root): $(basename "$section_path")"
+    local section_name
+    section_name="$(basename "$section_path")"
+    if is_skipped_section "$section_name"; then
+      log "Skipping auto section: ${section_name}"
       continue
     fi
     SECTION_BACKUP_PATHS+=("$section_path")
@@ -279,7 +298,31 @@ cleanup_staging() {
   fi
 }
 
-trap 'cleanup_lock; cleanup_staging' EXIT
+start_backup_heartbeat() {
+  if ! [[ "$BACKUP_HEARTBEAT_INTERVAL" =~ ^[0-9]+$ ]] || (( BACKUP_HEARTBEAT_INTERVAL <= 0 )); then
+    return
+  fi
+
+  BACKUP_START_EPOCH="$(date +%s)"
+  (
+    while true; do
+      sleep "$BACKUP_HEARTBEAT_INTERVAL"
+      current_time="$(date +%s)"
+      elapsed_seconds="$((current_time - BACKUP_START_EPOCH))"
+      log "Heartbeat: backup still running for ${elapsed_seconds}s (mode=${BACKUP_MODE})"
+    done
+  ) &
+  BACKUP_HEARTBEAT_PID=$!
+}
+
+stop_backup_heartbeat() {
+  if [[ -n "${BACKUP_HEARTBEAT_PID:-}" ]]; then
+    kill -TERM "$BACKUP_HEARTBEAT_PID" 2>/dev/null || true
+    wait "$BACKUP_HEARTBEAT_PID" 2>/dev/null || true
+  fi
+}
+
+trap 'stop_backup_heartbeat; cleanup_lock; cleanup_staging' EXIT
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
@@ -287,6 +330,10 @@ if ! flock -n 9; then
   exit 0
 fi
 lock_acquired=true
+start_backup_heartbeat
+log "Effective BACKUP_SECTIONS='${BACKUP_SECTIONS}'"
+log "Effective BACKUP_SKIP_SECTIONS='${BACKUP_SKIP_SECTIONS}'"
+log "Heartbeat interval: ${BACKUP_HEARTBEAT_INTERVAL}s"
 
 case "$BACKUP_MODE" in
   sectioned)

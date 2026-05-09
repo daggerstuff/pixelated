@@ -1,11 +1,15 @@
 ---
-description: 'Guide for testing Redis functionality'
-pubDate: 2025-03-25
+description: Guide for testing Redis functionality
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['redis', 'testing', 'vitest']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - redis
+  - testing
+  - vitest
+author: Pixelated Team
+title: Install dependencies
 ---
 
 ## Redis Service Testing Guide
@@ -317,3 +321,4 @@ For issues and questions:
 - GitHub Issues: [Report a bug](https://github.com/your-repo/issues)
 - Documentation: [Redis Service API](./redis-service.mdx)
 - Slack: #redis-service channel
+

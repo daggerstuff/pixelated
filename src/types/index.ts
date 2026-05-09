@@ -47,7 +47,7 @@ export const isBgType = (value: string): value is BgType => {
     'particle',
     'animated',
   ] as const
-  return validTypes.includes(value as BgType)
+  return (validTypes as readonly string[]).includes(value)
 }
 
 // ============================================================================
@@ -85,8 +85,8 @@ export type NavItemInput = {
 export const createNavItem = (input: NavItemInput): NavItem => ({
   name: input.name,
   link: input.link,
-  icon: input.icon || null,
-  desc: input.desc || null,
+  icon: input.icon ?? null,
+  desc: input.desc ?? null,
   isExternal: input.isExternal ?? false,
   ariaLabel: input.ariaLabel ?? input.name,
 })
@@ -97,21 +97,21 @@ export const createNavItem = (input: NavItemInput): NavItem => ({
 
 /** Base props that all components should accept */
 export type BaseComponentProps = {
-  readonly id?: ComponentId
-  readonly className?: string
+  readonly 'id'?: ComponentId
+  readonly 'className'?: string
   readonly 'data-testid'?: string
   readonly 'aria-label'?: string
 }
 
 /** Props for components that can be disabled */
 export type DisableableProps = {
-  readonly disabled?: boolean
+  readonly 'disabled'?: boolean
   readonly 'aria-disabled'?: boolean
 }
 
 /** Props for components with loading states */
 export type LoadingProps = {
-  readonly loading?: boolean
+  readonly 'loading'?: boolean
   readonly 'aria-busy'?: boolean
 }
 
@@ -167,7 +167,7 @@ export type AriaRole =
 
 /** Accessibility props for interactive elements */
 export type AccessibilityProps = {
-  readonly role?: AriaRole
+  readonly 'role'?: AriaRole
   readonly 'aria-label'?: string
   readonly 'aria-labelledby'?: string
   readonly 'aria-describedby'?: string
@@ -180,7 +180,7 @@ export type AccessibilityProps = {
     | 'grid'
     | 'dialog'
   readonly 'aria-hidden'?: boolean
-  readonly tabIndex?: number
+  readonly 'tabIndex'?: number
 }
 
 // ============================================================================
@@ -282,19 +282,30 @@ export * from './chat'
 export * from './user'
 export * from './analytics'
 export * from './treatment'
-export * from './bias-detection'
+export type {
+  AlertLevel,
+  AlertStatus,
+  BiasAlert,
+  AlertItem,
+  BiasScoreFilterLiteral,
+  BiasScoreFilter,
+} from './bias-detection'
 export * from './backup'
 
 // ============================================================================
 // TYPE GUARDS
 // ============================================================================
 
+const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null
+}
+
 /** Type guard for navigation items */
 export const isNavItem = (value: unknown): value is NavItem => {
-  if (typeof value !== 'object' || value === null) {
+  if (!isObjectRecord(value)) {
     return false
   }
-  const item = value as Record<string, unknown>
+  const item = value
 
   return (
     typeof item['name'] === 'string' &&

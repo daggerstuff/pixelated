@@ -1,6 +1,6 @@
 import { describe, beforeEach, expect, it, vi } from 'vitest'
 
-const mockRedis = {
+const mockRedis = vi.hoisted(() => ({
   get: vi.fn(),
   set: vi.fn(),
   del: vi.fn(),
@@ -34,7 +34,7 @@ const mockRedis = {
   on: vi.fn(),
   off: vi.fn(),
   emit: vi.fn(),
-}
+}))
 
 process.env['REDIS_URL'] = 'redis://localhost:6379'
 delete process.env['UPSTASH_REDIS_REST_URL']
@@ -43,7 +43,7 @@ delete process.env['UPSTASH_REDIS_REST_TOKEN']
 // Mock ioredis
 vi.mock('ioredis', () => {
   return {
-    default: vi.fn().mockImplementation(function () {
+    default: vi.fn(function () {
       return mockRedis
     }),
   }
@@ -72,7 +72,6 @@ describe('Redis Module', () => {
 
   describe('getRedisClient', () => {
     it('should return the redis instance', () => {
-      console.log('redis === mockRedis:', redis === mockRedis)
       const client = getRedisClient()
       expect(client).toBe(redis)
     })
