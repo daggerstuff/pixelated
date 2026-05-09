@@ -3,7 +3,6 @@ import {
   motion,
   useAnimation,
   type Variants,
-  type TargetAndTransition,
 } from 'framer-motion'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -30,7 +29,7 @@ export interface AnimationOrchestratorProps {
   onAnimationComplete?: () => void
   className?: string
   style?: React.CSSProperties
-  as?: keyof JSX.IntrinsicElements
+  as?: keyof React.JSX.IntrinsicElements
   viewport?: boolean
   once?: boolean
 }
@@ -68,7 +67,7 @@ export function AnimationOrchestrator({
   onAnimationComplete,
   className = '',
   style = {},
-  as = 'div',
+  as: _as = 'div',
   once = true,
 }: AnimationOrchestratorProps) {
   const controls = useAnimation()
@@ -78,9 +77,19 @@ export function AnimationOrchestrator({
   // Get the animation variants
   const variants = useMemo(() => {
     let baseVariants: Variants
+    const isPreset = (value: string): value is AnimationPreset =>
+      value in animationPresets
+
+    const getPreset = (presetName: AnimationPreset): Variants => {
+      return animationPresets[presetName]
+    }
 
     if (typeof sequence === 'string') {
-      baseVariants = animationPresets[sequence] || animationPresets.fadeIn
+      if (isPreset(sequence)) {
+        baseVariants = getPreset(sequence)
+      } else {
+        baseVariants = animationPresets.fadeIn
+      }
     } else {
       baseVariants = sequence
     }
@@ -96,12 +105,13 @@ export function AnimationOrchestrator({
       baseVariants['animate'] &&
       typeof baseVariants['animate'] === 'object'
     ) {
+      const baseAnimate = baseVariants['animate']
       return {
         ...baseVariants,
         animate: {
-          ...baseVariants['animate'],
+          ...baseAnimate,
           transition: {
-            ...(baseVariants['animate'] as { transition?: Record<string, unknown> }).transition,
+            ...(baseAnimate.transition ?? {}),
             staggerChildren: staggerDelay,
           },
         },
@@ -139,18 +149,14 @@ export function AnimationOrchestrator({
     onAnimationComplete?.()
   }, [onAnimationComplete])
 
-  const Component = motion[as] as React.ComponentType<
-    React.ComponentProps<typeof motion.div>
-  >
-
   return (
-    <Component
+    <motion.div
       className={className}
       style={style}
       variants={variants}
-      initial='initial'
+      initial="initial"
       animate={controls}
-      exit='exit'
+      exit="exit"
       onAnimationComplete={handleAnimationComplete}
       onViewportEnter={triggerOnViewport ? handleViewportEnter : undefined}
       viewport={
@@ -164,7 +170,7 @@ export function AnimationOrchestrator({
       }
     >
       {children}
-    </Component>
+    </motion.div>
   )
 }
 
@@ -179,7 +185,7 @@ export function PageTransition({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType='page'
+      orchestrationType="page"
       className={className}
       {...props}
     >
@@ -200,7 +206,7 @@ export function ListAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType='list'
+      orchestrationType="list"
       staggerChildren={staggerChildren}
       staggerDelay={staggerDelay}
       triggerOnViewport={triggerOnViewport}
@@ -222,7 +228,7 @@ export function ModalAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType='modal'
+      orchestrationType="modal"
       triggerOnMount={triggerOnMount}
       className={className}
       {...props}
@@ -242,7 +248,7 @@ export function InteractiveAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType='interactive'
+      orchestrationType="interactive"
       triggerOnMount={triggerOnMount}
       className={className}
       {...props}
@@ -284,23 +290,25 @@ export function AdvancedSequence({
   const executeSequence = useCallback(async () => {
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i]
-      setCurrentStep(i)
+      if (!step) {
+        continue
+      }
 
-      await controls.start({
-        ...(step.variants['animate'] as TargetAndTransition),
-        transition: {
-          duration: step.duration || TIMING.normal,
-          ease: typeof step.ease === 'string' ? EASING[step.ease] : step.ease,
-          delay: step.delay || 0,
-        },
-      })
+      const animateStep = step.variants['animate']
+      setCurrentStep(i)
+      await controls.start(animateStep ?? 'animate')
+      await new Promise((resolve) =>
+        setTimeout(resolve, (step.duration ?? TIMING.normal) * 1000),
+      )
     }
 
     onSequenceComplete?.()
 
     if (loop) {
       setCurrentStep(0)
-      await controls.start(steps[0].variants['initial'] || {})
+      if (steps[0]) {
+        await controls.start(steps[0].variants['initial'] ?? 'initial')
+      }
       void executeSequence()
     }
   }, [steps, controls, loop, onSequenceComplete])
@@ -311,14 +319,8 @@ export function AdvancedSequence({
     }
   }, [autoPlay, executeSequence, steps.length])
 
-  const currentVariants = steps[currentStep]?.variants || {}
-
   return (
-    <motion.div
-      className={className}
-      initial={(currentVariants['initial'] as TargetAndTransition) || {}}
-      animate={controls}
-    >
+    <motion.div className={className} initial="initial" animate={controls}>
       {children}
     </motion.div>
   )
@@ -350,7 +352,8 @@ export function Choreography({
   useEffect(() => {
     const runChoreography = async () => {
       if (masterSequence) {
-        await masterControls.start(masterSequence['animate'] || {})
+        const animateStep = masterSequence['animate']
+        await masterControls.start(animateStep ?? 'animate')
       }
       onChoreographyComplete?.()
     }
@@ -361,7 +364,7 @@ export function Choreography({
   return (
     <motion.div
       className={className}
-      initial={(masterSequence?.['initial'] as TargetAndTransition) || {}}
+      initial="initial"
       animate={masterControls}
     >
       <AnimatePresence>
@@ -369,9 +372,9 @@ export function Choreography({
           <motion.div
             key={item.id}
             variants={item.variants}
-            initial='initial'
-            animate='animate'
-            exit='exit'
+            initial="initial"
+            animate="animate"
+            exit="exit"
             custom={item.delay}
           >
             {item.element}
