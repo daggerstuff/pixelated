@@ -11,11 +11,25 @@ import { useSyncedState, useSyncedObject } from '@/hooks/useSyncedState'
 import tabSyncManager from '@/utils/sync/tabSyncManager'
 
 interface SyncedPreferences {
-   theme: 'light' | 'dark'
-   fontSize: 'small' | 'medium' | 'large'
-   notifications: boolean
-   language: string
-   [key: string]: unknown
+  theme: 'light' | 'dark'
+  fontSize: 'small' | 'medium' | 'large'
+  notifications: boolean
+  language: string
+  [key: string]: unknown
+}
+
+const parseThemePreference = (value: string): 'light' | 'dark' => {
+  return value === 'dark' ? 'dark' : 'light'
+}
+
+const parseFontSizePreference = (
+  value: string,
+): 'small' | 'medium' | 'large' => {
+  return value === 'small'
+    ? 'small'
+    : value === 'large'
+      ? 'large'
+      : 'medium'
 }
 
 /**
@@ -257,7 +271,7 @@ export const TabSyncDemo: FC = () => {
                             onChange={(e) =>
                               updatePreference(
                                 'theme',
-                                e.target.value as 'light' | 'dark',
+                                parseThemePreference(e.target.value),
                               )
                             }
                             className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 w-full rounded-lg border px-3 py-2'
@@ -280,7 +294,7 @@ export const TabSyncDemo: FC = () => {
                             onChange={(e) =>
                               updatePreference(
                                 'fontSize',
-                                e.target.value as 'small' | 'medium' | 'large',
+                                parseFontSizePreference(e.target.value),
                               )
                             }
                             className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 w-full rounded-lg border px-3 py-2'

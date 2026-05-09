@@ -1,6 +1,9 @@
 #!/usr/bin/env node
+/* eslint-disable typescript/no-unsafe-call,typescript/no-unsafe-assignment,typescript/no-unsafe-member-access,typescript/no-unsafe-return,typescript/no-unsafe-argument,typescript/prefer-nullish-coalescing */
 import { existsSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
+
+/** @typedef {import('node:child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
 
 const EXCLUDED_FROM_OXFMT = new Set([
   'eslint.config.js',
@@ -18,12 +21,14 @@ const OXFMT_APPLICABLE_EXTENSIONS = new Set([
   '.cts',
 ])
 
+/** @param {string[]} files */
 function dedupeAndFilterExisting(files) {
   const seen = new Set()
+  /** @type {string[]} */
   const results = []
 
   for (const filePath of files) {
-    if (!filePath || !existsSync(filePath)) {
+    if (typeof filePath !== 'string' || !filePath || !existsSync(filePath)) {
       continue
     }
     if (seen.has(filePath)) {
@@ -37,50 +42,57 @@ function dedupeAndFilterExisting(files) {
   return results
 }
 
+/** @param {string} command @param {string[]} args */
 function runCommand(command, args) {
+  /** @type {SpawnSyncTextResult} */
   const result = spawnSync('pnpm', ['-s', command, ...args], {
     stdio: 'inherit',
   })
-
-  if (result.status !== 0) {
-    process.exit(result.status)
+  const exitCode = typeof result.status === 'number' ? result.status : 0
+  if (exitCode !== 0) {
+    process.exit(exitCode)
   }
 }
 
+/** @param {string} filePath @returns {string[]} */
 function readFilesFromPath(filePath) {
   if (!existsSync(filePath)) {
     return []
   }
 
-  return readFileSync(filePath, 'utf8')
+  const fileContents = readFileSync(filePath, 'utf8')
+  return fileContents
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
 }
 
+/** @returns {string[]} */
 function readChangedFilesFromGit() {
+  /** @type {SpawnSyncTextResult} */
   const result = spawnSync('git', [
     'diff',
     '--name-only',
     '--diff-filter=ACMRTUXB',
     '--',
   ], { encoding: 'utf8' })
+  const exitCode = typeof result.status === 'number' ? result.status : 0
 
-  if (result.status !== 0) {
+  if (exitCode !== 0 || typeof result.stdout !== 'string') {
     console.error('Failed to read changed files from git')
-    process.exit(result.status)
+    process.exit(exitCode || 1)
   }
 
   return result.stdout
+    .trim()
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
 }
 
 const explicitFileListPath = process.argv[2]
-const rawChangedFiles = explicitFileListPath
-  ? readFilesFromPath(explicitFileListPath)
-  : readChangedFilesFromGit()
+const rawChangedFiles =
+  typeof explicitFileListPath === 'string' ? readFilesFromPath(explicitFileListPath) : readChangedFilesFromGit()
 const changedFiles = dedupeAndFilterExisting(rawChangedFiles)
 
 if (changedFiles.length === 0) {
