@@ -184,14 +184,32 @@ function extractEntities(content: string): ParseResponse['entities'] {
     riskFactors: [],
   }
 
-  for (const [category, patterns] of Object.entries(ENTITY_PATTERNS)) {
+  const isEntityCategory = (
+    category: string,
+  ): category is keyof typeof ENTITY_PATTERNS => category in ENTITY_PATTERNS
+
+  for (const category of Object.keys(ENTITY_PATTERNS)) {
+    if (!isEntityCategory(category)) {
+      continue
+    }
+
+    const patterns = ENTITY_PATTERNS[category]
     const found = patterns.filter((pattern) =>
       lowerContent.includes(pattern.toLowerCase()),
     )
-    entities[category as keyof typeof entities] = found
+    entities[category] = found
   }
 
   return entities
+}
+
+const isParseRequest = (value: unknown): value is ParseRequest => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'content' in value &&
+    typeof (value as { content: unknown }).content === 'string'
+  )
 }
 
 function identifyFrameworks(
@@ -306,11 +324,25 @@ function calculateComplexity(
   return 'low'
 }
 
+import type { APIContext } from 'astro'
+
 export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {
-    const body: ParseRequest = await request.json()
+    const bodyPayload: unknown = await request.json()
+    if (!isParseRequest(bodyPayload)) {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid request: content is required and must be a string',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+    const body = bodyPayload
 
     if (!body.content || typeof body.content !== 'string') {
       return new Response(

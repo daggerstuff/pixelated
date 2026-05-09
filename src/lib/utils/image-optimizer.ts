@@ -14,7 +14,7 @@ import {
   validatePath,
 } from '../../utils/path-security'
 
-const logger = getLogger('image-optimizer')
+const logger = getLogger({ prefix: 'image-optimizer' })
 
 // Optimization configuration
 const IMAGE_CONFIG = {
@@ -79,7 +79,7 @@ export interface OptimizationResult {
  * Image optimization service
  */
 export class ImageOptimizer {
-  private outputDirs: string[]
+  private readonly outputDirs: string[]
 
   constructor() {
     this.outputDirs = [
@@ -182,7 +182,7 @@ export class ImageOptimizer {
       }
 
       // Calculate total savings
-      const totalOptimizedSize = (result.webpSize || 0) + (result.avifSize || 0)
+      const totalOptimizedSize = (result.webpSize ?? 0) + (result.avifSize ?? 0)
       if (totalOptimizedSize > 0) {
         result.savings = originalSize - totalOptimizedSize / 2 // Average savings
         result.compressionRatio = originalSize / (totalOptimizedSize / 2)
@@ -222,25 +222,25 @@ export class ImageOptimizer {
     // Check file extension first
     const ext = filePath.toLowerCase().split('.').pop()
 
-    if (['jpg', 'jpeg'].includes(ext || '')) return 'jpeg'
+    if (['jpg', 'jpeg'].includes(ext ?? '')) return 'jpeg'
     if (ext === 'png') return 'png'
     if (ext === 'webp') return 'webp'
     if (ext === 'avif') return 'avif'
     if (ext === 'gif') return 'gif'
 
     // Check magic bytes if extension is unclear
-    const magic = buffer.slice(0, 12).toString('hex')
+    const magic = buffer.subarray(0, 12).toString('hex')
 
     if (magic.startsWith('ffd8ff')) return 'jpeg'
     if (magic.startsWith('89504e47')) return 'png'
     if (
       magic.startsWith('52494646') &&
-      buffer.slice(8, 12).toString('hex') === '57454250'
+      buffer.subarray(8, 12).toString('hex') === '57454250'
     )
       return 'webp'
     if (
       magic.startsWith('52494646') &&
-      buffer.slice(8, 12).toString('hex') === '41564946'
+      buffer.subarray(8, 12).toString('hex') === '41564946'
     )
       return 'avif'
 
@@ -342,7 +342,7 @@ export class ImageOptimizer {
       originalPath
         .split('/')
         .pop()
-        ?.replace(/\.[^/.]+$/, '') || 'image'
+        ?.replace(/\.[^/.]+$/, '') ?? 'image'
     return `${basename}-optimized.${format}`
   }
 
@@ -361,7 +361,7 @@ export class ImageOptimizer {
     for (let i = 0; i < imagePaths.length; i += batchSize) {
       const batch = imagePaths.slice(i, i + batchSize)
 
-      const batchPromises = batch.map((path) => this.optimizeImage(path))
+      const batchPromises = batch.map(async (path) => this.optimizeImage(path))
       const batchResults = await Promise.all(batchPromises)
 
       results.push(...batchResults)
@@ -377,7 +377,7 @@ export class ImageOptimizer {
       0,
     )
     const totalOptimizedSize = results.reduce(
-      (sum, r) => sum + (r.webpSize || r.originalSize),
+      (sum, r) => sum + (r.webpSize ?? r.originalSize),
       0,
     )
     const totalSavings = totalOriginalSize - totalOptimizedSize
@@ -402,7 +402,7 @@ export class ImageOptimizer {
       result.originalPath
         .split('/')
         .pop()
-        ?.replace(/\.[^/.]+$/, '') || 'image'
+        ?.replace(/\.[^/.]+$/, '') ?? 'image'
 
     let html = `<!-- Responsive image: ${alt} -->\n`
     html += `<picture>\n`
@@ -418,7 +418,7 @@ export class ImageOptimizer {
     }
 
     // Original format as fallback
-    const fallbackPath = result.optimizedPath || result.originalPath
+    const fallbackPath = result.optimizedPath ?? result.originalPath
     html += `  <img src="${fallbackPath}" alt="${alt}" loading="lazy">\n`
     html += `</picture>`
 
@@ -442,7 +442,7 @@ export class ImageOptimizer {
     )
     const totalOptimizedSize =
       results.reduce((sum, r) => {
-        return sum + (r.webpSize || r.originalSize) + (r.avifSize || 0)
+        return sum + (r.webpSize ?? r.originalSize) + (r.avifSize ?? 0)
       }, 0) / 2 // Average of available formats
 
     const totalSavings = totalOriginalSize - totalOptimizedSize

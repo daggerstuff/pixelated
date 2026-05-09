@@ -17,22 +17,26 @@ afterAll(() => {
 describe('Bias Detection API Integration Tests', () => {
   const baseUrl = 'http://localhost:4321/api/demos/bias-detection'
 
+  const createJsonResponse = (body: unknown): Response =>
+    new Response(JSON.stringify(body), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
   describe('Analysis API (/analyze)', () => {
     it('should successfully analyze bias in therapeutic content', async () => {
-      const mockResponse = {
-        success: true,
-        analysis: {
-          sessionId: 'test-session-123',
-          overallBiasScore: 0.45,
-          alertLevel: 'medium',
-          confidence: 0.87,
-        },
-      }
-
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response)
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        createJsonResponse({
+          success: true,
+          analysis: {
+            sessionId: 'test-session-123',
+            overallBiasScore: 0.45,
+            alertLevel: 'medium',
+            confidence: 0.87,
+          },
+        }),
+      )
 
       const requestBody = {
         content:
@@ -51,11 +55,10 @@ describe('Bias Detection API Integration Tests', () => {
         body: JSON.stringify(requestBody),
       })
 
-      const data = await response.json()
-
       expect(response.ok).toBe(true)
-      expect(data.success).toBe(true)
-      expect(data.analysis.overallBiasScore).toBeGreaterThan(0)
+      const responseBody = await response.text()
+      expect(responseBody).toContain('"success":true')
+      expect(responseBody).toContain('"overallBiasScore":0.45')
     })
 
     it('should reject requests with missing required fields', async () => {
@@ -63,11 +66,14 @@ describe('Bias Detection API Integration Tests', () => {
         error: 'Missing required fields: content and demographics are required',
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        json: async () => mockResponse,
-      } as Response)
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+      )
 
       const response = await fetch(`${baseUrl}/analyze`, {
         method: 'POST',
@@ -75,10 +81,11 @@ describe('Bias Detection API Integration Tests', () => {
         body: JSON.stringify({ content: 'Test content' }),
       })
 
-      const data = await response.json()
-
       expect(response.ok).toBe(false)
-      expect(data.error).toContain('Missing required fields')
+      const responseBody = await response.text()
+      expect(responseBody).toContain(
+        '"error":"Missing required fields: content and demographics are required"',
+      )
     })
   })
 
@@ -100,17 +107,21 @@ describe('Bias Detection API Integration Tests', () => {
         },
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response)
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        createJsonResponse({
+          ...mockResponse,
+          metadata: {
+            total: 6,
+            categories: ['cultural', 'gender', 'age'],
+          },
+        }),
+      )
 
       const response = await fetch(`${baseUrl}/presets`)
-      const data = await response.json()
-
       expect(response.ok).toBe(true)
-      expect(data.success).toBe(true)
-      expect(data.scenarios).toBeInstanceOf(Array)
+      const responseBody = await response.text()
+      expect(responseBody).toContain('"success":true')
+      expect(responseBody).toContain('"id":"high-bias-cultural"')
     })
   })
 
@@ -121,11 +132,13 @@ describe('Bias Detection API Integration Tests', () => {
         analysis: { overallBiasScore: 0.45 },
       })
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        text: async () => mockResponse,
-        headers: new Map([['content-type', 'application/json']]),
-      } as Response)
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(mockResponse, {
+          headers: {
+            'content-type': 'application/json',
+          },
+        }),
+      )
 
       const response = await fetch(`${baseUrl}/export`, {
         method: 'POST',
