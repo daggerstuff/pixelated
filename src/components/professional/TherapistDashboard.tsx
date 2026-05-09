@@ -19,7 +19,7 @@ interface PatientSummary {
   id: string
   name: string
   lastSession: Date
-  riskLevel: 'low' | 'medium' | 'high' | 'critical'
+  riskLevel: RiskLevel
   progress: number // 0-100
   nextAppointment?: Date
   alerts: string[]
@@ -32,16 +32,39 @@ interface SessionMetrics {
   patientSatisfaction: number
 }
 
+type DashboardView = 'overview' | 'patients' | 'analytics' | 'schedule'
+type TimeRange = 'week' | 'month' | 'quarter' | 'year'
+type RiskLevel = 'low' | 'medium' | 'high' | 'critical'
+
+type DashboardTab = {
+  id: DashboardView
+  label: string
+  icon: 'chart' | 'users' | 'trending' | 'calendar'
+}
+
+const DASHBOARD_TABS: readonly DashboardTab[] = [
+  { id: 'overview', label: 'Overview', icon: 'chart' },
+  { id: 'patients', label: 'Patients', icon: 'users' },
+  { id: 'analytics', label: 'Analytics', icon: 'trending' },
+  { id: 'schedule', label: 'Schedule', icon: 'calendar' },
+]
+
+const TIME_RANGES: readonly TimeRange[] = ['week', 'month', 'quarter', 'year']
+
+const isTimeRange = (value: string): value is TimeRange =>
+  (TIME_RANGES as readonly string[]).includes(value)
+
 /**
  * Comprehensive Therapist Dashboard for Mental Health Professionals
  */
 export const TherapistDashboard: FC = () => {
   // Persistent dashboard preferences
-  const [dashboardView, setDashboardView] = usePersistentState<
-    'overview' | 'patients' | 'analytics' | 'schedule'
-  >('therapist_dashboard_view', 'overview')
+  const [dashboardView, setDashboardView] = usePersistentState<DashboardView>(
+    'therapist_dashboard_view',
+    'overview',
+  )
   const [timeRange, setTimeRange] = usePersistentState<
-    'week' | 'month' | 'quarter' | 'year'
+    TimeRange
   >('therapist_dashboard_timerange', 'month')
   const [selectedPatients, setSelectedPatients] = usePersistentState<string[]>(
     'therapist_selected_patients',
@@ -124,13 +147,23 @@ export const TherapistDashboard: FC = () => {
                 <select
                   aria-label='Select time range'
                   value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value as any)}
+                  onChange={(event) =>
+                    isTimeRange(event.target.value) &&
+                    setTimeRange(event.target.value)
+                  }
                   className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
-                  <option value='week'>This Week</option>
-                  <option value='month'>This Month</option>
-                  <option value='quarter'>This Quarter</option>
-                  <option value='year'>This Year</option>
+                  {TIME_RANGES.map((range) => (
+                    <option value={range} key={range}>
+                      {range === 'week'
+                        ? 'This Week'
+                        : range === 'month'
+                          ? 'This Month'
+                          : range === 'quarter'
+                            ? 'This Quarter'
+                            : 'This Year'}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -139,15 +172,10 @@ export const TherapistDashboard: FC = () => {
           {/* Navigation Tabs */}
           <div className='px-6'>
             <nav className='flex space-x-8'>
-              {[
-                { id: 'overview', label: 'Overview', icon: 'chart' },
-                { id: 'patients', label: 'Patients', icon: 'users' },
-                { id: 'analytics', label: 'Analytics', icon: 'trending' },
-                { id: 'schedule', label: 'Schedule', icon: 'calendar' },
-              ].map((tab) => (
+              {DASHBOARD_TABS.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setDashboardView(tab.id as any)}
+                  onClick={() => setDashboardView(tab.id)}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -539,7 +567,7 @@ const PatientsTab: FC<{
                     <div>Progress: {patient.progress}%</div>
                     <div>
                       Next appointment:{' '}
-                      {patient.nextAppointment?.toLocaleDateString() ||
+                      {patient.nextAppointment?.toLocaleDateString() ??
                         'Not scheduled'}
                     </div>
                     <div>Alerts: {patient.alerts.length}</div>
@@ -631,8 +659,8 @@ const ScheduleTab: FC<{
     .filter((p) => p.nextAppointment && p.nextAppointment >= today)
     .sort(
       (a, b) =>
-        (a.nextAppointment?.getTime() || 0) -
-        (b.nextAppointment?.getTime() || 0),
+        (a.nextAppointment?.getTime() ?? 0) -
+        (b.nextAppointment?.getTime() ?? 0),
     )
     .slice(0, 10)
 
@@ -706,15 +734,15 @@ const ScheduleTab: FC<{
 }
 
 // Helper function (defined outside component to avoid recreation)
-function getRiskColor(risk: string) {
-  const colors = {
+function getRiskColor(risk: RiskLevel) {
+  const colors: Record<RiskLevel, string> = {
     low: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
     medium:
       'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
     high: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200',
     critical: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
   }
-  return colors[risk as keyof typeof colors] || colors.low
+  return colors[risk]
 }
 
 function getProgressColor(progress: number) {

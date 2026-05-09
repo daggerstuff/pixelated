@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 
 const EXCLUDED_FROM_OXFMT = new Set([
+  'eslint.config.js',
   'src/lib/auth/__tests__/integration.test.ts',
   'src/types/index.ts',
   'tests/unit/auth0/auth0-jwt-service.test.ts',

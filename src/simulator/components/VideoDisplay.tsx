@@ -138,53 +138,6 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
   // Refs to break circular dependencies between callbacks
   const handleConnectionFailureRef = useRef<(() => Promise<void>) | null>(null)
 
-  // Create and send an offer to the peer
-  const createAndSendOffer = useCallback(async () => {
-    const peerConnection = peerConnectionRef.current
-    if (!peerConnection) {
-      return
-    }
-
-    try {
-      const offer = await peerConnection.createOffer()
-      await peerConnection.setLocalDescription(offer)
-      await signalingService.sendOffer(sessionId, userId, offer)
-    } catch (error: unknown) {
-      logger.error('Failed to create and send offer', { error, sessionId })
-      toast.error('Failed to establish connection')
-    }
-  }, [sessionId, userId])
-
-  // Handle connection failures and reconnection
-  const handleConnectionFailure = useCallback(async () => {
-    logger.warn('Connection failed, attempting reconnection', { sessionId })
-    setIsReconnecting(true)
-
-    try {
-      // Clean up existing connection
-      if (peerConnectionRef.current) {
-        peerConnectionRef.current.close()
-      }
-
-      // Reinitialize connection
-      const newPeerConnection = initializePeerConnection()
-      if (newPeerConnection) {
-        await setupMediaStream()
-        await createAndSendOffer()
-      }
-    } catch (error: unknown) {
-      logger.error('Reconnection failed', { error, sessionId })
-      toast.error('Failed to reconnect video call')
-    } finally {
-      setIsReconnecting(false)
-    }
-  }, [
-    createAndSendOffer,
-    initializePeerConnection,
-    sessionId,
-    setupMediaStream,
-  ])
-
   // Initialize WebRTC peer connection
   const initializePeerConnection = useCallback(() => {
     try {
@@ -239,6 +192,23 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     }
   }, [sessionId, userId, onConnectionStateChange])
 
+  // Create and send an offer to the peer
+  const createAndSendOffer = useCallback(async () => {
+    const peerConnection = peerConnectionRef.current
+    if (!peerConnection) {
+      return
+    }
+
+    try {
+      const offer = await peerConnection.createOffer()
+      await peerConnection.setLocalDescription(offer)
+      await signalingService.sendOffer(sessionId, userId, offer)
+    } catch (error: unknown) {
+      logger.error('Failed to create and send offer', { error, sessionId })
+      toast.error('Failed to establish connection')
+    }
+  }, [sessionId, userId])
+
   // Handle media stream setup
   const setupMediaStream = useCallback(async () => {
     try {
@@ -273,6 +243,30 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
       toast.error('Unable to access camera or microphone')
     }
   }, [sessionId])
+
+  // Handle connection failures and reconnection
+  const handleConnectionFailure = useCallback(async () => {
+    logger.warn('Connection failed, attempting reconnection', { sessionId })
+    setIsReconnecting(true)
+
+    try {
+      // Clean up existing connection
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close()
+      }
+
+      const newPeerConnection = initializePeerConnection()
+      if (newPeerConnection) {
+        await setupMediaStream()
+        await createAndSendOffer()
+      }
+    } catch (error: unknown) {
+      logger.error('Reconnection failed', { error, sessionId })
+      toast.error('Failed to reconnect video call')
+    } finally {
+      setIsReconnecting(false)
+    }
+  }, [createAndSendOffer, initializePeerConnection, sessionId, setupMediaStream])
 
   handleConnectionFailureRef.current = handleConnectionFailure
 
