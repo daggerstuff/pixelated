@@ -228,27 +228,27 @@ export function NotificationPreferences({
           activities
         </CardDescription>
       </CardHeader>
-      <CardContent className='space-y-6'>
+      <CardContent className="space-y-6">
         {error && (
-          <Alert variant='error'>
-            <AlertCircle className='h-4 w-4' />
+          <Alert variant="error">
+            <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <div className='space-y-4'>
+        <div className="space-y-4">
           <div>
-            <h3 className='mb-3 text-sm font-medium'>Notification Channels</h3>
-            <div className='space-y-3'>
-              <div className='flex items-center justify-between'>
-                <div className='space-y-0.5'>
-                  <Label htmlFor='in-app'>In-app notifications</Label>
-                  <p className='text-muted-foreground text-xs'>
+            <h3 className="mb-3 text-sm font-medium">Notification Channels</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="in-app">In-app notifications</Label>
+                  <p className="text-muted-foreground text-xs">
                     Show notifications in the notification center
                   </p>
                 </div>
                 <Switch
-                  id='in-app'
+                  id="in-app"
                   checked={preferences.inApp}
                   onCheckedChange={(checked) =>
                     setPreferences({ inApp: checked })
@@ -256,15 +256,15 @@ export function NotificationPreferences({
                 />
               </div>
 
-              <div className='flex items-center justify-between'>
-                <div className='space-y-0.5'>
-                  <Label htmlFor='toast'>Toast notifications</Label>
-                  <p className='text-muted-foreground text-xs'>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="toast">Toast notifications</Label>
+                  <p className="text-muted-foreground text-xs">
                     Show temporary toast messages
                   </p>
                 </div>
                 <Switch
-                  id='toast'
+                  id="toast"
                   checked={preferences.toast}
                   onCheckedChange={(checked) =>
                     setPreferences({ toast: checked })
@@ -272,28 +272,28 @@ export function NotificationPreferences({
                 />
               </div>
 
-              <div className='flex items-center justify-between'>
-                <div className='space-y-0.5'>
-                  <Label htmlFor='browser-push'>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="browser-push">
                     Browser push notifications
                   </Label>
-                  <p className='text-muted-foreground text-xs'>
+                  <p className="text-muted-foreground text-xs">
                     Receive notifications even when the app is closed
                   </p>
                 </div>
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   {pushPermission === 'granted' && preferences.browserPush ? (
                     <Button
-                      variant='outline'
-                      size='sm'
+                      variant="outline"
+                      size="sm"
                       onClick={disablePushNotifications}
                     >
                       Disable
                     </Button>
                   ) : (
                     <Button
-                      variant='outline'
-                      size='sm'
+                      variant="outline"
+                      size="sm"
                       onClick={requestPushPermission}
                       disabled={isRequestingPush || pushPermission === 'denied'}
                     >
@@ -305,20 +305,20 @@ export function NotificationPreferences({
                     </Button>
                   )}
                   {pushPermission === 'granted' && (
-                    <CheckCircle className='text-green-600 h-4 w-4' />
+                    <CheckCircle className="text-green-600 h-4 w-4" />
                   )}
                 </div>
               </div>
 
-              <div className='flex items-center justify-between'>
-                <div className='space-y-0.5'>
-                  <Label htmlFor='email'>Email notifications</Label>
-                  <p className='text-muted-foreground text-xs'>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="email">Email notifications</Label>
+                  <p className="text-muted-foreground text-xs">
                     Receive notifications via email
                   </p>
                 </div>
                 <Switch
-                  id='email'
+                  id="email"
                   checked={preferences.email}
                   onCheckedChange={(checked) =>
                     setPreferences({ email: checked })
@@ -329,7 +329,7 @@ export function NotificationPreferences({
           </div>
 
           <div>
-            <h3 className='mb-3 text-sm font-medium'>Notification Frequency</h3>
+            <h3 className="mb-3 text-sm font-medium">Notification Frequency</h3>
             <Select
               value={preferences.frequency}
               onValueChange={(value) => {
@@ -342,30 +342,30 @@ export function NotificationPreferences({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='immediate'>Immediate</SelectItem>
-                <SelectItem value='batched'>
+                <SelectItem value="immediate">Immediate</SelectItem>
+                <SelectItem value="batched">
                   Batched (every 5 minutes)
                 </SelectItem>
-                <SelectItem value='daily'>Daily digest</SelectItem>
-                <SelectItem value='never'>Never</SelectItem>
+                <SelectItem value="daily">Daily digest</SelectItem>
+                <SelectItem value="never">Never</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <h3 className='mb-3 text-sm font-medium'>
+            <h3 className="mb-3 text-sm font-medium">
               Notification Categories
             </h3>
-            <div className='space-y-2'>
+            <div className="space-y-2">
               {Object.entries(preferences.categories).map(
                 ([category, enabled]) => (
                   <div
                     key={category}
-                    className='flex items-center justify-between'
+                    className="flex items-center justify-between"
                   >
                     <Label
                       htmlFor={`category-${category}`}
-                      className='capitalize'
+                      className="capitalize"
                     >
                       {category}
                     </Label>
