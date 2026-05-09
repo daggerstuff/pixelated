@@ -5,7 +5,6 @@ import markdown from '@eslint/markdown'
 import pluginVitest from '@vitest/eslint-plugin'
 import pluginAstro from 'eslint-plugin-astro'
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-import pluginNode from 'eslint-plugin-node'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
@@ -165,7 +164,7 @@ export default tseslint.config(
       // Disabled complexity rules (matching OXC)
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      complexity: 'off',
+      'complexity': 'off',
       'max-params': 'off',
       'max-statements': 'off',
       'no-await-in-loop': 'off',
@@ -176,7 +175,7 @@ export default tseslint.config(
   {
     files: ['**/*.{jsx,tsx}'],
     plugins: {
-      react: pluginReact,
+      'react': pluginReact,
       'react-hooks': pluginReactHooks,
     },
     settings: {
@@ -249,22 +248,11 @@ export default tseslint.config(
     },
   },
 
-  // Node.js configuration
-  {
-    files: ['**/*.{js,mjs,cjs}'],
-    plugins: {
-      node: pluginNode,
-    },
-    rules: {
-      ...pluginNode.configs.recommended.rules,
-    },
-  },
-
   // Vitest configuration
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      vitest: pluginVitest,
+      'vitest': pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -295,7 +283,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      complexity: 'off',
+      'complexity': 'off',
       'max-params': 'off',
       'max-statements': 'off',
     },

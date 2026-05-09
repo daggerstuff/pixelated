@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const messages = [
     {
       role: 'system',
-      content: `User context:\nStatic facts: ${profile.static.join('\n')}\nRecent context: ${profile.dynamic.join('\n')}\nSearch context: ${context.join('\n')}`,
+      content: `User context:\nStatic facts: ${profile.static.join('\n')}\nRecent context: ${profile.dynamic.join('\n')}\nSearch context: ${context}`,
     },
     { role: 'user', content: message },
   ]

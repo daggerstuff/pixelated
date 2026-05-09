@@ -369,9 +369,9 @@ export function EnhancedSimulationContainer({
             className="flex-1 space-y-4 overflow-y-auto p-4"
             key={conversationKey}
           >
-            {conversationHistory.map((message, index: number) => (
+            {conversationHistory.map((message) => (
               <div
-                key={`message-${index}-${message.role}-${message.text.slice(0, 20)}`}
+                key={`${message.role}-${message.text.slice(0, 20)}-${message.text.length}`}
                 className={cn(
                   'flex p-3 rounded-lg max-w-3/4',
                   message.role === 'user' ? 'bg-blue-50 ml-auto' : 'bg-gray-50',

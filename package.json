@@ -362,7 +362,7 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "latest",
-    "eslint": "^10.3.0",
+    "eslint": "^9.7.0",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-node": "latest",
@@ -472,6 +472,7 @@
       "@aws-amplify/cli",
       "@contrast/fn-inspect",
       "@dwmkerr/terminal-ai",
+      "@modelcontextprotocol/ext-apps",
       "@letta-ai/letta-code",
       "@newrelic/native-metrics",
       "@parcel/watcher",
@@ -527,7 +528,8 @@
       "unrs-resolver",
       "utf-8-validate",
       "win-export-certificate-and-key",
-      "workerd"
+      "workerd",
+      "better-sqlite3"
     ],
     "ignoredBuiltDependencies": [
       "libpg-query"
