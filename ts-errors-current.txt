@@ -1,12 +1,12 @@
 Already up to date
-Done in 246ms using pnpm v11.0.8
+Done in 241ms using pnpm v11.0.8
 $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit
 🟢 Using Node adapter for standard deployment
-18:35:08 [@astrojs/node] Enabling sessions with filesystem storage
-18:35:09 [content] Syncing content
-18:35:09 [content] Synced content
-18:35:09 [types] Generated 1.01s
-18:35:09 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
+23:49:40 [@astrojs/node] Enabling sessions with filesystem storage
+23:49:41 [content] Syncing content
+23:49:41 [content] Synced content
+23:49:41 [types] Generated 1.15s
+23:49:41 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
 [96msrc/content.config.ts[0m:[93m103[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
 
 [7m103[0m       'sponsor.to-suport': z.string().optional(),
@@ -1223,6 +1223,103 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m17[0m   content: [
 [7m  [0m [91m  ~~~~~~~[0m
 
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m530[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m530[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m529[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m529[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m495[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m495[0m       type: "general",
+[7m   [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m464[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m464[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m463[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m463[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m429[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m429[0m       type: "general",
+[7m   [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m397[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m397[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m396[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m396[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m362[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m362[0m       type: "general",
+[7m   [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m331[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m331[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m330[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m330[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m296[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m296[0m       type: "general",
+[7m   [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m264[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m264[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m263[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m263[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m229[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m229[0m       type: "general",
+[7m   [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m198[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m198[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m197[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m197[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m163[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m163[0m       type: "general",
+[7m   [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m131[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m131[0m     type: "general",
+[7m   [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m130[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m130[0m     scenarioId: "fixed",
+[7m   [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m96[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m96[0m       type: "general",
+[7m  [0m [91m      ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m64[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"substance-abuse" | "anxiety" | "depression" | "trauma" | "relationship-issues" | "general-wellness"'.
+
+[7m64[0m     type: "general",
+[7m  [0m [91m    ~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m63[0m:[93m5[0m - [91merror[0m[90m ts(1117): [0mAn object literal cannot have multiple properties with the same name.
+
+[7m63[0m     scenarioId: "fixed",
+[7m  [0m [91m    ~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/fixtures/demographic-bias-scenarios.ts[0m:[93m29[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '"general"' is not assignable to type '"intervention" | "diagnostic" | "risk-assessment" | "recommendation" | undefined'.
+
+[7m29[0m       type: "general",
+[7m  [0m [91m      ~~~~[0m
+
 [96msrc/lib/ai/bias-detection/__tests__/fixtures/index.ts[0m:[93m59[0m:[93m5[0m - [91merror[0m[90m ts(18004): [0mNo value exists in scope for the shorthand property 'ageBiasElderlyPatient'. Either declare one or provide an initializer.
 
 [7m59[0m     ageBiasElderlyPatient,
@@ -1243,23 +1340,23 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m3[0m import { pipeline } from "node:stream/promises";
 [7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m198[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m198[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m198[0m   timestamp: z.string().datetime(),
 [7m   [0m [93m                        ~~~~~~~~[0m
-[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m188[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m188[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m188[0m   timestamp: z.string().datetime(),
 [7m   [0m [93m                        ~~~~~~~~[0m
-[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m177[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m177[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m177[0m   lastRequestAt: z.string().datetime().optional().nullable(),
 [7m   [0m [93m                            ~~~~~~~~[0m
-[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m136[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m136[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m136[0m   createdAt: z.string().datetime(),
 [7m   [0m [93m                        ~~~~~~~~[0m
-[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m111[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/ai/embedding-agent/schemas.ts[0m:[93m111[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m111[0m   createdAt: z.string().datetime(),
 [7m   [0m [93m                        ~~~~~~~~[0m
@@ -1278,7 +1375,7 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m7[0m   EmotionalMetadata
 [7m [0m [93m  ~~~~~~~~~~~~~~~~~[0m
 
-[96msrc/lib/ai/memory/types.ts[0m:[93m53[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/ai/memory/types.ts[0m:[93m53[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m53[0m   timestamp: z.string().datetime(),
 [7m  [0m [93m                        ~~~~~~~~[0m
@@ -1343,10 +1440,10 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m38[0m   private crisisSessionFlaggingServiceImport?: Promise<unknown>;
 [7m  [0m [93m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96msrc/lib/ai/mental-llama/bridge/MentalLLaMAPythonBridge.ts[0m:[93m85[0m:[93m21[0m - [91merror[0m[90m ts(2322): [0mType 'unknown' is not assignable to type 'PythonBridgeResponse & { id?: string | undefined; }'.
+[96msrc/lib/ai/mental-llama/bridge/MentalLLaMAPythonBridge.ts[0m:[93m89[0m:[93m21[0m - [91merror[0m[90m ts(2322): [0mType 'unknown' is not assignable to type 'PythonBridgeResponse & { id?: string | undefined; }'.
   Type 'unknown' is not assignable to type 'PythonBridgeResponse'.
 
-[7m85[0m               const response: PythonBridgeResponse & { id?: string } =
+[7m89[0m               const response: PythonBridgeResponse & { id?: string } =
 [7m  [0m [91m                    ~~~~~~~~[0m
 
 [96msrc/lib/ai/mental-llama/bridge/server.ts[0m:[93m32[0m:[93m5[0m - [91merror[0m[90m ts(2322): [0mType 'MentalLLaMAPythonBridge' is not assignable to type '{ initialize(): Promise<void>; isReady(): boolean; }'.
@@ -1656,14 +1753,10 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m239[0m         element.addEventListener('click', (e) => {
 [7m   [0m [93m                                           ~[0m
 
-[96msrc/lib/animations/sequences.ts[0m:[93m427[0m:[93m7[0m - [91merror[0m[90m ts(2353): [0mObject literal may only specify known properties, and 'brightness' does not exist in type 'Variant'.
+[96msrc/lib/animations/sequences.ts[0m:[93m6[0m:[93m31[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
 
-[7m427[0m       brightness: 1.1,
-[7m   [0m [91m      ~~~~~~~~~~[0m
-[96msrc/lib/animations/sequences.ts[0m:[93m423[0m:[93m34[0m - [91merror[0m[90m ts(2353): [0mObject literal may only specify known properties, and 'brightness' does not exist in type 'Variant'.
-
-[7m423[0m     rest: { scale: 1, rotate: 0, brightness: 1 },
-[7m   [0m [91m                                 ~~~~~~~~~~[0m
+[7m6[0m import { type Variants } from 'framer-motion'
+[7m [0m [91m                              ~~~~~~~~~~~~~~~[0m
 
 [96msrc/lib/api/evaluation.test.ts[0m:[93m1[0m:[93m44[0m - [93mwarning[0m[90m ts(6133): [0m'vi' is declared but its value is never read.
 
@@ -1780,11 +1873,11 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m64[0m   fairness_metrics: z.record(z.number()),
 [7m  [0m [91m                      ~~~~~~[0m
 
-[96msrc/lib/api/journal-research/types.ts[0m:[93m357[0m:[93m46[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/api/journal-research/types.ts[0m:[93m357[0m:[93m46[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m357[0m       endDate: z.union([z.date(), z.string().datetime()]).optional(),
 [7m   [0m [93m                                             ~~~~~~~~[0m
-[96msrc/lib/api/journal-research/types.ts[0m:[93m356[0m:[93m48[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/api/journal-research/types.ts[0m:[93m356[0m:[93m48[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m356[0m       startDate: z.union([z.date(), z.string().datetime()]).optional(),
 [7m   [0m [93m                                               ~~~~~~~~[0m
@@ -1792,11 +1885,11 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m69[0m     url: z.string().url(),
 [7m  [0m [93m                    ~~~[0m
-[96msrc/lib/api/journal-research/types.ts[0m:[93m10[0m:[93m4[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/api/journal-research/types.ts[0m:[93m10[0m:[93m4[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m10[0m   .datetime()
 [7m  [0m [93m   ~~~~~~~~[0m
-[96msrc/lib/api/journal-research/types.ts[0m:[93m5[0m:[93m4[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/api/journal-research/types.ts[0m:[93m5[0m:[93m4[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m5[0m   .datetime()
 [7m [0m [93m   ~~~~~~~~[0m
@@ -3023,9 +3116,9 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m171[0m   private isInitialized = false
 [7m   [0m [93m          ~~~~~~~~~~~~~[0m
 
-[96msrc/lib/deployment/multi-region/CrossRegionDataSyncManager.ts[0m:[93m34[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'isInitialized' is declared but its value is never read.
+[96msrc/lib/deployment/multi-region/CrossRegionDataSyncManager.ts[0m:[93m37[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'isInitialized' is declared but its value is never read.
 
-[7m34[0m   private isInitialized = false
+[7m37[0m   private isInitialized = false
 [7m  [0m [93m          ~~~~~~~~~~~~~[0m
 
 [96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m26[0m:[93m38[0m - [93mwarning[0m[90m ts(6133): [0m'recordType' is declared but its value is never read.
@@ -3126,87 +3219,87 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m85[0m   private deploymentOrchestrator: DeploymentOrchestrator
 [7m  [0m [93m          ~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1611[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
-
-[7m1611[0m   LoadBalancerConfig,
-[7m    [0m [91m  ~~~~~~~~~~~~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1610[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
-
-[7m1610[0m   ServiceStats,
-[7m    [0m [91m  ~~~~~~~~~~~~[0m
 [96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1609[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
 
-[7m1609[0m   DiscoveryOptions,
-[7m    [0m [91m  ~~~~~~~~~~~~~~~~[0m
+[7m1609[0m   LoadBalancerConfig,
+[7m    [0m [91m  ~~~~~~~~~~~~~~~~~~[0m
 [96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1608[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
 
-[7m1608[0m   ServiceInstance,
-[7m    [0m [91m  ~~~~~~~~~~~~~~~[0m
+[7m1608[0m   ServiceStats,
+[7m    [0m [91m  ~~~~~~~~~~~~[0m
 [96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1607[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
 
-[7m1607[0m   ServiceRegistration,
+[7m1607[0m   DiscoveryOptions,
+[7m    [0m [91m  ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1606[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+
+[7m1606[0m   ServiceInstance,
+[7m    [0m [91m  ~~~~~~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1605[0m:[93m3[0m - [91merror[0m[90m ts(1205): [0mRe-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+
+[7m1605[0m   ServiceRegistration,
 [7m    [0m [91m  ~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1244[0m:[93m42[0m - [91merror[0m[90m ts(2339): [0mProperty 'map' does not exist on type 'string | ServiceInstance[]'.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1242[0m:[93m42[0m - [91merror[0m[90m ts(2339): [0mProperty 'map' does not exist on type 'string | ServiceInstance[]'.
   Property 'map' does not exist on type 'string'.
 
-[7m1244[0m           regions: [...new Set(instances.map((i) => i.region))],
+[7m1242[0m           regions: [...new Set(instances.map((i) => i.region))],
 [7m    [0m [91m                                         ~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1240[0m:[93m24[0m - [91merror[0m[90m ts(2538): [0mType 'ServiceInstance[]' cannot be used as an index type.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1238[0m:[93m24[0m - [91merror[0m[90m ts(2538): [0mType 'ServiceInstance[]' cannot be used as an index type.
 
-[7m1240[0m         stats.services[name] = {
+[7m1238[0m         stats.services[name] = {
 [7m    [0m [91m                       ~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1238[0m:[93m37[0m - [91merror[0m[90m ts(2339): [0mProperty 'filter' does not exist on type 'string | ServiceInstance[]'.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1236[0m:[93m37[0m - [91merror[0m[90m ts(2339): [0mProperty 'filter' does not exist on type 'string | ServiceInstance[]'.
   Property 'filter' does not exist on type 'string'.
 
-[7m1238[0m         const unhealthy = instances.filter((i) => i.status !== 'healthy').length
+[7m1236[0m         const unhealthy = instances.filter((i) => i.status !== 'healthy').length
 [7m    [0m [91m                                    ~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1237[0m:[93m35[0m - [91merror[0m[90m ts(2339): [0mProperty 'filter' does not exist on type 'string | ServiceInstance[]'.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1235[0m:[93m35[0m - [91merror[0m[90m ts(2339): [0mProperty 'filter' does not exist on type 'string | ServiceInstance[]'.
   Property 'filter' does not exist on type 'string'.
 
-[7m1237[0m         const healthy = instances.filter((i) => i.status === 'healthy').length
+[7m1235[0m         const healthy = instances.filter((i) => i.status === 'healthy').length
 [7m    [0m [91m                                  ~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m188[0m:[93m30[0m - [91merror[0m[90m ts(2554): [0mExpected 0 arguments, but got 1.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m191[0m:[93m30[0m - [91merror[0m[90m ts(2554): [0mExpected 0 arguments, but got 1.
 
-[7m188[0m       const etcd = new Etcd3({
+[7m191[0m       const etcd = new Etcd3({
 [7m   [0m [91m                             ~[0m
-[7m189[0m         hosts: config.endpoints.map((endpoint: string) =>
+[7m192[0m         hosts: config.endpoints.map((endpoint: string) =>
 [7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 [7m...[0m 
-[7m202[0m           : undefined,
+[7m205[0m           : undefined,
 [7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m203[0m       })
+[7m206[0m       })
 [7m   [0m [91m~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m160[0m:[93m22[0m - [91merror[0m[90m ts(2350): [0mOnly a void function can be called with the 'new' keyword.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m163[0m:[93m22[0m - [91merror[0m[90m ts(2350): [0mOnly a void function can be called with the 'new' keyword.
 
-[7m160[0m       const consul = new (Consul as (opts?: Record<string, unknown>) => any)(
+[7m163[0m       const consul = new (Consul as (opts?: Record<string, unknown>) => any)(
 [7m   [0m [91m                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m161[0m         consulConfig,
+[7m164[0m         consulConfig,
 [7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~[0m
-[7m162[0m       )
+[7m165[0m       )
 [7m   [0m [91m~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1435[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'circuitBreaker' is declared but its value is never read.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1433[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'circuitBreaker' is declared but its value is never read.
 
-[7m1435[0m   private circuitBreaker: any
+[7m1433[0m   private circuitBreaker: any
 [7m    [0m [93m          ~~~~~~~~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1434[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'healthCheck' is declared but its value is never read.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1432[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'healthCheck' is declared but its value is never read.
 
-[7m1434[0m   private healthCheck: any
+[7m1432[0m   private healthCheck: any
 [7m    [0m [93m          ~~~~~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1432[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'serviceName' is declared but its value is never read.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1430[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'serviceName' is declared but its value is never read.
 
-[7m1432[0m   private serviceName: string
+[7m1430[0m   private serviceName: string
 [7m    [0m [93m          ~~~~~~~~~~~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1244[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1242[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
 
-[7m1244[0m           regions: [...new Set(instances.map((i) => i.region))],
+[7m1242[0m           regions: [...new Set(instances.map((i) => i.region))],
 [7m    [0m [93m                                              ~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1238[0m:[93m45[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1236[0m:[93m45[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
 
-[7m1238[0m         const unhealthy = instances.filter((i) => i.status !== 'healthy').length
+[7m1236[0m         const unhealthy = instances.filter((i) => i.status !== 'healthy').length
 [7m    [0m [93m                                            ~[0m
-[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1237[0m:[93m43[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m1235[0m:[93m43[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
 
-[7m1237[0m         const healthy = instances.filter((i) => i.status === 'healthy').length
+[7m1235[0m         const healthy = instances.filter((i) => i.status === 'healthy').length
 [7m    [0m [93m                                          ~[0m
 [96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m27[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'isInitialized' is declared but its value is never read.
 
@@ -4209,22 +4302,22 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m107[0m         aiResponse,
 [7m   [0m [91m        ~~~~~~~~~~[0m
 
-[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m566[0m:[93m10[0m - [91merror[0m[90m ts(2339): [0mProperty 'filter' does not exist on type 'void'.
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m568[0m:[93m10[0m - [91merror[0m[90m ts(2339): [0mProperty 'filter' does not exist on type 'void'.
 
-[7m566[0m       }).filter(t => t && t.transitionType === 'crisis_elevation')
+[7m568[0m         .filter((t) => t && t.transitionType === 'crisis_elevation')
 [7m   [0m [91m         ~~~~~~[0m
-[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m768[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(prev: ContextEvent, curr: ContextEvent): ContextTransition' of 'detectContextTransition' is deprecated.
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m770[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(prev: ContextEvent, curr: ContextEvent): ContextTransition' of 'detectContextTransition' is deprecated.
 
-[7m768[0m       const transition = detectContextTransition(prev, curr)
+[7m770[0m       const transition = detectContextTransition(prev, curr)
 [7m   [0m [93m                         ~~~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m744[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(prev: ContextEvent, curr: ContextEvent): ContextTransition' of 'detectContextTransition' is deprecated.
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m746[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(prev: ContextEvent, curr: ContextEvent): ContextTransition' of 'detectContextTransition' is deprecated.
 
-[7m744[0m       const transition = detectContextTransition(prev, curr)
+[7m746[0m       const transition = detectContextTransition(prev, curr)
 [7m   [0m [93m                         ~~~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m566[0m:[93m17[0m - [93mwarning[0m[90m ts(7044): [0mParameter 't' implicitly has an 'any' type, but a better type may be inferred from usage.
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m568[0m:[93m18[0m - [93mwarning[0m[90m ts(7044): [0mParameter 't' implicitly has an 'any' type, but a better type may be inferred from usage.
 
-[7m566[0m       }).filter(t => t && t.transitionType === 'crisis_elevation')
-[7m   [0m [93m                ~[0m
+[7m568[0m         .filter((t) => t && t.transitionType === 'crisis_elevation')
+[7m   [0m [93m                 ~[0m
 [96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m6[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'detectContextTransition' is deprecated.
 
 [7m6[0m   detectContextTransition,
@@ -4636,7 +4729,7 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m250[0m     if (recent.responseTime > this.config.alertThresholds.responseTime) {
 [7m   [0m [91m        ~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/lib/monitoring/performanceMonitor.ts[0m:[93m204[0m:[93m9[0m - [91merror[0m[90m ts(2322): [0mType '"performance"' is not assignable to type '"cache" | "optimize" | "migrate" | "scale_up" | "scale_down"'.
+[96msrc/lib/monitoring/performanceMonitor.ts[0m:[93m204[0m:[93m9[0m - [91merror[0m[90m ts(2322): [0mType '"performance"' is not assignable to type '"cache" | "migrate" | "optimize" | "scale_up" | "scale_down"'.
 
 [7m204[0m         type: 'performance',
 [7m   [0m [91m        ~~~~[0m
@@ -5946,11 +6039,11 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m10[0m const logger = getLogger('cdn-optimizer')
 [7m  [0m [91m                         ~~~~~~~~~~~~~~~[0m
 
-[96msrc/lib/services/emotion-tracking-types.ts[0m:[93m41[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/services/emotion-tracking-types.ts[0m:[93m41[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m41[0m   timestamp: z.string().datetime(),
 [7m  [0m [93m                        ~~~~~~~~[0m
-[96msrc/lib/services/emotion-tracking-types.ts[0m:[93m25[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/lib/services/emotion-tracking-types.ts[0m:[93m25[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m25[0m   timestamp: z.string().datetime(),
 [7m  [0m [93m                        ~~~~~~~~[0m
@@ -8475,103 +8568,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m34[0m           details: parsed.error.flatten(),
 [7m  [0m [93m                                ~~~~~~~[0m
 
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m430[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"system_error"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m430[0m       'system_error',
-[7m   [0m [91m      ~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m384[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"emotion_point_added"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m384[0m       'emotion_point_added',
-[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m275[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"system_error"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m275[0m       'system_error',
-[7m   [0m [91m      ~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m244[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"3d_emotion_visualization_access"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m244[0m       '3d_emotion_visualization_access',
-[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m181[0m:[93m31[0m - [91merror[0m[90m ts(2339): [0mProperty 'confidence' does not exist on type 'never'.
-
-[7m181[0m           confidence: emotion.confidence || 0.7,
-[7m   [0m [91m                              ~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m180[0m:[93m30[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m180[0m           sessionId: emotion.sessionId,
-[7m   [0m [91m                             ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m176[0m:[93m43[0m - [91merror[0m[90m ts(2339): [0mProperty 'intensity' does not exist on type 'never'.
-
-[7m176[0m             emotion.confidence || emotion.intensity || 0.5,
-[7m   [0m [91m                                          ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m176[0m:[93m21[0m - [91merror[0m[90m ts(2339): [0mProperty 'confidence' does not exist on type 'never'.
-
-[7m176[0m             emotion.confidence || emotion.intensity || 0.5,
-[7m   [0m [91m                    ~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m174[0m:[93m30[0m - [91merror[0m[90m ts(2339): [0mProperty 'timestamp' does not exist on type 'never'.
-
-[7m174[0m           timestamp: emotion.timestamp || new Date().toISOString(),
-[7m   [0m [91m                             ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m173[0m:[93m54[0m - [91merror[0m[90m ts(2339): [0mProperty 'emotion' does not exist on type 'never'.
-
-[7m173[0m           emotion: emotion.primaryEmotion || emotion.emotion || 'neutral',
-[7m   [0m [91m                                                     ~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m173[0m:[93m28[0m - [91merror[0m[90m ts(2339): [0mProperty 'primaryEmotion' does not exist on type 'never'.
-
-[7m173[0m           emotion: emotion.primaryEmotion || emotion.emotion || 'neutral',
-[7m   [0m [91m                           ~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m172[0m:[93m50[0m - [91merror[0m[90m ts(2339): [0mProperty 'dominance' does not exist on type 'DimensionalMap'.
-
-[7m172[0m           dominance: normalizeToRange(dimensions.dominance || 0, -1, 1),
-[7m   [0m [91m                                                 ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m171[0m:[93m48[0m - [91merror[0m[90m ts(2339): [0mProperty 'arousal' does not exist on type 'DimensionalMap'.
-
-[7m171[0m           arousal: normalizeToRange(dimensions.arousal || 0, -1, 1),
-[7m   [0m [91m                                               ~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m170[0m:[93m48[0m - [91merror[0m[90m ts(2339): [0mProperty 'valence' does not exist on type 'DimensionalMap'.
-
-[7m170[0m           valence: normalizeToRange(dimensions.valence || 0, -1, 1),
-[7m   [0m [91m                                               ~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m169[0m:[93m34[0m - [91merror[0m[90m ts(2339): [0mProperty 'id' does not exist on type 'never'.
-
-[7m169[0m           id: `emotion-${emotion.id || index}`,
-[7m   [0m [91m                                 ~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m148[0m:[93m34[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m148[0m               sessionId: session.sessionId,
-[7m   [0m [91m                                 ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m146[0m:[93m13[0m - [91merror[0m[90m ts(2345): [0mArgument of type '{ sessionId: any; id: string; timestamp: string; emotions: EmotionVector; dimensions: EmotionDimensions; confidence: number; metadata?: EmotionMetadata; }' is not assignable to parameter of type 'never'.
-
-[7m146[0m             ...sessionEmotions.map((e) => ({
-[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m147[0m               ...e,
-[7m   [0m [91m~~~~~~~~~~~~~~~~~~~[0m
-[7m148[0m               sessionId: session.sessionId,
-[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m149[0m             })),
-[7m   [0m [91m~~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m143[0m:[93m21[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m143[0m             session.sessionId,
-[7m   [0m [91m                    ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m141[0m:[93m21[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m141[0m         if (session.sessionId) {
-[7m   [0m [91m                    ~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m134[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType 'TherapySession[]' is not assignable to type 'never[]'.
-  Type 'TherapySession' is not assignable to type 'never'.
-
-[7m134[0m       sessions = await repository.getSessions({
-[7m   [0m [91m      ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m131[0m:[93m19[0m - [91merror[0m[90m ts(2322): [0mType '{ sessionId: string; }' is not assignable to type 'never'.
-
-[7m131[0m       sessions = [{ sessionId }]
-[7m   [0m [91m                  ~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-3d-emotion-visualization.ts[0m:[93m130[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType 'EmotionAnalysis[]' is not assignable to type 'never[]'.
-  Type 'EmotionAnalysis' is not assignable to type 'never'.
-
-[7m130[0m       emotionData = await repository.getEmotionsForSession(sessionId)
-[7m   [0m [91m      ~~~~~~~~~~~[0m
-
 [96msrc/pages/api/auth/auth0-admin-users.ts[0m:[93m305[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"system_error"' is not assignable to parameter of type 'AuditEventType'.
 
 [7m305[0m       'system_error',
@@ -8641,23 +8637,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m61[0m       existingUser = await auth0UserService.findUserByEmail(socialUser.email)
 [7m  [0m [91m      ~~~~~~~~~~~~[0m
 
-[96msrc/pages/api/auth/auth0-carousel-content.ts[0m:[93m354[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"system_error"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m354[0m       'system_error',
-[7m   [0m [91m      ~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-carousel-content.ts[0m:[93m313[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"carousel_configuration_processed"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m313[0m       'carousel_configuration_processed',
-[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-carousel-content.ts[0m:[93m175[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"system_error"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m175[0m       'system_error',
-[7m   [0m [91m      ~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-carousel-content.ts[0m:[93m142[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"carousel_content_access"' is not assignable to parameter of type 'AuditEventType'.
-
-[7m142[0m       'carousel_content_access',
-[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
 [96msrc/pages/api/auth/auth0-engagement-analytics.ts[0m:[93m205[0m:[93m7[0m - [91merror[0m[90m ts(2345): [0mArgument of type '"system_error"' is not assignable to parameter of type 'AuditEventType'.
 
 [7m205[0m       'system_error',
@@ -8703,35 +8682,35 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m422[0m       'treatment_plans_access',
 [7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m79[0m:[93m30[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m79[0m:[93m30[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m79[0m             date: z.string().datetime(),
 [7m  [0m [93m                             ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m74[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m74[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m74[0m       nextSessionDate: z.string().datetime().optional(),
 [7m  [0m [93m                                  ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m64[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m64[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m64[0m   lastModified: z.string().datetime().optional(),
 [7m  [0m [93m                           ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m63[0m:[93m27[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m63[0m:[93m27[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m63[0m   createdDate: z.string().datetime().optional(),
 [7m  [0m [93m                          ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m52[0m:[93m36[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m52[0m:[93m36[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m52[0m       lastActivityDate: z.string().datetime().optional(),
 [7m  [0m [93m                                   ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m33[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m33[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m33[0m   targetDate: z.string().datetime(),
 [7m  [0m [93m                         ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m26[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m26[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m26[0m   dueDate: z.string().datetime().optional(),
 [7m  [0m [93m                      ~~~~~~~~[0m
-[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m24[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m24[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m24[0m   completedDate: z.string().datetime().optional(),
 [7m  [0m [93m                            ~~~~~~~~[0m
@@ -9351,105 +9330,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m338[0m   const { _type } = params
 [7m   [0m [93m        ~~~~~~~~~[0m
 
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m250[0m:[93m14[0m - [91merror[0m[90m ts(2322): [0mType '(context: BaseAPIContext) => Promise<Response>' is not assignable to type 'APIRoute'.
-  Types of parameters 'context' and 'context' are incompatible.
-    Type 'APIContext<Record<string, any>, Record<string, string | undefined>>' is not assignable to type 'BaseAPIContext<Record<string, unknown>, Record<string, string | undefined>>'.
-      Types of property 'locals' are incompatible.
-        Type 'Locals' is not assignable to type 'Record<string, unknown>'.
-          Index signature for type 'string' is missing in type 'Locals'.
-
-[7m250[0m export const POST: APIRoute = protectRoute()(async (
-[7m   [0m [91m             ~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m150[0m:[93m31[0m - [91merror[0m[90m ts(2339): [0mProperty 'confidence' does not exist on type 'never'.
-
-[7m150[0m           confidence: emotion.confidence || 0.7,
-[7m   [0m [91m                              ~~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m149[0m:[93m30[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m149[0m           sessionId: emotion.sessionId,
-[7m   [0m [91m                             ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m145[0m:[93m43[0m - [91merror[0m[90m ts(2339): [0mProperty 'intensity' does not exist on type 'never'.
-
-[7m145[0m             emotion.confidence || emotion.intensity || 0.5,
-[7m   [0m [91m                                          ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m145[0m:[93m21[0m - [91merror[0m[90m ts(2339): [0mProperty 'confidence' does not exist on type 'never'.
-
-[7m145[0m             emotion.confidence || emotion.intensity || 0.5,
-[7m   [0m [91m                    ~~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m143[0m:[93m30[0m - [91merror[0m[90m ts(2339): [0mProperty 'timestamp' does not exist on type 'never'.
-
-[7m143[0m           timestamp: emotion.timestamp || new Date().toISOString(),
-[7m   [0m [91m                             ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m142[0m:[93m54[0m - [91merror[0m[90m ts(2339): [0mProperty 'emotion' does not exist on type 'never'.
-
-[7m142[0m           emotion: emotion.primaryEmotion || emotion.emotion || 'neutral',
-[7m   [0m [91m                                                     ~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m142[0m:[93m28[0m - [91merror[0m[90m ts(2339): [0mProperty 'primaryEmotion' does not exist on type 'never'.
-
-[7m142[0m           emotion: emotion.primaryEmotion || emotion.emotion || 'neutral',
-[7m   [0m [91m                           ~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m141[0m:[93m50[0m - [91merror[0m[90m ts(2339): [0mProperty 'dominance' does not exist on type 'DimensionalMap'.
-
-[7m141[0m           dominance: normalizeToRange(dimensions.dominance || 0, -1, 1),
-[7m   [0m [91m                                                 ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m140[0m:[93m48[0m - [91merror[0m[90m ts(2339): [0mProperty 'arousal' does not exist on type 'DimensionalMap'.
-
-[7m140[0m           arousal: normalizeToRange(dimensions.arousal || 0, -1, 1),
-[7m   [0m [91m                                               ~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m139[0m:[93m48[0m - [91merror[0m[90m ts(2339): [0mProperty 'valence' does not exist on type 'DimensionalMap'.
-
-[7m139[0m           valence: normalizeToRange(dimensions.valence || 0, -1, 1),
-[7m   [0m [91m                                               ~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m138[0m:[93m34[0m - [91merror[0m[90m ts(2339): [0mProperty 'id' does not exist on type 'never'.
-
-[7m138[0m           id: `emotion-${emotion.id || index}`,
-[7m   [0m [91m                                 ~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m117[0m:[93m34[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m117[0m               sessionId: session.sessionId,
-[7m   [0m [91m                                 ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m115[0m:[93m13[0m - [91merror[0m[90m ts(2345): [0mArgument of type '{ sessionId: any; id: string; timestamp: string; emotions: EmotionVector; dimensions: EmotionDimensions; confidence: number; metadata?: EmotionMetadata; }' is not assignable to parameter of type 'never'.
-
-[7m115[0m             ...sessionEmotions.map((e) => ({
-[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m116[0m               ...e,
-[7m   [0m [91m~~~~~~~~~~~~~~~~~~~[0m
-[7m117[0m               sessionId: session.sessionId,
-[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m118[0m             })),
-[7m   [0m [91m~~~~~~~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m112[0m:[93m21[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m112[0m             session.sessionId,
-[7m   [0m [91m                    ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m110[0m:[93m21[0m - [91merror[0m[90m ts(2339): [0mProperty 'sessionId' does not exist on type 'never'.
-
-[7m110[0m         if (session.sessionId) {
-[7m   [0m [91m                    ~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m103[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType 'TherapySession[]' is not assignable to type 'never[]'.
-  Type 'TherapySession' is not assignable to type 'never'.
-
-[7m103[0m       sessions = await repository.getSessions({
-[7m   [0m [91m      ~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m100[0m:[93m19[0m - [91merror[0m[90m ts(2322): [0mType '{ sessionId: string; }' is not assignable to type 'never'.
-
-[7m100[0m       sessions = [{ sessionId }]
-[7m   [0m [91m                  ~~~~~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m99[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType 'EmotionAnalysis[]' is not assignable to type 'never[]'.
-  Type 'EmotionAnalysis' is not assignable to type 'never'.
-
-[7m99[0m       emotionData = await repository.getEmotionsForSession(sessionId)
-[7m  [0m [91m      ~~~~~~~~~~~[0m
-[96msrc/pages/api/components/emotions/3d-visualization.ts[0m:[93m51[0m:[93m14[0m - [91merror[0m[90m ts(2322): [0mType '(context: BaseAPIContext) => Promise<Response>' is not assignable to type 'APIRoute'.
-  Types of parameters 'context' and 'context' are incompatible.
-    Type 'APIContext<Record<string, any>, Record<string, string | undefined>>' is not assignable to type 'BaseAPIContext<Record<string, unknown>, Record<string, string | undefined>>'.
-      Types of property 'locals' are incompatible.
-        Type 'Locals' is not assignable to type 'Record<string, unknown>'.
-          Index signature for type 'string' is missing in type 'Locals'.
-
-[7m51[0m export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
-[7m  [0m [91m             ~~~[0m
-
 [96msrc/pages/api/components/particles/emotion-system.ts[0m:[93m206[0m:[93m14[0m - [91merror[0m[90m ts(2322): [0mType '(context: BaseAPIContext) => Promise<Response>' is not assignable to type 'APIRoute'.
   Types of parameters 'context' and 'context' are incompatible.
     Type 'APIContext<Record<string, any>, Record<string, string | undefined>>' is not assignable to type 'BaseAPIContext<Record<string, unknown>, Record<string, string | undefined>>'.
@@ -9509,57 +9389,38 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m139[0m export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 [7m   [0m [91m             ~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m72[0m:[93m30[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m72[0m:[93m30[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m72[0m             date: z.string().datetime(),
 [7m  [0m [93m                             ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m67[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m67[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m67[0m       nextSessionDate: z.string().datetime().optional(),
 [7m  [0m [93m                                  ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m57[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m57[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m57[0m   lastModified: z.string().datetime().optional(),
 [7m  [0m [93m                           ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m56[0m:[93m27[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m56[0m:[93m27[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m56[0m   createdDate: z.string().datetime().optional(),
 [7m  [0m [93m                          ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m45[0m:[93m36[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m45[0m:[93m36[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m45[0m       lastActivityDate: z.string().datetime().optional(),
 [7m  [0m [93m                                   ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m26[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m26[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m26[0m   targetDate: z.string().datetime(),
 [7m  [0m [93m                         ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m19[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m19[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m19[0m   dueDate: z.string().datetime().optional(),
 [7m  [0m [93m                      ~~~~~~~~[0m
-[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m17[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m17[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m17[0m   completedDate: z.string().datetime().optional(),
 [7m  [0m [93m                            ~~~~~~~~[0m
-
-[96msrc/pages/api/components/ui/carousel-content.ts[0m:[93m148[0m:[93m14[0m - [91merror[0m[90m ts(2322): [0mType '(context: BaseAPIContext) => Promise<Response>' is not assignable to type 'APIRoute'.
-  Types of parameters 'context' and 'context' are incompatible.
-    Type 'APIContext<Record<string, any>, Record<string, string | undefined>>' is not assignable to type 'BaseAPIContext<Record<string, unknown>, Record<string, string | undefined>>'.
-      Types of property 'locals' are incompatible.
-        Type 'Locals' is not assignable to type 'Record<string, unknown>'.
-          Index signature for type 'string' is missing in type 'Locals'.
-
-[7m148[0m export const POST: APIRoute = protectRoute()(async (
-[7m   [0m [91m             ~~~~[0m
-[96msrc/pages/api/components/ui/carousel-content.ts[0m:[93m58[0m:[93m14[0m - [91merror[0m[90m ts(2322): [0mType '(context: BaseAPIContext) => Promise<Response>' is not assignable to type 'APIRoute'.
-  Types of parameters 'context' and 'context' are incompatible.
-    Type 'APIContext<Record<string, any>, Record<string, string | undefined>>' is not assignable to type 'BaseAPIContext<Record<string, unknown>, Record<string, string | undefined>>'.
-      Types of property 'locals' are incompatible.
-        Type 'Locals' is not assignable to type 'Record<string, unknown>'.
-          Index signature for type 'string' is missing in type 'Locals'.
-
-[7m58[0m export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
-[7m  [0m [91m             ~~~[0m
 
 [96msrc/pages/api/crisis/session-flags.ts[0m:[93m226[0m:[93m39[0m - [91merror[0m[90m ts(2339): [0mProperty 'user_metadata' does not exist on type '{ id: string; email?: string | undefined; role: string; name?: string | undefined; }'.
 
@@ -10252,19 +10113,19 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m95[0m           details: validationResult.error.errors,
 [7m  [0m [91m                                          ~~~~~~[0m
-[96msrc/pages/api/treatment-plans/index.ts[0m:[93m40[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/treatment-plans/index.ts[0m:[93m40[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m40[0m   endDate: z.string().datetime().optional().nullable(),
 [7m  [0m [93m                      ~~~~~~~~[0m
-[96msrc/pages/api/treatment-plans/index.ts[0m:[93m39[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/treatment-plans/index.ts[0m:[93m39[0m:[93m25[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m39[0m   startDate: z.string().datetime().optional(),
 [7m  [0m [93m                        ~~~~~~~~[0m
-[96msrc/pages/api/treatment-plans/index.ts[0m:[93m23[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/treatment-plans/index.ts[0m:[93m23[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m23[0m   targetDate: z.string().datetime().optional().nullable(),
 [7m  [0m [93m                         ~~~~~~~~[0m
-[96msrc/pages/api/treatment-plans/index.ts[0m:[93m13[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; precision?: number | null | undefined; offset?: boolean | undefined; local?: boolean | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+[96msrc/pages/api/treatment-plans/index.ts[0m:[93m13[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; local?: boolean | undefined; offset?: boolean | undefined; precision?: number | null | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
 
 [7m13[0m   targetDate: z.string().datetime().optional().nullable(),
 [7m  [0m [93m                         ~~~~~~~~[0m
@@ -10581,73 +10442,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m44[0m   Scenario,
 [7m  [0m [91m  ~~~~~~~~[0m
-
-[96msrc/simulator/utils/privacy.test.ts[0m:[93m19[0m:[93m18[0m - [91merror[0m[90m ts(2304): [0mCannot find name 'createEphemeralSessionId'.
-
-[7m19[0m       const id = createEphemeralSessionId()
-[7m  [0m [91m                 ~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/simulator/utils/privacy.test.ts[0m:[93m14[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m14[0m >>>>>>> 81f2fd0dc (🧪 QA: Add test for createEphemeralSessionId edge case)
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/privacy.test.ts[0m:[93m12[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m12[0m =======
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/privacy.test.ts[0m:[93m6[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m6[0m <<<<<<< HEAD
-[7m [0m [91m~~~~~~~[0m
-
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m7[0m:[93m3[0m - [91merror[0m[90m ts(2459): [0mModule '"../scenarios"' declares 'ScenarioDifficulty' locally, but it is not exported.
-
-[7m7[0m   ScenarioDifficulty,
-[7m [0m [91m  ~~~~~~~~~~~~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m77[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m77[0m >>>>>>> a8591b08b (Fix scenarios test for getRecommendedScenario by using valid literal union types)
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m52[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m52[0m =======
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m20[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m20[0m <<<<<<< HEAD
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m13[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m13[0m >>>>>>> a8591b08b (Fix scenarios test for getRecommendedScenario by using valid literal union types)
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m9[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m9[0m =======
-[7m [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/scenarios.test.ts[0m:[93m1[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m1[0m <<<<<<< HEAD
-[7m [0m [91m~~~~~~~[0m
-
-[96msrc/simulator/utils/__tests__/speechRecognition.test.ts[0m:[93m20[0m:[93m21[0m - [91merror[0m[90m ts(2304): [0mCannot find name 'getTherapeuticPrompts'.
-
-[7m20[0m     const prompts = getTherapeuticPrompts([], 'anxiety')
-[7m  [0m [91m                    ~~~~~~~~~~~~~~~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/speechRecognition.test.ts[0m:[93m27[0m:[93m27[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'p' implicitly has an 'any' type, but a better type may be inferred from usage.
-
-[7m27[0m     expect(prompts.every((p) => validPrompts.includes(p))).toBe(true)
-[7m  [0m [93m                          ~[0m
-[96msrc/simulator/utils/__tests__/speechRecognition.test.ts[0m:[93m7[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m7[0m >>>>>>> 1ed0e6a0f (🧪 QA: Add test for getTherapeuticPrompts edge case)
-[7m [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/speechRecognition.test.ts[0m:[93m5[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m5[0m =======
-[7m [0m [91m~~~~~~~[0m
-[96msrc/simulator/utils/__tests__/speechRecognition.test.ts[0m:[93m2[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m2[0m <<<<<<< HEAD
-[7m [0m [91m~~~~~~~[0m
 
 [96msrc/test/hipaa-compliance.test.ts[0m:[93m353[0m:[93m20[0m - [91merror[0m[90m ts(2339): [0mProperty 'activity_log' does not exist on type 'Session'.
 
@@ -10980,19 +10774,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m16[0m     const debouncedFunc = debounce(func, 100)
 [7m  [0m [91m                                   ~~~~[0m
 
-[96msrc/utils/formatDate.test.ts[0m:[93m16[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m16[0m >>>>>>> 06d96a598 (🧪 QA: Add test for formatDate edge case)
-[7m  [0m [91m~~~~~~~[0m
-[96msrc/utils/formatDate.test.ts[0m:[93m9[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m9[0m =======
-[7m [0m [91m~~~~~~~[0m
-[96msrc/utils/formatDate.test.ts[0m:[93m3[0m:[93m1[0m - [91merror[0m[90m ts(1185): [0mMerge conflict marker encountered.
-
-[7m3[0m <<<<<<< HEAD
-[7m [0m [91m~~~~~~~[0m
-
 [96msrc/utils/path-security.test.ts[0m:[93m112[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'result' is declared but its value is never read.
 
 [7m112[0m       const result = validatePath('test.txt', '/b') // Valid for /b
@@ -11020,7 +10801,7 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m  [0m [93m                                              ~~~~~~~~~[0m
 
 [96msrc/utils/request.test.ts[0m:[93m78[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '{}' is not assignable to type 'Window & typeof globalThis'.
-  Type '{}' is missing the following properties from type 'Window': clientInformation, closed, cookieStore, customElements, and 226 more.
+  Type '{}' is missing the following properties from type 'Window': clientInformation, closed, cookieStore, customElements, and 222 more.
 
 [7m78[0m       global.window = {}
 [7m  [0m [91m      ~~~~~~~~~~~~~[0m
@@ -11427,11 +11208,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m52[0m     e: React.FormEvent<HTMLFormElement>,
 [7m  [0m [93m             ~~~~~~~~~[0m
 
-[96msrc/components/LaunchDarklyInit.tsx[0m:[93m4[0m:[93m28[0m - [91merror[0m[90m ts(2694): [0mNamespace '"launchdarkly-js-client-sdk"' has no exported member 'LDClient'.
-
-[7m4[0m let ldClient: LaunchDarkly.LDClient | null = null
-[7m [0m [91m                           ~~~~~~~~[0m
-
 [96msrc/components/MentalHealthChatDemo.tsx[0m:[93m56[0m:[93m11[0m - [93mwarning[0m[90m ts(6196): [0m'ExtendedMentalHealthAnalysisResult' is declared but never used.
 
 [7m56[0m interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {
@@ -11521,9 +11297,9 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m 10[0m } from 'lucide-react'
 [7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96msrc/components/TrainingSession.tsx[0m:[93m123[0m:[93m48[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+[96msrc/components/TrainingSession.tsx[0m:[93m126[0m:[93m48[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
 
-[7m123[0m   const handleFeedbackSubmit = async (e: React.FormEvent) => {
+[7m126[0m   const handleFeedbackSubmit = async (e: React.FormEvent) => {
 [7m   [0m [93m                                               ~~~~~~~~~[0m
 
 [96msrc/components/admin/AdminDashboard.tsx[0m:[93m682[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'metrics' is declared but its value is never read.
@@ -11731,6 +11507,21 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m9[0m import { useState, useEffect, useCallback, useMemo } from 'react'
 [7m [0m [93m                              ~~~~~~~~~~~[0m
 
+[96msrc/components/demos/bias-detection/AccessibleLoadingState.tsx[0m:[93m1[0m:[93m24[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion } from 'framer-motion'
+[7m [0m [91m                       ~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/demos/bias-detection/EnhancedBiasDetectionInterface.tsx[0m:[93m1[0m:[93m41[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion, AnimatePresence } from 'framer-motion'
+[7m [0m [91m                                        ~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/demos/bias-detection/RealTimeBiasIndicator.tsx[0m:[93m1[0m:[93m41[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion, AnimatePresence } from 'framer-motion'
+[7m [0m [91m                                        ~~~~~~~~~~~~~~~[0m
+
 [96msrc/components/demos/bias-detection/SessionInputForm.tsx[0m:[93m65[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
 
 [7m65[0m   const handleSubmit = (e: React.FormEvent) => {
@@ -11777,6 +11568,16 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m2[0m import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 [7m [0m [93m         ~~~~~~~~~[0m
 
+[96msrc/components/others/background-paths.tsx[0m:[93m1[0m:[93m24[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion } from 'framer-motion'
+[7m [0m [91m                       ~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/others/cube-paths.tsx[0m:[93m1[0m:[93m24[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion } from 'framer-motion'
+[7m [0m [91m                       ~~~~~~~~~~~~~~~[0m
+
 [96msrc/components/pages/EmotionProgressDemo.tsx[0m:[93m32[0m:[93m11[0m - [91merror[0m[90m ts(2740): [0mType 'EmotionProgressData' is missing the following properties from type 'EmotionProgressData[]': length, pop, push, concat, and 35 more.
 
 [7m32[0m           data={data}
@@ -11785,18 +11586,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m1[0m import React, { useState } from 'react'
 [7m [0m [93m       ~~~~~[0m
-
-[96msrc/components/pages/EmotionVisualizationDemo.tsx[0m:[93m161[0m:[93m17[0m - [91merror[0m[90m ts(2322): [0mType 'EmotionData[]' is not assignable to type 'EmotionDataPoint[]'.
-  Property 'id' is missing in type 'EmotionData' but required in type 'EmotionDataPoint'.
-
-[7m161[0m                 emotionData={data}
-[7m   [0m [91m                ~~~~~~~~~~~[0m
-
-[96msrc/components/pages/EmotionVisualizationPage.tsx[0m:[93m74[0m:[93m13[0m - [91merror[0m[90m ts(2322): [0mType 'EmotionData[]' is not assignable to type 'EmotionDataPoint[]'.
-  Property 'id' is missing in type 'EmotionData' but required in type 'EmotionDataPoint'.
-
-[7m74[0m             emotionData={emotionData}
-[7m  [0m [91m            ~~~~~~~~~~~[0m
 
 [96msrc/components/patient/PatientFileViewer.tsx[0m:[93m3[0m:[93m35[0m - [93mwarning[0m[90m ts(6133): [0m'_patientModel' is declared but its value is never read.
 
@@ -11831,6 +11620,11 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m41[0m   const handleSubmit = async (e: React.FormEvent) => {
 [7m  [0m [93m                                       ~~~~~~~~~[0m
 
+[96msrc/components/research/DatasetCard.tsx[0m:[93m1[0m:[93m24[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion } from 'framer-motion'
+[7m [0m [91m                       ~~~~~~~~~~~~~~~[0m
+
 [96msrc/components/research/DatasetSearch.tsx[0m:[93m32[0m:[93m41[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
 
 [7m32[0m   const handleSearch = async (e?: React.FormEvent) => {
@@ -11857,11 +11651,20 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m2[0m import React, { useMemo, useCallback, memo } from 'react'
 [7m [0m [93m       ~~~~~[0m
 
+[96msrc/components/research/ResultCard.tsx[0m:[93m1[0m:[93m24[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion } from 'framer-motion'
+[7m [0m [91m                       ~~~~~~~~~~~~~~~[0m
+
 [96msrc/components/research/SearchFilters.tsx[0m:[93m1[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'React' is declared but its value is never read.
 
 [7m1[0m import React, { useState, useMemo } from 'react'
 [7m [0m [93m       ~~~~~[0m
 
+[96msrc/components/research/SearchInterface.tsx[0m:[93m1[0m:[93m24[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m1[0m import { motion } from 'framer-motion'
+[7m [0m [91m                       ~~~~~~~~~~~~~~~[0m
 [96msrc/components/research/SearchInterface.tsx[0m:[93m88[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
 
 [7m88[0m   const handleSearch = (e: React.FormEvent) => {
@@ -11978,23 +11781,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m176[0m             tickFormatter={(tick) =>
 [7m   [0m [93m                            ~~~~[0m
 
-[96msrc/components/session/MultidimensionalEmotionChart.tsx[0m:[93m182[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'_initialObjectPool' is declared but its value is never read.
-
-[7m182[0m       const _initialObjectPool = objectPoolRef.current
-[7m   [0m [93m            ~~~~~~~~~~~~~~~~~~[0m
-[96msrc/components/session/MultidimensionalEmotionChart.tsx[0m:[93m181[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'_initialScene' is declared but its value is never read.
-
-[7m181[0m       const _initialScene = sceneRef.current
-[7m   [0m [93m            ~~~~~~~~~~~~~[0m
-[96msrc/components/session/MultidimensionalEmotionChart.tsx[0m:[93m180[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'_initialControls' is declared but its value is never read.
-
-[7m180[0m       const _initialControls = controlsRef.current
-[7m   [0m [93m            ~~~~~~~~~~~~~~~~[0m
-[96msrc/components/session/MultidimensionalEmotionChart.tsx[0m:[93m179[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'_initialRenderer' is declared but its value is never read.
-
-[7m179[0m       const _initialRenderer = rendererRef.current
-[7m   [0m [93m            ~~~~~~~~~~~~~~~~[0m
-
 [96msrc/components/session/SessionDocumentation.tsx[0m:[93m905[0m:[93m36[0m - [91merror[0m[90m ts(2488): [0mType 'readonly EmotionalPattern[] | undefined' must have a '[Symbol.iterator]()' method that returns an iterator.
 
 [7m905[0m                                 ...editableDocumentation.emotionalPatterns,
@@ -12070,30 +11856,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m397[0m   const handleCreatePlan = async (e: React.FormEvent) => {
 [7m   [0m [93m                                           ~~~~~~~~~[0m
 
-[96msrc/components/three/MultidimensionalEmotionChart.tsx[0m:[93m7[0m:[93m10[0m - [91merror[0m[90m ts(2769): [0mNo overload matches this call.
-  Overload 1 of 2, '(objects: ConstructorRepresentation<any>): ExoticComponent<Mutable<Overwrite<Partial<Overwrite<any, MathProps<any> & (ReactProps<any> | (ReactProps<any> & Partial<...>))>>, Omit<...>>>>', gave the following error.
-    Object literal may only specify known properties, and 'OrbitControls' does not exist in type 'ConstructorRepresentation<any>'.
-  Overload 2 of 2, '(objects: Catalogue): void', gave the following error.
-    Type 'ForwardRefComponent<OrbitControlsProps, OrbitControls>' is not assignable to type 'ConstructorRepresentation<any>'.
-      Type 'ForwardRefExoticComponent<OrbitControlsProps & RefAttributes<OrbitControls>>' provides no match for the signature 'new (...args: any[]): any'.
-
-[7m7[0m extend({ OrbitControls })
-[7m [0m [91m         ~~~~~~~~~~~~~[0m
-
-[96msrc/components/three/Particle.tsx[0m:[93m184[0m:[93m14[0m - [91merror[0m[90m ts(2741): [0mProperty 'args' is missing in type '{ attach: string; count: number; array: Float32Array<ArrayBuffer>; itemSize: number; }' but required in type 'Mutable<Overwrite<Partial<Overwrite<BufferAttribute<BufferAttributeEventMap>, MathProps<BufferAttribute<BufferAttributeEventMap>> & ReactProps<...>>>, Omit<...>>>'.
-
-[7m184[0m             <bufferAttribute
-[7m   [0m [91m             ~~~~~~~~~~~~~~~[0m
-[96msrc/components/three/Particle.tsx[0m:[93m7[0m:[93m10[0m - [91merror[0m[90m ts(2769): [0mNo overload matches this call.
-  Overload 1 of 2, '(objects: ConstructorRepresentation<any>): ExoticComponent<Mutable<Overwrite<Partial<Overwrite<any, MathProps<any> & (ReactProps<any> | (ReactProps<any> & Partial<...>))>>, Omit<...>>>>', gave the following error.
-    Object literal may only specify known properties, and 'OrbitControls' does not exist in type 'ConstructorRepresentation<any>'.
-  Overload 2 of 2, '(objects: Catalogue): void', gave the following error.
-    Type 'ForwardRefComponent<OrbitControlsProps, OrbitControls>' is not assignable to type 'ConstructorRepresentation<any>'.
-      Type 'ForwardRefExoticComponent<OrbitControlsProps & RefAttributes<OrbitControls>>' provides no match for the signature 'new (...args: any[]): any'.
-
-[7m7[0m extend({ OrbitControls })
-[7m [0m [91m         ~~~~~~~~~~~~~[0m
-
 [96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m556[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
 
 [7m556[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
@@ -12131,35 +11893,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m237[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
 [7m   [0m [93m                                  ~~~~~~~~~~~~~~~~[0m
 
-[96msrc/components/transitions/AnimationOrchestrator.tsx[0m:[93m365[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType 'Variant' is not assignable to type 'boolean | TargetAndTransition | VariantLabels | undefined'.
-  Type 'TargetResolver' is not assignable to type 'boolean | TargetAndTransition | VariantLabels | undefined'.
-
-[7m365[0m       initial={masterSequence?.['initial'] || {}}
-[7m   [0m [91m      ~~~~~~~[0m
-[96msrc/components/transitions/AnimationOrchestrator.tsx[0m:[93m320[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType 'Variant' is not assignable to type 'boolean | TargetAndTransition | VariantLabels | undefined'.
-  Type 'TargetResolver' is not assignable to type 'boolean | TargetAndTransition | VariantLabels | undefined'.
-
-[7m320[0m       initial={currentVariants['initial'] || {}}
-[7m   [0m [91m      ~~~~~~~[0m
-[96msrc/components/transitions/AnimationOrchestrator.tsx[0m:[93m290[0m:[93m28[0m - [91merror[0m[90m ts(2345): [0mArgument of type '{ transition: { duration: number; ease: number[] | readonly [0.25, 0.1, 0.25, 1] | readonly [0.4, 0, 1, 1] | readonly [0, 0, 0.2, 1] | readonly [0.4, 0, 0.2, 1] | readonly [0.34, 1.56, 0.64, 1] | readonly [0.22, 1, 0.36, 1] | readonly [0.68, -0.55, 0.265, 1.55] | undefined; delay: number; }; ... 701 more ...; transi...' is not assignable to parameter of type 'AnimationDefinition'.
-  Types of property 'transition' are incompatible.
-    Type '{ duration: number; ease: number[] | readonly [0.25, 0.1, 0.25, 1] | readonly [0.4, 0, 1, 1] | readonly [0, 0, 0.2, 1] | readonly [0.4, 0, 0.2, 1] | readonly [0.34, 1.56, 0.64, 1] | readonly [0.22, 1, 0.36, 1] | readonly [0.68, -0.55, 0.265, 1.55] | undefined; delay: number; }' is not assignable to type 'Transition<any> | undefined'.
-      Types of property 'ease' are incompatible.
-        Type 'number[] | readonly [0.25, 0.1, 0.25, 1] | readonly [0.4, 0, 1, 1] | readonly [0, 0, 0.2, 1] | readonly [0.4, 0, 0.2, 1] | readonly [0.34, 1.56, 0.64, 1] | readonly [0.22, 1, 0.36, 1] | readonly [0.68, -0.55, 0.265, 1.55] | undefined' is not assignable to type 'Easing | Easing[] | undefined'.
-          Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
-            Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
-              Type 'number[]' is not assignable to type 'Easing[]'.
-                Type 'number' is not assignable to type 'Easing'.
-
-[7m290[0m       await controls.start({
-[7m   [0m [91m                           ~[0m
-[7m291[0m         ...step.variants['animate'],
-[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-[7m...[0m 
-[7m296[0m         },
-[7m   [0m [91m~~~~~~~~~~[0m
-[7m297[0m       })
-[7m   [0m [91m~~~~~~~[0m
 [96msrc/components/transitions/AnimationOrchestrator.tsx[0m:[93m103[0m:[93m13[0m - [91merror[0m[90m ts(2698): [0mSpread types may only be created from object types.
 
 [7m103[0m             ...(baseVariants['animate'] as Record<string, unknown>)[
@@ -12168,6 +11901,10 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 [7m105[0m             ],
 [7m   [0m [91m~~~~~~~~~~~~~[0m
+[96msrc/components/transitions/AnimationOrchestrator.tsx[0m:[93m6[0m:[93m8[0m - [91merror[0m[90m ts(2307): [0mCannot find module 'framer-motion' or its corresponding type declarations.
+
+[7m6[0m } from 'framer-motion'
+[7m [0m [91m       ~~~~~~~~~~~~~~~[0m
 
 [96msrc/components/treatment/TreatmentPlanManager.tsx[0m:[93m2[0m:[93m49[0m - [93mwarning[0m[90m ts(6133): [0m'Clipboard' is declared but its value is never read.
 
@@ -12253,20 +11990,6 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m1[0m import React, { useEffect, useState } from 'react'
 [7m [0m [93m       ~~~~~[0m
 
-[96msrc/components/ui/SwiperCarousel.tsx[0m:[93m278[0m:[93m8[0m - [91merror[0m[90m ts(2322): [0mType '{ children: Element[]; className: string; fadeEffect?: { crossFade: boolean; } | undefined; coverflowEffect?: { rotate: number; stretch: number; depth: number; modifier: number; slideShadows: boolean; } | undefined; ... 14 more ...; onSlideChange: ((swiper: Swiper) => void) | undefined; }' is not assignable to type 'SwiperOptions'.
-  Types of property 'breakpoints' are incompatible.
-    Type 'Record<number, unknown> | { 320: { slidesPerView: number; spaceBetween: number; }; 640: { slidesPerView: string | number; spaceBetween: number; }; 1024: { slidesPerView: string | number; spaceBetween: number; }; }' is not assignable to type '{ [width: number]: SwiperOptions; [ratio: string]: SwiperOptions; } | undefined'.
-      Type 'Record<number, unknown>' is not assignable to type '{ [width: number]: SwiperOptions; [ratio: string]: SwiperOptions; }'.
-        'number' index signatures are incompatible.
-          Type 'unknown' is not assignable to type 'SwiperOptions'.
-
-[7m278[0m       <Swiper {...swiperProps} className='h-full w-full'>
-[7m   [0m [91m       ~~~~~~[0m
-[96msrc/components/ui/SwiperCarousel.tsx[0m:[93m80[0m:[93m21[0m - [91merror[0m[90m ts(2554): [0mExpected 1 arguments, but got 0.
-
-[7m80[0m   const swiperRef = useRef<SwiperType>()
-[7m  [0m [91m                    ~~~~~~[0m
-
 [96msrc/components/ui/ToastProvider.tsx[0m:[93m23[0m:[93m9[0m - [91merror[0m[90m ts(2353): [0mObject literal may only specify known properties, and 'success' does not exist in type 'Partial<Partial<Pick<Toast, "duration" | "id" | "icon" | "position" | "style" | "className" | "ariaProps" | "iconTheme" | "toasterId" | "removeDelay">>>'.
 
 [7m23[0m         success: {
@@ -12285,6 +12008,11 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 
 [7m1[0m import React from 'react'
 [7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/ui/tooltip.tsx[0m:[93m1[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '@radix-ui/react-tooltip' or its corresponding type declarations.
+
+[7m1[0m import * as TooltipPrimitive from '@radix-ui/react-tooltip'
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96msrc/components/ui/__tests__/PasswordInputWithStrength.test.tsx[0m:[93m25[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'event' is declared but its value is never read.
 
@@ -12350,9 +12078,9 @@ $ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-ol
 [7m20[0m   const { securityLevel, setSecurityLevel } = useSecurity()
 [7m  [0m [91m          ~~~~~~~~~~~~~[0m
 
-[96msrc/lib/utils/dynamic-components.tsx[0m:[93m73[0m:[93m6[0m - [91merror[0m[90m ts(2741): [0mProperty 'data' is missing in type '{}' but required in type 'EmotionTemporalAnalysisChartProps'.
+[96msrc/lib/utils/dynamic-components.tsx[0m:[93m47[0m:[93m6[0m - [91merror[0m[90m ts(2741): [0mProperty 'data' is missing in type '{}' but required in type 'EmotionTemporalAnalysisChartProps'.
 
-[7m73[0m     <EmotionTemporalAnalysisChart {...props} />
+[7m47[0m     <EmotionTemporalAnalysisChart {...props} />
 [7m  [0m [91m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96msrc/simulator/index.tsx[0m:[93m3[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'useAnonymizedMetrics' is declared but its value is never read.
@@ -12745,13 +12473,37 @@ Add the `is:inline` directive explicitly to silence this hint.
 [7m219[0m     const sunIcon = document.getElementById('sun-icon-unified')
 [7m   [0m [93m          ~~~~~~~[0m
 
+[96msrc/components/views/CardItem.astro[0m:[93m110[0m:[93m22[0m - [91merror[0m[90m ts(18048): [0m'images' is possibly 'undefined'.
+
+[7m110[0m                 alt={images[0]!.alt}
+[7m   [0m [91m                     ~~~~~~[0m
+[96msrc/components/views/CardItem.astro[0m:[93m109[0m:[93m22[0m - [91merror[0m[90m ts(18048): [0m'images' is possibly 'undefined'.
+
+[7m109[0m                 src={images[0]!.src}
+[7m   [0m [91m                     ~~~~~~[0m
+[96msrc/components/views/CardItem.astro[0m:[93m100[0m:[93m17[0m - [91merror[0m[90m ts(2588): [0mCannot assign to 'images' because it is a constant.
+
+[7m100[0m                 images={images}
+[7m   [0m [91m                ~~~~~~[0m
+[96msrc/components/views/CardItem.astro[0m:[93m115[0m:[93m15[0m - [91merror[0m[90m ts(1381): [0mUnexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+[7m115[0m             ))}
+[7m   [0m [91m              ~[0m
+[96msrc/components/views/CardItem.astro[0m:[93m105[0m:[93m16[0m - [91merror[0m[90m ts(1382): [0mUnexpected token. Did you mean `{'>'}` or `&gt;`?
+
+[7m105[0m               />
+[7m   [0m [91m               ~[0m
+[96msrc/components/views/CardItem.astro[0m:[93m101[0m:[93m17[0m - [91merror[0m[90m ts(1005): [0m')' expected.
+
+[7m101[0m                 imageProps={{
+[7m   [0m [91m                ~~~~~~~~~~[0m
+[96msrc/components/views/CardItem.astro[0m:[93m288[0m:[93m11[0m - [91merror[0m[90m ts(2531): [0mObject is possibly 'null'.
+
+[7m288[0m           this.#button.setAttribute('aria-expanded', 'false')
+[7m   [0m [91m          ~~~~~~~~~~~~[0m
 [96msrc/components/views/CardItem.astro[0m:[93m282[0m:[93m11[0m - [91merror[0m[90m ts(2531): [0mObject is possibly 'null'.
 
-[7m282[0m           this.#button.setAttribute('aria-expanded', 'false')
-[7m   [0m [91m          ~~~~~~~~~~~~[0m
-[96msrc/components/views/CardItem.astro[0m:[93m276[0m:[93m11[0m - [91merror[0m[90m ts(2531): [0mObject is possibly 'null'.
-
-[7m276[0m           this.#button.setAttribute('aria-expanded', 'true')
+[7m282[0m           this.#button.setAttribute('aria-expanded', 'true')
 [7m   [0m [91m          ~~~~~~~~~~~~[0m
 
 [96msrc/components/views/GroupView.astro[0m:[93m29[0m:[93m7[0m - [91merror[0m[90m ts(2322): [0mType '{ category: string[]; style: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
@@ -12821,11 +12573,6 @@ Add the `is:inline` directive explicitly to silence this hint.
 
 [7m12[0m interface Props {
 [7m  [0m [93m          ~~~~~[0m
-
-[96msrc/components/widgets/SwiperCarousel.astro[0m:[93m3[0m:[93m15[0m - [91merror[0m[90m ts(2305): [0mModule '"astro:assets"' has no exported member 'ImageMetadata'.
-
-[7m3[0m import type { ImageMetadata } from 'astro:assets'
-[7m [0m [91m              ~~~~~~~~~~~~~[0m
 
 [96msrc/components/widgets/ThemeSwitch.astro[0m:[93m112[0m:[93m20[0m - [91merror[0m[90m ts(2345): [0mArgument of type 'EventTarget | null' is not assignable to parameter of type 'HTMLElement'.
   Type 'null' is not assignable to type 'HTMLElement'.
@@ -12963,6 +12710,11 @@ Add the `is:inline` directive explicitly to silence this hint.
 [7m5[0m const mockUser = {
 [7m [0m [93m      ~~~~~~~~[0m
 
+[96msrc/pages/emotion-visualization.astro[0m:[93m2[0m:[93m38[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../components/pages/EmotionVisualizationPage' or its corresponding type declarations.
+
+[7m2[0m import EmotionVisualizationPage from '../components/pages/EmotionVisualizationPage'
+[7m [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
 [96msrc/pages/index.astro[0m:[93m70[0m:[93m44[0m - [91merror[0m[90m ts(2339): [0mProperty 'comparison' does not exist on type '{ readonly label: "Product modules"; readonly title: "A case library, a practice room, and a review desk built for supervision."; readonly copy: "The product is not a generic chatbot. It is a training system for scenario design, repeated practice, and evidence-based review."; readonly proofLabel: "What changes opera...'.
 
 [7m70[0m       comparison={homepageContent.features.comparison}
@@ -13075,10 +12827,30 @@ Add the `is:inline` directive explicitly to silence this hint.
 [7m3[0m import { Target, TrendingUp } from 'lucide-react'
 [7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
-[96msrc/pages/dashboard/patient.astro[0m:[93m16[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'Users' is declared but its value is never read.
+[96msrc/pages/dashboard/enhanced.astro[0m:[93m6[0m:[93m1[0m - [93mwarning[0m[90m ts(6192): [0mAll imports in import declaration are unused.
 
-[7m16[0m import { Users } from 'lucide-react'
+[7m  6[0m import {
+[7m   [0m [93m~~~~~~~~[0m
+[7m  7[0m   DynamicEnhancedChartComponent,
+[7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m  9[0m   DynamicTreatmentPlanManager,
+[7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 10[0m } from '@/lib/utils/dynamic-components'
+[7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/dashboard/patient.astro[0m:[93m13[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'Users' is declared but its value is never read.
+
+[7m13[0m import { Users } from 'lucide-react'
 [7m  [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/dashboard/patient.astro[0m:[93m6[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'DynamicEnhancedChartComponent' is declared but its value is never read.
+
+[7m6[0m import {
+[7m [0m [93m~~~~~~~~[0m
+[7m7[0m   DynamicEnhancedChartComponent,
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m8[0m } from '@/lib/utils/dynamic-components'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96msrc/pages/dashboard/bias-detection/analytics.astro[0m:[93m6[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'Search' is declared but its value is never read.
 
@@ -13111,6 +12883,11 @@ Add the `is:inline` directive explicitly to silence this hint.
 
 [7m3[0m import { Target } from 'lucide-react'
 [7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/demo/emotion-visualization.astro[0m:[93m2[0m:[93m38[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../components/pages/EmotionVisualizationDemo' or its corresponding type declarations.
+
+[7m2[0m import EmotionVisualizationDemo from '../../components/pages/EmotionVisualizationDemo'
+[7m [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
 
 [96msrc/pages/dev/accessibility-test.astro[0m:[93m14[0m:[93m11[0m - [93mwarning[0m[90m ts(6196): [0m'LoadingIndicatorProps' is declared but never used.
 
@@ -13235,9 +13012,9 @@ Add the `is:inline` directive explicitly to silence this hint.
 [7m38[0m     visit(tree, (node) => {
 [7m  [0m [93m                 ~~~~[0m
 
-Result (2326 files): 
-- 1793 errors
+Result (2305 files): 
+- 1756 errors
 - 0 warnings
-- 982 hints
+- 979 hints
 
 [ELIFECYCLE] Command failed with exit code 1.
