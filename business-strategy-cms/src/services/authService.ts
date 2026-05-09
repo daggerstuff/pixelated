@@ -83,10 +83,10 @@ const BCRYPT_ROUNDS = Number.parseInt(process.env['BCRYPT_ROUNDS'] ?? '12', 10)
 export class AuthService {
   public static generateTokens(payload: JwtPayload): AuthTokens {
     const accessToken = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
+      expiresIn: JWT_EXPIRES_IN_SECONDS,
     })
     const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET, {
-      expiresIn: JWT_REFRESH_EXPIRES_IN as jwt.SignOptions['expiresIn'],
+      expiresIn: JWT_REFRESH_EXPIRES_IN_SECONDS,
     })
 
     return {
