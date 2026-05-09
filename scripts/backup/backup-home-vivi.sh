@@ -6,6 +6,13 @@ RCLONE_TARGET="${RCLONE_TARGET:-gdrive:vivi-home-backups}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
 LOCK_FILE_BASE="${HOME:-/home/vivi}"
 BACKUP_MODE="${BACKUP_MODE:-incremental}"
+BACKUP_KEEP_RUNS="${BACKUP_KEEP_RUNS:-6}"
+BACKUP_RUN_PREFIX="${BACKUP_RUN_PREFIX:-home-vivi-run}"
+BACKUP_SECTION_STRICT_ERRORS="${BACKUP_SECTION_STRICT_ERRORS:-false}"
+BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
+BACKUP_SECTIONS="${BACKUP_SECTIONS:-}"
+SECTION_BACKUP_PATHS=()
+SECTION_FAIL_COUNT=0
 
 if [[ "$RCLONE_TARGET" == "drive:vivi-home-backups" ]]; then
   RCLONE_TARGET="gdrive:vivi-home-backups"
@@ -95,6 +102,163 @@ else
   RCLONE_DEST="$RCLONE_TARGET"
 fi
 
+declare -a RCLONE_COPY_ARGS
+declare -a RCLONE_EXCLUDE_PATHS
+declare -a RCLONE_RETENTION_PREFIXES
+
+load_rclone_args() {
+  mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
+    "--checksum" \
+    "--create-empty-src-dirs" \
+    "--transfers" "8" \
+    "--checkers" "8" \
+    "--ignore-errors" \
+    "--skip-links" \
+    "--retries" "5" \
+    "--low-level-retries" "10" \
+    "--stats" "15s" \
+    "--stats-one-line")
+
+  mapfile -t RCLONE_EXCLUDE_PATHS < <(printf '%s\n' \
+    ".cache/**" \
+    "cache/**" \
+    ".cursor/**" \
+    ".cursor-server/**" \
+    ".codex/**" \
+    ".claude/**" \
+    ".claude-mem/**" \
+    "pixelated/dist/**" \
+    "pixelated/build/**" \
+    "pixelated/.next/**" \
+    "pixelated/.turbo/**" \
+    "pixelated/.cache/**" \
+    "coverage/**" \
+    "**/coverage/**" \
+    "**/.cache/**" \
+    "node_modules/**" \
+    "**/node_modules/**" \
+    ".venv/**" \
+    "**/.venv/**" \
+    "**/tmp/**" \
+    "**/.tmp/**" \
+    "tmp/**" \
+    ".gemini/tmp/**" \
+    ".kube/cache/**" \
+    ".local/share/zed/**" \
+    ".local/share/home_backups/**" \
+    ".cache/home-vivi-backup.lock" \
+    "*.sock" \
+    "*.log" \
+    ".cache/home-backup-*" \
+    ".cache/home-vivi-backup-*")
+
+  local exclude_arg
+  for exclude_arg in "${RCLONE_EXCLUDE_PATHS[@]}"; do
+    RCLONE_COPY_ARGS+=("--exclude" "$exclude_arg")
+  done
+}
+
+collect_section_paths() {
+  local source_sections
+  source_sections="${BACKUP_SECTIONS:-}"
+  if [[ -n "$source_sections" ]]; then
+    while IFS= read -r section_path; do
+      section_path="$(printf '%s\n' "$section_path" | tr ',;' '\n')"
+      section_path="$(echo "$section_path" | sed 's/[[:space:]]*$//; s/^[[:space:]]*//')"
+      if [[ -z "$section_path" || "${section_path:0:1}" == "#" ]]; then
+        continue
+      fi
+      SECTION_BACKUP_PATHS+=("$section_path")
+    done < <(printf '%s\n' "$source_sections" | tr ',;' '\n')
+    if (( ${#SECTION_BACKUP_PATHS[@]} == 0 )); then
+      log "No valid BACKUP_SECTIONS entries found; falling back to auto-discovery."
+      SECTION_BACKUP_PATHS=()
+    else
+      return
+    fi
+  fi
+
+  while IFS= read -r -d '' section_path; do
+    if [[ "$(basename "$section_path")" == ".cache" ]]; then
+      log "Skipping auto section (cache root): $(basename "$section_path")"
+      continue
+    fi
+    SECTION_BACKUP_PATHS+=("$section_path")
+  done < <(find "$SOURCE_DIR" -mindepth 1 -maxdepth 1 -print0 | sort -z)
+}
+
+resolve_section_path() {
+  local section_path="$1"
+  local expanded
+
+  expanded="${section_path/#\~/$HOME}"
+  if [[ "$expanded" = .* ]]; then
+    printf '%s\n' "${SOURCE_DIR%/}/${expanded}"
+    return
+  fi
+  if [[ "$expanded" = /* ]]; then
+    printf '%s\n' "$expanded"
+    return
+  fi
+  printf '%s\n' "${SOURCE_DIR%/}/${expanded}"
+}
+
+run_section_backup() {
+  local section_path="$1"
+  local section_name
+  local section_dest
+
+  section_path="$(resolve_section_path "$section_path")"
+  if [[ ! -e "$section_path" ]]; then
+    log "Section source missing, skipping: ${section_path}"
+    return
+  fi
+
+  section_name="$(basename "$section_path")"
+  if [[ -z "$section_name" || "$section_name" == "." ]]; then
+    section_name="root"
+  fi
+  section_dest="${RCLONE_SECTION_ROOT}/${section_name}"
+
+  log "Starting incremental section sync (${section_name}) from ${section_path} to ${section_dest}"
+  if rclone copy "$section_path" "$section_dest" "${RCLONE_COPY_ARGS[@]}"; then
+    log "Section sync completed successfully: ${section_name}"
+  else
+    SECTION_FAIL_COUNT=$((SECTION_FAIL_COUNT + 1))
+    log "Section sync failed: ${section_name}"
+  fi
+}
+
+run_retention_cleanup() {
+  if ! command -v jq >/dev/null 2>&1; then
+    log "jq is missing, skipping remote run retention cleanup"
+    return 0
+  fi
+
+  local run_count remove_count old_run old_run_dir
+  mapfile -t RCLONE_RETENTION_PREFIXES < <(
+    rclone lsjson "$RCLONE_DEST" --dirs-only 2>/dev/null \
+      | jq -r --arg prefix "$BACKUP_RUN_PREFIX" \
+        '.[] | select(.IsDir and (.Name | startswith($prefix + "-"))) | .Name' \
+      | sort
+  )
+
+  run_count="${#RCLONE_RETENTION_PREFIXES[@]}"
+  if (( run_count <= BACKUP_KEEP_RUNS )); then
+    return 0
+  fi
+
+  remove_count=$((run_count - BACKUP_KEEP_RUNS))
+  log "Retention cleanup: keeping ${BACKUP_KEEP_RUNS} runs, removing ${remove_count} old run folders from ${RCLONE_DEST}"
+  for ((old_run = 0; old_run < remove_count; old_run++)); do
+    old_run_dir="${RCLONE_RETENTION_PREFIXES[$old_run]}"
+    if [[ -n "$old_run_dir" ]]; then
+      log "Pruning old backup run: ${RCLONE_DEST}/${old_run_dir}"
+      rclone purge "${RCLONE_DEST}/${old_run_dir}" || log "Unable to purge ${old_run_dir}"
+    fi
+  done
+}
+
 cleanup_lock() {
   if [ -n "${lock_acquired:-}" ] && [ -f "$LOCK_FILE" ]; then
     flock -u 9 || true
@@ -125,44 +289,29 @@ fi
 lock_acquired=true
 
 case "$BACKUP_MODE" in
-  incremental)
-    mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
-      "--checksum" \
-      "--create-empty-src-dirs" \
-      "--transfers" "8" \
-      "--checkers" "16" \
-      "--ignore-errors" \
-      "--skip-links" \
-      "--retries" "5" \
-      "--low-level-retries" "10" \
-      "--stats" "10s" \
-      "--stats-one-line" \
-      "--exclude" ".cache/**" \
-      "--exclude" ".cursor/**" \
-      "--exclude" ".cursor-server/**" \
-      "--exclude" ".codex/**" \
-      "--exclude" ".claude/**" \
-      "--exclude" "pixelated/dist/**" \
-      "--exclude" "pixelated/build/**" \
-      "--exclude" "pixelated/.next/**" \
-      "--exclude" "pixelated/.turbo/**" \
-      "--exclude" "pixelated/.cache/**" \
-      "--exclude" "**/coverage/**" \
-      "--exclude" "**/.cache/**" \
-      "--exclude" "**/terminals/**" \
-      "--exclude" "free-claude-code/**" \
-      "--exclude" "*.sock" \
-      "--exclude" "**/*.log" \
-      "--exclude" ".local/share/zed/**" \
-      "--exclude" ".local/share/home_backups/**" \
-      "--exclude" ".claude-mem/**" \
-      "--exclude" ".cache/home-vivi-backup.lock" \
-      "--exclude" "**/node_modules/**" \
-      "--exclude" "**/.venv/**")
+  sectioned)
+    load_rclone_args
+    RCLONE_SECTION_ROOT="${RCLONE_DEST}/${BACKUP_RUN_PREFIX}-${BACKUP_RUN_ID}"
+    collect_section_paths
+    log "Starting sectioned sync from ${SOURCE_DIR} to ${RCLONE_SECTION_ROOT}"
+    for section_path in "${SECTION_BACKUP_PATHS[@]}"; do
+      run_section_backup "$section_path"
+    done
 
-    log "Starting incremental stream sync from ${SOURCE_DIR} to ${RCLONE_DEST}"
-    rclone copy "$SOURCE_DIR" "$RCLONE_DEST" "${RCLONE_COPY_ARGS[@]}"
+    log "Sectioned sync completed with ${SECTION_FAIL_COUNT} section error(s)"
+    run_retention_cleanup
+    if [[ "${BACKUP_SECTION_STRICT_ERRORS,,}" == "true" && "$SECTION_FAIL_COUNT" -gt 0 ]]; then
+      log "Sectioned sync encountered errors and BACKUP_SECTION_STRICT_ERRORS=true"
+      exit 1
+    fi
+    ;;
+
+  incremental)
+    load_rclone_args
+    log "Starting incremental stream sync from ${SOURCE_DIR} to ${RCLONE_DEST}/${BACKUP_RUN_PREFIX}-${BACKUP_RUN_ID}"
+    rclone copy "$SOURCE_DIR" "${RCLONE_DEST}/${BACKUP_RUN_PREFIX}-${BACKUP_RUN_ID}" "${RCLONE_COPY_ARGS[@]}"
     log "Incremental stream sync completed successfully"
+    run_retention_cleanup
     ;;
   full)
     BACKUP_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
@@ -172,6 +321,7 @@ case "$BACKUP_MODE" in
 
     mapfile -t TAR_EXCLUDE_ARGS < <(printf '%s\n' \
       "--exclude=.cache/**" \
+    "--exclude=cache/**" \
       "--exclude=.cursor/**" \
       "--exclude=.cursor-server/**" \
       "--exclude=.codex/**" \
@@ -185,6 +335,10 @@ case "$BACKUP_MODE" in
       "--exclude=**/.cache/**" \
       "--exclude=**/terminals/**" \
       "--exclude=free-claude-code/**" \
+    "--exclude=tmp/**" \
+    "--exclude=.tmp/**" \
+    "--exclude=.gemini/tmp/**" \
+    "--exclude=.kube/cache/**" \
       "--exclude=*.sock" \
       "--exclude=**/*.log" \
       "--exclude=.local/share/zed/**" \
@@ -214,7 +368,7 @@ case "$BACKUP_MODE" in
     fi
     ;;
   *)
-    log "Invalid BACKUP_MODE '$BACKUP_MODE'. Expected 'incremental' or 'full'."
+    log "Invalid BACKUP_MODE '$BACKUP_MODE'. Expected 'sectioned', 'incremental', or 'full'."
     exit 1
     ;;
 esac

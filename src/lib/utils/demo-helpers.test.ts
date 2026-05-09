@@ -181,10 +181,7 @@ describe('Demo Helpers', () => {
         evaluation: 0.7,
       }
 
-      const scenarios = generateCounterfactualScenarios(
-        mockSessionData,
-        biasFactors,
-      )
+      const scenarios = generateCounterfactualScenarios(biasFactors)
       const highLikelihoodScenarios = scenarios.filter(
         (s) => s.likelihood === 'high',
       )
