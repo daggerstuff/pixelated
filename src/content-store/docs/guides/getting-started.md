@@ -1,5 +1,4 @@
 ---
-title: 'Getting Started'
 description: 'Learn how to get started with Pixelated'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

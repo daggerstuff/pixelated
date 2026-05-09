@@ -1,5 +1,4 @@
 ---
-title: 'Debugging Tests'
 description: 'Guide to debugging tests in Pixelated'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

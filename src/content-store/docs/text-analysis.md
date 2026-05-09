@@ -1,5 +1,4 @@
 ---
-title: 'Text Analysis System Documentation'
 description: 'Text Analysis System Documentation documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

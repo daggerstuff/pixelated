@@ -3,7 +3,7 @@ import { Image } from 'astro:assets'
 import DOMPurify from 'isomorphic-dompurify'
 
 import Link from '@/components/base/Link.astro'
-import SwiperCarousel from '@/components/widgets/SwiperCarousel.astro'
+import ImageCarousel from '@/components/widgets/ImageCarousel.astro'
 import { formatDate } from '@/utils/datetime'
 
 import type { HTMLAttributes } from 'astro/types'
@@ -98,7 +98,7 @@ const sanitizedDetails = details
           {images &&
             images.length > 0 &&
             (images.length > 1 ? (
-              <SwiperCarousel
+              <ImageCarousel
                 images={images}
                 imageProps={{
                   width: 1200,

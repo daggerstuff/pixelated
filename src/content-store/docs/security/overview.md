@@ -1,6 +1,7 @@
 ---
 title: 'Security Overview'
 description:
+---
   'Learn about Pixelated Healths comprehensive security features and compliance
   measures'
 pubDate: '2025-01-01'
@@ -89,7 +90,7 @@ logging.
 ## Security Best Practices
 
 <Steps>
-  ### Enable MFA Require multi-factor authentication for all accounts ###
+### Enable MFA Require multi-factor authentication for all accounts ###
   Regular Audits Conduct periodic security audits and assessments ### Access
   Control Implement proper role-based access control (RBAC) ### Monitor Activity
   Set up comprehensive security monitoring and alerts

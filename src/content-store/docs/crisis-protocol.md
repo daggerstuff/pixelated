@@ -1,5 +1,4 @@
 ---
-title: 'Crisis Protocol Documentation'
 description: 'Crisis Protocol Documentation documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

@@ -1,5 +1,4 @@
 ---
-title: Posts
 description: Browse our latest blog posts and articles
 ---
 

@@ -1,5 +1,4 @@
 ---
-title: 'Plugin Development Best Practices'
 description: 'Plugin Development Best Practices documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

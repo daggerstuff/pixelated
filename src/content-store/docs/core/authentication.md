@@ -1,5 +1,4 @@
 ---
-title: 'Authentication'
 description: 'Understanding Pixelated authentication and authorization system'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'

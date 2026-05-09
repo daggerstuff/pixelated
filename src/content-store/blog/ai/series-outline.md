@@ -1,6 +1,6 @@
 ---
-title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
 description:
+---
   'Exploring the intersection of artificial intelligence and emotional
   wellbeing, from digital therapeutics to AI-enhanced mental health support'
 author: 'AI & Psychology Team'

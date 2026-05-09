@@ -1,6 +1,6 @@
 ---
-title: 'Email Service'
 description:
+---
   'Guide to Pixelated Healths email service implementation and configuration'
 pubDate: 2025-03-24
 share: true

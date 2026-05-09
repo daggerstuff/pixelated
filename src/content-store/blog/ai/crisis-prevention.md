@@ -1,6 +1,6 @@
 ---
-title: AI in Mental Health Crisis Prevention
 description: >-
+---
   Exploring how artificial intelligence is revolutionizing mental health crisis
   detection, intervention, and prevention through advanced monitoring and
   support systems

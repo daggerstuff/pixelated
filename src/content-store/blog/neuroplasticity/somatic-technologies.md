@@ -1,6 +1,6 @@
 ---
-title: Advanced Somatic Technologies in Trauma Treatment
 description: >-
+---
   Exploring cutting-edge technological innovations that harness the body-mind
   connection for more effective trauma healing and neuroplastic recovery
 author: Research & Clinical Team

@@ -1,6 +1,6 @@
 ---
-title: 'Global Settings'
 description:
+---
   'Mintlify gives you complete control over the look and feel of your
   documentation using the mint.json file'
 pubDate: '2025-01-01'

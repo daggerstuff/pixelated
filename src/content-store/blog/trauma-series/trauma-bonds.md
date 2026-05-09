@@ -1,6 +1,6 @@
 ---
-title: 'Breaking Free from Trauma Bonds'
 description:
+---
   'Understand the powerful psychological attachments that form in abusive
   relationships and learn strategies to recognize and heal from trauma bonds'
 author: 'Dr. Sarah Chen'

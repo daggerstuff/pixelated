@@ -1,6 +1,6 @@
 ---
-title: 'Silencing the Inner Critic: Finding Your Authentic Voice'
 description:
+---
   'Learn how to identify, understand, and transform your inner critic into a
   supportive ally for personal growth and healing'
 author: 'Dr. Sarah Chen'

@@ -1,6 +1,7 @@
 ---
 title: 'Redis Configuration'
 description:
+---
   'Detailed guide to configuring Redis for Pixelated Healths caching and queue
   system'
 pubDate: 2025-03-25

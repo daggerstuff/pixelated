@@ -1,5 +1,4 @@
 ---
-title: 'Redis Error Handling'
 description: 'Guide for handling Redis errors and exceptions'
 pubDate: 2025-03-25
 share: true

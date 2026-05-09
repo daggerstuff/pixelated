@@ -1,5 +1,4 @@
 ---
-title: 'Real User Monitoring (RUM) Documentation'
 description: 'Real User Monitoring (RUM) Documentation documentation'
 pubDate: 2024-01-15
 author: 'Pixelated Team'

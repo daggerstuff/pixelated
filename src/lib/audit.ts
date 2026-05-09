@@ -15,21 +15,71 @@ const logger = createBuildSafeLogger('default')
 // Environment detection
 const isServer = typeof window === 'undefined'
 
+type UnknownRecord = Record<string, unknown>
+
+const isObject = (value: unknown): value is UnknownRecord =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const parseJsonSafely = (value: string): unknown => {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return null
+  }
+}
+
+const isAuditEventType = (value: unknown): value is AuditEventType =>
+  typeof value === 'string' &&
+  (Object.values(AuditEventType) as readonly string[]).includes(value)
+
+const isAuditEventStatus = (value: unknown): value is AuditEventStatus =>
+  typeof value === 'string' &&
+  (Object.values(AuditEventStatus) as readonly string[]).includes(value)
+
+const isAuditLogEntry = (value: unknown): value is AuditLogEntry => {
+  if (!isObject(value)) {
+    return false
+  }
+
+  return (
+    typeof value.id === 'string' &&
+    typeof value.timestamp === 'string' &&
+    typeof value.userId === 'string' &&
+    typeof value.action === 'string' &&
+    typeof value.resource === 'string' &&
+    isAuditEventType(value.eventType) &&
+    isAuditEventStatus(value.status) &&
+    (value.userRole === undefined || typeof value.userRole === 'string') &&
+    (value.resourceId === undefined || typeof value.resourceId === 'string') &&
+    (value.ipAddress === undefined || typeof value.ipAddress === 'string') &&
+    (value.userAgent === undefined || typeof value.userAgent === 'string') &&
+    (value.sessionId === undefined || typeof value.sessionId === 'string') &&
+    (value.organizationId === undefined || typeof value.organizationId === 'string') &&
+    (value.patientId === undefined || typeof value.patientId === 'string') &&
+    (value.notes === undefined || typeof value.notes === 'string')
+  )
+}
+
+const normalizeError = (error: unknown): UnknownRecord => {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    }
+  }
+
+  if (isObject(error)) {
+    return error
+  }
+
+  return { error: String(error) }
+}
+
 // Helper function to get environment variables safely
 function getEnvVar(key: string): string | undefined {
   if (isServer && typeof process !== 'undefined') {
     return process.env[key]
-  }
-  // In browser, try to access environment variables through globalThis or window
-  // This is a fallback for build-time environment variables
-  if (
-    typeof globalThis !== 'undefined' &&
-    (globalThis as unknown as { process?: { env?: Record<string, string> } })
-      .process?.env
-  ) {
-    return (
-      globalThis as unknown as { process?: { env?: Record<string, string> } }
-    ).process?.env?.[key]
   }
   return undefined
 }
@@ -64,6 +114,12 @@ export enum AuditEventType {
   // Governance events
   GOVERNANCE_ALLOW = 'governance_allow',
   GOVERNANCE_DENY = 'governance_deny',
+  // Analytics & Access Control
+  ACCESS_DENIED = 'access_denied',
+  ANALYTICS_ACCESS = 'analytics_access',
+  SYSTEM_ERROR = 'system_error',
+  SESSION_ANALYTICS_SAVED = 'session_analytics_saved',
+  SESSION_ANALYTICS_FETCHED = 'session_analytics_fetched',
 }
 
 // Audit log status
@@ -195,7 +251,7 @@ async function processBatch(): Promise<void> {
     } catch (error: unknown) {
       logger.error(
         'Failed to send audit logs to remote endpoint',
-        error as Record<string, unknown>,
+      normalizeError(error),
       )
 
       // Put the logs back in the queue for retry
@@ -217,7 +273,7 @@ async function sendLogsToRemoteEndpoint(logs: AuditLogEntry[]): Promise<void> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': getEnvVar('AUDIT_API_KEY') || '',
+        'X-API-Key': getEnvVar('AUDIT_API_KEY') ?? '',
       },
       body: JSON.stringify({
         logs,
@@ -238,7 +294,7 @@ async function sendLogsToRemoteEndpoint(logs: AuditLogEntry[]): Promise<void> {
   } catch (error: unknown) {
     logger.error(
       'Error sending logs to remote endpoint',
-      error as Record<string, unknown>,
+      normalizeError(error),
     )
     throw error
   }
@@ -303,9 +359,11 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
   try {
     // Get existing logs
     const existingLogsJson = localStorage.getItem('hipaa-audit-logs')
-    const existingLogs: AuditLogEntry[] = existingLogsJson
-      ? (JSON.parse(existingLogsJson) as AuditLogEntry[])
-      : []
+    const parsedLogs = existingLogsJson ? parseJsonSafely(existingLogsJson) : null
+    const existingLogs: AuditLogEntry[] =
+      parsedLogs && Array.isArray(parsedLogs)
+        ? parsedLogs.filter(isAuditLogEntry)
+        : []
 
     // Add new log
     const updatedLogs = [entry, ...existingLogs]
@@ -325,7 +383,7 @@ function storeLocalAuditLog(entry: AuditLogEntry): void {
   } catch (error: unknown) {
     logger.error(
       'Failed to store audit log locally',
-      error as Record<string, unknown>,
+      normalizeError(error),
     )
   }
 }
@@ -364,7 +422,7 @@ export function logAuditEvent(
   createHIPAACompliantAuditLog({
     userId,
     action,
-    resource: resourceId || 'unknown',
+    resource: resourceId ?? 'unknown',
     eventType,
     ...(details !== undefined ? { details } : {}),
   }).catch((error) => {
@@ -389,8 +447,8 @@ export async function createHIPAACompliantAuditLog(params: {
   notes?: string
 }): Promise<AuditLogEntry> {
   // Default values
-  const eventType = params.eventType || AuditEventType.SYSTEM
-  const status = params.status || AuditEventStatus.SUCCESS
+  const eventType = params.eventType ?? AuditEventType.SYSTEM
+  const status = params.status ?? AuditEventStatus.SUCCESS
 
   // Base log entry with required fields
   const baseEntry = {
@@ -461,11 +519,17 @@ export function getAuditLogs(): AuditLogEntry[] {
 
   try {
     const logsJson = localStorage.getItem('hipaa-audit-logs')
-    return logsJson ? (JSON.parse(logsJson) as AuditLogEntry[]) : []
+    if (!logsJson) {
+      return []
+    }
+    const parsedLogs = parseJsonSafely(logsJson)
+    return parsedLogs && Array.isArray(parsedLogs)
+      ? parsedLogs.filter(isAuditLogEntry)
+      : []
   } catch (error: unknown) {
     logger.error(
       'Failed to retrieve audit logs',
-      error as Record<string, unknown>,
+      normalizeError(error),
     )
     return []
   }
@@ -483,7 +547,7 @@ export function clearAuditLogs() {
     localStorage.removeItem('hipaa-audit-logs')
     logger.info('Audit logs cleared from local storage')
   } catch (error: unknown) {
-    logger.error('Failed to clear audit logs', error as Record<string, unknown>)
+    logger.error('Failed to clear audit logs', normalizeError(error))
   }
 }
 

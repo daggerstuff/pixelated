@@ -1,5 +1,4 @@
 ---
-title: 'Database Monitoring Configuration'
 description: 'Setting up and configuring database performance monitoring'
 pubDate: '2025-01-01'
 author: 'DevOps Team'
