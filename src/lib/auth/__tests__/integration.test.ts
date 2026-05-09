@@ -686,11 +686,9 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      /* eslint-disable typescript/no-unsafe-type-assertion */
       await refreshHandler({
         request: refreshRequest,
       } as Parameters<typeof refreshHandler>[0])
-      /* eslint-enable typescript/no-unsafe-type-assertion */
 
       expect(
         mockPhase6.updatePhase6AuthenticationProgress,

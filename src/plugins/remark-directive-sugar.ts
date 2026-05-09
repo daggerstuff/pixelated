@@ -12,7 +12,10 @@ interface Node {
   type: string
   children?: Node[]
   value?: string
-  data?: any
+  data?: {
+    hName?: string
+    hProperties?: Record<string, unknown>
+  }
 }
 
 interface DirectiveNode extends Node {
@@ -44,54 +47,58 @@ function visit(
 
 export function remarkDirectiveSugar() {
   return (tree: Root) => {
-    visit(tree, () => true, (node: any) => {
-      // Process directive nodes
-      if (node.type && node.type.includes('Directive')) {
-        const directiveNode = node as DirectiveNode
+    visit(
+      tree,
+      () => true,
+      (node: Node) => {
+        // Process directive nodes
+        if (node.type && node.type.includes('Directive')) {
+          const directiveNode = node as DirectiveNode
 
-        // Handle different directive types
-        switch (directiveNode.name) {
-          case 'note':
-            // Transform note directives
-            if (directiveNode.children) {
-              ;(directiveNode as Node).type = 'paragraph'
-              directiveNode.data = {
-                hName: 'div',
-                hProperties: {
-                  className: ['note', 'directive-note'],
-                },
+          // Handle different directive types
+          switch (directiveNode.name) {
+            case 'note':
+              // Transform note directives
+              if (directiveNode.children) {
+                ;(directiveNode as Node).type = 'paragraph'
+                directiveNode.data = {
+                  hName: 'div',
+                  hProperties: {
+                    className: ['note', 'directive-note'],
+                  },
+                }
               }
-            }
-            break
+              break
 
-          case 'warning':
-            // Transform warning directives
-            if (directiveNode.children) {
-              ;(directiveNode as Node).type = 'paragraph'
-              directiveNode.data = {
-                hName: 'div',
-                hProperties: {
-                  className: ['warning', 'directive-warning'],
-                },
+            case 'warning':
+              // Transform warning directives
+              if (directiveNode.children) {
+                ;(directiveNode as Node).type = 'paragraph'
+                directiveNode.data = {
+                  hName: 'div',
+                  hProperties: {
+                    className: ['warning', 'directive-warning'],
+                  },
+                }
               }
-            }
-            break
+              break
 
-          case 'tip':
-            // Transform tip directives
-            if (directiveNode.children) {
-              ;(directiveNode as Node).type = 'paragraph'
-              directiveNode.data = {
-                hName: 'div',
-                hProperties: {
-                  className: ['tip', 'directive-tip'],
-                },
+            case 'tip':
+              // Transform tip directives
+              if (directiveNode.children) {
+                ;(directiveNode as Node).type = 'paragraph'
+                directiveNode.data = {
+                  hName: 'div',
+                  hProperties: {
+                    className: ['tip', 'directive-tip'],
+                  },
+                }
               }
-            }
-            break
+              break
+          }
         }
-      }
-    })
+      },
+    )
   }
 }
 

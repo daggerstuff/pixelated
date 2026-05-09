@@ -29,7 +29,8 @@
 - Run Foresight continuity at task start before editing: `manage_subconscious`
   (`list`, then `get` for `pending_items` and `project_context`) and
   `search_memories` for active/upcoming work.
-  - If continuity calls fail, pause and use the local `continuity` fallback only when explicitly justified in `project_context`.
+  - If continuity calls fail, pause and use the local `continuity` fallback only
+    when explicitly justified in `project_context`.
 
 ### ⚠️ Ask first
 
@@ -58,7 +59,8 @@
   - `scripts/memory/mcp-config.json`
 - Required task-start memory commands:
   1. `manage_subconscious` (`action: list`)
-  2. `manage_subconscious` (`action: get`, labels `pending_items` and `project_context`)
+  2. `manage_subconscious` (`action: get`, labels `pending_items` and
+     `project_context`)
   3. `search_memories` for `"active tasks"` and `"upcoming work"`
 - `.agent/internal`: `.agent/internal/plans/`, `.agent/internal/guides/`,
   `.agent/internal/decisions.md`.

@@ -81,7 +81,8 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
   }
 
   const summaryValue = body['summary']
-  const summary = typeof summaryValue === 'string' ? summaryValue.trim() : undefined
+  const summary =
+    typeof summaryValue === 'string' ? summaryValue.trim() : undefined
   if (summary !== undefined) {
     createPayload.summary = summary
   }
@@ -122,10 +123,7 @@ const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
   }
 
   const contentValue = body['content']
-  if (
-    typeof contentValue === 'string' &&
-    contentValue.trim().length > 0
-  ) {
+  if (typeof contentValue === 'string' && contentValue.trim().length > 0) {
     updates.content = contentValue.trim()
   }
 
