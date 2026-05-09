@@ -224,19 +224,24 @@ export function mockLocalStorage(): {
     .fn<() => void>()
     .mockImplementation(() => storage.clear())
 
-  const mocklocalStorage = {
-    getItem: mockGetItem,
-    setItem: mockSetItem,
-    removeItem: mockRemoveItem,
-    clear: mockClear,
-    key: vi
-      .fn<(index: number) => string | null>()
-      .mockImplementation((index: number) => Array.from(storage.keys())[index]),
-    length: vi.fn<() => number>().mockImplementation(() => storage.size),
-  } as Storage
+   const mocklocalStorage = {
+     getItem: mockGetItem,
+     setItem: mockSetItem,
+     removeItem: mockRemoveItem,
+     clear: mockClear,
+     key: vi
+       .fn<(index: number) => string | null>()
+       .mockImplementation((index: number) => Array.from(storage.keys())[index]),
+   };
 
-  const originalLocalStorage = global.localStorage
-  Object.assign(global, { localStorage: mocklocalStorage })
+   Object.defineProperty(mocklocalStorage, 'length', {
+     get: () => storage.size,
+     enumerable: false,
+     configurable: true,
+   });
+
+    const originalLocalStorage = global.localStorage
+    Object.assign(global, { localStorage: mocklocalStorage })
 
   return {
     storage,

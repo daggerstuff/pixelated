@@ -22,21 +22,18 @@ on:
         type: string
         required: false
         default: ''
-        description:
-          'Optional fixture stage folder under
+        description: 'Optional fixture stage folder under
           ai/research/simulator_realism/fixtures'
       humanDataset:
         type: string
         required: false
         default: ''
-        description:
-          'Optional explicit human dataset path (relative to repo root)'
+        description: 'Optional explicit human dataset path (relative to repo root)'
       simulatedDataset:
         type: string
         required: false
         default: ''
-        description:
-          'Optional explicit simulated dataset path (relative to repo root)'
+        description: 'Optional explicit simulated dataset path (relative to repo root)'
       baselinePath:
         type: string
         required: false
@@ -53,28 +50,22 @@ jobs:
     name: Evaluate ConvApparel-style realism
     runs-on: ubuntu-24.04
     env:
-      MAX_KS_STAT:
-        ${{ github.event_name == 'workflow_dispatch' &&
+      MAX_KS_STAT: ${{ github.event_name == 'workflow_dispatch' &&
         github.event.inputs.maxKsStat || vars['REALISM_MAX_KS_STAT'] || '0.35'
         }}
-      MIN_HLS_AUC:
-        ${{ github.event_name == 'workflow_dispatch' &&
+      MIN_HLS_AUC: ${{ github.event_name == 'workflow_dispatch' &&
         github.event.inputs.minHumanLikenessAuc || vars['REALISM_MIN_HLS_AUC']
         || '0.5' }}
-      REALISM_DATASET_STAGE:
-        ${{ github.event_name == 'workflow_dispatch' &&
+      REALISM_DATASET_STAGE: ${{ github.event_name == 'workflow_dispatch' &&
         github.event.inputs.datasetStage || vars['REALISM_DATASET_STAGE'] || ''
         }}
-      REALISM_HUMAN_DATASET:
-        ${{ github.event_name == 'workflow_dispatch' &&
+      REALISM_HUMAN_DATASET: ${{ github.event_name == 'workflow_dispatch' &&
         github.event.inputs.humanDataset || vars['REALISM_HUMAN_DATASET'] || ''
         }}
-      REALISM_SIMULATED_DATASET:
-        ${{ github.event_name == 'workflow_dispatch' &&
+      REALISM_SIMULATED_DATASET: ${{ github.event_name == 'workflow_dispatch' &&
         github.event.inputs.simulatedDataset ||
         vars['REALISM_SIMULATED_DATASET'] || '' }}
-      REALISM_BASELINE_PATH:
-        ${{ github.event_name == 'workflow_dispatch' &&
+      REALISM_BASELINE_PATH: ${{ github.event_name == 'workflow_dispatch' &&
         github.event.inputs.baselinePath || vars['REALISM_BASELINE_PATH'] || ''
         }}
     steps:

@@ -33,23 +33,58 @@ const parseStringArray = (value: unknown): string[] | undefined => {
   return validItems.length > 0 ? validItems : undefined
 }
 
-const isDocumentCategory = (value: unknown): value is DocumentCategory =>
-  typeof value === 'string' &&
-  Object.values(DocumentCategory).includes(value as DocumentCategory)
+const DOCUMENT_CATEGORIES: readonly string[] = Object.values(DocumentCategory)
+const DOCUMENT_STATUSES: readonly string[] = Object.values(DocumentStatus)
+
+const isDocumentCategory = (value: unknown): value is DocumentCategory => {
+  return typeof value === 'string' && DOCUMENT_CATEGORIES.includes(value)
+}
 
 const isDocumentStatus = (value: unknown): value is DocumentStatus =>
-  typeof value === 'string' &&
-  Object.values(DocumentStatus).includes(value as DocumentStatus)
+  typeof value === 'string' && DOCUMENT_STATUSES.includes(value)
 
 const parseMetadata = (
   value: unknown,
 ): Partial<DocumentMetadata> | undefined => {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+  if (!isRecord(value)) {
     return undefined
   }
 
-  return value as Partial<DocumentMetadata>
+  const metadata: Partial<DocumentMetadata> = {}
+  const candidate = value
+
+  const wordCount = candidate['wordCount']
+  if (typeof wordCount === 'number' && Number.isFinite(wordCount)) {
+    metadata.wordCount = wordCount
+  }
+
+  const readingTime = candidate['readingTime']
+  if (typeof readingTime === 'number' && Number.isFinite(readingTime)) {
+    metadata.readingTime = readingTime
+  }
+
+  if (typeof candidate['lastEditedBy'] === 'string') {
+    metadata.lastEditedBy = candidate['lastEditedBy']
+  }
+
+  const fileSize = candidate['fileSize']
+  if (typeof fileSize === 'number' && Number.isFinite(fileSize)) {
+    metadata.fileSize = fileSize
+  }
+
+  if (typeof candidate['mimeType'] === 'string') {
+    metadata.mimeType = candidate['mimeType']
+  }
+
+  if (isRecord(candidate['customFields'])) {
+    metadata.customFields = candidate['customFields']
+  }
+
+  return Object.keys(metadata).length > 0 ? metadata : undefined
 }
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
   const titleValue = body['title']
@@ -158,8 +193,12 @@ const getRouteParam = (req: DocumentRequest, key: string): string | null => {
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
+const getBodyRecord = (req: DocumentRequest): Record<string, unknown> => {
+  return isRecord(req.body) ? req.body : {}
+}
+
 const getBodyString = (req: DocumentRequest, key: string): string | null => {
-  const body = req.body as Record<string, unknown>
+  const body = getBodyRecord(req)
   const value = body[key]
   return typeof value === 'string' && value.length > 0 ? value : null
 }
@@ -190,7 +229,7 @@ router.post(
   requireCreator,
   async (req: DocumentRequest, res) => {
     try {
-      const body = req.body as Record<string, unknown>
+      const body = getBodyRecord(req)
       const documentData = parseDocumentCreate(body)
       const authorId = req.user!.userId
 
@@ -314,7 +353,7 @@ router.put(
         return
       }
 
-      const body = req.body as Record<string, unknown>
+      const body = getBodyRecord(req)
       const updates = parseDocumentUpdate(body)
       const userId = req.user!.userId
 
