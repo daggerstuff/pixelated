@@ -17,6 +17,8 @@ export interface Session {
     email?: string
     role: string
     name?: string
+    permissions?: string[]
+    appMetadata?: Record<string, unknown>
   }
   /** ISO-8601 timestamp when the session expires */
   expires: string
