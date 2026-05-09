@@ -30,13 +30,12 @@ export async function getCurrentUser(
   cookies: AstroCookies,
 ): Promise<AuthUser | null> {
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
-
   if (!accessToken) {
     return null
   }
 
   try {
-    const decoded = await validateToken(accessToken)
+    const decoded = await validateToken(accessToken, 'access')
     if (!decoded) {
       return null
     }
@@ -79,8 +78,8 @@ export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
     return false
   }
 
-  try {
-    const decoded = await validateToken(accessToken)
+   try {
+     const decoded = await validateToken(accessToken, 'access')
     return !!decoded
   } catch (error: unknown) {
     console.error('Error checking authentication:', error)
@@ -235,7 +234,7 @@ export class Auth {
           value,
         }))
       },
-    } as any
+    } as unknown as AstroCookies
   }
 }
 

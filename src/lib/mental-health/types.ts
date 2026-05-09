@@ -78,6 +78,7 @@ export interface ChatMessage {
   content: string
   timestamp: number
   metadata?: Record<string, unknown>
+  analysis?: MentalHealthAnalysis
 }
 
 // Therapeutic response

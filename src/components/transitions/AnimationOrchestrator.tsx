@@ -284,7 +284,7 @@ export function AdvancedSequence({
   onSequenceComplete,
 }: AdvancedSequenceProps) {
   const controls = useAnimation()
-  const [currentStep, setCurrentStep] = useState(0)
+  const [, setCurrentStep] = useState(0)
 
   // Execute sequence
   const executeSequence = useCallback(async () => {

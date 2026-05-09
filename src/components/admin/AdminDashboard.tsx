@@ -2,7 +2,6 @@ import {
   ChartBar,
   TrendingUp,
   Star,
-  Users,
   Building,
   Settings,
   Clipboard,
@@ -706,7 +705,7 @@ const TherapistsTab: FC<{
  */
 const InstitutionsTab: FC<{
   metrics: InstitutionMetrics
-}> = ({ metrics }) => {
+}> = ({ metrics: _metrics }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -891,29 +890,33 @@ const SystemTab: FC<{
 
   const getIssueClasses = (severity: DiagnosticIssueSeverity) => {
     switch (severity) {
-      case 'critical':
+      case 'critical': {
         return {
           wrapper:
             'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
           label: 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-100',
         }
-      case 'warning':
+      }
+      case 'warning': {
         return {
           wrapper:
             'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-100',
           label:
             'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-100',
         }
-      case 'info':
+      }
+      case 'info': {
         return {
           wrapper:
             'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
           label:
             'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
         }
-      default:
+      }
+      default: {
         const exhaustiveCheck: never = severity
         throw new Error(`Unhandled severity: ${String(exhaustiveCheck)}`)
+      }
     }
   }
 
@@ -1125,9 +1128,9 @@ const ComplianceTab: FC<{
                 status: 'passed',
                 score: 98,
               },
-            ].map((audit, index) => (
+            ].map((audit) => (
               <div
-                key={index}
+                key={`${audit.type}-${audit.date}`}
                 className="bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3"
               >
                 <div>

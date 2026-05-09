@@ -37,10 +37,8 @@ import type {
   UpdateTreatmentPlanData,
   TreatmentGoal,
   NewTreatmentGoalData,
-  TreatmentGoalStatus,
   TreatmentObjective,
   NewTreatmentObjectiveData,
-  TreatmentObjectiveStatus,
 } from '@/types/treatment'
 
 const formatDate = (dateString?: string | Date) => {

@@ -227,14 +227,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
         setProgressPercent(0)
       }
     },
-    [
-      analysisSettings,
-      generateRecommendations,
-      generateCounterfactualScenarios,
-      generateHistoricalComparison,
-      calculateBiasFactors,
-      generateSessionId,
-    ],
+    [analysisSettings],
   )
 
   const handleLoadPreset = useCallback(
@@ -409,10 +402,14 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
             <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="text-gray-700 mb-2 block text-sm font-medium">
+                <label
+                  htmlFor="risk-level-filter"
+                  className="text-gray-700 mb-2 block text-sm font-medium"
+                >
                   Risk Level Filter
                 </label>
                 <select
+                  id="risk-level-filter"
                   value={quickFilters.riskLevel}
                   onChange={(e) => {
                     const value = e.target.value
@@ -440,10 +437,14 @@ export const EnhancedBiasDetectionInterface: React.FC<
               </div>
 
               <div>
-                <label className="text-gray-700 mb-2 block text-sm font-medium">
+                <label
+                  htmlFor="bias-category-filter"
+                  className="text-gray-700 mb-2 block text-sm font-medium"
+                >
                   Bias Category Filter
                 </label>
                 <select
+                  id="bias-category-filter"
                   value={quickFilters.category}
                   onChange={(e) => {
                     const value = e.target.value
@@ -619,10 +620,11 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 Recent Sessions
               </h3>
               <div className="space-y-2">
-                {savedSessions.slice(0, 5).map((session, _index) => (
-                  <div
+                {savedSessions.slice(0, 5).map((session) => (
+                  <button
+                    type="button"
                     key={session.sessionId}
-                    className="bg-gray-50 hover:bg-gray-100 flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors"
+                    className="bg-gray-50 hover:bg-gray-100 w-full flex cursor-pointer items-center justify-between rounded-lg p-3 text-left transition-colors"
                     onClick={() => {
                       void handleAnalyze(session)
                     }}
@@ -638,10 +640,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
                         {session.demographics.ethnicity}
                       </div>
                     </div>
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <span className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                       Re-analyze
-                    </button>
-                  </div>
+                    </span>
+                  </button>
                 ))}
               </div>
             </div>
