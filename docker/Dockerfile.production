@@ -63,7 +63,7 @@ RUN set -eux; \
 FROM build-base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
 COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Build stage
 FROM prod-deps AS build
