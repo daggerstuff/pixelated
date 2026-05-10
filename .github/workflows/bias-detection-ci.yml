@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
@@ -94,12 +94,12 @@ jobs:
           languages: javascript,typescript
 
       - name: Setup Node.js for CodeQL
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm for CodeQL
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.6
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -128,7 +128,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies for CodeQL
-        run: pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Build for CodeQL
         run: pnpm build
@@ -143,18 +143,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.6
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -183,7 +183,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Run ESLint and markdown lint
         run: pnpm lint:ci:with-markdown
@@ -229,18 +229,18 @@ jobs:
           - 6379:6379
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.6
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -269,7 +269,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Setup test environment
         run: |
@@ -317,7 +317,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
@@ -456,18 +456,18 @@ jobs:
           - 5432:5432
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.6
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -496,7 +496,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Setup Python for ML service
         uses: actions/setup-python@v6.2.0

@@ -47,13 +47,13 @@ The build job performs the following tasks:
 build:
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v5
-    - uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v6.0.2
+    - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 10
-    - uses: actions/setup-node@v6
+        version: 11.0.9
+    - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 22
+        node-version: 24.14.1
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
@@ -87,13 +87,13 @@ deploy:
   environment:
     name: ${{ github.event.inputs.environment || 'staging' }}
   steps:
-    - uses: actions/checkout@v5
-    - uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v6.0.2
+    - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 10
-    - uses: actions/setup-node@v6
+        version: 11.0.9
+    - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 22
+        node-version: 24.14.1
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
@@ -163,13 +163,13 @@ rollback:
   environment:
     name: ${{ github.event.inputs.environment || 'staging' }}
   steps:
-    - uses: actions/checkout@v5
-    - uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v6.0.2
+    - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 10
-    - uses: actions/setup-node@v6
+        version: 11.0.9
+    - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 22
+        node-version: 24.14.1
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile

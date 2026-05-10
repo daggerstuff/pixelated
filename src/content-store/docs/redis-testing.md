@@ -207,9 +207,11 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v2
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6.0.2
+      - uses: pnpm/action-setup@v6.0.6
+        with:
+          version: 11.0.9
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: '20'
           cache: 'pnpm'
