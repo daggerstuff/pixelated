@@ -35,6 +35,7 @@
     "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
     "format:check": "oxfmt --check . && prettier --check \"**/*.astro\"",
     "format:check:changed": "node scripts/ci/format-changed.mjs",
+    "format:jules-markdown": "node scripts/ci/format-jules-markdown.mjs",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:markdown": "pnpm exec markdownlint --config .markdownlint.json --ignore node_modules --ignore '**/node_modules/**' \"**/*.md\" \"**/*.mdx\"",
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
@@ -434,22 +435,13 @@
     "vscode-jsonrpc": "9.0.0-next.11",
     "wait-on": "latest"
   },
-  "peerDependencies": {
-    "hono": "^4.12.14"
-  },
-  "resolutions": {
-    "path-to-regexp": "8.4.2"
-  },
-  "engines": {
-    "node": ">=24"
-  },
+  "peerDependencies": { "hono": "^4.12.14" },
+  "resolutions": { "path-to-regexp": "8.4.2" },
+  "engines": { "node": ">=24" },
   "packageManager": "pnpm@11.0.9",
   "pnpm": {
     "peerDependencyRules": {
-      "ignoreMissing": [
-        "typescript",
-        "zod"
-      ],
+      "ignoreMissing": ["typescript", "zod"],
       "allowedVersions": {
         "mongodb": "^6.14.0",
         "eslint": "^8.57.0 || ^9.0.0",
@@ -529,9 +521,7 @@
       "workerd",
       "better-sqlite3"
     ],
-    "ignoredBuiltDependencies": [
-      "libpg-query"
-    ],
+    "ignoredBuiltDependencies": ["libpg-query"],
     "overrides": {
       "@vercel/routing-utils": "npm:@vercel/routing-utils@6.2.0",
       "path-to-regexp@6.1.0": "npm:path-to-regexp@6.3.0",
@@ -607,10 +597,5 @@
       "teeny-request": "10.1.2"
     }
   },
-  "trustedDependencies": [
-    "aws-sdk",
-    "core-js",
-    "protobufjs",
-    "unrs-resolver"
-  ]
+  "trustedDependencies": ["aws-sdk", "core-js", "protobufjs", "unrs-resolver"]
 }

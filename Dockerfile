@@ -17,12 +17,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     g++ \
     curl \
-    && corepack enable \
-    && ( \
-    PNPM_SUCCESS=0; \
+    && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
-    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
+    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
     echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
     PNPM_SUCCESS=1 && \
     break; \
@@ -35,7 +33,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "❌ Failed to install pnpm after 5 attempts" && \
     exit 1; \
     fi \
-    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package manifests first for better layer caching
@@ -109,12 +106,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     git \
     curl \
-    && corepack enable \
-    && ( \
-    PNPM_SUCCESS=0; \
+    && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
-    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
+    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
     echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
     PNPM_SUCCESS=1 && \
     break; \
@@ -127,7 +122,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "❌ Failed to install pnpm after 5 attempts" && \
     exit 1; \
     fi \
-    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
