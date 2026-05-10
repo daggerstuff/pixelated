@@ -41,6 +41,56 @@ const DEFAULT_WEIGHTS: BiasLayerWeights = {
   evaluation: 0.25,
 };
 
+function isRecordValue(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function toStringValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function toNumberValue(value: unknown): number {
+  return typeof value === "number" ? value : 0;
+}
+
+function toStringArrayValue(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.every((item): item is string => typeof item === "string") ? value : [];
+}
+
+type DemographicsSnapshot = {
+  age: string;
+  gender: string;
+  ethnicity: string;
+  primaryLanguage: string;
+};
+
+function toDemographics(demographics: Record<string, unknown> | undefined): DemographicsSnapshot {
+  return {
+    age: toStringValue(demographics?.age),
+    gender: toStringValue(demographics?.gender),
+    ethnicity: toStringValue(demographics?.ethnicity),
+    primaryLanguage: toStringValue(demographics?.primaryLanguage),
+  };
+}
+
+function normalizeError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error));
+}
+
+function toAlertLevel(value: string): AlertLevel {
+  if (value === "low" || value === "medium" || value === "high" || value === "critical") {
+    return value;
+  }
+  return "low";
+}
+
+function isSessionData(value: unknown): value is SessionData {
+  return isRecordValue(value) && typeof value["sessionId"] === "string" && value["sessionId"] !== "";
+}
+
 function validateWeights(w: BiasLayerWeights): void {
   const sum = w["preprocessing"] + w["modelLevel"] + w["interactive"] + w["evaluation"];
   if (Math.abs(sum - 1) > 1e-6) {
@@ -49,14 +99,14 @@ function validateWeights(w: BiasLayerWeights): void {
 }
 
 export class BiasDetectionEngine {
-  private config: BiasDetectionConfig & {
+  private readonly config: BiasDetectionConfig & {
     thresholds: BiasThresholdsConfig;
     layerWeights: BiasLayerWeights;
   };
-  public pythonService: PythonBiasDetectionBridge;
-  private metricsCollector: BiasMetricsCollector;
-  private alertSystem: BiasAlertSystem;
-  private performanceOptimizer: PerformanceOptimizer | null;
+  public readonly pythonService: PythonBiasDetectionBridge;
+  private readonly metricsCollector: BiasMetricsCollector;
+  private readonly alertSystem: BiasAlertSystem;
+  private readonly performanceOptimizer: PerformanceOptimizer | null;
   private initialized = false;
   private monitoringActive = false;
   private monitoringCallbacks: Array<(alert: { level: AlertLevel; sessionId: string }) => void> =
@@ -68,9 +118,9 @@ export class BiasDetectionEngine {
 
     // Normalize threshold property names for backward compatibility
     const normalizedThresholds = {
-      warning: thresholds.warning ?? thresholds.warningLevel ?? DEFAULT_THRESHOLDS.warning,
-      high: thresholds.high ?? thresholds.highLevel ?? DEFAULT_THRESHOLDS.high,
-      critical: thresholds.critical ?? thresholds.criticalLevel ?? DEFAULT_THRESHOLDS.critical,
+      warning: thresholds.warning,
+      high: thresholds.high,
+      critical: thresholds.critical,
     };
 
     this.config = {
@@ -131,14 +181,14 @@ export class BiasDetectionEngine {
     // Cache instances are managed internally by the cache manager
 
     this.pythonService = new PythonBiasDetectionBridge(
-      this.config.pythonServiceUrl || "http://localhost:5000",
-      this.config.pythonServiceTimeout || 30000,
+      this.config.pythonServiceUrl ?? "http://localhost:5000",
+      this.config.pythonServiceTimeout ?? 30000,
     );
     this.metricsCollector = new BiasMetricsCollector(this.config, this.pythonService);
     this.alertSystem = new BiasAlertSystem(
       {
-        pythonServiceUrl: this.config.pythonServiceUrl || "http://localhost:5000",
-        timeout: this.config.pythonServiceTimeout || 30000,
+        pythonServiceUrl: this.config.pythonServiceUrl ?? "http://localhost:5000",
+        timeout: this.config.pythonServiceTimeout ?? 30000,
         notifications: this.config.alertConfig?.enableSlackNotifications
           ? { slack: { enabled: true } }
           : undefined,
@@ -150,21 +200,21 @@ export class BiasDetectionEngine {
     try {
       this.performanceOptimizer = getPerformanceOptimizer({
         httpPool: {
-          maxConnections: this.config.performanceConfig?.maxConcurrentAnalyses || 10,
-          connectionTimeout: this.config.pythonServiceTimeout || 30000,
+          maxConnections: this.config.performanceConfig?.maxConcurrentAnalyses ?? 10,
+          connectionTimeout: this.config.pythonServiceTimeout ?? 30000,
         },
         batchProcessing: {
-          defaultBatchSize: this.config.batchProcessingConfig?.batchSize || 10,
-          maxConcurrency: this.config.batchProcessingConfig?.concurrency || 5,
-          timeoutMs: this.config.batchProcessingConfig?.timeoutMs || 30000,
-          retryAttempts: this.config.batchProcessingConfig?.retries || 2,
+          defaultBatchSize: this.config.batchProcessingConfig?.batchSize ?? 10,
+          maxConcurrency: this.config.batchProcessingConfig?.concurrency ?? 5,
+          timeoutMs: this.config.batchProcessingConfig?.timeoutMs ?? 30000,
+          retryAttempts: this.config.batchProcessingConfig?.retries ?? 2,
           enablePrioritization: true,
         },
         cache: {
           enableCompression: this.config.cacheConfig?.compressionEnabled !== false,
-          compressionThreshold: this.config.cacheConfig?.compressionThreshold || 1024,
-          defaultTtl: (this.config.cacheConfig?.ttl || 300000) / 1000, // Convert to seconds
-          maxCacheSize: this.config.cacheConfig?.maxSize || 1000,
+          compressionThreshold: this.config.cacheConfig?.compressionThreshold ?? 1024,
+          defaultTtl: (this.config.cacheConfig?.ttl ?? 300000) / 1000, // Convert to seconds
+          maxCacheSize: this.config.cacheConfig?.maxSize ?? 1000,
           enableDistributedCache: this.config.cacheConfig?.enableDistributedCache !== false,
         },
       });
@@ -179,19 +229,15 @@ export class BiasDetectionEngine {
     const validated = { ...DEFAULT_THRESHOLDS };
 
     // Handle both new and legacy property names for backward compatibility
-    validated.warning = thresholds.warning ?? thresholds.warningLevel ?? DEFAULT_THRESHOLDS.warning;
-    validated.high = thresholds.high ?? thresholds.highLevel ?? DEFAULT_THRESHOLDS.high;
+    validated.warning = thresholds.warning;
+    validated.high = thresholds.high;
     validated.critical =
-      thresholds.critical ?? thresholds.criticalLevel ?? DEFAULT_THRESHOLDS.critical;
+      thresholds.critical;
 
     // Ensure thresholds are in valid range and properly ordered
-    const warning = validated.warning
-    const high = validated.high
-    const critical = validated.critical
-
-    if (warning === undefined || high === undefined || critical === undefined) {
-      throw new Error('Invalid threshold configuration')
-    }
+    const warning = validated.warning;
+    const high = validated.high;
+    const critical = validated.critical;
 
     if (warning >= high || high >= critical) {
       throw new Error("Invalid threshold configuration: warning < high < critical required");
@@ -210,8 +256,8 @@ export class BiasDetectionEngine {
 
   async initialize() {
     // Be tolerant of mocks that don't provide initialize
-    await this.pythonService.initialize?.();
-    await this.alertSystem.initialize?.();
+    await this.pythonService.initialize();
+    await this.alertSystem.initialize();
     this.initialized = true;
   }
 
@@ -238,7 +284,7 @@ export class BiasDetectionEngine {
   }
 
   private computeAlertLevel(score: number): AlertLevel {
-    const thresholds = this.config.thresholds ?? DEFAULT_THRESHOLDS;
+    const thresholds = this.config.thresholds;
     const warning = thresholds.warning;
     const high = thresholds.high;
     const critical = thresholds.critical;
@@ -423,12 +469,6 @@ export class BiasDetectionEngine {
 
   async analyzeSession(session: SessionData): Promise<AnalysisResult> {
     this.ensureInitialized();
-    if (!session) {
-      throw new Error("Session data is required");
-    }
-    if (session.sessionId === undefined) {
-      throw new Error("Session ID is required");
-    }
     if (session.sessionId === "") {
       throw new Error("Session ID cannot be empty");
     }
@@ -482,17 +522,16 @@ export class BiasDetectionEngine {
     const confidence = Math.max(0.1, baseConfidence - confidencePenalty);
 
     const maskedDemo = this.maskDemographics(
-      session.participantDemographics as unknown as Record<string, unknown>,
-    ) as Partial<ParticipantDemographics> | undefined;
+      isRecordValue(session.participantDemographics)
+        ? session.participantDemographics
+        : undefined,
+    );
 
     // If any tool returned an explicit fallback flag, note limited analysis
     const anyFallback = [layerResults.preprocessing, layerResults.modelLevel, layerResults.interactive, layerResults.evaluation].some(
       (r) =>
-        !!r &&
-        typeof r === "object" &&
-        r !== null &&
-        "fallback" in (r as Record<string, unknown>) &&
-        (r as Record<string, unknown>).fallback === true,
+        isRecordValue(r) &&
+        r["fallback"] === true,
     );
 
     // Enhanced fallback messages for error scenarios to satisfy various tests
@@ -532,17 +571,12 @@ export class BiasDetectionEngine {
       layerResults,
       recommendations,
       confidence,
-      demographics: {
-        age: maskedDemo?.age ?? "",
-        gender: maskedDemo?.gender ?? "",
-        ethnicity: maskedDemo?.ethnicity ?? "",
-        primaryLanguage: maskedDemo?.primaryLanguage ?? "",
-      },
+      demographics: toDemographics(maskedDemo),
     };
 
     // Store analysis results for metrics collection (independent of audit logging)
     try {
-      await this.metricsCollector.storeAnalysisResult?.(result);
+      await this.metricsCollector.storeAnalysisResult(result);
     } catch (err) {
       console.warn("storeAnalysisResult failed:", err);
     }
@@ -553,41 +587,31 @@ export class BiasDetectionEngine {
     // Patch: Create HIPAA-compliant audit log if enabled (call audit.ts API)
     if (this.config.auditLogging) {
       const auditLogger = getAuditLogger();
-      // Build UserContext from session or fallback
-      const sessionWithContext = session as unknown as {
-        userId?: string;
-        userEmail?: string;
-        userRole?: any;
-        userPermissions?: string[];
-        userInstitution?: string;
-        userDepartment?: string;
-        requestMeta?: any;
-      };
+      const sessionRecord = session as Record<string, unknown>;
+      const roleRecord = isRecordValue(sessionRecord.userRole) ? sessionRecord.userRole : {};
+      const roleName = toStringValue(roleRecord.name);
+      const roleLevel = toNumberValue(roleRecord.level);
+      const institution = toStringValue(sessionRecord.userInstitution);
+      const department = toStringValue(sessionRecord.userDepartment);
       const user: UserContext = {
-        userId: sessionWithContext.userId || "",
-        email: sessionWithContext.userEmail || "",
-        role: sessionWithContext.userRole || {
-          id: "",
-          name: "analyst",
-          description: "",
-          level: 1,
+        userId: toStringValue(sessionRecord.userId),
+        email: toStringValue(sessionRecord.userEmail),
+        role: {
+          id: toStringValue(roleRecord.id),
+          name: roleName === "" ? "analyst" : roleName,
+          description: toStringValue(roleRecord.description),
+          level: roleLevel === 0 ? 1 : roleLevel,
         },
-        permissions: sessionWithContext.userPermissions || [],
-        institution: sessionWithContext.userInstitution,
-        department: sessionWithContext.userDepartment,
+        permissions: toStringArrayValue(sessionRecord.userPermissions),
+        institution: institution === "" ? undefined : institution,
+        department: department === "" ? undefined : department,
       };
-      // Build request meta from session or fallback
-      const request = sessionWithContext.requestMeta || {
-        ipAddress: "",
-        userAgent: "",
+      const requestMeta = isRecordValue(sessionRecord.requestMeta) ? sessionRecord.requestMeta : {};
+      const request = {
+        ipAddress: toStringValue(requestMeta.ipAddress),
+        userAgent: toStringValue(requestMeta.userAgent),
       };
-      // Ensure demographics is of type ParticipantDemographics
-      const demographics: ParticipantDemographics = {
-        age: maskedDemo?.age ?? "",
-        gender: maskedDemo?.gender ?? "",
-        ethnicity: maskedDemo?.ethnicity ?? "",
-        primaryLanguage: maskedDemo?.primaryLanguage ?? "",
-      };
+      const demographics = toDemographics(maskedDemo);
       await auditLogger.logBiasAnalysis(
         user,
         session.sessionId,
@@ -613,24 +637,17 @@ export class BiasDetectionEngine {
     };
   }> {
     this.ensureInitialized();
-    const dashboardMetrics = await this.metricsCollector.getMetrics?.();
-    if (dashboardMetrics && dashboardMetrics.overall_stats) {
-      return {
-        totalAnalyses: dashboardMetrics.overall_stats.total_sessions,
-        averageBiasScore: dashboardMetrics.overall_stats.average_bias_score,
-        alertDistribution: {
-          low: dashboardMetrics.overall_stats.alert_distribution.low || 0,
-          medium: dashboardMetrics.overall_stats.alert_distribution.medium || 0,
-          high: dashboardMetrics.overall_stats.alert_distribution.high || 0,
-          critical: dashboardMetrics.overall_stats.alert_distribution.critical || 0,
-        },
-      };
-    }
+    const dashboardMetrics = await this.metricsCollector.getMetrics();
     return {
-      totalAnalyses: 0,
-      averageBiasScore: 0,
-      alertDistribution: { low: 0, medium: 0, high: 0, critical: 0 },
-    };
+      totalAnalyses: dashboardMetrics.overall_stats.total_sessions,
+      averageBiasScore: dashboardMetrics.overall_stats.average_bias_score,
+      alertDistribution: {
+        low: dashboardMetrics.overall_stats.alert_distribution.low,
+        medium: dashboardMetrics.overall_stats.alert_distribution.medium,
+        high: dashboardMetrics.overall_stats.alert_distribution.high,
+        critical: dashboardMetrics.overall_stats.alert_distribution.critical,
+      },
+    }
   }
 
   // Fast cached lookup used by performance tests
@@ -657,10 +674,14 @@ export class BiasDetectionEngine {
       alertLevel: analysis.alertLevel,
       highlights: Object.entries(analysis.layerResults)
         .map(([name, layer]) => {
-          const l = layer as { biasScore: number };
+          const layerRecord = isRecordValue(layer) ? layer : undefined;
           return {
             layer: name,
-            biasScore: l.biasScore,
+            biasScore:
+              layerRecord !== undefined &&
+              typeof layerRecord["biasScore"] === "number"
+                ? layerRecord["biasScore"]
+                : 0,
           };
         })
         .sort((a, b) => b.biasScore - a.biasScore)
@@ -683,7 +704,7 @@ export class BiasDetectionEngine {
   ) {
     this.ensureInitialized();
     // Create a cache key based on session IDs and report parameters
-    const reportKey = `report:${sessions.map((s) => s.sessionId).join(",")}:${_range?.start?.toISOString() ?? ""}:${_range?.end?.toISOString() ?? ""}:${_opts?.format ?? "json"}`;
+    const reportKey = `report:${sessions.map((s) => s.sessionId).join(",")}:${_range?.start.toISOString() ?? ""}:${_range?.end.toISOString() ?? ""}:${_opts?.format ?? "json"}`;
     const cachedReport = await getCachedReport(reportKey);
     if (cachedReport) {
       return cachedReport;
@@ -721,21 +742,23 @@ export class BiasDetectionEngine {
     }
     const averageBias =
       results.length > 0
-        ? results.filter(Boolean).reduce((sum, r) => sum + (r ? r.overallBiasScore : 0), 0) /
-          results.filter(Boolean).length
+        ? results.reduce((sum, r) => sum + r.overallBiasScore, 0) / results.length
         : 0;
-    const perf = await this.metricsCollector.getCurrentPerformanceMetrics?.();
+    const perf = await this.metricsCollector.getCurrentPerformanceMetrics();
     const report = {
       summary: {
         sessionCount: results.length,
         averageBiasScore: averageBias,
       },
-      performance: perf ?? {},
+      performance: perf,
       alerts: results
         .filter(Boolean)
         .reduce(
-          (acc, r) => (r ? { ...acc, [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1 } : acc),
-          {} as Record<string, number>,
+          (acc: Record<string, number>, r) => ({
+            ...acc,
+            [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1,
+          }),
+          {},
         ),
     };
     // Derive fairness from analysis: 1 - averageBias (bias in [0,1], so fairness = 1 - bias)
@@ -823,37 +846,20 @@ export class BiasDetectionEngine {
     recommendations: any[];
   }> {
     const dashboardMetrics = await this.metricsCollector.getDashboardData();
-    if (dashboardMetrics) {
-      return {
-        summary: {
-          totalSessions: dashboardMetrics.overall_stats?.total_sessions || 0,
-          averageBiasScore: dashboardMetrics.overall_stats?.average_bias_score || 0,
-          alertsLast24h: dashboardMetrics.recent_alerts?.length || 0,
-          criticalIssues: dashboardMetrics.overall_stats?.alert_distribution?.critical || 0,
-          improvementRate: 0, // Not available in DashboardMetrics
-          complianceScore: 0, // Not available in DashboardMetrics
-        },
-        recentAnalyses: [], // Not available in DashboardMetrics
-        alerts: dashboardMetrics.recent_alerts || [],
-        trends: dashboardMetrics.trend_data || [],
-        demographics: { age: {}, gender: {} }, // Not available in DashboardMetrics
-        recommendations: [], // Not available in DashboardMetrics
-      };
-    }
     return {
       summary: {
-        totalSessions: 0,
-        averageBiasScore: 0,
-        alertsLast24h: 0,
-        criticalIssues: 0,
-        improvementRate: 0,
-        complianceScore: 0,
+        totalSessions: dashboardMetrics.overall_stats.total_sessions,
+        averageBiasScore: dashboardMetrics.overall_stats.average_bias_score,
+        alertsLast24h: dashboardMetrics.recent_alerts.length,
+        criticalIssues: dashboardMetrics.overall_stats.alert_distribution.critical,
+        improvementRate: 0, // Not available in DashboardMetrics
+        complianceScore: 0, // Not available in DashboardMetrics
       },
-      recentAnalyses: [],
-      alerts: [],
-      trends: [],
-      demographics: { age: {}, gender: {} },
-      recommendations: [],
+      recentAnalyses: [], // Not available in DashboardMetrics
+      alerts: dashboardMetrics.recent_alerts,
+      trends: dashboardMetrics.trend_data,
+      demographics: { age: {}, gender: {} }, // Not available in DashboardMetrics
+      recommendations: [], // Not available in DashboardMetrics
     };
   }
 
@@ -862,12 +868,15 @@ export class BiasDetectionEngine {
     this.monitoringActive = true;
     this.monitoringCallbacks.push(callback);
     // Adapt callback type expected by alert system
-    this.alertSystem.addMonitoringCallback?.((a: unknown) => {
-      if (typeof a === "object" && a !== null && "level" in a && "sessionId" in a) {
-        const alert = a as Record<string, unknown>;
-        if (typeof alert.level === "string" && typeof alert.sessionId === "string") {
-          callback(a as { level: AlertLevel; sessionId: string });
-        }
+    this.alertSystem.addMonitoringCallback((a: unknown) => {
+      const alertRecord = isRecordValue(a) ? a : {};
+      const levelValue = toStringValue(alertRecord["level"] ?? alertRecord["alertLevel"]);
+      const sessionId = toStringValue(alertRecord["sessionId"]);
+      if (levelValue && sessionId) {
+        callback({
+          level: toAlertLevel(levelValue),
+          sessionId,
+        });
       }
     });
   }
@@ -878,24 +887,22 @@ export class BiasDetectionEngine {
   }
   async dispose() {
     try {
-      await this.metricsCollector.dispose?.();
+      await this.metricsCollector.dispose();
     } catch {
       /* swallow */
     }
     try {
-      await this.alertSystem.dispose?.();
+      await this.alertSystem.dispose();
     } catch {
       /* swallow */
     }
     try {
-      if (this.pythonService) {
-        await this.pythonService.dispose();
-      }
+      await this.pythonService.dispose();
     } catch {
       /* swallow */
     }
     try {
-      if (this.performanceOptimizer) {
+      if (this.performanceOptimizer !== null) {
         await this.performanceOptimizer.dispose();
       }
     } catch {
@@ -964,13 +971,13 @@ export class BiasDetectionEngine {
       performanceHealth = await this.performanceOptimizer.healthCheck();
     }
 
-    const pythonServiceHealth = await this.pythonService.checkHealth?.();
+    const pythonServiceHealth = await this.pythonService.checkHealth();
 
     return {
-      overall: performanceHealth.healthy && pythonServiceHealth?.status === "healthy",
+      overall: performanceHealth.healthy && pythonServiceHealth.status === "healthy",
       components: {
         ...performanceHealth.components,
-        pythonService: pythonServiceHealth?.status === "healthy",
+      pythonService: pythonServiceHealth.status === "healthy",
         engine: this.initialized,
         monitoring: this.monitoringActive,
         performanceOptimizer: this.performanceOptimizer !== null,
@@ -993,7 +1000,7 @@ export class BiasDetectionEngine {
 
       return await this.performanceOptimizer.addBackgroundJob("session-analysis", session, {
         priority: priorityMap[priority],
-        timeout: this.config.pythonServiceTimeout || 30000,
+        timeout: this.config.pythonServiceTimeout ?? 30000,
         maxAttempts: 3,
       });
     }
@@ -1027,6 +1034,9 @@ export class BiasDetectionEngine {
   }> {
     this.ensureInitialized();
 
+    const progressCallback = options.onProgress;
+    const errorCallback = options.onError;
+
     const startTime = Date.now();
 
     // Use performance optimizer for batch processing if available, otherwise fallback to original implementation
@@ -1045,11 +1055,17 @@ export class BiasDetectionEngine {
           timeout: options.timeoutMs,
           retries: options.retries,
           priority: options.priority,
-          onProgress: options.onProgress
-            ? (completed, total) => options.onProgress!({ completed, total })
+          onProgress: progressCallback
+            ? (completed: number, total: number) => {
+                progressCallback({ completed, total });
+              }
             : undefined,
-          onError: options.onError
-            ? (error, item) => options.onError!(error, item as SessionData)
+          onError: errorCallback
+            ? (error: Error, item: unknown) => {
+                if (isSessionData(item)) {
+                  errorCallback(error, item);
+                }
+              }
             : undefined,
         },
       );
@@ -1074,10 +1090,10 @@ export class BiasDetectionEngine {
             });
           }
         } catch (error: unknown) {
-          const err = { session, error: error as Error };
+          const err = { session, error: normalizeError(error) };
           errors.push(err);
           if (options.onError) {
-            options.onError(error as Error, session);
+            options.onError(normalizeError(error), session);
           }
         }
       }

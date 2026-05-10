@@ -1,6 +1,23 @@
 import * as dotenv from 'dotenv'
+import DigestFetch from 'digest-fetch'
 
 dotenv.config()
+
+function isResponse(value: unknown): value is Response {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  return (
+    "ok" in value &&
+    "status" in value &&
+    "statusText" in value &&
+    "text" in value &&
+    typeof (value as { ok: unknown }).ok === "boolean" &&
+    typeof (value as { status: unknown }).status === "number" &&
+    typeof (value as { statusText: unknown }).statusText === "string" &&
+    typeof (value as { text: unknown }).text === "function"
+  );
+}
 
 const PUBLIC_KEY = process.env.ATLAS_PUBLIC_KEY
 const PRIVATE_KEY = process.env.ATLAS_PRIVATE_KEY
@@ -25,15 +42,7 @@ async function updateWhitelist() {
   try {
     // 1. Get current IP
     console.log('🔍 Fetching current public IP...')
-    const digestFetchModule = (await import('digest-fetch')) as {
-      default: new (
-        publicKey: string,
-        privateKey: string,
-      ) => {
-        fetch: typeof fetch
-      }
-    }
-    const client = new digestFetchModule.default(
+    const client = new DigestFetch(
       PUBLIC_KEY!,
       PRIVATE_KEY!,
     )
@@ -60,11 +69,14 @@ async function updateWhitelist() {
       },
     ]
 
-    const response = await client.fetch(url, {
+    const response: unknown = await client.fetch(url, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: { 'Content-Type': 'application/json' },
     })
+    if (!isResponse(response)) {
+      throw new Error("Unexpected Atlas API response type");
+    }
 
     if (response.ok) {
       console.log('✅ IP successfully added to whitelist!')
