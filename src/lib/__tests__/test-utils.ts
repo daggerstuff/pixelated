@@ -120,8 +120,10 @@ export function mockURLMethods(): { restore: () => void } {
     .mockReturnValue('blob:test-url')
   const revokeObjectURL = vi.fn<(url: string) => void>()
 
-  URL.createObjectURL = ((obj) => createObjectURL(obj)) as typeof URL.createObjectURL
-  URL.revokeObjectURL = ((url) => revokeObjectURL(url)) as typeof URL.revokeObjectURL
+  URL.createObjectURL = ((obj) =>
+    createObjectURL(obj)) as typeof URL.createObjectURL
+  URL.revokeObjectURL = ((url) =>
+    revokeObjectURL(url)) as typeof URL.revokeObjectURL
 
   return {
     restore: () => {
@@ -186,9 +188,9 @@ export function createMockTimer(): {
 export function mockCrypto(): { restore: () => void } {
   const originalCrypto = global.crypto
 
-  const randomUUID = vi.fn().mockReturnValue(
-    '550e8400-e29b-41d4-a716-446655440000',
-  )
+  const randomUUID = vi
+    .fn()
+    .mockReturnValue('550e8400-e29b-41d4-a716-446655440000')
   const mockCrypto = new Proxy(originalCrypto, {
     get(target, property): unknown {
       if (property === 'randomUUID') {
@@ -232,24 +234,24 @@ export function mockLocalStorage(): {
     .fn<() => void>()
     .mockImplementation(() => storage.clear())
 
-   const mocklocalStorage = {
-     getItem: mockGetItem,
-     setItem: mockSetItem,
-     removeItem: mockRemoveItem,
-     clear: mockClear,
-     key: vi
-       .fn<(index: number) => string | null>()
-       .mockImplementation((index: number) => Array.from(storage.keys())[index]),
-   };
+  const mocklocalStorage = {
+    getItem: mockGetItem,
+    setItem: mockSetItem,
+    removeItem: mockRemoveItem,
+    clear: mockClear,
+    key: vi
+      .fn<(index: number) => string | null>()
+      .mockImplementation((index: number) => Array.from(storage.keys())[index]),
+  }
 
-   Object.defineProperty(mocklocalStorage, 'length', {
-     get: () => storage.size,
-     enumerable: false,
-     configurable: true,
-   });
+  Object.defineProperty(mocklocalStorage, 'length', {
+    get: () => storage.size,
+    enumerable: false,
+    configurable: true,
+  })
 
-    const originalLocalStorage = global.localStorage
-    Object.assign(global, { localStorage: mocklocalStorage })
+  const originalLocalStorage = global.localStorage
+  Object.assign(global, { localStorage: mocklocalStorage })
 
   return {
     storage,
