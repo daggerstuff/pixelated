@@ -46,7 +46,7 @@ export async function logAuditEvent(data: AuditData): Promise<void> {
   }
 }
 
-export function getActionType(method: string, path: string): string {
+export function getActionType(method: string): string {
   const methodMap: Record<string, string> = {
     POST: 'CREATE',
     PUT: 'UPDATE',
@@ -85,7 +85,7 @@ export function getResourceId(path: string): string | undefined {
 
 export async function requestLogger(req: any, res: any, next: any) {
   const startTime = Date.now()
-  const { method, url, ip, headers } = req
+  const { method, url, ip } = req
 
   console.log(`[${new Date().toISOString()}] ${method} ${url} - ${ip}`)
 
@@ -144,11 +144,10 @@ describe('Logger Middleware', () => {
     })
 
     it('should handle logging errors gracefully', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error')
-
       await expect(
         requestLogger(mockRequest, mockResponse, mockNext),
       ).resolves.not.toThrow()
+      expect(vi.spyOn(console, 'error')).toHaveBeenCalled()
     })
 
     it('should capture request duration', async () => {
@@ -229,20 +228,20 @@ describe('Logger Middleware', () => {
 
   describe('getActionType', () => {
     it('should map HTTP methods to action types', () => {
-      expect(getActionType('POST', '/api/users')).toBe('CREATE')
-      expect(getActionType('PUT', '/api/users/123')).toBe('UPDATE')
-      expect(getActionType('DELETE', '/api/users/123')).toBe('DELETE')
-      expect(getActionType('GET', '/api/users')).toBe('READ')
+      expect(getActionType('POST')).toBe('CREATE')
+      expect(getActionType('PUT')).toBe('UPDATE')
+      expect(getActionType('DELETE')).toBe('DELETE')
+      expect(getActionType('GET')).toBe('READ')
     })
 
     it('should handle lowercase methods', () => {
-      expect(getActionType('post', '/api/users')).toBe('CREATE')
-      expect(getActionType('get', '/api/users')).toBe('READ')
+      expect(getActionType('post')).toBe('CREATE')
+      expect(getActionType('get')).toBe('READ')
     })
 
     it('should default to UNKNOWN for unrecognized patterns', () => {
-      expect(getActionType('PATCH', '/api/custom')).toBe('UPDATE')
-      expect(getActionType('CUSTOM', '/api/test')).toBe('UNKNOWN')
+      expect(getActionType('PATCH')).toBe('UPDATE')
+      expect(getActionType('CUSTOM')).toBe('UNKNOWN')
     })
   })
 

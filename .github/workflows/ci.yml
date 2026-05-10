@@ -87,8 +87,10 @@ jobs:
         run: pnpm lint:ci:with-markdown
 
       - name: Format check
+        env:
+          PR_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
         run: |
-          git show --name-only --pretty=format: "$GITHUB_SHA" > /tmp/changed_files.txt
+          bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
           if [ -s /tmp/changed_files.txt ]; then
             pnpm format:check:changed /tmp/changed_files.txt
           else

@@ -114,14 +114,14 @@ process.on('SIGTERM', async () => {
   })
 })
 
-// Error handling
-app.use(
-  (
-    error: Error,
-    req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction,
-  ) => {
+  // Error handling
+  app.use(
+    (
+      error: Error,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction,
+    ) => {
     console.error('❌ Error:', error)
     res.status(500).json({
       error: 'Internal server error',
