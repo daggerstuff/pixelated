@@ -24,7 +24,11 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
 // Explicitly load environment variables from .env files into process.env
 // for use during configuration evaluation (e.g. Sentry DSN check).
-const loadedEnv = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '')
+const loadedEnv = loadEnv(
+  process.env.NODE_ENV ?? 'development',
+  process.cwd(),
+  '',
+)
 Object.assign(process.env, loadedEnv)
 
 // Detect if we're running a build command (not dev server)
@@ -472,10 +476,10 @@ export default defineConfig({
         'astro-icon/components': path.resolve(
           './src/components/ui/astro-icon-components.ts',
         ),
-        stream: 'stream-browserify',
-        zlib: 'browserify-zlib',
-        buffer: 'buffer',
-        util: 'util',
+        'stream': 'stream-browserify',
+        'zlib': 'browserify-zlib',
+        'buffer': 'buffer',
+        'util': 'util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
