@@ -1,7 +1,6 @@
-import '../config/instrument.mjs'
 import { readFileSync } from 'fs'
-import { createServer as createHttpsServer, Server as HttpsServer } from 'https'
 import { createServer as createHttpServer, Server as HttpServer } from 'http'
+import { createServer as createHttpsServer, Server as HttpsServer } from 'https'
 
 import compression from 'compression'
 import cors from 'cors'
@@ -15,6 +14,8 @@ import { productionConfig } from './config/production.js'
 import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
+
+import '../config/instrument.mjs'
 
 const app = express()
 import { Sentry, sentryMiddleware } from '../config/instrument.mjs'

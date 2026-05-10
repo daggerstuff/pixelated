@@ -16,6 +16,13 @@ from unittest.mock import AsyncMock, patch
 import numpy as np
 import pandas as pd
 import pytest
+from bias_utils import (
+    create_minimal_test_session_data,
+    create_synthetic_dataset,
+    create_test_session_data,
+)
+from placeholder_adapters import PlaceholderAdapters
+from werkzeug.exceptions import Unauthorized
 
 # Import the service and related classes
 from bias_detection_service import (
@@ -26,13 +33,6 @@ from bias_detection_service import (
     SessionData,
     app,
 )
-from bias_utils import (
-    create_minimal_test_session_data,
-    create_synthetic_dataset,
-    create_test_session_data,
-)
-from placeholder_adapters import PlaceholderAdapters
-from werkzeug.exceptions import Unauthorized
 
 # Create instance for testing
 placeholder_adapters = PlaceholderAdapters()
