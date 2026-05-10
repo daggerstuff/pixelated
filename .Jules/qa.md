@@ -17,3 +17,5 @@
 ## 2026-04-29 - QA: Fix privacy.test.ts jsdom environment | Pattern: When a test uses browser globals like window.localStorage but the test environment lacks jsdom, Vitest will throw ReferenceError: window is not defined. Furthermore, spying on window.localStorage may fail to intercept direct localStorage calls. | Action: Add /\*_ @vitest-environment jsdom _/ at the top of the test file and use vi.spyOn(Storage.prototype, "getItem") to properly intercept these methods.
 
 ## 2026-04-30 - QA: Add test for checkBrowserCompatibility edge case | Pattern: Mocking navigator properties in Vitest with jsdom | Action: Use Object.defineProperty to temporarily mock and restore navigator.mediaDevices.
+
+## 2026-05-11 - QA: Add test for datetime.ts edge cases | Pattern: Creating missing tests for utility functions with Vitest, and adding path glob inclusions to vitest.config.ts to execute new unit tests. | Action: Ensure both positive and negative cases for utility functions are systematically tested, and always register the path to the test files in the project configuration.
