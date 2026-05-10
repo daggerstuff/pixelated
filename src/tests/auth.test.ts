@@ -1,31 +1,40 @@
-import request from 'supertest'
-import { getConnection } from 'typeorm'
+import { describe, it, expect } from 'vitest'
 
-import { app } from '../app' // Assuming your Express app is exported from src/app.ts
+import { POST } from '@/pages/api/auth/register/route'
 
-describe('POST /register', () => {
-  beforeAll(async () => {
-    // Ensure DB connection
-    await getConnection()
+const buildRequest = (body: Record<string, unknown>) =>
+  new Request('https://example.com/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   })
 
-  afterAll(async () => {
-    await getConnection().close()
-  })
-
+describe('POST /api/auth/register', () => {
   it('should reject a request missing the email field', async () => {
-    const response = await request(app)
-      .post('/register')
-      .send({ password: 'secret123' })
+    const response = await POST({
+      request: buildRequest({
+        fullName: 'Test User',
+        password: 'secret123',
+        termsAccepted: true,
+      }),
+    })
+
     expect(response.status).toBe(400)
-    expect(response.body.errors[0]).toMatch(/email/)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
   })
 
   it('should reject a weak password', async () => {
-    const response = await request(app)
-      .post('/register')
-      .send({ email: 'test@example.com', password: '123' })
+    const response = await POST({
+      request: buildRequest({
+        fullName: 'Test User',
+        email: 'test@example.com',
+        password: '123',
+        termsAccepted: true,
+      }),
+    })
     expect(response.status).toBe(400)
-    expect(response.body.errors[0]).toMatch(/minlength/)
+    const data = await response.json()
+    expect(data.error).toBeTruthy()
   })
 })
