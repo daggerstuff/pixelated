@@ -117,10 +117,18 @@ const SECRET_PATTERNS = [
   },
 ]
 
+/**
+ * @param {string} filePath
+ * @returns {string}
+ */
 function normalizePath(filePath) {
   return filePath.split(path.sep).join('/')
 }
 
+/**
+ * @param {string} dirName
+ * @returns {boolean}
+ */
 function shouldIgnoreDir(dirName) {
   return IGNORED_DIRS.has(dirName) || dirName.startsWith('.pytest_cache')
 }

@@ -8,7 +8,7 @@ import path from 'path'
 import process from 'process'
 import { fileURLToPath } from 'url'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 
 const skip = (process.env.SKIP_TESTS ?? '').toLowerCase()
 if (skip === 'true' || skip === '1') {
@@ -17,7 +17,7 @@ if (skip === 'true' || skip === '1') {
 }
 
 const vitestBin = path.resolve(
-  __dirname,
+  scriptDir,
   '../../node_modules/.bin',
   process.platform === 'win32' ? 'vitest.cmd' : 'vitest',
 )
@@ -28,7 +28,7 @@ if (hasPositionalArg && !process.env.VITEST_COVERAGE_ENABLED) {
 }
 const args = [
   '--config',
-  path.resolve(__dirname, '../../config/vitest.config.ts'),
+  path.resolve(scriptDir, '../../config/vitest.config.ts'),
   ...forwardedArgs,
 ]
 

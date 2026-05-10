@@ -114,5 +114,5 @@ const oxfmtFiles = changedFiles.filter((filePath) => {
 })
 
 if (oxfmtFiles.length > 0) {
-  runCommand('oxfmt', ['--check', ...oxfmtFiles])
+  runCommand('oxfmt', ['--check', '--no-error-on-unmatched-pattern', ...oxfmtFiles])
 }

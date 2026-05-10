@@ -4,12 +4,15 @@ import fs from 'fs'
 import path from 'path'
 import { createRequire } from 'module'
 
+/** @type {string} */
 const projectRoot = process.cwd()
 const srcRoot = path.join(projectRoot, 'src')
 const nodeModulesRoot = path.join(projectRoot, 'node_modules')
 const requireFromProject = createRequire(path.join(projectRoot, 'package.json'))
-const packageManifest = JSON.parse(
-  fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'),
+const packageManifestText = fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8')
+/** @type {{ dependencies?: Record<string, string>, devDependencies?: Record<string, string> }} */
+const packageManifest = /** @type {{ dependencies?: Record<string, string>, devDependencies?: Record<string, string> }} */ (
+  JSON.parse(packageManifestText)
 )
 const declaredDeps = new Set([
   ...Object.keys(packageManifest.dependencies || {}),
@@ -17,7 +20,6 @@ const declaredDeps = new Set([
 ])
 
 const TS_IMPORT_EXTENSIONS = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.astro'])
-const STYLE_EXTENSIONS = new Set(['.css', '.pcss', '.scss', '.sass'])
 const IMPORT_REGEXP =
   /(?:import|export)\s+(?:[\s\S]*?)\s+from\s+['"]([^'"]+)['"]|import\(\s*['"]([^'"]+)['"]\s*\)|require\(\s*['"]([^'"]+)['"]\s*\)/g
 const STYLE_IMPORT_REGEXP = /@import\s+(?:url\()?\s*['"]([^'"]+)['"]\)?\s*;?/g
@@ -265,7 +267,7 @@ function checkImport(specifier, fromDir, sourcePath) {
   }
 }
 
-function recordUnresolvedPackageImport(specifier, sourcePath) {
+function recordUnresolvedPackageImport(specifier) {
   const packageRoot = getPackageRoot(specifier)
   if (!declaredDeps.has(packageRoot) && !packageRoot.startsWith('.')) {
     missingDependencies.add(packageRoot)
@@ -306,7 +308,7 @@ function scanFile(filePath, discoveredImports) {
 
       if (!tryResolveNodeModule(specifier)) {
         if (shouldIgnoreUnresolved(filePath, specifier)) continue
-        recordUnresolvedPackageImport(specifier, filePath)
+        recordUnresolvedPackageImport(specifier)
         pushIssue(`${filePath} -> ${specifier} (package or style import cannot be resolved)`)
       }
     }
