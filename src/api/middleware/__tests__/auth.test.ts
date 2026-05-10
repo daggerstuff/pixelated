@@ -60,7 +60,7 @@ describe('Authentication Middleware', () => {
         },
       })
 
-      await authMiddleware(mockRequest as any, mockResponse as any, mockNext)
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
       expect(mockRequest.user).toEqual({
@@ -77,7 +77,7 @@ describe('Authentication Middleware', () => {
         error: 'Invalid token',
       })
 
-      await authMiddleware(mockRequest as any, mockResponse as any, mockNext)
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(401)
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -89,7 +89,7 @@ describe('Authentication Middleware', () => {
     it('should handle authentication error gracefully', async () => {
       mockAuthenticateRequest.mockRejectedValue(new Error('Auth service error'))
 
-      await authMiddleware(mockRequest as any, mockResponse as any, mockNext)
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(401)
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -105,7 +105,7 @@ describe('Authentication Middleware', () => {
         error: 'No authorization header',
       })
 
-      await authMiddleware(mockRequest as any, mockResponse as any, mockNext)
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(401)
     })
@@ -116,7 +116,7 @@ describe('Authentication Middleware', () => {
       const middleware = requireRoles(['admin', 'moderator'])
       mockRequest.user = { roles: ['admin', 'user'] }
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -125,7 +125,7 @@ describe('Authentication Middleware', () => {
       const middleware = requireRoles(['admin'])
       mockRequest.user = undefined
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(401)
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -138,7 +138,7 @@ describe('Authentication Middleware', () => {
       const middleware = requireRoles(['admin'])
       mockRequest.user = { roles: ['user', 'editor'] }
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(403)
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -152,7 +152,7 @@ describe('Authentication Middleware', () => {
       const middleware = requireRoles(['admin', 'moderator', 'editor'])
       mockRequest.user = { roles: ['editor', 'user'] }
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -163,7 +163,7 @@ describe('Authentication Middleware', () => {
       const middleware = requirePermissions(['documents:read'])
       mockRequest.user = { permissions: ['documents:read', 'documents:write'] }
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -172,7 +172,7 @@ describe('Authentication Middleware', () => {
       const middleware = requirePermissions(['documents:read'])
       mockRequest.user = undefined
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(401)
     })
@@ -181,7 +181,7 @@ describe('Authentication Middleware', () => {
       const middleware = requirePermissions(['admin:delete'])
       mockRequest.user = { permissions: ['documents:read'] }
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(403)
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -198,7 +198,7 @@ describe('Authentication Middleware', () => {
       ])
       mockRequest.user = { permissions: ['documents:read'] }
 
-      middleware(mockRequest as any, mockResponse as any, mockNext)
+      middleware(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(403)
     })

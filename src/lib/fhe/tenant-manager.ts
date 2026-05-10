@@ -55,7 +55,7 @@ class TenantManager {
 
     // Create a new config merging base, custom, and resource limits
     // We prioritize tenant specific overrides
-    const newConfig = {
+    const newConfig: T & { tenantConfig: TenantConfig } = {
       ...baseConfig,
       ...customConfig,
       // Apply resource limits if they map to config properties

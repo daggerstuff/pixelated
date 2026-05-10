@@ -1133,7 +1133,7 @@ export default function SessionDocumentationComponent({
                   editableDocumentation.emotionalPatterns.map(
                     (
                       pattern: { pattern: string; significance: string },
-                      index: number,
+                      _index: number,
                     ) => {
                       const key = `pattern-full-${pattern.pattern
                         .trim()

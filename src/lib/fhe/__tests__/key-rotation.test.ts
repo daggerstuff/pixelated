@@ -17,7 +17,9 @@ describe('KeyRotationService', () => {
 
   beforeEach(() => {
     // Reset singleton for testing
-    ;(KeyRotationService as unknown).instance = undefined
+    ;(
+      KeyRotationService as { instance: KeyRotationService | undefined }
+    ).instance = undefined
     service = KeyRotationService.getInstance()
   })
 
@@ -78,12 +80,11 @@ describe('KeyRotationService', () => {
     it('should handle key compromise reporting', async () => {
       await service.initialize()
       const keyId = service.getActiveKeyId()
-      if (keyId) {
-        await service.reportKeyCompromise(keyId, 'Test compromise')
-        // Should trigger emergency rotation
-        const newKeyId = service.getActiveKeyId()
-        expect(newKeyId).not.toBe(keyId)
-      }
+      expect(keyId).toBeTruthy()
+      await service.reportKeyCompromise(keyId as string, 'Test compromise')
+      // Should trigger emergency rotation
+      const newKeyId = service.getActiveKeyId()
+      expect(newKeyId).not.toBe(keyId)
     })
   })
 
