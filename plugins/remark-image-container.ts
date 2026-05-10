@@ -6,6 +6,7 @@
 
 import type { Paragraph, PhrasingContent, Root } from 'mdast'
 import type { Directives } from 'mdast-util-directive'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -34,8 +35,8 @@ function remarkImageContainer() {
    * @param {import('vfile').VFile} file
    *   File.
    */
-  return (tree: Root, file: VFile) => {
-    visit(tree, (node) => {
+   return (tree: Root, file: VFile) => {
+     visit(tree, (node: Node) => {
       if (
         node.type !== 'containerDirective' &&
         node.type !== 'leafDirective' &&

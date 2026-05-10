@@ -77,8 +77,8 @@ function remarkDirectiveSugar() {
    * @param {import('vfile').VFile} file
    *   File.
    */
-  return (tree: Root, file: VFile) => {
-    visit(tree, (node) => {
+   return (tree: Root, file: VFile) => {
+     visit(tree, (node: Node) => {
       if (
         node.type === 'containerDirective' ||
         node.type === 'leafDirective' ||
