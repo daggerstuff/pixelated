@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import type { NextFunction, Request, Response } from 'express'
 
 // Mock Redis client before importing
 const mockIncr = vi.fn()
@@ -21,9 +22,9 @@ import {
 } from '../rate-limiter'
 
 describe('Rate Limiter Middleware', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: Request
+  let mockResponse: Response
+  let mockNext: NextFunction
 
   beforeEach(() => {
     mockRequest = {
@@ -35,8 +36,8 @@ describe('Rate Limiter Middleware', () => {
       json: vi.fn(),
       setHeader: vi.fn(),
       set: vi.fn(),
-    }
-    mockNext = vi.fn()
+    } as unknown as Response
+    mockNext = vi.fn() as NextFunction
 
     vi.clearAllMocks()
   })

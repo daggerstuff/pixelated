@@ -165,7 +165,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       )
 
       // Test connection
-      await (consul as any).agent.self()
+      await consul.agent.self()
 
       this.consulClients.set(region, consul)
       this.discoveryBackends.set(`${region}:consul`, {
@@ -347,17 +347,17 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       switch (backend.type) {
         case 'consul': {
-          const consul = backend.client as any
+          const consul = backend.client
           await consul.agent.self()
           return true
         }
         case 'etcd': {
-          const etcd = backend.client as any
+          const etcd = backend.client
           await etcd.get('/').string()
           return true
         }
         case 'zookeeper': {
-          const zk = backend.client as any
+          const zk = backend.client
           return zk.connected
         }
         default: {
@@ -518,15 +518,15 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       switch (backend.type) {
         case 'consul': {
-          await this.registerWithConsul(backend.client as any, instance)
+          await this.registerWithConsul(backend.client, instance)
           break
         }
         case 'etcd': {
-          await this.registerWithEtcd(backend.client as any, instance)
+          await this.registerWithEtcd(backend.client, instance)
           break
         }
         case 'zookeeper': {
-          await this.registerWithZookeeper(backend.client as any, instance)
+          await this.registerWithZookeeper(backend.client, instance)
           break
         }
       }
@@ -752,21 +752,21 @@ export class ServiceDiscoveryManager extends EventEmitter {
       switch (backend.type) {
         case 'consul': {
           return await this.discoverFromConsul(
-            backend.client as any,
+            backend.client,
             serviceName,
             options,
           )
         }
         case 'etcd': {
           return await this.discoverFromEtcd(
-            backend.client as any,
+            backend.client,
             serviceName,
             options,
           )
         }
         case 'zookeeper': {
           return await this.discoverFromZookeeper(
-            backend.client as any,
+            backend.client,
             serviceName,
             options,
           )
@@ -1075,7 +1075,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         }
         case 'etcd': {
           // Update lease for etcd
-          const etcd = backend.client as any
+          const etcd = backend.client
           const key = `/services/${instance.name}/${instance.region}/${instance.id}`
           await (etcd.get(key) as any).string() // Touch the key to renew lease
           break
@@ -1330,18 +1330,18 @@ export class ServiceDiscoveryManager extends EventEmitter {
     try {
       switch (backend.type) {
         case 'consul': {
-          const consul = backend.client as any
+          const consul = backend.client
           await consul.agent.service.deregister(instanceId)
           break
         }
         case 'etcd': {
-          const etcd = backend.client as any
+          const etcd = backend.client
           const key = `/services/${serviceName}/${backend.region}/${instanceId}`
           await etcd.delete().key(key)
           break
         }
         case 'zookeeper': {
-          const zk = backend.client as any
+          const zk = backend.client
           const path = `/services/${serviceName}/${backend.region}/${instanceId}`
           await zk.delete(path, -1)
           break

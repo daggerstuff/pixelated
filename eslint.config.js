@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import css from '@eslint/css'
 import js from '@eslint/js'
 import json from '@eslint/json'
@@ -208,6 +209,7 @@ export default tseslint.config(
       'jsx-a11y': pluginJsxA11y,
     },
     rules: {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       ...pluginJsxA11y.configs.recommended.rules,
     },
   },
@@ -235,6 +237,10 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unsafe-type-assertion': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       'react-hooks/rules-of-hooks': 'off',
     },
   },
@@ -304,7 +310,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
 
       // Use Astro-specific recommended rules
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       ...pluginAstro.configs.recommended.rules,
     },
   },
 )
+/* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */

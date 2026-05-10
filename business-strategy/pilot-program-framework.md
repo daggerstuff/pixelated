@@ -27,7 +27,7 @@ market expansion.
 
 #### Month 1: Foundation & Setup
 
-**Week 1-2: Program Kickoff**
+### Week 1-2: Program Kickoff
 
 - Executive briefing with department leadership
 - Technical setup and system integration
@@ -35,7 +35,7 @@ market expansion.
 - Student onboarding and consent process
 - Baseline assessment completion
 
-**Week 3-4: Initial Deployment**
+### Week 3-4: Initial Deployment
 
 - Soft launch with 25% of target users
 - System monitoring and optimization
