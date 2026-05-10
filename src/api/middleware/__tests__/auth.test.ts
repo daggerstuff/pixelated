@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { NextFunction, Request, Response } from 'express'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
 
@@ -18,38 +18,51 @@ vi.mock('../../../lib/auth/user-identity', () => ({
 
 import { authMiddleware, requirePermissions, requireRoles } from '../auth'
 
+type MockAuthRequest = Pick<
+  Request,
+  'protocol' | 'get' | 'originalUrl' | 'method' | 'headers'
+> & {
+  user?: {
+    id: string
+    email: string
+    roles: string[]
+    emailVerified: boolean
+  }
+  statusCode?: number
+}
+
+type MockAuthResponse = Pick<Response, 'status' | 'json'>
+
 describe('Authentication Middleware', () => {
   let mockRequest: Request
-  let mockResponse: Response
+  let mockResponse: MockAuthResponse
   let mockNext: NextFunction
   const statusSpy = vi.fn().mockReturnThis()
   const jsonSpy = vi.fn()
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    mockRequest = ({
+    mockRequest = {
       protocol: 'http',
-      get: ((header: string): string | string[] | undefined => {
+      get: (header: string): string | string[] | undefined => {
         const headers: Record<string, string> = {
           host: 'localhost:3000',
           authorization: 'Bearer test-token',
         }
         return headers[header] || undefined
-      }),
+      },
       originalUrl: '/api/users',
       method: 'GET',
       headers: {
         authorization: 'Bearer test-token',
       },
-    }) as unknown as Request
+    } as MockAuthRequest
     statusSpy.mockClear()
     jsonSpy.mockClear()
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    mockResponse = ({
+    mockResponse = {
       status: statusSpy,
       json: jsonSpy,
-    }) as unknown as Response
-    mockNext = vi.fn() as NextFunction
+    } satisfies MockAuthResponse
+    mockNext = vi.fn()
 
     vi.clearAllMocks()
   })

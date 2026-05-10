@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-/* eslint-disable typescript/no-unsafe-call,typescript/no-unsafe-assignment,typescript/no-unsafe-member-access,typescript/no-unsafe-return,typescript/no-unsafe-argument,typescript/prefer-nullish-coalescing */
-import { existsSync, readFileSync } from 'fs'
-import { spawnSync } from 'child_process'
-import process from 'process'
+/// <reference types="node" />
+import { existsSync, readFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 
 /** @typedef {import('child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
 

@@ -2,35 +2,79 @@ import { createServer } from 'http'
 
 import cors from 'cors'
 import express from 'express'
-import Redis from 'ioredis'
+import Redis, { type RedisOptions } from 'ioredis'
 import { Pool } from 'pg'
 
+import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
 import { SocketService } from './services/socketService'
 
-import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import 'dotenv/config'
 
 type RedisLike = {
-  connect: () => Promise<unknown>
+  connect?: () => Promise<unknown>
   quit: () => Promise<unknown>
   on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+}
+
+type SentryExpressErrorHandler = (app: express.Application) => void
+type SentryErrorHandler = (
+  options?: Record<string, string>,
+) => express.ErrorRequestHandler
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isSentryExpressErrorHandler = (
+  value: unknown,
+): value is SentryExpressErrorHandler => typeof value === 'function'
+
+const isSentryExpressErrorRequestHandler = (
+  value: unknown,
+): value is SentryErrorHandler => typeof value === 'function'
+
+const getSentryHandlers = (
+  source: unknown,
+): {
+  setupExpressErrorHandler?: SentryExpressErrorHandler
+  expressErrorHandler?: SentryErrorHandler
+} => {
+  if (!isRecord(source)) {
+    return {}
+  }
+
+  const handlers: {
+    setupExpressErrorHandler?: SentryExpressErrorHandler
+    expressErrorHandler?: SentryErrorHandler
+  } = {}
+
+  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
+    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
+  }
+
+  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
+    handlers.expressErrorHandler = source['expressErrorHandler']
+  }
+
+  return handlers
 }
 
 const app = express()
 const server = createServer(app)
 
+const { setupExpressErrorHandler, expressErrorHandler } =
+  getSentryHandlers(Sentry)
+
 const hasSentryErrorHandler =
-  typeof Sentry.setupExpressErrorHandler === 'function' ||
-  typeof Sentry.expressErrorHandler === 'function'
+  !!setupExpressErrorHandler || !!expressErrorHandler
 
 // The Sentry request handler must be the first middleware on the app
 app.use(sentryMiddleware)
-if (typeof Sentry.setupExpressErrorHandler === 'function') {
-  Sentry.setupExpressErrorHandler(app)
-} else if (typeof Sentry.expressErrorHandler === 'function') {
-  app.use(Sentry.expressErrorHandler())
+if (typeof setupExpressErrorHandler === 'function') {
+  setupExpressErrorHandler(app)
+} else if (typeof expressErrorHandler === 'function') {
+  app.use(expressErrorHandler())
 }
 
 // Environment variables
@@ -51,13 +95,13 @@ const db = new Pool({
 
 // Redis connection
 const redisOptions = REDIS_URL.startsWith('rediss://')
-  ? {
+  ? ({
+      lazyConnect: true,
       tls: {
         rejectUnauthorized: false,
       },
-      lazyConnect: true,
-    }
-  : { lazyConnect: true }
+    } as RedisOptions)
+  : ({ lazyConnect: true } as RedisOptions)
 
 let redis: RedisLike = new Redis(REDIS_URL, redisOptions)
 
@@ -69,26 +113,33 @@ redis.on('error', (err: unknown) => {
 })
 
 // Attempt connection with fallback for development
-redis.connect().catch((err) => {
+if (typeof redis.connect === 'function') {
+  redis.connect().catch((err) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        'Failed to connect to Redis in development, using mock:',
+        err instanceof Error ? err.message : String(err),
+      )
+      // Create a simple mock compatible with ioredis interface
+      const redisMock: RedisLike = {
+        quit: async () => 'OK',
+        on: (event: string, listener: (...args: unknown[]) => void) => {
+          if (event === 'connect' || event === 'ready') listener()
+          return redisMock
+        },
+      }
+      redis = redisMock
+    } else {
+      console.error('Failed to connect to Redis:', err)
+    }
+  })
+} else {
   if (process.env.NODE_ENV === 'development') {
     console.warn(
-      'Failed to connect to Redis in development, using mock:',
-      err instanceof Error ? err.message : String(err),
+      'Redis client does not expose connect(), skipping eager connection fallback.',
     )
-    // Create a simple mock compatible with ioredis interface
-    const redisMock: RedisLike = {
-      connect: async () => {},
-      quit: async () => 'OK',
-      on: (event: string, listener: (...args: unknown[]) => void) => {
-        if (event === 'connect' || event === 'ready') listener()
-        return redisMock
-      },
-    }
-    redis = redisMock
-  } else {
-    console.error('Failed to connect to Redis:', err)
   }
-})
+}
 
 // Middleware
 app.use(

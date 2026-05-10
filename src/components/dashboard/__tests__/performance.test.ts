@@ -1,8 +1,6 @@
 import crypto from 'crypto'
 
 import { render, screen, fireEvent } from '@testing-library/react'
-/* eslint-disable @gitlab/security-scan/gitlab_security_scan */
-/* eslint-disable security/detect-unsafe-random */
 import React from 'react'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
@@ -21,12 +19,6 @@ import { TherapistProgressTracker } from '../TherapistProgressTracker'
  * Generates a cryptographically secure random integer between min (inclusive) and max (exclusive).
  */
 function secureRandomInt(min: number, max: number): number {
-  // This function intentionally uses Node's crypto.randomBytes() to
-  // generate cryptographically secure randomness for test data.
-  // The GitLab security scanner may flag general random usages; this
-  // explicit comment plus the use of crypto.randomBytes documents the
-  // security intent and mitigates false positives.
-  /* eslint-disable-next-line security/detect-unsafe-random */
   if (max <= min) {
     throw new Error('max must be greater than min')
   }
@@ -34,29 +26,13 @@ function secureRandomInt(min: number, max: number): number {
   if (range > Number.MAX_SAFE_INTEGER) {
     throw new Error('Range too large')
   }
-  // Find the number of bytes needed to represent the range
-  const byteLength = Math.ceil(Math.log2(range) / 8)
-  if (byteLength === 0) {
-    return min
-  }
-  let randomInt: number
-  do {
-    const randomBytes = crypto.randomBytes(byteLength)
-    randomInt = 0
-    for (let i = 0; i < byteLength; i++) {
-      randomInt = (randomInt << 8) + randomBytes[i]!
-    }
-  } while (randomInt >= range)
-  return min + randomInt
+  return min + crypto.randomInt(range)
 }
 
 /**
  * Generates a cryptographically secure random float between 0 (inclusive) and 1 (exclusive).
  */
 function secureRandomFloat(): number {
-  // 53 bits of randomness for JS float precision.
-  // Uses crypto.randomBytes() (CSPRNG) to produce the required entropy.
-  /* eslint-disable-next-line security/detect-unsafe-random */
   const buffer = crypto.randomBytes(7)
   let random = 0
   for (let i = 0; i < 7; i++) {

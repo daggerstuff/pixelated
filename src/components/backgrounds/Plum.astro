@@ -12,6 +12,14 @@
 <script>
   type Fn = () => void
 
+  interface BackingStoreCanvasContext {
+    webkitBackingStorePixelRatio?: number
+    mozBackingStorePixelRatio?: number
+    msBackingStorePixelRatio?: number
+    oBackingStorePixelRatio?: number
+    backingStorePixelRatio?: number
+  }
+
   function initCanvas(
     canvas: HTMLCanvasElement,
     width = 400,
@@ -20,10 +28,17 @@
   ) {
     const ctx = canvas.getContext('2d')!
     const dpr = window.devicePixelRatio || 1
+    const ctxWithBackingStore = ctx as CanvasRenderingContext2D &
+      BackingStoreCanvasContext
 
     // prettier-ignore
-    // @ts-expect-error (vendor)
-    const bsr = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1
+    const bsr =
+      ctxWithBackingStore.webkitBackingStorePixelRatio ||
+      ctxWithBackingStore.mozBackingStorePixelRatio ||
+      ctxWithBackingStore.msBackingStorePixelRatio ||
+      ctxWithBackingStore.oBackingStorePixelRatio ||
+      ctxWithBackingStore.backingStorePixelRatio ||
+      1
     const dpi = _dpi || dpr / bsr
 
     canvas.style.width = `${width}px`
@@ -35,7 +50,12 @@
     return { ctx, dpi }
   }
 
-  function polar2cart(x = 0, y = 0, r = 0, theta = 0) {
+  function polar2cart(
+    x: number = 0,
+    y: number = 0,
+    r: number = 0,
+    theta: number = 0,
+  ): [number, number] {
     const dx = r * Math.cos(theta)
     const dy = r * Math.sin(theta)
 

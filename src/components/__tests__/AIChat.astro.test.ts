@@ -95,21 +95,6 @@ vi.mock('../AIChatReact', () => {
   return { default: mockFn }
 })
 
-// Helper function to render Astro components in tests
-// Note: Currently unused but kept for future test implementation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function renderAstroComponent(
-  Component: any,
-  props = {},
-): Promise<{ container: HTMLDivElement }> {
-  const { default: defaultExport } = Component
-  const html = await defaultExport.render(props)
-  const container = document.createElement('div')
-  container.innerHTML = html.html
-  document.body.appendChild(container)
-  return { container }
-}
-
 describe('AIChat.astro', () => {
   beforeEach(() => {
     document.body.innerHTML = ''

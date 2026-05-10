@@ -4,15 +4,26 @@
 import compression from 'compression'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import express, { Express } from 'express'
+import express, {
+  type ErrorRequestHandler,
+  type Express,
+  type NextFunction,
+} from 'express'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { closeSentry, Sentry, sentryMiddleware } from '../../config/instrument.mjs'
 
+import {
+  closeSentry,
+  Sentry,
+  sentryMiddleware,
+} from '../../config/instrument.mjs'
 import {
   connectMongoDB,
   connectPostgreSQL,
   connectRedis,
+  disconnectMongoDB,
+  disconnectPostgreSQL,
+  disconnectRedis,
 } from '../lib/database/connection'
 import { authMiddleware } from './middleware/auth'
 import { errorHandler, notFoundHandler } from './middleware/error-handler'
@@ -31,17 +42,73 @@ import userRoutes from './routes/users'
 dotenv.config()
 
 const app: Express = express()
-const PORT = process.env.PORT || 5000
-const NODE_ENV = process.env.NODE_ENV || 'development'
+const PORT = parseInt(process.env.PORT ?? '5000', 10)
+const NODE_ENV = process.env.NODE_ENV ?? 'development'
+
+type SentryExpressErrorHandler = (app: express.Application) => void
+type SentryErrorHandler = (
+  options?: Record<string, string>,
+) => express.ErrorRequestHandler
+type SentryCaptureHandler = (error: unknown) => void
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isSentryExpressErrorHandler = (
+  value: unknown,
+): value is SentryExpressErrorHandler => typeof value === 'function'
+
+const isSentryExpressErrorRequestHandler = (
+  value: unknown,
+): value is SentryErrorHandler => typeof value === 'function'
+
+const isSentryCaptureHandler = (
+  value: unknown,
+): value is SentryCaptureHandler => typeof value === 'function'
+
+const getSentryHandlers = (
+  source: unknown,
+): {
+  setupExpressErrorHandler?: SentryExpressErrorHandler
+  expressErrorHandler?: SentryErrorHandler
+  captureException?: SentryCaptureHandler
+} => {
+  if (!isRecord(source)) {
+    return {}
+  }
+
+  const handlers: {
+    setupExpressErrorHandler?: SentryExpressErrorHandler
+    expressErrorHandler?: SentryErrorHandler
+    captureException?: SentryCaptureHandler
+  } = {}
+
+  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
+    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
+  }
+
+  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
+    handlers.expressErrorHandler = source['expressErrorHandler']
+  }
+
+  if (isSentryCaptureHandler(source['captureException'])) {
+    handlers.captureException = source['captureException']
+  }
+
+  return handlers
+}
+
+const { setupExpressErrorHandler, expressErrorHandler, captureException } =
+  getSentryHandlers(Sentry)
+
 const hasSentryErrorHandler =
-  typeof Sentry.setupExpressErrorHandler === 'function' ||
-  typeof Sentry.expressErrorHandler === 'function'
+  !!setupExpressErrorHandler || !!expressErrorHandler
 
 app.use(sentryMiddleware)
-if (typeof Sentry.setupExpressErrorHandler === 'function') {
-  Sentry.setupExpressErrorHandler(app)
-} else if (typeof Sentry.expressErrorHandler === 'function') {
-  app.use(Sentry.expressErrorHandler())
+if (typeof setupExpressErrorHandler === 'function') {
+  setupExpressErrorHandler(app)
+} else if (typeof expressErrorHandler === 'function') {
+  app.use(expressErrorHandler())
 }
 
 // ============================================================================
@@ -54,7 +121,7 @@ app.use(helmet())
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN?.split(',') ?? ['http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -117,10 +184,18 @@ app.use(notFoundHandler)
 
 // Global error handler (must be last)
 if (!hasSentryErrorHandler) {
-  app.use((error: Error, _req, _res, next) => {
-    Sentry.captureException(error)
+  const sentryErrorHandler: ErrorRequestHandler = (
+    error: Error,
+    _req,
+    _res,
+    next: NextFunction,
+  ) => {
+    if (captureException) {
+      captureException(error)
+    }
     next(error)
-  })
+  }
+  app.use(sentryErrorHandler)
 }
 app.use(errorHandler)
 
@@ -128,9 +203,13 @@ app.use(errorHandler)
 // DATABASE INITIALIZATION
 // ============================================================================
 
-let mongoConnection: any = null
-let postgresConnection: any = null
-let redisConnection: any = null
+type MongoConnection = Awaited<ReturnType<typeof connectMongoDB>>
+type PostgresConnection = Awaited<ReturnType<typeof connectPostgreSQL>>
+type RedisConnection = Awaited<ReturnType<typeof connectRedis>>
+
+let mongoConnection: MongoConnection | null = null
+let postgresConnection: PostgresConnection | null = null
+let redisConnection: RedisConnection | null = null
 
 async function initializeDatabases() {
   try {
@@ -183,13 +262,13 @@ process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...')
   await closeSentry()
   if (mongoConnection) {
-    await mongoConnection.disconnect()
+    await disconnectMongoDB()
   }
   if (postgresConnection) {
-    await postgresConnection.end()
+    await disconnectPostgreSQL()
   }
   if (redisConnection) {
-    await redisConnection.quit()
+    await disconnectRedis()
   }
   process.exit(0)
 })

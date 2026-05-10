@@ -27,7 +27,7 @@ export const Content = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & { sideOffset?: number }
 >(({ children, ...rest }, ref) => {
   return (
-    <div ref={ref} role="tooltip" {...rest}>
+    <div ref={ref} role='tooltip' {...rest}>
       {children}
     </div>
   )

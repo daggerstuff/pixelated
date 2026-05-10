@@ -4,7 +4,7 @@ import { Pool } from 'pg'
 import { Server as SocketIOServer, Socket } from 'socket.io'
 
 type RedisLike = {
-  connect: () => Promise<unknown>
+  connect?: () => Promise<unknown>
   quit: () => Promise<unknown>
 }
 
