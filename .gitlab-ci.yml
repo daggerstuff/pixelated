@@ -31,7 +31,8 @@ validate:dependencies:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+      /dev/null
     - corepack enable pnpm
   script:
     - echo "Validating dependencies..."
@@ -58,7 +59,8 @@ validate:lint:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+      /dev/null
     - corepack enable pnpm
   script:
     - echo "Running lint validation..."
@@ -90,7 +92,8 @@ validate:typecheck:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+      /dev/null
     - corepack enable pnpm
   script:
     - echo "Running typecheck validation..."
@@ -121,7 +124,8 @@ test:unit:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+      /dev/null
     - corepack enable pnpm
   script:
     - echo "Running unit tests..."
@@ -158,7 +162,8 @@ test:integration:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+      /dev/null
     - corepack enable pnpm
   script:
     - echo "Running integration tests..."
@@ -296,7 +301,8 @@ build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - echo "Building application..."
-    - docker build --cache-from ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker build --cache-from ${IMAGE_NAME}:latest -t
+      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
     - docker tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} ${IMAGE_NAME}:latest
     - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
     - docker push ${IMAGE_NAME}:latest
@@ -376,7 +382,9 @@ security:scan:
   before_script:
     # Install Trivy (latest version)
     - apk add --no-cache curl
-    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - curl -sfL
+      https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
+      | sh -s -- -b /usr/local/bin
     # Validate Docker registry variables are set
     - |
       if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
@@ -394,8 +402,10 @@ security:scan:
     - docker pull ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
     # Exit code 1 on CRITICAL, 0 on HIGH (warnings only)
     # Consider changing to --exit-code 1 if you want HIGH severity to fail the pipeline
-    - trivy image --severity CRITICAL --exit-code 1 --format table ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
-    - trivy image --severity HIGH --exit-code 0 --format table ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || true
+    - trivy image --severity CRITICAL --exit-code 1 --format table
+      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    - trivy image --severity HIGH --exit-code 0 --format table
+      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || true
     - echo "Security scan completed"
   artifacts:
     reports:

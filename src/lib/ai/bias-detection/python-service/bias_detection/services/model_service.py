@@ -1,6 +1,7 @@
 """
 Model service for TensorFlow and PyTorch integration
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -20,6 +21,7 @@ if TYPE_CHECKING:
 # Optional TensorFlow import
 try:
     import tensorflow as tf
+
     TENSORFLOW_AVAILABLE = True
 except ImportError:
     TENSORFLOW_AVAILABLE = False
@@ -72,7 +74,9 @@ class TensorFlowModelService(ModelService):
             raise ImportError(
                 "TensorFlow is not available. Install it with: pip install tensorflow"
             )
-        super().__init__(model_path or settings.tensorflow_model_path, "tensorflow_bias_detector")
+        super().__init__(
+            model_path or settings.tensorflow_model_path, "tensorflow_bias_detector"
+        )
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
 
@@ -153,7 +157,9 @@ class TensorFlowModelService(ModelService):
                 self.vocab = {}
                 self.word_index = 1
 
-            def encode_plus(self, text: str, max_length: int = 512, **_kwargs) -> dict[str, Any]:
+            def encode_plus(
+                self, text: str, max_length: int = 512, **_kwargs
+            ) -> dict[str, Any]:
                 words = text.lower().split()
                 tokens = []
                 for word in words:
@@ -232,10 +238,14 @@ class TensorFlowModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: Any, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(
+        self, probabilities: Any, text: str
+    ) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
-        probs = probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
+        probs = (
+            probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
+        )
 
         # Handle different output shapes
         if len(probs.shape) == 2:
@@ -314,7 +324,9 @@ class PyTorchModelService(ModelService):
     """PyTorch model service for bias detection"""
 
     def __init__(self, model_path: str | None = None):
-        super().__init__(model_path or settings.pytorch_model_path, "pytorch_bias_detector")
+        super().__init__(
+            model_path or settings.pytorch_model_path, "pytorch_bias_detector"
+        )
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -394,7 +406,9 @@ class PyTorchModelService(ModelService):
             def __init__(self, num_labels: int = len(BiasType.__members__)):
                 super().__init__()
                 self.bert = BertModel.from_pretrained("bert-base-uncased")
-                self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
+                self.classifier = torch.nn.Linear(
+                    self.bert.config.hidden_size, num_labels
+                )
                 self.dropout = torch.nn.Dropout(0.1)
 
             def forward(self, input_ids, attention_mask):
@@ -459,7 +473,9 @@ class PyTorchModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(
+        self, probabilities: torch.Tensor, text: str
+    ) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
@@ -559,6 +575,7 @@ class ModelEnsembleService:
         # NVIDIA API service for Kimi-k2.5 (optional)
         try:
             from bias_detection.services.nvidia_api_service import NvidiaAPIService
+
             self.nvidia_service = NvidiaAPIService()
             # Note: We don't add this to services list automatically as it's a different type of service
         except ImportError as e:
@@ -586,7 +603,9 @@ class ModelEnsembleService:
                 result = await service.predict(text)
                 results.append(result)
             except Exception as e:
-                logger.warning(f"Model {service.model_name} failed: {str(e)!s}", error=str(e))
+                logger.warning(
+                    f"Model {service.model_name} failed: {str(e)!s}", error=str(e)
+                )
 
         if not results:
             raise RuntimeError("All models failed to predict")
@@ -619,7 +638,9 @@ class ModelEnsembleService:
         combined_results = []
         for bias_type, results_list in bias_groups.items():
             avg_score = sum(r["score"] for r in results_list) / len(results_list)
-            avg_confidence = sum(r["confidence"] for r in results_list) / len(results_list)
+            avg_confidence = sum(r["confidence"] for r in results_list) / len(
+                results_list
+            )
 
             # Use highest confidence level
             confidence_levels = [r["confidence_level"] for r in results_list]

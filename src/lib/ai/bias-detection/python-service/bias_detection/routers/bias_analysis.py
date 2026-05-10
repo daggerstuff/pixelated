@@ -63,8 +63,7 @@ async def get_analysis(
     analysis = await db.get_analysis_by_id(analysis_id)
     if not analysis:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
         )
 
     # Authorization check: user must own the analysis
@@ -72,7 +71,7 @@ async def get_analysis(
     if analysis_user_id and analysis_user_id != current_user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to access this analysis"
+            detail="Not authorized to access this analysis",
         )
 
     return BiasAnalysisResponse(**analysis)
@@ -97,7 +96,7 @@ async def get_user_analyses(
     if current_user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to access this user's analyses"
+            detail="Not authorized to access this user's analyses",
         )
 
     limit = min(limit, 1000)

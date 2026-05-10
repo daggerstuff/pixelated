@@ -1,4 +1,3 @@
-import '../config/instrument.mjs'
 import { createServer } from 'http'
 
 import cors from 'cors'
@@ -10,6 +9,7 @@ import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
 import { SocketService } from './services/socketService'
 
+import '../config/instrument.mjs'
 import 'dotenv/config'
 
 type RedisLike = {

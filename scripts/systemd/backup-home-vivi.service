@@ -21,7 +21,7 @@ Environment=RCLONE_SYNC_PATH=
 Environment=BACKUP_KEEP_RUNS=6
 Environment=BACKUP_RUN_PREFIX=home-vivi-run
 Environment=BACKUP_SECTION_STRICT_ERRORS=false
-Environment=BACKUP_SKIP_SECTIONS=.cache,.cargo
+Environment="BACKUP_SKIP_SECTIONS=.cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube"
 Environment=BACKUP_HEARTBEAT_INTERVAL=30
 # Optional: comma/newline-separated list of sections; defaults to all top-level home folders.
 Environment=BACKUP_SECTIONS=

@@ -624,7 +624,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   <button
                     type="button"
                     key={session.sessionId}
-                    className="bg-gray-50 hover:bg-gray-100 w-full flex cursor-pointer items-center justify-between rounded-lg p-3 text-left transition-colors"
+                    className="bg-gray-50 hover:bg-gray-100 flex w-full cursor-pointer items-center justify-between rounded-lg p-3 text-left transition-colors"
                     onClick={() => {
                       void handleAnalyze(session)
                     }}

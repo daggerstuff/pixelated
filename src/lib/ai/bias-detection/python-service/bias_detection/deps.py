@@ -49,15 +49,13 @@ async def require_authenticated_user(user: dict = Depends(get_current_user)) -> 
     """
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
         )
 
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid user credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user credentials"
         )
 
     return user

@@ -41,7 +41,9 @@ class RealFairlearnAnalyzer:
         self.is_trained = False
 
     async def analyze_fairness(
-        self, _session_data: dict[str, Any], _sensitive_features: np.ndarray | None = None
+        self,
+        _session_data: dict[str, Any],
+        _sensitive_features: np.ndarray | None = None,
     ) -> dict[str, Any]:
         """
         Perform real fairness analysis using Fairlearn if available.
@@ -79,7 +81,10 @@ class RealInterpretabilityAnalyzer:
             Dictionary containing feature importance and confidence scores.
         """
         if not SHAP_AVAILABLE and not LIME_AVAILABLE:
-            return {"bias_score": 0.0, "error": "Interpretability toolkits not available"}
+            return {
+                "bias_score": 0.0,
+                "error": "Interpretability toolkits not available",
+            }
 
         # Placeholder for actual SHAP/LIME explanation logic
         return {"feature_importance": {"group": 0.1}, "confidence": 0.8}

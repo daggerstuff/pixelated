@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Request, Response, NextFunction } from 'express'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+/* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access,typescript/no-unsafe-call,typescript/no-unsafe-return,typescript/no-floating-promises */
 
 // Mock dependencies
 const mockRedis = {
@@ -74,18 +75,24 @@ describe('Middleware Stack Integration', () => {
     mockAuthenticateRequest.mockResolvedValue({ id: 'user123' })
 
     const callOrder: string[] = []
-    mockRequestLogger.mockImplementation((req: Request, res: Response, next: NextFunction) => {
-      callOrder.push('logger')
-      next()
-    })
-    mockRateLimiter.mockImplementation((req: Request, res: Response, next: NextFunction) => {
-      callOrder.push('rateLimiter')
-      next()
-    })
-    mockAuthMiddleware.mockImplementation((req: Request, res: Response, next: NextFunction) => {
-      callOrder.push('auth')
-      next()
-    })
+    mockRequestLogger.mockImplementation(
+      (req: Request, res: Response, next: NextFunction) => {
+        callOrder.push('logger')
+        next()
+      },
+    )
+    mockRateLimiter.mockImplementation(
+      (req: Request, res: Response, next: NextFunction) => {
+        callOrder.push('rateLimiter')
+        next()
+      },
+    )
+    mockAuthMiddleware.mockImplementation(
+      (req: Request, res: Response, next: NextFunction) => {
+        callOrder.push('auth')
+        next()
+      },
+    )
 
     mockRequestLogger(mockRequest, mockResponse, () => {
       mockRateLimiter(mockRequest, mockResponse, () => {
@@ -100,13 +107,13 @@ describe('Middleware Stack Integration', () => {
   })
 
   it('should handle auth failure before reaching next middleware', async () => {
-     mockAuthenticateRequest.mockRejectedValue(new Error('Invalid token'))
-     mockRequest.headers.authorization = 'Bearer invalid'
-     mockAuthMiddleware.mockImplementation(
-       async (req: Request, res: Response, next: NextFunction) => {
-         throw new Error('Invalid token')
-       },
-     )
+    mockAuthenticateRequest.mockRejectedValue(new Error('Invalid token'))
+    mockRequest.headers.authorization = 'Bearer invalid'
+    mockAuthMiddleware.mockImplementation(
+      async (req: Request, res: Response, next: NextFunction) => {
+        throw new Error('Invalid token')
+      },
+    )
 
     try {
       await mockAuthMiddleware(mockRequest, mockResponse, mockNext)
@@ -117,11 +124,13 @@ describe('Middleware Stack Integration', () => {
     expect(mockNext).not.toHaveBeenCalled()
   })
 
-    it('should handle rate limit before auth', async () => {
-     mockRedis.get.mockResolvedValue('1001')
-     mockRateLimiter.mockImplementation((req: Request, res: Response, next: NextFunction) => {
-       res.status(429).json({ error: 'Too Many Requests' })
-     })
+  it('should handle rate limit before auth', async () => {
+    mockRedis.get.mockResolvedValue('1001')
+    mockRateLimiter.mockImplementation(
+      (req: Request, res: Response, next: NextFunction) => {
+        res.status(429).json({ error: 'Too Many Requests' })
+      },
+    )
 
     mockRateLimiter(mockRequest, mockResponse, mockNext)
 
