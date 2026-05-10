@@ -21,18 +21,18 @@ const institutions = [
       <div
         class="flex gap-12 animate-scroll w-max hover:[animation-play-state:paused]"
       >
-        {
-          [...institutions, ...institutions, ...institutions].map(
-            (institution, index) => (
-              <div class="flex items-center justify-center h-10 w-40 grayscale hover:grayscale-0 transition-grayscale duration-300">
-                <img
-                  src={institution.logo}
-                  alt={institution.name}
-                  class="h-full w-full object-contain brightness-200 contrast-50 hover:brightness-100 hover:contrast-100 transition-all duration-300"
-                />
-              </div>
-            ),
-          )
+       {
+         [...institutions, ...institutions, ...institutions].map(
+           (institution) => (
+             <div class="flex items-center justify-center h-10 w-40 grayscale hover:grayscale-0 transition-grayscale duration-300">
+               <img
+                 src={institution.logo}
+                 alt={institution.name}
+                 class="h-full w-full object-contain brightness-200 contrast-50 hover:brightness-100 hover:contrast-100 transition-all duration-300"
+               />
+             </div>
+           ),
+       )
         }
       </div>
     </div>

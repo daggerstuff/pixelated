@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Request, Response, NextFunction } from 'express'
 
 // Mock dependencies
 const mockRedis = {
@@ -73,15 +74,15 @@ describe('Middleware Stack Integration', () => {
     mockAuthenticateRequest.mockResolvedValue({ id: 'user123' })
 
     const callOrder: string[] = []
-    mockRequestLogger.mockImplementation((req, res, next) => {
+    mockRequestLogger.mockImplementation((req: Request, res: Response, next: NextFunction) => {
       callOrder.push('logger')
       next()
     })
-    mockRateLimiter.mockImplementation((req, res, next) => {
+    mockRateLimiter.mockImplementation((req: Request, res: Response, next: NextFunction) => {
       callOrder.push('rateLimiter')
       next()
     })
-    mockAuthMiddleware.mockImplementation((req, res, next) => {
+    mockAuthMiddleware.mockImplementation((req: Request, res: Response, next: NextFunction) => {
       callOrder.push('auth')
       next()
     })
@@ -99,13 +100,13 @@ describe('Middleware Stack Integration', () => {
   })
 
   it('should handle auth failure before reaching next middleware', async () => {
-    mockAuthenticateRequest.mockRejectedValue(new Error('Invalid token'))
-    mockRequest.headers.authorization = 'Bearer invalid'
-    mockAuthMiddleware.mockImplementation(
-      async (req: any, res: any, next: any) => {
-        throw new Error('Invalid token')
-      },
-    )
+     mockAuthenticateRequest.mockRejectedValue(new Error('Invalid token'))
+     mockRequest.headers.authorization = 'Bearer invalid'
+     mockAuthMiddleware.mockImplementation(
+       async (req: Request, res: Response, next: NextFunction) => {
+         throw new Error('Invalid token')
+       },
+     )
 
     try {
       await mockAuthMiddleware(mockRequest, mockResponse, mockNext)
@@ -116,11 +117,11 @@ describe('Middleware Stack Integration', () => {
     expect(mockNext).not.toHaveBeenCalled()
   })
 
-  it('should handle rate limit before auth', async () => {
-    mockRedis.get.mockResolvedValue('1001')
-    mockRateLimiter.mockImplementation((req, res, next) => {
-      res.status(429).json({ error: 'Too Many Requests' })
-    })
+    it('should handle rate limit before auth', async () => {
+     mockRedis.get.mockResolvedValue('1001')
+     mockRateLimiter.mockImplementation((req: Request, res: Response, next: NextFunction) => {
+       res.status(429).json({ error: 'Too Many Requests' })
+     })
 
     mockRateLimiter(mockRequest, mockResponse, mockNext)
 
@@ -262,7 +263,7 @@ describe('Middleware Context Preservation', () => {
   it('should preserve request context across middlewares', async () => {
     const context = { userId: '', startTime: 0 }
 
-    const contextMiddleware = async (req: any, res: any, next: any) => {
+    const contextMiddleware = async (_req: any, res: any, next: any) => {
       context.startTime = Date.now()
       next()
     }
@@ -289,12 +290,12 @@ describe('Middleware Context Preservation', () => {
   })
 
   it('should handle response modification by multiple middlewares', async () => {
-    const headerMiddleware = async (req: any, res: any, next: any) => {
+    const headerMiddleware = async (_req: any, res: any, next: any) => {
       res.setHeader('X-Request-Id', '12345')
       next()
     }
 
-    const securityMiddleware = async (req: any, res: any, next: any) => {
+    const securityMiddleware = async (_req: any, res: any, next: any) => {
       res.setHeader('X-Content-Type-Options', 'nosniff')
       next()
     }
