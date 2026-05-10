@@ -2,9 +2,7 @@
  * @description Register directive nodes in mdast.
  * @see https://github.com/remarkjs/remark-directive?tab=readme-ov-file#types
  */
-/// <reference types="mdast-util-directive" />
-
-import type { Paragraph, PhrasingContent, Root } from 'mdast'
+import type { PhrasingContent, Root } from 'mdast'
 import type { Directives } from 'mdast-util-directive'
 import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
@@ -29,28 +27,33 @@ const VALID_TAGS_FOR_IMG = new Set<string>([
  * Convert `:::image-*` into container elements for images.
  */
 function remarkImageContainer() {
+  const isDirectiveNode = (node: Node): node is Directives =>
+    (node.type === 'containerDirective' ||
+      node.type === 'leafDirective' ||
+      node.type === 'textDirective') &&
+    'name' in node &&
+    'attributes' in node &&
+    'children' in node &&
+    'data' in node
+
   /**
    * @param {import('mdast').Root} tree
    *   Tree.
    * @param {import('vfile').VFile} file
    *   File.
    */
-   return (tree: Root, file: VFile) => {
-     visit(tree, (node: Node) => {
-      if (
-        node.type !== 'containerDirective' &&
-        node.type !== 'leafDirective' &&
-        node.type !== 'textDirective'
-      ) {
+  return (tree: Root, file: VFile) => {
+    visit(tree, (node: Node) => {
+      if (!isDirectiveNode(node)) {
         return
       }
 
-      const d = node as Directives
+      const d = node
 
       if (d.name === 'image-figure') {
         /* image-figure */
-        const data = d.data || (d.data = {})
-        const attributes = d.attributes || {}
+        const data = d.data ?? (d.data = {})
+        const attributes = d.attributes ?? {}
         const { children } = d
 
         // add figure node
@@ -59,22 +62,23 @@ function remarkImageContainer() {
         // handle figcaption text
         // priority: content inside [] of `:::image-figure[]{}`、`![]()`
         let content: PhrasingContent[]
+        const firstChild = children[0]
         if (
-          children[0]?.type === 'paragraph' &&
-          (children[0] as Paragraph).data?.directiveLabel &&
-          (children[0] as Paragraph).children[0]?.type === 'text'
+          firstChild?.type === 'paragraph' &&
+          firstChild.data?.directiveLabel &&
+          firstChild.children[0]?.type === 'text'
         ) {
-          content = (children[0] as Paragraph).children
+          content = firstChild.children
           children.shift()
         } else if (
-          children[0]?.type === 'paragraph' &&
-          (children[0] as Paragraph).children[0]?.type === 'image' &&
-          ((children[0] as Paragraph).children[0] as any).alt
+          firstChild?.type === 'paragraph' &&
+          firstChild.children[0]?.type === 'image' &&
+          firstChild.children[0].alt
         ) {
           content = [
             {
               type: 'text',
-              value: ((children[0] as Paragraph).children[0] as any).alt,
+              value: firstChild.children[0].alt,
             },
           ]
         } else {
@@ -85,41 +89,37 @@ function remarkImageContainer() {
         }
 
         // add figcaption node
-        const figcaptionNode: any = {
+        children.push({
           type: 'paragraph',
           data: {
             hName: 'figcaption',
             hProperties: attributes,
           },
           children: content,
-        }
-
-        children.push(figcaptionNode)
+        })
       } else if (d.name === 'image-a') {
         /* image-a */
-        if (!d.attributes || !d.attributes['href']) {
+        if (!d.attributes?.['href']) {
           file.fail(
             'Unexpectedly missing `href` in the `image-a` directive.',
             d,
           )
         }
 
-        const data = d.data || (d.data = {})
-        const attributes = d.attributes || {}
+        const data = d.data ?? (d.data = {})
+        const attributes = d.attributes ?? {}
 
         data.hName = 'a'
         data.hProperties = attributes
       } else if (d.name.match(IMAGE_DIR_REGEXP)) {
         /* image-* */
-        const match = d.name.match(IMAGE_DIR_REGEXP)
-        if (match && match[1] && VALID_TAGS_FOR_IMG.has(match[1])) {
-          const data = d.data || (d.data = {})
-          const attributes = d.attributes || {}
+        const match = IMAGE_DIR_REGEXP.exec(d.name)
+        if (match?.[1] && VALID_TAGS_FOR_IMG.has(match[1])) {
+          const data = d.data ?? (d.data = {})
+          const attributes = d.attributes ?? {}
 
           data.hName = match[1]
           data.hProperties = attributes
-
-          // node.children.splice(0, 1, node.children[0].children[0])
         } else {
           file.fail('The `image-*` directive failed to match a valid tag.', d)
         }
