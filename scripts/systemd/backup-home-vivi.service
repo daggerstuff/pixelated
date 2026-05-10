@@ -29,6 +29,7 @@ Environment=BACKUP_RCLONE_STATS=8s
 Environment="BACKUP_RCLONE_EXCLUDE_EXTRA=.codeql/** .git/** .local/share/Trash/** .cache/** .npm/** .cargo/** .pnpm-store/** .yarn/** .node-gyp/** .gradle/** .rustup/** .android/** .ssh/** .cache/pip/** .cache/ms-playwright/** .cache/Code/** .cache/google-chrome/** .cache/gh/** .cache/huggingface/* pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
 Environment="BACKUP_RCLONE_EXTRA_ARGS="
 Environment=BACKUP_HEARTBEAT_INTERVAL=30
+Environment=BACKUP_RUN_STATE_MAX_AGE_SECONDS=0
 # Optional: comma/newline-separated list of sections; defaults to all top-level home folders.
 Environment=BACKUP_SECTIONS=
 ExecStart=/usr/bin/env bash /home/vivi/pixelated/scripts/backup/backup-home-vivi.sh
