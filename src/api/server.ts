@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import express, { Express } from 'express'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import { closeSentry, Sentry, sentryMiddleware } from '../../config/instrument.mjs'
 
 import {
   connectMongoDB,
@@ -32,6 +33,16 @@ dotenv.config()
 const app: Express = express()
 const PORT = process.env.PORT || 5000
 const NODE_ENV = process.env.NODE_ENV || 'development'
+const hasSentryErrorHandler =
+  typeof Sentry.setupExpressErrorHandler === 'function' ||
+  typeof Sentry.expressErrorHandler === 'function'
+
+app.use(sentryMiddleware)
+if (typeof Sentry.setupExpressErrorHandler === 'function') {
+  Sentry.setupExpressErrorHandler(app)
+} else if (typeof Sentry.expressErrorHandler === 'function') {
+  app.use(Sentry.expressErrorHandler())
+}
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -105,6 +116,12 @@ app.use('/api/users', userRoutes)
 app.use(notFoundHandler)
 
 // Global error handler (must be last)
+if (!hasSentryErrorHandler) {
+  app.use((error: Error, _req, _res, next) => {
+    Sentry.captureException(error)
+    next(error)
+  })
+}
 app.use(errorHandler)
 
 // ============================================================================
@@ -164,6 +181,7 @@ async function startServer() {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...')
+  await closeSentry()
   if (mongoConnection) {
     await mongoConnection.disconnect()
   }
