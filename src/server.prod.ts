@@ -120,18 +120,16 @@ process.on('SIGTERM', async () => {
   })
 })
 
-  // Error handling
-  app.use(
-    (
-      error: Error,
-      _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction,
-    ) => {
+// Error handling
+app.use(
+  (
+    error: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
     console.error('❌ Error:', error)
-    if (Sentry) {
-      Sentry.captureException(error)
-    }
+    Sentry.captureException(error)
     res.status(500).json({
       error: 'Internal server error',
       message: isProduction

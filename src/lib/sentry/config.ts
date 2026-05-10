@@ -29,31 +29,34 @@ import type { Event } from '@sentry/astro'
  * by setting whichever env var they support, without changing app code.
  */
 export function resolveSentryRelease(fallback: string = '0.0.1'): string {
-  const env = import.meta.env as Record<string, any>
-  const procEnv = process.env as Record<string, any>
+  const env = import.meta.env as Record<string, unknown>
+  const procEnv = process.env as Record<string, unknown>
+
+  const toOptionalString = (value: unknown): string | undefined =>
+    typeof value === 'string' && value.length > 0 ? value : undefined
 
   const candidates: (string | undefined)[] = [
     // Explicit app / Sentry release
-    env['PUBLIC_SENTRY_RELEASE'],
-    env['PUBLIC_APP_VERSION'],
-    env['SENTRY_RELEASE'],
+    toOptionalString(env['PUBLIC_SENTRY_RELEASE']),
+    toOptionalString(env['PUBLIC_APP_VERSION']),
+    toOptionalString(env['SENTRY_RELEASE']),
 
     // Common hosting providers
-    env['VERCEL_GIT_COMMIT_SHA'],
-    env['RENDER_GIT_COMMIT'],
-    env['NETLIFY_COMMIT_REF'],
-    env['RAILWAY_GIT_COMMIT_SHA'],
+    toOptionalString(env['VERCEL_GIT_COMMIT_SHA']),
+    toOptionalString(env['RENDER_GIT_COMMIT']),
+    toOptionalString(env['NETLIFY_COMMIT_REF']),
+    toOptionalString(env['RAILWAY_GIT_COMMIT_SHA']),
 
     // Generic CI / git environments
-    env['GITHUB_SHA'],
-    env['CI_COMMIT_SHA'],
+    toOptionalString(env['GITHUB_SHA']),
+    toOptionalString(env['CI_COMMIT_SHA']),
     // Fallback to process.env for Node.js environments (server-side)
-    procEnv['SENTRY_RELEASE'],
-    procEnv['PUBLIC_SENTRY_RELEASE'],
-    procEnv['PUBLIC_APP_VERSION'],
-    procEnv['npm_package_version'],
-    procEnv['GITHUB_SHA'],
-    procEnv['CI_COMMIT_SHA'],
+    toOptionalString(procEnv['SENTRY_RELEASE']),
+    toOptionalString(procEnv['PUBLIC_SENTRY_RELEASE']),
+    toOptionalString(procEnv['PUBLIC_APP_VERSION']),
+    toOptionalString(procEnv['npm_package_version']),
+    toOptionalString(procEnv['GITHUB_SHA']),
+    toOptionalString(procEnv['CI_COMMIT_SHA']),
   ]
 
   const release = candidates.find(
@@ -64,27 +67,40 @@ export function resolveSentryRelease(fallback: string = '0.0.1'): string {
 }
 
 export function resolveSentryDsn(): string | undefined {
-  const env = import.meta.env as Record<string, any>
-  const procEnv = process.env as Record<string, any>
+  const env = import.meta.env as Record<string, unknown>
+  const procEnv = process.env as Record<string, unknown>
+
+  const toTrimmedString = (value: unknown): string | undefined => {
+    if (typeof value !== 'string') return undefined
+
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  }
 
   const candidates: (string | undefined)[] = [
-    env['PUBLIC_SENTRY_DSN'],
-    env['SENTRY_DSN'],
-    env['SENTRY_PUBLIC_DSN'],
-    env['VITE_SENTRY_DSN'],
+    toTrimmedString(env['PUBLIC_SENTRY_DSN']),
+    toTrimmedString(env['SENTRY_DSN']),
+    toTrimmedString(env['SENTRY_PUBLIC_DSN']),
+    toTrimmedString(env['VITE_SENTRY_DSN']),
     // Fallback to process.env for Node.js environments (server-side)
-    procEnv['SENTRY_DSN'],
-    procEnv['PUBLIC_SENTRY_DSN'],
-    procEnv['SENTRY_PUBLIC_DSN'],
-    procEnv['VITE_SENTRY_DSN'],
+    toTrimmedString(procEnv['SENTRY_DSN']),
+    toTrimmedString(procEnv['PUBLIC_SENTRY_DSN']),
+    toTrimmedString(procEnv['SENTRY_PUBLIC_DSN']),
+    toTrimmedString(procEnv['VITE_SENTRY_DSN']),
   ]
 
   const dsn = candidates.find(
-    (value): value is string => typeof value === 'string' && value.trim().length > 0,
+    (value): value is string => typeof value === 'string' && value.length > 0,
   )
 
-  if (import.meta.env.DEV || process.env.NODE_ENV !== 'production' || process.env.SENTRY_DEBUG) {
-    console.log(`[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`)
+  if (
+    import.meta.env.DEV ||
+    process.env.NODE_ENV !== 'production' ||
+    process.env.SENTRY_DEBUG
+  ) {
+    console.log(
+      `[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`,
+    )
   }
 
   return dsn
