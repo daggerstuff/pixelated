@@ -74,6 +74,22 @@ interface ThreatPattern {
   responseActions: string[]
 }
 
+type HealthMetricValue =
+  | string
+  | number
+  | boolean
+  | null
+  | HealthMetricValue[]
+  | { [key: string]: HealthMetricValue }
+
+interface HealthMetrics {
+  [key: string]: HealthMetricValue
+  timestamp: string
+  checksPerformed: string[]
+  issuesFound: number
+  overallStatus: 'healthy' | 'warning' | 'degraded' | 'critical'
+}
+
 /**
  * HIPAA++ Security Monitoring Service
  */
@@ -612,13 +628,11 @@ export class HIPAAMonitoringService extends EventEmitter {
         recommendedActions: alert.recommendedActions,
       }
 
-      await this.sns
-        .publish({
-          TopicArn: topicArn,
-          Subject: `HIPAA++ Security Alert: ${alert.title}`,
-          Message: JSON.stringify(message, null, 2),
-        })
-        .promise()
+      await this.sns.publish({
+        TopicArn: topicArn,
+        Subject: `HIPAA++ Security Alert: ${alert.title}`,
+        Message: JSON.stringify(message, null, 2),
+      })
 
       logger.info('Security alert notification sent', { alertId: alert.id })
     } catch (error: unknown) {
@@ -1033,11 +1047,11 @@ export class HIPAAMonitoringService extends EventEmitter {
           eventId: this.generateAlertId(),
           timestamp: now.toISOString(),
           action: 'critical_compliance_violation',
-          actor: 'system',
-          resource: 'hipaa_compliance_service',
+          userId: 'system',
           riskLevel: 'high',
           metadata: {
             complianceScore,
+            resource: 'hipaa_compliance_service',
             criticalIssues: complianceIssues.filter((issue) =>
               issue.includes('CRITICAL'),
             ),
@@ -1094,7 +1108,8 @@ export class HIPAAMonitoringService extends EventEmitter {
     try {
       // HIPAA requires key rotation based on risk assessment
       // Typically every 90 days for high-risk environments
-      const maxKeyAge = HIPAA_SECURITY_CONFIG.MAX_KEY_AGE_DAYS || 90
+      const maxKeyAge =
+        HIPAA_SECURITY_CONFIG.MAX_KEY_AGE_MS / (24 * 60 * 60 * 1000)
       const now = new Date()
 
       // Get recent key events
@@ -1263,7 +1278,7 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private checkRetentionPolicyCompliance(issues: string[]): void {
     try {
-      const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555 // 7 years
+      const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS // 7 years
       const now = new Date()
       const cutoffDate = new Date(
         now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000,
@@ -1280,15 +1295,13 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Check if retention policy is configured
-      const auditRetentionDays =
-        HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555
-      if (auditRetentionDays === 0) {
+      const auditRetentionDays = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
+      if (auditRetentionDays <= 0) {
         issues.push('HIPAA audit retention policy not configured')
       }
 
       // Verify automatic deletion is working (check for very old events)
-      const auditRetentionDays2 =
-        HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555
+      const auditRetentionDays2 = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
       const veryOldCutoff = new Date(
         now.getTime() - (auditRetentionDays2 + 30) * 24 * 60 * 60 * 1000,
       ) // 30 days past retention
@@ -1389,7 +1402,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       logger.debug('Starting system health check')
 
       const healthIssues: string[] = []
-      const healthMetrics: Record<string, any> = {
+      const healthMetrics: HealthMetrics = {
         timestamp: new Date().toISOString(),
         checksPerformed: [] as string[],
         issuesFound: 0,
@@ -1454,10 +1467,10 @@ export class HIPAAMonitoringService extends EventEmitter {
           eventId: this.generateAlertId(),
           timestamp: healthMetrics.timestamp,
           action: 'critical_system_health_issue',
-          actor: 'system',
-          resource: 'health_monitoring_service',
+          userId: 'system',
           riskLevel: 'critical',
           metadata: {
+            resource: 'health_monitoring_service',
             issues: healthIssues.filter((issue) => issue.includes('CRITICAL')),
             immediateActionRequired: true,
           },
@@ -1510,7 +1523,7 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private checkServiceAvailability(
     issues: string[],
-    metrics: Record<string, any>,
+    metrics: HealthMetrics,
   ): void {
     try {
       metrics.checksPerformed.push('service_availability')
@@ -1563,10 +1576,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   /**
    * Check AWS connectivity
    */
-  private checkAWSConnectivity(
-    issues: string[],
-    metrics: Record<string, any>,
-  ): void {
+  private checkAWSConnectivity(issues: string[], metrics: HealthMetrics): void {
     try {
       metrics.checksPerformed.push('aws_connectivity')
 
@@ -1620,7 +1630,7 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private checkResourceUtilization(
     issues: string[],
-    metrics: Record<string, any>,
+    metrics: HealthMetrics,
   ): void {
     try {
       metrics.checksPerformed.push('resource_utilization')
@@ -1689,7 +1699,7 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private validateConfiguration(
     issues: string[],
-    metrics: Record<string, any>,
+    metrics: HealthMetrics,
   ): void {
     try {
       metrics.checksPerformed.push('configuration_validation')
@@ -1713,8 +1723,8 @@ export class HIPAAMonitoringService extends EventEmitter {
       // Validate HIPAA configuration
       const configIssues: string[] = []
 
-      if (!HIPAA_SECURITY_CONFIG.MAX_KEY_AGE_DAYS) {
-        configIssues.push('MAX_KEY_AGE_DAYS not configured')
+      if (!HIPAA_SECURITY_CONFIG.MAX_KEY_AGE_MS) {
+        configIssues.push('MAX_KEY_AGE_MS not configured')
       }
 
       if (!HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS) {
@@ -1756,7 +1766,7 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private checkDatabaseConnectivity(
     issues: string[],
-    metrics: Record<string, any>,
+    metrics: HealthMetrics,
   ): void {
     try {
       metrics.checksPerformed.push('database_connectivity')
@@ -1796,7 +1806,7 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private checkEncryptionService(
     issues: string[],
-    metrics: Record<string, any>,
+    metrics: HealthMetrics,
   ): void {
     try {
       metrics.checksPerformed.push('encryption_service')
@@ -1869,12 +1879,10 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
       ]
 
-      await this.cloudWatch
-        .putMetricData({
-          Namespace: HIPAA_SECURITY_CONFIG.CLOUDWATCH_NAMESPACE,
-          MetricData: metricData,
-        })
-        .promise()
+      await this.cloudWatch.putMetricData({
+        Namespace: HIPAA_SECURITY_CONFIG.CLOUDWATCH_NAMESPACE,
+        MetricData: metricData,
+      })
 
       logger.debug('Security metrics emitted to CloudWatch')
     } catch (error: unknown) {

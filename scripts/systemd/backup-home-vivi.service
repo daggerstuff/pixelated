@@ -1,5 +1,5 @@
 [Unit]
-Description=Backup /home/vivi and upload to Google Drive
+Description=Backup /home/vivi and upload to S3
 After=network-online.target
 Wants=network-online.target
 
@@ -14,7 +14,7 @@ Environment=HOME=/home/vivi
 Environment=RCLONE_CONFIG=/home/vivi/.config/rclone/rclone.conf
 Environment=SOURCE_DIR=/home/vivi
 Environment=BACKUP_DIR=/home/vivi/.local/share/home_backups
-Environment=RCLONE_TARGET=gdrive:vivi-home-backups
+Environment=RCLONE_TARGET=HetznerS3:vivi-home-backups
 # Optional: upload directly into a specific subfolder within RCLONE_TARGET.
 # Leave empty to sync directly into RCLONE_TARGET.
 Environment=RCLONE_SYNC_PATH=
@@ -22,6 +22,12 @@ Environment=BACKUP_KEEP_RUNS=6
 Environment=BACKUP_RUN_PREFIX=home-vivi-run
 Environment=BACKUP_SECTION_STRICT_ERRORS=false
 Environment="BACKUP_SKIP_SECTIONS=.cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk"
+Environment=BACKUP_RCLONE_TRANSFERS=24
+Environment=BACKUP_RCLONE_CHECKERS=16
+Environment=BACKUP_RCLONE_FAST_LIST=true
+Environment=BACKUP_RCLONE_STATS=8s
+Environment="BACKUP_RCLONE_EXCLUDE_EXTRA=.codeql/** .git/** .local/share/Trash/** .cache/** .npm/** .cargo/** .pnpm-store/** .yarn/** .node-gyp/** .gradle/** .rustup/** .android/** .ssh/** .cache/pip/** .cache/ms-playwright/** .cache/Code/** .cache/google-chrome/** .cache/gh/** .cache/huggingface/*"
+Environment="BACKUP_RCLONE_EXTRA_ARGS="
 Environment=BACKUP_HEARTBEAT_INTERVAL=30
 # Optional: comma/newline-separated list of sections; defaults to all top-level home folders.
 Environment=BACKUP_SECTIONS=

@@ -4,7 +4,6 @@ import {
   StarIcon,
   UserGroupIcon,
   CalendarIcon,
-  BoltIcon,
 } from '@heroicons/react/24/outline'
 import type { FC, ComponentProps, ReactElement } from 'react'
 import React from 'react'
@@ -252,6 +251,16 @@ export const TherapistDashboard: FC = () => {
 /**
  * Overview Tab Component
  */
+type AnalyticsPoint = {
+  patientId: string
+  patientName: string
+  sessionsCompleted: number
+  avgMoodScore: number
+  progressScore: number
+  riskScore: number
+  lastContact: Date
+}
+
 const OverviewTab: FC<{
   patients: PatientSummary[]
   metrics: SessionMetrics
@@ -600,7 +609,7 @@ const PatientsTab: FC<{
  * Analytics Tab Component
  */
 const AnalyticsTab: FC<{
-  data: any[]
+  data: AnalyticsPoint[]
   timeRange: string
 }> = ({ data, timeRange }) => {
   const visualizationConfig = {
@@ -643,7 +652,7 @@ const AnalyticsTab: FC<{
         data={data}
         config={visualizationConfig}
         onInsightGenerated={(insight) => {
-          console.log('New insight generated:', insight)
+          console.info('New insight generated:', insight)
         }}
       />
     </div>

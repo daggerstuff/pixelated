@@ -40,7 +40,7 @@ export const TabSyncDemo: FC = () => {
       enableSync: true,
       debounceMs: 500,
       onSync: (value, tabId) => {
-        console.log(`Counter synced from tab ${tabId}:`, value)
+        console.info(`Counter synced from tab ${tabId}:`, value)
       },
     })
 
@@ -64,7 +64,7 @@ export const TabSyncDemo: FC = () => {
     debounceMs: 300,
     conflictStrategy: 'merge',
     onSync: (value, tabId) => {
-      console.log(`Preferences synced from tab ${tabId}:`, value)
+      console.info(`Preferences synced from tab ${tabId}:`, value)
     },
   })
 
