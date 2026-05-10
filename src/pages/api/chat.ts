@@ -1,10 +1,7 @@
 import { anthropic } from '@ai-sdk/anthropic'
-import { supermemoryTools } from '@supermemory/tools/ai-sdk'
 import { streamText } from 'ai'
-import type { ModelMessage, ToolSet } from 'ai'
+import type { ModelMessage } from 'ai'
 import { NextRequest } from 'next/server'
-
-import { getContextWithProfile, storeConversation } from '@/lib/supermemory'
 
 type MessageRequestBody = {
   userId: string
@@ -25,14 +22,6 @@ const toMessageRequestBody = (value: unknown): MessageRequestBody | null => {
   return { userId, message }
 }
 
-type SupermemoryToolsFactory = (
-  apiKey: string,
-  containerTags: string[],
-) => ToolSet
-
-// eslint-disable-next-line typescript/no-unsafe-type-assertion
-const createSupermemoryTools = supermemoryTools as SupermemoryToolsFactory
-
 export async function POST(request: NextRequest) {
   const requestBody = toMessageRequestBody(await request.json())
   if (!requestBody) {
@@ -48,34 +37,19 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { userId, message } = requestBody
+  const message = requestBody.message
 
-  // Get context with profile + search
-  const { context, profile } = await getContextWithProfile(userId, message)
-
-  // Build messages with context
   const messages: ModelMessage[] = [
     {
       role: 'system',
-      content: `User context:\nStatic facts: ${profile.static.join('\n')}\nRecent context: ${profile.dynamic.join('\n')}\nSearch context: ${context}`,
+      content: `You are a helpful AI therapist assistant.`
     },
     { role: 'user', content: message },
   ]
 
-  // Stream response with Supermemory tools
-  const tools = createSupermemoryTools(process.env.SUPERMEMORY_API_KEY ?? '', [
-    userId,
-  ])
-
   const result = streamText({
     model: anthropic('claude-3-5-sonnet-20241022'),
     messages,
-    tools,
-    onFinish: ({ text }) => {
-      if (typeof text === 'string') {
-        void storeConversation(userId, message, text)
-      }
-    },
   })
 
   return result.toTextStreamResponse()
