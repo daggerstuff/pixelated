@@ -31,7 +31,7 @@ declare module "k6/http" {
   export interface Response {
     status: number;
     body: string;
-    json<T>(): T;
+    json(): unknown;
   }
   export default http;
 }

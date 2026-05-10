@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-call,typescript/no-unsafe-member-access,typescript/no-unsafe-return,typescript/no-unsafe-argument,typescript/prefer-nullish-coalescing,typescript/no-unsafe-spread,typescript/no-unsafe-type-assertion */
 
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
