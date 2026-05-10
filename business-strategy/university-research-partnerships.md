@@ -340,7 +340,7 @@ preliminary results **Months 19-21**: Manuscript preparation and peer review
 
 ### Annual Research Budget ($500,000)
 
-**Research Grants (60% - $300,000)**
+### Research Grants (60% - $300,000)
 
 - **University Research Grants**: $50,000-$75,000 per university partnership
 - **Graduate Student Support**: PhD student stipends and research support
@@ -348,21 +348,21 @@ preliminary results **Months 19-21**: Manuscript preparation and peer review
   research costs
 - **Technology & Tools**: Research platform and assessment tool development
 
-**Publication & Dissemination (20% - $100,000)**
+### Publication & Dissemination (20% - $100,000)
 
 - **Publication Costs**: Journal publication fees and open-access charges
 - **Conference Participation**: Travel, registration, and presentation costs
 - **Research Dissemination**: Research dissemination and knowledge translation
 - **Marketing Materials**: Research-based marketing materials and case studies
 
-**Quality Assurance (15% - $75,000)**
+### Quality Assurance (15% - $75,000)
 
 - **External Validation**: Independent validation and peer review
 - **Statistical Analysis**: Advanced statistical analysis and data management
 - **Regulatory Compliance**: IRB fees, ethics review, and regulatory compliance
 - **Quality Monitoring**: Continuous quality monitoring and improvement
 
-**Partnership Management (5% - $25,000)**
+### Partnership Management (5% - $25,000)
 
 - **Relationship Management**: Partnership coordination and relationship
   management

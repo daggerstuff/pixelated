@@ -25,6 +25,13 @@ vi.mock('../../utils/common', () => ({
   slug: vi.fn((str) => str.toLowerCase().replace(/\s+/g, '-')),
 }))
 
+type MockModel = {
+  new (data?: Record<string, unknown>): { save: ReturnType<typeof vi.fn> }
+  findById: ReturnType<typeof vi.fn>
+  find: ReturnType<typeof vi.fn>
+  countDocuments: ReturnType<typeof vi.fn>
+}
+
 describe('Project Service', () => {
   // Mock data
   const mockUserId = 'user-123'
@@ -54,14 +61,14 @@ describe('Project Service', () => {
   }
 
   // Mock Model constructor - needs to work with 'new' keyword
-  function MockModelConstructor(data: any) {
+  function MockModelConstructor(data: Record<string, unknown> = {}) {
     const instance = Object.create(mockProjectInstance)
     Object.assign(instance, data)
     instance.save = vi.fn(() => Promise.resolve(instance))
     return instance
   }
 
-  const MockModel = MockModelConstructor as any
+  const MockModel = MockModelConstructor as unknown as MockModel
   MockModel.findById = vi.fn()
   MockModel.find = vi.fn(() => ({
     limit: vi.fn(() => ({
@@ -80,11 +87,13 @@ describe('Project Service', () => {
     vi.clearAllMocks()
 
     // Setup mocks - MockModel is a constructor that returns mockProjectInstance
-    ;(getMongoConnection as any).mockReturnValue({
+    ;(vi.mocked(getMongoConnection) as ReturnType<typeof vi.fn>).mockReturnValue({
       model: vi.fn(() => MockModel),
     })
 
-    ;(getPostgresPool as any).mockReturnValue(mockPool)
+    ;(vi.mocked(getPostgresPool) as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockPool,
+    )
 
     // Reset mock instances
     mockProjectInstance.save.mockResolvedValue(mockProjectInstance)

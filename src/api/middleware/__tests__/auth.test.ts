@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { NextFunction, Request, Response } from 'express'
 
 const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
 
@@ -18,14 +19,17 @@ vi.mock('../../../lib/auth/user-identity', () => ({
 import { authMiddleware, requirePermissions, requireRoles } from '../auth'
 
 describe('Authentication Middleware', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: Request
+  let mockResponse: Response
+  let mockNext: NextFunction
+  const statusSpy = vi.fn().mockReturnThis()
+  const jsonSpy = vi.fn()
 
   beforeEach(() => {
-    mockRequest = {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    mockRequest = ({
       protocol: 'http',
-      get: vi.fn((header: string) => {
+      get: ((header: string): string | string[] | undefined => {
         const headers: Record<string, string> = {
           host: 'localhost:3000',
           authorization: 'Bearer test-token',
@@ -37,12 +41,15 @@ describe('Authentication Middleware', () => {
       headers: {
         authorization: 'Bearer test-token',
       },
-    }
-    mockResponse = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn(),
-    }
-    mockNext = vi.fn()
+    }) as unknown as Request
+    statusSpy.mockClear()
+    jsonSpy.mockClear()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    mockResponse = ({
+      status: statusSpy,
+      json: jsonSpy,
+    }) as unknown as Response
+    mockNext = vi.fn() as NextFunction
 
     vi.clearAllMocks()
   })
@@ -79,8 +86,8 @@ describe('Authentication Middleware', () => {
 
       await authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(401)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      expect(statusSpy).toHaveBeenCalledWith(401)
+      expect(jsonSpy).toHaveBeenCalledWith({
         error: 'Invalid token',
         code: 'UNAUTHORIZED',
       })
@@ -91,8 +98,8 @@ describe('Authentication Middleware', () => {
 
       await authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(401)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      expect(statusSpy).toHaveBeenCalledWith(401)
+      expect(jsonSpy).toHaveBeenCalledWith({
         error: 'Auth service error',
         code: 'AUTH_ERROR',
       })
@@ -107,14 +114,14 @@ describe('Authentication Middleware', () => {
 
       await authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(401)
+      expect(statusSpy).toHaveBeenCalledWith(401)
     })
   })
 
   describe('requireRoles', () => {
     it('should call next when user has required role', async () => {
       const middleware = requireRoles(['admin', 'moderator'])
-      mockRequest.user = { roles: ['admin', 'user'] }
+      mockRequest.user = { id: 'user-123', roles: ['admin', 'user'] }
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -127,8 +134,8 @@ describe('Authentication Middleware', () => {
 
       middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(401)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      expect(statusSpy).toHaveBeenCalledWith(401)
+      expect(jsonSpy).toHaveBeenCalledWith({
         error: 'Authentication required',
         code: 'UNAUTHORIZED',
       })
@@ -136,12 +143,12 @@ describe('Authentication Middleware', () => {
 
     it('should return 403 when user lacks required role', async () => {
       const middleware = requireRoles(['admin'])
-      mockRequest.user = { roles: ['user', 'editor'] }
+      mockRequest.user = { id: 'user-123', roles: ['user', 'editor'] }
 
       middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(403)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      expect(statusSpy).toHaveBeenCalledWith(403)
+      expect(jsonSpy).toHaveBeenCalledWith({
         error: 'Insufficient permissions',
         code: 'FORBIDDEN',
         required: ['admin'],
@@ -150,7 +157,7 @@ describe('Authentication Middleware', () => {
 
     it('should accept any of multiple allowed roles', async () => {
       const middleware = requireRoles(['admin', 'moderator', 'editor'])
-      mockRequest.user = { roles: ['editor', 'user'] }
+      mockRequest.user = { id: 'user-123', roles: ['editor', 'user'] }
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -161,7 +168,10 @@ describe('Authentication Middleware', () => {
   describe('requirePermissions', () => {
     it('should call next when user has required permission', async () => {
       const middleware = requirePermissions(['documents:read'])
-      mockRequest.user = { permissions: ['documents:read', 'documents:write'] }
+      mockRequest.user = {
+        id: 'user-123',
+        permissions: ['documents:read', 'documents:write'],
+      }
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -174,17 +184,17 @@ describe('Authentication Middleware', () => {
 
       middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(401)
+      expect(statusSpy).toHaveBeenCalledWith(401)
     })
 
     it('should return 403 when user lacks permission', async () => {
       const middleware = requirePermissions(['admin:delete'])
-      mockRequest.user = { permissions: ['documents:read'] }
+      mockRequest.user = { id: 'user-123', permissions: ['documents:read'] }
 
       middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(403)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      expect(statusSpy).toHaveBeenCalledWith(403)
+      expect(jsonSpy).toHaveBeenCalledWith({
         error: 'Insufficient permissions',
         code: 'FORBIDDEN',
         required: ['admin:delete'],
@@ -196,11 +206,11 @@ describe('Authentication Middleware', () => {
         'documents:read',
         'documents:write',
       ])
-      mockRequest.user = { permissions: ['documents:read'] }
+      mockRequest.user = { id: 'user-123', permissions: ['documents:read'] }
 
       middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(403)
+      expect(statusSpy).toHaveBeenCalledWith(403)
     })
   })
 })
