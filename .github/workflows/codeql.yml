@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -50,13 +50,13 @@ jobs:
 
       - name: Setup Node.js
         if: matrix.language == 'javascript'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.6
         with:
           version: 11.0.9
           run_install: false
@@ -90,7 +90,7 @@ jobs:
 
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run: pnpm install --no-frozen-lockfile --ignore-scripts
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'

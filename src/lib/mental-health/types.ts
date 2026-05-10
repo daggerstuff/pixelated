@@ -100,6 +100,9 @@ export interface AnalysisConfig {
   sensitivity: 'low' | 'medium' | 'high'
   maxContextLength: number
   enableAnalysis?: boolean
+  confidenceThreshold?: number
+  interventionThreshold?: number
+  analysisMinLength?: number
 }
 
 // Enhanced mental health analysis

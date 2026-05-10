@@ -14,7 +14,7 @@ interface AuditData {
   action: string
   resource?: string
   resourceId?: string
-  changes?: any
+  changes?: unknown
   timestamp?: number
 }
 
@@ -58,6 +58,20 @@ export function getActionType(method: string): string {
   return methodMap[method.toUpperCase()] || 'UNKNOWN'
 }
 
+interface MockRequest {
+  method: string
+  url: string
+  ip: string
+  headers?: Record<string, string>
+}
+
+interface MockResponse {
+  statusCode: number
+  on: (event: string, listener: () => void) => void
+}
+
+type MockNext = () => void
+
 export function getResourceType(path: string): string {
   const parts = path.split('/').filter(Boolean)
 
@@ -83,7 +97,11 @@ export function getResourceId(path: string): string | undefined {
   return parts[parts.length - 1]
 }
 
-export async function requestLogger(req: any, res: any, next: any) {
+export async function requestLogger(
+  req: MockRequest,
+  res: MockResponse,
+  next: MockNext,
+) {
   const startTime = Date.now()
   const { method, url, ip } = req
 
@@ -96,13 +114,13 @@ export async function requestLogger(req: any, res: any, next: any) {
     )
   })
 
-  next?.()
+  next()
 }
 
 describe('Logger Middleware', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: MockRequest
+  let mockResponse: MockResponse
+  let mockNext: MockNext
 
   beforeEach(() => {
     mockRequest = {
@@ -151,8 +169,8 @@ describe('Logger Middleware', () => {
     })
 
     it('should capture request duration', async () => {
-      let finishCallback: any
-      mockResponse.on = vi.fn((_, cb) => {
+      let finishCallback: () => void = () => {}
+      mockResponse.on = vi.fn((_: string, cb: () => void) => {
         finishCallback = cb
       })
 
