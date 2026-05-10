@@ -15,13 +15,20 @@ import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceR
 import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
 
-import '../config/instrument.mjs'
+import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 
 const app = express()
-import { Sentry, sentryMiddleware } from '../config/instrument.mjs'
+const hasSentryErrorHandler =
+  typeof Sentry.setupExpressErrorHandler === 'function' ||
+  typeof Sentry.expressErrorHandler === 'function'
 
 // The Sentry request handler must be the first middleware on the app
 app.use(sentryMiddleware)
+if (typeof Sentry.setupExpressErrorHandler === 'function') {
+  Sentry.setupExpressErrorHandler(app)
+} else if (typeof Sentry.expressErrorHandler === 'function') {
+  app.use(Sentry.expressErrorHandler())
+}
 
 // Environment setup
 const PORT = productionConfig.port
@@ -113,6 +120,7 @@ const socketService = new SocketService(server, redis, db)
 process.on('SIGTERM', async () => {
   console.log('🔄 SIGTERM received, shutting down gracefully')
 
+  await closeSentry()
   await redis.quit()
   await db.end()
   server.close(() => {
@@ -130,7 +138,9 @@ app.use(
     _next: express.NextFunction,
   ) => {
     console.error('❌ Error:', error)
-    Sentry.captureException(error)
+    if (!hasSentryErrorHandler) {
+      Sentry.captureException(error)
+    }
     res.status(500).json({
       error: 'Internal server error',
       message: isProduction

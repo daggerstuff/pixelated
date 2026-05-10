@@ -1,6 +1,7 @@
 import { createServer } from 'http'
 import { parse } from 'url'
 
+import { closeSentry, Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { apiMetrics, emotionMetrics } from '../../sentry/utils'
 import type { AIMessage, AIServiceOptions } from '../models/ai-types'
@@ -10,9 +11,6 @@ import {
   initializeProviders,
 } from '../providers'
 import type { AIProviderType } from '../providers'
-
-// IMPORTANT: Import Sentry instrumentation at the very top
-import '../../../../config/instrument.mjs'
 
 const appLogger = createBuildSafeLogger('ai-server')
 
@@ -476,6 +474,7 @@ Respond in JSON format with the following structure:
         this.server = createServer((req, res) => {
           this.handleRequest(req, res).catch((error) => {
             appLogger.error('Unhandled request error:', error)
+            Sentry.captureException(error)
             if (!res.headersSent) {
               this.sendJsonResponse(res, 500, {
                 success: false,
@@ -505,6 +504,7 @@ Respond in JSON format with the following structure:
 
         this.server.on('error', (error) => {
           appLogger.error('Server error:', error)
+          Sentry.captureException(error)
           reject(error)
         })
       } catch (error: unknown) {
@@ -531,11 +531,25 @@ Respond in JSON format with the following structure:
 const aiServer = new AIServer()
 
 // Graceful shutdown
-process.on('SIGTERM', () => aiServer.stop().then(() => process.exit(0)))
-process.on('SIGINT', () => aiServer.stop().then(() => process.exit(0)))
+process.on('SIGTERM', () => {
+  void aiServer
+    .stop()
+    .finally(() => closeSentry())
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1))
+})
+process.on('SIGINT', () => {
+  void aiServer
+    .stop()
+    .finally(() => closeSentry())
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1))
+})
 
 // Start server
 aiServer.start().catch((error) => {
   console.error('Failed to start AI service:', error)
+  Sentry.captureException(error)
+  void closeSentry()
   process.exit(1)
 })

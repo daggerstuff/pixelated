@@ -9,7 +9,7 @@ import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
 import { SocketService } from './services/socketService'
 
-import '../config/instrument.mjs'
+import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import 'dotenv/config'
 
 type RedisLike = {
@@ -20,10 +20,18 @@ type RedisLike = {
 
 const app = express()
 const server = createServer(app)
-import { sentryMiddleware } from '../config/instrument.mjs'
+
+const hasSentryErrorHandler =
+  typeof Sentry.setupExpressErrorHandler === 'function' ||
+  typeof Sentry.expressErrorHandler === 'function'
 
 // The Sentry request handler must be the first middleware on the app
 app.use(sentryMiddleware)
+if (typeof Sentry.setupExpressErrorHandler === 'function') {
+  Sentry.setupExpressErrorHandler(app)
+} else if (typeof Sentry.expressErrorHandler === 'function') {
+  app.use(Sentry.expressErrorHandler())
+}
 
 // Environment variables
 const PORT = process.env.WS_PORT ?? 3001
@@ -100,6 +108,30 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+app.use(
+  (
+    error: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    console.error('Unhandled server error:', error)
+    if (!hasSentryErrorHandler) {
+      Sentry.captureException(error)
+    }
+    if (res.headersSent) {
+      return
+    }
+    res.status(500).json({
+      error: 'Internal server error',
+      message:
+        process.env.NODE_ENV === 'production'
+          ? 'Something went wrong'
+          : error.message,
+    })
+  },
+)
+
 // Create Socket.IO service
 const socketService = new SocketService(server, redis, db)
 
@@ -109,6 +141,7 @@ process.on('SIGTERM', async () => {
 
   await redis.quit()
   await db.end()
+  await closeSentry()
   server.close(() => {
     console.log('Server closed')
     process.exit(0)
