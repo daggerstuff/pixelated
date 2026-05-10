@@ -61,6 +61,18 @@ type ProjectListResult = {
 };
 
 type ProjectQuery = Record<string, unknown>;
+type ProjectQueryChain = {
+  limit: (limit: number) => ProjectQueryChain;
+  skip: (count: number) => ProjectQueryChain;
+  sort: (sort: { createdAt: -1 | 1 }) => Promise<Project[]>;
+};
+type ProjectModelData = Omit<Project, "save">;
+type ProjectModel = {
+  new (data: ProjectModelData): Project;
+  findById(id: string): Promise<Project | null>;
+  find(query: ProjectQuery): ProjectQueryChain;
+  countDocuments(query: ProjectQuery): Promise<number>;
+};
 
 type ProjectUpdates = Partial<{
   name: string;
@@ -77,18 +89,9 @@ type ObjectiveInput = {
   deadline?: Date;
 };
 
-type ProjectQueryBuilder = {
-  limit: (limit: number) => ProjectQueryBuilder;
-  skip: (count: number) => ProjectQueryBuilder;
-  sort: (sort: { createdAt: -1 | 1 }) => Promise<Project[]>;
-};
-
-type ProjectModel = {
-  new (data: Omit<Project, "save">): Project;
-  findById(id: string): Promise<Project | null>;
-  find(query: ProjectQuery): ProjectQueryBuilder;
-  countDocuments(query: ProjectQuery): Promise<number>;
-};
+function getProjectModel(): ProjectModel {
+  return getMongoConnection().model<ProjectModelData, ProjectModel>("Project");
+}
 
 /**
  * Create a new project
@@ -101,9 +104,7 @@ export async function createProject(data: {
   stakeholders?: string[];
   budget?: number;
 }): Promise<Project> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
   const pool = getPostgresPool();
 
   const projectId = uuid();
@@ -156,9 +157,7 @@ export async function getProject(
   projectId: string,
   userId: string,
 ): Promise<Project> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
 
   const project = await ProjectModel.findById(projectId);
 
@@ -182,9 +181,7 @@ export async function updateProject(
   userId: string,
   updates: ProjectUpdates,
 ): Promise<Project> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
   const pool = getPostgresPool();
 
   const project = await ProjectModel.findById(projectId);
@@ -247,9 +244,7 @@ export async function addObjective(
   userId: string,
   objective: ObjectiveInput,
 ): Promise<Project> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
 
   const project = await ProjectModel.findById(projectId);
 
@@ -287,16 +282,9 @@ export async function addObjective(
  */
 export async function listProjects(
   userId: string,
-  options: {
-    page?: number;
-    limit?: number;
-    category?: string;
-    status?: string;
-  } = {},
+  options: ProjectListQuery = {},
 ): Promise<ProjectListResult> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
   const page = options.page ?? 1;
   const limit = options.limit ?? 50;
   const skip = (page - 1) * limit;
@@ -334,9 +322,7 @@ export async function searchProjects(
   userId: string,
   limit: number = 50,
 ): Promise<Project[]> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
 
   const foundProjects = await ProjectModel.find({
     $text: { $search: query },
@@ -357,9 +343,7 @@ export async function shareProject(
   targetUserId: string,
   permissionLevel: "view" | "edit" | "comment",
 ): Promise<Project> {
-  const ProjectModel = getMongoConnection().model<Project>(
-    "Project",
-  ) as ProjectModel;
+  const ProjectModel = getProjectModel();
 
   const project = await ProjectModel.findById(projectId);
 

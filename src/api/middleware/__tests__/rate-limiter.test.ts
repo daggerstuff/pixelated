@@ -16,7 +16,7 @@ type MockResponse = {
   setHeader: (name: string, value: string) => MockResponse;
   set: (name: string, value: string) => MockResponse;
 };
-type NextFunctionMock = ReturnType<typeof vi.fn<NextFunction>>;
+type NextFunctionMock = NextFunction;
 
 function createMockResponse(): MockResponse {
   return {
@@ -60,7 +60,7 @@ describe("Rate Limiter Middleware", () => {
       headers: {},
     };
     mockResponse = createMockResponse();
-    mockNext = vi.fn<NextFunction>();
+    mockNext = vi.fn() as NextFunction;
 
     vi.clearAllMocks();
   });

@@ -15,9 +15,12 @@ type MockResponse = {
   set?: (field: string, value: string | string[]) => MockResponse;
   on: (event: string, listener: (...args: unknown[]) => void) => void;
 };
-type TestMiddleware = ReturnType<typeof vi.fn>;
 type ErrorHandlingMiddleware = (req: TestRequest, res: MockResponse, next: NextFunction) => void | Promise<void>;
-type NextFunctionMock = ReturnType<typeof vi.fn<NextFunction>>;
+type TestMiddleware = ReturnType<typeof vi.fn<ErrorHandlingMiddleware>>;
+type NextFunctionMock = NextFunction;
+function createMockNext(): NextFunction {
+  return vi.fn() as NextFunction;
+}
 
 function createMockResponse(): MockResponse {
   return {
@@ -73,9 +76,9 @@ let mockRequestLogger: TestMiddleware;
 beforeEach(() => {
   vi.clearAllMocks();
 
-  mockAuthMiddleware = vi.fn();
-  mockRateLimiter = vi.fn();
-  mockRequestLogger = vi.fn();
+  mockAuthMiddleware = vi.fn<ErrorHandlingMiddleware>();
+  mockRateLimiter = vi.fn<ErrorHandlingMiddleware>();
+  mockRequestLogger = vi.fn<ErrorHandlingMiddleware>();
 });
 
 describe("Middleware Stack Integration", () => {
@@ -91,7 +94,7 @@ describe("Middleware Stack Integration", () => {
       method: "GET",
     } as TestRequest;
     mockResponse = createMockResponse();
-    mockNext = vi.fn<NextFunction>();
+    mockNext = createMockNext();
   });
 
   it("should process middleware in correct order: logger -> rateLimit -> auth", async () => {
@@ -267,14 +270,21 @@ describe("Middleware Error Scenarios", () => {
     mockRedis.get.mockRejectedValue(new Error("Redis connection failed"));
 
     mockRateLimiter = vi.fn<ErrorHandlingMiddleware>().mockImplementation(
-      (req: TestRequest, res: MockResponse, next: NextFunction) => {
-      throw new Error("Redis connection failed");
+      async (req: TestRequest, res: MockResponse, next: NextFunction) => {
+        throw new Error("Redis connection failed");
       },
     );
 
-    expect(() => {
-      mockRateLimiter(mockRequest, mockResponse, vi.fn());
-    }).toThrow();
+    let rateLimiterError: unknown;
+    try {
+      await mockRateLimiter(mockRequest, mockResponse, () => {});
+    } catch (error: unknown) {
+      rateLimiterError = error;
+    }
+    if (!(rateLimiterError instanceof Error)) {
+      throw new Error("Expected error to be thrown");
+    }
+    expect(rateLimiterError.message).toBe("Redis connection failed");
   });
 
   it("should handle authentication service unavailable", async () => {
@@ -282,25 +292,41 @@ describe("Middleware Error Scenarios", () => {
       new Error("Auth service unavailable"),
     );
 
-    mockAuthMiddleware = vi.fn<ErrorHandlingMiddleware>().mockImplementation(async (_req: TestRequest, _res: MockResponse, _next: NextFunction) => {
-      throw new Error("Auth service unavailable");
-    });
+    mockAuthMiddleware = vi.fn<ErrorHandlingMiddleware>().mockImplementation(
+      async (_req: TestRequest, _res: MockResponse, _next: NextFunction) => {
+        throw new Error("Auth service unavailable");
+      },
+    );
 
-    expect(() => {
-      mockAuthMiddleware(mockRequest, mockResponse, vi.fn());
-    }).toThrow();
+    let authError: unknown;
+    try {
+      await mockAuthMiddleware(mockRequest, mockResponse, () => {});
+    } catch (error: unknown) {
+      authError = error;
+    }
+    if (!(authError instanceof Error)) {
+      throw new Error("Expected error to be thrown");
+    }
+    expect(authError.message).toBe("Auth service unavailable");
   });
 
   it("should handle logger failure gracefully", async () => {
     mockRequestLogger = vi.fn<ErrorHandlingMiddleware>().mockImplementation(
-      (req: TestRequest, res: MockResponse, next: NextFunction) => {
-      throw new Error("Logger failed");
+      async (req: TestRequest, res: MockResponse, next: NextFunction) => {
+        throw new Error("Logger failed");
       },
     );
 
-    expect(() => {
-      mockRequestLogger(mockRequest, mockResponse, vi.fn());
-    }).toThrow();
+    let loggerError: unknown;
+    try {
+      await mockRequestLogger(mockRequest, mockResponse, () => {});
+    } catch (error: unknown) {
+      loggerError = error;
+    }
+    if (!(loggerError instanceof Error)) {
+      throw new Error("Expected error to be thrown");
+    }
+    expect(loggerError.message).toBe("Logger failed");
   });
 });
 
@@ -312,7 +338,7 @@ describe("Middleware Context Preservation", () => {
   beforeEach(() => {
     mockRequest = { ip: "192.168.1.1", headers: {} } as TestRequest;
     mockResponse = createMockResponse();
-    mockNext = vi.fn<NextFunction>();
+    mockNext = createMockNext();
   });
 
   it("should preserve request context across middlewares", async () => {

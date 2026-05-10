@@ -226,7 +226,7 @@ declare module "mongoose" {
       event: "connected" | "error" | "disconnected",
       listener: (error: unknown) => void,
     ): this;
-    model<T>(name: string): Model<T>;
+    model<T>(name: string, _schema?: unknown, _modelType?: T): Model<T>;
     startSession(): Promise<Session>;
   }
 

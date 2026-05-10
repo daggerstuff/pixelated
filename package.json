@@ -35,7 +35,7 @@
     "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
     "format:check": "oxfmt --check . && prettier --check \"**/*.astro\"",
     "format:check:changed": "node scripts/ci/format-changed.mjs",
-    "format:jules-markdown": "node scripts/ci/format-jules-markdown.mjs",
+    "format:jules-markdown": "tsx scripts/ci/format-jules-markdown.ts",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:markdown": "pnpm exec markdownlint --config .markdownlint.json --ignore node_modules --ignore '**/node_modules/**' \"**/*.md\" \"**/*.mdx\"",
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
