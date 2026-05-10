@@ -1,0 +1,442 @@
+---
+/**
+ * Professional Hero Component
+ * Enterprise-grade hero section for healthcare/clinical SaaS
+ */
+import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
+import HeroContent from '@/components/homepage/HeroContent.astro'
+import HeroStage from '@/components/homepage/HeroStage.astro'
+
+export interface Props {
+  kicker?: string
+  title?: string
+  subtitle?: string
+  helperText?: string
+  proofPoints?: readonly { label: string; text: string }[]
+  primaryCTA?: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
+}
+
+const {
+  kicker,
+  title,
+  subtitle,
+  helperText,
+  proofPoints = [],
+  primaryCTA,
+  secondaryCTA,
+} = Astro.props
+---
+
+<section class="hero hero-section" data-component="professional-hero">
+  <div class="hero-background">
+    <div class="hero-gradient"></div>
+    <div class="hero-grid-overlay"></div>
+  </div>
+
+  <div class="container hero-shell">
+    <div class="hero-content-wrapper">
+      {kicker && (
+        <div class="hero-kicker-wrapper">
+          <div class="hero-kicker-pill">
+            <span class="hero-kicker-dot"></span>
+            <span class="hero-kicker">{kicker}</span>
+          </div>
+        </div>
+      )}
+
+      <div class="hero-text-content">
+        <h1 class="hero-title">{title}</h1>
+        <p class="hero-subtitle">{subtitle}</p>
+        {helperText && <p class="hero-helper">{helperText}</p>}
+      </div>
+
+      <div class="hero-actions">
+        <div class="hero-action-buttons">
+          {primaryCTA && (
+            <a href={primaryCTA.href} class="btn-primary" role="button">
+              {primaryCTA.text}
+            </a>
+          )}
+          {secondaryCTA && (
+            <a href={secondaryCTA.href} class="btn-secondary" role="button">
+              {secondaryCTA.text}
+            </a>
+          )}
+        </div>
+      </div>
+
+      {proofPoints.length > 0 && (
+        <div class="hero-proof-grid" aria-label="Why choose Pixelated Empathy">
+          {proofPoints.map((point) => (
+            <div class="hero-proof-card">
+              <div class="hero-proof-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div class="hero-proof-content">
+                <span class="hero-proof-label">{point.label}</span>
+                <p>{point.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div class="hero-trust-indicators">
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <span>HIPAA-ready</span>
+        </div>
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Enterprise security</span>
+        </div>
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+          <span>Live support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.hero {
+  position: relative;
+  min-height: min(100dvh, 56rem);
+  padding: clamp(5rem, 10vh, 7rem) 0 clamp(4rem, 6vh, 5rem);
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.hero-section {
+  border-bottom: 1px solid rgba(var(--border-primary-rgb, 229, 231, 235), 0.4);
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.04) 0%,
+    rgba(37, 99, 235, 0.02) 50%,
+    transparent 100%
+  );
+}
+
+.hero-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.6;
+}
+
+.hero-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 3vw, 2rem);
+}
+
+.hero-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 2.5vw, 2rem);
+  align-items: center;
+  text-align: center;
+}
+
+/* Kicker Pill */
+.hero-kicker-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-kicker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.hero-kicker-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #2563EB;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.hero-kicker {
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1e40af;
+}
+
+/* Text Content */
+.hero-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 42rem;
+}
+
+.hero-title {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #1e293b;
+  text-wrap: balance;
+}
+
+.hero-subtitle {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.65;
+  color: #475569;
+  text-wrap: pretty;
+}
+
+.hero-helper {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+/* Action Buttons */
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.hero-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-button, 0.5rem);
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: all 200ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: #2563EB;
+  color: white;
+  border: 1px solid rgba(37, 99, 235, 0.9);
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.1);
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: white;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+}
+
+/* Proof Grid */
+.hero-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 42rem;
+  margin: 0;
+}
+
+.hero-proof-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: var(--radius-card, 0.75rem);
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.hero-proof-icon {
+  flex-shrink: 0;
+  color: #2563EB;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 999px;
+  padding: 0.4rem;
+}
+
+.hero-proof-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hero-proof-label {
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2563EB;
+}
+
+.hero-proof-content p {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #475569;
+}
+
+/* Trust Indicators */
+.hero-trust-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  font-family: 'Plus Jakarta Sans', var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #059669;
+}
+
+.trust-badge svg {
+  color: #059669;
+}
+
+/* Desktop */
+@media (min-width: 1040px) {
+  .hero {
+    align-items: center;
+    min-height: min(88dvh, 52rem);
+    padding-top: clamp(4rem, 7vh, 6rem);
+    padding-bottom: clamp(3.5rem, 6vh, 5rem);
+  }
+
+  .hero-content-wrapper {
+    gap: 1.75rem;
+  }
+
+  .hero-proof-grid {
+    gap: 1.15rem;
+  }
+
+  .hero-proof-card {
+    padding: 1.15rem;
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding-top: 4.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .hero-proof-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .hero-action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+
+  .hero-trust-indicators {
+    justify-content: center;
+  }
+}
+</style>

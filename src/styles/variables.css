@@ -1,39 +1,46 @@
 /* ================================================
-   TECHNICAL-HUMANIST DESIGN SYSTEM - CORE TOKENS
-   Fusing Opencode.ai Architecture with Mizu Fluidity
+   PROFESSIONAL HEALTHCARE SaaS DESIGN SYSTEM
+   Updated for enterprise clinical training platform
    ================================================ */
 
 :root {
-  /* === THE CANVAS (Warm Terminal) === */
-  --bg-primary: #201d1d; /* Warm Near-Black */
-  --bg-secondary: #302c2c; /* Elevated Dark Surface */
-  --bg-glass: rgba(48, 44, 44, 0.74); /* Glassmorphic Base */
-  --text-primary: #f7f3eb; /* Warm Off-White */
-  --text-secondary: #c7bfb7; /* Editorial secondary copy */
-  --text-muted: #a1958b; /* Muted labels */
+  /* === THE CANVAS (Clean Professional) === */
+  --bg-primary: #ffffff; /* Clean white */
+  --bg-secondary: #f8fafc; /* Subtle gray-blue */
+  --bg-glass: rgba(255, 255, 255, 0.8); /* Glassmorphic Base */
+  --text-primary: #1e293b; /* Professional dark slate */
+  --text-secondary: #475569; /* Editorial secondary copy */
+  --text-muted: #64748b; /* Muted labels */
 
-  /* === VIVID ACCENTS === */
-  --accent-primary: #0d9488; /* Vivid Mizu Orange */
-  --accent-primary-rgb: 255, 107, 0;
-  --accent-secondary: #007aff; /* System Blue */
+  /* === TRUST ACCENTS (Healthcare/Enterprise) === */
+  --accent-primary: #2563EB; /* Trust blue - primary action */
+  --accent-primary-rgb: 37, 99, 235;
+  --accent-secondary: #3B82F6; /* Lighter blue - secondary */
+  --accent-success: #059669; /* Clinical success/green */
 
-  /* === SEMANTIC COLORS (Apple HIG) === */
-  --success: #30d158;
-  --warning: #ff9f0a;
-  --danger: #ff3b30;
+  /* === SEMANTIC COLORS (Accessible) === */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
   /* === STRUCTURAL === */
-  --border-subtle: rgba(253, 252, 252, 0.08); /* Hairline */
-  --divider-dotted: rgba(253, 252, 252, 0.11); /* Dotted lines */
-  --divider-weak: rgba(253, 252, 252, 0.05); /* Very subtle divider */
-  --bg-surface-ghost: rgba(253, 252, 252, 0.02); /* Ghostly background */
-  --radius-sm: 8px; /* Standard components */
-  --radius-md: 10px; /* Inputs */
+  --border-subtle: rgba(229, 231, 235, 0.4); /* Hairline */
+  --border-primary: #e5e7eb;
+  --border-primary-rgb: 229, 231, 235;
+  --divider-dotted: rgba(148, 163, 184, 0.2); /* Dotted lines */
+  --divider-weak: rgba(148, 163, 184, 0.1); /* Very weak divider */
+  --bg-surface-ghost: rgba(249, 250, 251, 0.8); /* Ghostly background */
+  --radius-sm: 6px; /* Standard components */
+  --radius-md: 8px; /* Inputs */
+  --radius-lg: 12px; /* Cards */
+  --radius-xl: 16px; /* Large containers */
+  --radius-button: 8px; /* Buttons */
+  --radius-card: 12px; /* Cards */
 
   /* === ANIMATION === */
   --duration-fast: 0.15s;
-  --duration-normal: 0.25s;
-  --duration-slow: 0.4s;
+  --duration-normal: 0.2s;
+  --duration-slow: 0.3s;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* Apple-style ease-out */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
