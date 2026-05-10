@@ -2,7 +2,80 @@
 
 import { createServer } from 'node:http'
 
-import { Sentry, closeSentry } from '../../config/instrument.mjs'
+// Try to import Sentry from either the local development path or the production path
+/** @typedef {import('../../config/instrument.mjs').SentryInstance} SentryInstance */
+/** @typedef {{ Sentry: SentryInstance; closeSentry: () => Promise<void> }} SentryModule */
+/** @typedef {{ handler: import('node:http').RequestListener }} SSRModule */
+/** @typedef {Error & { code?: string }} ErrorWithCode */
+
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
+const isRecord = (value) =>
+  value !== null && typeof value === 'object' && !Array.isArray(value)
+
+/** @param {unknown} value @returns {value is Error} */
+const isError = (value) => value instanceof Error
+
+/** @param {unknown} value @returns {value is ErrorWithCode} */
+const isErrorWithCode = (value) => isError(value) && typeof value.code === 'string'
+
+/** @param {unknown} value @returns {value is SSRModule} */
+const isSSRModule = (value) =>
+  isRecord(value) && typeof value.handler === 'function'
+
+/** @param {unknown} value @returns {value is SentryModule} */
+const isSentryModule = (value) =>
+  isRecord(value) &&
+  isRecord(value.Sentry) &&
+  typeof value.Sentry.captureException === 'function' &&
+  typeof value.Sentry.close === 'function' &&
+  typeof value.closeSentry === 'function'
+
+/** @param {unknown} value @returns {Error} */
+const toError = (value) => (isError(value) ? value : new Error(String(value)))
+
+/** @type {SentryInstance} */
+let Sentry = createStubSentry()
+/** @type {() => Promise<void>} */
+let closeSentry = async () => {}
+
+const loadSentryModule = async () => {
+  const candidates = ['../../config/instrument.mjs', './instrument.mjs']
+  /** @type {unknown} */
+  let lastError
+
+  for (const candidate of candidates) {
+    try {
+      /** @type {unknown} */
+      const moduleExports = await import(candidate)
+      if (isSentryModule(moduleExports)) {
+        Sentry = moduleExports.Sentry
+        closeSentry = moduleExports.closeSentry
+        return
+      }
+      throw new Error(`Invalid Sentry module shape from ${candidate}`)
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  const errorMessage = toError(lastError).message
+  console.warn('⚠️ Could not load Sentry instrumentation:', errorMessage)
+  Sentry = createStubSentry()
+  closeSentry = async () => {}
+}
+
+await loadSentryModule()
+
+function createStubSentry() {
+  /** @type {SentryInstance} */
+  const stub = {
+    captureException: () => {},
+    init: () => {},
+    close: async () => {},
+  };
+  return stub;
+}
+
 import {
   getPortFallbackPolicy,
   resolveSsrEntryModuleUrl,
@@ -10,14 +83,20 @@ import {
 
 function resolveSentryDsn() {
   return (
-    process.env.SENTRY_DSN ||
-    process.env.PUBLIC_SENTRY_DSN ||
-    process.env.SENTRY_PUBLIC_DSN ||
+    process.env.SENTRY_DSN ??
+    process.env.PUBLIC_SENTRY_DSN ??
+    process.env.SENTRY_PUBLIC_DSN ??
     process.env.VITE_SENTRY_DSN
   )
 }
 
-const { handler: ssrHandler } = await import(resolveSsrEntryModuleUrl())
+/** @type {unknown} */
+const ssrModuleCandidate = await import(resolveSsrEntryModuleUrl())
+if (!isSSRModule(ssrModuleCandidate)) {
+  throw new Error('Failed to import SSR module with expected handler export.')
+}
+const ssrModule = ssrModuleCandidate
+const ssrHandler = ssrModule.handler
 
 const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT
 const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN
@@ -31,13 +110,14 @@ if (Number.isNaN(initialPort) || initialPort < 0 || initialPort > 65535) {
   )
   initialPort = 4321
 }
-const host = process.env.HOST || '0.0.0.0'
+const host = process.env.HOST ?? '0.0.0.0'
 
 const portFallbackPolicy = getPortFallbackPolicy(process.env)
 const isPortFallbackDisabled = portFallbackPolicy.isFallbackDisabled
 
 // Note: We create the server inside tryListen() to avoid port conflicts
 // The unused 'server' object was removed to prevent double-binding issues
+/** @type {import('node:http').Server | null} */
 let activeRetryServer = null
 
 function redactValue(val, keepLast = 8) {
@@ -59,7 +139,7 @@ function redactValue(val, keepLast = 8) {
 function logSentryStartupChecks() {
   const serverDsn = resolveSentryDsn()
   const publicDsn =
-    resolveSentryDsn() || process.env.NEXT_PUBLIC_SENTRY_DSN
+    resolveSentryDsn() ?? process.env.NEXT_PUBLIC_SENTRY_DSN
   const release = process.env.SENTRY_RELEASE
   const authToken = process.env.SENTRY_AUTH_TOKEN
 
@@ -92,9 +172,10 @@ function logSentryStartupChecks() {
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully')
   try {
-    if (activeRetryServer) {
-      activeRetryServer.removeAllListeners('error')
-      activeRetryServer.close(() => {
+    const s = activeRetryServer
+    if (s) {
+      s.removeAllListeners('error')
+      s.close(() => {
         console.log('Process terminated')
         process.exit(0)
       })
@@ -109,9 +190,10 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully')
   try {
-    if (activeRetryServer) {
-      activeRetryServer.removeAllListeners('error')
-      activeRetryServer.close(() => {
+    const s = activeRetryServer
+    if (s) {
+      s.removeAllListeners('error')
+      s.close(() => {
         console.log('Process terminated')
         process.exit(0)
       })
@@ -137,12 +219,13 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
 
   // If there's an existing retry server, close and detach it so it can be
   // garbage collected before creating a new one.
-  if (activeRetryServer) {
+  const oldServer = activeRetryServer
+  if (oldServer) {
     try {
       // Only clear 'error' listeners to avoid touching other process-wide
       // handlers that may be registered elsewhere.
-      activeRetryServer.removeAllListeners('error')
-      activeRetryServer.close(() => {})
+      oldServer.removeAllListeners('error')
+      oldServer.close(() => {})
     } catch {
       // ignore
     }
@@ -164,8 +247,9 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
     }
   }
 
-  const onError = (err) => {
-    if (err && err.code === 'EADDRINUSE') {
+  const onError = (rawErr) => {
+    const err = toError(rawErr)
+    if (isErrorWithCode(err) && err.code === 'EADDRINUSE') {
       console.error(`Port ${port} is already in use.`)
 
       if (isPortFallbackDisabled) {
@@ -174,38 +258,34 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
         )
         // Only report to Sentry when port fallback is disabled (fatal error)
         try {
-          if (Sentry) {
-            Sentry.captureException(err, {
-              tags: {
-                fatal: true,
-                port_fallback_disabled: true,
-              },
-            })
-          }
-        } catch (e) {
-          console.error('Failed to capture EADDRINUSE to Sentry:', e)
-        }
-        closeSentry().finally(() => process.exit(1))
-        return
+          Sentry.captureException(err, {
+            tags: {
+              fatal: true,
+              port_fallback_disabled: true,
+            },
+          })
+      } catch (e) {
+        console.error('Failed to capture EADDRINUSE to Sentry:', e)
+      }
+      void closeSentry().finally(() => process.exit(1))
+      return
       }
 
       if (retriesLeft <= 0) {
         console.error('No retries left for port fallback. Exiting.')
         // Only report to Sentry when retries are exhausted (fatal error)
         try {
-          if (Sentry) {
-            Sentry.captureException(err, {
-              tags: {
-                fatal: true,
-                retries_exhausted: true,
-              },
-            })
-          }
-        } catch (e) {
-          console.error('Failed to capture EADDRINUSE to Sentry:', e)
-        }
-        closeSentry().finally(() => process.exit(1))
-        return
+          Sentry.captureException(err, {
+            tags: {
+              fatal: true,
+              retries_exhausted: true,
+            },
+          })
+      } catch (e) {
+        console.error('Failed to capture EADDRINUSE to Sentry:', e)
+      }
+      void closeSentry().finally(() => process.exit(1))
+      return
       }
 
       // Port fallback is enabled and retries are available - don't report to Sentry
@@ -222,9 +302,7 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
     console.error('Listen error:', err)
     // Report non-EADDRINUSE errors to Sentry as they are unexpected
     try {
-      if (Sentry) {
-        Sentry.captureException(err)
-      }
+      Sentry.captureException(err)
     } catch (e) {
       console.error('Failed to capture listen error to Sentry:', e)
     }
@@ -238,7 +316,7 @@ const retriesRaw = process.env.PORT_FALLBACK_MAX_RETRIES
 let maxRetries
 {
   const n =
-    retriesRaw !== undefined ? Number.parseInt(String(retriesRaw), 10) : NaN
+    retriesRaw !== undefined ? Number.parseInt(retriesRaw, 10) : NaN
   maxRetries = Number.isFinite(n) && n >= 0 ? n : 10
 }
 tryListen(initialPort, maxRetries)
@@ -246,25 +324,19 @@ tryListen(initialPort, maxRetries)
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason)
   try {
-    if (Sentry) {
-      Sentry.captureException(
-        reason instanceof Error ? reason : new Error(String(reason)),
-      )
-    }
+    Sentry.captureException(toError(reason))
   } catch (e) {
     console.error('Failed to capture unhandledRejection to Sentry:', e)
   }
-  closeSentry().finally(() => process.exit(1))
+  void closeSentry().finally(() => process.exit(1))
 })
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err)
   try {
-    if (Sentry) {
-      Sentry.captureException(err)
-    }
+    Sentry.captureException(toError(err))
   } catch (e) {
     console.error('Failed to capture uncaughtException to Sentry:', e)
   }
-  closeSentry().finally(() => process.exit(1))
+  void closeSentry().finally(() => process.exit(1))
 })
