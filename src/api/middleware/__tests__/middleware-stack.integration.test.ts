@@ -2,6 +2,13 @@ import type { Request, Response, NextFunction } from 'express'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 /* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access,typescript/no-unsafe-call,typescript/no-unsafe-return,typescript/no-floating-promises */
 
+type TestRequest = Request & { user?: { id?: string; [key: string]: unknown } }
+type TestMiddleware = (
+  req: TestRequest,
+  res: Response,
+  next: NextFunction,
+) => unknown
+
 // Mock dependencies
 const mockRedis = {
   get: vi.fn(),
@@ -37,9 +44,9 @@ vi.mock('../logger', () => ({
 }))
 
 // Import after mocks
-let mockAuthMiddleware: any
-let mockRateLimiter: any
-let mockRequestLogger: any
+let mockAuthMiddleware: TestMiddleware
+let mockRateLimiter: TestMiddleware
+let mockRequestLogger: TestMiddleware
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -50,9 +57,9 @@ beforeEach(() => {
 })
 
 describe('Middleware Stack Integration', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: TestRequest
+  let mockResponse: Response
+  let mockNext: NextFunction
 
   beforeEach(() => {
     mockRequest = {
@@ -60,14 +67,14 @@ describe('Middleware Stack Integration', () => {
       headers: {},
       url: '/api/users',
       method: 'GET',
-    }
+    } as TestRequest
     mockResponse = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
       setHeader: vi.fn(),
       on: vi.fn(),
-    }
-    mockNext = vi.fn()
+    } as unknown as Response
+    mockNext = vi.fn() as NextFunction
   })
 
   it('should process middleware in correct order: logger -> rateLimit -> auth', async () => {
@@ -140,7 +147,7 @@ describe('Middleware Stack Integration', () => {
 
   it('should propagate errors to error handler', async () => {
     const error = new Error('Middleware error')
-    const faultyMiddleware = async (req: any, res: any, next: any) => {
+    const faultyMiddleware = async (req: TestRequest, res: Response, next: NextFunction) => {
       throw error
     }
 
@@ -154,17 +161,29 @@ describe('Middleware Stack Integration', () => {
   it('should handle middleware chain with multiple middlewares', async () => {
     const callOrder: string[] = []
 
-    const middleware1 = async (req: any, res: any, next: any) => {
+    const middleware1 = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       callOrder.push('middleware1-start')
       next()
     }
 
-    const middleware2 = async (req: any, res: any, next: any) => {
+    const middleware2 = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       callOrder.push('middleware2-start')
       next()
     }
 
-    const middleware3 = async (req: any, res: any, next: any) => {
+    const middleware3 = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       callOrder.push('middleware3')
     }
 
@@ -182,7 +201,11 @@ describe('Middleware Stack Integration', () => {
   })
 
   it('should handle async middleware correctly', async () => {
-    const asyncMiddleware = async (req: any, res: any, next: any) => {
+    const asyncMiddleware = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       await new Promise((resolve) => setTimeout(resolve, 10))
       next()
     }
@@ -193,7 +216,11 @@ describe('Middleware Stack Integration', () => {
   })
 
   it('should stop chain when middleware does not call next', async () => {
-    const stopMiddleware = async (req: any, res: any, next: any) => {
+    const stopMiddleware = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       res.status(200).json({ stopped: true })
       // Intentionally not calling next
     }
@@ -206,16 +233,16 @@ describe('Middleware Stack Integration', () => {
 })
 
 describe('Middleware Error Scenarios', () => {
-  let mockRequest: any
-  let mockResponse: any
+  let mockRequest: TestRequest
+  let mockResponse: Response
 
   beforeEach(() => {
-    mockRequest = { ip: '192.168.1.1', headers: {} }
+    mockRequest = { ip: '192.168.1.1', headers: {} } as TestRequest
     mockResponse = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
       on: vi.fn(),
-    }
+    } as unknown as Response
   })
 
   it('should handle Redis connection failure in rate limiter', async () => {
@@ -254,36 +281,48 @@ describe('Middleware Error Scenarios', () => {
 })
 
 describe('Middleware Context Preservation', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: TestRequest
+  let mockResponse: Response
+  let mockNext: NextFunction
 
   beforeEach(() => {
-    mockRequest = { ip: '192.168.1.1', headers: {} }
+    mockRequest = { ip: '192.168.1.1', headers: {} } as TestRequest
     mockResponse = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),
       setHeader: vi.fn(),
       on: vi.fn(),
-    }
-    mockNext = vi.fn()
+    } as unknown as Response
+    mockNext = vi.fn() as NextFunction
   })
 
   it('should preserve request context across middlewares', async () => {
     const context = { userId: '', startTime: 0 }
 
-    const contextMiddleware = async (_req: any, res: any, next: any) => {
+    const contextMiddleware = async (
+      _req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       context.startTime = Date.now()
       next()
     }
 
-    const authMiddleware = async (req: any, res: any, next: any) => {
+    const authMiddleware = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       req.user = { id: 'user123' }
       context.userId = 'user123'
       next()
     }
 
-    const loggingMiddleware = async (req: any, res: any, next: any) => {
+    const loggingMiddleware = async (
+      req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       const duration = Date.now() - context.startTime
       console.log(`Request by ${context.userId} took ${duration}ms`)
       next()
@@ -299,12 +338,20 @@ describe('Middleware Context Preservation', () => {
   })
 
   it('should handle response modification by multiple middlewares', async () => {
-    const headerMiddleware = async (_req: any, res: any, next: any) => {
+    const headerMiddleware = async (
+      _req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       res.setHeader('X-Request-Id', '12345')
       next()
     }
 
-    const securityMiddleware = async (_req: any, res: any, next: any) => {
+    const securityMiddleware = async (
+      _req: TestRequest,
+      res: Response,
+      next: NextFunction,
+    ) => {
       res.setHeader('X-Content-Type-Options', 'nosniff')
       next()
     }

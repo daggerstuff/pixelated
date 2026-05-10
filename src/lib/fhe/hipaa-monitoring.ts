@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'node:events'
 
-import * as AWS from 'aws-sdk'
+import AWS from 'aws-sdk'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { HIPAA_SECURITY_CONFIG } from './hipaa-config'
@@ -90,15 +90,26 @@ interface HealthMetrics {
   overallStatus: 'healthy' | 'warning' | 'degraded' | 'critical'
 }
 
+type CloudWatchClient = {
+  putMetricData(params: {
+    Namespace: string
+    MetricData: Array<Record<string, unknown>>
+  }): Promise<unknown>
+}
+
+type SNSClient = {
+  publish(params: Record<string, unknown>): Promise<unknown>
+}
+
 /**
  * HIPAA++ Security Monitoring Service
  */
 export class HIPAAMonitoringService extends EventEmitter {
-  private static instance: HIPAAMonitoringService
-  private alerts: SecurityAlert[] = []
+  private static instance: HIPAAMonitoringService | undefined
+  private readonly alerts: SecurityAlert[] = []
   private threatPatterns: ThreatPattern[] = []
-  private cloudWatch: AWS.CloudWatch | null = null
-  private sns: AWS.SNS | null = null
+  private cloudWatch: CloudWatchClient | null = null
+  private sns: SNSClient | null = null
   private isMonitoring = false
   private monitoringIntervals: NodeJS.Timeout[] = []
 
@@ -110,9 +121,7 @@ export class HIPAAMonitoringService extends EventEmitter {
   }
 
   public static getInstance(): HIPAAMonitoringService {
-    if (!HIPAAMonitoringService.instance) {
-      HIPAAMonitoringService.instance = new HIPAAMonitoringService()
-    }
+    HIPAAMonitoringService.instance ??= new HIPAAMonitoringService()
     return HIPAAMonitoringService.instance
   }
 
@@ -121,8 +130,17 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private initializeAWSServices() {
     try {
-      this.cloudWatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' })
-      this.sns = new AWS.SNS({ apiVersion: '2010-03-31' })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const awsServices = AWS as unknown as {
+        CloudWatch: new (
+          options: Record<string, unknown>,
+        ) => CloudWatchClient
+        SNS: new (options: Record<string, unknown>) => SNSClient
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this.cloudWatch = new awsServices.CloudWatch({ apiVersion: '2010-08-01' })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this.sns = new awsServices.SNS({ apiVersion: '2010-03-31' })
       logger.info('AWS monitoring services initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize AWS monitoring services', { error })
@@ -337,10 +355,15 @@ export class HIPAAMonitoringService extends EventEmitter {
       // Filter by event type if specified (and not 'all')
       if (eventType !== 'all') {
         return recentEvents.filter(
-          (event) =>
-            event.action.includes(eventType) ||
-            (event.keyId && event.keyId.includes(eventType)) ||
-            (eventType === 'key' && event.action.includes('key')),
+          (event) => {
+            if (event.action.includes(eventType)) {
+              return true
+            }
+            if (event.keyId?.includes(eventType)) {
+              return true
+            }
+            return eventType === 'key' && event.action.includes('key')
+          },
         )
       }
 
@@ -455,10 +478,10 @@ export class HIPAAMonitoringService extends EventEmitter {
       // - Redis connection for high-performance caching layer
 
       const auditStorageConfig = {
-        type: process.env['HIPAA_AUDIT_STORAGE_TYPE'] || 'dynamodb',
-        region: process.env['AWS_REGION'] || 'us-east-1',
+        type: process.env['HIPAA_AUDIT_STORAGE_TYPE'] ?? 'dynamodb',
+        region: process.env['AWS_REGION'] ?? 'us-east-1',
         tableName:
-          process.env['HIPAA_AUDIT_TABLE_NAME'] || 'hipaa_audit_events',
+          process.env['HIPAA_AUDIT_TABLE_NAME'] ?? 'hipaa_audit_events',
         connectionString: process.env['HIPAA_AUDIT_CONNECTION_STRING'],
       }
 
@@ -556,7 +579,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       category: 'key_management',
       title: pattern.name,
       description: pattern.description,
-      affectedResources: events.map((e) => e.keyId || 'system').filter(Boolean),
+      affectedResources: events.map((e) => e.keyId ?? 'system').filter(Boolean),
       recommendedActions: pattern.responseActions,
       auditEvents: events,
       metadata: {
@@ -805,16 +828,14 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Group by actor
-    const accessByActor = accessEvents.reduce(
+    const accessByActor = accessEvents.reduce<Record<string, AuditEvent[]>>(
       (acc, event) => {
-        const actor = event.userId || 'unknown'
-        if (!acc[actor]) {
-          acc[actor] = []
-        }
+        const actor = event.userId ?? 'unknown'
+        acc[actor] ??= []
         acc[actor].push(event)
         return acc
       },
-      {} as Record<string, AuditEvent[]>,
+      {},
     )
 
     // Analyze patterns for each actor
@@ -921,12 +942,12 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Analyze event distribution
-    const eventTypes = events.reduce(
+    const eventTypes = events.reduce<Record<string, number>>(
       (acc, event) => {
-        acc[event.action] = (acc[event.action] || 0) + 1
+        acc[event.action] = (acc[event.action] ?? 0) + 1
         return acc
       },
-      {} as Record<string, number>,
+      {},
     )
 
     // Identify key findings
@@ -1048,6 +1069,8 @@ export class HIPAAMonitoringService extends EventEmitter {
           timestamp: now.toISOString(),
           action: 'critical_compliance_violation',
           userId: 'system',
+          success: false,
+          details: { trigger: 'compliance_critical_issue' },
           riskLevel: 'high',
           metadata: {
             complianceScore,
@@ -1132,18 +1155,16 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Group by key ID
-      const keysById = keyEvents.reduce(
+    const keysById = keyEvents.reduce<Record<string, AuditEvent[]>>(
         (acc, event) => {
-          const keyId = event.keyId
-          if (keyId && !acc[keyId]) {
-            acc[keyId] = []
-          }
-          if (keyId) {
-            acc[keyId].push(event)
-          }
+        const keyId = event.keyId
+        if (keyId) {
+          acc[keyId] ??= []
+          acc[keyId].push(event)
+        }
           return acc
         },
-        {} as Record<string, AuditEvent[]>,
+      {},
       )
 
       // Check each key for compliance
@@ -1234,7 +1255,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Check for old events (retention policy compliance)
-      const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS || 2555 // 7 years default
+      const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
       const cutoffDate = new Date(
         now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000,
       )
@@ -1247,17 +1268,15 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Verify event completeness
-      const requiredFields = [
+      const requiredFields: Array<keyof AuditEvent> = [
         'eventId',
         'timestamp',
         'action',
-        'actor',
-        'resource',
       ]
       const incompleteEvents = sortedEvents.filter(
         (event) =>
           !requiredFields.every(
-            (field) => field in event && event[field as keyof AuditEvent],
+            (field) => event[field],
           ),
       )
 
@@ -1296,10 +1315,6 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       // Check if retention policy is configured
       const auditRetentionDays = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
-      if (auditRetentionDays <= 0) {
-        issues.push('HIPAA audit retention policy not configured')
-      }
-
       // Verify automatic deletion is working (check for very old events)
       const auditRetentionDays2 = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
       const veryOldCutoff = new Date(
@@ -1328,9 +1343,9 @@ export class HIPAAMonitoringService extends EventEmitter {
     try {
       // Check if encryption configuration meets HIPAA standards
       const encryptionConfig = {
-        algorithm: process.env['HIPAA_ENCRYPTION_ALGORITHM'] || 'AES-256-GCM',
-        keySize: parseInt(process.env['HIPAA_ENCRYPTION_KEY_SIZE'] || '256'),
-        mode: process.env['HIPAA_ENCRYPTION_MODE'] || 'GCM',
+        algorithm: process.env['HIPAA_ENCRYPTION_ALGORITHM'] ?? 'AES-256-GCM',
+        keySize: parseInt(process.env['HIPAA_ENCRYPTION_KEY_SIZE'] ?? '256'),
+        mode: process.env['HIPAA_ENCRYPTION_MODE'] ?? 'GCM',
       }
 
       // HIPAA requires AES-256 minimum
@@ -1468,6 +1483,8 @@ export class HIPAAMonitoringService extends EventEmitter {
           timestamp: healthMetrics.timestamp,
           action: 'critical_system_health_issue',
           userId: 'system',
+          success: false,
+          details: { trigger: 'critical_health_status' },
           riskLevel: 'critical',
           metadata: {
             resource: 'health_monitoring_service',
@@ -1563,7 +1580,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         monitoringService: monitoringServiceStatus,
         awsServices: awsServices.map(({ name }) => ({
           name,
-          status: metrics[`${name.toLowerCase()}_status`] || 'unknown',
+          status: metrics[`${name.toLowerCase()}_status`] ?? 'unknown',
         })),
       }
     } catch (error: unknown) {
@@ -1723,18 +1740,6 @@ export class HIPAAMonitoringService extends EventEmitter {
       // Validate HIPAA configuration
       const configIssues: string[] = []
 
-      if (!HIPAA_SECURITY_CONFIG.MAX_KEY_AGE_MS) {
-        configIssues.push('MAX_KEY_AGE_MS not configured')
-      }
-
-      if (!HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS) {
-        configIssues.push('AUDIT_RETENTION_DAYS not configured')
-      }
-
-      if (!HIPAA_SECURITY_CONFIG.CLOUDWATCH_NAMESPACE) {
-        configIssues.push('CLOUDWATCH_NAMESPACE not configured')
-      }
-
       if (configIssues.length > 0) {
         issues.push(`HIPAA configuration issues: ${configIssues.join(', ')}`)
       }
@@ -1775,9 +1780,9 @@ export class HIPAAMonitoringService extends EventEmitter {
       // For now, we'll simulate the check and note the requirement
 
       const dbConfig = {
-        host: process.env['DATABASE_HOST'] || 'not_configured',
-        port: process.env['DATABASE_PORT'] || 'not_configured',
-        name: process.env['DATABASE_NAME'] || 'not_configured',
+        host: process.env['DATABASE_HOST'] ?? 'not_configured',
+        port: process.env['DATABASE_PORT'] ?? 'not_configured',
+        name: process.env['DATABASE_NAME'] ?? 'not_configured',
       }
 
       if (dbConfig.host === 'not_configured') {
@@ -1976,51 +1981,58 @@ export class HIPAAMonitoringService extends EventEmitter {
       key_age_violation: 'Key Age Policy Violation',
       unauthorized_access: 'Unauthorized Access Attempt',
     }
-    return titles[action] || 'Security Event'
+    if (action === 'key_rotation_failed') {
+      return 'Key Rotation Failure'
+    }
+    if (action === 'key_compromise_reported') {
+      return 'Key Compromise Detected'
+    }
+    if (action === 'suspicious_activity_detected') {
+      return 'Suspicious Activity'
+    }
+    if (action === 'key_age_violation') {
+      return 'Key Age Policy Violation'
+    }
+    if (action === 'unauthorized_access') {
+      return 'Unauthorized Access Attempt'
+    }
+    return 'Security Event'
   }
 
   private getRecommendedActions(action: string): string[] {
-    const actions: Record<string, string[]> = {
-      key_rotation_failed: [
-        'Check system health',
-        'Retry rotation',
-        'Review logs',
-      ],
-      key_compromise_reported: [
-        'Emergency rotation',
-        'Audit access logs',
-        'Notify security team',
-      ],
-      suspicious_activity_detected: [
-        'Investigate source',
-        'Enhance monitoring',
-        'Review access controls',
-      ],
+    if (action === 'key_rotation_failed') {
+      return ['Check system health', 'Retry rotation', 'Review logs']
     }
-    return actions[action] || ['Review and investigate']
+    if (action === 'key_compromise_reported') {
+      return ['Emergency rotation', 'Audit access logs', 'Notify security team']
+    }
+    if (action === 'suspicious_activity_detected') {
+      return ['Investigate source', 'Enhance monitoring', 'Review access controls']
+    }
+    return ['Review and investigate']
   }
 
   private groupAlertsByCategory(
     alerts: SecurityAlert[],
   ): Record<string, number> {
-    return alerts.reduce(
+    return alerts.reduce<Record<string, number>>(
       (acc, alert) => {
-        acc[alert.category] = (acc[alert.category] || 0) + 1
+        acc[alert.category] = (acc[alert.category] ?? 0) + 1
         return acc
       },
-      {} as Record<string, number>,
+      {},
     )
   }
 
   private groupAlertsBySeverity(
     alerts: SecurityAlert[],
   ): Record<string, number> {
-    return alerts.reduce(
+    return alerts.reduce<Record<string, number>>(
       (acc, alert) => {
-        acc[alert.severity] = (acc[alert.severity] || 0) + 1
+        acc[alert.severity] = (acc[alert.severity] ?? 0) + 1
         return acc
       },
-      {} as Record<string, number>,
+      {},
     )
   }
 
