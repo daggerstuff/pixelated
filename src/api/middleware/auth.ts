@@ -54,7 +54,7 @@ export async function authMiddleware(
       {},
     )
     const webApiRequest = new globalThis.Request(
-      `${req.protocol}://${req.get('host')}${req.originalUrl || req.url}`,
+      `${req.protocol}://${req.get('host')}${req.originalUrl ?? req.url}`,
       {
         method: req.method,
         headers: new Headers(headers),
@@ -66,7 +66,7 @@ export async function authMiddleware(
 
     if (!authResult.success) {
       res.status(401).json({
-        error: authResult.error || 'Authentication required',
+        error: authResult.error ?? 'Authentication required',
         code: 'UNAUTHORIZED',
       })
       return
@@ -83,11 +83,7 @@ export async function authMiddleware(
     next()
   } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error
-        ? error instanceof Error
-          ? error.message
-          : 'Unknown error'
-        : 'Authentication failed'
+      error instanceof Error ? error.message : 'Authentication failed'
     res.status(401).json({
       error: errorMessage,
       code: 'AUTH_ERROR',
@@ -111,7 +107,7 @@ export function requireRoles(allowedRoles: string[]) {
       return
     }
 
-    const userRoles = user.roles || []
+    const userRoles = user.roles ?? []
     const hasRequiredRole = allowedRoles.some((role) =>
       userRoles.includes(role),
     )
@@ -145,7 +141,7 @@ export function requirePermissions(requiredPermissions: string[]) {
       return
     }
 
-    const userPermissions = user.permissions || []
+    const userPermissions = user.permissions ?? []
     const hasAllPermissions = requiredPermissions.every((permission) =>
       userPermissions.includes(permission),
     )
