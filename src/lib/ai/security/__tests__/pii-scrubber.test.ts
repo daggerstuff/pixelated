@@ -38,6 +38,6 @@ describe('PIIScrubber', () => {
 
   it('handles empty or null text gracefully', () => {
     expect(scrubPII('')).toBe('')
-    expect(scrubPII((null as unknown) as string)).toBe(null)
+    expect(scrubPII(null)).toBe(null)
   })
 })

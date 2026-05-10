@@ -24,8 +24,7 @@ const {
 >
 </image-viewer>
 
-<script>
-  import Viewer from 'viewerjs'
+<script lang="ts">
   import { lockScroll, unlockScroll } from '@/utils/misc'
 
   // global default config
@@ -66,7 +65,8 @@ const {
 
       let userOptions: Viewer.Options = {}
       try {
-        if (this.dataset['options']) userOptions = JSON.parse(this.dataset['options'])
+        if (this.dataset['options'])
+          userOptions = JSON.parse(this.dataset['options'])
       } catch (err) {
         console.error('[ImageViewer] Failed to parse options:', err)
       }
