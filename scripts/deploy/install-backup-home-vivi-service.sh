@@ -15,6 +15,7 @@ BACKUP_SERVICE_TARGET="$SYSTEMD_TARGET_DIR/$SERVICE_NAME"
 BACKUP_TIMER_TARGET="$SYSTEMD_TARGET_DIR/$TIMER_NAME"
 BACKUP_OVERRIDES_DIR="$SYSTEMD_TARGET_DIR/${SERVICE_NAME}.d"
 BACKUP_OVERRIDES_FILE="$BACKUP_OVERRIDES_DIR/10-local-env.conf"
+BACKUP_LEGACY_OVERRIDE_FILE="$BACKUP_OVERRIDES_DIR/override.conf"
 
 usage() {
   cat <<'USAGE'
@@ -155,6 +156,11 @@ build_override_file() {
 echo "[info] Copying systemd service/timer files..."
 "${SUDO[@]}" install -m 0644 "$BACKUP_SERVICE_SOURCE" "$BACKUP_SERVICE_TARGET"
 "${SUDO[@]}" install -m 0644 "$BACKUP_TIMER_SOURCE" "$BACKUP_TIMER_TARGET"
+
+if [[ -f "$BACKUP_LEGACY_OVERRIDE_FILE" ]]; then
+  echo "[info] Removing legacy override drop-in: $BACKUP_LEGACY_OVERRIDE_FILE"
+  "${SUDO[@]}" rm -f "$BACKUP_LEGACY_OVERRIDE_FILE"
+fi
 
 echo "[info] Applying optional environment overrides..."
 build_override_file

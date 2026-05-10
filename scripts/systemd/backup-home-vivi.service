@@ -21,12 +21,12 @@ Environment=RCLONE_SYNC_PATH=
 Environment=BACKUP_KEEP_RUNS=6
 Environment=BACKUP_RUN_PREFIX=home-vivi-run
 Environment=BACKUP_SECTION_STRICT_ERRORS=false
-Environment="BACKUP_SKIP_SECTIONS=.cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk .hermes"
+Environment="BACKUP_SKIP_SECTIONS=.cache .cargo .claude .claude-mem .codeql .cursor .cursor-server .codex .gemini .gemini-* .kube .antigravity-server .aitk .hermes .local .npm .pnpm-store .yarn .gradle .rustup .android .tmp .Trash .cache .cache-browser .venvs .virtualenvs"
 Environment=BACKUP_RCLONE_TRANSFERS=24
 Environment=BACKUP_RCLONE_CHECKERS=16
 Environment=BACKUP_RCLONE_FAST_LIST=true
 Environment=BACKUP_RCLONE_STATS=8s
-Environment="BACKUP_RCLONE_EXCLUDE_EXTRA=.codeql/** .git/** .local/share/Trash/** .cache/** .npm/** .cargo/** .pnpm-store/** .yarn/** .node-gyp/** .gradle/** .rustup/** .android/** .ssh/** .cache/pip/** .cache/ms-playwright/** .cache/Code/** .cache/google-chrome/** .cache/gh/** .cache/huggingface/*"
+Environment="BACKUP_RCLONE_EXCLUDE_EXTRA=.codeql/** .git/** .local/share/Trash/** .cache/** .npm/** .cargo/** .pnpm-store/** .yarn/** .node-gyp/** .gradle/** .rustup/** .android/** .ssh/** .cache/pip/** .cache/ms-playwright/** .cache/Code/** .cache/google-chrome/** .cache/gh/** .cache/huggingface/* pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
 Environment="BACKUP_RCLONE_EXTRA_ARGS="
 Environment=BACKUP_HEARTBEAT_INTERVAL=30
 # Optional: comma/newline-separated list of sections; defaults to all top-level home folders.

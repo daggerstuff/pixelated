@@ -27,7 +27,7 @@ chmod 666 /var/run/docker.sock
 echo "Installing Node.js 20..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
-corepack enable pnpm
+npm install -g pnpm@11.0.9
 
 echo "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sudo -u azureuser sh
