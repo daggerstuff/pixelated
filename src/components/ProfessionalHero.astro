@@ -1,7 +1,7 @@
 ---
 /**
  * Professional Hero Component
- * Enterprise-grade hero section for healthcare/clinical SaaS
+ * Dark-first enterprise clinical training platform
  */
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
 import HeroContent from '@/components/homepage/HeroContent.astro'
@@ -28,7 +28,7 @@ const {
 } = Astro.props
 ---
 
-<section class="hero hero-section" data-component="professional-hero">
+<section class="hero" data-component="professional-hero">
   <div class="hero-background">
     <div class="hero-gradient"></div>
     <div class="hero-grid-overlay"></div>
@@ -120,24 +120,20 @@ const {
   overflow: hidden;
 }
 
-.hero-section {
-  border-bottom: 1px solid rgba(var(--border-primary-rgb, 229, 231, 235), 0.4);
-}
-
 .hero-background {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
+/* Sunset orange gradient overlay */
 .hero-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.04) 0%,
-    rgba(37, 99, 235, 0.02) 50%,
-    transparent 100%
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(249, 115, 22, 0.08) 0%,
+    transparent 50%
   );
 }
 
@@ -145,10 +141,10 @@ const {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 64px 64px;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .hero-shell {
@@ -167,7 +163,7 @@ const {
   text-align: center;
 }
 
-/* Kicker Pill */
+/* Kicker Pill - sunset orange accent */
 .hero-kicker-wrapper {
   display: flex;
   justify-content: center;
@@ -179,21 +175,22 @@ const {
   gap: 0.5rem;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
-  background: rgba(59, 130, 246, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.3);
 }
 
 .hero-kicker-dot {
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 999px;
-  background: #2563EB;
+  background: #f97316;
   animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.6; }
 }
 
 .hero-kicker {
@@ -202,7 +199,7 @@ const {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #1e40af;
+  color: #fb923c;
 }
 
 /* Text Content */
@@ -220,7 +217,7 @@ const {
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  color: #1e293b;
+  color: var(--text-primary);
   text-wrap: balance;
 }
 
@@ -229,7 +226,7 @@ const {
   font-family: 'Plus Jakarta Sans', var(--font-sans);
   font-size: clamp(1rem, 1.4vw, 1.15rem);
   line-height: 1.65;
-  color: #475569;
+  color: var(--text-secondary);
   text-wrap: pretty;
 }
 
@@ -238,7 +235,7 @@ const {
   font-family: 'Plus Jakarta Sans', var(--font-sans);
   font-size: 0.88rem;
   line-height: 1.6;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 /* Action Buttons */
@@ -275,41 +272,42 @@ const {
   white-space: nowrap;
 }
 
+/* Sunset orange primary button */
 .btn-primary {
-  background: #2563EB;
+  background: #f97316;
   color: white;
-  border: 1px solid rgba(37, 99, 235, 0.9);
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.1);
+  border: 1px solid #f97316;
+  box-shadow: 0 1px 2px rgba(249, 115, 22, 0.2), 0 0 12px rgba(249, 115, 22, 0.15);
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  background: #fb923c;
+  border-color: #fb923c;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3), 0 0 20px rgba(249, 115, 22, 0.2);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: white;
-  color: #374151;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
 }
 
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible {
-  outline: 2px solid #2563EB;
+  outline: 2px solid #f97316;
   outline-offset: 2px;
 }
 
-/* Proof Grid */
+/* Proof Grid - dark surface cards */
 .hero-proof-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -325,15 +323,14 @@ const {
   gap: 0.85rem;
   padding: 1rem;
   border-radius: var(--radius-card, 0.75rem);
-  background: white;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
 }
 
 .hero-proof-icon {
   flex-shrink: 0;
-  color: #2563EB;
-  background: rgba(37, 99, 235, 0.1);
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.12);
   border-radius: 999px;
   padding: 0.4rem;
 }
@@ -350,7 +347,7 @@ const {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #2563EB;
+  color: #fb923c;
 }
 
 .hero-proof-content p {
@@ -358,10 +355,10 @@ const {
   font-family: 'Plus Jakarta Sans', var(--font-sans);
   font-size: 0.85rem;
   line-height: 1.55;
-  color: #475569;
+  color: var(--text-secondary);
 }
 
-/* Trust Indicators */
+/* Trust Indicators - subtle dark styling */
 .hero-trust-indicators {
   display: flex;
   flex-wrap: wrap;
@@ -376,16 +373,16 @@ const {
   gap: 0.45rem;
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   font-family: 'Plus Jakarta Sans', var(--font-sans);
   font-size: 0.72rem;
   font-weight: 500;
-  color: #059669;
+  color: #34d399;
 }
 
 .trust-badge svg {
-  color: #059669;
+  color: #34d399;
 }
 
 /* Desktop */
