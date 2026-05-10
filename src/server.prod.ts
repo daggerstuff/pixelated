@@ -1,5 +1,7 @@
+import '../config/instrument.mjs'
 import { readFileSync } from 'fs'
-import { createServer } from 'https'
+import { createServer as createHttpsServer, Server as HttpsServer } from 'https'
+import { createServer as createHttpServer, Server as HttpServer } from 'http'
 
 import compression from 'compression'
 import cors from 'cors'
@@ -15,6 +17,10 @@ import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
 
 const app = express()
+import { Sentry, sentryMiddleware } from '../config/instrument.mjs'
+
+// The Sentry request handler must be the first middleware on the app
+app.use(sentryMiddleware)
 
 // Environment setup
 const PORT = productionConfig.port
@@ -82,21 +88,21 @@ app.use('/api/files', createFileRoutes(db))
 app.use('/api/business-intelligence', createBusinessIntelligenceRoutes(db))
 
 // SSL configuration
-let server
+let server: HttpServer | HttpsServer
 if (isProduction) {
   try {
     const options = {
       key: readFileSync('/etc/ssl/private/server.key'),
       cert: readFileSync('/etc/ssl/certs/server.crt'),
     }
-    server = createServer(options, app)
+    server = createHttpsServer(options, app)
     console.log('🔒 HTTPS server configured')
   } catch (error: unknown) {
     console.error('❌ SSL certificates not found, falling back to HTTP:', error)
-    server = createServer(app)
+    server = createHttpServer(app)
   }
 } else {
-  server = createServer(app)
+  server = createHttpServer(app)
 }
 
 // Socket.IO configuration
@@ -123,6 +129,9 @@ process.on('SIGTERM', async () => {
       _next: express.NextFunction,
     ) => {
     console.error('❌ Error:', error)
+    if (Sentry) {
+      Sentry.captureException(error)
+    }
     res.status(500).json({
       error: 'Internal server error',
       message: isProduction

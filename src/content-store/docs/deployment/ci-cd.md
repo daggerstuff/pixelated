@@ -60,7 +60,7 @@ build:
     - name: Build application
       run: pnpm build
     - name: Upload build artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7.0.1
       with:
         name: build-files
         path: dist/
@@ -98,7 +98,7 @@ deploy:
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
     - name: Download build artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8.0.1
       with:
         name: build-files
         path: dist/

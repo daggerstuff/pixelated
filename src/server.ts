@@ -1,3 +1,4 @@
+import '../config/instrument.mjs'
 import { EventEmitter } from 'events'
 import { createServer } from 'http'
 
@@ -14,12 +15,16 @@ import 'dotenv/config'
 
 const app = express()
 const server = createServer(app)
+import { sentryMiddleware } from '../config/instrument.mjs'
+
+// The Sentry request handler must be the first middleware on the app
+app.use(sentryMiddleware)
 
 // Environment variables
-const PORT = process.env.WS_PORT || 3001
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
+const PORT = process.env.WS_PORT ?? 3001
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379'
 const DATABASE_URL =
-  process.env.DATABASE_URL ||
+  process.env.DATABASE_URL ??
   'postgresql://postgres:postgres@localhost:5432/pixelated'
 
 // Database connection
@@ -43,11 +48,11 @@ const redisOptions = REDIS_URL.startsWith('rediss://')
 
 let redis = new Redis(REDIS_URL, redisOptions)
 
-// Prevent unhandled error events during connection attempts
-redis.on('error', (err) => {
+redis.on('error', (err: unknown) => {
   // We handle connection errors in the connect().catch() block below
   // This listener prevents the "Unhandled error event" warning
-  console.debug('Redis connection error (handled):', err.message)
+  const message = err instanceof Error ? err.message : String(err)
+  console.debug('Redis connection error (handled):', message)
 })
 
 // Attempt connection with fallback for development
@@ -55,22 +60,27 @@ redis.connect().catch((err) => {
   if (process.env.NODE_ENV === 'development') {
     console.warn(
       'Failed to connect to Redis in development, using mock:',
-      err.message,
+      err instanceof Error ? err.message : String(err),
     )
     // Create a simple mock compatible with ioredis interface
-    redis = new EventEmitter() as any
-    Object.assign(redis, {
+    const redisMock = new EventEmitter()
+    Object.assign(redisMock, {
       status: 'ready',
-      quit: async () => 'OK',
+      connect: async () => {},
+      disconnect: () => {},
+      quit: async () => 'OK' as const,
       get: async () => null,
-      set: async () => 'OK',
+      set: async () => 'OK' as const,
       del: async () => 1,
-      on: (event: string, cb: any) => {
+      on: (event: string, cb: (...args: unknown[]) => void) => {
         if (event === 'connect' || event === 'ready') cb()
-        return redis
+        return redisMock
       },
-      // Add other necessary methods as no-ops
+      off: () => redisMock,
+      once: () => redisMock,
+      emit: () => true,
     })
+    redis = redisMock as unknown as Redis
   } else {
     console.error('Failed to connect to Redis:', err)
   }
@@ -79,7 +89,7 @@ redis.connect().catch((err) => {
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
     credentials: true,
   }),
 )
