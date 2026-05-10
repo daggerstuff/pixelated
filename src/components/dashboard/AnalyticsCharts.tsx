@@ -45,7 +45,11 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
           Unable to load analytics data
         </h4>
         <p className='text-red-600 mt-1 text-sm'>
-          {error instanceof Error ? error.message : String(error)}
+          {error instanceof Error
+            ? error.message
+            : typeof error === 'object'
+              ? JSON.stringify(error)
+              : String(error)}
         </p>
       </div>
       <button
@@ -241,6 +245,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
         return 'text-orange-600'
       case 'red':
         return 'text-red-600'
+      case undefined:
       default:
         return 'text-gray-600'
     }
