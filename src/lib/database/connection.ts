@@ -235,7 +235,7 @@ export async function withMongoSession<T>(
   const session = await connection.startSession()
 
   try {
-    await session.startTransaction()
+    session.startTransaction()
     const result = await callback(session)
     await session.commitTransaction()
     return result
