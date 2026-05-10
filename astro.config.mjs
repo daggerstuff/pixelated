@@ -30,11 +30,6 @@ const loadedEnv = loadEnv(
 )
 Object.assign(process.env, loadedEnv)
 
-// Detect if we're running a build command (not dev server)
-const isBuildCommand =
-  process.argv.includes('build') ||
-  process.env.CI === 'true' ||
-  !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN =
   !!process.env.SENTRY_DSN ||

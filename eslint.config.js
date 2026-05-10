@@ -5,7 +5,6 @@ import markdown from '@eslint/markdown'
 import pluginVitest from '@vitest/eslint-plugin'
 import pluginAstro from 'eslint-plugin-astro'
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
 import globals from 'globals'
@@ -175,7 +174,6 @@ export default tseslint.config(
   {
     files: ['**/*.{jsx,tsx}'],
     plugins: {
-      'react': pluginReact,
       'react-hooks': pluginReactHooks,
     },
     settings: {
@@ -191,43 +189,9 @@ export default tseslint.config(
       },
     },
     rules: {
-      ...pluginReact.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
-
-      // React rules (matching OXC)
-      'react/jsx-key': 'warn',
-      'react/jsx-no-comment-textnodes': 'warn',
-      'react/jsx-no-duplicate-props': 'warn',
-      'react/jsx-no-target-blank': 'warn',
-      'react/jsx-no-undef': 'warn',
-      'react/no-children-prop': 'warn',
-      'react/no-danger-with-children': 'warn',
-      'react/no-direct-mutation-state': 'warn',
-      'react/no-find-dom-node': 'warn',
-      'react/no-is-mounted': 'warn',
-      'react/no-render-return-value': 'warn',
-      'react/no-string-refs': 'warn',
-      'react/no-unescaped-entities': 'warn',
-      'react/no-unknown-property': [
-        'warn',
-        {
-          ignore: [
-            'attach',
-            'args',
-            'rotation',
-            'position',
-            'scale',
-            'frustumCulled',
-            'material',
-            'matrixAutoUpdate',
-            'emissive',
-            'roughness',
-            'metalness',
-          ],
-        },
-      ],
-      'react/no-array-index-key': 'warn',
+      'react/display-name': 'off',
       'no-control-regex': 'off',
       'no-console': ['warn', { allow: ['warn', 'error', 'debug', 'info'] }],
 
@@ -240,16 +204,12 @@ export default tseslint.config(
   // JSX-A11y configuration
   {
     files: ['**/*.{jsx,tsx}'],
-    /* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
     plugins: {
-      // eslint-disable-next-line typescript/no-unsafe-assignment
       'jsx-a11y': pluginJsxA11y,
     },
     rules: {
-      // eslint-disable-next-line typescript/no-unsafe-assignment,typescript/no-unsafe-member-access
       ...pluginJsxA11y.configs.recommended.rules,
     },
-    /* eslint-enable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
   },
 
   // Vitest configuration
@@ -316,6 +276,7 @@ export default tseslint.config(
     plugins: { markdown },
     language: 'markdown/commonmark',
     rules: {
+      'no-irregular-whitespace': 'off',
       'no-missing-label-refs': 'off',
       'markdown/no-missing-label-refs': 'off',
     },
@@ -331,9 +292,7 @@ export default tseslint.config(
   // Astro files
   {
     files: ['**/*.astro'],
-    /* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
     plugins: {
-      // eslint-disable-next-line typescript/no-unsafe-assignment
       astro: pluginAstro,
     },
     rules: {
@@ -345,9 +304,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
 
       // Use Astro-specific recommended rules
-      // eslint-disable-next-line typescript/no-unsafe-assignment,typescript/no-unsafe-member-access
       ...pluginAstro.configs.recommended.rules,
     },
-    /* eslint-enable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
   },
 )

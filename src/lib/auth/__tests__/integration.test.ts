@@ -686,7 +686,6 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      // eslint-disable-next-line typescript/no-unsafe-type-assertion
       const refreshContext = {
         request: refreshRequest,
       } as Parameters<typeof refreshHandler>[0]

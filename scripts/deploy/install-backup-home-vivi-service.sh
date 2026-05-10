@@ -174,3 +174,8 @@ echo "[info] Current timer status:"
 
 echo
 echo "[success] Backup service update complete."
+echo
+echo "[help] To run a one-off backup without blocking this terminal:"
+echo "  sudo /home/vivi/pixelated/scripts/backup/run-backup-home-vivi-now.sh"
+echo "  # add a second argument of 0 to skip live tail"
+echo "  sudo /home/vivi/pixelated/scripts/backup/run-backup-home-vivi-now.sh backup-home-vivi.service 0"
