@@ -1,5 +1,4 @@
-// @ts-ignore
-import DigestFetch from 'digest-fetch'
+import DigestFetch = require('digest-fetch')
 import * as dotenv from 'dotenv'
 
 dotenv.config()

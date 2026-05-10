@@ -210,6 +210,7 @@
     "@sentry/astro": "latest",
     "@sentry/node": "latest",
     "@sentry/profiling-node": "latest",
+    "@sentry/react": "latest",
     "@sentry/toolbar": "latest",
     "@sentry/vite-plugin": "latest",
     "@spotlightjs/astro": "latest",
@@ -435,13 +436,22 @@
     "vscode-jsonrpc": "9.0.0-next.11",
     "wait-on": "latest"
   },
-  "peerDependencies": { "hono": "^4.12.14" },
-  "resolutions": { "path-to-regexp": "8.4.2" },
-  "engines": { "node": ">=24" },
+  "peerDependencies": {
+    "hono": "^4.12.14"
+  },
+  "resolutions": {
+    "path-to-regexp": "8.4.2"
+  },
+  "engines": {
+    "node": ">=24"
+  },
   "packageManager": "pnpm@11.0.9",
   "pnpm": {
     "peerDependencyRules": {
-      "ignoreMissing": ["typescript", "zod"],
+      "ignoreMissing": [
+        "typescript",
+        "zod"
+      ],
       "allowedVersions": {
         "mongodb": "^6.14.0",
         "eslint": "^8.57.0 || ^9.0.0",
@@ -521,7 +531,9 @@
       "workerd",
       "better-sqlite3"
     ],
-    "ignoredBuiltDependencies": ["libpg-query"],
+    "ignoredBuiltDependencies": [
+      "libpg-query"
+    ],
     "overrides": {
       "@vercel/routing-utils": "npm:@vercel/routing-utils@6.2.0",
       "path-to-regexp@6.1.0": "npm:path-to-regexp@6.3.0",
@@ -597,5 +609,10 @@
       "teeny-request": "10.1.2"
     }
   },
-  "trustedDependencies": ["aws-sdk", "core-js", "protobufjs", "unrs-resolver"]
+  "trustedDependencies": [
+    "aws-sdk",
+    "core-js",
+    "protobufjs",
+    "unrs-resolver"
+  ]
 }

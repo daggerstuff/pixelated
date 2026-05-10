@@ -3,8 +3,8 @@
 
 import Redis from 'ioredis'
 import mongoose from 'mongoose'
-import { Pool, PoolClient } from 'pg'
 import type { Connection } from 'mongoose'
+import { Pool, PoolClient } from 'pg'
 
 // ============================================================================
 // CONNECTION INSTANCES

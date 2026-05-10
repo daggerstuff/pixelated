@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'node:events'
 
-import AWS from 'aws-sdk'
+import { CloudWatch, SNS } from 'aws-sdk'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { HIPAA_SECURITY_CONFIG } from './hipaa-config'
@@ -130,17 +130,8 @@ export class HIPAAMonitoringService extends EventEmitter {
    */
   private initializeAWSServices() {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const awsServices = AWS as unknown as {
-        CloudWatch: new (
-          options: Record<string, unknown>,
-        ) => CloudWatchClient
-        SNS: new (options: Record<string, unknown>) => SNSClient
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.cloudWatch = new awsServices.CloudWatch({ apiVersion: '2010-08-01' })
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this.sns = new awsServices.SNS({ apiVersion: '2010-03-31' })
+      this.cloudWatch = new CloudWatch({ apiVersion: '2010-08-01' })
+      this.sns = new SNS({ apiVersion: '2010-03-31' })
       logger.info('AWS monitoring services initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize AWS monitoring services', { error })
@@ -354,17 +345,15 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       // Filter by event type if specified (and not 'all')
       if (eventType !== 'all') {
-        return recentEvents.filter(
-          (event) => {
-            if (event.action.includes(eventType)) {
-              return true
-            }
-            if (event.keyId?.includes(eventType)) {
-              return true
-            }
-            return eventType === 'key' && event.action.includes('key')
-          },
-        )
+        return recentEvents.filter((event) => {
+          if (event.action.includes(eventType)) {
+            return true
+          }
+          if (event.keyId?.includes(eventType)) {
+            return true
+          }
+          return eventType === 'key' && event.action.includes('key')
+        })
       }
 
       logger.debug('Retrieved recent audit events', {
@@ -942,13 +931,10 @@ export class HIPAAMonitoringService extends EventEmitter {
     }
 
     // Analyze event distribution
-    const eventTypes = events.reduce<Record<string, number>>(
-      (acc, event) => {
-        acc[event.action] = (acc[event.action] ?? 0) + 1
-        return acc
-      },
-      {},
-    )
+    const eventTypes = events.reduce<Record<string, number>>((acc, event) => {
+      acc[event.action] = (acc[event.action] ?? 0) + 1
+      return acc
+    }, {})
 
     // Identify key findings
     if (Object.keys(eventTypes).length > 10) {
@@ -1155,16 +1141,16 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Group by key ID
-    const keysById = keyEvents.reduce<Record<string, AuditEvent[]>>(
+      const keysById = keyEvents.reduce<Record<string, AuditEvent[]>>(
         (acc, event) => {
-        const keyId = event.keyId
-        if (keyId) {
-          acc[keyId] ??= []
-          acc[keyId].push(event)
-        }
+          const keyId = event.keyId
+          if (keyId) {
+            acc[keyId] ??= []
+            acc[keyId].push(event)
+          }
           return acc
         },
-      {},
+        {},
       )
 
       // Check each key for compliance
@@ -1274,10 +1260,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         'action',
       ]
       const incompleteEvents = sortedEvents.filter(
-        (event) =>
-          !requiredFields.every(
-            (field) => event[field],
-          ),
+        (event) => !requiredFields.every((field) => event[field]),
       )
 
       if (incompleteEvents.length > 0) {
@@ -2007,7 +1990,11 @@ export class HIPAAMonitoringService extends EventEmitter {
       return ['Emergency rotation', 'Audit access logs', 'Notify security team']
     }
     if (action === 'suspicious_activity_detected') {
-      return ['Investigate source', 'Enhance monitoring', 'Review access controls']
+      return [
+        'Investigate source',
+        'Enhance monitoring',
+        'Review access controls',
+      ]
     }
     return ['Review and investigate']
   }
@@ -2015,25 +2002,19 @@ export class HIPAAMonitoringService extends EventEmitter {
   private groupAlertsByCategory(
     alerts: SecurityAlert[],
   ): Record<string, number> {
-    return alerts.reduce<Record<string, number>>(
-      (acc, alert) => {
-        acc[alert.category] = (acc[alert.category] ?? 0) + 1
-        return acc
-      },
-      {},
-    )
+    return alerts.reduce<Record<string, number>>((acc, alert) => {
+      acc[alert.category] = (acc[alert.category] ?? 0) + 1
+      return acc
+    }, {})
   }
 
   private groupAlertsBySeverity(
     alerts: SecurityAlert[],
   ): Record<string, number> {
-    return alerts.reduce<Record<string, number>>(
-      (acc, alert) => {
-        acc[alert.severity] = (acc[alert.severity] ?? 0) + 1
-        return acc
-      },
-      {},
-    )
+    return alerts.reduce<Record<string, number>>((acc, alert) => {
+      acc[alert.severity] = (acc[alert.severity] ?? 0) + 1
+      return acc
+    }, {})
   }
 
   private generateRecommendations(alerts: SecurityAlert[]): string[] {

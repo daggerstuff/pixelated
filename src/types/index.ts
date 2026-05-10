@@ -97,21 +97,21 @@ export const createNavItem = (input: NavItemInput): NavItem => ({
 
 /** Base props that all components should accept */
 export type BaseComponentProps = {
-  readonly 'id'?: ComponentId
-  readonly 'className'?: string
+  readonly id?: ComponentId
+  readonly className?: string
   readonly 'data-testid'?: string
   readonly 'aria-label'?: string
 }
 
 /** Props for components that can be disabled */
 export type DisableableProps = {
-  readonly 'disabled'?: boolean
+  readonly disabled?: boolean
   readonly 'aria-disabled'?: boolean
 }
 
 /** Props for components with loading states */
 export type LoadingProps = {
-  readonly 'loading'?: boolean
+  readonly loading?: boolean
   readonly 'aria-busy'?: boolean
 }
 
@@ -167,7 +167,7 @@ export type AriaRole =
 
 /** Accessibility props for interactive elements */
 export type AccessibilityProps = {
-  readonly 'role'?: AriaRole
+  readonly role?: AriaRole
   readonly 'aria-label'?: string
   readonly 'aria-labelledby'?: string
   readonly 'aria-describedby'?: string
@@ -180,7 +180,7 @@ export type AccessibilityProps = {
     | 'grid'
     | 'dialog'
   readonly 'aria-hidden'?: boolean
-  readonly 'tabIndex'?: number
+  readonly tabIndex?: number
 }
 
 // ============================================================================

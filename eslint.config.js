@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import css from '@eslint/css'
 import js from '@eslint/js'
 import json from '@eslint/json'
@@ -10,6 +9,10 @@ import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+
+const jsxA11yRecommendedRules = pluginJsxA11y.configs.recommended.rules
+const astroRecommendedRules = pluginAstro.configs.recommended.rules
+const vitestRecommendedRules = pluginVitest.configs.recommended.rules
 
 export default tseslint.config(
   // Base JavaScript recommendations
@@ -164,7 +167,7 @@ export default tseslint.config(
       // Disabled complexity rules (matching OXC)
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-params': 'off',
       'max-statements': 'off',
       'no-await-in-loop': 'off',
@@ -209,8 +212,7 @@ export default tseslint.config(
       'jsx-a11y': pluginJsxA11y,
     },
     rules: {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-      ...pluginJsxA11y.configs.recommended.rules,
+      ...jsxA11yRecommendedRules,
     },
   },
 
@@ -218,7 +220,7 @@ export default tseslint.config(
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      'vitest': pluginVitest,
+      vitest: pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -227,7 +229,7 @@ export default tseslint.config(
       },
     },
     rules: {
-      ...pluginVitest.configs.recommended.rules,
+      ...vitestRecommendedRules,
     },
   },
 
@@ -253,7 +255,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-params': 'off',
       'max-statements': 'off',
     },
@@ -310,9 +312,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
 
       // Use Astro-specific recommended rules
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-      ...pluginAstro.configs.recommended.rules,
+      ...astroRecommendedRules,
     },
   },
 )
-/* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
