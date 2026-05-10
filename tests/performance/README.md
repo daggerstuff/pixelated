@@ -232,7 +232,8 @@ k6 run --stage 0s:0,1m:100,30s:100,1m:0 tests/performance/k6-rest-inference-load
     sudo mv k6-v0.48.0-linux-amd64/k6 /usr/local/bin/
   displayName: 'Install K6'
 
-- script: k6 run --out json=$(Build.ArtifactStagingDirectory)/k6-results.json
+- script:
+    k6 run --out json=$(Build.ArtifactStagingDirectory)/k6-results.json
     tests/performance/k6-rest-inference-load.js
   displayName: 'Run Load Tests'
 

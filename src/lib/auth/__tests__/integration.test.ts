@@ -305,7 +305,7 @@ describe('Authentication System Integration', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer access.token.456',
+          Authorization: 'Bearer access.token.456',
           'X-CSRF-Token': 'valid-csrf-token',
         },
       })
@@ -686,10 +686,9 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const refreshContext = {
+      const refreshContext: Parameters<typeof refreshHandler>[0] = {
         request: refreshRequest,
-      } as unknown as Parameters<typeof refreshHandler>[0]
+      }
 
       await refreshHandler(refreshContext)
 
@@ -710,7 +709,7 @@ describe('Authentication System Integration', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer valid.token',
+          Authorization: 'Bearer valid.token',
           'X-CSRF-Token': 'valid-csrf-token',
         },
       })
@@ -810,7 +809,7 @@ describe('Authentication System Integration', () => {
       const request = new Request('https://example.com/api/auth/profile', {
         method: 'PUT',
         headers: {
-          'Authorization': 'Bearer valid.token',
+          Authorization: 'Bearer valid.token',
           'Content-Type': 'application/json',
           'X-CSRF-Token': 'valid-token',
         },

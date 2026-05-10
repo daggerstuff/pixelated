@@ -48,7 +48,7 @@ class TenantManager {
   ): Record<string, unknown> & { tenantConfig?: TenantConfig } {
     const tenant = this.getTenant(tenantId)
     if (!tenant) {
-    return baseConfig
+      return baseConfig
     }
 
     const { customConfig, resourceLimits } = tenant

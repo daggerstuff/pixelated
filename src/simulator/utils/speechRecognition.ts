@@ -227,7 +227,6 @@ export function getKeywordPatterns(domain: string): RegExp[] {
     ],
   }
 
-  // eslint-disable-next-line @typescript-eslint/dot-notation
   return patterns[domain] || patterns['general'] || []
 }
 
@@ -391,8 +390,7 @@ export function getTherapeuticPrompts(
       ],
     }
 
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    const domainPrompts = generalPrompts[domain] || generalPrompts['general']
+    const domainPrompts = generalPrompts[domain] || generalPrompts.general
     if (domainPrompts) {
       const selectedPrompt =
         domainPrompts[Math.floor(Math.random() * domainPrompts.length)]

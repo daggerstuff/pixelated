@@ -14,6 +14,12 @@ interface RouteConfig extends AuthOptions {
   pattern: RegExp
 }
 
+type LocalContextWithUser = App.Locals & {
+  user?: Record<string, unknown>
+}
+
+type MiddlewareFunction = Parameters<typeof sequence>[number]
+
 // Route authentication configuration
 // Defines which routes require authentication and what strategy/scopes to use
 const routeAuthConfig: RouteConfig[] = [
@@ -107,8 +113,7 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
         ...authResult.request.user,
         emailVerified: authResult.request.user.emailVerified ?? false,
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(context.locals as any).user = userData
+      ;(context.locals as LocalContextWithUser).user = userData
     }
   } catch (err) {
     // If authentication check fails, treat as unauthenticated
@@ -125,9 +130,9 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
 // Single, clean middleware sequence
 // Tracing middleware is first to capture all requests
 export const onRequest = sequence(
-  tracingMiddleware as any,
-  generateCspNonce as any,
-  securityHeaders as any,
-  corsMiddleware as any,
-  projectAuthMiddleware as any,
+  tracingMiddleware as MiddlewareFunction,
+  generateCspNonce as MiddlewareFunction,
+  securityHeaders as MiddlewareFunction,
+  corsMiddleware as MiddlewareFunction,
+  projectAuthMiddleware as MiddlewareFunction,
 )

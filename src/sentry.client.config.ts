@@ -14,6 +14,46 @@ const clientConfig = initSentry({
   // Force browser DSN to explicit public-only config so we don't silently
   // fall back to a fallback DSN and lose traceability.
   dsn: resolveSentryDsn(),
+  integrations: [
+    // Additional React-specific integrations can be added here
+  ],
 })
 
 initClient(clientConfig)
+
+// React 19 Error Handler
+// Export for use in entry points that call createRoot
+// Usage: import { createRoot } from 'react-dom/client'
+//        const root = createRoot(container, {
+//          onUncaughtError: reactErrorHandler(),
+//          onCaughtError: reactErrorHandler(),
+//          onRecoverableError: reactErrorHandler(),
+//        })
+export const reactErrorHandler = () => {
+  if (typeof window === 'undefined') {
+    return () => {}
+  }
+
+  const getWindowErrorHandler = (
+    window as Window & { Sentry?: { reactErrorHandler?: () => unknown } }
+  ).Sentry?.reactErrorHandler
+
+  if (typeof getWindowErrorHandler === 'function') {
+    try {
+      const handler = getWindowErrorHandler()
+      if (typeof handler === 'function') {
+        return handler
+      }
+    } catch {
+      // ignore and fall back to no-op
+    }
+  }
+
+  if (import.meta.env.DEV) {
+    return (error: unknown) => {
+      console.error('[Sentry] reactErrorHandler fallback triggered:', error)
+    }
+  }
+
+  return () => {}
+}

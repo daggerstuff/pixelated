@@ -1,8 +1,18 @@
 #!/usr/bin/env node
 
-import fs from 'fs'
-import path from 'path'
-import process from 'process'
+/// <reference types="node" />
+
+import {
+  basename,
+  dirname,
+  extname,
+  join,
+  relative,
+  resolve,
+  sep,
+} from 'node:path'
+import { cwd } from 'node:process'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 
 const TEXT_EXTENSIONS = new Set([
   '.astro',
@@ -122,7 +132,7 @@ const SECRET_PATTERNS = [
  * @returns {string}
  */
 function normalizePath(filePath) {
-  return filePath.split(path.sep).join('/')
+  return filePath.split(sep).join('/')
 }
 
 /**
@@ -133,26 +143,47 @@ function shouldIgnoreDir(dirName) {
   return IGNORED_DIRS.has(dirName) || dirName.startsWith('.pytest_cache')
 }
 
-function shouldScanFile(filePath) {
-  const basename = path.basename(filePath)
+/**
+ * @typedef {{ name: string, severity: string, regex: RegExp }} SecretPattern
+ * @typedef {{ file: string, line: number, severity: string, message: string, code: string }} Finding
+ */
 
-  if (LOCK_FILES.has(basename)) {
+/**
+ * @typedef {{ cwd?: string }} SecurityScanOptions
+ */
+
+/**
+ * @param {string} filePath
+ * @returns {boolean}
+ */
+function shouldScanFile(filePath) {
+  /** @type {string} */ const fileBaseName = basename(filePath)
+
+  if (LOCK_FILES.has(fileBaseName)) {
     return false
   }
 
-  if (basename === 'Dockerfile' || basename.startsWith('Dockerfile.')) {
+  if (fileBaseName === 'Dockerfile' || fileBaseName.startsWith('Dockerfile.')) {
     return true
   }
 
-  return TEXT_EXTENSIONS.has(path.extname(basename))
+  return TEXT_EXTENSIONS.has(extname(fileBaseName))
 }
 
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function looksLikePlaceholder(value) {
   return /example|placeholder|dummy|fake|mock|changeme|replace[_-]?me|test[_-]?key|sample/i.test(
     value,
   )
 }
 
+/**
+ * @param {string} line
+ * @returns {boolean}
+ */
 function isSafeLine(line) {
   return (
     line.includes('process.env') ||
@@ -167,6 +198,12 @@ function isSafeLine(line) {
   )
 }
 
+/**
+ * @param {string} line
+ * @param {string} match
+ * @param {string} patternName
+ * @returns {boolean}
+ */
 function shouldIgnoreMatch(line, match, patternName) {
   if (patternName === 'Connection string') {
     return (
@@ -182,6 +219,10 @@ function shouldIgnoreMatch(line, match, patternName) {
   return false
 }
 
+/**
+ * @param {string} match
+ * @returns {string}
+ */
 function redactMatch(match) {
   if (match.length <= 12) {
     return '[REDACTED]'
@@ -190,14 +231,25 @@ function redactMatch(match) {
   return `${match.slice(0, 4)}...${match.slice(-4)}`
 }
 
+/**
+ * @param {string} line
+ * @param {string} match
+ * @returns {string}
+ */
 function redactLine(line, match) {
   return line.replaceAll(match, redactMatch(match)).trim()
 }
 
+/**
+ * @param {string} rootDir
+ * @param {string} filePath
+ * @returns {Finding[]}
+ */
 function scanFile(rootDir, filePath) {
-  const relativePath = normalizePath(path.relative(rootDir, filePath))
-  const content = fs.readFileSync(filePath, 'utf8')
-  const lines = content.split(/\r?\n/)
+  const relativePath = normalizePath(relative(rootDir, filePath))
+  /** @type {string} */ const content = readFileSync(filePath, 'utf8')
+  /** @type {string[]} */ const lines = content.split(/\r?\n/)
+  /** @type {Finding[]} */
   const findings = []
 
   lines.forEach((line, index) => {
@@ -208,12 +260,13 @@ function scanFile(rootDir, filePath) {
     SECRET_PATTERNS.forEach(({ name, severity, regex }) => {
       const matches = [...line.matchAll(new RegExp(regex.source, regex.flags))]
 
-      matches.forEach(([match]) => {
-        if (!match || looksLikePlaceholder(match)) {
+      matches.forEach((match) => {
+        const rawMatch = match[0]
+        if (!rawMatch || looksLikePlaceholder(rawMatch)) {
           return
         }
 
-        if (shouldIgnoreMatch(line, match, name)) {
+        if (shouldIgnoreMatch(line, rawMatch, name)) {
           return
         }
 
@@ -222,7 +275,7 @@ function scanFile(rootDir, filePath) {
           line: index + 1,
           severity,
           message: `${name} detected`,
-          code: redactLine(line, match),
+          code: redactLine(line, rawMatch),
         })
       })
     })
@@ -231,11 +284,18 @@ function scanFile(rootDir, filePath) {
   return findings
 }
 
+/**
+ * @param {string} rootDir
+ * @param {string} currentDir
+ * @param {Finding[]} findings
+ */
 function walk(rootDir, currentDir, findings) {
-  const entries = fs.readdirSync(currentDir, { withFileTypes: true })
+  /** @type {import('node:fs').Dirent[]} */ const entries = readdirSync(currentDir, {
+    withFileTypes: true,
+  })
 
   entries.forEach((entry) => {
-    const fullPath = path.join(currentDir, entry.name)
+    /** @type {string} */ const fullPath = join(currentDir, entry.name)
 
     if (entry.isDirectory()) {
       if (shouldIgnoreDir(entry.name)) {
@@ -252,17 +312,22 @@ function walk(rootDir, currentDir, findings) {
   })
 }
 
+/**
+ * @param {string} [targetDir]
+ * @param {SecurityScanOptions} [options]
+ * @returns {Finding[]}
+ */
 export function scanDirectory(targetDir = '.', options = {}) {
-  const rootDir = path.resolve(options.cwd ?? process.cwd(), targetDir)
-  const findings = []
+  const rootDir = resolve(options.cwd ?? cwd(), targetDir)
+  /** @type {Finding[]} */ const findings = []
 
-  if (!fs.existsSync(rootDir)) {
+  if (!existsSync(rootDir)) {
     return findings
   }
 
-  const stat = fs.statSync(rootDir)
+  /** @type {import('node:fs').Stats} */ const stat = statSync(rootDir)
   if (stat.isFile()) {
-    return shouldScanFile(rootDir) ? scanFile(path.dirname(rootDir), rootDir) : findings
+    return shouldScanFile(rootDir) ? scanFile(dirname(rootDir), rootDir) : findings
   }
 
   walk(rootDir, rootDir, findings)

@@ -679,7 +679,6 @@ export class CloudProviderManager {
   /**
    * Get GCP region name from location
    */
-  // @ts-ignore - Unused function for now
   private getGCPRegionName(location: string): string {
     const regionMap: Record<string, string> = {
       'us-east': 'us-east1',
