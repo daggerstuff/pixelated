@@ -2,9 +2,9 @@
 
 import { spawnSync } from "node:child_process";
 
-const files = process.argv.slice(2).map((filePath) => filePath.trim());
+const files: string[] = process.argv.slice(2).map((filePath: string) => filePath.trim());
 
-const isGeneratedMarkdownFile = (filePath) => {
+const isGeneratedMarkdownFile = (filePath: string): boolean => {
   const normalizedPath = filePath.replaceAll("\\", "/");
   return (
     normalizedPath.startsWith(".Jules/") &&
@@ -18,11 +18,14 @@ if (generatedFiles.length === 0) {
   process.exit(0);
 }
 
-const runCommand = (args) => {
-  const { status } = spawnSync("pnpm", args, {
+const runCommand = (args: string[]): void => {
+  const result = spawnSync("pnpm", args, {
     stdio: "inherit",
   });
-  if (status !== 0) process.exit(status);
+  const status = result.status;
+  if (status === null || status !== 0) {
+    process.exit(status ?? 1);
+  }
 };
 
 runCommand([
