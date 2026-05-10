@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from 'express'
+import type { NextFunction } from 'express'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
@@ -17,51 +17,28 @@ vi.mock('../../../lib/auth/user-identity', () => ({
 }))
 
 import { authMiddleware, requirePermissions, requireRoles } from '../auth'
-
-type MockAuthRequest = Pick<
-  Request,
-  'protocol' | 'get' | 'originalUrl' | 'method' | 'headers'
-> & {
-  user?: {
-    id: string
-    email: string
-    roles: string[]
-    emailVerified: boolean
-  }
-  statusCode?: number
-}
-
-type MockAuthResponse = Pick<Response, 'status' | 'json'>
+import {
+  createMockAuthRequest,
+  createMockAuthResponse,
+  createMockAuthUser,
+  type MockAuthRequest,
+  type MockAuthResponse,
+} from './auth-test-helpers'
 
 describe('Authentication Middleware', () => {
-  let mockRequest: Request
+  let mockRequest: MockAuthRequest
   let mockResponse: MockAuthResponse
   let mockNext: NextFunction
-  const statusSpy = vi.fn().mockReturnThis()
-  const jsonSpy = vi.fn()
+  let statusSpy: ReturnType<typeof vi.fn>
+  let jsonSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    mockRequest = {
-      protocol: 'http',
-      get: (header: string): string | string[] | undefined => {
-        const headers: Record<string, string> = {
-          host: 'localhost:3000',
-          authorization: 'Bearer test-token',
-        }
-        return headers[header] || undefined
-      },
-      originalUrl: '/api/users',
-      method: 'GET',
-      headers: {
-        authorization: 'Bearer test-token',
-      },
-    } as MockAuthRequest
-    statusSpy.mockClear()
-    jsonSpy.mockClear()
-    mockResponse = {
-      status: statusSpy,
-      json: jsonSpy,
-    } satisfies MockAuthResponse
+    const responseMock = createMockAuthResponse()
+
+    mockRequest = createMockAuthRequest()
+    mockResponse = responseMock.response
+    statusSpy = responseMock.statusSpy
+    jsonSpy = responseMock.jsonSpy
     mockNext = vi.fn()
 
     vi.clearAllMocks()
@@ -134,7 +111,11 @@ describe('Authentication Middleware', () => {
   describe('requireRoles', () => {
     it('should call next when user has required role', async () => {
       const middleware = requireRoles(['admin', 'moderator'])
-      mockRequest.user = { id: 'user-123', roles: ['admin', 'user'] }
+      mockRequest.user = createMockAuthUser({
+        roles: ['admin', 'user'],
+        email: 'user@example.com',
+        emailVerified: true,
+      })
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -156,7 +137,11 @@ describe('Authentication Middleware', () => {
 
     it('should return 403 when user lacks required role', async () => {
       const middleware = requireRoles(['admin'])
-      mockRequest.user = { id: 'user-123', roles: ['user', 'editor'] }
+      mockRequest.user = createMockAuthUser({
+        roles: ['user', 'editor'],
+        email: 'user@example.com',
+        emailVerified: true,
+      })
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -170,7 +155,11 @@ describe('Authentication Middleware', () => {
 
     it('should accept any of multiple allowed roles', async () => {
       const middleware = requireRoles(['admin', 'moderator', 'editor'])
-      mockRequest.user = { id: 'user-123', roles: ['editor', 'user'] }
+      mockRequest.user = createMockAuthUser({
+        roles: ['editor', 'user'],
+        email: 'user@example.com',
+        emailVerified: true,
+      })
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -181,10 +170,11 @@ describe('Authentication Middleware', () => {
   describe('requirePermissions', () => {
     it('should call next when user has required permission', async () => {
       const middleware = requirePermissions(['documents:read'])
-      mockRequest.user = {
-        id: 'user-123',
+      mockRequest.user = createMockAuthUser({
+        roles: ['user'],
         permissions: ['documents:read', 'documents:write'],
-      }
+        emailVerified: true,
+      })
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -202,7 +192,11 @@ describe('Authentication Middleware', () => {
 
     it('should return 403 when user lacks permission', async () => {
       const middleware = requirePermissions(['admin:delete'])
-      mockRequest.user = { id: 'user-123', permissions: ['documents:read'] }
+      mockRequest.user = createMockAuthUser({
+        roles: ['user'],
+        permissions: ['documents:read'],
+        emailVerified: true,
+      })
 
       middleware(mockRequest, mockResponse, mockNext)
 
@@ -219,7 +213,11 @@ describe('Authentication Middleware', () => {
         'documents:read',
         'documents:write',
       ])
-      mockRequest.user = { id: 'user-123', permissions: ['documents:read'] }
+      mockRequest.user = createMockAuthUser({
+        roles: ['user'],
+        permissions: ['documents:read'],
+        emailVerified: true,
+      })
 
       middleware(mockRequest, mockResponse, mockNext)
 

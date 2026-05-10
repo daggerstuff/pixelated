@@ -11,7 +11,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 const jsxA11yRecommendedRules = pluginJsxA11y.configs.recommended.rules
-const astroRecommendedRules = pluginAstro.configs.recommended.rules
+const astroFlatRecommendedRules = pluginAstro.configs['flat/recommended'].rules
 const vitestRecommendedRules = pluginVitest.configs.recommended.rules
 
 export default tseslint.config(
@@ -24,6 +24,7 @@ export default tseslint.config(
       'dist/**',
       'node_modules/**',
       'public/**',
+      '.oxlintrc.json',
       'coverage/**',
       'playwright-report/**',
       'test-results/**',
@@ -167,7 +168,7 @@ export default tseslint.config(
       // Disabled complexity rules (matching OXC)
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      complexity: 'off',
+      'complexity': 'off',
       'max-params': 'off',
       'max-statements': 'off',
       'no-await-in-loop': 'off',
@@ -220,7 +221,7 @@ export default tseslint.config(
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      vitest: pluginVitest,
+      'vitest': pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -255,7 +256,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      complexity: 'off',
+      'complexity': 'off',
       'max-params': 'off',
       'max-statements': 'off',
     },
@@ -298,21 +299,24 @@ export default tseslint.config(
   },
 
   // Astro files
+  ...pluginAstro.configs['flat/recommended'],
   {
     files: ['**/*.astro'],
-    plugins: {
-      astro: pluginAstro,
-    },
     rules: {
-      // Disable unused variable warnings for Astro files
-      // Astro components split frontmatter and template sections,
-      // causing false positives when variables are defined in frontmatter
-      // but used in the template
+      ...astroFlatRecommendedRules,
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
 
-      // Use Astro-specific recommended rules
-      ...astroRecommendedRules,
+  // Multi-region modules allow typed interoperability while we migrate legacy interfaces
+  {
+    files: [
+      'src/lib/deployment/multi-region/AutomatedFailoverOrchestrator.ts',
+      'src/lib/deployment/multi-region/CrossRegionDataSyncManager.ts',
+    ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 )

@@ -130,7 +130,7 @@ const createPartialFailingPythonService = () =>
     }
   };
 
-describe("BiasDetectionEngine", { timeout: 20000 }, () => {
+describe("BiasDetectionEngine", () => {
   let biasEngine: BiasDetectionEngine;
   let mockConfig: EngineConfig;
   let mockSessionData: SessionData;
