@@ -1,8 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
 
-import { loadEnv } from 'vite'
-
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
@@ -10,6 +8,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { loadEnv } from 'vite'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
 const isRailwayDeploy =

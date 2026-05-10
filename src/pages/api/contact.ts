@@ -103,7 +103,8 @@ export const POST = async ({ request }: APIContext) => {
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'Invalid request format. Please check your data and try again.',
+          message:
+            'Invalid request format. Please check your data and try again.',
         }),
         {
           status: 400,
@@ -146,11 +147,11 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Prepare submission context
-  const submissionContext = {
-    ipAddress: getClientIP(request),
-    userAgent: request.headers.get('user-agent') ?? 'Unknown',
-    timestamp: new Date().toISOString(),
-  }
+    const submissionContext = {
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') ?? 'Unknown',
+      timestamp: new Date().toISOString(),
+    }
 
     // Submit contact form through service
     const result = await contactService.submitContactForm(

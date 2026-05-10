@@ -4,30 +4,80 @@ Constants for bias detection service, including bias-related term sets.
 
 # Gender bias term sets
 MALE_TERMS = {
-    "he", "him", "his", "man", "men", "boy", "boys", "male", "father", "son", "brother"
+    "he",
+    "him",
+    "his",
+    "man",
+    "men",
+    "boy",
+    "boys",
+    "male",
+    "father",
+    "son",
+    "brother",
 }
 
 FEMALE_TERMS = {
-    "she", "her", "hers", "woman", "women", "girl", "girls", "female", "mother", "daughter", "sister"
+    "she",
+    "her",
+    "hers",
+    "woman",
+    "women",
+    "girl",
+    "girls",
+    "female",
+    "mother",
+    "daughter",
+    "sister",
 }
 
 # Racial bias terms
 RACIAL_TERMS = {
-    "race", "racial", "ethnic", "ethnicity", "minority", "majority",
-    "black", "white", "asian", "hispanic", "latino", "native",
+    "race",
+    "racial",
+    "ethnic",
+    "ethnicity",
+    "minority",
+    "majority",
+    "black",
+    "white",
+    "asian",
+    "hispanic",
+    "latino",
+    "native",
 }
 
 # Age bias terms
 AGE_TERMS = {
-    "young", "old", "elderly", "senior", "youth", "teenager",
-    "adult", "child", "children", "baby", "infant", "toddler", "adolescent",
+    "young",
+    "old",
+    "elderly",
+    "senior",
+    "youth",
+    "teenager",
+    "adult",
+    "child",
+    "children",
+    "baby",
+    "infant",
+    "toddler",
+    "adolescent",
 }
 
 # Cultural bias terms
 CULTURAL_TERMS = {
-    "culture", "cultural", "religion", "religious", "tradition",
-    "traditional", "foreign", "immigrant", "native", "indigenous",
-    "western", "eastern",
+    "culture",
+    "cultural",
+    "religion",
+    "religious",
+    "tradition",
+    "traditional",
+    "foreign",
+    "immigrant",
+    "native",
+    "indigenous",
+    "western",
+    "eastern",
 }
 
 # Biased terms and their categories for detailed analysis

@@ -164,7 +164,7 @@ export default tseslint.config(
       // Disabled complexity rules (matching OXC)
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-params': 'off',
       'max-statements': 'off',
       'no-await-in-loop': 'off',
@@ -175,7 +175,7 @@ export default tseslint.config(
   {
     files: ['**/*.{jsx,tsx}'],
     plugins: {
-      'react': pluginReact,
+      react: pluginReact,
       'react-hooks': pluginReactHooks,
     },
     settings: {
@@ -240,19 +240,23 @@ export default tseslint.config(
   // JSX-A11y configuration
   {
     files: ['**/*.{jsx,tsx}'],
+    /* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
     plugins: {
+      // eslint-disable-next-line typescript/no-unsafe-assignment
       'jsx-a11y': pluginJsxA11y,
     },
     rules: {
+      // eslint-disable-next-line typescript/no-unsafe-assignment,typescript/no-unsafe-member-access
       ...pluginJsxA11y.configs.recommended.rules,
     },
+    /* eslint-enable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
   },
 
   // Vitest configuration
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      'vitest': pluginVitest,
+      vitest: pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -283,7 +287,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-params': 'off',
       'max-statements': 'off',
     },
@@ -327,7 +331,9 @@ export default tseslint.config(
   // Astro files
   {
     files: ['**/*.astro'],
+    /* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
     plugins: {
+      // eslint-disable-next-line typescript/no-unsafe-assignment
       astro: pluginAstro,
     },
     rules: {
@@ -339,7 +345,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
 
       // Use Astro-specific recommended rules
+      // eslint-disable-next-line typescript/no-unsafe-assignment,typescript/no-unsafe-member-access
       ...pluginAstro.configs.recommended.rules,
     },
+    /* eslint-enable typescript/no-unsafe-assignment,typescript/no-unsafe-member-access */
   },
 )

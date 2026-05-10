@@ -11,7 +11,35 @@ BACKUP_RUN_PREFIX="${BACKUP_RUN_PREFIX:-home-vivi-run}"
 BACKUP_SECTION_STRICT_ERRORS="${BACKUP_SECTION_STRICT_ERRORS:-false}"
 BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 BACKUP_SECTIONS="${BACKUP_SECTIONS:-}"
-BACKUP_SKIP_SECTIONS="${BACKUP_SKIP_SECTIONS:-.cache .cargo}"
+DEFAULT_BACKUP_SKIP_SECTIONS=".cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube"
+BACKUP_SKIP_SECTIONS="${BACKUP_SKIP_SECTIONS:-$DEFAULT_BACKUP_SKIP_SECTIONS}"
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".claude"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .claude"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".claude-mem"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .claude-mem"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cursor"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cursor"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cursor-server"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cursor-server"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".codex"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .codex"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".gemini"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .gemini"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".kube"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .kube"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cache"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cache"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cargo"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cargo"
+fi
 BACKUP_HEARTBEAT_INTERVAL="${BACKUP_HEARTBEAT_INTERVAL:-120}"
 SECTION_BACKUP_PATHS=()
 SECTION_FAIL_COUNT=0

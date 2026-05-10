@@ -26,7 +26,8 @@
 - Keep commands and constraints explicit and executable.
 - Preserve therapeutic and privacy context in user-facing messaging.
 - Use `uv run` for Python execution in this repo.
-- Run Foresight continuity at the start of substantial tasks (not for small one-offs): `manage_subconscious` (`get project_context`) and `inject_context`.
+- Run Foresight continuity at the start of substantial tasks (not for small
+  one-offs): `manage_subconscious` (`get project_context`) and `inject_context`.
   - If continuity calls fail, pause and use the local `continuity` fallback only
     when explicitly justified in `project_context`.
 

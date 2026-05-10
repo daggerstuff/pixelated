@@ -238,12 +238,9 @@ class DatabaseService:
             logger.info("Database schema initialized successfully")
 
         except Exception as e:
-            logger.error(
-                f"Failed to initialize database schema: {e!s}", error=str(e)
-            )
+            logger.error(f"Failed to initialize database schema: {e!s}", error=str(e))
             # Re-raise to ensure initialization failure is known
             raise
-
 
     @retry(
         stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
@@ -333,7 +330,9 @@ class DatabaseService:
             )
             return False
 
-    async def store_analysis_result(self, session_id: str, _result: dict[str, Any]) -> bool:
+    async def store_analysis_result(
+        self, session_id: str, _result: dict[str, Any]
+    ) -> bool:
         """Store an orchestrated analysis result (placeholder for high-level storage)."""
         logger.info("Orchestrated analysis result received", session_id=session_id)
         # In a real scenario, this might store to a different table or MongoDB
@@ -535,7 +534,9 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to track API usage: {e!s}", endpoint=request_details.get("endpoint"), error=str(e)
+                f"Failed to track API usage: {e!s}",
+                endpoint=request_details.get("endpoint"),
+                error=str(e),
             )
             return False
 
