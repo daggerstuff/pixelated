@@ -102,11 +102,17 @@ const isSentryInstance = (value) =>
  * @returns {SentryEvent | null | undefined}
  */
 const filterSensitiveFields = (event, fields) => {
-  if (!isRecord(event) || !isRecord(event.request) || !isRecord(event.request.data)) {
+  if (
+    !isRecord(event) ||
+    !isRecord(event.request) ||
+    !isRecord(event.request.data)
+  ) {
     return event
   }
 
-  const requestData = /** @type {Record<string, unknown>} */ ({ ...event.request.data })
+  const requestData = /** @type {Record<string, unknown>} */ ({
+    ...event.request.data,
+  })
   for (const field of fields) {
     if (Object.prototype.hasOwnProperty.call(requestData, field)) {
       requestData[field] = '[FILTERED]'
@@ -240,16 +246,16 @@ Sentry.init({
   // Before send hook for filtering sensitive data
   beforeSend: (/** @type {SentryEvent | null} */ event) => {
     // Filter out sensitive data from events
-    return filterSensitiveFields(
-      event,
-      ['password', 'token', 'apiKey', 'secret'],
-    )
+    return filterSensitiveFields(event, [
+      'password',
+      'token',
+      'apiKey',
+      'secret',
+    ])
   },
 
   // Before breadcrumb hook for custom breadcrumb handling
-  beforeBreadcrumb: (
-    /** @type {unknown} */ breadcrumb,
-  ) => {
+  beforeBreadcrumb: (/** @type {unknown} */ breadcrumb) => {
     // Customize breadcrumbs as needed
     if (!isSentryBreadcrumb(breadcrumb)) {
       return {
@@ -257,7 +263,10 @@ Sentry.init({
         level: undefined,
       }
     }
-    if (typeof breadcrumb.category === 'string' && breadcrumb.category === 'console') {
+    if (
+      typeof breadcrumb.category === 'string' &&
+      breadcrumb.category === 'console'
+    ) {
       // Enhance console breadcrumbs with more context
       return {
         ...breadcrumb,
@@ -344,7 +353,8 @@ export const healthCheck = () => {
     return { status: 'healthy', timestamp: new Date().toISOString() }
   } catch (caughtError) {
     Sentry.captureException(caughtError)
-    const message = caughtError instanceof Error ? caughtError.message : String(caughtError)
+    const message =
+      caughtError instanceof Error ? caughtError.message : String(caughtError)
     return {
       status: 'unhealthy',
       error: message,

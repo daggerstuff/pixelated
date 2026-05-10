@@ -1,9 +1,7 @@
 {
   "generated_at": "2026-05-10T06:17:33.903862+00:00",
   "threshold": 500,
-  "input_dirs": [
-    "ai/data/staged_datasets"
-  ],
+  "input_dirs": ["ai/data/staged_datasets"],
   "total_files_scanned": 6,
   "total_samples": 18229,
   "categories": {
