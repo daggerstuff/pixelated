@@ -11,6 +11,15 @@ import { Request, Response, NextFunction } from 'express'
  * Base class for all application-specific errors.
  * Extends the built-in Error object to include HTTP status codes and custom error codes.
  */
+export type ErrorRequest = Pick<
+  Request,
+  'method' | 'url' | 'path' | 'originalUrl'
+> & {
+  get: (name: string) => string | undefined
+}
+
+export type ErrorResponse = Pick<Response, 'status' | 'json'>
+
 export class AppError extends Error {
   constructor(
     public statusCode: number,
@@ -69,10 +78,32 @@ export class ConflictError extends AppError {
 // ERROR HANDLER MIDDLEWARE
 // ============================================================================
 
+type ExtendedError = Error & {
+  code?: string | number
+  keyValue?: Record<string, unknown>
+  routine?: string
+}
+
+type ErrorResponseBody = {
+  error: {
+    code: string
+    message: string
+    details?: Record<string, unknown>
+    stack?: string
+  }
+  request?: {
+    method: string
+    url: string
+    timestamp: string
+  }
+}
+
+const toErrorCode = (value: string | number): string => String(value)
+
 export function errorHandler(
   error: Error | AppError,
-  req: Request,
-  res: Response,
+  req: ErrorRequest,
+  res: ErrorResponse,
   _next: NextFunction,
 ) {
   console.error('Error:', error)
@@ -81,42 +112,44 @@ export function errorHandler(
   let statusCode = 500
   let message = 'Internal Server Error'
   let code = 'INTERNAL_SERVER_ERROR'
-  let details: any = undefined
+  let details: Record<string, unknown> | undefined
 
   // Handle custom AppError
   if (error instanceof AppError) {
     statusCode = error.statusCode
     message = error instanceof Error ? error.message : 'Unknown error'
-    code = error.code || 'APP_ERROR'
+    code = error.code ?? 'APP_ERROR'
 
     if (error instanceof ValidationError && error.fields) {
       details = {
         fields: error.fields,
       }
     }
-  }
-  // Handle MongoDB validation error
-  else if (error.name === 'ValidationError') {
+  } else if (error.name === 'ValidationError') {
     statusCode = 400
     message = 'Validation Error'
     code = 'VALIDATION_ERROR'
-  }
-  // Handle MongoDB duplicate key error
-  else if (error.name === 'MongoServerError' && (error as any).code === 11000) {
+  } else if (
+    error.name === 'MongoServerError' &&
+    (error as ExtendedError).code === 11000
+  ) {
+    const duplicateError = error as ExtendedError
+
     statusCode = 409
     message = 'Duplicate key error'
     code = 'DUPLICATE_KEY'
-    const field = Object.keys((error as any).keyValue)[0]
-    details = { field, value: (error as any).keyValue[field] }
-  }
-  // Handle PostgreSQL errors
-  else if ((error as any).code && (error as any).routine) {
+    const keyValue = duplicateError.keyValue
+    const fields = keyValue ?? {}
+    const field = Object.keys(fields)[0]
+    details = { field, value: field ? fields[field] : undefined }
+  } else if (
+    typeof (error as ExtendedError).code === 'string' &&
+    typeof (error as ExtendedError).routine === 'string'
+  ) {
     statusCode = 400
     message = 'Database error'
-    code = (error as any).code
-  }
-  // Handle JWT errors
-  else if (error.name === 'JsonWebTokenError') {
+    code = toErrorCode(String((error as ExtendedError).code))
+  } else if (error.name === 'JsonWebTokenError') {
     statusCode = 401
     message = 'Invalid token'
     code = 'INVALID_TOKEN'
@@ -127,7 +160,7 @@ export function errorHandler(
   }
 
   // Build response
-  const response: any = {
+  const response: ErrorResponseBody = {
     error: {
       code,
       message,
@@ -160,8 +193,8 @@ export function errorHandler(
 // ============================================================================
 
 export function notFoundHandler(
-  req: Request,
-  res: Response,
+  req: ErrorRequest,
+  res: ErrorResponse,
   next: NextFunction,
 ) {
   const error = new NotFoundError(`Route ${req.method} ${req.path}`)
@@ -177,9 +210,13 @@ export function notFoundHandler(
  * Usage: router.get('/path', asyncHandler(async (req, res) => { ... }))
  */
 export function asyncHandler(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>,
+  fn: (
+    req: ErrorRequest,
+    res: ErrorResponse,
+    next: NextFunction,
+  ) => Promise<any>,
 ) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: ErrorRequest, res: ErrorResponse, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next)
   }
 }

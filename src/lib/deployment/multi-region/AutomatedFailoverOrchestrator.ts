@@ -4,7 +4,10 @@ import {
   CloudWatchClient,
   PutMetricDataCommand,
 } from '@aws-sdk/client-cloudwatch'
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
+import {
+  LambdaClient,
+  InvokeCommand,
+} from '@aws-sdk/client-lambda'
 import {
   Route53Client,
   ChangeResourceRecordSetsCommand,
@@ -17,28 +20,30 @@ import { ConfigurationManager } from './ConfigurationManager'
 import { CrossRegionDataSyncManager } from './CrossRegionDataSyncManager'
 import { HealthMonitor } from './HealthMonitor'
 
+type LambdaPayload = Record<string, unknown>
+
 /**
  * Automated Failover Orchestrator
  * Manages automatic failover across regions with health monitoring integration
  */
 export class AutomatedFailoverOrchestrator extends EventEmitter {
-  private logger: Logger
-  private config: ConfigurationManager
-  private healthMonitor: HealthMonitor
-  private dataSyncManager: CrossRegionDataSyncManager
-  private snsClient: SNSClient
-  private sqsClient: SQSClient
-  private lambdaClient: LambdaClient
-  private route53Client: Route53Client
-  private cloudWatchClient: CloudWatchClient
+  private readonly logger: Logger
+  private readonly config: ConfigurationManager
+  private readonly healthMonitor: HealthMonitor
+  private readonly dataSyncManager: CrossRegionDataSyncManager
+  private readonly snsClient: SNSClient
+  private readonly sqsClient: SQSClient
+  private readonly lambdaClient: LambdaClient
+  private readonly route53Client: Route53Client
+  private readonly cloudWatchClient: CloudWatchClient
   private isActive = false
   private failoverState: FailoverState
   private healthCheckInterval: NodeJS.Timeout | null = null
   private failoverTimeout: NodeJS.Timeout | null = null
-  private circuitBreakers: Map<string, CircuitBreaker> = new Map()
-  private failoverHistory: FailoverEvent[] = []
+  private readonly circuitBreakers: Map<string, CircuitBreaker> = new Map()
+  private readonly failoverHistory: FailoverEvent[] = []
   private currentPrimaryRegion: string
-  private backupRegions: string[] = []
+  private readonly backupRegions: string[] = []
 
   constructor(
     config: ConfigurationManager,
@@ -294,7 +299,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
 
       return await breaker.execute(async () => {
         // Check region-specific health
-        const health = await this.healthMonitor.getRegionHealth(region)
+        const health = this.healthMonitor.getRegionHealth(region)
         return health.status === 'healthy'
       })
     } catch (error: unknown) {
@@ -309,7 +314,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   private async checkDataSyncLag(): Promise<number> {
     try {
       const regions = [this.currentPrimaryRegion, ...this.backupRegions]
-      const lagPromises = regions.map((region) =>
+      const lagPromises = regions.map(async (region) =>
         this.dataSyncManager.getReplicationLag(region),
       )
 
@@ -344,7 +349,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   private async performHealthCheck(): Promise<void> {
     try {
       // Check primary region health
-      const primaryHealth = await this.healthMonitor.getRegionHealth(
+      const primaryHealth = this.healthMonitor.getRegionHealth(
         this.currentPrimaryRegion,
       )
 
@@ -432,7 +437,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         let score = 100 // Base score
 
         // Check health status
-        const health = await this.healthMonitor.getRegionHealth(region)
+        const health = this.healthMonitor.getRegionHealth(region)
         if (health.status === 'healthy') {
           score += 50
         } else {
@@ -763,7 +768,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
    */
   private async updateRoute53Records(
     region: string,
-    config: any,
+    config: ReturnType<ConfigurationManager['getDNSConfig']>,
   ): Promise<void> {
     try {
       const changeBatch = {
@@ -805,7 +810,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
    */
   private async updateCloudflareRecords(
     region: string,
-    config: any,
+    config: ReturnType<ConfigurationManager['getDNSConfig']>,
   ): Promise<void> {
     try {
       // This would typically use Cloudflare API
@@ -1071,7 +1076,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   private async monitorBackupRegions(): Promise<void> {
     try {
       for (const region of this.backupRegions) {
-        const health = await this.healthMonitor.getRegionHealth(region)
+        const health = this.healthMonitor.getRegionHealth(region)
 
         if (health.status === 'unhealthy') {
           this.logger.warn('Backup region unhealthy', {
@@ -1177,7 +1182,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
     error?: string,
   ): Promise<void> {
     try {
-      const message = {
+      const message: FailoverNotification = {
         event: 'failover',
         status,
         region,
@@ -1201,7 +1206,9 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   /**
    * Send SNS notification
    */
-  private async sendSNSNotification(message: any): Promise<void> {
+  private async sendSNSNotification(
+    message: FailoverNotification,
+  ): Promise<void> {
     try {
       const topicArn = this.config.getFailoverConfig().snsTopicArn
       if (!topicArn) return
@@ -1221,7 +1228,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   /**
    * Send SQS message
    */
-  private async sendSQSMessage(message: any): Promise<void> {
+  private async sendSQSMessage(message: FailoverNotification): Promise<void> {
     try {
       const queueUrl = this.config.getFailoverConfig().sqsQueueUrl
       if (!queueUrl) return
@@ -1246,8 +1253,8 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
    */
   private async invokeLambdaFunction(
     functionName: string,
-    payload: any,
-  ): Promise<any> {
+    payload: LambdaPayload,
+  ): Promise<Record<string, unknown> | null> {
     try {
       const command = new InvokeCommand({
         FunctionName: functionName,
@@ -1255,18 +1262,38 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         InvocationType: 'RequestResponse',
       })
 
-      const response = (await this.lambdaClient.send(command)) as {
-        FunctionError?: string
-        Payload?: Uint8Array
+      const response = await this.lambdaClient.send(command)
+      if (!this.isInvocationResponse(response)) {
+        return null
       }
 
-      if (response.FunctionError) {
+      if (
+        typeof response.FunctionError === 'string' &&
+        response.FunctionError.length > 0
+      ) {
         throw new Error(`Lambda function error: ${response.FunctionError}`)
       }
 
       if (response.Payload) {
-        const decodedPayload = new TextDecoder().decode(response.Payload)
-        return JSON.parse(decodedPayload)
+        const decodedPayload =
+          typeof response.Payload === 'string'
+            ? response.Payload
+            : response.Payload instanceof Uint8Array
+              ? new TextDecoder().decode(response.Payload)
+              : null
+      if (!decodedPayload) {
+        return null
+      }
+
+        const parsedPayload = this.parseLambdaPayload(decodedPayload)
+        if (
+          typeof parsedPayload === 'object' &&
+          parsedPayload !== null &&
+          !Array.isArray(parsedPayload)
+        ) {
+          return parsedPayload
+        }
+        throw new Error('Unexpected Lambda payload shape')
       }
 
       return null
@@ -1278,11 +1305,35 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
     }
   }
 
+  private parseLambdaPayload(payload: string): Record<string, unknown> | null {
+    try {
+      const parsed: unknown = JSON.parse(payload)
+      if (this.isRecord(parsed) && !Array.isArray(parsed)) {
+        return parsed
+      }
+      return null
+    } catch {
+      return null
+    }
+  }
+
+  private isInvocationResponse(
+    response: unknown,
+  ): response is { FunctionError?: unknown; Payload?: unknown } {
+    return response !== null && typeof response === 'object'
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === 'object'
+  }
+
   /**
    * Register event handlers
    */
   private registerEventHandlers(): void {
-    this.healthMonitor.on('healthStatusChanged', async (data) => {
+    this.healthMonitor.on(
+      'healthStatusChanged',
+      async (data: { region: string; status: 'healthy' | 'unhealthy' }) => {
       if (
         data.region === this.currentPrimaryRegion &&
         data.status === 'unhealthy'
@@ -1293,17 +1344,18 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         )
         await this.evaluateFailover()
       }
-    })
+      },
+    )
 
-    this.on('failoverStarted', (data) => {
+    this.on('failoverStarted', (data: FailoverEvent) => {
       this.logger.info('Failover started event received', data)
     })
 
-    this.on('failoverCompleted', (data) => {
+    this.on('failoverCompleted', (data: FailoverEvent) => {
       this.logger.info('Failover completed event received', data)
     })
 
-    this.on('failoverFailed', (data) => {
+    this.on('failoverFailed', (data: FailoverEvent) => {
       this.logger.error('Failover failed event received', data)
     })
   }
@@ -1340,7 +1392,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   /**
    * Sleep utility
    */
-  private sleep(ms: number): Promise<void> {
+  private async sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
@@ -1424,11 +1476,11 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
  * Circuit Breaker implementation
  */
 class CircuitBreaker {
-  private name: string
-  private failureThreshold: number
-  private resetTimeout: number
-  private monitoringPeriod: number
-  private onStateChange?: (state: string) => void
+  private readonly name: string
+  private readonly failureThreshold: number
+  private readonly resetTimeout: number
+  private readonly monitoringPeriod: number
+  private readonly onStateChange?: (state: string) => void
 
   private state: 'closed' | 'open' | 'half-open' = 'closed'
   private failures = 0
@@ -1509,6 +1561,15 @@ interface FailoverState {
   lastFailover: Date | null
   failoverCount: number
   reason: string | null
+}
+
+interface FailoverNotification {
+  event: 'failover'
+  status: 'success' | 'failed'
+  region: string
+  timestamp: string
+  error?: string
+  failoverState: FailoverState
 }
 
 interface FailoverEvent {
