@@ -1,4 +1,8 @@
 name: Playwright Tests
+
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main, master, staging]
@@ -30,10 +34,13 @@ jobs:
 
       - name: Install dependencies
         run: NODE_OPTIONS="--no-deprecation" pnpm install
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
+
       - name: Run Playwright tests
         run: pnpm exec playwright test
+
       - uses: actions/upload-artifact@v7.0.1
         if: ${{ !cancelled() }}
         with:
