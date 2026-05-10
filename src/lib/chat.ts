@@ -196,29 +196,33 @@ function convertAnalysisToLegacyFormat(
 function toRecommendationAnalysis(
   analysis: MHAnalysis | MentalHealthAnalysisResult,
 ): MentalHealthAnalysisResult {
+  // Check if it's MHAnalysis (has 'indicators' property)
   if ('indicators' in analysis) {
+    const mhAnalysis = analysis as MHAnalysis;
     return {
-      hasMentalHealthIssue: analysis.hasMentalHealthIssue,
-      mentalHealthCategory: analysis.category || 'unknown',
-      confidence: analysis.confidence,
-      explanation: analysis.explanation,
-      supportingEvidence: analysis.supportingEvidence || [],
+      hasMentalHealthIssue: mhAnalysis.hasMentalHealthIssue,
+      mentalHealthCategory: mhAnalysis.category || 'unknown',
+      confidence: mhAnalysis.confidence,
+      explanation: mhAnalysis.explanation,
+      supportingEvidence: mhAnalysis.supportingEvidence || [],
       isCrisis:
-        analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
-      timestamp: new Date(analysis.timestamp).toISOString(),
-      stressLevel: analysis.riskLevel === 'high' ? 0.8 : 0.4,
+        mhAnalysis.riskLevel === 'high' || mhAnalysis.riskLevel === 'critical',
+      timestamp: new Date(mhAnalysis.timestamp).toISOString(),
+      stressLevel: mhAnalysis.riskLevel === 'high' ? 0.8 : 0.4,
     }
   }
 
+  // It's MentalHealthAnalysisResult
+  const result = analysis as MentalHealthAnalysisResult;
   return {
-    hasMentalHealthIssue: analysis.hasMentalHealthIssue,
-    mentalHealthCategory: analysis.mentalHealthCategory || 'unknown',
-    confidence: analysis.confidence,
-    explanation: analysis.explanation || '',
-    supportingEvidence: analysis.supportingEvidence || [],
-    isCrisis: analysis.isCrisis,
-    timestamp: analysis.timestamp,
-    stressLevel: analysis.stressLevel,
+    hasMentalHealthIssue: result.hasMentalHealthIssue,
+    mentalHealthCategory: result.mentalHealthCategory || 'unknown',
+    confidence: result.confidence,
+    explanation: result.explanation || '',
+    supportingEvidence: result.supportingEvidence || [],
+    isCrisis: result.isCrisis,
+    timestamp: result.timestamp,
+    stressLevel: result.stressLevel ?? 0,
   }
 }
 
