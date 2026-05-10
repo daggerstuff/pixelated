@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-/* eslint-disable typescript/no-unsafe-assignment,typescript/no-unsafe-call,typescript/no-unsafe-member-access,typescript/no-unsafe-return,typescript/no-unsafe-argument,typescript/prefer-nullish-coalescing,typescript/no-unsafe-spread,typescript/no-unsafe-type-assertion */
+/// <reference types="node" />
 
-import { existsSync } from "fs";
-import { spawnSync } from "child_process";
-import process from "process";
+import { existsSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+
+/** @typedef {import('node:child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
 
 const ALLOWED_EXTENSIONS_BY_MODE = {
   standard: new Set([
@@ -46,134 +47,160 @@ if (isTypeAware && isMarkdown) {
   process.exit(2);
 }
 
-const mode = isMarkdown ? "markdown" : "standard";
-const allowedExtensions = ALLOWED_EXTENSIONS_BY_MODE[mode];
-const diffPatterns = DIFF_PATTERNS_BY_MODE[mode];
+const mode = isMarkdown ? 'markdown' : 'standard'
+const allowedExtensions = ALLOWED_EXTENSIONS_BY_MODE[mode]
+const diffPatterns = DIFF_PATTERNS_BY_MODE[mode]
 
+/** @returns {string} */
 function getAllLintCommand() {
-  if (mode === "markdown") return "lint:markdown:ci:all";
-  return isTypeAware ? "lint:ci:type-aware:all" : "lint:ci:all";
+  if (mode === 'markdown') return 'lint:markdown:ci:all'
+  return isTypeAware ? 'lint:ci:type-aware:all' : 'lint:ci:all'
 }
 
+/** @param {string[]} files */
+/** @returns {string[]} */
 function getLintArgs(files) {
-  if (mode === "markdown") {
-    return [
-      "exec",
-      "markdownlint",
-      "--config",
-      ".markdownlint.json",
-      ...files,
-    ].filter(Boolean);
+  /** @type {string[]} */
+  const args = []
+  if (mode === 'markdown') {
+    args.push('exec')
+    args.push('markdownlint')
+    args.push('--config')
+    args.push('.markdownlint.json')
+    for (const file of files) {
+      args.push(String(file))
+    }
+    return args
   }
 
-  return [
-    "exec",
-    "oxlint",
-    ...(isTypeAware ? ["--type-aware"] : []),
-    "-c",
-    ".oxlintrc.json",
-    ...files,
-  ].filter(Boolean);
+  args.push('exec')
+  args.push('oxlint')
+  if (isTypeAware) {
+    args.push('--type-aware')
+  }
+  args.push('-c')
+  args.push('.oxlintrc.json')
+  for (const file of files) {
+    args.push(String(file))
+  }
+  return args
 }
 
+/** @returns {string} */
 function logMode() {
-  if (mode === "markdown") return `Running markdownlint on ${changedFiles.length} changed files`;
-  const lintMode = isTypeAware ? "type-aware" : "standard";
-  return `Running oxlint (${lintMode}) on ${changedFiles.length} changed files`;
+  if (mode === 'markdown') return `Running markdownlint on ${changedFiles.length} changed files`
+  const lintMode = isTypeAware ? 'type-aware' : 'standard'
+  return `Running oxlint (${lintMode}) on ${changedFiles.length} changed files`
 }
 
+/** @param {string | undefined} range */
+/** @returns {string[]} */
 function runGitDiff(range) {
-  const args = ["diff", "--name-only", "--diff-filter=ACMRTUXB", "--"];
-  if (range) {
-    args.splice(3, 0, range);
+  const args = ['diff', '--name-only', '--diff-filter=ACMRTUXB', '--']
+  if (typeof range === 'string') {
+    args.splice(3, 0, range)
   }
-  const { status, stdout } = spawnSync("git", [...args, ...diffPatterns], {
-    encoding: "utf8",
-  });
+  /** @type {SpawnSyncTextResult} */
+  const result = spawnSync('git', [...args, ...diffPatterns], {
+    encoding: 'utf8',
+  })
+  const { status, stdout } = result
 
   if (status !== 0 || !stdout) return [];
 
   return stdout
     .trim()
-    .split("\n")
+    .split('\n')
     .map((line) => line.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((line) => typeof line === 'string' && line.length > 0)
 }
 
+/** @returns {string[]} */
 function getCandidateFileDiffs() {
-  const eventName = process.env.GITHUB_EVENT_NAME;
-  const sha = process.env.GITHUB_SHA || "HEAD";
-  const beforeSha = process.env.GITHUB_EVENT_BEFORE;
-  const baseRef = process.env.GITHUB_BASE_REF;
+  const eventName = process.env.GITHUB_EVENT_NAME
+  const sha = process.env.GITHUB_SHA ?? 'HEAD'
+  const beforeSha = process.env.GITHUB_EVENT_BEFORE
+  const baseRef = process.env.GITHUB_BASE_REF
 
   if (eventName === "pull_request" || eventName === "pull_request_target") {
     if (baseRef) {
-      return runGitDiff(`origin/${baseRef}...${sha}`);
+      return runGitDiff(`origin/${baseRef}...${sha}`)
     }
   }
 
   if (beforeSha && !/0{40}/.test(beforeSha)) {
-    return runGitDiff(`${beforeSha}...${sha}`);
+    return runGitDiff(`${beforeSha}...${sha}`)
   }
 
-  const parentDiff = runGitDiff("HEAD~1...HEAD");
+  const parentDiff = runGitDiff('HEAD~1...HEAD')
   if (parentDiff.length > 0) {
-    return parentDiff;
+    return parentDiff
   }
 
-  const staged = runGitDiff("--cached");
+  const staged = runGitDiff('--cached')
   if (staged.length > 0) {
-    return staged;
+    return staged
   }
 
-  return runGitDiff();
+  return runGitDiff()
 }
 
+/** @param {string} filePath */
+/** @returns {boolean} */
 function isLintableFile(filePath) {
-  const normalizedPath = filePath.replaceAll("\\", "/");
+  const normalizedPath = String(filePath).replaceAll("\\", "/")
   return (
-    existsSync(filePath) &&
-    allowedExtensions.has(filePath.slice(filePath.lastIndexOf(".")))
-  );
+    existsSync(String(filePath)) &&
+    allowedExtensions.has(String(filePath).slice(String(filePath).lastIndexOf('.')))
+  )
 }
 
+/** @param {string} filePath */
+/** @returns {boolean} */
 function isGeneratedMarkdownFile(filePath) {
-  const normalizedPath = filePath.replaceAll("\\", "/");
-  return normalizedPath.startsWith(".Jules/");
+  const normalizedPath = String(filePath).replaceAll("\\", "/")
+  return normalizedPath.startsWith('.Jules/')
 }
 
+/** @param {string[]} files */
 function runGeneratedMarkdownLintFix(files) {
-  const { status } = spawnSync(
-    "pnpm",
-    ["run", "format:jules-markdown", ...files],
-    { stdio: "inherit" },
-  );
+  /** @type {SpawnSyncTextResult} */
+  const result = spawnSync('pnpm', ['run', 'format:jules-markdown', ...files], {
+    stdio: 'inherit',
+  })
+  const { status } = result
   if (status !== 0) {
-    process.exit(status);
+    process.exit(status)
   }
 }
 
+/** @param {string[]} files */
 function runLint(files) {
-  const { status } = spawnSync("pnpm", getLintArgs(files), {
-    stdio: "inherit",
-  });
-  if (status !== 0) process.exit(status);
+  /** @type {SpawnSyncTextResult} */
+  const result = spawnSync('pnpm', getLintArgs(files), {
+    stdio: 'inherit',
+  })
+  const { status } = result
+  if (status !== 0) process.exit(status)
 }
 
 function runFullLint() {
   const modeLabel = isMarkdown ? "markdown" : isTypeAware ? "type-aware" : "standard";
   console.log(
-    `No changed files detected; falling back to full lint:ci baseline check (${modeLabel}).`,
-  );
-  const { status } = spawnSync("pnpm", ["run", getAllLintCommand()], {
-    stdio: "inherit",
-  });
-  if (status !== 0) process.exit(status);
+    `No changed files detected; falling back to full lint:ci baseline check (${modeLabel}).`
+  )
+  /** @type {SpawnSyncTextResult} */
+  const result = spawnSync('pnpm', ['run', getAllLintCommand()], {
+    stdio: 'inherit',
+  })
+  const { status } = result
+  if (status !== 0) process.exit(status)
 }
 
 const changedFiles = getCandidateFileDiffs()
   .map((filePath) => filePath.trim())
-  .filter(isLintableFile);
+  .filter(isLintableFile)
 
 if (isMarkdown) {
   const generatedMarkdownFiles = changedFiles.filter(isGeneratedMarkdownFile);
@@ -186,11 +213,11 @@ if (isMarkdown) {
 }
 
 if (changedFiles.length === 0) {
-  if (process.env.GITHUB_ACTIONS === "true") {
-    const modeLabel = isMarkdown ? "markdown" : isTypeAware ? "type-aware" : "standard";
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    const modeLabel = isMarkdown ? 'markdown' : isTypeAware ? 'type-aware' : 'standard'
     console.log(
       `No changed files detected for lint:ci (${modeLabel}); skipping lint checks in CI.`,
-    );
+    )
     process.exit(0);
   }
   runFullLint();

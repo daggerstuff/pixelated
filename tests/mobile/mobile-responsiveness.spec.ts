@@ -21,6 +21,12 @@ const tabletDevices = [
   { name: 'Galaxy Tab S4', ...devices['Galaxy Tab S4'] },
 ]
 
+type PerformanceMemory = {
+  memory?: {
+    usedJSHeapSize: number
+  }
+}
+
 // Mobile device suite (all in one test so test.use is not nested)
 test.describe('Mobile Responsiveness All Devices', () => {
   for (const device of mobileDevices) {
@@ -179,8 +185,10 @@ test.describe('Mobile Responsiveness All Devices', () => {
       await page.reload()
       await page.waitForLoadState('networkidle')
       const loadTime = Date.now() - startTime
-      // eslint-disable-next-line no-console
-      console.log(`${device.name} page load time: ${loadTime}ms`)
+      test.info().annotations.push({
+        type: 'performance-metric',
+        description: `${device.name} page load time: ${loadTime}ms`,
+      })
       expect(loadTime).toBeLessThan(8000)
 
       const startTime2 = Date.now()
@@ -188,14 +196,21 @@ test.describe('Mobile Responsiveness All Devices', () => {
       await page.click('[data-testid="category-balancing-tab"]')
       await page.click('[data-testid="export-tab"]')
       const interactionTime = Date.now() - startTime2
-      console.log(`${device.name} interaction time: ${interactionTime}ms`)
+      test.info().annotations.push({
+        type: 'performance-metric',
+        description: `${device.name} interaction time: ${interactionTime}ms`,
+      })
       expect(interactionTime).toBeLessThan(4000)
 
-      const initialMemory = await page.evaluate(() => {
-        return (performance as any).memory
-          ? (performance as any).memory.usedJSHeapSize
-          : 0
-      })
+      const getUsedJsHeapSize = async () =>
+        page.evaluate<number>(() => {
+          const performanceWithMemory = performance as PerformanceMemory
+          return performanceWithMemory.memory
+            ? performanceWithMemory.memory.usedJSHeapSize
+            : 0
+        })
+
+      const initialMemory = await getUsedJsHeapSize()
       await page.click('[data-testid="data-ingestion-tab"]')
       const fileInput = page.locator('[data-testid="file-input"]')
       await fileInput.setInputFiles([
@@ -215,17 +230,13 @@ test.describe('Mobile Responsiveness All Devices', () => {
       await expect(page.locator('text=Processing complete')).toBeVisible({
         timeout: 10000,
       })
-      const finalMemory = await page.evaluate(() => {
-        return (performance as any).memory
-          ? (performance as any).memory.usedJSHeapSize
-          : 0
-      })
+      const finalMemory = await getUsedJsHeapSize()
       if (initialMemory > 0 && finalMemory > 0) {
         const memoryIncrease = finalMemory - initialMemory
-        // eslint-disable-next-line no-console
-        console.log(
-          `${device.name} memory increase: ${memoryIncrease / 1024 / 1024}MB`,
-        )
+        test.info().annotations.push({
+          type: 'performance-metric',
+          description: `${device.name} memory increase: ${memoryIncrease / 1024 / 1024}MB`,
+        })
         expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024) // Under 50MB
       }
 

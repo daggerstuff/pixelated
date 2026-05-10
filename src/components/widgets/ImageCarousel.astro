@@ -26,14 +26,22 @@ const { images, imageProps, autoplayDelay = 3000 } = Astro.props
   {
     images.map((item) => (
       <div class="op-transition-600" role="group" aria-roledescription="slide">
-        {/* @ts-expect-error(ignore) */}
-        <Image
-          class="aspect-[16/9] object-cover"
-          src={item.src}
-          alt={item.alt}
-          {...(typeof item.src === 'string' ? { inferSize: true } : {})}
-          {...imageProps}
-        />
+        {typeof item.src === 'string' ? (
+          <Image
+            class="aspect-[16/9] object-cover"
+            src={item.src}
+            alt={item.alt}
+            inferSize={true}
+            {...imageProps}
+          />
+        ) : (
+          <Image
+            class="aspect-[16/9] object-cover"
+            src={item.src}
+            alt={item.alt}
+            {...imageProps}
+          />
+        )}
       </div>
     ))
   }
@@ -42,15 +50,14 @@ const { images, imageProps, autoplayDelay = 3000 } = Astro.props
 <script>
   class ImageCarousel extends HTMLElement {
     #current = 0
-    #autoplayDelay = parseInt(this.dataset.autoplayDelay || '3000', 10)
+    #autoplayDelay = parseInt(this.dataset['autoplayDelay'] || '3000', 10)
     #autoplayTimer: number | null = null
     #slides: HTMLElement[] = []
 
     connectedCallback() {
       this.#slides = Array.from(this.children) as HTMLElement[]
 
-      for (let idx = 0; idx < this.#slides.length; idx++) {
-        const el = this.#slides[idx]
+      for (const [idx, el] of this.#slides.entries()) {
         el.setAttribute('aria-label', `${idx + 1} / ${this.#slides.length}`)
         if (idx !== 0) {
           el.style.position = 'absolute'
@@ -67,8 +74,7 @@ const { images, imageProps, autoplayDelay = 3000 } = Astro.props
     }
 
     #update = () => {
-      for (let idx = 0; idx < this.#slides.length; idx++) {
-        const el = this.#slides[idx]
+      for (const [idx, el] of this.#slides.entries()) {
         el.style.opacity = idx === this.#current ? '1' : '0'
         el.setAttribute('aria-hidden', idx === this.#current ? 'false' : 'true')
         el.setAttribute(

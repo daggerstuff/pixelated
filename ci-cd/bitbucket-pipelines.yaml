@@ -100,7 +100,7 @@ pipelines:
       - step: *build-test-sonarcloud
       - step: *check-quality-gate-sonarcloud
   pull-requests:
-    "**":
+    '**':
       - step: *governance-validate
       - step: *ingestion-stub-check
       - step: *quality-scoring-test

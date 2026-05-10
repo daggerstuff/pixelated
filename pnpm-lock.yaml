@@ -156,6 +156,9 @@ importers:
       '@sentry/profiling-node':
         specifier: latest
         version: 10.52.0(@opentelemetry/exporter-trace-otlp-http@0.217.0(@opentelemetry/api@1.9.1))
+      '@sentry/react':
+        specifier: latest
+        version: 10.52.0(react@19.2.6)
       '@sentry/toolbar':
         specifier: latest
         version: 1.0.0-beta.11(react@19.2.6)
@@ -4457,6 +4460,12 @@ packages:
     resolution: {integrity: sha512-1vTrELjKsRB0O/1WIrbj5zjChKwYSJ1rHU/4ZrCQPeMioJaqAJP2Hzy81TS6RVR78pXswQj+z2+PF4uOjb9Mlg==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@sentry/react@10.52.0':
+    resolution: {integrity: sha512-2m72QCsja2cJJHD0ALxRnVt0qMEC2FV4LSi6AAiEdEG4lTb6mgcxavx5pJrW90jE+6dMGPbUz4q8c9vi4jh1qQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: ^16.14.0 || 17.x || 18.x || 19.x
 
   '@sentry/rollup-plugin@5.2.1':
     resolution: {integrity: sha512-LKJyL4fzcHnHExipVN0/QinhBNoGZt+UXg8xJaqc6MwOolOhxHW0ii2hu1OZsiOhX0+r9MK7T+a7Sx0F0bzdMQ==}
@@ -15237,6 +15246,12 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/exporter-trace-otlp-http'
       - supports-color
+
+  '@sentry/react@10.52.0(react@19.2.6)':
+    dependencies:
+      '@sentry/browser': 10.52.0
+      '@sentry/core': 10.52.0
+      react: 19.2.6
 
   '@sentry/rollup-plugin@5.2.1(rollup@4.60.3)':
     dependencies:

@@ -154,9 +154,9 @@ export function AnimationOrchestrator({
       className={className}
       style={style}
       variants={variants}
-      initial="initial"
+      initial='initial'
       animate={controls}
-      exit="exit"
+      exit='exit'
       onAnimationComplete={handleAnimationComplete}
       onViewportEnter={triggerOnViewport ? handleViewportEnter : undefined}
       viewport={
@@ -185,7 +185,7 @@ export function PageTransition({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="page"
+      orchestrationType='page'
       className={className}
       {...props}
     >
@@ -206,7 +206,7 @@ export function ListAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="list"
+      orchestrationType='list'
       staggerChildren={staggerChildren}
       staggerDelay={staggerDelay}
       triggerOnViewport={triggerOnViewport}
@@ -228,7 +228,7 @@ export function ModalAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="modal"
+      orchestrationType='modal'
       triggerOnMount={triggerOnMount}
       className={className}
       {...props}
@@ -248,7 +248,7 @@ export function InteractiveAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="interactive"
+      orchestrationType='interactive'
       triggerOnMount={triggerOnMount}
       className={className}
       {...props}
@@ -320,7 +320,7 @@ export function AdvancedSequence({
   }, [autoPlay, executeSequence, steps.length])
 
   return (
-    <motion.div className={className} initial="initial" animate={controls}>
+    <motion.div className={className} initial='initial' animate={controls}>
       {children}
     </motion.div>
   )
@@ -364,7 +364,7 @@ export function Choreography({
   return (
     <motion.div
       className={className}
-      initial="initial"
+      initial='initial'
       animate={masterControls}
     >
       <AnimatePresence>
@@ -372,9 +372,9 @@ export function Choreography({
           <motion.div
             key={item.id}
             variants={item.variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
+            initial='initial'
+            animate='animate'
+            exit='exit'
             custom={item.delay}
           >
             {item.element}

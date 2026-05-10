@@ -7,27 +7,70 @@ import cors from 'cors'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import Redis from 'ioredis'
+import Redis, { type RedisOptions } from 'ioredis'
 import { Pool } from 'pg'
 
+import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import { productionConfig } from './config/production.js'
 import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
 
-import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
-
 const app = express()
+type SentryExpressErrorHandler = (app: express.Application) => void
+type SentryErrorHandler = (
+  options?: Record<string, string>,
+) => express.ErrorRequestHandler
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isSentryExpressErrorHandler = (
+  value: unknown,
+): value is SentryExpressErrorHandler => typeof value === 'function'
+
+const isSentryExpressErrorRequestHandler = (
+  value: unknown,
+): value is SentryErrorHandler => typeof value === 'function'
+
+const getSentryHandlers = (
+  source: unknown,
+): {
+  setupExpressErrorHandler?: SentryExpressErrorHandler
+  expressErrorHandler?: SentryErrorHandler
+} => {
+  if (!isRecord(source)) {
+    return {}
+  }
+
+  const handlers: {
+    setupExpressErrorHandler?: SentryExpressErrorHandler
+    expressErrorHandler?: SentryErrorHandler
+  } = {}
+
+  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
+    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
+  }
+
+  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
+    handlers.expressErrorHandler = source['expressErrorHandler']
+  }
+
+  return handlers
+}
+
+const { setupExpressErrorHandler, expressErrorHandler } =
+  getSentryHandlers(Sentry)
+
 const hasSentryErrorHandler =
-  typeof Sentry.setupExpressErrorHandler === 'function' ||
-  typeof Sentry.expressErrorHandler === 'function'
+  Boolean(setupExpressErrorHandler) || Boolean(expressErrorHandler)
 
 // The Sentry request handler must be the first middleware on the app
 app.use(sentryMiddleware)
-if (typeof Sentry.setupExpressErrorHandler === 'function') {
-  Sentry.setupExpressErrorHandler(app)
-} else if (typeof Sentry.expressErrorHandler === 'function') {
-  app.use(Sentry.expressErrorHandler())
+if (typeof setupExpressErrorHandler === 'function') {
+  setupExpressErrorHandler(app)
+} else if (typeof expressErrorHandler === 'function') {
+  app.use(expressErrorHandler())
 }
 
 // Environment setup
@@ -36,7 +79,10 @@ const isProduction = productionConfig.environment === 'production'
 
 // Database connection
 const db = new Pool(productionConfig.database)
-const redis = new Redis(productionConfig.redis)
+const redis = new Redis(productionConfig.redis.url, {
+  lazyConnect: true,
+  tls: productionConfig.redis.tls,
+} as RedisOptions)
 
 // Security middleware
 app.use(
