@@ -1,5 +1,4 @@
 import '../config/instrument.mjs'
-import { EventEmitter } from 'events'
 import { createServer } from 'http'
 
 import cors from 'cors'
@@ -12,6 +11,12 @@ import projectsRoutes from './api/routes/projects'
 import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
+
+type RedisLike = {
+  connect: () => Promise<unknown>
+  quit: () => Promise<unknown>
+  on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+}
 
 const app = express()
 const server = createServer(app)
@@ -46,7 +51,7 @@ const redisOptions = REDIS_URL.startsWith('rediss://')
     }
   : { lazyConnect: true }
 
-let redis = new Redis(REDIS_URL, redisOptions)
+let redis: RedisLike = new Redis(REDIS_URL, redisOptions)
 
 redis.on('error', (err: unknown) => {
   // We handle connection errors in the connect().catch() block below
@@ -63,24 +68,15 @@ redis.connect().catch((err) => {
       err instanceof Error ? err.message : String(err),
     )
     // Create a simple mock compatible with ioredis interface
-    const redisMock = new EventEmitter()
-    Object.assign(redisMock, {
-      status: 'ready',
+    const redisMock: RedisLike = {
       connect: async () => {},
-      disconnect: () => {},
-      quit: async () => 'OK' as const,
-      get: async () => null,
-      set: async () => 'OK' as const,
-      del: async () => 1,
-      on: (event: string, cb: (...args: unknown[]) => void) => {
-        if (event === 'connect' || event === 'ready') cb()
+      quit: async () => 'OK',
+      on: (event: string, listener: (...args: unknown[]) => void) => {
+        if (event === 'connect' || event === 'ready') listener()
         return redisMock
       },
-      off: () => redisMock,
-      once: () => redisMock,
-      emit: () => true,
-    })
-    redis = redisMock as unknown as Redis
+    }
+    redis = redisMock
   } else {
     console.error('Failed to connect to Redis:', err)
   }

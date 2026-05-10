@@ -1,15 +1,19 @@
 import { Server } from 'http'
 
-import Redis from 'ioredis'
 import { Pool } from 'pg'
 import { Server as SocketIOServer, Socket } from 'socket.io'
 
+type RedisLike = {
+  connect: () => Promise<unknown>
+  quit: () => Promise<unknown>
+}
+
 export class SocketService {
   private io: SocketIOServer
-  private redis: Redis
+  private redis: RedisLike
   private db: Pool
 
-  constructor(server: Server, redis: Redis, db: Pool) {
+  constructor(server: Server, redis: RedisLike, db: Pool) {
     this.redis = redis
     this.db = db
 
