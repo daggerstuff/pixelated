@@ -14,9 +14,7 @@ type MessageRequestBody = {
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
-const toMessageRequestBody = (
-  value: unknown,
-): MessageRequestBody | null => {
+const toMessageRequestBody = (value: unknown): MessageRequestBody | null => {
   if (!isObject(value)) return null
 
   const { userId, message } = value
@@ -65,7 +63,9 @@ export async function POST(request: NextRequest) {
   ]
 
   // Stream response with Supermemory tools
-  const tools = createSupermemoryTools(process.env.SUPERMEMORY_API_KEY ?? '', [userId])
+  const tools = createSupermemoryTools(process.env.SUPERMEMORY_API_KEY ?? '', [
+    userId,
+  ])
 
   const result = streamText({
     model: anthropic('claude-3-5-sonnet-20241022'),
