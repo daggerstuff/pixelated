@@ -23,7 +23,7 @@ Professionals_ _Eliminating the gap between training and real-world competency_
 
 ## Slide 4: Our Solution
 
-**Zero-Risk AI Training Environment**
+### Zero-Risk AI Training Environment
 
 - Practice with AI-simulated clients presenting challenging cases
 - Real-time bias detection and intervention suggestions

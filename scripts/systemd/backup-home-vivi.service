@@ -21,7 +21,7 @@ Environment=RCLONE_SYNC_PATH=
 Environment=BACKUP_KEEP_RUNS=6
 Environment=BACKUP_RUN_PREFIX=home-vivi-run
 Environment=BACKUP_SECTION_STRICT_ERRORS=false
-Environment="BACKUP_SKIP_SECTIONS=.cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk"
+Environment="BACKUP_SKIP_SECTIONS=.cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk .hermes"
 Environment=BACKUP_RCLONE_TRANSFERS=24
 Environment=BACKUP_RCLONE_CHECKERS=16
 Environment=BACKUP_RCLONE_FAST_LIST=true

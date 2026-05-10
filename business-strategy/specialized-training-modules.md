@@ -27,21 +27,21 @@ therapeutic approaches and certification programs **Market Expansion**: Target
 
 #### Training Content Structure
 
-**Foundation Level (Weeks 1-4)**
+### Foundation Level (Weeks 1-4)
 
 - **Trauma Theory**: Comprehensive trauma theory and neurobiology
 - **Trauma Types**: Acute, chronic, complex trauma presentations
 - **Assessment Tools**: PTSD, CPTSD, and trauma screening instruments
 - **Safety Planning**: Trauma-informed safety assessment and planning
 
-**Intermediate Level (Weeks 5-8)**
+### Intermediate Level (Weeks 5-8)
 
 - **Evidence-Based Interventions**: EMDR, TF-CBT, Somatic approaches
 - **Case Formulation**: Trauma-informed case conceptualization
 - **Treatment Planning**: Individualized trauma treatment planning
 - **Crisis Management**: Acute trauma response and crisis intervention
 
-**Advanced Level (Weeks 9-12)**
+### Advanced Level (Weeks 9-12)
 
 - **Complex Trauma**: Dissociation, personality disorders, complex presentations
 - **Trauma Systems**: Working with trauma systems and organizations
@@ -86,14 +86,14 @@ therapeutic approaches and certification programs **Market Expansion**: Target
 
 #### Training Content Structure
 
-**Assessment & Screening (Weeks 1-3)**
+### Assessment & Screening (Weeks 1-3)
 
 - **Substance Use Disorders**: DSM-5 criteria and assessment approaches
 - **Screening Tools**: AUDIT, DAST, CAGE, and specialized screening instruments
 - **Dual Diagnosis**: Co-occurring mental health and substance use disorders
 - **Motivational Interviewing**: MI techniques for substance use treatment
 
-**Treatment Approaches (Weeks 4-8)**
+### Treatment Approaches (Weeks 4-8)
 
 - **Evidence-Based Interventions**: CBT, DBT, 12-step facilitation, harm
   reduction
@@ -101,7 +101,7 @@ therapeutic approaches and certification programs **Market Expansion**: Target
 - **Relapse Prevention**: Comprehensive relapse prevention planning
 - **Family Systems**: Addiction family dynamics and intervention
 
-**Specialized Populations (Weeks 9-12)**
+#### Specialized Populations (Weeks 9-12)
 
 - **Adolescents**: Youth substance use and developmentally appropriate
   interventions
@@ -146,7 +146,7 @@ therapeutic approaches and certification programs **Market Expansion**: Target
 
 #### Training Content Structure
 
-**Cultural Competency Foundation (Weeks 1-3)**
+### Cultural Competency Foundation (Weeks 1-3)
 
 - **Cultural Competency Models**: Cultural humility, cultural safety, cultural
   responsiveness
@@ -155,7 +155,7 @@ therapeutic approaches and certification programs **Market Expansion**: Target
   approaches
 - **Communication Skills**: Culturally sensitive communication strategies
 
-**Specific Population Training (Weeks 4-8)**
+### Specific Population Training (Weeks 4-8)
 
 - **Indigenous Populations**: Native American, First Nations, Aboriginal
   cultural competency
@@ -165,7 +165,7 @@ therapeutic approaches and certification programs **Market Expansion**: Target
 - **Racial & Ethnic Minorities**: Systemic racism and mental health
   considerations
 
-**Advanced Cultural Competency (Weeks 9-12)**
+### Advanced Cultural Competency (Weeks 9-12)
 
 - **Intersectionality**: Multiple identity factors and complex cultural
   considerations
@@ -274,21 +274,21 @@ domains
 
 #### Training Content Structure
 
-**Developmental Considerations (Weeks 1-3)**
+### Developmental Considerations (Weeks 1-3)
 
 - **Child Development**: Typical and atypical child development
 - **Adolescent Development**: Teenage brain development and behavior
 - **Assessment Approaches**: Developmentally appropriate assessment tools
 - **Family Systems**: Family dynamics and child mental health
 
-**Common Disorders (Weeks 4-8)**
+### Common Disorders (Weeks 4-8)
 
 - **ADHD**: Attention-deficit/hyperactivity disorder assessment and treatment
 - **Anxiety Disorders**: Separation anxiety, social anxiety, generalized anxiety
 - **Depression**: Childhood and adolescent depression assessment and treatment
 - **Behavioral Disorders**: Oppositional defiant disorder, conduct disorder
 
-**Specialized Populations (Weeks 9-12)**
+### Specialized Populations (Weeks 9-12)
 
 - **Autism Spectrum Disorders**: ASD assessment and intervention
 - **Trauma in Children**: Child trauma and abuse assessment and treatment
@@ -334,14 +334,14 @@ competency
 
 #### Training Content Structure
 
-**Aging & Mental Health (Weeks 1-3)**
+### Aging & Mental Health (Weeks 1-3)
 
 - **Normal Aging**: Cognitive and emotional changes in normal aging
 - **Dementia Assessment**: Dementia screening and differential diagnosis
 - **Depression in Older Adults**: Late-life depression assessment and treatment
 - **Anxiety in Older Adults**: Anxiety disorders in aging populations
 
-**Complex Presentations (Weeks 4-8)**
+### Complex Presentations (Weeks 4-8)
 
 - **Delirium**: Acute confusional states and medical causes
 - **Behavioral Disturbances**: Dementia-related behavioral and psychological
@@ -349,7 +349,7 @@ competency
 - **Caregiver Support**: Supporting family caregivers of older adults
 - **End-of-Life Mental Health**: Mental health considerations in palliative care
 
-**Specialized Settings (Weeks 9-12)**
+### Specialized Settings (Weeks 9-12)
 
 - **Nursing Homes**: Mental health care in long-term care facilities
 - **Hospital Settings**: Mental health in acute medical settings
@@ -384,7 +384,7 @@ competency
 
 #### Trauma-Informed Care Certification
 
-**Level 1: Foundation Certification**
+### Level 1: Foundation Certification
 
 - **Requirements**: Complete trauma-informed care module + 20 hours supervised
   practice
@@ -392,7 +392,7 @@ competency
 - **Continuing Education**: 20 hours annual continuing education
 - **Renewal**: Annual renewal with competency demonstration
 
-**Level 2: Advanced Certification**
+### Level 2: Advanced Certification
 
 - **Requirements**: Level 1 + advanced module + 50 hours supervised practice
 - **Certification**: "Certified Advanced Trauma Practitioner" designation
@@ -401,7 +401,7 @@ competency
 
 #### Specialized Population Certifications
 
-**Child & Adolescent Mental Health Certification**
+### Child & Adolescent Mental Health Certification
 
 - **Requirements**: Complete child/adolescent module + 30 hours supervised
   practice
@@ -409,7 +409,7 @@ competency
 - **Practicum**: Supervised clinical practicum with child/adolescent populations
 - **Renewal**: Annual renewal with continuing education requirements
 
-**Cultural Competency Certification**
+### Cultural Competency Certification
 
 - **Requirements**: Complete cultural competency module + diversity training
 - **Certification**: "Culturally Competent Mental Health Practitioner"

@@ -11,7 +11,7 @@ BACKUP_RUN_PREFIX="${BACKUP_RUN_PREFIX:-home-vivi-run}"
 BACKUP_SECTION_STRICT_ERRORS="${BACKUP_SECTION_STRICT_ERRORS:-false}"
 BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 BACKUP_SECTIONS="${BACKUP_SECTIONS:-}"
-DEFAULT_BACKUP_SKIP_SECTIONS=".cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk"
+DEFAULT_BACKUP_SKIP_SECTIONS=".cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk .hermes"
 BACKUP_SKIP_SECTIONS="${BACKUP_SKIP_SECTIONS:-$DEFAULT_BACKUP_SKIP_SECTIONS}"
 BACKUP_RCLONE_TRANSFERS="${BACKUP_RCLONE_TRANSFERS:-16}"
 BACKUP_RCLONE_CHECKERS="${BACKUP_RCLONE_CHECKERS:-16}"
@@ -45,6 +45,9 @@ if [[ "${BACKUP_SKIP_SECTIONS}" != *".antigravity-server"* ]]; then
 fi
 if [[ "${BACKUP_SKIP_SECTIONS}" != *".aitk"* ]]; then
   BACKUP_SKIP_SECTIONS+=" .aitk"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".hermes"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .hermes"
 fi
 if [[ "${BACKUP_SKIP_SECTIONS}" != *".cache"* ]]; then
   BACKUP_SKIP_SECTIONS+=" .cache"

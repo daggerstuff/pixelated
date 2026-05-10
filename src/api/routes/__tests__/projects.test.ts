@@ -10,6 +10,13 @@ import {
 } from '../../../../tests/api/utils/test-helpers'
 import { app } from '../../../server'
 
+type ProjectListItem = {
+  category?: string
+  status?: string
+  name?: string
+  description?: string
+}
+
 describe('Projects API', () => {
   let authToken: string
   let testUserId: string
@@ -133,7 +140,7 @@ describe('Projects API', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
-      response.body.data.forEach((project: any) => {
+      ;(response.body.data as ProjectListItem[]).forEach((project) => {
         expect(project.category).toBe('Technology')
       })
     })
@@ -145,7 +152,7 @@ describe('Projects API', () => {
         .expect(200)
 
       expect(response.body.success).toBe(true)
-      response.body.data.forEach((project: any) => {
+      ;(response.body.data as ProjectListItem[]).forEach((project) => {
         expect(project.status).toBe('Active')
       })
     })
@@ -313,9 +320,9 @@ describe('Projects API', () => {
       expect(response.body.success).toBe(true)
       expect(response.body.data).toBeInstanceOf(Array)
       // Results should contain the search term
-      response.body.data.forEach((project: any) => {
+      ;(response.body.data as ProjectListItem[]).forEach((project) => {
         const searchText =
-          `${project.name} ${project.description}`.toLowerCase()
+          `${project.name ?? ''} ${project.description ?? ''}`.toLowerCase()
         expect(searchText).toContain('test'.toLowerCase())
       })
     })

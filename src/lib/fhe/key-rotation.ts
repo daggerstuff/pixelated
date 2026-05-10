@@ -8,7 +8,6 @@
 import crypto from 'crypto'
 import { EventEmitter } from 'node:events'
 
-import type { KMS, CloudWatch } from 'aws-sdk'
 import AWS from 'aws-sdk'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
@@ -26,6 +25,7 @@ interface AuditEvent {
   ipAddress?: string
   success: boolean
   details: Record<string, unknown>
+  metadata?: Record<string, unknown>
   riskLevel: 'low' | 'medium' | 'high' | 'critical'
 }
 
@@ -87,7 +87,7 @@ const SECURITY_CONSTANTS = {
  * HIPAA++ Compliant FHE Key Rotation Service
  */
 export class KeyRotationService extends EventEmitter {
-  private static instance: KeyRotationService
+  private static instance: KeyRotationService | undefined
   private options: KeyManagementOptions
   private activeKeyId: string | null = null
   private keyVersions = new Map<string, KeyVersion>()
@@ -100,9 +100,9 @@ export class KeyRotationService extends EventEmitter {
   private nodeId: string
   private sealService: SealService | null = null
   private sealInitialized = false
-  private kmsClient: KMS | null = null
+  private kmsClient: AWS.KMS | null = null
   private secretsManager: AWS.SecretsManager | null = null
-  private cloudWatch: CloudWatch | null = null
+  private cloudWatch: AWS.CloudWatch | null = null
   private keyCache = new Map<string, TFHEKeyPair>()
   private encryptionKey: Buffer | null = null
   private isInitialized = false
@@ -184,6 +184,15 @@ export class KeyRotationService extends EventEmitter {
       KeyRotationService.instance = new KeyRotationService(options)
     }
     return KeyRotationService.instance
+  }
+
+  /**
+   * Reset singleton instance for test environments.
+   */
+  public static resetInstanceForTests(): void {
+    if (process.env['NODE_ENV'] === 'test') {
+      KeyRotationService.instance = undefined
+    }
   }
 
   /**

@@ -41,8 +41,8 @@ After installing foresight-mcp package:
 
 ## Environment Variables
 
-| Variable              | Default                   | Description      |
-|-----------------------|--------------------------|------------------|
+| Variable              | Default                  | Description      |
+| --------------------- | ------------------------ | ---------------- |
 | `FORESIGHT_DB_PATH`   | `~/.foresight/memory.db` | Database path    |
 | `FORESIGHT_USER_ID`   | System user              | User identifier  |
 

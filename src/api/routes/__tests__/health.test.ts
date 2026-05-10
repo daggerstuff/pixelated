@@ -7,6 +7,10 @@ import { describe, it, expect, beforeEach } from 'vitest'
 
 import healthRoutes from '../health'
 
+type ServiceHealth = {
+  status?: string
+}
+
 describe('Health Endpoints', () => {
   let app: express.Express
 
@@ -154,9 +158,10 @@ describe('Health Endpoints', () => {
       const response = await request(app).get('/detailed')
 
       // Check that error details are included for failed services
-      Object.values(response.body.services || {}).forEach((service: any) => {
-        if (service.status === 'disconnected') {
-          expect(service).toHaveProperty('error')
+      Object.values(response.body.services || {}).forEach((service: unknown) => {
+        const details = service as ServiceHealth
+        if (details.status === 'disconnected') {
+          expect(details).toHaveProperty('error')
         }
       })
     })
