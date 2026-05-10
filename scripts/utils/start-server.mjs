@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-import { createServer } from 'node:http'
+import process from 'process'
+import { createServer } from 'http'
 
 // Try to import Sentry from either the local development path or the production path
 /** @typedef {import('../../config/instrument.mjs').SentryInstance} SentryInstance */
 /** @typedef {{ Sentry: SentryInstance; closeSentry: () => Promise<void> }} SentryModule */
-/** @typedef {{ handler: import('node:http').RequestListener }} SSRModule */
+/** @typedef {{ handler: import('http').RequestListener }} SSRModule */
 /** @typedef {Error & { code?: string }} ErrorWithCode */
 
 /** @param {unknown} value @returns {value is Record<string, unknown>} */
@@ -117,7 +118,7 @@ const isPortFallbackDisabled = portFallbackPolicy.isFallbackDisabled
 
 // Note: We create the server inside tryListen() to avoid port conflicts
 // The unused 'server' object was removed to prevent double-binding issues
-/** @type {import('node:http').Server | null} */
+/** @type {import('http').Server | null} */
 let activeRetryServer = null
 
 function redactValue(val, keepLast = 8) {

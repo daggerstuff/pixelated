@@ -3,10 +3,10 @@
 // If SKIP_TESTS is set to "true" (case-insensitive) or "1", the script exits 0 without running tests.
 // Otherwise it forwards arguments to vitest.
 
-import { spawn } from 'node:child_process'
-import path from 'node:path'
-import process from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { spawn } from 'child_process'
+import path from 'path'
+import process from 'process'
+import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

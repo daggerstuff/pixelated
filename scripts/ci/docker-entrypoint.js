@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { spawn } from 'node:child_process'
+import { spawn } from 'child_process'
 /* eslint-disable no-console */
-import fs from 'node:fs'
-import process from 'node:process'
+import fs from 'fs'
+import process from 'process'
 
 // Function to read secret and inject into environment
 function injectSecret(fileEnv, targetEnv, urlEnv = null) {
