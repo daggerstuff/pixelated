@@ -4,11 +4,23 @@
  */
 
 import { cleanup } from '@testing-library/react'
-import * as React from 'react'
 import { vi } from 'vitest'
 
-// React 19 compatibility: delegate to setup-react19.ts which has proper error handling
-import { act } from './setup-react19'
+// React 19 compatibility shim for environments that do not provide `act` directly.
+const act = async (callback: () => void | Promise<void>): Promise<void> => {
+  const result = callback()
+  if (result && typeof result === 'object' && 'then' in result) {
+    await Promise.resolve(result)
+  }
+
+  if (typeof queueMicrotask !== 'undefined') {
+    await new Promise<void>((resolve) => {
+      queueMicrotask(() => resolve())
+    })
+  }
+
+  return
+}
 
 import '@testing-library/jest-dom'
 
@@ -16,15 +28,12 @@ import '@testing-library/jest-dom'
 process.env.JWT_SECRET ??= 'test-jwt-secret'
 
 vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal<typeof React>()
+  const actual = await importOriginal<typeof import('react')>()
   const patchedAct = typeof actual.act === 'function' ? actual.act : act
+
   return {
     ...actual,
     act: patchedAct,
-    default: {
-      ...actual,
-      act: patchedAct,
-    },
   }
 })
 
@@ -32,21 +41,20 @@ vi.mock('react-dom/test-utils', () => ({
   act,
 }))
 
-try {
-  const reactCompat: {
-    act?: typeof act
-  } & typeof React = React
-
-  Object.defineProperty(reactCompat, 'act', {
-    value: act,
-    writable: true,
-    configurable: true,
-    enumerable: false,
+void import('react')
+  .then((reactModule) => {
+    if (!('act' in reactModule) || reactModule.act !== act) {
+      Object.defineProperty(reactModule, 'act', {
+        value: act,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      })
+    }
   })
-} catch (error: unknown) {
-  // React.act may already be defined in some React versions - safe to skip
-  console.debug('Failed to define React act helper', error)
-}
+  .catch((error: unknown) => {
+    console.debug('Failed to define React act helper', error)
+  })
 
 // Mock window.matchMedia
 if (typeof window !== 'undefined') {

@@ -76,6 +76,13 @@ export class HealthMonitor extends EventEmitter {
   private healthMetrics: Map<string, HealthMetrics[]> = new Map()
   private healthScores: Map<string, HealthScore> = new Map()
   private activeAlerts: Map<string, HealthAlert> = new Map()
+  private customHealthChecks: Map<
+    string,
+    () => Promise<{
+      status: 'healthy' | 'degraded' | 'unhealthy'
+      message: string
+    }>
+  > = new Map()
   private isInitialized = false
   private healthCheckInterval: NodeJS.Timeout | null = null
   private metricsRetentionInterval: NodeJS.Timeout | null = null
@@ -192,8 +199,59 @@ export class HealthMonitor extends EventEmitter {
       )
 
       await Promise.allSettled(checkPromises)
+
+      for (const [name, check] of this.customHealthChecks) {
+        const result = await check()
+        if (result.status !== 'healthy') {
+          this.emit('custom-health-check-failed', {
+            checkName: name,
+            status: result.status,
+            message: result.message,
+          })
+        }
+      }
     } catch (error: unknown) {
       logger.error('Health check cycle failed', { error })
+    }
+  }
+
+  /**
+   * Register custom health check
+   */
+  registerCheck(
+    name: string,
+    check: () => Promise<{
+      status: 'healthy' | 'degraded' | 'unhealthy'
+      message: string
+    }>,
+  ): void {
+    this.customHealthChecks.set(name, check)
+  }
+
+  /**
+   * Get region health status for a specific region
+   */
+  getRegionHealth(regionId: string): {
+    status: 'healthy' | 'degraded' | 'unhealthy'
+    message: string
+  } {
+    const healthScore = this.healthScores.get(regionId)
+
+    if (!healthScore) {
+      return {
+        status: 'unhealthy',
+        message: `No health score found for region ${regionId}`,
+      }
+    }
+
+    return {
+      status:
+        healthScore.status === 'healthy'
+          ? 'healthy'
+          : healthScore.status === 'degraded'
+            ? 'degraded'
+            : 'unhealthy',
+      message: `Health score ${healthScore.overallScore} for region ${regionId}`,
     }
   }
 

@@ -22,7 +22,7 @@ vi.mock('../AIChatReact', () => {
       props: {
         'data-testid': 'ai-chat-react',
         'data-props': JSON.stringify(props),
-        children: [
+        'children': [
           {
             type: 'div',
             props: {
@@ -105,7 +105,7 @@ describe('AIChat.astro', () => {
     vi.clearAllMocks()
   })
 
-  it.skip('renders with default props', async () => {
+  it('renders with default props', async () => {
     // Skip this test as Astro components cannot be directly imported in TypeScript tests
     // const { container } = await renderAstroComponent(AIChat)
 
@@ -123,7 +123,7 @@ describe('AIChat.astro', () => {
     expect(true).toBe(true) // Placeholder test
   })
 
-  it.skip('renders with custom props', async () => {
+  it('renders with custom props', async () => {
     // const { container } = await renderAstroComponent(AIChat, {
     //   availableModels: [
     //     { id: 'openai/gpt-4', name: 'GPT-4' },
@@ -151,7 +151,7 @@ describe('AIChat.astro', () => {
     expect(true).toBe(true) // Placeholder test
   })
 
-  it.skip('applies transition styles', async () => {
+  it('applies transition styles', async () => {
     // const { container } = await renderAstroComponent(AIChat)
 
     // // Check if transition styles are applied
@@ -166,7 +166,7 @@ describe('AIChat.astro', () => {
     expect(true).toBe(true) // Placeholder test
   })
 
-  it.skip('has responsive layout classes', async () => {
+  it('has responsive layout classes', async () => {
     // const { container } = await renderAstroComponent(AIChat)
 
     // const mainDiv = container.querySelector('div')

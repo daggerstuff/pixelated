@@ -454,6 +454,8 @@ describe('BiasAlertSystem', () => {
 
       await alertSystem.processAlert?.(criticalResult)
 
+      expect(callback).toHaveBeenCalled()
+
       // Note: In a real implementation, the callback would be triggered
       // This test verifies the callback registration works
     })
@@ -537,29 +539,5 @@ describe('BiasAlertSystem', () => {
       expect(true).toBe(true)
     })
 
-    // Comment out tests for methods that don't exist yet
-    /*
-    it('should handle alert resolution', async () => {
-      const alertId = 'test-alert-123'
-      const resolution = await alertSystem.resolveAlert?.(alertId, 'Issue resolved', 'test-user')
-      expect(resolution).toBeDefined()
-    })
-    */
-  })
-
-  // Comment out tests for methods that don't exist yet
-  /*
-  describe('alert statistics', () => {
-    it('should track alert statistics', async () => {
-      const stats = await alertSystem.getAlertStatistics?.()
-      expect(stats).toBeDefined()
-    })
-
-    it('should provide alert history', async () => {
-      const history = await alertSystem.getAlertHistory?.()
-      expect(history).toBeDefined()
-      expect(Array.isArray(history)).toBe(true)
-    })
-  })
-  */
+})
 })
