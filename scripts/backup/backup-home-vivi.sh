@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
-RCLONE_TARGET="${RCLONE_TARGET:-gdrive:vivi-home-backups}"
+RCLONE_TARGET="${RCLONE_TARGET:-HetznerS3:vivi-home-backups}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
 LOCK_FILE_BASE="${HOME:-/home/vivi}"
 BACKUP_MODE="${BACKUP_MODE:-incremental}"
@@ -13,6 +13,12 @@ BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 BACKUP_SECTIONS="${BACKUP_SECTIONS:-}"
 DEFAULT_BACKUP_SKIP_SECTIONS=".cache .cargo .claude .claude-mem .cursor .cursor-server .codex .gemini .kube .antigravity-server .aitk"
 BACKUP_SKIP_SECTIONS="${BACKUP_SKIP_SECTIONS:-$DEFAULT_BACKUP_SKIP_SECTIONS}"
+BACKUP_RCLONE_TRANSFERS="${BACKUP_RCLONE_TRANSFERS:-16}"
+BACKUP_RCLONE_CHECKERS="${BACKUP_RCLONE_CHECKERS:-16}"
+BACKUP_RCLONE_FAST_LIST="${BACKUP_RCLONE_FAST_LIST:-true}"
+BACKUP_RCLONE_STATS="${BACKUP_RCLONE_STATS:-8s}"
+BACKUP_RCLONE_EXTRA_ARGS="${BACKUP_RCLONE_EXTRA_ARGS:-}"
+BACKUP_RCLONE_EXCLUDE_EXTRA="${BACKUP_RCLONE_EXCLUDE_EXTRA:-}"
 if [[ "${BACKUP_SKIP_SECTIONS}" != *".claude"* ]]; then
   BACKUP_SKIP_SECTIONS+=" .claude"
 fi
@@ -147,19 +153,24 @@ load_rclone_args() {
   mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
     "--checksum" \
     "--create-empty-src-dirs" \
-    "--transfers" "8" \
-    "--checkers" "8" \
+    "--transfers" "${BACKUP_RCLONE_TRANSFERS}" \
+    "--checkers" "${BACKUP_RCLONE_CHECKERS}" \
     "--ignore-errors" \
     "--skip-links" \
     "--retries" "5" \
     "--low-level-retries" "10" \
-    "--stats" "15s" \
+    "--stats" "${BACKUP_RCLONE_STATS}" \
     "--stats-one-line")
+
+  if [[ "${BACKUP_RCLONE_FAST_LIST,,}" == "true" || "${BACKUP_RCLONE_FAST_LIST,,}" == "1" ]]; then
+    RCLONE_COPY_ARGS+=("--fast-list")
+  fi
 
   mapfile -t RCLONE_EXCLUDE_PATHS < <(printf '%s\n' \
     ".cache/**" \
     "cache/**" \
     ".cursor/**" \
+    ".codeql/**" \
     ".cursor-server/**" \
     ".codex/**" \
     ".claude/**" \
@@ -187,6 +198,23 @@ load_rclone_args() {
     "*.log" \
     ".cache/home-backup-*" \
     ".cache/home-vivi-backup-*")
+
+  if [[ -n "${BACKUP_RCLONE_EXCLUDE_EXTRA}" ]]; then
+    while IFS= read -r exclude_arg; do
+      exclude_arg="$(printf '%s\n' "$exclude_arg" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+      if [[ "${exclude_arg:0:1}" == "#" ]]; then
+        continue
+      fi
+      if [[ -n "$exclude_arg" ]]; then
+        RCLONE_EXCLUDE_PATHS+=("$exclude_arg")
+      fi
+    done < <(printf '%s\n' "${BACKUP_RCLONE_EXCLUDE_EXTRA}" | tr ',;' '\n')
+  fi
+
+  if [[ -n "${BACKUP_RCLONE_EXTRA_ARGS}" ]]; then
+    read -ra CUSTOM_RCLONE_ARGS <<< "${BACKUP_RCLONE_EXTRA_ARGS}"
+    RCLONE_COPY_ARGS+=("${CUSTOM_RCLONE_ARGS[@]}")
+  fi
 
   local exclude_arg
   for exclude_arg in "${RCLONE_EXCLUDE_PATHS[@]}"; do
@@ -366,6 +394,11 @@ lock_acquired=true
 start_backup_heartbeat
 log "Effective BACKUP_SECTIONS='${BACKUP_SECTIONS}'"
 log "Effective BACKUP_SKIP_SECTIONS='${BACKUP_SKIP_SECTIONS}'"
+log "Effective BACKUP_RCLONE_TRANSFERS='${BACKUP_RCLONE_TRANSFERS}'"
+log "Effective BACKUP_RCLONE_CHECKERS='${BACKUP_RCLONE_CHECKERS}'"
+log "Effective BACKUP_RCLONE_FAST_LIST='${BACKUP_RCLONE_FAST_LIST}'"
+log "Effective BACKUP_RCLONE_EXCLUDE_EXTRA='${BACKUP_RCLONE_EXCLUDE_EXTRA}'"
+log "Effective BACKUP_RCLONE_EXTRA_ARGS='${BACKUP_RCLONE_EXTRA_ARGS}'"
 log "Heartbeat interval: ${BACKUP_HEARTBEAT_INTERVAL}s"
 
 case "$BACKUP_MODE" in
@@ -400,7 +433,8 @@ case "$BACKUP_MODE" in
     ARCHIVE_STAGING_TMP="$ARCHIVE_STAGING_DIR/home-vivi-${BACKUP_TIMESTAMP}.tar.gz.tmp"
 
     mapfile -t TAR_EXCLUDE_ARGS < <(printf '%s\n' \
-      "--exclude=.cache/**" \
+    "--exclude=.cache/**" \
+    "--exclude=.codeql/**" \
     "--exclude=cache/**" \
       "--exclude=.cursor/**" \
       "--exclude=.cursor-server/**" \

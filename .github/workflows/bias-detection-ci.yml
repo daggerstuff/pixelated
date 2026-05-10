@@ -426,7 +426,7 @@ jobs:
       - name: Run Python tests
         run: |
           cd src/lib/ai/bias-detection/python-service
-          uv python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml --cov-fail-under=25
+          uv run python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml --cov-fail-under=25
         env:
           ENV: ci
           FLASK_SECRET_KEY: test-flask-secret
@@ -590,7 +590,7 @@ jobs:
       - name: Start Python ML service
         run: |
           cd src/lib/ai/bias-detection/python-service
-          uv python bias_detection_service.py &
+          uv run python bias_detection_service.py &
           PYTHON_PID=$!
           echo "Started Python service with PID: $PYTHON_PID"
           echo "Waiting for Python service to be ready..."
