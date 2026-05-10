@@ -129,7 +129,6 @@ load_rclone_args() {
     ".cursor-server/**" \
     ".codex/**" \
     ".claude/**" \
-    ".claude-mem/**" \
     "pixelated/dist/**" \
     "pixelated/build/**" \
     "pixelated/.next/**" \
@@ -390,7 +389,6 @@ case "$BACKUP_MODE" in
       "--exclude=**/*.log" \
       "--exclude=.local/share/zed/**" \
       "--exclude=.local/share/home_backups/**" \
-      "--exclude=.claude-mem/**" \
       "--exclude=.cache/home-vivi-backup.lock" \
       "--exclude=**/node_modules/**" \
       "--exclude=**/.venv/**")

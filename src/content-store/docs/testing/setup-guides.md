@@ -147,9 +147,9 @@ jobs:
           node-version: '18'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v6.0.6
         with:
-          version: 10
+          version: 11.0.9
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

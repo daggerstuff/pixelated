@@ -6,7 +6,6 @@
 import { createMentalLLaMAFromEnvSafe } from './ai/mental-llama/client-adapter'
 import type {
   MentalHealthAnalysisResult,
-  ExpertGuidedAnalysisResult,
   RoutingContext,
 } from './ai/mental-llama/types/mentalLLaMATypes'
 import { RecommendationService } from './ai/services/RecommendationService'
@@ -83,8 +82,22 @@ function convertAnalysisToLegacyFormat(
 ): MentalHealthAnalysis {
   const now = Date.now()
 
+  const isLlmAnalysis = (
+    candidate: MHAnalysis | MentalHealthAnalysisResult,
+  ): candidate is MentalHealthAnalysisResult =>
+    'mentalHealthCategory' in candidate
+
+  const getNumberValue = (
+    values: Record<string, number>,
+    key: string,
+  ): number => values[key] ?? 0
+  const getStringValues = (
+    values: Record<string, string[]>,
+    key: string,
+  ): string[] => values[key] ?? []
+
   // Handle different analysis result types
-  if ('indicators' in analysis) {
+  if (!isLlmAnalysis(analysis)) {
     // Handle our mental-health service analysis
     const mhAnalysis = analysis
     const scores: Record<string, number> = {}
@@ -97,30 +110,32 @@ function convertAnalysisToLegacyFormat(
     })
 
     return {
-      id: mhAnalysis.id,
+      id: mhAnalysis.id ?? `analysis-${mhAnalysis.timestamp}`,
       timestamp: mhAnalysis.timestamp,
-      category: (mhAnalysis.categories ?? [])[0]?.name || 'general',
+      category: mhAnalysis.categories?.[0]?.name ?? 'general',
       explanation: (mhAnalysis.indicators ?? [])
         .map((indicator) => indicator.description)
         .join('; '),
       expertGuided: false,
-
       scores: {
-        depression: scores['depression'] || 0,
-        anxiety: scores['anxiety'] || 0,
-        stress: scores['stress'] || 0,
-        anger: scores['anger'] || 0,
-        socialIsolation: scores['isolation'] || 0,
+        depression: getNumberValue(scores, 'depression'),
+        anxiety: getNumberValue(scores, 'anxiety'),
+        stress: getNumberValue(scores, 'stress'),
+        anger: getNumberValue(scores, 'anger'),
+        socialIsolation: getNumberValue(scores, 'isolation'),
       },
       evidence: {
-        depression: evidence['depression'] || [],
-        anxiety: evidence['anxiety'] || [],
-        stress: evidence['stress'] || [],
-        anger: evidence['anger'] || [],
-        socialIsolation: evidence['isolation'] || [],
+        depression: getStringValues(evidence, 'depression'),
+        anxiety: getStringValues(evidence, 'anxiety'),
+        stress: getStringValues(evidence, 'stress'),
+        anger: getStringValues(evidence, 'anger'),
+        socialIsolation: getStringValues(evidence, 'isolation'),
         ...evidence,
       },
-      summary: mhAnalysis.recommendations?.join('. '),
+      summary:
+        mhAnalysis.summary ??
+        mhAnalysis.recommendations?.join('. ') ??
+        'Analysis completed',
       riskLevel:
         mhAnalysis.riskLevel === 'critical'
           ? 'high'
@@ -128,101 +143,70 @@ function convertAnalysisToLegacyFormat(
             ? 'moderate'
             : 'low',
     }
-  } else {
-    // Handle MentalLLaMA analysis result
-    const llmAnalysis = analysis
-    const isExpertGuided = 'expertGuidance' in llmAnalysis
+  }
 
-    return {
-      id: `analysis-${now}`,
-      timestamp: now,
-      category: llmAnalysis.mentalHealthCategory || 'general',
-      explanation: llmAnalysis.explanation || 'Analysis completed',
-      expertGuided: isExpertGuided,
-      scores: {
-        depression:
-          llmAnalysis.mentalHealthCategory === 'depression'
-            ? llmAnalysis.confidence
-            : 0,
-        anxiety:
-          llmAnalysis.mentalHealthCategory === 'anxiety'
-            ? llmAnalysis.confidence
-            : 0,
-        stress:
-          llmAnalysis.mentalHealthCategory === 'stress'
-            ? llmAnalysis.confidence
-            : 0,
-        anger:
-          llmAnalysis.mentalHealthCategory === 'anger'
-            ? llmAnalysis.confidence
-            : 0,
-        socialIsolation:
-          llmAnalysis.mentalHealthCategory === 'social_isolation'
-            ? llmAnalysis.confidence
-            : 0,
-      },
-      evidence: {
-        depression:
-          llmAnalysis.mentalHealthCategory === 'depression'
-            ? llmAnalysis.supportingEvidence || []
-            : [],
-        anxiety:
-          llmAnalysis.mentalHealthCategory === 'anxiety'
-            ? llmAnalysis.supportingEvidence || []
-            : [],
-        stress:
-          llmAnalysis.mentalHealthCategory === 'stress'
-            ? llmAnalysis.supportingEvidence || []
-            : [],
-        anger:
-          llmAnalysis.mentalHealthCategory === 'anger'
-            ? llmAnalysis.supportingEvidence || []
-            : [],
-        socialIsolation:
-          llmAnalysis.mentalHealthCategory === 'social_isolation'
-            ? llmAnalysis.supportingEvidence || []
-            : [],
-      },
-      summary: llmAnalysis.explanation || 'Mental health analysis completed',
-      riskLevel: llmAnalysis.isCrisis
-        ? 'high'
-        : llmAnalysis.confidence > 0.7
-          ? 'moderate'
-          : 'low',
-    }
+  // Handle MentalLLaMA analysis result
+  const llmAnalysis = analysis
+  const isExpertGuided = 'expertGuidance' in llmAnalysis
+  const category = llmAnalysis.mentalHealthCategory
+  const evidence = llmAnalysis.supportingEvidence ?? []
+
+  return {
+    id: `analysis-${now}`,
+    timestamp: now,
+    category,
+    explanation: llmAnalysis.explanation,
+    expertGuided: isExpertGuided,
+    scores: {
+      depression: category === 'depression' ? llmAnalysis.confidence : 0,
+      anxiety: category === 'anxiety' ? llmAnalysis.confidence : 0,
+      stress: category === 'stress' ? llmAnalysis.confidence : 0,
+      anger: category === 'anger' ? llmAnalysis.confidence : 0,
+      socialIsolation:
+        category === 'social_isolation' ? llmAnalysis.confidence : 0,
+    },
+    evidence: {
+      depression: category === 'depression' ? evidence : [],
+      anxiety: category === 'anxiety' ? evidence : [],
+      stress: category === 'stress' ? evidence : [],
+      anger: category === 'anger' ? evidence : [],
+      socialIsolation: category === 'social_isolation' ? evidence : [],
+    },
+    summary: llmAnalysis.explanation,
+    riskLevel: llmAnalysis.isCrisis
+      ? 'high'
+      : llmAnalysis.confidence > 0.7
+        ? 'moderate'
+        : 'low',
   }
 }
 
 function toRecommendationAnalysis(
   analysis: MHAnalysis | MentalHealthAnalysisResult,
 ): MentalHealthAnalysisResult {
-  // Check if it's MHAnalysis (has 'indicators' property)
   if ('indicators' in analysis) {
-    const mhAnalysis = analysis as MHAnalysis;
     return {
-      hasMentalHealthIssue: mhAnalysis.hasMentalHealthIssue,
-      mentalHealthCategory: mhAnalysis.category || 'unknown',
-      confidence: mhAnalysis.confidence,
-      explanation: mhAnalysis.explanation,
-      supportingEvidence: mhAnalysis.supportingEvidence || [],
+      hasMentalHealthIssue: analysis.hasMentalHealthIssue,
+      mentalHealthCategory: analysis.category,
+      confidence: analysis.confidence,
+      explanation: analysis.explanation,
+      supportingEvidence: analysis.supportingEvidence,
       isCrisis:
-        mhAnalysis.riskLevel === 'high' || mhAnalysis.riskLevel === 'critical',
-      timestamp: new Date(mhAnalysis.timestamp).toISOString(),
-      stressLevel: mhAnalysis.riskLevel === 'high' ? 0.8 : 0.4,
+        analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
+      timestamp: new Date(analysis.timestamp).toISOString(),
+      stressLevel: analysis.riskLevel === 'high' ? 0.8 : 0.4,
     }
   }
 
-  // It's MentalHealthAnalysisResult
-  const result = analysis as MentalHealthAnalysisResult;
   return {
-    hasMentalHealthIssue: result.hasMentalHealthIssue,
-    mentalHealthCategory: result.mentalHealthCategory || 'unknown',
-    confidence: result.confidence,
-    explanation: result.explanation || '',
-    supportingEvidence: result.supportingEvidence || [],
-    isCrisis: result.isCrisis,
-    timestamp: result.timestamp,
-    stressLevel: result.stressLevel ?? 0,
+    hasMentalHealthIssue: analysis.hasMentalHealthIssue,
+    mentalHealthCategory: analysis.mentalHealthCategory,
+    confidence: analysis.confidence,
+    explanation: analysis.explanation,
+    supportingEvidence: analysis.supportingEvidence,
+    isCrisis: analysis.isCrisis,
+    timestamp: analysis.timestamp,
+    stressLevel: analysis.stressLevel ?? 0,
   }
 }
 
@@ -236,7 +220,10 @@ export function createMentalHealthChat(
 ) {
   // Initialize services
   let mentalHealthService: MentalHealthService | null = null
-  let mentalLLaMAAdapter: unknown = null
+  type MentalLLaMAFactoryAdapter = Awaited<
+    ReturnType<typeof createMentalLLaMAFromEnvSafe>
+  >['adapter']
+  let mentalLLaMAAdapter: MentalLLaMAFactoryAdapter | null = null
   let recommendationService: RecommendationService | null = null
   let isInitialized = false
 
@@ -262,18 +249,24 @@ export function createMentalHealthChat(
       logger.info('Initializing MentalHealthChat services...')
 
       // Initialize MentalHealthService for basic analysis
-      mentalHealthService = new MentalHealthService({
+      const analysisConfig = {
         enableAnalysis: config.enableAnalysis,
         confidenceThreshold: config.confidenceThreshold,
         interventionThreshold: config.triggerInterventionThreshold,
         analysisMinLength: config.analysisMinimumLength,
         enableCrisisDetection: config.enableCrisisDetection,
-      })
+      }
+
+      mentalHealthService = new MentalHealthService(analysisConfig)
 
       // Initialize MentalLLaMA for advanced analysis (if available)
       try {
         const mentalLLaMAFactory = await createMentalLLaMAFromEnvSafe()
-        mentalLLaMAAdapter = mentalLLaMAFactory.adapter
+        if (
+          'analyzeMentalHealthWithExpertGuidance' in mentalLLaMAFactory.adapter
+        ) {
+          mentalLLaMAAdapter = mentalLLaMAFactory.adapter
+        }
         logger.info('MentalLLaMA adapter initialized successfully')
       } catch (error: unknown) {
         logger.warn(
@@ -321,7 +314,11 @@ export function createMentalHealthChat(
         let analysis: MentalHealthAnalysis | null = null
 
         // Use MentalLLaMA if available and expert guidance is enabled
-        if (mentalLLaMAAdapter && config.useExpertGuidance) {
+        if (
+          mentalLLaMAAdapter &&
+          config.useExpertGuidance &&
+          'analyzeMentalHealthWithExpertGuidance' in mentalLLaMAAdapter
+        ) {
           const routingContext: RoutingContext = {
             userId: config.userId,
             sessionId: config.sessionId,
@@ -329,19 +326,12 @@ export function createMentalHealthChat(
           }
 
           // Type-safe call to MentalLLaMA adapter
-          const adapter = mentalLLaMAAdapter as {
-            analyzeMentalHealthWithExpertGuidance: (
-              text: string,
-              guidance: boolean,
-              context: RoutingContext,
-            ) => Promise<ExpertGuidedAnalysisResult>
-          }
-
-          const llmResult = await adapter.analyzeMentalHealthWithExpertGuidance(
-            message.content,
-            true,
-            routingContext,
-          )
+          const llmResult =
+            await mentalLLaMAAdapter.analyzeMentalHealthWithExpertGuidance(
+              message.content,
+              true,
+              routingContext,
+            )
 
           analysis = convertAnalysisToLegacyFormat(llmResult)
         }
