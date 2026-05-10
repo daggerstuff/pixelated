@@ -144,6 +144,7 @@ export default defineConfig({
       'src/e2e/breach-notification.spec.ts',
       'src/tests/performance.test.ts',
       'src/tests/responsive-navigation.test.js',
+      'tests/integration/complete-system.integration.test.ts',
       'tests/e2e/**/*',
       'tests/browser/**/*',
       'tests/accessibility/**/*',
@@ -169,6 +170,7 @@ export default defineConfig({
                 ],
           environment: 'jsdom',
           exclude: [
+            'tests/integration/complete-system.integration.test.ts',
             'src/tests/simple-browser-compatibility.test.ts',
             'src/tests/browser-compatibility.test.ts',
             'src/tests/mobile-compatibility.test.ts',
@@ -195,7 +197,7 @@ export default defineConfig({
           include:
             targetedTestGlobs.length > 0
               ? targetedNodeTestGlobs
-              : nodeTestGlobs,
+              : [...nodeTestGlobs, 'src/tests/auth.test.ts'],
           environment: 'node',
         },
         resolve: {
