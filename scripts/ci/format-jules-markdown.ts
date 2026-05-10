@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /// <reference types="node" />
 
-import * as process from "process";
 import { spawnSync } from "child_process";
-import { argv, exit } from "node:process";
+import { argv, exit } from "process";
 
 const files: string[] = argv.slice(2).map((filePath: string) => filePath.trim());
 
