@@ -1,6 +1,8 @@
 import path from 'node:path'
 import process from 'node:process'
 
+import { loadEnv } from 'vite'
+
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
@@ -19,6 +21,12 @@ const isFlyioDeploy =
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+// Explicitly load environment variables from .env files into process.env
+// for use during configuration evaluation (e.g. Sentry DSN check).
+const loadedEnv = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '')
+Object.assign(process.env, loadedEnv)
+
 // Detect if we're running a build command (not dev server)
 const isBuildCommand =
   process.argv.includes('build') ||
