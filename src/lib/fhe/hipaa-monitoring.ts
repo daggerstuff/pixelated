@@ -90,17 +90,6 @@ interface HealthMetrics {
   overallStatus: 'healthy' | 'warning' | 'degraded' | 'critical'
 }
 
-type CloudWatchClient = {
-  putMetricData(params: {
-    Namespace: string
-    MetricData: Array<Record<string, unknown>>
-  }): Promise<unknown>
-}
-
-type SNSClient = {
-  publish(params: Record<string, unknown>): Promise<unknown>
-}
-
 /**
  * HIPAA++ Security Monitoring Service
  */
@@ -108,8 +97,8 @@ export class HIPAAMonitoringService extends EventEmitter {
   private static instance: HIPAAMonitoringService | undefined
   private readonly alerts: SecurityAlert[] = []
   private threatPatterns: ThreatPattern[] = []
-  private cloudWatch: CloudWatchClient | null = null
-  private sns: SNSClient | null = null
+  private cloudWatch: CloudWatch | null = null
+  private sns: SNS | null = null
   private isMonitoring = false
   private monitoringIntervals: NodeJS.Timeout[] = []
 
@@ -1241,9 +1230,10 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Check for old events (retention policy compliance)
-      const retentionPeriod = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
+      const retentionPeriodForCleanup =
+        HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
       const cutoffDate = new Date(
-        now.getTime() - retentionPeriod * 24 * 60 * 60 * 1000,
+        now.getTime() - retentionPeriodForCleanup * 24 * 60 * 60 * 1000,
       )
       const oldEvents = sortedEvents.filter(
         (event) => new Date(event.timestamp) < cutoffDate,
@@ -1297,11 +1287,9 @@ export class HIPAAMonitoringService extends EventEmitter {
       }
 
       // Check if retention policy is configured
-      const auditRetentionDays = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
       // Verify automatic deletion is working (check for very old events)
-      const auditRetentionDays2 = HIPAA_SECURITY_CONFIG.AUDIT_RETENTION_DAYS
       const veryOldCutoff = new Date(
-        now.getTime() - (auditRetentionDays2 + 30) * 24 * 60 * 60 * 1000,
+        now.getTime() - (retentionPeriod + 30) * 24 * 60 * 60 * 1000,
       ) // 30 days past retention
       const veryOldEvents = oldEvents.filter(
         (event) => new Date(event.timestamp) < veryOldCutoff,
@@ -1867,10 +1855,12 @@ export class HIPAAMonitoringService extends EventEmitter {
         },
       ]
 
-      await this.cloudWatch.putMetricData({
-        Namespace: HIPAA_SECURITY_CONFIG.CLOUDWATCH_NAMESPACE,
-        MetricData: metricData,
-      })
+      await this.cloudWatch
+        .putMetricData({
+          Namespace: HIPAA_SECURITY_CONFIG.CLOUDWATCH_NAMESPACE,
+          MetricData: metricData,
+        })
+        .promise()
 
       logger.debug('Security metrics emitted to CloudWatch')
     } catch (error: unknown) {
@@ -1957,13 +1947,6 @@ export class HIPAAMonitoringService extends EventEmitter {
   }
 
   private getAlertTitle(action: string): string {
-    const titles: Record<string, string> = {
-      key_rotation_failed: 'Key Rotation Failure',
-      key_compromise_reported: 'Key Compromise Detected',
-      suspicious_activity_detected: 'Suspicious Activity',
-      key_age_violation: 'Key Age Policy Violation',
-      unauthorized_access: 'Unauthorized Access Attempt',
-    }
     if (action === 'key_rotation_failed') {
       return 'Key Rotation Failure'
     }

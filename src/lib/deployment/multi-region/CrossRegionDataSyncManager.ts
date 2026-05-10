@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 import { createClient } from '@clickhouse/client'
 import * as cockroach from 'cockroach'
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -501,13 +501,20 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       try {
         const redisConfig = this.getRedisConfig(region)
 
-        const client = new Redis({
-          host: redisConfig.host,
-          port: redisConfig.port,
-          password: redisConfig.password,
-          db: redisConfig.database,
-          maxRetriesPerRequest: 3,
-        })
+        const redisHost = redisConfig.host ?? 'localhost'
+        const redisPort = Number(redisConfig.port) || 6379
+        const redisDb = Number(redisConfig.database) || 0
+        const redisPassword =
+          redisConfig.password && redisConfig.password.length > 0
+            ? `:${encodeURIComponent(String(redisConfig.password))}@`
+            : ''
+        const client = new Redis(
+          `redis://${redisPassword}${redisHost}:${redisPort}/${redisDb}`,
+          {
+            maxRetriesPerRequest: 3,
+            connectTimeout: 5000,
+          },
+        )
 
         // Test connection
         await client.ping()
@@ -1303,7 +1310,11 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         if (!client) continue
 
         // Get performance metrics from Redis
-        const regionMetrics = await client.hgetall(`metrics:${region}`)
+        const regionMetrics = (await (
+          client as unknown as {
+            hgetall: (key: string) => Promise<Record<string, string>>
+          }
+        ).hgetall(`metrics:${region}`)) as Record<string, string>
 
         for (const [metricName, metricValue] of Object.entries(regionMetrics)) {
           metrics.push({

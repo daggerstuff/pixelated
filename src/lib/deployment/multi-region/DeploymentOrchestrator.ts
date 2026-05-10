@@ -130,12 +130,10 @@ export class DeploymentOrchestrator extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to initialize Deployment Orchestrator', { error })
-      throw new Error(
-        `Initialization failed: ${error instanceof Error ? (error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error') : 'Unknown error'}`,
-        {
-          cause: error instanceof Error ? error : undefined,
-        },
-      )
+      if (error instanceof Error) {
+        throw new Error('Initialization failed', { cause: error })
+      }
+      throw error
     }
   }
 
@@ -307,14 +305,8 @@ export class DeploymentOrchestrator extends EventEmitter {
    * Setup event listeners
    */
   private setupEventListeners(): void {
-    this.cloudProviderManager.on('deployment-complete', (data) => {
-      logger.info('Cloud provider deployment completed', data)
-    })
-
-    this.cloudProviderManager.on('deployment-failed', (data) => {
-      logger.error('Cloud provider deployment failed', data)
-      this.handleDeploymentFailure(data)
-    })
+    // Cloud provider manager events are not currently exposed in this implementation.
+    // Keep this method for future extension without failing initialization.
   }
 
   /**
@@ -514,7 +506,7 @@ export class DeploymentOrchestrator extends EventEmitter {
 
     try {
       let phaseResults: (DeploymentResult | Record<string, unknown>)[] = []
-      let phaseErrors: string[] = []
+      const phaseErrors: string[] = []
 
       switch (phase.type) {
         case 'infrastructure':
@@ -1044,7 +1036,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       if (responseTime <= maxResponseTime && throughput >= minThroughput) {
         return { success: true }
       } else {
-        const errors = []
+        const errors: string[] = []
         if (responseTime > maxResponseTime) {
           errors.push(
             `Response time ${responseTime.toFixed(0)}ms exceeds maximum ${maxResponseTime}ms`,

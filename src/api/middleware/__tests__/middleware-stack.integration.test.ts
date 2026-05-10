@@ -23,6 +23,19 @@ type ErrorHandlingMiddleware = (
 ) => void | Promise<void>
 type TestMiddleware = ReturnType<typeof vi.fn<ErrorHandlingMiddleware>>
 type NextFunctionMock = NextFunction
+
+function createMockTestRequest(
+  overrides: Partial<TestRequest> = {},
+): TestRequest {
+  return {
+    ip: '192.168.1.1',
+    headers: {},
+    url: '/api/users',
+    method: 'GET',
+    ...overrides,
+  }
+}
+
 function createMockNext(): NextFunction {
   return vi.fn() as NextFunction
 }
@@ -94,12 +107,7 @@ describe('Middleware Stack Integration', () => {
   let mockNext: NextFunctionMock
 
   beforeEach(() => {
-    mockRequest = {
-      ip: '192.168.1.1',
-      headers: {},
-      url: '/api/users',
-      method: 'GET',
-    } as TestRequest
+    mockRequest = createMockTestRequest()
     mockResponse = createMockResponse()
     mockNext = createMockNext()
   })
@@ -144,16 +152,14 @@ describe('Middleware Stack Integration', () => {
     mockAuthenticateRequest.mockRejectedValue(new Error('Invalid token'))
     mockRequest.headers.authorization = 'Bearer invalid'
     mockAuthMiddleware.mockImplementation(
-      async (_req: TestRequest, _res: MockResponse, _next: NextFunction) => {
+      async (__req: TestRequest, _res: MockResponse, _next: NextFunction) => {
         throw new Error('Invalid token')
       },
     )
 
-    try {
-      await mockAuthMiddleware(mockRequest, mockResponse, mockNext)
-    } catch (error: unknown) {
-      expect(error).toBeDefined()
-    }
+    await expect(
+      mockAuthMiddleware(mockRequest, mockResponse, mockNext),
+    ).rejects.toBeInstanceOf(Error)
 
     expect(mockNext).not.toHaveBeenCalled()
   })
@@ -163,7 +169,6 @@ describe('Middleware Stack Integration', () => {
     mockRateLimiter.mockImplementation(
       (req: TestRequest, res: MockResponse, next: NextFunction) => {
         res.status(429).json({ error: 'Too Many Requests' })
-        next()
       },
     )
 
@@ -176,18 +181,16 @@ describe('Middleware Stack Integration', () => {
   it('should propagate errors to error handler', async () => {
     const error = new Error('Middleware error')
     const faultyMiddleware = async (
-      req: TestRequest,
-      res: MockResponse,
-      next: NextFunction,
+      _req: TestRequest,
+      _res: MockResponse,
+      _next: NextFunction,
     ) => {
       throw error
     }
 
-    try {
-      await faultyMiddleware(mockRequest, mockResponse, mockNext)
-    } catch (err) {
-      expect(err).toBe(error)
-    }
+    await expect(
+      faultyMiddleware(mockRequest, mockResponse, mockNext),
+    ).rejects.toBe(error)
   })
 
   it('should handle middleware chain with multiple middlewares', async () => {
@@ -212,9 +215,9 @@ describe('Middleware Stack Integration', () => {
     }
 
     const middleware3 = async (
-      req: TestRequest,
-      res: MockResponse,
-      next: NextFunction,
+      _req: TestRequest,
+      _res: MockResponse,
+      _next: NextFunction,
     ) => {
       callOrder.push('middleware3')
     }
@@ -249,9 +252,9 @@ describe('Middleware Stack Integration', () => {
 
   it('should stop chain when middleware does not call next', async () => {
     const stopMiddleware = async (
-      req: TestRequest,
+      _req: TestRequest,
       res: MockResponse,
-      next: NextFunction,
+      _next: NextFunction,
     ) => {
       res.status(200).json({ stopped: true })
       // Intentionally not calling next
@@ -269,7 +272,7 @@ describe('Middleware Error Scenarios', () => {
   let mockResponse: MockResponse
 
   beforeEach(() => {
-    mockRequest = { ip: '192.168.1.1', headers: {} } as TestRequest
+    mockRequest = createMockTestRequest()
     mockResponse = createMockResponse()
   })
 
@@ -279,7 +282,7 @@ describe('Middleware Error Scenarios', () => {
     mockRateLimiter = vi
       .fn<ErrorHandlingMiddleware>()
       .mockImplementation(
-        async (req: TestRequest, res: MockResponse, next: NextFunction) => {
+        async (_req: TestRequest, _res: MockResponse, _next: NextFunction) => {
           throw new Error('Redis connection failed')
         },
       )
@@ -325,7 +328,7 @@ describe('Middleware Error Scenarios', () => {
     mockRequestLogger = vi
       .fn<ErrorHandlingMiddleware>()
       .mockImplementation(
-        async (req: TestRequest, res: MockResponse, next: NextFunction) => {
+        async (_req: TestRequest, _res: MockResponse, _next: NextFunction) => {
           throw new Error('Logger failed')
         },
       )
@@ -349,7 +352,7 @@ describe('Middleware Context Preservation', () => {
   let mockNext: NextFunctionMock
 
   beforeEach(() => {
-    mockRequest = { ip: '192.168.1.1', headers: {} } as TestRequest
+    mockRequest = createMockTestRequest()
     mockResponse = createMockResponse()
     mockNext = createMockNext()
   })

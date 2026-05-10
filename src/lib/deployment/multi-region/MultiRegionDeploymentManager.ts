@@ -67,6 +67,7 @@ export interface DeploymentConfig {
     recoveryTime: number
     healthCheckInterval: number
     maxDataSyncLag: number
+    failoverCooldown: number
     snsTopicArn?: string
     sqsQueueUrl?: string
   }

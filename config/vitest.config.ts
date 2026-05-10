@@ -39,6 +39,21 @@ const coverageEnabled =
       ? false
       : !process.env['CI']
 
+const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
+  ? process.env['VITEST_TARGET_TESTS']
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+  : []
+const targetedNodeTestGlobs = targetedTestGlobs.filter(
+  (entry) =>
+    (entry.includes('/api/') || entry.includes('/lib/')) &&
+    !entry.includes('__tests__/AIChat'),
+)
+const targetedJsdomTestGlobs = targetedTestGlobs.filter(
+  (entry) => !targetedNodeTestGlobs.includes(entry),
+)
+
 export default defineConfig({
   plugins: [react()],
   define: {
@@ -107,16 +122,19 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './src/test/setup-react19.ts'],
+    setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
       },
     },
-    include: [
-      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-      'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-    ],
+    include:
+      targetedTestGlobs.length > 0
+        ? targetedTestGlobs
+        : [
+            'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+            'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+          ],
     exclude: [
       '**/node_modules/**',
       'src/tests/simple-browser-compatibility.test.ts',
@@ -140,9 +158,44 @@ export default defineConfig({
       {
         test: {
           globals: true,
+          setupFiles: ['./src/test/setup.ts'],
+          name: 'jsdom',
+          include:
+            targetedTestGlobs.length > 0
+              ? targetedJsdomTestGlobs
+              : [
+                  'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                  'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                ],
+          environment: 'jsdom',
+          exclude: [
+            'src/tests/simple-browser-compatibility.test.ts',
+            'src/tests/browser-compatibility.test.ts',
+            'src/tests/mobile-compatibility.test.ts',
+            'src/tests/cross-browser-compatibility.test.ts',
+            'src/e2e/breach-notification.spec.ts',
+            'src/tests/performance.test.ts',
+            'src/tests/responsive-navigation.test.js',
+            'tests/e2e/**/*',
+            'tests/browser/**/*',
+            'tests/accessibility/**/*',
+            'tests/performance/**/*',
+            'tests/security/**/*',
+            'backups/**',
+            'backups/**/*',
+            'worktrees/**',
+          ],
+        },
+      },
+      {
+        test: {
+          globals: true,
           setupFiles: ['./src/test/setup-node.ts'],
           name: 'node',
-          include: nodeTestGlobs,
+          include:
+            targetedTestGlobs.length > 0
+              ? targetedNodeTestGlobs
+              : nodeTestGlobs,
           environment: 'node',
         },
         resolve: {

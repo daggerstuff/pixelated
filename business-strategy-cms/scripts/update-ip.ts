@@ -1,4 +1,3 @@
-import DigestFetch = require('digest-fetch')
 import * as dotenv from 'dotenv'
 
 dotenv.config()
@@ -26,17 +25,33 @@ async function updateWhitelist() {
   try {
     // 1. Get current IP
     console.log('🔍 Fetching current public IP...')
-    const client = new DigestFetch(PUBLIC_KEY, PRIVATE_KEY)
+    const digestFetchModule = (await import('digest-fetch')) as {
+      default: new (
+        publicKey: string,
+        privateKey: string,
+      ) => {
+        fetch: typeof fetch
+      }
+    }
+    const client = new digestFetchModule.default(
+      PUBLIC_KEY!,
+      PRIVATE_KEY!,
+    )
 
     // We can't use axios for ipify essentially, but let's just use regular fetch or keeping it simple
     const ipRes = await fetch('https://api.ipify.org?format=json')
-    const { ip } = (await ipRes.json()) as { ip: string }
+    const ipText = await ipRes.text()
+    const ipMatch = /"ip"\s*:\s*"([^"]+)"/.exec(ipText)
+    if (!ipMatch) {
+      throw new Error('Failed to resolve current public IP')
+    }
+    const ip = ipMatch[1]
 
     console.log(`📍 Current IP: ${ip}`)
 
     // 2. Add to Atlas
     console.log('🚀 Adding to Atlas Whitelist...')
-    const url = `https://cloud.mongodb.com/api/atlas/v1.0/groups/${GROUP_ID}/accessList`
+    const url = `https://cloud.mongodb.com/api/atlas/v1.0/groups/${GROUP_ID!}/accessList`
 
     const payload = [
       {
@@ -60,7 +75,7 @@ async function updateWhitelist() {
         response.status,
         response.statusText,
       )
-      const errBody = await response.json()
+      const errBody = await response.text()
       console.error(errBody)
     }
   } catch (err) {

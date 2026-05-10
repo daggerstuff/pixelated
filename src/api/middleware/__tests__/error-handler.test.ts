@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction } from 'express'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import {
@@ -13,21 +13,44 @@ import {
   asyncHandler,
 } from '../error-handler'
 
+type ErrorRequest = Parameters<typeof errorHandler>[1]
+type ErrorResponse = Parameters<typeof errorHandler>[2]
+type MockError = Error & {
+  code?: string | number
+  keyValue?: Record<string, unknown>
+  routine?: string
+}
+
+function createMockRequest(): ErrorRequest {
+  return {
+    method: 'GET',
+    url: '/test-route',
+    path: '/test-route',
+  } as ErrorRequest
+}
+
+function createMockResponse(): ErrorResponse {
+  return {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn(),
+  } as ErrorResponse
+}
+
+function createDatabaseError(
+  message: string,
+  details: Partial<MockError> = {},
+): MockError {
+  return Object.assign(new Error(message), details)
+}
+
 describe('error-handler middleware', () => {
-  let req: Partial<Request>
-  let res: Partial<Response>
+  let req: ErrorRequest
+  let res: ErrorResponse
   let next: NextFunction
 
   beforeEach(() => {
-    req = {
-      method: 'GET',
-      url: '/test-route',
-      path: '/test-route',
-    }
-    res = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn(),
-    }
+    req = createMockRequest()
+    res = createMockResponse()
     next = vi.fn()
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
@@ -40,12 +63,7 @@ describe('error-handler middleware', () => {
   describe('errorHandler', () => {
     it('should handle standard Error with 500 status', () => {
       const error = new Error('Standard error message')
-      errorHandler(
-        error as any,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(500)
       expect(res.json).toHaveBeenCalledWith(
@@ -60,12 +78,7 @@ describe('error-handler middleware', () => {
 
     it('should handle custom AppError', () => {
       const error = new AppError(400, 'Bad request', 'BAD_REQUEST')
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.json).toHaveBeenCalledWith(
@@ -82,12 +95,7 @@ describe('error-handler middleware', () => {
       const error = new ValidationError('Invalid input', {
         email: 'Invalid email format',
       })
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.json).toHaveBeenCalledWith(
@@ -104,14 +112,10 @@ describe('error-handler middleware', () => {
     })
 
     it('should handle MongoDB ValidationError', () => {
-      const error = new Error('Mongoose validation error')
-      error.name = 'ValidationError'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      const error = Object.assign(new Error('Mongoose validation error'), {
+        name: 'ValidationError',
+      })
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.json).toHaveBeenCalledWith(
@@ -125,16 +129,12 @@ describe('error-handler middleware', () => {
     })
 
     it('should handle MongoDB duplicate key error (code 11000)', () => {
-      const error = new Error('Mongo server error')
-      error.name = 'MongoServerError'
-      ;(error as any).code = 11000
-      ;(error as any).keyValue = { email: 'test@example.com' }
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      const error = createDatabaseError('Mongo server error', {
+        name: 'MongoServerError',
+        code: 11000,
+        keyValue: { email: 'test@example.com' },
+      })
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(409)
       expect(res.json).toHaveBeenCalledWith(
@@ -152,15 +152,11 @@ describe('error-handler middleware', () => {
     })
 
     it('should handle PostgreSQL error', () => {
-      const error = new Error('Postgres error')
-      ;(error as any).code = '23505'
-      ;(error as any).routine = 'pg_routine'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      const error = createDatabaseError('Postgres error', {
+        code: '23505',
+        routine: 'pg_routine',
+      })
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
       expect(res.json).toHaveBeenCalledWith(
@@ -176,12 +172,7 @@ describe('error-handler middleware', () => {
     it('should handle JsonWebTokenError', () => {
       const error = new Error('JWT error')
       error.name = 'JsonWebTokenError'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(401)
       expect(res.json).toHaveBeenCalledWith(
@@ -197,12 +188,7 @@ describe('error-handler middleware', () => {
     it('should handle TokenExpiredError', () => {
       const error = new Error('Token expired error')
       error.name = 'TokenExpiredError'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(401)
       expect(res.json).toHaveBeenCalledWith(
@@ -218,12 +204,7 @@ describe('error-handler middleware', () => {
     it('should include stack trace and request info in development mode', () => {
       process.env.NODE_ENV = 'development'
       const error = new Error('Test error')
-      errorHandler(
-        error as any,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -277,11 +258,7 @@ describe('error-handler middleware', () => {
 
   describe('notFoundHandler', () => {
     it('should generate NotFoundError and call errorHandler', () => {
-      notFoundHandler(
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      notFoundHandler(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(res.json).toHaveBeenCalledWith(
@@ -303,7 +280,7 @@ describe('error-handler middleware', () => {
       }
 
       const wrappedFn = asyncHandler(failingAsyncFn)
-      wrappedFn(req as unknown as Request, res as unknown as Response, next)
+      wrappedFn(req, res, next)
       await new Promise((resolve) => process.nextTick(resolve))
 
       expect(next).toHaveBeenCalledWith(error)
@@ -315,7 +292,7 @@ describe('error-handler middleware', () => {
       }
 
       const wrappedFn = asyncHandler(successAsyncFn)
-      wrappedFn(req as unknown as Request, res as unknown as Response, next)
+      wrappedFn(req, res, next)
       await new Promise((resolve) => process.nextTick(resolve))
 
       expect(next).not.toHaveBeenCalled()

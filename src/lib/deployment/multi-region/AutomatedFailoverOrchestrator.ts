@@ -1255,7 +1255,10 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         InvocationType: 'RequestResponse',
       })
 
-      const response = await this.lambdaClient.send(command)
+      const response = (await this.lambdaClient.send(command)) as {
+        FunctionError?: string
+        Payload?: Uint8Array
+      }
 
       if (response.FunctionError) {
         throw new Error(`Lambda function error: ${response.FunctionError}`)
@@ -1534,4 +1537,9 @@ interface RegionMetrics {
   activeConnections: number
 }
 
-export { FailoverState, FailoverEvent, CircuitBreakerConfig, RegionMetrics }
+export type {
+  FailoverState,
+  FailoverEvent,
+  CircuitBreakerConfig,
+  RegionMetrics,
+}
