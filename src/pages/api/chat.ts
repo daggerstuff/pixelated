@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   const messages: ModelMessage[] = [
     {
       role: 'system',
-      content: `You are a helpful AI therapist assistant.`
+      content: `You are a helpful AI therapist assistant.`,
     },
     { role: 'user', content: message },
   ]

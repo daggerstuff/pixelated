@@ -88,7 +88,8 @@ jobs:
 
       - name: Format check
         env:
-          PR_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
+          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
+            github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
           if [ -s /tmp/changed_files.txt ]; then

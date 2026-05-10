@@ -9,9 +9,9 @@ type RedisLike = {
 }
 
 export class SocketService {
-  private io: SocketIOServer
-  private redis: RedisLike
-  private db: Pool
+  private readonly io: SocketIOServer
+  private readonly redis: RedisLike
+  private readonly db: Pool
 
   constructor(server: Server, redis: RedisLike, db: Pool) {
     this.redis = redis
@@ -20,7 +20,7 @@ export class SocketService {
     // Initialize Socket.IO
     this.io = new SocketIOServer(server, {
       cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
         methods: ['GET', 'POST'],
         credentials: true,
       },

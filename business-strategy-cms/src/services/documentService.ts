@@ -1,4 +1,5 @@
 import { DocumentModel } from '@/models/Document'
+import type { DocumentVersionDocument } from '@/models/DocumentMongoose'
 import { UserModel } from '@/models/User'
 import {
   Document,
@@ -8,7 +9,6 @@ import {
   DocumentSearchResult,
   DocumentStatus,
 } from '@/types/document'
-import type { DocumentVersionDocument } from '@/models/DocumentMongoose'
 
 export class DocumentService {
   static async createDocument(

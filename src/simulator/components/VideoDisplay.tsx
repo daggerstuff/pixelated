@@ -266,7 +266,12 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     } finally {
       setIsReconnecting(false)
     }
-  }, [createAndSendOffer, initializePeerConnection, sessionId, setupMediaStream])
+  }, [
+    createAndSendOffer,
+    initializePeerConnection,
+    sessionId,
+    setupMediaStream,
+  ])
 
   handleConnectionFailureRef.current = handleConnectionFailure
 

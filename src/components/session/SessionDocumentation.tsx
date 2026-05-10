@@ -407,9 +407,7 @@ export default function SessionDocumentationComponent({
                   className="border-gray-300 min-h-[100px] w-full rounded-md border p-2"
                 />
               ) : (
-                <p className="text-gray-700">
-                  {editableDocumentation.summary}
-                </p>
+                <p className="text-gray-700">{editableDocumentation.summary}</p>
               )}
             </section>
 
@@ -438,8 +436,7 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newInsights = [
-                                ...(editableDocumentation.keyInsights ??
-                                  []),
+                                ...(editableDocumentation.keyInsights ?? []),
                               ]
 
                               newInsights[index] = e.target.value
@@ -700,8 +697,8 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLTextAreaElement>,
                               ) => {
                                 const newGoals = [
-                                  ...(editableDocumentation.treatmentProgress?.goals ??
-                                    []),
+                                  ...(editableDocumentation.treatmentProgress
+                                    ?.goals ?? []),
                                 ]
 
                                 newGoals[index] = {
@@ -735,8 +732,8 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLInputElement>,
                               ) => {
                                 const newGoals = [
-                                  ...(editableDocumentation.treatmentProgress?.goals ??
-                                    []),
+                                  ...(editableDocumentation.treatmentProgress
+                                    ?.goals ?? []),
                                 ]
 
                                 newGoals[index] = {
@@ -770,8 +767,8 @@ export default function SessionDocumentationComponent({
                                 e: React.ChangeEvent<HTMLTextAreaElement>,
                               ) => {
                                 const newGoals = [
-                                  ...(editableDocumentation.treatmentProgress?.goals ??
-                                    []),
+                                  ...(editableDocumentation.treatmentProgress
+                                    ?.goals ?? []),
                                 ]
 
                                 newGoals[index] = {
@@ -800,7 +797,8 @@ export default function SessionDocumentationComponent({
                   <button
                     onClick={() => {
                       const newGoals = [
-                        ...(editableDocumentation.treatmentProgress?.goals ?? []),
+                        ...(editableDocumentation.treatmentProgress?.goals ??
+                          []),
                         {
                           description: '',
                           progress: 0,
@@ -827,8 +825,8 @@ export default function SessionDocumentationComponent({
                 {!readOnly ? (
                   <textarea
                     value={
-                      editableDocumentation.treatmentProgress?.overallAssessment ??
-                      ''
+                      editableDocumentation.treatmentProgress
+                        ?.overallAssessment ?? ''
                     }
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       handleChange('treatmentProgress', {
@@ -871,7 +869,8 @@ export default function SessionDocumentationComponent({
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => {
                               const newStrengths = [
-                                ...(editableDocumentation.clientStrengths ?? []),
+                                ...(editableDocumentation.clientStrengths ??
+                                  []),
                               ]
 
                               newStrengths[index] = e.target.value
@@ -935,8 +934,8 @@ export default function SessionDocumentationComponent({
                                   e: React.ChangeEvent<HTMLInputElement>,
                                 ) => {
                                   const newPatterns = [
-                                ...(editableDocumentation.emotionalPatterns ??
-                                  []),
+                                    ...(editableDocumentation.emotionalPatterns ??
+                                      []),
                                   ]
 
                                   newPatterns[index] = {
@@ -1007,34 +1006,34 @@ export default function SessionDocumentationComponent({
               <ul className="list-disc space-y-1 pl-5">
                 {editableDocumentation.emergentIssues?.map(
                   (issue: string, index: number) => {
-                  const key = `issue-${issue
-                    .trim()
-                    .toLowerCase()
-                    .replace(/\\W+/g, '-')}`
+                    const key = `issue-${issue
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
 
-                  return (
-                    <li key={key || 'issue-empty'} className="text-gray-700">
-                      {!readOnly ? (
-                        <input
-                          type="text"
-                          value={issue}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const newIssues = [
-                              ...(editableDocumentation.emergentIssues ?? []),
-                            ]
+                    return (
+                      <li key={key || 'issue-empty'} className="text-gray-700">
+                        {!readOnly ? (
+                          <input
+                            type="text"
+                            value={issue}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const newIssues = [
+                                ...(editableDocumentation.emergentIssues ?? []),
+                              ]
 
-                            newIssues[index] = e.target.value
-                            handleChange('emergentIssues', newIssues)
-                          }}
-                          className="border-gray-300 w-full rounded-md border p-1"
-                        />
-                      ) : (
-                        issue
-                      )}
-                    </li>
-                  )
+                              newIssues[index] = e.target.value
+                              handleChange('emergentIssues', newIssues)
+                            }}
+                            className="border-gray-300 w-full rounded-md border p-1"
+                          />
+                        ) : (
+                          issue
+                        )}
+                      </li>
+                    )
                   },
                 )}
               </ul>
@@ -1130,25 +1129,28 @@ export default function SessionDocumentationComponent({
                 Emotional Patterns Observed
               </h4>
               <div className="mb-4 space-y-3">
-               {Array.isArray(editableDocumentation.emotionalPatterns) &&
-                   editableDocumentation.emotionalPatterns.map(
-                     (pattern: { pattern: string; significance: string }, index: number) => {
-                       const key = `pattern-full-${pattern.pattern
-                         .trim()
-                         .toLowerCase()
-                         .replace(/\\W+/g, '-')}`
-                       return (
-                         <div key={key || 'pattern-full-empty'} className="mb-3">
-                           <h5 className="text-gray-800 font-medium">
-                             {pattern.pattern}
-                           </h5>
-                           <p className="text-gray-700">
-                             {pattern.significance}
-                           </p>
-                         </div>
-                       )
-                     },
-                   )}
+                {Array.isArray(editableDocumentation.emotionalPatterns) &&
+                  editableDocumentation.emotionalPatterns.map(
+                    (
+                      pattern: { pattern: string; significance: string },
+                      index: number,
+                    ) => {
+                      const key = `pattern-full-${pattern.pattern
+                        .trim()
+                        .toLowerCase()
+                        .replace(/\\W+/g, '-')}`
+                      return (
+                        <div key={key || 'pattern-full-empty'} className="mb-3">
+                          <h5 className="text-gray-800 font-medium">
+                            {pattern.pattern}
+                          </h5>
+                          <p className="text-gray-700">
+                            {pattern.significance}
+                          </p>
+                        </div>
+                      )
+                    },
+                  )}
               </div>
             </section>
 
@@ -1297,7 +1299,7 @@ export default function SessionDocumentationComponent({
                       </thead>
                       <tbody>
                         {Array.isArray(
-                        editableDocumentation.outcomePredictions,
+                          editableDocumentation.outcomePredictions,
                         ) &&
                           editableDocumentation.outcomePredictions.map(
                             (

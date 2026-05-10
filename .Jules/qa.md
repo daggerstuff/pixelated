@@ -1,7 +1,7 @@
 ## 2026-04-14 - QA: Added tests for createPrivacyHash edge case
 
-Pattern: Using `replace_with_git_merge_diff` to inject tests into
-pre-existing describe blocks where testing gaps exist
+Pattern: Using `replace_with_git_merge_diff` to inject tests into pre-existing
+describe blocks where testing gaps exist
 
 Action: Ensure edge cases like empty inputs are systematically tested
 
@@ -14,10 +14,10 @@ broken aliased imports
 
 ## 2026-04-17 - Add comprehensive test suite for Express error-handler
 
-Pattern: When testing Express asyncHandler wrappers, the wrapped function executes
-asynchronously but the wrapper itself may return a non-promise or a promise that
-is not easily awaited in the test. To properly assert on the `next()` callback,
-await `process.nextTick` to flush microtasks
+Pattern: When testing Express asyncHandler wrappers, the wrapped function
+executes asynchronously but the wrapper itself may return a non-promise or a
+promise that is not easily awaited in the test. To properly assert on the
+`next()` callback, await `process.nextTick` to flush microtasks
 
 Action: Use `await new Promise((resolve) => process.nextTick(resolve))` after
 invoking the wrapped handler to ensure asynchronous errors are caught and passed
@@ -52,21 +52,22 @@ Pattern: Finding untested utility functions lacking a .test.ts file and creating
 isolated tests
 
 Action: Ensure the new test file fully isolates its test logic, covers an edge
-case, and passes verification using localized execution
-node ./scripts/testing/local-test-runner.cjs
+case, and passes verification using localized execution node
+./scripts/testing/local-test-runner.cjs
 
 ## 2026-04-28 - QA: Add test for getRecommendedScenario edge case
 
-Pattern: Finding untested branches in utility functions and adding targeted tests
+Pattern: Finding untested branches in utility functions and adding targeted
+tests
 
-Action: Ensure both positive and negative branches for scenario recommendation are
-systematically tested
+Action: Ensure both positive and negative branches for scenario recommendation
+are systematically tested
 
 ## 2026-04-29 - QA: Fix privacy.test.ts jsdom environment
 
 Pattern: When a test uses browser globals like window.localStorage but the test
-environment lacks jsdom, Vitest will throw ReferenceError: window is not defined.
-Furthermore, spying on window.localStorage may fail to intercept direct
+environment lacks jsdom, Vitest will throw ReferenceError: window is not
+defined. Furthermore, spying on window.localStorage may fail to intercept direct
 localStorage calls
 
 Action: Add `/*_ @vitest-environment jsdom _*/` at the top of the test file and

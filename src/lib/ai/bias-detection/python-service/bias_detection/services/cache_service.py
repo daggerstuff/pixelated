@@ -9,11 +9,11 @@ from typing import Any
 
 import redis.asyncio as redis
 import structlog
+from redis.asyncio import ConnectionError as RedisConnectionError
 from redis.asyncio import (
-    ConnectionError as RedisConnectionError,
     RedisError,
-    TimeoutError as RedisTimeoutError,
 )
+from redis.asyncio import TimeoutError as RedisTimeoutError
 
 from bias_detection.config import settings
 

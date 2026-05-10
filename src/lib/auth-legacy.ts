@@ -63,10 +63,12 @@ export interface AuthUser {
  * Get the current authenticated user from cookies
  */
 interface CookieAccessor {
-  get(name: string): {
-    value: string
-    json: () => unknown
-  } | undefined
+  get(name: string):
+    | {
+        value: string
+        json: () => unknown
+      }
+    | undefined
 }
 
 export async function getCurrentUser(

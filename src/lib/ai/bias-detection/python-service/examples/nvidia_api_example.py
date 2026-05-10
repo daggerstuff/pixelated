@@ -9,7 +9,10 @@ import sys
 # Add the service path to sys.path so we can import the service
 sys.path.append("/home/vivi/pixelated/src/lib/ai/bias-detection/python-service")
 
-from bias_detection.services.nvidia_api_service import NvidiaAPIService, kimi_chat_completion
+from bias_detection.services.nvidia_api_service import (
+    NvidiaAPIService,
+    kimi_chat_completion,
+)
 
 
 async def basic_example():
@@ -25,9 +28,7 @@ async def basic_example():
     print(f"Health status: {json.dumps(health, indent=2)}")
 
     # Simple conversation
-    messages = [
-        {"role": "user", "content": "Hello! Can you tell me about yourself?"}
-    ]
+    messages = [{"role": "user", "content": "Hello! Can you tell me about yourself?"}]
 
     print("\nSending message to Kimi-k2.5...")
     try:
@@ -83,7 +84,10 @@ async def conversation_example():
 
     # Start conversation
     conversation_history = [
-        {"role": "user", "content": "Hi! I'm learning about machine learning. Can you help me?"}
+        {
+            "role": "user",
+            "content": "Hi! I'm learning about machine learning. Can you help me?",
+        }
     ]
 
     print("Starting conversation with Kimi-k2.5...")
@@ -98,7 +102,9 @@ async def conversation_example():
         conversation_history.append({"role": "assistant", "content": assistant_message})
 
         # Second user message
-        conversation_history.append({"role": "user", "content": "That's helpful! Can you give me an example?"})
+        conversation_history.append(
+            {"role": "user", "content": "That's helpful! Can you give me an example?"}
+        )
 
         # Second response
         response = await service.chat_completion(conversation_history)
@@ -116,14 +122,21 @@ async def parameter_tuning_example():
     service = NvidiaAPIService()
 
     messages = [
-        {"role": "user", "content": "Tell me a creative story about a robot learning to paint."}
+        {
+            "role": "user",
+            "content": "Tell me a creative story about a robot learning to paint.",
+        }
     ]
 
     # Different parameter combinations
     settings = [
-        {"temperature": 0.3, "top_p": 0.9, "description": "More focused, deterministic"},
+        {
+            "temperature": 0.3,
+            "top_p": 0.9,
+            "description": "More focused, deterministic",
+        },
         {"temperature": 0.7, "top_p": 0.9, "description": "Balanced creativity"},
-        {"temperature": 1.0, "top_p": 1.0, "description": "Highly creative, diverse"}
+        {"temperature": 1.0, "top_p": 1.0, "description": "Highly creative, diverse"},
     ]
 
     for setting in settings:
@@ -135,7 +148,7 @@ async def parameter_tuning_example():
                 messages=messages,
                 temperature=setting["temperature"],
                 top_p=setting["top_p"],
-                max_tokens=1000
+                max_tokens=1000,
             )
             content = response["choices"][0]["message"]["content"]
             print(f"Story: {content[:200]}...")  # Print first 200 characters
@@ -148,7 +161,10 @@ async def convenience_function_example():
     print("\n=== Convenience Function Example ===")
 
     messages = [
-        {"role": "user", "content": "Explain what makes a good chatbot in one sentence."}
+        {
+            "role": "user",
+            "content": "Explain what makes a good chatbot in one sentence.",
+        }
     ]
 
     try:
