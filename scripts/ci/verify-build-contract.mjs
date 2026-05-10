@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import fs from 'node:fs'
-import path from 'node:path'
-import { createRequire } from 'node:module'
+import process from 'process'
+import fs from 'fs'
+import path from 'path'
+import { createRequire } from 'module'
 
 const projectRoot = process.cwd()
 const srcRoot = path.join(projectRoot, 'src')

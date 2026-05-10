@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /* eslint-disable typescript/no-unsafe-call,typescript/no-unsafe-assignment,typescript/no-unsafe-member-access,typescript/no-unsafe-return,typescript/no-unsafe-argument,typescript/prefer-nullish-coalescing */
-import { existsSync, readFileSync } from 'node:fs'
-import { spawnSync } from 'node:child_process'
+import { existsSync, readFileSync } from 'fs'
+import { spawnSync } from 'child_process'
+import process from 'process'
 
-/** @typedef {import('node:child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
+/** @typedef {import('child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
 
 const EXCLUDED_FROM_OXFMT = new Set([
   'eslint.config.js',
