@@ -25,3 +25,8 @@
   without `aria-pressed`, screen reader users cannot perceive the active state.
 - Action: Added `aria-pressed={true/false}` and grouped them with `role="group"`
   and an explicit `aria-label`.
+
+## 2026-05-20 - Search Box Accessibility
+
+- Learning: Real-time search inputs need aria-live regions to announce result counts.
+- Action: Added an sr-only aria-live polite region to announce the number of search results found.

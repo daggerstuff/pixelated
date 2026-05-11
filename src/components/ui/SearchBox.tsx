@@ -215,6 +215,17 @@ export default function SearchBox({
       aria-haspopup='listbox'
       aria-controls='search-results'
     >
+      {/* Screen reader announcement for search results */}
+      <div className='sr-only' aria-live='polite' role='status'>
+        {isSearchReady && query.length >= minQueryLength
+          ? hasResults
+            ? `${results.length} result${results.length === 1 ? '' : 's'} found.`
+            : showNoResults
+              ? `No results found for "${query}".`
+              : ''
+          : ''}
+      </div>
+
       <div className='relative'>
         <input
           ref={inputRef}
