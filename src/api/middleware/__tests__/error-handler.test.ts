@@ -35,7 +35,9 @@ type ErrorResponsePayload = {
   }
 }
 
-function getLastResponsePayload(response: ErrorResponse): ErrorResponsePayload | undefined {
+function getLastResponsePayload(
+  response: ErrorResponse,
+): ErrorResponsePayload | undefined {
   if (!vi.isMockFunction(response.json)) {
     return undefined
   }
@@ -60,7 +62,10 @@ function isErrorResponsePayload(value: unknown): value is ErrorResponsePayload {
   }
 
   const errorPayload = candidate.error as { code?: unknown; message?: unknown }
-  return typeof errorPayload.code === 'string' && typeof errorPayload.message === 'string'
+  return (
+    typeof errorPayload.code === 'string' &&
+    typeof errorPayload.message === 'string'
+  )
 }
 
 function createMockRequest(): ErrorRequest {
@@ -114,7 +119,10 @@ describe('error-handler middleware', () => {
 
       expect(res.status).toHaveBeenCalledWith(500)
       expect(getLastResponsePayload(res)).toMatchObject({
-        error: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal Server Error' },
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Internal Server Error',
+        },
       })
     })
 
@@ -267,7 +275,10 @@ describe('error-handler middleware', () => {
 
       expect(res.status).toHaveBeenCalledWith(404)
       expect(getLastResponsePayload(res)).toMatchObject({
-        error: { code: 'NOT_FOUND', message: 'Route GET /test-route not found' },
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Route GET /test-route not found',
+        },
       })
     })
   })
