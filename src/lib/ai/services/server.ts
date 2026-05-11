@@ -63,12 +63,22 @@ class AIServer {
   private server: ReturnType<typeof createServer> | null = null
   private isRunning = false
 
-  constructor() {
-    // Initialize AI providers on startup
-    initializeProviders()
-  }
+   constructor() {
+     // Initialize AI providers on startup
+     initializeProviders()
+   }
 
-  private sendJsonResponse(
+   /**
+    * Format error message for consistent error handling
+    * @param error - The error object to format
+    * @param fallback - Fallback message if error is not an Error instance
+    * @returns Formatted error message string
+    */
+   private formatErrorMessage(error: unknown, fallback: string): string {
+     return error instanceof Error ? error.message : fallback
+   }
+
+   private sendJsonResponse(
     res: HttpResponse,
     statusCode: number,
     data: ServerResponse,
@@ -211,7 +221,7 @@ class AIServer {
           return {
             provider,
             status: 'error',
-            error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+            error: formatErrorMessage(error, 'Unknown error'),
           }
         }
       })
@@ -225,13 +235,13 @@ class AIServer {
           uptime: process.uptime(),
         },
       })
-    } catch (error: unknown) {
-      appLogger.error('Health check failed:', error)
-      this.sendJsonResponse(res, 500, {
-        success: false,
-        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Health check failed',
-      })
-    }
+     } catch (error: unknown) {
+       appLogger.error('Health check failed:', error)
+       this.sendJsonResponse(res, 500, {
+         success: false,
+         error: formatErrorMessage(error, 'Health check failed'),
+       })
+     }
   }
 
   private async handleChatCompletion(
@@ -306,14 +316,13 @@ class AIServer {
           provider: selectedProvider,
         },
       })
-    } catch (error: unknown) {
-      appLogger.error('Chat completion failed:', error)
-      this.sendJsonResponse(res, 500, {
-        success: false,
-        error:
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Chat completion failed',
-      })
-    }
+     } catch (error: unknown) {
+       appLogger.error('Chat completion failed:', error)
+       this.sendJsonResponse(res, 500, {
+         success: false,
+         error: formatErrorMessage(error, 'Chat completion failed'),
+       })
+     }
   }
 
   private async handleEmotionAnalysis(
@@ -413,14 +422,13 @@ Respond in JSON format with the following structure:
           model: completion.model,
         },
       })
-    } catch (error: unknown) {
-      appLogger.error('Emotion analysis failed:', error)
-      this.sendJsonResponse(res, 500, {
-        success: false,
-        error:
-          error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Emotion analysis failed',
-      })
-    }
+     } catch (error: unknown) {
+       appLogger.error('Emotion analysis failed:', error)
+       this.sendJsonResponse(res, 500, {
+         success: false,
+         error: formatErrorMessage(error, 'Emotion analysis failed'),
+       })
+     }
   }
 
   private async handleStreamingChat(
@@ -501,17 +509,17 @@ Respond in JSON format with the following structure:
 
       res.write('data: [DONE]\n\n')
       res.end()
-    } catch (error: unknown) {
-      appLogger.error('Streaming chat failed:', error)
-      if (!res.headersSent) {
-        this.sendJsonResponse(res, 500, {
-          success: false,
-          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Streaming failed',
-        })
-      } else {
-        res.write(
-          `data: ${JSON.stringify({ error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Streaming failed' })}\n\n`,
-        )
+     } catch (error: unknown) {
+       appLogger.error('Streaming chat failed:', error)
+       if (!res.headersSent) {
+         this.sendJsonResponse(res, 500, {
+           success: false,
+           error: formatErrorMessage(error, 'Streaming failed'),
+         })
+       } else {
+         res.write(
+           `data: ${JSON.stringify({ error: formatErrorMessage(error, 'Streaming failed') })}\n\n`,
+         )
         res.end()
       }
     }
@@ -535,11 +543,11 @@ Respond in JSON format with the following structure:
             this.isRecord(parsed) ? parsed : {},
           )
         } catch (error: unknown) {
-          reject(
-            new Error(
-              `Invalid JSON: ${error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)}`,
-            ),
-          )
+           reject(
+             new Error(
+               `Invalid JSON: ${formatErrorMessage(error, String(error))}`,
+             ),
+           )
         }
       })
       req.on('error', reject)
@@ -574,7 +582,7 @@ Respond in JSON format with the following structure:
       const chatBody = await this.parseRequestBody(req)
           await this.handleChatCompletion(res, chatBody)
           const durationMs = Date.now() - startTime
-          apiMetrics.request('/ai-service/chat', 'POST', res.statusCode || 200)
+           apiMetrics.request('/ai-service/chat', 'POST', res.statusCode ?? 200)
           apiMetrics.responseTime('/ai-service/chat', durationMs, 'POST')
           break
         }
@@ -586,9 +594,9 @@ Respond in JSON format with the following structure:
           const durationMs = Date.now() - startTime
           const analysisDurationMs = Date.now() - analysisStartTime
           apiMetrics.request(
-            '/ai-service/analyze-emotion',
-            'POST',
-            res.statusCode || 200,
+             '/ai-service/analyze-emotion',
+             'POST',
+             res.statusCode ?? 200,
           )
           apiMetrics.responseTime(
             '/ai-service/analyze-emotion',
@@ -603,11 +611,11 @@ Respond in JSON format with the following structure:
           const streamBody = await this.parseRequestBody(req)
           await this.handleStreamingChat(req, res, streamBody)
           const durationMs = Date.now() - startTime
-          apiMetrics.request(
-            '/ai-service/chat/stream',
-            'POST',
-            res.statusCode || 200,
-          )
+           apiMetrics.request(
+             '/ai-service/chat/stream',
+             'POST',
+             res.statusCode ?? 200,
+           )
           apiMetrics.responseTime('/ai-service/chat/stream', durationMs, 'POST')
           break
         }
