@@ -3,10 +3,9 @@ import { Server } from 'http'
 import { Pool } from 'pg'
 import { Server as SocketIOServer, Socket } from 'socket.io'
 
-type RedisLike = {
-  connect?: () => Promise<unknown>
-  quit: () => Promise<unknown>
-}
+// Use the actual Redis type from ioredis instead of our custom RedisLike type
+// to avoid type mismatches with the ioredis library
+type RedisLike = typeof Redis
 
 export class SocketService {
   private readonly io: SocketIOServer

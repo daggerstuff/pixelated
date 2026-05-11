@@ -32,7 +32,12 @@
 
 /* Global styles */
 html {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Plus Jakarta Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   max-width: 100vw;
   overflow-x: hidden;
   min-height: 100vh;
@@ -42,7 +47,12 @@ html {
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-family:
+    'Plus Jakarta Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif !important;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -125,7 +135,12 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Plus Jakarta Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   margin: 2rem 0 1rem;
   line-height: var(--leading-tight, 1.2);
   letter-spacing: -0.02em;

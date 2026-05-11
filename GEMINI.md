@@ -23,8 +23,10 @@
 ### ✅ Always
 
 - Follow root `AGENTS.md` and the continuity stack first.
-- Apply root behavioral defaults: assumptions-first, simplicity, surgical edits, and explicit success criteria.
-- Quick examples: ask before coding if scope is unclear; remove only imports/files your change made obsolete; verify with one concrete check.
+- Apply root behavioral defaults: assumptions-first, simplicity, surgical edits,
+  and explicit success criteria.
+- Quick examples: ask before coding if scope is unclear; remove only
+  imports/files your change made obsolete; verify with one concrete check.
 - Keep commands and constraints explicit and executable.
 - Preserve therapeutic and privacy context in user-facing messaging.
 - Use `uv run` for Python execution in this repo.
