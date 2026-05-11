@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload advisory test log
         if: always() && hashFiles('advisory-test.log') != ''
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7
         with:
           name: advisory-test-log
           path: advisory-test.log
