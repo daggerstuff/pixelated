@@ -1,0 +1,13 @@
+{
+  "total_records": 3,
+  "processed": 3,
+  "enhanced": 3,
+  "scored": 3,
+  "errors": 0,
+  "score_distribution": {
+    "excellent": 0,
+    "good": 0,
+    "fair": 0,
+    "poor": 3
+  }
+}
