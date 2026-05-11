@@ -26,3 +26,5 @@ sanitized to prevent XSS
 
 Prevention: Always sanitize HTML strings with DOMPurify before using set:html in
 Astro components
+
+## 2025-05-18 - Fix XSS in GithubItem | Vulnerability: Unsanitized set:html for GitHub release/PR descriptions | Learning: External data sources like GitHub API can contain malicious payload and must be sanitized before rendering | Prevention: Always use DOMPurify when setting HTML from external sources
