@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment node
+ */
 // Project Service Unit Tests
 // Tests for project-service.ts functions
 
@@ -63,6 +66,7 @@ type MockFindLimit = {
   skip: (skip: number) => {
     sort: (sort: Record<string, 1 | -1>) => MockProject[]
   }
+  sort: (sort: Record<string, 1 | -1>) => MockProject[]
 }
 
 type MockFindQuery = {
@@ -115,17 +119,21 @@ const createFindChain = (): MockFindQuery => ({
     skip: vi.fn(() => ({
       sort: vi.fn(() => [] as MockProject[]),
     })),
+    sort: vi.fn(() => [] as MockProject[]),
   })),
 })
 
-const MockModelFactory = (data: Partial<MockProject> = {}) =>
-  createMockProject(data)
+class MockModelConstructor {
+  constructor(data: Partial<MockProject> = {}) {
+    return createMockProject(data)
+  }
 
-const MockModel: MockProjectModel = Object.assign(vi.fn(MockModelFactory), {
-  findById: vi.fn(),
-  find: vi.fn(() => createFindChain()),
-  countDocuments: vi.fn(),
-})
+  static findById = vi.fn()
+  static find = vi.fn(() => createFindChain())
+  static countDocuments = vi.fn()
+}
+
+const MockModel: MockProjectModel = MockModelConstructor as MockProjectModel
 
 const mockPool: MockPool = {
   query: vi.fn(),
@@ -327,6 +335,7 @@ describe('Project Service', () => {
     })
 
     it('should throw ForbiddenError if user cannot edit', async () => {
+      mockProjectInstance.owner = 'other-user'
       mockProjectInstance.permissions.edit = ['other-user']
       MockModel.findById.mockResolvedValue(mockProjectInstance)
 
@@ -458,7 +467,9 @@ describe('Project Service', () => {
   describe('searchProjects', () => {
     it('should search projects by text query', async () => {
       MockModel.find.mockReturnValue({
-        limit: vi.fn(() => []),
+        limit: vi.fn(() => ({
+          sort: vi.fn(() => [] as MockProject[]),
+        })),
       })
 
       await projectService.searchProjects('test query', mockUserId, 20)
@@ -472,7 +483,9 @@ describe('Project Service', () => {
 
     it('should respect user permissions in search', async () => {
       MockModel.find.mockReturnValue({
-        limit: vi.fn(() => []),
+        limit: vi.fn(() => ({
+          sort: vi.fn(() => [] as MockProject[]),
+        })),
       })
 
       await projectService.searchProjects('test', mockUserId, 10)
