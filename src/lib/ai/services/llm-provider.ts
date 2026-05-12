@@ -244,6 +244,14 @@ function estimateTokenCount(messages: AIMessage[]): number {
   return Math.ceil(totalChars / 4)
 }
 
+function normalizeBaseUrl(baseUrl: string): string {
+  return baseUrl
+    .trim()
+    .replace(/\/+$/, '')
+    .replace(/\/v1\/chat\/completions$/i, '')
+    .replace(/\/v1$/i, '')
+}
+
 export function createLLMService(config: LLMClientConfig): LLMService {
   if (!config.baseUrl) {
     throw new LLMServiceError(
@@ -251,7 +259,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
       'config_error',
     )
   }
-  const baseUrl = config.baseUrl
+  const baseUrl = normalizeBaseUrl(config.baseUrl)
   const apiKey = config.apiKey
   const timeoutMs = config.timeoutMs || 30000
   const rateLimitRpm = config.rateLimitRpm || 60
