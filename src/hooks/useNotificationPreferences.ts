@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+import { NotificationChannel } from '../lib/services/notification/NotificationService'
 
 export interface NotificationPreferences {
   channels: {

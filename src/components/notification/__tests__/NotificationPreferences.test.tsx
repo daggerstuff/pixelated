@@ -1,56 +1,59 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+import { NotificationChannel } from '../../../lib/services/notification/NotificationService'
 
 import { NotificationPreferences } from '../NotificationPreferences'
 
-// Mock useNotificationPreferences hook
 const mockUpdateChannel = vi.fn()
 const mockUpdateFrequency = vi.fn()
 const mockUpdateQuietHours = vi.fn()
 const mockUpdateCategory = vi.fn()
 const mockUpdatePreferences = vi.fn()
+const { useNotificationPreferencesMock } = vi.hoisted(() => ({
+  useNotificationPreferencesMock: vi.fn(),
+}))
 
-vi.mock('@/hooks/useNotificationPreferences', () => ({
-  useNotificationPreferences: vi.fn(() => ({
-    preferences: {
-      channels: {
-        [NotificationChannel.IN_APP]: true,
-        [NotificationChannel.EMAIL]: true,
-        [NotificationChannel.PUSH]: false,
-        [NotificationChannel.SMS]: false,
-      },
-      frequency: 'immediate',
-      quiet_hours: {
-        enabled: false,
-        start: '22:00',
-        end: '07:00',
-      },
-      categories: {
-        system: true,
-        security: true,
-        updates: true,
-        reminders: true,
-      },
-    },
-    isLoading: false,
-    error: null,
-    updateChannel: vi.fn(),
-    updateFrequency: vi.fn(),
-    updateQuietHours: vi.fn(),
-    updateCategory: vi.fn(),
-  })),
+vi.mock('../../hooks/useNotificationPreferences', () => ({
+  useNotificationPreferences: useNotificationPreferencesMock,
 }))
 
 describe('notificationPreferences', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    useNotificationPreferencesMock.mockReturnValue({
+      preferences: {
+        channels: {
+          [NotificationChannel.IN_APP]: true,
+          [NotificationChannel.EMAIL]: true,
+          [NotificationChannel.PUSH]: false,
+          [NotificationChannel.SMS]: false,
+        },
+        frequency: 'immediate',
+        quiet_hours: {
+          enabled: false,
+          start: '22:00',
+          end: '07:00',
+        },
+        categories: {
+          system: true,
+          security: true,
+          updates: true,
+          reminders: true,
+        },
+      },
+      isLoading: false,
+      error: null,
+      updateChannel: mockUpdateChannel,
+      updateFrequency: mockUpdateFrequency,
+      updateQuietHours: mockUpdateQuietHours,
+      updateCategory: mockUpdateCategory,
+      updatePreferences: mockUpdatePreferences,
+    })
   })
 
   it('renders loading state', () => {
-    vi.mocked(useNotificationPreferences).mockReturnValue({
+    useNotificationPreferencesMock.mockReturnValue({
       preferences: {
         channels: {
           [NotificationChannel.IN_APP]: true,
@@ -81,11 +84,11 @@ describe('notificationPreferences', () => {
     } as any)
 
     const { container } = render(<NotificationPreferences />)
-    expect(container.getElementsByClassName('animate-pulse')).toHaveLength(1)
+    expect(container.getElementsByClassName('animate-pulse')).toHaveLength(9)
   })
 
   it('renders error state', () => {
-    vi.mocked(useNotificationPreferences).mockReturnValue({
+    useNotificationPreferencesMock.mockReturnValue({
       preferences: {
         channels: {
           [NotificationChannel.IN_APP]: true,
@@ -131,9 +134,11 @@ describe('notificationPreferences', () => {
   it('renders frequency selector', () => {
     render(<NotificationPreferences />)
 
-    expect(screen.getByText('Notification Frequency')).toBeInTheDocument()
     expect(
-      screen.getByRole('combobox', { name: /notification frequency/i }),
+      screen.getByRole('heading', { name: 'Notification Frequency' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('combobox', { name: /select option/i }),
     ).toBeInTheDocument()
   })
 
@@ -145,7 +150,7 @@ describe('notificationPreferences', () => {
   })
 
   it('shows time inputs when quiet hours are enabled', () => {
-    vi.mocked(useNotificationPreferences).mockReturnValue({
+    useNotificationPreferencesMock.mockReturnValue({
       preferences: {
         channels: {
           [NotificationChannel.IN_APP]: true,

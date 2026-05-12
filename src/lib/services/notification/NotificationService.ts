@@ -1,11 +1,11 @@
 import type { WebSocket } from 'ws'
 import { z } from 'zod'
 
-import { config } from '@/config/env.config'
-import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
-import { EmailService, type EmailConfig } from '@/lib/email'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { redis } from '@/lib/redis'
+import { config } from '../../../config/env.config'
+import type { RoutingContext } from '../../../lib/ai/mental-llama/routing/MentalHealthTaskRouter'
+import { EmailService, type EmailConfig } from '../../../lib/email'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { redis } from '../../../lib/redis'
 
 import type { IRedisService } from '../redis/types'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'

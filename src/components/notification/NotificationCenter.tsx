@@ -1,13 +1,13 @@
 import { Bell, Check, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
-import { Card } from '@/components/ui/card/index.ts'
-import { useWebSocket } from '@/hooks/useWebSocket'
-import type { NotificationItem } from '@/lib/services/notification/NotificationService'
-import { NotificationStatus } from '@/lib/services/notification/NotificationService'
-import { cn } from '@/lib/utils'
+import { Badge } from '../ui/badge/index.ts'
+import { Button } from '../ui/button/index.ts'
+import { Card } from '../ui/card/index.ts'
+import { useWebSocket } from '../../hooks/useWebSocket'
+import type { NotificationItem } from '../../lib/services/notification/NotificationService'
+import { NotificationStatus } from '../../lib/services/notification/NotificationService'
+import { cn } from '../../lib/utils'
 
 interface NotificationCenterProps {
   className?: string
