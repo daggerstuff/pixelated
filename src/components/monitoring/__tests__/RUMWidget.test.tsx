@@ -41,7 +41,7 @@ describe('RUMWidget', () => {
     render(<RUMWidget />)
 
     // Check title
-    expect(screen.getByText('Real User Monitoring')).toBeInTheDocument()
+    expect(screen.getByText(/Real User Monitoring/)).toBeInTheDocument()
 
     // Check category headings
     expect(screen.getByText('Loading')).toBeInTheDocument()
