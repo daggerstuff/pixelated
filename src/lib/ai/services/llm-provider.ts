@@ -1,6 +1,10 @@
 import { SpanStatusCode } from '@opentelemetry/api'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import {
+  extractToolCallSummary,
+  normalizeToolCallPayload,
+} from './llm-tool-call-transformer'
 import type {
   AIMessage,
   AIServiceOptions,
@@ -30,6 +34,14 @@ export interface LLMStreamResponse {
     delta: {
       content?: string
       role?: string
+      tool_calls?: Array<{
+        id?: string
+        type?: string
+        function?: {
+          name?: string
+          arguments?: string
+        }
+      }>
     }
     index: number
     finish_reason?: string
@@ -256,6 +268,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
   if (!config.baseUrl) {
     throw new LLMServiceError(
       'LLM API base URL is required for this provider.',
+      undefined,
       'config_error',
     )
   }
@@ -315,6 +328,14 @@ export function createLLMService(config: LLMClientConfig): LLMService {
       message: {
         role: string
         content: string
+        tool_calls?: Array<{
+          id?: string
+          type?: string
+          function?: {
+            name?: string
+            arguments?: string
+          }
+        }>
       }
       finish_reason?: string
     }>
@@ -384,13 +405,13 @@ export function createLLMService(config: LLMClientConfig): LLMService {
 
             const model =
               options?.model || 'minimaxai/minimax-m2.7'
-            const requestBody = {
+            const requestBody = normalizeToolCallPayload({
               model,
               messages,
               temperature: options?.temperature || 0.7,
               max_tokens: options?.maxTokens || 1024,
               stop: options?.stop,
-            }
+            })
 
             span.setAttributes({
               'llm.model_name': model,
@@ -404,13 +425,22 @@ export function createLLMService(config: LLMClientConfig): LLMService {
             )
 
             const completion = {
-            id: data.id || `llm-${Date.now()}`,
+              id: data.id || `llm-${Date.now()}`,
               created: data.created || Date.now(),
               model: data.model || requestBody.model,
               choices: data.choices?.map((choice) => ({
                 message: {
                   role: choice.message.role as 'assistant',
-                  content: choice.message.content,
+                  content:
+                    choice.message.content ||
+                    (Array.isArray(choice.message.tool_calls)
+                      ? choice.message.tool_calls
+                          .map((toolCall) => extractToolCallSummary(toolCall))
+                          .join('\n')
+                      : ''),
+                  ...(Array.isArray(choice.message.tool_calls)
+                    ? { tool_calls: choice.message.tool_calls }
+                    : {}),
                 },
                 finishReason: (choice.finish_reason === 'stop'
                   ? 'stop'
@@ -433,7 +463,13 @@ export function createLLMService(config: LLMClientConfig): LLMService {
                 totalTokens: data.usage?.total_tokens || 0,
               },
               provider: 'llm',
-              content: data.choices?.[0]?.message?.content || '',
+              content:
+                data.choices?.[0]?.message?.content ||
+                (Array.isArray(data.choices?.[0]?.message?.tool_calls)
+                  ? data.choices[0]?.message.tool_calls
+                      ?.map((toolCall) => extractToolCallSummary(toolCall))
+                      .join('\n')
+                  : ''),
             }
 
             span.setAttributes({
@@ -515,13 +551,13 @@ export function createLLMService(config: LLMClientConfig): LLMService {
         }
 
         const model = options?.model || 'minimaxai/minimax-m2.7'
-        const requestBody = {
+        const requestBody = normalizeToolCallPayload({
           model,
           messages,
           temperature: options?.temperature || 0.7,
           max_tokens: options?.maxTokens || 1024,
           stop: options?.stop,
-        }
+        })
 
         span.setAttributes({
           'llm.model_name': model,
@@ -579,14 +615,26 @@ export function createLLMService(config: LLMClientConfig): LLMService {
 
                 try {
                   const jsonData = trimmedLine.slice(6) // Remove 'data: ' prefix
-                  const parsed = JSON.parse(jsonData) as LLMStreamResponse
+                  const parsed = normalizeToolCallPayload(
+                    JSON.parse(jsonData) as Record<string, unknown>,
+                  ) as unknown as LLMStreamResponse
 
                   if (parsed.id) {
                     requestId = parsed.id
                   }
 
                   const choice = parsed.choices?.[0]
-                  if (choice?.delta?.content) {
+                  if (
+                    choice?.delta?.content ||
+                    Array.isArray(choice?.delta?.tool_calls)
+                  ) {
+                    const deltaContent =
+                      choice.delta.content ||
+                      (Array.isArray(choice.delta.tool_calls)
+                        ? choice.delta.tool_calls
+                            .map((toolCall) => extractToolCallSummary(toolCall))
+                            .join('\n')
+                        : '')
                     const finishReason:
                       | 'stop'
                       | 'length'
@@ -602,7 +650,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
                       id: requestId,
                       model: parsed.model || model,
                       created: parsed.created || Date.now(),
-                      content: choice.delta.content,
+                      content: deltaContent,
                       done: !!choice.finish_reason,
                       ...(finishReason && { finishReason }),
                     }
