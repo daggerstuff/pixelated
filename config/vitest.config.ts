@@ -10,6 +10,8 @@ const baseNodeTestGlobs = [
   'src/pages/api/**/*.test.ts',
   'src/pages/api/**/*.spec.ts',
   'src/pages/api/**/__tests__/**/*.test.ts',
+  'src/api/routes/__tests__/**/*.test.ts',
+  'src/api/middleware/__tests__/**/*.test.ts',
   'src/lib/auth/**/*.test.ts',
   'src/lib/services/product-memory-gateway.test.ts',
   'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
@@ -88,34 +90,10 @@ export default defineConfig({
         find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
         replacement: path.resolve(
           __dirname,
-          '../src/test/testing-library-act-compat.ts',
+          '../__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
         ),
       },
-      {
-        find: 'react/jsx-dev-runtime',
-        replacement: path.resolve(
-          __dirname,
-          '../node_modules/react/jsx-dev-runtime.js',
-        ),
-      },
-      {
-        find: 'react/jsx-runtime',
-        replacement: path.resolve(
-          __dirname,
-          '../node_modules/react/jsx-runtime.js',
-        ),
-      },
-      {
-        find: 'react',
-        replacement: path.resolve(__dirname, '../src/test/react-compat.ts'),
-      },
-      {
-        find: 'react-dom',
-        replacement: path.resolve(
-          __dirname,
-          '../node_modules/react-dom/index.js',
-        ),
-      },
+      
     ],
     conditions: ['node', 'import', 'module', 'default'],
   },
@@ -183,10 +161,54 @@ export default defineConfig({
             'tests/accessibility/**/*',
             'tests/performance/**/*',
             'tests/security/**/*',
+            'src/api/routes/__tests__/**/*.test.ts',
+            'src/api/middleware/__tests__/**/*.test.ts',
             'backups/**',
             'backups/**/*',
             'worktrees/**',
           ],
+          resolve: {
+            tsconfigPaths: true,
+            alias: [
+              { find: '@', replacement: path.resolve(__dirname, '../src') },
+              {
+                find: 'react-dom/test-utils',
+                replacement: path.resolve(
+                  __dirname,
+                  '../__mocks__/react-dom/test-utils.js',
+                ),
+              },
+              {
+                find: /@testing-library\/react\/dist\/act-compat\.js$/,
+                replacement: path.resolve(
+                  __dirname,
+                  '../src/test/testing-library-act-compat.ts',
+                ),
+              },
+              {
+                find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
+                replacement: path.resolve(
+                  __dirname,
+                  '../__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
+                ),
+              },
+              {
+                find: 'react/jsx-dev-runtime',
+                replacement: path.resolve(
+                  __dirname,
+                  '../node_modules/react/jsx-dev-runtime.js',
+                ),
+              },
+              {
+                find: 'react/jsx-runtime',
+                replacement: path.resolve(
+                  __dirname,
+                  '../node_modules/react/jsx-runtime.js',
+                ),
+              },
+            ],
+            conditions: ['node', 'import', 'module', 'default'],
+          },
         },
       },
       {

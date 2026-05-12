@@ -3,8 +3,8 @@
  * This file is automatically loaded by Vitest before tests are run
  */
 
-import { cleanup } from '@testing-library/react'
 import { vi } from 'vitest'
+import './patch-react-act.cjs'
 
 // React 19 compatibility shim for environments that do not provide `act` directly.
 const act = async (callback: () => void | Promise<void>): Promise<void> => {
@@ -37,9 +37,15 @@ vi.mock('react', async (importOriginal) => {
   }
 })
 
-vi.mock('react-dom/test-utils', () => ({
-  act,
-}))
+vi.mock('react-dom/test-utils', async () => {
+  const actual = await vi.importActual<typeof import('react-dom/test-utils')>(
+    'react-dom/test-utils',
+  )
+  return {
+    ...actual,
+    act,
+  }
+})
 
 void import('react')
   .then((reactModule) => {
@@ -172,6 +178,8 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  cleanup()
+  void import('@testing-library/react')
+    .then(({ cleanup }) => cleanup())
+    .catch(() => {})
   vi.restoreAllMocks()
 })
