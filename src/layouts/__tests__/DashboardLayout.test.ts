@@ -1,4 +1,4 @@
-import { renderAstro } from '@/test/utils/astro'
+import { renderAstro } from '../../test/utils/astro'
 
 // Vitest is imported via globals from tsconfig
 import DashboardLayout from '../DashboardLayout.astro'

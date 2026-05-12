@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 import { AccessibilityAnnouncer } from '../ui/AccessibilityAnnouncer'
 import {

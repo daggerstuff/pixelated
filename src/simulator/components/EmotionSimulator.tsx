@@ -1,9 +1,9 @@
 import { Loader2 } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
+import { Alert } from '@/components/ui/alert.tsx'
+import { Button } from '@/components/ui/button/index.ts'
+import { Switch } from '@/components/ui/switch.tsx'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'

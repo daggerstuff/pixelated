@@ -1,7 +1,7 @@
 import { useState, type FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardHeader,
@@ -9,14 +9,14 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from '@/components/ui/card'
+} from '@/components/ui/card/index.ts'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/components/ui/select.tsx'
 
 import {
   BackupType,

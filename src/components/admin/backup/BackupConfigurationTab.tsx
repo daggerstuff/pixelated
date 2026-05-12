@@ -1,23 +1,23 @@
 import { useState, type FC } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardHeader,
   CardContent,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/card/index.ts'
+import { Input } from '@/components/ui/input.tsx'
+import { Label } from '@/components/ui/label.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+} from '@/components/ui/select.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
 
 import { StorageLocation } from '../../../lib/security/backup/backup-types'
 import type { BackupType } from '../../../lib/security/backup/types'

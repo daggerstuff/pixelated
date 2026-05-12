@@ -7,24 +7,24 @@ import { format } from 'date-fns'
 import * as React from 'react'
 import { useState, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { IconFilter, IconX } from '@/components/ui/icons'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button/index.ts'
+import { Checkbox } from '@/components/ui/checkbox.tsx'
+import { IconFilter, IconX } from '@/components/ui/icons.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { Label } from '@/components/ui/label.tsx'
 import Popover, {
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from '@/components/ui/popover.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
+} from '@/components/ui/select.tsx'
+import { Slider } from '@/components/ui/slider.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
 import { cn } from '@/lib/utils'
 
 export interface AdvancedFilterOptions {
