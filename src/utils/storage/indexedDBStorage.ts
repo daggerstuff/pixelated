@@ -28,10 +28,19 @@ class IndexedDBStorage {
   }
 
   private async init(): Promise<void> {
-    if (this.initialized) return
+    if (this.initialized && this.db) return
 
     await new Promise<void>((resolve, reject) => {
+      if (typeof indexedDB?.open !== 'function') {
+        reject(new Error('Database not initialized'))
+        return
+      }
+
       const request = indexedDB.open(this.dbName, this.version)
+      if (!request) {
+        reject(new Error('Database not initialized'))
+        return
+      }
 
       request.onerror = () => reject(request.error)
       request.onsuccess = () => {
@@ -60,6 +69,10 @@ class IndexedDBStorage {
       const transaction = this.db.transaction([this.storeName], 'readwrite')
       const store = transaction.objectStore(this.storeName)
       const request = store.put({ id: key, value })
+      if (!request) {
+        reject(new Error('Database not initialized'))
+        return
+      }
 
       request.onerror = () => reject(request.error)
       request.onsuccess = () => resolve()
