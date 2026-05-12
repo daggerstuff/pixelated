@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment node
+ */
 import type { NextFunction } from 'express'
 
 import 'vitest'
@@ -37,6 +40,15 @@ const mockIncr = vi.fn()
 const mockExpire = vi.fn()
 const mockMulti = vi.fn()
 
+vi.mock('../../../lib/database/connection', () => ({
+  getRedisClient: () => ({
+    incr: mockIncr,
+    expire: mockExpire,
+    multi: mockMulti,
+  }),
+}))
+
+// Mirror the same module path used by the middleware import (defensive for Vitest resolution quirks)
 vi.mock('../../lib/database/connection', () => ({
   getRedisClient: () => ({
     incr: mockIncr,
@@ -67,7 +79,7 @@ describe('Rate Limiter Middleware', () => {
     mockResponse = createMockResponse()
     mockNext = vi.fn() as NextFunction
 
-    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   const invokeRateLimiter = async (
@@ -75,7 +87,9 @@ describe('Rate Limiter Middleware', () => {
     response: MockResponse,
     next: NextFunction,
   ) => {
-    return rateLimiter(request, response, next)
+    const result = rateLimiter(request, response, next)
+    await Promise.resolve()
+    return result
   }
 
   const invokeUserLimiter = async (
@@ -108,7 +122,8 @@ describe('Rate Limiter Middleware', () => {
       await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(429)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      const jsonPayload = vi.mocked(mockResponse.json).mock.calls[0]?.[0]
+      expect(jsonPayload).toMatchObject({
         error: 'Too Many Requests',
         message: 'Rate limit exceeded. Please try again later.',
       })
@@ -197,12 +212,9 @@ describe('Rate Limiter Middleware', () => {
     it('should return 429 when user exceeds limit', async () => {
       const middleware = rateLimitByUser(10, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([
-        [null, 11],
-        [null, 1],
-      ])
-
-      await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
+      for (let i = 0; i < 11; i += 1) {
+        await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
+      }
 
       expect(mockResponse.status).toHaveBeenCalledWith(429)
     })
@@ -231,6 +243,7 @@ describe('Rate Limiter Middleware', () => {
 
       const result = await incrementRedisCounter('test-key', 60)
 
+      expect(mockMulti).toHaveBeenCalled()
       expect(mockIncr).toHaveBeenCalledWith('test-key')
       expect(result).toBe(1)
     })
@@ -249,6 +262,8 @@ describe('Rate Limiter Middleware', () => {
 
       const result = await incrementRedisCounter('test-key', 60)
 
+      expect(mockMulti).toHaveBeenCalled()
+      expect(mockIncr).toHaveBeenCalledWith('test-key')
       expect(result).toBe(5)
     })
   })

@@ -44,6 +44,7 @@ export class RedisService extends EventEmitter implements IRedisService {
 
     const upstashRedisUrl = process.env['UPSTASH_REDIS_REST_URL']
     const redisUrl = process.env['REDIS_URL']
+    const hasExplicitUrl = Boolean(config.url)
 
     // Check if we have either UPSTASH_REDIS_REST_URL or traditional Redis URL
     const hasUpstashUrl = Boolean(upstashRedisUrl)
@@ -53,8 +54,10 @@ export class RedisService extends EventEmitter implements IRedisService {
       `[RedisService] Config check: hasUpstashUrl=${hasUpstashUrl}, hasRedisUrl=${hasRedisUrl}`,
     )
 
-    // If environment variables exist, use them regardless of what was in config
-    if (hasUpstashUrl) {
+    // Use explicitly provided URL first, then env vars.
+    if (hasExplicitUrl) {
+      this.config.url = config.url ?? ''
+    } else if (hasUpstashUrl) {
       this.config.url = upstashRedisUrl ?? ''
     } else if (hasRedisUrl) {
       this.config.url = redisUrl ?? ''
@@ -128,6 +131,7 @@ export class RedisService extends EventEmitter implements IRedisService {
 
       const redisOptions: Record<string, unknown> = {
         maxRetriesPerRequest: this.config.maxRetries,
+        lazyConnect: true,
         retryStrategy: (times: number) => {
           if (times > (this.config.maxRetries ?? 3)) {
             return null
