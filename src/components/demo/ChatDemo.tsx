@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useCallback, useEffect, useRef } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
 import type { AIMessage } from '../../lib/ai/models/ai-types'

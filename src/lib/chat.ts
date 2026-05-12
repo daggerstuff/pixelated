@@ -184,29 +184,28 @@ function convertAnalysisToLegacyFormat(
 function toRecommendationAnalysis(
   analysis: MHAnalysis | MentalHealthAnalysisResult,
 ): MentalHealthAnalysisResult {
-  if ('indicators' in analysis) {
+  if ('mentalHealthCategory' in analysis) {
     return {
       hasMentalHealthIssue: analysis.hasMentalHealthIssue,
-      mentalHealthCategory: analysis.category,
+      mentalHealthCategory: analysis.mentalHealthCategory,
       confidence: analysis.confidence,
       explanation: analysis.explanation,
-      supportingEvidence: analysis.supportingEvidence,
-      isCrisis:
-        analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
-      timestamp: new Date(analysis.timestamp).toISOString(),
-      stressLevel: analysis.riskLevel === 'high' ? 0.8 : 0.4,
+      supportingEvidence: analysis.supportingEvidence ?? [],
+      isCrisis: analysis.isCrisis,
+      timestamp: analysis.timestamp,
+      stressLevel: analysis.stressLevel ?? 0,
     }
   }
 
   return {
     hasMentalHealthIssue: analysis.hasMentalHealthIssue,
-    mentalHealthCategory: analysis.mentalHealthCategory,
+    mentalHealthCategory: analysis.category,
     confidence: analysis.confidence,
     explanation: analysis.explanation,
     supportingEvidence: analysis.supportingEvidence,
-    isCrisis: analysis.isCrisis,
-    timestamp: analysis.timestamp,
-    stressLevel: analysis.stressLevel ?? 0,
+    isCrisis: analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
+    timestamp: new Date(analysis.timestamp).toISOString(),
+    stressLevel: analysis.riskLevel === 'high' ? 0.8 : 0.4,
   }
 }
 

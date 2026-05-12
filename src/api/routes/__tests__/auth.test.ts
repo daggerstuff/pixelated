@@ -81,12 +81,30 @@ describe('Authentication API', () => {
   describe('POST /api/auth/logout', () => {
     it('should logout successfully', async () => {
       const response = await request(app).post('/api/auth/logout')
-      expect([200, 204]).toContain(response.status)
+      const hasAuth0Config = !!(
+        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+      )
+
+      if (hasAuth0Config) {
+        expect([200]).toContain(response.status)
+      } else {
+        expect(response.status).toBe(500)
+        expect(response.body.code).toBe('CONFIG_ERROR')
+      }
     })
 
     it('should clear session data', async () => {
       const response = await request(app).post('/api/auth/logout')
-      expect(response.status).toBeLessThan(500)
+      const hasAuth0Config = !!(
+        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+      )
+
+      if (hasAuth0Config) {
+        expect(response.status).toBe(200)
+      } else {
+        expect(response.status).toBe(500)
+        expect(response.body.code).toBe('CONFIG_ERROR')
+      }
     })
   })
 

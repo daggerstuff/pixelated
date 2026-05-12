@@ -21,7 +21,7 @@ class MockWebSocket {
 global.WebSocket = MockWebSocket as any
 
 // Mock authClient
-vi.mock('@/lib/auth-client', () => ({
+vi.mock('@/lib/auth-client.ts', () => ({
   authClient: {
     useSession: () => ({ data: { user: { id: 'test-user' } } }),
   },

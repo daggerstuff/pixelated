@@ -1,16 +1,16 @@
-import { Alert } from '@/components/ui/alert'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Alert } from '@/components/ui/alert.tsx'
+import { Card } from '@/components/ui/card/index.ts'
+import { Input } from '@/components/ui/input.tsx'
+import { Label } from '@/components/ui/label.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Switch } from '@/components/ui/switch'
+} from '@/components/ui/select.tsx'
+import { Skeleton } from '@/components/ui/skeleton.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 import { NotificationChannel } from '@/lib/services/notification/NotificationService'
 import { cn } from '@/lib/utils'

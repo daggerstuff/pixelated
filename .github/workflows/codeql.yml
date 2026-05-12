@@ -22,8 +22,13 @@ env:
 jobs:
   analyze:
     name: Analyze
+    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
+    # Skip CodeQL on Dependabot PRs to avoid transient GitHub action download rate-limit failures.
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: codeql-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:

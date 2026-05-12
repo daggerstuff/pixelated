@@ -12,25 +12,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { DialogModal } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+} from '@/components/ui/alert-dialog.tsx'
+import { Button } from '@/components/ui/button/index.ts'
+import { DialogModal } from '@/components/ui/dialog.tsx'
+import { Input } from '@/components/ui/input.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/components/ui/select.tsx'
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Textarea } from '@/components/ui/textarea'
+} from '@/components/ui/table.tsx'
+import { Textarea } from '@/components/ui/textarea.tsx'
 import type {
   TreatmentPlan,
   NewTreatmentPlanData,

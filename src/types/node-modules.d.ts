@@ -1,5 +1,22 @@
 // Type declarations for third-party modules without type definitions
 
+declare module 'unist' {
+  export interface Node {
+    type: string
+    [key: string]: unknown
+  }
+
+  export interface Parent extends Node {
+    children: Node[]
+  }
+
+  export type Visitor<T extends Node = Node> = (
+    node: T,
+    index: number | null,
+    parent: Parent | null,
+  ) => void
+}
+
 declare module 'unist-util-visit' {
   import type { Node, Visitor } from 'unist'
   export function visit<T extends Node>(

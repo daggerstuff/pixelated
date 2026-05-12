@@ -9,13 +9,13 @@ import {
   Loader2,
 } from 'lucide-react'
 
-import { Button } from '@/components/ui/button/button'
+import { Button } from '@/components/ui/button/button.tsx'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import {
   useAcquisitionQuery,
   useAcquisitionUpdateMutation,

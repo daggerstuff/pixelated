@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderAstro } from '@/test/utils/astro'
+import { renderAstro } from '../../test/utils/astro'
 
 import ErrorBoundary from '../ErrorBoundary.astro'
 

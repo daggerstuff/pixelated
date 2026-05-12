@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis'
 
-import { CacheInvalidation } from '@/lib/cache/invalidation'
+import { CacheInvalidation } from '@/lib/cache/invalidation.ts'
 
 import { RedisService } from '../RedisService'
 import {

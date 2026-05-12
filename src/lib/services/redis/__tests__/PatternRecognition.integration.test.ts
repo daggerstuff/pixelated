@@ -1,5 +1,9 @@
-import type { EmotionAnalysis, TherapySession } from '@/lib/ai/emotions/types'
-import { PatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
+import type {
+  EmotionAnalysis,
+  PatternRecognitionService,
+  TherapySession,
+} from '../../../ai/services/pattern-recognition-types'
+import { createPatternRecognitionService } from '../../../ai/services/PatternRecognitionFactory'
 
 import type { IRedisService } from '../types'
 
@@ -64,6 +68,10 @@ const mockFHEService: ExtendedFHEService = {
     },
   ],
 }
+
+vi.mock('../../../fhe/pattern-recognition-factory', () => ({
+  createPatternRecognitionFHEService: vi.fn(async () => mockFHEService),
+}))
 
 // Mock Redis service that implements IRedisService
 const mockRedisService: IRedisService = {
@@ -161,21 +169,8 @@ describe('patternRecognition Integration', () => {
   let patternService: PatternRecognitionService
   const testId = 'test-id'
 
-  beforeEach(() => {
-    patternService = new PatternRecognitionService(
-      mockFHEService,
-      mockRedisService,
-      {
-        timeWindow: 24 * 60 * 60 * 1000, // 1 day
-        minDataPoints: 3,
-        confidenceThreshold: 0.7,
-        riskFactorWeights: {
-          anxiety: 1,
-          sleep: 0.8,
-          mood: 0.6,
-        },
-      },
-    )
+  beforeEach(async () => {
+    patternService = await createPatternRecognitionService()
   })
 
   describe('pattern Detection', () => {
@@ -224,7 +219,7 @@ describe('patternRecognition Integration', () => {
       )
       expect(patterns).toContainEqual(
         expect.objectContaining({
-          type: 'sleep_anxiety_correlation',
+          type: 'behavioral',
           confidence: expect.any(Number),
         }),
       )

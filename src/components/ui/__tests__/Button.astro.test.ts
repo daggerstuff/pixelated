@@ -1,7 +1,7 @@
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { renderAstro } from '@/test/utils/astro'
+import { renderAstro } from '../../test/utils/astro'
 
 import Button from '../Button.astro'
 

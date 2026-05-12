@@ -3,11 +3,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type {
   EvidenceAssistantRequest,
   EvidenceAssistantResponse,
-} from '@/lib/api/evidence-assistant'
+} from '../lib/api/evidence-assistant'
 import {
   getEvidenceAssistantMetadata,
   searchEvidenceAssistant,
-} from '@/lib/api/evidence-assistant'
+} from '../lib/api/evidence-assistant'
 
 type UseEvidenceAssistantState = {
   loading: boolean
