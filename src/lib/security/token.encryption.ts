@@ -8,7 +8,19 @@ import { promisify } from 'node:util'
 
 import { SecurityError } from './errors/security.error'
 
-const scryptAsync = promisify(scrypt)
+interface TokenCryptoProvider {
+  createCipheriv: typeof createCipheriv
+  createDecipheriv: typeof createDecipheriv
+  randomBytes: typeof randomBytes
+  scrypt: typeof scrypt
+}
+
+const defaultCryptoProvider: TokenCryptoProvider = {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  scrypt,
+}
 
 export interface TokenEncryptionConfig {
   algorithm: string
@@ -22,6 +34,7 @@ export interface TokenEncryptionConfig {
 export class TokenEncryptionService {
   private readonly config: TokenEncryptionConfig
   private readonly logger: Console
+  private readonly crypto: TokenCryptoProvider
   private encryptionKey: Buffer | null = null
   private initializationPromise: Promise<void> | null = null
 
@@ -34,9 +47,11 @@ export class TokenEncryptionService {
       password: process.env['TOKEN_ENCRYPTION_PASSWORD'],
     },
     logger: Console = console,
+    cryptoProvider: TokenCryptoProvider = defaultCryptoProvider,
   ) {
     this.config = config
     this.logger = logger
+    this.crypto = cryptoProvider
 
     if (!this.config.salt || this.config.salt.length < 16) {
       throw new SecurityError(
@@ -52,6 +67,7 @@ export class TokenEncryptionService {
 
   async initialize(password: string): Promise<void> {
     try {
+      const scryptAsync = promisify(this.crypto.scrypt)
       this.encryptionKey = (await scryptAsync(
         password,
         this.config.salt,
@@ -117,8 +133,8 @@ export class TokenEncryptionService {
     await this.ensureInitialized()
 
     try {
-      const iv = randomBytes(this.config.ivLength)
-      const cipher = createCipheriv(
+      const iv = this.crypto.randomBytes(this.config.ivLength)
+      const cipher = this.crypto.createCipheriv(
         this.config.algorithm,
         this.encryptionKey!,
         iv,
@@ -159,7 +175,7 @@ export class TokenEncryptionService {
     await this.ensureInitialized()
 
     try {
-      const decipher = createDecipheriv(
+      const decipher = this.crypto.createDecipheriv(
         this.config.algorithm,
         this.encryptionKey!,
         Buffer.from(iv, 'base64'),
@@ -195,6 +211,7 @@ export class TokenEncryptionService {
     await this.ensureInitialized()
 
     try {
+      const scryptAsync = promisify(this.crypto.scrypt)
       const newKey = await scryptAsync(
         newPassword,
         this.config.salt,

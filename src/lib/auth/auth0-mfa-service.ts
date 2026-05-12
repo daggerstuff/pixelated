@@ -32,29 +32,23 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-declare module 'auth0' {
-  interface ManagementClient {
-    getGuardianEnrollments(params: {
-      id: string
-    }): Promise<GuardianEnrollment[]>
-    getGuardianFactors(): Promise<GuardianFactor[]>
-    createGuardianEnrollmentTicket(params: {
-      user_id: string
-      send_mail: boolean
-    }): Promise<EnrollmentTicketResponse>
-    deleteGuardianEnrollment(params: { id: string }): Promise<void>
-  }
-}
-
 type ExtendedAuthenticationClient = AuthenticationClient
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 // Initialize Auth0 clients
+type ExtendedManagementClient = ManagementClient & {
+  users: ManagementClient['users'] & {
+    getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
+  }
+}
+
 let auth0Authentication: ExtendedAuthenticationClient | null = null
-let auth0Management: ManagementClient | null = null
+let auth0Management: ExtendedManagementClient | null = null
 
 /**
  * Initialize Auth0 clients
@@ -65,7 +59,9 @@ function initializeAuth0Clients() {
     !auth0Config.clientId ||
     !auth0Config.clientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
@@ -85,7 +81,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-    })
+    }) as ExtendedManagementClient
   }
 }
 
@@ -188,7 +184,9 @@ function parseEnrollmentTicket(
 export class Auth0MFAService {
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
   }
 
@@ -202,9 +200,7 @@ export class Auth0MFAService {
 
     try {
       const enrolledFactors = parseGuardianEnrollments(
-        await auth0Management.getGuardianEnrollments({
-          id: userId,
-        }),
+        await this.getGuardianEnrollmentsForUser(userId),
       )
 
       // Get all available factors
@@ -368,9 +364,7 @@ export class Auth0MFAService {
 
     try {
       const enrollments = parseGuardianEnrollments(
-        await auth0Management.getGuardianEnrollments({
-          id: userId,
-        }),
+        await this.getGuardianEnrollmentsForUser(userId),
       )
 
       const factors: MFAFactor[] = enrollments
@@ -578,6 +572,19 @@ export class Auth0MFAService {
       value === 'webauthn-roaming' ||
       value === 'webauthn-platform'
     )
+  }
+
+  private async getGuardianEnrollmentsForUser(
+    userId: string,
+  ): Promise<unknown> {
+    if (!auth0Management) {
+      throw new Error('Auth0 management client not initialized')
+    }
+
+    const getGuardianEnrollments = auth0Management.users
+      .getGuardianEnrollments as (params: { id: string }) => Promise<unknown>
+
+    return await getGuardianEnrollments({ id: userId })
   }
 
   private normalizeFactorStatus(value: unknown): MFAFactorStatus {

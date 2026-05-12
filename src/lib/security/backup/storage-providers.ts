@@ -19,6 +19,16 @@ import { securePathJoin } from '../../utils/server'
 
 const logger = createBuildSafeLogger('backup-storage')
 
+function hasUnsafeControlCharacters(value: string): boolean {
+  for (let i = 0; i < value.length; i += 1) {
+    const charCode = value.charCodeAt(i)
+    if (charCode <= 31 || charCode === 127) {
+      return true
+    }
+  }
+  return false
+}
+
 // Define interfaces for cloud storage clients to avoid 'any' types
 interface S3Client {
   send(command: unknown): Promise<unknown>
@@ -813,8 +823,8 @@ export class AWSS3StorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
-    if (unsafeChars.test(key)) {
+    const hasReservedChars = /[<>:"|?*]/.test(key)
+    if (hasReservedChars || hasUnsafeControlCharacters(key)) {
       throw new Error('Key contains unsafe characters')
     }
 
@@ -1032,8 +1042,8 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
-    if (unsafeChars.test(key)) {
+    const hasReservedChars = /[<>:"|?*]/.test(key)
+    if (hasReservedChars || hasUnsafeControlCharacters(key)) {
       throw new Error('Key contains unsafe characters')
     }
 
@@ -1285,8 +1295,8 @@ export class AzureBlobStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
-    if (unsafeChars.test(key)) {
+    const hasReservedChars = /[<>:"|?*]/.test(key)
+    if (hasReservedChars || hasUnsafeControlCharacters(key)) {
       throw new Error('Key contains unsafe characters')
     }
 

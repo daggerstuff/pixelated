@@ -17,46 +17,6 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-interface Auth0ManagementRolesClient {
-  list: (params: {
-    per_page?: number
-    page?: number
-    name_filter?: string
-  }) => Promise<{ data: unknown[] }>
-  create: (params: { name: string; description?: string }) => Promise<unknown>
-  assignRolestoUser: (params: {
-    id: string
-    roles: string[]
-  }) => Promise<unknown>
-  removeRolesFromUser: (params: {
-    id: string
-    roles: string[]
-  }) => Promise<unknown>
-  getUserRoles: (params: { id: string }) => Promise<unknown>
-}
-
-interface Auth0ManagementClient {
-  roles: Auth0ManagementRolesClient
-  getRoles: (params: {
-    per_page?: number
-    page?: number
-    name_filter?: string
-  }) => Promise<unknown[]>
-  assignRolestoUser: (params: {
-    id: string
-    roles: string[]
-  }) => Promise<unknown>
-  removeRolesFromUser: (params: {
-    id: string
-    roles: string[]
-  }) => Promise<unknown>
-  getUserRoles: (params: { id: string }) => Promise<unknown[]>
-}
-
-declare module 'auth0' {
-  interface ManagementClient extends Auth0ManagementClient {}
-}
-
 // Auth0 Configuration
 
 interface Auth0ManagementRole {
@@ -129,7 +89,7 @@ function getPermissionDefinition(permission: string): Permission | undefined {
 }
 
 // Initialize Auth0 management client
-let auth0Management: Auth0ManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 
 function getAuth0ManagementConfig() {
   return {
