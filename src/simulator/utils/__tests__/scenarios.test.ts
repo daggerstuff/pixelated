@@ -31,5 +31,17 @@ describe('scenarios utility functions', () => {
       expect(result).not.toBeNull()
       expect(result?.difficulty).toBe(ScenarioDifficulty.INTERMEDIATE)
     })
+
+    it('returns any available scenario if no matching difficulty scenario is available', async () => {
+      const allScenarios = await getScenarios()
+      const intermediateIds = allScenarios
+        .filter((s) => s.difficulty === ScenarioDifficulty.INTERMEDIATE)
+        .map((s) => s.id)
+
+      const result = await getRecommendedScenario(intermediateIds, 'intermediate')
+
+      expect(result).not.toBeNull()
+      expect(result?.difficulty).not.toBe(ScenarioDifficulty.INTERMEDIATE)
+    })
   })
 })

@@ -79,3 +79,9 @@ Pattern: Mocking navigator properties in Vitest with jsdom
 
 Action: Use `Object.defineProperty` to temporarily mock and restore
 navigator.mediaDevices
+
+## 2026-05-11 - QA: Add test for getRecommendedScenario fallback edge case
+
+Pattern: Finding untested branches in utility functions and adding targeted tests
+
+Action: Ensure both positive and negative branches for scenario recommendation are systematically tested
