@@ -11,6 +11,8 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
 
@@ -23,18 +25,18 @@ function initializeAuth0Management() {
     !auth0Config.managementClientId ||
     !auth0Config.managementClientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-    })
-  }
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  })
 }
 
 // Initialize the management client
@@ -79,12 +81,14 @@ export interface ImpersonationLogEntry {
  * Implements secure user impersonation with comprehensive audit logging
  */
 export class Auth0ImpersonationService {
-  private activeSessions: Map<string, ImpersonationSession> = new Map()
-  private impersonationLogs: ImpersonationLogEntry[] = []
+  private readonly activeSessions: Map<string, ImpersonationSession> = new Map()
+  private readonly impersonationLogs: ImpersonationLogEntry[] = []
 
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
 
     // Periodically clean up expired sessions
@@ -351,7 +355,7 @@ export class Auth0ImpersonationService {
    */
   getActiveSessionById(sessionId: string): ImpersonationSession | null {
     const session = this.activeSessions.get(sessionId)
-    return session && session.isActive ? session : null
+    return session?.isActive ? session : null
   }
 
   /**

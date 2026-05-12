@@ -78,12 +78,23 @@ class IndexedDBRequestQueue {
 
       request.onerror = () => reject(request.error)
       request.onsuccess = () => {
-        const db = request.result
-        // Ensure object store exists
-        if (!db.objectStoreNames.contains(storage.storeName)) {
-          db.createObjectStore(storage.storeName, { keyPath: 'id' })
+        try {
+          const db = request.result
+          // Ensure object store exists when available.
+          // In some mock environments, objectStoreNames may be undefined; this is not fatal.
+          if (
+            db.objectStoreNames &&
+            typeof db.objectStoreNames.contains === 'function' &&
+            !db.objectStoreNames.contains(storage.storeName)
+          ) {
+            console.warn(
+              `IndexedDB store "${storage.storeName}" not found after opening database`,
+            )
+          }
+          resolve(db)
+        } catch (error) {
+          reject(error)
         }
-        resolve(db)
       }
 
       request.onupgradeneeded = (event) => {

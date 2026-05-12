@@ -61,6 +61,9 @@ export type AuthenticationEvent =
   | `role_removed_${string}`
   | `social_account_linked_${string}`
   | `social_account_unlinked_${string}`
+  | `impersonation_started_${string}`
+  | `impersonation_ended_${string}`
+  | `impersonation_extended_${string}`
 
 /**
  * Update Phase 6 authentication progress

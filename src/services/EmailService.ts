@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer'
+import { createTransport, type Transporter } from 'nodemailer'
 
 import { productionConfig } from '../config/production.js'
 
@@ -33,18 +33,18 @@ export interface WeeklyDigest {
 }
 
 export class EmailService {
-  private transporter: nodemailer.Transporter
+  private readonly transporter: Transporter
 
   constructor() {
     this.transporter = this.createTransporter()
   }
 
-  private createTransporter(): nodemailer.Transporter {
+  private createTransporter(): Transporter {
     const config = productionConfig.email
 
     switch (config.provider) {
       case 'sendgrid':
-        return nodemailer.createTransporter({
+        return createTransport({
           service: 'SendGrid',
           auth: {
             user: 'apikey',
@@ -53,7 +53,7 @@ export class EmailService {
         })
 
       case 'smtp':
-        return nodemailer.createTransporter({
+        return createTransport({
           host: config.smtp.host,
           port: config.smtp.port,
           secure: config.smtp.secure,
@@ -61,18 +61,18 @@ export class EmailService {
         })
 
       case 'aws':
-        return nodemailer.createTransporter({
+        return createTransport({
           host: 'email-smtp.us-east-1.amazonaws.com',
           port: 587,
           secure: false,
           auth: {
-            user: process.env.AWS_SES_USER || '',
-            pass: process.env.AWS_SES_PASS || '',
+            user: process.env.AWS_SES_USER ?? '',
+            pass: process.env.AWS_SES_PASS ?? '',
           },
         })
 
       default:
-        return nodemailer.createTransporter({
+        return createTransport({
           service: 'gmail',
           auth: {
             user: productionConfig.email.smtp.auth.user,

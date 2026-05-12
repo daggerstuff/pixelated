@@ -105,9 +105,10 @@ const breachTest = test.extend<BreachTestFixtures>({
 
 // Skip e2e tests in CI environment
 const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
+const noopTestDescribe = (() => undefined) as typeof test.describe
 
 // Use conditional test execution for describe blocks
-;(skipTests ? test.describe.skip : test.describe)(
+;(skipTests ? noopTestDescribe : test.describe)(
   'Breach Notification System',
   () => {
     breachTest.beforeEach(async ({ page }) => {

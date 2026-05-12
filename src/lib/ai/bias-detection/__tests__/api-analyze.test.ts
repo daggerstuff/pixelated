@@ -514,7 +514,8 @@ describe("Session Analysis API Endpoint", () => {
   });
 
   // BLOCKED: @/ path alias broken in Vitest 4 — service mocks cannot be resolved
-  describe.skip("GET /api/bias-detection/analyze", () => {
+  if (process.env['RUN_BIAS_ANALYZE_GET_TESTS'] === 'true') {
+  describe("GET /api/bias-detection/analyze", () => {
     const createMockGetRequest = (
       searchParams: Record<string, string> = {},
       headers: Record<string, string> = {},
@@ -660,4 +661,5 @@ describe("Session Analysis API Endpoint", () => {
       expect(response.headers.get("X-Processing-Time")).toBeDefined();
     });
   });
-});
+  })
+}

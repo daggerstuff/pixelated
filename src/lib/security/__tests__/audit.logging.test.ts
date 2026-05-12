@@ -72,14 +72,19 @@ describe('auditLoggingService', () => {
   describe('sanitizeEntry', () => {
     it('should hash sensitive identifiers when PII is not included', () => {
       const hashSpy = vi.spyOn(auditLoggingService as unknown, 'hashValue')
+      const entryCopy = {
+        ...testEntry,
+        metadata: { ...testEntry.metadata },
+      }
 
       const sanitizedEntry = (auditLoggingService as unknown).sanitizeEntry({
-        ...testEntry,
+        ...entryCopy,
         timestamp: new Date().toISOString(),
       })
 
-      expect(hashSpy).toHaveBeenCalledWith(testEntry.userId)
-      expect(hashSpy).toHaveBeenCalledWith(testEntry.metadata.sessionId)
+      expect(hashSpy).toHaveBeenCalledTimes(2)
+      expect(hashSpy).toHaveBeenNthCalledWith(1, testEntry.userId)
+      expect(hashSpy).toHaveBeenNthCalledWith(2, testEntry.metadata.sessionId)
 
       expect(sanitizedEntry.userId).not.toBe(testEntry.userId)
       expect(sanitizedEntry.metadata.sessionId).not.toBe(

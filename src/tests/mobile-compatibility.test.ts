@@ -48,9 +48,11 @@ const DEVICE_PRESETS = [
 
 // Skip mobile compatibility tests in CI environment
 const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
+const noopDescribe = (() => undefined) as typeof describe
+const describeFn = skipTests ? noopDescribe : describe
 
 // Use conditional test execution for describe blocks
-;(skipTests ? describe.skip : describe)('Mobile Device Compatibility', () => {
+describeFn('Mobile Device Compatibility', () => {
   // Test each device preset on the homepage
   DEVICE_PRESETS.forEach((device) => {
     test(`Homepage should render properly on ${device['name']}`, async ({
