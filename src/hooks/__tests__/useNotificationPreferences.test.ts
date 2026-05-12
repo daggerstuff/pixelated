@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 
 /* global vi, describe, it, expect, beforeEach */
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+import { NotificationChannel } from '../../lib/services/notification/NotificationService'
 
 import { useNotificationPreferences } from '../useNotificationPreferences'
 

@@ -85,23 +85,42 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
   },
 }
 
+const LLM_PROVIDER_API_KEYS: readonly string[] = [
+  'LLM_API_KEY',
+  'NVIDIA_API_KEY',
+  'NIM_API_KEY',
+  'NVIDIA_TOKEN',
+]
+
+const LLM_PROVIDER_BASE_URLS: readonly string[] = [
+  'LLM_BASE_URL',
+  'LLM_API_URL',
+  'OPENAI_BASE_URL',
+  'NVIDIA_OPENAI_BASE_URL',
+  'NVIDIA_BASE_URL',
+  'NIM_BASE_URL',
+]
+
+function resolveProviderConfigValue(keys: readonly string[]): string | undefined {
+  for (const key of keys) {
+    const value = getEnvVar(key)
+    if (value) return value
+  }
+  return undefined
+}
+
 /**
  * Initialize AI providers with environment configuration
  */
 export function initializeProviders() {
   try {
     // Primary LLM provider key
-    const providerApiKey = getEnvVar('LLM_API_KEY')
+    const providerApiKey = resolveProviderConfigValue(LLM_PROVIDER_API_KEYS)
     const isOpenRouterPrimaryProvider =
       isOpenRouterBaseUrl(
-        getEnvVar('LLM_BASE_URL') ||
-          getEnvVar('LLM_API_URL') ||
-          getEnvVar('OPENAI_BASE_URL'),
+        resolveProviderConfigValue(LLM_PROVIDER_BASE_URLS),
       ) || isOpenRouterKey(providerApiKey)
-    const providerBaseUrl =
-      getEnvVar('LLM_BASE_URL') ||
-      getEnvVar('LLM_API_URL') ||
-      getEnvVar('OPENAI_BASE_URL')
+    const providerBaseUrl = resolveProviderConfigValue(LLM_PROVIDER_BASE_URLS)
     if (providerApiKey && providerBaseUrl && !isOpenRouterPrimaryProvider) {
       providers.set('llm', {
         ...defaultConfigs.llm,

@@ -71,7 +71,7 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
     alias: [
-      { find: '@', replacement: path.resolve(__dirname, '../src') },
+      { find: /^@\//, replacement: `${path.resolve(__dirname, '../src')}/` },
       {
         find: 'react-dom/test-utils',
         replacement: path.resolve(
@@ -170,7 +170,10 @@ export default defineConfig({
           resolve: {
             tsconfigPaths: true,
             alias: [
-              { find: '@', replacement: path.resolve(__dirname, '../src') },
+              {
+                find: /^@\//,
+                replacement: `${path.resolve(__dirname, '../src')}/`,
+              },
               {
                 find: 'react-dom/test-utils',
                 replacement: path.resolve(
@@ -222,13 +225,16 @@ export default defineConfig({
               : [...nodeTestGlobs, 'src/tests/auth.test.ts'],
           environment: 'node',
         },
-        resolve: {
-          tsconfigPaths: true,
-          alias: [
-            { find: '@', replacement: path.resolve(__dirname, '../src') },
-          ],
+          resolve: {
+            tsconfigPaths: true,
+            alias: [
+              {
+                find: /^@\//,
+                replacement: `${path.resolve(__dirname, '../src')}/`,
+              },
+            ],
+          },
         },
-      },
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
