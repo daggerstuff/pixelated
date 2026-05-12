@@ -1,6 +1,6 @@
-import { getSession, isSessionValid } from '@/lib/auth/session'
-import type { Session } from '@/lib/auth/session'
-import { developerApiKeyManager } from '@/lib/db/developer-api-keys'
+import { getSession, isSessionValid } from '../lib/auth/session'
+import type { Session } from '../lib/auth/session'
+import { developerApiKeyManager } from '../lib/db/developer-api-keys'
 
 const DEFAULT_SESSION_TTL_MS = 365 * 24 * 60 * 60 * 1000
 

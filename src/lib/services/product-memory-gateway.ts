@@ -1,12 +1,12 @@
-import { resolveInternalMemoryServiceConfig } from '@/lib/server/internal-memory-service-auth'
+import { resolveInternalMemoryServiceConfig } from '../server/internal-memory-service-auth'
 import {
   InternalMemoryServiceClient,
   InternalMemoryServiceError,
   type InternalMemoryMetadata,
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
-} from '@/lib/server/internal-memory-service-client'
-import { assertOwnedMemoryAccessible } from '@/lib/services/product-memory-ownership'
+} from '../server/internal-memory-service-client'
+import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
 export interface ProductMemoryRecord {
   id: string

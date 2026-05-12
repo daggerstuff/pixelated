@@ -1,6 +1,9 @@
+/// <reference types="vitest/node" />
+/** @vitest-environment node */
+
 import { describe, it, expect } from 'vitest'
 
-import { POST } from '@/pages/api/auth/register/route'
+import { POST } from '../pages/api/auth/register/route'
 
 const buildRequest = (body: Record<string, unknown>) =>
   new Request('https://example.com/api/auth/register', {

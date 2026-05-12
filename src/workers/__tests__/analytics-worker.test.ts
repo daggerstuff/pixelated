@@ -87,12 +87,9 @@ Object.defineProperty(global, 'crypto', {
   },
 })
 
-// Mock process.exit to prevent tests from actually exiting
-const mockExit = vi
-  .spyOn(process, 'exit')
-  .mockImplementation(() => undefined as never)
-
 describe('analytics-worker', () => {
+  const originalNodeEnv = process.env['NODE_ENV']
+  let mockExit: ReturnType<typeof vi.spyOn> | undefined
   let mockAnalyticsService: {
     processEvents: Mock
     registerClient: Mock
@@ -100,8 +97,12 @@ describe('analytics-worker', () => {
   }
 
   beforeEach(() => {
+    mockExit = vi
+      .spyOn(process, 'exit')
+      .mockImplementation(() => undefined as never)
     vi.clearAllMocks()
     vi.resetModules()
+    process.env['NODE_ENV'] = 'test'
 
     // Reset environment variables
     ;(env as any).ANALYTICS_WS_PORT = '8083'
@@ -125,6 +126,13 @@ describe('analytics-worker', () => {
         process.removeListener(signal, listeners[listeners.length - 1])
       }
     })
+    if (originalNodeEnv === undefined) {
+      delete process.env['NODE_ENV']
+    } else {
+      process.env['NODE_ENV'] = originalNodeEnv
+    }
+    mockExit?.mockRestore()
+    mockExit = undefined
   })
 
   // Helper to simulate a connection
