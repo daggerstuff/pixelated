@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import type { TokenEncryptionConfig } from '../token.encryption'
-import { TokenEncryptionService } from '../token.encryption'
+import {
+  TokenEncryptionService,
+  type TokenEncryptionConfig,
+} from '../token.encryption'
 
 const { mockCrypto } = vi.hoisted(() => {
   const mockSecureCipher = {
@@ -27,17 +29,6 @@ const { mockCrypto } = vi.hoisted(() => {
   }
 })
 
-// Apply the mock to crypto module
-vi.mock('node:crypto', () => {
-  return {
-    createCipheriv: mockCrypto.createCipheriv,
-    createDecipheriv: mockCrypto.createDecipheriv,
-    randomBytes: mockCrypto.randomBytes,
-    scrypt: mockCrypto.scrypt,
-  }
-})
-// --- End Mock ---
-
 describe('token Encryption Service', () => {
   const mockLogger = {
     info: vi.fn(),
@@ -61,6 +52,7 @@ describe('token Encryption Service', () => {
     tokenEncryptionService = new TokenEncryptionService(
       testConfig,
       mockLogger as unknown as Console,
+      mockCrypto as any,
     )
     vi.clearAllMocks()
   })

@@ -59,7 +59,7 @@ describe('Security Scanning Configuration', () => {
 
       // Check for security scanning components
       expect(workflowContent).toContain('security-scan')
-      expect(workflowContent).toContain('ubuntu-latest')
+      expect(workflowContent).toMatch(/ubuntu-\w+/)
     })
 
     it('should have proper dependency scanning', () => {

@@ -518,7 +518,6 @@ describe('Auth0 Social Auth Service', () => {
           picture: undefined,
           provider: 'google-oauth2',
           emailVerified: true,
-          createdAt: expect.any(String),
         },
         tokens: {
           accessToken: 'access-token-123',
@@ -528,6 +527,7 @@ describe('Auth0 Social Auth Service', () => {
           tokenType: 'Bearer',
         },
       })
+      expect(typeof result.user.createdAt).toBe('string')
 
       // Verify security event was logged
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
@@ -604,11 +604,9 @@ describe('Auth0 Social Auth Service', () => {
           'google-oauth2',
           'access-token-123',
         ),
-      ).rejects.toMatchObject({
-        message: expect.stringMatching(
-          /Auth0 management client not initialized|Failed to link social account/,
-        ),
-      })
+      ).rejects.toThrow(
+        /Auth0 management client not initialized|Failed to link social account/,
+      )
     })
   })
 

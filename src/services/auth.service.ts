@@ -1,9 +1,18 @@
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
-import { Repository } from 'typeorm'
 
 import type { User } from '../entities/user.entity'
 import { RegisterDto } from '../validation/register-schema'
+
+type UserRepository = {
+  findOne(options: {
+    where: {
+      email: string
+    }
+  }): Promise<User | null>
+  create(user: { email: string; password: string }): User
+  save(user: User): Promise<User>
+}
 
 class UnauthorizedException extends Error {
   constructor(message: string) {
@@ -13,7 +22,7 @@ class UnauthorizedException extends Error {
 }
 
 export class AuthService {
-  constructor(private readonly userRepository: Repository<User>) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async register(dto: RegisterDto): Promise<User> {
     // Check if email already exists
