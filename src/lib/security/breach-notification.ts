@@ -1,7 +1,8 @@
-import { sendEmail } from '@/lib/email'
-import { fheService } from '@/lib/fhe'
-import { logger } from '@/lib/logger'
-import { redis } from '@/lib/redis'
+import { auth } from '../auth'
+import { sendEmail } from '../email'
+import { fheService } from '../fhe'
+import { logger } from '../logger'
+import { redis } from '../redis'
 
 export interface TrainingMaterials {
   procedures: {
@@ -18,21 +19,6 @@ export interface TrainingMaterials {
     title: string
     content: string
     lastUpdated: number
-  }
-}
-
-/**
- * Local helper to get user by ID.
- * Replace with real implementation as needed.
- */
-async function getUserById(
-  userId: string,
-): Promise<{ id: string; email: string; name: string }> {
-  // Mock implementation that returns definite string values
-  return {
-    id: userId,
-    email: `user-${userId}@example.com`,
-    name: `User ${userId}`,
   }
 }
 
@@ -54,19 +40,27 @@ interface NotificationTemplate {
   textContent: string
 }
 
-// Implement proper mock for HHS_NOTIFICATION_EMAIL
-// Make sure process.env values are handled safely
-const ENV = {
-  ORGANIZATION_NAME:
-    process.env['ORGANIZATION_NAME'] || 'Pixelated Empathy Health',
-  SECURITY_CONTACT: process.env['SECURITY_CONTACT'] || 'security@example.com',
-  ORGANIZATION_ADDRESS:
-    process.env['ORGANIZATION_ADDRESS'] || '123 Health St, MedCity',
-  HHS_NOTIFICATION_EMAIL:
-    process.env['HHS_NOTIFICATION_EMAIL'] || 'hhs-notifications@example.gov',
-  SECURITY_STAKEHOLDERS: (
-    process.env['SECURITY_STAKEHOLDERS'] || 'admin@example.com'
-  ).split(','),
+// Resolve environment-dependent values lazily so tests can update process.env between runs.
+const getBreachEnv = () => {
+  const configuredStakeholders = process.env['SECURITY_STAKEHOLDERS']
+  const stakeholderList =
+    configuredStakeholders === undefined
+      ? 'admin@example.com'
+      : configuredStakeholders
+
+  return {
+    ORGANIZATION_NAME:
+      process.env['ORGANIZATION_NAME'] || 'Pixelated Empathy Health',
+    SECURITY_CONTACT: process.env['SECURITY_CONTACT'] || 'security@example.com',
+    ORGANIZATION_ADDRESS:
+      process.env['ORGANIZATION_ADDRESS'] || '123 Health St, MedCity',
+    HHS_NOTIFICATION_EMAIL:
+      process.env['HHS_NOTIFICATION_EMAIL'] || 'hhs-notifications@example.gov',
+    SECURITY_STAKEHOLDERS: stakeholderList
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
+  }
 }
 
 // Constants
@@ -196,7 +190,7 @@ async function notifyAffectedUsers(
 ): Promise<void> {
   const notifications = breach.affectedUsers.map(async (userId) => {
     try {
-      const user = await getUserById(userId)
+      const user = await auth.getUserById(userId)
 
       if (!user || !user.email) {
         logger.warn(`User ${userId} has no email, skipping notification`)
@@ -239,13 +233,14 @@ function requiresAuthorityNotification(breach: BreachDetails): boolean {
 
 async function notifyAuthorities(breach: BreachDetails): Promise<void> {
   try {
+    const env = getBreachEnv()
     // Prepare HIPAA-compliant notification
     const notification = {
       breachId: breach.id,
       organizationInfo: {
-        name: ENV.ORGANIZATION_NAME,
-        contact: ENV.SECURITY_CONTACT,
-        address: ENV.ORGANIZATION_ADDRESS,
+        name: env.ORGANIZATION_NAME,
+        contact: env.SECURITY_CONTACT,
+        address: env.ORGANIZATION_ADDRESS,
       },
       breach: {
         type: breach.type,
@@ -259,7 +254,7 @@ async function notifyAuthorities(breach: BreachDetails): Promise<void> {
 
     // Send to HHS (Health and Human Services)
     await sendEmail({
-      to: ENV.HHS_NOTIFICATION_EMAIL,
+      to: env.HHS_NOTIFICATION_EMAIL,
       subject: `HIPAA Breach Notification - ${breach.id}`,
       textContent: JSON.stringify(notification, null, 2),
     })
@@ -279,7 +274,8 @@ async function notifyInternalStakeholders(
   breach: BreachDetails,
 ): Promise<void> {
   try {
-    const notifications = ENV.SECURITY_STAKEHOLDERS.map((email) =>
+    const env = getBreachEnv()
+    const notifications = env.SECURITY_STAKEHOLDERS.map((email) =>
       sendEmail({
         to: email,
         subject: `Security Breach Alert - ${breach.severity.toUpperCase()} - ${breach.id}`,
@@ -328,12 +324,26 @@ export async function listRecentBreaches(): Promise<BreachDetails[]> {
     const breaches = await Promise.all(
       keys.map(async (key: string) => {
         const breach = await redis.get(key)
-        return breach ? (JSON.parse(breach) as BreachDetails) : null
+        if (!breach) return null
+
+        try {
+          return JSON.parse(breach) as BreachDetails
+        } catch {
+          return null
+        }
       }),
     )
 
     return breaches
-      .filter((item): item is BreachDetails => Boolean(item))
+      .filter((item): item is BreachDetails => {
+        if (!item) return false
+
+        return (
+          typeof item.id === 'string' &&
+          typeof item.timestamp === 'number' &&
+          typeof item.notificationStatus === 'string'
+        )
+      })
       .sort((a, b) => b.timestamp - a.timestamp)
   } catch (error: unknown) {
     logger.error('Failed to list recent breaches:', error)

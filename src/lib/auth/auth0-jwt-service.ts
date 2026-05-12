@@ -21,6 +21,8 @@ import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 type Auth0UserInfoClient = {
   getUserInfo?: (
     accessToken: string,
@@ -37,12 +39,16 @@ type Auth0RuntimeConfig = {
   audience: string
 }
 
+type Auth0UserInfoClientConstructor = new (options: {
+  domain: string
+}) => Auth0UserInfoClient
+
 function getRuntimeAuth0Config(): Auth0RuntimeConfig {
   return {
-    domain: process.env.AUTH0_DOMAIN || auth0Config.domain,
-    clientId: process.env.AUTH0_CLIENT_ID || auth0Config.clientId,
-    clientSecret: process.env.AUTH0_CLIENT_SECRET || auth0Config.clientSecret,
-    audience: process.env.AUTH0_AUDIENCE || auth0Config.audience,
+    domain: process.env.AUTH0_DOMAIN ?? auth0Config.domain,
+    clientId: process.env.AUTH0_CLIENT_ID ?? auth0Config.clientId,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET ?? auth0Config.clientSecret,
+    audience: process.env.AUTH0_AUDIENCE ?? auth0Config.audience,
   }
 }
 
@@ -50,28 +56,29 @@ function isRuntimeAuth0Configured(config: Auth0RuntimeConfig): boolean {
   return !!(config.domain && config.clientId && config.clientSecret)
 }
 
+function isAuth0UserInfoClientConstructor(
+  value: unknown,
+): value is Auth0UserInfoClientConstructor {
+  return typeof value === 'function'
+}
+
 // Initialize Auth0 authentication client
-let auth0Authentication: InstanceType<
-  typeof auth0.AuthenticationClient
-> | null = null
+let auth0Authentication:
+  | (InstanceType<typeof auth0.AuthenticationClient> & Auth0UserInfoClient)
+  | null = null
 let auth0UserInfo: Auth0UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
  */
 function initializeAuth0Client() {
-  const UserInfoClient = (
-    auth0 as unknown as {
-      UserInfoClient?: new (options: { domain: string }) => {
-        getUserInfo: (accessToken: string) => Promise<Auth0UserInfoResponse>
-        getProfile: (accessToken: string) => Promise<Auth0UserInfoResponse>
-      }
-    }
-  ).UserInfoClient
+  const UserInfoClient = Reflect.get(auth0, 'UserInfoClient')
 
   const runtimeConfig = getRuntimeAuth0Config()
   if (!isRuntimeAuth0Configured(runtimeConfig)) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
@@ -82,7 +89,7 @@ function initializeAuth0Client() {
     clientSecret: runtimeConfig.clientSecret,
   })
 
-  if (typeof UserInfoClient === 'function') {
+  if (isAuth0UserInfoClientConstructor(UserInfoClient)) {
     try {
       const userInfoClient = new UserInfoClient({
         domain: runtimeConfig.domain,
@@ -99,16 +106,15 @@ function initializeAuth0Client() {
     }
   }
 
-  const authenticationLikeClient = auth0Authentication as Auth0UserInfoClient
   const hasAuthenticationUserInfoMethod =
-    typeof authenticationLikeClient.getUserInfo === 'function' ||
-    typeof authenticationLikeClient.getProfile === 'function'
+    typeof auth0Authentication.getUserInfo === 'function' ||
+    typeof auth0Authentication.getProfile === 'function'
   if (hasAuthenticationUserInfoMethod) {
-    auth0UserInfo = authenticationLikeClient
+    auth0UserInfo = auth0Authentication
     return
   }
 
-  if (typeof UserInfoClient !== 'function') {
+  if (!isAuth0UserInfoClientConstructor(UserInfoClient)) {
     auth0UserInfo = null
     return
   }
@@ -156,6 +162,10 @@ function isRecord(value: unknown): value is UnknownRecord {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
+function toOptionalString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined
+}
+
 async function getAuth0UserInfo(
   accessToken: string,
 ): Promise<Auth0UserInfoResponse> {
@@ -163,12 +173,11 @@ async function getAuth0UserInfo(
     throw new AuthenticationError('Auth0 user info client not initialized')
   }
 
-  const userInfoClient = auth0UserInfo as Auth0UserInfoClient
-  if (typeof userInfoClient.getUserInfo === 'function') {
-    return await userInfoClient.getUserInfo(accessToken)
+  if (typeof auth0UserInfo.getUserInfo === 'function') {
+    return await auth0UserInfo.getUserInfo(accessToken)
   }
-  if (typeof userInfoClient.getProfile === 'function') {
-    return await userInfoClient.getProfile(accessToken)
+  if (typeof auth0UserInfo.getProfile === 'function') {
+    return await auth0UserInfo.getProfile(accessToken)
   }
 
   throw new AuthenticationError('Auth0 user info method not available')
@@ -262,7 +271,7 @@ type Auth0TokenClaims = JwtPayload & {
   'https://pixelated.empathy/user_metadata'?: {
     role?: string
   }
-  permissions?: readonly string[]
+  'permissions'?: readonly string[]
 }
 
 function isAuth0TokenClaims(payload: unknown): payload is Auth0TokenClaims {
@@ -454,8 +463,8 @@ export async function validateToken(
     }
 
     // Validate Audience
-    const expectedAudience = currentConfig.audience
-    if (!expectedAudience || expectedAudience.trim() === '') {
+    const expectedAudience = currentConfig.audience.trim()
+    if (expectedAudience === '') {
       console.warn(
         'AUTH0_AUDIENCE not configured - audience validation skipped',
       )
@@ -476,27 +485,19 @@ export async function validateToken(
 
     // Now verify with UserInfo (acts as online signature/revocation check)
     const userInfo = await getAuth0UserInfo(token)
-    if (!userInfo) {
-      throw new AuthenticationError('Failed to get user info')
-    }
 
     // Extract user information
     const userInfoData = toStringRecord(userInfo.data)
-    const tokenPayload: Auth0TokenClaims = isAuth0TokenClaims(userInfoData)
+    const tokenPayload = isAuth0TokenClaims(userInfoData)
       ? userInfoData
       : payload
-    const userId =
-      typeof tokenPayload.sub === 'string'
-        ? tokenPayload.sub
-        : typeof payload.sub === 'string'
-          ? payload.sub
-          : ''
-    if (userId.length === 0) {
+    const userId = toOptionalString(tokenPayload.sub ?? payload.sub)
+    if (!userId) {
       throw new AuthenticationError('Token missing subject claim')
     }
     const role = extractRoleFromPayload(tokenPayload)
-    const tokenId = typeof payload.jti === 'string' ? payload.jti : ''
-    const sessionId = typeof payload.sid === 'string' ? payload.sid : undefined
+    const tokenId = payload.jti
+    const sessionId = payload.sid
 
     // Log successful validation
     logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, null, {
@@ -523,18 +524,16 @@ export async function validateToken(
     }
 
     // Extract accountId and workspaceId from user info
+    const userMetadata = toStringRecord(userInfoData.user_metadata)
+    const appMetadata = toStringRecord(userInfoData.app_metadata)
     const accountId =
-      (userInfoData as Record<string, unknown>).accountId ??
-      (userInfoData.user_metadata as Record<string, unknown> | undefined)
-        ?.accountId ??
-      (userInfoData.app_metadata as Record<string, unknown> | undefined)
-        ?.accountId
+      toOptionalString(userInfoData.accountId) ??
+      toOptionalString(userMetadata.accountId) ??
+      toOptionalString(appMetadata.accountId)
     const workspaceId =
-      (userInfoData as Record<string, unknown>).workspaceId ??
-      (userInfoData.user_metadata as Record<string, unknown> | undefined)
-        ?.workspaceId ??
-      (userInfoData.app_metadata as Record<string, unknown> | undefined)
-        ?.workspaceId
+      toOptionalString(userInfoData.workspaceId) ??
+      toOptionalString(userMetadata.workspaceId) ??
+      toOptionalString(appMetadata.workspaceId)
 
     return {
       valid: true,
@@ -543,8 +542,8 @@ export async function validateToken(
       tokenId: tokenId,
       expiresAt: payload.exp,
       payload: safePayload,
-      accountId: accountId as string | undefined,
-      workspaceId: workspaceId as string | undefined,
+      accountId,
+      workspaceId,
     }
   } catch (error: unknown) {
     // Log validation failure
@@ -591,9 +590,6 @@ export async function refreshAccessToken(
 
     // Get user info from new access token
     const userResponse = await getAuth0UserInfo(accessToken)
-    if (!userResponse) {
-      throw new AuthenticationError('Failed to get refreshed user info')
-    }
 
     // Extract user information
     const userResponseData = toStringRecord(userResponse.data)
@@ -602,8 +598,7 @@ export async function refreshAccessToken(
     }
     const userPayload = userResponseData
     const userId = typeof userPayload.sub === 'string' ? userPayload.sub : ''
-    const accessTokenId =
-      typeof userPayload.jti === 'string' ? userPayload.jti : undefined
+    const accessTokenId = userPayload.jti
     const role = extractRoleFromPayload(userPayload)
 
     // Log token refresh event

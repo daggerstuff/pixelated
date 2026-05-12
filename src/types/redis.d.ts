@@ -21,6 +21,12 @@ declare module 'ioredis' {
 
     // Key methods
     keys(pattern: string): Promise<string[]>
+    get(key: string): Promise<string | null>
+    setex(key: string, seconds: number, value: string): Promise<unknown>
+    sadd(key: string, ...members: string[]): Promise<number>
+    smembers(key: string): Promise<string[]>
+    srem(key: string, ...members: string[]): Promise<number>
+    del(...keys: string[]): Promise<number>
   }
 }
 

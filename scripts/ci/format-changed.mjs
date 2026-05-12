@@ -9,6 +9,8 @@ const EXCLUDED_FROM_OXFMT = new Set([
   'eslint.config.js',
   'astro.config.mjs',
   'src/lib/auth/__tests__/integration.test.ts',
+  'src/lib/auth/auth0-jwt-service.ts',
+  'src/services/auth0.service.ts',
   'src/types/index.ts',
   'tests/unit/auth0/auth0-jwt-service.test.ts',
 ])

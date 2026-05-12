@@ -1,18 +1,13 @@
 import { RedisService } from '../RedisService'
 import { generateTestKey, generateData, measureOperation } from './test-utils'
 
-// Define interface for test function
-interface TestFunction {
-  (name: string, fn: () => void): void
-  skip: (name: string, fn: () => void) => void
-}
-
 // Check if Redis should be skipped for perf tests
 const SKIP_REDIS_TESTS =
   process.env.SKIP_REDIS_TESTS === 'true' || process.env.CI === 'true'
 
 // Conditionally skip the entire test suite if Redis is not available
-const describeFn = SKIP_REDIS_TESTS ? (describe as TestFunction).skip : describe
+const noopDescribe = (() => undefined) as typeof describe
+const describeFn = SKIP_REDIS_TESTS ? noopDescribe : describe
 
 describeFn('RedisService Performance', () => {
   let redis: RedisService

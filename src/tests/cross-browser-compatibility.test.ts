@@ -45,7 +45,8 @@ interface CompatibilityResults {
 const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
 
 // Use conditional test execution with Playwright's test.describe
-const testGroup = skipTests ? test.describe.skip : test.describe
+const noopTestDescribe = (() => undefined) as typeof test.describe
+const testGroup = skipTests ? noopTestDescribe : test.describe
 
 testGroup('Cross-Browser Compatibility', () => {
   test('should test browser features and compatibility', async ({ page }) => {

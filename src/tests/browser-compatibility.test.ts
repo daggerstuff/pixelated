@@ -33,48 +33,47 @@ interface CompatibilityResults {
 
 // Skip browser compatibility tests in CI environment
 const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
+const noopTestDescribe = (() => undefined) as typeof test.describe
+const testDescribe = skipTests ? noopTestDescribe : test.describe
 
 // Create a separate test suite
-;(skipTests ? test.describe.skip : test.describe)(
-  'Browser Features and Compatibility',
-  () => {
-    test('should test browser features and compatibility', async ({
-      page,
-    }: {
-      page: any
-    }) => {
-      const compatibilityResults: CompatibilityResults = {
-        browsers: {},
+testDescribe('Browser Features and Compatibility', () => {
+  test('should test browser features and compatibility', async ({
+    page,
+  }: {
+    page: any
+  }) => {
+    const compatibilityResults: CompatibilityResults = {
+      browsers: {},
+    }
+
+    // Test each feature
+    for (const [featureKey, feature] of Object.entries(FEATURES)) {
+      const detectionCode = feature.detectionFn.toString()
+      const result = await page.evaluate(`(${detectionCode})()`)
+      compatibilityResults.browsers['chromium'] = {
+        ...compatibilityResults.browsers['chromium'],
+        features: {
+          ...compatibilityResults.browsers['chromium']?.features,
+          [featureKey]: Boolean(result),
+        },
       }
+    }
 
-      // Test each feature
-      for (const [featureKey, feature] of Object.entries(FEATURES)) {
-        const detectionCode = feature.detectionFn.toString()
-        const result = await page.evaluate(`(${detectionCode})()`)
-        compatibilityResults.browsers['chromium'] = {
-          ...compatibilityResults.browsers['chromium'],
-          features: {
-            ...compatibilityResults.browsers['chromium']?.features,
-            [featureKey]: Boolean(result),
-          },
-        }
-      }
+    // Save results
+    const resultsPath = safeJoin(
+      ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      'browser-compatibility-results.json',
+    )
+    await fs.writeFile(
+      resultsPath,
+      JSON.stringify(compatibilityResults, null, 2),
+    )
 
-      // Save results
-      const resultsPath = safeJoin(
-        ALLOWED_DIRECTORIES.PROJECT_ROOT,
-        'browser-compatibility-results.json',
-      )
-      await fs.writeFile(
-        resultsPath,
-        JSON.stringify(compatibilityResults, null, 2),
-      )
-
-      // Basic assertion to ensure test ran
-      expect(Object.keys(compatibilityResults.browsers)).toHaveLength(1)
-    })
-  },
-)
+    // Basic assertion to ensure test ran
+    expect(Object.keys(compatibilityResults.browsers)).toHaveLength(1)
+  })
+})
 
 // Use conditional test execution for a standalone test
 if (!skipTests) {

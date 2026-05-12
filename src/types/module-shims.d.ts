@@ -222,6 +222,12 @@ declare module 'ioredis' {
     disconnect(): void
     ping(): Promise<string>
     multi(): Pipeline
+    setex(key: string, seconds: number, value: string): Promise<unknown>
+    get(key: string): Promise<string | null>
+    sadd(key: string, ...members: string[]): Promise<number>
+    smembers(key: string): Promise<string[]>
+    srem(key: string, member: string): Promise<number>
+    del(...keys: string[]): Promise<number>
     quit(): Promise<unknown>
   }
 }
