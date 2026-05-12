@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/dom'
 import { describe, expect, it } from 'vitest'
 
-import { renderAstro } from '@/test/utils/astro'
+import { renderAstro } from '../../test/utils/astro'
 
 import Card from '../Card.astro'
 import CardAction from '../CardAction.astro'

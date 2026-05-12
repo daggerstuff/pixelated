@@ -5,6 +5,9 @@
 
 import Redis from 'ioredis'
 
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand>
+
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
@@ -34,7 +37,7 @@ const isTestEnvironment = () => {
 }
 
 // Create a mock Redis client for development
-function createMockRedisClient() {
+function createMockRedisClient(): RedisClient {
   const message = isProduction()
     ? 'CRITICAL: Using mock Redis client in production. This should never happen.'
     : 'Using mock Redis client for development. Redis operations will be mocked.'
@@ -70,7 +73,7 @@ function createMockRedisClient() {
           result[key] = rawValue
         }
       }
-      return result
+        return result
     }
     return {}
   }
@@ -120,10 +123,10 @@ function createMockRedisClient() {
     },
     hgetall: async (key: string) => {
       const result: Record<string, string> = {}
-      for (const [k, v] of mockStore.entries()) {
+    for (const [k, v] of Array.from(mockStore.entries())) {
         if (k.startsWith(`${key}:`)) {
           const field = k.substring(key.length + 1)
-          result[field] = v
+        result[field] = v as string
         }
       }
       return result
@@ -157,7 +160,7 @@ function createMockRedisClient() {
     ping: async () => 'PONG',
     quit: async () => 'OK',
     disconnect: () => {},
-    status: 'ready',
+    status: 'ready' as any,
 
     // List operations
     lpush: async (key: string, ...values: string[]) => {
@@ -257,7 +260,7 @@ function createMockRedisClient() {
  * Create Redis client with appropriate configuration (lazy)
  * Returns a real Redis client if credentials are present, otherwise a mock client.
  */
-function createRedisClient() {
+function createRedisClient(): RedisClient {
   const { connectionUrl, restToken } = getRedisConfig()
 
   if (connectionUrl && connectionUrl.startsWith('redis')) {
@@ -270,7 +273,7 @@ function createRedisClient() {
       return new Redis(connectionUrl, {
         password: restToken,
         // Add any additional options here if needed
-      })
+      }) as unknown as RedisClient
     } catch (error: unknown) {
       if (isTestEnvironment()) {
         console.warn('Invalid REDIS_URL; using mock Redis client for tests.')
@@ -297,13 +300,9 @@ function createRedisClient() {
   return createMockRedisClient()
 }
 
-export const redis = createRedisClient()
-if (typeof (redis as { on?: (...args: unknown[]) => void }).on === 'function') {
-  ;(
-    redis as {
-      on: (event: string, handler: (...args: unknown[]) => void) => void
-    }
-  ).on('error', (error: unknown) => {
+export const redis: RedisClient = createRedisClient() as RedisClient
+if (typeof redis.on === 'function') {
+  redis.on('error', (error: unknown) => {
     console.warn('Redis connection warning:', error)
   })
 }

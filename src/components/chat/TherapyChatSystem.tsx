@@ -17,9 +17,9 @@ import { BarChart as IconChart } from 'lucide-react'
 // Import SupervisorFeedback component
 import { SupervisorFeedback } from '@/components/feedback/SupervisorFeedback'
 import { MentalHealthInsights } from '@/components/MentalHealthInsights'
-import { Label } from '@/components/ui/label'
+import { Label } from '@/components/ui/label.tsx'
 // Removed unused import: SecurityBadge
-import { Switch } from '@/components/ui/switch'
+import { Switch } from '@/components/ui/switch.tsx'
 import { useAIService } from '@/hooks/useAIService'
 import {
   useEmotionDetection,

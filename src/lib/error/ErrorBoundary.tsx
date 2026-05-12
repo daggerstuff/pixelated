@@ -1,9 +1,9 @@
 import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'
 
-import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Alert } from '@/components/ui/alert.tsx'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card } from '@/components/ui/card/index.ts'
 import { logger } from '@/lib/logger'
 
 import { type ErrorContext } from './types'

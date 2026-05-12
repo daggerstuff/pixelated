@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 import { useConversationMemory } from '../../hooks/useMemory'
 import { getJournalResearchAuthToken } from '../../lib/api/journal-research/auth'

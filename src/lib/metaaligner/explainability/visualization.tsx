@@ -3,9 +3,9 @@
  * Provides React components for visualizing objective evaluation results and alignment metrics
  */
 
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { LineChart, PieChart } from '@/components/ui/LazyChart'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card } from '@/components/ui/card/index.ts'
+import { LineChart, PieChart } from '@/components/ui/LazyChart.tsx'
 
 import {
   ObjectiveMetrics,

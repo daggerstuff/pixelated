@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 // Remove AuthProvider wrapper dependency if possible, but keep structure for now if needed
 
 const AuthButtonsInner = () => {

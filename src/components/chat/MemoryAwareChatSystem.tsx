@@ -12,21 +12,21 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card/index.ts'
+import { Label } from '@/components/ui/label.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from '@/components/ui/tooltip.tsx'
 import {
   useChatWithMemory,
   UseChatWithMemoryReturn,
 } from '@/hooks/useChatWithMemory'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 

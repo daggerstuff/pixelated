@@ -1,22 +1,22 @@
 import { useState, type FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardHeader,
   CardContent,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card'
+} from '@/components/ui/card/index.ts'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { toast } from '@/components/ui/toast'
+} from '@/components/ui/select.tsx'
+import { toast } from '@/components/ui/toast.tsx'
 import type { VerificationResult } from '@/types/backup'
 
 import type { BackupType, BackupStatus } from '../../../lib/security/backup'
