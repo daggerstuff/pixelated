@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 24.14.1
 
-      - uses: pnpm/action-setup@v6.0.6
+      - uses: pnpm/action-setup@v6.0.8
         with:
           version: 11.1.1
 
@@ -41,7 +41,7 @@ jobs:
       - name: Run Playwright tests
         run: pnpm exec playwright test
 
-      - uses: actions/upload-artifact@v7.0.1
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report

@@ -20,7 +20,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.6
+        uses: pnpm/action-setup@v6.0.8
         with:
           version: 11.1.1
 
