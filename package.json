@@ -316,7 +316,7 @@
     "@astrojs/markdoc": "latest",
     "@astrojs/rss": "latest",
     "@eslint/css": "latest",
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.4",
     "@eslint/json": "latest",
     "@eslint/markdown": "latest",
     "@fontsource/inter": "latest",
@@ -362,7 +362,7 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "latest",
-    "eslint": "^10.3.0",
+    "eslint": "^9.17.0",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-node": "latest",
@@ -423,7 +423,7 @@
     "tsconfig-paths": "latest",
     "tsx": "latest",
     "tw-animate-css": "latest",
-    "typescript": "^6.0.3",
+    "typescript": "^5.9.3",
     "typescript-eslint": "latest",
     "unocss": "latest",
     "url-polyfill": "latest",
@@ -445,7 +445,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.0.9",
+  "packageManager": "pnpm@11.1.1",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
