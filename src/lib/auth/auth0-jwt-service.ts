@@ -496,7 +496,7 @@ export async function validateToken(
       throw new AuthenticationError('Token missing subject claim')
     }
     const role = extractRoleFromPayload(tokenPayload)
-    const tokenId = payload.jti
+    const tokenId = payload.jti ?? ''
     const sessionId = payload.sid
 
     // Log successful validation
