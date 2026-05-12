@@ -72,6 +72,8 @@ describe('PatternVisualization', () => {
     render(
       <PatternVisualization
         trends={mockTrends}
+        crossSessionPatterns={mockCrossSessionPatterns}
+        riskCorrelations={mockRiskCorrelations}
         onPatternSelect={handlePatternSelect}
       />,
     )
@@ -80,7 +82,7 @@ describe('PatternVisualization', () => {
     expect(screen.getByText('Increasing anxiety levels')).toBeInTheDocument()
 
     // Check cross-session pattern
-    expect(screen.getByText('Topic avoidance')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Select cross-session pattern: Topic avoidance/i })).toBeInTheDocument()
 
     // Check risk correlation
     expect(screen.getByText('Immediate action recommended')).toBeInTheDocument()
