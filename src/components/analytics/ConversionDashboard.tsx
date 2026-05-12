@@ -1,22 +1,22 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { IconRefresh, IconDownload, IconFilter } from '@/components/ui/icons'
+} from '@/components/ui/card/index.ts'
+import { IconRefresh, IconDownload, IconFilter } from '@/components/ui/icons.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from '@/components/ui/select.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import { AnalyticsService } from '@/lib/analytics'
 
 // Types

@@ -1,7 +1,7 @@
 // Vitest is imported via globals
 import { screen, fireEvent, waitFor } from '@testing-library/dom'
 
-import { renderAstro } from '@/test/utils/astro'
+import { renderAstro } from '../../test/utils/astro.ts'
 
 import SecurityDashboard from '../SecurityDashboard.astro'
 // Mock data for testing

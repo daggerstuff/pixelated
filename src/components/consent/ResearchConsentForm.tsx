@@ -1,7 +1,7 @@
 import DOMPurify from 'isomorphic-dompurify'
 import { useState, useEffect, useMemo } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import { consentService } from '@/lib/security/consent/ConsentService'
 import type { UserConsentStatus } from '@/lib/security/consent/types'
 

@@ -12,12 +12,12 @@ import {
 } from 'lucide-react'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
-import Alert from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Alert from '@/components/ui/alert.tsx'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 
 export interface PatientRiskData {

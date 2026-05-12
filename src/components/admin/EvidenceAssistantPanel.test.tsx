@@ -1,34 +1,35 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { EvidenceAssistantResponse } from '@/lib/api/evidence-assistant'
-
+import type { EvidenceAssistantResponse } from '../../lib/api/evidence-assistant'
 import { EvidenceAssistantPanel } from './EvidenceAssistantPanel'
+
+const { mockedHookState, useEvidenceAssistantMock } = vi.hoisted(() => ({
+  mockedHookState: {
+    loading: false,
+    error: null,
+    response: null,
+    groundedAnswerAvailable: true,
+  } as {
+    loading: boolean
+    error: Error | null
+    response: EvidenceAssistantResponse | null
+    groundedAnswerAvailable: boolean | null
+  },
+  useEvidenceAssistantMock: vi.fn(),
+}))
 
 const mockSearch = vi.fn()
 const mockReset = vi.fn()
 const mockCancel = vi.fn()
 
-const hookState: {
-  loading: boolean
-  error: Error | null
-  response: EvidenceAssistantResponse | null
-  groundedAnswerAvailable: boolean | null
-} = {
-  loading: false,
-  error: null,
-  response: null,
-  groundedAnswerAvailable: true,
-}
-
-const useEvidenceAssistantMock = vi.fn(() => ({
-  ...hookState,
-  search: mockSearch,
-  reset: mockReset,
-  cancel: mockCancel,
-}))
-
-vi.mock('@/hooks/useEvidenceAssistant', () => ({
+vi.mock('../../hooks/useEvidenceAssistant', () => ({
   useEvidenceAssistant: useEvidenceAssistantMock,
 }))
 
@@ -66,25 +67,42 @@ const mockResponse: EvidenceAssistantResponse = {
   ],
 }
 
-const renderPanel = () => {
-  return render(<EvidenceAssistantPanel />)
+const renderPanel = async () => {
+  cleanup()
+  const result = render(<EvidenceAssistantPanel />)
+  await screen.findByRole('combobox')
+  return result
 }
 
 describe('EvidenceAssistantPanel', () => {
-  beforeEach(() => {
-    hookState.loading = false
-    hookState.error = null
-    hookState.response = null
-    hookState.groundedAnswerAvailable = true
-    mockSearch.mockReset()
-    mockReset.mockReset()
+  afterEach(() => {
+    cleanup()
   })
 
-  it('runs search with trimmed query and selected collection', () => {
-    renderPanel()
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    useEvidenceAssistantMock.mockImplementation(() => {
+      return {
+        ...mockedHookState,
+        search: mockSearch,
+        reset: mockReset,
+        cancel: mockCancel,
+      }
+    })
+    mockedHookState.loading = false
+    mockedHookState.error = null
+    mockedHookState.response = null
+    mockedHookState.groundedAnswerAvailable = true
+    mockSearch.mockReset()
+    mockReset.mockReset()
+    mockCancel.mockReset()
+  })
 
-    const queryInput = screen.getByPlaceholderText(
-      /which internal docs define crisis sensitivity requirements/i,
+  it('runs search with trimmed query and selected collection', async () => {
+    await renderPanel()
+
+    const queryInput = await screen.findByPlaceholderText(
+      /internal docs define crisis sensitivity requirements/i,
     )
     fireEvent.change(queryInput, {
       target: { value: '   how to escalate crisis   ' },
@@ -107,14 +125,14 @@ describe('EvidenceAssistantPanel', () => {
     })
   })
 
-  it('renders answer, provider badge, results, and warnings from response', () => {
-    hookState.response = mockResponse
-    renderPanel()
+  it('renders answer, provider badge, results, and warnings from response', async () => {
+    mockedHookState.response = mockResponse
+    await renderPanel()
 
     expect(screen.getByText('Grounded answer')).toBeVisible()
     expect(screen.getByText('local', { exact: false })).toBeInTheDocument()
     expect(
-      screen.getByText('Escalation should prioritize active-risk signals'),
+      screen.getByText(/Escalation should prioritize active-risk signals/i),
     ).toBeInTheDocument()
     expect(screen.getByText('[1] Crisis Playbook')).toBeInTheDocument()
     expect(
@@ -124,12 +142,12 @@ describe('EvidenceAssistantPanel', () => {
     ).toBeInTheDocument()
   })
 
-  it('resets local state and hook state when reset clicked', () => {
-    hookState.response = mockResponse
-    renderPanel()
+  it('resets local state and hook state when reset clicked', async () => {
+    mockedHookState.response = mockResponse
+    await renderPanel()
 
     const queryInput = screen.getByPlaceholderText(
-      /which internal docs define crisis sensitivity requirements/i,
+      /internal docs define crisis sensitivity requirements/i,
     ) as HTMLTextAreaElement
     const collectionSelect = screen.getByRole('combobox') as HTMLSelectElement
     const generateAnswerCheckbox = screen.getByRole('checkbox', {
@@ -149,14 +167,14 @@ describe('EvidenceAssistantPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: /Reset/i }))
 
     expect(mockReset).toHaveBeenCalledTimes(1)
-    expect(queryInput.value).toBe('')
+    await waitFor(() => expect(queryInput.value).toBe(''))
     expect(collectionSelect.value).toBe('')
     expect(generateAnswerCheckbox.checked).toBe(true)
   })
 
-  it('disables search while loading', () => {
-    hookState.loading = true
-    renderPanel()
+  it('disables search while loading', async () => {
+    mockedHookState.loading = true
+    await renderPanel()
 
     const submitButton = screen.getByRole('button', {
       name: /searching\.\.\./i,
@@ -170,8 +188,8 @@ describe('EvidenceAssistantPanel', () => {
     expect(mockCancel).toHaveBeenCalledTimes(1)
   })
 
-  it('disables search for empty query', () => {
-    renderPanel()
+  it('disables search for empty query', async () => {
+    await renderPanel()
 
     const submitButton = screen.getByRole('button', {
       name: /run evidence search/i,
@@ -181,9 +199,9 @@ describe('EvidenceAssistantPanel', () => {
     expect(submitButton).toHaveTextContent('Run evidence search')
   })
 
-  it('disables grounded answer generation when no provider is available', () => {
-    hookState.groundedAnswerAvailable = false
-    renderPanel()
+  it('disables grounded answer generation when no provider is available', async () => {
+    mockedHookState.groundedAnswerAvailable = false
+    await renderPanel()
 
     const generateAnswerCheckbox = screen.getByRole('checkbox', {
       name: /Generate grounded answer/i,
@@ -197,9 +215,9 @@ describe('EvidenceAssistantPanel', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders hook-reported errors', () => {
-    hookState.error = new Error('search endpoint is temporarily unavailable')
-    renderPanel()
+  it('renders hook-reported errors', async () => {
+    mockedHookState.error = new Error('search endpoint is temporarily unavailable')
+    await renderPanel()
 
     expect(
       screen.getByText('search endpoint is temporarily unavailable'),

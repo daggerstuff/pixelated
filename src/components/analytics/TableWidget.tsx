@@ -1,15 +1,15 @@
 import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button/index.ts'
+import { Input } from '@/components/ui/input.tsx'
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/ui/table.tsx'
 
 import { DashboardWidget } from './DashboardWidget'
 import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
