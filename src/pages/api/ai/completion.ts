@@ -29,15 +29,43 @@ const MAX_PAYLOAD_SIZE = 1024 * 50 // 50KB
 
 const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
 
+const LLM_PROVIDER_API_KEYS: readonly string[] = [
+  'LLM_API_KEY',
+  'NVIDIA_API_KEY',
+  'NIM_API_KEY',
+  'NVIDIA_TOKEN',
+]
+
+const LLM_PROVIDER_BASE_URLS: readonly string[] = [
+  'LLM_BASE_URL',
+  'LLM_API_URL',
+  'OPENAI_BASE_URL',
+  'NVIDIA_OPENAI_BASE_URL',
+  'NVIDIA_BASE_URL',
+  'NIM_BASE_URL',
+]
+
+function getEnvValue(key: string): string | undefined {
+  const importMetaEnv = import.meta.env as Record<string, string | undefined>
+  return process.env[key] ?? importMetaEnv?.[key]
+}
+
+function resolveProviderApiKey(): string | undefined {
+  for (const key of LLM_PROVIDER_API_KEYS) {
+    const value = getEnvValue(key)
+    if (value) return value
+  }
+  return undefined
+}
+
 function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
   return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
 }
 
 function resolveSafeLlmBaseUrl(): string | undefined {
-  const providerBaseUrl =
-    import.meta.env['LLM_BASE_URL'] ||
-    import.meta.env['LLM_API_URL'] ||
-    import.meta.env['OPENAI_BASE_URL']
+  const providerBaseUrl = LLM_PROVIDER_BASE_URLS.map((key) => getEnvValue(key)).find(
+    Boolean,
+  ) as string | undefined
 
   if (isOpenRouterBaseUrl(providerBaseUrl)) {
     logger.warn(
@@ -136,7 +164,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     session = validatedSession
 
     // 2. Initialize and configure AI service
-    const llmApiKey = import.meta.env['LLM_API_KEY']
+    const llmApiKey = resolveProviderApiKey()
     if (!llmApiKey) {
       logger.error('LLM API key is not configured')
       return new Response(

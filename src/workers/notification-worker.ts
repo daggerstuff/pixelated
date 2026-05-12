@@ -1,6 +1,6 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { NotificationService } from '@/lib/services/notification/NotificationService'
-import { WebSocketServer } from '@/lib/services/notification/WebSocketServer'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { NotificationService } from '../lib/services/notification/NotificationService'
+import { WebSocketServer } from '../lib/services/notification/WebSocketServer'
 
 // Create logger
 const logger = createBuildSafeLogger('notification-worker')
