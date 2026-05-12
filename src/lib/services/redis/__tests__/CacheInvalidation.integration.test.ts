@@ -1,6 +1,9 @@
+/**
+ * @vitest-environment node
+ */
 import { Redis } from 'ioredis'
 
-import { CacheInvalidation } from '@/lib/cache/invalidation.ts'
+import { CacheInvalidation } from '../../../cache/invalidation.ts'
 
 import { RedisService } from '../RedisService'
 import {
@@ -96,6 +99,7 @@ const hasRedisAccess = SKIP_REDIS_TESTS
 
       cacheInvalidation = new CacheInvalidation({
         redis: getRedisClientOrThrow(redis),
+        prefix: keyPrefix,
       })
     })
 
@@ -225,7 +229,7 @@ const hasRedisAccess = SKIP_REDIS_TESTS
 
         // Verify key exists
         await expectKeyExists(redis, key)
-        expect(await redis.exists(key)).toBe(1)
+        expect(await redis.exists(key)).toBe(true)
 
         // Invalidate using each tag
         for (const tag of tags) {
@@ -309,6 +313,10 @@ const hasRedisAccess = SKIP_REDIS_TESTS
         // Force Redis disconnection and reconnection
         await redis.disconnect()
         await redis.connect()
+        cacheInvalidation = new CacheInvalidation({
+          redis: getRedisClientOrThrow(redis),
+          prefix: process.env['REDIS_KEY_PREFIX'] ?? '',
+        })
 
         // Attempt invalidation after recovery
         await cacheInvalidation.invalidatePattern(`${pattern}:*`)

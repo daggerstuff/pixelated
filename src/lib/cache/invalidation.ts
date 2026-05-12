@@ -1,7 +1,7 @@
 import type { Redis } from 'ioredis'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { RedisService } from '../services/redis'
+import { RedisService } from '../services/redis/RedisService'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -33,7 +33,7 @@ export class CacheInvalidation {
       throw new Error('Redis client is not initialized')
     }
     this.redis = redisClient
-    this.prefix = options.prefix || 'cache:'
+    this.prefix = options.prefix ?? 'cache:'
     this.defaultTTL = options.defaultTTL || 3600 // 1 hour
   }
 
