@@ -79,3 +79,8 @@ Pattern: Mocking navigator properties in Vitest with jsdom
 
 Action: Use `Object.defineProperty` to temporarily mock and restore
 navigator.mediaDevices
+## 2023-10-27 - QA: Add test for liveRegion edge case
+
+Pattern: Mocking browser globals (like window.LiveRegionSystem) in Vitest with jsdom
+
+Action: Use vi.useFakeTimers() and clear window globals to ensure isolated tests for browser utilities
