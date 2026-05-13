@@ -5,7 +5,10 @@ Database service for PostgreSQL and MongoDB integration
 import json
 from typing import Any
 
-import asyncpg
+try:
+    import asyncpg  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    asyncpg = None
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -21,13 +24,16 @@ class DatabaseService:
     """Database service for PostgreSQL and MongoDB operations"""
 
     def __init__(self):
-        self.pg_pool: asyncpg.Pool | None = None
+        self.pg_pool: Any | None = None
         self.async_engine = None
         self.async_session = None
         self.is_connected = False
 
     async def connect(self) -> bool:
         """Connect to databases"""
+        if asyncpg is None:
+            logger.warning("asyncpg not installed; database connections are disabled.")
+            return False
         try:
             logger.info("Connecting to databases")
 
@@ -65,6 +71,8 @@ class DatabaseService:
 
     async def _connect_postgresql(self) -> bool:
         """Connect to PostgreSQL"""
+        if asyncpg is None:
+            return False
         try:
             # Create connection pool
             self.pg_pool = await asyncpg.create_pool(

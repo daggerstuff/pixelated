@@ -6,7 +6,12 @@ import time
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import Response
-from prometheus_client import generate_latest
+
+try:
+    from prometheus_client import generate_latest
+except Exception:  # pragma: no cover - optional dependency/environment issue
+    def generate_latest() -> bytes:
+        return b""
 
 from bias_detection.config import settings
 from bias_detection.deps import get_bias_service
