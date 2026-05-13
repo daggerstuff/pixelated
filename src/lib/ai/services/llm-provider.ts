@@ -264,6 +264,32 @@ function normalizeBaseUrl(baseUrl: string): string {
     .replace(/\/v1$/i, '')
 }
 
+function isRateLimitError(
+  status: number,
+  message: string,
+  code?: string,
+): boolean {
+  if (status === 429) {
+    return true
+  }
+
+  if (status !== 400) {
+    return false
+  }
+
+  const normalizedMessage = message.toLowerCase()
+  const normalizedCode = String(code || '').toLowerCase()
+
+  return (
+    normalizedMessage.includes('rate limit') ||
+    normalizedMessage.includes('monthly_request_count') ||
+    normalizedMessage.includes('you have reached the limit') ||
+    normalizedMessage.includes('quota') ||
+    normalizedMessage.includes('limit reached') ||
+    normalizedCode === '402'
+  )
+}
+
 export function createLLMService(config: LLMClientConfig): LLMService {
   if (!config.baseUrl) {
     throw new LLMServiceError(
@@ -297,20 +323,36 @@ export function createLLMService(config: LLMClientConfig): LLMService {
   }
 
   const handleAPIError = (response: Response, data?: unknown): never => {
-    const isRetryable = response.status >= 500 || response.status === 429
-
     let errorMessage = `LLM API error: ${response.status} ${response.statusText}`
     let errorCode = response.status.toString()
+    let extractedMessage = ''
+    let extractedCode: string | undefined
 
-    if (data && typeof data === 'object' && 'error' in data) {
-      const errorData = data as { error: { message?: string; code?: string } }
+    if (data && typeof data === 'object') {
+      const errorData = data as {
+        error?: { message?: string; code?: string; reason?: string }
+        message?: string
+        reason?: string
+        code?: string
+      }
       const fallbackMessage =
         errorData.error?.message ||
         (errorData as { message?: unknown }).message?.toString() ||
+        errorData.error?.reason?.toString() ||
+        errorData.reason?.toString() ||
         'Unknown error'
       errorMessage = `LLM API error: ${fallbackMessage}`
-      errorCode = errorData.error.code || errorCode
+      errorCode = errorData.error?.code || errorData.code || errorCode
+      extractedMessage = fallbackMessage
+      extractedCode = errorCode
     }
+
+    const retryableMessage = extractedMessage || response.statusText
+    const isRetryable = isRateLimitError(
+      response.status,
+      retryableMessage,
+      extractedCode || errorCode,
+    )
 
     throw new LLMServiceError(
       errorMessage,
