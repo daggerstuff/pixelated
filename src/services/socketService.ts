@@ -1,12 +1,13 @@
 import { Server } from 'http'
 
-import type { Redis } from 'ioredis'
 import { Pool } from 'pg'
 import { Server as SocketIOServer, Socket } from 'socket.io'
 
-// Use the actual Redis type from ioredis instead of our custom RedisLike type
-// to avoid type mismatches with the ioredis library
-type RedisLike = Redis
+type RedisLike = {
+  on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+  connect?: () => Promise<unknown>
+  quit: () => Promise<unknown>
+}
 
 export class SocketService {
   private readonly io: SocketIOServer
