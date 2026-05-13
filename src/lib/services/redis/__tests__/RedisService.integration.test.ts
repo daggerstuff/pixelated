@@ -478,7 +478,7 @@ describeFn('RedisService Integration Tests', () => {
       // Create a new instance with retry configuration
       const retryRedis = new RedisService({
         url: process.env['REDIS_URL']!,
-        keyPrefix: process.env['REDIS_KEY_PREFIX']!,
+        keyPrefix: process.env['REDIS_KEY_PREFIX'] ?? 'integration:',
         maxRetries: 3,
         retryDelay: 100,
       })
