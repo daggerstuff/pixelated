@@ -68,6 +68,11 @@ check_dependencies() {
 pre_deployment_checks() {
     log "Running pre-deployment checks for ${ENVIRONMENT}..."
 
+    # Ensure Redis hardening configuration is compliant
+    if ! "${SCRIPT_DIR}/../check-redis-hardening.sh"; then
+        error "Redis hardening audit failed"
+    fi
+
     # Check if branch exists
     if ! git show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
         error "Branch ${BRANCH} does not exist"

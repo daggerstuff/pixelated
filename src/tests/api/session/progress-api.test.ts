@@ -61,7 +61,7 @@ const { mockConnect } = vi.hoisted(() => ({
 
 vi.mock('pg', () => ({
   Pool: class {
-    connect() {
+    async connect() {
       return mockConnect()
     }
   },

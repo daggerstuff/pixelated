@@ -4,6 +4,18 @@ set -euo pipefail
 # Production deployment script using Helm
 # Requirements: kubectl, helm, access to cluster context
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+run_redis_hardening_audit() {
+  if ! "${PROJECT_ROOT}/scripts/check-redis-hardening.sh"; then
+    echo "Redis hardening audit failed"
+    exit 1
+  fi
+}
+
+run_redis_hardening_audit
+
 usage() {
   cat <<EOF
 Usage: $0 -r <release> -n <namespace> -i <image> -t <tag> [-f <values.yaml>] [--set key=val]...

@@ -929,7 +929,14 @@ describe('Threat Detection Integration', () => {
 
     it('should handle missing dependencies gracefully', () => {
       expect(() => {
-        createThreatDetectionIntegration(null, null)
+        createThreatDetectionIntegration(
+          mockOrchestrator as Parameters<
+            typeof createThreatDetectionIntegration
+          >[0],
+          mockRateLimiter as Parameters<
+            typeof createThreatDetectionIntegration
+          >[1],
+        )
       }).not.toThrow()
     })
   })

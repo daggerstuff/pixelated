@@ -6,14 +6,17 @@
 import crypto from 'crypto'
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
 import { AdvancedPredictiveThreatIntelligence } from '../../threat-detection/predictive/predictive-threat-intelligence'
 import { AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'
-import { ThreatCorrelationEngine } from '../correlation/ThreatCorrelationEngine'
+import {
+  ThreatCorrelationEngine,
+  ThreatCorrelationEngineCore,
+} from '../correlation/ThreatCorrelationEngine'
 import { ThreatIntelligenceDatabase } from '../database/ThreatIntelligenceDatabase'
 import {
   EdgeThreatDetectionSystem,
@@ -22,7 +25,10 @@ import {
 import { ExternalThreatFeedIntegration } from '../feeds/ExternalThreatFeedIntegration'
 import { ThreatHuntingSystem } from '../hunting/ThreatHuntingSystem'
 import { AutomatedThreatResponseOrchestrator } from '../orchestration/AutomatedThreatResponseOrchestrator'
-import { ThreatValidationSystem } from '../validation/ThreatValidationSystem'
+import {
+  ThreatValidationSystem,
+  ThreatValidationSystemCore,
+} from '../validation/ThreatValidationSystem'
 import {
   GlobalThreatIntelligenceNetworkConfig,
   GlobalThreatIntelligence,
@@ -82,9 +88,9 @@ export class GlobalThreatIntelligenceNetworkCore
   private feedIntegration: ExternalThreatFeedIntegration
   private validationSystem: ThreatValidationSystem
 
-  private existingResponseOrchestrator: AdvancedResponseOrchestrator
-  private existingIntelligenceService: ExternalThreatIntelligenceService
-  private existingPredictiveService: AdvancedPredictiveThreatIntelligence
+  private existingResponseOrchestrator?: AdvancedResponseOrchestrator
+  private existingIntelligenceService?: ExternalThreatIntelligenceService
+  private existingPredictiveService?: AdvancedPredictiveThreatIntelligence
 
   private isInitialized = false
   private healthCheckInterval: NodeJS.Timeout | null = null
@@ -171,7 +177,7 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.edgeDetectionSystem.initialize()
 
       // Initialize Threat Correlation Engine
-      this.correlationEngine = new ThreatCorrelationEngine(
+      this.correlationEngine = new ThreatCorrelationEngineCore(
         this.config.correlation,
       )
       await this.correlationEngine.initialize()
@@ -197,7 +203,7 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.feedIntegration.initialize()
 
       // Initialize Threat Validation System
-      this.validationSystem = new ThreatValidationSystem(this.config.validation)
+      this.validationSystem = new ThreatValidationSystemCore(this.config.validation)
       await this.validationSystem.initialize()
 
       logger.info('All subsystems initialized successfully')
@@ -272,7 +278,7 @@ export class GlobalThreatIntelligenceNetworkCore
 
       // Step 7: Validate the intelligence
       const validationStatus =
-        await this.validationSystem.validateIntelligence(globalThreat)
+        await this.validationSystem.validateThreat(globalThreat)
       globalThreat.validationStatus = validationStatus
 
       // Step 8: Cache for real-time access
@@ -400,13 +406,13 @@ export class GlobalThreatIntelligenceNetworkCore
             value: indicator.value,
             confidence: indicator.confidence,
             sourceRegion: newThreatData.region,
-            firstSeen: indicator.timestamp,
-            lastSeen: indicator.timestamp,
+            firstSeen: indicator.firstSeen,
+            lastSeen: indicator.lastSeen,
             metadata: indicator.metadata || {},
           })
         } else {
           // Update existing indicator
-          existingIndicator.lastSeen = indicator.timestamp
+          existingIndicator.lastSeen = indicator.lastSeen
           if (indicator.confidence > existingIndicator.confidence) {
             existingIndicator.confidence = indicator.confidence
           }
@@ -429,7 +435,7 @@ export class GlobalThreatIntelligenceNetworkCore
   private async createGlobalThreatIntelligence(
     threatData: RealTimeThreatData,
     edgeDetectionResult: any,
-    correlationData: CorrelationData[],
+    correlationData: CorrelationData,
   ): Promise<GlobalThreatIntelligence> {
     const globalThreatId = this.generateGlobalThreatId()
 
@@ -438,6 +444,7 @@ export class GlobalThreatIntelligenceNetworkCore
       threatId: threatData.threatId,
       globalThreatId,
       regions: [threatData.region],
+      threatType: edgeDetectionResult.threatType,
       severity: this.mapSeverityToLevel(threatData.severity),
       confidence: threatData.confidence,
       firstSeen: threatData.timestamp,
@@ -448,8 +455,8 @@ export class GlobalThreatIntelligenceNetworkCore
         value: indicator.value,
         confidence: indicator.confidence,
         sourceRegion: threatData.region,
-        firstSeen: indicator.timestamp,
-        lastSeen: indicator.timestamp,
+        firstSeen: indicator.firstSeen,
+        lastSeen: indicator.lastSeen,
         metadata: indicator.metadata || {},
       })),
       attribution: await this.generateAttribution(threatData),
@@ -457,7 +464,7 @@ export class GlobalThreatIntelligenceNetworkCore
         threatData,
         correlationData,
       ),
-      correlationData: correlationData[0] || null,
+      correlationData,
       validationStatus: null as any, // Will be set later
     }
 
@@ -503,14 +510,14 @@ export class GlobalThreatIntelligenceNetworkCore
 
   private async assessGlobalImpact(
     threatData: RealTimeThreatData,
-    correlationData: CorrelationData[],
+    correlationData: CorrelationData,
   ): Promise<GlobalImpactAssessment> {
     const affectedRegions = [threatData.region]
     const geographicSpread = affectedRegions.length
 
     // Calculate potential impact based on severity and correlation
     const potentialImpact =
-      threatData.severity * (1 + correlationData.length * 0.1)
+      threatData.severity * (1 + Math.max(0, correlationData.correlationStrength) * 0.1)
 
     return {
       geographicSpread,
@@ -565,6 +572,9 @@ export class GlobalThreatIntelligenceNetworkCore
   ): Promise<void> {
     try {
       // Use existing response orchestrator for compatibility
+      if (!this.existingResponseOrchestrator) {
+        return
+      }
       const threatResponse =
         await this.existingResponseOrchestrator.orchestrateResponse(
           globalThreat.threatId,
@@ -684,7 +694,7 @@ export class GlobalThreatIntelligenceNetworkCore
         this.intelligenceDatabase.getThreatsBySeverity(region),
         this.intelligenceDatabase.getRecentThreats(region, 10),
         this.intelligenceDatabase.getCorrelationCount(region),
-        this.validationSystem.getValidationMetrics(region),
+        this.validationSystem.getValidationMetrics(),
       ])
 
       return {

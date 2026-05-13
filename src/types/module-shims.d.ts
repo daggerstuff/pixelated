@@ -222,7 +222,10 @@ declare module 'ioredis' {
       command: string,
       ...args: Array<string | number | Buffer>
     ): Promise<unknown>
-    callBuffer(command: string, ..._args: Array<string | number | Buffer>): Promise<unknown>
+    callBuffer(
+      command: string,
+      ..._args: Array<string | number | Buffer>
+    ): Promise<unknown>
     set(key: string, value: string, ...options: unknown[]): Promise<unknown>
     setex(key: string, seconds: number, value: string): Promise<unknown>
     exists(key: string): Promise<number>

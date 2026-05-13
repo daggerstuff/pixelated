@@ -279,17 +279,7 @@ jobs:
             touch .env.test
           fi
           echo "DATABASE_URL=postgresql://${POSTGRES_USER}@localhost:5432/test_db" >> .env.test
-          if [ -n "${REDIS_URL:-}" ]; then
-            echo "REDIS_URL=$REDIS_URL" >> .env.test
-          else
-            echo "REDIS_URL=redis://:redis-ci-password@localhost:6379" >> .env.test
-          fi
-          if [ -n "${UPSTASH_REDIS_REST_URL:-}" ]; then
-            echo "UPSTASH_REDIS_REST_URL=$UPSTASH_REDIS_REST_URL" >> .env.test
-          fi
-          if [ -n "${UPSTASH_REDIS_REST_TOKEN:-}" ]; then
-            echo "UPSTASH_REDIS_REST_TOKEN=$UPSTASH_REDIS_REST_TOKEN" >> .env.test
-          fi
+          echo "REDIS_URL=redis://:redis-ci-password@localhost:6379" >> .env.test
         env:
           POSTGRES_USER: postgres
 
@@ -297,11 +287,19 @@ jobs:
         run: pnpm test:unit
         env:
           NODE_ENV: test
+          REDIS_URL: redis://:redis-ci-password@localhost:6379
+          UPSTASH_REDIS_REST_URL: ''
+          UPSTASH_REDIS_REST_TOKEN: ''
+          NODE_OPTIONS: --max-old-space-size=8192 --experimental-wasm-exnref
 
       - name: Run integration tests
         run: pnpm test:integration
         env:
           NODE_ENV: test
+          REDIS_URL: redis://:redis-ci-password@localhost:6379
+          UPSTASH_REDIS_REST_URL: ''
+          UPSTASH_REDIS_REST_TOKEN: ''
+          NODE_OPTIONS: --max-old-space-size=8192 --experimental-wasm-exnref
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v6.0.0
@@ -424,9 +422,13 @@ jobs:
       - name: Run Python tests
         run: |
           cd src/lib/ai/bias-detection/python-service
-          uv run python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml --cov-fail-under=25
+          uv run python -m pytest tests/test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml --cov-fail-under=25
         env:
+          DEBUG: 'false'
+          ENVIRONMENT: development
           ENV: ci
+          ENCRYPTION_PASSWORD: test-encryption-password
+          ENCRYPTION_SALT: test-encryption-salt
           FLASK_SECRET_KEY: test-flask-secret
           JWT_SECRET_KEY: test-jwt-secret
 
@@ -613,6 +615,8 @@ jobs:
           FLASK_ENV: testing
           ENV: ci
           FLASK_SECRET_KEY: test-flask-secret
+          ENCRYPTION_PASSWORD: test-encryption-password
+          ENCRYPTION_SALT: test-encryption-salt
           JWT_SECRET_KEY: test-jwt-secret
 
       - name: Build application

@@ -512,7 +512,6 @@ export class AnonymizationService {
 
     return {
       isValid: issues.length === 0,
-      valid: issues.length === 0,
       issues,
       recommendations,
     }

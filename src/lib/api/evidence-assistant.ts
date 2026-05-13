@@ -1,3 +1,5 @@
+import type { AuthRequestConfig } from '@/lib/auth/auth0-protected-fetch'
+import { fetchWithAuthToken } from '@/lib/auth/auth0-protected-fetch'
 import type {
   EvidenceAnswerCitation,
   EvidenceCollection,
@@ -163,15 +165,35 @@ function normalizeEvidenceAssistantMetadata(
 export async function searchEvidenceAssistant(
   request: EvidenceAssistantRequest,
   signal?: AbortSignal,
+  authConfig?: Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
+    getAccessTokenSilently?: AuthRequestConfig['getAccessTokenSilently']
+  },
 ): Promise<EvidenceAssistantResponse> {
-  const response = await fetch('/api/ai/evidence-assistant', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-    signal,
-  })
+  const response = authConfig?.getAccessTokenSilently
+    ? await fetchWithAuthToken(
+        '/api/ai/evidence-assistant',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+          signal,
+        },
+        {
+          getAccessTokenSilently: authConfig.getAccessTokenSilently,
+          ...(authConfig.audience ? { audience: authConfig.audience } : {}),
+          ...(authConfig.scope ? { scope: authConfig.scope } : {}),
+        },
+      )
+    : await fetch('/api/ai/evidence-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+        signal,
+      })
 
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null)
@@ -189,14 +211,33 @@ export async function searchEvidenceAssistant(
 
 export async function getEvidenceAssistantMetadata(
   signal?: AbortSignal,
+  authConfig?: Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
+    getAccessTokenSilently?: AuthRequestConfig['getAccessTokenSilently']
+  },
 ): Promise<EvidenceAssistantMetadata> {
-  const response = await fetch('/api/ai/evidence-assistant', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal,
-  })
+  const response = authConfig?.getAccessTokenSilently
+    ? await fetchWithAuthToken(
+        '/api/ai/evidence-assistant',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal,
+        },
+        {
+          getAccessTokenSilently: authConfig.getAccessTokenSilently,
+          ...(authConfig.audience ? { audience: authConfig.audience } : {}),
+          ...(authConfig.scope ? { scope: authConfig.scope } : {}),
+        },
+      )
+    : await fetch('/api/ai/evidence-assistant', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal,
+      })
 
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null)
