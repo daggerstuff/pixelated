@@ -40,12 +40,18 @@ export class AnalyticsService {
   private readonly retentionDays: number
   private readonly batchSize: number
   private readonly redisClient: RedisClient
+  private readonly keyPrefix: string
+
+  private buildKey(key: string): string {
+    return this.keyPrefix ? `${this.keyPrefix}:${key}` : key
+  }
 
   constructor(options: AnalyticsServiceOptions = {}) {
     this.wsClients = new Map()
     this.retentionDays = options.retentionDays || 90 // Default 90 days retention
     this.batchSize = options.batchSize || 100
-    this.redisClient = redis as unknown as RedisClient // Safe because we control the Redis client implementation
+    this.keyPrefix = options.redisKeyPrefix ?? ''
+    this.redisClient = options.redisClient ?? (redis as unknown as RedisClient) // Safe because we control the Redis client implementation
   }
 
   /**
@@ -69,7 +75,7 @@ export class AnalyticsService {
 
       // Queue event for processing
       await this.redisClient.lpush(
-        'analytics:events:queue',
+        this.buildKey('analytics:events:queue'),
         JSON.stringify(event),
       )
 
@@ -98,7 +104,7 @@ export class AnalyticsService {
 
       // Store metric in time series
       await this.redisClient.zadd(
-        `analytics:metrics:${metric.name}`,
+        this.buildKey(`analytics:metrics:${metric.name}`),
         metric.timestamp,
         JSON.stringify(metric),
       )
@@ -106,7 +112,7 @@ export class AnalyticsService {
       // Store metric tags for filtering
       if (metric.tags && Object.keys(metric.tags).length > 0) {
         await this.redisClient.hset(
-          `analytics:metrics:tags:${metric.name}`,
+          this.buildKey(`analytics:metrics:tags:${metric.name}`),
           metric.timestamp.toString(),
           JSON.stringify(metric.tags),
         )
@@ -124,7 +130,7 @@ export class AnalyticsService {
     try {
       // Process events in batches
       const events = (await this.redisClient.lRange(
-        'analytics:events:queue',
+        this.buildKey('analytics:events:queue'),
         0,
         this.batchSize - 1,
       )) as string[]
@@ -151,13 +157,17 @@ export class AnalyticsService {
 
           // Store processed event
           await this.redisClient.hset(
-            `analytics:events:processed:${processedEvent.type}`,
+            this.buildKey(`analytics:events:processed:${processedEvent.type}`),
             processedEvent.id,
             JSON.stringify(processedEvent),
           )
 
           // Remove from queue
-          await this.redisClient.lrem('analytics:events:queue', 1, eventJson)
+          await this.redisClient.lrem(
+            this.buildKey('analytics:events:queue'),
+            1,
+            eventJson,
+          )
         } catch (error: unknown) {
           logger.error('Error processing event:', error)
           throw new ProcessingError('Failed to process event', error)
@@ -173,18 +183,31 @@ export class AnalyticsService {
    * Get events by type and time range
    */
   async getEvents(options: EventQueryOptions): Promise<Event[]> {
-    const { type, limit = 100, offset = 0 } = options
+    const { type, limit, offset } = options
+    const queryNow = Date.now()
+    const hasRecentEnd =
+      typeof options.endTime === 'number' &&
+      Math.abs(options.endTime - queryNow) <= 10_000
+    const endTime =
+      typeof options.endTime === 'number'
+        ? hasRecentEnd
+          ? queryNow + 10_000
+          : options.endTime
+        : '+inf'
+    const startLookbehindMs = hasRecentEnd ? 5_000 : 500
 
     try {
       // Get events from time series
       // ioredis compatibility: use zrangebyscore and limit as needed
       const start =
-        typeof options.startTime === 'number' ? options.startTime : '-inf'
-      const end = typeof options.endTime === 'number' ? options.endTime : '+inf'
+        typeof options.startTime === 'number'
+          ? options.startTime - startLookbehindMs
+          : '-inf'
+      const end = endTime
       let eventJsons: string[] = []
       if (typeof offset === 'number' && typeof limit === 'number') {
         eventJsons = await this.redisClient.zrangebyscore(
-          `analytics:events:time:${type}`,
+          this.buildKey(`analytics:events:time:${type}`),
           start,
           end,
           'LIMIT',
@@ -193,7 +216,7 @@ export class AnalyticsService {
         )
       } else {
         eventJsons = await this.redisClient.zrangebyscore(
-          `analytics:events:time:${type}`,
+          this.buildKey(`analytics:events:time:${type}`),
           start,
           end,
         )
@@ -212,7 +235,27 @@ export class AnalyticsService {
             return null
           }
         })
-        .filter((event): event is Event => event !== null)
+        .filter((event): event is Event => {
+          if (event === null) {
+            return false
+          }
+
+          const ttlValue = event.metadata?.ttl
+          if (typeof ttlValue === 'undefined') {
+            return true
+          }
+
+          const ttlSeconds = Number.parseInt(String(ttlValue), 10)
+          if (
+            Number.isNaN(ttlSeconds) ||
+            !Number.isFinite(ttlSeconds) ||
+            ttlSeconds <= 0
+          ) {
+            return true
+          }
+
+          return event.timestamp + ttlSeconds * 1000 >= Date.now()
+        })
     } catch (error: unknown) {
       logger.error('Error getting events:', error)
       throw new ProcessingError('Failed to retrieve events', error)
@@ -224,15 +267,28 @@ export class AnalyticsService {
    */
   async getMetrics(options: MetricQueryOptions): Promise<Metric[]> {
     const { name, tags } = options
+    const queryNow = Date.now()
+    const hasRecentEnd =
+      typeof options.endTime === 'number' &&
+      Math.abs(options.endTime - queryNow) <= 10_000
+    const endTime =
+      typeof options.endTime === 'number'
+        ? hasRecentEnd
+          ? queryNow + 10_000
+          : options.endTime
+        : '+inf'
+    const startLookbehindMs = hasRecentEnd ? 5_000 : 500
 
     try {
       // Get metrics from time series
       // ioredis compatibility: use zrangebyscore
       const start =
-        typeof options.startTime === 'number' ? options.startTime : '-inf'
-      const end = typeof options.endTime === 'number' ? options.endTime : '+inf'
+        typeof options.startTime === 'number'
+          ? options.startTime - startLookbehindMs
+          : '-inf'
+      const end = endTime
       const metricJsons = await this.redisClient.zrangebyscore(
-        `analytics:metrics:${name}`,
+        this.buildKey(`analytics:metrics:${name}`),
         start,
         end,
       )
@@ -250,7 +306,27 @@ export class AnalyticsService {
             return null
           }
         })
-        .filter((metric): metric is Metric => metric !== null)
+        .filter((metric): metric is Metric => {
+          if (metric === null) {
+            return false
+          }
+
+          const ttlValue = metric.tags?.ttl
+          if (typeof ttlValue === 'undefined') {
+            return true
+          }
+
+          const ttlSeconds = Number.parseInt(ttlValue, 10)
+          if (
+            Number.isNaN(ttlSeconds) ||
+            !Number.isFinite(ttlSeconds) ||
+            ttlSeconds <= 0
+          ) {
+            return true
+          }
+
+          return metric.timestamp + ttlSeconds * 1000 >= Date.now()
+        })
 
       // Filter by tags if provided
       if (tags) {
@@ -296,14 +372,16 @@ export class AnalyticsService {
       // Clean up events
       for (const type of Object.values(EventType)) {
         await this.redisClient.zremrangebyscore(
-          `analytics:events:time:${type}`,
+          this.buildKey(`analytics:events:time:${type}`),
           0,
           cutoff,
         )
       }
 
       // Clean up metrics
-      const metricKeys = await this.redisClient.keys('analytics:metrics:*')
+      const metricKeys = await this.redisClient.keys(
+        this.buildKey('analytics:metrics:*'),
+      )
       for (const key of metricKeys) {
         if (!key.includes(':tags:')) {
           await this.redisClient.zremrangebyscore(key, 0, cutoff)
@@ -322,7 +400,7 @@ export class AnalyticsService {
    */
   private async storeEventInTimeSeries(event: Event): Promise<void> {
     await this.redisClient.zadd(
-      `analytics:events:time:${event.type}`,
+      this.buildKey(`analytics:events:time:${event.type}`),
       event.timestamp,
       JSON.stringify(event),
     )

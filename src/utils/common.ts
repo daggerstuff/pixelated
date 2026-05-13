@@ -106,7 +106,9 @@ export async function checkFileExistsInDir(
  * Unescape HTML entities in a given virtual DOM node's children.
  * Recursively processes nested children to ensure all entities are properly unescaped.
  */
-export function unescapeHTML(node: VNode): VNode {
+export function unescapeHTML(
+  node: VNode | null | undefined,
+): VNode | null | undefined {
   if (!node) {
     return node
   }

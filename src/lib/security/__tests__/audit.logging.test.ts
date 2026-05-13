@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import type { AuditLogConfig, AuditLogEntry } from '../audit.logging'
 import { AuditLoggingService } from '../audit.logging'
 
