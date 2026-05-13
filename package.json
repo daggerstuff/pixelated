@@ -55,7 +55,7 @@
     "test": "node ./scripts/testing/local-test-runner.cjs",
     "test:blocking": "VITEST_SUITE=blocking node ./scripts/testing/blocking-test-runner.cjs",
     "test:advisory": "VITEST_SUITE=advisory node ./scripts/testing/local-test-runner.cjs",
-    "test:unit": "NODE_ENV=test NODE_OPTIONS='--max-old-space-size=8192 --experimental-wasm-exnref' vitest run -c config/vitest.config.ts --coverage",
+    "test:unit": "NODE_ENV=test NODE_OPTIONS='--max-old-space-size=8192' vitest run -c config/vitest.config.ts --coverage",
     "test:integration": "vitest run tests/integration/",
     "test:coverage": "NODE_ENV=test vitest run -c config/vitest.config.ts --coverage",
     "test:watch": "vitest watch",
