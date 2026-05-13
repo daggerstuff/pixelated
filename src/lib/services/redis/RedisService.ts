@@ -201,14 +201,24 @@ export class RedisService extends EventEmitter implements IRedisService {
       }
 
       if (this.client) {
-        await this.client.quit()
+        try {
+          await this.client.quit()
+        } catch (error: unknown) {
+          logger.warn('Ignoring Redis quit error during disconnect', {
+            error: error instanceof Error ? String(error) : String(error),
+          })
+        }
         this.client = null
       }
 
       if (this.subscribers.size > 0) {
         await Promise.all(
           Array.from(this.subscribers.values(), async (subscriber) =>
-            subscriber.quit(),
+            subscriber.quit().catch((error) => {
+              logger.warn('Ignoring subscriber quit error', {
+                error: error instanceof Error ? String(error) : String(error),
+              })
+            }),
           ),
         )
       }
@@ -224,11 +234,7 @@ export class RedisService extends EventEmitter implements IRedisService {
 
   private async ensureConnection(): Promise<Redis | RedisMockClient> {
     if (!this.client) {
-      await this.connect()
-    }
-
-    if (!this.client) {
-      // If we're in development, return a mock client
+      // If we're in development and no Redis is available, return a mock client
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn('Using mock Redis client in development')
         // Create a mock client that implements basic Redis methods
@@ -237,7 +243,7 @@ export class RedisService extends EventEmitter implements IRedisService {
 
       throw new RedisServiceError(
         RedisErrorCode.CONNECTION_FAILED,
-        'Redis client is not initialized',
+        'Redis client is not connected',
       )
     }
 
