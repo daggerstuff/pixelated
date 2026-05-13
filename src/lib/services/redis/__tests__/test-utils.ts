@@ -9,7 +9,8 @@ import { RedisServiceError } from '../types'
 export function generateTestKey(prefix: string = ''): string {
   const timestamp = Date.now()
   const random = Math.random().toString(36).substring(2, 15)
-  return `${process.env['REDIS_KEY_PREFIX']}${prefix}${timestamp}:${random}`
+  const keyPrefix = process.env['REDIS_KEY_PREFIX'] ?? ''
+  return `${keyPrefix}${prefix}${timestamp}:${random}`
 }
 
 /**
