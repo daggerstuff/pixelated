@@ -278,10 +278,11 @@ function createLLMServiceAdapter(config: AIProviderConfig): AIService {
         options,
       )) as AICompletion
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('Streaming not implemented for LLM service'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
+    createStreamingChatCompletion: async (messages, options) =>
+      llmService.createStreamingChatCompletion(messages, {
+        ...options,
+        model: options?.model || config.defaultModel,
+      }),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
@@ -367,40 +368,74 @@ function createHuggingFaceServiceAdapter(config: AIProviderConfig): AIService {
 }
 
 function createLocalServiceAdapter(config: AIProviderConfig): AIService {
+  const createLocalCompletion = async (
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+  ): Promise<AICompletion> => {
+    const response = await fetch(`${config.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages,
+        ...options,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Local AI service failed: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const content = data?.choices?.[0]?.message?.content
+    if (content === undefined) {
+      throw new Error('Local AI service returned an empty or malformed response')
+    }
+
+    return {
+      id: data.id || 'local-id',
+      created: Date.now(),
+      content,
+      model: config.defaultModel,
+      usage: data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+    } as AICompletion
+  }
+
   return {
-    createChatCompletion: async (messages, options) => {
-      const response = await fetch(`${config.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages,
-          ...options,
-        }),
-      })
+    createChatCompletion: createLocalCompletion,
+    createStreamingChatCompletion: async (messages, options) => {
+      const completion = await createLocalCompletion(messages, options)
+      const stream = async function* (): AsyncGenerator<AIStreamChunk, void, void> {
+        const normalizedContent = completion.content || ''
+        if (!normalizedContent) {
+          yield {
+            id: completion.id,
+            model: completion.model,
+            created: Date.now(),
+            content: '',
+            done: true,
+          }
+          return
+        }
 
-      if (!response.ok) {
-        throw new Error(`Local AI service failed: ${response.statusText}`)
+        const chunkSize = 80
+        for (let i = 0; i < normalizedContent.length; i += chunkSize) {
+          const contentChunk = normalizedContent.slice(i, i + chunkSize)
+          yield {
+            id: completion.id,
+            model: completion.model,
+            created: completion.created || Date.now(),
+            content: contentChunk,
+            done: i + chunkSize >= normalizedContent.length,
+            ...(i + chunkSize >= normalizedContent.length && {
+              finishReason: 'stop',
+            }),
+          }
+        }
       }
-
-      const data = await response.json()
-      const content = data?.choices?.[0]?.message?.content
-      if (content === undefined) {
-        throw new Error('Local AI service returned an empty or malformed response')
-      }
-
-      return {
-        id: data.id || 'local-id',
-        content,
-        model: config.defaultModel,
-        usage: data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-      } as AICompletion
+      return stream()
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('Local streaming not yet implemented'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
