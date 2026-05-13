@@ -13,13 +13,14 @@ import type {
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className='animate-pulse'>
+  <div className='animate-pulse' role='status' aria-label='Loading data'>
     <div className='bg-gray-200 mb-4 h-4 w-3/4 rounded'></div>
     <div className='space-y-2'>
       <div className='bg-gray-200 h-3 rounded'></div>
       <div className='bg-gray-200 h-3 w-5/6 rounded'></div>
       <div className='bg-gray-200 h-3 w-4/6 rounded'></div>
     </div>
+    <span className='sr-only'>Loading data...</span>
   </div>
 )
 
@@ -30,7 +31,7 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div className='bg-red-50 border-red-200 rounded-lg border p-4'>
+  <div className='bg-red-50 border-red-200 rounded-lg border p-4' role='alert' aria-live='assertive'>
     <div className='flex items-center justify-between'>
       <div>
         <h4 className='text-red-800 font-medium'>
