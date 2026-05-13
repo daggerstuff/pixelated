@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { Redis } from 'ioredis'
 
 import {
@@ -5,7 +6,7 @@ import {
   EventType,
   EventPriority,
   type EventData,
-} from '@/lib/services/analytics/AnalyticsService'
+} from '../../analytics/AnalyticsService'
 
 import { RedisService } from '../RedisService'
 import {
@@ -20,7 +21,7 @@ import {
 // Conditionally skip Redis integration tests in CI or when explicitly requested
 const SKIP_REDIS_TESTS =
   process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
-const noopDescribe = (() => undefined) as typeof describe
+const noopDescribe = describe.skip
 const describeFn = SKIP_REDIS_TESTS ? noopDescribe : describe
 
 describeFn('analytics Integration', () => {

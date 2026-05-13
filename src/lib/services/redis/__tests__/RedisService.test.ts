@@ -1,3 +1,4 @@
+// @vitest-environment node
 import {
   vi,
   describe,
@@ -47,13 +48,9 @@ const createMockRedis = () => ({
 })
 
 // Mock the ioredis module
-vi.mock('ioredis', async () => {
-  const actual = await vi.importActual('ioredis')
-  return {
-    default: actual,
-    Redis: vi.fn().mockImplementation(() => createMockRedis()),
-  }
-})
+vi.mock('ioredis', () => ({
+  Redis: vi.fn().mockImplementation(() => createMockRedis()),
+}))
 
 // Use built-in vitest matchers instead of custom ones
 // No need to define custom matchers as vitest provides them

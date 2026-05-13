@@ -662,7 +662,35 @@ export class RedisService extends EventEmitter implements IRedisService {
   async keys(pattern: string): Promise<string[]> {
     try {
       const client = await this.ensureConnection()
-      return await client.keys(pattern)
+      try {
+        return await client.keys(pattern)
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          error.message.includes('ERR KEYS command is disabled')
+        ) {
+          const results: string[] = []
+          let cursor = '0'
+
+          do {
+            const scanResult = await client.scan(
+              cursor,
+              'MATCH',
+              pattern,
+              'COUNT',
+              1000,
+            )
+            const nextCursor = scanResult[0]
+            const keys = scanResult[1]
+            results.push(...keys)
+            cursor = nextCursor
+          } while (cursor !== '0')
+
+          return results
+        }
+
+        throw error
+      }
     } catch (error: unknown) {
       throw new RedisServiceError(
         RedisErrorCode.OPERATION_FAILED,
@@ -774,7 +802,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       const client = await this.ensureConnection()
 
       // Get all keys matching the pattern
-      const keys = await client.keys(pattern)
+      const keys = await this.keys(pattern)
 
       if (keys.length === 0) {
         return

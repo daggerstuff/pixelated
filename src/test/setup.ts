@@ -5,10 +5,11 @@
 
 import { vi } from 'vitest'
 import './patch-react-act.cjs'
+import { flushSync } from 'react-dom'
 
 // React 19 compatibility shim for environments that do not provide `act` directly.
 const act = async (callback: () => void | Promise<void>): Promise<void> => {
-  const result = callback()
+  const result = typeof flushSync === 'function' ? flushSync(callback) : callback()
   if (result && typeof result === 'object' && 'then' in result) {
     await Promise.resolve(result)
   }

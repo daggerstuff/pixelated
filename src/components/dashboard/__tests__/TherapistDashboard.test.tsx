@@ -143,12 +143,10 @@ describe('TherapistDashboard', () => {
   })
 
   it('throws error when onSessionControl prop is missing', () => {
-    const renderWithoutProp = () => {
-      render(<TherapistDashboard sessions={mockSessions} />)
-    }
-    expect(renderWithoutProp).toThrow(
-      'TherapistDashboard requires onSessionControl prop',
-    )
+    render(<TherapistDashboard sessions={mockSessions} />)
+    expect(
+      screen.getByText('TherapistDashboard requires onSessionControl prop'),
+    ).toBeInTheDocument()
   })
 
   it('handles keyboard navigation for skip links', () => {

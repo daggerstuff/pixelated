@@ -550,7 +550,7 @@ describe('ContextTransitionDetector', () => {
 
       const crisisTransitions: ReturnType<typeof detector.addEvent>[] = []
       dialogue
-        .forEach((turn, index) => {
+        .map((turn, index) => {
           const event: ContextEvent = {
             turnId: index + 1,
             contextType: turn.context,
@@ -565,7 +565,7 @@ describe('ContextTransitionDetector', () => {
           }
           return transition
         })
-        .filter((t) => t && t.transitionType === 'crisis_elevation')
+        .filter((transition) => transition?.transitionType === 'crisis_elevation')
 
       expect(crisisTransitions).toHaveLength(1)
       expect(crisisTransitions[0]!.detected).toBe(true)

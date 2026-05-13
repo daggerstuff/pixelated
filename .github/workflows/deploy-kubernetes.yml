@@ -98,6 +98,17 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
           echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_ENV"
 
+      - name: Validate image exists before rollout
+        run: |
+          set -euo pipefail
+          if ! gcloud artifacts docker images describe "$IMAGE_URI" >/tmp/image-describe.out 2>&1; then
+            echo "::error title=Missing image tag::Image ${IMAGE_URI} does not exist in Artifact Registry."
+            echo "Inspecting available image tags for repository ${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/api."
+            gcloud artifacts docker images list "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/api" --include-tags --format="table(name, tags)" | head -n 40
+            exit 1
+          fi
+          echo "Validated image exists: ${IMAGE_URI}"
+
       - name: Validate workflow inputs
         env:
           GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
