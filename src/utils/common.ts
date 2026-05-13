@@ -136,7 +136,10 @@ export function unescapeHTML(
         .map((child) =>
           typeof child === 'object' ? unescapeHTML(child) : child,
         )
-        .filter((child): child is string | VNode => child !== null && child !== undefined),
+        .filter(
+          (child): child is string | VNode =>
+            child !== null && child !== undefined,
+        ),
     }
   } else if (typeof children === 'object') {
     return {

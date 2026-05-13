@@ -4,8 +4,8 @@
 import Redis from 'ioredis'
 
 import { CacheInvalidation } from '../../../cache/invalidation.ts'
-import { RedisService } from '../RedisService'
 import type { RedisMockClient } from '../redis-operation-types'
+import { RedisService } from '../RedisService'
 import {
   cleanupTestKeys,
   generateTestKey,

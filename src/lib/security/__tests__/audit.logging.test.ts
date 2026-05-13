@@ -31,7 +31,16 @@ const testEntry: Omit<AuditLogEntry, 'timestamp'> = {
   },
 }
 
+type AuditLoggingServiceInternals = {
+  storeLogEntry: (entry: unknown) => Promise<void>
+  hashValue: (...values: string[]) => string
+  sanitizeEntry: (entry: AuditLogEntry) => AuditLogEntry
+}
+
 let auditLoggingService: AuditLoggingService
+
+const getAuditLoggingService = (service: AuditLoggingService) =>
+  service as unknown as AuditLoggingServiceInternals
 
 beforeEach(() => {
   auditLoggingService = new AuditLoggingService(
@@ -59,10 +68,10 @@ describe('auditLoggingService', () => {
     })
 
     it('should handle logging errors gracefully', async () => {
-      vi.spyOn(
-        auditLoggingService as unknown,
-        'storeLogEntry',
-      ).mockRejectedValue(new Error('Storage failed'))
+      const service = getAuditLoggingService(auditLoggingService)
+      vi.spyOn(service, 'storeLogEntry').mockRejectedValue(
+        new Error('Storage failed'),
+      )
       await expect(auditLoggingService.logEvent(testEntry)).rejects.toThrow(
         'Failed to log audit event',
       )
@@ -72,13 +81,14 @@ describe('auditLoggingService', () => {
 
   describe('sanitizeEntry', () => {
     it('should hash sensitive identifiers when PII is not included', () => {
-      const hashSpy = vi.spyOn(auditLoggingService as unknown, 'hashValue')
+      const service = getAuditLoggingService(auditLoggingService)
+      const hashSpy = vi.spyOn(service, 'hashValue')
       const entryCopy = {
         ...testEntry,
         metadata: { ...testEntry.metadata },
       }
 
-      const sanitizedEntry = (auditLoggingService as unknown).sanitizeEntry({
+      const sanitizedEntry = service.sanitizeEntry({
         ...entryCopy,
         timestamp: new Date().toISOString(),
       })
