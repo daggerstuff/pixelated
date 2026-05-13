@@ -7,6 +7,8 @@ import pytest
 # Ensure non-prod defaults
 os.environ.setdefault("ENV", "test")
 os.environ.setdefault("PYTEST", "1")
+os.environ.setdefault("ENCRYPTION_PASSWORD", "test-password")
+os.environ.setdefault("ENCRYPTION_SALT", "test-salt")
 
 # Import after env setup
 sys.path.append(
