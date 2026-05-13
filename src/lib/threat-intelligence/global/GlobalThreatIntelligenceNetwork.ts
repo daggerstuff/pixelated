@@ -15,9 +15,12 @@ import { AdvancedPredictiveThreatIntelligence } from '../../threat-detection/pre
 import { AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'
 import { ThreatCorrelationEngine } from '../correlation/ThreatCorrelationEngine'
 import { ThreatIntelligenceDatabase } from '../database/ThreatIntelligenceDatabase'
-import { EdgeThreatDetectionSystem } from '../edge/EdgeThreatDetectionSystem'
+import {
+  EdgeThreatDetectionSystem,
+  EdgeThreatDetectionSystemCore,
+} from '../edge/EdgeThreatDetectionSystem'
+import { ExternalThreatFeedIntegration } from '../feeds/ExternalThreatFeedIntegration'
 import { ThreatHuntingSystem } from '../hunting/ThreatHuntingSystem'
-import { ExternalThreatFeedIntegration } from '../integration/ExternalThreatFeedIntegration'
 import { AutomatedThreatResponseOrchestrator } from '../orchestration/AutomatedThreatResponseOrchestrator'
 import { ThreatValidationSystem } from '../validation/ThreatValidationSystem'
 import {
@@ -162,7 +165,7 @@ export class GlobalThreatIntelligenceNetworkCore
   private async initializeSubsystems(): Promise<void> {
     try {
       // Initialize Edge Threat Detection System
-      this.edgeDetectionSystem = new EdgeThreatDetectionSystem(
+      this.edgeDetectionSystem = new EdgeThreatDetectionSystemCore(
         this.config.edgeDetection,
       )
       await this.edgeDetectionSystem.initialize()

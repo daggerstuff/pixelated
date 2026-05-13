@@ -1,8 +1,7 @@
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 
 import type { RedisErrorCode } from '../types'
 import { RedisServiceError } from '../types'
-
 /**
  * Generates a unique test key with optional prefix
  */
@@ -16,8 +15,8 @@ export function generateTestKey(prefix: string = ''): string {
 /**
  * Sleeps for the specified number of milliseconds
  */
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+export async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
@@ -38,34 +37,28 @@ export function generateData(sizeInBytes: number): string {
   return 'x'.repeat(sizeInBytes)
 }
 
+type RedisCustomMatcherResult = {
+  pass: boolean
+  message: () => string
+}
+
+const createRedisClient = (): Redis =>
+  new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
+
 /**
  * Cleans up test keys matching a pattern
  */
 export async function cleanupTestKeys(pattern: string = '*'): Promise<void> {
-  const redis = new Redis(process.env['REDIS_URL']!)
+  const redis = createRedisClient()
 
   try {
-    // Add mock methods if they don't exist (for testing environment)
-    if (!redis.keys && vi && vi.fn) {
-      redis.keys = vi.fn().mockResolvedValue([])
-    }
-    if (!redis.del && vi && vi.fn) {
-      redis.del = vi.fn().mockResolvedValue(0)
-    }
-
-    const keys = await redis.keys(
-      `${process.env['REDIS_KEY_PREFIX']}${pattern}`,
-    )
+    const keys = await redis.keys(`${process.env['REDIS_KEY_PREFIX']}${pattern}`)
     if (keys.length > 0) {
       await redis.del(...keys)
     }
   } catch {
     // Don't throw the error to allow tests to continue
   } finally {
-    // Add mock quit method if it doesn't exist
-    if (!redis.quit && vi && vi.fn) {
-      redis.quit = vi.fn().mockResolvedValue('OK')
-    }
     await redis.quit()
   }
 }
@@ -74,20 +67,11 @@ export async function cleanupTestKeys(pattern: string = '*'): Promise<void> {
  * Verifies Redis connection is healthy
  */
 export async function verifyRedisConnection(): Promise<void> {
-  const redis = new Redis(process.env['REDIS_URL']!)
+  const redis = createRedisClient()
 
   try {
-    // Add mock ping method if it doesn't exist
-    if (!redis.ping && vi && vi.fn) {
-      redis.ping = vi.fn().mockResolvedValue('PONG')
-    }
-
     await redis.ping()
-  } catch {
-    // Add mock quit method if it doesn't exist
-    if (!redis.quit && vi && vi.fn) {
-      redis.quit = vi.fn().mockResolvedValue('OK')
-    }
+  } finally {
     await redis.quit()
   }
 }
@@ -108,7 +92,7 @@ export async function runConcurrentOperations<T>(
   throughput: number
 }> {
   const start = Date.now()
-  const results = await Promise.all(operations.map((op) => op()))
+  const results = await Promise.all(operations.map(async (op) => op()))
   const duration = Date.now() - start
   const throughput = Math.floor((operations.length / duration) * 1000)
 
@@ -194,13 +178,13 @@ export const customMatchers = {
   toBeRedisError(
     received: unknown,
     expectedCode: RedisErrorCode,
-  ): vi.CustomMatcherResult {
+  ): RedisCustomMatcherResult {
     const pass =
       received instanceof RedisServiceError && received.code === expectedCode
 
     return {
       message: () =>
-        `expected ${received} to ${pass ? 'not ' : ''}be a RedisServiceError with code ${expectedCode}`,
+        `expected ${String(received)} to ${pass ? 'not ' : ''}be a RedisServiceError with code ${expectedCode}`,
       pass,
     }
   },
@@ -208,41 +192,27 @@ export const customMatchers = {
   async toBeInRedis(
     key: string,
     expectedValue: unknown,
-  ): Promise<vi.CustomMatcherResult> {
-    const redis = new Redis(process.env['REDIS_URL']!)
+  ): Promise<RedisCustomMatcherResult> {
+    const redis = createRedisClient()
 
     try {
-      // Add mock get method if it doesn't exist
-      if (!redis.get && vi && vi.fn) {
-        redis.get = vi.fn().mockResolvedValue(JSON.stringify(expectedValue))
-      }
-
       const value = await redis.get(key)
       const pass = value === JSON.stringify(expectedValue)
 
       return {
         message: () =>
-          `expected Redis key ${key} to ${pass ? 'not ' : ''}have value ${expectedValue}`,
+          `expected Redis key ${key} to ${pass ? 'not ' : ''}have value ${String(expectedValue)}`,
         pass,
       }
     } finally {
-      // Add mock quit method if it doesn't exist
-      if (!redis.quit && vi && vi.fn) {
-        redis.quit = vi.fn().mockResolvedValue('OK')
-      }
       await redis.quit()
     }
   },
 
-  async toExistInRedis(key: string): Promise<vi.CustomMatcherResult> {
-    const redis = new Redis(process.env['REDIS_URL']!)
+  async toExistInRedis(key: string): Promise<RedisCustomMatcherResult> {
+    const redis = createRedisClient()
 
     try {
-      // Add mock exists method if it doesn't exist
-      if (!redis.exists && vi && vi.fn) {
-        redis.exists = vi.fn().mockResolvedValue(1)
-      }
-
       const exists = await redis.exists(key)
       const pass = exists === 1
 
@@ -252,10 +222,6 @@ export const customMatchers = {
         pass,
       }
     } finally {
-      // Add mock quit method if it doesn't exist
-      if (!redis.quit && vi && vi.fn) {
-        redis.quit = vi.fn().mockResolvedValue('OK')
-      }
       await redis.quit()
     }
   },
@@ -263,15 +229,10 @@ export const customMatchers = {
   async toHaveTTL(
     key: string,
     expectedTTL: number,
-  ): Promise<vi.CustomMatcherResult> {
-    const redis = new Redis(process.env['REDIS_URL']!)
+  ): Promise<RedisCustomMatcherResult> {
+    const redis = createRedisClient()
 
     try {
-      // Add mock ttl method if it doesn't exist
-      if (!redis.ttl && vi && vi.fn) {
-        redis.ttl = vi.fn().mockResolvedValue(expectedTTL)
-      }
-
       const ttl = await redis.ttl(key)
       const pass = Math.abs(ttl - expectedTTL) <= 1 // Allow 1 second difference
 
@@ -281,10 +242,6 @@ export const customMatchers = {
         pass,
       }
     } finally {
-      // Add mock quit method if it doesn't exist
-      if (!redis.quit && vi && vi.fn) {
-        redis.quit = vi.fn().mockResolvedValue('OK')
-      }
       await redis.quit()
     }
   },

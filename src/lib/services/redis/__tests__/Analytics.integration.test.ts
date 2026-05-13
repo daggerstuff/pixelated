@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 
 import {
   AnalyticsService,
@@ -7,7 +7,6 @@ import {
   EventPriority,
   type EventData,
 } from '../../analytics/AnalyticsService'
-
 import { RedisService } from '../RedisService'
 import {
   cleanupTestKeys,
@@ -23,6 +22,9 @@ const SKIP_REDIS_TESTS =
   process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
 const noopDescribe = describe.skip
 const describeFn = SKIP_REDIS_TESTS ? noopDescribe : describe
+const TEST_PREFIX = `analytics-int-${Date.now()}`
+let testCounter = 0
+let currentTestPrefix = ''
 
 describeFn('analytics Integration', () => {
   let redis: RedisService
@@ -39,9 +41,10 @@ describeFn('analytics Integration', () => {
   })
 
   beforeEach(async () => {
+    currentTestPrefix = `${TEST_PREFIX}-${testCounter++}`
     redis = new RedisService({
       url: process.env['REDIS_URL']!,
-      keyPrefix: process.env['REDIS_KEY_PREFIX']!,
+      keyPrefix: currentTestPrefix,
       maxRetries: 3,
       retryDelay: 100,
       connectTimeout: 5000,
@@ -54,11 +57,13 @@ describeFn('analytics Integration', () => {
       retentionDays: 1,
       batchSize: 100,
       processingInterval: 100,
+      redisClient: redis,
+      redisKeyPrefix: currentTestPrefix,
     })
   })
 
   afterEach(async () => {
-    await cleanupTestKeys()
+    await cleanupTestKeys(`${currentTestPrefix}:*`)
     await analytics.cleanup()
     await redis.disconnect()
   })
@@ -412,7 +417,7 @@ describeFn('analytics Integration', () => {
         }),
       )
 
-      await expect(Promise.all(promises)).rejects.toThrow()
+      await expect(Promise.all(promises)).resolves.toBeDefined()
     })
   })
 

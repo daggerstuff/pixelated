@@ -75,6 +75,8 @@ export interface AnalyticsServiceOptions {
   retentionDays?: number
   batchSize?: number
   processingInterval?: number
+  redisClient?: RedisClient
+  redisKeyPrefix?: string
 }
 
 // Event query options

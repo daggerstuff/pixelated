@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 /**
  * Authentication Middleware Tests
  * Comprehensive test suite for authentication middleware stack
