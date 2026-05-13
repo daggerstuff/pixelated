@@ -12,16 +12,33 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import structlog
-import torch
-from transformers import AutoTokenizer, BertModel
 
 try:
+    from transformers import AutoTokenizer, BertModel
     from transformers import TFBertForSequenceClassification
-except ImportError:  # pragma: no cover
+    TRANSFORMERS_AVAILABLE = True
+except Exception:  # pragma: no cover - optional dependency/environment issue
+    AutoTokenizer = None
+    BertModel = None
     TFBertForSequenceClassification = None
+    TRANSFORMERS_AVAILABLE = False
 
 if TYPE_CHECKING:
     import tensorflow as tf
+
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except Exception:  # pragma: no cover - optional dependency/environment issue
+    torch = None
+    TORCH_AVAILABLE = False
+
+
+def _transformer_available() -> bool:
+    return (
+        TRANSFORMERS_AVAILABLE and AutoTokenizer is not None and BertModel is not None
+    )
+
 
 # Optional TensorFlow import
 try:
@@ -103,8 +120,11 @@ class TensorFlowModelService(ModelService):
             # Load tokenizer
             tokenizer_path = self.model_path / "tokenizer"
             if tokenizer_path.exists():
-                # For BERT-based models
-                self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                if AutoTokenizer is not None:
+                    # For BERT-based models
+                    self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
             else:
                 # For custom models, create basic tokenizer
                 self.tokenizer = self._create_basic_tokenizer()
@@ -142,8 +162,13 @@ class TensorFlowModelService(ModelService):
         model.save(str(self.model_path))
 
         # Save tokenizer
-        tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        if AutoTokenizer is not None:
+            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        else:
+            logger.warning(
+                "AutoTokenizer unavailable; skipping tokenizer persistence for TensorFlow model."
+            )
 
         logger.info("Pretrained model downloaded and saved")
 
@@ -334,6 +359,16 @@ class PyTorchModelService(ModelService):
     """PyTorch model service for bias detection"""
 
     def __init__(self, model_path: str | None = None):
+        if not TORCH_AVAILABLE:
+            raise ImportError(
+                "PyTorch is not available. Install a working PyTorch build or disable "
+                "PyTorch-backed inference."
+            )
+        if not _transformer_available():
+            raise ImportError(
+                "transformers is not available. Install a working transformers build or "
+                "disable PyTorch-backed inference."
+            )
         super().__init__(
             model_path or settings.pytorch_model_path, "pytorch_bias_detector"
         )
@@ -363,9 +398,15 @@ class PyTorchModelService(ModelService):
             # Load tokenizer
             tokenizer_path = self.model_path / "tokenizer"
             if tokenizer_path.exists():
-                self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                if AutoTokenizer is not None:
+                    self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
             else:
-                self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+                if AutoTokenizer is not None:
+                    self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
 
             self.model.to(self.device)
             self.model.eval()
@@ -403,14 +444,24 @@ class PyTorchModelService(ModelService):
         torch.save(model, str(self.model_path / "model.pt"))
 
         # Save tokenizer
-        tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        if AutoTokenizer is not None:
+            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        else:
+            logger.warning(
+                "AutoTokenizer unavailable; skipping tokenizer persistence for PyTorch model."
+            )
 
         logger.info("Pretrained model downloaded and saved")
 
     def _create_basic_model(self) -> torch.nn.Module:
         """Create a basic bias detection model"""
         # Simple BERT-based model for bias detection using top-level BertModel
+
+        if BertModel is None:
+            raise ImportError(
+                "transformers BertModel is not available for PyTorch model creation."
+            )
 
         class BiasDetectionModel(torch.nn.Module):
             def __init__(self, num_labels: int = len(BiasType.__members__)):
@@ -578,9 +629,16 @@ class ModelEnsembleService:
         else:
             self.tf_service = None
 
-        # PyTorch service (required)
-        self.pt_service = PyTorchModelService()
-        self.services.append(self.pt_service)
+        # PyTorch service (optional)
+        self.pt_service = None
+        if TORCH_AVAILABLE:
+            try:
+                self.pt_service = PyTorchModelService()
+                self.services.append(self.pt_service)
+            except Exception as e:
+                logger.warning(f"PyTorch service not available: {e}")
+        else:
+            logger.warning("PyTorch service not available in this environment.")
 
         # NVIDIA API service for Kimi-k2.5 (optional)
         try:
@@ -598,6 +656,9 @@ class ModelEnsembleService:
     async def load_all_models(self) -> bool:
         """Load all models"""
         results = []
+        if not self.services:
+            logger.warning("No model services are configured.")
+            return False
         for service in self.services:
             result = await service.load_model()
             results.append(result)
@@ -625,6 +686,8 @@ class ModelEnsembleService:
 
         # Use first available service for text hash
         hash_service = self.tf_service or self.pt_service
+        if hash_service is None:
+            raise RuntimeError("No model service is available for predictions.")
         return {
             "ensemble_results": combined_results,
             "individual_results": results,
