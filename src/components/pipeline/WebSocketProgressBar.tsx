@@ -33,7 +33,17 @@ export function WebSocketProgressBar(props: {
   } = props
   const [progress, setProgress] = useState(0)
   const [stage, setStage] = useState('initializing')
-  const [statusText, setStatusText] = useState('connecting')
+  const [statusText, setStatusText] = useState(() => {
+    if (!webSocket) return 'disconnected'
+    if (webSocket.readyState === WebSocket.OPEN) return 'live updates'
+    if (
+      webSocket.readyState === WebSocket.CLOSED ||
+      webSocket.readyState === WebSocket.CLOSING
+    ) {
+      return 'disconnected'
+    }
+    return 'connecting'
+  })
 
   useEffect(() => {
     if (!webSocket) {

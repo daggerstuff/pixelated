@@ -2,7 +2,7 @@ import { getEnv } from '../../../../config/env.config.js'
 import { MentalLLaMAModelProvider } from './MentalLLaMAModelProvider.ts'
 
 // Mock getEnv
-vi.mock('src/config/env.config.ts', () => ({
+vi.mock('../../../../config/env.config.js', () => ({
   getEnv: vi.fn(),
 }))
 

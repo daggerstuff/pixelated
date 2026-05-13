@@ -106,7 +106,7 @@ export function RegisterForm({
         return
       }
 
-      if (response.data?.user) {
+      if (response.data?.user || response.success) {
         setIsSuccessful(true)
       }
     } catch (error: unknown) {

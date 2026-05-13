@@ -41,6 +41,18 @@ vi.mock('../../logger', () => ({
   },
 }))
 
+const { mockRandomBytes, mockRandomUUID } = vi.hoisted(() => ({
+  mockRandomBytes: vi.fn().mockReturnValue(Buffer.from('breach-random')),
+  mockRandomUUID: vi.fn().mockReturnValue('test-breach-uuid'),
+}))
+
+vi.mock('crypto', () => ({
+  Buffer: globalThis.Buffer,
+  randomBytes: mockRandomBytes,
+  randomUUID: mockRandomUUID,
+}))
+
+
 import { fheService } from '../../fhe' // Corrected import
 import { logger } from '../../logger'
 import { redis } from '../../redis'

@@ -37,6 +37,13 @@ async function expectKeyDoesNotExist(
   expect(await getRedisClientOrThrow(redisService).exists(key)).toBe(0)
 }
 
+async function getMatchingKeys(
+  redisService: RedisService,
+  pattern: string,
+): Promise<string[]> {
+  return redisService.keys(pattern)
+}
+
 function resolveRedisUrl(): string {
   const redisUrl = process.env['REDIS_URL']
   if (!redisUrl) {
@@ -68,7 +75,7 @@ const hasRedisAccess = SKIP_REDIS_TESTS
     })()
 
 const shouldRunCacheInvalidationTests = SKIP_REDIS_TESTS || !hasRedisAccess
-const noopDescribe = (() => undefined) as typeof describe
+const noopDescribe = describe.skip
 const describeCacheInvalidation = shouldRunCacheInvalidationTests
   ? noopDescribe
   : describe
@@ -143,7 +150,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       for (const key of keys) {
         await expectKeyDoesNotExist(redis, key)
       }
-      expect(await redis.keys(`${pattern}:*`)).toHaveLength(0)
+      expect(await getMatchingKeys(redis, `${pattern}:*`)).toHaveLength(0)
     })
 
     it('should handle concurrent pattern invalidations', async () => {
@@ -177,8 +184,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
 
       // Verify all keys are removed
       for (const pattern of patterns) {
-        const client = getRedisClientOrThrow(redis)
-        const keys = await client.keys(`${pattern}:*`)
+        const keys = await getMatchingKeys(redis, `${pattern}:*`)
         expect(keys).toHaveLength(0)
       }
       expect(patterns).toHaveLength(3)
@@ -216,7 +222,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       for (const key of keys) {
         await expectKeyDoesNotExist(redis, key)
       }
-      expect(await redis.keys(`${tag}:*`)).toHaveLength(0)
+      expect(await getMatchingKeys(redis, `${tag}:*`)).toHaveLength(0)
     })
 
     it('should handle multiple tags per key', async () => {
@@ -259,8 +265,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       await cacheInvalidation.invalidatePattern(`${pattern}:*`)
       await sleep(100)
 
-      const client = getRedisClientOrThrow(redis)
-      const keys = await client.keys(`${pattern}:*`)
+      const keys = await getMatchingKeys(redis, `${pattern}:*`)
       expect(keys).toHaveLength(0)
     })
 
@@ -281,8 +286,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       await sleep(100)
 
       // Verify all keys are removed
-      const client = getRedisClientOrThrow(redis)
-      const remainingKeys = await client.keys(`${pattern}:*`)
+      const remainingKeys = await getMatchingKeys(redis, `${pattern}:*`)
       expect(remainingKeys).toHaveLength(0)
     })
   })
@@ -351,8 +355,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       await sleep(100) // Allow time for invalidation to propagate
 
       // Verify all keys are removed
-      const client = getRedisClientOrThrow(redis)
-      const remainingKeys = await client.keys(`${pattern}:*`)
+      const remainingKeys = await getMatchingKeys(redis, `${pattern}:*`)
       expect(remainingKeys).toHaveLength(0)
     })
 
@@ -390,8 +393,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       await sleep(100) // Allow time for invalidation to propagate
 
       // Verify all keys are removed
-      const client = getRedisClientOrThrow(redis)
-      const remainingKeys = await client.keys(`${basePattern}:*`)
+      const remainingKeys = await getMatchingKeys(redis, `${basePattern}:*`)
       expect(remainingKeys).toHaveLength(0)
     })
   })

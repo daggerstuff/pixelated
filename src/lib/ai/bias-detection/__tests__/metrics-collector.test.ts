@@ -261,6 +261,7 @@ describe('BiasMetricsCollector', () => {
 
   describe('error handling', () => {
     it('should handle initialization failures', async () => {
+      mockConfig.strictMode = true
       const failingBridge = new PythonBiasDetectionBridge(
         mockConfig.pythonServiceUrl,
         mockConfig.pythonServiceTimeout,
