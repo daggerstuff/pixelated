@@ -33,7 +33,7 @@ spec:
         command:
         - sh
         - -c
-        - redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
+        - redis-server --bind 0.0.0.0 --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
         envFrom:
         - secretRef:
             name: pixelated-empathy-secrets

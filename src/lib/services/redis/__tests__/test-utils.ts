@@ -52,7 +52,9 @@ export async function cleanupTestKeys(pattern: string = '*'): Promise<void> {
   const redis = createRedisClient()
 
   try {
-    const keys = await redis.keys(`${process.env['REDIS_KEY_PREFIX']}${pattern}`)
+    const keys = await redis.keys(
+      `${process.env['REDIS_KEY_PREFIX']}${pattern}`,
+    )
     if (keys.length > 0) {
       await redis.del(...keys)
     }

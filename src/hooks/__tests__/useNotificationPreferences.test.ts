@@ -108,9 +108,7 @@ describe('useNotificationPreferences', () => {
 
     const { result } = renderHook(() => useNotificationPreferences())
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeInstanceOf(Error)

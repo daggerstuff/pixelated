@@ -132,14 +132,16 @@ export function unescapeHTML(
   } else if (Array.isArray(children)) {
     return {
       ...node,
-      children: children.map((child) =>
-        typeof child === 'object' ? unescapeHTML(child) : child,
-      ),
+      children: children
+        .map((child) =>
+          typeof child === 'object' ? unescapeHTML(child) : child,
+        )
+        .filter((child): child is string | VNode => child !== null && child !== undefined),
     }
   } else if (typeof children === 'object') {
     return {
       ...node,
-      children: unescapeHTML(children),
+      children: unescapeHTML(children) ?? undefined,
     }
   }
 

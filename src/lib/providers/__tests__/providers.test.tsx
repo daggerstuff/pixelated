@@ -4,12 +4,21 @@ import { useSecurity } from '../SecurityProvider'
 import { SharedProviders } from '../SharedProviders'
 import { useTheme } from '../ThemeProvider'
 
+vi.mock('@/lib/fhe', () => ({
+  fheService: {
+    initialize: vi.fn(async () => undefined),
+    encrypt: vi.fn(async (value: string) => value),
+    decrypt: vi.fn(async (value: string) => value),
+    verifyIntegrity: vi.fn(async () => true),
+  },
+}))
+
 // Mock components for testing providers
 function ThemeConsumer() {
   const { colorScheme, setColorScheme } = useTheme()
   return (
     <div>
-      <div data-testid='color-scheme'>{colorScheme}</div>
+      <div data-testid="color-scheme">{colorScheme}</div>
       <button onClick={() => setColorScheme('dark')}>Set Dark</button>
     </div>
   )
@@ -19,14 +28,15 @@ function SecurityConsumer() {
   const { level, setSecurityLevel } = useSecurity()
   return (
     <div>
-      <div data-testid='security-level'>{level}</div>
+      <div data-testid="security-level">{level}</div>
       <button onClick={() => setSecurityLevel('hipaa')}>Set HIPAA</button>
     </div>
   )
 }
 
-function ErrorThrower() {
+function ErrorThrower(): JSX.Element | null {
   throw new Error('Test error')
+  return null
 }
 
 describe('providers', () => {

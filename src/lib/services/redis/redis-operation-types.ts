@@ -10,6 +10,11 @@ export interface RedisPipelineOperation {
 
 export interface RedisPipeline {
   del(...keys: string[]): this
+  setex(key: string, seconds: number, value: string): this
+  sadd(key: string, member: string): this
+  expire(key: string, seconds: number): this
+  get(key: string): this
+  ttl(key: string): this
   exec(): Promise<[Error | null, unknown][]>
 }
 
@@ -29,7 +34,8 @@ export interface RedisMockClient {
   get(key: string): Promise<string | null>
   set(key: string, value: string, ...options: unknown[]): Promise<unknown>
   del(...keys: string[]): Promise<number>
-  multi(...commands: unknown[]): RedisMockClient
+  multi(...commands: unknown[]): RedisPipeline
+  expire(key: string, seconds: number): Promise<number>
   setex(key: string, seconds: number, value: string): Promise<unknown>
   exists(key: string): Promise<number>
   lpush(key: string, ...elements: string[]): Promise<number>
@@ -50,10 +56,7 @@ export interface RedisMockClient {
   incr(key: string): Promise<number>
   pttl(key: string): Promise<number>
   ttl(key: string): Promise<number>
-  scan(
-    cursor: string,
-    ...args: unknown[]
-  ): Promise<[string, string[]]>
+  scan(cursor: string, ...args: unknown[]): Promise<[string, string[]]>
   subscribe(channel: string): Promise<number>
   publish(channel: string, message: string): Promise<number>
   unsubscribe(channel: string): Promise<number>
@@ -89,4 +92,3 @@ export interface RedisMockClient {
   info(section?: string): Promise<string>
   deletePattern(pattern: string): Promise<number>
 }
-

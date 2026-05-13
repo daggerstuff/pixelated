@@ -20,6 +20,8 @@ const baseNodeTestGlobs = [
   'tests/unit/auth0/**/*.test.ts',
   'tests/integration/auth0/**/*.test.ts',
   'src/lib/redis.test.ts',
+  'src/lib/services/notification/__tests__/NotificationService.test.ts',
+  'src/lib/__tests__/security-implementation.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -79,15 +81,20 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
     alias: [
-      { find: '@/',
-        replacement: `${path.resolve(process.cwd(), 'src')}/` },
+      { find: '@/', replacement: `${path.resolve(process.cwd(), 'src')}/` },
       {
         find: 'react-dom/test-utils',
-        replacement: path.resolve(projectRoot, '__mocks__/react-dom/test-utils.js'),
+        replacement: path.resolve(
+          projectRoot,
+          '__mocks__/react-dom/test-utils.js',
+        ),
       },
       {
         find: /@testing-library\/react\/dist\/act-compat\.js$/,
-        replacement: path.resolve(projectRoot, 'src/test/testing-library-act-compat.ts'),
+        replacement: path.resolve(
+          projectRoot,
+          'src/test/testing-library-act-compat.ts',
+        ),
       },
       {
         find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
@@ -96,7 +103,6 @@ export default defineConfig({
           '__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
         ),
       },
-      
     ],
     conditions: ['node', 'import', 'module', 'default'],
   },
@@ -169,11 +175,17 @@ export default defineConfig({
             },
             {
               find: 'react/jsx-dev-runtime',
-              replacement: path.resolve(process.cwd(), 'node_modules/react/jsx-dev-runtime.js'),
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-dev-runtime.js',
+              ),
             },
             {
               find: 'react/jsx-runtime',
-              replacement: path.resolve(process.cwd(), 'node_modules/react/jsx-runtime.js'),
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-runtime.js',
+              ),
             },
           ],
           conditions: ['node', 'import', 'module', 'default'],
@@ -191,7 +203,13 @@ export default defineConfig({
                 ],
           environment: 'jsdom',
           exclude: [
-          '**/node_modules/**',
+            '**/node_modules/**',
+            'src/lib/security/__tests__/**/*.test.ts',
+            'src/lib/ehr/__tests__/**/*.test.ts',
+            'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'src/lib/redis.test.ts',
+            'src/lib/services/notification/__tests__/NotificationService.test.ts',
+            'src/lib/__tests__/security-implementation.test.ts',
             'tests/integration/complete-system.integration.test.ts',
             'src/tests/simple-browser-compatibility.test.ts',
             'src/tests/browser-compatibility.test.ts',
@@ -230,7 +248,13 @@ export default defineConfig({
           include:
             targetedTestGlobs.length > 0
               ? targetedNodeTestGlobs
-              : [...nodeTestGlobs, 'src/tests/auth.test.ts'],
+              : [
+                  ...nodeTestGlobs,
+                  'src/lib/security/__tests__/**/*.test.ts',
+                  'src/lib/ehr/__tests__/allscripts.test.ts',
+                  'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'src/tests/auth.test.ts',
+                ],
           environment: 'node',
         },
       },

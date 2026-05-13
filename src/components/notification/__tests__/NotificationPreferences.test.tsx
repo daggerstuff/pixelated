@@ -1,9 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { NotificationChannel } from '../../../lib/services/notification/NotificationService'
-
 import { NotificationPreferences } from '../NotificationPreferences'
+vi.mock('../../../lib/services/notification/NotificationService', () => ({
+  NotificationChannel: {
+    IN_APP: 'in_app',
+    PUSH: 'push',
+    EMAIL: 'email',
+    SMS: 'sms',
+  },
+}))
+
+const NotificationChannel = {
+  IN_APP: 'in_app',
+  PUSH: 'push',
+  EMAIL: 'email',
+  SMS: 'sms',
+}
 
 const mockUpdateChannel = vi.fn()
 const mockUpdateFrequency = vi.fn()

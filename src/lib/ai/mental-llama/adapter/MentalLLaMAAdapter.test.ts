@@ -22,11 +22,8 @@ const evidenceServiceMockInstance = vi.hoisted(() => ({
   clearCache: vi.fn<EvidenceService["clearCache"]>(),
 }));
 const evidenceServiceMockConstructor = vi.hoisted(() => {
-  function MockEvidenceService() {
-    return evidenceServiceMockInstance
-  }
   return vi.fn(function () {
-    return new MockEvidenceService()
+    return evidenceServiceMockInstance
   })
 });
 
@@ -36,11 +33,8 @@ const expertGuidanceOrchestratorMockInstance = vi.hoisted(() => ({
   >(),
 }));
 const expertGuidanceOrchestratorMockConstructor = vi.hoisted(() => {
-  function MockExpertGuidanceOrchestrator() {
-    return expertGuidanceOrchestratorMockInstance
-  }
   return vi.fn(function () {
-    return new MockExpertGuidanceOrchestrator()
+    return expertGuidanceOrchestratorMockInstance
   })
 });
 // Mock dependencies
@@ -55,11 +49,8 @@ const crisisSessionFlaggingServiceMockInstance = vi.hoisted(() => ({
   flagSessionForReview: vi.fn().mockResolvedValue(undefined),
 }));
 const crisisSessionFlaggingServiceMockConstructor = vi.hoisted(() => {
-  function MockCrisisSessionFlaggingService() {
-    return crisisSessionFlaggingServiceMockInstance
-  }
   return vi.fn(function () {
-    return new MockCrisisSessionFlaggingService()
+    return crisisSessionFlaggingServiceMockInstance
   })
 });
 vi.mock("../crisis/CrisisSessionFlaggingService", () => ({

@@ -13,7 +13,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import structlog
 import torch
-from transformers import AutoTokenizer, BertModel, TFBertForSequenceClassification
+from transformers import AutoTokenizer, BertModel
+
+try:
+    from transformers import TFBertForSequenceClassification
+except ImportError:  # pragma: no cover
+    TFBertForSequenceClassification = None
 
 if TYPE_CHECKING:
     import tensorflow as tf
@@ -144,6 +149,11 @@ class TensorFlowModelService(ModelService):
 
     def _create_basic_model(self) -> Any:
         """Create a basic bias detection model"""
+        if TFBertForSequenceClassification is None:
+            raise ImportError(
+                "TFBertForSequenceClassification is not available in the installed "
+                "transformers version."
+            )
         return TFBertForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=len(BiasType.__members__)
         )

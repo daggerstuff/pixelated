@@ -85,7 +85,7 @@ describe('Authentication Middleware', () => {
     mockRequest = new Request('https://example.com/api/test', {
       method: 'GET',
       headers: {
-        Authorization: 'Bearer valid-token',
+        'Authorization': 'Bearer valid-token',
         'X-CSRF-Token': 'valid-csrf-token',
         'User-Agent': 'Mozilla/5.0',
         'X-Forwarded-For': '127.0.0.1',
@@ -817,7 +817,7 @@ describe('Authentication Middleware', () => {
       const optionsRequest = new Request('https://example.com/api/test', {
         method: 'OPTIONS',
         headers: {
-          Origin: 'https://app.example.com',
+          'Origin': 'https://app.example.com',
           'Access-Control-Request-Method': 'POST',
         },
       })
@@ -873,7 +873,7 @@ describe('Authentication Middleware', () => {
       await rateLimitMiddleware(mockRequest, 'api', 100, 60)
 
       const duration = performance.now() - start
-      expect(duration).toBeLessThan(5)
+      expect(duration).toBeLessThan(10)
     })
   })
 

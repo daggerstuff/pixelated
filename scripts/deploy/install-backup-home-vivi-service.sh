@@ -2,9 +2,14 @@
 # Install or update the backup-home-vivi systemd service/timer and restart the timer.
 
 set -euo pipefail
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+ 
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 SYSTEMD_SOURCE_DIR="$PROJECT_ROOT/scripts/systemd"
 SYSTEMD_TARGET_DIR="/etc/systemd/system"
 SERVICE_NAME="backup-home-vivi.service"

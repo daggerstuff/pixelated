@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 # Strict wrapper around docker build and Hetzner AI job run
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 # 1. Enforce Execution Directory
 if [[ ! -d "ai/training" || ! -f "package.json" ]]; then
