@@ -107,7 +107,7 @@ export class ResearchPlatform {
       auditRetentionDays: config.hipaa.auditRetentionDays,
       accessControlMatrix: {
         roles: {
-          researcher: {
+          'researcher': {
             permissions: ['read-anonymized', 'aggregate-analysis'],
             restrictions: ['no-identifiable', 'no-raw-phi'],
           },
@@ -120,7 +120,7 @@ export class ResearchPlatform {
             ],
             restrictions: ['no-identifiable', 'audit-required'],
           },
-          therapist: {
+          'therapist': {
             permissions: [
               'read-own-clients',
               'write-notes',
@@ -128,7 +128,7 @@ export class ResearchPlatform {
             ],
             restrictions: ['own-clients-only', 'no-research-export'],
           },
-          admin: {
+          'admin': {
             permissions: ['full-access', 'user-management', 'audit-review'],
             restrictions: ['audit-required', 'dual-authorization'],
           },

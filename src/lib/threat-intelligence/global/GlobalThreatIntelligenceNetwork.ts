@@ -10,33 +10,49 @@ import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
-import { AdvancedPredictiveThreatIntelligence } from '../../threat-detection/predictive/predictive-threat-intelligence'
-import { AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'
+import { type ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
+import { type AdvancedPredictiveThreatIntelligence } from '../../threat-detection/predictive/predictive-threat-intelligence'
+import { type AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'
 import {
   ThreatCorrelationEngine,
   ThreatCorrelationEngineCore,
 } from '../correlation/ThreatCorrelationEngine'
-import { ThreatIntelligenceDatabase } from '../database/ThreatIntelligenceDatabase'
 import {
-  EdgeThreatDetectionSystem,
+  ThreatIntelligenceDatabaseCore,
+  type ThreatIntelligenceDatabase,
+} from '../database/ThreatIntelligenceDatabase'
+import {
+  type EdgeThreatDetectionSystem,
   EdgeThreatDetectionSystemCore,
 } from '../edge/EdgeThreatDetectionSystem'
-import { ExternalThreatFeedIntegration } from '../feeds/ExternalThreatFeedIntegration'
-import { ThreatHuntingSystem } from '../hunting/ThreatHuntingSystem'
-import { AutomatedThreatResponseOrchestrator } from '../orchestration/AutomatedThreatResponseOrchestrator'
 import {
-  ThreatValidationSystem,
+  type ExternalThreatFeedIntegration,
+  ExternalThreatFeedIntegrationCore,
+} from '../feeds/ExternalThreatFeedIntegration'
+import {
+  type ThreatHuntingSystem,
+  ThreatHuntingSystemCore,
+} from '../hunting/ThreatHuntingSystem'
+import {
+  type AutomatedThreatResponseOrchestrator,
+  AutomatedThreatResponseOrchestratorCore,
+} from '../orchestration/AutomatedThreatResponseOrchestrator'
+import {
+  type ThreatValidationSystem,
   ThreatValidationSystemCore,
+  type ValidationMetrics as ValidationSystemMetrics,
 } from '../validation/ThreatValidationSystem'
 import {
   GlobalThreatIntelligenceNetworkConfig,
   GlobalThreatIntelligence,
   RealTimeThreatData,
   ThreatAttribution,
+  FeedConfig,
   GlobalImpactAssessment,
   CorrelationData,
   ValidationStatus,
+  ThreatValidation,
+  HuntingConfig,
   HealthStatus,
 } from './types'
 
@@ -64,13 +80,7 @@ export interface GlobalThreatSummary {
   validationMetrics: ValidationMetrics
 }
 
-export interface ValidationMetrics {
-  totalValidated: number
-  accuracy: number
-  completeness: number
-  consistency: number
-  averageProcessingTime: number
-}
+export interface ValidationMetrics extends ValidationSystemMetrics {}
 
 export class GlobalThreatIntelligenceNetworkCore
   extends EventEmitter
@@ -80,13 +90,13 @@ export class GlobalThreatIntelligenceNetworkCore
   private mongoClient!: MongoClient
   private db!: Db
 
-  private edgeDetectionSystem: EdgeThreatDetectionSystem
-  private correlationEngine: ThreatCorrelationEngine
-  private intelligenceDatabase: ThreatIntelligenceDatabase
-  private responseOrchestrator: AutomatedThreatResponseOrchestrator
-  private huntingSystem: ThreatHuntingSystem
-  private feedIntegration: ExternalThreatFeedIntegration
-  private validationSystem: ThreatValidationSystem
+  private edgeDetectionSystem!: EdgeThreatDetectionSystem
+  private correlationEngine!: ThreatCorrelationEngine
+  private intelligenceDatabase!: ThreatIntelligenceDatabase
+  private responseOrchestrator!: AutomatedThreatResponseOrchestrator
+  private huntingSystem!: ThreatHuntingSystem
+  private feedIntegration!: ExternalThreatFeedIntegration
+  private validationSystem!: ThreatValidationSystem
 
   private existingResponseOrchestrator?: AdvancedResponseOrchestrator
   private existingIntelligenceService?: ExternalThreatIntelligenceService
@@ -183,27 +193,31 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.correlationEngine.initialize()
 
       // Initialize Threat Intelligence Database
-      this.intelligenceDatabase = new ThreatIntelligenceDatabase(
+      this.intelligenceDatabase = new ThreatIntelligenceDatabaseCore(
         this.config.database,
       )
       await this.intelligenceDatabase.initialize()
 
       // Initialize Automated Threat Response Orchestrator
-      this.responseOrchestrator = new AutomatedThreatResponseOrchestrator(
+      this.responseOrchestrator = new AutomatedThreatResponseOrchestratorCore(
         this.config.orchestration,
       )
       await this.responseOrchestrator.initialize()
 
       // Initialize Threat Hunting System
-      this.huntingSystem = new ThreatHuntingSystem()
+      this.huntingSystem = new ThreatHuntingSystemCore(this.createDefaultHuntingConfig())
       await this.huntingSystem.initialize()
 
       // Initialize External Threat Feed Integration
-      this.feedIntegration = new ExternalThreatFeedIntegration()
+      this.feedIntegration = new ExternalThreatFeedIntegrationCore(
+        this.createDefaultFeedConfig(),
+      )
       await this.feedIntegration.initialize()
 
       // Initialize Threat Validation System
-      this.validationSystem = new ThreatValidationSystemCore(this.config.validation)
+      this.validationSystem = new ThreatValidationSystemCore(
+        this.config.validation,
+      )
       await this.validationSystem.initialize()
 
       logger.info('All subsystems initialized successfully')
@@ -277,9 +291,11 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.intelligenceDatabase.storeThreatIntelligence(globalThreat)
 
       // Step 7: Validate the intelligence
-      const validationStatus =
+      const threatValidationResult =
         await this.validationSystem.validateThreat(globalThreat)
-      globalThreat.validationStatus = validationStatus
+      globalThreat.validationStatus = this.mapThreatValidationToStatus(
+        threatValidationResult,
+      )
 
       // Step 8: Cache for real-time access
       await this.cacheThreatIntelligence(globalThreat)
@@ -500,6 +516,76 @@ export class GlobalThreatIntelligenceNetworkCore
     return `${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
   }
 
+  private createDefaultHuntingConfig(): HuntingConfig {
+    return {
+      enabled: false,
+      maxHunts: 10,
+      defaultTimeout: 60_000,
+      autoEscalate: false,
+      huntPatterns: [],
+    }
+  }
+
+  private createDefaultFeedConfig(): FeedConfig {
+    return {
+      feedId: 'default-feed',
+      provider: 'default',
+      feedType: 'generic',
+      endpoint: 'https://localhost',
+      requiresAuth: false,
+      updateFrequency: 'hourly',
+      parameters: {},
+      filters: {},
+    }
+  }
+
+  private mapThreatValidationToStatus(
+    validation: ThreatValidation,
+  ): ValidationStatus {
+    const completionRatio = validation.results.length === 0 ? 0 : 1
+    const issueRatio = validation.results.filter(
+      (result) => !result.passed,
+    ).length
+    const relevance =
+      validation.results.length > 0
+        ? completionRatio
+          ? 1 - issueRatio / validation.results.length
+          : validation.isValid
+            ? 1
+            : 0
+        : validation.overallScore
+
+    const mappedStatus =
+      validation.status === 'valid'
+        ? 'validated'
+        : validation.status === 'invalid'
+          ? 'rejected'
+          : 'pending'
+
+    return {
+      validationId: validation.validationId,
+      status: mappedStatus,
+      accuracy: Math.max(0, Math.min(1, validation.overallScore)),
+      completeness: Math.max(0, Math.min(1, validation.overallScore)),
+      consistency: Math.max(0, Math.min(1, validation.overallScore)),
+      timeliness: validation.completedAt
+        ? 1 -
+          Math.min(
+            1,
+            Math.max(
+              0,
+              validation.completedAt.getTime() - validation.createdAt.getTime(),
+            ) /
+              (1000 * 60 * 60),
+          )
+        : 1,
+      relevance: Math.max(0, Math.min(1, relevance)),
+      validator: 'threat_validation_system',
+      validationDate: validation.completedAt ?? validation.createdAt,
+      feedback: validation.results.flatMap((result) => result.issues),
+    }
+  }
+
   private async generateAttribution(
     _threatData: RealTimeThreatData,
   ): Promise<ThreatAttribution | undefined> {
@@ -517,7 +603,8 @@ export class GlobalThreatIntelligenceNetworkCore
 
     // Calculate potential impact based on severity and correlation
     const potentialImpact =
-      threatData.severity * (1 + Math.max(0, correlationData.correlationStrength) * 0.1)
+      threatData.severity *
+      (1 + Math.max(0, correlationData.correlationStrength) * 0.1)
 
     return {
       geographicSpread,
@@ -660,16 +747,20 @@ export class GlobalThreatIntelligenceNetworkCore
         throw new Error(`Threat intelligence not found: ${intelligenceId}`)
       }
 
-      const validationStatus =
-        await this.validationSystem.validateIntelligence(intelligence)
+      const threatValidation =
+        await this.validationSystem.validateThreat(intelligence)
 
       // Update the intelligence with validation status
-      intelligence.validationStatus = validationStatus
+      intelligence.validationStatus =
+        this.mapThreatValidationToStatus(threatValidation)
       await this.intelligenceDatabase.updateThreatIntelligence(intelligence)
 
-      this.emit('intelligence_validated', { intelligenceId, validationStatus })
+      this.emit('intelligence_validated', {
+        intelligenceId,
+        validationStatus: intelligence.validationStatus,
+      })
 
-      return validationStatus
+      return intelligence.validationStatus
     } catch (error: unknown) {
       logger.error('Failed to validate threat intelligence:', { error })
       this.emit('validation_error', { error, intelligenceId })

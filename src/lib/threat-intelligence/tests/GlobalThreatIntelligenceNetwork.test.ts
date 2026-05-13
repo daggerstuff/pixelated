@@ -173,7 +173,7 @@ vi.mock('../correlation/ThreatCorrelationEngine', () => ({
 const mockThreatIntelligenceDatabase = vi.hoisted(() => ({
   initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   storeThreatIntelligence: vi
-    .fn<() => Promise<void>>()
+    .fn<(threat: any) => Promise<void>>()
     .mockImplementation(async (threat: any) => {
       mockThreatStore.threats.set(threat.threatId, threat)
       mockThreatStore.threatIntelligence.set(threat.intelligenceId, threat)
@@ -203,8 +203,17 @@ const mockThreatIntelligenceDatabase = vi.hoisted(() => ({
       return mockThreatStore.threatIntelligence.get(intelligenceId) ?? null
     }),
   updateThreatIntelligence: vi
-    .fn<() => Promise<void>>()
-    .mockResolvedValue(undefined),
+    .fn<(threat: any) => Promise<void>>()
+    .mockImplementation(async (threat: any) => {
+      mockThreatStore.threats.set(threat.threatId, threat)
+      mockThreatStore.threatIntelligence.set(threat.intelligenceId, threat)
+      threat.indicators?.forEach((indicator: any) => {
+        mockThreatStore.indicators.set(
+          `${indicator.indicatorType}:${indicator.value}`,
+          threat.threatId,
+        )
+      })
+    }),
   getTotalThreatCount: vi.fn<() => Promise<number>>().mockResolvedValue(0),
   getActiveThreatCount: vi.fn<() => Promise<number>>().mockResolvedValue(0),
   getThreatsByRegion: vi

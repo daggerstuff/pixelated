@@ -33,7 +33,6 @@ export interface TracingConfig {
     mongodb: boolean
     postgres: boolean
     redis: boolean
-    fastify?: boolean
   }
 }
 
@@ -76,7 +75,6 @@ export function getTracingConfig(): TracingConfig {
       mongodb: import.meta.env.TRACING_INSTRUMENT_MONGODB !== 'false',
       postgres: import.meta.env.TRACING_INSTRUMENT_POSTGRES !== 'false',
       redis: import.meta.env.TRACING_INSTRUMENT_REDIS !== 'false',
-      fastify: import.meta.env.TRACING_INSTRUMENT_FASTIFY === 'true',
     },
   }
 }

@@ -8,14 +8,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createCompleteThreatDetectionSystem } from '../integrations'
 
 const setMockFetchResponse = (response: Response): void => {
-  const fetchMock = vi.fn() as unknown as typeof fetch
+  const fetchMock = vi.fn<
+    (input: URL | RequestInfo, init?: RequestInit) => Promise<Response>
+  >()
   global.fetch = fetchMock
-  fetchMock.mockResolvedValue(response)
+  void fetchMock.mockResolvedValue(response)
 }
 
 describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   let mongod: MongoMemoryServer
-  let redis: Redis
+  let redis: ReturnType<typeof Redis>
   let mockOrchestrator: any
   let mockRateLimiter: any
   let threatDetectionSystem: any
@@ -169,55 +171,55 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
   describe('Threat Hunting Service', () => {
     it('should execute hunting rules automatically', async () => {
-        const { huntingService } = threatDetectionSystem
-        const investigationSpy =
-          vi.fn<(investigation: { id: string; title: string }) => void>()
+      const { huntingService } = threatDetectionSystem
+      const investigationSpy =
+        vi.fn<(investigation: { id: string; title: string }) => void>()
 
-        huntingService.on('investigation:started', investigationSpy)
+      huntingService.on('investigation:started', investigationSpy)
 
-        // Start hunting
-        await huntingService.start()
+      // Start hunting
+      await huntingService.start()
 
-        // Simulate threat data
-        mockOrchestrator.emit('threat:detected', {
-          threatId: 'threat123',
-          severity: 'high',
-          userId: 'user123',
-          ip: '192.168.1.1',
-          timestamp: new Date(),
-        })
+      // Simulate threat data
+      mockOrchestrator.emit('threat:detected', {
+        threatId: 'threat123',
+        severity: 'high',
+        userId: 'user123',
+        ip: '192.168.1.1',
+        timestamp: new Date(),
+      })
 
-        // Wait for hunting execution
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Wait for hunting execution
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-        expect(investigationSpy).toHaveBeenCalled()
+      expect(investigationSpy).toHaveBeenCalled()
 
-        await huntingService.stop()
-      }, 10000)
+      await huntingService.stop()
+    }, 10000)
 
     it('should perform manual threat investigation', async () => {
-        const { huntingService } = threatDetectionSystem
+      const { huntingService } = threatDetectionSystem
 
-        const investigation = await huntingService.startInvestigation({
-          threatId: 'threat456',
-          userId: 'user456',
-          severity: 'medium',
-          templateId: 'standard_threat_investigation',
-        })
+      const investigation = await huntingService.startInvestigation({
+        threatId: 'threat456',
+        userId: 'user456',
+        severity: 'medium',
+        templateId: 'standard_threat_investigation',
+      })
 
-        expect(investigation).toBeDefined()
-        expect(investigation.id).toBeDefined()
-        expect(investigation.status).toBe('running')
+      expect(investigation).toBeDefined()
+      expect(investigation.id).toBeDefined()
+      expect(investigation.status).toBe('running')
 
-        // Wait for investigation to complete
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+      // Wait for investigation to complete
+      await new Promise((resolve) => setTimeout(resolve, 5000))
 
-        const result = await huntingService.getInvestigationResult(
-          investigation.id,
-        )
-        expect(result).toBeDefined()
-        expect(result.status).toBe('completed')
-      }, 15000)
+      const result = await huntingService.getInvestigationResult(
+        investigation.id,
+      )
+      expect(result).toBeDefined()
+      expect(result.status).toBe('completed')
+    }, 15000)
 
     it('should update threat intelligence feeds', async () => {
       const { intelligenceService } = threatDetectionSystem
@@ -270,61 +272,61 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
   describe('Integration Tests', () => {
     it('should coordinate between all Phase 8 services', async () => {
-        const { monitoringService, huntingService, intelligenceService } =
-          threatDetectionSystem
+      const { monitoringService, huntingService, intelligenceService } =
+        threatDetectionSystem
 
-        // Start all services
-        await Promise.all([
-          monitoringService.start(),
-          huntingService.start(),
-          intelligenceService.start(),
-        ])
+      // Start all services
+      await Promise.all([
+        monitoringService.start(),
+        huntingService.start(),
+        intelligenceService.start(),
+      ])
 
-        // Simulate a complex threat scenario
-        const threatData = {
-          threatId: 'integrated_threat_001',
-          userId: 'victim_user',
-          ip: 'malicious.ip.address',
-          severity: 'critical',
-          type: 'data_exfiltration',
-          timestamp: new Date(),
-        }
+      // Simulate a complex threat scenario
+      const threatData = {
+        threatId: 'integrated_threat_001',
+        userId: 'victim_user',
+        ip: 'malicious.ip.address',
+        severity: 'critical',
+        type: 'data_exfiltration',
+        timestamp: new Date(),
+      }
 
-        // Emit threat to orchestrator
-        mockOrchestrator.emit('threat:detected', threatData)
+      // Emit threat to orchestrator
+      mockOrchestrator.emit('threat:detected', threatData)
 
-        // Wait briefly for investigation to start (auto-complete happens in 500ms)
-        await new Promise((resolve) => setTimeout(resolve, 100))
+      // Wait briefly for investigation to start (auto-complete happens in 500ms)
+      await new Promise((resolve) => setTimeout(resolve, 100))
 
-        // Verify monitoring captured the event
-        const metrics = await monitoringService.getMetrics()
-        const threatMetric = metrics.find((m) => m.name === 'threats_detected')
-        expect(threatMetric).toBeDefined()
+      // Verify monitoring captured the event
+      const metrics = await monitoringService.getMetrics()
+      const threatMetric = metrics.find((m) => m.name === 'threats_detected')
+      expect(threatMetric).toBeDefined()
 
-        // Verify hunting service initiated investigation (check all, not just active)
-        const allInvestigations = await huntingService.getActiveInvestigations()
-        const completedInvestigations = [
-          ...(huntingService as any).investigations.values(),
-        ]
-        const relatedInvestigation = completedInvestigations.find(
-          (inv) => inv.threatId === threatData.threatId,
-        )
-        expect(relatedInvestigation).toBeDefined()
+      // Verify hunting service initiated investigation (check all, not just active)
+      const allInvestigations = await huntingService.getActiveInvestigations()
+      const completedInvestigations = [
+        ...(huntingService as any).investigations.values(),
+      ]
+      const relatedInvestigation = completedInvestigations.find(
+        (inv) => inv.threatId === threatData.threatId,
+      )
+      expect(relatedInvestigation).toBeDefined()
 
-        // Verify intelligence service checked IOCs
-        const iocResults = await intelligenceService.lookupIOC(
-          threatData.ip,
-          'ip',
-        )
-        expect(iocResults).toBeDefined()
+      // Verify intelligence service checked IOCs
+      const iocResults = await intelligenceService.lookupIOC(
+        threatData.ip,
+        'ip',
+      )
+      expect(iocResults).toBeDefined()
 
-        // Stop all services
-        await Promise.all([
-          monitoringService.stop(),
-          huntingService.stop(),
-          intelligenceService.stop(),
-        ])
-      }, 30000)
+      // Stop all services
+      await Promise.all([
+        monitoringService.stop(),
+        huntingService.stop(),
+        intelligenceService.stop(),
+      ])
+    }, 30000)
 
     it('should handle service failures gracefully', async () => {
       const { monitoringService, huntingService } = threatDetectionSystem
