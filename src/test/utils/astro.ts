@@ -1,5 +1,5 @@
 type AstroSlotRenderer = { render: () => string }
-type AstroRenderResult = string | { html: string }
+type AstroRenderResult = string | { html: string; setup?: (container: HTMLDivElement) => void | Promise<void> }
 type AstroRenderOptions = { default?: AstroSlotRenderer }
 type AstroRenderFunction = (
   props: Record<string, unknown>,
@@ -32,6 +32,19 @@ function extractHtml(renderResult: unknown): string {
   return String(renderResult)
 }
 
+async function applyRenderSetup(result: unknown, container: HTMLDivElement) {
+  if (
+    result &&
+    typeof result === 'object' &&
+    'setup' in result &&
+    typeof (result as { setup?: unknown }).setup === 'function'
+  ) {
+    await (result as { setup: (container: HTMLDivElement) => void | Promise<void> }).setup(
+      container,
+    )
+  }
+}
+
 /**
  * Renders an Astro component for testing
  * @param Component The Astro component to render
@@ -52,6 +65,7 @@ export async function renderAstro<
   querySelector: (selector: string) => Element | null
   querySelectorAll: (selector: string) => NodeListOf<Element>
 }> {
+  const resolvedComponent = (Component as { default?: unknown }).default ?? Component
   const renderProps = props ?? {}
   const renderSlots = slotContent
     ? {
@@ -61,13 +75,13 @@ export async function renderAstro<
       }
     : undefined
   const resolvedHtml = await (async () => {
-    if (typeof Component === 'function') {
+    if (typeof resolvedComponent === 'function') {
       return Promise.resolve(
-        (Component as AstroRenderFunction)(renderProps, renderSlots),
+        (resolvedComponent as AstroRenderFunction)(renderProps, renderSlots),
       )
     }
 
-    const factory = Component as AstroComponentFactory
+    const factory = resolvedComponent as AstroComponentFactory
     if (factory && typeof factory.render === 'function') {
       return Promise.resolve(factory.render(renderProps, renderSlots))
     }
@@ -76,7 +90,10 @@ export async function renderAstro<
   })()
   const html = extractHtml(resolvedHtml)
   const container = document.createElement('div')
+  document.body.innerHTML = ''
   container.innerHTML = html
+  document.body.appendChild(container)
+  await applyRenderSetup(resolvedHtml, container)
 
   // Return a testing-friendly interface
   return {

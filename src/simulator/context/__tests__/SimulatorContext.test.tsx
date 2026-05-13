@@ -1,3 +1,4 @@
+import { Component, type ReactNode } from 'react'
 import { renderHook, act } from '@testing-library/react'
 
 import type {
@@ -15,9 +16,48 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SimulatorProvider>{children}</SimulatorProvider>
 )
 
+class UseSimulatorErrorBoundary extends Component<{
+  children: ReactNode
+  onError: (error: Error) => void
+}> {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error) {
+    this.props.onError(error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return null
+    }
+
+    return this.props.children
+  }
+}
+
 describe('SimulatorContext', () => {
   it('should throw error when useSimulator is used outside of SimulatorProvider', () => {
-    expect(() => renderHook(() => useSimulator())).toThrow(
+    let capturedError: Error | null = null
+    const errorBoundary = ({ children }: { children: ReactNode }) => {
+      return (
+        <UseSimulatorErrorBoundary
+          onError={(error) => {
+            capturedError = error
+          }}
+        >
+          {children}
+        </UseSimulatorErrorBoundary>
+      )
+    }
+
+    renderHook(() => useSimulator(), { wrapper: errorBoundary })
+
+    expect(capturedError).toBeDefined()
+    expect(capturedError?.message).toBe(
       'useSimulator must be used within a SimulatorProvider',
     )
   })

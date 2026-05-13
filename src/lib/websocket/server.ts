@@ -83,9 +83,13 @@ class TherapyChatWebSocketServer {
             data: string,
             operation: string,
           ) => Promise<{ data: string }>
+          initialize?: () => Promise<void> | void
         }
 
         if (typeof fhe.processEncrypted === 'function') {
+          if (typeof fhe.initialize === 'function') {
+            await fhe.initialize()
+          }
           const result = await fhe.processEncrypted(
             message.data as string,
             'CHAT',
@@ -107,6 +111,11 @@ class TherapyChatWebSocketServer {
     }
 
     // Broadcast to all clients in the session
+    if (!this.sessions.has(message.sessionId)) {
+      this.sessions.set(message.sessionId, new Set())
+    }
+    this.sessions.get(message.sessionId)!.add(clientId)
+
     this.broadcastToSession(message.sessionId, {
       type: 'message',
       data: message.data,
