@@ -271,10 +271,12 @@ export function TherapeuticGoalsTracker({
   return (
     <div className='therapeutic-goals-tracker bg-white rounded-lg p-4 shadow'>
       <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-lg font-semibold'>Therapeutic Goals</h3>
+          <h3 className='text-lg font-semibold'>Therapeutic Goals Tracker</h3>
         <div className='text-gray-600 text-sm'>
           Session #
-          {patientModel.therapeuticProgress.sessionProgressLog.length + 1}
+          {patientModel?.therapeuticProgress?.sessionProgressLog?.length
+              ? patientModel.therapeuticProgress.sessionProgressLog.length + 1
+              : 1}
         </div>
       </div>
 
@@ -677,14 +679,20 @@ export function TherapeuticGoalsTracker({
 
 // Helper function to generate goals from patient model
 function generateGoalsFromPatientModel(
-  patientModel: CognitiveModel,
+  patientModel: Partial<CognitiveModel> | undefined,
 ): TherapeuticGoal[] {
   const goals: TherapeuticGoal[] = []
   const now = Date.now()
   const sixMonthsFromNow = now + 15768000000 // 6 months in milliseconds
 
+  const presentingIssues = patientModel?.presentingIssues ?? []
+  const goalsForTherapy = patientModel?.goalsForTherapy ?? []
+  const distortionPatterns = patientModel?.distortionPatterns ?? []
+  const sessionProgressLog =
+    patientModel?.therapeuticProgress?.sessionProgressLog ?? []
+
   // Generate goals based on presenting issues
-  patientModel.presentingIssues.forEach((issue, index) => {
+  presentingIssues.forEach((issue, index) => {
     if (index < 3) {
       // Limit to 3 goals from presenting issues
       goals.push({
@@ -700,7 +708,7 @@ function generateGoalsFromPatientModel(
         checkpoints: generateCheckpoints(issue, 4, now),
         progressHistory: generateProgressHistory(now, 3),
         relatedInterventions: generateInterventionTypes(issue),
-        relevantDistortions: patientModel.distortionPatterns
+        relevantDistortions: distortionPatterns
           .slice(0, 2)
           .map((d) => d.type),
         notes:
@@ -712,7 +720,7 @@ function generateGoalsFromPatientModel(
   })
 
   // Generate goals based on therapy goals
-  patientModel.goalsForTherapy.forEach((goal, index) => {
+  goalsForTherapy.forEach((goal, index) => {
     if (index < 2) {
       // Limit to 2 goals from therapy goals
       goals.push({
@@ -737,7 +745,7 @@ function generateGoalsFromPatientModel(
   })
 
   // Add a completed goal if there are enough sessions
-  if (patientModel.therapeuticProgress.sessionProgressLog.length > 5) {
+  if (sessionProgressLog.length > 5) {
     goals.push({
       id: `goal-completed-1`,
       title: 'Develop Emotion Recognition Skills',

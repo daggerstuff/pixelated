@@ -37,6 +37,7 @@ class IndexedDBRequestQueue {
   private options: Required<RequestQueueOptions>
   private db: IDBDatabase | null = null
   private initialized = false
+  private lastTimestamp = 0
 
   constructor(options: RequestQueueOptions = {}) {
     this.options = {
@@ -60,6 +61,10 @@ class IndexedDBRequestQueue {
 
   private async initDB(): Promise<void> {
     if (this.initialized) return
+
+    if (typeof indexedDB?.open !== 'function') {
+      return
+    }
 
     // Create a separate IndexedDBStorage instance for the queue
     const queueStorage = new IndexedDBStorage({
@@ -91,6 +96,7 @@ class IndexedDBRequestQueue {
               `IndexedDB store "${storage.storeName}" not found after opening database`,
             )
           }
+          this.initialized = true
           resolve(db)
         } catch (error) {
           reject(error)
@@ -206,7 +212,7 @@ class IndexedDBRequestQueue {
       const queuedRequest: QueuedRequest = {
         ...request,
         id: this.generateId(),
-        timestamp: Date.now(),
+        timestamp: this.getSafeTimestamp(),
         retryCount: 0,
       }
 
@@ -272,7 +278,7 @@ class IndexedDBRequestQueue {
           // Request failed, increment retry count
           request.retryCount++
 
-          if (request.retryCount >= request.maxRetries) {
+          if (request.retryCount > request.maxRetries) {
             // Max retries reached, remove from queue
             console.warn(
               `Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`,
@@ -371,6 +377,17 @@ class IndexedDBRequestQueue {
       oldestRequest,
       newestRequest,
     }
+  }
+
+  private getSafeTimestamp(): number {
+    const now = Date.now()
+    if (now <= this.lastTimestamp) {
+      this.lastTimestamp += 1
+      return this.lastTimestamp
+    }
+
+    this.lastTimestamp = now
+    return now
   }
 
   /**

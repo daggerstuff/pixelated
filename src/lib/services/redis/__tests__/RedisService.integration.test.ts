@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { RedisService } from '../RedisService'
 import type { RedisServiceConfig } from '../types'
 import { RedisErrorCode } from '../types'
@@ -20,7 +21,7 @@ expect.extend({
 // Conditionally skip Redis integration tests in CI or when explicitly requested
 const SKIP_REDIS_TESTS =
   process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
-const noopDescribe = (() => undefined) as typeof describe
+const noopDescribe = describe.skip
 const describeFn = SKIP_REDIS_TESTS ? noopDescribe : describe
 
 describeFn('RedisService Integration Tests', () => {

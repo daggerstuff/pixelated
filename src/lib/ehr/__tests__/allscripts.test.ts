@@ -5,10 +5,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { AllscriptsProvider } from '../providers/allscripts.provider'
 
-// Mock dependencies
+const { mockCreateHash, mockRandomBytes } = vi.hoisted(() => ({
+  mockCreateHash: vi.fn(),
+  mockRandomBytes: vi.fn(),
+}))
+
 vi.mock('node:crypto', () => ({
-  createHash: vi.fn(),
-  randomBytes: vi.fn(),
+  Buffer: globalThis.Buffer,
+  createHash: mockCreateHash,
+  randomBytes: mockRandomBytes,
 }))
 
 describe('allscripts Provider', () => {

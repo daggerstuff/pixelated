@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { createRoot } from 'react-dom/client'
 import { fireEvent } from '@testing-library/dom'
-import { act } from 'react-dom/test-utils'
+import { act } from '@testing-library/react'
 import type { SearchFiltersState } from './SearchFilters'
 import SearchFilters from './SearchFilters'
 
