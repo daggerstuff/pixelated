@@ -178,7 +178,13 @@ export async function createProductionLLMInvoker(
     }
 
     // Rate limiting is retryable with backoff
-    if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+    if (
+      errorMessage.includes('rate limit') ||
+      errorMessage.includes('monthly_request_count') ||
+      errorMessage.includes('limit reached') ||
+      errorMessage.includes('quota') ||
+      errorMessage.includes('429')
+    ) {
       return true
     }
 
@@ -194,7 +200,18 @@ export async function createProductionLLMInvoker(
 
     // Client errors (4xx except rate limiting) are generally not retryable
     if (
-      errorMessage.includes('400') ||
+      errorMessage.includes('400') &&
+      !(
+        errorMessage.includes('rate limit') ||
+        errorMessage.includes('monthly_request_count') ||
+        errorMessage.includes('limit reached') ||
+        errorMessage.includes('quota')
+      )
+    ) {
+      return false
+    }
+
+    if (
       errorMessage.includes('401') ||
       errorMessage.includes('403') ||
       errorMessage.includes('404')
@@ -225,7 +242,13 @@ export async function createProductionLLMInvoker(
       return LLMInvokerErrorType.TIMEOUT
     }
 
-    if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+    if (
+      errorMessage.includes('rate limit') ||
+      errorMessage.includes('monthly_request_count') ||
+      errorMessage.includes('limit reached') ||
+      errorMessage.includes('quota') ||
+      errorMessage.includes('429')
+    ) {
       return LLMInvokerErrorType.RATE_LIMITED
     }
 
