@@ -161,8 +161,8 @@ export class HIPAADataService {
       const key =
         this.encryptionKeys.get(dataType) || this.encryptionKeys.get('master')!
       const _iv = crypto.randomBytes(16)
-
-      const cipher = crypto.createCipher(this.config.encryptionAlgorithm, key)
+      const normalizedAlgorithm = this.config.encryptionAlgorithm
+      const cipher = crypto.createCipheriv(normalizedAlgorithm, key, _iv)
       let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex')
       encrypted += cipher.final('hex')
 
@@ -216,8 +216,8 @@ export class HIPAADataService {
         this.encryptionKeys.get(metadataObj.keyId) ||
         this.encryptionKeys.get('master')!
       const _iv = Buffer.from(metadataObj.iv, 'hex')
-
-      const decipher = crypto.createDecipher(metadataObj.algorithm, key)
+      const normalizedAlgorithm = metadataObj.algorithm
+      const decipher = crypto.createDecipheriv(normalizedAlgorithm, key, _iv)
       if (metadataObj.tag && decipher.setAuthTag) {
         decipher.setAuthTag(Buffer.from(metadataObj.tag, 'hex'))
       }

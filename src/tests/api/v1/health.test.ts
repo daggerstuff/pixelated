@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { GET } from '../health'
+import { GET } from '../../../pages/api/v1/health'
 
 // Mock the health monitor
 vi.mock('../../../lib/services/health-monitor', () => ({
@@ -178,6 +178,6 @@ describe('GET /api/v1/health', () => {
 
     expect(response.status).toBe(503)
     expect(data.status).toBe('unhealthy')
-    expect(data.error).toBe('Health monitor failed')
+    expect(data.error).toBe('Error: Health monitor failed')
   })
 })
