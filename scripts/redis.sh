@@ -4,7 +4,6 @@ set -euo pipefail
 
 CONTAINER_NAME="pixelated-redis"
 LOCAL_IMAGE="redis:7-alpine"
-LOCAL_REDIS_URL="redis://127.0.0.1:6379"
 REDIS_TEST_CMD=(
   pnpm
   vitest
@@ -42,6 +41,8 @@ EOF
 }
 
 ensure_local_redis_running() {
+  local redis_password="${REDIS_PASSWORD:?REDIS_PASSWORD is required for local Redis startup}"
+
   if docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
     return 0
   fi
@@ -49,7 +50,11 @@ ensure_local_redis_running() {
   if docker ps -a --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
     docker start "$CONTAINER_NAME" >/dev/null
   else
-    docker run -d --name "$CONTAINER_NAME" -p 6379:6379 "$LOCAL_IMAGE" >/dev/null
+    docker run -d \
+      --name "$CONTAINER_NAME" \
+      -p 127.0.0.1:6379:6379 \
+      "$LOCAL_IMAGE" \
+      redis-server --bind 0.0.0.0 --appendonly yes --requirepass "$redis_password" --protected-mode yes >/dev/null
   fi
 }
 
@@ -65,8 +70,9 @@ run_with_mode() {
 
   if [ "$mode" = "local" ]; then
     ensure_local_redis_running
+    local redis_password="${REDIS_PASSWORD:?REDIS_PASSWORD is required for local Redis testing}"
     SKIP_REDIS_TESTS=false \
-      REDIS_URL="$LOCAL_REDIS_URL" \
+      REDIS_URL="redis://:${redis_password}@127.0.0.1:6379" \
       "${command[@]}"
   else
     if [ -z "${REDIS_URL_REMOTE:-}" ]; then

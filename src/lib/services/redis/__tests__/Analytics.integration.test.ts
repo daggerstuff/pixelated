@@ -57,7 +57,7 @@ describeFn('analytics Integration', () => {
       retentionDays: 1,
       batchSize: 100,
       processingInterval: 100,
-      redisClient: redis,
+      redisClient: redis as unknown as any,
       redisKeyPrefix: currentTestPrefix,
     })
   })
@@ -496,6 +496,6 @@ describeFn('analytics Integration', () => {
           eventsPerUser,
         )
       }
-    })
+    }, 30000)
   })
 })

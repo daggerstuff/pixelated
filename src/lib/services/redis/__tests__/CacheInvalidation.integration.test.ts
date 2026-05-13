@@ -5,6 +5,7 @@ import Redis from 'ioredis'
 
 import { CacheInvalidation } from '../../../cache/invalidation.ts'
 import { RedisService } from '../RedisService'
+import type { RedisMockClient } from '../redis-operation-types'
 import {
   cleanupTestKeys,
   generateTestKey,
@@ -13,7 +14,9 @@ import {
   verifyRedisConnection,
 } from './test-utils'
 
-function getRedisClientOrThrow(redisService: RedisService): Redis {
+function getRedisClientOrThrow(
+  redisService: RedisService,
+): Redis | RedisMockClient {
   const client = redisService.getClient()
 
   if (!client) {

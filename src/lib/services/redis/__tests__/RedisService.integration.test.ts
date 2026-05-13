@@ -32,7 +32,9 @@ const parseRedisRecord = (value: string | null): JsonRecord => {
 }
 
 const asStringArray = (value: unknown): string[] =>
-  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : []
 
 describeFn('RedisService Integration Tests', () => {
   let redis: RedisService
@@ -100,7 +102,7 @@ describeFn('RedisService Integration Tests', () => {
 
         // Pattern-based invalidation
         const keys = await redis.keys('integration:cache:*')
-      await Promise.all(keys.map(async (key) => redis.del(key)))
+        await Promise.all(keys.map(async (key) => redis.del(key)))
 
         // Verify all cache entries are invalidated
         expect(await redis.exists('integration:cache:key2')).toBe(false)
@@ -135,7 +137,7 @@ describeFn('RedisService Integration Tests', () => {
 
         // Verify session
         const session = await redis.get(`integration:session:${sessionId}`)
-    expect(parseRedisRecord(session)).toEqual(userData)
+        expect(parseRedisRecord(session)).toEqual(userData)
 
         // Update session
         userData.roles.push('admin')
@@ -465,7 +467,7 @@ describeFn('RedisService Integration Tests', () => {
 
   describe('concurrent operations', () => {
     it('should handle multiple set operations concurrently', async () => {
-        const operations = Array.from({ length: 100 }, async (_, i) => {
+      const operations = Array.from({ length: 100 }, async (_, i) => {
         const key = generateTestKey(`concurrent-set-${i}`)
         return redis.set(key, `value-${i}`)
       })
@@ -520,9 +522,9 @@ describeFn('RedisService Integration Tests', () => {
         await retryRedis.disconnect()
 
         // This should retry and eventually fail
-      await expect(retryRedis.get(key)).rejects.toMatchObject({
-        code: RedisErrorCode.OPERATION_FAILED,
-      } as Partial<RedisServiceError>)
+        await expect(retryRedis.get(key)).rejects.toMatchObject({
+          code: RedisErrorCode.OPERATION_FAILED,
+        } as Partial<RedisServiceError>)
       } finally {
         await retryRedis.disconnect()
       }
