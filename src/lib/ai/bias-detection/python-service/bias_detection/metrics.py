@@ -1,8 +1,25 @@
-"""
-Prometheus metrics for the bias detection service.
-"""
+"""Prometheus metrics for the bias detection service."""
 
-from prometheus_client import Counter, Histogram
+from __future__ import annotations
+
+
+class _NoopMetric:
+    def labels(self, *_args: object, **_kwargs: object) -> "_NoopMetric":
+        return self
+
+    def inc(self, *_args: object, **_kwargs: object) -> None:
+        return None
+
+    def observe(self, *_args: object, **_kwargs: object) -> None:
+        return None
+
+
+try:
+    from prometheus_client import Counter, Histogram
+except Exception:  # pragma: no cover - optional dependency/environment issue
+    Counter = lambda *_, **__: _NoopMetric()  # type: ignore[assignment]
+    Histogram = lambda *_, **__: _NoopMetric()  # type: ignore[assignment]
+
 
 request_count = Counter(
     "bias_detection_requests_total",
