@@ -494,7 +494,7 @@ export class AnonymizationService {
     const minK = Math.min(...Array.from(groups.values()))
     if (minK < this.config.kAnonymity) {
       issues.push(
-        `K-anonymity requirement not met: ${minK} < ${this.config.kAnonymity}`,
+        `k-anonymity requirement not met: ${minK} < ${this.config.kAnonymity}`,
       )
       recommendations.push(
         'Increase generalization or reduce quasi-identifiers',
@@ -512,6 +512,7 @@ export class AnonymizationService {
 
     return {
       isValid: issues.length === 0,
+      valid: issues.length === 0,
       issues,
       recommendations,
     }

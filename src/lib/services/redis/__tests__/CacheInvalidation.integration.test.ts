@@ -1,7 +1,7 @@
 /**
  * @vitest-environment node
  */
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 
 import { CacheInvalidation } from '../../../cache/invalidation.ts'
 import { RedisService } from '../RedisService'

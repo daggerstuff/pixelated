@@ -1,10 +1,10 @@
+/* @vitest-environment node */
 /**
  * Tests for Global Threat Intelligence Network
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntelligenceNetwork'
 
 // Mock dependencies
@@ -24,31 +24,43 @@ vi.mock('../../logging/build-safe-logger', () => ({
   })),
 }))
 
+const redisMockState = {
+  failPing: false,
+}
+
 vi.mock('ioredis', () => {
-  return {
-    Redis: vi.fn<
-      (..._args: unknown[]) => {
-        ping: () => Promise<string>
-        setex: () => Promise<string>
-        get: () => Promise<string | null>
-        del: () => Promise<number>
-        publish: () => Promise<number>
-        quit: () => Promise<string>
+  const createMockRedis = function () {
+    if (redisMockState.failPing) {
+      return {
+        ping: vi
+          .fn<() => Promise<string>>()
+          .mockRejectedValue(new Error('Redis connection failed')),
+        setex: vi.fn<() => Promise<string>>().mockResolvedValue('OK'),
+        get: vi.fn<() => Promise<string | null>>().mockResolvedValue(null),
+        del: vi.fn<() => Promise<number>>().mockResolvedValue(1),
+        publish: vi.fn<() => Promise<number>>().mockResolvedValue(1),
+        quit: vi.fn<() => Promise<string>>().mockResolvedValue('OK'),
       }
-    >(() => ({
+    }
+
+    return {
       ping: vi.fn<() => Promise<string>>().mockResolvedValue('PONG'),
       setex: vi.fn<() => Promise<string>>().mockResolvedValue('OK'),
       get: vi.fn<() => Promise<string | null>>().mockResolvedValue(null),
       del: vi.fn<() => Promise<number>>().mockResolvedValue(1),
       publish: vi.fn<() => Promise<number>>().mockResolvedValue(1),
       quit: vi.fn<() => Promise<string>>().mockResolvedValue('OK'),
-    })),
+    }
+  }
+
+  return {
+    Redis: vi.fn(createMockRedis),
   }
 })
 
 vi.mock('mongodb', () => {
-  return {
-    MongoClient: vi.fn(() => ({
+  const createMongoClient = function () {
+    return {
       connect: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
       db: vi.fn(() => ({
         collection: vi.fn(() => ({
@@ -81,19 +93,273 @@ vi.mock('mongodb', () => {
         })),
       })),
       close: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
-    })),
+    }
+  }
+
+  return {
+    MongoClient: vi.fn(createMongoClient),
   }
 })
+
+const mockEdgeDetectionSystem = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  detectThreat: vi.fn<() => Promise<unknown>>().mockResolvedValue({
+    threatDetected: false,
+    severity: 'low',
+    confidence: 0.5,
+    details: {},
+  }),
+  getEdgeNodeStatus: vi.fn<() => Promise<unknown>>().mockResolvedValue({
+    healthy: true,
+    statusMessage: 'ok',
+  }),
+  deployAIModel: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
+  updateDetectionThresholds: vi
+    .fn<() => Promise<boolean>>()
+    .mockResolvedValue(true),
+  getHealthStatus: vi.fn<() => Promise<unknown>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../edge/EdgeThreatDetectionSystem', () => ({
+  EdgeThreatDetectionSystemCore: vi.fn(function () {
+    return mockEdgeDetectionSystem
+  }),
+}))
+
+const mockThreatStore = vi.hoisted(() => ({
+  threats: new Map<string, any>(),
+  threatIntelligence: new Map<string, any>(),
+  indicators: new Map<string, string>(),
+}))
+
+const mockThreatCorrelationEngine = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  correlateThreat: vi.fn<() => Promise<any>>().mockResolvedValue({
+    correlationId: 'test-correlation',
+    correlationType: 'shared_indicators',
+    correlationStrength: 0.85,
+    correlatedThreats: [],
+    confidence: 0.85,
+    analysisMethod: 'unit-test',
+    timestamp: new Date(),
+  }),
+  correlateThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
+  findSimilarThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
+  getCorrelationPatterns: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
+  updateCorrelationAlgorithm: vi
+    .fn<() => Promise<boolean>>()
+    .mockResolvedValue(true),
+  getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+    responseTime: 12,
+    activeCorrelations: 0,
+    patternCount: 0,
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../correlation/ThreatCorrelationEngine', () => ({
+  ThreatCorrelationEngine: vi.fn(function () {
+    return mockThreatCorrelationEngine
+  }),
+}))
+
+const mockThreatIntelligenceDatabase = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  storeThreatIntelligence: vi
+    .fn<() => Promise<void>>()
+    .mockImplementation(async (threat: any) => {
+      mockThreatStore.threats.set(threat.threatId, threat)
+      mockThreatStore.threatIntelligence.set(threat.intelligenceId, threat)
+      threat.indicators?.forEach((indicator: any) => {
+        mockThreatStore.indicators.set(
+          `${indicator.indicatorType}:${indicator.value}`,
+          threat.threatId,
+        )
+      })
+    }),
+  getThreatById: vi
+    .fn<() => Promise<any | null>>()
+    .mockImplementation(async (threatId: string) => {
+      return mockThreatStore.threats.get(threatId) ?? null
+    }),
+  getThreatByIndicator: vi
+    .fn<() => Promise<any | null>>()
+    .mockImplementation(async (indicatorType: string, value: string) => {
+      const threatId = mockThreatStore.indicators.get(
+        `${indicatorType}:${value}`,
+      )
+      return threatId ? (mockThreatStore.threats.get(threatId) ?? null) : null
+    }),
+  getThreatByIntelligenceId: vi
+    .fn<() => Promise<any | null>>()
+    .mockImplementation(async (intelligenceId: string) => {
+      return mockThreatStore.threatIntelligence.get(intelligenceId) ?? null
+    }),
+  updateThreatIntelligence: vi
+    .fn<() => Promise<void>>()
+    .mockResolvedValue(undefined),
+  getTotalThreatCount: vi.fn<() => Promise<number>>().mockResolvedValue(0),
+  getActiveThreatCount: vi.fn<() => Promise<number>>().mockResolvedValue(0),
+  getThreatsByRegion: vi
+    .fn<() => Promise<Record<string, number>>>()
+    .mockResolvedValue({}),
+  getThreatsBySeverity: vi
+    .fn<() => Promise<Record<string, number>>>()
+    .mockResolvedValue({}),
+  getRecentThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
+  getCorrelationCount: vi.fn<() => Promise<number>>().mockResolvedValue(0),
+  getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+    responseTime: 11,
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../database/ThreatIntelligenceDatabase', () => ({
+  ThreatIntelligenceDatabase: vi.fn(function () {
+    return mockThreatIntelligenceDatabase
+  }),
+}))
+
+const mockResponseOrchestrator = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  orchestrateThreatResponse: vi
+    .fn<() => Promise<any>>()
+    .mockResolvedValue({ responseId: 'response-1', status: 'ok' }),
+  getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+    responseTime: 8,
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../orchestration/AutomatedThreatResponseOrchestrator', () => ({
+  AutomatedThreatResponseOrchestrator: vi.fn(function () {
+    return mockResponseOrchestrator
+  }),
+}))
+
+const mockHuntingSystem = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../hunting/ThreatHuntingSystem', () => ({
+  ThreatHuntingSystem: vi.fn(function () {
+    return mockHuntingSystem
+  }),
+}))
+
+const mockFeedIntegration = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  fetchThreatIntelligence: vi
+    .fn<() => Promise<unknown[]>>()
+    .mockResolvedValue([]),
+  getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../feeds/ExternalThreatFeedIntegration', () => ({
+  ExternalThreatFeedIntegration: vi.fn(function () {
+    return mockFeedIntegration
+  }),
+}))
+
+const mockValidationSystem = vi.hoisted(() => ({
+  initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+  validateIntelligence: vi.fn<() => Promise<any>>().mockResolvedValue({
+    validationId: 'validation-1',
+    status: 'validated',
+    accuracy: 0.99,
+    completeness: 0.97,
+    consistency: 0.96,
+    timeliness: 0.98,
+    relevance: 0.99,
+    validator: 'mock',
+    validationDate: new Date(),
+    feedback: [],
+  }),
+  getValidationMetrics: vi.fn<() => Promise<any>>().mockResolvedValue({
+    totalValidated: 1,
+    accuracy: 0.97,
+    completeness: 0.97,
+    consistency: 0.96,
+    averageProcessingTime: 5,
+  }),
+  getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
+    healthy: true,
+    message: 'healthy',
+    responseTime: 7,
+  }),
+  shutdown: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+}))
+
+vi.mock('../validation/ThreatValidationSystem', () => ({
+  ThreatValidationSystem: vi.fn(function () {
+    return mockValidationSystem
+  }),
+}))
 
 describe('GlobalThreatIntelligenceNetworkCore', () => {
   let network: GlobalThreatIntelligenceNetworkCore
   let mockConfig: any
 
+  const createThreatData = (overrides: Record<string, unknown> = {}) => ({
+    threatId: `threat-${Math.random().toString(36).slice(2, 11)}`,
+    threatType: 'malware',
+    severity: 0.8,
+    confidence: 0.9,
+    indicators: [
+      {
+        indicatorType: 'ip',
+        value: '192.168.1.100',
+        confidence: 0.9,
+        firstSeen: new Date(),
+        lastSeen: new Date(),
+      },
+    ],
+    context: {
+      sourceSystem: 'unit-test',
+      ingestionPipeline: 'test',
+      dataQuality: 'high',
+      geolocation: {
+        country: 'US',
+        region: 'us-east-1',
+        city: 'New York',
+      },
+    },
+    source: 'test-source',
+    timestamp: new Date(),
+    region: 'us-east-1',
+    ...overrides,
+  })
+
+  const resetMockStore = () => {
+    mockThreatStore.threats.clear()
+    mockThreatStore.threatIntelligence.clear()
+    mockThreatStore.indicators.clear()
+  }
+
   beforeEach(() => {
+    resetMockStore()
     mockConfig = {
       networkId: 'test-network',
       networkName: 'Test Network',
-      regions: ['us-east-1', 'eu-west-1'],
       primaryRegion: 'us-east-1',
       failoverRegions: ['eu-west-1'],
       syncInterval: 30000,
@@ -103,479 +369,406 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
       realTimeProcessing: true,
       encryptionEnabled: true,
       compressionEnabled: true,
+      regions: [
+        {
+          regionId: 'us-east-1',
+          regionName: 'US East',
+          location: {
+            latitude: 40.7128,
+            longitude: -74.006,
+            timezone: 'America/New_York',
+          },
+          dataCenters: [
+            {
+              dataCenterId: 'dc-us-east-1-a',
+              location: 'NY',
+              capacity: {
+                maxThreats: 10000,
+                maxConnections: 5000,
+                storageGB: 5000,
+              },
+              services: ['database', 'redis', 'ml'],
+              status: 'active',
+            },
+          ],
+          edgeNodes: [
+            {
+              nodeId: 'edge-us-east-1-a',
+              location: 'NYC',
+              capabilities: ['detection', 'correlation'],
+              aiModels: ['threat-model-v1'],
+              bandwidth: 1000,
+              latency: 20,
+            },
+          ],
+          priority: 1,
+          complianceRequirements: ['SOC2'],
+        },
+      ],
+      dataSharing: {
+        enabled: true,
+        protocols: ['json'],
+        encryption: {
+          algorithm: 'AES-256-GCM',
+          keyRotation: 3600,
+        },
+        authentication: {
+          method: 'token',
+          certificates: ['test-cert'],
+        },
+        rateLimiting: {
+          requestsPerSecond: 100,
+          burstLimit: 200,
+        },
+      },
+      edgeDetection: {
+        aiModels: [
+          {
+            modelId: 'threat-model-v1',
+            modelType: 'classification',
+            version: '1.0.0',
+            framework: 'tensorflow',
+            performance: {
+              accuracy: 0.95,
+              precision: 0.94,
+              recall: 0.93,
+              f1Score: 0.93,
+            },
+            deployment: {
+              regions: ['us-east-1'],
+              edgeNodes: ['edge-us-east-1-a'],
+              resources: {
+                cpu: 4,
+                memory: 16384,
+                gpu: 1,
+              },
+            },
+          },
+        ],
+        detectionThresholds: {
+          anomaly: 0.8,
+          threat: 0.75,
+          confidence: 0.85,
+          severity: {
+            low: 0.2,
+            medium: 0.5,
+            high: 0.75,
+            critical: 0.9,
+          },
+        },
+        updateFrequency: 60000,
+        modelDeployment: {
+          strategy: 'rolling',
+          rolloutPercentage: 50,
+          rollbackThreshold: 0.15,
+          healthChecks: [
+            {
+              type: 'http',
+              endpoint: '/health',
+              interval: 5000,
+              timeout: 2000,
+            },
+          ],
+        },
+      },
+      correlation: {
+        algorithms: [
+          {
+            algorithmId: 'shared-indicators-v1',
+            algorithmType: 'graph',
+            parameters: {},
+            performance: {
+              accuracy: 0.9,
+              speed: 0.9,
+              scalability: 0.88,
+            },
+          },
+        ],
+        timeWindow: 600000,
+        similarityThreshold: 0.85,
+        crossRegionWeight: 0.6,
+        historicalWeight: 0.4,
+      },
+      database: {
+        primary: {
+          host: 'localhost',
+          port: 27017,
+          database: 'threat-intel',
+          username: 'user',
+          password: 'password',
+          ssl: false,
+          connectionPool: {
+            min: 1,
+            max: 10,
+            idleTimeout: 30000,
+          },
+        },
+        replicas: [],
+        sharding: {
+          enabled: false,
+          shards: [],
+          shardKey: 'threatId',
+          balancingStrategy: 'round_robin',
+        },
+        backup: {
+          enabled: false,
+          frequency: 86400,
+          retention: 7,
+          locations: ['local'],
+          encryption: true,
+        },
+        stixSupport: {
+          enabled: false,
+          version: '2.1',
+          objects: [],
+          validation: true,
+          exportFormats: ['json'],
+        },
+        taxiiSupport: {
+          enabled: false,
+          version: '2.1',
+          collections: [],
+          authentication: {
+            method: 'token',
+            certificates: [],
+          },
+          rateLimiting: {
+            requestsPerMinute: 120,
+            burstLimit: 200,
+          },
+        },
+      },
+      orchestration: {
+        responseStrategies: [
+          {
+            strategyId: 'default',
+            name: 'default-response',
+            description: 'Default response strategy',
+            threatTypes: ['malware', 'c2'],
+            severityLevels: ['high', 'critical'],
+            responseActions: [
+              {
+                actionId: 'alert',
+                actionType: 'alert',
+                priority: 1,
+                parameters: {},
+                timeout: 5000,
+                retryCount: 1,
+              },
+            ],
+            conditions: [
+              {
+                conditionId: 'default',
+                type: 'severity',
+                field: 'severity',
+                operator: 'gte',
+                value: 0.8,
+              },
+            ],
+            priority: 1,
+            primaryType: 'alert',
+          },
+        ],
+        automationLevel: 'semi',
+        escalationRules: [
+          {
+            ruleId: 'default',
+            triggerCondition: {
+              type: 'confidence',
+              operator: 'gte',
+              threshold: 0.9,
+            },
+            escalateTo: ['SOC'],
+            requiredApprovals: 1,
+            timeout: 300,
+          },
+        ],
+        integrationEndpoints: [],
+      },
+      validation: {
+        enabled: true,
+        validationRules: [
+          {
+            ruleId: 'confidence',
+            name: 'Confidence threshold',
+            ruleType: 'accuracy',
+            conditions: [],
+            condition: 'confidence >= 0.6',
+            severity: 'medium',
+            threshold: 0.6,
+            action: 'accept',
+          },
+        ],
+        validationThreshold: 0.75,
+        qualityThresholds: {
+          accuracy: 0.7,
+          completeness: 0.7,
+          consistency: 0.7,
+          timeliness: 0.7,
+          relevance: 0.7,
+        },
+        feedbackLoop: {
+          enabled: true,
+          sources: ['human'],
+          updateFrequency: 86400,
+          learningRate: 0.1,
+        },
+      },
     }
 
     process.env.MONGODB_URI = 'mongodb://localhost:27017/test'
     process.env.REDIS_URL = 'redis://localhost:6379'
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    if (network) {
+      await network.shutdown().catch(() => undefined)
+    }
+
     vi.clearAllMocks()
+    redisMockState.failPing = false
+    resetMockStore()
   })
 
-  describe('Initialization', () => {
-    it('should initialize successfully with valid configuration', async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+  it('should initialize successfully with valid configuration', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
 
-      await expect(network.initialize()).resolves.not.toThrow()
-
-      const logger = createBuildSafeLogger('global-threat-intelligence-network')
-      expect(logger.info).toHaveBeenCalledWith(
-        'Initializing Global Threat Intelligence Network',
-      )
-      expect(logger.info).toHaveBeenCalledWith(
-        'Global Threat Intelligence Network initialized successfully',
-      )
-    })
-
-    it('should handle initialization errors gracefully', async () => {
-      const Redis = vi.fn().mockImplementation(() => ({
-        ping: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
-      }))
-
-      vi.doMock('ioredis', () => ({ Redis }))
-
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-
-      await expect(network.initialize()).rejects.toThrow(
-        'Redis connection failed',
-      )
-    })
+    await expect(network.initialize()).resolves.not.toThrow()
   })
 
-  describe('Threat Processing', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
+  it('should handle initialization errors gracefully', async () => {
+    redisMockState.failPing = true
+
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await expect(network.initialize()).rejects.toThrow(
+      'Redis connection failed',
+    )
+  })
+
+  it('should process threat intelligence successfully', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
+
+    const threatData = createThreatData({ threatId: 'threat-123' })
+    const result = await network.processThreatIntelligence(threatData)
+
+    expect(result.threatId).toBe('threat-123')
+    expect(result.globalThreatId).toBeTruthy()
+  })
+
+  it('should update existing threat on duplicate input', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
+
+    const threatData = createThreatData({ threatId: 'duplicate-threat' })
+    const first = await network.processThreatIntelligence(threatData)
+    const second = await network.processThreatIntelligence({
+      ...threatData,
+      confidence: 0.97,
     })
 
-    it('should process threat intelligence successfully', async () => {
-      const threatData = {
-        threatId: 'threat-123',
-        threatType: 'malware',
-        severity: 'high',
+    expect(first.threatId).toBe(second.threatId)
+    expect(second.globalThreatId).toBeTruthy()
+  })
+
+  it('should validate threat data before processing', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
+
+    const invalidThreat = {
+      threatId: 'bad-threat',
+      severity: 1.2,
+      confidence: 1.5,
+      indicators: [],
+      timestamp: new Date(),
+      region: 'us-east-1',
+    } as any
+
+    await expect(
+      network.processThreatIntelligence(invalidThreat),
+    ).rejects.toThrow()
+  })
+
+  it('should correlate threat IDs across regions', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
+
+    const first = await network.processThreatIntelligence(
+      createThreatData({ threatId: 'threat-a' }),
+    )
+    const second = await network.processThreatIntelligence(
+      createThreatData({ threatId: 'threat-b' }),
+    )
+
+    mockThreatCorrelationEngine.correlateThreats.mockResolvedValueOnce([
+      {
+        correlationId: 'corr-1',
+        correlationType: 'shared_indicators',
+        correlationStrength: 0.8,
+        correlatedThreats: [first.threatId, second.threatId],
         confidence: 0.8,
-        indicators: [
-          {
-            indicatorType: 'ip',
-            value: '192.168.1.1',
-            confidence: 0.9,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1'],
-        attribution: {
-          family: 'test-family',
-          campaign: 'test-campaign',
-          confidence: 0.7,
-        },
-        metadata: {
-          source: 'test-source',
-          processed: true,
-        },
-      }
+        analysisMethod: 'mock',
+        timestamp: new Date(),
+      },
+    ])
 
-      const result = await network.processThreatIntelligence(threatData)
-
-      expect(result).toBeDefined()
-      expect(result.threatId).toBe('threat-123')
-      expect(result.status).toBe('processed')
-    })
-
-    it('should validate threat data before processing', async () => {
-      const invalidThreat = {
-        threatId: '',
-        threatType: '',
-        severity: 'invalid',
-        confidence: 1.5, // Invalid confidence
-        indicators: [],
-      }
-
-      await expect(
-        network.processThreatIntelligence(invalidThreat),
-      ).rejects.toThrow()
-    })
-
-    it('should handle duplicate threats', async () => {
-      const threatData = {
-        threatId: 'duplicate-threat',
-        threatType: 'malware',
-        severity: 'high',
-        confidence: 0.8,
-        indicators: [
-          {
-            indicatorType: 'ip',
-            value: '10.0.0.1',
-            confidence: 0.9,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1'],
-      }
-
-      // Process first threat
-      await network.processThreatIntelligence(threatData)
-
-      // Process duplicate
-      const result = await network.processThreatIntelligence(threatData)
-
-      expect(result.status).toBe('duplicate')
+    const correlations = await network.correlateThreatsAcrossRegions([
+      first.threatId,
+      second.threatId,
+    ])
+    expect(correlations).toHaveLength(1)
+    expect(correlations[0]).toMatchObject({
+      correlationId: 'corr-1',
+      correlationType: 'shared_indicators',
     })
   })
 
-  describe('Cross-Region Synchronization', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
+  it('should return empty correlations for empty threat list', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
 
-    it('should synchronize threats across regions', async () => {
-      const threatData = {
-        threatId: 'sync-threat-123',
-        threatType: 'c2',
-        severity: 'critical',
-        confidence: 0.9,
-        indicators: [
-          {
-            indicatorType: 'domain',
-            value: 'malicious.com',
-            confidence: 0.95,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1', 'eu-west-1'],
-      }
+    const correlations = await network.correlateThreatsAcrossRegions([])
+    expect(correlations).toEqual([])
+  })
 
-      const result = await network.synchronizeThreat(threatData)
+  it('should return healthy status when all systems are operational', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
 
-      expect(result).toBeDefined()
-      expect(result.syncStatus).toBe('completed')
-      expect(result.regionsSynced).toContain('us-east-1')
-      expect(result.regionsSynced).toContain('eu-west-1')
-    })
+    const status = await network.getHealthStatus()
+    expect(status.status).toBe('healthy')
+  })
 
-    it('should handle synchronization failures gracefully', async () => {
-      const threatData = {
-        threatId: 'sync-fail-threat',
-        threatType: 'malware',
-        severity: 'high',
-        confidence: 0.8,
-        indicators: [
-          {
-            indicatorType: 'ip',
-            value: '192.168.1.100',
-            confidence: 0.85,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['invalid-region'],
-      }
+  it('should return a global threat summary', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
 
-      await expect(network.synchronizeThreat(threatData)).rejects.toThrow()
+    const summary = await network.getGlobalThreatSummary()
+    expect(summary.totalThreats).toBeGreaterThanOrEqual(0)
+    expect(summary.correlationCount).toBeGreaterThanOrEqual(0)
+    expect(summary.validationMetrics).toBeDefined()
+  })
+
+  it('should emit threat_processed events', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
+
+    const eventHandler = vi.fn()
+    network.on('threat_processed', eventHandler)
+
+    const threatData = createThreatData({ threatId: 'event-test-threat' })
+    const result = await network.processThreatIntelligence(threatData)
+
+    expect(eventHandler).toHaveBeenCalledWith({
+      threatId: threatData.threatId,
+      globalThreatId: result.globalThreatId,
     })
   })
 
-  describe('Threat Correlation', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
+  it('should shutdown gracefully', async () => {
+    network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
+    await network.initialize()
 
-    it('should correlate related threats', async () => {
-      const threats = [
-        {
-          threatId: 'threat-1',
-          threatType: 'malware',
-          severity: 'high',
-          confidence: 0.8,
-          indicators: [
-            {
-              indicatorType: 'ip',
-              value: '192.168.1.10',
-              confidence: 0.9,
-              firstSeen: new Date(),
-              lastSeen: new Date(),
-            },
-          ],
-          firstSeen: new Date(),
-          lastSeen: new Date(),
-          regions: ['us-east-1'],
-        },
-        {
-          threatId: 'threat-2',
-          threatType: 'malware',
-          severity: 'high',
-          confidence: 0.85,
-          indicators: [
-            {
-              indicatorType: 'ip',
-              value: '192.168.1.10', // Same IP
-              confidence: 0.9,
-              firstSeen: new Date(),
-              lastSeen: new Date(),
-            },
-          ],
-          firstSeen: new Date(),
-          lastSeen: new Date(),
-          regions: ['eu-west-1'],
-        },
-      ]
-
-      const correlations = await network.correlateThreats(threats)
-
-      expect(correlations).toBeDefined()
-      expect(correlations.length).toBeGreaterThan(0)
-      expect(correlations[0].correlationType).toBe('shared_indicators')
-    })
-
-    it('should handle empty threat arrays', async () => {
-      const correlations = await network.correlateThreats([])
-
-      expect(correlations).toBeDefined()
-      expect(correlations.length).toBe(0)
-    })
-  })
-
-  describe('Health Monitoring', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
-
-    it('should return healthy status when all systems are operational', async () => {
-      const healthStatus = await network.getHealthStatus()
-
-      expect(healthStatus.healthy).toBe(true)
-      expect(healthStatus.message).toContain('healthy')
-      expect(healthStatus.activeRegions).toBeGreaterThan(0)
-    })
-
-    it('should monitor threat processing metrics', async () => {
-      const metrics = await network.getThreatMetrics()
-
-      expect(metrics).toBeDefined()
-      expect(metrics.totalThreats).toBeGreaterThanOrEqual(0)
-      expect(metrics.threatsBySeverity).toBeDefined()
-      expect(metrics.threatsByType).toBeDefined()
-    })
-  })
-
-  describe('Error Handling', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
-
-    it('should handle database connection errors gracefully', async () => {
-      // Simulate database error
-
-      // This would need to be properly mocked in the actual implementation
-      // For now, we test the error handling structure
-
-      const threatData = {
-        threatId: 'error-threat',
-        threatType: 'malware',
-        severity: 'high',
-        confidence: 0.8,
-        indicators: [
-          {
-            indicatorType: 'ip',
-            value: '192.168.1.200',
-            confidence: 0.9,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1'],
-      }
-
-      // The actual error handling would be tested with proper mocking
-      expect(async () => {
-        await network.processThreatIntelligence(threatData)
-      }).toBeDefined()
-    })
-
-    it('should handle invalid threat data with proper validation', async () => {
-      const invalidThreats = [
-        { threatId: null, threatType: 'malware' }, // Missing threatId
-        { threatId: 'test', threatType: '' }, // Empty threatType
-        { threatId: 'test', threatType: 'malware', severity: 'invalid' }, // Invalid severity
-        { threatId: 'test', threatType: 'malware', confidence: 1.5 }, // Invalid confidence
-        { threatId: 'test', threatType: 'malware', indicators: [] }, // No indicators
-      ]
-
-      for (const invalidThreat of invalidThreats) {
-        await expect(
-          network.processThreatIntelligence(invalidThreat),
-        ).rejects.toThrow()
-      }
-    })
-  })
-
-  describe('Performance', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
-
-    it('should handle high-volume threat processing', async () => {
-      const threats = Array.from({ length: 100 }, (_, i) => ({
-        threatId: `bulk-threat-${i}`,
-        threatType: 'malware',
-        severity: i % 2 === 0 ? 'high' : 'medium',
-        confidence: 0.7 + (i % 3) * 0.1,
-        indicators: [
-          {
-            indicatorType: 'ip',
-            value: `192.168.1.${i}`,
-            confidence: 0.8,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1'],
-      }))
-
-      const startTime = Date.now()
-
-      const results = await Promise.all(
-        threats.map((threat) => network.processThreatIntelligence(threat)),
-      )
-
-      const endTime = Date.now()
-      const processingTime = endTime - startTime
-
-      expect(results).toHaveLength(100)
-      expect(processingTime).toBeLessThan(30000) // Should process 100 threats in under 30 seconds
-
-      const successfulResults = results.filter((r) => r.status === 'processed')
-      expect(successfulResults.length).toBeGreaterThan(0)
-    })
-
-    it('should implement proper caching for repeated queries', async () => {
-      const threatId = 'cache-test-threat'
-
-      // First query - should hit database
-      const result1 = await network.getThreatById(threatId)
-
-      // Second query - should hit cache
-      const result2 = await network.getThreatById(threatId)
-
-      // Both should return the same result (or null if not found)
-      expect(result1).toEqual(result2)
-    })
-  })
-
-  describe('Event Emission', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
-
-    it('should emit events for threat processing', async () => {
-      const eventHandler = vi.fn()
-      network.on('threat_processed', eventHandler)
-
-      const threatData = {
-        threatId: 'event-test-threat',
-        threatType: 'malware',
-        severity: 'high',
-        confidence: 0.8,
-        indicators: [
-          {
-            indicatorType: 'ip',
-            value: '192.168.1.75',
-            confidence: 0.9,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1'],
-      }
-
-      await network.processThreatIntelligence(threatData)
-
-      expect(eventHandler).toHaveBeenCalledWith({
-        threatId: 'event-test-threat',
-        status: 'processed',
-        region: 'us-east-1',
-      })
-    })
-
-    it('should emit events for synchronization', async () => {
-      const eventHandler = vi.fn()
-      network.on('threat_synchronized', eventHandler)
-
-      const threatData = {
-        threatId: 'sync-event-threat',
-        threatType: 'c2',
-        severity: 'critical',
-        confidence: 0.9,
-        indicators: [
-          {
-            indicatorType: 'domain',
-            value: 'bad-domain.com',
-            confidence: 0.95,
-            firstSeen: new Date(),
-            lastSeen: new Date(),
-          },
-        ],
-        firstSeen: new Date(),
-        lastSeen: new Date(),
-        regions: ['us-east-1', 'eu-west-1'],
-      }
-
-      await network.synchronizeThreat(threatData)
-
-      expect(eventHandler).toHaveBeenCalled()
-    })
-  })
-
-  describe('Shutdown', () => {
-    beforeEach(async () => {
-      network = new GlobalThreatIntelligenceNetworkCore(mockConfig)
-      await network.initialize()
-    })
-
-    it('should shutdown gracefully', async () => {
-      await expect(network.shutdown()).resolves.not.toThrow()
-
-      const logger = createBuildSafeLogger('global-threat-intelligence-network')
-      expect(logger.info).toHaveBeenCalledWith(
-        'Shutting down Global Threat Intelligence Network',
-      )
-      expect(logger.info).toHaveBeenCalledWith(
-        'Global Threat Intelligence Network shutdown completed',
-      )
-    })
-
-    it('should handle shutdown errors gracefully', async () => {
-      // Mock a shutdown error
-
-      // This would need proper mocking in the actual implementation
-      // For now, we test the error handling structure
-
-      expect(async () => {
-        await network.shutdown()
-      }).toBeDefined()
-    })
+    await expect(network.shutdown()).resolves.not.toThrow()
   })
 })

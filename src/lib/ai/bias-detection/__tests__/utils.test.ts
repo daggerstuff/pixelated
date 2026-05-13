@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 /**
  * Unit tests for bias detection utility functions
  */

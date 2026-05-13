@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import { WebSocket } from 'ws'
 
 import { config } from '@/config/env.config'

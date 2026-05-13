@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import SyncManager from '../syncManager'
-import { indexedDBRequestQueue } from './indexedDBRequestQueue'
+import { indexedDBRequestQueue } from '../indexedDBRequestQueue'
+import { SyncManager } from '../syncManager'
 
 describe('SyncManager', () => {
   let syncManager: SyncManager

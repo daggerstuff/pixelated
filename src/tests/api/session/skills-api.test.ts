@@ -1,20 +1,24 @@
 import { Pool } from 'pg'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
-import { POST, GET } from '../skills'
+import { POST, GET } from '../../../pages/api/session/skills'
 
-// Mock pg.Pool
-vi.mock('pg', () => {
+const { mockPool } = vi.hoisted(() => {
   const mockQuery = vi.fn()
-  const mockClient = {
+  const client = {
     query: mockQuery,
     release: vi.fn(),
   }
-  const mockPool = {
-    connect: vi.fn(() => Promise.resolve(mockClient)),
+  return {
+    mockPool: class {
+      connect = vi.fn(async () => client)
+    },
   }
-  return { Pool: vi.fn(() => mockPool) }
 })
+
+vi.mock('pg', () => ({
+  Pool: mockPool,
+}))
 
 describe('Session Skills API', () => {
   const mockPool = new Pool()

@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import { EventEmitter } from 'events'
 
 import Redis from 'ioredis-mock'

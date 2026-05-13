@@ -213,13 +213,79 @@ describe('breachAnalytics', () => {
 
       expect(listRecentBreaches).toHaveBeenCalled()
       expect(RiskScoring.calculateOverallRisk).toHaveBeenCalledWith(
-        mockBreaches,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'breach_1',
+            severity: 'high',
+            affectedUsers: ['user1', 'user2'],
+            dataTypes: undefined,
+            attackVector: undefined,
+            description: undefined,
+            metadata: {},
+            remediationStatus: 'completed',
+            timestamp: new Date(mockBreaches[0].timestamp),
+            detectionTime: new Date(mockBreaches[0].timestamp),
+            responseTime: new Date(mockBreaches[0].timestamp + 3_600_000),
+          }),
+          expect.objectContaining({
+            id: 'breach_2',
+            severity: 'critical',
+            affectedUsers: ['user3', 'user4', 'user5'],
+            dataTypes: undefined,
+            attackVector: undefined,
+            description: undefined,
+            metadata: {},
+            remediationStatus: 'completed',
+            timestamp: new Date(mockBreaches[1].timestamp),
+            detectionTime: new Date(mockBreaches[1].timestamp),
+            responseTime: new Date(mockBreaches[1].timestamp + 3_600_000),
+          }),
+        ]),
       )
       expect(ComplianceMetrics.calculateScore).toHaveBeenCalledWith(
         mockBreaches,
       )
       expect(NotificationEffectiveness.calculate).toHaveBeenCalledWith(
-        mockBreaches,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'breach_1',
+            timestamp: new Date(mockBreaches[0].timestamp),
+            severity: {
+              level: 'high',
+              score: 0.8,
+            },
+            notificationStatus: 'completed',
+            notifications: {
+              acknowledged: 1,
+              actioned: 1,
+              delivered: 1,
+              failed: 0,
+              timeToAcknowledge: 2,
+              timeToNotify: 1,
+              total: 1,
+            },
+            regulatoryFrameworks: ['GDPR'],
+          }),
+          expect.objectContaining({
+            id: 'breach_2',
+            timestamp: new Date(mockBreaches[1].timestamp),
+            severity: {
+              level: 'critical',
+              score: 1,
+            },
+            notificationStatus: 'completed',
+            notifications: {
+              acknowledged: 1,
+              actioned: 1,
+              delivered: 1,
+              failed: 0,
+              timeToAcknowledge: 2,
+              timeToNotify: 1,
+              total: 1,
+            },
+            regulatoryFrameworks: ['GDPR'],
+          }),
+        ]),
       )
     })
 

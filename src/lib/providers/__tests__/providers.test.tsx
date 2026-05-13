@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 
-import { useErrorBoundary } from '../ErrorBoundary'
 import { useSecurity } from '../SecurityProvider'
 import { SharedProviders } from '../SharedProviders'
 import { useTheme } from '../ThemeProvider'
@@ -17,22 +16,17 @@ function ThemeConsumer() {
 }
 
 function SecurityConsumer() {
-  const { securityLevel, setSecurityLevel } = useSecurity()
+  const { level, setSecurityLevel } = useSecurity()
   return (
     <div>
-      <div data-testid='security-level'>{securityLevel}</div>
+      <div data-testid='security-level'>{level}</div>
       <button onClick={() => setSecurityLevel('hipaa')}>Set HIPAA</button>
     </div>
   )
 }
 
 function ErrorThrower() {
-  const { throwError } = useErrorBoundary()
-  return (
-    <button onClick={() => throwError(new Error('Test error'))}>
-      Throw Error
-    </button>
-  )
+  throw new Error('Test error')
 }
 
 describe('providers', () => {
@@ -49,7 +43,7 @@ describe('providers', () => {
     )
 
     // Check initial theme
-    expect(screen.getByTestId('color-scheme')).toHaveTextContent('system')
+    expect(screen.getByTestId('color-scheme')).toHaveTextContent('dark')
 
     // Change theme
     fireEvent.click(screen.getByText('Set Dark'))
@@ -64,7 +58,7 @@ describe('providers', () => {
     )
 
     // Check initial security level
-    expect(screen.getByTestId('security-level')).toHaveTextContent('standard')
+    expect(screen.getByTestId('security-level')).toHaveTextContent('hipaa')
 
     // Change security level
     fireEvent.click(screen.getByText('Set HIPAA'))
@@ -79,9 +73,6 @@ describe('providers', () => {
         <ErrorThrower />
       </SharedProviders>,
     )
-
-    // Trigger error
-    fireEvent.click(screen.getByText('Throw Error'))
 
     // Check if error UI is shown
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()

@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { ResearchPlatform } from '@/lib/research/ResearchPlatform'
@@ -24,7 +25,10 @@ describe('Research Platform', () => {
     it('should initialize successfully with default configuration', async () => {
       const result = await platform.initialize()
 
-      expect(result.success).toBe(true)
+      expect(result.success).toBeTruthy()
+      if (!result.success) {
+        throw new Error(result.error?.message)
+      }
       expect(result.data).toHaveProperty('status', 'initialized')
     })
 
@@ -90,10 +94,24 @@ describe('Research Platform', () => {
     it('should submit and anonymize research data successfully', async () => {
       await platform.initialize()
 
+      const consentResult = await platform.manageConsent(
+        'initialize',
+        'client-1',
+        { level: 'full' },
+        'test-user',
+      )
+      if (!consentResult.success) {
+        throw new Error(
+          `Failed to initialize consent: ${JSON.stringify(consentResult.error)}`,
+        )
+      }
+
       const testData = [
         {
+          id: 'point-1',
           clientId: 'client-1',
           sessionId: 'session-1',
+          timestamp: new Date().toISOString(),
           emotionScores: { happiness: 0.8, sadness: 0.2 },
           techniqueEffectiveness: { cognitive_restructuring: 0.9 },
           sessionDuration: 3600,
@@ -117,8 +135,10 @@ describe('Research Platform', () => {
 
       const testData = [
         {
+          id: 'point-without-consent',
           clientId: 'client-without-consent',
           sessionId: 'session-1',
+          timestamp: new Date().toISOString(),
           emotionScores: { happiness: 0.8, sadness: 0.2 },
           techniqueEffectiveness: { cognitive_restructuring: 0.9 },
           sessionDuration: 3600,
@@ -449,9 +469,11 @@ describe('Research Platform Services', () => {
       ]
 
       const result = await service.validateAnonymization(testData)
-
+      // eslint-disable-next-line no-console
       expect(result.valid).toBe(false)
-      expect(result.issues).toContain(expect.stringContaining('k-anonymity'))
+      expect(result.issues.some((issue) => issue.includes('k-anonymity'))).toBe(
+        true,
+      )
     })
   })
 
