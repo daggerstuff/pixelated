@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import type { ReactElement } from 'react'
 
 import { useSecurity } from '../SecurityProvider'
 import { SharedProviders } from '../SharedProviders'
@@ -34,9 +35,8 @@ function SecurityConsumer() {
   )
 }
 
-function ErrorThrower(): JSX.Element | null {
+function ErrorThrower(): ReactElement {
   throw new Error('Test error')
-  return null
 }
 
 describe('providers', () => {
