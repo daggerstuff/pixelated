@@ -25,6 +25,7 @@ import {
   type EdgeThreatDetectionSystem,
   EdgeThreatDetectionSystemCore,
 } from '../edge/EdgeThreatDetectionSystem'
+import type { EdgeDetectionResult } from '../global/types'
 import {
   type ExternalThreatFeedIntegration,
   ExternalThreatFeedIntegrationCore,
@@ -154,7 +155,7 @@ export class GlobalThreatIntelligenceNetworkCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established')
     } catch (error: unknown) {
@@ -166,7 +167,7 @@ export class GlobalThreatIntelligenceNetworkCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ||
+        process.env.MONGODB_URI ??
           'mongodb://localhost:27017/global_threat_intelligence',
       )
       await this.mongoClient.connect()
@@ -334,7 +335,11 @@ export class GlobalThreatIntelligenceNetworkCore
     threatData: RealTimeThreatData,
   ): Promise<RealTimeThreatData> {
     // Validate required fields
-    if (!threatData.threatId || !threatData.region || !threatData.timestamp) {
+    if (
+      threatData.threatId.length === 0 ||
+      threatData.region.length === 0 ||
+      Number.isNaN(threatData.timestamp.getTime())
+    ) {
       throw new Error('Invalid threat data: missing required fields')
     }
 
@@ -450,7 +455,7 @@ export class GlobalThreatIntelligenceNetworkCore
 
   private async createGlobalThreatIntelligence(
     threatData: RealTimeThreatData,
-    edgeDetectionResult: any,
+    edgeDetectionResult: EdgeDetectionResult,
     correlationData: CorrelationData,
   ): Promise<GlobalThreatIntelligence> {
     const globalThreatId = this.generateGlobalThreatId()
@@ -481,7 +486,7 @@ export class GlobalThreatIntelligenceNetworkCore
         correlationData,
       ),
       correlationData,
-      validationStatus: null as any, // Will be set later
+      validationStatus: this.createPendingValidationStatus(),
     }
 
     return globalThreat
@@ -506,14 +511,29 @@ export class GlobalThreatIntelligenceNetworkCore
 
   private secureId(): string {
     try {
-      const cryptoModule = crypto as unknown as { randomUUID?: () => string }
-      if (cryptoModule.randomUUID) {
-        return cryptoModule.randomUUID()
+      if (typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID()
       }
     } catch {
       // Fallback to timestamp-based ID
     }
     return `${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+  }
+
+  private createPendingValidationStatus(): ValidationStatus {
+    const now = new Date()
+    return {
+      validationId: `validation_${this.secureId()}`,
+      status: 'pending',
+      accuracy: 0,
+      completeness: 0,
+      consistency: 0,
+      timeliness: 0,
+      relevance: 0,
+      validator: 'pending',
+      validationDate: now,
+      feedback: [],
+    }
   }
 
   private createDefaultHuntingConfig(): HuntingConfig {
