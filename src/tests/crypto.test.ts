@@ -7,7 +7,8 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import type { CryptoSystem } from '../lib/crypto'
+import type { CryptoSystem, CryptoSystemOptions } from '../lib/crypto'
+import * as cryptoModule from '../lib/crypto'
 
 // Define SessionData locally rather than importing it
 interface SessionData {
@@ -17,30 +18,27 @@ interface SessionData {
   metadata?: Record<string, unknown>
 }
 
-// Import the actual implementation
-import { createCryptoSystem } from '../lib/crypto'
-
 // Check if FHE tests should be skipped
 const SKIP_FHE_TESTS = process.env['SKIP_FHE_TESTS'] === 'true'
 
 // Mock FHE service if we're skipping FHE tests
-if (SKIP_FHE_TESTS) {
-  vi.mock('../lib/fhe/fhe-service', () => ({
+vi.mock('../lib/fhe/fhe-service', async () => {
+  if (!SKIP_FHE_TESTS) {
+    return await vi.importActual('../lib/fhe/fhe-service')
+  }
+
+  return {
     default: {
-      encrypt: vi.fn((data: string) => Promise.resolve(`encrypted-${data}`)),
-      decrypt: vi.fn((data: string) =>
-        Promise.resolve(data.replace('encrypted-', '')),
-      ),
-      verifySender: vi.fn(() => Promise.resolve(true)),
-      processEncrypted: vi.fn(() =>
-        Promise.resolve({
-          success: true,
-          metadata: { operation: 'test' },
-        }),
-      ),
+      encrypt: vi.fn(async (data: string) => `encrypted-${data}`),
+      decrypt: vi.fn(async (data: string) => data.replace('encrypted-', '')),
+      verifySender: vi.fn(async () => true),
+      processEncrypted: vi.fn(async () => ({
+        success: true,
+        metadata: { operation: 'test' },
+      })),
     },
-  }))
-}
+  }
+})
 
 // Mock implementations for testing
 const Encryption = {
@@ -82,9 +80,12 @@ interface KeyMetadata {
 }
 
 class KeyRotationManager {
-  private rotationDays: number
-  private keys: Map<string, KeyMetadata> = new Map<string, KeyMetadata>()
-  private keyValues: Map<string, string> = new Map<string, string>() // Store keys for reencryption
+  private readonly rotationDays: number
+  private readonly keys: Map<string, KeyMetadata> = new Map<
+    string,
+    KeyMetadata
+  >()
+  private readonly keyValues: Map<string, string> = new Map<string, string>() // Store keys for reencryption
 
   constructor(rotationDays: number) {
     this.rotationDays = rotationDays
@@ -149,7 +150,7 @@ class KeyRotationManager {
       throw new Error('Invalid encrypted data format')
     }
 
-    const version = parseInt(parts[0]?.substring(1) || '1', 10)
+    const version = parseInt(parts[0]?.substring(1) ?? '1', 10)
 
     // The original encrypted format could be:
     // v1:keyId:keyValue:data (4 parts) or v1:simpleKey:data (3 parts)
@@ -165,7 +166,7 @@ class KeyRotationManager {
     }
 
     // Get the current key value
-    const currentKeyValue = this.keyValues.get(keyId) || 'mock-key'
+    const currentKeyValue = this.keyValues.get(keyId) ?? 'mock-key'
 
     // If already using latest version, return as is
     if (version === metadata.version) {
@@ -187,8 +188,8 @@ interface KeyData {
 }
 
 class KeyStorage {
-  private namespace: string
-  private keys: Map<string, KeyData> = new Map<string, KeyData>()
+  private readonly namespace: string
+  private readonly keys: Map<string, KeyData> = new Map<string, KeyData>()
 
   constructor(options: { namespace: string }) {
     this.namespace = options.namespace
@@ -208,7 +209,7 @@ class KeyStorage {
   }
 
   async getKey(keyId: string): Promise<KeyData | null> {
-    return this.keys.get(keyId) || null
+    return this.keys.get(keyId) ?? null
   }
 
   async rotateKey(
@@ -251,9 +252,9 @@ interface ScheduledKeyRotationOptions {
 }
 
 class ScheduledKeyRotation {
-  private options: ScheduledKeyRotationOptions
+  private readonly options: ScheduledKeyRotationOptions
   private interval: ReturnType<typeof setInterval> | null = null
-  private keyStorage: KeyStorage
+  private readonly keyStorage: KeyStorage
 
   constructor(options: ScheduledKeyRotationOptions) {
     this.options = options
@@ -283,7 +284,7 @@ class ScheduledKeyRotation {
 
     for (const keyId of keys) {
       const keyData = await this.keyStorage.getKey(keyId)
-      if (keyData && keyData.expiresAt && keyData.expiresAt < Date.now()) {
+      if (keyData?.expiresAt && keyData.expiresAt < Date.now()) {
         const newKey = await this.forceRotateKey(keyId)
         if (newKey) {
           rotatedKeyIds.push(keyId)
@@ -316,6 +317,10 @@ interface ExtendedCryptoSystem extends CryptoSystem {
   stopScheduledRotation: () => void
 }
 
+type CryptoSystemTestOptions = CryptoSystemOptions & {
+  enableScheduledRotation?: boolean
+}
+
 // Extended FHE System for testing
 interface ExtendedFHESystem {
   verifySender: (
@@ -340,12 +345,6 @@ interface ExtendedFHESystem {
 // while still having usable test values
 function getTestKey(id = ''): string {
   return `test-${id}-mock-key-${new Date().getTime().toString().substring(5)}`
-}
-
-// Near the top of the file, add this type definition
-type TestFunction = {
-  (name: string, fn: () => void): void
-  skip: (name: string, fn: () => void) => void
 }
 
 describe('encryption', () => {
@@ -444,9 +443,9 @@ describe('keyRotationManager', () => {
   })
 
   // Skip this test in CI - it's failing with "Failed to decrypt data"
-  const runKeyRotationTest = process.env['SKIP_CRYPTO_ROTATION_TEST'] !== 'true'
-  if (runKeyRotationTest) {
-    it('should re-encrypt data with the latest key version', async () => {
+  it.skipIf(process.env['SKIP_CRYPTO_ROTATION_TEST'] === 'true')(
+    'should re-encrypt data with the latest key version',
+    async () => {
       const manager = new KeyRotationManager(30)
       const keyId = 'initial-encrypt-mock-key'
       manager.addKey(keyId, '25122679')
@@ -462,8 +461,8 @@ describe('keyRotationManager', () => {
       const expectedContent = data
       const actualContent = decrypted.replace(/^v\d+:.*?:/, '')
       expect(actualContent).toBe(expectedContent)
-    })
-  }
+    },
+  )
 })
 
 describe('keyStorage', () => {
@@ -529,13 +528,13 @@ describe('keyStorage', () => {
 
 describe('scheduledKeyRotation', () => {
   let scheduledRotation: ScheduledKeyRotation
-  let onRotationMock: ReturnType<typeof vi.fn>
-  let onErrorMock: ReturnType<typeof vi.fn>
+  let onRotationMock: ScheduledKeyRotationOptions['onRotation']
+  let onErrorMock: ScheduledKeyRotationOptions['onError']
 
   beforeEach(() => {
     // Mock the callbacks
-    onRotationMock = vi.fn()
-    onErrorMock = vi.fn()
+    onRotationMock = vi.fn<(oldKeyId: string, newKeyId: string) => void>()
+    onErrorMock = vi.fn<(error: Error) => void>()
 
     scheduledRotation = new ScheduledKeyRotation({
       namespace: 'test',
@@ -637,48 +636,46 @@ describe('scheduledKeyRotation', () => {
 })
 
 describe('createCryptoSystem', () => {
+  const createCryptoSystemMock = (
+    options: CryptoSystemTestOptions,
+  ): ExtendedCryptoSystem => {
+    const scheduledRotationEnabled = options.enableScheduledRotation ?? false
+    return {
+      encryption: Encryption,
+      keyStorage: new KeyStorage({
+        namespace: options.namespace,
+      }),
+      keyRotationManager: new KeyRotationManager(90),
+      scheduledRotation: scheduledRotationEnabled
+        ? new ScheduledKeyRotation({
+            namespace: options.namespace,
+            checkIntervalMs: 1000,
+            onRotation: () => {},
+            onError: () => {},
+          })
+        : null,
+      rotateExpiredKeys: async () => ['test-key'],
+      stopScheduledRotation: () => {
+        /* Implementation not needed for test */
+      },
+      encrypt: async (data: string, context?: string) =>
+        `v1:${context ?? 'default'}:${data}`,
+      decrypt: async (encryptedData: string, _context?: string) => {
+        const parts = encryptedData.split(':')
+        return parts[parts.length - 1]
+      },
+      hash: async (data: string) => `hash-${data}`,
+      sign: async (data: string) => `sig-${data}`,
+      verify: async (data: string, signature: string) =>
+        signature === `sig-${data}`,
+    }
+  }
+
   // Setup mocks before each test
   beforeEach(() => {
-    vi.mock('../lib/crypto', async () => {
-      const actual = await vi.importActual('../lib/crypto')
-
-      return {
-        ...actual,
-        createCryptoSystem: (options: any) => {
-          const scheduledRotationEnabled =
-            options.enableScheduledRotation || false
-          return {
-            encryption: Encryption,
-            keyStorage: new KeyStorage({
-              namespace: options.namespace || 'test',
-            }),
-            keyRotationManager: new KeyRotationManager(90),
-            scheduledRotation: scheduledRotationEnabled
-              ? new ScheduledKeyRotation({
-                  namespace: options.namespace || 'test',
-                  checkIntervalMs: 1000,
-                  onRotation: () => {},
-                  onError: () => {},
-                })
-              : null,
-            rotateExpiredKeys: async () => ['test-key'],
-            stopScheduledRotation: () => {
-              /* Implementation not needed for test */
-            },
-            encrypt: async (data: string, context?: string) =>
-              `v1:${context || 'default'}:${data}`,
-            decrypt: async (encryptedData: string, _context?: string) => {
-              const parts = encryptedData.split(':')
-              return parts[parts.length - 1]
-            },
-            hash: async (data: string) => `hash-${data}`,
-            sign: async (data: string) => `sig-${data}`,
-            verify: async (data: string, signature: string) =>
-              signature === `sig-${data}`,
-          }
-        },
-      }
-    })
+    vi.spyOn(cryptoModule, 'createCryptoSystem').mockImplementation(
+      (options: CryptoSystemOptions) => createCryptoSystemMock(options),
+    )
   })
 
   // Clean up mocks after each test
@@ -687,9 +684,9 @@ describe('createCryptoSystem', () => {
   })
 
   it('should create a complete crypto system', () => {
-    const crypto = createCryptoSystem({
+    const crypto = createCryptoSystemMock({
       namespace: 'test',
-    }) as ExtendedCryptoSystem
+    })
 
     expect(crypto.encryption).toBe(Encryption)
     expect(crypto.keyStorage).toBeInstanceOf(KeyStorage)
@@ -698,10 +695,10 @@ describe('createCryptoSystem', () => {
   })
 
   it('should enable scheduled rotation when specified', () => {
-    const crypto = createCryptoSystem({
+    const crypto = createCryptoSystemMock({
       namespace: 'test',
       enableScheduledRotation: true,
-    } as any) as ExtendedCryptoSystem
+    })
 
     expect(crypto.scheduledRotation).not.toBeNull()
 
@@ -713,7 +710,7 @@ describe('createCryptoSystem', () => {
     const data = 'Sensitive patient data'
     const purpose = 'patient-data'
 
-    const crypto = createCryptoSystem({
+    const crypto = createCryptoSystemMock({
       namespace: 'test',
     })
 
@@ -732,9 +729,9 @@ describe('createCryptoSystem', () => {
   })
 
   it('should rotate expired keys', async () => {
-    const crypto = createCryptoSystem({
+    const crypto = createCryptoSystemMock({
       namespace: 'test',
-    }) as ExtendedCryptoSystem
+    })
 
     const rotatedKeys = await crypto.rotateExpiredKeys()
     expect(rotatedKeys).toContain('test-key')
@@ -743,13 +740,11 @@ describe('createCryptoSystem', () => {
 
 describe('Fully Homomorphic Encryption Integration Tests', () => {
   // Skip all these tests if SKIP_FHE_TESTS is true
-  const noopIt = (() => undefined) as typeof it
-  const itOrSkip = SKIP_FHE_TESTS ? noopIt : it
   let fheSystem: ExtendedFHESystem
 
   beforeEach(() => {
     // Create crypto system (not used in these tests)
-    createCryptoSystem({
+    cryptoModule.createCryptoSystem({
       namespace: 'test',
     })
 
@@ -775,60 +770,69 @@ describe('Fully Homomorphic Encryption Integration Tests', () => {
       verifySender: async (senderId: string, authorizedSenders: string[]) => {
         return authorizedSenders.includes(senderId)
       },
-    } as ExtendedFHESystem
+    }
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  itOrSkip('should process data securely with FHE', async () => {
-    // Create test session data
-    const sessionData: SessionData = {
-      sessionId: 'test-session-123',
-      userId: 'user-456',
-      startTime: Date.now(),
-      metadata: {
-        ipAddress: '127.0.0.1',
-        userAgent: 'Test Browser',
-      },
-    }
+  it.skipIf(SKIP_FHE_TESTS)(
+    'should process data securely with FHE',
+    async () => {
+      // Create test session data
+      const sessionData: SessionData = {
+        sessionId: 'test-session-123',
+        userId: 'user-456',
+        startTime: Date.now(),
+        metadata: {
+          ipAddress: '127.0.0.1',
+          userAgent: 'Test Browser',
+        },
+      }
 
-    // Encrypt the session data using FHE
-    const encryptedData = await fheSystem.encrypt(JSON.stringify(sessionData))
-    expect(encryptedData).toBeTruthy()
+      // Encrypt the session data using FHE
+      const encryptedData = await fheSystem.encrypt(JSON.stringify(sessionData))
+      expect(encryptedData).toBeTruthy()
 
-    // Process the encrypted data without decryption
-    const result = await fheSystem.processEncrypted(encryptedData, 'analyze')
-    expect(result).toBeTruthy()
-    expect(result.success).toBe(true)
-    expect(result.metadata.operation).toBe('analyze')
-  })
+      // Process the encrypted data without decryption
+      const result = await fheSystem.processEncrypted(encryptedData, 'analyze')
+      expect(result).toBeTruthy()
+      expect(result.success).toBe(true)
+      expect(result.metadata.operation).toBe('analyze')
+    },
+  )
 
-  itOrSkip('should verify sender identity securely', async () => {
-    const senderId = 'user-789'
-    const authorizedSenders = ['user-123', 'user-456', 'user-789']
+  it.skipIf(SKIP_FHE_TESTS)(
+    'should verify sender identity securely',
+    async () => {
+      const senderId = 'user-789'
+      const authorizedSenders = ['user-123', 'user-456', 'user-789']
 
-    // Verify the sender through FHE
-    const verified = await fheSystem.verifySender(senderId, authorizedSenders)
-    expect(verified).toBe(true)
-  })
+      // Verify the sender through FHE
+      const verified = await fheSystem.verifySender(senderId, authorizedSenders)
+      expect(verified).toBe(true)
+    },
+  )
 
-  itOrSkip('should encrypt and decrypt data securely', async () => {
-    const data = {
-      message: 'Secret therapy notes',
-      patientId: process.env['PATIENT_ID'] || 'example-patient-id',
-    }
+  it.skipIf(SKIP_FHE_TESTS)(
+    'should encrypt and decrypt data securely',
+    async () => {
+      const data = {
+        message: 'Secret therapy notes',
+        patientId: process.env['PATIENT_ID'] ?? 'example-patient-id',
+      }
 
-    // Encrypt the data
-    const encrypted = await fheSystem.encrypt(JSON.stringify(data))
-    expect(encrypted).toBeTruthy()
+      // Encrypt the data
+      const encrypted = await fheSystem.encrypt(JSON.stringify(data))
+      expect(encrypted).toBeTruthy()
 
-    // Decrypt the data
-    const decrypted = await fheSystem.decrypt(encrypted)
-    const parsedData = JSON.parse(decrypted)
-
-    expect(parsedData.message).toBe(data.message)
-    expect(parsedData.patientId).toBe(data.patientId)
-  })
+      // Decrypt the data
+      const decrypted = await fheSystem.decrypt(encrypted)
+      expect(JSON.parse(decrypted)).toMatchObject({
+        message: data.message,
+        patientId: data.patientId,
+      })
+    },
+  )
 })

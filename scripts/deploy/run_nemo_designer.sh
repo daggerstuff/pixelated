@@ -6,6 +6,12 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
+
 usage() {
   cat <<'USAGE'
 Usage: scripts/deploy/run_nemo_designer.sh [--standalone]

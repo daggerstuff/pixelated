@@ -11,13 +11,28 @@ import {
   NotificationStatus,
 } from '../NotificationService'
 
+vi.mock('../pushUtils', () => ({
+  generateVAPIDKeys: vi.fn(async () => ({
+    publicKey: 'mock-public-key',
+    privateKey: 'mock-private-key',
+  })),
+  sendNotification: vi.fn(async () => {}),
+}))
+
+vi.mock('../smsUtils', () => ({
+  sendSMS: vi.fn(async () => {}),
+  isValidPhoneNumber: vi.fn(() => true),
+}))
+
 // Type for accessing private properties in tests
 interface NotificationServiceTestInterface {
   wsClients: Map<string, WebSocket>
   emailService: {
     upsertTemplate: (template: unknown) => Promise<void>
+    queueEmail?: (..._args: unknown[]) => Promise<unknown>
   }
   deliverInApp: (notification: unknown) => Promise<void>
+  deliverPush: (notification: unknown) => Promise<void>
 }
 
 // Mock dependencies
@@ -84,13 +99,14 @@ vi.mock('@/lib/services/email/EmailService')
 // Mock WebSocket constructor and methods
 vi.mock('ws', () => {
   return {
-    WebSocket: vi.fn().mockImplementation(() => {
-      return {
-        on: vi.fn().mockReturnThis(),
-        close: vi.fn(),
-        send: vi.fn(),
+    WebSocket: class {
+      on = vi.fn().mockReturnThis()
+      close = vi.fn()
+      send = vi.fn()
+      constructor() {
+        // no-op
       }
-    }),
+    },
   }
 })
 
@@ -234,9 +250,9 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return one item then null
-      vi.mocked(redis.rpoplpush).mockImplementation(async () => {
-        return JSON.stringify(queueItem)
-      })
+      vi.mocked(redis.rpoplpush)
+        .mockResolvedValueOnce(JSON.stringify(queueItem))
+        .mockResolvedValueOnce(null as unknown as string)
 
       await notificationService.processQueue()
 
@@ -273,6 +289,10 @@ describe('notificationService', () => {
       vi.mocked(redis.rpoplpush).mockResolvedValueOnce(
         JSON.stringify(queueItem),
       )
+      vi.spyOn(
+        notificationService as unknown as NotificationServiceTestInterface,
+        'deliverPush',
+      ).mockRejectedValueOnce(new Error('Push delivery not supported'))
 
       await notificationService.processQueue()
 
@@ -327,11 +347,33 @@ describe('notificationService', () => {
       const notifications = {
         'test-id-1': JSON.stringify({
           id: 'test-id-1',
+          userId: 'test-user',
+          templateId: mockTemplate.id,
+          title: mockTemplate.title,
+          body: mockTemplate.body,
+          data: mockNotification.data,
+          channels: mockTemplate.channels,
+          priority: NotificationPriority.NORMAL,
           createdAt: Date.now(),
+          deliveredAt: Date.now(),
+          readAt: null,
+          status: NotificationStatus.DELIVERED,
+          error: null,
         }),
         'test-id-2': JSON.stringify({
           id: 'test-id-2',
+          userId: 'test-user',
+          templateId: mockTemplate.id,
+          title: mockTemplate.title,
+          body: mockTemplate.body,
+          data: mockNotification.data,
+          channels: mockTemplate.channels,
+          priority: NotificationPriority.NORMAL,
           createdAt: Date.now() - 1000,
+          deliveredAt: Date.now(),
+          readAt: null,
+          status: NotificationStatus.DELIVERED,
+          error: null,
         }),
       }
 
@@ -349,7 +391,18 @@ describe('notificationService', () => {
           `test-id-${i}`,
           JSON.stringify({
             id: `test-id-${i}`,
+            userId: 'test-user',
+            templateId: mockTemplate.id,
+            title: mockTemplate.title,
+            body: mockTemplate.body,
+            data: mockNotification.data,
+            channels: mockTemplate.channels,
+            priority: NotificationPriority.NORMAL,
             createdAt: Date.now() - i * 1000,
+            deliveredAt: Date.now(),
+            readAt: null,
+            status: NotificationStatus.DELIVERED,
+            error: null,
           }),
         ]),
       )
@@ -372,15 +425,48 @@ describe('notificationService', () => {
       const notifications = {
         'test-id-1': JSON.stringify({
           id: 'test-id-1',
+          userId: 'test-user',
+          templateId: mockTemplate.id,
+          title: mockTemplate.title,
+          body: mockTemplate.body,
+          data: mockNotification.data,
+          channels: mockTemplate.channels,
+          priority: NotificationPriority.NORMAL,
+          createdAt: Date.now(),
+          deliveredAt: Date.now(),
+          readAt: null,
           status: NotificationStatus.DELIVERED,
+          error: null,
         }),
         'test-id-2': JSON.stringify({
           id: 'test-id-2',
+          userId: 'test-user',
+          templateId: mockTemplate.id,
+          title: mockTemplate.title,
+          body: mockTemplate.body,
+          data: mockNotification.data,
+          channels: mockTemplate.channels,
+          priority: NotificationPriority.NORMAL,
+          createdAt: Date.now(),
+          deliveredAt: Date.now(),
+          readAt: Date.now(),
           status: NotificationStatus.READ,
+          error: null,
         }),
         'test-id-3': JSON.stringify({
           id: 'test-id-3',
+          userId: 'test-user',
+          templateId: mockTemplate.id,
+          title: mockTemplate.title,
+          body: mockTemplate.body,
+          data: mockNotification.data,
+          channels: mockTemplate.channels,
+          priority: NotificationPriority.NORMAL,
+          createdAt: Date.now(),
+          deliveredAt: Date.now(),
+          readAt: null,
           status: NotificationStatus.DELIVERED,
+          error: null,
         }),
       }
 

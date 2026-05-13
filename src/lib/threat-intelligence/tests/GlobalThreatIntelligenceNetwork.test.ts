@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntelligenceNetwork'
+import type { RealTimeThreatData } from '../global/types'
 
 // Mock dependencies
 vi.mock('../../logging/build-safe-logger', () => ({
@@ -184,12 +185,12 @@ const mockThreatIntelligenceDatabase = vi.hoisted(() => ({
       })
     }),
   getThreatById: vi
-    .fn<() => Promise<any | null>>()
+    .fn<(threatId: string) => Promise<any | null>>()
     .mockImplementation(async (threatId: string) => {
       return mockThreatStore.threats.get(threatId) ?? null
     }),
   getThreatByIndicator: vi
-    .fn<() => Promise<any | null>>()
+    .fn<(indicatorType: string, value: string) => Promise<any | null>>()
     .mockImplementation(async (indicatorType: string, value: string) => {
       const threatId = mockThreatStore.indicators.get(
         `${indicatorType}:${value}`,
@@ -197,7 +198,7 @@ const mockThreatIntelligenceDatabase = vi.hoisted(() => ({
       return threatId ? (mockThreatStore.threats.get(threatId) ?? null) : null
     }),
   getThreatByIntelligenceId: vi
-    .fn<() => Promise<any | null>>()
+    .fn<(intelligenceId: string) => Promise<any | null>>()
     .mockImplementation(async (intelligenceId: string) => {
       return mockThreatStore.threatIntelligence.get(intelligenceId) ?? null
     }),
@@ -282,7 +283,7 @@ vi.mock('../feeds/ExternalThreatFeedIntegration', () => ({
 
 const mockValidationSystem = vi.hoisted(() => ({
   initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
-  validateIntelligence: vi.fn<() => Promise<any>>().mockResolvedValue({
+  validateThreat: vi.fn<(threat: unknown) => Promise<any>>().mockResolvedValue({
     validationId: 'validation-1',
     status: 'validated',
     accuracy: 0.99,
@@ -319,9 +320,10 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
   let network: GlobalThreatIntelligenceNetworkCore
   let mockConfig: any
 
-  const createThreatData = (overrides: Record<string, unknown> = {}) => ({
+  const createThreatData = (
+    overrides: Partial<RealTimeThreatData> = {},
+  ): RealTimeThreatData => ({
     threatId: `threat-${Math.random().toString(36).slice(2, 11)}`,
-    threatType: 'malware',
     severity: 0.8,
     confidence: 0.9,
     indicators: [
@@ -334,14 +336,7 @@ describe('GlobalThreatIntelligenceNetworkCore', () => {
       },
     ],
     context: {
-      sourceSystem: 'unit-test',
-      ingestionPipeline: 'test',
-      dataQuality: 'high',
-      geolocation: {
-        country: 'US',
-        region: 'us-east-1',
-        city: 'New York',
-      },
+      geographicLocation: 'us-east-1',
     },
     source: 'test-source',
     timestamp: new Date(),

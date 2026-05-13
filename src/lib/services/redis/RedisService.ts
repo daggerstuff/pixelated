@@ -5,7 +5,6 @@ import Redis from 'ioredis'
 
 import { getHipaaCompliantLogger } from '../../logging/standardized-logger'
 import type {
-  RedisPipeline,
   RedisPipelineOperation,
   RedisZSetMember,
   RedisMockClient,
@@ -154,7 +153,8 @@ export class RedisService extends EventEmitter implements IRedisService {
       }
 
       const rawClient = new Redis(this.config.url, redisOptions)
-      this.client = this.createCommandClient(rawClient)
+      const commandClient = this.createCommandClient(rawClient)
+      this.client = commandClient
 
       // Set up event handlers
       rawClient.on('error', (error: unknown) => {
@@ -174,6 +174,16 @@ export class RedisService extends EventEmitter implements IRedisService {
       // Start health checks
       this.startHealthCheck()
     } catch (error: unknown) {
+      if (this.healthCheckInterval) {
+        clearInterval(this.healthCheckInterval)
+        this.healthCheckInterval = null
+      }
+
+      if (this.client && this.client.quit) {
+        await this.client.quit().catch(() => undefined)
+      }
+      this.client = null
+
       // In development, we can continue without Redis
       if (process.env['NODE_ENV'] === 'development') {
         logger.warn(
@@ -256,7 +266,11 @@ export class RedisService extends EventEmitter implements IRedisService {
     let client!: RedisClient
 
     const normalizeCommandArg = (value: unknown): string | number | Buffer => {
-      if (typeof value === 'string' || typeof value === 'number' || Buffer.isBuffer(value)) {
+      if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        Buffer.isBuffer(value)
+      ) {
         return value
       }
       if (typeof value === 'boolean') {
@@ -333,6 +347,47 @@ export class RedisService extends EventEmitter implements IRedisService {
       return tuples.map(([first, second]) => [first, String(second)])
     }
 
+    const createPipeline = () => {
+      const commands: Array<{ command: string; args: unknown[] }> = []
+      const addCommand = (command: string, args: unknown[]) => {
+        commands.push({ command, args })
+        return pipeline
+      }
+
+      const pipeline = {
+        setex: (key: string, seconds: number, value: string) =>
+          addCommand('setex', [key, seconds, value]),
+        sadd: (key: string, member: string) =>
+          addCommand('sadd', [key, member]),
+        expire: (key: string, seconds: number) =>
+          addCommand('expire', [key, seconds]),
+        del: (...keys: string[]) => {
+          if (keys.length > 0) {
+            addCommand('del', keys)
+          }
+          return pipeline
+        },
+        get: (key: string) => addCommand('get', [key]),
+        ttl: (key: string) => addCommand('ttl', [key]),
+        exec: async () => {
+          const results: [Error | null, unknown][] = []
+          for (const item of commands) {
+            try {
+              const executed = await invoke(item.command, ...item.args)
+              results.push([null, executed])
+            } catch (error: unknown) {
+              const pipelineError =
+                error instanceof Error ? error : new Error(String(error))
+              results.push([pipelineError, null])
+            }
+          }
+          return results
+        },
+      }
+
+      return pipeline
+    }
+
     client = {
       get: async (key: string) => {
         const value = await invoke('get', key)
@@ -344,11 +399,14 @@ export class RedisService extends EventEmitter implements IRedisService {
       exists: async (key: string) => toNumber(await invoke('exists', key)),
       setex: async (key: string, seconds: number, value: string) =>
         invoke('setex', key, seconds, value),
+      expire: async (key: string, seconds: number) =>
+        toNumber(await invoke('expire', key, seconds)),
       sadd: async (key: string, member: string) =>
         toNumber(await invoke('sadd', key, member)),
       srem: async (key: string, member: string) =>
         toNumber(await invoke('srem', key, member)),
-      smembers: async (key: string) => toStringArray(await invoke('smembers', key)),
+      smembers: async (key: string) =>
+        toStringArray(await invoke('smembers', key)),
       lpush: async (key: string, ...elements: string[]) =>
         toNumber(await invoke('lpush', key, ...elements)),
       rpoplpush: async (source: string, destination: string) => {
@@ -358,7 +416,8 @@ export class RedisService extends EventEmitter implements IRedisService {
       lrem: async (key: string, count: number, value: string) =>
         toNumber(await invoke('lrem', key, count, value)),
       llen: async (key: string) => toNumber(await invoke('llen', key)),
-      keys: async (pattern: string) => toStringArray(await invoke('keys', pattern)),
+      keys: async (pattern: string) =>
+        toStringArray(await invoke('keys', pattern)),
       hset: async (key: string, field: string, value: string) =>
         toNumber(await invoke('hset', key, field, value)),
       hget: async (key: string, field: string) => {
@@ -367,7 +426,11 @@ export class RedisService extends EventEmitter implements IRedisService {
       },
       hgetall: async (key: string) => {
         const value = await invoke('hgetall', key)
-        if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+        if (
+          value === null ||
+          typeof value !== 'object' ||
+          Array.isArray(value)
+        ) {
           return {}
         }
 
@@ -402,14 +465,17 @@ export class RedisService extends EventEmitter implements IRedisService {
           return ['0', []]
         }
 
-        const nextCursor = typeof value[0] === 'string' ? value[0] : String(value[0])
+        const nextCursor =
+          typeof value[0] === 'string' ? value[0] : String(value[0])
         const keys = Array.isArray(value[1]) ? toStringArray(value[1]) : []
         return [nextCursor, keys]
       },
-      subscribe: async (channel: string) => toNumber(await rawClient.subscribe(channel)),
+      subscribe: async (channel: string) =>
+        toNumber(await rawClient.subscribe(channel)),
       publish: async (channel: string, message: string) =>
         toNumber(await rawClient.publish(channel, message)),
-      unsubscribe: async (channel: string) => toNumber(await rawClient.unsubscribe(channel)),
+      unsubscribe: async (channel: string) =>
+        toNumber(await rawClient.unsubscribe(channel)),
       quit: async () => rawClient.quit(),
       disconnect: () => rawClient.disconnect(),
       connect: async () => {
@@ -419,32 +485,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         rawClient.on(event, callback)
         return client
       },
-      pipeline: () => {
-        const commands: Array<{ command: string; args: unknown[] }> = []
-        const pipeline = {
-          del: (...keys: string[]) => {
-            if (keys.length > 0) {
-              commands.push({ command: 'del', args: [...keys] })
-            }
-            return pipeline
-          },
-          exec: async () => {
-            const results: [Error | null, unknown][] = []
-            for (const item of commands) {
-              try {
-                const executed = await invoke(item.command, ...item.args)
-                results.push([null, executed])
-              } catch (error: unknown) {
-                const pipelineError =
-                  error instanceof Error ? error : new Error(String(error))
-                results.push([pipelineError, null])
-              }
-            }
-            return results
-          },
-        }
-        return pipeline
-      },
+      pipeline: () => createPipeline(),
       zadd: async (key: string, score: number, member: string) =>
         toNumber(await invoke('zadd', key, score, member)),
       zrem: async (key: string, member: string) =>
@@ -483,18 +524,25 @@ export class RedisService extends EventEmitter implements IRedisService {
         count?: number,
       ) => {
         const args: unknown[] = [key, min, max]
-        if (withscores === 'LIMIT' && typeof offset === 'number' && typeof count === 'number') {
+        if (
+          withscores === 'LIMIT' &&
+          typeof offset === 'number' &&
+          typeof count === 'number'
+        ) {
           args.push('LIMIT', offset, count)
         }
         return toStringArray(await invoke('zrangebyscore', ...args))
       },
-      zremrangebyscore: async (key: string, min: string | number, max: string | number) =>
-        toNumber(await invoke('zremrangebyscore', key, min, max)),
+      zremrangebyscore: async (
+        key: string,
+        min: string | number,
+        max: string | number,
+      ) => toNumber(await invoke('zremrangebyscore', key, min, max)),
       info: async (section?: string) => {
         const info = await invoke('info', ...(section ? [section] : []))
         return typeof info === 'string' ? info : ''
       },
-      multi: () => client,
+      multi: () => createPipeline(),
       deletePattern: async (pattern: string) => {
         const keys = await client.keys(pattern)
         if (keys.length === 0) {
@@ -531,6 +579,101 @@ export class RedisService extends EventEmitter implements IRedisService {
         : []
     }
 
+    const createMockPipeline = () => {
+      const commands: RedisPipelineOperation[] = []
+      const addCommand = (cmd: string, args: unknown[]) => {
+        commands.push({ cmd, args })
+        return pipeline
+      }
+
+      const pipeline = {
+        setex: (key: string, _seconds: number, value: string) =>
+          addCommand('setex', [key, value]),
+        sadd: (key: string, member: string) =>
+          addCommand('sadd', [key, member]),
+        expire: (key: string, _seconds: number) => addCommand('expire', [key]),
+        del: (...keys: string[]) => {
+          if (keys.length > 0) {
+            addCommand('del', keys)
+          }
+          return pipeline
+        },
+        get: (key: string) => addCommand('get', [key]),
+        ttl: (key: string) => addCommand('ttl', [key]),
+        exec: async () => {
+          const commandsToResolve = commands.map(
+            async (command): Promise<[Error | null, unknown]> => {
+              try {
+                if (command.cmd === 'setex') {
+                  const [key, value] = command.args
+                  if (typeof key === 'string' && typeof value === 'string') {
+                    store.set(key, value)
+                    return [null, 'OK']
+                  }
+                  return [null, null]
+                }
+
+                if (command.cmd === 'sadd') {
+                  const [key, member] = command.args
+                  if (typeof key === 'string' && typeof member === 'string') {
+                    if (!setStore.has(key)) {
+                      setStore.set(key, new Set())
+                    }
+                    const set = setStore.get(key)
+                    if (!set) {
+                      return [null, 0]
+                    }
+                    const existed = set.has(member)
+                    set.add(member)
+                    return [null, existed ? 0 : 1]
+                  }
+                  return [null, 0]
+                }
+
+                if (command.cmd === 'expire') {
+                  return [null, 1]
+                }
+
+                if (command.cmd === 'del') {
+                  const keys = command.args.filter(
+                    (arg): arg is string => typeof arg === 'string',
+                  )
+                  const deletedCount = keys.reduce(
+                    (count, key) => (store.delete(key) ? count + 1 : count),
+                    0,
+                  )
+                  return [null, deletedCount]
+                }
+
+                if (command.cmd === 'get') {
+                  const key = command.args[0]
+                  return [
+                    null,
+                    typeof key === 'string' ? (store.get(key) ?? null) : null,
+                  ]
+                }
+
+                if (command.cmd === 'ttl') {
+                  return [null, -1]
+                }
+
+                return [null, null]
+              } catch (error: unknown) {
+                return [
+                  error instanceof Error ? error : new Error(String(error)),
+                  null,
+                ]
+              }
+            },
+          )
+
+          return Promise.all(commandsToResolve)
+        },
+      }
+
+      return pipeline
+    }
+
     // Create a mock client implementing the Redis interface
     const mockClient: RedisMockClient = {
       get: async (key: string) => store.get(key) ?? null,
@@ -542,7 +685,8 @@ export class RedisService extends EventEmitter implements IRedisService {
         store.set(key, value)
         return 'OK'
       },
-      multi: () => mockClient,
+      expire: async (_key: string, _seconds: number) => 1,
+      multi: () => createMockPipeline(),
       del: async (key: string) => {
         const deleted = store.delete(key)
         return deleted ? 1 : 0
@@ -809,7 +953,8 @@ export class RedisService extends EventEmitter implements IRedisService {
       },
       ttl: async (_key: string) => -1,
       pttl: async (_key: string) => -1,
-      info: async (_section?: string) => 'connected_clients:1\nblocked_clients:0',
+      info: async (_section?: string) =>
+        'connected_clients:1\nblocked_clients:0',
       publish: async (_channel: string, _message: string) => 0,
       subscribe: async (_channel: string) => 0,
       unsubscribe: async (_channel: string) => 0,
@@ -824,28 +969,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         }
         return mockClient
       }, // Basic event handling for mock
-      pipeline: () => {
-        const commands: RedisPipelineOperation[] = []
-        const pipeline: RedisPipeline = {
-          del: (key: string) => {
-            commands.push({ cmd: 'del', args: [key] })
-            return pipeline
-          },
-          exec: async () => {
-            return commands.map((cmd) => {
-              if (cmd.cmd === 'del') {
-                const key = cmd.args[0]
-                return [
-                  null,
-                  typeof key === 'string' && store.delete(key) ? 1 : 0,
-                ]
-              }
-              return [null, null]
-            })
-          },
-        }
-        return pipeline
-      },
+      pipeline: () => createMockPipeline(),
     }
 
     return mockClient
@@ -865,7 +989,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       connectTimeout: this.config.connectTimeout,
     }
 
-      return this.createCommandClient(new Redis(this.config.url, redisOptions))
+    return this.createCommandClient(new Redis(this.config.url, redisOptions))
   }
 
   private startHealthCheck() {
@@ -1110,15 +1234,12 @@ export class RedisService extends EventEmitter implements IRedisService {
       const subscriber = this.createClient()
       this.subscribers.set(channel, subscriber)
 
-      subscriber.on(
-        'message',
-        ((...args: unknown[]) => {
-          const [ch, message] = args
-          if (typeof ch === 'string' && typeof message === 'string') {
-            callback(message)
-          }
-        }),
-      )
+      subscriber.on('message', (...args: unknown[]) => {
+        const [ch, message] = args
+        if (typeof ch === 'string' && typeof message === 'string') {
+          callback(message)
+        }
+      })
 
       await subscriber.subscribe(channel)
     }

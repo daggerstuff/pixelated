@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type { SystemHealth } from '../../../lib/services/health-monitor'
 import { GET } from '../../../pages/api/v1/health'
+
+type HealthApiResponse = SystemHealth & { error?: string }
 
 // Mock the health monitor
 vi.mock('../../../lib/services/health-monitor', () => ({
@@ -14,11 +17,36 @@ describe('GET /api/v1/health', () => {
     vi.clearAllMocks()
   })
 
+  const isSystemHealth = (value: unknown): value is HealthApiResponse => {
+    if (!value || typeof value !== 'object') {
+      return false
+    }
+    const status: unknown = Reflect.get(value, 'status')
+    const checks: unknown = Reflect.get(value, 'checks')
+    const system: unknown = Reflect.get(value, 'system')
+    return (
+      typeof status === 'string' &&
+      Array.isArray(checks) &&
+      !!system &&
+      typeof system === 'object'
+    )
+  }
+
+  const parseHealthResponse = async (
+    response: Response,
+  ): Promise<HealthApiResponse> => {
+    const data: unknown = await response.json()
+    if (!isSystemHealth(data)) {
+      throw new Error('Invalid health response payload')
+    }
+    return data
+  }
+
   it('should return healthy status when all systems are operational', async () => {
     const { healthMonitor } =
       await import('../../../lib/services/health-monitor')
 
-    vi.mocked(healthMonitor.getHealth).mockResolvedValue({
+    vi.spyOn(healthMonitor, 'getHealth').mockResolvedValue({
       status: 'healthy',
       timestamp: '2025-08-16T20:00:00.000Z',
       uptime: 86400,
@@ -57,7 +85,7 @@ describe('GET /api/v1/health', () => {
     })
 
     const response = await GET()
-    const data = await response.json()
+    const data = await parseHealthResponse(response)
 
     expect(response.status).toBe(200)
     expect(data.status).toBe('healthy')
@@ -69,7 +97,7 @@ describe('GET /api/v1/health', () => {
     const { healthMonitor } =
       await import('../../../lib/services/health-monitor')
 
-    vi.mocked(healthMonitor.getHealth).mockResolvedValue({
+    vi.spyOn(healthMonitor, 'getHealth').mockResolvedValue({
       status: 'degraded',
       timestamp: '2025-08-16T20:00:00.000Z',
       uptime: 86400,
@@ -108,7 +136,7 @@ describe('GET /api/v1/health', () => {
     })
 
     const response = await GET()
-    const data = await response.json()
+    const data = await parseHealthResponse(response)
 
     expect(response.status).toBe(200) // Still 200 for degraded
     expect(data.status).toBe('degraded')
@@ -119,7 +147,7 @@ describe('GET /api/v1/health', () => {
     const { healthMonitor } =
       await import('../../../lib/services/health-monitor')
 
-    vi.mocked(healthMonitor.getHealth).mockResolvedValue({
+    vi.spyOn(healthMonitor, 'getHealth').mockResolvedValue({
       status: 'unhealthy',
       timestamp: '2025-08-16T20:00:00.000Z',
       uptime: 86400,
@@ -158,7 +186,7 @@ describe('GET /api/v1/health', () => {
     })
 
     const response = await GET()
-    const data = await response.json()
+    const data = await parseHealthResponse(response)
 
     expect(response.status).toBe(503) // Service unavailable for unhealthy
     expect(data.status).toBe('unhealthy')
@@ -169,12 +197,12 @@ describe('GET /api/v1/health', () => {
     const { healthMonitor } =
       await import('../../../lib/services/health-monitor')
 
-    vi.mocked(healthMonitor.getHealth).mockRejectedValue(
+    vi.spyOn(healthMonitor, 'getHealth').mockRejectedValue(
       new Error('Health monitor failed'),
     )
 
     const response = await GET()
-    const data = await response.json()
+    const data = await parseHealthResponse(response)
 
     expect(response.status).toBe(503)
     expect(data.status).toBe('unhealthy')

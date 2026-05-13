@@ -162,7 +162,11 @@ export class HIPAADataService {
         this.encryptionKeys.get(dataType) || this.encryptionKeys.get('master')!
       const _iv = crypto.randomBytes(16)
       const normalizedAlgorithm = this.config.encryptionAlgorithm
-      const cipher = crypto.createCipheriv(normalizedAlgorithm, key, _iv)
+      const cipher = crypto.createCipheriv(
+        normalizedAlgorithm,
+        key,
+        _iv,
+      ) as crypto.CipherGCM
       let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex')
       encrypted += cipher.final('hex')
 
@@ -181,7 +185,7 @@ export class HIPAADataService {
         action: 'encrypt',
         userId: 'system',
         dataType,
-        clientId,
+        clientIds: clientId ? [clientId] : undefined,
         timestamp: new Date().toISOString(),
         details: { keyId: dataType },
       })
@@ -217,8 +221,12 @@ export class HIPAADataService {
         this.encryptionKeys.get('master')!
       const _iv = Buffer.from(metadataObj.iv, 'hex')
       const normalizedAlgorithm = metadataObj.algorithm
-      const decipher = crypto.createDecipheriv(normalizedAlgorithm, key, _iv)
-      if (metadataObj.tag && decipher.setAuthTag) {
+      const decipher = crypto.createDecipheriv(
+        normalizedAlgorithm,
+        key,
+        _iv,
+      ) as crypto.DecipherGCM
+      if (metadataObj.tag) {
         decipher.setAuthTag(Buffer.from(metadataObj.tag, 'hex'))
       }
 
@@ -232,7 +240,7 @@ export class HIPAADataService {
         action: 'decrypt',
         userId: 'system',
         dataType,
-        clientId,
+        clientIds: clientId ? [clientId] : undefined,
         timestamp: new Date().toISOString(),
         details: { keyId: metadataObj.keyId },
       })

@@ -14,8 +14,14 @@ from flask_cors import CORS
 # Module imports from the 'bias_detection' package
 from bias_detection.config import settings
 from bias_detection.services.analysis_orchestrator import AnalysisOrchestrator
-from bias_detection.services.bias_detection_service import BiasDetectionService
 from bias_detection.services.database_service import DatabaseService
+from bias_detection.compat import (
+    AuditLogger,
+    BiasDetectionConfig,
+    LegacyBiasDetectionService,
+    SecurityManager,
+    SessionData,
+)
 
 # Logging configuration
 logging.basicConfig(
@@ -23,6 +29,18 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+# Backward-compatible public symbol names expected by legacy imports.
+BiasDetectionService = LegacyBiasDetectionService
+
+__all__ = [
+    "app",
+    "BiasDetectionConfig",
+    "SessionData",
+    "BiasDetectionService",
+    "AuditLogger",
+    "SecurityManager",
+]
 
 # Initialize services
 load_dotenv()

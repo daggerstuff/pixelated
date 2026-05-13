@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+import {
+  type AuthRequestConfig,
+  fetchWithAuthToken,
+} from '@/lib/auth/auth0-protected-fetch'
+
 import type { ComparativeProgressResult } from '../types/analytics.js'
 
 interface DateRange {
@@ -44,6 +49,9 @@ export function useComparativeProgress(
   metric: string,
   cohort: string,
   dateRange: DateRange,
+  authConfig?: Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
+    getAccessTokenSilently?: AuthRequestConfig['getAccessTokenSilently']
+  },
 ) {
   const [data, setData] = useState<ComparativeProgressResult | null>(null)
   const [loading, setLoading] = useState(false)
@@ -149,10 +157,18 @@ export function useComparativeProgress(
         endDate: dateRange.endDate,
       })
 
-      const response = await fetch(
-        `/api/analytics/comparative-progress?${params.toString()}`,
-        { signal: controller.signal },
-      )
+      const response = authConfig?.getAccessTokenSilently
+        ? await fetchWithAuthToken(
+            `/api/analytics/comparative-progress?${params.toString()}`,
+            { signal: controller.signal },
+            { getAccessTokenSilently: authConfig.getAccessTokenSilently },
+          )
+        : await fetch(
+            `/api/analytics/comparative-progress?${params.toString()}`,
+            {
+              signal: controller.signal,
+            },
+          )
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -182,7 +198,14 @@ export function useComparativeProgress(
     } finally {
       setLoading(false)
     }
-  }, [userId, metric, cohort, dateRange, validateInputs])
+  }, [
+    authConfig?.getAccessTokenSilently,
+    userId,
+    metric,
+    cohort,
+    dateRange,
+    validateInputs,
+  ])
 
   useEffect(() => {
     void fetchData()

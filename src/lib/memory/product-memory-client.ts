@@ -1,3 +1,5 @@
+import type { AuthRequestConfig } from '../auth/auth0-protected-fetch'
+import { fetchWithAuthToken } from '../auth/auth0-protected-fetch'
 import type {
   AddMemoryInput,
   MemoryEntry,
@@ -5,15 +7,40 @@ import type {
   SearchOptions,
 } from './memory-client'
 
+type MemoryAuthConfig = Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
+  getAccessTokenSilently?: AuthRequestConfig['getAccessTokenSilently']
+}
+
 /**
  * ProductMemoryClient targets the app-owned /api/memory/* gateway routes
  * using relative paths to ensure it works across different environments.
  * It provides a standardized interface for memory operations in the frontend.
  */
 export class ProductMemoryClient {
+  private defaultAuthConfig?: MemoryAuthConfig
+
+  constructor(defaultAuthConfig?: MemoryAuthConfig) {
+    this.defaultAuthConfig = defaultAuthConfig
+  }
+
+  private async request(
+    input: RequestInfo | URL,
+    init: RequestInit = {},
+    authConfig?: MemoryAuthConfig,
+  ): Promise<Response> {
+    const activeConfig = authConfig || this.defaultAuthConfig
+    return activeConfig?.getAccessTokenSilently
+      ? fetchWithAuthToken(input, init, {
+          getAccessTokenSilently: activeConfig.getAccessTokenSilently,
+          ...(activeConfig.audience ? { audience: activeConfig.audience } : {}),
+          ...(activeConfig.scope ? { scope: activeConfig.scope } : {}),
+        })
+      : fetch(input, init)
+  }
+
   async addMemory(input: AddMemoryInput, userId?: string): Promise<string> {
     const resolvedUserId = requireUserId(userId)
-    const response = await fetch('/api/memory/add', {
+    const response = await this.request('/api/memory/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -59,7 +86,7 @@ export class ProductMemoryClient {
       options.tags.forEach((tag) => params.append('tag', tag))
     }
 
-    const response = await fetch(`/api/memory/list?${params.toString()}`)
+    const response = await this.request(`/api/memory/list?${params.toString()}`)
     if (!response.ok) {
       throw new Error(`Failed to list memories: ${response.statusText}`)
     }
@@ -70,7 +97,7 @@ export class ProductMemoryClient {
 
   async searchMemories(options: SearchOptions): Promise<MemoryEntry[]> {
     const resolvedUserId = requireUserId(options.userId)
-    const response = await fetch('/api/memory/search', {
+    const response = await this.request('/api/memory/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -96,7 +123,7 @@ export class ProductMemoryClient {
     userId?: string,
   ): Promise<void> {
     const resolvedUserId = requireUserId(userId)
-    const response = await fetch('/api/memory/update', {
+    const response = await this.request('/api/memory/update', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -113,7 +140,7 @@ export class ProductMemoryClient {
 
   async deleteMemory(memoryId: string, userId?: string): Promise<void> {
     const resolvedUserId = requireUserId(userId)
-    const response = await fetch('/api/memory/delete', {
+    const response = await this.request('/api/memory/delete', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -129,7 +156,7 @@ export class ProductMemoryClient {
 
   async getStats(userId?: string): Promise<MemoryStats> {
     const resolvedUserId = requireUserId(userId)
-    const response = await fetch(
+    const response = await this.request(
       `/api/memory/stats?userId=${encodeURIComponent(resolvedUserId)}`,
     )
 
