@@ -40,27 +40,48 @@ export interface TestMetrics {
  * Comprehensive Testing Suite Manager
  */
 class TestSuiteManager {
-  private config: TestSuiteConfig
-  private testResults = new Map<string, TestResult>()
+  private readonly config: TestSuiteConfig
+  private readonly testResults = new Map<string, TestResult>()
   private isRunning = false
+  private lastRun?: Date
 
-  constructor(config: TestSuiteConfig) {
+  constructor(config: Partial<TestSuiteConfig>) {
+    const coverage = config.coverage ?? {
+      statements: 90,
+      branches: 85,
+      functions: 90,
+      lines: 90,
+    }
+    const performance = config.performance ?? {
+      maxResponseTime: 100,
+      maxMemoryUsage: 100,
+      maxCpuUsage: 80,
+    }
     this.config = {
-      layers: ['unit', 'integration', 'e2e', 'performance', 'security'],
+      layers: config.layers ?? [
+        'unit',
+        'integration',
+        'e2e',
+        'performance',
+        'security',
+      ],
       coverage: {
-        statements: 90,
-        branches: 85,
-        functions: 90,
-        lines: 90,
+        statements: coverage.statements,
+        branches: coverage.branches,
+        functions: coverage.functions,
+        lines: coverage.lines,
       },
       performance: {
-        maxResponseTime: 100,
-        maxMemoryUsage: 100, // MB
-        maxCpuUsage: 80, // %
+        maxResponseTime: performance.maxResponseTime,
+        maxMemoryUsage: performance.maxMemoryUsage,
+        maxCpuUsage: performance.maxCpuUsage,
       },
-      environments: ['development', 'staging', 'production'],
-      enableCI: true,
-      ...config,
+      environments: config.environments ?? [
+        'development',
+        'staging',
+        'production',
+      ],
+      enableCI: config.enableCI ?? true,
     }
   }
 
@@ -97,6 +118,7 @@ class TestSuiteManager {
         duration: Date.now() - startTime,
       }
 
+      this.lastRun = new Date()
       await this.generateReport(finalMetrics)
       return finalMetrics
     } finally {
@@ -121,18 +143,22 @@ class TestSuiteManager {
     for (const testFile of unitTests) {
       // Simulate test execution with some failures for realism
       const passed = Math.random() > 0.1 // 90% pass rate
+      const failure = passed ? undefined : new Error('Mock test failure')
 
       results.push({
         id: `unit_${testFile}`,
-        name: testFile,
+        testName: testFile,
         status: passed ? 'passed' : 'failed',
         duration: Math.random() * 1000 + 100, // 100-1100ms
-        error: passed ? undefined : new Error('Mock test failure'),
-        coverage: {
-          statements: Math.floor(Math.random() * 20) + 80,
-          branches: Math.floor(Math.random() * 20) + 75,
-          functions: Math.floor(Math.random() * 20) + 80,
-          lines: Math.floor(Math.random() * 20) + 80,
+        timestamp: new Date(),
+        message: failure ? failure.message : undefined,
+        metadata: {
+          coverage: {
+            statements: Math.floor(Math.random() * 20) + 80,
+            branches: Math.floor(Math.random() * 20) + 75,
+            functions: Math.floor(Math.random() * 20) + 80,
+            lines: Math.floor(Math.random() * 20) + 80,
+          },
         },
       })
     }
@@ -154,18 +180,22 @@ class TestSuiteManager {
 
     for (const testFile of integrationTests) {
       const passed = Math.random() > 0.15 // 85% pass rate
+      const failure = passed ? undefined : new Error('Integration test failure')
 
       results.push({
         id: `integration_${testFile}`,
-        name: testFile,
+        testName: testFile,
         status: passed ? 'passed' : 'failed',
         duration: Math.random() * 3000 + 500, // 500-3500ms
-        error: passed ? undefined : new Error('Integration test failure'),
-        coverage: {
-          statements: Math.floor(Math.random() * 15) + 85,
-          branches: Math.floor(Math.random() * 15) + 80,
-          functions: Math.floor(Math.random() * 15) + 85,
-          lines: Math.floor(Math.random() * 15) + 85,
+        timestamp: new Date(),
+        message: failure ? failure.message : undefined,
+        metadata: {
+          coverage: {
+            statements: Math.floor(Math.random() * 15) + 85,
+            branches: Math.floor(Math.random() * 15) + 80,
+            functions: Math.floor(Math.random() * 15) + 85,
+            lines: Math.floor(Math.random() * 15) + 85,
+          },
         },
       })
     }
@@ -187,18 +217,22 @@ class TestSuiteManager {
 
     for (const testFile of e2eTests) {
       const passed = Math.random() > 0.2 // 80% pass rate
+      const failure = passed ? undefined : new Error('E2E test failure')
 
       results.push({
         id: `e2e_${testFile}`,
-        name: testFile,
+        testName: testFile,
         status: passed ? 'passed' : 'failed',
         duration: Math.random() * 10000 + 2000, // 2-12 seconds
-        error: passed ? undefined : new Error('E2E test failure'),
-        coverage: {
-          statements: Math.floor(Math.random() * 10) + 90,
-          branches: Math.floor(Math.random() * 10) + 85,
-          functions: Math.floor(Math.random() * 10) + 90,
-          lines: Math.floor(Math.random() * 10) + 90,
+        timestamp: new Date(),
+        message: failure ? failure.message : undefined,
+        metadata: {
+          coverage: {
+            statements: Math.floor(Math.random() * 10) + 90,
+            branches: Math.floor(Math.random() * 10) + 85,
+            functions: Math.floor(Math.random() * 10) + 90,
+            lines: Math.floor(Math.random() * 10) + 90,
+          },
         },
       })
     }
@@ -221,21 +255,25 @@ class TestSuiteManager {
     for (const testFile of performanceTests) {
       const responseTime = Math.random() * 150 + 50 // 50-200ms
       const passed = responseTime < this.config.performance.maxResponseTime
+      const failure = passed
+        ? undefined
+        : new Error(
+            `Performance threshold exceeded: ${responseTime}ms > ${this.config.performance.maxResponseTime}ms`,
+          )
 
       results.push({
         id: `perf_${testFile}`,
-        name: testFile,
+        testName: testFile,
         status: passed ? 'passed' : 'failed',
         duration: responseTime,
-        error: passed
-          ? undefined
-          : new Error(
-              `Performance threshold exceeded: ${responseTime}ms > ${this.config.performance.maxResponseTime}ms`,
-            ),
-        performance: {
-          responseTime,
-          memoryUsage: Math.random() * 50 + 25, // 25-75MB
-          cpuUsage: Math.random() * 40 + 20, // 20-60%
+        timestamp: new Date(),
+        message: failure ? failure.message : undefined,
+        metadata: {
+          performance: {
+            responseTime,
+            memoryUsage: Math.random() * 50 + 25, // 25-75MB
+            cpuUsage: Math.random() * 40 + 20, // 20-60%
+          },
         },
       })
     }
@@ -258,28 +296,30 @@ class TestSuiteManager {
 
     for (const testFile of securityTests) {
       const passed = Math.random() > 0.05 // 95% pass rate for security
+      const failure = passed ? undefined : new Error('Security vulnerability detected')
 
       results.push({
         id: `security_${testFile}`,
-        name: testFile,
+        testName: testFile,
         status: passed ? 'passed' : 'failed',
         duration: Math.random() * 2000 + 500, // 500-2500ms
-        error: passed
-          ? undefined
-          : new Error('Security vulnerability detected'),
-        security: {
-          vulnerabilities: passed
-            ? []
-            : [
-                {
-                  type: 'mock',
-                  severity: 'high',
-                  description: 'Mock security issue',
-                },
-              ],
-          complianceScore: passed
-            ? 95 + Math.random() * 5
-            : 70 + Math.random() * 10,
+        timestamp: new Date(),
+        message: failure ? failure.message : undefined,
+        metadata: {
+          security: {
+            vulnerabilities: passed
+              ? []
+              : [
+                  {
+                    type: 'mock',
+                    severity: 'high',
+                    description: 'Mock security issue',
+                  },
+                ],
+            complianceScore: passed
+              ? 95 + Math.random() * 5
+              : 70 + Math.random() * 10,
+          },
         },
       })
     }
@@ -325,44 +365,32 @@ class TestSuiteManager {
   private async generateCoverageReport(): Promise<CoverageReport> {
     // Simulate coverage report generation
     const coverage: CoverageReport = {
+      id: `coverage_${Date.now()}`,
+      timestamp: new Date(),
       statements: {
         total: 1500,
         covered: Math.floor(1500 * 0.92),
         percentage: 92,
-        uncovered: [],
       },
       branches: {
         total: 800,
         covered: Math.floor(800 * 0.87),
         percentage: 87,
-        uncovered: [],
       },
       functions: {
         total: 350,
         covered: Math.floor(350 * 0.94),
         percentage: 94,
-        uncovered: [],
       },
       lines: {
         total: 1200,
         covered: Math.floor(1200 * 0.91),
         percentage: 91,
-        uncovered: [],
       },
+      files: [],
     }
 
-    // Check if coverage meets requirements
-    const meetsRequirements =
-      coverage.statements.percentage >= this.config.coverage.statements &&
-      coverage.branches.percentage >= this.config.coverage.branches &&
-      coverage.functions.percentage >= this.config.coverage.functions &&
-      coverage.lines.percentage >= this.config.coverage.lines
-
-    return {
-      ...coverage,
-      meetsRequirements,
-      requirements: this.config.coverage,
-    }
+    return coverage
   }
 
   private async measurePerformance(): Promise<TestMetrics['performance']> {
@@ -375,7 +403,35 @@ class TestSuiteManager {
   }
 
   private async generateReport(metrics: TestMetrics): Promise<void> {
-    const report = {
+    const meetsRequirements =
+      metrics.coverage.statements.percentage >= this.config.coverage.statements &&
+      metrics.coverage.branches.percentage >= this.config.coverage.branches &&
+      metrics.coverage.functions.percentage >= this.config.coverage.functions &&
+      metrics.coverage.lines.percentage >= this.config.coverage.lines
+    const report: {
+      timestamp: string
+      summary: {
+        totalTests: number
+        passedTests: number
+        failedTests: number
+        skippedTests: number
+        successRate: string
+        duration: string
+      }
+      coverage: {
+        statements: string
+        branches: string
+        functions: string
+        lines: string
+        meetsRequirements: boolean
+      }
+      performance: {
+        averageResponseTime: string
+        memoryUsage: string
+        cpuUsage: string
+      }
+      recommendations: string[]
+    } = {
       timestamp: new Date().toISOString(),
       summary: {
         totalTests: metrics.totalTests,
@@ -390,14 +446,14 @@ class TestSuiteManager {
         branches: `${metrics.coverage.branches.percentage}%`,
         functions: `${metrics.coverage.functions.percentage}%`,
         lines: `${metrics.coverage.lines.percentage}%`,
-        meetsRequirements: metrics.coverage.meetsRequirements,
+        meetsRequirements,
       },
       performance: {
         averageResponseTime: `${metrics.performance.averageResponseTime.toFixed(1)}ms`,
         memoryUsage: `${metrics.performance.memoryUsage.toFixed(1)}MB`,
         cpuUsage: `${metrics.performance.cpuUsage.toFixed(1)}%`,
       },
-      recommendations: this.generateRecommendations(metrics),
+      recommendations: this.generateRecommendations(metrics, meetsRequirements),
     }
 
     console.log('📊 Test Report Generated:', report)
@@ -408,7 +464,10 @@ class TestSuiteManager {
     }
   }
 
-  private generateRecommendations(metrics: TestMetrics): string[] {
+  private generateRecommendations(
+    metrics: TestMetrics,
+    meetsRequirements: boolean,
+  ): string[] {
     const recommendations: string[] = []
 
     if (metrics.failedTests > 0) {
@@ -417,7 +476,7 @@ class TestSuiteManager {
       )
     }
 
-    if (!metrics.coverage.meetsRequirements) {
+    if (!meetsRequirements) {
       recommendations.push('Improve test coverage to meet requirements')
     }
 
@@ -441,7 +500,29 @@ class TestSuiteManager {
     return recommendations
   }
 
-  private async exportToCI(report: any): Promise<void> {
+  private async exportToCI(report: {
+    summary: {
+      totalTests: number
+      passedTests: number
+      failedTests: number
+      skippedTests: number
+      successRate: string
+      duration: string
+    }
+    coverage: {
+      statements: string
+      branches: string
+      functions: string
+      lines: string
+      meetsRequirements: boolean
+    }
+    performance: {
+      averageResponseTime: string
+      memoryUsage: string
+      cpuUsage: string
+    }
+    recommendations: string[]
+  }): Promise<void> {
     // Export test results to CI/CD system
     console.log('📤 Exporting results to CI/CD system...')
 
@@ -486,7 +567,8 @@ class TestSuiteManager {
       case 'security':
         return this.runSecurityTests()
       default:
-        throw new Error(`Unknown test layer: ${layer}`)
+      const _exhaustiveCheck: never = layer
+      throw new Error(`Unknown test layer: ${_exhaustiveCheck}`)
     }
   }
 
@@ -500,7 +582,7 @@ class TestSuiteManager {
   } {
     return {
       isRunning: this.isRunning,
-      lastRun: this.optimizationHistory.length > 0 ? new Date() : undefined,
+      lastRun: this.lastRun,
       nextScheduled: this.config.enableCI
         ? new Date(Date.now() + 24 * 60 * 60 * 1000)
         : undefined,

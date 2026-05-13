@@ -122,9 +122,6 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
     metadata: {
       source: 'test',
     },
-    toString() {
-      return this.data
-    },
   }
 
   beforeEach(() => {
