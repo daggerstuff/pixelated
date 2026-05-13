@@ -179,9 +179,7 @@ export class RedisService extends EventEmitter implements IRedisService {
         this.healthCheckInterval = null
       }
 
-      if (this.client && this.client.quit) {
-        await this.client.quit().catch(() => undefined)
-      }
+      await this.client?.quit().catch(() => undefined)
       this.client = null
 
       // In development, we can continue without Redis
