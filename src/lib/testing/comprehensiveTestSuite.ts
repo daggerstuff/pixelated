@@ -567,8 +567,8 @@ class TestSuiteManager {
       case 'security':
         return this.runSecurityTests()
       default:
-      const _exhaustiveCheck: never = layer
-      throw new Error(`Unknown test layer: ${_exhaustiveCheck}`)
+        const _exhaustiveCheck: never = layer
+        throw new Error(`Unknown test layer: ${_exhaustiveCheck}`)
     }
   }
 
