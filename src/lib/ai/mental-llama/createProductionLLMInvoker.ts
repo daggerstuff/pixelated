@@ -183,6 +183,7 @@ export async function createProductionLLMInvoker(
       errorMessage.includes('monthly_request_count') ||
       errorMessage.includes('limit reached') ||
       errorMessage.includes('quota') ||
+      errorMessage.includes('402') ||
       errorMessage.includes('429')
     ) {
       return true
@@ -247,6 +248,7 @@ export async function createProductionLLMInvoker(
       errorMessage.includes('monthly_request_count') ||
       errorMessage.includes('limit reached') ||
       errorMessage.includes('quota') ||
+      errorMessage.includes('402') ||
       errorMessage.includes('429')
     ) {
       return LLMInvokerErrorType.RATE_LIMITED
