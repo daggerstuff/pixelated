@@ -9,6 +9,18 @@ import {
 
 const logger = getLogger('HIPAADataService')
 
+type RolePermissions = {
+  permissions: string[]
+  restrictions: string[]
+}
+
+interface EncryptionMetadata {
+  keyId: string
+  iv: string
+  tag?: string
+  algorithm: string
+}
+
 export interface HIPAAConfig {
   encryptionAlgorithm: string
   keyRotationDays: number
@@ -41,10 +53,10 @@ export interface DataAccessResult {
 }
 
 export class HIPAADataService {
-  private config: HIPAAConfig
-  private encryptionKeys: Map<string, Buffer> = new Map()
+  private readonly config: HIPAAConfig
+  private readonly encryptionKeys: Map<string, Buffer> = new Map()
   private auditLog: AuditLog[] = []
-  private activeSessions: Map<string, { userId: string; expiration: Date }> =
+  private readonly activeSessions: Map<string, { userId: string; expiration: Date }> =
     new Map()
 
   constructor(
