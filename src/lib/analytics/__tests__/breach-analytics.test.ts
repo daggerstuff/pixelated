@@ -1,5 +1,4 @@
-import { type Mock } from 'vitest'
-
+import type { EncryptedData } from '@/lib/fhe/types'
 import * as BreachAnalytics from '@/lib/analytics/breach-analytics'
 /// <reference types="vitest/globals" />
 import * as ComplianceMetrics from '@/lib/analytics/compliance'
@@ -10,6 +9,7 @@ import { StatisticalAnalysis } from '@/lib/analytics/statistics'
 import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
 import { redis } from '@/lib/redis'
+import type { BreachDetails } from '@/lib/security/breach-notification'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
 
 // Mock dependencies
@@ -70,7 +70,25 @@ describe('breachAnalytics', () => {
     to: new Date('2025-03-07'),
   }
 
-  const mockBreaches = [
+const mockedListRecentBreaches = vi.mocked(listRecentBreaches)
+const mockedRedisGet = vi.mocked(redis.get)
+const mockedCalculateOverallRisk = vi.mocked(RiskScoring.calculateOverallRisk)
+const mockedCalculateDailyRisk = vi.mocked(RiskScoring.calculateDailyRisk)
+const mockedCalculateScore = vi.mocked(ComplianceMetrics.calculateScore)
+const mockedCalculateNotificationEffectiveness = vi.mocked(
+  NotificationEffectiveness.calculate,
+)
+const mockedCalculateDailyNotification = vi.mocked(
+  NotificationEffectiveness.calculateDaily,
+)
+const mockedDetectAnomalies = vi.mocked(MachineLearning.detectAnomalies)
+const mockedPredictBreaches = vi.mocked(MachineLearning.predictBreaches)
+const mockedGetFactors = vi.mocked(RiskScoring.getFactors)
+const mockedAnalyzeTrends = vi.mocked(SecurityTrends.analyze)
+const mockedCalculateTrend = vi.mocked(StatisticalAnalysis.calculateTrend)
+const mockedFheEncrypt = vi.mocked(fheService.encrypt)
+
+  const mockBreaches: BreachDetails[] = [
     {
       id: 'breach_1',
       type: 'unauthorized_access',
@@ -78,6 +96,10 @@ describe('breachAnalytics', () => {
       timestamp: new Date('2025-03-02').getTime(),
       affectedUsers: ['user1', 'user2'],
       notificationStatus: 'completed',
+      description: 'Unauthorized access to account',
+      affectedData: ['passwords', 'emails'],
+      detectionMethod: 'monitoring',
+      remediation: 'Rotated credentials and forced logout',
     },
     {
       id: 'breach_2',
@@ -86,59 +108,51 @@ describe('breachAnalytics', () => {
       timestamp: new Date('2025-03-03').getTime(),
       affectedUsers: ['user3', 'user4', 'user5'],
       notificationStatus: 'completed',
+      description: 'Sensitive data exposed in logs',
+      affectedData: ['medical_records'],
+      detectionMethod: 'siem',
+      remediation: 'Patched exposed endpoint and rotated keys',
     },
   ]
+
+  const mockEncryptedData: EncryptedData = {
+    id: 'encrypted_mock',
+    data: 'encrypted_data',
+    dataType: 'string',
+    metadata: {
+      source: 'test',
+    },
+    toString() {
+      return this.data
+    },
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    void (
-      listRecentBreaches as unknown as {
-        mockResolvedValue: (v: unknown) => Promise<unknown>
-      }
-    ).mockResolvedValue(mockBreaches)
-    void (
-      redis.get as unknown as {
-        mockResolvedValue: (v: unknown) => Promise<unknown>
-      }
-    ).mockResolvedValue(
+    mockedListRecentBreaches.mockResolvedValue(mockBreaches)
+    mockedRedisGet.mockResolvedValue(
       JSON.stringify({
         completedAt: Date.now(),
       }),
     )
-    void (
-      RiskScoring.calculateOverallRisk as unknown as {
-        mockResolvedValue: (v: unknown) => Promise<unknown>
-      }
-    ).mockResolvedValue({
+    mockedCalculateOverallRisk.mockResolvedValue({
       overallScore: 0.75,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
       recommendations: [],
     })
-    void (
-      RiskScoring.calculateDailyRisk as unknown as {
-        mockResolvedValue: (v: unknown) => Promise<unknown>
-      }
-    ).mockResolvedValue({
+    mockedCalculateDailyRisk.mockResolvedValue({
       overallScore: 0.65,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
       recommendations: [],
     })
-    void (
-      ComplianceMetrics.calculateScore as unknown as {
-        mockResolvedValue: (v: unknown) => Promise<unknown>
-      }
-    ).mockResolvedValue(0.98)
-    void (
-      NotificationEffectiveness.calculate as unknown as {
-        mockResolvedValue: (v: unknown) => Promise<unknown>
-      }
-    ).mockResolvedValue({
+    mockedCalculateScore.mockResolvedValue(0.98)
+    mockedCalculateNotificationEffectiveness.mockResolvedValue({
       overall: 0.95,
       delivery: 0.98,
       timing: 0.92,
@@ -154,7 +168,7 @@ describe('breachAnalytics', () => {
         complianceRate: 0.99,
       },
     })
-    void (NotificationEffectiveness.calculateDaily as Mock).mockResolvedValue({
+    mockedCalculateDailyNotification.mockResolvedValue({
       overall: 0.92,
       delivery: 0.95,
       timing: 0.88,
@@ -170,21 +184,33 @@ describe('breachAnalytics', () => {
         complianceRate: 0.96,
       },
     })
-    void (MachineLearning.detectAnomalies as Mock).mockResolvedValue([0.1, 0.2])
-    void (MachineLearning.predictBreaches as Mock).mockResolvedValue([
+    mockedDetectAnomalies.mockResolvedValue([0.1, 0.2])
+    mockedPredictBreaches.mockResolvedValue([
       { value: 3, confidence: 0.8 },
       { value: 4, confidence: 0.7 },
     ])
-    void (RiskScoring.getFactors as Mock).mockResolvedValue([
-      { name: 'factor1', weight: 0.8, score: 0.9 },
-      { name: 'factor2', weight: 0.6, score: 0.7 },
+    mockedGetFactors.mockResolvedValue([
+      {
+        name: 'factor1',
+        weight: 0.8,
+        score: 0.9,
+        description: 'Access controls not segmented by role',
+        calculateScore: async () => 0.9,
+      },
+      {
+        name: 'factor2',
+        weight: 0.6,
+        score: 0.7,
+        description: 'Patch cadence below target',
+        calculateScore: async () => 0.7,
+      },
     ])
-    void (SecurityTrends.analyze as Mock).mockResolvedValue([
+    mockedAnalyzeTrends.mockResolvedValue([
       'increasing',
       'stable',
     ])
-    void (StatisticalAnalysis.calculateTrend as Mock).mockReturnValue(0.15)
-    void (fheService.encrypt as Mock).mockResolvedValue('encrypted_data')
+    mockedCalculateTrend.mockReturnValue(0.15)
+    mockedFheEncrypt.mockResolvedValue(mockEncryptedData)
   })
 
   afterEach(() => {
@@ -290,11 +316,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should handle empty breach list', async () => {
-      void (
-        listRecentBreaches as unknown as {
-          mockResolvedValue: (v: unknown) => Promise<unknown>
-        }
-      ).mockResolvedValue([])
+      mockedListRecentBreaches.mockResolvedValue([])
 
       const metrics = await BreachAnalytics.generateMetrics(mockTimeframe)
 
@@ -401,7 +423,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should include notification effectiveness insights when below threshold', async () => {
-      ;(NotificationEffectiveness.calculate as Mock).mockResolvedValue({
+      mockedCalculateNotificationEffectiveness.mockResolvedValue({
         overall: 0.94,
         delivery: 0.95,
         timing: 0.88,
@@ -432,7 +454,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should include compliance insights when below threshold', async () => {
-      ;(ComplianceMetrics.calculateScore as Mock).mockResolvedValue(0.97)
+      mockedCalculateScore.mockResolvedValue(0.97)
 
       const insights = await BreachAnalytics.generateInsights()
 
@@ -482,7 +504,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should handle errors during report generation', async () => {
-      ;(listRecentBreaches as Mock).mockRejectedValue(
+      mockedListRecentBreaches.mockRejectedValue(
         new Error('Failed to fetch breaches'),
       )
 

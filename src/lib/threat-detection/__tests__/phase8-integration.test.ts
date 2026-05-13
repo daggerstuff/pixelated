@@ -7,10 +7,26 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createCompleteThreatDetectionSystem } from '../integrations'
 
-const setMockFetchResponse = (response: Response): void => {
+type ThreatDetectionSystem = ReturnType<typeof createCompleteThreatDetectionSystem>
+type RateLimiterMock = {
+  checkLimit: ReturnType<typeof vi.fn>
+  consume: ReturnType<typeof vi.fn>
+  reset: ReturnType<typeof vi.fn>
+}
+
+const setMockFetchResponse = (payload: unknown): void => {
   const fetchMock = vi.fn<
     (input: URL | RequestInfo, init?: RequestInit) => Promise<Response>
   >()
+  const response = new Response(
+    typeof payload === 'string' ? payload : JSON.stringify(payload),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  )
   global.fetch = fetchMock
   void fetchMock.mockResolvedValue(response)
 }
@@ -18,9 +34,9 @@ const setMockFetchResponse = (response: Response): void => {
 describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   let mongod: MongoMemoryServer
   let redis: ReturnType<typeof Redis>
-  let mockOrchestrator: any
-  let mockRateLimiter: any
-  let threatDetectionSystem: any
+  let mockOrchestrator: EventEmitter
+  let mockRateLimiter: RateLimiterMock
+  let threatDetectionSystem: ThreatDetectionSystem
 
   beforeEach(async () => {
     // Setup in-memory MongoDB
@@ -227,11 +243,8 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       process.env.ALIENVAULT_API_KEY = 'test_valid_api_key'
 
       setMockFetchResponse({
-        ok: true,
-        json: async () => ({
-          results: [{ ip: '192.168.1.1', reputation: 'bad' }],
-        }),
-      } as unknown as Response)
+        results: [{ ip: '192.168.1.1', reputation: 'bad' }],
+      })
 
       await intelligenceService.updateFeeds()
 
@@ -246,11 +259,8 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       const { intelligenceService } = threatDetectionSystem
 
       setMockFetchResponse({
-        ok: true,
-        json: async () => ({
-          data: [{ indicator: 'test.com', type: 'domain' }],
-        }),
-      } as unknown as Response)
+        data: [{ indicator: 'test.com', type: 'domain' }],
+      })
 
       const result = await intelligenceService.lookupIOC('test.com', 'domain')
       expect(result).toBeDefined()
@@ -305,10 +315,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Verify hunting service initiated investigation (check all, not just active)
       const allInvestigations = await huntingService.getActiveInvestigations()
-      const completedInvestigations = [
-        ...(huntingService as any).investigations.values(),
-      ]
-      const relatedInvestigation = completedInvestigations.find(
+      const relatedInvestigation = allInvestigations.find(
         (inv) => inv.threatId === threatData.threatId,
       )
       expect(relatedInvestigation).toBeDefined()
@@ -401,9 +408,8 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       process.env.ALIENVAULT_API_KEY = 'test_valid_api_key'
 
       setMockFetchResponse({
-        ok: true,
-        json: async () => ({ data: [] }),
-      } as unknown as Response)
+        data: [],
+      })
 
       const start = Date.now()
       await intelligenceService.lookupIOC('test.com', 'domain')
