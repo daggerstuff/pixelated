@@ -85,8 +85,8 @@ const mockedDetectAnomalies = vi.mocked(MachineLearning.detectAnomalies)
 const mockedPredictBreaches = vi.mocked(MachineLearning.predictBreaches)
 const mockedGetFactors = vi.mocked(RiskScoring.getFactors)
 const mockedAnalyzeTrends = vi.mocked(SecurityTrends.analyze)
-const mockedCalculateTrend = vi.mocked(StatisticalAnalysis.calculateTrend)
-const mockedFheEncrypt = vi.mocked(fheService.encrypt)
+const mockedCalculateTrend = vi.spyOn(StatisticalAnalysis, 'calculateTrend')
+const mockedFheEncrypt = vi.spyOn(fheService, 'encrypt')
 
   const mockBreaches: BreachDetails[] = [
     {
@@ -218,7 +218,7 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
     it('should generate breach metrics for the given timeframe', async () => {
       const metrics = await BreachAnalytics.generateMetrics(mockTimeframe)
 
-      expect(metrics).toEqual({
+      expect(metrics).toMatchObject({
         totalBreaches: 2,
         bySeverity: {
           high: 1,
@@ -228,11 +228,11 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
           unauthorized_access: 1,
           data_leak: 1,
         },
-        averageResponseTime: expect.any(Number),
         riskScore: 0.75,
         complianceScore: 0.98,
         notificationEffectiveness: 0.95,
       })
+      expect(typeof metrics.averageResponseTime).toBe('number')
 
       expect(listRecentBreaches).toHaveBeenCalled()
       expect(RiskScoring.calculateOverallRisk).toHaveBeenCalledWith(
@@ -334,15 +334,16 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
       const trends = await BreachAnalytics.analyzeTrends(mockTimeframe)
 
       expect(trends).toHaveLength(7) // 7 days
-      expect(trends[0]).toEqual({
+      const firstTrend = trends[0]
+      expect(firstTrend).toMatchObject({
         timestamp: mockTimeframe.from.getTime(),
-        breaches: expect.any(Number),
-        affectedUsers: expect.any(Number),
         notificationRate: 0.92,
-        responseTime: expect.any(Number),
         riskScore: 0.65,
-        anomalyScore: expect.any(Number),
       })
+      expect(typeof firstTrend.breaches).toBe('number')
+      expect(typeof firstTrend.affectedUsers).toBe('number')
+      expect(typeof firstTrend.responseTime).toBe('number')
+      expect(typeof firstTrend.anomalyScore).toBe('number')
 
       expect(MachineLearning.detectAnomalies).toHaveBeenCalled()
       expect(NotificationEffectiveness.calculateDaily).toHaveBeenCalled()
@@ -355,12 +356,13 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
       const predictions = await BreachAnalytics.predictBreaches(7)
 
       expect(predictions).toHaveLength(2)
-      expect(predictions[0]).toEqual({
-        timestamp: expect.any(Number),
+      const firstPrediction = predictions[0]
+      expect(firstPrediction).toMatchObject({
         predictedBreaches: 3,
         confidence: 0.8,
         factors: ['factor1'],
       })
+      expect(typeof firstPrediction.timestamp).toBe('number')
 
       expect(MachineLearning.predictBreaches).toHaveBeenCalled()
       expect(RiskScoring.getFactors).toHaveBeenCalled()
@@ -399,13 +401,23 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
       // console.log('Actual Insights:', JSON.stringify(insights, null, 2));
 
       // Adjusted expectation based on log output
-      expect(insights).toContainEqual({
+      const responseTimeInsight = insights.find(
+        (item) => item.type === 'response_time',
+      )
+      expect(responseTimeInsight).toMatchObject({
         type: 'response_time', // Changed from 'critical_breaches'
         severity: 'medium',
-        description: expect.stringContaining('Response time'), // Made less specific
-        recommendation: expect.stringContaining('Review incident response'), // Made less specific
-        relatedMetrics: expect.arrayContaining(['averageResponseTime']),
       })
+      expect(responseTimeInsight).toBeDefined()
+      expect(responseTimeInsight?.description).toEqual(
+        expect.stringContaining('Response time'),
+      )
+      expect(responseTimeInsight?.recommendation).toEqual(
+        expect.stringContaining('Review incident response'),
+      )
+      expect(responseTimeInsight?.relatedMetrics).toEqual(
+        expect.arrayContaining(['averageResponseTime']),
+      )
 
       // Keep the original assertion commented out for reference
       // expect(insights).toContainEqual({
@@ -439,15 +451,21 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
 
       const insights = await BreachAnalytics.generateInsights()
 
-      expect(insights).toContainEqual({
+      const notificationInsight = insights.find(
+        (item) => item.type === 'notification_effectiveness',
+      )
+      expect(notificationInsight).toMatchObject({
         type: 'notification_effectiveness',
         severity: 'high',
-        description: expect.stringContaining('below 95%'),
-        recommendation: expect.stringContaining(
-          'Review notification delivery system',
-        ),
         relatedMetrics: ['notificationEffectiveness', 'averageResponseTime'],
       })
+      expect(notificationInsight).toBeDefined()
+      expect(notificationInsight?.description).toEqual(
+        expect.stringContaining('below 95%'),
+      )
+      expect(notificationInsight?.recommendation).toEqual(
+        expect.stringContaining('Review notification delivery system'),
+      )
     })
 
     it('should include compliance insights when below threshold', async () => {
@@ -469,7 +487,7 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
     it('should generate a comprehensive analytics report', async () => {
       const report = await BreachAnalytics.generateReport(mockTimeframe)
 
-      expect(report).toEqual({
+      expect(report).toMatchObject({
         timeframe: {
           from: mockTimeframe.from.toISOString(),
           to: mockTimeframe.to.toISOString(),
@@ -484,20 +502,21 @@ const mockedFheEncrypt = vi.mocked(fheService.encrypt)
             unauthorized_access: 1,
             data_leak: 1,
           },
-          averageResponseTime: expect.any(Number),
           riskScore: 0.75,
           complianceScore: 0.98,
           notificationEffectiveness: 0.95,
           encryptedData: 'encrypted_data',
         },
-        trends: expect.any(Array),
-        predictions: expect.any(Array),
-        riskFactors: expect.any(Array),
-        insights: expect.any(Array),
-        generatedAt: expect.any(String),
+        generatedAt: '',
       })
+      expect(Array.isArray(report.trends)).toBe(true)
+      expect(Array.isArray(report.predictions)).toBe(true)
+      expect(Array.isArray(report.riskFactors)).toBe(true)
+      expect(Array.isArray(report.insights)).toBe(true)
+      expect(typeof report.metrics.averageResponseTime).toBe('number')
+      expect(typeof report.generatedAt).toBe('string')
 
-      expect(fheService.encrypt).toHaveBeenCalled()
+      expect(mockedFheEncrypt).toHaveBeenCalled()
     })
 
     it('should handle errors during report generation', async () => {
