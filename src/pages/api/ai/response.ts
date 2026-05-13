@@ -265,18 +265,10 @@ export const POST: APIRoute = async ({ request }) => {
         _messages: AIMessage[],
         options?: AIServiceOptions,
       ): Promise<AsyncGenerator<AIStreamChunk, void, void>> => {
-        const generator = async function* () {
-          // Minimal implementation - streaming not fully supported
-          yield {
-            id: `llm_${Date.now()}`,
-            model: options?.model || modelId,
-            created: Date.now(),
-            content: '',
-            done: true,
-          } as AIStreamChunk
-          throw new Error('Streaming not supported in this implementation')
-        }
-        return generator()
+        return llmService.createStreamingChatCompletion(_messages, {
+          ...(options ?? {}),
+          model: options?.model || modelId,
+        })
       },
       getModelInfo: (model: string) => ({
         id: model,
