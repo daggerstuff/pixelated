@@ -10,14 +10,14 @@ fi
 COMMAND=("$@")
 DEFAULT_NEMOTRON_MODEL="openai/gpt-oss-120b"
 
-is_forbidden_model() {
+_copilot_safe_is_forbidden_model() {
   local candidate="$1"
   [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
 }
 
-sanitize_model() {
+_copilot_safe_sanitize_model() {
   local candidate="$1"
-  if is_forbidden_model "$candidate"; then
+  if _copilot_safe_is_forbidden_model "$candidate"; then
     echo "$DEFAULT_NEMOTRON_MODEL"
     return
   fi
@@ -38,16 +38,16 @@ sanitize_model_flags() {
 
     if [[ $skip_next -eq 1 ]]; then
       skip_next=0
-      output+=("$(sanitize_model "$arg")")
+      output+=("$(_copilot_safe_sanitize_model "$arg")")
       continue
     fi
 
     case "$arg" in
       --model=*)
-        output+=("--model=$(sanitize_model "${arg#--model=}")")
+        output+=("--model=$(_copilot_safe_sanitize_model "${arg#--model=}")")
         ;;
       --provider-model-id=*)
-        output+=("--provider-model-id=$(sanitize_model "${arg#--provider-model-id=}")")
+        output+=("--provider-model-id=$(_copilot_safe_sanitize_model "${arg#--provider-model-id=}")")
         ;;
       --model|--provider-model-id)
         output+=("$arg")
@@ -72,20 +72,18 @@ if [[ ${#COMMAND[@]} -eq 0 ]]; then
   exit 1
 fi
 
-sanitize_model_sequence() {
+_copilot_safe_sanitize_model_sequence() {
   local raw_sequence="$1"
   local token normalized
   local output=""
-  local -a tokens
 
   if [[ -z "$raw_sequence" ]]; then
     echo "$DEFAULT_NEMOTRON_MODEL"
     return
   fi
 
-  read -r -a tokens <<< "${raw_sequence//,/ }"
-  for token in "${tokens[@]}"; do
-    normalized="$(sanitize_model "$token")"
+  for token in ${raw_sequence//,/ }; do
+    normalized="$(_copilot_safe_sanitize_model "$token")"
     if [[ -z "$normalized" ]]; then
       continue
     fi
@@ -102,15 +100,19 @@ sanitize_model_sequence() {
   echo "$output"
 }
 
-DETERMINE_MODELS="$(sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}")"
-DETERMINE_PROVIDER_MODELS="$(sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}}")"
+DETERMINE_MODELS="$(_copilot_safe_sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}")"
+DETERMINE_PROVIDER_MODELS="$(_copilot_safe_sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}}")"
 
-read -r -a CANDIDATE_MODELS <<< "${DETERMINE_MODELS//,/ }"
+for token in ${DETERMINE_MODELS//,/ }; do
+  CANDIDATE_MODELS+=("$token")
+done
 if [[ ${#CANDIDATE_MODELS[@]} -eq 0 || -z "${CANDIDATE_MODELS[0]}" ]]; then
   CANDIDATE_MODELS=("${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}")
 fi
 
-read -r -a CANDIDATE_PROVIDER_MODELS <<< "${DETERMINE_PROVIDER_MODELS//,/ }"
+for token in ${DETERMINE_PROVIDER_MODELS//,/ }; do
+  CANDIDATE_PROVIDER_MODELS+=("$token")
+done
 if [[ ${#CANDIDATE_PROVIDER_MODELS[@]} -eq 0 || -z "${CANDIDATE_PROVIDER_MODELS[0]}" ]]; then
   CANDIDATE_PROVIDER_MODELS=("${COPILOT_PROVIDER_MODEL_ID:-${CANDIDATE_MODELS[0]}}")
 fi

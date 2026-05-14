@@ -19,16 +19,24 @@ import type {
   FHEKeys,
 } from './types'
 
-type DecryptDataType = 'number' | 'string' | 'boolean' | 'array' | 'object'
-type DecryptDataTypeByValue<T> = T extends number
-  ? 'number'
-  : T extends string
-    ? 'string'
-    : T extends boolean
-      ? 'boolean'
-      : T extends readonly unknown[]
-        ? 'array'
-        : 'object'
+type DecryptDataType = EncryptedData['dataType']
+type DecryptedValueByDataType = {
+  number: number
+  string: string
+  boolean: boolean
+  array: unknown[]
+  object: Record<string, unknown>
+}
+type DecryptedValue = DecryptedValueByDataType[keyof DecryptedValueByDataType]
+type DecryptInputByDataType<TDataType extends DecryptDataType> = EncryptedData<
+  DecryptedValueByDataType[TDataType]
+> & { dataType: TDataType }
+type DecryptInput =
+  | DecryptInputByDataType<'number'>
+  | DecryptInputByDataType<'string'>
+  | DecryptInputByDataType<'boolean'>
+  | DecryptInputByDataType<'array'>
+  | DecryptInputByDataType<'object'>
 
 const logger = createBuildSafeLogger('fhe-service')
 const fheOperationNames = new Set<string>(Object.values(FHEOperation))
@@ -40,7 +48,7 @@ function isFHEOperation(operation: string): operation is FHEOperation {
 /**
  * Real implementation of FHEService that uses the SEAL-based homomorphic operations
  */
-export class RealFHEService implements FHEService {
+export class RealFHEService {
   private initialized = false
   private initPromise: Promise<void> | null = null
   public readonly scheme: FHEScheme = {
@@ -154,10 +162,10 @@ export class RealFHEService implements FHEService {
   /**
    * Decrypt data
    */
-  public async decrypt<T>(
-    encryptedData: EncryptedData<T> & { dataType: DecryptDataTypeByValue<T> },
-    options?: Record<string, unknown>,
-  ): Promise<T> {
+  public async decrypt(
+    encryptedData: DecryptInput,
+    _options?: Record<string, unknown>,
+  ): Promise<DecryptedValue> {
     await this.ensureInitialized()
 
     // Create a memory scope for safe resource tracking
@@ -181,24 +189,24 @@ export class RealFHEService implements FHEService {
       // 3. Decode number[] back to T
       const result = this.decodeValue(decryptedNumbers, encryptedData.dataType)
 
-      if (encryptedData.dataType === 'number' && typeof result === 'number') {
+      if (typeof result === 'number') {
         return result
       }
 
-      if (encryptedData.dataType === 'string' && typeof result === 'string') {
+      if (typeof result === 'string') {
         return result
       }
 
-      if (encryptedData.dataType === 'boolean' && typeof result === 'boolean') {
+      if (typeof result === 'boolean') {
         return result
       }
 
-      if (encryptedData.dataType === 'array' && Array.isArray(result)) {
-        return result as unknown as T
+      if (Array.isArray(result)) {
+        return result
       }
 
-      if (encryptedData.dataType === 'object' && result !== null) {
-        return result as unknown as T
+      if (typeof result === 'object') {
+        return result
       }
 
       throw new Error('Decryption result type mismatch')
@@ -367,7 +375,10 @@ export class RealFHEService implements FHEService {
   /**
    * Helper to decode a number array back to the original type
    */
-  private decodeValue(data: number[], dataType: string): unknown {
+  private decodeValue(
+    data: number[],
+    dataType: DecryptDataType,
+  ): DecryptedValue {
     if (dataType === 'number') {
       return data[0]
     }
@@ -380,15 +391,23 @@ export class RealFHEService implements FHEService {
       return String.fromCharCode(...data)
     }
 
-    if (dataType === 'object' || dataType === 'array') {
-      try {
-        const json = String.fromCharCode(...data)
-        return JSON.parse(json)
-      } catch (err) {
-        logger.warn('Failed to parse decrypted JSON, returning as char codes', {
-          error: err,
-        })
-        return data
+    switch (dataType) {
+      case 'object':
+      case 'array': {
+        try {
+          const json = String.fromCharCode(...data)
+          const parsed = JSON.parse(json) as unknown
+
+          if (Array.isArray(parsed) || this.isRecordValue(parsed)) {
+            return parsed
+          }
+        } catch (err) {
+          logger.warn('Failed to parse decrypted JSON, returning as char codes', {
+            error: err,
+          })
+          return data
+        }
+        break
       }
     }
 
@@ -420,6 +439,14 @@ export class RealFHEService implements FHEService {
         'Real FHE service not initialized. Call initialize() first.',
       )
     }
+  }
+
+  private isRecordValue(value: unknown): value is Record<string, unknown> {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    )
   }
 }
 
