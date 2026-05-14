@@ -98,6 +98,12 @@ python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=bias_detection --cov-report=term-missing --cov-report=html --cov-fail-under=25"
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  "ignore::PendingDeprecationWarning",
+  "ignore:.*Eventlet is deprecated.*:DeprecationWarning",
+  "ignore:The default value of `allowed_objects` will change in a future version.*:DeprecationWarning",
+]
 
 [tool.mypy]
 python_version = "3.11"

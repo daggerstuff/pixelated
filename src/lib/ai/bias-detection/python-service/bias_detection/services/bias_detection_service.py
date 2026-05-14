@@ -294,7 +294,7 @@ class BiasDetectionService:
                     type="gender_neutral_language",
                     description="Use gender-neutral language instead of gender-specific terms",
                     priority="high" if score > 0.7 else "medium",
-                    implementation_difficulty="easy",
+                    implementation_difficulty="medium",
                     estimated_impact="high",
                     examples=[
                         "Use 'they' instead of 'he/she'",
@@ -325,7 +325,7 @@ class BiasDetectionService:
                     type="age_neutral_language",
                     description="Use age-neutral terms and avoid age-based assumptions",
                     priority="medium",
-                    implementation_difficulty="easy",
+                    implementation_difficulty="medium",
                     estimated_impact="medium",
                     examples=[
                         "Use 'experienced' instead of 'old'",
@@ -499,7 +499,7 @@ class BiasDetectionService:
     ) -> None:
         """Cache analysis result"""
         if settings.enable_caching:
-            await cache_service.cache_analysis_result(content_hash, result.dict())
+            await cache_service.cache_analysis_result(content_hash, result.model_dump())
 
     async def _store_analysis_result(self, result: BiasAnalysisResponse) -> None:
         """Store analysis result in database"""

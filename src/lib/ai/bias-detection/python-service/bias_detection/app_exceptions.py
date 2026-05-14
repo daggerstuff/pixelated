@@ -2,7 +2,6 @@
 Global exception handlers for the FastAPI application.
 """
 
-import sentry_sdk
 import structlog
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
@@ -54,7 +53,13 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         method=request.method,
         url=str(request.url),
     )
-    sentry_sdk.capture_exception(exc)
+    try:
+        import sentry_sdk as _sentry_sdk
+
+        _sentry_sdk.capture_exception(exc)
+    except Exception:
+        # Sentry is optional for tests and local development.
+        pass
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
