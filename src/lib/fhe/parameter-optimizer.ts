@@ -52,6 +52,11 @@ type AnalyzePerformanceHistoryReturn =
 
 // Get logger for this module
 const logger = createBuildSafeLogger('fhe-parameter-optimizer')
+const fheOperationSet = new Set<string>(Object.values(FHEOperation))
+
+const isFHEOperation = (operation: string): operation is FHEOperation => {
+  return fheOperationSet.has(operation)
+}
 
 // Operation complexity ratings (1-10) for different operations
 const OPERATION_COMPLEXITY: Record<FHEOperation, number> = {
@@ -314,7 +319,9 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType = SealSchemeType.BFV,
   ): SealEncryptionParamsOptions {
     // Extract operation type from context
-    const operationType = context.operationType as FHEOperation
+    const operationType = isFHEOperation(context.operationType)
+      ? context.operationType
+      : FHEOperation.CUSTOM
 
     // If we have metrics, use them for optimization
     if (context.metrics) {
@@ -355,13 +362,12 @@ export class FHEParameterOptimizer {
     }
 
     // Group by operation type
-    const operationGroups: Record<string, FHEPerformanceMetrics[]> = {}
+    const operationGroups = new Map<string, FHEPerformanceMetrics[]>()
 
     for (const metric of this.performanceHistory) {
-      if (!operationGroups[metric.operation]) {
-        operationGroups[metric.operation] = []
-      }
-      operationGroups[metric.operation].push(metric)
+      const groupedMetrics = operationGroups.get(metric.operation) ?? []
+      groupedMetrics.push(metric)
+      operationGroups.set(metric.operation, groupedMetrics)
     }
 
     // Calculate average durations by operation
@@ -374,7 +380,7 @@ export class FHEParameterOptimizer {
       }
     > = {}
 
-    for (const [operation, metrics] of Object.entries(operationGroups)) {
+    for (const [operation, metrics] of operationGroups.entries()) {
       // Only analyze if we have enough samples
       if (metrics.length >= 3) {
         // Calculate average duration
@@ -765,16 +771,22 @@ export class FHEParameterOptimizer {
     // If we have parameters, adjust based on them
     if (context.parameters) {
       // Check for data size
-      const dataSize = context.parameters.dataSize as number
-      if (dataSize && dataSize > 1000000) {
+      const dataSize =
+        typeof context.parameters.dataSize === 'number'
+          ? context.parameters.dataSize
+          : 0
+      if (dataSize > 1000000) {
         modifier *= 1.5 // Large data increases complexity
-      } else if (dataSize && dataSize < 1000) {
+      } else if (dataSize < 1000) {
         modifier *= 0.8 // Small data decreases complexity
       }
 
       // Check for batch operations
-      const batchSize = context.parameters.batchSize as number
-      if (batchSize && batchSize > 10) {
+      const batchSize =
+        typeof context.parameters.batchSize === 'number'
+          ? context.parameters.batchSize
+          : 0
+      if (batchSize > 10) {
         modifier *= 1.3 // Batch operations increase complexity
       }
     }

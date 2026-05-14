@@ -102,17 +102,17 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export class MemoryApiClient {
   private readonly baseUrl: string
-  private readonly _fetch: typeof fetch
+  private readonly fetch: typeof fetch
 
   constructor(config: MemoryApiConfig = {}) {
     this.baseUrl = config.baseUrl ?? 'http://localhost:8000'
-    this._fetch = config.fetchFn ?? fetch
+    this.fetch = config.fetchFn ?? fetch
   }
 
   // ── Health ─────────────────────────────────────────────────────────────────
 
   async health(): Promise<HealthStatus> {
-    const res = await this._fetch(`${this.baseUrl}/health`)
+    const res = await this.fetch(`${this.baseUrl}/health`)
     const data = await handleResponse<Record<string, unknown>>(res)
     return {
       status: String(data['status'] ?? 'ok'),
@@ -136,7 +136,7 @@ export class MemoryApiClient {
     if (input.gating) {
       (body).gating = input.gating
     }
-    const res = await this._fetch(`${this.baseUrl}/memories`, {
+    const res = await this.fetch(`${this.baseUrl}/memories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -160,7 +160,7 @@ export class MemoryApiClient {
     qs.set('limit', String(params.limit ?? 50))
     qs.set('offset', String(params.offset ?? 0))
 
-    const res = await this._fetch(`${this.baseUrl}/memories?${qs}`)
+    const res = await this.fetch(`${this.baseUrl}/memories?${qs}`)
     return handleResponse<MemoryBlock[]>(res)
   }
 
@@ -168,7 +168,7 @@ export class MemoryApiClient {
 
   async get(memoryId: string, tenantId: string): Promise<MemoryBlock> {
     const qs = new URLSearchParams({ tenant_id: tenantId })
-    const res = await this._fetch(`${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`)
+    const res = await this.fetch(`${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`)
     return handleResponse<MemoryBlock>(res)
   }
 
@@ -181,7 +181,7 @@ export class MemoryApiClient {
     if (params.importance !== undefined) body['importance'] = params.importance
     if (params.consolidationPhase !== undefined) body['consolidation_phase'] = params.consolidationPhase
 
-    const res = await this._fetch(
+    const res = await this.fetch(
       `${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`,
       {
         method: 'PATCH',
@@ -196,7 +196,7 @@ export class MemoryApiClient {
 
   async delete(memoryId: string, tenantId: string): Promise<void> {
     const qs = new URLSearchParams({ tenant_id: tenantId })
-    const res = await this._fetch(
+    const res = await this.fetch(
       `${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`,
       { method: 'DELETE' },
     )
@@ -210,7 +210,7 @@ export class MemoryApiClient {
   async score(memoryId: string, tenantId: string, context = ''): Promise<ScoreResponse> {
     const qs = new URLSearchParams({ tenant_id: tenantId })
     if (context) qs.set('context', context)
-    const res = await this._fetch(`${this.baseUrl}/memories/score?${qs}`, {
+    const res = await this.fetch(`${this.baseUrl}/memories/score?${qs}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ memory_id: memoryId }),
@@ -222,7 +222,7 @@ export class MemoryApiClient {
 
   async trajectory(sessionId: string, tenantId: string, limit = 50): Promise<TrajectoryResponse> {
     const qs = new URLSearchParams({ tenant_id: tenantId, limit: String(limit) })
-    const res = await this._fetch(`${this.baseUrl}/memories/trajectory/${encodeURIComponent(sessionId)}?${qs}`)
+    const res = await this.fetch(`${this.baseUrl}/memories/trajectory/${encodeURIComponent(sessionId)}?${qs}`)
     const data = await handleResponse<Record<string, unknown>>(res)
     return data as TrajectoryResponse
   }

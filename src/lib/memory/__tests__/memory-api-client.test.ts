@@ -3,7 +3,8 @@
  * Uses a mock fetch to test client logic without needing a running server.
  */
 
-import { MemoryApiClient, MemoryApiError } from '../memory-api-client'
+import { MemoryApiClient, MemoryApiError } from '../memory-api-client';
+import { describe, it, expect, vi } from 'vitest';
 
 // ─── Mock fetch factory ───────────────────────────────────────────────────────
 

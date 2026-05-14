@@ -24,7 +24,7 @@ function tokenise(text: string): Set<string> {
   return new Set(text.toLowerCase().match(/\b\w+\b/g) ?? [])
 }
 
-function cosineSimilarity(a: string, b: string): number {
+export function cosineSimilarity(a: string, b: string): number {
   if (!a || !b) return 0
   const tokensA = tokenise(a)
   const tokensB = tokenise(b)
@@ -62,7 +62,7 @@ const HIGH_CATEGORIES = new Set([
   'grief', 'trauma', 'anxiety', 'fear', 'anger', 'despair', 'hopelessness',
 ])
 
-function emotionalWeight(categories: string[]): number {
+export function emotionalWeight(categories: string[]): number {
   const lower = categories.map((c) => c.toLowerCase())
   if (lower.some((c) => CRISIS_CATEGORIES.has(c))) return 5.0
   if (lower.some((c) => HIGH_CATEGORIES.has(c))) return 2.0
