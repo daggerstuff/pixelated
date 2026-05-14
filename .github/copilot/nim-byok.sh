@@ -17,22 +17,22 @@ export COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"
 export COPILOT_PROVIDER_TYPE="openai"
 
 # Keep qwen/GPT-4o mini drift from being reused as default for this project.
-is_forbidden_model() {
+_nim_byok_is_forbidden_model() {
   local candidate="$1"
   [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
 }
 
-sanitize_model() {
+_nim_byok_sanitize_model() {
   local candidate="$1"
   candidate="$(printf '%s' "$candidate" | xargs)"
-  if is_forbidden_model "$candidate"; then
+  if _nim_byok_is_forbidden_model "$candidate"; then
     echo "$NIM_DEFAULT_MODEL"
     return
   fi
   echo "$candidate"
 }
 
-sanitize_model_sequence() {
+_nim_byok_sanitize_model_sequence() {
   local raw_sequence="$1"
   local token normalized
   local normalized_sequence
@@ -45,7 +45,7 @@ sanitize_model_sequence() {
 
   normalized_sequence="${raw_sequence//,/ }"
   for token in $normalized_sequence; do
-    normalized="$(sanitize_model "$token")"
+    normalized="$(_nim_byok_sanitize_model "$token")"
     [[ -z "$normalized" ]] && continue
     if [[ " $output " != *" $normalized "* ]]; then
       output="${output:+$output }$normalized"
@@ -63,16 +63,16 @@ sanitize_model_sequence() {
 # Wire model — exact ID sent to Nvidia NIM. Environment can override these
 # values if you need to temporarily switch providers/models.
 export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-openai/gpt-oss-120b}"
-export NIM_MODEL_SEQUENCE="$(sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-2.7}")"
-export COPILOT_MODEL="$(sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
+export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-2.7}")"
+export COPILOT_MODEL="$(_nim_byok_sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
 
 # Provider model ID used by Copilot's BYOK wiring.
 # Default to the NIM baseline model so provider/model ids stay on the NIM side.
-export COPILOT_PROVIDER_MODEL_ID="$(sanitize_model "${COPILOT_PROVIDER_MODEL_ID:-${NIM_DEFAULT_MODEL}}")"
+export COPILOT_PROVIDER_MODEL_ID="$(_nim_byok_sanitize_model "${COPILOT_PROVIDER_MODEL_ID:-${NIM_DEFAULT_MODEL}}")"
 
 # Optional fallback sequence for rate-limit recovery (space/comma separated).
-export COPILOT_MODEL_SEQUENCE="$(sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
-export COPILOT_PROVIDER_MODEL_SEQUENCE="$(sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
+export COPILOT_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
+export COPILOT_PROVIDER_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
 
 # Token limits for the NIM model.
 export COPILOT_PROVIDER_MAX_PROMPT_TOKENS="120000"
