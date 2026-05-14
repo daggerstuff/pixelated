@@ -102,7 +102,7 @@ filterwarnings = [
   "ignore::DeprecationWarning",
   "ignore::PendingDeprecationWarning",
   "ignore:.*Eventlet is deprecated.*:DeprecationWarning",
-  "ignore:The default value of `allowed_objects` will change in a future version.*:DeprecationWarning",
+  "ignore:The default value of `allowed_objects` will change in a future version.*:langchain_core._api.deprecation.LangChainPendingDeprecationWarning",
 ]
 
 [tool.mypy]
