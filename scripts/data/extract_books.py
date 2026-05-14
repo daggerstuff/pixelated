@@ -57,13 +57,20 @@ except ImportError:
     EPUB_AVAILABLE = False
 
 # Pipeline components
+# Attempt to import optional pipeline components
 try:
     from ai.pipelines.design.hybrid_classifier import HybridTaxonomyClassifier
-    from ai.safety.crisis_detection.production_crisis_detector import CrisisDetector
-
-    PIPELINE_COMPONENTS_AVAILABLE = True
 except ImportError:
-    PIPELINE_COMPONENTS_AVAILABLE = False
+    HybridTaxonomyClassifier = None
+
+# Crisis detector is essential for safety filtering; import it separately
+try:
+    from ai.safety.crisis_detection.production_crisis_detector import CrisisDetector
+    CRISIS_DETECTOR_AVAILABLE = True
+except ImportError:
+    CRISIS_DETECTOR_AVAILABLE = False
+
+PIPELINE_COMPONENTS_AVAILABLE = HybridTaxonomyClassifier is not None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -178,16 +185,18 @@ class BooksExtractor:
         self.classifier = None
 
         # Initialize pipeline components
-        if PIPELINE_COMPONENTS_AVAILABLE:
-            if config.apply_safety_filter:
-                self.crisis_detector = CrisisDetector()
-                logger.info("✅ Crisis detector initialized (100% sensitivity)")
+        # Initialize optional components separately
+        if config.apply_safety_filter and CRISIS_DETECTOR_AVAILABLE:
+            self.crisis_detector = CrisisDetector()
+            logger.info("✅ Crisis detector initialized (100% sensitivity)")
+        elif config.apply_safety_filter:
+            logger.warning("⚠️ Crisis detector unavailable - safety filtering disabled")
 
-            if config.apply_classification:
-                self.classifier = HybridTaxonomyClassifier(enable_llm=False)
-                logger.info("✅ Taxonomy classifier initialized")
-        else:
-            logger.warning("⚠️ Pipeline components not available - safety filtering disabled")
+        if config.apply_classification and HybridTaxonomyClassifier is not None:
+            self.classifier = HybridTaxonomyClassifier(enable_llm=False)
+            logger.info("✅ Taxonomy classifier initialized")
+        elif config.apply_classification:
+            logger.warning("⚠️ Classification component unavailable - classification disabled")
 
     def extract_from_pdf(self, file_path: Path) -> list[BookSegment]:
         """Extract text segments from a PDF file."""

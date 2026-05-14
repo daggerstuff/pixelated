@@ -9,6 +9,24 @@ import {
 import { SecurityLevel } from '../parameter-optimizer'
 import { SealSchemeType } from '../seal-types'
 import { FHEOperation } from '../types'
+import type { FHEPerformanceMetrics } from '../types'
+
+type OptimizerInternals = {
+  strategy: OptimizationStrategy
+  constraints: {
+    minimumSecurityLevel: SecurityLevel
+    maximumMemoryMB?: number
+    minimumPrecisionBits?: number
+    maximumLatencyMs?: number
+  }
+  performanceHistory: FHEPerformanceMetrics[]
+  MAX_HISTORY_ENTRIES: number
+  recordOperationMetrics: (metrics: FHEPerformanceMetrics) => void
+}
+
+const getOptimizerInternals = (
+  optimizer: FHEParameterOptimizer,
+): OptimizerInternals => optimizer as unknown as OptimizerInternals
 
 describe('FHEParameterOptimizer', () => {
   let optimizer: FHEParameterOptimizer
@@ -31,14 +49,14 @@ describe('FHEParameterOptimizer', () => {
   })
 
   it('default strategy is BalancedApproach', () => {
-    const strategy = Reflect.get(optimizer, 'strategy')
+    const strategy = getOptimizerInternals(optimizer).strategy
     expect(strategy).toBe(OptimizationStrategy.BalancedApproach)
   })
 
   it('setStrategy updates the active strategy', () => {
     optimizer.setStrategy(OptimizationStrategy.SecurityFocused)
 
-    const strategy = Reflect.get(optimizer, 'strategy')
+    const strategy = getOptimizerInternals(optimizer).strategy
     expect(strategy).toBe(OptimizationStrategy.SecurityFocused)
   })
 
@@ -48,7 +66,7 @@ describe('FHEParameterOptimizer', () => {
       maximumMemoryMB: 2048,
     })
 
-    const constraints = Reflect.get(optimizer, 'constraints')
+    const constraints = getOptimizerInternals(optimizer).constraints
     expect(constraints).toEqual({
       minimumSecurityLevel: SecurityLevel.TC192,
       maximumMemoryMB: 2048,
@@ -157,8 +175,7 @@ describe('FHEParameterOptimizer', () => {
     optimizer.recordOperationMetrics(metric)
 
     // Access private property through reflection for testing
-    const performanceHistory =
-      Reflect.get(optimizer, 'performanceHistory') ?? []
+    const performanceHistory = getOptimizerInternals(optimizer).performanceHistory
 
     expect(performanceHistory.length).toBe(1)
     expect(performanceHistory[0]).toBe(metric)
@@ -183,8 +200,7 @@ describe('FHEParameterOptimizer', () => {
     }
 
     // Access private property through reflection for testing
-    const performanceHistory =
-      Reflect.get(optimizer, 'performanceHistory') ?? []
+    const performanceHistory = getOptimizerInternals(optimizer).performanceHistory
 
     expect(performanceHistory.length).toBe(3)
     // The most recent operation should be first
@@ -218,9 +234,10 @@ describe('FHEParameterOptimizer', () => {
     }
 
     // Use function replacement instead of spying
-    const originalMethod = optimizer.recordOperationMetrics
+    const optimizerWithInternals = getOptimizerInternals(optimizer)
+    const originalMethod = optimizerWithInternals.recordOperationMetrics
     const mockFn = vi.fn()
-    optimizer.recordOperationMetrics = mockFn
+    optimizerWithInternals.recordOperationMetrics = mockFn
 
     optimizer.optimizeForContext(context, SealSchemeType.BFV)
 
@@ -228,7 +245,7 @@ describe('FHEParameterOptimizer', () => {
     expect(mockFn).toHaveBeenCalledWith(context.metrics)
 
     // Restore original method
-    optimizer.recordOperationMetrics = originalMethod
+    optimizerWithInternals.recordOperationMetrics = originalMethod
   })
 
   it('adaptive optimization with history affects parameters', () => {
