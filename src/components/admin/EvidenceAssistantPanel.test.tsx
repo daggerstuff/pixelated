@@ -148,11 +148,11 @@ describe('EvidenceAssistantPanel', () => {
 
     const queryInput = screen.getByPlaceholderText(
       /internal docs define crisis sensitivity requirements/i,
-    ) as HTMLTextAreaElement
-    const collectionSelect = screen.getByRole('combobox') as HTMLSelectElement
+    )
+    const collectionSelect = screen.getByRole('combobox')
     const generateAnswerCheckbox = screen.getByRole('checkbox', {
       name: /Generate grounded answer/i,
-    }) as HTMLInputElement
+    })
 
     fireEvent.change(queryInput, {
       target: { value: 'How do we handle crisis escalation safely?' },
@@ -205,7 +205,7 @@ describe('EvidenceAssistantPanel', () => {
 
     const generateAnswerCheckbox = screen.getByRole('checkbox', {
       name: /Generate grounded answer/i,
-    }) as HTMLInputElement
+    })
     expect(generateAnswerCheckbox).toBeDisabled()
     expect(generateAnswerCheckbox).not.toBeChecked()
     expect(

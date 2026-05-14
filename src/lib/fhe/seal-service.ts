@@ -232,14 +232,6 @@ export class SealService {
       if (typeof modeOrOptions === 'string') {
         const mode = modeOrOptions
         const schemeType = getSchemeForMode(mode)
-
-        if (!schemeType) {
-          logger.info(
-            `Mode ${mode} does not use FHE, skipping SEAL initialization`,
-          )
-          return
-        }
-
         this.schemeType = schemeType
 
         const operations: FHEOperation[] = [

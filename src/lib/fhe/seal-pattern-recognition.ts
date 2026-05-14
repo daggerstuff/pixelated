@@ -83,10 +83,10 @@ export class SealPatternRecognitionService implements FHEService {
    * Decrypt data using SEAL
    */
   async decrypt<T>(
-    encryptedData: EncryptedData,
+    encryptedData: EncryptedData<T>,
     options?: unknown,
   ): Promise<T> {
-    return this.enhancedService.decrypt(encryptedData, options)
+    return this.enhancedService.decrypt<T>(encryptedData, options)
   }
 
   /**
@@ -739,6 +739,42 @@ export class SealPatternRecognitionService implements FHEService {
 
     return result
   }
+}
+
+type ParsedPatternResult = {
+  type: string
+  confidence: number
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isNumberRecord = (value: unknown): value is Record<string, number> => {
+  if (!isRecord(value)) {
+    return false
+  }
+  return Object.values(value).every((entry) => typeof entry === 'number')
+}
+
+const isParsedPatternResult = (value: unknown): value is ParsedPatternResult =>
+  isRecord(value) &&
+  typeof value.type === 'string' &&
+  typeof value.confidence === 'number'
+
+const parseJsonRecord = (input: string): Record<string, unknown> => {
+  try {
+    const parsed = JSON.parse(input)
+    return isRecord(parsed) ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+const parseSessionIds = (value: unknown): string[] => {
+  if (!Array.isArray(value)) {
+    return []
+  }
+  return value.filter((item): item is string => typeof item === 'string')
 }
 
 /**
