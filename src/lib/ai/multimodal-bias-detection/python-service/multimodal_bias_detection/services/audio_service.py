@@ -12,7 +12,7 @@ import librosa
 import numpy as np
 import soundfile as sf
 import structlog
-import torch
+from ..utils.torch_proxy import torch
 from transformers import (
     Wav2Vec2ForSequenceClassification,
     Wav2Vec2Processor,
