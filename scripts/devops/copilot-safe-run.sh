@@ -10,6 +10,54 @@ fi
 COMMAND=("$@")
 DEFAULT_NEMOTRON_MODEL="openai/gpt-oss-120b"
 
+sanitize_model_flags() {
+  local -n __output_ref="$1"
+  shift
+  local -a input=("$@")
+  local -a output=()
+  local arg
+  local skip_next=0
+  local index
+
+  for index in "${!input[@]}"; do
+    arg="${input[$index]}"
+
+    if [[ $skip_next -eq 1 ]]; then
+      skip_next=0
+      output+=("$(sanitize_model "$arg")")
+      continue
+    fi
+
+    case "$arg" in
+      --model=*)
+        output+=("--model=$(sanitize_model "${arg#--model=}")")
+        ;;
+      --provider-model-id=*)
+        output+=("--provider-model-id=$(sanitize_model "${arg#--provider-model-id=}")")
+        ;;
+      --model|--provider-model-id)
+        output+=("$arg")
+        skip_next=1
+        ;;
+      *)
+        output+=("$arg")
+        ;;
+    esac
+  done
+
+  __output_ref=("${output[@]}")
+}
+
+_sanitized_command=()
+sanitize_model_flags _sanitized_command "${COMMAND[@]}"
+COMMAND=("${_sanitized_command[@]}")
+unset _sanitized_command
+
+if [[ ${#COMMAND[@]} -eq 0 ]]; then
+  echo "copilot-safe-run: command contains only model flags; provide a Copilot command to run."
+  exit 1
+fi
+
 is_forbidden_model() {
   local candidate="$1"
   [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
