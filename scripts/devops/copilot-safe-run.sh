@@ -9,8 +9,53 @@ fi
 
 COMMAND=("$@")
 DEFAULT_NEMOTRON_MODEL="openai/gpt-oss-120b"
-DETERMINE_MODELS="${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}"
-DETERMINE_PROVIDER_MODELS="${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}}"
+
+is_forbidden_model() {
+  local candidate="$1"
+  [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
+}
+
+sanitize_model() {
+  local candidate="$1"
+  if is_forbidden_model "$candidate"; then
+    echo "$DEFAULT_NEMOTRON_MODEL"
+    return
+  fi
+  echo "$candidate"
+}
+
+sanitize_model_sequence() {
+  local raw_sequence="$1"
+  local token normalized
+  local output=""
+  local -a tokens
+
+  if [[ -z "$raw_sequence" ]]; then
+    echo "$DEFAULT_NEMOTRON_MODEL"
+    return
+  fi
+
+  read -r -a tokens <<< "${raw_sequence//,/ }"
+  for token in "${tokens[@]}"; do
+    normalized="$(sanitize_model "$token")"
+    if [[ -z "$normalized" ]]; then
+      continue
+    fi
+    if [[ " $output " != *" $normalized "* ]]; then
+      output="${output:+$output }$normalized"
+    fi
+  done
+
+  if [[ -z "${output// }" ]]; then
+    echo "$DEFAULT_NEMOTRON_MODEL"
+    return
+  fi
+
+  echo "$output"
+}
+
+DETERMINE_MODELS="$(sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}")"
+DETERMINE_PROVIDER_MODELS="$(sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}}")"
 
 read -r -a CANDIDATE_MODELS <<< "${DETERMINE_MODELS//,/ }"
 if [[ ${#CANDIDATE_MODELS[@]} -eq 0 || -z "${CANDIDATE_MODELS[0]}" ]]; then
