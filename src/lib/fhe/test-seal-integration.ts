@@ -8,9 +8,24 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealContext } from './seal-context'
 import { SealOperations } from './seal-operations'
-import { SealService } from './seal-service'
+import { SealService, type SealCipherText } from './seal-service'
 import { SealSchemeType } from './seal-types'
 import { EncryptionMode } from './types'
+import { fileURLToPath } from 'node:url'
+
+const isSealCipherText = (value: unknown): value is SealCipherText => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const candidate = value as Partial<SealCipherText>
+  return (
+    typeof candidate.copy === 'function' &&
+    typeof candidate.save === 'function' &&
+    typeof candidate.load === 'function' &&
+    typeof candidate.delete === 'function'
+  )
+}
 
 // Initialize logger
 const logger = createBuildSafeLogger('seal-test')
@@ -75,6 +90,9 @@ async function testSEALIntegration() {
     const addResult = await operations.add(encrypted, [5, 5, 5, 5, 5])
 
     if (addResult.success) {
+      if (!isSealCipherText(addResult.result)) {
+        throw new Error('SEAL add result is not a valid ciphertext')
+      }
       const decryptedAdd = await service.decrypt(addResult.result)
       logger.info('Homomorphic addition result:', { decryptedAdd })
       const expectedAdd = testData.map((v) => v + 5)
@@ -91,6 +109,9 @@ async function testSEALIntegration() {
     const multResult = await operations.multiply(encrypted, [2, 2, 2, 2, 2])
 
     if (multResult.success) {
+      if (!isSealCipherText(multResult.result)) {
+        throw new Error('SEAL multiply result is not a valid ciphertext')
+      }
       const decryptedMult = await service.decrypt(multResult.result)
       logger.info('Homomorphic multiplication result:', { decryptedMult })
       const expectedMult = testData.map((v) => v * 2)
@@ -119,7 +140,7 @@ async function testSEALIntegration() {
 }
 
 // Run the test if this file is executed directly
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   logger.info('Running SEAL integration test directly')
   testSEALIntegration()
     .then((success) => {
@@ -131,8 +152,11 @@ if (require.main === module) {
         process.exit(1)
       }
     })
-    .catch((error) => {
-      logger.error('Unhandled error in SEAL integration test:', { error })
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error)
+      logger.error('Unhandled error in SEAL integration test:', {
+        error: message,
+      })
       process.exit(1)
     })
 }
