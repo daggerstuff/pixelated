@@ -259,6 +259,8 @@ filterwarnings = [
   "ignore:.*WordPiece.*:DeprecationWarning",
   "ignore:.*swig.*:DeprecationWarning",
   "ignore:.*Swig.*:DeprecationWarning",
+  "ignore:::EventletDeprecationWarning:sentry_sdk",
+  "ignore:::LangChainPendingDeprecationWarning",
 ]
 [tool.coverage.run]
 branch = true
