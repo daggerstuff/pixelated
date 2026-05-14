@@ -18,8 +18,8 @@ export COPILOT_PROVIDER_TYPE="openai"
 
 # Wire model — exact ID sent to Nvidia NIM. Environment can override these
 # values if you need to temporarily switch providers/models.
-export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-nvidia/llama-3.3-nemotron-super-49b-v1.5}"
-export NIM_MODEL_SEQUENCE="${NIM_MODEL_SEQUENCE:-nvidia/llama-3.3-nemotron-super-49b-v1.5 qwen/qwen3.5-122b-a10b qwen/qwen3.5-397b-a17b qwen/qwen3-coder-480b-a35b-instruct z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-2.7}"
+export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-openai/gpt-oss-120b}"
+export NIM_MODEL_SEQUENCE="${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-2.7}"
 export COPILOT_MODEL="${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}"
 
 # Provider model ID used by Copilot's BYOK wiring.
@@ -43,11 +43,9 @@ echo "  Fallback Provider IDs: ${COPILOT_PROVIDER_MODEL_SEQUENCE}"
 echo "  Tokens:   ${COPILOT_PROVIDER_MAX_PROMPT_TOKENS} prompt / ${COPILOT_PROVIDER_MAX_OUTPUT_TOKENS} output"
 echo ""
 echo "Switch model: export COPILOT_MODEL=<model-id>"
+echo "  GPT OSS:         openai/gpt-oss-120b"
 echo "  Nemotron Super:  nvidia/llama-3.3-nemotron-super-49b-v1.5"
 echo "  NIM default:     ${NIM_DEFAULT_MODEL}"
-echo "  Qwen 3.5 122B:   qwen/qwen3.5-122b-a10b"
-echo "  Qwen 3.5 397B:   qwen/qwen3.5-397b-a17b"
-echo "  Qwen 3 Coder:    qwen/qwen3-coder-480b-a35b-instruct"
 echo "  GLM-5.1:         z-ai/glm-5.1"
 echo "  DeepSeek V3.2:   deepseek-ai/deepseek-v3.2"
 echo "  Kimi K2.6:       moonshotai/kimi-k2.6"
