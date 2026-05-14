@@ -217,7 +217,7 @@ export interface DistanceCoordinates {
 }
 
 export class ThreatCorrelationEngine extends EventEmitter {
-  private config: CorrelationEngineConfig
+  private readonly config: CorrelationEngineConfig
   private mongoClient!: MongoClient
   private db!: Db
   private threatsCollection!: Collection<ThreatData>
@@ -625,7 +625,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
       // Check for similar indicators
       const allIndicators = threats.flatMap(
-        (t) => t.indicators?.map((i: ThreatIndicator) => i.value) || [],
+        (t) => t.indicators?.map((i: ThreatIndicator) => i.value) ?? [],
       )
       const indicatorCounts = this.countOccurrences(allIndicators)
 
@@ -738,7 +738,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       const group: SpatialGroup = {
         threats: [threat],
         distance: 0,
-        center: threat.location?.coordinates || { latitude: 0, longitude: 0 },
+        center: threat.location?.coordinates ?? { latitude: 0, longitude: 0 },
       }
 
       // Find nearby threats
@@ -847,7 +847,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private computeGeographicSpan(threats: ThreatData[]): number {
     const coordinates = threats
       .map((t) => t.location?.coordinates)
-      .filter((coord) => coord && coord.latitude && coord.longitude)
+      .filter((coord) => coord?.latitude && coord.longitude)
 
     if (coordinates.length < 2) return 0
 
@@ -890,7 +890,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
     // Check for indicator sharing across locations
     const allIndicators = threats.flatMap(
-      (t) => t.indicators?.map((i) => i.value) || [],
+      (t) => t.indicators?.map((i) => i.value) ?? [],
     )
     const indicatorCounts = this.countOccurrences(allIndicators)
 
@@ -1343,14 +1343,14 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Utility functions
    */
   private groupBy<T>(array: T[], key: string): Record<string, T[]> {
-    return array.reduce(
+    return array.reduce< Record<string, T[]>>(
       (groups, item) => {
-        const value = this.getNestedValue(item, key) || 'unknown'
-        groups[value] = groups[value] || []
+        const value = this.getNestedValue(item, key) ?? 'unknown'
+        groups[value] = groups[value] ?? []
         groups[value].push(item)
         return groups
       },
-      {} as Record<string, T[]>,
+      {},
     )
   }
 
@@ -1359,12 +1359,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
   }
 
   private countOccurrences(array: string[]): Record<string, number> {
-    return array.reduce(
+    return array.reduce< Record<string, number>>(
       (counts, item) => {
         counts[item] = (counts[item] || 0) + 1
         return counts
       },
-      {} as Record<string, number>,
+      {},
     )
   }
 
@@ -1378,7 +1378,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private calculateSpatialSpan(threats: ThreatData[]): number {
     const coordinates = threats
       .map((t) => t.location?.coordinates)
-      .filter((coord) => coord && coord.latitude && coord.longitude)
+      .filter((coord) => coord?.latitude && coord.longitude)
 
     if (coordinates.length < 2) return 0
 
@@ -1436,10 +1436,10 @@ export class ThreatCorrelationEngine extends EventEmitter {
     return {
       threat_id: threat.id,
       region: threat.region,
-      location: threat.location?.name || threat.location,
+      location: threat.location?.name ?? threat.location,
       severity: threat.severity,
       confidence: threat.confidence,
-      indicators: threat.indicators || [],
+      indicators: threat.indicators ?? [],
       timestamp: new Date(threat.timestamp),
     }
   }
@@ -1461,7 +1461,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     }
 
     recommendations.push(
-      `Monitor for similar threats within ${Math.round(metrics.span_value || 0)}s time windows (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
+      `Monitor for similar threats within ${Math.round(metrics.span_value ?? 0)}s time windows (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
     )
 
     if (metrics.confidence > 0.8) {
@@ -1497,7 +1497,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     }
 
     recommendations.push(
-      `Implement geographic-based access controls for ${Math.round(metrics.span_value || 0)}km radius (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
+      `Implement geographic-based access controls for ${Math.round(metrics.span_value ?? 0)}km radius (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
     )
 
     if (metrics.confidence > 0.8) {
@@ -1724,7 +1724,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       return await this.correlationsCollection
         .find(filter)
         .sort({ timestamp: -1 })
-        .limit(query.limit || 100)
+        .limit(query.limit ?? 100)
         .toArray()
     } catch (error: unknown) {
       logger.error('Failed to search correlations', {
@@ -1773,12 +1773,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
       return {
         total_correlations: totalCorrelations,
-        type_distribution: typeDistribution.reduce(
+        type_distribution: typeDistribution.reduce< Record<string, number>>(
           (acc, item) => {
             acc[item._id] = item.count
             return acc
           },
-          {} as Record<string, number>,
+          {},
         ),
         confidence_distribution: confidenceDistribution,
         recent_correlations_24h: recentCorrelations,

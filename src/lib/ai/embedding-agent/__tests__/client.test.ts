@@ -270,7 +270,7 @@ describe('EmbeddingAgentClient', () => {
       })
 
       mockFetch.mockImplementationOnce(
-        () => new Promise((resolve) => setTimeout(resolve, 1000)),
+         async () => new Promise((resolve) => setTimeout(resolve, 1000)),
       )
 
       // This should timeout (AbortError converted to EmbeddingAgentError)

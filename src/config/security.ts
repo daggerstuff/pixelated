@@ -133,7 +133,7 @@ export function buildCSP(
       ...cspConfigDev,
       'connect-src': [
         ...(config['connect-src'] || []),
-        ...(cspConfigDev['connect-src'] || []),
+        ...(cspConfigDev['connect-src'] ?? []),
       ],
     }
   }

@@ -218,7 +218,7 @@ export class RegressionUtils {
  * Bug tracking and reporting utilities
  */
 export class BugTracker {
-  private static fixedBugs = new Set([
+  private static readonly fixedBugs = new Set([
     'AUTH-001',
     'AUTH-002',
     'CHAT-001',

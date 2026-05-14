@@ -190,8 +190,8 @@ async function shutdown(signal: string): Promise<void> {
   }
 }
 
-process.on('SIGTERM', () => shutdown('SIGTERM'))
-process.on('SIGINT', () => shutdown('SIGINT'))
+process.on('SIGTERM',  async () => shutdown('SIGTERM'))
+process.on('SIGINT',  async () => shutdown('SIGINT'))
 
 // Start the worker
 void startWorker()

@@ -16,11 +16,11 @@ interface ScheduledRotationOptions {
  * Automatically rotates keys based on expiration
  */
 export class ScheduledKeyRotation {
-  private keyStorage: KeyStorage
-  private checkInterval: number
+  private readonly keyStorage: KeyStorage
+  private readonly checkInterval: number
   private intervalId: NodeJS.Timeout | null = null
-  private onRotation?: (keyId: string, newKeyId: string) => void
-  private onError?: (error: Error) => void
+  private readonly onRotation?: (keyId: string, newKeyId: string) => void
+  private readonly onError?: (error: Error) => void
 
   /**
    * Creates a new ScheduledKeyRotation instance
@@ -28,13 +28,13 @@ export class ScheduledKeyRotation {
    */
   constructor(options: ScheduledRotationOptions = {}) {
     this.keyStorage = new KeyStorage({
-      namespace: options.namespace || 'app',
+      namespace: options.namespace ?? 'app',
       region: 'us-east-1',
       useKms: false,
     })
 
     // Default check interval: 1 hour
-    this.checkInterval = options.checkIntervalMs || 60 * 60 * 1000
+    this.checkInterval = options.checkIntervalMs ?? 60 * 60 * 1000
     this.onRotation = options.onRotation
     this.onError = options.onError
   }

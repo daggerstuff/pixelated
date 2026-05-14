@@ -61,10 +61,10 @@ export interface TrafficMetrics {
 }
 
 export class GlobalTrafficRoutingManager extends EventEmitter {
-  private config: RoutingConfig
-  private routeTargets: Map<string, RouteTarget> = new Map()
-  private routingCache: Map<string, RoutingDecision> = new Map()
-  private metrics: TrafficMetrics
+  private readonly config: RoutingConfig
+  private readonly routeTargets: Map<string, RouteTarget> = new Map()
+  private readonly routingCache: Map<string, RoutingDecision> = new Map()
+  private readonly metrics: TrafficMetrics
   private isInitialized = false
   private metricsInterval: NodeJS.Timeout | null = null
 
@@ -623,7 +623,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     const region = this.loadRegionConfiguration().find(
       (r) => r.id === target.regionId,
     )
-    return region?.complianceRequirements || []
+    return region?.complianceRequirements ?? []
   }
 
   /**

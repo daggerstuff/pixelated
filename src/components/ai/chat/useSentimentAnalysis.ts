@@ -93,16 +93,16 @@ function generateSentimentInsights(
   }
 
   // Calculate sentiment distribution
-  const sentimentCounts = results.reduce(
+  const sentimentCounts = results.reduce< { [key: string]: number }>(
     (acc, result) => {
       acc[result.sentiment] = (acc[result.sentiment] || 0) + 1
       return acc
     },
-    {} as { [key: string]: number },
+    {},
   )
 
   const dominantSentiment =
-    Object.entries(sentimentCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+    Object.entries(sentimentCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ??
     'neutral'
 
   // Calculate confidence distribution
@@ -262,7 +262,7 @@ export function useSentimentAnalysis({
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error || `API request failed: ${response.status}`,
+            errorData.error ?? `API request failed: ${response.status}`,
           )
         }
 

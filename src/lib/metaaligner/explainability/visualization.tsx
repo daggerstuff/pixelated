@@ -468,9 +468,9 @@ export function generateAlignmentExplanation(
   )
 
   const bestObjName =
-    objectives.find((o) => o.id === bestObjective.id)?.name || 'Unknown'
+    objectives.find((o) => o.id === bestObjective.id)?.name ?? 'Unknown'
   const worstObjName =
-    objectives.find((o) => o.id === worstObjective.id)?.name || 'Unknown'
+    objectives.find((o) => o.id === worstObjective.id)?.name ?? 'Unknown'
 
   let explanation = `The response achieved an overall alignment score of ${overallScore.toFixed(1)}%. `
 

@@ -34,7 +34,7 @@ export interface RequestQueueOptions {
 class IndexedDBRequestQueue {
   private queue: QueuedRequest[] = []
   private isProcessing = false
-  private options: Required<RequestQueueOptions>
+  private readonly options: Required<RequestQueueOptions>
   private db: IDBDatabase | null = null
   private initialized = false
   private lastTimestamp = 0
@@ -51,7 +51,7 @@ class IndexedDBRequestQueue {
 
     if (this.options.enablePersistence) {
       this.initDB()
-        .then(() => this.loadFromStorage())
+        .then( async () => this.loadFromStorage())
         .catch((err) => {
           console.warn('Failed to initialize IndexedDB for request queue:', err)
           // Continue with empty queue

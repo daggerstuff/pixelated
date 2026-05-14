@@ -23,7 +23,7 @@ describe('SearchFilters', () => {
     const container = document.createElement('div')
     const root = createRoot(container)
     document.body.appendChild(container)
-    await act(() => {
+     act(() => {
       root.render(
         <SearchFilters
           filters={defaultFilters}
@@ -38,7 +38,7 @@ describe('SearchFilters', () => {
       container,
       root,
       async cleanup() {
-        await act(() => {
+         act(() => {
           root.unmount()
         })
         container.remove()

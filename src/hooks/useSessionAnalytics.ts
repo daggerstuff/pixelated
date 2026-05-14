@@ -92,7 +92,7 @@ export function useSessionAnalytics(
                       : 0,
               }
               return item.dominantEmotion
-                ? { ...baseData, label: `${item.dominantEmotion}` }
+                ? { ...baseData, label: item.dominantEmotion }
                 : baseData
             })
           : []

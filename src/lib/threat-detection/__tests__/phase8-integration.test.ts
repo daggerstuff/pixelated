@@ -460,9 +460,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Verify sensitive operations require proper authorization
       const sensitiveOperations = [
-        () => monitoringService.clearMetrics(),
-        () => monitoringService.getSystemConfig(),
-        () => monitoringService.exportData(),
+         async () => monitoringService.clearMetrics(),
+         async () => monitoringService.getSystemConfig(),
+         async () => monitoringService.exportData(),
       ]
 
       for (const operation of sensitiveOperations) {

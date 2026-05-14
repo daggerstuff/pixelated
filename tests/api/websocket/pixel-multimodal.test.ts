@@ -14,7 +14,7 @@ import { WebSocket } from 'ws'
 
 const parseWsMessage = (data: unknown) => JSON.parse(String(data))
 
-vi.mock('ws', () => {
+vi.mock('ws',  async () => {
   return vi.importActual('ws')
 })
 

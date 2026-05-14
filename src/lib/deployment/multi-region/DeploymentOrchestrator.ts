@@ -90,11 +90,11 @@ export interface DeploymentPhaseResult {
 }
 
 export class DeploymentOrchestrator extends EventEmitter {
-  private config: DeploymentOrchestratorConfig
-  private cloudProviderManager: CloudProviderManager
-  private deploymentPlans: Map<string, DeploymentPlan> = new Map()
-  private activeExecutions: Map<string, DeploymentExecution> = new Map()
-  private rollbackPoints: Map<string, RollbackPoint> = new Map()
+  private readonly config: DeploymentOrchestratorConfig
+  private readonly cloudProviderManager: CloudProviderManager
+  private readonly deploymentPlans: Map<string, DeploymentPlan> = new Map()
+  private readonly activeExecutions: Map<string, DeploymentExecution> = new Map()
+  private readonly rollbackPoints: Map<string, RollbackPoint> = new Map()
   private isInitialized = false
 
   constructor(
@@ -569,7 +569,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         regions: regions.length,
       })
 
-      const deploymentPromises = regions.map((region) =>
+      const deploymentPromises = regions.map( async (region) =>
         this.cloudProviderManager.deployRegion(region),
       )
 
@@ -739,7 +739,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         (r) => r.phaseId === dependencyId,
       )
 
-      if (!dependencyResult || dependencyResult.status !== 'success') {
+      if (dependencyResult?.status !== 'success') {
         logger.warn(
           `Phase dependency not met: ${dependencyId} for phase: ${phase.id}`,
         )
@@ -985,7 +985,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       const minHealthScore =
         (typeof step.successCriteria.minHealthScore === 'number'
           ? step.successCriteria.minHealthScore
-          : undefined) || 80
+          : undefined) ?? 80
 
       // Simulate health check validation
       const simulatedHealthScore = 85 + Math.random() * 10 // 85-95 range
@@ -1023,11 +1023,11 @@ export class DeploymentOrchestrator extends EventEmitter {
       const maxResponseTime =
         (typeof step.successCriteria.maxResponseTime === 'number'
           ? step.successCriteria.maxResponseTime
-          : undefined) || 200
+          : undefined) ?? 200
       const minThroughput =
         (typeof step.successCriteria.minThroughput === 'number'
           ? step.successCriteria.minThroughput
-          : undefined) || 100
+          : undefined) ?? 100
 
       // Simulate performance test results
       const responseTime = 150 + Math.random() * 50 // 150-200ms range

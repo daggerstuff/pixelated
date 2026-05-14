@@ -99,7 +99,7 @@ const DEFAULT_CONFIG: AnalyticsConfig = {
 export class FHEAnalyticsService {
   private static instance: FHEAnalyticsService
   private initialized = false
-  private fheService!: FHEServiceInterface
+  private readonly fheService!: FHEServiceInterface
 
   /**
    * Private constructor to enforce singleton pattern
@@ -194,7 +194,7 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex: index,
                   sentiment: sentimentResult,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               } else {
                 // For unencrypted messages, we need to encrypt first
@@ -209,7 +209,7 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex: index,
                   sentiment: sentimentResult,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               }
             } catch (error: unknown) {
@@ -219,7 +219,7 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 error: true,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             }
           }),
@@ -234,8 +234,8 @@ export class FHEAnalyticsService {
         errorCount: results.filter((r) => r.error).length,
         sentimentData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -323,7 +323,7 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 topic: topicResult,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             } catch (error: unknown) {
               logger.error(
@@ -333,7 +333,7 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 error: true,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             }
           }),
@@ -344,8 +344,8 @@ export class FHEAnalyticsService {
         messageCount: filteredMessages.length,
         topicData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -428,7 +428,7 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 risk: riskResult,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             } catch (error: unknown) {
               logger.error(
@@ -438,7 +438,7 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 error: true,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             }
           }),
@@ -453,8 +453,8 @@ export class FHEAnalyticsService {
         messageCount: filteredMessages.length,
         riskData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -562,7 +562,7 @@ export class FHEAnalyticsService {
               exchangeIndex: index,
               interventionType,
               responseSentiment,
-              timestamp: exchange.client.timestamp || Date.now(),
+              timestamp: exchange.client.timestamp ?? Date.now(),
             }
           } catch (error: unknown) {
             logger.error(
@@ -583,8 +583,8 @@ export class FHEAnalyticsService {
         exchangeCount: exchanges.length,
         interventionData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -642,9 +642,9 @@ export class FHEAnalyticsService {
       // Create time windows for trend analysis
       const timeWindows: { startTime: number; endTime: number }[] = []
       if (userMessages.length > 0) {
-        const firstTimestamp = userMessages[0].timestamp || Date.now()
+        const firstTimestamp = userMessages[0].timestamp ?? Date.now()
         const lastTimestamp =
-          userMessages[userMessages.length - 1].timestamp || Date.now()
+          userMessages[userMessages.length - 1].timestamp ?? Date.now()
         const duration = lastTimestamp - firstTimestamp
 
         // Create 5 equal time windows or fewer if not enough messages
@@ -665,8 +665,8 @@ export class FHEAnalyticsService {
           // Get messages in this time window
           const windowMessages = userMessages.filter(
             (m) =>
-              (m.timestamp || 0) >= window.startTime &&
-              (m.timestamp || 0) <= window.endTime,
+              (m.timestamp ?? 0) >= window.startTime &&
+              (m.timestamp ?? 0) <= window.endTime,
           )
 
           // Process each message in the window
@@ -697,7 +697,7 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex,
                   emotion: emotionResult,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               } catch (error: unknown) {
                 logger.error(
@@ -707,7 +707,7 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex,
                   error: true,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               }
             }),
@@ -729,8 +729,8 @@ export class FHEAnalyticsService {
         messageCount: userMessages.length,
         windowResults,
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -805,11 +805,11 @@ export class FHEAnalyticsService {
     messages: ChatMessage[],
     config: AnalyticsConfig,
   ): ChatMessage[] {
-    const startTime = config.timeWindow?.startTime || 0
-    const endTime = config.timeWindow?.endTime || Date.now()
+    const startTime = config.timeWindow?.startTime ?? 0
+    const endTime = config.timeWindow?.endTime ?? Date.now()
 
     return messages.filter((message) => {
-      const timestamp = message.timestamp || Date.now()
+      const timestamp = message.timestamp ?? Date.now()
       return timestamp >= startTime && timestamp <= endTime
     })
   }

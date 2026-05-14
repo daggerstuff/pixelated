@@ -316,7 +316,7 @@ export function SessionForm({
                     type='number'
                     min='0'
                     value={
-                      (formData.weeklyTargets ?? {})[week]?.toString() ?? '0'
+                      formData.weeklyTargets?.[week]?.toString() ?? '0'
                     }
                     onChange={(e) =>
                       handleWeeklyTargetChange(week, e.target.value)

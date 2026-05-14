@@ -24,7 +24,7 @@ const buildHeadersMap = (headers?: HeadersInit): Map<string, string> => {
   }
 
   Object.entries(headers).forEach(([key, value]) => {
-    headerMap.set(key.toLowerCase(), String(value))
+    headerMap.set(key.toLowerCase(), value)
   })
 
   return headerMap
@@ -68,9 +68,7 @@ const createResponse = (
   if (typeof Response === 'function') {
     const responsePrototype = (Response as unknown as { prototype?: unknown })
       .prototype
-    const canConstructResponse = Boolean(
-      responsePrototype && responsePrototype.constructor === Response,
-    )
+    const canConstructResponse = (responsePrototype?.constructor === Response)
 
     if (canConstructResponse) {
       try {
@@ -128,9 +126,9 @@ export const POST = async ({
       )
     }
 
-    const text = body.content || body.text
-    const therapistId = body.therapistId || 'default-therapist'
-    const sessionId = body.sessionId || 'default-session'
+    const text = body.content ?? body.text
+    const therapistId = body.therapistId ?? 'default-therapist'
+    const sessionId = body.sessionId ?? 'default-session'
 
     // Perform real analysis — forward sessionId so a caller's existing
     // session is honoured rather than silently replaced with a new UUID.
@@ -221,7 +219,7 @@ export const GET = async ({
       )
     }
 
-    const days = parseInt(url.searchParams.get('days') || '30', 10)
+    const days = parseInt(url.searchParams.get('days') ?? '30', 10)
 
     // Get real summary
     const summary = await biasDetectionService.getBiasSummary(therapistId, days)

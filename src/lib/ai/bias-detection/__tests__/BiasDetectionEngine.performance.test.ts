@@ -210,7 +210,7 @@ interface BenchmarkResult {
 
 const PerformanceBenchmark = {
   getMemoryUsage(): number {
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (process?.memoryUsage) {
       return process.memoryUsage().heapUsed
     }
     return 0

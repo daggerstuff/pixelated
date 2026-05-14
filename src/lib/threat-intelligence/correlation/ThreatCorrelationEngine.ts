@@ -74,12 +74,12 @@ export class ThreatCorrelationEngineCore
   private redis!: Redis
   private mongoClient!: MongoClient
   private db!: Db
-  private correlationAlgorithms: Map<string, CorrelationAlgorithm> = new Map()
-  private activeCorrelations: Map<string, CorrelationData> = new Map()
-  private correlationPatterns: Map<string, CorrelationPattern> = new Map()
+  private readonly correlationAlgorithms: Map<string, CorrelationAlgorithm> = new Map()
+  private readonly activeCorrelations: Map<string, CorrelationData> = new Map()
+  private readonly correlationPatterns: Map<string, CorrelationPattern> = new Map()
   private mlModel: tf.Sequential | null = null
 
-  constructor(private config: CorrelationConfig) {
+  constructor(private readonly config: CorrelationConfig) {
     super()
     this.initializeAlgorithms()
   }
@@ -121,7 +121,7 @@ export class ThreatCorrelationEngineCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for correlation engine')
     } catch (error: unknown) {
@@ -133,7 +133,7 @@ export class ThreatCorrelationEngineCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ||
+        process.env.MONGODB_URI ??
           'mongodb://localhost:27017/threat_correlation',
       )
       await this.mongoClient.connect()
@@ -504,8 +504,8 @@ export class ThreatCorrelationEngineCore
 
   private compareSeverity(severity1: string, severity2: string): number {
     const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
-    const score1 = severityOrder[severity1] || 1
-    const score2 = severityOrder[severity2] || 1
+    const score1 = severityOrder[severity1] ?? 1
+    const score2 = severityOrder[severity2] ?? 1
 
     // Similarity decreases as the difference increases
     const difference = Math.abs(score1 - score2)
@@ -678,12 +678,12 @@ export class ThreatCorrelationEngineCore
     }
 
     return (
-      (attribution1.actor &&
+      ((attribution1.actor &&
         attribution2.actor &&
-        attribution1.actor === attribution2.actor) ||
+        attribution1.actor === attribution2.actor) ??
       (attribution1.campaign &&
         attribution2.campaign &&
-        attribution1.campaign === attribution2.campaign) ||
+        attribution1.campaign === attribution2.campaign)) ??
       (attribution1.family &&
         attribution2.family &&
         attribution1.family === attribution2.family)
@@ -1491,7 +1491,7 @@ export class ThreatCorrelationEngineCore
       // Determine dominant correlation type
       const typeCounts = new Map<string, number>()
       for (const correlation of correlations) {
-        const count = typeCounts.get(correlation.correlationType) || 0
+        const count = typeCounts.get(correlation.correlationType) ?? 0
         typeCounts.set(correlation.correlationType, count + 1)
       }
 

@@ -120,7 +120,7 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
 
     logger.info('Starting recovery test', {
       testType: typedConfig.testType,
-      backupId: typedConfig.backupId || 'latest',
+      backupId: typedConfig.backupId ?? 'latest',
       validateIntegrity: typedConfig.validateIntegrity ?? true,
     })
 
@@ -166,7 +166,7 @@ import type { APIContext } from 'astro'
 export const POST = async (context: APIContext) => {
   const { request, locals } = context
   // Apply admin middleware to check for admin status and required permission
-  const next = () =>
+  const next =  async () =>
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )
@@ -223,8 +223,8 @@ export const POST = async (context: APIContext) => {
       success: result.success,
       message: result.message,
       resourcesProcessed: result.details?.resourcesProcessed,
-      warnings: result.details?.warnings?.join(', ') || 'None',
-      errors: result.details?.errors?.join(', ') || 'None',
+      warnings: result.details?.warnings?.join(', ') ?? 'None',
+      errors: result.details?.errors?.join(', ') ?? 'None',
       durationMs: result.details?.durationMs,
       note: 'Recovery test initiated.',
     }
@@ -242,7 +242,7 @@ export const POST = async (context: APIContext) => {
     })
   } catch (error: unknown) {
     // Get user ID from locals or fallback to 'system' if not available
-    const userId = locals?.user?.id || 'system'
+    const userId = locals?.user?.id ?? 'system'
     const errorMessage =
       error instanceof Error ? String(error) : 'Unknown error'
 

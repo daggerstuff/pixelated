@@ -65,7 +65,7 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 function resolveSafeLlmBaseUrl(): string | undefined {
   const providerBaseUrl = LLM_PROVIDER_BASE_URLS.map((key) => getEnvValue(key)).find(
     Boolean,
-  ) as string | undefined
+  )
 
   if (isOpenRouterBaseUrl(providerBaseUrl)) {
     logger.warn(
@@ -185,7 +185,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       providerBaseUrl: resolveSafeLlmBaseUrl(),
     })
 
-    const formattedMessages = completionService.formatMessages(data?.messages || [])
+    const formattedMessages = completionService.formatMessages(data?.messages ?? [])
     const sessionUserId = session.user.id
 
     // 3. Execute AI completion (Streaming or Non-streaming)
@@ -239,7 +239,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     logger.error(
       'Error in AI completion API:',
       error instanceof Error
-        ? { message: String(error), stack: (error as Error).stack }
+        ? { message: String(error), stack: (error).stack }
         : { message: String(error) },
     )
     console.error('Error in AI completion API:', error)
@@ -247,7 +247,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.completion.error',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai-completion',
       {
         error: error instanceof Error ? error?.message : String(error),
@@ -275,7 +275,7 @@ async function handleValidationError(
   await createAuditLog(
     AuditEventType.AI_OPERATION,
     'ai.completion.validation_error',
-    userId || 'anonymous',
+    userId ?? 'anonymous',
     'ai-completion',
     {
       error: 'Validation failed',

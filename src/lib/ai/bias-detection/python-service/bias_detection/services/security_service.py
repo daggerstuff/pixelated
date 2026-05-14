@@ -48,7 +48,7 @@ class SecurityManager:
             encryption_password, encryption_salt
         )
         self.fernet = Fernet(self.encryption_key)
-        self.jwt_secret_key = jwt_secret_key
+        self.jwt_secret_key = jwt_secret_key or os.getenv("JWT_SECRET_KEY")
 
     def _generate_encryption_key(self, password: str | None, salt: str | None) -> bytes:
         """

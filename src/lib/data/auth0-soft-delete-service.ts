@@ -12,9 +12,9 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+  domain: process.env.AUTH0_DOMAIN ?? '',
+  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? '',
+  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? '',
 }
 
 // Initialize Auth0 management client
@@ -34,15 +34,13 @@ function initializeAuth0Management() {
     )
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
+  auth0Management ??= new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
       scope: 'read:users update:users delete:users',
-    })
-  }
+    });
 }
 
 // Initialize the management client
@@ -91,7 +89,7 @@ export interface PurgeSchedule {
  */
 export class Auth0SoftDeleteService {
   private db: Db | null = null
-  private collectionName = 'deleted_users'
+  private readonly collectionName = 'deleted_users'
   private defaultPolicy: SoftDeletePolicy
 
   constructor() {
@@ -120,9 +118,7 @@ export class Auth0SoftDeleteService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    if (!this.db) {
-      this.db = await mongodb.connect()
-    }
+    this.db ??= await mongodb.connect();
     return this.db
   }
 

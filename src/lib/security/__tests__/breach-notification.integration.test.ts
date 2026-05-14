@@ -151,7 +151,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       await reportBreach(largeBreach)
 
       const expectedAuthorityEmail =
-        process.env['HHS_NOTIFICATION_EMAIL'] || 'hhs-notifications@example.gov'
+        process.env['HHS_NOTIFICATION_EMAIL'] ?? 'hhs-notifications@example.gov'
 
       expect(mockSendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -180,8 +180,8 @@ describe('breachNotificationSystem Integration Tests', () => {
         .mockResolvedValueOnce(userOne)
         .mockResolvedValueOnce(userTwo)
       mockSendEmail
-        .mockImplementationOnce(() => Promise.reject(new Error('Email error')))
-        .mockImplementationOnce(() => Promise.resolve())
+        .mockImplementationOnce( async () => Promise.reject(new Error('Email error')))
+        .mockImplementationOnce( async () => Promise.resolve())
 
       const breachWithMultipleUsers = {
         ...mockBreach,

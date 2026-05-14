@@ -37,7 +37,7 @@ function useConsentState(user: { id: string } | undefined) {
         if (!active) return
 
         if (statuses.length > 0) {
-          const status = statuses[0] || null
+          const status = statuses[0] ?? null
           setConsentStatus(status)
 
           // Initialize selected options from user's existing consent if available
@@ -103,7 +103,7 @@ function useConsentActions(
       consentTypeName: 'Research Participation',
     })
     if (statuses.length > 0) {
-      setConsentStatus(statuses[0] || null)
+      setConsentStatus(statuses[0] ?? null)
     }
   }
 

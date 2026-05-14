@@ -148,8 +148,8 @@ interface TestCaseConfig {
  */
 export class RecoveryTestingManager {
   private config: RecoveryTestConfig
-  private testEnvironments: Map<string, TestEnvironment> = new Map()
-  private testCases: Map<string, TestCase> = new Map()
+  private readonly testEnvironments: Map<string, TestEnvironment> = new Map()
+  private readonly testCases: Map<string, TestCase> = new Map()
 
   constructor(config: RecoveryTestConfig) {
     this.config = config

@@ -25,7 +25,7 @@ export const GET = withAuthenticatedMemoryRoute(
       ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       limit,
       offset,
-      category: category || undefined,
+      category: category ?? undefined,
       tags,
     })
 

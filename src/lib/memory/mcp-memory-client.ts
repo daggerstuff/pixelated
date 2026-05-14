@@ -5,7 +5,7 @@ import type {
   SearchOptions,
 } from './memory-client'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_ORIGIN || ''
+const BASE_URL = process.env.NEXT_PUBLIC_APP_ORIGIN ?? ''
 
 export const mcpMemoryManager = {
   async addMemory(input: AddMemoryInput, userId?: string): Promise<string> {
@@ -107,8 +107,8 @@ export const mcpMemoryManager = {
     const data = await response.json()
 
     return {
-      totalMemories: data.totalMemories || 0,
-      categoryCounts: data.categoryCounts || {},
+      totalMemories: data.totalMemories ?? 0,
+      categoryCounts: data.categoryCounts ?? {},
       recentActivity: [],
     }
   },
@@ -232,8 +232,8 @@ function mapMemoryEntries(memories: unknown): MemoryEntry[] {
   }
 
   return memories.map((memory: any) => ({
-    id: memory.id || 'unknown',
-    content: memory.memory || memory.content || '',
-    metadata: memory.metadata || {},
+    id: memory.id ?? 'unknown',
+    content: (memory.memory ?? memory.content) ?? '',
+    metadata: memory.metadata ?? {},
   }))
 }

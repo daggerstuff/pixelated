@@ -335,7 +335,7 @@ export const PUT: APIRoute = async ({ request }) => {
         },
         intelligence: {
           feeds,
-          updateInterval: updateInterval || 3600000, // 1 hour default
+          updateInterval: updateInterval ?? 3600000, // 1 hour default
         },
       },
     )
@@ -350,7 +350,7 @@ export const PUT: APIRoute = async ({ request }) => {
       JSON.stringify({
         message: 'Threat intelligence configuration updated successfully',
         feeds: feeds.length,
-        updateInterval: updateInterval || 3600000,
+        updateInterval: updateInterval ?? 3600000,
         timestamp: new Date().toISOString(),
       }),
       {

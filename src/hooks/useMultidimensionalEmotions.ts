@@ -47,9 +47,9 @@ interface CacheEntry {
 
 // Improved cache implementation
 class EmotionDataCache {
-  private cache = new Map<string, CacheEntry>()
-  private maxEntries = 20 // Maximum number of cache entries
-  private maxMemory = 10 * 1024 * 1024 // Max cache size (10MB)
+  private readonly cache = new Map<string, CacheEntry>()
+  private readonly maxEntries = 20 // Maximum number of cache entries
+  private readonly maxMemory = 10 * 1024 * 1024 // Max cache size (10MB)
   private currentMemory = 0
   private ttl = 5 * 60 * 1000 // Default TTL: 5 minutes
   private cleanupInterval: NodeJS.Timeout | null = null

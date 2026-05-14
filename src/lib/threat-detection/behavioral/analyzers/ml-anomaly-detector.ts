@@ -109,7 +109,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
       features.spatial.geographicSpread,
       features.sequential.sequenceEntropy,
       features.frequency.eventFrequency / 100,
-      features.frequency.endpointFrequency['/api/sensitive'] || 0,
+      features.frequency.endpointFrequency['/api/sensitive'] ?? 0,
       features.contextual.deviceCharacteristics.deviceType === 'mobile' ? 1 : 0,
     ]
 

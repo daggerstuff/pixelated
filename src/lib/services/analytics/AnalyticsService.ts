@@ -48,8 +48,8 @@ export class AnalyticsService {
 
   constructor(options: AnalyticsServiceOptions = {}) {
     this.wsClients = new Map()
-    this.retentionDays = options.retentionDays || 90 // Default 90 days retention
-    this.batchSize = options.batchSize || 100
+    this.retentionDays = options.retentionDays ?? 90 // Default 90 days retention
+    this.batchSize = options.batchSize ?? 100
     this.keyPrefix = options.redisKeyPrefix ?? ''
     this.redisClient = options.redisClient ?? (redis as unknown as RedisClient) // Safe because we control the Redis client implementation
   }

@@ -37,7 +37,7 @@ const features = {
   CSSVariables: () => {
     try {
       return (
-        window.CSS && window.CSS.supports && window.CSS.supports('--a', '0')
+        window.CSS?.supports?.('--a', '0')
       )
     } catch {
       return false
@@ -46,7 +46,7 @@ const features = {
 }
 
 // Load a script dynamically
-function loadScript(src, async = true) {
+ async function loadScript(src, async = true) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script')
     script.src = src

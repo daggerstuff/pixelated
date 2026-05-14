@@ -119,8 +119,8 @@ export function createTurnRecord(
     decision: input.decision.trim(),
     evidence: input.evidence.map((item) => item.trim()).filter(Boolean),
     requestedAction: input.requestedAction,
-    replyTo: input.replyTo?.trim() || undefined,
-    expiresAt: input.expiresAt?.trim() || undefined,
+    replyTo: input.replyTo?.trim() ?? undefined,
+    expiresAt: input.expiresAt?.trim() ?? undefined,
     createdAt: now,
     updatedAt: now,
   }
@@ -221,7 +221,7 @@ export class InMemoryTurnLedger implements TurnLedger {
     const turnId = input.turnId.trim() || this.nextTurnIdForArtifact(artifactId)
     const now = nowIso()
     const turn = createTurnRecord({ ...input, turnId }, now)
-    const retryKey = `${artifactId}:${turn.replyTo || MAX_RETRY_COUNTER_KEY}`
+    const retryKey = `${artifactId}:${turn.replyTo ?? MAX_RETRY_COUNTER_KEY}`
     const retries = this.attemptsByTurn.get(retryKey) ?? 0
     const route = routeTurn(turn, retries, this.policy)
     this.attemptsByTurn.set(retryKey, retries + 1)

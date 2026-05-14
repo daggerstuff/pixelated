@@ -35,16 +35,16 @@ sanitize_model() {
 sanitize_model_sequence() {
   local raw_sequence="$1"
   local token normalized
+  local normalized_sequence
   local output=""
-  local -a tokens
 
   if [[ -z "$raw_sequence" ]]; then
     echo "$NIM_DEFAULT_MODEL"
     return
   fi
 
-  read -r -a tokens <<< "${raw_sequence//,/ }"
-  for token in "${tokens[@]}"; do
+  normalized_sequence="${raw_sequence//,/ }"
+  for token in $normalized_sequence; do
     normalized="$(sanitize_model "$token")"
     [[ -z "$normalized" ]] && continue
     if [[ " $output " != *" $normalized "* ]]; then

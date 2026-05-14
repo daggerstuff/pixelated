@@ -29,7 +29,7 @@ export function safelyGetHeader(
   const isBuild = import.meta.env.COMMAND === 'build'
   if (import.meta.env.SSR && astro.request?.headers && !isBuild) {
     const headerValue = astro.request.headers.get(headerName)
-    return headerValue || defaultValue
+    return headerValue ?? defaultValue
   }
 
   // In prerendered pages, return the default value
@@ -50,8 +50,7 @@ export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
   const isBuild = import.meta.env.COMMAND === 'build'
   if (
     import.meta.env.SSR &&
-    astro.request &&
-    astro.request.headers &&
+    astro.request?.headers &&
     !isBuild
   ) {
     const headers: Record<string, string> = {}

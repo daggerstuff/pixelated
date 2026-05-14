@@ -27,14 +27,14 @@ export interface UserProfileUpdate {
 }
 
 export class PixelatedEmpathy {
-  private apiKey: string
+  private readonly apiKey: string
   private baseUrl: string
-  private timeout: number
+  private readonly timeout: number
 
   constructor(config: SDKConfig) {
     this.apiKey = config.apiKey
-    this.baseUrl = config.baseUrl || 'https://api.pixelatedempathy.com/api/v1'
-    this.timeout = config.timeout || 30000
+    this.baseUrl = config.baseUrl ?? 'https://api.pixelatedempathy.com/api/v1'
+    this.timeout = config.timeout ?? 30000
   }
 
   /**
@@ -62,7 +62,7 @@ export class PixelatedEmpathy {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || `API Error: ${response.statusText}`)
+        throw new Error(errorData.error ?? `API Error: ${response.statusText}`)
       }
 
       return await response.json()

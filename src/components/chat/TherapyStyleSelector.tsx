@@ -25,7 +25,7 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
   const [hoveredStyle, setHoveredStyle] = useState<TherapyStyleId | null>(null)
 
   // Get the style to display details for (either hovered or selected)
-  const detailStyle: TherapyStyleId = hoveredStyle || selectedStyle
+  const detailStyle: TherapyStyleId = hoveredStyle ?? selectedStyle
 
   // Get recommended styles if enabled and an issue is provided
   const recommendedStyles =

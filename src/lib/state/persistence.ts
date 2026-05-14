@@ -29,8 +29,8 @@ const defaultOptions: Required<StorageOptions> = {
 }
 
 export class StatePersistence {
-  private config: PersistenceConfig
-  private options: Required<StorageOptions>
+  private readonly config: PersistenceConfig
+  private readonly options: Required<StorageOptions>
 
   constructor(config: PersistenceConfig) {
     this.config = config

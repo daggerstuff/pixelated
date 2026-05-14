@@ -109,15 +109,10 @@ const metricsMiddleware = (req, res, next) => {
   res.end = function (...args) {
     const duration = (Date.now() - start) / 1000
     // Derive route safely: prefer route.path when available, else use req.path
-    const rawRoute =
-      req && req.route && req.route.path
-        ? req.route.path
-        : req && req.path
-          ? req.path
-          : 'unknown'
+    const rawRoute = req?.route?.path ?? req?.path ?? 'unknown'
     const route = sanitizeLabel(rawRoute)
     const method = sanitizeLabel(
-      req && req.method ? req.method.toUpperCase() : 'UNKNOWN',
+      req?.method ? req.method.toUpperCase() : 'UNKNOWN',
     )
     const statusCode = sanitizeLabel(
       res.statusCode ? res.statusCode.toString() : '0',
@@ -143,17 +138,17 @@ const metricsMiddleware = (req, res, next) => {
 // Health check metrics
 const updateHealthMetrics = (healthData) => {
   if (healthData.database) {
-    databaseConnections.set(healthData.database.connections || 0)
+    databaseConnections.set(healthData.database.connections ?? 0)
   }
 
   if (healthData.sessions) {
-    userSessions.set(healthData.sessions.active || 0)
+    userSessions.set(healthData.sessions.active ?? 0)
   }
 
   if (healthData.memory) {
-    memoryUsage.set({ type: 'heap_used' }, healthData.memory.heapUsed || 0)
-    memoryUsage.set({ type: 'heap_total' }, healthData.memory.heapTotal || 0)
-    memoryUsage.set({ type: 'external' }, healthData.memory.external || 0)
+    memoryUsage.set({ type: 'heap_used' }, healthData.memory.heapUsed ?? 0)
+    memoryUsage.set({ type: 'heap_total' }, healthData.memory.heapTotal ?? 0)
+    memoryUsage.set({ type: 'external' }, healthData.memory.external ?? 0)
   }
 }
 

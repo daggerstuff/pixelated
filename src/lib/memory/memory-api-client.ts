@@ -131,10 +131,10 @@ export class MemoryApiClient {
       content: input.content,
     }
     if (input.emotions) {
-      (body as Record<string, unknown>).emotions = input.emotions
+      (body).emotions = input.emotions
     }
     if (input.gating) {
-      (body as Record<string, unknown>).gating = input.gating
+      (body).gating = input.gating
     }
     const res = await this._fetch(`${this.baseUrl}/memories`, {
       method: 'POST',

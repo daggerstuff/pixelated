@@ -82,19 +82,19 @@ Be thorough in identifying indicators but prioritize safety - if there's any ind
  * Analyzes conversation context to determine appropriate objective prioritization
  */
 export class ContextDetector {
-  private aiService: AIService
-  private crisisDetectionService: CrisisDetectionService | undefined
-  private educationalContextRecognizer: EducationalContextRecognizer | undefined
-  private model: string
-  private enableCrisisIntegration: boolean
-  private enableEducationalRecognition: boolean
+  private readonly aiService: AIService
+  private readonly crisisDetectionService: CrisisDetectionService | undefined
+  private readonly educationalContextRecognizer: EducationalContextRecognizer | undefined
+  private readonly model: string
+  private readonly enableCrisisIntegration: boolean
+  private readonly enableEducationalRecognition: boolean
 
   constructor(config: ContextDetectorConfig) {
     this.aiService = config.aiService
     this.crisisDetectionService = config.crisisDetectionService ?? undefined
     this.educationalContextRecognizer =
       config.educationalContextRecognizer ?? undefined
-    this.model = config.model || 'gpt-4'
+    this.model = config.model ?? 'gpt-4'
     this.enableCrisisIntegration = config.enableCrisisIntegration ?? true
     this.enableEducationalRecognition =
       config.enableEducationalRecognition ?? true
@@ -114,21 +114,21 @@ export class ContextDetector {
       if (this.enableCrisisIntegration && this.crisisDetectionService) {
         const crisisOptions = {
           sensitivityLevel: 'medium' as const,
-          userId: userId || 'anonymous',
+          userId: userId ?? 'anonymous',
           source: 'context-detection',
         }
         crisisResult = await this.crisisDetectionService.detectCrisis(
           userInput,
           crisisOptions,
         )
-        if (crisisResult && crisisResult['isCrisis']) {
+        if (crisisResult?.['isCrisis']) {
           return {
             detectedContext: ContextType.CRISIS,
             confidence: crisisResult['confidence'],
             contextualIndicators: [
               {
                 type: 'crisis_detection',
-                description: crisisResult['category'] || 'Crisis detected',
+                description: crisisResult['category'] ?? 'Crisis detected',
                 confidence: crisisResult['confidence'],
                 severity: this.mapRiskLevelToNumber(crisisResult['riskLevel']),
               },
@@ -160,8 +160,7 @@ export class ContextDetector {
             conversationHistory,
           )
         if (
-          educationalResult &&
-          educationalResult['isEducational'] &&
+          educationalResult?.['isEducational'] &&
           educationalResult['confidence'] > 0.8
         ) {
           return {
@@ -252,7 +251,7 @@ export class ContextDetector {
       }
 
       // Merge educational analysis if available
-      if (educationalResult && educationalResult['isEducational']) {
+      if (educationalResult?.['isEducational']) {
         result['metadata']['educationalAnalysis'] = {
           confidence: educationalResult['confidence'],
           type: educationalResult['educationalType'],
@@ -375,7 +374,7 @@ export class ContextDetector {
     }>,
   ): Promise<ContextDetectionResult[]> {
     return Promise.all(
-      inputs.map((input) =>
+      inputs.map( async (input) =>
         this.detectContext(
           input['text'],
           input['conversationHistory'],
@@ -432,7 +431,7 @@ export class ContextDetector {
     const extractJson = (text: string): string | null => {
       if (!text) return null
       const fenced = text.match(/```(?:json)?\n([\s\S]*?)```/i)
-      if (fenced && fenced[1]) {
+      if (fenced?.[1]) {
         return fenced[1].trim()
       }
       // Try to locate first balanced JSON object in text
@@ -497,7 +496,7 @@ export class ContextDetector {
 
     try {
       const jsonText = extractJson(content) ?? ''
-      const parsed = JSON.parse(jsonText) as any
+      const parsed = JSON.parse(jsonText)
 
       return {
         detectedContext: normalizeContext(parsed['detectedContext']),

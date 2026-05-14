@@ -58,7 +58,7 @@ if (command === 'create') {
   try {
     execFileSync('git', ['tag', '-a', tagName, '-m', message || 'Rollback tag'])
     if (push) {
-      const remote = process.env.GIT_PUSH_REMOTE || 'origin'
+      const remote = process.env.GIT_PUSH_REMOTE ?? 'origin'
       execFileSync('git', ['push', remote, tagName])
     }
     console.log(`Created tag: ${tagName}`)

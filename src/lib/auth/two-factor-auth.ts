@@ -27,7 +27,7 @@ export const setupTwoFactorAuth = async (
   const config = await getFromCache<{ enabled?: boolean }>(
     `2fa:config:${userId}`,
   )
-  if (config && config.enabled) {
+  if (config?.enabled) {
     throw new Error('2FA is already enabled')
   }
 

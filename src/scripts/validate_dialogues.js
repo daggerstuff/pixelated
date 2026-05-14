@@ -59,8 +59,8 @@ function parseFilename(filename) {
 
 // Count the number of therapist and client turns
 function countTurns(content) {
-  const therapistMatches = content.match(/Therapist:/g) || []
-  const clientMatches = content.match(/Client:/g) || []
+  const therapistMatches = content.match(/Therapist:/g) ?? []
+  const clientMatches = content.match(/Client:/g) ?? []
 
   return {
     therapistTurns: therapistMatches.length,
@@ -203,17 +203,17 @@ function checkNarrativeElements(content) {
   // Count occurrences
   const internalMonologue = internalMonologuePatterns.reduce(
     (count, pattern) => {
-      return count + (content.match(pattern) || []).length
+      return count + (content.match(pattern) ?? []).length
     },
     0,
   )
 
   const nonVerbalCues = nonVerbalCuePatterns.reduce((count, pattern) => {
-    return count + (content.match(pattern) || []).length
+    return count + (content.match(pattern) ?? []).length
   }, 0)
 
   const physicalSymptoms = physicalSymptomPatterns.reduce((count, pattern) => {
-    return count + (content.match(pattern) || []).length
+    return count + (content.match(pattern) ?? []).length
   }, 0)
 
   return {
@@ -242,7 +242,7 @@ function checkEthicalDilemmas(content) {
   ]
 
   const ethicalMentions = ethicalDilemmaPatterns.reduce((count, pattern) => {
-    return count + (content.match(pattern) || []).length
+    return count + (content.match(pattern) ?? []).length
   }, 0)
 
   return {
@@ -275,7 +275,7 @@ function analyzeOutcome(content, scenarioType) {
   // Count occurrences
   const troublingOutcomeCount = troublingOutcomePatterns.reduce(
     (count, pattern) => {
-      return count + (content.match(pattern) || []).length
+      return count + (content.match(pattern) ?? []).length
     },
     0,
   )
@@ -475,7 +475,7 @@ async function main() {
     if (result.isValid) {
       console.log(`  ✅ Valid`)
     } else {
-      console.log(`  ❌ Invalid: ${result.error || 'Failed validation checks'}`)
+      console.log(`  ❌ Invalid: ${result.error ?? 'Failed validation checks'}`)
     }
   }
 

@@ -85,7 +85,7 @@ export function createEnhancedFHEService(
       baseService.supportsOperation(operation),
 
     // Enhanced encrypt with stats tracking
-    async encrypt<T>(value: T, options?: unknown): Promise<EncryptedData> {
+    async encrypt(value: unknown, options?: unknown): Promise<EncryptedData> {
       try {
         stats.encryptCount++
         return await baseService.encrypt(value, options)
