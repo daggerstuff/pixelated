@@ -48,7 +48,7 @@ const RATE_LIMIT_WINDOW = 60000 // 1 minute
 const RATE_LIMIT_MAX = 100 // requests per window
 
 export function rateLimiter(req: Request, res: Response, next: NextFunction) {
-  const ip = req.ip || 'unknown'
+  const ip = req.ip ?? 'unknown'
   const now = Date.now()
 
   let record = requestCounts.get(ip)
@@ -102,7 +102,7 @@ async function logAuditEvent(
        (user_id, action, resource_type, resource_id, changes, ip_address, user_agent, status, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
       [
-        req.user?.id || null,
+        req.user?.id ?? null,
         action,
         getResourceType(req),
         getResourceId(req),
@@ -211,5 +211,5 @@ function createRequestId(): string {
 }
 
 export function getRequestId(req: Request): string {
-  return (req as any).requestId || 'unknown'
+  return (req as any).requestId ?? 'unknown'
 }

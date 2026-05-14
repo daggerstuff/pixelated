@@ -49,8 +49,8 @@ export function getTracingConfig(): TracingConfig {
 
   return {
     enabled,
-    serviceName: import.meta.env.TRACING_SERVICE_NAME || 'pixelated-empathy',
-    serviceVersion: import.meta.env.TRACING_SERVICE_VERSION || '1.0.0',
+    serviceName: import.meta.env.TRACING_SERVICE_NAME ?? 'pixelated-empathy',
+    serviceVersion: import.meta.env.TRACING_SERVICE_VERSION ?? '1.0.0',
     environment:
       import.meta.env.MODE || (isProduction ? 'production' : 'development'),
     exporter: {
@@ -61,13 +61,13 @@ export function getTracingConfig(): TracingConfig {
           | 'jaeger'
           | 'zipkin') || 'otlp',
       endpoint:
-        import.meta.env.TRACING_EXPORTER_ENDPOINT || 'http://localhost:4318',
+        import.meta.env.TRACING_EXPORTER_ENDPOINT ?? 'http://localhost:4318',
       headers: import.meta.env.TRACING_EXPORTER_HEADERS
         ? JSON.parse(import.meta.env.TRACING_EXPORTER_HEADERS)
         : undefined,
     },
     sampling: {
-      ratio: parseFloat(import.meta.env.TRACING_SAMPLING_RATIO || '1.0'),
+      ratio: parseFloat(import.meta.env.TRACING_SAMPLING_RATIO ?? '1.0'),
     },
     instrumentation: {
       http: import.meta.env.TRACING_INSTRUMENT_HTTP !== 'false',

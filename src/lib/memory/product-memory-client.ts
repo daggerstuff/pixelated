@@ -17,7 +17,7 @@ type MemoryAuthConfig = Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
  * It provides a standardized interface for memory operations in the frontend.
  */
 export class ProductMemoryClient {
-  private defaultAuthConfig?: MemoryAuthConfig
+  private readonly defaultAuthConfig?: MemoryAuthConfig
 
   constructor(defaultAuthConfig?: MemoryAuthConfig) {
     this.defaultAuthConfig = defaultAuthConfig
@@ -28,7 +28,7 @@ export class ProductMemoryClient {
     init: RequestInit = {},
     authConfig?: MemoryAuthConfig,
   ): Promise<Response> {
-    const activeConfig = authConfig || this.defaultAuthConfig
+    const activeConfig = authConfig ?? this.defaultAuthConfig
     return activeConfig?.getAccessTokenSilently
       ? fetchWithAuthToken(input, init, {
           getAccessTokenSilently: activeConfig.getAccessTokenSilently,
@@ -60,7 +60,7 @@ export class ProductMemoryClient {
 
     const data = await response.json()
     // Support both legacy memory_id and new id format
-    const memoryId = data.id || data.memory_id
+    const memoryId = data.id ?? data.memory_id
     if (!memoryId) {
       throw new Error('Memory add response did not include an ID')
     }
@@ -166,9 +166,9 @@ export class ProductMemoryClient {
 
     const data = await response.json()
     return {
-      totalMemories: data.totalMemories || 0,
-      categoryCounts: data.categoryCounts || {},
-      recentActivity: data.recentActivity || [],
+      totalMemories: data.totalMemories ?? 0,
+      categoryCounts: data.categoryCounts ?? {},
+      recentActivity: data.recentActivity ?? [],
     }
   }
 
@@ -208,10 +208,10 @@ function mapMemoryEntries(memories: any[]): MemoryEntry[] {
   }
 
   return memories.map((memory: any) => ({
-    id: memory.id || 'unknown',
-    content: memory.content || memory.memory || '',
-    metadata: memory.metadata || {},
-    createdAt: memory.createdAt || memory.created_at,
-    updatedAt: memory.updatedAt || memory.updated_at,
+    id: memory.id ?? 'unknown',
+    content: (memory.content ?? memory.memory) ?? '',
+    metadata: memory.metadata ?? {},
+    createdAt: memory.createdAt ?? memory.created_at,
+    updatedAt: memory.updatedAt ?? memory.updated_at,
   }))
 }

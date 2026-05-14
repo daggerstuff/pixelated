@@ -96,7 +96,7 @@ function loadWeightsFromEnv(): ScoringWeights {
 // ─── Main scorer ───────────────────────────────────────────────────────────────
 
 export class ImportanceScorer {
-  private weights: ScoringWeights
+  private readonly weights: ScoringWeights
 
   constructor(weights: ScoringWeights = DEFAULT_WEIGHTS) {
     this.weights = weights

@@ -18,7 +18,7 @@ const getMockClientResponse = (value: unknown): string => {
   return typeof response === 'string' ? response : ''
 }
 
-function AIErrorBoundary({ children }: { children: React.ReactNode }) {
+ async function AIErrorBoundary({ children }: { children: React.ReactNode }) {
   const [hasError] = useState(false)
   const [error] = useState<Error | null>(null)
 

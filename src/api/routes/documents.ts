@@ -274,7 +274,7 @@ router.post(
       `INSERT INTO comments (document_id, author_id, content, parent_comment_id, created_at)
        VALUES ($1, $2, $3, $4, NOW())
        RETURNING id, content, author_id, created_at`,
-      [documentId, req.user!.id, content, parentCommentId || null],
+      [documentId, req.user!.id, content, parentCommentId ?? null],
     )
 
     res.status(201).json({

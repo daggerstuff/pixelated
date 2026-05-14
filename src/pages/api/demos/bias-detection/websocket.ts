@@ -209,7 +209,7 @@ export const POST: APIRoute = async ({ request }) => {
           finalResult: {
             type: 'analysis_complete',
             payload: {
-              sessionId: body.sessionId || 'demo_session',
+              sessionId: body.sessionId ?? 'demo_session',
               overallBiasScore: 0.35,
               alertLevel: 'medium',
               confidence: 0.87,

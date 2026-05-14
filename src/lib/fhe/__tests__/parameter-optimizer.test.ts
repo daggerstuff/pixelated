@@ -158,7 +158,7 @@ describe('FHEParameterOptimizer', () => {
 
     // Access private property through reflection for testing
     const performanceHistory =
-      Reflect.get(optimizer, 'performanceHistory') || []
+      Reflect.get(optimizer, 'performanceHistory') ?? []
 
     expect(performanceHistory.length).toBe(1)
     expect(performanceHistory[0]).toBe(metric)
@@ -184,7 +184,7 @@ describe('FHEParameterOptimizer', () => {
 
     // Access private property through reflection for testing
     const performanceHistory =
-      Reflect.get(optimizer, 'performanceHistory') || []
+      Reflect.get(optimizer, 'performanceHistory') ?? []
 
     expect(performanceHistory.length).toBe(3)
     // The most recent operation should be first

@@ -142,7 +142,7 @@ export function FilterControls({
           <div className='space-y-2'>
             <Label htmlFor='patternType'>Pattern Type</Label>
             <Select
-              value={options.patternType || ''}
+              value={options.patternType ?? ''}
               onValueChange={(value) => handleChange('patternType', value)}
             >
               <SelectTrigger id='patternType' aria-label='Select pattern type'>
@@ -165,7 +165,7 @@ export function FilterControls({
               id='minFrequency'
               type='number'
               min={0}
-              value={options.minFrequency || ''}
+              value={options.minFrequency ?? ''}
               onChange={(e) =>
                 handleChange(
                   'minFrequency',
@@ -188,7 +188,7 @@ export function FilterControls({
               min={0}
               max={1}
               step={0.1}
-              value={options.minConfidence || ''}
+              value={options.minConfidence ?? ''}
               onChange={(e) =>
                 handleChange(
                   'minConfidence',
@@ -202,7 +202,7 @@ export function FilterControls({
           <div className='space-y-2'>
             <Label htmlFor='riskFactor'>Risk Factor</Label>
             <Select
-              value={options.riskFactor || ''}
+              value={options.riskFactor ?? ''}
               onValueChange={(value) => handleChange('riskFactor', value)}
             >
               <SelectTrigger>

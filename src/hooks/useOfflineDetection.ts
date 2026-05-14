@@ -55,16 +55,16 @@ export function useOfflineDetection({
       webkitConnection?: NetworkInformationLike
     }
     const connection =
-      nav.connection || nav.mozConnection || nav.webkitConnection
+      (nav.connection ?? nav.mozConnection) ?? nav.webkitConnection
 
     setNetworkState({
       isOnline,
       isOffline: !isOnline,
-      connectionType: connection?.type || 'unknown',
-      effectiveType: connection?.effectiveType || 'unknown',
-      downlink: connection?.downlink || 0,
-      rtt: connection?.rtt || 0,
-      saveData: connection?.saveData || false,
+      connectionType: connection?.type ?? 'unknown',
+      effectiveType: connection?.effectiveType ?? 'unknown',
+      downlink: connection?.downlink ?? 0,
+      rtt: connection?.rtt ?? 0,
+      saveData: connection?.saveData ?? false,
     })
 
     // Trigger callbacks

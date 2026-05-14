@@ -63,22 +63,22 @@ export interface RedisConnection {
  * Redis Connection Pool for specific use cases
  */
 export class RedisConnectionPool {
-  private connections: Map<string, RedisConnection> = new Map()
-  private waitQueue: Array<{
+  private readonly connections: Map<string, RedisConnection> = new Map()
+  private readonly waitQueue: Array<{
     resolve: (connection: RedisConnection) => void
     reject: (error: Error) => void
     timeout: ReturnType<typeof setTimeout>
   }> = []
 
-  private config: RedisPoolConfig
-  private stats: RedisPoolStats
+  private readonly config: RedisPoolConfig
+  private readonly stats: RedisPoolStats
   private healthCheckInterval?: ReturnType<typeof setInterval>
   private metricsInterval?: ReturnType<typeof setInterval>
   private isDisposed = false
 
   constructor(
-    private name: string,
-    private redisConfig: RedisServiceConfig,
+    private readonly name: string,
+    private readonly redisConfig: RedisServiceConfig,
     config: Partial<RedisPoolConfig> = {},
   ) {
     this.config = {
@@ -443,7 +443,7 @@ export class RedisConnectionPool {
 
     // Destroy all connections
     await Promise.all(
-      [...this.connections.values()].map((conn) =>
+      [...this.connections.values()].map( async (conn) =>
         this.destroyConnection(conn),
       ),
     )
@@ -456,8 +456,8 @@ export class RedisConnectionPool {
  * Redis Pool Manager - manages multiple pools for different use cases
  */
 export class RedisPoolManager {
-  private pools = new Map<string, RedisConnectionPool>()
-  private defaultConfig: RedisServiceConfig
+  private readonly pools = new Map<string, RedisConnectionPool>()
+  private readonly defaultConfig: RedisServiceConfig
 
   constructor(defaultConfig: RedisServiceConfig) {
     this.defaultConfig = defaultConfig
@@ -489,7 +489,7 @@ export class RedisPoolManager {
    * Get existing pool
    */
   getPool(name: string): RedisConnectionPool | null {
-    return this.pools.get(name) || null
+    return this.pools.get(name) ?? null
   }
 
   /**
@@ -530,7 +530,7 @@ export class RedisPoolManager {
    * Dispose all pools
    */
   async dispose(): Promise<void> {
-    await Promise.all([...this.pools.values()].map((pool) => pool.dispose()))
+    await Promise.all([...this.pools.values()].map( async (pool) => pool.dispose()))
 
     this.pools.clear()
 
@@ -548,7 +548,7 @@ export function getRedisPoolManager(
   config?: RedisServiceConfig,
 ): RedisPoolManager {
   if (!redisPoolManager) {
-    const defaultConfig = config || { url: process.env['REDIS_URL'] || '' }
+    const defaultConfig = config ?? { url: process.env['REDIS_URL'] ?? '' }
     redisPoolManager = new RedisPoolManager(defaultConfig)
   }
   return redisPoolManager

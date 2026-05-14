@@ -15,9 +15,9 @@ export interface IndexedDBStorageConfig {
  * All methods return Promises for non-blocking operation.
  */
 class IndexedDBStorage {
-  private dbName: string
-  private version: number
-  private storeName: string
+  private readonly dbName: string
+  private readonly version: number
+  private readonly storeName: string
   private db: IDBDatabase | null = null
   private initialized = false
 

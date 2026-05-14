@@ -18,7 +18,7 @@ const child = spawn(process.execPath, [localRunner, ...blockingTests], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    VITEST_SUITE: process.env.VITEST_SUITE || 'blocking',
+    VITEST_SUITE: process.env.VITEST_SUITE ?? 'blocking',
   },
 })
 

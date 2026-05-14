@@ -80,12 +80,12 @@ export function createSpeechRecognition(
   const recognition = new SpeechRecognitionConstructor()
 
   // Apply configuration
-  recognition.lang = config.language || 'en-US'
+  recognition.lang = config.language ?? 'en-US'
   recognition.continuous =
-    config.continuous !== undefined ? config.continuous : true
+    config.continuous ?? true
   recognition.interimResults =
-    config.interimResults !== undefined ? config.interimResults : true
-  recognition.maxAlternatives = config.maxAlternatives || 1
+    config.interimResults ?? true
+  recognition.maxAlternatives = config.maxAlternatives ?? 1
 
   // Add grammar list if specified and supported
   if (config.grammarList && window.SpeechGrammarList) {

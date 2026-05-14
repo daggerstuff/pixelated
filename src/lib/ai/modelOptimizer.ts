@@ -33,7 +33,7 @@ export interface OptimizationResult {
  */
 class ModelOptimizer {
   private currentMetrics: ModelMetrics | null = null;
-  private optimizationHistory: OptimizationResult[] = [];
+  private readonly optimizationHistory: OptimizationResult[] = [];
   private strategies: OptimizationStrategy[] = [];
 
   constructor() {
@@ -251,7 +251,7 @@ class ModelOptimizer {
     Object.keys(improvements).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
       if (typeof optimizedMetrics[key] === "number") {
-        (optimizedMetrics[key] as number) *= 1 + improvements[key];
+        (optimizedMetrics[key]) *= 1 + improvements[key];
       }
     });
 
@@ -345,15 +345,15 @@ class ModelOptimizer {
     let mostBalanced = this.optimizationHistory[0];
 
     this.optimizationHistory.forEach((result) => {
-      if ((result.improvements.accuracy || 0) > (bestAccuracy.improvements.accuracy || 0)) {
+      if ((result.improvements.accuracy ?? 0) > (bestAccuracy.improvements.accuracy ?? 0)) {
         bestAccuracy = result;
       }
 
-      if ((result.improvements.inferenceTime || 0) > (bestSpeed.improvements.inferenceTime || 0)) {
+      if ((result.improvements.inferenceTime ?? 0) > (bestSpeed.improvements.inferenceTime ?? 0)) {
         bestSpeed = result;
       }
 
-      if ((result.improvements.memoryUsage || 0) > (bestMemory.improvements.memoryUsage || 0)) {
+      if ((result.improvements.memoryUsage ?? 0) > (bestMemory.improvements.memoryUsage ?? 0)) {
         bestMemory = result;
       }
 
@@ -376,7 +376,7 @@ class ModelOptimizer {
 
   private calculateBalanceScore(result: OptimizationResult): number {
     const metrics = ["accuracy", "inferenceTime", "memoryUsage"] as const;
-    const scores = metrics.map((metric) => result.improvements[metric] || 0);
+    const scores = metrics.map((metric) => result.improvements[metric] ?? 0);
     const positiveScores = scores.filter((score) => score > 0);
 
     if (positiveScores.length === 0) return 0;
@@ -426,7 +426,7 @@ class ModelOptimizer {
     // Calculate trends for each metric
     Object.keys(trends).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
-      const values = this.optimizationHistory.map((h) => h.improvements[key] || 0);
+      const values = this.optimizationHistory.map((h) => h.improvements[key] ?? 0);
       const avgChange = values.reduce((sum, val) => sum + val, 0) / values.length;
 
       if (avgChange > 0.01) trends[key] = "improving";

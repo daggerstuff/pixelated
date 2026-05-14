@@ -181,7 +181,7 @@ export interface ExtendedSerializedSealKeys extends SerializedSealKeys {
 export class SealService {
   private static instance: SealService | null = null
   private sealContext: SealContext | null = null
-  private memoryManager = new SealMemoryManager()
+  private readonly memoryManager = new SealMemoryManager()
 
   // SEAL components
   private keyGenerator: SealKeyGenerator | null = null
@@ -208,9 +208,7 @@ export class SealService {
    * Get the singleton instance of SealService
    */
   public static getInstance(): SealService {
-    if (!SealService.instance) {
-      SealService.instance = new SealService()
-    }
+    SealService.instance ??= new SealService();
     return SealService.instance
   }
 
@@ -537,7 +535,7 @@ export class SealService {
       if (this.schemeType === SealSchemeType.CKKS) {
         const ckksEncoder = this.getCKKSEncoder()
         const effectiveScale =
-          scale !== undefined ? scale : BigInt(1) << BigInt(40)
+          scale ?? (BigInt(1) << BigInt(40))
 
         plaintext = seal.PlainText()
         ckksEncoder.encode(data, effectiveScale, plaintext)

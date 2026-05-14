@@ -67,6 +67,7 @@ export default function RealTimeFeedbackPanel({
         return 'border-amber-200 bg-amber-50'
       case 'low':
         return 'border-blue-200 bg-blue-50'
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return 'border-gray-200 bg-gray-50'
     }

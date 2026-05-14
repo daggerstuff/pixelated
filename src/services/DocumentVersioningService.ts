@@ -27,8 +27,8 @@ export interface VersionHistory {
 }
 
 export class DocumentVersioningService {
-  private db: Pool
-  private fileStorage: FileStorageService
+  private readonly db: Pool
+  private readonly fileStorage: FileStorageService
 
   constructor(db: Pool) {
     this.db = db
@@ -79,7 +79,7 @@ export class DocumentVersioningService {
       const versionId = uuidv4()
       await tx.execute(sql`
         INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
-        VALUES (${versionId}, ${fileId}, ${newVersion}, ${file.originalname}, ${file.size}, ${fileMetadata.url}, ${fileMetadata.fileName}, ${userId}, ${changes || `Version ${newVersion}`}, ${await this.generateChecksum(file.buffer)}, true)
+        VALUES (${versionId}, ${fileId}, ${newVersion}, ${file.originalname}, ${file.size}, ${fileMetadata.url}, ${fileMetadata.fileName}, ${userId}, ${changes ?? `Version ${newVersion}`}, ${await this.generateChecksum(file.buffer)}, true)
       `)
 
       const versionRecord = await this.getFileVersionInternal(
@@ -115,7 +115,7 @@ export class DocumentVersioningService {
       sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
     )
 
-    const row = result.rows[0] as any
+    const row = result.rows[0]
     if (!row) return null
 
     return {
@@ -214,7 +214,7 @@ export class DocumentVersioningService {
       isCurrent: row.is_current as boolean,
     }))
 
-    const currentVersion = versions.find((v) => v.isCurrent) || versions[0]
+    const currentVersion = versions.find((v) => v.isCurrent) ?? versions[0]
 
     return {
       file,
@@ -287,7 +287,7 @@ export class DocumentVersioningService {
 
     await db.execute(sql`
       INSERT INTO folders (id, name, parent_id, owner_id)
-      VALUES (${folderId}, ${name}, ${parentId || null}, ${userId})
+      VALUES (${folderId}, ${name}, ${parentId ?? null}, ${userId})
     `)
 
     return folderId
@@ -362,12 +362,12 @@ export class DocumentVersioningService {
       sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${fileId}`,
     )
     const newVersion =
-      (Number((versionResult.rows[0] as any)?.max_version) || 0) + 1
+      (Number((versionResult.rows[0])?.max_version) || 0) + 1
 
     const versionId = uuidv4()
     await executor.execute(sql`
       INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
-      VALUES (${versionId}, ${fileId}, ${newVersion}, ${`version-${newVersion}`}, 0, '', ${s3Key}, ${userId}, ${changes || `Version ${newVersion}`}, ${await this.generateChecksum(Buffer.from(''))}, true)
+      VALUES (${versionId}, ${fileId}, ${newVersion}, ${`version-${newVersion}`}, 0, '', ${s3Key}, ${userId}, ${changes ?? `Version ${newVersion}`}, ${await this.generateChecksum(Buffer.from(''))}, true)
     `)
 
     const newVersionRecord = await this.getFileVersionInternal(

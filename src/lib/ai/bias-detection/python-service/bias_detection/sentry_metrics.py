@@ -21,8 +21,21 @@ _sentry_sdk: Any | None = None
 _sentry_sdk_imported = False
 
 
+def _sentry_enabled() -> bool:
+    """Check whether Sentry should be initialized or used."""
+    return os.getenv("BIAS_DETECTION_DISABLE_SENTRY", "").lower().strip() not in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
 def _get_sentry_sdk() -> Any | None:
     global _sentry_sdk, _sentry_sdk_imported
+    if not _sentry_enabled():
+        return None
+
     if _sentry_sdk_imported:
         return _sentry_sdk
 

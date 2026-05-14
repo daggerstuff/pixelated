@@ -172,7 +172,7 @@ export function initializeProviders() {
     }
 
     // Local GGUF Inference
-    const localAiBaseUrl = getEnvVar('LOCAL_AI_BASE_URL') || 'http://localhost:8000/v1'
+    const localAiBaseUrl = getEnvVar('LOCAL_AI_BASE_URL') ?? 'http://localhost:8000/v1'
     providers.set('local', {
       ...defaultConfigs.local,
       apiKey: 'local-no-key',
@@ -222,6 +222,7 @@ export function getAIServiceByProvider(
       case 'local':
         service = createLocalServiceAdapter(config)
         break
+      case "azure-openai": { throw new Error('Not implemented yet: "azure-openai" case') }
       default:
         appLogger.warn(`Unsupported provider type: ${providerType}`)
         return null
@@ -260,7 +261,7 @@ export function isProviderAvailable(providerType: AIProviderType): boolean {
 export function getProviderConfig(
   providerType: AIProviderType,
 ): AIProviderConfig | null {
-  return providers.get(providerType) || null
+  return providers.get(providerType) ?? null
 }
 
 // Provider-specific service adapters
@@ -281,7 +282,7 @@ function createLLMServiceAdapter(config: AIProviderConfig): AIService {
     createStreamingChatCompletion: async (messages, options) =>
       llmService.createStreamingChatCompletion(messages, {
         ...options,
-        model: options?.model || config.defaultModel,
+        model: options?.model ?? config.defaultModel,
       }),
     getModelInfo: (model: string) => ({
       id: model,
@@ -394,11 +395,11 @@ function createLocalServiceAdapter(config: AIProviderConfig): AIService {
     }
 
     return {
-      id: data.id || 'local-id',
+      id: data.id ?? 'local-id',
       created: Date.now(),
       content,
       model: config.defaultModel,
-      usage: data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+      usage: data.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
     } as AICompletion
   }
 

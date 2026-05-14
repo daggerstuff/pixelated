@@ -59,9 +59,9 @@ const getEnvLogLevel = (): LogLevel => {
  * and provides structured logging capabilities
  */
 class ConsoleLogger implements Logger {
-  private logLevel: LogLevel
-  private isDevelopment: boolean
-  private prefix?: string
+  private readonly logLevel: LogLevel
+  private readonly isDevelopment: boolean
+  private readonly prefix?: string
 
   constructor(level: LogLevel = LogLevel.INFO, prefix?: string) {
     this.logLevel = level

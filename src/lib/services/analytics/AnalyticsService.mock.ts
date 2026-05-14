@@ -10,8 +10,8 @@ export interface AnalyticsServiceOptions {
  * Mock Analytics service for tracking events and metrics
  */
 export class AnalyticsService {
-  private options: AnalyticsServiceOptions
-  private clients: Map<string, WebSocket[]>
+  private readonly options: AnalyticsServiceOptions
+  private readonly clients: Map<string, WebSocket[]>
 
   constructor(options: AnalyticsServiceOptions) {
     this.options = options
