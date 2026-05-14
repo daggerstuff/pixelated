@@ -2,6 +2,12 @@
 # Nvidia NIM BYOK setup for GitHub Copilot CLI
 # Usage: source .github/copilot/nim-byok.sh
 
+# If this shell has stale legacy helper functions from an older version, drop them
+# so the fixed zsh-compatible implementations below always win in long-lived sessions.
+if typeset -f sanitize_model_sequence >/dev/null 2>&1; then
+  unset -f sanitize_model_sequence sanitize_model is_forbidden_model 2>/dev/null || true
+fi
+
 # Reuse an existing GitHub CLI login when no token is exported yet.
 # This keeps Copilot auth working across new terminals without hardcoding a PAT.
 if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
@@ -58,6 +64,19 @@ _nim_byok_sanitize_model_sequence() {
   fi
 
   echo "$output"
+}
+
+# Backwards-compatible aliases for any scripts/commands still invoking old helper names.
+sanitize_model() {
+  _nim_byok_sanitize_model "$@"
+}
+
+sanitize_model_sequence() {
+  _nim_byok_sanitize_model_sequence "$@"
+}
+
+is_forbidden_model() {
+  _nim_byok_is_forbidden_model "$@"
 }
 
 # Wire model — exact ID sent to Nvidia NIM. Environment can override these
