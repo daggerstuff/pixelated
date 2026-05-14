@@ -3,6 +3,7 @@ Global exception handlers for the FastAPI application.
 """
 
 import structlog
+import os
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
@@ -53,6 +54,20 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         method=request.method,
         url=str(request.url),
     )
+    if os.getenv("BIAS_DETECTION_DISABLE_SENTRY", "").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": "internal_server_error",
+                "message": "An internal server error occurred",
+                "request_id": request.headers.get("X-Request-ID"),
+            },
+        )
     try:
         import sentry_sdk as _sentry_sdk
 

@@ -100,10 +100,10 @@ export const POST = async ({ request }) => {
     const exportResult = await createDataExportRequest({
       patientId,
       formats: [format as ExportFormat],
-      dataTypes: includeCategories || ['all'],
+      dataTypes: includeCategories ?? ['all'],
       reason: 'User-initiated export',
       priority: 'normal',
-      requestedBy: userId || 'unknown',
+      requestedBy: userId ?? 'unknown',
     })
 
     if (!exportResult.success) {

@@ -406,9 +406,9 @@ export class ClinicalKnowledgeBase {
     category: string,
   ) {
     const enhancedContext = {
-      relevantDiagnoses: [...(baseContext.relevantDiagnoses || [])],
-      contraindications: [...(baseContext.contraindications || [])],
-      specialConsiderations: [...(baseContext.specialConsiderations || [])],
+      relevantDiagnoses: [...(baseContext.relevantDiagnoses ?? [])],
+      contraindications: [...(baseContext.contraindications ?? [])],
+      specialConsiderations: [...(baseContext.specialConsiderations ?? [])],
     }
 
     // Crisis-specific enhancements

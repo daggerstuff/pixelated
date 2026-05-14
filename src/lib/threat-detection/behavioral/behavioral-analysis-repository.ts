@@ -8,8 +8,8 @@ const logger = createBuildSafeLogger('behavioral-analysis-repository')
  */
 export class BehavioralAnalysisRepository {
   constructor(
-    private mongoClient: IMongoClient,
-    private redis: IRedisClient,
+    private readonly mongoClient: IMongoClient,
+    private readonly redis: IRedisClient,
   ) {}
 
   async storeProfile(userId: string, profile: any): Promise<void> {

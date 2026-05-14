@@ -189,7 +189,7 @@ export default function EmotionTrackingChart({
                 arousal: 'Arousal (Calm/Excited)',
                 dominance: 'Dominance (Control)',
               }
-              return [`${value}/10`, dimensionLabels[name] || name]
+              return [`${value}/10`, dimensionLabels[name] ?? name]
             }}
             labelFormatter={(label) => new Date(label).toLocaleTimeString()}
           />

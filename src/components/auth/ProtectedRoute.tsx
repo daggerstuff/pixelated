@@ -14,7 +14,7 @@ export interface ProtectedRouteProps {
 /**
  * ProtectedRoute component - Protects routes that require authentication
  */
-export function ProtectedRoute({
+export async function ProtectedRoute({
   children,
   requiredRole,
   redirectTo = '/login',

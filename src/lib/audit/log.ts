@@ -38,7 +38,7 @@ export async function getUserAuditLogs(
     return events.map((event) => ({
       id: event.id,
       userId: event.userId,
-      action: String(event.action),
+      action: event.action,
       resource: {
         id: event.resourceId ?? '',
         type: event.resourceType,

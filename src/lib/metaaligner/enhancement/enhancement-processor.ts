@@ -25,7 +25,7 @@ export interface IEnhancementProcessor {
  * The EnhancementProcessor class.
  */
 export class EnhancementProcessor implements IEnhancementProcessor {
-  private enhancementHistory: string[] = []
+  private readonly enhancementHistory: string[] = []
 
   public async enhance(
     request: UnifiedProcessingRequest,

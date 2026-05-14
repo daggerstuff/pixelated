@@ -110,7 +110,7 @@ export function useCognitiveDistortionDetection({
             let evidence = ''
             for (const pattern of matchingPatterns) {
               const match = text.match(pattern)
-              if (match && match[0]) {
+              if (match?.[0]) {
                 evidence = match[0]
                 break
               }
@@ -195,7 +195,7 @@ export function useCognitiveDistortionDetection({
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error || 'Failed to detect cognitive distortions',
+            errorData.error ?? 'Failed to detect cognitive distortions',
           )
         }
 
@@ -278,7 +278,7 @@ export function useCognitiveDistortionDetection({
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error ||
+            errorData.error ??
               'Failed to detect cognitive distortions in batch',
           )
         }

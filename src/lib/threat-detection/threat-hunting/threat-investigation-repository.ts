@@ -9,8 +9,8 @@ const logger = createBuildSafeLogger('threat-investigation-repository')
  */
 export class ThreatInvestigationRepository {
   constructor(
-    private mongoClient: IMongoClient,
-    private redis: IRedisClient,
+    private readonly mongoClient: IMongoClient,
+    private readonly redis: IRedisClient,
   ) {}
 
   async store(investigation: Investigation): Promise<void> {

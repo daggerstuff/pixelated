@@ -60,7 +60,7 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 function resolveSafeLlmBaseUrl(): string | undefined {
   const llmBaseUrl = LLM_PROVIDER_BASE_URLS.map((key) => getEnvValue(key)).find(
     Boolean,
-  ) as string | undefined
+  )
 
   if (isOpenRouterBaseUrl(llmBaseUrl)) {
     console.warn(
@@ -237,12 +237,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create LLM service
     const llmService = createLLMService({
-      apiKey: resolveProviderApiKey() || '',
+      apiKey: resolveProviderApiKey() ?? '',
       baseUrl: resolveSafeLlmBaseUrl(),
     })
 
     // Use the model from the request or the default
-    const modelId = model || 'minimaxai/minimax-m2.7'
+    const modelId = model ?? 'minimaxai/minimax-m2.7'
 
     // Create an adapter for the AI service
     const serviceAdapter: AIService = {
@@ -257,7 +257,7 @@ export const POST: APIRoute = async ({ request }) => {
         return {
           id: `llm-${Date.now()}`,
           created: Date.now(),
-          model: options?.model || modelId,
+          model: options?.model ?? modelId,
           choices: [
             {
               message: {
@@ -278,18 +278,12 @@ export const POST: APIRoute = async ({ request }) => {
             response !== null &&
             'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
+                  promptTokens: ((response.usage as { promptTokens: number })
+                      ?.promptTokens || 0),
+                  completionTokens: ((response.usage as { completionTokens: number })
+                      ?.completionTokens || 0),
+                  totalTokens: ((response.usage as { totalTokens: number })?.totalTokens ||
+                      0),
                 }
               : {
                   promptTokens: 0,
@@ -311,7 +305,7 @@ export const POST: APIRoute = async ({ request }) => {
       ): Promise<AsyncGenerator<AIStreamChunk, void, void>> => {
         return llmService.createStreamingChatCompletion(_messages, {
           ...(options ?? {}),
-          model: options?.model || modelId,
+          model: options?.model ?? modelId,
         })
       },
       getModelInfo: (model: string) => ({
@@ -333,7 +327,7 @@ export const POST: APIRoute = async ({ request }) => {
         return {
           id: `llm-${Date.now()}`,
           created: Date.now(),
-          model: options?.model || modelId,
+          model: options?.model ?? modelId,
           choices: [
             {
               message: {
@@ -354,18 +348,12 @@ export const POST: APIRoute = async ({ request }) => {
             response !== null &&
             'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
+                  promptTokens: ((response.usage as { promptTokens: number })
+                      ?.promptTokens || 0),
+                  completionTokens: ((response.usage as { completionTokens: number })
+                      ?.completionTokens || 0),
+                  totalTokens: ((response.usage as { totalTokens: number })?.totalTokens ||
+                      0),
                 }
               : {
                   promptTokens: 0,
@@ -401,7 +389,7 @@ export const POST: APIRoute = async ({ request }) => {
       userId || 'anonymous',
       'response-generation',
       {
-        model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
         temperature,
         maxResponseTokens,
         messageCount: messages ? messages.length : 1,
@@ -431,7 +419,7 @@ export const POST: APIRoute = async ({ request }) => {
     trackApiRequest(endpoint, 'POST', 200, latencyMs)
     apiMetrics.responseTime(endpoint, latencyMs, 'POST')
     countMetric('ai.response.generated', 1, {
-      model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
       provider: 'llm',
       success: true,
     })
@@ -439,20 +427,20 @@ export const POST: APIRoute = async ({ request }) => {
     // Store the result in the database
     await aiRepository.storeResponseGeneration({
       userId: userId || 'anonymous',
-      modelId: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      modelId: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
       modelProvider: 'llm',
       latencyMs,
       success: true,
       error: null,
-      prompt: currentMessage || (messages ? JSON.stringify(messages) : ''),
+      prompt: currentMessage ?? (messages ? JSON.stringify(messages) : ''),
       response: result?.content,
       context: '',
       instructions,
       temperature,
       maxTokens: maxResponseTokens,
-      requestTokens: result?.usage?.promptTokens || 0,
-      responseTokens: result?.usage?.completionTokens || 0,
-      totalTokens: result?.usage?.totalTokens || 0,
+      requestTokens: result?.usage?.promptTokens ?? 0,
+      responseTokens: result?.usage?.completionTokens ?? 0,
+      totalTokens: result?.usage?.totalTokens ?? 0,
       metadata: {
         messageCount: messages ? messages.length : 1,
       },
@@ -465,7 +453,7 @@ export const POST: APIRoute = async ({ request }) => {
       userId || 'anonymous',
       'response-generation',
       {
-        model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
         responseLength: result?.content.length,
         latencyMs,
       },
@@ -494,7 +482,7 @@ export const POST: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.response.error',
-      userId || 'anonymous',
+      userId ?? 'anonymous',
       'response-generation',
       {
         error: error instanceof Error ? error?.message : String(error),

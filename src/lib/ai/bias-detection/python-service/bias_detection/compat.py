@@ -15,7 +15,7 @@ import numpy as np
 from .services.bias_detection_service import BiasDetectionService
 from .services.fairness_analyzer import FairnessAnalyzer
 from .services.placeholder_service import placeholder_service
-from .services.security_service import AuditLogger, SecurityManager
+from .services.security_service import AuditLogger as _ServiceAuditLogger, SecurityManager
 from .services.linguistic_service import LinguisticAnalyzer
 from .services.diagnostic_service import DiagnosticService
 
@@ -59,7 +59,7 @@ class _LegacyAuditLogger:
     def __init__(
         self, security_manager: SecurityManager, audit_file: str | None = None
     ) -> None:
-        self._legacy = AuditLogger(security_manager, audit_file)
+        self._legacy = _ServiceAuditLogger(security_manager, audit_file)
 
     @property
     def audit_file(self) -> str:
@@ -211,3 +211,7 @@ __all__ = [
     "SecurityManager",
     "SessionData",
 ]
+
+# Preserve historical import expectations from older tests and integration code.
+BiasDetectionService = LegacyBiasDetectionService
+AuditLogger = _LegacyAuditLogger

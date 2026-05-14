@@ -136,9 +136,9 @@ export function createThreatDetectionIntegration(
     bridge: threatDetectionService['rateLimitingBridge'],
 
     // Convenience methods
-    analyzeThreat: (threatData: unknown) =>
+    analyzeThreat:  async (threatData: unknown) =>
       threatDetectionService.analyzeThreat(threatData as ThreatData),
-    checkRequest: (identifier: string, context: unknown) =>
+    checkRequest:  async (identifier: string, context: unknown) =>
       threatDetectionService.checkRequest(
         identifier,
         context as {
@@ -150,8 +150,8 @@ export function createThreatDetectionIntegration(
           headers?: Record<string, string>
         },
       ),
-    getHealthStatus: () => threatDetectionService.getHealthStatus(),
-    getStatistics: () => threatDetectionService.getStatistics(),
+    getHealthStatus:  async () => threatDetectionService.getHealthStatus(),
+    getStatistics:  async () => threatDetectionService.getStatistics(),
   }
 }
 
@@ -263,7 +263,7 @@ export const expressMiddlewareConfig = {
         )
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(', ') : value || '',
+          Array.isArray(value) ? value.join(', ') : value ?? '',
         ]),
     ),
   }),
@@ -623,8 +623,8 @@ export const defaultThreatIntelligenceConfig: ThreatIntelligenceConfig = {
   updateInterval: 3600000, // 1 hour
   cacheTimeout: 86400000, // 24 hours
   apiKeys: {
-    alienvault: process.env.ALIENVAULT_API_KEY || '',
-    virustotal: process.env.VIRUSTOTAL_API_KEY || '',
-    abuseipdb: process.env.ABUSEIPDB_API_KEY || '',
+    alienvault: process.env.ALIENVAULT_API_KEY ?? '',
+    virustotal: process.env.VIRUSTOTAL_API_KEY ?? '',
+    abuseipdb: process.env.ABUSEIPDB_API_KEY ?? '',
   },
 }

@@ -64,7 +64,7 @@ const astroVite = await astroViteConfig({
   mode: process.env['VITEST_MODE'] ?? 'test',
   command: 'serve',
 })
-const astroPlugins = astroVite.plugins ? astroVite.plugins : []
+const astroPlugins = astroVite.plugins ?? []
 
 export default defineConfig({
   plugins: [react(), ...astroPlugins],

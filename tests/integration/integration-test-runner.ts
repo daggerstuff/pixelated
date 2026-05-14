@@ -65,8 +65,8 @@ const defaultConfig: IntegrationTestConfig = {
 }
 
 class IntegrationTestRunner {
-  private config: IntegrationTestConfig
-  private results: TestResult[] = []
+  private readonly config: IntegrationTestConfig
+  private readonly results: TestResult[] = []
   private startTime: number = 0
 
   constructor(config: IntegrationTestConfig = defaultConfig) {
@@ -232,8 +232,8 @@ class IntegrationTestRunner {
       const duration = Date.now() - startTime
 
       // Parse results (simplified parsing)
-      const passed = (result.match(/✓/g) || []).length
-      const failed = (result.match(/✗/g) || []).length
+      const passed = (result.match(/✓/g) ?? []).length
+      const failed = (result.match(/✗/g) ?? []).length
 
       this.results.push({
         suite: suiteName,
@@ -338,7 +338,7 @@ class IntegrationTestRunner {
           const startTime = Date.now()
 
           const options: any = {
-            method: benchmark.method || 'GET',
+            method: benchmark.method ?? 'GET',
             headers:
               benchmark.method === 'POST'
                 ? { 'Content-Type': 'application/json' }
@@ -402,7 +402,7 @@ class IntegrationTestRunner {
     console.log('✅ Cleanup completed')
   }
 
-  private delay(ms: number): Promise<void> {
+  private  async delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }

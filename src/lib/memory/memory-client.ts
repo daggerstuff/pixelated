@@ -178,7 +178,7 @@ export const memoryManager = {
 
     if (category) {
       results = results.filter(
-        (m) => (m.metadata?.category || 'general') === category,
+        (m) => (m.metadata?.category ?? 'general') === category,
       )
     }
 
@@ -198,7 +198,7 @@ export const memoryManager = {
     ensureUser(userId)
     return store
       .get(userId)!
-      .filter((m) => (m.metadata?.category || 'general') === category)
+      .filter((m) => (m.metadata?.category ?? 'general') === category)
   },
 
   async searchByTags(
@@ -216,13 +216,13 @@ export const memoryManager = {
     const list = store.get(userId)!
     const categoryCounts: Record<string, number> = {}
     for (const m of list) {
-      const cat = m.metadata?.category || 'general'
+      const cat = m.metadata?.category ?? 'general'
       categoryCounts[cat] = (categoryCounts[cat] || 0) + 1
     }
     return {
       totalMemories: list.length,
       categoryCounts,
-      recentActivity: (history.get(userId) || []).slice(-10).reverse(),
+      recentActivity: (history.get(userId) ?? []).slice(-10).reverse(),
     }
   },
 
@@ -274,7 +274,7 @@ export const memoryManager = {
 
   async getMemoryHistory(userId = 'default') {
     ensureUser(userId)
-    return [...(history.get(userId) || [])]
+    return [...(history.get(userId) ?? [])]
   },
 }
 

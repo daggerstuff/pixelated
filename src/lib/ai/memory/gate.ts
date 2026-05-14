@@ -9,7 +9,7 @@ const appLogger = createBuildSafeLogger('socratic-gate');
  * Middleman for memory ingestion. Ensures psychological safety and data quality.
  */
 export class SocraticGate {
-  private tagger: MemoryCrisisTagger;
+  private readonly tagger: MemoryCrisisTagger;
 
   constructor(tagger: MemoryCrisisTagger) {
     this.tagger = tagger;

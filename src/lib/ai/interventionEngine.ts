@@ -61,7 +61,7 @@ class InterventionEngine {
             'hurt myself',
             'die',
           ]
-          const transcript = session.transcript?.toLowerCase() || ''
+          const transcript = session.transcript?.toLowerCase() ?? ''
           return crisisKeywords.some((keyword) => transcript.includes(keyword))
         },
         suggestions: [
@@ -91,8 +91,8 @@ class InterventionEngine {
         name: 'Anxiety Management',
         description: 'Interventions for elevated anxiety levels',
         condition: (session, patient) => {
-          const anxietyIndicators = session.emotionAnalysis?.anxiety || 0
-          const baseline = patient.baselineMetrics?.anxiety || 0.3
+          const anxietyIndicators = session.emotionAnalysis?.anxiety ?? 0
+          const baseline = patient.baselineMetrics?.anxiety ?? 0.3
           return anxietyIndicators > baseline * 1.5
         },
         suggestions: [
@@ -121,8 +121,8 @@ class InterventionEngine {
         name: 'Depression Pattern Recognition',
         description: 'Long-term depression pattern interventions',
         condition: (session, patient) => {
-          const sessionCount = patient.sessionHistory?.length || 0
-          const recentSessions = patient.sessionHistory?.slice(-5) || []
+          const sessionCount = patient.sessionHistory?.length ?? 0
+          const recentSessions = patient.sessionHistory?.slice(-5) ?? []
 
           if (sessionCount < 5) return false
 
@@ -160,8 +160,8 @@ class InterventionEngine {
         name: 'Therapeutic Alliance Enhancement',
         description: 'Strengthen therapist-patient relationship',
         condition: (session, patient) => {
-          const rapportScore = session.therapeuticMetrics?.rapport || 0.5
-          const sessionNumber = patient.sessionHistory?.length || 0
+          const rapportScore = session.therapeuticMetrics?.rapport ?? 0.5
+          const sessionNumber = patient.sessionHistory?.length ?? 0
 
           return rapportScore < 0.6 && sessionNumber > 2
         },
@@ -191,7 +191,7 @@ class InterventionEngine {
         name: 'Progress Recognition',
         description: 'Acknowledge and reinforce therapeutic progress',
         condition: (session, patient) => {
-          const currentMood = session.emotionAnalysis?.moodScore || 0.5
+          const currentMood = session.emotionAnalysis?.moodScore ?? 0.5
           const recentAverage = this.calculateRecentMoodAverage(patient)
 
           return currentMood > recentAverage * 1.2 // 20% improvement
@@ -219,11 +219,11 @@ class InterventionEngine {
   }
 
   private calculateRecentMoodAverage(patient: PatientProfile): number {
-    const recentSessions = patient.sessionHistory?.slice(-5) || []
+    const recentSessions = patient.sessionHistory?.slice(-5) ?? []
     if (recentSessions.length === 0) return 0.5
 
     const sum = recentSessions.reduce(
-      (acc, session) => acc + (session.emotionAnalysis?.moodScore || 0.5),
+      (acc, session) => acc + (session.emotionAnalysis?.moodScore ?? 0.5),
       0,
     )
     return sum / recentSessions.length
@@ -319,7 +319,7 @@ class InterventionEngine {
     }
 
     // Check session frequency
-    const daysSinceLastSession = patientProfile.daysSinceLastSession || 0
+    const daysSinceLastSession = patientProfile.daysSinceLastSession ?? 0
     if (daysSinceLastSession > 14) {
       recommendations.push(
         'Consider increasing session frequency for more intensive support',
@@ -330,7 +330,7 @@ class InterventionEngine {
     const recentEmotions =
       patientProfile.sessionHistory
         ?.slice(-3)
-        .map((s) => s.emotionAnalysis?.dominantEmotion) || []
+        .map((s) => s.emotionAnalysis?.dominantEmotion) ?? []
     if (recentEmotions.every((emotion) => emotion === 'anxious')) {
       recommendations.push(
         'Consider anxiety-focused interventions in next session',

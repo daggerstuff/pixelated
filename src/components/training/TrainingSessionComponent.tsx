@@ -76,7 +76,7 @@ const ROLE_TEXT_CONFIG = {
 export function TrainingSessionComponent() {
   const { data: session } = authClient.useSession()
   // Use authenticated user ID, fallback to demo user for development/testing
-  const userId = session?.user?.id || 'demo-therapist'
+  const userId = session?.user?.id ?? 'demo-therapist'
   const sessionId = 'session-1'
   const [therapistResponse, setTherapistResponse] = useState('')
   const [conversation, setConversation] = useState<ConversationEntry[]>([
@@ -207,7 +207,7 @@ export function TrainingSessionComponent() {
       return 'Bias analysis unavailable.'
     }
 
-    const recommendations = biasResult.recommendations?.join(', ') || 'None'
+    const recommendations = biasResult.recommendations?.join(', ') ?? 'None'
     return `Bias Score: ${biasResult.overallScore} | Risk Level: ${biasResult.riskLevel}\nRecommendations: ${recommendations}`
   }
 
@@ -295,7 +295,7 @@ export function TrainingSessionComponent() {
         id: `note-${Date.now()}-${noteAuthorId}`,
         authorId: noteAuthorId,
         content: noteContent,
-        timestamp: String(msg.payload?.timestamp || new Date().toISOString()),
+        timestamp: String(msg.payload?.timestamp ?? new Date().toISOString()),
       }
 
       setCoachingNotes((prev) => [...prev, coachingNote])
@@ -363,8 +363,8 @@ export function TrainingSessionComponent() {
       if (history && history.length > 0) {
         setConversation(
           history.map((m) => ({
-            id: `msg-${m.createdAt?.toString() || ''}-${m.id || m.content}`,
-            role: (m.metadata?.role || 'client') as 'client' | 'therapist',
+            id: `msg-${m.createdAt?.toString() ?? ''}-${m.id || m.content}`,
+            role: (m.metadata?.role ?? 'client') as 'client' | 'therapist',
             message: m.content,
           })),
         )
@@ -378,12 +378,12 @@ export function TrainingSessionComponent() {
     isAuthenticatedRef.current = false
 
     const wsUrl =
-      import.meta.env.PUBLIC_TRAINING_WS_URL || 'ws://localhost:8084'
+      import.meta.env.PUBLIC_TRAINING_WS_URL ?? 'ws://localhost:8084'
     const websocket = new WebSocket(wsUrl)
     ws.current = websocket
 
     websocket.onopen = async () => {
-      const authToken = (await getJournalResearchAuthToken()) || ''
+      const authToken = (await getJournalResearchAuthToken()) ?? ''
       websocket.send(
         JSON.stringify({
           type: 'authenticate',
@@ -445,7 +445,7 @@ export function TrainingSessionComponent() {
 
   // Helper function to send authentication
   const sendAuthentication = useCallback(async (websocket: WebSocket) => {
-    const authToken = (await getJournalResearchAuthToken()) || ''
+    const authToken = (await getJournalResearchAuthToken()) ?? ''
     websocket.send(
       JSON.stringify({
         type: 'authenticate',

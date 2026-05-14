@@ -104,7 +104,7 @@ describeFn('analytics Integration', () => {
       }))
 
       const operations = events.map(
-        (event) => () => analytics.trackEvent(event),
+        (event) =>  async () => analytics.trackEvent(event),
       )
 
       await runConcurrentOperations(operations, {
@@ -160,7 +160,7 @@ describeFn('analytics Integration', () => {
 
       // Record metric values
       await Promise.all(
-        values.map((value) =>
+        values.map( async (value) =>
           analytics.trackMetric({
             name: metricName,
             value,
@@ -257,7 +257,7 @@ describeFn('analytics Integration', () => {
 
       // Track user activity through events
       await Promise.all(
-        users.map((userId) =>
+        users.map( async (userId) =>
           analytics.trackEvent({
             type: EventType.USER_ACTION,
             priority: EventPriority.NORMAL,
@@ -328,7 +328,7 @@ describeFn('analytics Integration', () => {
       await monitorMemoryUsage(
         async () => {
           const operations = users.map(
-            (userId) => () =>
+            (userId) =>  async () =>
               analytics.trackEvent({
                 type: EventType.USER_ACTION,
                 priority: EventPriority.NORMAL,
@@ -408,7 +408,7 @@ describeFn('analytics Integration', () => {
       const largeValue = 'x'.repeat(1024 * 1024) // 1MB string
 
       // Attempt to store large values
-      const promises = Array.from({ length: 100 }, () =>
+      const promises = Array.from({ length: 100 },  async () =>
         analytics.trackMetric({
           name: metricName,
           value: 1,
@@ -435,7 +435,7 @@ describeFn('analytics Integration', () => {
       }))
 
       const { duration, throughput } = await runConcurrentOperations(
-        events.map((event) => () => analytics.trackEvent(event)),
+        events.map((event) =>  async () => analytics.trackEvent(event)),
         {
           description: 'High throughput event tracking',
           expectedDuration: 10000,
@@ -475,7 +475,7 @@ describeFn('analytics Integration', () => {
             }))
 
             await Promise.all(
-              events.map((event) => analytics.trackEvent(event)),
+              events.map( async (event) => analytics.trackEvent(event)),
             )
           }
         },

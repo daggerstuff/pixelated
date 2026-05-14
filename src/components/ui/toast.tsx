@@ -169,7 +169,7 @@ export const toast = {
   },
 
   // Promise toast with proper TypeScript generics
-  promise: function promiseToast<T>(
+  promise:  async function promiseToast<T>(
     promise: Promise<T>,
     messages: ToastPromiseMessages<T>,
     options?: Partial<ToastOptions>,

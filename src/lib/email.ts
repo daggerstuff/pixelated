@@ -41,7 +41,7 @@ export interface EmailResult {
  * Email Service for sending notifications and communications
  */
 export class EmailService {
-  private config: EmailConfig
+  private readonly config: EmailConfig
 
   constructor(config: EmailConfig) {
     this.config = config
@@ -324,10 +324,10 @@ export function getEmailService(): EmailService {
   if (!emailServiceInstance) {
     const config: EmailConfig = {
       provider: 'smtp',
-      fromEmail: process.env['FROM_EMAIL'] || 'noreply@pixelated.health',
-      fromName: process.env['FROM_NAME'] || 'Pixelated Mental Health Platform',
+      fromEmail: process.env['FROM_EMAIL'] ?? 'noreply@pixelated.health',
+      fromName: process.env['FROM_NAME'] ?? 'Pixelated Mental Health Platform',
       smtpHost: process.env['SMTP_HOST'],
-      smtpPort: Number.parseInt(process.env['SMTP_PORT'] || '587'),
+      smtpPort: Number.parseInt(process.env['SMTP_PORT'] ?? '587'),
       smtpUser: process.env['SMTP_USER'],
       smtpPassword: process.env['SMTP_PASSWORD'],
       apiKey: process.env['EMAIL_API_KEY'],

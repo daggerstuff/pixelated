@@ -67,7 +67,7 @@ const CACHE_TAGS = {
  * Advanced cache key generator with versioning
  */
 class CacheKeyGenerator {
-  private version: string
+  private readonly version: string
 
   constructor(version: string = 'v1') {
     this.version = version
@@ -110,9 +110,9 @@ class CacheKeyGenerator {
  * Advanced caching strategy with multi-layer support
  */
 export class AdvancedCacheStrategy {
-  private cache = getCache()
-  private keyGenerator = new CacheKeyGenerator()
-  private invalidation = createCacheInvalidation({
+  private readonly cache = getCache()
+  private readonly keyGenerator = new CacheKeyGenerator()
+  private readonly invalidation = createCacheInvalidation({
     redis: this.cache,
     prefix: 'pixelated:',
     defaultTTL: CACHE_CONFIG.TTL.L2_CACHE,
@@ -232,14 +232,14 @@ export class AdvancedCacheStrategy {
       await this.cache.set(
         key,
         dataToCache,
-        options.ttl || CACHE_CONFIG.TTL.L2_CACHE,
+        options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE,
       )
 
       // Add tags for invalidation
       if (options.tags && options.tags.length > 0) {
         const rule = {
           tags: options.tags,
-          ttl: options.ttl || CACHE_CONFIG.TTL.L2_CACHE,
+          ttl: options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE,
         }
         await this.invalidation.set(key, value, rule)
       }
@@ -289,7 +289,7 @@ export class AdvancedCacheStrategy {
       demographics: params.demographics
         ? JSON.stringify(params.demographics)
         : 'none',
-      context: params.context || 'none',
+      context: params.context ?? 'none',
     })
 
     return this.get(key, {
@@ -318,13 +318,13 @@ export class AdvancedCacheStrategy {
       demographics: params.demographics
         ? JSON.stringify(params.demographics)
         : 'none',
-      context: params.context || 'none',
+      context: params.context ?? 'none',
     })
 
     // Use shorter TTL for high-bias results to ensure freshness
     const ttl = options.highBias
-      ? (options.ttl || CACHE_CONFIG.TTL.L2_CACHE) / 2
-      : options.ttl || CACHE_CONFIG.TTL.L2_CACHE
+      ? (options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE) / 2
+      : options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE
 
     await this.set(key, result, {
       ttl,
@@ -422,7 +422,7 @@ export class AdvancedCacheStrategy {
     const batchSize = CACHE_CONFIG.PERFORMANCE.BATCH_SIZE
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize)
-      const batchPromises = batch.map((item) =>
+      const batchPromises = batch.map( async (item) =>
         this.set(item.key, item.value, {
           ttl: item.ttl,
           tags: item.tags,
@@ -541,7 +541,7 @@ export class AdvancedCacheStrategy {
  * Cache warming service
  */
 export class CacheWarmingService {
-  private cache: AdvancedCacheStrategy
+  private readonly cache: AdvancedCacheStrategy
 
   constructor() {
     this.cache = new AdvancedCacheStrategy()
@@ -592,7 +592,7 @@ export class CacheWarmingService {
       { key: 'monthly_summary', days: 30 },
     ]
 
-    const warmupPromises = analyticsKeys.map(({ key, days }) =>
+    const warmupPromises = analyticsKeys.map( async ({ key, days }) =>
       this.cache.getAnalytics(key, days),
     )
 

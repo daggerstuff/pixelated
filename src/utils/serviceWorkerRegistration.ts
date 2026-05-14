@@ -29,8 +29,8 @@ const defaultConfig = {
  */
 export class ServiceWorkerManager {
   private registration: ServiceWorkerRegistration | null = null
-  private debug: boolean
-  private config: typeof defaultConfig
+  private readonly debug: boolean
+  private readonly config: typeof defaultConfig
 
   constructor(config = defaultConfig) {
     this.config = config

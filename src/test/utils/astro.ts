@@ -52,11 +52,9 @@ async function applyRenderSetup(result: unknown, container: HTMLDivElement) {
  * @param slotContent Optional content to pass to the default slot
  * @returns The rendered component
  */
-export async function renderAstro<
-  Props extends Record<string, unknown> = Record<string, unknown>,
->(
+export async function renderAstro(
   Component: unknown,
-  props?: Props,
+  props?: Record<string, unknown>,
   slotContent?: string,
 ): Promise<{
   astroContainer: HTMLDivElement

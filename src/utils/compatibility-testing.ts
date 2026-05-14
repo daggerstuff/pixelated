@@ -25,7 +25,7 @@ export function removeIssue(id: number): void {
  */
 export function displayIssues() {
   const issues = getStoredIssues()
-  const container = document.getElementById('issues-container') as HTMLElement
+  const container = document.getElementById('issues-container')!
 
   if (!container) {
     return
@@ -63,7 +63,7 @@ export function displayIssues() {
  */
 function getStoredIssues(): CompatibilityIssue[] {
   return JSON.parse(
-    localStorage.getItem('compatibility-issues') || '[]',
+    localStorage.getItem('compatibility-issues') ?? '[]',
   ) as CompatibilityIssue[]
 }
 

@@ -63,7 +63,7 @@ def cmd_discover(args):
             pass
 
 
-def cmd_generate(args):  # noqa: PLR0912
+def cmd_generate(args):
     """Generate samples from specified source."""
 
     # Select source based on stage and args

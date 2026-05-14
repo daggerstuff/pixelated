@@ -9,7 +9,7 @@ const appLogger = createBuildSafeLogger('app')
  */
 class ContinuousValidationRunner {
   private initialised = false
-  private history: Array<{ timestamp: string; outcome: string }> = []
+  private readonly history: Array<{ timestamp: string; outcome: string }> = []
 
   async initialize(): Promise<void> {
     if (!this.initialised) {

@@ -1,7 +1,7 @@
 export class LRUCache<K, V> {
-  private cache = new Map<K, V>()
+  private readonly cache = new Map<K, V>()
 
-  constructor(private maxSize: number) {
+  constructor(private readonly maxSize: number) {
     if (maxSize <= 0) {
       throw new Error('LRUCache maxSize must be positive')
     }

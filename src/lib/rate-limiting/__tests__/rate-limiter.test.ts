@@ -16,14 +16,14 @@ vi.mock('../../redis', () => {
   const store = new Map<string, string>()
   const pipeline = {
     incr: vi.fn().mockImplementation((key) => {
-      const current = parseInt(store.get(key) || '0')
+      const current = parseInt(store.get(key) ?? '0')
       store.set(key, (current + 1).toString())
       return pipeline
     }),
     expire: vi.fn().mockImplementation(() => pipeline),
     hincrby: vi.fn().mockImplementation(() => pipeline),
     hset: vi.fn().mockImplementation(() => pipeline),
-    exec: vi.fn().mockImplementation(() =>
+    exec: vi.fn().mockImplementation( async () =>
       Promise.resolve([
         [null, 1],
         [null, 1],
@@ -36,22 +36,22 @@ vi.mock('../../redis', () => {
       _store: store,
       get: vi
         .fn()
-        .mockImplementation((key) => Promise.resolve(store.get(key) || null)),
-      set: vi.fn().mockImplementation((key, val) => {
+        .mockImplementation( async (key) => Promise.resolve(store.get(key) ?? null)),
+      set: vi.fn().mockImplementation( async (key, val) => {
         store.set(key, typeof val === 'string' ? val : JSON.stringify(val))
         return Promise.resolve('OK')
       }),
-      setex: vi.fn().mockImplementation((key, sec, val) => {
+      setex: vi.fn().mockImplementation( async (key, sec, val) => {
         store.set(key, typeof val === 'string' ? val : JSON.stringify(val))
         return Promise.resolve('OK')
       }),
-      del: vi.fn().mockImplementation((key) => {
+      del: vi.fn().mockImplementation( async (key) => {
         store.delete(key)
         return Promise.resolve(1)
       }),
       exists: vi
         .fn()
-        .mockImplementation((key) => Promise.resolve(store.has(key) ? 1 : 0)),
+        .mockImplementation( async (key) => Promise.resolve(store.has(key) ? 1 : 0)),
       expire: vi.fn().mockResolvedValue(1),
       ping: vi.fn().mockResolvedValue('PONG'),
       pipeline: vi.fn().mockReturnValue(pipeline),
@@ -147,7 +147,7 @@ describe('DistributedRateLimiter', () => {
         ...pipeline,
         exec: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
       }
-      vi.mocked(redis.pipeline).mockReturnValueOnce(failingPipeline as any)
+      vi.mocked(redis.pipeline).mockReturnValueOnce(failingPipeline)
 
       const rule: RateLimitRule = {
         name: 'test_rule',

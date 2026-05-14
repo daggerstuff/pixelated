@@ -10,7 +10,7 @@ const reactTypeof = Symbol.for('react.element')
 function errorIsComingFromPreactComponent(err) {
   return (
     err.message &&
-    (err.message.startsWith("Cannot read property '__H'") ||
+    (err.message.startsWith("Cannot read property '__H'") ??
       err.message.includes("(reading '__H')"))
   )
 }
@@ -46,7 +46,7 @@ function check(Component, props, children) {
   const Tester = (...args) => {
     try {
       const vnode = Component(...args)
-      if (vnode && vnode['$$typeof'] === reactTypeof) {
+      if (vnode?.['$$typeof'] === reactTypeof) {
         isReactComponent = true
       }
     } catch (err) {

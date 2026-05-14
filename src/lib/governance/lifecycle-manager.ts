@@ -18,9 +18,9 @@ export interface RetentionRecord {
 }
 
 export class LifecycleManager {
-  private retentionRecords: Map<string, RetentionRecord> = new Map()
+  private readonly retentionRecords: Map<string, RetentionRecord> = new Map()
   // Alias for secure deletion operations
-  private records: Map<string, RetentionRecord> = this.retentionRecords
+  private readonly records: Map<string, RetentionRecord> = this.retentionRecords
 
   /**
    * Apply a retention policy to a record

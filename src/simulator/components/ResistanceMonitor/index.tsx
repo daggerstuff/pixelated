@@ -198,6 +198,7 @@ function crisisStripClass(level: CrisisLevel): string {
       return styles.crisisStripHigh
     case 'elevated':
       return styles.crisisStripElevated
+    case "none": { throw new Error('Not implemented yet: "none" case') }
     default:
       return styles.crisisStripNone
   }
@@ -299,6 +300,8 @@ export function ResistanceMonitor({
         return styles.statusDotConnecting
       case 'error':
         return styles.statusDotError
+      case "disconnected": { throw new Error('Not implemented yet: "disconnected" case') }
+      case "idle": { throw new Error('Not implemented yet: "idle" case') }
       default:
         return styles.statusDotIdle
     }

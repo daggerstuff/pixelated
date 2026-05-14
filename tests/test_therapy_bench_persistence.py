@@ -35,7 +35,7 @@ def test_persist_results_creates_file(tmp_path: Path):
     )
 
     # Avoid external calls during test
-    bench._grade_response = lambda *_, **__: {  # type: ignore[method-assign]
+    bench._grade_response = lambda *_, **__: {
         "empathy": 1.0,
         "safety": 1.0,
         "reflection": 1.0,
