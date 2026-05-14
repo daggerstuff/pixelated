@@ -58,22 +58,21 @@ class StorageClientFactory {
   private s3Client: S3Client | null = null
 
   constructor(
-    private readonly endpoint: string = process.env['HETZNER_ENDPOINT'] ||
+    private readonly endpoint: string = process.env['HETZNER_ENDPOINT'] ??
       'https://hel1.your-objectstorage.com',
-    private readonly bucketName: string = process.env['HETZNER_BUCKET_NAME'] ||
+    private readonly bucketName: string = process.env['HETZNER_BUCKET_NAME'] ??
       'business-strategy-cms-uploads',
-    private readonly region: string = process.env['HETZNER_REGION'] || 'hel1',
+    private readonly region: string = process.env['HETZNER_REGION'] ?? 'hel1',
     private readonly accessKeyId: string = process.env[
       'HETZNER_ACCESS_KEY_ID'
-    ] || '',
+    ] ?? '',
     private readonly secretAccessKey: string = process.env[
       'HETZNER_SECRET_ACCESS_KEY'
-    ] || '',
+    ] ?? '',
   ) {}
 
   getS3Client(): S3Client {
-    if (!this.s3Client) {
-      this.s3Client = new S3Client({
+    this.s3Client ??= new S3Client({
         endpoint: this.getEndpoint(),
         credentials: {
           accessKeyId: this.accessKeyId,
@@ -81,8 +80,7 @@ class StorageClientFactory {
         },
         region: this.region,
         forcePathStyle: true,
-      })
-    }
+      });
 
     return this.s3Client
   }
@@ -126,9 +124,9 @@ export class MediaService {
     folder?: string,
   ): Promise<MediaUpload> {
     const uniqueSuffix = uuidv4()
-    const fileExtension = file.originalname.split('.').pop() || ''
+    const fileExtension = file.originalname.split('.').pop() ?? ''
     const filename = `${uniqueSuffix}.${fileExtension}`
-    const uploadFolder = folder || this.getFolderByFileType(file.mimetype)
+    const uploadFolder = folder ?? this.getFolderByFileType(file.mimetype)
     const key = `${userId}/${uploadFolder}/${filename}`
     const fileSize = this.getUploadedFileSize(file)
 
@@ -284,16 +282,16 @@ export class MediaService {
       }),
     )
 
-    const metadata = result.Metadata || {}
-    const uploadedBy = metadata['uploaded-by'] || ''
-    const originalName = metadata['original-name'] || ''
+    const metadata = result.Metadata ?? {}
+    const uploadedBy = metadata['uploaded-by'] ?? ''
+    const originalName = metadata['original-name'] ?? ''
 
     return {
       key,
-      size: result.ContentLength || 0,
-      lastModified: result.LastModified || new Date(),
-      contentType: result.ContentType || 'application/octet-stream',
-      etag: result.ETag || '',
+      size: result.ContentLength ?? 0,
+      lastModified: result.LastModified ?? new Date(),
+      contentType: result.ContentType ?? 'application/octet-stream',
+      etag: result.ETag ?? '',
       uploadedBy,
       originalName,
       metadata: {
@@ -352,8 +350,8 @@ export class MediaService {
   }): MediaListItem {
     return {
       key: file.Key,
-      lastModified: file.LastModified || new Date(),
-      size: file.Size || 0,
+      lastModified: file.LastModified ?? new Date(),
+      size: file.Size ?? 0,
       url: null,
     }
   }
@@ -388,7 +386,7 @@ export class MediaService {
     }
 
     await Promise.all(
-      Array.from({ length: concurrencyLimit }, (_, workerIndex) =>
+      Array.from({ length: concurrencyLimit },  async (_, workerIndex) =>
         worker(workerIndex),
       ),
     )

@@ -66,7 +66,7 @@ test.describe('Psychology Pipeline Demo - Complete Workflow', () => {
       const overallScore = await page
         .locator('[data-testid="overall-score"]')
         .textContent()
-      expect(parseInt(overallScore || '0')).toBeGreaterThan(70)
+      expect(parseInt(overallScore ?? '0')).toBeGreaterThan(70)
     })
 
     // Step 3: Category Balancing
@@ -99,7 +99,7 @@ test.describe('Psychology Pipeline Demo - Complete Workflow', () => {
       const balanceScore = await page
         .locator('[data-testid="balance-score"]')
         .textContent()
-      expect(parseInt(balanceScore || '0')).toBeGreaterThan(80)
+      expect(parseInt(balanceScore ?? '0')).toBeGreaterThan(80)
     })
 
     // Step 4: Results Export

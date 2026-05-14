@@ -7,8 +7,8 @@ const logger = createBuildSafeLogger('component-integration-service')
  * Provides a unified interface for all enterprise components to access backend data
  */
 export class ComponentIntegrationService {
-  private baseUrl: string
-  private authHeaders: HeadersInit
+  private readonly baseUrl: string
+  private readonly authHeaders: HeadersInit
 
   constructor(baseUrl: string = '', authToken?: string) {
     this.baseUrl = baseUrl

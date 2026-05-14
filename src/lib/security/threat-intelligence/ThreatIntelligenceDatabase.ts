@@ -170,7 +170,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
   private isInitialized = false
   private indexingInterval: NodeJS.Timeout | null = null
 
-  constructor(private config: ThreatIntelligenceDatabaseConfig) {
+  constructor(private readonly config: ThreatIntelligenceDatabaseConfig) {
     super()
     this.setMaxListeners(0)
   }
@@ -352,7 +352,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
           confidence: metadata.confidence,
           reliability: metadata.reliability,
           collection_id: metadata.collection_id,
-          tags: metadata.tags || [],
+          tags: metadata.tags ?? [],
           processed: false,
           validated: false,
         },
@@ -605,8 +605,8 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         this.stixCollection
           .find(filter)
           .sort({ 'stix_object.created': -1 })
-          .skip(query.offset || 0)
-          .limit(query.limit || 100)
+          .skip(query.offset ?? 0)
+          .limit(query.limit ?? 100)
           .toArray(),
         this.stixCollection.countDocuments(filter),
       ])
@@ -747,10 +747,10 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       const limit = Math.min(
-        options.limit || 100,
+        options.limit ?? 100,
         this.config.taxii.max_page_size,
       )
-      const offset = options.offset || 0
+      const offset = options.offset ?? 0
 
       const [objects, _total] = await Promise.all([
         this.stixCollection
@@ -937,7 +937,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       // Update processed data
-      let updatedData = stixObject
+      const updatedData = stixObject
       if (this.config.encryption.enabled && obj.encrypted_data) {
         const encryptedData = await encrypt(
           JSON.stringify(updatedData),
@@ -1180,12 +1180,12 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         this.stixCollection.countDocuments({ 'metadata.validated': true }),
       ])
 
-      const byTypeMap = byType.reduce(
+      const byTypeMap = byType.reduce< Record<string, number>>(
         (acc, item) => {
           acc[item._id] = item.count
           return acc
         },
-        {} as Record<string, number>,
+        {},
       )
 
       return {
@@ -1282,7 +1282,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         throw new Error('Invalid STIX bundle format')
       }
 
-      const objects = bundle.objects || []
+      const objects = bundle.objects ?? []
       let imported = 0
       const errors: string[] = []
 

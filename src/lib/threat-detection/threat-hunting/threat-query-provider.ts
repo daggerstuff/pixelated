@@ -10,15 +10,15 @@ const logger = createBuildSafeLogger('threat-query-provider')
  */
 export class ThreatQueryProvider {
   // P4.2: TTL Cache for counts with size limit (max 100 entries)
-  private searchCountCache = new Map<
+  private readonly searchCountCache = new Map<
     string,
     { count: number; isCapped: boolean; expires: number }
   >()
   private readonly MAX_CACHE_SIZE = 100
 
   constructor(
-    private redis: IRedisClient,
-    private mongoClient: IMongoClient,
+    private readonly redis: IRedisClient,
+    private readonly mongoClient: IMongoClient,
   ) {}
 
   /**

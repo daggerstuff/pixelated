@@ -164,9 +164,9 @@ export interface ICrisisNotificationHandler {
 }
 
 export class NotificationService {
-  private emailService: EmailService
-  private wsClients: Map<string, WebSocket>
-  private templates: Map<string, NotificationTemplate>
+  private readonly emailService: EmailService
+  private readonly wsClients: Map<string, WebSocket>
+  private readonly templates: Map<string, NotificationTemplate>
   private vapidKeys: { publicKey: string; privateKey: string } | null = null
   private readonly queueKey = 'notification_queue'
   private readonly processingKey = 'notification_processing'
@@ -175,10 +175,10 @@ export class NotificationService {
   constructor() {
     const emailConfig: EmailConfig = {
       provider: 'smtp',
-      fromEmail: config.email.from() || 'noreply@example.com',
+      fromEmail: config.email.from() ?? 'noreply@example.com',
       fromName: 'Pixelated Empathy',
       smtpHost: process.env['SMTP_HOST'],
-      smtpPort: Number.parseInt(process.env['SMTP_PORT'] || '587'),
+      smtpPort: Number.parseInt(process.env['SMTP_PORT'] ?? '587'),
       smtpUser: process.env['SMTP_USER'],
       smtpPassword: process.env['SMTP_PASSWORD'],
       apiKey: process.env['EMAIL_API_KEY'],
@@ -304,7 +304,7 @@ export class NotificationService {
         alias: template.id,
         subject: template.title,
         htmlBody: template.body,
-        from: config.email.from() || 'noreply@example.com',
+        from: config.email.from() ?? 'noreply@example.com',
       })
     }
   }
@@ -330,8 +330,8 @@ export class NotificationService {
       title: template.title,
       body: template.body,
       data: data.data,
-      channels: data.channels || template.channels,
-      priority: data.priority || template.priority,
+      channels: data.channels ?? template.channels,
+      priority: data.priority ?? template.priority,
       status: NotificationStatus.PENDING,
       createdAt: Date.now(),
       deliveredAt: null,
@@ -746,7 +746,7 @@ export class NotificationService {
  * (e.g., email, SMS, PagerDuty, Slack, dedicated monitoring dashboard).
  */
 export class ConsoleNotificationService implements ICrisisNotificationHandler {
-  private logger = console // Or use a more sophisticated logger
+  private readonly logger = console // Or use a more sophisticated logger
 
   async sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void> {
     this.logger.error(

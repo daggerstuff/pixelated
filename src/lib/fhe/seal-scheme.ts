@@ -12,7 +12,7 @@ import type { FHEScheme } from './types'
  * Implementation of the SEAL FHE scheme
  */
 export class SealScheme implements FHEScheme {
-  private schemeType: SealSchemeType
+  private readonly schemeType: SealSchemeType
 
   /**
    * Create a new SealScheme instance

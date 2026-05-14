@@ -245,7 +245,7 @@ export function validateContextCoverage(
   // Check for duplicate contexts
   const contextCounts = new Map<ContextType, number>()
   for (const mapping of config.mappings) {
-    const count = contextCounts.get(mapping.context) || 0
+    const count = contextCounts.get(mapping.context) ?? 0
     contextCounts.set(mapping.context, count + 1)
   }
 
@@ -365,7 +365,7 @@ export function validateMappingConfiguration(config: MappingConfiguration): {
   if (config.normalization === 'enabled') {
     for (const mapping of config.mappings) {
       const sum = Object.values(mapping.weights).reduce(
-        (acc, w) => acc + (w || 0),
+        (acc, w) => acc + (w ?? 0),
         0,
       )
       // Allow small floating point errors

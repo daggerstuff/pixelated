@@ -20,8 +20,8 @@ describe('privacy utilities', () => {
       expect(parts[1]?.length).toBeGreaterThan(0)
       expect(parts[2]?.length).toBeGreaterThan(0)
       // Check that the segments contain only alphanumeric characters (base36)
-      expect(/^[0-9a-z]+$/.test(parts[1] as string)).toBe(true)
-      expect(/^[0-9a-z]+$/.test(parts[2] as string)).toBe(true)
+      expect(/^[0-9a-z]+$/.test(parts[1])).toBe(true)
+      expect(/^[0-9a-z]+$/.test(parts[2])).toBe(true)
     })
   })
 

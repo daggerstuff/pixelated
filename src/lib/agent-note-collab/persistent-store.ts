@@ -50,7 +50,7 @@ const LOCK_RETRY_DELAY_MS = 75
 const LOCK_MAX_RETRIES = 200
 const COMPACTION_AFTER_BYTES = 2_097_152
 
-function sleep(ms: number): Promise<void> {
+ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
@@ -99,7 +99,7 @@ async function readStoredTurns(
       return { turns: parsed.filter(isNoteTurn), hasValidSnapshot: true }
     }
 
-    const payload = parsed as Partial<PersistedLedgerFile>
+    const payload = parsed
     if (
       payload.version === LEDGER_FILE_VERSION &&
       Array.isArray(payload.turns)

@@ -22,7 +22,7 @@ export interface SessionStats {
 type Subscriber = (stats: SessionStats) => void
 
 export class SessionAnalysisService {
-  private subscribers: Set<Subscriber> = new Set()
+  private readonly subscribers: Set<Subscriber> = new Set()
   private lastStats: SessionStats | null = null
   private pending: boolean = false
 
@@ -81,7 +81,7 @@ export class SessionAnalysisService {
       }
       if (msg.personaContext?.traits) {
         msg.personaContext.traits.forEach((trait) => {
-          personaTagCounts[trait] = (personaTagCounts[trait] || 0) + 1
+          personaTagCounts[trait] = (personaTagCounts[trait] ?? 0) + 1
         })
       }
     })

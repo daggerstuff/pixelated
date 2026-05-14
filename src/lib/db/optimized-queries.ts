@@ -53,9 +53,9 @@ export async function executeQuery<T = unknown>(
   } = {},
 ): Promise<QueryResult<T>> {
   const startTime = Date.now()
-  const queryName = options.name || 'unnamed'
-  const timeout = options.timeout || QUERY_CONFIG.TIMEOUT_MS
-  const maxRetries = options.retries || QUERY_CONFIG.MAX_RETRIES
+  const queryName = options.name ?? 'unnamed'
+  const timeout = options.timeout ?? QUERY_CONFIG.TIMEOUT_MS
+  const maxRetries = options.retries ?? QUERY_CONFIG.MAX_RETRIES
 
   let lastError: Error | null = null
 
@@ -133,8 +133,8 @@ export async function executeTransaction<T>(
   } = {},
 ): Promise<T> {
   const startTime = Date.now()
-  const transactionName = options.name || 'unnamed'
-  const timeout = options.timeout || QUERY_CONFIG.TIMEOUT_MS
+  const transactionName = options.name ?? 'unnamed'
+  const timeout = options.timeout ?? QUERY_CONFIG.TIMEOUT_MS
 
   const client = await getPool().connect()
 
@@ -326,7 +326,7 @@ export class OptimizedBiasQueries {
       timeout: 2000, // 2 second timeout for cache lookups
     })
 
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   /**
@@ -477,7 +477,7 @@ export class OptimizedBiasQueries {
       name: 'getCacheHitRate',
     })
     const cacheHitRate =
-      (cacheResult.rows[0] as { cache_hit_rate: string } | {}).cache_hit_rate ||
+      (cacheResult.rows[0] as { cache_hit_rate: string } | {}).cache_hit_rate ??
       0
 
     return {

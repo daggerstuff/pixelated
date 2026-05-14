@@ -33,7 +33,7 @@ const NotificationChannel = {
 const mockFetch = vi.fn<() => Promise<Response>>()
 global.fetch = mockFetch
 
-function createMockResponse<T>(body: T): Response {
+function createMockResponse(body: unknown): Response {
   return {
     ok: true,
     async json() {

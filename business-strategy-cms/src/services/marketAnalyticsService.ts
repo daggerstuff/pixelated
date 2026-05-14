@@ -6,7 +6,7 @@ import { Logger } from '../utils/logger'
 // import { DatabaseService } from './databaseService'
 
 export class MarketAnalyticsService {
-  private logger: Logger
+  private readonly logger: Logger
   constructor() {
     this.logger = new Logger('MarketAnalyticsService')
   }
@@ -291,7 +291,7 @@ export class MarketAnalyticsService {
 
     const forecast = []
     let currentMarketSize =
-      historicalData[historicalData.length - 1]?.marketSize || 1000000
+      historicalData[historicalData.length - 1]?.marketSize ?? 1000000
 
     for (let month = 1; month <= forecastPeriod; month++) {
       const growthMultiplier = 1 + trends.growthRate / 100 / 12
@@ -337,7 +337,7 @@ export class MarketAnalyticsService {
     return Object.fromEntries(
       segments.map((segment) => [
         segment,
-        mockData[segment] || { current: 0, total: 1000 },
+        mockData[segment] ?? { current: 0, total: 1000 },
       ]),
     )
   }

@@ -78,7 +78,7 @@ const MAX_COLLECTED_LOGS = 1000
  * Logger class for consistent logging
  */
 export class Logger {
-  private options: LoggerOptions
+  private readonly options: LoggerOptions
 
   constructor(options?: Partial<LoggerOptions>) {
     this.options = {
@@ -86,12 +86,12 @@ export class Logger {
       ...options,
       // Ensure phiPatterns is an array even if options.phiPatterns is undefined
       phiPatterns: [
-        ...(DEFAULT_OPTIONS.phiPatterns || []),
-        ...(options?.phiPatterns || []),
+        ...(DEFAULT_OPTIONS.phiPatterns ?? []),
+        ...(options?.phiPatterns ?? []),
       ],
       sanitizeFields: [
-        ...(DEFAULT_OPTIONS.sanitizeFields || []),
-        ...(options?.sanitizeFields || []),
+        ...(DEFAULT_OPTIONS.sanitizeFields ?? []),
+        ...(options?.sanitizeFields ?? []),
       ],
     }
   }
@@ -167,9 +167,9 @@ export class Logger {
     patterns?: RegExp[],
     sensitiveKeys?: string[],
   ): LogMetadataValue {
-    const currentPatterns = patterns || this.options.phiPatterns || []
+    const currentPatterns = (patterns ?? this.options.phiPatterns) ?? []
     const currentSensitiveKeys =
-      sensitiveKeys || this.options.sanitizeFields || []
+      (sensitiveKeys ?? this.options.sanitizeFields) ?? []
 
     if (typeof data === 'string') {
       return this.sanitizeString(data, currentPatterns)
@@ -224,7 +224,7 @@ export class Logger {
       return str === undefined ? '' : String(str) // Handle undefined or non-string types gracefully
     }
     let sanitizedStr = str
-    const currentPatterns = patterns || this.options.phiPatterns || []
+    const currentPatterns = (patterns ?? this.options.phiPatterns) ?? []
     for (const pattern of currentPatterns) {
       // Ensure the pattern has the global flag for multiple replacements
       const globalPattern = new RegExp(
@@ -272,7 +272,7 @@ export class Logger {
     // Important: Ensure the console methods themselves don't cause issues or bypass sanitization
     // if a custom console object is used that does its own formatting with raw objects.
     // Here, we pass the already formatted string and the sanitized metadata separately.
-    const consoleOutputMetadata = sanitizedMetadata || {}
+    const consoleOutputMetadata = sanitizedMetadata ?? {}
 
     switch (level) {
       case LogLevel.DEBUG:
@@ -307,7 +307,7 @@ export class Logger {
       LogLevel.ERROR,
     ]
     const configuredLevelIndex = levels.indexOf(
-      this.options.level || LogLevel.INFO,
+      this.options.level ?? LogLevel.INFO,
     )
     const logLevelIndex = levels.indexOf(level)
 
@@ -373,7 +373,7 @@ let _globalLoggerInstance: Logger | undefined
  */
 export function getLogger(options?: Partial<LoggerOptions>): Logger {
   if (!_globalLoggerInstance || options) {
-    _globalLoggerInstance = new Logger(options || {})
+    _globalLoggerInstance = new Logger(options ?? {})
   }
   return _globalLoggerInstance
 }

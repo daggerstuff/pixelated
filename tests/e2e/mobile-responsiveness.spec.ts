@@ -45,7 +45,7 @@ mobileDevices.forEach((device) => {
         await expect(uploadArea).toBeVisible()
 
         const uploadBox = await uploadArea.boundingBox()
-        expect(uploadBox?.width).toBeLessThanOrEqual(viewport?.width || 0)
+        expect(uploadBox?.width).toBeLessThanOrEqual(viewport?.width ?? 0)
 
         // Test file format cards stack properly on mobile
         const formatCards = page.locator('[data-testid="format-card"]')
@@ -77,7 +77,7 @@ mobileDevices.forEach((device) => {
 
         const textAreaBox = await textArea.boundingBox()
         expect(textAreaBox?.width).toBeLessThanOrEqual(
-          (viewport?.width || 0) - 40,
+          (viewport?.width ?? 0) - 40,
         ) // Account for padding
 
         // Test validation results layout
@@ -120,7 +120,7 @@ mobileDevices.forEach((device) => {
 
             const cardBox = await card.boundingBox()
             expect(cardBox?.width).toBeLessThanOrEqual(
-              (viewport?.width || 0) - 20,
+              (viewport?.width ?? 0) - 20,
             )
           }
         }
@@ -152,7 +152,7 @@ mobileDevices.forEach((device) => {
             const option = formatOptions.nth(i)
             const optionBox = await option.boundingBox()
             expect(optionBox?.width).toBeLessThanOrEqual(
-              (viewport?.width || 0) - 20,
+              (viewport?.width ?? 0) - 20,
             )
           }
         }

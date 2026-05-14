@@ -12,9 +12,9 @@ interface ProgressDataDisplayProps {
 }
 
 export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
-  labels = [],
-  userData = [],
-  benchmarkData = [],
+  labels,
+  userData,
+  benchmarkData,
   color,
   title,
   benchmarkLabel,

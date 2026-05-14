@@ -34,7 +34,7 @@ export interface MonitoringService {
 class ErrorLoggingService {
   private monitoringService?: MonitoringService
   private errorQueue: ErrorLogEntry[] = []
-  private maxQueueSize = 100
+  private readonly maxQueueSize = 100
   private isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true
 
   constructor() {

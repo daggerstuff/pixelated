@@ -422,13 +422,13 @@ export function StatePersistenceDebugger() {
         />
         <button
           onClick={() =>
-            (document.getElementById('import-input') as HTMLElement)?.click()
+            (document.getElementById('import-input')!)?.click()
           }
         >
           Import
         </button>
         <button onClick={createBackup}>Backup</button>
-        <button onClick={() => confirm('Clear all state?') && clearAllState()}>
+        <button onClick={ async () => confirm('Clear all state?') && clearAllState()}>
           Clear
         </button>
       </div>

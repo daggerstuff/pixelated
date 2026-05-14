@@ -426,7 +426,7 @@ export default function CrisisDetectionDemo() {
                 {realTimeMonitoring ? 'Disable' : 'Enable'} Real-time
               </Button>
               <Button
-                onClick={() => performCrisisAssessment(false)}
+                onClick={ async () => performCrisisAssessment(false)}
                 disabled={assessing || inputText.trim().length < 5}
                 className='bg-red-600 hover:bg-red-700 flex items-center gap-2'
               >
@@ -706,7 +706,7 @@ export default function CrisisDetectionDemo() {
 
                 <Button
                   variant='outline'
-                  onClick={() => performCrisisAssessment(false)}
+                  onClick={ async () => performCrisisAssessment(false)}
                   disabled={assessing}
                 >
                   Re-assess Risk

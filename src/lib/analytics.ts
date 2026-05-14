@@ -95,8 +95,8 @@ export class AnalyticsService {
   private config: AnalyticsConfig
   private eventBuffer: AnalyticsEvent[] = []
   private flushTimer: NodeJS.Timeout | null = null
-  private sessionId: string
-  private anonymousId: string
+  private readonly sessionId: string
+  private readonly anonymousId: string
 
   /**
    * Private constructor (singleton pattern)
@@ -267,7 +267,7 @@ export class AnalyticsService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] || '',
+          'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] ?? '',
         },
         body: JSON.stringify({
           events,
@@ -488,7 +488,7 @@ export class AnalyticsService {
       {
         page,
         referrer:
-          referrer ||
+          referrer ??
           (typeof document !== 'undefined' ? document.referrer : 'unknown'),
         title: typeof document !== 'undefined' ? document.title : 'unknown',
       },
@@ -671,7 +671,7 @@ export class AnalyticsService {
   /**
    * Force flush the event buffer
    */
-  public forceFlush(): Promise<void> {
+  public  async forceFlush(): Promise<void> {
     return this.flush()
   }
 }

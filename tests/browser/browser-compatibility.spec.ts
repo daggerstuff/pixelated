@@ -107,30 +107,22 @@ test('CSS feature support check', async ({ page, browserName }) => {
   const cssFeatures = await page.evaluate(() => {
     return {
       flexbox:
-        window.CSS &&
-        window.CSS.supports &&
-        window.CSS.supports('display', 'flex'),
+        window.CSS?.supports?.('display', 'flex'),
       grid:
-        window.CSS &&
-        window.CSS.supports &&
-        window.CSS.supports('display', 'grid'),
+        window.CSS?.supports?.('display', 'grid'),
       variables:
-        window.CSS && window.CSS.supports && window.CSS.supports('(--a: 0)'),
+        window.CSS?.supports?.('(--a: 0)'),
       sticky:
-        window.CSS &&
-        window.CSS.supports &&
+        window.CSS?.supports &&
         (window.CSS.supports('position', 'sticky') ||
           window.CSS.supports('position', '-webkit-sticky')),
       animations: 'animation' in document.documentElement.style,
       filters:
-        window.CSS &&
-        window.CSS.supports &&
+        window.CSS?.supports &&
         (window.CSS.supports('filter', 'blur(5px)') ||
           window.CSS.supports('-webkit-filter', 'blur(5px)')),
       aspectRatio:
-        window.CSS &&
-        window.CSS.supports &&
-        window.CSS.supports('aspect-ratio', '16/9'),
+        window.CSS?.supports?.('aspect-ratio', '16/9'),
     }
   })
 

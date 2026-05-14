@@ -40,8 +40,8 @@ interface ContactSubmissionContext {
 }
 
 export class ContactService {
-  private emailService: EmailService
-  private templates = new Map<string, { html: string; text: string }>()
+  private readonly emailService: EmailService
+  private readonly templates = new Map<string, { html: string; text: string }>()
   private initializationPromise: Promise<void> | null = null
   private isInitialized = false
 
@@ -84,8 +84,8 @@ export class ContactService {
       await this.emailService.upsertTemplate({
         alias: 'contact-form-notification',
         subject: 'New Contact Form Submission - {{subject}}',
-        htmlBody: this.templates.get('contact-form')?.html || '',
-        textBody: this.templates.get('contact-form')?.text || '',
+        htmlBody: this.templates.get('contact-form')?.html ?? '',
+        textBody: this.templates.get('contact-form')?.text ?? '',
         from: 'noreply@pixelatedempathy.com',
         replyTo: '{{email}}', // Reply to the user who submitted the form
       })
@@ -93,8 +93,8 @@ export class ContactService {
       await this.emailService.upsertTemplate({
         alias: 'contact-confirmation',
         subject: 'Thank you for contacting Pixelated Empathy',
-        htmlBody: this.templates.get('contact-confirmation')?.html || '',
-        textBody: this.templates.get('contact-confirmation')?.text || '',
+        htmlBody: this.templates.get('contact-confirmation')?.html ?? '',
+        textBody: this.templates.get('contact-confirmation')?.text ?? '',
         from: 'noreply@pixelatedempathy.com',
         replyTo: 'info@pixelatedempathy.com',
       })
@@ -289,7 +289,7 @@ export class ContactService {
 
     // Check for suspicious patterns
     if (data.message.includes('http://') || data.message.includes('https://')) {
-      const urlCount = (data.message.match(/https?:\/\/[^\s]+/g) || []).length
+      const urlCount = (data.message.match(/https?:\/\/[^\s]+/g) ?? []).length
       if (urlCount > 2) {
         throw new Error('SECURITY: Too many URLs in message')
       }
@@ -300,7 +300,7 @@ export class ContactService {
     const wordCounts = new Map<string, number>()
     for (const word of words) {
       if (word.length > 3) {
-        wordCounts.set(word, (wordCounts.get(word) || 0) + 1)
+        wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1)
       }
     }
 

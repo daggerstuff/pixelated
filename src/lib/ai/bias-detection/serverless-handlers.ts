@@ -14,18 +14,18 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
     try {
       // Transform serverless event to standard request format
       const req = {
-        method: event.httpMethod || event.method || 'GET',
-        headers: event.headers || {},
-        query: event.queryStringParameters || {},
+        method: (event.httpMethod ?? event.method) ?? 'GET',
+        headers: event.headers ?? {},
+        query: event.queryStringParameters ?? {},
         body: event.body ? (JSON.parse(event.body) as unknown) : null,
-        path: event.path || event.rawPath || '/',
+        path: (event.path ?? event.rawPath) ?? '/',
       }
 
       const response = await handler(req)
 
       // Return serverless response format
       return {
-        statusCode: response.statusCode || 200,
+        statusCode: response.statusCode ?? 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
@@ -33,7 +33,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
           ...response.headers,
         },
-        body: response.body || JSON.stringify({ message: 'OK' }),
+        body: response.body ?? JSON.stringify({ message: 'OK' }),
       }
     } catch (error: unknown) {
       console.error('Serverless handler error:', error)
@@ -57,7 +57,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
  * Validates request format for serverless compatibility
  */
 export function validateServerlessRequest(event: any): boolean {
-  return !!(event && (event.httpMethod || event.method))
+  return !!(event && (event.httpMethod ?? event.method))
 }
 
 /**

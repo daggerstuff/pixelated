@@ -6,8 +6,8 @@ import json
 from typing import Any
 
 try:
-    import asyncpg  # type: ignore
-except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    import asyncpg
+except ModuleNotFoundError:
     asyncpg = None
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine

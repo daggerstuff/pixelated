@@ -38,7 +38,7 @@ export class CircuitBreaker {
   private lastSuccessTime?: Date
   private stateChangedAt = new Date()
   private requestWindow: Array<{ timestamp: Date; success: boolean }> = []
-  private config: CircuitBreakerConfig
+  private readonly config: CircuitBreakerConfig
 
   constructor(config: Partial<CircuitBreakerConfig> = {}) {
     this.config = {

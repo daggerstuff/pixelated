@@ -186,7 +186,7 @@ export function ImprovedBiasInterface({
             className='w-full rounded border p-2'
           />
           <button
-            onClick={() =>
+            onClick={ async () =>
               startAnalysis({
                 scenario: 'general',
                 demographics: {

@@ -204,7 +204,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
     const exportData = createExportData(
       analysisResults,
       counterfactualScenarios,
-      historicalComparison || {
+      historicalComparison ?? {
         thirtyDayAverage: 0,
         sevenDayTrend: 'stable' as const,
         percentileRank: 50,

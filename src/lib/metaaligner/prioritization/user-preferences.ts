@@ -105,8 +105,8 @@ export interface PreferenceValidationResult {
  * Manages user preferences with validation, storage, and application logic.
  */
 export class UserPreferenceManager {
-  private preferences: Map<string, UserPreferences> = new Map()
-  private defaultPreferences: UserPreferences
+  private readonly preferences: Map<string, UserPreferences> = new Map()
+  private readonly defaultPreferences: UserPreferences
 
   constructor(defaultPreferences: UserPreferences = DEFAULT_PREFERENCES) {
     this.defaultPreferences = defaultPreferences
@@ -141,7 +141,7 @@ export class UserPreferenceManager {
    * Get preferences for a user
    */
   getPreferences(userId: string): UserPreferences {
-    return this.preferences.get(userId) || this.defaultPreferences
+    return this.preferences.get(userId) ?? this.defaultPreferences
   }
 
   /**

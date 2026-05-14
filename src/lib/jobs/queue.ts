@@ -43,11 +43,11 @@ export interface EnqueueOptions {
 
 export class JobQueueService {
   private static instance: JobQueueService
-  private queueKey = 'jobs:queue'
-  private processingKey = 'jobs:processing'
-  private completedKey = 'jobs:completed'
-  private failedKey = 'jobs:failed'
-  private jobStatusKeyPrefix = 'job:status:'
+  private readonly queueKey = 'jobs:queue'
+  private readonly processingKey = 'jobs:processing'
+  private readonly completedKey = 'jobs:completed'
+  private readonly failedKey = 'jobs:failed'
+  private readonly jobStatusKeyPrefix = 'job:status:'
 
   private constructor() {
     logger.info('JobQueueService initialized')
@@ -79,7 +79,7 @@ export class JobQueueService {
     }
 
     const jobString = JSON.stringify(job)
-    const score = options?.priority || 0 // For sorted set, higher score = higher priority
+    const score = options?.priority ?? 0 // For sorted set, higher score = higher priority
 
     if (options?.delay) {
       // Schedule job to be added to queue after delay
@@ -148,14 +148,14 @@ export class JobQueueService {
         status,
         updatedAt: new Date().toISOString(),
       }
-    } else if (updates && updates.type && updates.payload) {
+    } else if (updates?.type && updates.payload) {
       // If job doesn't exist in status, but we have enough info to create it (e.g., from enqueue)
       job = {
         id: jobId,
         type: updates.type,
         payload: updates.payload,
         status,
-        createdAt: updates.createdAt || new Date().toISOString(),
+        createdAt: updates.createdAt ?? new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         ...updates,
       } as Job
@@ -189,6 +189,8 @@ export class JobQueueService {
         await redis.hset(this.failedKey, jobId, JSON.stringify(job)) // Store cancelled in failed for review
         logger.info('Job cancelled', { jobId, type: job.type })
         break
+      case JobStatus.PENDING: { throw new Error('Not implemented yet: JobStatus.PENDING case') }
+      case JobStatus.IN_PROGRESS: { throw new Error('Not implemented yet: JobStatus.IN_PROGRESS case') }
       default:
         // For PENDING and IN_PROGRESS, it remains in the status hash and potentially processing list
         break

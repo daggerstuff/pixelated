@@ -48,7 +48,7 @@ export const cleanupTemporaryData = () => {
 
   // Force garbage collection if possible (not directly possible in standard JavaScript)
   // This is just illustrative
-  if (typeof global !== 'undefined' && global.gc) {
+  if (global?.gc) {
     try {
       global.gc()
     } catch (e) {
@@ -68,7 +68,7 @@ export const verifyPrivacySettings = (): string[] => {
   const issues: string[] = []
 
   // Check for localStorage usage
-  if (typeof window !== 'undefined' && window.localStorage) {
+  if (window?.localStorage) {
     try {
       // Set a test item
       localStorage.setItem('privacy_test', 'test')
@@ -88,7 +88,7 @@ export const verifyPrivacySettings = (): string[] => {
   }
 
   // Check for indexedDB usage
-  if (typeof window !== 'undefined' && window.indexedDB) {
+  if (window?.indexedDB) {
     issues.push('Browser indexedDB is enabled')
   }
 
@@ -181,7 +181,7 @@ export function checkBrowserCompatibility(): {
   const missingFeatures: string[] = []
 
   // Check for WebRTC support (for real-time processing)
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  if (!navigator.mediaDevices?.getUserMedia) {
     missingFeatures.push('WebRTC/getUserMedia')
   }
 

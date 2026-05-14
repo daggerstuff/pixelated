@@ -251,16 +251,10 @@ force_single_line = false
 addopts = "-ra --strict-markers"
 testpaths = ["tests", "ai/core/tests"]
 norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
+asyncio_default_fixture_loop_scope = "function"
 markers = [
   "integration: marks tests as integration tests (require external services)",
   "slow: marks tests as slow running",
-]
-filterwarnings = [
-  "ignore:.*WordPiece.*:DeprecationWarning",
-  "ignore:.*swig.*:DeprecationWarning",
-  "ignore:.*Swig.*:DeprecationWarning",
-  "ignore:::EventletDeprecationWarning:sentry_sdk",
-  "ignore:::LangChainPendingDeprecationWarning",
 ]
 [tool.coverage.run]
 branch = true

@@ -95,8 +95,8 @@ export interface SwitcherTelemetry {
 export class ObjectiveSwitcher {
   private currentObjectives: ObjectivePriority[] = []
   private lastContext?: ContextEvent
-  private observers: Set<ObjectiveSwitchObserver> = new Set()
-  private weightingStrategy: ObjectiveWeightingStrategy
+  private readonly observers: Set<ObjectiveSwitchObserver> = new Set()
+  private readonly weightingStrategy: ObjectiveWeightingStrategy
   private auditLog: SwitchAuditLog[] = []
   private telemetry: SwitcherTelemetry = {
     objective_switch_count: 0,
@@ -105,13 +105,13 @@ export class ObjectiveSwitcher {
     failed_switches: 0,
     observer_notifications: 0,
   }
-  private config: Required<Omit<ObjectiveSwitcherConfig, 'initialContext'>>
+  private readonly config: Required<Omit<ObjectiveSwitcherConfig, 'initialContext'>>
   private switchInProgress = false
   private pendingSwitch: ContextTransition | null = null
 
   constructor(config: ObjectiveSwitcherConfig = {}) {
     this.config = {
-      weightingStrategy: config.weightingStrategy || defaultWeightingStrategy,
+      weightingStrategy: config.weightingStrategy ?? defaultWeightingStrategy,
       enableTelemetry: config.enableTelemetry ?? true,
       enableAuditLog: config.enableAuditLog ?? true,
       maxAuditLogSize: config.maxAuditLogSize ?? 100,

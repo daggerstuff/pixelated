@@ -52,10 +52,7 @@ export const FEATURES: Record<string, FeatureDefinition> = {
     name: 'CSSVariables',
     description: 'Support for CSS custom properties',
     detectionFn: () =>
-      typeof window !== 'undefined' &&
-      window.CSS &&
-      window.CSS.supports &&
-      window.CSS.supports('--a', '0'),
+      window.CSS?.supports?.('--a', '0'),
   },
   Fetch: {
     name: 'Fetch',
@@ -89,7 +86,7 @@ export const FEATURES: Record<string, FeatureDefinition> = {
         return (
           !!window.WebGLRenderingContext &&
           !!(
-            canvas.getContext('webgl') ||
+            canvas.getContext('webgl') ??
             canvas.getContext('experimental-webgl')
           )
         )
@@ -106,9 +103,9 @@ export const FEATURES: Record<string, FeatureDefinition> = {
         return false
       }
       const elem = document.createElement('canvas')
-      if (elem.getContext && elem.getContext('2d')) {
+      if (elem.getContext?.('2d')) {
         // Check if webp dataURL can be created
-        return elem.toDataURL('image/webp').indexOf('data:image/webp') === 0
+        return elem.toDataURL('image/webp').startsWith('data:image/webp')
       }
       return false
     },
@@ -144,8 +141,7 @@ export const FEATURES: Record<string, FeatureDefinition> = {
         return (
           typeof navigator !== 'undefined' &&
           'share' in navigator &&
-          navigator.canShare &&
-          navigator.canShare({ files: [] })
+          navigator.canShare?.({ files: [] })
         )
       } catch {
         return false
@@ -286,7 +282,7 @@ export function withFeature<T>(
 // Helper function to dynamically import a module
 // This adds a layer of abstraction that helps TypeScript
 // ignore the actual import path at compile time
-function dynamicImport(modulePath: string): Promise<unknown> {
+ async function dynamicImport(modulePath: string): Promise<unknown> {
   return import(modulePath)
 }
 
