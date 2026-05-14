@@ -27,8 +27,8 @@ _copilot_safe_sanitize_model() {
 sanitize_model_flags() {
   local -n __output_ref="$1"
   shift
-  local -a input=("$@")
-  local -a output=()
+  local input=("$@")
+  local output=()
   local arg
   local skip_next=0
   local index
