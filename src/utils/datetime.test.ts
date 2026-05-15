@@ -22,11 +22,14 @@ describe('datetime utils', () => {
     it('returns false if preTime is undefined', () => {
       expect(isDiffMonth('2024-03-15T12:00:00Z')).toBe(false)
     })
-    it('returns false if months are the same', () => {
+    it('returns false if months and years are the same', () => {
       expect(isDiffMonth('2024-03-15T12:00:00Z', '2024-03-01T12:00:00Z')).toBe(false)
     })
     it('returns true if months are different', () => {
       expect(isDiffMonth('2024-04-15T12:00:00Z', '2024-03-15T12:00:00Z')).toBe(true)
+    })
+    it('returns true if years are different', () => {
+      expect(isDiffMonth('2024-03-15T12:00:00Z', '2023-03-15T12:00:00Z')).toBe(true)
     })
   })
 
