@@ -21,9 +21,6 @@ from ai.memory.unified_memory import (
     MemoryProvider,
 )
 
-pytestmark = pytest.mark.skip(reason="Module ai.memory.unified_memory not implemented")
-
-
 class TestMemoryCategory:
     """Test MemoryCategory enum."""
 
