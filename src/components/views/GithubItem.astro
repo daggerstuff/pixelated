@@ -127,9 +127,5 @@ const sanitizedContent = content
       </div>
     </div>
   </summary>
-  {
-    sanitizedContent && (
-      <div class="prose github-item-prose" set:html={sanitizedContent} />
-    )
-  }
+  <div class="prose github-item-prose" set:html={sanitizedContent || ''} />
 </details>
