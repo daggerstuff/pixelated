@@ -13,7 +13,7 @@ import type {
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className='animate-pulse' role='status' aria-label='Loading data'>
+  <div className='animate-pulse' role='status'>
     <div className='bg-gray-200 mb-4 h-4 w-3/4 rounded'></div>
     <div className='space-y-2'>
       <div className='bg-gray-200 h-3 rounded'></div>
