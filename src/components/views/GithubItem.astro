@@ -124,5 +124,5 @@ const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: {
       </div>
     </div>
   </summary>
-  <div class="prose github-item-prose" set:html={sanitizedContent} />
+  {sanitizedContent && <div class="prose github-item-prose" set:html={sanitizedContent} />}
 </details>
