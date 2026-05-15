@@ -184,7 +184,7 @@ jobs:
           fi
 
       - name: Upload SARIF results as artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@65474929f620d15768caa62e6e497dfe48b7d8e
         if: always() && steps.codeql-sarif.outputs.found == 'true'
         with:
           name: codeql-sarif-${{ matrix.language }}
@@ -192,7 +192,7 @@ jobs:
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@65474929f620d15768caa62e6e497dfe48b7d8e
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}
