@@ -217,7 +217,7 @@ export default function SearchBox({
     >
       {/* Screen reader announcement for search results */}
       <div className='sr-only' aria-live='polite' role='status'>
-        {isSearchReady && query.length >= minQueryLength
+        {isSearchReady && query === debouncedQuery && query.length >= minQueryLength
           ? hasResults
             ? `${results.length} result${results.length === 1 ? '' : 's'} found.`
             : showNoResults
