@@ -13,7 +13,8 @@ import type {
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className="animate-pulse">
+  <div className="animate-pulse" role="status">
+    <span className="sr-only">Loading...</span>
     <div className="bg-gray-200 mb-4 h-4 w-3/4 rounded"></div>
     <div className="space-y-2">
       <div className="bg-gray-200 h-3 rounded"></div>
@@ -216,9 +217,6 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div role="status" className="sr-only">
-          Loading summary statistics...
-        </div>
         {[1, 2, 3].map((i) => (
           <div key={i} className="bg-white rounded-lg p-4 shadow">
             <LoadingSkeleton />
