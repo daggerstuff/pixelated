@@ -15,7 +15,6 @@ const baseNodeTestGlobs = [
   'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
   'tests/unit/auth0/**/*.test.ts',
   'tests/integration/auth0/**/*.test.ts',
-  'src/utils/**/*.test.ts',
   'src/lib/redis.test.ts',
 ] as const
 
