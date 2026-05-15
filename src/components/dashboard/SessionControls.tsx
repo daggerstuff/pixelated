@@ -83,7 +83,7 @@ export function SessionControls({
               ? 'bg-blue-600 text-white hover:opacity-90'
               : 'bg-gray-200 text-gray-500',
             'px-3 py-2 rounded transition-opacity',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
@@ -104,7 +104,7 @@ export function SessionControls({
               ? 'bg-green-600 text-white hover:opacity-90'
               : 'bg-gray-200 text-gray-500',
             'px-3 py-2 rounded transition-opacity',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
@@ -125,7 +125,7 @@ export function SessionControls({
               ? 'bg-red-600 text-white hover:opacity-90'
               : 'bg-gray-200 text-gray-500',
             'px-3 py-2 rounded transition-opacity',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >

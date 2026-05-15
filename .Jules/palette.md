@@ -13,12 +13,12 @@ Action: Always add explicit aria-labels and check for .trim() empty states on su
 Learning: Repeated icon and text buttons inside loops create ambiguous announcements for screen reader users.
 Action: Use loop variables to provide specific, dynamically generated aria-labels.
 
-## 2026-05-15 - Time Range Selectors
-
-Learning: Custom time range buttons visually act as toggle buttons, but without aria-pressed state fails.
-Action: Added `aria-pressed={true/false}` and grouped them with role="group".
-
 ## 2026-04-20 - Group roles and interactive button feedback
 
 Learning: Elements with role="group" need an accessible name (aria-label).
 Action: Added aria-label to role="group" and comprehensive styling to SessionControls buttons.
+
+## 2026-05-15 - Time Range Selectors
+
+Learning: Custom time range buttons visually act as toggle buttons, but without aria-pressed state fails.
+Action: Added `aria-pressed={true/false}` and grouped them with role="group".
