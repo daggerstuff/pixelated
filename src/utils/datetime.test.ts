@@ -32,6 +32,10 @@ describe('datetime utils', () => {
     it('returns true if months are different', () => {
       expect(isDiffMonth('2024-04-15T12:00:00Z', '2024-03-15T12:00:00Z')).toBe(true)
     })
+
+    it('returns true if years are different even in the same month', () => {
+      expect(isDiffMonth('2024-03-15T12:00:00Z', '2023-03-15T12:00:00Z')).toBe(true)
+    })
   })
 
   describe('isSameYear', () => {
