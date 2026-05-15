@@ -11,7 +11,7 @@ References:
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -28,12 +28,15 @@ def audit_logger():
 @pytest.fixture
 def mock_encryption_service():
     """Mock encryption service for testing"""
+
     class MockEncryptionService:
-        def encrypt(self, data):
+        def encrypt(self, _data: dict[str, object]) -> str:
             return "encrypted_data_mock"
-        def decrypt(self, data):
+
+        def decrypt(self, _data: dict[str, object]) -> dict[str, object]:
             return {"sensitive": "data"}
-    yield MockEncryptionService()
+
+    return MockEncryptionService()
 
 
 @pytest.fixture
@@ -43,53 +46,56 @@ def mock_session():
         "session_id": "test-session-123",
         "user_id": "user-456",
         "role": "therapist",
-        "created_at": datetime.utcnow().isoformat(),
-        "last_activity": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
+        "last_activity": datetime.now(UTC).isoformat(),
     }
 
 
 class TestAuditTrailLogging:
     """Test HIPAA requirement: Audit controls to record and examine activity"""
 
-    def test_audit_event_generated_for_login(self, audit_logger):
+    @pytest.mark.usefixtures("audit_logger")
+    def test_audit_event_generated_for_login(self):
         """Verify login events are logged with required fields"""
         # This tests the audit logging infrastructure
         event = {
             "event_type": "USER_LOGIN",
             "user_id": "user-123",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "ip_address": "192.168.1.1",
-            "details": {"success": True}
+            "details": {"success": True},
         }
 
         assert event["event_type"] == "USER_LOGIN"
         assert "timestamp" in event
         assert "user_id" in event
 
-    def test_audit_event_generated_for_phi_access(self, audit_logger):
+    @pytest.mark.usefixtures("audit_logger")
+    def test_audit_event_generated_for_phi_access(self):
         """Verify PHI access events are logged"""
         event = {
             "event_type": "PHI_ACCESS",
             "user_id": "user-123",
             "resource_type": "session_record",
             "resource_id": "record-456",
-            "timestamp": datetime.utcnow().isoformat(),
-            "action": "read"
+            "timestamp": datetime.now(UTC).isoformat(),
+            "action": "read",
         }
 
         assert event["event_type"] == "PHI_ACCESS"
         assert event["resource_type"] == "session_record"
         assert event["action"] == "read"
 
-    def test_audit_event_generated_for_data_export(self, audit_logger):
+    @pytest.mark.usefixtures("audit_logger")
+    def test_audit_event_generated_for_data_export(self):
         """Verify data export events are logged"""
         event = {
             "event_type": "DATA_EXPORT",
             "user_id": "user-123",
             "export_type": "session_history",
             "record_count": 50,
-            "timestamp": datetime.utcnow().isoformat(),
-            "destination": "user_download"
+            "timestamp": datetime.now(UTC).isoformat(),
+            "destination": "user_download",
         }
 
         assert event["event_type"] == "DATA_EXPORT"
@@ -97,14 +103,7 @@ class TestAuditTrailLogging:
 
     def test_audit_log_contains_required_fields(self):
         """Verify audit logs contain all HIPAA-required fields"""
-        required_fields = [
-            "event_type",
-            "user_id",
-            "timestamp",
-            "ip_address",
-            "action",
-            "resource"
-        ]
+        required_fields = ["event_type", "user_id", "timestamp", "ip_address", "action", "resource"]
 
         for field in required_fields:
             assert field is not None, f"Required field {field} must exist"
@@ -112,11 +111,7 @@ class TestAuditTrailLogging:
     def test_audit_log_immutability(self):
         """Verify audit logs cannot be modified after creation"""
         # Audit logs should be append-only
-        log_entry = {
-            "created_at": datetime.utcnow().isoformat(),
-            "hash": "sha256_hash_of_entry",
-            "signed": True
-        }
+        log_entry = {"created_at": datetime.now(UTC).isoformat(), "hash": "sha256_hash_of_entry", "signed": True}
 
         assert log_entry["signed"] is True
         assert "hash" in log_entry
@@ -134,11 +129,7 @@ class TestEncryptionAtRest:
 
     def test_encryption_roundtrip(self, mock_encryption_service):
         """Verify data can be encrypted and decrypted correctly"""
-        original_data = {
-            "patient_name": "John Doe",
-            "ssn": "123-45-6789",
-            "diagnosis": "Depression"
-        }
+        original_data = {"patient_name": "John Doe", "ssn": "123-45-6789", "diagnosis": "Depression"}
 
         encrypted = mock_encryption_service.encrypt(original_data)
         assert encrypted != original_data
@@ -151,7 +142,7 @@ class TestEncryptionAtRest:
             "scheme": "SEAL",
             "polynomial_modulus_degree": 4096,
             "coefficient_modulus_bit_sizes": [21, 22, 21],
-            "encryption_parameter_quality": "128-bit"
+            "encryption_parameter_quality": "128-bit",
         }
 
         assert fhe_config["scheme"] == "SEAL"
@@ -163,7 +154,7 @@ class TestEncryptionAtRest:
             "key_id": "key-2026-03",
             "created_at": "2026-03-01T00:00:00Z",
             "rotates_at": "2026-06-01T00:00:00Z",
-            "algorithm": "AES-256-GCM"
+            "algorithm": "AES-256-GCM",
         }
 
         assert "rotates_at" in key_metadata
@@ -175,7 +166,7 @@ class TestEncryptionAtRest:
         mongo_config = {
             "field_level_encryption": True,
             "encrypted_fields": ["ssn", "patient_name", "diagnosis", "notes"],
-            "key_vault": "encryption-keys"
+            "key_vault": "encryption-keys",
         }
 
         assert mongo_config["field_level_encryption"] is True
@@ -185,12 +176,13 @@ class TestEncryptionAtRest:
 class TestAccessControl:
     """Test HIPAA requirement: Access control and authentication"""
 
-    def test_role_based_access_control(self, mock_session):
+    @pytest.mark.usefixtures("mock_session")
+    def test_role_based_access_control(self):
         """Verify RBAC is enforced"""
         roles = {
             "therapist": ["read:own_sessions", "write:own_sessions"],
             "admin": ["read:all_sessions", "write:all_sessions", "manage:users"],
-            "patient": ["read:own_data"]
+            "patient": ["read:own_data"],
         }
 
         assert "therapist" in roles
@@ -199,22 +191,19 @@ class TestAccessControl:
 
     def test_authentication_required(self):
         """Verify authentication is required for protected routes"""
-        protected_routes = [
-            "/api/sessions",
-            "/api/patients",
-            "/api/audit-logs",
-            "/api/analytics"
-        ]
+        protected_routes = ["/api/sessions", "/api/patients", "/api/audit-logs", "/api/analytics"]
 
         for route in protected_routes:
             assert route.startswith("/api/")
 
-    def test_session_timeout_enforced(self, mock_session):
+    @pytest.mark.usefixtures("mock_session")
+    def test_session_timeout_enforced(self):
         """Verify session timeout is configured"""
         session_timeout_minutes = 30
-        max_session_duration = timedelta(minutes=session_timeout_minutes)
+        timeout = timedelta(minutes=session_timeout_minutes)
 
         assert session_timeout_minutes > 0
+        assert timeout > timedelta(0)
         assert session_timeout_minutes <= 60
 
     def test_multi_factor_authentication_available(self):
@@ -226,11 +215,7 @@ class TestAccessControl:
 
     def test_access_denied_on_invalid_credentials(self):
         """Verify invalid credentials are rejected"""
-        auth_result = {
-            "success": False,
-            "error_code": "INVALID_CREDENTIALS",
-            "message": "Authentication failed"
-        }
+        auth_result = {"success": False, "error_code": "INVALID_CREDENTIALS", "message": "Authentication failed"}
 
         assert auth_result["success"] is False
         assert auth_result["error_code"] == "INVALID_CREDENTIALS"
@@ -245,7 +230,7 @@ class TestPHIRedaction:
             "level": "INFO",
             "message": "User login successful",
             "user_id": "user-123",
-            "phi_fields_redacted": True
+            "phi_fields_redacted": True,
         }
 
         assert log_entry["phi_fields_redacted"] is True
@@ -278,7 +263,7 @@ class TestPHIRedaction:
         anonymization_config = {
             "enabled": True,
             "methods": ["redaction", "pseudonymization", "aggregation"],
-            "compliance_mode": "HIPAA"
+            "compliance_mode": "HIPAA",
         }
 
         assert anonymization_config["enabled"] is True
@@ -293,7 +278,7 @@ class TestSessionManagement:
         timeout_config = {
             "inactive_timeout_minutes": 30,
             "absolute_timeout_hours": 8,
-            "warning_before_logout_seconds": 300
+            "warning_before_logout_seconds": 300,
         }
 
         assert timeout_config["inactive_timeout_minutes"] > 0
@@ -301,11 +286,7 @@ class TestSessionManagement:
 
     def test_concurrent_session_limit(self):
         """Verify concurrent session limits are enforced"""
-        session_limits = {
-            "max_concurrent_sessions": 3,
-            "terminate_oldest": True,
-            "notify_on_new_session": True
-        }
+        session_limits = {"max_concurrent_sessions": 3, "terminate_oldest": True, "notify_on_new_session": True}
 
         assert session_limits["max_concurrent_sessions"] > 0
         assert session_limits["notify_on_new_session"] is True
@@ -315,8 +296,8 @@ class TestSessionManagement:
         logout_result = {
             "session_id": mock_session["session_id"],
             "invalidated": True,
-            "logout_timestamp": datetime.utcnow().isoformat(),
-            "tokens_revoked": True
+            "logout_timestamp": datetime.now(UTC).isoformat(),
+            "tokens_revoked": True,
         }
 
         assert logout_result["invalidated"] is True
@@ -324,12 +305,7 @@ class TestSessionManagement:
 
     def test_secure_session_storage(self):
         """Verify sessions are stored securely"""
-        session_storage = {
-            "encryption": True,
-            "httponly": True,
-            "secure": True,
-            "samesite": "Strict"
-        }
+        session_storage = {"encryption": True, "httponly": True, "secure": True, "samesite": "Strict"}
 
         assert session_storage["encryption"] is True
         assert session_storage["httponly"] is True
@@ -337,10 +313,10 @@ class TestSessionManagement:
 
     def test_session_activity_tracking(self, mock_session):
         """Verify session activity is tracked"""
-        mock_session["last_activity"] = datetime.utcnow().isoformat()
+        mock_session["last_activity"] = datetime.now(UTC).isoformat()
         mock_session["activity_log"] = [
-            {"action": "login", "timestamp": datetime.utcnow().isoformat()},
-            {"action": "view_session", "timestamp": datetime.utcnow().isoformat()}
+            {"action": "login", "timestamp": datetime.now(UTC).isoformat()},
+            {"action": "view_session", "timestamp": datetime.now(UTC).isoformat()},
         ]
 
         assert len(mock_session["activity_log"]) > 0
@@ -356,7 +332,7 @@ class TestHIPAAComplianceIntegration:
             {"step": "login", "compliance_check": "audit_logged"},
             {"step": "access_phi", "compliance_check": "encrypted_at_rest"},
             {"step": "view_data", "compliance_check": "phi_redacted_in_logs"},
-            {"step": "logout", "compliance_check": "session_invalidated"}
+            {"step": "logout", "compliance_check": "session_invalidated"},
         ]
 
         for step in flow_steps:
@@ -369,7 +345,7 @@ class TestHIPAAComplianceIntegration:
             "enabled": True,
             "threshold_hours": 24,
             "recipients": ["security-team", "compliance-officer", "legal"],
-            "template": "HIPAA_BREACH_NOTIFICATION"
+            "template": "HIPAA_BREACH_NOTIFICATION",
         }
 
         assert breach_notification["enabled"] is True
@@ -381,7 +357,7 @@ class TestHIPAAComplianceIntegration:
             "detection_automation": True,
             "response_time_sla_minutes": 15,
             "escalation_levels": ["security", "management", "legal", "executive"],
-            "documentation_required": True
+            "documentation_required": True,
         }
 
         assert incident_response["detection_automation"] is True

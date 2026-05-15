@@ -138,7 +138,7 @@ export class FHEParameterOptimizer {
   private readonly performanceHistory: FHEPerformanceMetrics[] = []
 
   // Maximum entries to keep in performance history
-  private readonly MAX_HISTORY_ENTRIES = 100
+  private MAX_HISTORY_ENTRIES = 100
 
   // Current strategy
   private strategy: OptimizationStrategy = OptimizationStrategy.BalancedApproach
@@ -176,6 +176,29 @@ export class FHEParameterOptimizer {
   public setStrategy(strategy: OptimizationStrategy): void {
     this.strategy = strategy
     logger.info(`Optimization strategy set to ${strategy}`)
+  }
+
+  public getStrategy(): OptimizationStrategy {
+    return this.strategy
+  }
+
+  public getConstraints(): OptimizationConstraints {
+    return this.constraints
+  }
+
+  public getPerformanceHistory(): FHEPerformanceMetrics[] {
+    return [...this.performanceHistory]
+  }
+
+  public getMaxHistoryEntries(): number {
+    return this.MAX_HISTORY_ENTRIES
+  }
+
+  public setMaxHistoryEntries(entries: number): void {
+    if (!Number.isFinite(entries) || entries <= 0) {
+      throw new Error('Maximum history entries must be a positive integer')
+    }
+    this.MAX_HISTORY_ENTRIES = Math.floor(entries)
   }
 
   /**

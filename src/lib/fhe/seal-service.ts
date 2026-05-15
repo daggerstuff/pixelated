@@ -17,6 +17,9 @@ import { FHEOperation } from './types'
 // Initialize logger
 const logger = createBuildSafeLogger('seal-service')
 
+const getObjectProperty = (value: object, property: string | symbol): unknown =>
+  Reflect.get(value, property)
+
 // --- Begin SEAL Type Definitions ---
 
 export interface SealDisposable {
@@ -208,7 +211,7 @@ export class SealService {
    * Get the singleton instance of SealService
    */
   public static getInstance(): SealService {
-    SealService.instance ??= new SealService();
+    SealService.instance ??= new SealService()
     return SealService.instance
   }
 
@@ -404,7 +407,13 @@ export class SealService {
    */
   public getSeal(): SealModule {
     this.checkInitialized()
-    return this.sealContext!.getSeal() as SealModule
+    const seal = this.sealContext!.getSeal()
+    if (!this.isSealModule(seal)) {
+      throw new Error(
+        'SEAL service did not receive a valid SEAL module instance',
+      )
+    }
+    return seal
   }
 
   /**
@@ -412,7 +421,13 @@ export class SealService {
    */
   public getContext(): SealContextInternal {
     this.checkInitialized()
-    return this.sealContext!.getContext() as SealContextInternal
+    const context = this.sealContext!.getContext()
+    if (!this.isSealContext(context)) {
+      throw new Error(
+        'SEAL service did not receive a valid SEAL context instance',
+      )
+    }
+    return context
   }
 
   /**
@@ -526,8 +541,7 @@ export class SealService {
 
       if (this.schemeType === SealSchemeType.CKKS) {
         const ckksEncoder = this.getCKKSEncoder()
-        const effectiveScale =
-          scale ?? (BigInt(1) << BigInt(40))
+        const effectiveScale = scale ?? BigInt(1) << BigInt(40)
 
         plaintext = seal.PlainText()
         ckksEncoder.encode(data, effectiveScale, plaintext)
@@ -728,6 +742,45 @@ export class SealService {
         'SEAL keys not generated/loaded. Call generateKeys() or loadKeys() first.',
       )
     }
+  }
+
+  private isSealModule(value: unknown): value is SealModule {
+    if (typeof value !== 'object' || value === null) {
+      return false
+    }
+
+    const keyGenerator = getObjectProperty(value, 'KeyGenerator')
+    if (typeof keyGenerator !== 'function') {
+      return false
+    }
+
+    return (
+      typeof keyGenerator === 'function' &&
+      typeof getObjectProperty(value, 'Encryptor') === 'function' &&
+      typeof getObjectProperty(value, 'Decryptor') === 'function' &&
+      typeof getObjectProperty(value, 'Evaluator') === 'function' &&
+      typeof getObjectProperty(value, 'BatchEncoder') === 'function' &&
+      typeof getObjectProperty(value, 'CKKSEncoder') === 'function' &&
+      typeof getObjectProperty(value, 'PlainText') === 'function' &&
+      typeof getObjectProperty(value, 'CipherText') === 'function' &&
+      typeof getObjectProperty(value, 'SecretKey') === 'function' &&
+      typeof getObjectProperty(value, 'PublicKey') === 'function' &&
+      typeof getObjectProperty(value, 'RelinKeys') === 'function' &&
+      typeof getObjectProperty(value, 'GaloisKeys') === 'function' &&
+      typeof getObjectProperty(value, 'ComprModeType') !== 'undefined'
+    )
+  }
+
+  private isSealContext(value: unknown): value is SealContextInternal {
+    if (typeof value !== 'object' || value === null) {
+      return false
+    }
+
+    return (
+      typeof getObjectProperty(value, 'parametersSet') === 'function' &&
+      typeof getObjectProperty(value, 'usingKeyswitching') === 'function' &&
+      typeof getObjectProperty(value, 'delete') === 'function'
+    )
   }
 
   /**
