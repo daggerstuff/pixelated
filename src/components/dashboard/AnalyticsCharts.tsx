@@ -11,29 +11,10 @@ import type {
   AnalyticsFilters,
 } from '@/types/analytics'
 
-// Helper to safely format error messages
-const formatErrorMessage = (error: unknown): string => {
-  if (error instanceof Error) {
-    return error.message
-  }
-  if (typeof error === 'object' && error !== null) {
-    try {
-      const MAX_ERROR_LENGTH = 500
-      const str = JSON.stringify(error)
-      if (str.length > MAX_ERROR_LENGTH) {
-        return str.substring(0, MAX_ERROR_LENGTH) + '... (truncated)'
-      }
-      return str
-    } catch {
-      return 'An error occurred'
-    }
-  }
-  return String(error)
-}
-
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className="animate-pulse" role="status" aria-label="Loading data">
+  <div className="animate-pulse" role="status">
+    <span className="sr-only">Loading...</span>
     <div className="bg-gray-200 mb-4 h-4 w-3/4 rounded"></div>
     <div className="space-y-2">
       <div className="bg-gray-200 h-3 rounded"></div>
@@ -57,7 +38,11 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
           Unable to load analytics data
         </h4>
         <p className="text-red-600 mt-1 text-sm">
-          {formatErrorMessage(error)}
+          {error instanceof Error
+            ? error.message
+            : typeof error === 'object'
+              ? 'An unknown error occurred.'
+              : String(error)}
         </p>
       </div>
       <button
