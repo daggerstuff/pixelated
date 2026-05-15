@@ -245,15 +245,15 @@ export function TherapeuticGoalsTracker({
     setForm({})
   }
 
-  // Handle form changes
-  function handleFormChange(
+  // ⚡ Bolt: Memoize form change handler to prevent unnecessary re-renders of input fields
+  const handleFormChange = useCallback((
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
-  ) {
+  ) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
-  }
+  }, [])
 
   // Handle form submit
   async function handleFormSubmit(e: React.FormEvent) {
