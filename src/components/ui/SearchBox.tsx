@@ -208,13 +208,7 @@ export default function SearchBox({
   }
 
   return (
-    <div
-      className='relative w-full'
-      role='combobox'
-      aria-expanded={showResults}
-      aria-haspopup='listbox'
-      aria-controls='search-results'
-    >
+    <>
       {/* Screen reader announcement for search results */}
       <div className='sr-only' aria-live='polite' role='status'>
         {isSearchReady && query === debouncedQuery && query.length >= minQueryLength
@@ -226,7 +220,14 @@ export default function SearchBox({
           : ''}
       </div>
 
-      <div className='relative'>
+      <div
+        className='relative w-full'
+        role='combobox'
+        aria-expanded={showResults}
+        aria-haspopup='listbox'
+        aria-controls='search-results'
+      >
+        <div className='relative'>
         <input
           ref={inputRef}
           type='text'
@@ -340,6 +341,7 @@ export default function SearchBox({
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
