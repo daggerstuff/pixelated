@@ -1,11 +1,13 @@
 ---
-title: 'Astro Integration Testing Guide'
-description: 'Astro Integration Testing Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'testing']
+description: Astro Integration Testing Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - testing
 draft: false
 toc: true
+title: Astro Integration Testing Guide
 ---
 
 # Astro Integration Testing Guide

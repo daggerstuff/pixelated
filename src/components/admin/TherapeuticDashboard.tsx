@@ -59,7 +59,7 @@ export const TherapeuticDashboard: React.FC = () => {
               : 'bg-red-100 text-red-700'
           }`}
         >
-          API: {health?.status || 'Unknown'}{' '}
+          API: {health?.status ?? 'Unknown'}{' '}
           {health?.mode && `(${health.mode})`}
         </div>
       </div>
@@ -131,7 +131,7 @@ export const TherapeuticDashboard: React.FC = () => {
                     <ul className='space-y-2'>
                       {analysis.crisis.signals.map((signal, idx) => (
                         <li
-                          key={`signal-${signal.category}-${signal.context}-${signal.id || idx}`}
+                          key={`signal-${signal.category}-${signal.context}-${signal.id ?? idx}`}
                           className='bg-gray-50 rounded p-2 text-sm'
                         >
                           <span className='text-indigo-700 font-medium'>

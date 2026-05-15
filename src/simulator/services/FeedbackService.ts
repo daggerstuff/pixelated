@@ -1,18 +1,54 @@
+import type { LayersModel } from '@tensorflow/tfjs'
+
 // TensorFlow.js imports moved to dynamic imports to reduce bundle size
 // import * as tf from '@tensorflow/tfjs'
 // import { loadLayersModel } from '@tensorflow/tfjs-layers'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'
-import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/MentalLLaMAAdapter'
+import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/adapter/MentalLLaMAAdapter'
 import { createLLMService } from '../../lib/ai/services/llm-provider'
 import type { LLMService } from '../../lib/ai/services/llm-provider'
 import type {
   FeedbackServiceInterface,
   RealTimeFeedback,
   Scenario,
+  DetectedTechnique,
+  EmotionState,
 } from '../types'
 import { TherapeuticTechnique, FeedbackType } from '../types'
+
+type AudioProcessorMessage = {
+  type: 'audioData'
+  data: Float32Array
+  metadata: { timestamp: number }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isAudioProcessorMessage(
+  value: unknown,
+): value is AudioProcessorMessage {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'audioData') {
+    return false
+  }
+
+  return (
+    value.data instanceof Float32Array &&
+    isRecord(value.metadata) &&
+    typeof value.metadata.timestamp === 'number'
+  )
+}
+
+function isTherapeuticTechnique(value: string): value is TherapeuticTechnique {
+  return (Object.values(TherapeuticTechnique) as string[]).includes(value)
+}
 
 export interface MentalHealthInsights {
   hasMentalHealthIssue: boolean
@@ -30,9 +66,9 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 
 function resolveSafeLlmBaseUrl(): string {
   const baseUrl =
-    process.env['LLM_BASE_URL'] ||
-    process.env['LLM_API_URL'] ||
-    process.env['OPENAI_BASE_URL'] ||
+    process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL'] ??
+    process.env['OPENAI_BASE_URL'] ??
     'http://localhost:8000/v1'
 
   if (isOpenRouterBaseUrl(baseUrl)) {
@@ -63,7 +99,7 @@ export class FeedbackService implements FeedbackServiceInterface {
   private analyzer: AnalyserNode | null = null
   private audioWorklet: AudioWorkletNode | null = null
   private lastProcessedTimestamp: number = 0
-  private processingThrottleMs: number = 750 // Throttle processing to avoid excessive CPU usage
+  private readonly processingThrottleMs: number = 750 // Throttle processing to avoid excessive CPU usage
   private emotionState: {
     energy: number
     valence: number
@@ -93,10 +129,11 @@ export class FeedbackService implements FeedbackServiceInterface {
     toneVariation: 0,
     volumeVariation: 0,
   }
-  private detectedKeywords: Map<string, number> = new Map() // Maps keywords to frequency
-  private detectedTechniques: Map<TherapeuticTechnique, number> = new Map()
+  private readonly detectedKeywords: Map<string, number> = new Map() // Maps keywords to frequency
+  private readonly detectedTechniques: Map<TherapeuticTechnique, number> =
+    new Map()
   // Remove unused clientResponsePredictions
-  private techniqueModel: unknown | null = null // tf.LayersModel | null = null
+  private techniqueModel: LayersModel | null = null
   private isModelLoaded = false
   private modelLoadingPromise: Promise<void> | null = null
   private mentalLLaMAAdapter: MentalLLaMAAdapter | null = null
@@ -108,7 +145,7 @@ export class FeedbackService implements FeedbackServiceInterface {
   private transcriptBuffer: string[] = []
   // Remove unused emotionDetectionEngine
   private audioProcessor: AudioWorkletNode | null = null
-  private processingQueue: Array<{
+  private readonly processingQueue: Array<{
     data: Float32Array
     timestamp: number
   }> = []
@@ -117,7 +154,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
   constructor() {
     // Initialize audio worklet if available
-    if (typeof window !== 'undefined' && window.AudioContext) {
+    if (typeof window !== 'undefined' && typeof AudioContext !== 'undefined') {
       void this.initializeAudioProcessor()
     }
 
@@ -155,7 +192,7 @@ export class FeedbackService implements FeedbackServiceInterface {
   }
 
   private handleAudioProcessorMessage(event: MessageEvent): void {
-    if (event.data.type === 'audioData') {
+    if (isAudioProcessorMessage(event.data)) {
       this.queueAudioData(event.data.data, event.data.metadata)
     }
   }
@@ -270,7 +307,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
       // Initialize the shared LLM service for inference
       this.llmService = createLLMService({
-        apiKey: process.env['LLM_API_KEY'] || '',
+        apiKey: process.env['LLM_API_KEY'] ?? '',
         baseUrl: resolveSafeLlmBaseUrl(),
       })
 
@@ -322,40 +359,53 @@ export class FeedbackService implements FeedbackServiceInterface {
 
       // Analyze mental health indicators using MentalLLaMA
       const mentalHealthAnalysis = this.mentalLLaMAAdapter
-        ? await this.mentalLLaMAAdapter.analyzeMentalHealth(context)
+        ? await this.mentalLLaMAAdapter.analyzeMentalHealth({ text: context })
         : null
 
       // Generate therapeutic suggestions based on the analysis
-      let therapeuticSuggestions = null
+      let therapeuticSuggestions: string | null = null
 
       if (mentalHealthAnalysis?.hasMentalHealthIssue && this.llmService) {
+        const analysisCategory = mentalHealthAnalysis.mentalHealthCategory
+        const analysisExplanation = mentalHealthAnalysis.explanation
+        const supportingEvidence = Array.isArray(
+          mentalHealthAnalysis.supportingEvidence,
+        )
+          ? mentalHealthAnalysis.supportingEvidence
+          : []
+
         // Use LLM service with the fine-tuned model to generate therapeutic suggestions
         const response = await this.llmService.createChatCompletion(
           [
             {
               role: 'system',
-              content: `You are a therapeutic assistant specializing in ${mentalHealthAnalysis.mentalHealthCategory || 'mental health'}.
+              content: `You are a therapeutic assistant specializing in ${analysisCategory}.
                        Generate appropriate therapeutic interventions and feedback for a therapist to help a client.`,
             },
             {
               role: 'user',
               content: `Based on this client statement: "${this.lastTranscribedText}"
-                       Mental health analysis indicates: ${mentalHealthAnalysis.explanation || 'possible mental health concerns'}
-                       Supporting evidence: ${JSON.stringify(mentalHealthAnalysis.supportingEvidence || [])}
+                       Mental health analysis indicates: ${analysisExplanation}
+                       Supporting evidence: ${JSON.stringify(supportingEvidence)}
 
                        Please provide 2-3 specific therapeutic suggestions, appropriate techniques to try, and things to avoid.`,
             },
           ],
           {
             model:
-              process.env['FINE_TUNED_THERAPEUTIC_MODEL'] ||
+              process.env['FINE_TUNED_THERAPEUTIC_MODEL'] ??
               'meta-llama-3-8b-instruct',
             temperature: 0.3,
             maxTokens: 500,
           },
         )
 
-        therapeuticSuggestions = response.choices?.[0]?.message?.content || null
+        const firstChoice = response.choices[0]
+        if (typeof firstChoice.message.content === 'string') {
+          therapeuticSuggestions = firstChoice.message.content
+        } else {
+          therapeuticSuggestions = null
+        }
       }
 
       return {
@@ -401,7 +451,7 @@ export class FeedbackService implements FeedbackServiceInterface {
       if (mentalHealthInsights) {
         // Map mental health category to appropriate therapeutic technique
         const category =
-          mentalHealthInsights.mentalHealthCategory?.toLowerCase() || ''
+          mentalHealthInsights.mentalHealthCategory?.toLowerCase() ?? ''
 
         if (category.includes('depression')) {
           suggestedTechnique = TherapeuticTechnique.COGNITIVE_RESTRUCTURING
@@ -418,7 +468,7 @@ export class FeedbackService implements FeedbackServiceInterface {
         timestamp: Date.now(),
         type: FeedbackType.TECHNIQUE_SUGGESTION,
         content:
-          therapeuticSuggestions ||
+          therapeuticSuggestions ??
           "Try using reflective listening to better understand the client's perspective.",
         suggestedTechnique,
         emotionalState: {
@@ -426,11 +476,17 @@ export class FeedbackService implements FeedbackServiceInterface {
           valence: this.emotionState.valence,
           dominance: this.emotionState.dominance,
         },
-        confidence: 0.85, // Enhanced models have higher confidence
+        confidence: 0.85,
+        suggestion:
+          therapeuticSuggestions ??
+          "Try using reflective listening to better understand the client's perspective.",
+        rationale:
+          'Automatically generated feedback based on enhanced model analysis',
+        priority: 'medium' as const,
         metadata: {
           hasMentalHealthInsights: !!mentalHealthInsights,
           mentalHealthCategory:
-            mentalHealthInsights?.mentalHealthCategory || null,
+            mentalHealthInsights?.mentalHealthCategory ?? null,
           enhancedModelUsed: true,
         },
       }
@@ -449,7 +505,7 @@ export class FeedbackService implements FeedbackServiceInterface {
    */
   private processAudioData(audioData: Float32Array): void {
     // Get input data
-    if (!audioData || audioData.length === 0) {
+    if (audioData.length === 0) {
       return
     }
 
@@ -468,16 +524,14 @@ export class FeedbackService implements FeedbackServiceInterface {
    * Analyzes audio for therapeutic characteristics
    */
   private analyzeAudioCharacteristics(audioData: Float32Array): void {
-    if (!audioData || audioData.length === 0) {
+    if (audioData.length === 0) {
       return
     }
 
     // Calculate RMS (loudness)
     let sumSquares = 0
     for (const sample of audioData) {
-      if (sample !== undefined) {
-        sumSquares += sample * sample
-      }
+      sumSquares += sample * sample
     }
     const rms = Math.sqrt(sumSquares / audioData.length)
 
@@ -486,11 +540,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     for (let i = 1; i < audioData.length; i++) {
       const current = audioData[i]
       const previous = audioData[i - 1]
-      if (
-        current !== undefined &&
-        previous !== undefined &&
-        ((current >= 0 && previous < 0) || (current < 0 && previous >= 0))
-      ) {
+      if ((current >= 0 && previous < 0) || (current < 0 && previous >= 0)) {
         zeroCrossings++
       }
     }
@@ -505,16 +555,14 @@ export class FeedbackService implements FeedbackServiceInterface {
    * Detects speech patterns like pauses, speaking rate, etc.
    */
   private detectSpeechPatterns(audioData: Float32Array): void {
-    if (!audioData || audioData.length === 0) {
+    if (audioData.length === 0) {
       return
     }
 
     // Calculate RMS
     let sumSquares = 0
     for (const sample of audioData) {
-      if (sample !== undefined) {
-        sumSquares += sample * sample
-      }
+      sumSquares += sample * sample
     }
     const rms = Math.sqrt(sumSquares / audioData.length)
 
@@ -614,6 +662,43 @@ export class FeedbackService implements FeedbackServiceInterface {
     }
   }
 
+  /** Implements FeedbackServiceInterface.analyzeFeedback */
+  async analyzeFeedback(
+    text: string,
+    techniques: DetectedTechnique[],
+    emotionState: EmotionState | null,
+  ): Promise<RealTimeFeedback> {
+    this.addTranscribedText(text)
+
+    for (const technique of techniques) {
+      if (isTherapeuticTechnique(technique.technique)) {
+        this.detectedTechniques.set(technique.technique, Date.now())
+      }
+    }
+
+    if (emotionState) {
+      this.emotionState.energy = emotionState.energy
+      this.emotionState.valence = emotionState.valence
+      this.emotionState.dominance = emotionState.dominance
+    }
+
+    const enhancedFeedback = await this.generateEnhancedFeedback()
+    if (enhancedFeedback) {
+      return enhancedFeedback
+    }
+
+    return {
+      type: FeedbackType.TECHNIQUE_SUGGESTION,
+      timestamp: Date.now(),
+      suggestion: text
+        ? `Consider reflecting on the client's statement: "${text.slice(0, 80)}"`
+        : 'Continue using reflective listening to explore the client experience.',
+      rationale:
+        'Automatically generated feedback based on real-time analysis of therapeutic interaction.',
+      priority: 'medium',
+    }
+  }
+
   /**
    * Detects significant changes in emotional state
    */
@@ -627,7 +712,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     const recentTrends = this.emotionState.trends.slice(-5)
 
     // Ensure we have valid data
-    if (recentTrends.length === 0 || !recentTrends[0]) {
+    if (recentTrends.length === 0) {
       return null
     }
 
@@ -641,10 +726,6 @@ export class FeedbackService implements FeedbackServiceInterface {
     const baseTime = recentTrends[0].timestamp
 
     for (const trend of recentTrends) {
-      if (!trend) {
-        continue
-      }
-
       const x = (trend.timestamp - baseTime) / 1000 // seconds
       const y = trend.valence
 
@@ -667,9 +748,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     for (let i = 1; i < recentTrends.length; i++) {
       const current = recentTrends[i]
       const previous = recentTrends[i - 1]
-      if (current && previous) {
-        energyVolatility += Math.abs(current.energy - previous.energy)
-      }
+      energyVolatility += Math.abs(current.energy - previous.energy)
     }
     energyVolatility /= recentTrends.length - 1
 
@@ -727,8 +806,20 @@ export class FeedbackService implements FeedbackServiceInterface {
       ])
 
       // Run inference
-      const prediction = this.techniqueModel.predict(features) as tf.Tensor // tf.Tensor
-      const predictionData = await prediction.data()
+      const prediction = this.techniqueModel.predict(features)
+      if (Array.isArray(prediction)) {
+        for (const tensor of prediction) {
+          tensor.dispose()
+        }
+        features.dispose()
+        return null
+      }
+
+      const predictionData = Array.from(await prediction.data())
+      if (predictionData.length === 0) {
+        prediction.dispose()
+        return null
+      }
 
       // Clean up tensors
       features.dispose()
@@ -740,24 +831,22 @@ export class FeedbackService implements FeedbackServiceInterface {
 
       for (let i = 1; i < predictionData.length; i++) {
         const currentValue = predictionData[i]
-        if (
-          currentValue !== undefined &&
-          maxValue !== undefined &&
-          currentValue > maxValue
-        ) {
+        if (typeof currentValue === 'number' && currentValue > maxValue) {
           maxIndex = i
           maxValue = currentValue
         }
       }
 
       // If confidence is too low, return null
-      if (maxValue === undefined || maxValue < 0.4) {
+      if (maxValue < 0.4) {
+        features.dispose()
+        prediction.dispose()
         return null
       }
 
       // Map index to therapeutic technique
       // This mapping must match the order of the model's output classes
-      const techniques = [
+      const techniques: TherapeuticTechnique[] = [
         TherapeuticTechnique.REFLECTIVE_STATEMENTS,
         TherapeuticTechnique.COGNITIVE_RESTRUCTURING,
         TherapeuticTechnique.MOTIVATIONAL_INTERVIEWING,
@@ -768,7 +857,7 @@ export class FeedbackService implements FeedbackServiceInterface {
         TherapeuticTechnique.MINDFULNESS,
       ]
 
-      return techniques[maxIndex] || null
+      return techniques[maxIndex] ?? null
     } catch (error: unknown) {
       logger.error('Error in therapeutic approach analysis', {
         error: error instanceof Error ? String(error) : String(error),
@@ -785,7 +874,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     currentApproach: TherapeuticTechnique | null,
   ): RealTimeFeedback {
     // Generate appropriate feedback based on emotional change direction
-    const contextString = this.currentScenario?.domain || 'general'
+    const contextString = this.currentScenario?.domain ?? 'general'
 
     if (emotionChange === 'positive') {
       return {
@@ -904,9 +993,6 @@ export class FeedbackService implements FeedbackServiceInterface {
     this.feedbackBuffer = []
   }
 
-  /**
-   * Cleanup method to release resources
-   */
   cleanup() {
     // Clean up audio context if it exists
     if (this.audioWorklet) {

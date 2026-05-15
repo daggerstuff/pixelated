@@ -1,11 +1,11 @@
 ---
-title: 'Test Execution'
-description: 'Guide to running and managing tests in Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Guide to running and managing tests in Pixelated
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Test Execution
 ---
 
 # Test Execution
@@ -141,8 +141,8 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: '22'
 

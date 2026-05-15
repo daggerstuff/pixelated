@@ -5,6 +5,35 @@
 import Layout from '@/layouts/Layout.astro'
 import { getSession } from '@/lib/auth'
 
+type TrainingSessionResponse = {
+  clientProfile: {
+    name: string
+    age: number
+    gender: string
+    personalityType: string
+    presentingProblem: string
+    triggers?: string[]
+    strengths?: string[]
+  }
+  difficultyLevel: string | number
+}
+
+const isTrainingSessionResponse = (
+  value: unknown,
+): value is TrainingSessionResponse => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const maybeValue = value as Record<string, unknown>
+  const clientProfile = maybeValue['clientProfile']
+
+  return (
+    typeof maybeValue['difficultyLevel'] === 'string' ||
+    typeof maybeValue['difficultyLevel'] === 'number'
+  ) && typeof clientProfile === 'object' && clientProfile !== null
+}
+
 const { sessionId } = Astro.params
 const session = await getSession(Astro.request)
 
@@ -31,11 +60,16 @@ const fetchCookieValue = (cookieName: string): string | undefined => {
 const token =
   authHeader?.replace('Bearer ', '') || fetchCookieValue('auth-token')
 
-const escapeJsonForScriptTag = (value: any) =>
-  JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
+const escapeJsonForScriptTag = (value: unknown): string => {
+  const serialized = JSON.stringify(value)
+  if (serialized === undefined) {
+    return 'null'
+  }
+  return serialized.replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
+}
 
 // Get session data from API
-let sessionData = undefined
+let sessionData: TrainingSessionResponse | undefined
 try {
   const response = await fetch(
     `${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`,
@@ -43,7 +77,10 @@ try {
       headers: { Authorization: `Bearer ${token}` },
     },
   )
-  sessionData = await response.json()
+  const rawSessionData = await response.json()
+  if (isTrainingSessionResponse(rawSessionData)) {
+    sessionData = rawSessionData
+  }
 } catch {
   sessionData = undefined
 }

@@ -29,7 +29,7 @@ export function remarkGenerateOgImage() {
     // Simple implementation - just log the processing
     console.log(
       chalk.blue('Processing OG image generation for:'),
-      file?.path || 'unknown file',
+      file?.path ?? 'unknown file',
     )
 
     // Add metadata for OG image generation
@@ -50,7 +50,7 @@ function extractTitle(tree: Root): string {
 
   function walk(node: any) {
     if (node.type === 'heading' && node.depth === 1) {
-      if (node.children && node.children[0] && node.children[0].value) {
+      if (node.children?.[0]?.value) {
         title = node.children[0].value
       }
     }
@@ -70,7 +70,7 @@ function extractDescription(tree: Root): string {
 
   function walk(node: any) {
     if (node.type === 'paragraph' && !foundFirstParagraph) {
-      if (node.children && node.children[0] && node.children[0].value) {
+      if (node.children?.[0]?.value) {
         description = node.children[0].value.substring(0, 160)
         foundFirstParagraph = true
       }

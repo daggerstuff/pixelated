@@ -205,7 +205,7 @@ export const isStaging = (): boolean => process.env['NODE_ENV'] === 'staging'
 
 /** Check if we're running in CI */
 export const isCI = (): boolean =>
-  Boolean(process.env['CI'] || process.env['GITHUB_ACTIONS'])
+  Boolean(process.env['CI'] ?? process.env['GITHUB_ACTIONS'])
 /**
  * Validates that a string is a well-formed URL (http, https, ws, wss, etc).
  * Returns true if valid, false otherwise.

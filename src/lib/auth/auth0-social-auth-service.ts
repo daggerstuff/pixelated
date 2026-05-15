@@ -7,24 +7,75 @@ import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
+import { auth0Config } from './auth0-config'
 
-// Auth0 Configuration
-const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
-  clientId:
-    process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
-  clientSecret:
-    process.env.AUTH0_CLIENT_SECRET ||
-    import.meta.env.AUTH0_CLIENT_SECRET ||
-    '',
-  managementClientId:
-    process.env.AUTH0_MANAGEMENT_CLIENT_ID ||
-    import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID ||
-    '',
-  managementClientSecret:
-    process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
-    import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
-    '',
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
+type Auth0RuntimeConfig = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  managementClientId: string
+  managementClientSecret: string
+}
+
+function getFirstDefined(...values: Array<string | undefined>): string {
+  for (const value of values) {
+    if (value !== undefined) {
+      return value
+    }
+  }
+
+  return ''
+}
+
+function getAuth0RuntimeConfig(): Auth0RuntimeConfig {
+  return {
+    domain: getFirstDefined(
+      process.env.AUTH0_DOMAIN,
+      process.env.PUBLIC_AUTH0_DOMAIN,
+      auth0Config.domain,
+    ),
+    clientId: getFirstDefined(
+      process.env.AUTH0_CLIENT_ID,
+      process.env.PUBLIC_AUTH0_CLIENT_ID,
+      auth0Config.clientId,
+    ),
+    clientSecret: getFirstDefined(
+      process.env.AUTH0_CLIENT_SECRET,
+      auth0Config.clientSecret,
+    ),
+    managementClientId: getFirstDefined(
+      process.env.AUTH0_MANAGEMENT_CLIENT_ID,
+      auth0Config.managementClientId,
+    ),
+    managementClientSecret: getFirstDefined(
+      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET,
+      auth0Config.managementClientSecret,
+    ),
+  }
+}
+
+interface Auth0UserInfo {
+  sub?: string
+  email?: string
+  name?: string
+  given_name?: string
+  family_name?: string
+  picture?: string
+  email_verified?: boolean
+}
+
+interface Auth0UserInfoResponse {
+  data: Auth0UserInfo
+}
+
+type Auth0TokenResponse = {
+  access_token: string
+  refresh_token?: string
+  id_token?: string
+  expires_in: number
+  token_type: string
 }
 
 // Initialize Auth0 clients
@@ -36,45 +87,39 @@ let auth0UserInfo: UserInfoClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
+  const AUTH0_CONFIG = getAuth0RuntimeConfig()
   if (
     !AUTH0_CONFIG.domain ||
     !AUTH0_CONFIG.clientId ||
     !AUTH0_CONFIG.clientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret,
-    })
-  }
+  auth0Authentication = new AuthenticationClient({
+    domain: AUTH0_CONFIG.domain,
+    clientId: AUTH0_CONFIG.clientId,
+    clientSecret: AUTH0_CONFIG.clientSecret,
+  })
 
-  if (!auth0UserInfo) {
-    auth0UserInfo = new UserInfoClient({
-      domain: AUTH0_CONFIG.domain,
-    })
-  }
+  auth0UserInfo = new UserInfoClient({
+    domain: AUTH0_CONFIG.domain,
+  })
 
-  if (
-    !auth0Management &&
-    AUTH0_CONFIG.managementClientId &&
-    AUTH0_CONFIG.managementClientSecret
-  ) {
+  if (AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
     auth0Management = new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
     })
+  } else {
+    auth0Management = null
   }
 }
-
-// Initialize the clients
-initializeAuth0Clients()
 
 // Types
 export interface SocialUser {
@@ -107,13 +152,20 @@ export interface SocialAuthResult {
  * Handles OAuth2 flow with Auth0 for social providers
  */
 export class Auth0SocialAuthService {
-  private readonly domain = AUTH0_CONFIG.domain
-  private readonly clientId = AUTH0_CONFIG.clientId
+  private readonly domain: string
+  private readonly clientId: string
 
   constructor() {
+    const config = getAuth0RuntimeConfig()
+    this.domain = config.domain
+    this.clientId = config.clientId
+
     if (!this.domain || !this.clientId) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
+    initializeAuth0Clients()
   }
 
   /**
@@ -173,9 +225,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const response = await (
-        auth0Authentication.oauth as any
-      ).authorizationCodeGrant({
+      const response = await auth0Authentication.oauth.authorizationCodeGrant({
         code,
         redirect_uri: redirectUri,
       })
@@ -209,14 +259,14 @@ export class Auth0SocialAuthService {
       const userInfo = response.data
 
       return {
-        id: userInfo.sub || '',
-        email: userInfo.email || '',
-        name: userInfo.name || '',
+        id: userInfo.sub ?? '',
+        email: userInfo.email ?? '',
+        name: userInfo.name ?? '',
         givenName: userInfo.given_name,
         familyName: userInfo.family_name,
         picture: userInfo.picture,
-        provider: userInfo.sub?.split('|')[0] || 'unknown',
-        emailVerified: userInfo.email_verified || false,
+        provider: userInfo.sub ? userInfo.sub.split('|')[0] : 'unknown',
+        emailVerified: userInfo.email_verified ?? false,
         createdAt: new Date().toISOString(),
       }
     } catch (error: unknown) {
@@ -236,9 +286,7 @@ export class Auth0SocialAuthService {
     }
 
     try {
-      const response = await (
-        auth0Authentication.oauth as any
-      ).refreshTokenGrant({
+      const response = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken,
       })
       const data = response.data
@@ -342,17 +390,7 @@ export class Auth0SocialAuthService {
 
     try {
       // Link the social account to the user
-      const usersClient = auth0Management.users as unknown as {
-        link: (
-          params: { id: string },
-          identity: {
-            provider: string
-            connection_id: string
-            user_id: string
-          },
-        ) => Promise<unknown>
-      }
-      await usersClient.link(
+      await auth0Management.users.link(
         {
           id: userId,
         },
@@ -400,16 +438,7 @@ export class Auth0SocialAuthService {
 
     try {
       // Unlink the social account from the user
-      const usersClient = auth0Management.users as unknown as {
-        unlink: (
-          userId: string,
-          identity: {
-            provider: string
-            user_id: string
-          },
-        ) => Promise<unknown>
-      }
-      await usersClient.unlink(userId, {
+      await auth0Management.users.unlink(userId, {
         provider: connection,
         user_id: providerUserId,
       })
@@ -440,18 +469,22 @@ export class Auth0SocialAuthService {
   /**
    * Get user's social connections
    */
-  async getUserSocialConnections(userId: string): Promise<any[]> {
+  async getUserSocialConnections(userId: string): Promise<unknown[]> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
 
     try {
-      const usersClient = auth0Management.users as unknown as {
-        get: (userId: string) => Promise<{ data: { identities?: any[] } }>
-      }
-      const response = await usersClient.get(userId)
+      const response = await auth0Management.users.get(userId)
       const user = response.data
-      return user.identities || []
+      if (
+        typeof user === 'object' &&
+        'identities' in user &&
+        Array.isArray(user.identities)
+      ) {
+        return user.identities
+      }
+      return []
     } catch (error: unknown) {
       console.error(
         `Failed to get social connections for user ${userId}:`,

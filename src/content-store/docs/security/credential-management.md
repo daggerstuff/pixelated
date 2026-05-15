@@ -1,11 +1,12 @@
 ---
-title: 'Credential and PHI Management Guide'
-description: 'Credential and PHI Management Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Credential and PHI Management Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Credential and PHI Management Guide
 ---
 
 # Credential and PHI Management Guide
@@ -149,7 +150,7 @@ scanning tools, please contact the security team.
 | Variable          | Development | Production | Test | Description                        |
 | ----------------- | ----------- | ---------- | ---- | ---------------------------------- |
 | API_KEY           | ✅          | ❌         | ❌   | API key for general authentication |
-| LLM_API_KEY  | ✅          | ✅         | ❌   | API key for LLM API service   |
+| LLM_API_KEY       | ✅          | ✅         | ❌   | API key for LLM API service        |
 | ANTHROPIC_API_KEY | ❌          | ❌         | ❌   | API key for Anthropic AI services  |
 | OPENAI_API_KEY    | ❌          | ❌         | ❌   | API key for OpenAI services        |
 

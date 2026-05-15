@@ -59,6 +59,12 @@ error_exit() {
     exit 1
 }
 
+run_redis_hardening_audit() {
+    if ! "${PROJECT_ROOT}/scripts/check-redis-hardening.sh"; then
+        error_exit "Redis hardening audit failed"
+    fi
+}
+
 # Check prerequisites
 check_prerequisites() {
     log INFO "Checking prerequisites..."
@@ -634,6 +640,7 @@ main() {
     # Create log directory
     mkdir -p "$(dirname "$LOG_FILE")"
     
+    run_redis_hardening_audit
     # Run deployment steps
     check_prerequisites
     init_terraform

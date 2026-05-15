@@ -1,7 +1,8 @@
+/**
+ * @vitest-environment node
+ */
 // Project Service Unit Tests
 // Tests for project-service.ts functions
-
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import {
   getMongoConnection,
@@ -22,72 +23,154 @@ vi.mock('uuid', () => ({
 }))
 
 vi.mock('../../utils/common', () => ({
-  slug: vi.fn((str) => str.toLowerCase().replace(/\s+/g, '-')),
+  slug: vi.fn((str: string): string => str.toLowerCase().replace(/\s+/g, '-')),
 }))
+
+type MockProjectPermissions = {
+  view: string[]
+  edit: string[]
+  comment: string[]
+}
+
+type MockProjectObjective = {
+  _id: string
+  title: string
+  description: string
+  successCriteria: string[]
+  deadline?: Date
+  status: string
+  progress: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+type MockProject = {
+  _id: string
+  name: string
+  slug: string
+  description: string
+  category: string
+  owner: string
+  stakeholders: string[]
+  budget: number
+  status: string
+  objectives: MockProjectObjective[]
+  milestones: unknown[]
+  permissions: MockProjectPermissions
+  createdAt: Date
+  updatedAt: Date
+  save: () => Promise<MockProject>
+}
+
+type MockFindLimit = {
+  skip: (skip: number) => {
+    sort: (sort: Record<string, 1 | -1>) => MockProject[]
+  }
+  sort: (sort: Record<string, 1 | -1>) => MockProject[]
+}
+
+type MockFindQuery = {
+  limit: (limit: number) => MockFindLimit
+}
+
+type MockProjectModel = {
+  new (data?: Partial<MockProject>): MockProject
+  findById: ReturnType<typeof vi.fn>
+  find: ReturnType<typeof vi.fn>
+  countDocuments: ReturnType<typeof vi.fn>
+}
+
+type MockPool = {
+  query: ReturnType<typeof vi.fn>
+}
+
+const mockProjectTemplate: Omit<MockProject, 'save'> = {
+  _id: 'project-456',
+  name: 'Test Project',
+  slug: 'test-project',
+  description: 'Test Description',
+  category: 'general',
+  owner: 'user-123',
+  stakeholders: ['user-123'],
+  budget: 1000,
+  status: 'active',
+  objectives: [],
+  milestones: [],
+  permissions: {
+    view: ['user-123'],
+    edit: ['user-123'],
+    comment: ['user-123'],
+  },
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
+
+function createMockProject(overrides: Partial<MockProject>): MockProject {
+  const project: MockProject = {
+    ...mockProjectTemplate,
+    ...overrides,
+    save: async () => project,
+  }
+  return project
+}
+
+const createFindChain = (): MockFindQuery => ({
+  limit: vi.fn(() => ({
+    skip: vi.fn(() => ({
+      sort: vi.fn(() => [] as MockProject[]),
+    })),
+    sort: vi.fn(() => [] as MockProject[]),
+  })),
+})
+
+class MockModelConstructor {
+  constructor(data: Partial<MockProject> = {}) {
+    return createMockProject(data)
+  }
+
+  static findById = vi.fn()
+  static find = vi.fn(() => createFindChain())
+  static countDocuments = vi.fn()
+}
+
+const MockModel: MockProjectModel = MockModelConstructor as MockProjectModel
+
+const mockPool: MockPool = {
+  query: vi.fn(),
+}
 
 describe('Project Service', () => {
   // Mock data
   const mockUserId = 'user-123'
   const mockProjectId = 'project-456'
+  let mockProjectInstance: MockProject
 
   // Mock objects
-  const mockProjectInstance = {
-    _id: mockProjectId,
-    name: 'Test Project',
-    slug: 'test-project',
-    description: 'Test Description',
-    category: 'general',
-    owner: mockUserId,
-    stakeholders: [mockUserId],
-    budget: 1000,
-    status: 'active',
-    objectives: [],
-    milestones: [],
-    permissions: {
-      view: [mockUserId],
-      edit: [mockUserId],
-      comment: [mockUserId],
-    },
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    save: vi.fn(),
-  }
-
-  // Mock Model constructor - needs to work with 'new' keyword
-  function MockModelConstructor(data: any) {
-    const instance = Object.create(mockProjectInstance)
-    Object.assign(instance, data)
-    instance.save = vi.fn(() => Promise.resolve(instance))
-    return instance
-  }
-
-  const MockModel = MockModelConstructor as any
-  MockModel.findById = vi.fn()
-  MockModel.find = vi.fn(() => ({
-    limit: vi.fn(() => ({
-      skip: vi.fn(() => ({
-        sort: vi.fn(() => []),
-      })),
-    })),
-  }))
-  MockModel.countDocuments = vi.fn()
-
-  const mockPool = {
-    query: vi.fn(),
-  }
-
   beforeEach(() => {
     vi.clearAllMocks()
 
     // Setup mocks - MockModel is a constructor that returns mockProjectInstance
-    ;(getMongoConnection as any).mockReturnValue({
+    mockProjectInstance = createMockProject({
+      _id: mockProjectId,
+      owner: mockUserId,
+      stakeholders: [mockUserId],
+      permissions: {
+        view: [mockUserId],
+        edit: [mockUserId],
+        comment: [mockUserId],
+      },
+    })
+    ;(
+      vi.mocked(getMongoConnection) as ReturnType<typeof vi.fn>
+    ).mockReturnValue({
       model: vi.fn(() => MockModel),
     })
-
-    ;(getPostgresPool as any).mockReturnValue(mockPool)
+    ;(vi.mocked(getPostgresPool) as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockPool,
+    )
 
     // Reset mock instances
-    mockProjectInstance.save.mockResolvedValue(mockProjectInstance)
+    mockProjectInstance.save = vi.fn(async () => mockProjectInstance)
     MockModel.findById.mockResolvedValue(mockProjectInstance)
   })
 
@@ -252,6 +335,7 @@ describe('Project Service', () => {
     })
 
     it('should throw ForbiddenError if user cannot edit', async () => {
+      mockProjectInstance.owner = 'other-user'
       mockProjectInstance.permissions.edit = ['other-user']
       MockModel.findById.mockResolvedValue(mockProjectInstance)
 
@@ -383,7 +467,9 @@ describe('Project Service', () => {
   describe('searchProjects', () => {
     it('should search projects by text query', async () => {
       MockModel.find.mockReturnValue({
-        limit: vi.fn(() => []),
+        limit: vi.fn(() => ({
+          sort: vi.fn(() => [] as MockProject[]),
+        })),
       })
 
       await projectService.searchProjects('test query', mockUserId, 20)
@@ -397,7 +483,9 @@ describe('Project Service', () => {
 
     it('should respect user permissions in search', async () => {
       MockModel.find.mockReturnValue({
-        limit: vi.fn(() => []),
+        limit: vi.fn(() => ({
+          sort: vi.fn(() => [] as MockProject[]),
+        })),
       })
 
       await projectService.searchProjects('test', mockUserId, 10)
@@ -405,7 +493,7 @@ describe('Project Service', () => {
       // Should include permission check in query
       expect(MockModel.find).toHaveBeenCalledWith(
         expect.objectContaining({
-          $or: expect.any(Array),
+          $or: [{ owner: mockUserId }, { 'permissions.view': mockUserId }],
         }),
       )
     })

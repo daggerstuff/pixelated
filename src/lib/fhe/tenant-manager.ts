@@ -1,8 +1,8 @@
 import { TenantConfig } from './types'
 
 class TenantManager {
-  private tenants: Map<string, TenantConfig> = new Map()
-  private operationCounts: Map<string, number> = new Map()
+  private readonly tenants: Map<string, TenantConfig> = new Map()
+  private readonly operationCounts: Map<string, number> = new Map()
 
   async initialize(): Promise<void> {
     this.tenants.clear()
@@ -31,7 +31,7 @@ class TenantManager {
     const tenant = this.getTenant(tenantId)
     if (!tenant) return false
 
-    const currentCount = this.operationCounts.get(tenantId) || 0
+    const currentCount = this.operationCounts.get(tenantId) ?? 0
     const limit = tenant.resourceLimits?.maxOperationsPerMinute
 
     if (limit !== undefined && currentCount >= limit) {
@@ -42,10 +42,10 @@ class TenantManager {
     return true
   }
 
-  applyTenantConfig<T extends object>(
-    baseConfig: T,
+  applyTenantConfig(
+    baseConfig: Record<string, unknown>,
     tenantId: string,
-  ): T & { tenantConfig?: TenantConfig } {
+  ): Record<string, unknown> & { tenantConfig?: TenantConfig } {
     const tenant = this.getTenant(tenantId)
     if (!tenant) {
       return baseConfig
@@ -55,7 +55,7 @@ class TenantManager {
 
     // Create a new config merging base, custom, and resource limits
     // We prioritize tenant specific overrides
-    const newConfig = {
+    return {
       ...baseConfig,
       ...customConfig,
       // Apply resource limits if they map to config properties
@@ -63,9 +63,7 @@ class TenantManager {
         ? { keySize: resourceLimits.maxKeySize }
         : {}),
       tenantConfig: tenant,
-    }
-
-    return newConfig
+    } as Record<string, unknown> & { tenantConfig: TenantConfig }
   }
 
   getTenantKeyPrefix(tenantId: string, basePrefix: string): string {

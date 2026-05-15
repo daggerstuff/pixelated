@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { Pool } from 'pg'
-import { createClient } from 'redis'
+import { createClient, type RedisClientType } from 'redis'
 
 import { logger } from '@/utils/logger'
 
@@ -79,7 +79,7 @@ export const testPostgresConnection = async (): Promise<void> => {
 }
 
 // Redis connection
-export const redisClient = createClient({
+export const redisClient: RedisClientType = createClient({
   url:
     process.env['REDIS_URL'] ??
     `redis://${process.env['REDIS_HOST'] ?? 'localhost'}:${process.env['REDIS_PORT'] ?? '6379'}`,

@@ -214,27 +214,27 @@ years **AE**: 0.02% equity over 4 years
 
 #### Enterprise Sales Process (6-18 months)
 
-**Phase 1: Discovery (Weeks 1-4)**
+### Phase 1: Discovery (Weeks 1-4)
 
 - **Activities**: Needs assessment, stakeholder mapping, competitive analysis
 - **Tools**: Discovery questionnaire, stakeholder analysis matrix
 - **Success Metrics**: 3+ stakeholder meetings, qualified opportunity criteria
   met
 
-**Phase 2: Solution Design (Weeks 5-8)**
+### Phase 2: Solution Design (Weeks 5-8)
 
 - **Activities**: Custom solution development, ROI analysis, technical
   requirements
 - **Tools**: Solution design workshop, ROI calculator, technical specification
 - **Success Metrics**: Solution approval, budget confirmation, technical fit
 
-**Phase 3: Proposal & Negotiation (Weeks 9-12)**
+### Phase 3: Proposal & Negotiation (Weeks 9-12)
 
 - **Activities**: Formal proposal, legal review, contract negotiation
 - **Tools**: Proposal template, legal review checklist, negotiation framework
 - **Success Metrics**: Contract terms agreed, signature authority confirmed
 
-**Phase 4: Closing & Onboarding (Weeks 13-16)**
+### Phase 4: Closing & Onboarding (Weeks 13-16)
 
 - **Activities**: Contract execution, project kickoff, customer success handoff
 - **Tools**: Contract execution checklist, onboarding plan, success metrics
@@ -243,20 +243,20 @@ years **AE**: 0.02% equity over 4 years
 
 #### Mid-Market Sales Process (3-6 months)
 
-**Phase 1: Qualification (Weeks 1-2)**
+### Phase 1: Qualification (Weeks 1-2)
 
 - **Activities**: BANT qualification, needs assessment, budget confirmation
 - **Tools**: Qualification checklist, discovery call framework
 - **Success Metrics**: Qualified opportunity, budget confirmed, decision
   timeline
 
-**Phase 2: Demonstration (Weeks 3-6)**
+### Phase 2: Demonstration (Weeks 3-6)
 
 - **Activities**: Product demonstration, trial setup, reference calls
 - **Tools**: Demo script, trial setup guide, reference program
 - **Success Metrics**: Demo completed, trial initiated, positive feedback
 
-**Phase 3: Proposal & Closing (Weeks 7-10)**
+### Phase 3: Proposal & Closing (Weeks 7-10)
 
 - **Activities**: Proposal development, pricing discussion, contract negotiation
 - **Tools**: Proposal template, pricing calculator, contract terms
@@ -264,19 +264,19 @@ years **AE**: 0.02% equity over 4 years
 
 #### SMB Sales Process (1-3 months)
 
-**Phase 1: Qualification (Week 1)**
+### Phase 1: Qualification (Week 1)
 
 - **Activities**: Inbound lead qualification, needs assessment, trial setup
 - **Tools**: Lead qualification form, trial setup guide
 - **Success Metrics**: Qualified lead, trial initiated, positive engagement
 
-**Phase 2: Demonstration & Trial (Weeks 2-4)**
+### Phase 2: Demonstration & Trial (Weeks 2-4)
 
 - **Activities**: Product demonstration, trial management, objection handling
 - **Tools**: Demo script, trial management guide, objection handling framework
 - **Success Metrics**: Demo completed, trial success, positive feedback
 
-**Phase 3: Closing (Weeks 5-8)**
+### Phase 3: Closing (Weeks 5-8)
 
 - **Activities**: Pricing discussion, contract execution, onboarding
 - **Tools**: Pricing presentation, contract template, onboarding checklist
@@ -434,25 +434,25 @@ Certification**: Advanced sales certification and competency assessment
 
 #### Annual Sales Budget ($2.5M by Year 4)
 
-**Personnel Costs (70% - $1.75M)**
+### Personnel Costs (70% - $1.75M)
 
 - **Base Salaries**: $875,000 across 25-30 sales professionals
 - **Commissions**: $700,000 based on 8-12% commission rates
 - **Bonuses**: $175,000 quarterly and annual bonus payments
 
-**Sales Technology (15% - $375,000)**
+### Sales Technology (15% - $375,000)
 
 - **CRM & Tools**: $150,000 Salesforce and sales technology costs
 - **Marketing Automation**: $100,000 marketing automation and lead management
 - **Sales Intelligence**: $75,000 sales intelligence and lead generation
 - **Training & Development**: $50,000 sales training and development
 
-**Travel & Entertainment (10% - $250,000)**
+### Travel & Entertainment (10% - $250,000)
 
 - **Travel**: $175,000 for customer meetings and conferences
 - **Entertainment**: $75,000 for customer entertainment and events
 
-**Other Costs (5% - $125,000)**
+### Other Costs (5% - $125,000)
 
 - **Sales Operations**: $75,000 sales operations and support
 - **Legal & Compliance**: $50,000 legal and compliance costs

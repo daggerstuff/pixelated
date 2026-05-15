@@ -64,7 +64,7 @@ export function useAgentThoughtStream() {
           buffer += decoder.decode(value, { stream: true })
 
           const parts = buffer.split('\n\n')
-          buffer = parts.pop() || ''
+          buffer = parts.pop() ?? ''
 
           for (const part of parts) {
             if (!part.trim()) continue
@@ -92,7 +92,7 @@ export function useAgentThoughtStream() {
                 setIsStreaming(false)
                 options.onFinalResponse?.(data)
               } else if (eventType === 'error') {
-                throw new Error(data.detail || 'Unknown streaming error')
+                throw new Error(data.detail ?? 'Unknown streaming error')
               }
             } catch (e) {
               console.error('Failed to parse SSE message', e)

@@ -8,6 +8,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { loadEnv } from 'vite'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
 const isRailwayDeploy =
@@ -19,11 +20,16 @@ const isFlyioDeploy =
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
-// Detect if we're running a build command (not dev server)
-const isBuildCommand =
-  process.argv.includes('build') ||
-  process.env.CI === 'true' ||
-  !!process.env.VERCEL
+
+// Explicitly load environment variables from .env files into process.env
+// for use during configuration evaluation (e.g. Sentry DSN check).
+const loadedEnv = loadEnv(
+  process.env.NODE_ENV ?? 'development',
+  process.cwd(),
+  '',
+)
+Object.assign(process.env, loadedEnv)
+
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN =
   !!process.env.SENTRY_DSN ||
@@ -33,6 +39,24 @@ const hasSentryDSN =
 const sentryRelease =
   process.env.SENTRY_RELEASE ?? process.env.npm_package_version ?? undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+
+/**
+ * Astro's `site` config must be a valid absolute URL.
+ * Some CI environments provide hostnames without protocol; normalize safely.
+ * @param {string | undefined} value
+ */
+function normalizeSiteUrl(value) {
+  if (!value) return 'https://pixelatedempathy.com'
+  try {
+    return new URL(value).toString()
+  } catch {
+    try {
+      return new URL(`https://${value}`).toString()
+    } catch {
+      return 'https://pixelatedempathy.com'
+    }
+  }
+}
 
 /**
  * @param {{ ssr: boolean; assets: string[]; filesToDeleteAfterUpload: string[] }} params
@@ -283,7 +307,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL ?? 'https://pixelatedempathy.com',
+  site: normalizeSiteUrl(process.env.PUBLIC_SITE_URL),
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -439,6 +463,10 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'framer-motion': path.resolve('./src/lib/shims/framer-motion.tsx'),
+        '@radix-ui/react-tooltip': path.resolve(
+          './src/lib/shims/radix-tooltip.tsx',
+        ),
         'astro-icon/components': path.resolve(
           './src/components/ui/astro-icon-components.ts',
         ),

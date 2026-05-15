@@ -1,11 +1,12 @@
 ---
-title: 'API Documentation'
-description: 'API Documentation documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: API Documentation documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: API Documentation
 ---
 
 # API Documentation

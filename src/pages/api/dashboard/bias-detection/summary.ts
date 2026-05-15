@@ -61,24 +61,24 @@ export const GET: APIRoute = async () => {
 
     const uptimeResult = await query(uptimeQuery)
 
-    const metrics = metricsResult.rows[0] || {}
-    const uptime = uptimeResult.rows[0]?.uptime_hours || 0
+    const metrics = metricsResult.rows[0] ?? {}
+    const uptime = uptimeResult.rows[0]?.uptime_hours ?? 0
 
     // Format response
     const response = {
       metrics: {
-        'total-sessions': metrics.total_sessions || 0,
+        'total-sessions': metrics.total_sessions ?? 0,
         'avg-bias-score':
-          ((metrics.avg_bias_score || 0) * 100).toFixed(1) + '%',
-        'active-alerts': metrics.active_alerts || 0,
+          ((metrics.avg_bias_score ?? 0) * 100).toFixed(1) + '%',
+        'active-alerts': metrics.active_alerts ?? 0,
         'system-uptime': uptime > 24 ? '99.7%' : '98.5%',
       },
       recentAnalyses: recentAnalysesResult.rows.map((row) => ({
         sessionId: row.session_id,
-        biasScore: parseFloat(row.bias_score || '0'),
+        biasScore: parseFloat(row.bias_score ?? '0'),
         alertLevel: row.alert_level,
         timestamp: row.created_at,
-        sessionType: row.session_type || 'Unknown',
+        sessionType: row.session_type ?? 'Unknown',
       })),
       activeAlerts: alertsResult.rows.map((row) => ({
         id: row.id,

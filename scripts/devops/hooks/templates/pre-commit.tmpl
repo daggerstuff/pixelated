@@ -61,3 +61,26 @@ else
   echo -e "${YELLOW}✨ Running full project linting (consider setting up lint-staged)...${NC}"
   pnpm run lint
 fi
+
+# D. Block markdownlint suppression comments in staged Markdown files
+MARKDOWNLINT_MARKER='<!-- markdownlint-disable -->'
+MD_FILES=$(mktemp)
+MARKDOWNLINT_VIOLATIONS=$(mktemp)
+
+git diff --cached --name-only --diff-filter=ACM -- '*.md' > "$MD_FILES"
+
+while IFS= read -r FILE; do
+  [ -z "$FILE" ] && continue
+  if [ -f "$FILE" ] && grep -nF "$MARKDOWNLINT_MARKER" "$FILE" >/dev/null 2>&1; then
+    echo "$FILE" >> "$MARKDOWNLINT_VIOLATIONS"
+  fi
+done < "$MD_FILES"
+
+if [ -s "$MARKDOWNLINT_VIOLATIONS" ]; then
+  echo -e "${RED}❌ Error: markdownlint suppression markers found in staged Markdown files:"
+  cat "$MARKDOWNLINT_VIOLATIONS"
+  rm -f "$MD_FILES" "$MARKDOWNLINT_VIOLATIONS"
+  exit 1
+fi
+
+rm -f "$MD_FILES" "$MARKDOWNLINT_VIOLATIONS"

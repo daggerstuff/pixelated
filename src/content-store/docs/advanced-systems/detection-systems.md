@@ -1,11 +1,12 @@
 ---
-title: 'Advanced Detection Systems in Therapy'
-description: 'Advanced Detection Systems in Therapy documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Advanced Detection Systems in Therapy documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Advanced Detection Systems in Therapy
 ---
 
 # Advanced Detection Systems in Therapy

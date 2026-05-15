@@ -3,13 +3,13 @@ import { logger } from '../logger'
 
 export class PerformanceLogger {
   private static instance: PerformanceLogger
-  private logDir: string
+  private readonly logDir: string
   private metricsBuffer: PerformanceMetrics[] = []
   private readonly BUFFER_SIZE = 100
   private readonly FLUSH_INTERVAL = 60000 // 1 minute
 
   private constructor() {
-    this.logDir = process.env['LOG_DIR'] || './logs/performance'
+    this.logDir = process.env['LOG_DIR'] ?? './logs/performance'
     void this.initializeLogDir()
     this.startPeriodicFlush()
   }

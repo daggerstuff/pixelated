@@ -20,10 +20,10 @@ export interface CrisisDetectionConfig {
 }
 
 export class CrisisDetectionService {
-  private aiService: AIService
-  private sensitivityLevel: 'low' | 'medium' | 'high'
-  private model?: string
-  private defaultPrompt?: string
+  private readonly aiService: AIService
+  private readonly sensitivityLevel: 'low' | 'medium' | 'high'
+  private readonly model?: string
+  private readonly defaultPrompt?: string
 
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
@@ -139,7 +139,7 @@ export class CrisisDetectionService {
       }
 
       // Combine results
-      const finalScore = Math.max(keywordAnalysis.score, aiAnalysis?.score || 0)
+      const finalScore = Math.max(keywordAnalysis.score, aiAnalysis?.score ?? 0)
 
       const thresholds =
         CrisisDetectionService.SENSITIVITY_THRESHOLDS[this.sensitivityLevel]
@@ -187,7 +187,7 @@ export class CrisisDetectionService {
   ): Promise<CrisisDetectionResult[]> {
     try {
       return await Promise.all(
-        texts.map((text) => this.detectCrisis(text, options)),
+        texts.map( async (text) => this.detectCrisis(text, options)),
       )
     } catch (error: unknown) {
       appLogger.error('Error in batch crisis detection:', {
@@ -320,7 +320,7 @@ export class CrisisDetectionService {
       )
 
       // Validate response structure
-      if (!response || !response.content) {
+      if (!response?.content) {
         appLogger.warn(
           'Invalid AI response structure, falling back to keyword analysis',
         )

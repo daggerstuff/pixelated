@@ -50,10 +50,10 @@ export class Transform extends Duplex {
 
 export class PassThrough extends Transform {}
 
-export function pipeline() {
+export async function pipeline() {
   return Promise.resolve()
 }
-export function finished() {
+export async function finished() {
   return Promise.resolve()
 }
 

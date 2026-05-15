@@ -2,17 +2,113 @@
 set -euo pipefail
 
 SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
-RCLONE_TARGET="${RCLONE_TARGET:-gdrive:vivi-home-backups}"
+RCLONE_TARGET="${RCLONE_TARGET:-HetznerS3:vivi-home-backups}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
 LOCK_FILE_BASE="${HOME:-/home/vivi}"
 BACKUP_MODE="${BACKUP_MODE:-incremental}"
 BACKUP_KEEP_RUNS="${BACKUP_KEEP_RUNS:-6}"
 BACKUP_RUN_PREFIX="${BACKUP_RUN_PREFIX:-home-vivi-run}"
 BACKUP_SECTION_STRICT_ERRORS="${BACKUP_SECTION_STRICT_ERRORS:-false}"
-BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
 BACKUP_SECTIONS="${BACKUP_SECTIONS:-}"
+DEFAULT_BACKUP_SKIP_SECTIONS=".cache .cargo .claude .claude-mem .codeql .cursor .cursor-server .codex .gemini .gemini-* .kube .antigravity-server .aitk .hermes .local .npm .pnpm-store .yarn .gradle .rustup .android .tmp .Trash .cache-browser .venvs .virtualenvs"
+BACKUP_SKIP_SECTIONS="${BACKUP_SKIP_SECTIONS:-$DEFAULT_BACKUP_SKIP_SECTIONS}"
+BACKUP_RCLONE_TRANSFERS="${BACKUP_RCLONE_TRANSFERS:-16}"
+BACKUP_RCLONE_CHECKERS="${BACKUP_RCLONE_CHECKERS:-16}"
+BACKUP_RCLONE_FAST_LIST="${BACKUP_RCLONE_FAST_LIST:-true}"
+BACKUP_RCLONE_STATS="${BACKUP_RCLONE_STATS:-8s}"
+BACKUP_RCLONE_EXTRA_ARGS="${BACKUP_RCLONE_EXTRA_ARGS:-}"
+BACKUP_RCLONE_EXCLUDE_EXTRA="${BACKUP_RCLONE_EXCLUDE_EXTRA:-}"
+if [[ "${BACKUP_RCLONE_EXCLUDE_EXTRA}" != *"pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"* ]]; then
+  BACKUP_RCLONE_EXCLUDE_EXTRA+=" pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".claude"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .claude"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".codeql"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .codeql"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".claude-mem"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .claude-mem"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".gemini-*"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .gemini-*"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cursor"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cursor"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cursor-server"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cursor-server"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".codex"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .codex"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".gemini"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .gemini"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".kube"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .kube"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".antigravity-server"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .antigravity-server"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".npm"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .npm"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".pnpm-store"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .pnpm-store"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".yarn"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .yarn"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".gradle"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .gradle"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".rustup"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .rustup"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".venvs"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .venvs"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".virtualenvs"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .virtualenvs"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".android"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .android"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".tmp"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .tmp"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".Trash"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .Trash"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cache-browser"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cache-browser"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".aitk"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .aitk"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".hermes"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .hermes"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".local"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .local"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cache"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cache"
+fi
+if [[ "${BACKUP_SKIP_SECTIONS}" != *".cargo"* ]]; then
+  BACKUP_SKIP_SECTIONS+=" .cargo"
+fi
+BACKUP_HEARTBEAT_INTERVAL="${BACKUP_HEARTBEAT_INTERVAL:-120}"
 SECTION_BACKUP_PATHS=()
 SECTION_FAIL_COUNT=0
+BACKUP_HEARTBEAT_PID=""
+BACKUP_RUN_ID="${BACKUP_RUN_ID:-}"
+BACKUP_RESUME_STATE_DIR="${BACKUP_RESUME_STATE_DIR:-}"
+BACKUP_SECTION_COMPLETED_FILE="${BACKUP_SECTION_COMPLETED_FILE:-}"
+BACKUP_RUN_STATE_FILE="${BACKUP_RUN_STATE_FILE:-}"
+BACKUP_RUN_STATE_MAX_AGE_SECONDS="${BACKUP_RUN_STATE_MAX_AGE_SECONDS:-0}"
+declare -A COMPLETED_SECTIONS=()
 
 if [[ "$RCLONE_TARGET" == "drive:vivi-home-backups" ]]; then
   RCLONE_TARGET="gdrive:vivi-home-backups"
@@ -34,6 +130,28 @@ LOCK_FILE_BASE="$HOME"
 BACKUP_DIR="${BACKUP_DIR:-$HOME/.local/share/home_backups}"
 LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
 LOCK_FILE="${LOCK_FILE_BASE}/.cache/home-vivi-backup.lock"
+BACKUP_RESUME_STATE_DIR="${BACKUP_RESUME_STATE_DIR:-$BACKUP_DIR/.backup-state}"
+BACKUP_RUN_STATE_FILE="${BACKUP_RUN_STATE_FILE:-$BACKUP_RESUME_STATE_DIR/sectioned-run-state}"
+mkdir -p "$BACKUP_RESUME_STATE_DIR"
+
+if [[ -z "$BACKUP_RUN_ID" && -s "$BACKUP_RUN_STATE_FILE" ]]; then
+  SAVED_RUN_ID="$(tr -d '[:space:]' < "$BACKUP_RUN_STATE_FILE")"
+  if [[ -n "$SAVED_RUN_ID" ]]; then
+    if (( BACKUP_RUN_STATE_MAX_AGE_SECONDS > 0 )); then
+      BACKUP_RUN_STATE_MTIME="$(stat -c %Y "$BACKUP_RUN_STATE_FILE" 2>/dev/null || echo 0)"
+      BACKUP_RUN_STATE_AGE="$(( $(date +%s) - BACKUP_RUN_STATE_MTIME ))"
+      if (( BACKUP_RUN_STATE_AGE < 0 || BACKUP_RUN_STATE_AGE > BACKUP_RUN_STATE_MAX_AGE_SECONDS )); then
+        SAVED_RUN_ID=""
+      fi
+    fi
+    if [[ -n "$SAVED_RUN_ID" ]]; then
+      BACKUP_RUN_ID="$SAVED_RUN_ID"
+    fi
+  fi
+fi
+BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
+BACKUP_SECTION_COMPLETED_FILE="${BACKUP_SECTION_COMPLETED_FILE:-$BACKUP_RESUME_STATE_DIR/sectioned-completed.${BACKUP_RUN_ID}}"
+echo "$BACKUP_RUN_ID" > "$BACKUP_RUN_STATE_FILE"
 
 if [[ -n "${RCLONE_CONFIG:-}" && ! -r "$RCLONE_CONFIG" ]]; then
   RCLONE_CONFIG=""
@@ -110,23 +228,27 @@ load_rclone_args() {
   mapfile -t RCLONE_COPY_ARGS < <(printf '%s\n' \
     "--checksum" \
     "--create-empty-src-dirs" \
-    "--transfers" "8" \
-    "--checkers" "8" \
+    "--transfers" "${BACKUP_RCLONE_TRANSFERS}" \
+    "--checkers" "${BACKUP_RCLONE_CHECKERS}" \
     "--ignore-errors" \
     "--skip-links" \
     "--retries" "5" \
     "--low-level-retries" "10" \
-    "--stats" "15s" \
+    "--stats" "${BACKUP_RCLONE_STATS}" \
     "--stats-one-line")
+
+  if [[ "${BACKUP_RCLONE_FAST_LIST,,}" == "true" || "${BACKUP_RCLONE_FAST_LIST,,}" == "1" ]]; then
+    RCLONE_COPY_ARGS+=("--fast-list")
+  fi
 
   mapfile -t RCLONE_EXCLUDE_PATHS < <(printf '%s\n' \
     ".cache/**" \
     "cache/**" \
     ".cursor/**" \
+    ".codeql/**" \
     ".cursor-server/**" \
     ".codex/**" \
     ".claude/**" \
-    ".claude-mem/**" \
     "pixelated/dist/**" \
     "pixelated/build/**" \
     "pixelated/.next/**" \
@@ -152,10 +274,76 @@ load_rclone_args() {
     ".cache/home-backup-*" \
     ".cache/home-vivi-backup-*")
 
+  if [[ -n "${BACKUP_RCLONE_EXCLUDE_EXTRA}" ]]; then
+    while IFS= read -r exclude_arg; do
+      exclude_arg="$(printf '%s\n' "$exclude_arg" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+      if [[ "${exclude_arg:0:1}" == "#" ]]; then
+        continue
+      fi
+      if [[ -n "$exclude_arg" ]]; then
+        RCLONE_EXCLUDE_PATHS+=("$exclude_arg")
+      fi
+    done < <(printf '%s\n' "${BACKUP_RCLONE_EXCLUDE_EXTRA}" | tr ',;' '\n')
+  fi
+
+  if [[ -n "${BACKUP_RCLONE_EXTRA_ARGS}" ]]; then
+    read -ra CUSTOM_RCLONE_ARGS <<< "${BACKUP_RCLONE_EXTRA_ARGS}"
+    RCLONE_COPY_ARGS+=("${CUSTOM_RCLONE_ARGS[@]}")
+  fi
+
   local exclude_arg
   for exclude_arg in "${RCLONE_EXCLUDE_PATHS[@]}"; do
     RCLONE_COPY_ARGS+=("--exclude" "$exclude_arg")
   done
+}
+
+is_skipped_section() {
+  local section_name="$1"
+  local skip_section
+  local skip_candidates
+
+  skip_candidates="$(printf '%s' "${BACKUP_SKIP_SECTIONS:-}" | tr ',;' ' ')"
+  for skip_section in ${skip_candidates}; do
+    case "$section_name" in
+      $skip_section)
+        return 0
+        ;;
+    esac
+  done
+  return 1
+}
+
+load_completed_sections() {
+  local section_path
+  if [[ -f "$BACKUP_SECTION_COMPLETED_FILE" ]]; then
+    while IFS= read -r section_path; do
+      [[ -z "$section_path" ]] && continue
+      COMPLETED_SECTIONS["$section_path"]=1
+    done < "$BACKUP_SECTION_COMPLETED_FILE"
+    log "Loaded checkpoint file with ${#COMPLETED_SECTIONS[@]} completed sections"
+  fi
+}
+
+mark_section_complete() {
+  local section_name="$1"
+  local marker
+  marker="$BACKUP_SECTION_COMPLETED_FILE"
+
+  if [[ -n "${COMPLETED_SECTIONS[$section_name]:-}" ]]; then
+    return
+  fi
+  printf '%s\n' "$section_name" >> "$marker"
+  COMPLETED_SECTIONS["$section_name"]=1
+}
+
+is_section_complete() {
+  local section_name="$1"
+  [[ -n "${COMPLETED_SECTIONS[$section_name]:-}" ]]
+}
+
+cleanup_completed_checkpoint() {
+  rm -f "$BACKUP_SECTION_COMPLETED_FILE"
+  rm -f "$BACKUP_RUN_STATE_FILE"
 }
 
 collect_section_paths() {
@@ -179,8 +367,10 @@ collect_section_paths() {
   fi
 
   while IFS= read -r -d '' section_path; do
-    if [[ "$(basename "$section_path")" == ".cache" ]]; then
-      log "Skipping auto section (cache root): $(basename "$section_path")"
+    local section_name
+    section_name="$(basename "$section_path")"
+    if is_skipped_section "$section_name"; then
+      log "Skipping auto section: ${section_name}"
       continue
     fi
     SECTION_BACKUP_PATHS+=("$section_path")
@@ -218,11 +408,16 @@ run_section_backup() {
   if [[ -z "$section_name" || "$section_name" == "." ]]; then
     section_name="root"
   fi
+  if is_section_complete "$section_name"; then
+    log "Skipping already-completed section (resume): ${section_name}"
+    return
+  fi
   section_dest="${RCLONE_SECTION_ROOT}/${section_name}"
 
   log "Starting incremental section sync (${section_name}) from ${section_path} to ${section_dest}"
   if rclone copy "$section_path" "$section_dest" "${RCLONE_COPY_ARGS[@]}"; then
     log "Section sync completed successfully: ${section_name}"
+    mark_section_complete "$section_name"
   else
     SECTION_FAIL_COUNT=$((SECTION_FAIL_COUNT + 1))
     log "Section sync failed: ${section_name}"
@@ -279,7 +474,31 @@ cleanup_staging() {
   fi
 }
 
-trap 'cleanup_lock; cleanup_staging' EXIT
+start_backup_heartbeat() {
+  if ! [[ "$BACKUP_HEARTBEAT_INTERVAL" =~ ^[0-9]+$ ]] || (( BACKUP_HEARTBEAT_INTERVAL <= 0 )); then
+    return
+  fi
+
+  BACKUP_START_EPOCH="$(date +%s)"
+  (
+    while true; do
+      sleep "$BACKUP_HEARTBEAT_INTERVAL"
+      current_time="$(date +%s)"
+      elapsed_seconds="$((current_time - BACKUP_START_EPOCH))"
+      log "Heartbeat: backup still running for ${elapsed_seconds}s (mode=${BACKUP_MODE})"
+    done
+  ) &
+  BACKUP_HEARTBEAT_PID=$!
+}
+
+stop_backup_heartbeat() {
+  if [[ -n "${BACKUP_HEARTBEAT_PID:-}" ]]; then
+    kill -TERM "$BACKUP_HEARTBEAT_PID" 2>/dev/null || true
+    wait "$BACKUP_HEARTBEAT_PID" 2>/dev/null || true
+  fi
+}
+
+trap 'stop_backup_heartbeat; cleanup_lock; cleanup_staging' EXIT
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
@@ -287,11 +506,23 @@ if ! flock -n 9; then
   exit 0
 fi
 lock_acquired=true
+start_backup_heartbeat
+log "Effective BACKUP_SECTIONS='${BACKUP_SECTIONS}'"
+log "Effective BACKUP_SKIP_SECTIONS='${BACKUP_SKIP_SECTIONS}'"
+log "Effective BACKUP_RCLONE_TRANSFERS='${BACKUP_RCLONE_TRANSFERS}'"
+log "Effective BACKUP_RCLONE_CHECKERS='${BACKUP_RCLONE_CHECKERS}'"
+log "Effective BACKUP_RCLONE_FAST_LIST='${BACKUP_RCLONE_FAST_LIST}'"
+log "Effective BACKUP_RCLONE_EXCLUDE_EXTRA='${BACKUP_RCLONE_EXCLUDE_EXTRA}'"
+log "Effective BACKUP_RCLONE_EXTRA_ARGS='${BACKUP_RCLONE_EXTRA_ARGS}'"
+log "Effective BACKUP_RUN_ID='${BACKUP_RUN_ID}'"
+log "Checkpoint file='${BACKUP_SECTION_COMPLETED_FILE}'"
+log "Heartbeat interval: ${BACKUP_HEARTBEAT_INTERVAL}s"
 
 case "$BACKUP_MODE" in
   sectioned)
     load_rclone_args
     RCLONE_SECTION_ROOT="${RCLONE_DEST}/${BACKUP_RUN_PREFIX}-${BACKUP_RUN_ID}"
+    load_completed_sections
     collect_section_paths
     log "Starting sectioned sync from ${SOURCE_DIR} to ${RCLONE_SECTION_ROOT}"
     for section_path in "${SECTION_BACKUP_PATHS[@]}"; do
@@ -304,6 +535,7 @@ case "$BACKUP_MODE" in
       log "Sectioned sync encountered errors and BACKUP_SECTION_STRICT_ERRORS=true"
       exit 1
     fi
+    cleanup_completed_checkpoint
     ;;
 
   incremental)
@@ -311,6 +543,7 @@ case "$BACKUP_MODE" in
     log "Starting incremental stream sync from ${SOURCE_DIR} to ${RCLONE_DEST}/${BACKUP_RUN_PREFIX}-${BACKUP_RUN_ID}"
     rclone copy "$SOURCE_DIR" "${RCLONE_DEST}/${BACKUP_RUN_PREFIX}-${BACKUP_RUN_ID}" "${RCLONE_COPY_ARGS[@]}"
     log "Incremental stream sync completed successfully"
+    cleanup_completed_checkpoint
     run_retention_cleanup
     ;;
   full)
@@ -320,7 +553,8 @@ case "$BACKUP_MODE" in
     ARCHIVE_STAGING_TMP="$ARCHIVE_STAGING_DIR/home-vivi-${BACKUP_TIMESTAMP}.tar.gz.tmp"
 
     mapfile -t TAR_EXCLUDE_ARGS < <(printf '%s\n' \
-      "--exclude=.cache/**" \
+    "--exclude=.cache/**" \
+    "--exclude=.codeql/**" \
     "--exclude=cache/**" \
       "--exclude=.cursor/**" \
       "--exclude=.cursor-server/**" \
@@ -343,7 +577,6 @@ case "$BACKUP_MODE" in
       "--exclude=**/*.log" \
       "--exclude=.local/share/zed/**" \
       "--exclude=.local/share/home_backups/**" \
-      "--exclude=.claude-mem/**" \
       "--exclude=.cache/home-vivi-backup.lock" \
       "--exclude=**/node_modules/**" \
       "--exclude=**/.venv/**")
@@ -366,6 +599,7 @@ case "$BACKUP_MODE" in
         log "Removed old local backup: ${archive}"
       done
     fi
+    cleanup_completed_checkpoint
     ;;
   *)
     log "Invalid BACKUP_MODE '$BACKUP_MODE'. Expected 'sectioned', 'incremental', or 'full'."

@@ -20,7 +20,7 @@ interface EncryptedData {
  * with AWS KMS for key management
  */
 export class Encryption {
-  private keyStorage: KeyStorage
+  private readonly keyStorage: KeyStorage
 
   constructor(options: EncryptionOptions) {
     this.keyStorage = new KeyStorage({
@@ -87,7 +87,7 @@ export class Encryption {
 
       // Get the key data
       const keyData = await this.keyStorage.getKey(encrypted.keyId)
-      if (!keyData || !keyData.encryptedKey) {
+      if (!keyData?.encryptedKey) {
         throw new Error('Key not found or invalid')
       }
 

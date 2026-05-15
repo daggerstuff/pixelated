@@ -17,9 +17,9 @@ interface ExtendedPerformance extends Performance {
 function formatError(error: unknown): Record<string, unknown> {
   if (error instanceof Error) {
     return {
-      name: (error as Error)?.name,
+      name: (error)?.name,
       message: String(error),
-      stack: (error as Error)?.stack,
+      stack: (error)?.stack,
     }
   }
   return { unknownError: error }
@@ -27,7 +27,7 @@ function formatError(error: unknown): Record<string, unknown> {
 
 export class MonitoringService {
   private static instance: MonitoringService
-  private config: MonitoringConfig
+  private readonly config: MonitoringConfig
   private initialized: boolean = false
 
   private constructor() {
@@ -95,8 +95,8 @@ export class MonitoringService {
           apiKey,
           app: {
             name: rumApplicationName,
-            version: process.env['APP_VERSION'] || '1.0.0',
-            environment: process.env['NODE_ENV'] || 'production',
+            version: process.env['APP_VERSION'] ?? '1.0.0',
+            environment: process.env['NODE_ENV'] ?? 'production',
           },
           instrumentations: ['errors', 'webVitals', 'fetch', 'history'],
           samplingRate: rumSamplingRate,
@@ -171,7 +171,7 @@ export class MonitoringService {
   private collectPerformanceMetrics() {
     const metrics = {
       timestamp: Date.now(),
-      memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize || 0,
+      memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize ?? 0,
       navigation: performance.getEntriesByType(
         'navigation',
       )[0] as PerformanceNavigationTiming,

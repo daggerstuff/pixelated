@@ -1,11 +1,14 @@
 ---
-title: 'Integration Guide: Therapy Analysis System'
-description: 'Integration Guide: Therapy Analysis System documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: >-
+  This guide demonstrates how to integrate the Advanced Detection Systems, Mistral-7B RAG, and Behavioral Analysis
+  Models into a cohesive therapy analysis
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: 'Integration Guide: Therapy Analysis System'
 ---
 
 # Integration Guide: Therapy Analysis System
@@ -56,21 +59,21 @@ class TherapySession:
         self.behavioral_analyzer = BehavioralAnalyzer()
 
     async def process_interaction(self, interaction: ClientInteraction):
-        # 1. Real-time analysis
+# 1. Real-time analysis
         detection_results = await self.detection_system.analyze(interaction)
 
-        # 2. Context retrieval and response generation
+# 2. Context retrieval and response generation
         context = await self.rag_system.retrieve_context(interaction, detection_results)
         response = await self.rag_system.generate_response(interaction, context)
 
-        # 3. Behavioral analysis
+# 3. Behavioral analysis
         behavioral_insights = await self.behavioral_analyzer.analyze(
             interaction,
             detection_results,
             response
         )
 
-        # 4. Risk assessment
+# 4. Risk assessment
         risk_assessment = self.assess_risk(detection_results, behavioral_insights)
 
         return TherapyResponse(
@@ -92,19 +95,19 @@ class RealTimeProcessor:
 
     async def process_stream(self, stream: AsyncIterator[InteractionData]):
         async for data in stream:
-            # Parallel processing of different modalities
+# Parallel processing of different modalities
             text_analysis = self.text_pipeline.process(data.text)
             voice_analysis = self.voice_pipeline.process(data.voice)
             behavior_analysis = self.behavior_pipeline.process(data.behavior)
 
-            # Combine results
+# Combine results
             combined_analysis = await self.merge_analyses(
                 text_analysis,
                 voice_analysis,
                 behavior_analysis
             )
 
-            # Check for critical patterns
+# Check for critical patterns
             if self.requires_immediate_action(combined_analysis):
                 await self.trigger_alert(combined_analysis)
 
@@ -124,13 +127,13 @@ class CrisisDetector:
         session_data = await self.get_session_stream(session_id)
 
         async for interaction in session_data:
-            # Pattern matching
+# Pattern matching
             patterns = await self.pattern_matcher.find_patterns(interaction)
 
-            # Risk assessment
+# Risk assessment
             risk_level = await self.risk_assessor.assess_risk(patterns)
 
-            # Alert handling
+# Alert handling
             if risk_level.requires_action:
                 await self.alert_manager.handle_risk(
                     session_id=session_id,

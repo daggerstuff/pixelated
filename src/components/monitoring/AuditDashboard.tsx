@@ -40,7 +40,7 @@ export function AuditDashboard() {
       } catch (err: unknown) {
         setError(
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : 'Failed to load audit metrics',
         )
       } finally {
@@ -48,7 +48,7 @@ export function AuditDashboard() {
       }
     }
 
-    fetchAuditMetrics()
+    void fetchAuditMetrics()
     // Refresh metrics every 5 minutes
     const interval = setInterval(fetchAuditMetrics, 5 * 60 * 1000)
     return () => clearInterval(interval)

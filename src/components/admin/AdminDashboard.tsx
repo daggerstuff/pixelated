@@ -2,7 +2,6 @@ import {
   ChartBar,
   TrendingUp,
   Star,
-  Users,
   Building,
   Settings,
   Clipboard,
@@ -34,6 +33,16 @@ interface TherapistPerformance {
   riskLevelDistribution: Record<string, number>
 }
 
+type DiagnosticIssueSeverity = 'critical' | 'warning' | 'info'
+
+interface DiagnosticIssue {
+  id: string
+  title: string
+  message: string
+  action: string
+  severity: DiagnosticIssueSeverity
+}
+
 interface SystemHealth {
   apiResponseTime: number
   databasePerformance: number
@@ -41,6 +50,27 @@ interface SystemHealth {
   errorRate: number
   uptime: number
 }
+
+type DashboardTabId =
+  | 'overview'
+  | 'therapists'
+  | 'institutions'
+  | 'system'
+  | 'compliance'
+
+type DashboardTab = {
+  id: DashboardTabId
+  label: string
+  icon: 'chart' | 'therapist' | 'institution' | 'system' | 'compliance'
+}
+
+const dashboardTabs: DashboardTab[] = [
+  { id: 'overview', label: 'Overview', icon: 'chart' },
+  { id: 'therapists', label: 'Therapists', icon: 'therapist' },
+  { id: 'institutions', label: 'Institutions', icon: 'institution' },
+  { id: 'system', label: 'System Health', icon: 'system' },
+  { id: 'compliance', label: 'Compliance', icon: 'compliance' },
+]
 
 function getHighRiskCount(
   riskLevelDistribution: Record<string, number>,
@@ -131,6 +161,13 @@ export const AdminDashboard: FC = () => {
     errorRate: 0.02,
     uptime: 99.9,
   }
+  const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
+    chart: <ChartBar className='h-5 w-5' />,
+    therapist: <Stethoscope className='h-5 w-5' />,
+    institution: <Building className='h-5 w-5' />,
+    system: <Settings className='h-5 w-5' />,
+    compliance: <Clipboard className='h-5 w-5' />,
+  }
 
   return (
     <ResponsiveContainer size='full'>
@@ -154,7 +191,16 @@ export const AdminDashboard: FC = () => {
                 <select
                   aria-label='Select time range'
                   value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value as any)}
+                  onChange={(event) => {
+                    if (
+                      event.target.value === 'week' ||
+                      event.target.value === 'month' ||
+                      event.target.value === 'quarter' ||
+                      event.target.value === 'year'
+                    ) {
+                      setTimeRange(event.target.value)
+                    }
+                  }}
                   className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
                   <option value='week'>This Week</option>
@@ -169,37 +215,17 @@ export const AdminDashboard: FC = () => {
           {/* Navigation Tabs */}
           <div className='px-6'>
             <nav className='flex space-x-8'>
-              {[
-                { id: 'overview', label: 'Overview', icon: 'chart' },
-                { id: 'therapists', label: 'Therapists', icon: 'therapist' },
-                {
-                  id: 'institutions',
-                  label: 'Institutions',
-                  icon: 'institution',
-                },
-                { id: 'system', label: 'System Health', icon: 'system' },
-                { id: 'compliance', label: 'Compliance', icon: 'compliance' },
-              ].map((tab) => (
+              {dashboardTabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setDashboardView(tab.id as any)}
+                  onClick={() => setDashboardView(tab.id)}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  {tab.icon === 'chart' ? (
-                    <ChartBar className='h-5 w-5' />
-                  ) : tab.icon === 'therapist' ? (
-                    <Stethoscope className='h-5 w-5' />
-                  ) : tab.icon === 'institution' ? (
-                    <Building className='h-5 w-5' />
-                  ) : tab.icon === 'system' ? (
-                    <Settings className='h-5 w-5' />
-                  ) : tab.icon === 'compliance' ? (
-                    <Clipboard className='h-5 w-5' />
-                  ) : null}
+                  {tabIcons[tab.icon]}
                   {tab.label}
                 </button>
               ))}
@@ -679,7 +705,7 @@ const TherapistsTab: FC<{
  */
 const InstitutionsTab: FC<{
   metrics: InstitutionMetrics
-}> = ({ metrics }) => {
+}> = ({ metrics: _metrics }) => {
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
@@ -776,11 +802,133 @@ const InstitutionsTab: FC<{
 const SystemTab: FC<{
   health: SystemHealth
 }> = ({ health }) => {
+  const [diagnosticIssues, setDiagnosticIssues] = React.useState<
+    DiagnosticIssue[]
+  >([])
+  const [isRunningDiagnostics, setIsRunningDiagnostics] =
+    React.useState<boolean>(false)
+  const [lastDiagnosticsRun, setLastDiagnosticsRun] =
+    React.useState<Date | null>(null)
+
+  const runDiagnostics = React.useCallback(async () => {
+    setIsRunningDiagnostics(true)
+
+    const issues: DiagnosticIssue[] = []
+
+    if (health.apiResponseTime > 75) {
+      issues.push({
+        id: 'api-response-time',
+        title: 'API latency elevated',
+        message: `Current API response time is ${health.apiResponseTime}ms, above the recommended 75ms threshold.`,
+        action:
+          'Inspect upstream service dependencies and database query plans.',
+        severity: 'critical',
+      })
+    }
+
+    if (health.databasePerformance < 90) {
+      issues.push({
+        id: 'database-performance',
+        title: 'Database health warning',
+        message: `Database performance is ${health.databasePerformance}%, below target range.`,
+        action: 'Review connection pools and slow query logs.',
+        severity: 'warning',
+      })
+    }
+
+    if (health.memoryUsage > 80) {
+      issues.push({
+        id: 'memory-usage',
+        title: 'High memory pressure',
+        message: `Memory usage is ${health.memoryUsage}%, which may increase restart risk.`,
+        action:
+          'Scale memory resources or trim background worker cache retention.',
+        severity: 'warning',
+      })
+    }
+
+    if (health.errorRate > 0.02) {
+      issues.push({
+        id: 'error-rate',
+        title: 'Error rate spike',
+        message: `Current error rate is ${(health.errorRate * 100).toFixed(2)}%, above the 2% alert threshold.`,
+        action:
+          'Review recent error logs and isolate failing service dependencies.',
+        severity: 'critical',
+      })
+    }
+
+    if (health.uptime < 99.5) {
+      issues.push({
+        id: 'uptime',
+        title: 'Suboptimal uptime',
+        message: `Uptime is ${health.uptime}%, indicating recent instability.`,
+        action:
+          'Correlate deployment events with service restarts and incident logs.',
+        severity: 'warning',
+      })
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 450))
+
+    setDiagnosticIssues(
+      issues.length > 0
+        ? issues
+        : [
+            {
+              id: 'no-issues',
+              title: 'No diagnostic concerns',
+              message: 'All checks are within normal operating thresholds.',
+              action: 'Continue scheduled monitoring.',
+              severity: 'info',
+            },
+          ],
+    )
+    setLastDiagnosticsRun(new Date())
+    setIsRunningDiagnostics(false)
+  }, [health])
+
+  const getIssueClasses = (severity: DiagnosticIssueSeverity) => {
+    switch (severity) {
+      case 'critical': {
+        return {
+          wrapper:
+            'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
+          label: 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-100',
+        }
+      }
+      case 'warning': {
+        return {
+          wrapper:
+            'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-100',
+          label:
+            'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-100',
+        }
+      }
+      case 'info': {
+        return {
+          wrapper:
+            'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
+          label:
+            'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
+        }
+      }
+      default: {
+        const exhaustiveCheck: never = severity
+        throw new Error(`Unhandled severity: ${String(exhaustiveCheck)}`)
+      }
+    }
+  }
+
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <h2 className='text-xl font-semibold'>System Health & Performance</h2>
-        <button className='bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors'>
+        <button
+          onClick={runDiagnostics}
+          disabled={isRunningDiagnostics}
+          className='bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors disabled:opacity-60'
+        >
           Run Diagnostics
         </button>
       </div>
@@ -858,6 +1006,52 @@ const SystemTab: FC<{
           </div>
         </div>
       </div>
+
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+        <div className='mb-4 flex items-center justify-between'>
+          <h3 className='text-lg font-semibold'>Diagnostic Problems</h3>
+          {lastDiagnosticsRun ? (
+            <p className='text-gray-500 text-sm'>
+              Last run: {lastDiagnosticsRun.toLocaleTimeString()}
+            </p>
+          ) : (
+            <p className='text-gray-500 text-sm'>Not run yet</p>
+          )}
+        </div>
+
+        {isRunningDiagnostics ? (
+          <div className='text-gray-600 dark:text-gray-300 text-sm'>
+            Running diagnostics...
+          </div>
+        ) : diagnosticIssues.length === 0 ? (
+          <div className='text-gray-600 dark:text-gray-300 text-sm'>
+            Run diagnostics to scan for current system issues.
+          </div>
+        ) : (
+          <div className='space-y-3'>
+            {diagnosticIssues.map((issue) => {
+              const styles = getIssueClasses(issue.severity)
+              return (
+                <div
+                  key={issue.id}
+                  className={`rounded-lg border p-3 ${styles.wrapper}`}
+                >
+                  <div className='flex items-center justify-between'>
+                    <p className='font-medium'>{issue.title}</p>
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${styles.label}`}
+                    >
+                      {issue.severity.toUpperCase()}
+                    </span>
+                  </div>
+                  <p className='mt-1 text-sm'>{issue.message}</p>
+                  <p className='text-gray-500 mt-2 text-sm'>{issue.action}</p>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -934,9 +1128,9 @@ const ComplianceTab: FC<{
                 status: 'passed',
                 score: 98,
               },
-            ].map((audit, index) => (
+            ].map((audit) => (
               <div
-                key={index}
+                key={`${audit.type}-${audit.date}`}
                 className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
               >
                 <div>

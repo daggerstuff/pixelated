@@ -13,13 +13,27 @@ spec:
       labels:
         app: pixelated-empathy-redis
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: redis
         image: redis:7-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
         command:
         - sh
         - -c
-        - redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
+        - redis-server --bind 0.0.0.0 --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
         envFrom:
         - secretRef:
             name: pixelated-empathy-secrets

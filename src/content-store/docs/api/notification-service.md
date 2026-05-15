@@ -1,11 +1,12 @@
 ---
-title: 'Notification Service API Documentation'
-description: 'Notification Service API Documentation documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Notification Service API Documentation documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Notification Service API Documentation
 ---
 
 # Notification Service API Documentation

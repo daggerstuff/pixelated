@@ -2,9 +2,14 @@
 # Install or update the backup-home-vivi systemd service/timer and restart the timer.
 
 set -euo pipefail
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+ 
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 SYSTEMD_SOURCE_DIR="$PROJECT_ROOT/scripts/systemd"
 SYSTEMD_TARGET_DIR="/etc/systemd/system"
 SERVICE_NAME="backup-home-vivi.service"
@@ -15,6 +20,7 @@ BACKUP_SERVICE_TARGET="$SYSTEMD_TARGET_DIR/$SERVICE_NAME"
 BACKUP_TIMER_TARGET="$SYSTEMD_TARGET_DIR/$TIMER_NAME"
 BACKUP_OVERRIDES_DIR="$SYSTEMD_TARGET_DIR/${SERVICE_NAME}.d"
 BACKUP_OVERRIDES_FILE="$BACKUP_OVERRIDES_DIR/10-local-env.conf"
+BACKUP_LEGACY_OVERRIDE_FILE="$BACKUP_OVERRIDES_DIR/override.conf"
 
 usage() {
   cat <<'USAGE'
@@ -29,6 +35,7 @@ Options:
   --run-prefix <prefix>                 Override BACKUP_RUN_PREFIX.
   --strict-errors <true|false>           Override BACKUP_SECTION_STRICT_ERRORS.
   --sections <comma/newline-separated>   Override BACKUP_SECTIONS.
+  --no-block                           Restart timer without blocking.
 
 All environment overrides can also be provided via environment variables:
   BACKUP_MODE, BACKUP_KEEP_RUNS, BACKUP_RUN_PREFIX,
@@ -73,6 +80,7 @@ BACKUP_KEEP_RUNS_OVERRIDE="${BACKUP_KEEP_RUNS:-}"
 BACKUP_RUN_PREFIX_OVERRIDE="${BACKUP_RUN_PREFIX:-}"
 BACKUP_SECTION_STRICT_ERRORS_OVERRIDE="${BACKUP_SECTION_STRICT_ERRORS:-}"
 BACKUP_SECTIONS_OVERRIDE="${BACKUP_SECTIONS:-}"
+NO_BLOCK_RESTART=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -95,6 +103,14 @@ while [[ $# -gt 0 ]]; do
     --sections)
       BACKUP_SECTIONS_OVERRIDE="$(parse_arg "$1" "${@:2}")"
       shift 2
+      ;;
+    --no-block)
+      NO_BLOCK_RESTART=1
+      shift
+      ;;
+    --block)
+      NO_BLOCK_RESTART=0
+      shift
       ;;
     -h|--help)
       usage
@@ -146,16 +162,31 @@ echo "[info] Copying systemd service/timer files..."
 "${SUDO[@]}" install -m 0644 "$BACKUP_SERVICE_SOURCE" "$BACKUP_SERVICE_TARGET"
 "${SUDO[@]}" install -m 0644 "$BACKUP_TIMER_SOURCE" "$BACKUP_TIMER_TARGET"
 
+if [[ -f "$BACKUP_LEGACY_OVERRIDE_FILE" ]]; then
+  echo "[info] Removing legacy override drop-in: $BACKUP_LEGACY_OVERRIDE_FILE"
+  "${SUDO[@]}" rm -f "$BACKUP_LEGACY_OVERRIDE_FILE"
+fi
+
 echo "[info] Applying optional environment overrides..."
 build_override_file
 
 echo "[info] Reloading systemd and restarting timer..."
 "${SUDO[@]}" systemctl daemon-reload
 "${SUDO[@]}" systemctl enable backup-home-vivi.timer
-"${SUDO[@]}" systemctl restart backup-home-vivi.timer
+RESTART_CMD=( "${SUDO[@]}" systemctl restart )
+if (( NO_BLOCK_RESTART == 1 )); then
+  RESTART_CMD+=(--no-block)
+fi
+RESTART_CMD+=(backup-home-vivi.timer)
+"${RESTART_CMD[@]}"
 
 echo "[info] Current timer status:"
 "${SUDO[@]}" systemctl status backup-home-vivi.timer --no-pager --full
 
 echo
 echo "[success] Backup service update complete."
+echo
+echo "[help] To run a one-off backup without blocking this terminal:"
+echo "  sudo /home/vivi/pixelated/scripts/backup/run-backup-home-vivi-now.sh"
+echo "  # add a second argument of 0 to skip live tail"
+echo "  sudo /home/vivi/pixelated/scripts/backup/run-backup-home-vivi-now.sh backup-home-vivi.service 0"

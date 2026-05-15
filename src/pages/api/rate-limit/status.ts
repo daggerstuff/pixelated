@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url)
     const includeAnalytics = url.searchParams.get('analytics') === 'true'
     const includeAlerts = url.searchParams.get('alerts') === 'true'
-    const days = parseInt(url.searchParams.get('days') || '7')
+    const days = parseInt(url.searchParams.get('days') ?? '7')
 
     const [status, health] = await Promise.all([
       getRateLimitStatus(),

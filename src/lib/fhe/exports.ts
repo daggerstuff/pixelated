@@ -78,7 +78,7 @@ export async function createFHEService(
 }
 
 // Export the FHEService class
-export { FHEService } from './index'
+export type { FHEService } from './types'
 
 // Re-export types explicitly to avoid ambiguity
 export type {

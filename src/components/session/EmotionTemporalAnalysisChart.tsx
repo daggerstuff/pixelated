@@ -17,7 +17,12 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import type { TemporalEmotionAnalysis } from '../../lib/ai/temporal/EmotionTemporalAnalyzer'
+import type {
+  TemporalCriticalPoint,
+  TemporalDimensionalRelationship,
+  TemporalEmotionAnalysis,
+  TemporalTransition,
+} from '../../lib/ai/temporal/EmotionTemporalAnalyzer'
 
 type EmotionTemporalAnalysisChartProps = {
   data: TemporalEmotionAnalysis
@@ -45,7 +50,20 @@ const emotionColors: Record<string, string> = {
 
 // Get color for an emotion type, with fallback
 const getEmotionColor = (emotion: string): string => {
-  return emotionColors[emotion.toLowerCase()] || '#94a3b8' // slate-400 default
+  return emotionColors[emotion.toLowerCase()] ?? '#94a3b8' // slate-400 default
+}
+
+type _RechartsTooltipPayload = {
+  sessionId?: unknown
+  timestamp?: unknown
+}
+
+const toNumber = (value: unknown): number => {
+  return typeof value === 'number' ? value : 0
+}
+
+const formatNumber = (value: unknown, digits = 2): string => {
+  return toNumber(value).toFixed(digits)
 }
 
 /**
@@ -90,71 +108,101 @@ export default function EmotionTemporalAnalysisChart({
       .map(([emotion]) => emotion)
 
     // Create trendline data with selected emotions
-    return filteredEmotions.map((emotion) => {
+    return filteredEmotions.flatMap((emotion) => {
       const trendline = data.trendlines[emotion]
-      const volatility = data.volatility[emotion] || 0
-
-      return {
-        name: emotion,
-        slope: trendline.slope,
-        correlation: trendline.correlation,
-        significance: trendline.significance,
-        volatility,
-        color: getEmotionColor(emotion),
+      if (!trendline) {
+        return []
       }
+
+      const volatility = data.volatility[emotion] ?? 0
+
+      return [
+        {
+          name: emotion,
+          slope: trendline.slope,
+          correlation: trendline.correlation,
+          significance: trendline.significance,
+          volatility,
+          color: getEmotionColor(emotion),
+        },
+      ]
     })
   }
 
   // Format data for critical points visualization
   const prepareCriticalPointsData = () => {
-    return (
-      data?.['criticalPoints']?.map((point) => ({
-        name: point?.['emotion'],
-        intensity: point?.['intensity'],
-        timestamp: point?.['timestamp']?.toLocaleString(),
-        sessionId: point?.['sessionId'],
-        color: getEmotionColor(point?.['emotion']),
-      })) || []
-    )
+    return (data.criticalPoints ?? []).map((point: TemporalCriticalPoint) => ({
+      name: point.emotion,
+      intensity: point.intensity,
+      timestamp: point.timestamp.toLocaleString(),
+      sessionId: point.sessionId,
+      color: getEmotionColor(point.emotion),
+    }))
   }
 
   // Format data for progression visualization
   const prepareProgressionData = () => {
-    const progression =
-      typeof data === 'object' && data !== null && 'progression' in data
-        ? (data as { progression?: Record<string, unknown> }).progression
-        : undefined
+    const progression: {
+      overallImprovement: number
+      stabilityChange: number
+      positiveEmotionChange: number
+      negativeEmotionChange: number
+    } = {
+      overallImprovement: 0,
+      stabilityChange: 0,
+      positiveEmotionChange: 0,
+      negativeEmotionChange: 0,
+    }
+
+    if (data.progression && typeof data.progression === 'object') {
+      if (
+        'overallImprovement' in data.progression &&
+        typeof data.progression.overallImprovement === 'number'
+      ) {
+        progression.overallImprovement = data.progression.overallImprovement
+      }
+      if (
+        'stabilityChange' in data.progression &&
+        typeof data.progression.stabilityChange === 'number'
+      ) {
+        progression.stabilityChange = data.progression.stabilityChange
+      }
+      if (
+        'positiveEmotionChange' in data.progression &&
+        typeof data.progression.positiveEmotionChange === 'number'
+      ) {
+        progression.positiveEmotionChange =
+          data.progression.positiveEmotionChange
+      }
+      if (
+        'negativeEmotionChange' in data.progression &&
+        typeof data.progression.negativeEmotionChange === 'number'
+      ) {
+        progression.negativeEmotionChange =
+          data.progression.negativeEmotionChange
+      }
+    }
 
     return [
       {
         name: 'Overall Improvement',
-        value: progression?.['overallImprovement'] || 0,
-        fill:
-          (progression?.['overallImprovement'] || 0) >= 0
-            ? '#22c55e'
-            : '#ef4444',
+        value: progression.overallImprovement,
+        fill: progression.overallImprovement >= 0 ? '#22c55e' : '#ef4444',
       },
       {
         name: 'Stability Change',
-        value: progression?.['stabilityChange'] || 0,
-        fill:
-          (progression?.['stabilityChange'] || 0) >= 0 ? '#3b82f6' : '#f97316',
+        value: progression.stabilityChange,
+        fill: progression.stabilityChange >= 0 ? '#3b82f6' : '#f97316',
       },
       {
         name: 'Positive Emotion Change',
-        value: progression?.['positiveEmotionChange'] || 0,
-        fill:
-          (progression?.['positiveEmotionChange'] || 0) >= 0
-            ? '#4ade80'
-            : '#f59e0b',
+        value: progression.positiveEmotionChange,
+        fill: progression.positiveEmotionChange >= 0 ? '#4ade80' : '#f59e0b',
       },
       {
         name: 'Negative Emotion Change',
-        value: progression?.['negativeEmotionChange'] || 0,
-        fill:
-          (progression?.['negativeEmotionChange'] || 0) >= 0
-            ? '#8b5cf6'
-            : '#6366f1',
+        value: progression.negativeEmotionChange,
+        fill: progression.negativeEmotionChange >= 0 ? '#8b5cf6' : '#6366f1',
       },
     ]
   }
@@ -162,47 +210,29 @@ export default function EmotionTemporalAnalysisChart({
   // Format data for transitions visualization
   const prepareTransitionsData = () => {
     // Get top 10 most frequent transitions
-    return data?.['transitions']?.slice(0, 10)?.map((transition) => ({
-      name: `${transition?.['from']} → ${transition?.['to']}`,
-      frequency: transition?.['frequency'],
-      duration: transition.avgDuration / (1000 * 60), // Convert to minutes
-      from: transition.from,
-      to: transition.to,
-      fromColor: getEmotionColor(transition.from),
-      toColor: getEmotionColor(transition.to),
-    }))
+    return (data.transitions ?? [])
+      .slice(0, 10)
+      .map((transition: TemporalTransition) => ({
+        name: `${transition.from} → ${transition.to}`,
+        frequency: transition.frequency,
+        duration: transition.avgDuration / (1000 * 60), // Convert to minutes
+        from: transition.from,
+        to: transition.to,
+        fromColor: getEmotionColor(transition.from),
+        toColor: getEmotionColor(transition.to),
+      }))
   }
 
   // Format data for relationships visualization
   const prepareRelationshipsData = () => {
-    return Array.isArray(
-      (data as { dimensionalRelationships?: unknown[] })
-        .dimensionalRelationships,
+    return (data.dimensionalRelationships ?? []).map(
+      (rel: TemporalDimensionalRelationship) => ({
+        name: `${rel.dimensions[0]} & ${rel.dimensions[1]}`,
+        correlation: rel.correlation,
+        description: rel.description,
+        color: rel.correlation >= 0 ? '#22c55e' : '#ef4444',
+      }),
     )
-      ? (
-          data as unknown as { dimensionalRelationships: unknown[] }
-        ).dimensionalRelationships
-          .map((rel) => {
-            if (
-              typeof rel === 'object' &&
-              rel !== null &&
-              'dimensions' in rel &&
-              Array.isArray((rel as { dimensions: unknown[] }).dimensions)
-            ) {
-              return {
-                name: `${(rel as { dimensions: unknown[] }).dimensions?.[0]} & ${(rel as { dimensions: unknown[] }).dimensions?.[1]}`,
-                correlation: (rel as { correlation?: number }).correlation,
-                description: (rel as { description?: string }).description,
-                color:
-                  (rel as { correlation?: number }).correlation! >= 0
-                    ? '#22c55e'
-                    : '#ef4444',
-              }
-            }
-            return null
-          })
-          .filter(Boolean)
-      : []
   }
 
   // Toggle emotion selection in filters
@@ -227,15 +257,9 @@ export default function EmotionTemporalAnalysisChart({
 
   // Empty state (no data)
   if (
-    !data ||
-    (Object.keys(data.trendlines || {}).length === 0 &&
-      (Array.isArray((data as { criticalPoints?: unknown[] }).criticalPoints)
-        ? (data as unknown as { criticalPoints: unknown[] }).criticalPoints
-            .length
-        : 0) === 0 &&
-      (Array.isArray((data as { transitions?: unknown[] }).transitions)
-        ? (data as unknown as { transitions: unknown[] }).transitions.length
-        : 0) === 0)
+    Object.keys(data.trendlines).length === 0 &&
+    (data.criticalPoints?.length ?? 0) === 0 &&
+    (data.transitions ?? []).length === 0
   ) {
     return (
       <div className='bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6'>
@@ -263,16 +287,17 @@ export default function EmotionTemporalAnalysisChart({
           <Tooltip
             formatter={(value, name) => {
               if (name === 'slope') {
+                const numericValue = toNumber(value)
                 return [
-                  `${(value as number).toFixed(2)} (${(value as number) > 0 ? 'increasing' : 'decreasing'})`,
+                  `${formatNumber(numericValue, 2)} (${numericValue > 0 ? 'increasing' : 'decreasing'})`,
                   'Trend',
                 ]
               }
               if (name === 'correlation') {
-                return [(value as number).toFixed(2), 'Correlation']
+                return [formatNumber(value, 2), 'Correlation']
               }
               if (name === 'significance') {
-                return [(value as number).toFixed(2), 'Significance']
+                return [formatNumber(value, 2), 'Significance']
               }
               return [value, name]
             }}
@@ -331,15 +356,9 @@ export default function EmotionTemporalAnalysisChart({
 
           <Tooltip
             cursor={{ strokeDasharray: '3 3' }}
-            formatter={(value, name, _props) => {
+            formatter={(value, name) => {
               if (name === 'Intensity') {
                 return [value, name]
-              }
-              if (name === 'Session') {
-                return [_props.payload.sessionId, 'Session']
-              }
-              if (name === 'Timestamp') {
-                return [_props.payload.timestamp, 'Timestamp']
               }
               return [value, name]
             }}
@@ -414,7 +433,7 @@ export default function EmotionTemporalAnalysisChart({
                 return [value, 'Frequency']
               }
               if (name === 'duration') {
-                return [(value as number).toFixed(1), 'Avg Duration (min)']
+                return [formatNumber(value, 1), 'Avg Duration (min)']
               }
               return [value, name]
             }}
@@ -444,46 +463,33 @@ export default function EmotionTemporalAnalysisChart({
       )
     }
 
-    if (viewMode === 'relationships') {
-      return (
-        <AreaChart
-          data={prepareRelationshipsData()}
-          margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
-        >
-          <CartesianGrid strokeDasharray='3 3' />
-          <XAxis dataKey='name' />
-          <YAxis domain={[-1, 1]} />
-          <Tooltip
-            formatter={(value, name) => {
-              if (name === 'correlation') {
-                return [(value as number).toFixed(2), 'Correlation']
-              }
-              return [value, name]
-            }}
-          />
-
-          <Legend />
-          <ReferenceLine y={0} stroke='#666' />
-          <Area
-            type='monotone'
-            dataKey='correlation'
-            stroke='#8884d8'
-            fill='#8884d8'
-            fillOpacity={0.6}
-            strokeWidth={2}
-            name='Correlation'
-          />
-        </AreaChart>
-      )
-    }
-
-    // Default fallback - return an empty chart if no condition matches
     return (
-      <AreaChart data={[]} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
+      <AreaChart
+        data={prepareRelationshipsData()}
+        margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
+      >
         <CartesianGrid strokeDasharray='3 3' />
-        <XAxis />
-        <YAxis />
-        <Tooltip />
+        <XAxis dataKey='name' />
+        <YAxis domain={[-1, 1]} />
+        <Tooltip
+          formatter={(value, name) => {
+            if (name === 'correlation') {
+              return [formatNumber(value, 2), 'Correlation']
+            }
+            return [value, name]
+          }}
+        />
+        <Legend />
+        <ReferenceLine y={0} stroke='#666' />
+        <Area
+          type='monotone'
+          dataKey='correlation'
+          stroke='#8884d8'
+          fill='#8884d8'
+          fillOpacity={0.6}
+          strokeWidth={2}
+          name='Correlation'
+        />
       </AreaChart>
     )
   }

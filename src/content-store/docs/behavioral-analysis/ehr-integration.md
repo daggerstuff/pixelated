@@ -1,11 +1,12 @@
 ---
-title: 'EHR Integration for Behavioral Analysis'
-description: 'EHR Integration for Behavioral Analysis documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: EHR Integration for Behavioral Analysis documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: EHR Integration for Behavioral Analysis
 ---
 
 # EHR Integration for Behavioral Analysis

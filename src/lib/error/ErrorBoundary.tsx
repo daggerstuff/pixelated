@@ -1,9 +1,9 @@
 import type { ErrorInfo, ReactNode } from 'react'
 import React, { Component } from 'react'
 
-import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Alert } from '@/components/ui/alert.tsx'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card } from '@/components/ui/card/index.ts'
 import { logger } from '@/lib/logger'
 
 import { type ErrorContext } from './types'
@@ -125,7 +125,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({ errorInfo })
   }
 
-  private handleReset = async () => {
+  private readonly handleReset = async () => {
     if (this.state.retryCount >= MAX_RETRY_COUNT) {
       // Max retries reached, reload page
       window.location.reload()
@@ -152,11 +152,11 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private handleReload = () => {
+  private readonly handleReload = () => {
     window.location.reload()
   }
 
-  public override render() {
+  public override  async render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback

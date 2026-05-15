@@ -28,7 +28,7 @@ students/faculty **Investment:** $[AMOUNT] (refundable if benchmarks not met)
 
 ## 2. DELIVERABLES
 
-### Company Will Provide:
+### Company Will Provide
 
 - [ ] Access to AI training platform for [NUMBER] users
 - [ ] 410+ validated mental health scenarios
@@ -38,7 +38,7 @@ students/faculty **Investment:** $[AMOUNT] (refundable if benchmarks not met)
 - [ ] Monthly progress reports
 - [ ] Research collaboration and publication support
 
-### Institution Will Provide:
+### Institution Will Provide
 
 - [ ] Designated primary contact and project coordinator
 - [ ] Student/faculty participant recruitment

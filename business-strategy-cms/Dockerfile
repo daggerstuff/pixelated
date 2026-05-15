@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:24.14.1-alpine
 
 # Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
@@ -19,6 +19,13 @@ COPY . .
 
 # Build the application
 RUN pnpm build
+
+RUN addgroup --system --gid 1001 app && \
+    adduser --system --uid 1001 --ingroup app --shell /bin/bash app && \
+    chown -R app:app /app
+
+# Switch to non-root user
+USER app
 
 # Expose port
 EXPOSE 3000

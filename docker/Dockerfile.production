@@ -1,11 +1,11 @@
 # Production Dockerfile for Business Strategy CMS
 # Base stage for shared environment (no build tools)
-ARG NODE_IMAGE=node:24.12.0-bookworm-slim
+ARG NODE_IMAGE=node:24.14.1-bookworm-slim
 FROM ${NODE_IMAGE} AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@11.0.8
+RUN npm install -g pnpm@11.1.1
 RUN npm install -g npm@11.12.1
 
 # Build dependencies stage (has build tools)
@@ -14,7 +14,7 @@ WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=1
-RUN npm install -g pnpm@11.0.8
+RUN npm install -g pnpm@11.1.1
 RUN npm install -g npm@11.12.1
 RUN set -eux; \
     echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries && \
@@ -62,8 +62,9 @@ RUN set -eux; \
 # Production dependencies stage
 FROM build-base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Build stage
 FROM prod-deps AS build
@@ -76,8 +77,8 @@ WORKDIR /app
 
 # The final runtime image only needs `node`; remove package-manager tooling
 # so Trivy does not flag bundled npm/pnpm libraries we never use in prod.
-RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
-  && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+RUN rm -rf /usr/local/lib/node_modules/npm \
+  && rm -f /usr/local/bin/npm /usr/local/bin/npx \
   && rm -rf /usr/local/lib/node_modules/pnpm \
   && rm -f /usr/local/bin/pnpm /usr/local/bin/pnpx
 
@@ -105,6 +106,10 @@ ENV NODE_ENV=production
 
 # Expose port
 EXPOSE 4321
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/health || exit 1
 
 # Start application
 CMD ["node", "./docker-entrypoint.js", "node", "./dist/server/entry.mjs"]

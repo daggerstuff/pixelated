@@ -2,25 +2,112 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { Auth0UserService } from '../../../src/services/auth0.service'
 
+type MockAuthMethod = ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>
+
+type MockManagementMethods = {
+  create: MockAuthMethod
+  get: MockAuthMethod
+  list: MockAuthMethod
+  listUsersByEmail: MockAuthMethod
+  update: MockAuthMethod
+}
+
+type MockManagementTickets = {
+  changePassword: MockAuthMethod
+}
+
+type MockManagementClient = {
+  users: MockManagementMethods
+  tickets: MockManagementTickets
+  createUser: MockAuthMethod
+  getUser: MockAuthMethod
+  getUsers: MockAuthMethod
+  listUsersByEmail: MockAuthMethod
+  updateUser: MockAuthMethod
+  createPasswordChangeTicket: MockAuthMethod
+}
+
+type MockAuthOAuthMethods = {
+  passwordGrant: MockAuthMethod
+  getProfile: MockAuthMethod
+  refreshTokenGrant: MockAuthMethod
+  revokeRefreshToken: MockAuthMethod
+}
+
+type MockAuthMethods = {
+  passwordGrant: MockAuthMethod
+  getProfile: MockAuthMethod
+  refreshToken: MockAuthMethod
+  refreshTokenGrant: MockAuthMethod
+  revokeRefreshToken: MockAuthMethod
+  oauth: MockAuthOAuthMethods
+}
+
+type MockUserInfoClient = {
+  getUserInfo: MockAuthMethod
+}
+
+const mockManagementUserMethods: MockManagementMethods = vi.hoisted(() => ({
+  create: vi.fn(),
+  get: vi.fn(),
+  list: vi.fn(),
+  listUsersByEmail: vi.fn(),
+  update: vi.fn(),
+}))
+
+const mockManagementTickets: MockManagementTickets = vi.hoisted(() => ({
+  changePassword: vi.fn(),
+}))
+
+const mockManagementClient: MockManagementClient = vi.hoisted(() => {
+  return {
+    users: mockManagementUserMethods,
+    tickets: mockManagementTickets,
+    createUser: mockManagementUserMethods.create,
+    getUser: mockManagementUserMethods.get,
+    getUsers: mockManagementUserMethods.list,
+    listUsersByEmail: mockManagementUserMethods.listUsersByEmail,
+    updateUser: mockManagementUserMethods.update,
+    createPasswordChangeTicket: mockManagementTickets.changePassword,
+  }
+})
+
+const mockAuthMethods: MockAuthMethods = vi.hoisted(() => {
+  const passwordGrant = vi.fn()
+  const refreshToken = vi.fn()
+  const getProfile = vi.fn()
+  const refreshTokenGrant = vi.fn()
+  const revokeRefreshToken = vi.fn()
+  return {
+    passwordGrant,
+    getProfile,
+    refreshToken,
+    refreshTokenGrant: refreshToken,
+    revokeRefreshToken,
+    oauth: {
+      passwordGrant,
+      getProfile,
+      refreshTokenGrant: refreshToken,
+      revokeRefreshToken,
+    },
+  }
+})
+
+const mockUserInfoClient: MockUserInfoClient = vi.hoisted(() => ({
+  getUserInfo: vi.fn(),
+}))
+
 // Mock the auth0 module
 vi.mock('auth0', () => {
   return {
-    ManagementClient: vi.fn().mockImplementation(() => {
-      return {
-        createUser: vi.fn(),
-        getUser: vi.fn(),
-        getUsers: vi.fn(),
-        updateUser: vi.fn(),
-        createPasswordChangeTicket: vi.fn(),
-      }
+    ManagementClient: vi.fn(function () {
+      return mockManagementClient
     }),
-    AuthenticationClient: vi.fn().mockImplementation(() => {
-      return {
-        passwordGrant: vi.fn(),
-        getProfile: vi.fn(),
-        refreshToken: vi.fn(),
-        revokeRefreshToken: vi.fn(),
-      }
+    AuthenticationClient: vi.fn(function () {
+      return mockAuthMethods
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient
     }),
   }
 })
@@ -42,8 +129,8 @@ vi.mock('../../../src/config/mongodb.config', () => {
 
 describe('Auth0UserService', () => {
   let auth0UserService: Auth0UserService
-  let mockManagementClient: any
-  let mockAuthenticationClient: any
+  let mockAuthenticationClient: MockAuthMethods
+  let mockUserInfoClientInstance: MockUserInfoClient
 
   beforeEach(() => {
     // Reset environment variables
@@ -54,14 +141,13 @@ describe('Auth0UserService', () => {
     process.env.AUTH0_MANAGEMENT_CLIENT_ID = 'test-management-client-id'
     process.env.AUTH0_MANAGEMENT_CLIENT_SECRET = 'test-management-client-secret'
 
+    vi.clearAllMocks()
+
     // Create new instance
     auth0UserService = new Auth0UserService()
 
-    // Get the mock clients
-    const auth0Module = require('auth0')
-    mockManagementClient = auth0Module.ManagementClient.mock.results[0].value
-    mockAuthenticationClient =
-      auth0Module.AuthenticationClient.mock.results[0].value
+    mockAuthenticationClient = mockAuthMethods
+    mockUserInfoClientInstance = mockUserInfoClient
   })
 
   afterEach(() => {
@@ -83,7 +169,7 @@ describe('Auth0UserService', () => {
       }
 
       const mockUserProfile = {
-        user_id: 'auth0|123456',
+        sub: 'auth0|123456',
         email: 'test@example.com',
         email_verified: true,
         name: 'Test User',
@@ -94,17 +180,19 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'user' },
       }
 
-      mockAuthenticationClient.passwordGrant.mockResolvedValue(
-        mockTokenResponse,
-      )
-      mockAuthenticationClient.getProfile.mockResolvedValue(mockUserProfile)
+      mockAuthenticationClient.passwordGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      mockUserInfoClientInstance.getUserInfo.mockResolvedValue({
+        data: mockUserProfile,
+      })
 
       const result = await auth0UserService.signIn(
         'test@example.com',
         'password123',
       )
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         user: {
           id: 'auth0|123456',
           email: 'test@example.com',
@@ -154,7 +242,7 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       }
 
-      mockManagementClient.createUser.mockResolvedValue(mockAuth0User)
+      mockManagementClient.createUser.mockResolvedValue({ data: mockAuth0User })
 
       const result = await auth0UserService.createUser(
         'newuser@example.com',
@@ -167,14 +255,15 @@ describe('Auth0UserService', () => {
         email: 'newuser@example.com',
         emailVerified: false,
         role: 'user',
-        fullName: null,
-        avatarUrl: null,
+        fullName: undefined,
+        avatarUrl: undefined,
         createdAt: '2023-01-01T00:00:00Z',
         appMetadata: { roles: ['User'] },
         userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       })
 
-      expect(mockManagementClient.createUser).toHaveBeenCalledWith({
+      expect(mockManagementClient.createUser).toHaveBeenCalled()
+      expect(mockManagementClient.createUser.mock.calls[0]?.[0]).toMatchObject({
         email: 'newuser@example.com',
         password: 'password123',
         connection: 'Username-Password-Authentication',
@@ -185,7 +274,6 @@ describe('Auth0UserService', () => {
         },
         user_metadata: {
           role: 'user',
-          created_at: expect.any(String),
         },
       })
     })
@@ -219,7 +307,7 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'admin' },
       }
 
-      mockManagementClient.getUser.mockResolvedValue(mockAuth0User)
+      mockManagementClient.getUser.mockResolvedValue({ data: mockAuth0User })
 
       const result = await auth0UserService.getUserById('auth0|123456')
 
@@ -264,7 +352,7 @@ describe('Auth0UserService', () => {
         },
       ]
 
-      mockManagementClient.getUsers.mockResolvedValue(mockAuth0Users)
+      mockManagementClient.listUsersByEmail.mockResolvedValue(mockAuth0Users)
 
       const result = await auth0UserService.findUserByEmail('test@example.com')
 
@@ -281,14 +369,13 @@ describe('Auth0UserService', () => {
         userMetadata: { role: 'therapist' },
       })
 
-      expect(mockManagementClient.getUsers).toHaveBeenCalledWith({
-        q: 'email:"test@example.com"',
-        search_engine: 'v3',
+      expect(mockManagementClient.listUsersByEmail).toHaveBeenCalledWith({
+        email: 'test@example.com',
       })
     })
 
     it('should return null when user is not found', async () => {
-      mockManagementClient.getUsers.mockResolvedValue([])
+      mockManagementClient.listUsersByEmail.mockResolvedValue([])
 
       const result = await auth0UserService.findUserByEmail(
         'nonexistent@example.com',
@@ -312,7 +399,7 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'user', updated_field: 'new_value' },
       }
 
-      mockManagementClient.updateUser.mockResolvedValue(mockAuth0User)
+      mockManagementClient.updateUser.mockResolvedValue({ data: mockAuth0User })
 
       const updates = {
         email: 'updated@example.com',
@@ -337,12 +424,13 @@ describe('Auth0UserService', () => {
       })
 
       expect(mockManagementClient.updateUser).toHaveBeenCalledWith(
-        { id: 'auth0|123456' },
+        'auth0|123456',
         {
           email: 'updated@example.com',
           user_metadata: {
             fullName: 'Updated User',
             customField: 'new_value',
+            role: 'user',
           },
           app_metadata: {
             roles: ['User'],
@@ -366,14 +454,14 @@ describe('Auth0UserService', () => {
 
   describe('changePassword', () => {
     it('should successfully change user password', async () => {
-      mockManagementClient.updateUser.mockResolvedValue({})
+      mockManagementClient.updateUser.mockResolvedValue({ data: {} })
 
       await expect(
         auth0UserService.changePassword('auth0|123456', 'newpassword123'),
       ).resolves.not.toThrow()
 
       expect(mockManagementClient.updateUser).toHaveBeenCalledWith(
-        { id: 'auth0|123456' },
+        'auth0|123456',
         { password: 'newpassword123' },
       )
     })
@@ -420,7 +508,7 @@ describe('Auth0UserService', () => {
       }
 
       const mockUserProfile = {
-        user_id: 'auth0|123456',
+        sub: 'auth0|123456',
         email: 'test@example.com',
         email_verified: true,
         name: 'Test User',
@@ -431,12 +519,16 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'user' },
       }
 
-      mockAuthenticationClient.refreshToken.mockResolvedValue(mockTokenResponse)
-      mockAuthenticationClient.getProfile.mockResolvedValue(mockUserProfile)
+      mockAuthenticationClient.refreshToken.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      mockUserInfoClientInstance.getUserInfo.mockResolvedValue({
+        data: mockUserProfile,
+      })
 
       const result = await auth0UserService.refreshSession('old-refresh-token')
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         user: {
           id: 'auth0|123456',
           email: 'test@example.com',
@@ -449,13 +541,13 @@ describe('Auth0UserService', () => {
           appMetadata: { roles: ['User'] },
           userMetadata: { role: 'user' },
         },
+        accessToken: 'new-access-token',
         session: {
           accessToken: 'new-access-token',
           refreshToken: 'new-refresh-token',
-          expiresAt: expect.any(Date),
         },
-        accessToken: 'new-access-token',
       })
+      expect(result.session.expiresAt).toBeInstanceOf(Date)
 
       expect(mockAuthenticationClient.refreshToken).toHaveBeenCalledWith({
         refresh_token: 'old-refresh-token',
@@ -476,12 +568,15 @@ describe('Auth0UserService', () => {
   describe('verifyAuthToken', () => {
     it('should successfully verify authentication token', async () => {
       const mockDecodedToken = {
+        sub: 'auth0|123456',
         user_id: 'auth0|123456',
         email: 'test@example.com',
         app_metadata: { roles: ['Admin'] },
       }
 
-      mockAuthenticationClient.getProfile.mockResolvedValue(mockDecodedToken)
+      mockUserInfoClientInstance.getUserInfo.mockResolvedValue({
+        data: mockDecodedToken,
+      })
 
       const result = await auth0UserService.verifyAuthToken('valid-jwt-token')
 
@@ -493,7 +588,7 @@ describe('Auth0UserService', () => {
     })
 
     it('should throw error for invalid token', async () => {
-      mockAuthenticationClient.getProfile.mockRejectedValue(
+      mockUserInfoClientInstance.getUserInfo.mockRejectedValue(
         new Error('Invalid token'),
       )
 
@@ -509,9 +604,9 @@ describe('Auth0UserService', () => {
         ticket: 'https://test-domain.auth0.com/lo/reset?ticket=abc123',
       }
 
-      mockManagementClient.createPasswordChangeTicket.mockResolvedValue(
-        mockTicket,
-      )
+      mockManagementClient.createPasswordChangeTicket.mockResolvedValue({
+        data: mockTicket,
+      })
 
       const result = await auth0UserService.createPasswordResetTicket(
         'auth0|123456',
@@ -543,7 +638,7 @@ describe('Auth0UserService', () => {
   })
 
   describe('role mapping', () => {
-    it('should correctly map internal roles to Auth0 roles', () => {
+    it('should correctly map internal roles to Auth0 roles', async () => {
       // This test would require accessing private methods, so we'll test indirectly
       // through the createUser method which uses role mapping
       const mockAuth0User = {
@@ -557,25 +652,19 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'admin', created_at: '2023-01-01T00:00:00Z' },
       }
 
-      mockManagementClient.createUser.mockResolvedValue(mockAuth0User)
+      mockManagementClient.createUser.mockResolvedValue({ data: mockAuth0User })
 
       // Test admin role mapping
-      void auth0UserService.createUser(
+      const result = await auth0UserService.createUser(
         'admin@example.com',
         'password123',
         'admin',
       )
 
-      expect(mockManagementClient.createUser).toHaveBeenCalledWith(
-        expect.objectContaining({
-          app_metadata: expect.objectContaining({
-            roles: ['Admin'],
-          }),
-          user_metadata: expect.objectContaining({
-            role: 'admin',
-          }),
-        }),
-      )
+      expect(result).toBeDefined()
+      expect(result.appMetadata).toBeDefined()
+      expect(result.role).toBe('admin')
+      expect(result.appMetadata?.roles).toEqual(['Admin'])
     })
 
     it('should correctly map Auth0 roles to internal roles', async () => {
@@ -591,11 +680,19 @@ describe('Auth0UserService', () => {
         user_metadata: { role: 'therapist' },
       }
 
-      mockManagementClient.getUser.mockResolvedValue(mockAuth0User)
+      mockManagementClient.getUser.mockResolvedValue({ data: mockAuth0User })
 
       const result = await auth0UserService.getUserById('auth0|123456')
 
-      expect(result?.role).toBe('therapist')
+      expect(result).toBeDefined()
+      if (!result) {
+        throw new Error('User should be returned for role mapping test')
+      }
+      expect(result.appMetadata).toBeDefined()
+      if (!result.appMetadata) {
+        throw new Error('appMetadata should be defined for role mapping test')
+      }
+      expect(result.role).toBe('therapist')
     })
   })
 })

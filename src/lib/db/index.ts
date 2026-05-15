@@ -22,15 +22,15 @@ export interface DatabaseConfig {
 
 // Default configuration
 const DEFAULT_CONFIG: DatabaseConfig = {
-  host: process.env['DB_HOST'] || 'localhost',
-  port: parseInt(process.env['DB_PORT'] || '5432'),
-  database: process.env['DB_NAME'] || 'pixelated',
-  user: process.env['DB_USER'] || 'postgres',
-  password: process.env['DB_PASSWORD'] || '',
-  max: parseInt(process.env['DB_MAX_CONNECTIONS'] || '20'),
-  idleTimeoutMillis: parseInt(process.env['DB_IDLE_TIMEOUT'] || '30000'),
+  host: process.env['DB_HOST'] ?? 'localhost',
+  port: parseInt(process.env['DB_PORT'] ?? '5432'),
+  database: process.env['DB_NAME'] ?? 'pixelated',
+  user: process.env['DB_USER'] ?? 'postgres',
+  password: process.env['DB_PASSWORD'] ?? '',
+  max: parseInt(process.env['DB_MAX_CONNECTIONS'] ?? '20'),
+  idleTimeoutMillis: parseInt(process.env['DB_IDLE_TIMEOUT'] ?? '30000'),
   connectionTimeoutMillis: parseInt(
-    process.env['DB_CONNECTION_TIMEOUT'] || '2000',
+    process.env['DB_CONNECTION_TIMEOUT'] ?? '2000',
   ),
   ssl: process.env['NODE_ENV'] === 'production',
 }
@@ -193,7 +193,7 @@ export function createContentHash(
  * Database migration utilities
  */
 export class DatabaseMigration {
-  private migrations: Map<string, string> = new Map()
+  private readonly migrations: Map<string, string> = new Map()
 
   /**
    * Register a migration
@@ -282,7 +282,7 @@ export class UserManager {
         userData.passwordHash,
         userData.firstName,
         userData.lastName,
-        userData.role || 'therapist',
+        userData.role ?? 'therapist',
         userData.institution,
         userData.licenseNumber,
       ],
@@ -305,7 +305,7 @@ export class UserManager {
       [id],
     )
 
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   /**
@@ -322,7 +322,7 @@ export class UserManager {
       [email],
     )
 
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   /**
@@ -362,8 +362,8 @@ export class UserManager {
         profileData.specializations,
         profileData.years_experience,
         profileData.certifications,
-        profileData.languages || ['en'],
-        profileData.timezone || 'UTC',
+        profileData.languages ?? ['en'],
+        profileData.timezone ?? 'UTC',
       ],
     )
   }
@@ -393,8 +393,8 @@ export class SessionManager {
       [
         sessionData.therapistId,
         sessionData.clientId,
-        sessionData.sessionType || 'individual',
-        JSON.stringify(sessionData.context || {}),
+        sessionData.sessionType ?? 'individual',
+        JSON.stringify(sessionData.context ?? {}),
       ],
     )
 
@@ -429,7 +429,7 @@ export class SessionManager {
       [sessionId],
     )
 
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   /**
@@ -531,7 +531,7 @@ export class BiasAnalysisManager {
       [contentHash],
     )
 
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   /**
@@ -590,7 +590,7 @@ export class BiasAnalysisManager {
     )
 
     return (
-      result.rows[0] || {
+      result.rows[0] ?? {
         total_analyses: 0,
         avg_bias_score: 0,
         high_alerts: 0,

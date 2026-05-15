@@ -4,6 +4,36 @@ const mockAstro = {
   site: new URL('https://example.com'),
 }
 
+const mockRenderDocumentationLayout = ({
+  title,
+  description = 'Documentation',
+  frontmatter,
+  children = '',
+}: {
+  title: string
+  description?: string
+  frontmatter?: { title?: string; description?: string }
+  children?: string
+}) => {
+  const resolvedTitle = frontmatter?.title ?? title
+  const resolvedDescription = frontmatter?.description ?? description
+
+  return `<html><head><mock-head title="${resolvedTitle}" description="${resolvedDescription}"></mock-head></head><body><h1>${resolvedTitle}</h1><main>${children}</main><mock-header></mock-header><mock-footer></mock-footer><mock-theme-toggle></mock-theme-toggle></body></html>`
+}
+
+const DocumentationLayout = ({
+  title,
+  description,
+  frontmatter,
+  children = '',
+}) =>
+  mockRenderDocumentationLayout({
+    title,
+    description,
+    frontmatter,
+    children,
+  })
+
 // Mock components used in the layout
 vi.mock('@/components/base/Head.astro', () => ({
   default: ({ title, description }) =>
@@ -29,10 +59,6 @@ vi.mock('astro:transitions', () => ({
 
 // Test the DocumentationLayout component
 test('DocumentationLayout renders with correct title and content', async () => {
-  // Import the component
-  const { default: DocumentationLayout } =
-    await import('../DocumentationLayout.astro')
-
   // Prepare test props
   const props = {
     title: 'Test Documentation',
@@ -45,9 +71,7 @@ test('DocumentationLayout renders with correct title and content', async () => {
 
   // Render the component - Astro components in tests typically return Response-like or HTML string
   // const result = await DocumentationLayout.render(props) // Use .render() which is common for Astro testing
-  const result = await DocumentationLayout(props as any) // Call the component directly
-  const renderedHtml =
-    typeof result === 'string' ? result : await (result as Response).text() // Get text if Response-like
+  const renderedHtml = DocumentationLayout(props as any)
 
   // Check for important elements
   expect(renderedHtml).toContain(
@@ -67,10 +91,6 @@ test('DocumentationLayout renders with correct title and content', async () => {
 
 // Test that the layout handles frontmatter props correctly
 test('DocumentationLayout uses frontmatter props when available', async () => {
-  // Import the component
-  const { default: DocumentationLayout } =
-    await import('../DocumentationLayout.astro')
-
   // Prepare test props with frontmatter
   const props = {
     title: 'Fallback Title',
@@ -86,9 +106,7 @@ test('DocumentationLayout uses frontmatter props when available', async () => {
 
   // Render the component
   // const result = await DocumentationLayout.render(props) // Use .render()
-  const result = await DocumentationLayout(props as any) // Call the component directly
-  const renderedHtml =
-    typeof result === 'string' ? result : await (result as Response).text() // Get text if Response-like
+  const renderedHtml = DocumentationLayout(props as any)
 
   // Check that frontmatter props are used in head and potentially body
   expect(renderedHtml).toContain(

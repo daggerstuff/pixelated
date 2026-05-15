@@ -5,10 +5,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { AllscriptsProvider } from '../providers/allscripts.provider'
 
-// Mock dependencies
+const { mockCreateHash, mockRandomBytes } = vi.hoisted(() => ({
+  mockCreateHash: vi.fn(),
+  mockRandomBytes: vi.fn(),
+}))
+
 vi.mock('node:crypto', () => ({
-  createHash: vi.fn(),
-  randomBytes: vi.fn(),
+  Buffer: globalThis.Buffer,
+  createHash: mockCreateHash,
+  randomBytes: mockRandomBytes,
 }))
 
 describe('allscripts Provider', () => {
@@ -24,7 +29,7 @@ describe('allscripts Provider', () => {
     name: 'Test Allscripts Provider',
     baseUrl: 'https://fhir.allscriptscloud.com/fhir/r4',
     clientId: 'example-client-id',
-    clientSecret: process.env.CLIENT_SECRET || 'example-client-secret',
+    clientSecret: process.env.CLIENT_SECRET ?? 'example-client-secret',
     scopes: ['user/Patient.read', 'user/Observation.read'],
   }
 
@@ -156,7 +161,7 @@ describe('allscripts Provider', () => {
       // but fail for endpoint verification
       const mockSearchResources = vi
         .fn()
-        .mockImplementation((resourceType: string) => {
+        .mockImplementation( async (resourceType: string) => {
           if (resourceType === 'CapabilityStatement') {
             return Promise.resolve([
               {

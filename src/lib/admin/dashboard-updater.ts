@@ -5,14 +5,14 @@ export class DashboardUpdater {
   private readonly UPDATE_INTERVAL_MS = 30000
 
   private updateElement(id: string, value: string | number): void {
-    const element = document.getElementById(id) as HTMLElement
+    const element = document.getElementById(id)!
     if (element) {
       element.textContent = String(value)
     }
   }
 
   private updateProgressBar(id: string, percent: number): void {
-    const element = document.getElementById(id) as HTMLElement
+    const element = document.getElementById(id)!
     if (element) {
       element.style.width = `${Math.min(percent, 100)}%`
     }
@@ -23,7 +23,7 @@ export class DashboardUpdater {
   ): void {
     const element = document.getElementById(
       'security-level-value',
-    ) as HTMLElement
+    )!
     if (!element) {
       return
     }
@@ -49,7 +49,7 @@ export class DashboardUpdater {
   }
 
   private showError(message: string): void {
-    const errorEl = document.getElementById('error-message') as HTMLElement
+    const errorEl = document.getElementById('error-message')!
     if (errorEl) {
       errorEl.style.display = 'block'
       errorEl.textContent = message
@@ -57,7 +57,7 @@ export class DashboardUpdater {
   }
 
   private hideError() {
-    const errorEl = document.getElementById('error-message') as HTMLElement
+    const errorEl = document.getElementById('error-message')!
     if (errorEl) {
       errorEl.style.display = 'none'
     }
@@ -106,7 +106,7 @@ export class DashboardUpdater {
 
     // Set up interval for updates
     this.updateInterval = window.setInterval(
-      () => this.updateMetrics(),
+       async () => this.updateMetrics(),
       this.UPDATE_INTERVAL_MS,
     )
   }

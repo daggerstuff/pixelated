@@ -77,6 +77,9 @@ vi.mock('../auth0-jwt-service', () => mockJwtService)
 vi.mock('../../mcp/phase6-integration', () => mockPhase6)
 vi.mock('../../redis', () => mockRedis)
 vi.mock('../../security', () => mockSecurity)
+vi.mock('../user-identity', () => ({
+  resolveIdentity: vi.fn(),
+}))
 
 // Mock MongoDB config to prevent node: module errors
 vi.mock('../../../config/mongodb.config', () => ({
@@ -98,19 +101,29 @@ vi.mock('bcryptjs', () => ({
   genSalt: vi.fn(),
 }))
 
+
 // Mock Node.js built-in modules with node: prefix
+const { mockRandomBytes, mockRandomUUID } = vi.hoisted(() => ({
+  mockRandomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
+  mockRandomUUID: vi.fn().mockReturnValue('test-uuid'),
+}))
+
 vi.mock('node:buffer', () => ({
-  Buffer: globalThis.Buffer || class {},
+  Buffer: globalThis.Buffer,
 }))
 
 vi.mock('node:crypto', () => ({
-  default: {
-    randomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
-    randomUUID: vi.fn().mockReturnValue('test-uuid'),
-  },
-  randomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
-  randomUUID: vi.fn().mockReturnValue('test-uuid'),
+  Buffer: globalThis.Buffer,
+  createHash: vi.fn(),
+  createHmac: vi.fn(),
+  randomBytes: mockRandomBytes,
+  randomUUID: mockRandomUUID,
+  randomFillSync: vi.fn(),
+  pbkdf2Sync: vi.fn(),
+  randomFill: vi.fn(),
+  randomInt: vi.fn(),
 }))
+
 
 import {
   GET as profileGetHandler,
@@ -122,7 +135,40 @@ import { POST as logoutHandler } from '../../../pages/api/auth/signout'
 // Import handlers after mocks are set up
 import { POST as registerHandler } from '../../../pages/api/auth/signup'
 import { GET as verifyHandler } from '../../../pages/api/auth/verify'
-import { authenticateRequest, requireRole } from '../auth0-middleware'
+import {
+  authenticateRequest,
+  requireRole,
+  type AuthenticatedRequest,
+} from '../auth0-middleware'
+import { resolveIdentity } from '../user-identity'
+
+type JsonObject = Record<string, unknown>
+
+const isRecord = (value: unknown): value is JsonObject =>
+  typeof value === 'object' && value !== null
+
+const readJsonObject = async (response: Response): Promise<JsonObject> => {
+  const jsonText = await response.text()
+  const parsed: unknown = JSON.parse(jsonText)
+  if (!isRecord(parsed)) {
+    throw new Error('Expected JSON response body to be an object')
+  }
+  return parsed
+}
+
+const expectString = (value: unknown): string => {
+  if (typeof value !== 'string') {
+    throw new Error('Expected string value from response payload')
+  }
+  return value
+}
+
+const expectRecord = (value: unknown): JsonObject => {
+  if (!isRecord(value)) {
+    throw new Error('Expected object value from response payload')
+  }
+  return value
+}
 
 describe('Authentication System Integration', () => {
   const mockClientInfo = {
@@ -133,6 +179,14 @@ describe('Authentication System Integration', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(resolveIdentity).mockResolvedValue({
+      internalId: 'user123',
+      auth0Sub: 'user123',
+      email: 'test@example.com',
+      emailVerified: true,
+      role: 'admin',
+      isNewUser: false,
+    })
     // Set test environment variables
     process.env.JWT_SECRET = 'test-secret-key'
     process.env.JWT_AUDIENCE = 'test-audience'
@@ -188,12 +242,13 @@ describe('Authentication System Integration', () => {
       const registerResponse = await registerHandler({
         request: registerRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(registerResponse.status).toBe(201)
-      const registerData = await registerResponse.json()
+      const registerData = await readJsonObject(registerResponse)
       expect(registerData.success).toBe(true)
-      expect(registerData.user.id).toBe('user123')
+      const registerUser = expectRecord(registerData.user)
+      expect(expectString(registerUser.id)).toBe('user123')
 
       // Mock login
       mockAuth0UserService.signIn.mockResolvedValue({
@@ -227,12 +282,12 @@ describe('Authentication System Integration', () => {
       const loginResponse = await loginHandler({
         request: loginRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(loginResponse.status).toBe(200)
-      const loginData = await loginResponse.json()
+      const loginData = await readJsonObject(loginResponse)
       expect(loginData.success).toBe(true)
-      expect(loginData.token).toBe('access.token.456')
+      expect(expectString(loginData.token)).toBe('access.token.456')
 
       // Mock dependencies for logout
       mockAuth0UserService.signOut.mockResolvedValue({ success: true })
@@ -260,18 +315,17 @@ describe('Authentication System Integration', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer access.token.456',
+          'Authorization': 'Bearer access.token.456',
           'X-CSRF-Token': 'valid-csrf-token',
         },
       })
 
       const logoutResponse = await logoutHandler({
         request: logoutRequest,
-        clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(logoutResponse.status).toBe(200)
-      const logoutData = await logoutResponse.json()
+      const logoutData = await readJsonObject(logoutResponse)
       expect(logoutData.success).toBe(true)
     })
 
@@ -297,11 +351,11 @@ describe('Authentication System Integration', () => {
       const response = await loginHandler({
         request: loginRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(response.status).toBe(429)
-      const data = await response.json()
-      expect(data.error).toContain('Rate limit exceeded')
+      const data = await readJsonObject(response)
+      expect(expectString(data.error)).toContain('Rate limit exceeded')
     })
 
     it('should enforce CSRF protection', async () => {
@@ -323,11 +377,11 @@ describe('Authentication System Integration', () => {
       const response = await loginHandler({
         request: loginRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(response.status).toBe(403)
-      const data = await response.json()
-      expect(data.error).toContain('Invalid CSRF token')
+      const data = await readJsonObject(response)
+      expect(expectString(data.error)).toContain('Invalid CSRF token')
     })
   })
 
@@ -363,13 +417,14 @@ describe('Authentication System Integration', () => {
     })
 
     it('should enforce role-based authorization', async () => {
-      const authenticatedRequest = {
-        user: {
-          id: 'user123',
-          email: 'test@example.com',
-          role: 'patient',
-        },
-      } as any
+      const authenticatedRequest: AuthenticatedRequest = new Request(
+        'https://example.com/api/auth/profile',
+      )
+      authenticatedRequest.user = {
+        id: 'user123',
+        email: 'test@example.com',
+        role: 'patient',
+      }
 
       // Should fail for therapist role
       const result = await requireRole(authenticatedRequest, [
@@ -410,12 +465,15 @@ describe('Authentication System Integration', () => {
           }),
         }),
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       expect(response.status).toBe(201)
-      const data = await response.json()
+      const data = await readJsonObject(response)
+      const user = expectRecord(data.user)
       // Note: sanitizeInput removes < and >
-      expect(data.user.email).toBe('scriptalert(xss)/scripttest@example.com')
+      expect(expectString(user.email)).toBe(
+        'scriptalert(xss)/scripttest@example.com',
+      )
     })
 
     it('should enforce password complexity requirements', async () => {
@@ -434,11 +492,13 @@ describe('Authentication System Integration', () => {
           }),
         }),
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       expect(response.status).toBe(400)
-      const data = await response.json()
-      expect(data.error).toBe('Password does not meet requirements')
+      const data = await readJsonObject(response)
+      expect(expectString(data.error)).toBe(
+        'Password does not meet requirements',
+      )
       expect(data.details).toBeDefined()
     })
 
@@ -458,11 +518,11 @@ describe('Authentication System Integration', () => {
           }),
         }),
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       expect(response.status).toBe(400)
-      const data = await response.json()
-      expect(data.error).toBe('Invalid email format')
+      const data = await readJsonObject(response)
+      expect(expectString(data.error)).toBe('Invalid email format')
     })
 
     it('should prevent timing attacks in login', async () => {
@@ -489,7 +549,7 @@ describe('Authentication System Integration', () => {
       await loginHandler({
         request: loginRequest,
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       const duration = Date.now() - start
       expect(duration).toBeGreaterThanOrEqual(50)
@@ -521,7 +581,7 @@ describe('Authentication System Integration', () => {
       await registerHandler({
         request: registerRequest,
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       // Verify audit log doesn't contain sensitive data
       const securityCalls = mockSecurity.logSecurityEvent.mock.calls
@@ -562,10 +622,10 @@ describe('Authentication System Integration', () => {
       const response = await registerHandler({
         request: registerRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       if (response.status !== 201) {
-        const data = await response.json()
+        const data = await readJsonObject(response)
         console.error('Registration failed:', data)
       }
       expect(response.status).toBe(201)
@@ -602,7 +662,7 @@ describe('Authentication System Integration', () => {
       await loginHandler({
         request: loginRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(
         mockPhase6.updatePhase6AuthenticationProgress,
@@ -636,10 +696,13 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      await refreshHandler({
+      const refreshContext = {
         request: refreshRequest,
         clientAddress: mockClientInfo.ip,
-      } as any)
+      }
+
+      // @ts-expect-error APIRoute context type requires full Astro API context in tests.
+      await refreshHandler(refreshContext)
 
       expect(
         mockPhase6.updatePhase6AuthenticationProgress,
@@ -658,7 +721,7 @@ describe('Authentication System Integration', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer valid.token',
+          'Authorization': 'Bearer valid.token',
           'X-CSRF-Token': 'valid-csrf-token',
         },
       })
@@ -679,8 +742,7 @@ describe('Authentication System Integration', () => {
 
       await logoutHandler({
         request: logoutRequest,
-        clientAddress: mockClientInfo.ip,
-      } as any)
+      })
 
       expect(
         mockPhase6.updatePhase6AuthenticationProgress,
@@ -722,12 +784,13 @@ describe('Authentication System Integration', () => {
       const response = await profileGetHandler({
         request,
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       expect(response.status).toBe(200)
-      const data = await response.json()
-      expect(data.user.id).toBe('user123')
-      expect(data.user.fullName).toBe('John Doe')
+      const data = await readJsonObject(response)
+      const user = expectRecord(data.user)
+      expect(expectString(user.id)).toBe('user123')
+      expect(expectString(user.fullName)).toBe('John Doe')
     })
 
     it('should update user profile', async () => {
@@ -758,7 +821,7 @@ describe('Authentication System Integration', () => {
       const request = new Request('https://example.com/api/auth/profile', {
         method: 'PUT',
         headers: {
-          Authorization: 'Bearer valid.token',
+          'Authorization': 'Bearer valid.token',
           'Content-Type': 'application/json',
           'X-CSRF-Token': 'valid-token',
         },
@@ -771,19 +834,24 @@ describe('Authentication System Integration', () => {
       const response = await profilePutHandler({
         request,
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       expect(response.status).toBe(200)
-      const data = await response.json()
+      const data = await readJsonObject(response)
       expect(data.success).toBe(true)
-      expect(data.user.fullName).toBe('Jane Doe')
+      const user = expectRecord(data.user)
+      expect(expectString(user.fullName)).toBe('Jane Doe')
 
       // Verify security log
-      expect(mockSecurity.logSecurityEvent).toHaveBeenCalledWith(
-        mockSecurity.SecurityEventType.USER_UPDATED,
-        'user123',
-        expect.anything(),
-      )
+      expect(mockSecurity.logSecurityEvent).toHaveBeenCalled()
+      const latestLogCall = vi
+        .mocked(mockSecurity.logSecurityEvent)
+        .mock.calls.at(-1)
+      expect(latestLogCall).toBeDefined()
+      expect(latestLogCall?.[1]).toBe('user123')
+      expect(latestLogCall?.[2]).toMatchObject({
+        updates: ['name', 'picture'],
+      })
     })
   })
 
@@ -796,11 +864,11 @@ describe('Authentication System Integration', () => {
       const response = await verifyHandler({
         request,
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       expect(response.status).toBe(400)
-      const data = await response.json()
-      expect(data.message).toContain('Missing token')
+      const data = await readJsonObject(response)
+      expect(expectString(data.message)).toContain('Missing token')
     })
 
     it('should attempt verification with valid params', async () => {
@@ -815,7 +883,7 @@ describe('Authentication System Integration', () => {
       const response = await verifyHandler({
         request,
         clientAddress: '127.0.0.1',
-      } as any)
+      })
 
       // Current stub returns 200
       expect(response.status).toBe(200)

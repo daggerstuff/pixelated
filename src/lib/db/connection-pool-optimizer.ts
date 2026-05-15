@@ -62,11 +62,11 @@ interface PoolMetrics {
  */
 export class OptimizedConnectionPool extends EventEmitter {
   private pool: Pool | null = null
-  private config: OptimizedPoolConfig
+  private readonly config: OptimizedPoolConfig
   private metrics: PoolMetrics
   private healthCheckTimer?: NodeJS.Timeout
   private metricsTimer?: NodeJS.Timeout
-  private startTime: number
+  private readonly startTime: number
   private queryStats: Array<{
     duration: number
     success: boolean
@@ -153,8 +153,8 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.info('Connection pool initialized', {
         min: this.config.min,
         max: this.config.max,
-        host: this.config.host || 'localhost',
-        database: this.config.database || 'pixelated',
+        host: this.config.host ?? 'localhost',
+        database: this.config.database ?? 'pixelated',
       })
     } catch (error: unknown) {
       logger.error('Failed to initialize connection pool', { error })
@@ -235,10 +235,10 @@ export class OptimizedConnectionPool extends EventEmitter {
   /**
    * Execute a query with enhanced monitoring
    */
-  async query<T = unknown>(
+  async query(
     text: string,
     params?: unknown[],
-  ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
+  ): Promise<{ rows: unknown[]; rowCount: number; duration: number }> {
     const startTime = Date.now()
     let client: PoolClient | null = null
 
@@ -270,7 +270,7 @@ export class OptimizedConnectionPool extends EventEmitter {
 
       return {
         rows: result.rows,
-        rowCount: result.rowCount || 0,
+        rowCount: result.rowCount ?? 0,
         duration,
       }
     } catch (error: unknown) {
@@ -576,9 +576,7 @@ let connectionPool: OptimizedConnectionPool | null = null
  * Get the global connection pool
  */
 export function getConnectionPool(): OptimizedConnectionPool {
-  if (!connectionPool) {
-    connectionPool = new OptimizedConnectionPool()
-  }
+  connectionPool ??= new OptimizedConnectionPool();
   return connectionPool
 }
 
@@ -599,7 +597,7 @@ export function initializeConnectionPool(
 /**
  * Enhanced query function with pool optimization
  */
-export async function optimizedQuery<T = unknown>(
+export async function optimizedQuery(
   text: string,
   params?: unknown[],
   options: {
@@ -607,7 +605,7 @@ export async function optimizedQuery<T = unknown>(
     retries?: number
     client?: PoolClient
   } = {},
-): Promise<{ rows: T[]; rowCount: number; duration: number }> {
+): Promise<{ rows: unknown[]; rowCount: number; duration: number }> {
   const pool = getConnectionPool()
 
   // Use provided client or acquire from pool
@@ -618,7 +616,7 @@ export async function optimizedQuery<T = unknown>(
 
     return {
       rows: result.rows,
-      rowCount: result.rowCount || 0,
+      rowCount: result.rowCount ?? 0,
       duration,
     }
   }

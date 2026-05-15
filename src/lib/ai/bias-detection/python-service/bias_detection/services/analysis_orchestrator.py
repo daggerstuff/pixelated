@@ -23,7 +23,7 @@ class AnalysisOrchestrator:
         self,
         bias_detection_service: BiasDetectionService,
         database_service: DatabaseService,
-        config: Any | None = None
+        config: Any | None = None,
     ):
         self.bias_service = bias_detection_service
         self.db_service = database_service
@@ -41,9 +41,9 @@ class AnalysisOrchestrator:
         # Security managers
         self.security_manager = SecurityManager(
             jwt_secret_key=getattr(config, "jwt_secret_key", None),
-encryption_password=getattr(config, "encryption_password", None),
-encryption_salt=getattr(config, "encryption_salt", None),
-pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
+            encryption_password=getattr(config, "encryption_password", None),
+            encryption_salt=getattr(config, "encryption_salt", None),
+            pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
         )
         self.audit_logger = AuditLogger(self.security_manager)
 
@@ -53,14 +53,16 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
         user_id = session_data.get("user_id", "anonymous")
         start_time = time.time()
 
-        logger.info("Starting comprehensive bias analysis for session", session_id=session_id)
+        logger.info(
+            "Starting comprehensive bias analysis for session", session_id=session_id
+        )
 
         # 1. Run all analysis layers in parallel
         tasks = [
             self._run_layer_analysis("model_ensemble", session_data),
             self._run_layer_analysis("fairness", session_data),
             self._run_layer_analysis("diagnostic", session_data),
-            self._run_layer_analysis("linguistic", session_data)
+            self._run_layer_analysis("linguistic", session_data),
         ]
 
         layer_results = await asyncio.gather(*tasks)
@@ -77,11 +79,10 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
             user_context={"session_id": session_id, "user_id": user_id},
             details={
                 "overall_score": final_result["overall_bias_score"],
-                "alert_level": final_result["alert_level"]
+                "alert_level": final_result["alert_level"],
             },
-            sensitive_data=False
+            sensitive_data=False,
         )
-
 
         # 4. Persistence (optional database storage)
         try:
@@ -89,10 +90,16 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
         except Exception as e:
             logger.warning("Failed to store analysis result", error=str(e))
 
-        logger.info("Analysis completed", score=final_result["overall_bias_score"], session_id=session_id)
+        logger.info(
+            "Analysis completed",
+            score=final_result["overall_bias_score"],
+            session_id=session_id,
+        )
         return final_result
 
-    async def _run_layer_analysis(self, layer_type: str, session_data: dict[str, Any]) -> dict[str, Any]:
+    async def _run_layer_analysis(
+        self, layer_type: str, session_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute a specific analysis layer based on its type."""
         session_id = session_data.get("session_id", "unknown")
         try:
@@ -102,9 +109,11 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
                 bias_request = BiasAnalysisRequest(
                     content=text_content,
                     user_id=session_data.get("user_id", "anonymous"),
-                    context=session_data.get("context", "")
+                    context=session_data.get("context", ""),
                 )
-                response = await self.bias_service.analyze_bias(bias_request, request_id=session_id)
+                response = await self.bias_service.analyze_bias(
+                    bias_request, request_id=session_id
+                )
 
                 # Extract dictionary representation
                 res = {}
@@ -117,10 +126,14 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
                 return res
 
             if layer_type == "fairness":
-                return await self.fairness_analyzer.run_preprocessing_analysis(session_data)
+                return await self.fairness_analyzer.run_preprocessing_analysis(
+                    session_data
+                )
 
             if layer_type == "diagnostic":
-                return await self.diagnostic_service.run_interactive_analysis(session_data)
+                return await self.diagnostic_service.run_interactive_analysis(
+                    session_data
+                )
 
             if layer_type == "linguistic":
                 text_content = self._extract_text(session_data)
@@ -131,8 +144,9 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
             logger.error("Layer analysis failed", layer_type=layer_type, error=str(e))
             return {"layer": layer_type, "error": str(e), "bias_score": 0.0}
 
-
-    def _consolidate_results(self, layer_results: list[dict[str, Any]]) -> dict[str, Any]:
+    def _consolidate_results(
+        self, layer_results: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Consolidate multiple layer results into a single final report."""
         scores = []
         recommendations = []
@@ -167,7 +181,7 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
             "alert_level": alert_level,
             "detected_biases": detected_biases,
             "recommendations": list(set(recommendations)),
-            "layer_results": layer_results
+            "layer_results": layer_results,
         }
 
     def _extract_text(self, session_data: dict[str, Any]) -> str:
@@ -176,15 +190,26 @@ pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
 
         # AI Responses
         if "ai_responses" in session_data:
-            parts.extend([r.get("content", "") for r in session_data["ai_responses"] if isinstance(r, dict)])
+            parts.extend(
+                [
+                    r.get("content", "")
+                    for r in session_data["ai_responses"]
+                    if isinstance(r, dict)
+                ]
+            )
 
         # Transcripts
         if "transcripts" in session_data:
-            parts.extend([t.get("text", "") for t in session_data["transcripts"] if isinstance(t, dict)])
+            parts.extend(
+                [
+                    t.get("text", "")
+                    for t in session_data["transcripts"]
+                    if isinstance(t, dict)
+                ]
+            )
 
         # Raw text
         if "text" in session_data:
             parts.append(str(session_data["text"]))
 
         return " ".join([p for p in parts if p])
-

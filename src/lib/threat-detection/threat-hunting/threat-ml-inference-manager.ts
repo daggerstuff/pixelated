@@ -27,7 +27,7 @@ export class ThreatMLInferenceManager {
         // P3.1: Return all findings, updating severity only if confidence is high
         if (
           result.confidence >
-          (this.config.mlModelConfig?.confidenceThreshold || 0.7)
+          (this.config.mlModelConfig?.confidenceThreshold ?? 0.7)
         ) {
           return {
             ...finding,
@@ -55,7 +55,7 @@ export class ThreatMLInferenceManager {
 
     const confidence = Math.random()
     const label =
-      confidence > (this.config.mlModelConfig?.confidenceThreshold || 0.7)
+      confidence > (this.config.mlModelConfig?.confidenceThreshold ?? 0.7)
         ? 'suspicious'
         : 'benign'
 

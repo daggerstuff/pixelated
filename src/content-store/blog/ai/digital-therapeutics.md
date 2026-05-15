@@ -1,8 +1,8 @@
 ---
 title: 'Digital Therapeutics: AI-Enhanced Mental Health Tools'
 description: >-
-  Exploring the revolutionary landscape of AI-powered digital therapeutics and
-  their growing impact on mental healthcare accessibility and effectiveness
+  _Next in our series, we'll explore Emotional AI and how technology is learning
+  to support emotional wellbeing on a wider scale._
 author: AI & Psychology Team
 pubDate: 2024-05-13T00:00:00.000Z
 draft: false
@@ -14,10 +14,9 @@ tags:
   - healthcare
 series: AI & Emotional Intelligence
 seriesOrder: 2
-category: Technical
 ---
 
-# Digital Therapeutics: AI-Enhanced Mental Health Tools
+## Digital Therapeutics: AI-Enhanced Mental Health Tools
 
 ## Introduction
 

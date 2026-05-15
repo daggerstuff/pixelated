@@ -1,5 +1,5 @@
 # Production Dockerfile for Business Strategy CMS
-FROM node:20-alpine AS base
+FROM node:24.14.1-alpine AS base
 
 # Install build dependencies for sharp and other native modules
 RUN apk add --no-cache \
@@ -16,10 +16,10 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install pnpm
-RUN npm install -g pnpm@11.0.8
+RUN npm install -g pnpm@11.1.1
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 # Copy source code
 COPY . .

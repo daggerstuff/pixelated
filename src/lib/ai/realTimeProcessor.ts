@@ -66,10 +66,10 @@ export interface AdaptiveConfig {
  * Real-Time AI Processing Engine
  */
 class RealTimeProcessor {
-  private activeSessions = new Map<string, StreamingSession>()
+  private readonly activeSessions = new Map<string, StreamingSession>()
   private processingQueue: ProcessingTask[] = []
   private isProcessing = false
-  private adaptiveController: AdaptiveController
+  private readonly adaptiveController: AdaptiveController
 
   constructor() {
     this.adaptiveController = new AdaptiveController()

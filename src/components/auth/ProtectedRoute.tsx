@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 import type { AuthRole } from '@/config/auth.config'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import type { UserRole } from '@/types/auth'
 
 export interface ProtectedRouteProps {
@@ -14,7 +14,7 @@ export interface ProtectedRouteProps {
 /**
  * ProtectedRoute component - Protects routes that require authentication
  */
-export function ProtectedRoute({
+export async function ProtectedRoute({
   children,
   requiredRole,
   redirectTo = '/login',

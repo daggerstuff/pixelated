@@ -1,11 +1,12 @@
 ---
-title: 'Mistral-7B RAG Implementation for Therapy Support'
-description: 'Mistral-7B RAG Implementation for Therapy Support documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Mistral-7B RAG Implementation for Therapy Support documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Mistral-7B RAG Implementation for Therapy Support
 ---
 
 # Mistral-7B RAG Implementation for Therapy Support

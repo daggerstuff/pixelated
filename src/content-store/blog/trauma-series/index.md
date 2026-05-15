@@ -1,21 +1,19 @@
 ---
-title: 'Understanding Trauma Series'
-description:
-  'A deep dive into the complex dynamics of trauma and its effects on
-  relationships'
+title: index
+description: >-
+  This series explores the intricate ways trauma shapes our relationships,
 author: 'Pixelated Empathy Team'
 pubDate: 2024-02-10
-tags: ['trauma', 'series', 'mental health', 'relationships']
+tags:
+  - trauma
+  - series
+  - mental health
+  - relationships
 series: 'Understanding Trauma'
 seriesOrder: 0
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Symbolic representation of trauma and healing',
-  }
 ---
 
-# Understanding Trauma Series
+## Understanding Trauma Series
 
 This series explores the intricate ways trauma shapes our relationships,
 behaviors, and sense of self. Through clinical insights and compassionate
@@ -24,35 +22,33 @@ mental health.
 
 ## Featured Articles
 
-### [The Heart of Codependency](/blog/trauma-series/heart-of-codependency)
+### [The Heart of Codependency](./heart-of-codependency.md)
 
 <ArticleCard title="The Heart of Codependency" description="Explore the deep
 connection between trauma and codependent relationships, understanding how early
 experiences shape our attachment patterns." author="Dr. Sarah Chen"
-date="2024-02-15" readingTime="12 min" tags={['trauma', 'relationships',
-'codependency', 'attachment']} />
+date="2024-02-15" readingTime="12 min" tags="trauma, relationships, codependency, attachment" />
 
-### [Understanding the Scapegoat Dynamic](/blog/trauma-series/scapegoat-dynamics)
+### [Understanding the Scapegoat Dynamic](./scapegoat-dynamics.md)
 
 <ArticleCard title="Understanding the Scapegoat Dynamic" description="Uncover
 the complex role of the scapegoat in family systems and how this dynamic
 perpetuates trauma cycles." author="Dr. Michael Rivera" date="2024-02-16"
-readingTime="15 min" tags={['family systems', 'trauma', 'healing',
-'relationships']} />
+readingTime="15 min" tags="family systems, trauma, healing, relationships" />
 
-### [Understanding Narcissistic Patterns](/blog/trauma-series/understanding-narcissism)
+### [Understanding Narcissistic Patterns](./understanding-narcissism.md)
 
 <ArticleCard title="Understanding Narcissistic Patterns" description="Examine
 the roots of narcissistic behavior patterns and their connection to early trauma
 and attachment wounds." author="Dr. Emily Watson" date="2024-02-17"
-readingTime="14 min" tags={['narcissism', 'trauma', 'patterns', 'healing']} />
+readingTime="14 min" tags="narcissism, trauma, patterns, healing" />
 
-### [The Dark Side of Love](/blog/trauma-series/dark-side-of-love)
+### [The Dark Side of Love](./dark-side-of-love.md)
 
 <ArticleCard title="The Dark Side of Love" description="Explore how trauma
 influences our understanding and experience of love, and the path to healthier
 relationships." author="Dr. James Martinez" date="2024-02-18" readingTime="13
-min" tags={['relationships', 'trauma', 'love', 'healing']} />
+min" tags="relationships, trauma, love, healing" />
 
 ## Series Overview
 
@@ -82,19 +78,19 @@ the most comprehensive understanding:
 
 ## Additional Resources
 
-- [CPTSD Resources](/mental/I-CPTSD/resources)
-- [Therapy Options](/mental/V-Resources/therapy-options)
-- [Support Groups](/mental/V-Resources/support-groups)
+- [CPTSD Resources](../.mental/I-CPTSD/resources.md)
+- [Therapy Options](../.mental/V-Resources/therapy-options.md)
+- [Support Groups](../.mental/V-Resources/support-groups.md)
 
 ## Stay Updated
 
 Subscribe to our newsletter to receive notifications about new articles in this
 series:
 
-{/_ Subscribe component will be added in a future update _/}
+{/_Subscribe component will be added in a future update_/}
 
 ## Share This Series
 
 Help others discover these insights:
 
-{/_ Social sharing component will be added in a future update _/}
+{/_Social sharing component will be added in a future update_/}

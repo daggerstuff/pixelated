@@ -1,11 +1,10 @@
 ---
-title: AI in Mental Health Crisis Prevention
+title: "AI in Crisis Prevention: How Technology Can Help"
 description: >-
-  Exploring how artificial intelligence is revolutionizing mental health crisis
-  detection, intervention, and prevention through advanced monitoring and
-  support systems
+  _Next in our series, we'll explore the Future of AI-Human Connection and the
+  opportunities for compassionate, data-driven support systems._
 author: AI & Psychology Team
-pubDate: 2024-05-27T00:00:00.000Z
+pubDate: 2024-05-27
 draft: false
 tags:
   - crisis-prevention
@@ -15,10 +14,9 @@ tags:
   - suicide-prevention
 series: AI & Emotional Intelligence
 seriesOrder: 4
-category: Technical
 ---
 
-# AI in Mental Health Crisis Prevention
+## AI in Mental Health Crisis Prevention
 
 ## Introduction
 

@@ -23,9 +23,23 @@ spec:
         app: pixelated-empathy-api
     spec:
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: pixelated-empathy-api
         image: us-west1-docker.pkg.dev/grand-karma-492912-v1/pixelated-empathy/api:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5001

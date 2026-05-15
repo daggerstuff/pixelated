@@ -97,9 +97,9 @@ export function extractJsonFromString(text: string): string | null {
  * // Returns: null (logs error)
  * ```
  */
-export function safeJsonParse<T = unknown>(jsonString: string): T | null {
+export function safeJsonParse(jsonString: string): unknown | null {
   try {
-    return JSON.parse(jsonString) as unknown as T
+    return JSON.parse(jsonString) as unknown
   } catch (error: unknown) {
     logger.error('Failed to parse JSON string', {
       error: error instanceof Error ? String(error) : String(error),
@@ -127,10 +127,10 @@ export function safeJsonParse<T = unknown>(jsonString: string): T | null {
  * // Returns: { category: "test", confidence: 0.9 }
  * ```
  */
-export function extractAndParseJson<T = unknown>(text: string): T | null {
+export function extractAndParseJson(text: string): unknown | null {
   const jsonString = extractJsonFromString(text)
   if (!jsonString) {
     return null
   }
-  return safeJsonParse<T>(jsonString)
+  return safeJsonParse<unknown>(jsonString)
 }

@@ -5,10 +5,10 @@ import { PatientPsiProfile } from "../types/patient-psi";
 import { RealTimeAnalyzer } from "./real-time-analyzer";
 
 export class ContextualEnhancer {
-  private sessionHistory: Map<string, SessionContext[]> = new Map();
-  private progressTracker: Map<string, TherapeuticProgress> = new Map();
-  private analyzer: RealTimeAnalyzer;
-  private logger: Logger;
+  private readonly sessionHistory: Map<string, SessionContext[]> = new Map();
+  private readonly progressTracker: Map<string, TherapeuticProgress> = new Map();
+  private readonly analyzer: RealTimeAnalyzer;
+  private readonly logger: Logger;
 
   constructor() {
     this.analyzer = new RealTimeAnalyzer();
@@ -100,7 +100,7 @@ export class ContextualEnhancer {
   ): Promise<TherapeuticProgress> {
     const history = this.getSessionHistory(sessionId);
     const baseline =
-      this.progressTracker.get(patientProfile.id) || this.createBaselineProgress(patientProfile);
+      this.progressTracker.get(patientProfile.id) ?? this.createBaselineProgress(patientProfile);
 
     const currentProgress: TherapeuticProgress = {
       emotionalRegulation: this.calculateEmotionalProgress(history, baseline),
@@ -234,7 +234,7 @@ export class ContextualEnhancer {
    * Session history management
    */
   private getSessionHistory(sessionId: string): SessionContext[] {
-    return this.sessionHistory.get(sessionId) || [];
+    return this.sessionHistory.get(sessionId) ?? [];
   }
 
   private addToSessionHistory(sessionId: string, context: SessionContext): void {

@@ -35,7 +35,7 @@ evidence-based therapeutic education.
 
 ### Partnership Benefits
 
-#### For Academic Partners:
+#### For Academic Partners
 
 **Immediate Value**:
 
@@ -51,7 +51,7 @@ evidence-based therapeutic education.
 - Speaking opportunities and thought leadership
 - Faculty training and development resources
 
-#### For Pixelated Empathy:
+#### For Pixelated Empathy
 
 **Research Benefits**:
 
@@ -144,7 +144,7 @@ evidence-based therapeutic education.
 
 ### Healthcare Partnership Value Propositions
 
-#### For Healthcare Systems:
+#### For Healthcare Systems
 
 **Operational Benefits**:
 

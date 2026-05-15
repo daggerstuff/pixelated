@@ -1,12 +1,15 @@
 ---
-title: 'Redis Error Handling'
-description: 'Guide for handling Redis errors and exceptions'
-pubDate: 2025-03-25
+description: Guide for handling Redis errors and exceptions
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['redis', 'error-handling', 'exceptions']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - redis
+  - error-handling
+  - exceptions
+author: Pixelated Team
+title: Redis Error Handling Guide
 ---
 
 # Redis Error Handling Guide

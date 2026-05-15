@@ -8,8 +8,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+} from '@/components/ui/card/index.ts'
+import { Skeleton } from '@/components/ui/skeleton.tsx'
 
 export interface DashboardWidgetProps {
   title: string

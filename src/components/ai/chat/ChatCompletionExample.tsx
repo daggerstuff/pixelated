@@ -225,7 +225,7 @@ export default function ChatCompletionExample() {
                   </button>
                   {message.role === 'user' && (
                     <button
-                      onClick={() => resendMessage(index)}
+                      onClick={ async () => resendMessage(index)}
                       className='text-green-600 hover:text-green-800 text-xs'
                     >
                       Resend

@@ -254,7 +254,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Handle different actions
     if (action === 'run' && backupId) {
       // Run a recovery test on the specified backup
-      const environment = environmentType || TestEnvironmentType.SANDBOX
+      const environment = environmentType ?? TestEnvironmentType.SANDBOX
 
       // In a real implementation, this would call the recovery test manager
       // For now, simulate a test run

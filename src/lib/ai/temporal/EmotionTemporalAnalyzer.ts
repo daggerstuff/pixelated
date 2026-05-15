@@ -18,6 +18,39 @@ export interface EmotionTrendline {
   timestamps: Date[]
 }
 
+export interface TemporalEmotionTrendline {
+  slope: number
+  correlation: number
+  significance: number
+}
+
+export interface TemporalCriticalPoint {
+  emotion: string
+  intensity: number
+  timestamp: Date
+  sessionId: string
+}
+
+export interface TemporalTransition {
+  from: string
+  to: string
+  frequency: number
+  avgDuration: number
+}
+
+export interface TemporalProgressSummary {
+  overallImprovement: number
+  stabilityChange: number
+  positiveEmotionChange: number
+  negativeEmotionChange: number
+}
+
+export interface TemporalDimensionalRelationship {
+  dimensions: string[]
+  correlation: number
+  description: string
+}
+
 interface EmotionPattern {
   type: string
   confidence: number
@@ -33,11 +66,14 @@ export interface EmotionData {
 }
 
 export interface TemporalEmotionAnalysis {
-  trendlines: EmotionTrendline[]
-  volatility: number
+  trendlines: Record<string, TemporalEmotionTrendline>
+  volatility: Record<string, number>
+  criticalPoints?: TemporalCriticalPoint[]
+  transitions?: TemporalTransition[]
   emotions: EmotionData[]
-  patterns?: EmotionPattern[]
-  progression?: EmotionProgression
+  patterns: EmotionPattern[]
+  progression?: EmotionProgression | TemporalProgressSummary
+  dimensionalRelationships?: TemporalDimensionalRelationship[]
 }
 
 export interface EmotionAnalysisResult {
@@ -62,7 +98,7 @@ export interface EmotionCorrelation {
 }
 
 export class EmotionTemporalAnalyzer {
-  constructor(private repository: AIRepository) {}
+  constructor(private readonly repository: AIRepository) {}
 
   async analyzeSessionEmotions(
     sessionIds: string[],
@@ -71,10 +107,8 @@ export class EmotionTemporalAnalyzer {
     logger.info('Analyzing session emotions', { sessionIds, options })
 
     // Get emotion data from repository
-    const emotionData = await (
-      this.repository as unknown as AIRepository
-    )?.getEmotionData?.(sessionIds)
-    if (!emotionData || emotionData.length === 0) {
+    const emotionData = await this.repository.getEmotionData(sessionIds)
+    if (emotionData.length === 0) {
       return {
         trendlines: [],
         volatility: 0.5,
@@ -96,9 +130,7 @@ export class EmotionTemporalAnalyzer {
     options?: { emotionTypes?: string[] },
   ): Promise<EmotionData[]> {
     logger.info('Getting critical emotional moments', { clientId, options })
-    return await (
-      this.repository as unknown as AIRepository
-    )?.getCriticalEmotions?.(clientId, options?.emotionTypes)
+    return await this.repository.getCriticalEmotions(clientId, options?.emotionTypes)
   }
 
   async calculateEmotionProgression(
@@ -111,10 +143,12 @@ export class EmotionTemporalAnalyzer {
       startDate,
       endDate,
     })
-    const emotionData = await (
-      this.repository as unknown as AIRepository
-    )?.getEmotionDataByDateRange?.(clientId, startDate, endDate)
-    if (!emotionData || emotionData.length === 0) {
+    const emotionData = await this.repository.getEmotionDataByDateRange(
+      clientId,
+      startDate,
+      endDate,
+    )
+    if (emotionData.length === 0) {
       return { progression: 'stable', score: 0.7 }
     }
     return { progression: 'stable', score: 0.7 }
@@ -124,8 +158,13 @@ export class EmotionTemporalAnalyzer {
     clientId: string,
   ): Promise<EmotionCorrelation[]> {
     logger.info('Finding emotion correlations', { clientId })
-    return await (
-      this.repository as unknown as AIRepository
-    )?.getEmotionCorrelations?.(clientId)
+    const correlations = await this.repository.getEmotionCorrelations(clientId)
+    return correlations.map((correlation) => ({
+      emotion1: correlation.emotion1,
+      emotion2: correlation.emotion2,
+      correlationStrength: correlation.correlation,
+      confidence: Math.abs(correlation.correlation),
+      description: `Correlation between ${correlation.emotion1} and ${correlation.emotion2}`,
+    }))
   }
 }

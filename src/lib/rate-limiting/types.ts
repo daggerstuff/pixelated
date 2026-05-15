@@ -113,6 +113,14 @@ export interface RateLimitAnalytics {
     count: number
     confidence: number
   }>
+  /** Hourly breakdown of analytics data (optional) */
+  hourlyData?: Array<{
+    hour: number
+    totalRequests: number
+    blockedRequests: number
+    attackDetections: number
+    errors: number
+  }>
 }
 
 export interface SecurityEvent {

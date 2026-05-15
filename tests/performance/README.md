@@ -32,7 +32,7 @@ sudo apt-get install k6
 choco install k6
 ```
 
-Or download from: https://k6.io/docs/get-started/installation/
+Or download from: <https://k6.io/docs/get-started/installation/>
 
 ## Test Files
 
@@ -218,7 +218,7 @@ k6 run --stage 0s:0,1m:100,30s:100,1m:0 tests/performance/k6-rest-inference-load
     k6 run --out json=test-results/k6-results.json tests/performance/k6-rest-inference-load.js
 
 - name: Upload Results
-  uses: actions/upload-artifact@v3
+  uses: actions/upload-artifact@v7.0.1
   with:
     name: k6-results
     path: test-results/k6-results.json

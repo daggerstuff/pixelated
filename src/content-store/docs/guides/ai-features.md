@@ -1,11 +1,12 @@
 ---
-title: 'AI Features User Guide'
-description: 'AI Features User Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: AI Features User Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: AI Features User Guide
 ---
 
 # AI Features User Guide

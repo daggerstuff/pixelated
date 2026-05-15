@@ -1,11 +1,11 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.12.0-bookworm-slim AS base
+FROM node:24.14.1-bookworm-slim AS base
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
 ENV NODE_ENV=production
-ARG PNPM_VERSION=11.0.8
+ARG PNPM_VERSION=11.1.1
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -17,12 +17,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     g++ \
     curl \
-    && corepack enable \
-    && ( \
-    PNPM_SUCCESS=0; \
+    && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
-    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
+    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
     echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
     PNPM_SUCCESS=1 && \
     break; \
@@ -35,7 +33,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "❌ Failed to install pnpm after 5 attempts" && \
     exit 1; \
     fi \
-    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package manifests first for better layer caching
@@ -102,19 +99,17 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=11.0.8
+ARG PNPM_VERSION=11.1.1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
     git \
     curl \
-    && corepack enable \
-    && ( \
-    PNPM_SUCCESS=0; \
+    && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
-    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
+    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
     echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
     PNPM_SUCCESS=1 && \
     break; \
@@ -127,7 +122,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "❌ Failed to install pnpm after 5 attempts" && \
     exit 1; \
     fi \
-    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user

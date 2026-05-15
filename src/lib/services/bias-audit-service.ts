@@ -58,8 +58,8 @@ export interface BiasAuditServiceConfig {
 }
 
 export class BiasAuditService {
-  private biasEngine: BiasDetectionEngine
-  private onProgressUpdate?: (update: AuditProgressUpdate) => void
+  private readonly biasEngine: BiasDetectionEngine
+  private readonly onProgressUpdate?: (update: AuditProgressUpdate) => void
 
   constructor(config: BiasAuditServiceConfig = {}) {
     this.biasEngine =
@@ -266,9 +266,7 @@ export class BiasAuditService {
 
     // Run batch analysis using BiasDetectionEngine
     const batchResult = await this.biasEngine.batchAnalyzeSessions(
-      sampleSessions as Parameters<
-        BiasDetectionEngine['batchAnalyzeSessions']
-      >[0],
+      sampleSessions,
       {
         concurrency: 4,
         batchSize: 50,
@@ -826,9 +824,7 @@ let biasAuditServiceInstance: BiasAuditService | null = null
 export function getBiasAuditService(
   config?: BiasAuditServiceConfig,
 ): BiasAuditService {
-  if (!biasAuditServiceInstance) {
-    biasAuditServiceInstance = new BiasAuditService(config)
-  }
+  biasAuditServiceInstance ??= new BiasAuditService(config);
   return biasAuditServiceInstance
 }
 

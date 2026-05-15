@@ -1,11 +1,11 @@
 ---
-title: 'Security Audit API'
-description: 'API documentation for security audit logging and monitoring'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: API documentation for security audit logging and monitoring
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Security Audit API
 ---
 
 # Security Audit API

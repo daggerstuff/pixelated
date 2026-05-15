@@ -1,8 +1,8 @@
 ---
-title: 'Development'
-description: 'Preview changes locally to update your docs'
-pubDate: 2024-01-15
+description: Preview changes locally to update your docs
+pubDate: '2024-01-15'
 author: Pixelated Empathy Team
+title: Development
 ---
 
 **Prerequisite**: Please install Node.js (version 19 or higher) before
@@ -93,8 +93,6 @@ for code formatting.
     1. Remove the currently-installed version of mintlify: `npm remove -g mintlify`
     2. Upgrade to Node v19 or higher.
     3. Reinstall mintlify: `npm install -g mintlify`
-
-
 
     Solution: Go to the root of your device and delete the \~/.mintlify folder. Afterwards, run `mintlify dev` again.
 

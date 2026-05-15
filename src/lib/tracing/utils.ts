@@ -6,6 +6,7 @@
 
 import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import * as Sentry from '@sentry/astro'
 
 const tracer = trace.getTracer('pixelated-empathy')
 
@@ -124,6 +125,9 @@ export function addSpanEvent(
  * Mark the current span with an error
  */
 export function markSpanError(error: Error): void {
+  // Capture in Sentry
+  Sentry.captureException(error)
+
   const activeSpan = trace.getActiveSpan()
   if (activeSpan) {
     activeSpan.setStatus({

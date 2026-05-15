@@ -181,7 +181,7 @@ export async function updateDataDeletionRequest(
       {
         requestId: params.id,
         newStatus: params.status,
-        notes: params.processingNotes || 'No notes provided',
+        notes: params.processingNotes ?? 'No notes provided',
       },
       { ipAddress: '::1', userAgent: 'system' },
     )

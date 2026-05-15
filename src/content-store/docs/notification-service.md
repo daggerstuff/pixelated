@@ -1,64 +1,11 @@
 ---
-title: 'Notification Service'
-description:
-  'Documentation for Pixelated Healths notification system and real-time alerts'
-pubDate: 2025-03-27
-share: true
-toc: true
-lastModDate: 2025-03-27
-tags: ['notifications', 'services', 'real-time']
-author: 'Pixelated Team'
+title: Notification Service
+description: >-
+  Documentation for Pixelated Healths notification system and real-time alerts' share: true lastModDate: 2025-03-27
+  tags: ['notif
+pubDate: '2026-05-09'
 ---
 
-## Notification Service
-
-### Overview
-
-The Notification Service provides a robust, real-time notification system that
-supports multiple delivery channels and ensures reliable message delivery. Built
-with TypeScript and WebSocket technology, it offers a scalable solution for
-handling notifications across the application.
-
-### Features
-
-- Multi-channel delivery (in-app, email, push notifications)
-- Real-time notifications via WebSocket
-- Template-based notification system
-- Redis-based queue for reliable delivery
-- User preference management
-- Delivery status tracking
-- Comprehensive error handling
-- HIPAA-compliant data handling
-
-### Usage
-
-### Initializing the Service
-
-```typescript
-const notificationService = new NotificationService()
-```
-
-### Registering Notification Templates
-
-```typescript
-await notificationService.registerTemplate({
-  id: 'appointment-reminder',
-  title: 'Upcoming Appointment',
-  body: 'You have an appointment with {{therapistName}} on {{date}} at {{time}}',
-  channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
-  priority: NotificationPriority.NORMAL,
-})
-```
-
-### Queuing a Notification
-
-```typescript
-const notificationId = await notificationService.queueNotification({
-  userId: 'user-123',
-  templateId: 'appointment-reminder',
-  data: {
-    therapistName: 'Dr. Smith',
-    date: '2025-03-15',
     time: '2:00 PM',
   },
 })

@@ -53,6 +53,9 @@ declare global {
 interface ImportMetaEnv {
   readonly PUBLIC_AUTH0_DOMAIN: string
   readonly PUBLIC_AUTH0_CLIENT_ID: string
+  readonly VITE_AUTH0_DOMAIN?: string
+  readonly VITE_AUTH0_CLIENT_ID?: string
+  readonly VITE_AUTH0_AUDIENCE?: string
   readonly GRAFANA_URL: string
   readonly GRAFANA_API_KEY: string
   readonly GRAFANA_ORG_ID: string

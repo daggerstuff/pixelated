@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         isConfigured: configResult.isConfigured,
-        connectionStatus: configResult.connectionStatus || null,
+        connectionStatus: configResult.connectionStatus ?? null,
       }),
       {
         status: 200,

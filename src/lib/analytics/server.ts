@@ -1,7 +1,7 @@
 // Analytics Service Placeholder
 // TODO: Implement full analytics service after pulling changes from other branch
 
-const ANALYTICS_PORT = process.env['PORT'] || 8003
+const ANALYTICS_PORT = process.env['PORT'] ?? 8003
 
 const analyticsServer = {
   async start() {

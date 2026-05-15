@@ -70,8 +70,8 @@ export interface TransitionDetectorConfig {
  */
 export class ContextTransitionDetector {
   private history: ContextEvent[] = []
-  private config: Required<TransitionDetectorConfig>
-  private pendingTransitions: Map<ContextType, number> = new Map()
+  private readonly config: Required<TransitionDetectorConfig>
+  private readonly pendingTransitions: Map<ContextType, number> = new Map()
   private lastConfirmedEvent: ContextEvent | null = null
 
   constructor(config: TransitionDetectorConfig = {}) {
@@ -150,7 +150,7 @@ export class ContextTransitionDetector {
         // Check if confidence meets threshold
         if (curr.confidence >= this.config.minConfidenceThreshold) {
           // Track pending transition
-          const count = (this.pendingTransitions.get(curr.contextType) || 0) + 1
+          const count = (this.pendingTransitions.get(curr.contextType) ?? 0) + 1
           this.pendingTransitions.set(curr.contextType, count)
 
           // Require multiple consecutive detections

@@ -101,7 +101,7 @@ export const GET: APIRoute = async (context) => {
   const { socket, response } = Astro.getWebSocket(context)
   const connectionId = crypto.randomUUID()
   const sessionId =
-    context.url.searchParams.get('sessionId') || crypto.randomUUID()
+    context.url.searchParams.get('sessionId') ?? crypto.randomUUID()
 
   logger.info('WebSocket connection opened', {
     connectionId,
@@ -309,7 +309,7 @@ async function handleTextInput(
     ? T
     : never,
 ) {
-  const text = message.data?.text || ''
+  const text = message.data?.text ?? ''
 
   if (!text) {
     logger.warn('Empty text input')

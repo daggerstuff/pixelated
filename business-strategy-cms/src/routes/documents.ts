@@ -17,19 +17,14 @@ import {
 
 const router = Router()
 
-type DocumentRequest = AuthenticatedRequest<
-  Record<string, string>,
-  Record<string, unknown>,
-  Record<string, unknown>
->
+type DocumentRequest = AuthenticatedRequest
 
 const parseStringArray = (value: unknown): string[] | undefined => {
   if (!Array.isArray(value)) return undefined
 
-  const items = value
   const validItems: string[] = []
 
-  for (const item of items) {
+  for (const item of value) {
     if (typeof item === 'string' && item.length > 0) {
       validItems.push(item)
     }
@@ -38,37 +33,66 @@ const parseStringArray = (value: unknown): string[] | undefined => {
   return validItems.length > 0 ? validItems : undefined
 }
 
-const isDocumentCategory = (value: unknown): value is DocumentCategory =>
-  value === DocumentCategory.BUSINESS_PLAN ||
-  value === DocumentCategory.MARKET_ANALYSIS ||
-  value === DocumentCategory.COMPETITIVE_ANALYSIS ||
-  value === DocumentCategory.MARKETING_STRATEGY ||
-  value === DocumentCategory.FINANCIAL_PROJECTION ||
-  value === DocumentCategory.OPERATIONS_PLAN ||
-  value === DocumentCategory.EXECUTIVE_SUMMARY ||
-  value === DocumentCategory.CUSTOM
+const DOCUMENT_CATEGORIES: readonly string[] = Object.values(DocumentCategory)
+const DOCUMENT_STATUSES: readonly string[] = Object.values(DocumentStatus)
+
+const isDocumentCategory = (value: unknown): value is DocumentCategory => {
+  return typeof value === 'string' && DOCUMENT_CATEGORIES.includes(value)
+}
 
 const isDocumentStatus = (value: unknown): value is DocumentStatus =>
-  value === DocumentStatus.DRAFT ||
-  value === DocumentStatus.IN_REVIEW ||
-  value === DocumentStatus.APPROVED ||
-  value === DocumentStatus.PUBLISHED ||
-  value === DocumentStatus.ARCHIVED
+  typeof value === 'string' && DOCUMENT_STATUSES.includes(value)
 
 const parseMetadata = (
   value: unknown,
 ): Partial<DocumentMetadata> | undefined => {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+  if (!isRecord(value)) {
     return undefined
   }
 
-  return value
+  const metadata: Partial<DocumentMetadata> = {}
+  const candidate = value
+
+  const wordCount = candidate['wordCount']
+  if (typeof wordCount === 'number' && Number.isFinite(wordCount)) {
+    metadata.wordCount = wordCount
+  }
+
+  const readingTime = candidate['readingTime']
+  if (typeof readingTime === 'number' && Number.isFinite(readingTime)) {
+    metadata.readingTime = readingTime
+  }
+
+  if (typeof candidate['lastEditedBy'] === 'string') {
+    metadata.lastEditedBy = candidate['lastEditedBy']
+  }
+
+  const fileSize = candidate['fileSize']
+  if (typeof fileSize === 'number' && Number.isFinite(fileSize)) {
+    metadata.fileSize = fileSize
+  }
+
+  if (typeof candidate['mimeType'] === 'string') {
+    metadata.mimeType = candidate['mimeType']
+  }
+
+  if (isRecord(candidate['customFields'])) {
+    metadata.customFields = candidate['customFields']
+  }
+
+  return Object.keys(metadata).length > 0 ? metadata : undefined
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
 const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
-  const title = typeof body['title'] === 'string' ? body['title'].trim() : ''
-  const content =
-    typeof body['content'] === 'string' ? body['content'].trim() : ''
+  const titleValue = body['title']
+  const title = typeof titleValue === 'string' ? titleValue.trim() : ''
+
+  const contentValue = body['content']
+  const content = typeof contentValue === 'string' ? contentValue.trim() : ''
+
   const category = isDocumentCategory(body['category'])
     ? body['category']
     : undefined
@@ -91,8 +115,9 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
     category,
   }
 
+  const summaryValue = body['summary']
   const summary =
-    typeof body['summary'] === 'string' ? body['summary'].trim() : undefined
+    typeof summaryValue === 'string' ? summaryValue.trim() : undefined
   if (summary !== undefined) {
     createPayload.summary = summary
   }
@@ -102,8 +127,9 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
     createPayload.tags = tags
   }
 
-  if (typeof body['parentDocumentId'] === 'string') {
-    createPayload.parentDocumentId = body['parentDocumentId']
+  const parentIdValue = body['parentDocumentId']
+  if (typeof parentIdValue === 'string') {
+    createPayload.parentDocumentId = parentIdValue
   }
 
   if (isDocumentStatus(body['status'])) {
@@ -126,19 +152,19 @@ const parseDocumentCreate = (body: Record<string, unknown>): DocumentCreate => {
 const parseDocumentUpdate = (body: Record<string, unknown>): DocumentUpdate => {
   const updates: DocumentUpdate = {}
 
-  if (typeof body['title'] === 'string' && body['title'].trim().length > 0) {
-    updates.title = body['title'].trim()
+  const titleValue = body['title']
+  if (typeof titleValue === 'string' && titleValue.trim().length > 0) {
+    updates.title = titleValue.trim()
   }
 
-  if (
-    typeof body['content'] === 'string' &&
-    body['content'].trim().length > 0
-  ) {
-    updates.content = body['content'].trim()
+  const contentValue = body['content']
+  if (typeof contentValue === 'string' && contentValue.trim().length > 0) {
+    updates.content = contentValue.trim()
   }
 
-  if (typeof body['summary'] === 'string') {
-    updates.summary = body['summary'].trim()
+  const summaryValue = body['summary']
+  if (typeof summaryValue === 'string') {
+    updates.summary = summaryValue.trim()
   }
 
   if (isDocumentCategory(body['category'])) {
@@ -167,8 +193,13 @@ const getRouteParam = (req: DocumentRequest, key: string): string | null => {
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
+const getBodyRecord = (req: DocumentRequest): Record<string, unknown> => {
+  return isRecord(req.body) ? req.body : {}
+}
+
 const getBodyString = (req: DocumentRequest, key: string): string | null => {
-  const value = req.body[key]
+  const body = getBodyRecord(req)
+  const value = body[key]
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
@@ -198,7 +229,8 @@ router.post(
   requireCreator,
   async (req: DocumentRequest, res) => {
     try {
-      const documentData = parseDocumentCreate(req.body)
+      const body = getBodyRecord(req)
+      const documentData = parseDocumentCreate(body)
       const authorId = req.user!.userId
 
       const document = await DocumentService.createDocument(
@@ -321,7 +353,8 @@ router.put(
         return
       }
 
-      const updates = parseDocumentUpdate(req.body)
+      const body = getBodyRecord(req)
+      const updates = parseDocumentUpdate(body)
       const userId = req.user!.userId
 
       const document = await DocumentService.updateDocument(

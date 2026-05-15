@@ -1,11 +1,13 @@
 ---
-title: 'Credential Security Guide'
-description: 'Credential Security Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'security']
+description: Credential Security Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - security
 draft: false
 toc: true
+title: Credential Security Guide
 ---
 
 # Credential Security Guide

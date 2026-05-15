@@ -52,7 +52,7 @@ function isSafeToken(token) {
 
 function runBlogCommand(command) {
   try {
-    const tokens = Array.isArray(command) ? command : parseArgs(command || '')
+    const tokens = Array.isArray(command) ? command : parseArgs(command ?? '')
     if (tokens.length === 0) {
       return { success: false, error: 'Empty command' }
     }
@@ -84,8 +84,8 @@ function runBlogCommand(command) {
 
     return {
       success: false,
-      error: proc.stderr || 'Unknown error',
-      output: proc.stdout || '',
+      error: proc.stderr ?? 'Unknown error',
+      output: proc.stdout ?? '',
     }
   } catch (err) {
     return { success: false, error: err.message }

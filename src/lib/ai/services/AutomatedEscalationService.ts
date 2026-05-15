@@ -637,7 +637,7 @@ export class AutomatedEscalationService {
     _riskLevel: string,
   ): EscalationProtocol {
     return (
-      this.escalationProtocols.get(level) ||
+      this.escalationProtocols.get(level) ??
       this.escalationProtocols.get('low')!
     )
   }
@@ -708,7 +708,7 @@ export class AutomatedEscalationService {
   ): NotificationTemplate | undefined {
     const key = `${type}_${contactType}`
     return (
-      this.notificationTemplates.get(key) ||
+      this.notificationTemplates.get(key) ??
       this.notificationTemplates.get('crisis_alert_high')
     )
   }

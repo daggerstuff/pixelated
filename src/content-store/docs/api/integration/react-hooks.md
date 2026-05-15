@@ -1,11 +1,12 @@
 ---
-title: 'React Hooks for API Integration'
-description: 'React Hooks for API Integration documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: React Hooks for API Integration documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: React Hooks for API Integration
 ---
 
 # React Hooks for API Integration

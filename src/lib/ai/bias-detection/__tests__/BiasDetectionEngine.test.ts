@@ -2,19 +2,79 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BiasDetectionEngine } from "../BiasDetectionEngine";
+import type {
+  BiasAlertConfig,
+  BiasAnalysisResult,
+  BiasExplanationConfig,
+  BiasMetricsConfig,
+  BiasReportConfig,
+  BiasDetectionConfig as EngineConfig,
+  EvaluationLayerResult,
+  InteractiveLayerResult,
+  ModelLevelLayerResult,
+  PreprocessingLayerResult,
+  SessionData,
+  TherapeuticSession,
+} from "../types";
+import type { PythonHealthResponse } from "../bias-detection-interfaces";
+import {
+  createDefaultAnalysisResult,
+  createEvaluationAnalysisResult,
+  createInteractiveAnalysisResult,
+  createModelLevelAnalysisResult,
+} from "./fixtures";
 
 // Create a hoisted mock instance that can be accessed by both the mock factory and tests
-const mockBridge = vi.hoisted(() => {
+type MockPythonBridge = {
+  initialize: ReturnType<typeof vi.fn>;
+  checkHealth: ReturnType<typeof vi.fn>;
+  runPreprocessingAnalysis: ReturnType<typeof vi.fn>;
+  runModelLevelAnalysis: ReturnType<typeof vi.fn>;
+  runInteractiveAnalysis: ReturnType<typeof vi.fn>;
+  runEvaluationAnalysis: ReturnType<typeof vi.fn>;
+  analyze_session: ReturnType<typeof vi.fn>;
+  dispose: ReturnType<typeof vi.fn>;
+};
+
+const mockBridge: MockPythonBridge = vi.hoisted(() => {
   return {
-    initialize: vi.fn(),
-    checkHealth: vi.fn(),
-    runPreprocessingAnalysis: vi.fn(),
-    runModelLevelAnalysis: vi.fn(),
-    runInteractiveAnalysis: vi.fn(),
-    runEvaluationAnalysis: vi.fn(),
-    analyze_session: vi.fn(),
+    initialize: vi.fn<() => Promise<void>>(),
+    checkHealth: vi.fn<() => Promise<PythonHealthResponse>>(),
+    runPreprocessingAnalysis: vi.fn<(session: SessionData) => Promise<PreprocessingLayerResult>>(),
+    runModelLevelAnalysis: vi.fn<(session: SessionData) => Promise<ModelLevelLayerResult>>(),
+    runInteractiveAnalysis: vi.fn<(session: SessionData) => Promise<InteractiveLayerResult>>(),
+    runEvaluationAnalysis: vi.fn<(session: SessionData) => Promise<EvaluationLayerResult>>(),
+    analyze_session: vi.fn<(session: SessionData) => Promise<BiasAnalysisResult>>(),
+    dispose: vi.fn<() => Promise<void>>(),
   };
 });
+
+const isMonitoringCallback = (value: unknown): value is { level: string; sessionId: string } => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "level" in value &&
+    "sessionId" in value &&
+    typeof (value as Record<string, unknown>)["level"] === "string" &&
+    typeof (value as Record<string, unknown>)["sessionId"] === "string"
+  );
+};
+
+const getMonitoringPayload = (callback: ReturnType<typeof vi.fn>) => {
+  const lastCall = callback.mock.calls.at(-1);
+  if (!lastCall || lastCall.length === 0) {
+    return null;
+  }
+  if (!isMonitoringCallback(lastCall[0])) {
+    return null;
+  }
+  return lastCall[0];
+};
+
+type RecordValue = Record<string, unknown>;
+
+const isRecordValue = (value: unknown): value is RecordValue =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
 
 // Export the mock instance for use in tests
 export const mockPythonBridge = mockBridge;
@@ -33,104 +93,7 @@ vi.mock("../python-bridge", () => {
   };
 });
 
-import type {
-  BiasAlertConfig,
-  BiasAnalysisResult,
-  BiasExplanationConfig,
-  BiasMetricsConfig,
-  BiasReportConfig,
-  BiasDetectionConfig as EngineConfig,
-  SessionData,
-  TherapeuticSession,
-} from "../types";
-import {
-  createDefaultAnalysisResult,
-  createEvaluationAnalysisResult,
-  createInteractiveAnalysisResult,
-  createModelLevelAnalysisResult,
-} from "./fixtures";
-
-const createPartialFailingPythonService = () =>
-  class PartialFailingPythonService {
-    async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-      throw new Error("Preprocessing service unavailable");
-    }
-    async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-      // Return a realistic 0.5 response
-      return {
-        biasScore: 0.5,
-        fairnessMetrics: {
-          demographicParity: 0.75,
-          equalizedOdds: 0.8,
-          equalOpportunity: 0.8,
-          calibration: 0.8,
-          individualFairness: 0.8,
-          counterfactualFairness: 0.8,
-        },
-        performanceMetrics: {
-          accuracy: 0.9,
-          precision: 0.9,
-          recall: 0.9,
-          f1Score: 0.9,
-          auc: 0.9,
-          calibrationError: 0.05,
-          demographicBreakdown: {},
-        },
-        groupPerformanceComparison: [],
-        recommendations: [],
-      };
-    }
-    async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-      // Return a realistic 0.5 response
-      return {
-        biasScore: 0.5,
-        counterfactualAnalysis: {
-          scenariosAnalyzed: 3,
-          biasDetected: false,
-          consistencyScore: 0.15,
-          problematicScenarios: [],
-        },
-        featureImportance: [],
-        whatIfScenarios: [],
-        recommendations: [],
-      };
-    }
-    async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-      // Return a realistic 0.5 response
-      return {
-        biasScore: 0.5,
-        huggingFaceMetrics: {
-          toxicity: 0.05,
-          bias: 0.15,
-          regard: {},
-          stereotype: 0.1,
-          fairness: 0.85,
-        },
-        customMetrics: {
-          therapeuticBias: 0.1,
-          culturalSensitivity: 0.1,
-          professionalEthics: 0.1,
-          patientSafety: 0.1,
-        },
-        temporalAnalysis: {
-          trendDirection: "stable",
-          changeRate: 0,
-          seasonalPatterns: [],
-          interventionEffectiveness: [],
-        },
-        recommendations: [],
-      };
-    }
-    async initialize() {}
-    async checkHealth() {
-      return { status: "error", message: "Service failed" };
-    }
-    async analyze_session(_sessionData: SessionData): Promise<BiasAnalysisResult> {
-      throw new Error("Python service unavailable");
-    }
-  };
-
-describe("BiasDetectionEngine", { timeout: 20000 }, () => {
+describe("BiasDetectionEngine", () => {
   let biasEngine: BiasDetectionEngine;
   let mockConfig: EngineConfig;
   let mockSessionData: SessionData;
@@ -150,6 +113,7 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
     mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
     mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
     mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
+    mockPythonBridge.dispose.mockResolvedValue(undefined);
     mockPythonBridge.analyze_session.mockResolvedValue({
       session_id: "test-session",
       overall_bias_score: 0.25,
@@ -255,8 +219,10 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         interactive: { biasScore: 0.5 },
         evaluation: { biasScore: 0.5 },
       },
-      recommendations: expect.arrayContaining([expect.any(String)]),
     });
+    expect(lowBiasResult.recommendations).toEqual(
+      expect.arrayContaining([expect.stringMatching(/.+/)]),
+    );
 
     // Test high bias score (default mocks return 0.5 overall, which should be 'medium')
     mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult());
@@ -281,8 +247,10 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         interactive: { biasScore: 0.5 },
         evaluation: { biasScore: 0.5 },
       },
-      recommendations: expect.arrayContaining([expect.any(String)]),
     });
+    expect(highBiasResult.recommendations).toEqual(
+      expect.arrayContaining([expect.stringMatching(/.+/)]),
+    );
 
     // Test critical bias score (default mocks return 0.5 overall, which should be 'medium')
     mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult());
@@ -307,8 +275,10 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         interactive: { biasScore: 0.5 },
         evaluation: { biasScore: 0.5 },
       },
-      recommendations: expect.arrayContaining([expect.any(String)]),
     });
+    expect(criticalBiasResult.recommendations).toEqual(
+      expect.arrayContaining([expect.stringMatching(/.+/)]),
+    );
   });
 
   it("should initialize the engine", async () => {
@@ -334,8 +304,8 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         interactive: { biasScore: 0.5 },
         evaluation: { biasScore: 0.5 },
       },
-      recommendations: expect.arrayContaining([expect.any(String)]),
     });
+    expect(result.recommendations).toEqual(expect.arrayContaining([expect.any(String)]));
   });
 
   it("should analyze a session with high bias score", async () => {
@@ -356,8 +326,8 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         interactive: { biasScore: 0.5 },
         evaluation: { biasScore: 0.5 },
       },
-      recommendations: expect.arrayContaining([expect.any(String)]),
     });
+    expect(result.recommendations).toEqual(expect.arrayContaining([expect.any(String)]));
   });
 
   it("should analyze a session with critical bias score", async () => {
@@ -378,8 +348,8 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         interactive: { biasScore: 0.5 },
         evaluation: { biasScore: 0.5 },
       },
-      recommendations: expect.arrayContaining([expect.any(String)]),
     });
+    expect(result.recommendations).toEqual(expect.arrayContaining([expect.any(String)]));
 
     mockConfig = {
       pythonServiceUrl: "http://localhost:5000",
@@ -768,55 +738,28 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
 
     it("should trigger alerts for high bias scores", async () => {
       await biasEngine.initialize();
-
-      // Create a new engine instance with a service that returns high bias scores
-      class HighBiasPythonService {
-        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-          return {
-            biasScore: 0.7,
-            linguisticBias: 0.6,
-            confidence: 0.9,
-          };
-        }
-        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-          return {
-            biasScore: 0.8,
-            fairnessMetrics: { equalizedOdds: 0.5, demographicParity: 0.4 },
-            confidence: 0.9,
-          };
-        }
-        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-          return {
-            biasScore: 0.7,
-            counterfactualAnalysis: { scenarios: 3, improvements: 0.4 },
-            confidence: 0.9,
-          };
-        }
-        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-          return {
-            biasScore: 0.75,
-            nlpBiasMetrics: { sentimentBias: 0.6, toxicityBias: 0.7 },
-            confidence: 0.9,
-          };
-        }
-        async initialize() {}
-        async checkHealth() {
-          return { status: "healthy", message: "Service is running" };
-        }
-        async analyze_session(_sessionData: SessionData): Promise<BiasAnalysisResult> {
-          throw new Error("Python service unavailable");
-        }
-      }
-
-      const highBiasService = new HighBiasPythonService();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = highBiasService as any;
-
-      // Start monitoring with callback
+      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({
+        biasScore: 0.7,
+        linguisticBias: 0.6,
+        confidence: 0.9,
+      });
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({
+        biasScore: 0.8,
+        fairnessMetrics: { equalizedOdds: 0.5, demographicParity: 0.4 },
+        confidence: 0.9,
+      });
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({
+        biasScore: 0.7,
+        counterfactualAnalysis: { scenarios: 3, improvements: 0.4 },
+        confidence: 0.9,
+      });
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({
+        biasScore: 0.75,
+        nlpBiasMetrics: { sentimentBias: 0.6, toxicityBias: 0.7 },
+        confidence: 0.9,
+      });
       const mockCallback = vi.fn();
       await biasEngine.startMonitoring(mockCallback);
-
-      // Simulate high bias session by mocking all layers with high scores
       const result = await biasEngine.analyzeSession(
         sessionDataToTherapeuticSession(mockSessionData),
       );
@@ -826,15 +769,13 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.alertLevel).toMatch(/^(high|critical)$/); // Should be high or critical
 
       // Should trigger monitoring callback for high/critical alerts
-      expect(mockCallback).toHaveBeenCalledWith(
-        expect.objectContaining({
-          level: expect.stringMatching(/^(high|critical)$/),
-          sessionId: mockSessionData.sessionId,
-        }),
-      );
-
-      // Restore original service
-      biasEngine.pythonService = originalService;
+      const monitoredPayload = getMonitoringPayload(mockCallback);
+      expect(monitoredPayload).not.toBeNull();
+      if (!monitoredPayload) {
+        throw new Error("Expected monitoring callback to be called");
+      }
+      expect(monitoredPayload.level).toMatch(/^(high|critical)$/);
+      expect(monitoredPayload.sessionId).toBe(mockSessionData.sessionId);
     });
   });
 
@@ -859,7 +800,7 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
 
       const startTime = Date.now();
       const results = await Promise.all(
-        sessions.map((session) => biasEngine.analyzeSession(session)),
+        sessions.map(async (session) => biasEngine.analyzeSession(session)),
       );
       const endTime = Date.now();
 
@@ -872,32 +813,10 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
     it("should handle Python service errors gracefully", async () => {
       await biasEngine.initialize();
 
-      // Create a new engine instance with a service that always throws errors
-      class FailingPythonService {
-        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-          throw new Error("Python service unavailable");
-        }
-        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-          throw new Error("Python service unavailable");
-        }
-        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-          throw new Error("Python service unavailable");
-        }
-        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-          throw new Error("Python service unavailable");
-        }
-        async initialize() {}
-        async checkHealth() {
-          return { status: "error", message: "Service failed" };
-        }
-        async analyze_session(_sessionData: SessionData): Promise<BiasAnalysisResult> {
-          throw new Error("Python service unavailable");
-        }
-      }
-
-      const failingService = new FailingPythonService();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = failingService as any;
+      mockPythonBridge.runPreprocessingAnalysis.mockRejectedValue(new Error("Python service unavailable"));
+      mockPythonBridge.runModelLevelAnalysis.mockRejectedValue(new Error("Python service unavailable"));
+      mockPythonBridge.runInteractiveAnalysis.mockRejectedValue(new Error("Python service unavailable"));
+      mockPythonBridge.runEvaluationAnalysis.mockRejectedValue(new Error("Python service unavailable"));
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(
@@ -920,98 +839,15 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.recommendations.some((rec) => rec.includes("Limited analysis available"))).toBe(
         true,
       );
-
-      // Restore original service
-      biasEngine.pythonService = originalService;
     });
 
     it("should provide fallback analysis when toolkits are unavailable", async () => {
       await biasEngine.initialize();
 
-      // Create a new engine instance with a service that always throws errors
-      const createFailingPythonService = () =>
-        class FailingPythonService {
-          async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-            throw new Error("Toolkit unavailable");
-          }
-          async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-            // Return a realistic 0.5 response
-            return {
-              biasScore: 0.5,
-              fairnessMetrics: {
-                demographicParity: 0.75,
-                equalizedOdds: 0.8,
-                equalOpportunity: 0.8,
-                calibration: 0.8,
-                individualFairness: 0.8,
-                counterfactualFairness: 0.8,
-              },
-              performanceMetrics: {
-                accuracy: 0.9,
-                precision: 0.9,
-                recall: 0.9,
-                f1Score: 0.9,
-                auc: 0.9,
-                calibrationError: 0.05,
-                demographicBreakdown: {},
-              },
-              groupPerformanceComparison: [],
-              recommendations: [],
-            };
-          }
-          async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-            // Return a realistic 0.5 response
-            return {
-              biasScore: 0.5,
-              counterfactualAnalysis: {
-                scenariosAnalyzed: 3,
-                biasDetected: false,
-                consistencyScore: 0.15,
-                problematicScenarios: [],
-              },
-              featureImportance: [],
-              whatIfScenarios: [],
-              recommendations: [],
-            };
-          }
-          async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-            // Return a realistic 0.5 response
-            return {
-              biasScore: 0.5,
-              huggingFaceMetrics: {
-                toxicity: 0.05,
-                bias: 0.15,
-                regard: {},
-                stereotype: 0.1,
-                fairness: 0.85,
-              },
-              customMetrics: {
-                therapeuticBias: 0.1,
-                culturalSensitivity: 0.1,
-                professionalEthics: 0.1,
-                patientSafety: 0.1,
-              },
-              temporalAnalysis: {
-                trendDirection: "stable",
-                changeRate: 0,
-                seasonalPatterns: [],
-                interventionEffectiveness: [],
-              },
-              recommendations: [],
-            };
-          }
-          async initialize() {}
-          async checkHealth() {
-            return { status: "error", message: "Service failed" };
-          }
-          async analyze_session(_sessionData: SessionData): Promise<BiasAnalysisResult> {
-            throw new Error("Python service unavailable");
-          }
-        };
-
-      const failingService = new (createFailingPythonService())();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = failingService as any;
+      mockPythonBridge.runPreprocessingAnalysis.mockRejectedValue(new Error("Toolkit unavailable"));
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(
@@ -1036,17 +872,17 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.recommendations.some((rec) => rec.includes("Limited analysis available"))).toBe(
         true,
       );
-
-      // Restore original service
-      biasEngine.pythonService = originalService;
     });
 
     it("should handle partial layer failures", async () => {
       await biasEngine.initialize();
 
-      const failingService = new (createPartialFailingPythonService())();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = failingService as any;
+      mockPythonBridge.runPreprocessingAnalysis.mockRejectedValue(
+        new Error("Preprocessing service unavailable"),
+      );
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
 
       const result = await biasEngine.analyzeSession(
         sessionDataToTherapeuticSession(mockSessionData),
@@ -1067,97 +903,17 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.overallBiasScore).toBe(0.5);
       // Confidence should be reduced due to failed layer (0.8 base - 1 * 0.15 penalty = 0.65)
       expect(result.confidence).toBeCloseTo(0.65, 10);
-
-      // Restore original service
-      biasEngine.pythonService = originalService;
     });
 
     it("should handle malformed Python service responses", async () => {
       await biasEngine.initialize();
 
-      // Create a new engine instance with a service that throws format errors
-      class MalformedPythonService {
-        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-          throw new Error("Invalid response format: missing required fields");
-        }
-        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            fairnessMetrics: {
-              demographicParity: 0.75,
-              equalizedOdds: 0.8,
-              equalOpportunity: 0.8,
-              calibration: 0.8,
-              individualFairness: 0.8,
-              counterfactualFairness: 0.8,
-            },
-            performanceMetrics: {
-              accuracy: 0.9,
-              precision: 0.9,
-              recall: 0.9,
-              f1Score: 0.9,
-              auc: 0.9,
-              calibrationError: 0.05,
-              demographicBreakdown: {},
-            },
-            groupPerformanceComparison: [],
-            recommendations: [],
-          };
-        }
-        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            counterfactualAnalysis: {
-              scenariosAnalyzed: 3,
-              biasDetected: false,
-              consistencyScore: 0.15,
-              problematicScenarios: [],
-            },
-            featureImportance: [],
-            whatIfScenarios: [],
-            recommendations: [],
-          };
-        }
-        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            huggingFaceMetrics: {
-              toxicity: 0.05,
-              bias: 0.15,
-              regard: {},
-              stereotype: 0.1,
-              fairness: 0.85,
-            },
-            customMetrics: {
-              therapeuticBias: 0.1,
-              culturalSensitivity: 0.1,
-              professionalEthics: 0.1,
-              patientSafety: 0.1,
-            },
-            temporalAnalysis: {
-              trendDirection: "stable",
-              changeRate: 0,
-              seasonalPatterns: [],
-              interventionEffectiveness: [],
-            },
-            recommendations: [],
-          };
-        }
-        async initialize() {}
-        async checkHealth() {
-          return { status: "healthy", message: "Service is running" };
-        }
-        async analyze_session(_sessionData: SessionData): Promise<BiasAnalysisResult> {
-          throw new Error("Python service unavailable");
-        }
-      }
-
-      const malformedService = new MalformedPythonService();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = malformedService as any;
+      mockPythonBridge.runPreprocessingAnalysis.mockRejectedValue(
+        new Error("Invalid response format: missing required fields"),
+      );
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
 
       const result = await biasEngine.analyzeSession(
         sessionDataToTherapeuticSession(mockSessionData),
@@ -1171,32 +927,15 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.recommendations.some((rec) => rec.includes("Limited analysis available"))).toBe(
         true,
       );
-
-      // Restore original service
-      biasEngine.pythonService = originalService;
     });
 
     it("should handle service overload scenarios", async () => {
       await biasEngine.initialize();
 
-      const createOverloadPythonService = () =>
-        class OverloadPythonService {
-          async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-            throw new Error("Overload!");
-          }
-          async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-            throw new Error("Overload!");
-          }
-          async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-            throw new Error("Overload!");
-          }
-          async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-            throw new Error("Overload!");
-          }
-        };
-      const overloadService = new (createOverloadPythonService())();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = overloadService as any;
+      mockPythonBridge.runPreprocessingAnalysis.mockRejectedValue(new Error("Overload!"));
+      mockPythonBridge.runModelLevelAnalysis.mockRejectedValue(new Error("Overload!"));
+      mockPythonBridge.runInteractiveAnalysis.mockRejectedValue(new Error("Overload!"));
+      mockPythonBridge.runEvaluationAnalysis.mockRejectedValue(new Error("Overload!"));
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(
@@ -1222,97 +961,21 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.recommendations.some((rec) => rec.includes("Limited analysis available"))).toBe(
         true,
       );
-
-      // Restore original service
-      biasEngine.pythonService = originalService;
     });
 
     it("should handle authentication failures", async () => {
       await biasEngine.initialize();
 
-      // Create a new engine instance with a service that throws auth errors
-      class AuthFailurePythonService {
-        async runPreprocessingAnalysis(_session: SessionData): Promise<any> {
-          throw new Error("401: Authentication required");
-        }
-        async runModelLevelAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            fairnessMetrics: {
-              demographicParity: 0.75,
-              equalizedOdds: 0.8,
-              equalOpportunity: 0.8,
-              calibration: 0.8,
-              individualFairness: 0.8,
-              counterfactualFairness: 0.8,
-            },
-            performanceMetrics: {
-              accuracy: 0.9,
-              precision: 0.9,
-              recall: 0.9,
-              f1Score: 0.9,
-              auc: 0.9,
-              calibrationError: 0.05,
-              demographicBreakdown: {},
-            },
-            groupPerformanceComparison: [],
-            recommendations: [],
-          };
-        }
-        async runInteractiveAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            counterfactualAnalysis: {
-              scenariosAnalyzed: 3,
-              biasDetected: false,
-              consistencyScore: 0.15,
-              problematicScenarios: [],
-            },
-            featureImportance: [],
-            whatIfScenarios: [],
-            recommendations: [],
-          };
-        }
-        async runEvaluationAnalysis(_session: SessionData): Promise<any> {
-          // Return a realistic 0.5 response
-          return {
-            biasScore: 0.5,
-            huggingFaceMetrics: {
-              toxicity: 0.05,
-              bias: 0.15,
-              regard: {},
-              stereotype: 0.1,
-              fairness: 0.85,
-            },
-            customMetrics: {
-              therapeuticBias: 0.1,
-              culturalSensitivity: 0.1,
-              professionalEthics: 0.1,
-              patientSafety: 0.1,
-            },
-            temporalAnalysis: {
-              trendDirection: "stable",
-              changeRate: 0,
-              seasonalPatterns: [],
-              interventionEffectiveness: [],
-            },
-            recommendations: [],
-          };
-        }
-        async initialize() {}
-        async checkHealth() {
-          return { status: "error", message: "Authentication failed" };
-        }
-        async analyze_session(_sessionData: SessionData): Promise<BiasAnalysisResult> {
-          throw new Error("Python service unavailable");
-        }
-      }
-
-      const authFailureService = new AuthFailurePythonService();
-      const originalService = biasEngine.pythonService;
-      biasEngine.pythonService = authFailureService as any;
+      mockPythonBridge.runPreprocessingAnalysis.mockRejectedValue(
+        new Error("401: Authentication required"),
+      );
+      mockPythonBridge.checkHealth.mockResolvedValue({
+        status: "error",
+        message: "Authentication failed",
+      });
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
 
       // Should complete with fallback results instead of throwing
       const result = await biasEngine.analyzeSession(
@@ -1323,26 +986,14 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       expect(result.layerResults.preprocessing).toBeDefined();
       expect(result.layerResults.preprocessing.biasScore).toBe(0.5); // Fallback value
 
-      // Restore original service
-      biasEngine.pythonService = originalService;
     });
   });
 
   describe("Resource Management and Cleanup", () => {
     it("should handle cleanup failures gracefully", async () => {
       await biasEngine.initialize();
-      // Mock cleanup failures - access private properties for testing
-      const engineWithMockProps = biasEngine as unknown as {
-        metricsCollector: { dispose: () => Promise<void> };
-        alertSystem: { dispose: () => Promise<void> };
-      };
-
-      engineWithMockProps.metricsCollector.dispose = vi
-        .fn()
-        .mockRejectedValue(new Error("Failed to close database connection"));
-      engineWithMockProps.alertSystem.dispose = vi
-        .fn()
-        .mockRejectedValue(new Error("Failed to unregister webhooks"));
+      // Simulate python service cleanup failure while keeping behavior consistent
+      mockPythonBridge.dispose.mockRejectedValue(new Error("Failed to close python service"));
 
       // Should not throw during disposal
       await expect(biasEngine.dispose()).resolves.not.toThrow();
@@ -1351,7 +1002,7 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
     it("should handle concurrent resource access", async () => {
       await biasEngine.initialize();
       // Simulate concurrent access to shared resources
-      const promises = Array.from({ length: 10 }, (_, i) =>
+      const promises = Array.from({ length: 10 }, async (_, i) =>
         biasEngine.analyzeSession(
           sessionDataToTherapeuticSession({
             ...mockSessionData,
@@ -1367,6 +1018,7 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
         expect(result).toBeDefined();
       });
     });
+
     it("should handle memory pressure scenarios", async () => {
       await biasEngine.initialize();
       // Simulate memory pressure by processing many large sessions
@@ -1691,10 +1343,8 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
 
     it("should provide comparative bias analysis for paired scenarios", async () => {
       await biasEngine.initialize();
+      expect(fixtureScenarios.comparativePairs.length).toBeGreaterThan(0);
       const comparativePair = fixtureScenarios.comparativePairs[0];
-      if (!comparativePair) {
-        throw new Error("No comparative pairs available for testing");
-      }
 
       const [favorableScenario, unfavorableScenario] = comparativePair;
 
@@ -1717,8 +1367,8 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
       );
 
       expect(result.demographics).toBeDefined();
-      expect(result.demographics?.["age"]).toBeDefined();
-      expect(result.demographics?.["gender"]).toBeDefined();
+      expect(result.demographics).toHaveProperty("age");
+      expect(result.demographics).toHaveProperty("gender");
       expect(result.layerResults).toBeDefined();
       expect(result.recommendations).toBeDefined();
     });
@@ -1728,21 +1378,37 @@ describe("BiasDetectionEngine", { timeout: 20000 }, () => {
 // Fix: Ensure all analyzeSession calls use TherapeuticSession type
 // Helper to convert SessionData to TherapeuticSession for tests
 function sessionDataToTherapeuticSession(data: SessionData): TherapeuticSession {
+  const metadata = data.sessionData?.metadata ?? {
+    age: "",
+    gender: "",
+    race: "",
+    language: "",
+  };
+  const sessionDataPayload = data.sessionData ?? { transcript: "" };
+  const rawDemographics = isRecordValue(data.participantDemographics)
+    ? data.participantDemographics
+    : null;
+  const toStringField = (source: RecordValue | null, key: string, fallback: string): string => {
+    const value = source?.[key];
+    return typeof value === "string" ? value : fallback;
+  };
+  const participantDemographics = {
+    age: toStringField(rawDemographics, "age", metadata.age),
+    gender: toStringField(rawDemographics, "gender", metadata.gender),
+    ethnicity: toStringField(rawDemographics, "ethnicity", metadata.race),
+    primaryLanguage: toStringField(rawDemographics, "primaryLanguage", metadata.language),
+  };
+
   return {
     sessionId: data.sessionId,
-    sessionDate: data.sessionDate || new Date().toISOString(),
-    participantDemographics: data.participantDemographics || {
-      age: data.sessionData?.metadata?.age || "",
-      gender: data.sessionData?.metadata?.gender || "",
-      ethnicity: data.sessionData?.metadata?.race || "",
-      primaryLanguage: data.sessionData?.metadata?.language || "",
-    },
+    sessionDate: data.sessionDate ?? new Date().toISOString(),
+    participantDemographics,
     scenario: {
       scenarioId: "test-scenario",
       type: "general-wellness",
     },
     content: {
-      transcript: data.sessionData?.transcript || "",
+      transcript: sessionDataPayload.transcript || "",
       aiResponses: [],
       userInputs: [],
     },

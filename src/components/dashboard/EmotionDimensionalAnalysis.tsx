@@ -10,7 +10,7 @@ const getEmotionColor = (emotion: string): string => {
     sadness: '#2196F3',
     anger: '#F44336',
   }
-  return colors[emotion] || '#9E9E9E'
+  return colors[emotion] ?? '#9E9E9E'
 }
 
 interface EmotionPoint {
@@ -119,7 +119,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`emotion-dimensional-analysis ${className || ''}`}>
+      <div className={`emotion-dimensional-analysis ${className ?? ''}`}>
         <div className='flex h-64 items-center justify-center'>
           <div className='text-gray-500 text-lg'>
             Loading emotion analysis...
@@ -131,7 +131,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
 
   return (
     <div
-      className={`emotion-dimensional-analysis ${className || ''} space-y-6`}
+      className={`emotion-dimensional-analysis ${className ?? ''} space-y-6`}
     >
       <div className='bg-white rounded-lg p-6 shadow'>
         <h3 className='mb-4 text-xl font-semibold'>Dimensional Controls</h3>

@@ -16,10 +16,10 @@ interface KeyMetadata {
  * Implements HIPAA-compliant key rotation policies
  */
 export class KeyRotationManager {
-  private keys: Map<string, KeyMetadata>
-  private keyStore: Map<string, string> // In production, use a secure key vault
-  private rotationInterval: number // in milliseconds
-  private encryption: Encryption
+  private readonly keys: Map<string, KeyMetadata>
+  private readonly keyStore: Map<string, string> // In production, use a secure key vault
+  private readonly rotationInterval: number // in milliseconds
+  private readonly encryption: Encryption
 
   /**
    * Creates a new KeyRotationManager
@@ -34,7 +34,7 @@ export class KeyRotationManager {
     this.keys = new Map()
     this.keyStore = new Map()
     this.rotationInterval =
-      (options.rotationInterval || 90) * 24 * 60 * 60 * 1000 // Convert days to milliseconds
+      (options.rotationInterval ?? 90) * 24 * 60 * 60 * 1000 // Convert days to milliseconds
     this.encryption = new Encryption({
       namespace: options.namespace,
       region: options.region,

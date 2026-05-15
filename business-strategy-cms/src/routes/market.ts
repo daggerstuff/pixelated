@@ -8,8 +8,7 @@ import { logger } from '@/utils/logger'
 type MarketBulkRequest = AuthenticatedRequest<
   Record<string, string>,
   unknown,
-  { symbols?: unknown },
-  Record<string, string | string[] | undefined>
+  { symbols?: unknown }
 >
 
 const parseSymbols = (value: unknown): string[] => {
