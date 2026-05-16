@@ -21,11 +21,26 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
+<<<<<<< HEAD
   const clientInfo = {
     ip: clientAddress || 'unknown',
     userAgent: request.headers.get('user-agent') ?? 'unknown',
     deviceId: request.headers.get('x-device-id') ?? 'unknown',
   }
+=======
+  let clientInfo = {
+    ip: clientAddress || 'unknown',
+    userAgent: 'unknown',
+    deviceId: 'unknown',
+  }
+  try {
+    // Extract client info for logging
+    clientInfo = {
+      ip: clientAddress || 'unknown',
+      userAgent: request.headers.get('user-agent') ?? 'unknown',
+      deviceId: request.headers.get('x-device-id') ?? 'unknown',
+    }
+>>>>>>> origin/staging
 
   try {
     // Rate limit profile reads (e.g. 60 per minute)
@@ -41,11 +56,31 @@ export const GET = async ({
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
+<<<<<<< HEAD
+    if (session && session.user) {
+      const _id = (session.user as any)._id
+      userId = session.user.id || (_id ? _id.toString() : null) || null
+=======
     if (session?.user) {
+<<<<<<< HEAD
 <<<<<<< HEAD
       userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
 =======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+      userId = session.user.id || (session.user as any)._id?.toString() ?? null
+>>>>>>> origin/staging
+=======
+      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+>>>>>>> origin/staging
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
+>>>>>>> origin/staging
 >>>>>>> origin/staging
     } else {
       const authHeader = request.headers.get('Authorization')
@@ -174,11 +209,31 @@ export const PUT = async ({
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
+<<<<<<< HEAD
+    if (session && session.user) {
+      const _id = (session.user as any)._id
+      userId = session.user.id || (_id ? _id.toString() : null) || null
+=======
     if (session?.user) {
+<<<<<<< HEAD
 <<<<<<< HEAD
       userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
 =======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+      userId = session.user.id || (session.user as any)._id?.toString() ?? null
+>>>>>>> origin/staging
+=======
+      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+>>>>>>> origin/staging
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
+>>>>>>> origin/staging
 >>>>>>> origin/staging
     } else {
       const authHeader = request.headers.get('Authorization')

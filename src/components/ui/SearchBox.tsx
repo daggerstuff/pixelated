@@ -25,6 +25,7 @@ export default function SearchBox({
 }: SearchBoxProps) {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
   const [results, setResults] = useState<SearchResult[]>([])
   const [isSearchReady, setIsSearchReady] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -35,6 +36,7 @@ export default function SearchBox({
 
   // ⚡ Bolt: Debounce query to prevent synchronous main thread blocking during rapid typing
   useEffect(() => {
+    setIsSearching(true)
     const timer = setTimeout(() => {
       setDebouncedQuery(query)
     }, 300)
@@ -105,6 +107,7 @@ export default function SearchBox({
   useEffect(() => {
     if (!isSearchReady || debouncedQuery.length < minQueryLength) {
       setResults([])
+      setIsSearching(false)
       return
     }
 
@@ -127,6 +130,8 @@ export default function SearchBox({
     } catch (error: unknown) {
       console.error('Search error:', error)
       setResults([])
+    } finally {
+      setIsSearching(false)
     }
   }, [debouncedQuery, isSearchReady, maxResults, minQueryLength, onSearch])
 
@@ -208,14 +213,26 @@ export default function SearchBox({
   }
 
   return (
-    <div
-      className='relative w-full'
-      role='combobox'
-      aria-expanded={showResults}
-      aria-haspopup='listbox'
-      aria-controls='search-results'
-    >
-      <div className='relative'>
+    <>
+      {/* Screen reader announcement for search results */}
+      <div className='sr-only' aria-live='polite' role='status'>
+        {!isSearching && isSearchReady && isOpen && query === debouncedQuery && query.length >= minQueryLength
+          ? hasResults
+            ? `${results.length} result${results.length === 1 ? '' : 's'} found.`
+            : showNoResults
+              ? `No results found for "${query}".`
+              : ''
+          : ''}
+      </div>
+
+      <div
+        className='relative w-full'
+        role='combobox'
+        aria-expanded={showResults}
+        aria-haspopup='listbox'
+        aria-controls='search-results'
+      >
+        <div className='relative'>
         <input
           ref={inputRef}
           type='text'
@@ -329,6 +346,7 @@ export default function SearchBox({
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
