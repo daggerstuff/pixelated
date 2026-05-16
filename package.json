@@ -543,13 +543,6 @@
       "libpg-query"
     ],
     "overrides": {
-<<<<<<< HEAD
-      "path-to-regexp@6.1.0": "8.4.2",
-      "path-to-regexp": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils>path-to-regexp": "8.4.2",
-=======
       "@vercel/routing-utils": "npm:@vercel/routing-utils@6.2.0",
       "path-to-regexp@6.1.0": "npm:path-to-regexp@6.3.0",
       "path-to-regexp": "6.3.0",
@@ -557,17 +550,11 @@
       "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp": "npm:path-to-regexp@6.3.0",
       "@astrojs/vercel>@vercel/routing-utils>path-to-regexp": "npm:path-to-regexp@6.3.0",
       "@vercel/routing-utils>path-to-regexp": "^6.3.0",
->>>>>>> origin/staging
       "yaml": "npm:yaml@2.8.4",
       "yaml@2.7.1": "npm:yaml@2.8.4",
       "openai": "npm:openai@6.37.0",
       "@astrojs/vercel>@vercel/routing-utils@5.3.3": "npm:@vercel/routing-utils@6.2.0",
-<<<<<<< HEAD
-      "@vercel/routing-utils>path-to-regexp@<6.3.0": "8.4.2",
-      "@supermemory/tools@2.0.0(@ai-sdk/provider@3.0.10)(ws@8.20.0(utf-8-validate@6.0.6))>openai": "npm:openai@6.37.0",
-=======
       "@vercel/routing-utils>path-to-regexp@<6.3.0": "6.3.0",
->>>>>>> origin/staging
       "follow-redirects": ">=1.16.0",
       "@opentelemetry/api": "^1.9.0",
       "scmp": "2.1.0",
@@ -592,12 +579,8 @@
       "node-domexception": "^2.0.1",
       "sitemap": "^9.0.0",
       "jws": ">=4.0.1",
-<<<<<<< HEAD
-      "protobufjs": ">=8.0.2",
-=======
       "@opentelemetry/otlp-transformer>protobufjs": "8.0.2",
       "protobufjs": "8.0.2",
->>>>>>> origin/staging
       "vite": "7.3.2",
       "unocss": "^66.5.12",
       "@unocss/reset": "^66.5.12",
