@@ -683,11 +683,11 @@ function getUniqueCategories(frameworks: TherapeuticFramework[]): string[] {
 export const GET = async ({ url }: { url: URL }) => {
   try {
     const { searchParams } = url
-    const query = searchParams.get('query') || undefined
-    const category = searchParams.get('category') || 'all'
-    const evidenceLevel = searchParams.get('evidenceLevel') || 'all'
-    const clientPopulation = searchParams.get('clientPopulation') || undefined
-    const issue = searchParams.get('issue') || undefined
+    const query = searchParams.get('query') ?? undefined
+    const category = searchParams.get('category') ?? 'all'
+    const evidenceLevel = searchParams.get('evidenceLevel') ?? 'all'
+    const clientPopulation = searchParams.get('clientPopulation') ?? undefined
+    const issue = searchParams.get('issue') ?? undefined
 
     const filteredFrameworks = filterFrameworks(
       THERAPEUTIC_FRAMEWORKS,
@@ -708,8 +708,8 @@ export const GET = async ({ url }: { url: URL }) => {
         appliedFilters: {
           category: category === 'all' ? '' : category,
           evidenceLevel: evidenceLevel === 'all' ? '' : evidenceLevel,
-          clientPopulation: clientPopulation || '',
-          issue: issue || '',
+          clientPopulation: clientPopulation ?? '',
+          issue: issue ?? '',
         },
         generatedAt: new Date().toISOString(),
       },
@@ -759,10 +759,10 @@ export const POST = async ({ request }: APIContext) => {
       metadata: {
         searchQuery: body.query,
         appliedFilters: {
-          category: body.category || '',
-          evidenceLevel: body.evidenceLevel || '',
-          clientPopulation: body.clientPopulation || '',
-          issue: body.issue || '',
+          category: body.category ?? '',
+          evidenceLevel: body.evidenceLevel ?? '',
+          clientPopulation: body.clientPopulation ?? '',
+          issue: body.issue ?? '',
         },
         generatedAt: new Date().toISOString(),
       },

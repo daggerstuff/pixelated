@@ -19,6 +19,26 @@ import {
 // Initialize logger
 const logger = createBuildSafeLogger('analytics')
 
+const toErrorRecord = (error: unknown): Record<string, unknown> => {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    }
+  }
+
+  if (typeof error === 'string') {
+    return { message: error }
+  }
+
+  if (error !== null && typeof error === 'object') {
+    return { ...error }
+  }
+
+  return { message: String(error) }
+}
+
 /**
  * Operation types for FHE processing (our local enum)
  */
@@ -97,9 +117,9 @@ const DEFAULT_CONFIG: AnalyticsConfig = {
  * Uses Microsoft SEAL for Fully Homomorphic Encryption.
  */
 export class FHEAnalyticsService {
-  private static instance: FHEAnalyticsService
+  private static instance: FHEAnalyticsService | null = null
   private initialized = false
-  private fheService!: FHEServiceInterface
+  private readonly fheService!: FHEServiceInterface
 
   /**
    * Private constructor to enforce singleton pattern
@@ -113,9 +133,7 @@ export class FHEAnalyticsService {
    * Get the singleton instance
    */
   public static getInstance(): FHEAnalyticsService {
-    if (!FHEAnalyticsService.instance) {
-      FHEAnalyticsService.instance = new FHEAnalyticsService()
-    }
+    FHEAnalyticsService.instance ??= new FHEAnalyticsService()
     return FHEAnalyticsService.instance
   }
 
@@ -194,7 +212,7 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex: index,
                   sentiment: sentimentResult,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               } else {
                 // For unencrypted messages, we need to encrypt first
@@ -209,7 +227,7 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex: index,
                   sentiment: sentimentResult,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               }
             } catch (error: unknown) {
@@ -219,7 +237,7 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 error: true,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             }
           }),
@@ -234,8 +252,8 @@ export class FHEAnalyticsService {
         errorCount: results.filter((r) => r.error).length,
         sentimentData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -268,7 +286,8 @@ export class FHEAnalyticsService {
       return finalResult
     } catch (error: unknown) {
       logger.error('Failed to analyze sentiment trend', { error })
-      throw new Error(`Sentiment analysis error: ${(error as Error).message}`, {
+      const errorRecord = toErrorRecord(error)
+      throw new Error(`Sentiment analysis error: ${String(errorRecord.message)}`, {
         cause: error,
       })
     }
@@ -323,17 +342,17 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 topic: topicResult,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             } catch (error: unknown) {
               logger.error(
                 `Failed to analyze topics for message ${index}`,
-                error as Record<string, unknown>,
+                toErrorRecord(error),
               )
               return {
                 messageIndex: index,
                 error: true,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             }
           }),
@@ -344,8 +363,8 @@ export class FHEAnalyticsService {
         messageCount: filteredMessages.length,
         topicData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -374,7 +393,7 @@ export class FHEAnalyticsService {
     } catch (error: unknown) {
       logger.error(
         'Failed to analyze topic clusters',
-        error as Record<string, unknown>,
+        toErrorRecord(error),
       )
       throw error
     }
@@ -428,17 +447,17 @@ export class FHEAnalyticsService {
               return {
                 messageIndex: index,
                 risk: riskResult,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             } catch (error: unknown) {
               logger.error(
                 `Failed to analyze risk for message ${index}`,
-                error as Record<string, unknown>,
+                toErrorRecord(error),
               )
               return {
                 messageIndex: index,
                 error: true,
-                timestamp: message.timestamp || Date.now(),
+                timestamp: message.timestamp ?? Date.now(),
               }
             }
           }),
@@ -453,8 +472,8 @@ export class FHEAnalyticsService {
         messageCount: filteredMessages.length,
         riskData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -483,7 +502,7 @@ export class FHEAnalyticsService {
     } catch (error: unknown) {
       logger.error(
         'Failed to perform risk assessment',
-        error as Record<string, unknown>,
+        toErrorRecord(error),
       )
       throw error
     }
@@ -562,13 +581,10 @@ export class FHEAnalyticsService {
               exchangeIndex: index,
               interventionType,
               responseSentiment,
-              timestamp: exchange.client.timestamp || Date.now(),
+              timestamp: exchange.client.timestamp ?? Date.now(),
             }
           } catch (error: unknown) {
-            logger.error(
-              `Failed to analyze exchange ${index}`,
-              error as Record<string, unknown>,
-            )
+            logger.error(`Failed to analyze exchange ${index}`, toErrorRecord(error))
             return {
               exchangeIndex: index,
               error: true,
@@ -583,8 +599,8 @@ export class FHEAnalyticsService {
         exchangeCount: exchanges.length,
         interventionData: results.filter((r) => !r.error),
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -613,7 +629,7 @@ export class FHEAnalyticsService {
     } catch (error: unknown) {
       logger.error(
         'Failed to analyze intervention effectiveness',
-        error as Record<string, unknown>,
+        toErrorRecord(error),
       )
       throw error
     }
@@ -642,9 +658,9 @@ export class FHEAnalyticsService {
       // Create time windows for trend analysis
       const timeWindows: { startTime: number; endTime: number }[] = []
       if (userMessages.length > 0) {
-        const firstTimestamp = userMessages[0].timestamp || Date.now()
+        const firstTimestamp = userMessages[0].timestamp ?? Date.now()
         const lastTimestamp =
-          userMessages[userMessages.length - 1].timestamp || Date.now()
+          userMessages[userMessages.length - 1].timestamp ?? Date.now()
         const duration = lastTimestamp - firstTimestamp
 
         // Create 5 equal time windows or fewer if not enough messages
@@ -665,8 +681,8 @@ export class FHEAnalyticsService {
           // Get messages in this time window
           const windowMessages = userMessages.filter(
             (m) =>
-              (m.timestamp || 0) >= window.startTime &&
-              (m.timestamp || 0) <= window.endTime,
+              (m.timestamp ?? 0) >= window.startTime &&
+              (m.timestamp ?? 0) <= window.endTime,
           )
 
           // Process each message in the window
@@ -697,17 +713,17 @@ export class FHEAnalyticsService {
                 return {
                   messageIndex,
                   emotion: emotionResult,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               } catch (error: unknown) {
                 logger.error(
                   `Failed to analyze emotion for message ${messageIndex}`,
-                  error as Record<string, unknown>,
+                  toErrorRecord(error),
                 )
                 return {
                   messageIndex,
                   error: true,
-                  timestamp: message.timestamp || Date.now(),
+                  timestamp: message.timestamp ?? Date.now(),
                 }
               }
             }),
@@ -729,8 +745,8 @@ export class FHEAnalyticsService {
         messageCount: userMessages.length,
         windowResults,
         timeRange: {
-          start: config.timeWindow?.startTime || 0,
-          end: config.timeWindow?.endTime || Date.now(),
+          start: config.timeWindow?.startTime ?? 0,
+          end: config.timeWindow?.endTime ?? Date.now(),
         },
       }
 
@@ -759,7 +775,7 @@ export class FHEAnalyticsService {
     } catch (error: unknown) {
       logger.error(
         'Failed to analyze emotional patterns',
-        error as Record<string, unknown>,
+        toErrorRecord(error),
       )
       throw error
     }
@@ -790,10 +806,7 @@ export class FHEAnalyticsService {
         this.performRiskAssessment(messages, config),
       ])
     } catch (error: unknown) {
-      logger.error(
-        'Failed to create analytics dashboard',
-        error as Record<string, unknown>,
-      )
+      logger.error('Failed to create analytics dashboard', toErrorRecord(error))
       throw error
     }
   }
@@ -805,11 +818,11 @@ export class FHEAnalyticsService {
     messages: ChatMessage[],
     config: AnalyticsConfig,
   ): ChatMessage[] {
-    const startTime = config.timeWindow?.startTime || 0
-    const endTime = config.timeWindow?.endTime || Date.now()
+    const startTime = config.timeWindow?.startTime ?? 0
+    const endTime = config.timeWindow?.endTime ?? Date.now()
 
     return messages.filter((message) => {
-      const timestamp = message.timestamp || Date.now()
+      const timestamp = message.timestamp ?? Date.now()
       return timestamp >= startTime && timestamp <= endTime
     })
   }

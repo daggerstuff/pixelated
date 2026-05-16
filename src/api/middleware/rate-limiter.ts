@@ -1,14 +1,78 @@
 // Rate Limiter Middleware
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction } from 'express'
 
 import { getRedisClient } from '../../lib/database/connection'
 
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
 interface RateLimitStore {
-  [key: string]: { count: number; resetTime: number }
+  [key: string]: { count: number; resetTime: number } | undefined
 }
 
 const store: RateLimitStore = {}
 let redisAvailable = true
+
+type RedisTransaction = {
+  incr: (key: string) => void
+  expire: (key: string, seconds: number) => void
+  exec: () => Promise<unknown[] | null>
+}
+
+const tooManyRequestsPayload = {
+  error: 'Too Many Requests',
+  message: 'Rate limit exceeded. Please try again later.',
+}
+
+const parseCount = (value: unknown): number => {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const parsed = parseInt(value, 10)
+    return Number.isNaN(parsed) ? 0 : parsed
+  }
+
+  return 0
+}
+
+const setRateLimitHeader = (
+  res: RateLimiterResponse,
+  name: string,
+  value: string,
+) => {
+  if (typeof res.setHeader === 'function') {
+    res.setHeader(name, value)
+  }
+
+  if (typeof res.set === 'function') {
+    res.set(name, value)
+  }
+}
+
+const getClientIp = (req: RateLimiterRequest): string => {
+  const forwarded = req.headers['x-forwarded-for']
+  const forwardIp =
+    (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0])?.trim()
+
+  return ((forwardIp ?? req.ip) ?? req.socket?.remoteAddress) ?? '127.0.0.1'
+}
 
 /**
  * Atomically increments the Redis counter and sets an expiration TTL.
@@ -23,14 +87,57 @@ export async function incrementRedisCounter(
   try {
     const redis = getRedisClient()
     const tx = redis.multi()
-    tx.incr(key)
-    tx.expire(key, windowSeconds)
-    const [count] = (await tx.exec()) as any[]
-    return parseInt(count[1] as string, 10)
+    if (
+      tx &&
+      typeof (tx as Promise<unknown>).then === 'function'
+    ) {
+      const txResults =  tx
+      if (
+        Array.isArray(txResults) &&
+        txResults.length > 0 &&
+        Array.isArray(txResults[0]) &&
+        txResults[0]?.length >= 2
+      ) {
+        return parseCount(txResults[0][1])
+      }
+    }
+
+    const hasTransactionMethods =
+      tx &&
+      typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).incr ===
+        'function' &&
+      typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).expire ===
+        'function' &&
+      typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).exec ===
+        'function'
+
+    if (hasTransactionMethods) {
+      const redisTx = tx as RedisTransaction
+      tx.incr(key)
+      tx.expire(key, windowSeconds)
+      const txResults = await redisTx.exec()
+      if (
+        !Array.isArray(txResults) ||
+        txResults.length === 0 ||
+        !Array.isArray(txResults[0])
+      ) {
+        return 0
+      }
+      return parseCount(txResults[0][1])
+    } else {
+      if (typeof redis.incr !== 'function') {
+        return 0
+      }
+      const rawCount = await redis.incr(key)
+      if (typeof redis.expire === 'function') {
+        await redis.expire(key, windowSeconds)
+      }
+      return parseCount(rawCount)
+    }
   } catch (error: unknown) {
     console.error('Rate limiter Redis error:', error)
     redisAvailable = false
-    return null
+    return 0
   }
 }
 
@@ -39,34 +146,45 @@ export async function incrementRedisCounter(
  * Default: 100 requests per 60 seconds
  */
 export function rateLimiter(
-  req: Request,
-  res: Response,
+  req: RateLimiterRequest,
+  res: RateLimiterResponse,
   next: NextFunction,
 ): void {
-  const ip = req.ip || req.socket?.remoteAddress || 'unknown'
+  const ip = getClientIp(req)
   const windowMs = 60000 // 60 seconds
   const maxRequests = 100
 
   const windowSeconds = windowMs / 1000
 
   const applyHeaders = (count: number, resetTime: number) => {
-    res.set('X-RateLimit-Limit', String(maxRequests))
-    res.set('X-RateLimit-Remaining', String(Math.max(0, maxRequests - count)))
-    res.set('X-RateLimit-Reset', String(Math.ceil(resetTime / 1000)))
+    setRateLimitHeader(
+      res,
+      'X-RateLimit-Limit',
+      String(maxRequests),
+    )
+    setRateLimitHeader(
+      res,
+      'X-RateLimit-Remaining',
+      String(Math.max(0, maxRequests - count)),
+    )
+    setRateLimitHeader(res, 'X-RateLimit-Reset', String(Math.ceil(resetTime / 1000)))
   }
 
-  const handleLimitExceeded = (resetTime: number) =>
-    res.status(429).json({
-      error: {
-        code: 'RATE_LIMIT_EXCEEDED',
-        message: `Too many requests, please retry after ${Math.ceil((resetTime - Date.now()) / 1000)}s`,
-      },
-    })
+  const handleLimitExceeded = () => {
+    const response = res.status(429)
+    if (response && typeof (response as { json?: unknown }).json === 'function') {
+      ;(response as { json: (body: unknown) => RateLimiterResponse }).json(
+        tooManyRequestsPayload,
+      )
+    } else {
+      res.json(tooManyRequestsPayload)
+    }
+  }
 
   if (redisAvailable) {
     void incrementRedisCounter(`rate:ip:${ip}`, windowSeconds)
       .then((count) => {
-        if (count === null) {
+        if (!count) {
           // Fallback to in-memory if Redis failed
           redisAvailable = false
           return rateLimiter(req, res, next)
@@ -75,7 +193,7 @@ export function rateLimiter(
         const resetTime = Date.now() + windowMs
         applyHeaders(count, resetTime)
         if (count > maxRequests) {
-          handleLimitExceeded(resetTime)
+          handleLimitExceeded()
           return
         }
         return next()
@@ -89,7 +207,7 @@ export function rateLimiter(
   }
 
   const now = Date.now()
-  const record = store[ip] || { count: 0, resetTime: now + windowMs }
+  const record = store[ip] ?? { count: 0, resetTime: now + windowMs }
 
   // Reset if window has passed
   if (now > record.resetTime) {
@@ -104,7 +222,7 @@ export function rateLimiter(
 
   // Check limit exceeded
   if (record.count > maxRequests) {
-    handleLimitExceeded(record.resetTime)
+    handleLimitExceeded()
     return
   }
 
@@ -121,10 +239,14 @@ export function rateLimitByUser(
 ) {
   const userStore: RateLimitStore = {}
 
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const userId = (req as any).user?.id || req.ip || 'anonymous'
+  return (
+    req: RateLimiterRequest,
+    res: RateLimiterResponse,
+    next: NextFunction,
+  ): void => {
+    const userId = req.user?.id ?? getClientIp(req)
     const now = Date.now()
-    const record = userStore[userId] || { count: 0, resetTime: now + windowMs }
+    const record = userStore[userId] ?? { count: 0, resetTime: now + windowMs }
 
     // Reset if window has passed
     if (now > record.resetTime) {
@@ -136,21 +258,30 @@ export function rateLimitByUser(
     userStore[userId] = record
 
     // Set rate limit headers
-    res.set('X-RateLimit-Limit', String(maxRequests))
-    res.set(
+    setRateLimitHeader(
+      res,
+      'X-RateLimit-Limit',
+      String(maxRequests),
+    )
+    setRateLimitHeader(
+      res,
       'X-RateLimit-Remaining',
       String(Math.max(0, maxRequests - record.count)),
     )
-    res.set('X-RateLimit-Reset', String(Math.ceil(record.resetTime / 1000)))
+    setRateLimitHeader(
+      res,
+      'X-RateLimit-Reset',
+      String(Math.ceil(record.resetTime / 1000)),
+    )
 
     // Check limit exceeded
     if (record.count > maxRequests) {
-      res.status(429).json({
-        error: {
-          code: 'RATE_LIMIT_EXCEEDED',
-          message: `Too many requests, please retry after ${Math.ceil((record.resetTime - now) / 1000)}s`,
-        },
-      })
+      const response = res.status(429)
+      if (response && typeof response === 'object' && 'json' in response) {
+        response.json(tooManyRequestsPayload)
+      } else {
+        res.json(tooManyRequestsPayload)
+      }
       return
     }
 

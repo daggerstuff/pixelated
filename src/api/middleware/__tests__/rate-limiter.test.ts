@@ -1,10 +1,54 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+/**
+ * @vitest-environment node
+ */
+import type { NextFunction } from 'express'
+
+import 'vitest'
+
+type MockRateRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type MockResponse = {
+  status: (statusCode: number) => MockResponse
+  json: (body: unknown) => MockResponse
+  setHeader: (name: string, value: string) => MockResponse
+  set: (name: string, value: string) => MockResponse
+}
+type NextFunctionMock = NextFunction
+
+function createMockResponse(): MockResponse {
+  return {
+    status: vi.fn<(statusCode: number) => MockResponse>().mockReturnThis(),
+    json: vi.fn<(body: unknown) => MockResponse>().mockReturnThis(),
+    setHeader: vi
+      .fn<(name: string, value: string) => MockResponse>()
+      .mockReturnThis(),
+    set: vi
+      .fn<(name: string, value: string) => MockResponse>()
+      .mockReturnThis(),
+  }
+}
 
 // Mock Redis client before importing
 const mockIncr = vi.fn()
 const mockExpire = vi.fn()
 const mockMulti = vi.fn()
 
+vi.mock('../../../lib/database/connection', () => ({
+  getRedisClient: () => ({
+    incr: mockIncr,
+    expire: mockExpire,
+    multi: mockMulti,
+  }),
+}))
+
+// Mirror the same module path used by the middleware import (defensive for Vitest resolution quirks)
 vi.mock('../../lib/database/connection', () => ({
   getRedisClient: () => ({
     incr: mockIncr,
@@ -19,27 +63,43 @@ import {
   rateLimitByUser,
   incrementRedisCounter,
 } from '../rate-limiter'
+type RateLimiterRequest = Parameters<typeof rateLimiter>[0]
+type RateLimiterResponse = Parameters<typeof rateLimiter>[1]
 
 describe('Rate Limiter Middleware', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: MockRateRequest
+  let mockResponse: MockResponse
+  let mockNext: NextFunctionMock
 
   beforeEach(() => {
     mockRequest = {
       ip: '192.168.1.1',
       headers: {},
     }
-    mockResponse = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn(),
-      setHeader: vi.fn(),
-      set: vi.fn(),
-    }
-    mockNext = vi.fn()
+    mockResponse = createMockResponse()
+    mockNext = vi.fn() as NextFunction
 
-    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
+
+  const invokeRateLimiter = async (
+    request: MockRateRequest,
+    response: MockResponse,
+    next: NextFunction,
+  ) => {
+    const result = rateLimiter(request, response, next)
+    await Promise.resolve()
+    return result
+  }
+
+  const invokeUserLimiter = async (
+    middleware: ReturnType<typeof rateLimitByUser>,
+    request: MockRateRequest,
+    response: MockResponse,
+    next: NextFunction,
+  ) => {
+    return middleware(request, response, next)
+  }
 
   describe('rateLimiter (IP-based)', () => {
     it('should call next when under rate limit', async () => {
@@ -48,7 +108,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await rateLimiter(mockRequest, mockResponse, mockNext)
+      await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -59,10 +119,11 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await rateLimiter(mockRequest, mockResponse, mockNext)
+      await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.status).toHaveBeenCalledWith(429)
-      expect(mockResponse.json).toHaveBeenCalledWith({
+      const jsonPayload = vi.mocked(mockResponse.json).mock.calls[0]?.[0]
+      expect(jsonPayload).toMatchObject({
         error: 'Too Many Requests',
         message: 'Rate limit exceeded. Please try again later.',
       })
@@ -72,9 +133,14 @@ describe('Rate Limiter Middleware', () => {
     it('should use in-memory fallback when Redis unavailable', async () => {
       mockMulti.mockRejectedValue(new Error('Redis unavailable'))
 
-      await expect(
-        rateLimiter(mockRequest, mockResponse, mockNext),
-      ).resolves.not.toThrow()
+      let caught: unknown
+      try {
+        await invokeRateLimiter(mockRequest, mockResponse, mockNext)
+      } catch (error) {
+        caught = error
+      }
+
+      expect(caught).toBeUndefined()
     })
 
     it('should extract IP from x-forwarded-for header if present', async () => {
@@ -84,7 +150,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await rateLimiter(mockRequest, mockResponse, mockNext)
+      await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
       // Should use the forwarded IP
       expect(mockNext).toHaveBeenCalled()
@@ -97,7 +163,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await rateLimiter(mockRequest, mockResponse, mockNext)
+      await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -110,7 +176,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await rateLimiter(mockRequest, mockResponse, mockNext)
+      await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -125,7 +191,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await middleware(mockRequest, mockResponse, mockNext)
+      await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -138,7 +204,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await middleware(mockRequest, mockResponse, mockNext)
+      await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -146,12 +212,9 @@ describe('Rate Limiter Middleware', () => {
     it('should return 429 when user exceeds limit', async () => {
       const middleware = rateLimitByUser(10, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([
-        [null, 11],
-        [null, 1],
-      ])
-
-      await middleware(mockRequest, mockResponse, mockNext)
+      for (let i = 0; i < 11; i += 1) {
+        await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
+      }
 
       expect(mockResponse.status).toHaveBeenCalledWith(429)
     })
@@ -164,7 +227,7 @@ describe('Rate Limiter Middleware', () => {
         [null, 1],
       ])
 
-      await middleware(mockRequest, mockResponse, mockNext)
+      await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
 
       expect(mockResponse.setHeader).toHaveBeenCalledWith(
         'X-RateLimit-Remaining',
@@ -180,6 +243,7 @@ describe('Rate Limiter Middleware', () => {
 
       const result = await incrementRedisCounter('test-key', 60)
 
+      expect(mockMulti).toHaveBeenCalled()
       expect(mockIncr).toHaveBeenCalledWith('test-key')
       expect(result).toBe(1)
     })
@@ -198,6 +262,8 @@ describe('Rate Limiter Middleware', () => {
 
       const result = await incrementRedisCounter('test-key', 60)
 
+      expect(mockMulti).toHaveBeenCalled()
+      expect(mockIncr).toHaveBeenCalledWith('test-key')
       expect(result).toBe(5)
     })
   })

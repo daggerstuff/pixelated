@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction } from 'express'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import {
@@ -8,26 +8,101 @@ import {
   UnauthorizedError,
   ForbiddenError,
   ConflictError,
+  ErrorRequest,
+  ErrorResponse,
   errorHandler,
   notFoundHandler,
   asyncHandler,
 } from '../error-handler'
 
+type MockError = Error & {
+  code?: string | number
+  keyValue?: Record<string, unknown>
+  routine?: string
+}
+
+type ErrorResponsePayload = {
+  error: {
+    code: string
+    message: string
+    details?: Record<string, unknown>
+    stack?: string
+  }
+  request?: {
+    method: string
+    url: string
+    timestamp: string
+  }
+}
+
+function getLastResponsePayload(
+  response: ErrorResponse,
+): ErrorResponsePayload | undefined {
+  if (!vi.isMockFunction(response.json)) {
+    return undefined
+  }
+
+  const payload = response.json.mock.calls[0]?.[0] as unknown
+
+  if (!isErrorResponsePayload(payload)) {
+    return undefined
+  }
+
+  return payload
+}
+
+function isErrorResponsePayload(value: unknown): value is ErrorResponsePayload {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const candidate = value as { error?: unknown }
+  if (!candidate.error || typeof candidate.error !== 'object') {
+    return false
+  }
+
+  const errorPayload = candidate.error as { code?: unknown; message?: unknown }
+  return (
+    typeof errorPayload.code === 'string' &&
+    typeof errorPayload.message === 'string'
+  )
+}
+
+function createMockRequest(): ErrorRequest {
+  return {
+    method: 'GET',
+    url: '/test-route',
+    path: '/test-route',
+    originalUrl: '/test-route',
+    get: (name) => (name === 'host' ? 'localhost' : undefined),
+  }
+}
+
+function createMockResponse(): ErrorResponse {
+  const status = vi.fn().mockReturnThis() as ErrorResponse['status']
+  const json = vi.fn() as ErrorResponse['json']
+
+  return {
+    status,
+    json,
+  }
+}
+
+function createDatabaseError(
+  message: string,
+  details: Partial<MockError> = {},
+): MockError {
+  return Object.assign(new Error(message), details)
+}
+
 describe('error-handler middleware', () => {
-  let req: Partial<Request>
-  let res: Partial<Response>
+  let req: ErrorRequest
+  let res: ErrorResponse
   let next: NextFunction
 
   beforeEach(() => {
-    req = {
-      method: 'GET',
-      url: '/test-route',
-      path: '/test-route',
-    }
-    res = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn(),
-    }
+    req = createMockRequest()
+    res = createMockResponse()
     next = vi.fn()
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
@@ -40,203 +115,122 @@ describe('error-handler middleware', () => {
   describe('errorHandler', () => {
     it('should handle standard Error with 500 status', () => {
       const error = new Error('Standard error message')
-      errorHandler(
-        error as any,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(500)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Internal Server Error',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Internal Server Error',
+        },
+      })
     })
 
     it('should handle custom AppError', () => {
       const error = new AppError(400, 'Bad request', 'BAD_REQUEST')
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'BAD_REQUEST',
-            message: 'Bad request',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: { code: 'BAD_REQUEST', message: 'Bad request' },
+      })
     })
 
     it('should handle ValidationError with fields details', () => {
       const error = new ValidationError('Invalid input', {
         email: 'Invalid email format',
       })
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid input',
-            details: {
-              fields: { email: 'Invalid email format' },
-            },
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid input',
+          details: {
+            fields: { email: 'Invalid email format' },
+          },
+        },
+      })
     })
 
     it('should handle MongoDB ValidationError', () => {
-      const error = new Error('Mongoose validation error')
-      error.name = 'ValidationError'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      const error = Object.assign(new Error('Mongoose validation error'), {
+        name: 'ValidationError',
+      })
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'VALIDATION_ERROR',
-            message: 'Validation Error',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: { code: 'VALIDATION_ERROR', message: 'Validation Error' },
+      })
     })
 
     it('should handle MongoDB duplicate key error (code 11000)', () => {
-      const error = new Error('Mongo server error')
-      error.name = 'MongoServerError'
-      ;(error as any).code = 11000
-      ;(error as any).keyValue = { email: 'test@example.com' }
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      const error = createDatabaseError('Mongo server error', {
+        name: 'MongoServerError',
+        code: 11000,
+        keyValue: { email: 'test@example.com' },
+      })
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(409)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'DUPLICATE_KEY',
-            message: 'Duplicate key error',
-            details: {
-              field: 'email',
-              value: 'test@example.com',
-            },
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: {
+          code: 'DUPLICATE_KEY',
+          message: 'Duplicate key error',
+          details: { field: 'email', value: 'test@example.com' },
+        },
+      })
     })
 
     it('should handle PostgreSQL error', () => {
-      const error = new Error('Postgres error')
-      ;(error as any).code = '23505'
-      ;(error as any).routine = 'pg_routine'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      const error = createDatabaseError('Postgres error', {
+        code: '23505',
+        routine: 'pg_routine',
+      })
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: '23505',
-            message: 'Database error',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: { code: '23505', message: 'Database error' },
+      })
     })
 
     it('should handle JsonWebTokenError', () => {
       const error = new Error('JWT error')
       error.name = 'JsonWebTokenError'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(401)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'INVALID_TOKEN',
-            message: 'Invalid token',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: { code: 'INVALID_TOKEN', message: 'Invalid token' },
+      })
     })
 
     it('should handle TokenExpiredError', () => {
       const error = new Error('Token expired error')
       error.name = 'TokenExpiredError'
-      errorHandler(
-        error,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(401)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'TOKEN_EXPIRED',
-            message: 'Token expired',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: { code: 'TOKEN_EXPIRED', message: 'Token expired' },
+      })
     })
 
     it('should include stack trace and request info in development mode', () => {
       process.env.NODE_ENV = 'development'
       const error = new Error('Test error')
-      errorHandler(
-        error as any,
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      errorHandler(error, req, res, next)
 
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            stack: expect.any(String),
-          }),
-          request: expect.objectContaining({
-            method: 'GET',
-            url: '/test-route',
-            timestamp: expect.any(String),
-          }),
-        }),
-      )
+      const payload = getLastResponsePayload(res)
+      expect(payload?.error.stack).toEqual(expect.any(String))
+      expect(payload?.request).toMatchObject({
+        method: 'GET',
+        url: '/test-route',
+      })
+      expect(payload?.request?.timestamp).toEqual(expect.any(String))
     })
   })
 
@@ -277,21 +271,15 @@ describe('error-handler middleware', () => {
 
   describe('notFoundHandler', () => {
     it('should generate NotFoundError and call errorHandler', () => {
-      notFoundHandler(
-        req as unknown as Request,
-        res as unknown as Response,
-        next,
-      )
+      notFoundHandler(req, res, next)
 
       expect(res.status).toHaveBeenCalledWith(404)
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({
-            code: 'NOT_FOUND',
-            message: 'Route GET /test-route not found',
-          }),
-        }),
-      )
+      expect(getLastResponsePayload(res)).toMatchObject({
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Route GET /test-route not found',
+        },
+      })
     })
   })
 
@@ -303,8 +291,7 @@ describe('error-handler middleware', () => {
       }
 
       const wrappedFn = asyncHandler(failingAsyncFn)
-      wrappedFn(req as unknown as Request, res as unknown as Response, next)
-      await new Promise((resolve) => process.nextTick(resolve))
+       wrappedFn(req, res, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
@@ -315,8 +302,7 @@ describe('error-handler middleware', () => {
       }
 
       const wrappedFn = asyncHandler(successAsyncFn)
-      wrappedFn(req as unknown as Request, res as unknown as Response, next)
-      await new Promise((resolve) => process.nextTick(resolve))
+       wrappedFn(req, res, next)
 
       expect(next).not.toHaveBeenCalled()
     })

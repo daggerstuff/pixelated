@@ -24,10 +24,89 @@ interface IceServer {
   credential?: string
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+const isSdpType = (value: string): value is RTCSdpType => {
+  return (
+    value === 'offer' ||
+    value === 'pranswer' ||
+    value === 'answer' ||
+    value === 'rollback'
+  )
+}
+
+const toSessionDescription = (
+  data: unknown,
+): RTCSessionDescriptionInit | null => {
+  if (!isRecord(data)) {
+    return null
+  }
+
+  const rawType = data.type
+  const rawSdp = data.sdp
+
+  if (
+    typeof rawType !== 'string' ||
+    !isSdpType(rawType) ||
+    typeof rawSdp !== 'string'
+  ) {
+    return null
+  }
+
+  return { type: rawType, sdp: rawSdp }
+}
+
+const toIceCandidate = (data: unknown): RTCIceCandidateInit | null => {
+  if (!isRecord(data)) {
+    return null
+  }
+
+  const rawCandidate = data.candidate
+  if (typeof rawCandidate !== 'string') {
+    return null
+  }
+
+  const rawSdpMid = data.sdpMid
+  const rawSdpMLineIndex = data.sdpMLineIndex
+  const rawUsernameFragment = data.usernameFragment
+
+  if (
+    rawSdpMLineIndex !== undefined &&
+    (typeof rawSdpMLineIndex !== 'number' ||
+      !Number.isInteger(rawSdpMLineIndex))
+  ) {
+    return null
+  }
+
+  if (rawSdpMid !== undefined && typeof rawSdpMid !== 'string') {
+    return null
+  }
+
+  if (
+    rawUsernameFragment !== undefined &&
+    typeof rawUsernameFragment !== 'string'
+  ) {
+    return null
+  }
+
+  return {
+    candidate: rawCandidate,
+    ...(rawSdpMid !== undefined ? { sdpMid: rawSdpMid } : {}),
+    ...(rawSdpMLineIndex !== undefined
+      ? { sdpMLineIndex: rawSdpMLineIndex }
+      : {}),
+    ...(rawUsernameFragment !== undefined
+      ? { usernameFragment: rawUsernameFragment }
+      : {}),
+  }
+}
+
 const ICE_SERVERS: IceServer[] = [
   {
     urls: [
-      process.env.TURN_SERVER_URL || 'turn:turn.pixelatedempathy.com:3478',
+      process.env.TURN_SERVER_URL ?? 'turn:turn.pixelatedempathy.com:3478',
     ],
 
     username: process.env.TURN_SERVER_USERNAME,
@@ -55,6 +134,9 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
   const [isReconnecting, setIsReconnecting] = useState(false)
   const [hasPermissionError, setHasPermissionError] = useState(false)
+
+  // Refs to break circular dependencies between callbacks
+  const handleConnectionFailureRef = useRef<(() => Promise<void>) | null>(null)
 
   // Initialize WebRTC peer connection
   const initializePeerConnection = useCallback(() => {
@@ -89,7 +171,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         onConnectionStateChange?.(peerConnection.connectionState)
 
         if (peerConnection.connectionState === 'failed') {
-          handleConnectionFailure()
+          void handleConnectionFailureRef.current?.()
         }
       }
 
@@ -108,7 +190,24 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
       toast.error('Failed to establish video connection')
       return null
     }
-  }, [sessionId, userId, onConnectionStateChange, handleConnectionFailure])
+  }, [sessionId, userId, onConnectionStateChange])
+
+  // Create and send an offer to the peer
+  const createAndSendOffer = useCallback(async () => {
+    const peerConnection = peerConnectionRef.current
+    if (!peerConnection) {
+      return
+    }
+
+    try {
+      const offer = await peerConnection.createOffer()
+      await peerConnection.setLocalDescription(offer)
+      await signalingService.sendOffer(sessionId, userId, offer)
+    } catch (error: unknown) {
+      logger.error('Failed to create and send offer', { error, sessionId })
+      toast.error('Failed to establish connection')
+    }
+  }, [sessionId, userId])
 
   // Handle media stream setup
   const setupMediaStream = useCallback(async () => {
@@ -156,7 +255,6 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         peerConnectionRef.current.close()
       }
 
-      // Reinitialize connection
       const newPeerConnection = initializePeerConnection()
       if (newPeerConnection) {
         await setupMediaStream()
@@ -169,28 +267,13 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
       setIsReconnecting(false)
     }
   }, [
-    sessionId,
-    initializePeerConnection,
-    setupMediaStream,
     createAndSendOffer,
+    initializePeerConnection,
+    sessionId,
+    setupMediaStream,
   ])
 
-  // Create and send an offer to the peer
-  const createAndSendOffer = useCallback(async () => {
-    const peerConnection = peerConnectionRef.current
-    if (!peerConnection) {
-      return
-    }
-
-    try {
-      const offer = await peerConnection.createOffer()
-      await peerConnection.setLocalDescription(offer)
-      await signalingService.sendOffer(sessionId, userId, offer)
-    } catch (error: unknown) {
-      logger.error('Failed to create and send offer', { error, sessionId })
-      toast.error('Failed to establish connection')
-    }
-  }, [sessionId, userId])
+  handleConnectionFailureRef.current = handleConnectionFailure
 
   // Handle incoming signaling messages
   const handleSignalingMessage = useCallback(
@@ -204,32 +287,37 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         switch (message.type) {
           case 'offer':
             if (message.data) {
-              await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(
-                  message.data as RTCSessionDescriptionInit,
-                ),
-              )
-              const answer = await peerConnection.createAnswer()
-              await peerConnection.setLocalDescription(answer)
-              await signalingService.sendAnswer(sessionId, userId, answer)
+              const description = toSessionDescription(message.data)
+              if (description) {
+                await peerConnection.setRemoteDescription(
+                  new RTCSessionDescription(description),
+                )
+                const answer = await peerConnection.createAnswer()
+                await peerConnection.setLocalDescription(answer)
+                await signalingService.sendAnswer(sessionId, userId, answer)
+              }
             }
             break
 
           case 'answer':
             if (message.data) {
-              await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(
-                  message.data as RTCSessionDescriptionInit,
-                ),
-              )
+              const description = toSessionDescription(message.data)
+              if (description) {
+                await peerConnection.setRemoteDescription(
+                  new RTCSessionDescription(description),
+                )
+              }
             }
             break
 
           case 'ice-candidate':
             if (message.data) {
-              await peerConnection.addIceCandidate(
-                new RTCIceCandidate(message.data as RTCIceCandidateInit),
-              )
+              const candidate = toIceCandidate(message.data)
+              if (candidate) {
+                await peerConnection.addIceCandidate(
+                  new RTCIceCandidate(candidate),
+                )
+              }
             }
             break
         }

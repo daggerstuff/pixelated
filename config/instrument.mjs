@@ -15,42 +15,134 @@ const createStubScope = () => ({
   setUser: () => {},
 })
 
+/** @typedef {{ end: () => void }} SentrySpan */
+/** @typedef {{ data?: unknown }} SentryRequest */
+/** @typedef {{ request?: SentryRequest }} SentryEvent */
+/** @typedef {{ category?: string; level?: string; [key: string]: unknown }} SentryBreadcrumb */
+/** @typedef {{ setTags: (tags: Record<string, string>) => void; setExtras: (extras: Record<string, unknown>) => void; setUser: (user: SentryUser) => void }} SentryScope */
+/** @typedef {{ id?: string; email?: string; username?: string }} SentryUser */
+/** @typedef {{ [key: string]: string | number | boolean | null | Record<string, unknown> | unknown[] }} PrimitiveValue */
+/** @typedef {{ id?: string; op: string; [key: string]: unknown }} SentrySpanOptions */
+/** @typedef {(options?: { tracing?: boolean }) => unknown} HttpIntegrationFactory */
+/** @typedef {() => unknown} BasicIntegrationFactory */
+/** @typedef {{ count: (name: string, value: number, options?: { attributes?: Record<string, unknown> }) => void, distribution: (name: string, value: number, options?: { attributes?: Record<string, unknown> }) => void }} SentryMetrics */
+/** @typedef {(error: unknown) => void} CaptureHandler */
+/** @typedef {{ category?: string; [key: string]: unknown }} EventData */
+/** @typedef {{ startInactiveSpan: (options: SentrySpanOptions) => SentrySpan, startSpan: (options: SentrySpanOptions) => SentrySpan }} SentrySpanFactory */
+/** @typedef {() => Promise<unknown>} QueryFunction */
+/** @typedef {string | QueryFunction} DatabaseQueryInput */
+/** @typedef {{
+  init: (options: Record<string, unknown>) => void
+  close: () => Promise<void> | void
+  captureException: CaptureHandler
+  setUser: (user: SentryUser | null) => void
+  setContext: (key: string, context: EventData) => void
+  withScope: (callback: (scope: SentryScope) => void) => void
+  startInactiveSpan: (options: SentrySpanOptions) => SentrySpan
+  startSpan: (options: SentrySpanOptions) => SentrySpan
+  metrics: SentryMetrics
+  setTag?: (key: string, value: string) => void
+  setExtra?: (key: string, value: unknown) => void
+}} SentryLike */
+/** @typedef {{ [key: string]: unknown }} PrimitiveValueRecord */
+/** @typedef {{ tags?: Record<string, string>; extra?: PrimitiveValueRecord; user?: SentryUser }} CaptureErrorContext */
+/** @typedef {ReturnType<typeof createStubSentry>} SentryStub */
+/** @typedef {SentryLike & SentryStub} SentryInstance */
+/** @typedef {{ user?: SentryUser }} SentryRequestLike */
+/** @typedef {(error?: unknown) => void} NextHandler */
+
 const createStubSentry = () => ({
   init: () => {},
   close: async () => {},
-  captureException: () => {},
-  setUser: () => {},
-  setContext: () => {},
-  withScope: (callback = () => {}) => {
+  captureException: (_err) => {},
+  setUser: (_user) => {},
+  setContext: (_key, _context) => {},
+  withScope: (callback = (_scope) => {}) => {
     try {
       callback(createStubScope())
     } catch {
       // ignore — noop scope wrapper
     }
   },
-  startInactiveSpan: () => createStubSpan(),
-  startSpan: () => createStubSpan(),
+  startInactiveSpan: (_options) => createStubSpan(),
+  startSpan: (_options) => createStubSpan(),
   metrics: {
-    count: () => {},
-    distribution: () => {},
+    count: (_name, _value, _options) => {},
+    distribution: (_name, _value, _options) => {},
   },
 })
 
-let Sentry = null
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
+const isRecord = (value) =>
+  value !== null && typeof value === 'object' && !Array.isArray(value)
+
+/** @param {unknown} value @returns {value is SentryBreadcrumb} */
+const isSentryBreadcrumb = (value) =>
+  isRecord(value) &&
+  (value.category === undefined || typeof value.category === 'string') &&
+  (value.level === undefined || typeof value.level === 'string')
+
+/** @param {unknown} value @returns {value is SentryInstance} */
+const isSentryInstance = (value) =>
+  value !== null &&
+  typeof value === 'object' &&
+  typeof value.init === 'function' &&
+  typeof value.close === 'function' &&
+  typeof value.captureException === 'function' &&
+  typeof value.setUser === 'function' &&
+  typeof value.setContext === 'function' &&
+  typeof value.withScope === 'function' &&
+  typeof value.startInactiveSpan === 'function' &&
+  typeof value.startSpan === 'function' &&
+  typeof value.metrics === 'object'
+
+/**
+ * @param {SentryEvent | null | undefined} event
+ * @param {readonly string[]} fields
+ * @returns {SentryEvent | null | undefined}
+ */
+const filterSensitiveFields = (event, fields) => {
+  if (
+    !isRecord(event) ||
+    !isRecord(event.request) ||
+    !isRecord(event.request.data)
+  ) {
+    return event
+  }
+
+  const requestData = /** @type {Record<string, unknown>} */ ({
+    ...event.request.data,
+  })
+  for (const field of fields) {
+    if (Object.prototype.hasOwnProperty.call(requestData, field)) {
+      requestData[field] = '[FILTERED]'
+    }
+  }
+
+  event.request.data = requestData
+  return event
+}
+
+/** @type {SentryInstance} */
+let Sentry = createStubSentry()
+/** @type {BasicIntegrationFactory} */
 let nodeProfilingIntegration = () => null
+/** @type {HttpIntegrationFactory} */
 let httpIntegration = () => null
+/** @type {BasicIntegrationFactory} */
+let expressIntegration = () => null
 
 const SUPPORTED_PROFILING_NODE_MAJORS = new Set([16, 18, 20, 22, 24])
 
 const resolveSentryDsn = () =>
-  process.env.SENTRY_DSN ||
-  process.env.PUBLIC_SENTRY_DSN ||
-  process.env.SENTRY_PUBLIC_DSN ||
+  process.env.SENTRY_DSN ??
+  process.env.PUBLIC_SENTRY_DSN ??
+  process.env.SENTRY_PUBLIC_DSN ??
   process.env.VITE_SENTRY_DSN
 
 const getNodeMajorVersion = () => {
   try {
-    const [major = ''] = (process.versions?.node ?? '').split('.')
+    const [major = ''] = process.versions.node.split('.')
     const parsed = Number.parseInt(major, 10)
     return Number.isFinite(parsed) ? parsed : null
   } catch {
@@ -60,11 +152,15 @@ const getNodeMajorVersion = () => {
 
 try {
   const sentryNode = await import('@sentry/node')
-  Sentry = sentryNode
-  httpIntegration =
-    typeof sentryNode.httpIntegration === 'function'
-      ? sentryNode.httpIntegration
-      : () => null
+  if (isSentryInstance(sentryNode)) {
+    Sentry = sentryNode
+  }
+  if (typeof sentryNode.httpIntegration === 'function') {
+    httpIntegration = (options) => sentryNode.httpIntegration(options)
+  }
+  if (typeof sentryNode.expressIntegration === 'function') {
+    expressIntegration = () => sentryNode.expressIntegration()
+  }
 
   const nodeMajor = getNodeMajorVersion()
   const profilingSupported =
@@ -73,8 +169,9 @@ try {
   if (profilingSupported) {
     try {
       const profiling = await import('@sentry/profiling-node')
-      nodeProfilingIntegration =
-        profiling?.nodeProfilingIntegration ?? (() => null)
+      if (typeof profiling.nodeProfilingIntegration === 'function') {
+        nodeProfilingIntegration = () => profiling.nodeProfilingIntegration()
+      }
     } catch (profilingError) {
       console.warn(
         `[Sentry Profiling] Failed to load profiling addon on Node.js ${process.version}. ` +
@@ -109,17 +206,17 @@ if (!resolvedSentryDsn && process.env.NODE_ENV === 'production') {
 // Enhanced Sentry configuration with comprehensive instrumentation
 Sentry.init({
   dsn: resolvedSentryDsn, // Must be set in environment
-  environment: process.env.NODE_ENV || 'production',
+  environment: process.env.NODE_ENV ?? 'production',
   release:
-    process.env.SENTRY_RELEASE ||
-    process.env.PUBLIC_SENTRY_RELEASE ||
-    process.env.PUBLIC_APP_VERSION ||
-    process.env.VERCEL_GIT_COMMIT_SHA ||
-    process.env.RENDER_GIT_COMMIT ||
-    process.env.NETLIFY_COMMIT_REF ||
-    process.env.RAILWAY_GIT_COMMIT_SHA ||
-    process.env.GITHUB_SHA ||
-    process.env.CI_COMMIT_SHA ||
+    process.env.SENTRY_RELEASE ??
+    process.env.PUBLIC_SENTRY_RELEASE ??
+    process.env.PUBLIC_APP_VERSION ??
+    process.env.VERCEL_GIT_COMMIT_SHA ??
+    process.env.RENDER_GIT_COMMIT ??
+    process.env.NETLIFY_COMMIT_REF ??
+    process.env.RAILWAY_GIT_COMMIT_SHA ??
+    process.env.GITHUB_SHA ??
+    process.env.CI_COMMIT_SHA ??
     process.env['npm_package_version'],
 
   // Performance monitoring configuration
@@ -130,14 +227,11 @@ Sentry.init({
   // Integrations for comprehensive monitoring
   integrations: [
     // HTTP integration for outgoing requests
-    typeof httpIntegration === 'function'
-      ? httpIntegration({ tracing: true })
-      : null,
-
+    httpIntegration({ tracing: true }),
+    // Express integration for incoming requests
+    expressIntegration(),
     // Profiling integration for performance monitoring
-    typeof nodeProfilingIntegration === 'function'
-      ? nodeProfilingIntegration()
-      : null,
+    nodeProfilingIntegration(),
   ].filter(Boolean),
 
   // Tracing configuration
@@ -150,26 +244,34 @@ Sentry.init({
   ],
 
   // Before send hook for filtering sensitive data
-  beforeSend: (event, _hint) => {
+  beforeSend: (/** @type {SentryEvent | null} */ event) => {
     // Filter out sensitive data from events
-    if (event.request?.data) {
-      // Remove sensitive fields from request data
-      const sensitiveFields = ['password', 'token', 'apiKey', 'secret']
-      sensitiveFields.forEach((field) => {
-        if (event.request.data[field]) {
-          event.request.data[field] = '[FILTERED]'
-        }
-      })
-    }
-    return event
+    return filterSensitiveFields(event, [
+      'password',
+      'token',
+      'apiKey',
+      'secret',
+    ])
   },
 
   // Before breadcrumb hook for custom breadcrumb handling
-  beforeBreadcrumb: (breadcrumb) => {
+  beforeBreadcrumb: (/** @type {unknown} */ breadcrumb) => {
     // Customize breadcrumbs as needed
-    if (breadcrumb.category === 'console') {
+    if (!isSentryBreadcrumb(breadcrumb)) {
+      return {
+        category: undefined,
+        level: undefined,
+      }
+    }
+    if (
+      typeof breadcrumb.category === 'string' &&
+      breadcrumb.category === 'console'
+    ) {
       // Enhance console breadcrumbs with more context
-      breadcrumb.level = breadcrumb.level || 'info'
+      return {
+        ...breadcrumb,
+        level: breadcrumb.level ?? 'info',
+      }
     }
     return breadcrumb
   },
@@ -185,26 +287,26 @@ Sentry.init({
 })
 
 // Performance monitoring helpers
+/** @param {string} name @param {string} operation */
 export const startTransaction = (name, operation = 'function') => {
   return Sentry.startInactiveSpan({ name, op: operation })
 }
 
+/** @param {string} name @param {string} operation */
 export const startSpan = (name, operation = 'function') => {
   return Sentry.startSpan({ name, op: operation })
 }
 
 // Error handling helpers
+/** @param {unknown} error @param {CaptureErrorContext} context */
 export const captureError = (error, context = {}) => {
-  Sentry.withScope((scope) => {
+  Sentry.withScope((rawScope) => {
+    const scope = rawScope
     if (context.tags) {
-      Object.entries(context.tags).forEach(([key, value]) => {
-        scope.setTag(key, value)
-      })
+      scope.setTags(context.tags)
     }
     if (context.extra) {
-      Object.entries(context.extra).forEach(([key, value]) => {
-        scope.setExtra(key, value)
-      })
+      scope.setExtras(context.extra)
     }
     if (context.user) {
       scope.setUser(context.user)
@@ -214,6 +316,7 @@ export const captureError = (error, context = {}) => {
 }
 
 // User context helper
+/** @param {SentryUser} user */
 export const setUserContext = (user) => {
   Sentry.setUser({
     id: user.id,
@@ -225,23 +328,21 @@ export const setUserContext = (user) => {
 
 // Custom metrics and monitoring using Sentry Metrics
 // See: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
+/** @param {string} name @param {number} value @param {Record<string, unknown>} tags */
 export const recordMetric = (name, value = 1, tags = {}) => {
   // Use counter metrics for incrementing values (button clicks, jobs processed, etc.)
-  if (Sentry.metrics && typeof Sentry.metrics.count === 'function') {
-    Sentry.metrics.count(name, value, {
-      attributes: tags,
-    })
-  }
+  Sentry.metrics.count(name, value, {
+    attributes: tags,
+  })
 }
 
 // Record a duration metric (for example, API response time in milliseconds)
+/** @param {string} name @param {number} durationMs @param {Record<string, unknown>} tags */
 export const recordDurationMetric = (name, durationMs, tags = {}) => {
-  if (Sentry.metrics && typeof Sentry.metrics.distribution === 'function') {
-    Sentry.metrics.distribution(name, durationMs, {
-      unit: 'millisecond',
-      attributes: tags,
-    })
-  }
+  Sentry.metrics.distribution(name, durationMs, {
+    unit: 'millisecond',
+    attributes: tags,
+  })
 }
 
 // Health check function for monitoring
@@ -250,15 +351,17 @@ export const healthCheck = () => {
   try {
     // Add your health check logic here
     return { status: 'healthy', timestamp: new Date().toISOString() }
-  } catch (error) {
-    Sentry.captureException(error)
+  } catch (caughtError) {
+    Sentry.captureException(caughtError)
+    const message =
+      caughtError instanceof Error ? caughtError.message : String(caughtError)
     return {
       status: 'unhealthy',
-      error: error.message,
+      error: message,
       timestamp: new Date().toISOString(),
     }
   } finally {
-    transaction?.end()
+    transaction.end()
   }
 }
 
@@ -268,51 +371,45 @@ export const closeSentry = async () => {
 }
 
 // Middleware for Express.js applications
+/** @param {SentryRequestLike} req @param {unknown} res @param {NextHandler} next */
 export const sentryMiddleware = (req, res, next) => {
-  const transaction = Sentry.startSpan({
-    name: `${req.method} ${req.path}`,
-    op: 'http.server',
-  })
-
-  // Set user context if available
-  if (req.user) {
-    Sentry.setUser({
-      id: req.user.id,
-      email: req.user.email,
-    })
-  }
-
-  // Add request context
-  Sentry.setContext('request', {
-    method: req.method,
-    url: req.url,
-    headers: {
-      'user-agent': req.get('User-Agent'),
-      'content-type': req.get('Content-Type'),
-    },
-  })
-
-  res.on('finish', () => {
-    transaction?.end()
-  })
+  // In Sentry 8+, the expressIntegration handles most of this automatically
+  // if you use Sentry.setupExpressErrorHandler(app).
+  // This manual middleware is kept for backward compatibility and custom tagging.
+  Sentry.setUser(
+    req.user
+      ? {
+          id: req.user.id,
+          email: req.user.email,
+        }
+      : null,
+  )
 
   next()
 }
 
 // Database instrumentation helper
 export const instrumentDatabaseQuery = async (
+  /** @type {DatabaseQueryInput} */
   query,
   operation = 'db.query',
 ) => {
-  const span = Sentry.startSpan({ name: query, op: operation })
+  const spanName = typeof query === 'string' ? query : 'db.query'
+  const span = Sentry.startSpan({ name: spanName, op: operation })
   try {
     // Your database query logic here
-    return await query
+    const queryFn =
+      typeof query === 'function'
+        ? async () => {
+            return query()
+          }
+        : async () => query
+    return await queryFn()
   } catch (error) {
     Sentry.captureException(error)
     throw error
   } finally {
-    span?.end()
+    span.end()
   }
 }
 

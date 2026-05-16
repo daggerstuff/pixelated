@@ -18,7 +18,7 @@ export interface SlackAlertResult {
 }
 
 export class SlackAlerter {
-  private webhookUrl: string
+  private readonly webhookUrl: string
 
   constructor(webhookUrl: string) {
     this.webhookUrl = webhookUrl

@@ -14,7 +14,7 @@ const createFallbackAnnouncer = (
   clearDelay = 5000,
 ) => {
   return (message: string, customClearDelay?: number) => {
-    const delay = customClearDelay !== undefined ? customClearDelay : clearDelay
+    const delay = customClearDelay ?? clearDelay
 
     // Create a temporary element for the announcement
     const announcer = document.createElement('div')
@@ -49,13 +49,13 @@ const createFallbackAnnouncer = (
  */
 export function announceStatus(message: string, clearDelay?: number): void {
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
+  if (window?.LiveRegionSystem) {
     window.LiveRegionSystem.announceStatus(message, clearDelay)
     return
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('status-live-region') as HTMLElement
+  const element = document.getElementById('status-live-region')!
   if (element) {
     element.textContent = message
     if (clearDelay && clearDelay > 0) {
@@ -80,13 +80,13 @@ export function announceStatus(message: string, clearDelay?: number): void {
  */
 export function announceAlert(message: string, clearDelay?: number): void {
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
+  if (window?.LiveRegionSystem) {
     window.LiveRegionSystem.announceAlert(message, clearDelay)
     return
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('alert-live-region') as HTMLElement
+  const element = document.getElementById('alert-live-region')!
   if (element) {
     element.textContent = message
     if (clearDelay && clearDelay > 0) {
@@ -111,13 +111,13 @@ export function announceAlert(message: string, clearDelay?: number): void {
  */
 export function log(message: string, clear = false): void {
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
+  if (window?.LiveRegionSystem) {
     window.LiveRegionSystem.log(message, clear)
     return
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('log-live-region') as HTMLElement
+  const element = document.getElementById('log-live-region')!
   if (element) {
     if (clear) {
       element.textContent = message
@@ -153,13 +153,13 @@ export function announceProgress(
   const message = `${label}: ${percent}% (${value} of ${max})`
 
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
+  if (window?.LiveRegionSystem) {
     window.LiveRegionSystem.announceProgress(value, max, label)
     return
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('progress-live-region') as HTMLElement
+  const element = document.getElementById('progress-live-region')!
   if (element) {
     element.textContent = message
     return

@@ -18,7 +18,7 @@ function isValidRegexPattern(pattern: string): boolean {
     return false
   }
   // Reject patterns with excessive backreferences
-  if ((pattern.match(/\\[1-9]/g) || []).length > 5) {
+  if ((pattern.match(/\\[1-9]/g) ?? []).length > 5) {
     logger.info(`Rejected pattern with too many backreferences: ${pattern}`)
     return false
   }
@@ -40,7 +40,7 @@ interface CompiledPolicy {
 }
 
 export class PolicyEngine {
-  private policies: Map<string, CompiledPolicy> = new Map()
+  private readonly policies: Map<string, CompiledPolicy> = new Map()
   private loadedVersion: string | null = null
 
   async loadPolicy(policy: GovernancePolicy): Promise<void> {
@@ -130,7 +130,7 @@ export class PolicyEngine {
     context: PolicyEvaluationContext,
   ): string[] {
     const missing: string[] = []
-    const ctx = context.context as Record<string, unknown>
+    const ctx = context.context
 
     for (const req of required) {
       switch (req) {

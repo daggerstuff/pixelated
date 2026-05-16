@@ -17,7 +17,7 @@ dotenv.config()
 const STRATEGY_DIR = path.resolve(__dirname, '../../business-strategy')
 const WORKSPACE_DIR = path.resolve(__dirname, '..')
 const MONGO_URI =
-  process.env.MONGODB_URI ||
+  process.env.MONGODB_URI ??
   'mongodb://admin:password@127.0.0.1:27017/business-strategy-cms?authSource=admin'
 const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000'
 
@@ -76,7 +76,7 @@ function parseStrategyFile(
         ? titleMatch[1]
         : baseName
 
-  let category = frontmatter.category || DocumentCategory.BUSINESS_PLAN
+  let category = frontmatter.category ?? DocumentCategory.BUSINESS_PLAN
   if (!frontmatter.category) {
     if (sourceFile.startsWith('outreach/') || sourceFile.startsWith('pilot-operations/')) {
       category = DocumentCategory.OPERATIONS_PLAN
@@ -95,13 +95,13 @@ function parseStrategyFile(
   return {
     title,
     content: bodyContent.trim(),
-    summary: frontmatter.summary || `Imported from ${sourceFile}`,
+    summary: frontmatter.summary ?? `Imported from ${sourceFile}`,
     category,
-    tags: frontmatter.tags || ['imported', 'strategy', 'v1'],
-    status: frontmatter.status || DocumentStatus.PUBLISHED,
-    authorId: frontmatter.authorId || SYSTEM_USER_ID,
-    collaborators: frontmatter.collaborators || [],
-    version: frontmatter.version || 1,
+    tags: frontmatter.tags ?? ['imported', 'strategy', 'v1'],
+    status: frontmatter.status ?? DocumentStatus.PUBLISHED,
+    authorId: frontmatter.authorId ?? SYSTEM_USER_ID,
+    collaborators: frontmatter.collaborators ?? [],
+    version: frontmatter.version ?? 1,
     metadata: {
       wordCount,
       readingTime,

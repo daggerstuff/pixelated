@@ -129,6 +129,6 @@ Complex PTSD.
 
 ## Related Resources
 
-- [Treatment Options](/mental/I-CPTSD/treatment)
-- [Management Strategies](/mental/IV-Management/strategies)
-- [Support Groups](/mental/V-Resources/support-groups)
+- [Treatment Options](./treatment.md)
+- [Management Strategies](../IV-Management/strategies.md)
+- [Support Groups](../V-Resources/support-groups.md)

@@ -376,7 +376,7 @@ function generateReport(results: TestResultOutput[]): string {
                   <br>
                   <strong>Category:</strong> ${item.category}
                   <br>
-                  <strong>Response Time:</strong> ${((item.responseTime || 0) / 1000).toFixed(2)}s
+                  <strong>Response Time:</strong> ${((item.responseTime ?? 0) / 1000).toFixed(2)}s
                 </div>
               </div>
             `,

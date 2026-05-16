@@ -2,7 +2,6 @@ import {
   ChartBar,
   TrendingUp,
   Star,
-  Users,
   Building,
   Settings,
   Clipboard,
@@ -51,6 +50,27 @@ interface SystemHealth {
   errorRate: number
   uptime: number
 }
+
+type DashboardTabId =
+  | 'overview'
+  | 'therapists'
+  | 'institutions'
+  | 'system'
+  | 'compliance'
+
+type DashboardTab = {
+  id: DashboardTabId
+  label: string
+  icon: 'chart' | 'therapist' | 'institution' | 'system' | 'compliance'
+}
+
+const dashboardTabs: DashboardTab[] = [
+  { id: 'overview', label: 'Overview', icon: 'chart' },
+  { id: 'therapists', label: 'Therapists', icon: 'therapist' },
+  { id: 'institutions', label: 'Institutions', icon: 'institution' },
+  { id: 'system', label: 'System Health', icon: 'system' },
+  { id: 'compliance', label: 'Compliance', icon: 'compliance' },
+]
 
 function getHighRiskCount(
   riskLevelDistribution: Record<string, number>,
@@ -141,6 +161,13 @@ export const AdminDashboard: FC = () => {
     errorRate: 0.02,
     uptime: 99.9,
   }
+  const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
+    chart: <ChartBar className='h-5 w-5' />,
+    therapist: <Stethoscope className='h-5 w-5' />,
+    institution: <Building className='h-5 w-5' />,
+    system: <Settings className='h-5 w-5' />,
+    compliance: <Clipboard className='h-5 w-5' />,
+  }
 
   return (
     <ResponsiveContainer size='full'>
@@ -164,7 +191,16 @@ export const AdminDashboard: FC = () => {
                 <select
                   aria-label='Select time range'
                   value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value as any)}
+                  onChange={(event) => {
+                    if (
+                      event.target.value === 'week' ||
+                      event.target.value === 'month' ||
+                      event.target.value === 'quarter' ||
+                      event.target.value === 'year'
+                    ) {
+                      setTimeRange(event.target.value)
+                    }
+                  }}
                   className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
                   <option value='week'>This Week</option>
@@ -179,37 +215,17 @@ export const AdminDashboard: FC = () => {
           {/* Navigation Tabs */}
           <div className='px-6'>
             <nav className='flex space-x-8'>
-              {[
-                { id: 'overview', label: 'Overview', icon: 'chart' },
-                { id: 'therapists', label: 'Therapists', icon: 'therapist' },
-                {
-                  id: 'institutions',
-                  label: 'Institutions',
-                  icon: 'institution',
-                },
-                { id: 'system', label: 'System Health', icon: 'system' },
-                { id: 'compliance', label: 'Compliance', icon: 'compliance' },
-              ].map((tab) => (
+              {dashboardTabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setDashboardView(tab.id as any)}
+                  onClick={() => setDashboardView(tab.id)}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  {tab.icon === 'chart' ? (
-                    <ChartBar className='h-5 w-5' />
-                  ) : tab.icon === 'therapist' ? (
-                    <Stethoscope className='h-5 w-5' />
-                  ) : tab.icon === 'institution' ? (
-                    <Building className='h-5 w-5' />
-                  ) : tab.icon === 'system' ? (
-                    <Settings className='h-5 w-5' />
-                  ) : tab.icon === 'compliance' ? (
-                    <Clipboard className='h-5 w-5' />
-                  ) : null}
+                  {tabIcons[tab.icon]}
                   {tab.label}
                 </button>
               ))}
@@ -689,7 +705,7 @@ const TherapistsTab: FC<{
  */
 const InstitutionsTab: FC<{
   metrics: InstitutionMetrics
-}> = ({ metrics }) => {
+}> = ({ metrics: _metrics }) => {
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
@@ -791,9 +807,8 @@ const SystemTab: FC<{
   >([])
   const [isRunningDiagnostics, setIsRunningDiagnostics] =
     React.useState<boolean>(false)
-  const [lastDiagnosticsRun, setLastDiagnosticsRun] = React.useState<
-    Date | null
-  >(null)
+  const [lastDiagnosticsRun, setLastDiagnosticsRun] =
+    React.useState<Date | null>(null)
 
   const runDiagnostics = React.useCallback(async () => {
     setIsRunningDiagnostics(true)
@@ -805,7 +820,8 @@ const SystemTab: FC<{
         id: 'api-response-time',
         title: 'API latency elevated',
         message: `Current API response time is ${health.apiResponseTime}ms, above the recommended 75ms threshold.`,
-        action: 'Inspect upstream service dependencies and database query plans.',
+        action:
+          'Inspect upstream service dependencies and database query plans.',
         severity: 'critical',
       })
     }
@@ -825,7 +841,8 @@ const SystemTab: FC<{
         id: 'memory-usage',
         title: 'High memory pressure',
         message: `Memory usage is ${health.memoryUsage}%, which may increase restart risk.`,
-        action: 'Scale memory resources or trim background worker cache retention.',
+        action:
+          'Scale memory resources or trim background worker cache retention.',
         severity: 'warning',
       })
     }
@@ -835,7 +852,8 @@ const SystemTab: FC<{
         id: 'error-rate',
         title: 'Error rate spike',
         message: `Current error rate is ${(health.errorRate * 100).toFixed(2)}%, above the 2% alert threshold.`,
-        action: 'Review recent error logs and isolate failing service dependencies.',
+        action:
+          'Review recent error logs and isolate failing service dependencies.',
         severity: 'critical',
       })
     }
@@ -845,7 +863,8 @@ const SystemTab: FC<{
         id: 'uptime',
         title: 'Suboptimal uptime',
         message: `Uptime is ${health.uptime}%, indicating recent instability.`,
-        action: 'Correlate deployment events with service restarts and incident logs.',
+        action:
+          'Correlate deployment events with service restarts and incident logs.',
         severity: 'warning',
       })
     }
@@ -871,25 +890,33 @@ const SystemTab: FC<{
 
   const getIssueClasses = (severity: DiagnosticIssueSeverity) => {
     switch (severity) {
-      case 'critical':
+      case 'critical': {
         return {
           wrapper:
             'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
           label: 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-100',
         }
-      case 'warning':
+      }
+      case 'warning': {
         return {
           wrapper:
             'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-100',
           label:
             'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-100',
         }
-      default:
+      }
+      case 'info': {
         return {
           wrapper:
             'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
-          label: 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
+          label:
+            'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
         }
+      }
+      default: {
+        const exhaustiveCheck: never = severity
+        throw new Error(`Unhandled severity: ${String(exhaustiveCheck)}`)
+      }
     }
   }
 
@@ -900,7 +927,7 @@ const SystemTab: FC<{
         <button
           onClick={runDiagnostics}
           disabled={isRunningDiagnostics}
-          className='bg-green-500 disabled:opacity-60 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors'
+          className='bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors disabled:opacity-60'
         >
           Run Diagnostics
         </button>
@@ -1101,9 +1128,9 @@ const ComplianceTab: FC<{
                 status: 'passed',
                 score: 98,
               },
-            ].map((audit, index) => (
+            ].map((audit) => (
               <div
-                key={index}
+                key={`${audit.type}-${audit.date}`}
                 className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
               >
                 <div>

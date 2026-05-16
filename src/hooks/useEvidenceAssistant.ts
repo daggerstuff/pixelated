@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { AuthRequestConfig } from '@/lib/auth/auth0-protected-fetch'
+
 import type {
   EvidenceAssistantRequest,
   EvidenceAssistantResponse,
-} from '@/lib/api/evidence-assistant'
+} from '../lib/api/evidence-assistant'
 import {
   getEvidenceAssistantMetadata,
   searchEvidenceAssistant,
-} from '@/lib/api/evidence-assistant'
+} from '../lib/api/evidence-assistant'
 
 type UseEvidenceAssistantState = {
   loading: boolean
@@ -16,7 +18,11 @@ type UseEvidenceAssistantState = {
   groundedAnswerEnabled: boolean | null
 }
 
-export function useEvidenceAssistant() {
+export function useEvidenceAssistant(
+  authConfig?: Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
+    getAccessTokenSilently?: AuthRequestConfig['getAccessTokenSilently']
+  },
+) {
   const [state, setState] = useState<UseEvidenceAssistantState>({
     loading: false,
     error: null,
@@ -30,7 +36,9 @@ export function useEvidenceAssistant() {
 
     const loadMetadata = async () => {
       try {
-        const metadata = await getEvidenceAssistantMetadata(controller.signal)
+        const metadata = await getEvidenceAssistantMetadata(controller.signal, {
+          getAccessTokenSilently: authConfig?.getAccessTokenSilently,
+        })
 
         setState((current) => ({
           ...current,
@@ -50,7 +58,7 @@ export function useEvidenceAssistant() {
     return () => {
       controller.abort()
     }
-  }, [])
+  }, [authConfig?.getAccessTokenSilently])
 
   const search = useCallback(
     async (
@@ -70,6 +78,7 @@ export function useEvidenceAssistant() {
         const response = await searchEvidenceAssistant(
           request,
           abortControllerRef.current.signal,
+          { getAccessTokenSilently: authConfig?.getAccessTokenSilently },
         )
 
         setState((current) => ({
@@ -100,7 +109,7 @@ export function useEvidenceAssistant() {
         throw normalizedError
       }
     },
-    [],
+    [authConfig?.getAccessTokenSilently],
   )
 
   const cancel = useCallback(() => {

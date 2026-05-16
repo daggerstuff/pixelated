@@ -1,11 +1,12 @@
 ---
-description: 'Setting up and configuring database performance monitoring'
-pubDate: '2025-01-01'
-author: 'DevOps Team'
+description: Setting up and configuring database performance monitoring
+pubDate: '2026-05-09'
+author: DevOps Team
 draft: false
 toc: true
 share: true
 date: '2025-04-14'
+title: Database Performance Monitoring
 ---
 
 # Database Performance Monitoring

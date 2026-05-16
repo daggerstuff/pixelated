@@ -1,13 +1,27 @@
+/* @vitest-environment node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { ResearchPlatform } from '@/lib/research/ResearchPlatform'
 import { AnonymizationService } from '@/lib/research/services/AnonymizationService'
 import { ConsentManagementService } from '@/lib/research/services/ConsentManagementService'
 import { HIPAADataService } from '@/lib/research/services/HIPAADataService'
+import type { ResearchAPIResponse } from '@/lib/research/types/research-types'
 
 // Mock environment variables
 vi.stubEnv('HIPAA_MASTER_KEY', 'test-master-key-32-chars-long-12345')
 vi.stubEnv('RESEARCH_ENCRYPTION_KEY', 'test-research-key-32-chars-long-123')
+
+const getSuccessData = <T>(
+  result: ResearchAPIResponse<T>,
+  context: string,
+): T => {
+  if (!result.success || !result.data) {
+    throw new Error(
+      `${context}: ${result.error?.message ?? 'Operation failed'}`,
+    )
+  }
+  return result.data
+}
 
 describe('Research Platform', () => {
   let platform: ResearchPlatform
@@ -24,7 +38,10 @@ describe('Research Platform', () => {
     it('should initialize successfully with default configuration', async () => {
       const result = await platform.initialize()
 
-      expect(result.success).toBe(true)
+      expect(result.success).toBeTruthy()
+      if (!result.success) {
+        throw new Error(result.error?.message)
+      }
       expect(result.data).toHaveProperty('status', 'initialized')
     })
 
@@ -65,24 +82,23 @@ describe('Research Platform', () => {
     it('should return platform status', async () => {
       await platform.initialize()
 
-      const result = await platform.getStatus()
+      const result = getSuccessData(await platform.getStatus(), 'getStatus')
 
-      expect(result.success).toBe(true)
-      expect(result.data).toHaveProperty('healthy')
-      expect(result.data).toHaveProperty('services')
-      expect(result.data).toHaveProperty('metrics')
-      expect(result.data).toHaveProperty('alerts')
+      expect(result).toHaveProperty('healthy')
+      expect(result).toHaveProperty('services')
+      expect(result).toHaveProperty('metrics')
+      expect(result).toHaveProperty('alerts')
     })
 
     it('should indicate healthy status when all services are operational', async () => {
       await platform.initialize()
 
-      const result = await platform.getStatus()
+      const result = getSuccessData(await platform.getStatus(), 'getStatus')
 
-      expect(result.data.healthy).toBe(true)
-      expect(result.data.services.anonymization).toBe(true)
-      expect(result.data.services.consent).toBe(true)
-      expect(result.data.services.hipaa).toBe(true)
+      expect(result.healthy).toBe(true)
+      expect(result.services.anonymization).toBe(true)
+      expect(result.services.consent).toBe(true)
+      expect(result.services.hipaa).toBe(true)
     })
   })
 
@@ -90,10 +106,24 @@ describe('Research Platform', () => {
     it('should submit and anonymize research data successfully', async () => {
       await platform.initialize()
 
+      const consentResult = await platform.manageConsent(
+        'initialize',
+        'client-1',
+        { level: 'full' },
+        'test-user',
+      )
+      if (!consentResult.success) {
+        throw new Error(
+          `Failed to initialize consent: ${JSON.stringify(consentResult.error)}`,
+        )
+      }
+
       const testData = [
         {
+          id: 'point-1',
           clientId: 'client-1',
           sessionId: 'session-1',
+          timestamp: new Date().toISOString(),
           emotionScores: { happiness: 0.8, sadness: 0.2 },
           techniqueEffectiveness: { cognitive_restructuring: 0.9 },
           sessionDuration: 3600,
@@ -117,8 +147,10 @@ describe('Research Platform', () => {
 
       const testData = [
         {
+          id: 'point-without-consent',
           clientId: 'client-without-consent',
           sessionId: 'session-1',
+          timestamp: new Date().toISOString(),
           emotionScores: { happiness: 0.8, sadness: 0.2 },
           techniqueEffectiveness: { cognitive_restructuring: 0.9 },
           sessionDuration: 3600,
@@ -393,10 +425,14 @@ describe('Research Platform', () => {
         'test-user',
       )
 
-      const audit = await platform.getAuditTrail('test-user')
-
-      expect(audit.success).toBe(true)
-      expect((audit.data as unknown[]).length).toBeGreaterThan(0)
+      const auditData = getSuccessData(
+        await platform.getAuditTrail('test-user'),
+        'getAuditTrail',
+      )
+      if (!Array.isArray(auditData)) {
+        throw new Error('Expected audit trail response to be an array')
+      }
+      expect(auditData.length).toBeGreaterThan(0)
     })
   })
 })
@@ -412,22 +448,37 @@ describe('Research Platform Services', () => {
     it('should anonymize data with k-anonymity', async () => {
       const testData = [
         {
+          id: 'point-1',
           clientId: '1',
-          age: 25,
-          gender: 'M',
+          sessionId: 'session-1',
+          timestamp: new Date(),
           emotionScores: { happiness: 0.8 },
+          techniqueEffectiveness: { happiness: 0.8 },
+          sessionDuration: 3000,
+          age: '25',
+          gender: 'M',
         },
         {
+          id: 'point-2',
           clientId: '2',
-          age: 26,
-          gender: 'M',
+          sessionId: 'session-2',
+          timestamp: new Date(),
           emotionScores: { happiness: 0.7 },
+          techniqueEffectiveness: { happiness: 0.7 },
+          sessionDuration: 2800,
+          age: '26',
+          gender: 'M',
         },
         {
+          id: 'point-3',
           clientId: '3',
-          age: 27,
-          gender: 'M',
+          sessionId: 'session-3',
+          timestamp: new Date(),
           emotionScores: { happiness: 0.9 },
+          techniqueEffectiveness: { happiness: 0.9 },
+          sessionDuration: 3200,
+          age: '27',
+          gender: 'M',
         },
       ]
 
@@ -442,16 +493,22 @@ describe('Research Platform Services', () => {
       const testData = [
         {
           clientId: '1',
-          age: 25,
+          id: 'point-1',
+          sessionId: 'session-1',
+          timestamp: new Date(),
+          techniqueEffectiveness: { happiness: 0.8 },
+          sessionDuration: 3600,
+          age: '25',
           gender: 'M',
           emotionScores: { happiness: 0.8 },
         },
       ]
 
       const result = await service.validateAnonymization(testData)
-
-      expect(result.valid).toBe(false)
-      expect(result.issues).toContain(expect.stringContaining('k-anonymity'))
+      expect(result.isValid).toBe(false)
+      expect(result.issues.some((issue) => issue.includes('k-anonymity'))).toBe(
+        true,
+      )
     })
   })
 

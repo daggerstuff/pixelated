@@ -10,9 +10,36 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
 let auth0Management: ManagementClient | null = null
+type WebAuthnCredentialInput = Partial<
+  Pick<
+    WebAuthnCredential,
+    'id' | 'name' | 'type' | 'publicKey' | 'counter' | 'deviceType' | 'backedUp'
+  >
+>
+
+function toWebAuthnCredentialInput(
+  value: Record<string, unknown>,
+): WebAuthnCredentialInput {
+  return {
+    id: typeof value.id === 'string' ? value.id : undefined,
+    name: typeof value.name === 'string' ? value.name : undefined,
+    type:
+      value.type === 'webauthn-roaming' || value.type === 'webauthn-platform'
+        ? value.type
+        : undefined,
+    publicKey:
+      typeof value.publicKey === 'string' ? value.publicKey : undefined,
+    counter: typeof value.counter === 'number' ? value.counter : undefined,
+    deviceType:
+      typeof value.deviceType === 'string' ? value.deviceType : undefined,
+    backedUp: typeof value.backedUp === 'boolean' ? value.backedUp : undefined,
+  }
+}
 
 /**
  * Initialize Auth0 clients
@@ -23,30 +50,29 @@ function initializeAuth0Clients() {
     !auth0Config.clientId ||
     !auth0Config.clientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret,
-    })
+  auth0Authentication ??= new AuthenticationClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.clientId,
+    clientSecret: auth0Config.clientSecret,
+  })
+
+  if (!auth0Config.managementClientId || !auth0Config.managementClientSecret) {
+    return
   }
 
-  if (
-    !auth0Management &&
-    auth0Config.managementClientId &&
-    auth0Config.managementClientSecret
-  ) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-    }) as ManagementClient
-  }
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  })
+  return
 }
 
 // Initialize the clients
@@ -127,7 +153,9 @@ export class Auth0WebAuthnService {
 
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
 
     // Use the domain as RP ID for WebAuthn
@@ -163,9 +191,9 @@ export class Auth0WebAuthnService {
         attestation: 'none',
         authenticatorSelection: {
           authenticatorAttachment:
-            registrationOptions.authenticatorAttachment || 'cross-platform',
-          residentKey: registrationOptions.residentKey || 'preferred',
-          userVerification: registrationOptions.userVerification || 'preferred',
+            registrationOptions.authenticatorAttachment ?? 'cross-platform',
+          residentKey: registrationOptions.residentKey ?? 'preferred',
+          userVerification: registrationOptions.userVerification ?? 'preferred',
         },
       }
 
@@ -197,21 +225,23 @@ export class Auth0WebAuthnService {
    */
   async verifyRegistration(
     userId: string,
-    credential: any,
+    credential: Record<string, unknown> = {},
   ): Promise<WebAuthnCredential> {
     try {
+      const credentialInput = toWebAuthnCredentialInput(credential)
+
       // In a real implementation, we would verify the credential using a WebAuthn library
       // For now, we'll simulate the verification and registration
 
       const newCredential: WebAuthnCredential = {
-        id: credential.id || `cred-${Date.now()}`,
-        name: credential.name || 'WebAuthn Credential',
-        type: credential.type || 'webauthn-roaming',
+        id: credentialInput.id ?? `cred-${Date.now()}`,
+        name: credentialInput.name ?? 'WebAuthn Credential',
+        type: credentialInput.type ?? 'webauthn-roaming',
         registeredAt: new Date().toISOString(),
-        publicKey: credential.publicKey || 'public-key-placeholder',
-        counter: credential.counter || 0,
-        deviceType: credential.deviceType || 'unknown',
-        backedUp: credential.backedUp || false,
+        publicKey: credentialInput.publicKey ?? 'public-key-placeholder',
+        counter: credentialInput.counter ?? 0,
+        deviceType: credentialInput.deviceType ?? 'unknown',
+        backedUp: credentialInput.backedUp ?? false,
       }
 
       // Log successful registration
@@ -270,7 +300,7 @@ export class Auth0WebAuthnService {
         challenge: this.generateChallenge(),
         timeout: 60000, // 60 seconds
         rpId: this.rpId,
-        userVerification: authenticationOptions.userVerification || 'preferred',
+        userVerification: authenticationOptions.userVerification ?? 'preferred',
         allowCredentials: credentials.map((cred) => ({
           type: 'public-key',
           id: cred.id,
@@ -314,8 +344,11 @@ export class Auth0WebAuthnService {
    */
   async verifyAuthentication(
     userId: string,
-    credential: any,
+    credential: Record<string, unknown> = {},
   ): Promise<boolean> {
+    const credentialInput = toWebAuthnCredentialInput(credential)
+    const credentialId =
+      credentialInput.id ?? `webauthn-credential-${Date.now()}`
     try {
       // In a real implementation, we would verify the authentication response using a WebAuthn library
       // For now, we'll simulate the verification
@@ -326,7 +359,7 @@ export class Auth0WebAuthnService {
         userId,
         {
           userId: userId,
-          credentialId: credential.id,
+          credentialId,
           timestamp: new Date().toISOString(),
         },
       )
@@ -334,7 +367,7 @@ export class Auth0WebAuthnService {
       // Update Phase 6 MCP server with authentication completion
       await updatePhase6AuthenticationProgress(
         userId,
-        `webauthn_authentication_completed_${credential.id}`,
+        `webauthn_authentication_completed_${credentialId}`,
       )
 
       return true
@@ -344,7 +377,7 @@ export class Auth0WebAuthnService {
       // Log failed authentication
       logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, null, {
         userId: userId,
-        credentialId: credential.id,
+        credentialId,
         error:
           error instanceof Error
             ? error instanceof Error
@@ -504,7 +537,7 @@ export class Auth0WebAuthnService {
   private generateChallenge(): string {
     // Generate a random 32-byte challenge
     const array = new Uint8Array(32)
-    if (typeof window !== 'undefined' && window.crypto) {
+    if (typeof window !== 'undefined') {
       window.crypto.getRandomValues(array)
     } else {
       // Fallback for Node.js environment

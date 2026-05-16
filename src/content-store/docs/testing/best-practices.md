@@ -1,12 +1,7 @@
 ---
-description:
----
-  'Comprehensive best practices for testing in the Pixelated platform'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
-draft: false
-toc: true
-share: true
+description: Comprehensive best practices for testing in the Pixelated platform
+title: Testing Best Practices
+pubDate: '2026-05-09'
 ---
 
 # Testing Best Practices

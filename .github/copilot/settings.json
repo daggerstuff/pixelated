@@ -1,5 +1,5 @@
 {
-  "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+  "model": "openai/gpt-oss-120b",
   "reasoning_effort": "medium",
   "log_level": "warning",
   "auto_update": true,

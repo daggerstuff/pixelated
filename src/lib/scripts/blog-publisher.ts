@@ -332,7 +332,7 @@ async function generatePost(
     if (seriesPosts.length > 0) {
       // Get the highest seriesOrder and add 1
       seriesOrder =
-        Math.max(...seriesPosts.map((post) => post.metadata.seriesOrder || 0)) +
+        Math.max(...seriesPosts.map((post) => post.metadata.seriesOrder ?? 0)) +
         1
     }
   }

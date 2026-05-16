@@ -1,10 +1,13 @@
 ---
-description: 'Plugin API Reference documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'api']
+description: Plugin API Reference documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - api
 draft: false
 toc: true
+title: Plugin API Reference
 ---
 
 # Plugin API Reference

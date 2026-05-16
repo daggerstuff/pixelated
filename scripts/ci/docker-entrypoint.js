@@ -1,11 +1,15 @@
 #!/usr/bin/env node
-import { spawn } from 'node:child_process'
-/* eslint-disable no-console */
+/// <reference types="node" />
+
 import fs from 'node:fs'
 import process from 'node:process'
+import { spawn } from 'node:child_process'
 
-// Function to read secret and inject into environment
-function injectSecret(fileEnv, targetEnv, urlEnv = null) {
+/** @param {string} fileEnv
+ * @param {string | undefined} targetEnv
+ * @param {string | undefined} urlEnv
+ */
+function injectSecret(fileEnv, targetEnv, urlEnv) {
   const filePath = process.env[fileEnv]
   if (filePath && fs.existsSync(filePath)) {
     try {
@@ -14,7 +18,7 @@ function injectSecret(fileEnv, targetEnv, urlEnv = null) {
         // Inject as standard env var (e.g. REDIS_PASSWORD) if targetEnv provided
         if (targetEnv) {
           process.env[targetEnv] = secret
-          console.log(`[Entrypoint] Injected ${fileEnv} into ${targetEnv}`)
+          process.stdout.write(`[Entrypoint] Injected ${fileEnv} into ${targetEnv}\n`)
         }
 
         // Inject into URL if urlEnv provided (e.g. REDIS_URL)
@@ -30,17 +34,18 @@ function injectSecret(fileEnv, targetEnv, urlEnv = null) {
               process.env[urlEnv] = url.toString()
               // Mask the password in logs
               const maskedUrl = url.toString().replace(/:[^:@]*@/, ':****@')
-              console.log(
+              process.stdout.write(
                 `[Entrypoint] Injected ${fileEnv} into ${urlEnv} (Result: ${maskedUrl})`,
               )
+              process.stdout.write('\n')
             }
           } catch (e) {
-            console.error(`[Entrypoint] Failed to parse ${urlEnv}:`, e)
+            process.stderr.write(`[Entrypoint] Failed to parse ${urlEnv}: ${String(e)}\n`)
           }
         }
       }
     } catch (err) {
-      console.error(`[Entrypoint] Failed to read ${fileEnv}:`, err)
+      process.stderr.write(`[Entrypoint] Failed to read ${fileEnv}: ${String(err)}\n`)
     }
   }
 }
@@ -58,7 +63,7 @@ if (args.length === 0) {
   args.push('node', './dist/server/entry.mjs')
 }
 
-console.log(`[Entrypoint] Starting: ${args.join(' ')}`)
+process.stdout.write(`[Entrypoint] Starting: ${args.join(' ')}\n`)
 
 const child = spawn(args[0], args.slice(1), { stdio: 'inherit' })
 
@@ -67,7 +72,7 @@ child.on('close', (code) => {
 })
 
 child.on('error', (err) => {
-  console.error('[Entrypoint] Failed to start child process:', err)
+  process.stderr.write(`[Entrypoint] Failed to start child process: ${String(err)}\n`)
   process.exit(1)
 })
 

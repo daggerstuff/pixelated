@@ -7,18 +7,40 @@ This Flask service now delegates to the 'bias_detection' package for logic.
 import logging
 import traceback
 
-# Module imports from the 'bias_detection' package
-from bias_detection.config import settings
-from bias_detection.services.analysis_orchestrator import AnalysisOrchestrator
-from bias_detection.services.bias_detection_service import BiasDetectionService
-from bias_detection.services.database_service import DatabaseService
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+# Module imports from the 'bias_detection' package
+from bias_detection.config import settings
+from bias_detection.services.analysis_orchestrator import AnalysisOrchestrator
+from bias_detection.services.database_service import DatabaseService
+from bias_detection.compat import (
+    AuditLogger,
+    BiasDetectionConfig,
+    LegacyBiasDetectionService,
+    SecurityManager,
+    SessionData,
+)
+
 # Logging configuration
-logging.basicConfig(level=settings.log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=settings.log_level,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 logger = logging.getLogger(__name__)
+
+# Backward-compatible public symbol names expected by legacy imports.
+BiasDetectionService = LegacyBiasDetectionService
+
+__all__ = [
+    "app",
+    "BiasDetectionConfig",
+    "SessionData",
+    "BiasDetectionService",
+    "AuditLogger",
+    "SecurityManager",
+]
 
 # Initialize services
 load_dotenv()
@@ -31,6 +53,7 @@ CORS(app, resources={r"/api/*": {"origins": settings.cors_allowed_origins}})
 
 # Initialization state
 app_state = {"initialized": False}
+
 
 @app.before_request
 async def ensure_initialized():
@@ -47,6 +70,7 @@ async def ensure_initialized():
         except Exception as e:
             logger.error(f"Error initializing services: {e}\n{traceback.format_exc()}")
 
+
 @app.route("/api/v1/bias/analyze", methods=["POST"])
 async def analyze_bias():
     """Analyze text or session data for bias."""
@@ -61,6 +85,7 @@ async def analyze_bias():
         logger.error(f"Analysis endpoint failed: {e}\n{traceback.format_exc()}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 @app.route("/api/v1/health", methods=["GET"])
 async def health_check():
     """Service health check status."""
@@ -70,7 +95,7 @@ async def health_check():
     except Exception as e:
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
+
 if __name__ == "__main__":
     # Start the Flask app
     app.run(host=settings.host, port=settings.port, debug=settings.debug)
-

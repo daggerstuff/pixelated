@@ -96,7 +96,7 @@ services:
     image: redis:7-alpine
     container_name: pixelated-multimodal-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --protected-mode yes
+    command: redis-server --bind 0.0.0.0 --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --protected-mode yes
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     ports:
@@ -191,8 +191,8 @@ services:
       - '9000:9000'
       - '9001:9001'
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=admin123
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"

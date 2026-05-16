@@ -375,7 +375,7 @@ export function getRolePermissions(role: UserRole): string[] {
  */
 export function requiresMFA(permission: string): boolean {
   const permDef = PERMISSION_DEFINITIONS[permission]
-  return permDef?.requiresMFA || false
+  return permDef?.requiresMFA ?? false
 }
 
 /**

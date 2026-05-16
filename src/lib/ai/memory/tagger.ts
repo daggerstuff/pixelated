@@ -9,7 +9,7 @@ const appLogger = createBuildSafeLogger('memory-tagger');
  * Combines high-performance keyword scanning with deep AI analysis.
  */
 export class MemoryCrisisTagger {
-  private crisisService: CrisisDetectionService;
+  private readonly crisisService: CrisisDetectionService;
 
   constructor(crisisService: CrisisDetectionService) {
     this.crisisService = crisisService;

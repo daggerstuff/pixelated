@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
-import type { Scenario, TherapeuticDomain } from '../types'
+import type { Scenario } from '../types'
+import { TherapeuticDomain } from '../types'
 
 interface ScenarioInfoProps {
   scenario: Scenario
@@ -126,26 +127,30 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
               </div>
             )}
 
-          <div>
-            <div className='text-gray-700 mb-1 font-medium'>Target Skills</div>
-            <div className='mt-1 flex flex-wrap gap-1'>
-              {scenario.techniques.map((skill) => (
-                <span
-                  key={skill}
-                  className='bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-xs'
-                >
-                  {skill
-                    .toString()
-                    .split('_')
-                    .map(
-                      (word: string) =>
-                        word.charAt(0).toUpperCase() + word.slice(1),
-                    )
-                    .join(' ')}
-                </span>
-              ))}
+          {scenario.techniques && scenario.techniques.length > 0 && (
+            <div>
+              <div className='text-gray-700 mb-1 font-medium'>
+                Target Skills
+              </div>
+              <div className='mt-1 flex flex-wrap gap-1'>
+                {scenario.techniques.map((skill) => (
+                  <span
+                    key={skill}
+                    className='bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-xs'
+                  >
+                    {skill
+                      .toString()
+                      .split('_')
+                      .map(
+                        (word: string) =>
+                          word.charAt(0).toUpperCase() + word.slice(1),
+                      )
+                      .join(' ')}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

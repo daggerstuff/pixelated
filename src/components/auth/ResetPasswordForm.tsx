@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 interface ResetPasswordFormProps {
   token: string
@@ -44,7 +44,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         document.dispatchEvent(event)
       } else {
         throw new Error(
-          (response as { error?: { message?: string } }).error?.message ||
+          (response as { error?: { message?: string } }).error?.message ??
             'Password reset failed',
         )
       }

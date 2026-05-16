@@ -1,9 +1,8 @@
 ---
+title: 'Emotional AI: Understanding Human Feelings'
 description: >-
----
-  Exploring how artificial intelligence is learning to recognize, interpret, and
-  respond to human emotions, with profound implications for mental health and
-  emotional wellbeing
+  _Next in our series, we'll explore AI in Mental Health Crisis Prevention and how
+  emotional intelligence systems can sense and respond to distress.
 author: AI & Psychology Team
 pubDate: 2024-05-20T00:00:00.000Z
 draft: false
@@ -15,10 +14,9 @@ tags:
   - technology
 series: AI & Emotional Intelligence
 seriesOrder: 3
-category: Technical
 ---
 
-# Emotional AI: Understanding Human Feelings
+## Emotional AI: Understanding Human Feelings
 
 ## Introduction
 

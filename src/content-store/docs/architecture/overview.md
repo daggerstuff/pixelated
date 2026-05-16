@@ -1,10 +1,12 @@
 ---
-description: 'Pixelated Empathy Architecture documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Pixelated Empathy Architecture documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Pixelated Empathy Architecture
 ---
 
 # Pixelated Empathy Architecture

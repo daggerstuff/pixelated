@@ -45,7 +45,7 @@ export const DELETE = withAuth(async (request, session) => {
     return jsonError(404, 'Not Found', 'API key not found or already revoked')
   }
 
-  await logSecurityEvent(
+   logSecurityEvent(
     SecurityEventType.AUTHENTICATION_SUCCESS,
     session.user.id,
     {
@@ -88,7 +88,7 @@ export const PATCH = withAuth(async (request, session) => {
     return jsonError(404, 'Not Found', 'API key not found or not active')
   }
 
-  await logSecurityEvent(
+   logSecurityEvent(
     SecurityEventType.AUTHENTICATION_SUCCESS,
     session.user.id,
     {

@@ -1,16 +1,18 @@
-type BaseAPIContext = {
-  locals: Record<string, unknown>
+import type { MiddlewareHandler, APIContext } from 'astro'
+
+type CSPContext = APIContext & {
+  locals: APIContext['locals'] & {
+    cspNonce?: string
+  }
 }
 
-type MiddlewareNext = () => Promise<Response>
-
-export const securityHeaders = async (
-  context: BaseAPIContext,
-  next: MiddlewareNext,
+export const securityHeaders: MiddlewareHandler = async (
+  context: CSPContext,
+  next,
 ) => {
   const response = await next()
 
-  const nonce = context.locals['cspNonce'] as string | undefined
+  const nonce = context.locals.cspNonce
   const isRelaxedScriptEnv =
     process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
   const scriptSourceList = [

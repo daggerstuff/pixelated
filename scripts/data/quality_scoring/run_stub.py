@@ -10,8 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.quality_scoring.scoring_interface import compose_score, compute_signals  # noqa: E402
-
+from scripts.quality_scoring.scoring_interface import compose_score, compute_signals
 
 def main(args: list[str] | None = None) -> int:
 

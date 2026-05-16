@@ -231,20 +231,20 @@ full methodology
 
 ### Content Cluster Strategy
 
-**Cluster 1: Diagnostic Training Excellence**
+### Cluster 1: Diagnostic Training Excellence
 
 - Core pillar: "Diagnostic Accuracy Improvement"
 - Supporting content: Assessment tools, validation studies, best practices
 - Internal linking: 15-20 related articles
 
-**Cluster 2: Crisis Intervention Mastery**
+### Cluster 2: Crisis Intervention Mastery
 
 - Core pillar: "Crisis Intervention Training"
 - Supporting content: Edge case scenarios, safety protocols, de-escalation
   techniques
 - Internal linking: 12-15 related articles
 
-**Cluster 3: Cultural Competency Development**
+### Cluster 3: Cultural Competency Development
 
 - Core pillar: "Cultural Competency in Mental Health"
 - Supporting content: Diverse populations, bias reduction, inclusive practices
@@ -254,26 +254,26 @@ full methodology
 
 ### Core Team Roles
 
-**Chief Clinical Officer (Executive Sponsor)**
+### Chief Clinical Officer (Executive Sponsor)
 
 - **Responsibility**: Clinical expertise and credibility
 - **Content**: Clinical validation, research findings, best practices
 - **Time Allocation**: 20% content creation, 80% strategic oversight
 
-**Director of Research Partnerships**
+### Director of Research Partnerships
 
 - **Responsibility**: Academic collaborations and research publications
 - **Content**: Research studies, academic partnerships, validation data
 - **Time Allocation**: 40% research, 30% content creation, 30% partnership
   development
 
-**Content Marketing Manager**
+### Content Marketing Manager
 
 - **Responsibility**: Content strategy execution and production management
 - **Content**: Blog posts, whitepapers, case studies, social media
 - **Time Allocation**: 60% content creation, 25% strategy, 15% distribution
 
-**Clinical Advisory Board**
+### Clinical Advisory Board
 
 - **Composition**: 8-10 leading mental health experts
 - **Responsibility**: Content validation, expert insights, credibility
@@ -283,14 +283,14 @@ full methodology
 
 ### External Contributors
 
-**Guest Authors & Experts**
+### Guest Authors & Experts
 
 - **University Partners**: Research collaborators and academic leaders
 - **Industry Experts**: Healthcare administrators and training directors
 - **Customer Advocates**: Successful implementation leaders
 - **Policy Experts**: Mental health policy and regulatory specialists
 
-**Content Partnerships**
+### Content Partnerships
 
 - **Academic Institutions**: Joint research publications
 - **Professional Associations**: Co-branded content and webinars
@@ -381,28 +381,28 @@ Typeform **Presentation**: Beautiful.ai, PowerPoint, Google Slides
 
 ### Annual Content Budget ($150,000)
 
-**Content Creation (60% - $90,000)**
+### Content Creation (60% - $90,000)
 
 - Staff salaries and freelance writers
 - Research and data acquisition
 - Expert interviews and validation
 - Design and production costs
 
-**Distribution & Promotion (25% - $37,500)**
+### Distribution & Promotion (25% - $37,500)
 
 - Paid social media promotion
 - Email marketing platform costs
 - Conference and webinar expenses
 - PR and media outreach
 
-**Tools & Technology (10% - $15,000)**
+### Tools & Technology (10% - $15,000)
 
 - Content management systems
 - SEO and analytics tools
 - Design and production software
 - Video and webinar platforms
 
-**Measurement & Optimization (5% - $7,500)**
+### Measurement & Optimization (5% - $7,500)
 
 - Analytics and reporting tools
 - A/B testing and optimization

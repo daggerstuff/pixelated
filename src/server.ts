@@ -1,25 +1,87 @@
-import { EventEmitter } from 'events'
 import { createServer } from 'http'
 
 import cors from 'cors'
 import express from 'express'
-import Redis from 'ioredis'
+import Redis, { type RedisOptions } from 'ioredis'
 import { Pool } from 'pg'
 
+import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
 import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
 
+type RedisLike = {
+  on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+  connect: () => Promise<unknown>
+  quit: () => Promise<unknown>
+}
+
+type SentryExpressErrorHandler = (app: express.Application) => void
+type SentryErrorHandler = (
+  options?: Record<string, string>,
+) => express.ErrorRequestHandler
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isSentryExpressErrorHandler = (
+  value: unknown,
+): value is SentryExpressErrorHandler => typeof value === 'function'
+
+const isSentryExpressErrorRequestHandler = (
+  value: unknown,
+): value is SentryErrorHandler => typeof value === 'function'
+
+const getSentryHandlers = (
+  source: unknown,
+): {
+  setupExpressErrorHandler?: SentryExpressErrorHandler
+  expressErrorHandler?: SentryErrorHandler
+} => {
+  if (!isRecord(source)) {
+    return {}
+  }
+
+  const handlers: {
+    setupExpressErrorHandler?: SentryExpressErrorHandler
+    expressErrorHandler?: SentryErrorHandler
+  } = {}
+
+  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
+    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
+  }
+
+  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
+    handlers.expressErrorHandler = source['expressErrorHandler']
+  }
+
+  return handlers
+}
+
 const app = express()
 const server = createServer(app)
 
+const { setupExpressErrorHandler, expressErrorHandler } =
+  getSentryHandlers(Sentry)
+
+const hasSentryErrorHandler =
+  !!setupExpressErrorHandler || !!expressErrorHandler
+
+// The Sentry request handler must be the first middleware on the app
+app.use(sentryMiddleware)
+if (typeof setupExpressErrorHandler === 'function') {
+  setupExpressErrorHandler(app)
+} else if (typeof expressErrorHandler === 'function') {
+  app.use(expressErrorHandler())
+}
+
 // Environment variables
-const PORT = process.env.WS_PORT || 3001
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
+const PORT = process.env.WS_PORT ?? 3001
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379'
 const DATABASE_URL =
-  process.env.DATABASE_URL ||
+  process.env.DATABASE_URL ??
   'postgresql://postgres:postgres@localhost:5432/pixelated'
 
 // Database connection
@@ -33,53 +95,58 @@ const db = new Pool({
 
 // Redis connection
 const redisOptions = REDIS_URL.startsWith('rediss://')
-  ? {
+  ? ({
+      lazyConnect: true,
       tls: {
         rejectUnauthorized: false,
       },
-      lazyConnect: true,
-    }
-  : { lazyConnect: true }
+    } as RedisOptions)
+  : ({ lazyConnect: true } as RedisOptions)
 
-let redis = new Redis(REDIS_URL, redisOptions)
+let redis: RedisLike | Redis = new Redis(REDIS_URL, redisOptions)
 
-// Prevent unhandled error events during connection attempts
-redis.on('error', (err) => {
+redis.on('error', (err: unknown) => {
   // We handle connection errors in the connect().catch() block below
   // This listener prevents the "Unhandled error event" warning
-  console.debug('Redis connection error (handled):', err.message)
+  const message = err instanceof Error ? err.message : String(err)
+  console.debug('Redis connection error (handled):', message)
 })
 
 // Attempt connection with fallback for development
-redis.connect().catch((err) => {
+if (typeof redis.connect === 'function') {
+  redis.connect().catch((err) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        'Failed to connect to Redis in development, using mock:',
+        err instanceof Error ? err.message : String(err),
+      )
+      // Create a simple mock compatible with ioredis interface
+      const redisMock: RedisLike = {
+        connect: async () => undefined,
+        quit: async () => 'OK',
+        on: (event: string, listener: (...args: unknown[]) => void) => {
+          if (event === 'connect' || event === 'ready') listener()
+          // Return this to allow chaining
+          return redisMock
+        },
+      }
+      redis = redisMock
+    } else {
+      console.error('Failed to connect to Redis:', err)
+    }
+  })
+} else {
   if (process.env.NODE_ENV === 'development') {
     console.warn(
-      'Failed to connect to Redis in development, using mock:',
-      err.message,
+      'Redis client does not expose connect(), skipping eager connection fallback.',
     )
-    // Create a simple mock compatible with ioredis interface
-    redis = new EventEmitter() as any
-    Object.assign(redis, {
-      status: 'ready',
-      quit: async () => 'OK',
-      get: async () => null,
-      set: async () => 'OK',
-      del: async () => 1,
-      on: (event: string, cb: any) => {
-        if (event === 'connect' || event === 'ready') cb()
-        return redis
-      },
-      // Add other necessary methods as no-ops
-    })
-  } else {
-    console.error('Failed to connect to Redis:', err)
   }
-})
+}
 
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
     credentials: true,
   }),
 )
@@ -94,6 +161,30 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+app.use(
+  (
+    error: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    console.error('Unhandled server error:', error)
+    if (!hasSentryErrorHandler) {
+      Sentry.captureException(error)
+    }
+    if (res.headersSent) {
+      return
+    }
+    res.status(500).json({
+      error: 'Internal server error',
+      message:
+        process.env.NODE_ENV === 'production'
+          ? 'Something went wrong'
+          : error.message,
+    })
+  },
+)
+
 // Create Socket.IO service
 const socketService = new SocketService(server, redis, db)
 
@@ -103,6 +194,7 @@ process.on('SIGTERM', async () => {
 
   await redis.quit()
   await db.end()
+  await closeSentry()
   server.close(() => {
     console.log('Server closed')
     process.exit(0)

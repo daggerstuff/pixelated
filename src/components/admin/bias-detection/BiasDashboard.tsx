@@ -59,13 +59,13 @@ import {
   isTrendItemArray,
 } from '@/components/admin/bias-detection/utils/dashboard-type-guards'
 import { exportBiasDashboardData } from '@/components/admin/bias-detection/utils/export-dashboard-data'
-import { Alert } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert.tsx'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
 // Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
@@ -87,9 +87,9 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from '@/components/ui/LazyChart'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from '@/components/ui/LazyChart.tsx'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import type {
   BiasDashboardData,
   BiasAnalysisResult,
@@ -129,7 +129,7 @@ interface AlertAction {
 
 // ⚡ Bolt: Extracted CustomTooltip to module level to prevent Recharts from recreating the function on every render.
 const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
-  if (active && payload && payload.length) {
+  if (active && payload?.length) {
     return (
       <div className='bg-white border-gray-200 rounded-lg border p-3 shadow-lg'>
         <p className='font-medium'>{`${label}`}</p>
@@ -245,8 +245,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     start:
       new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         .toISOString()
-        .split('T')[0] || '', // 7 days ago
-    end: new Date().toISOString().split('T')[0] || '', // today
+        .split('T')[0] ?? '', // 7 days ago
+    end: new Date().toISOString().split('T')[0] ?? '', // today
   })
 
   // Alert management state
@@ -280,8 +280,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     start:
       new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         .toISOString()
-        .split('T')[0] || '', // 7 days ago
-    end: new Date().toISOString().split('T')[0] || '', // today
+        .split('T')[0] ?? '', // 7 days ago
+    end: new Date().toISOString().split('T')[0] ?? '', // today
   })
   const [exportDataTypes, setExportDataTypes] = useState({
     summary: true,
@@ -469,7 +469,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           : now
 
       return data.filter((item) => {
-        const itemDate = new Date(item.timestamp || item.date || '')
+        const itemDate = new Date((item.timestamp ?? item.date) ?? '')
         return itemDate >= startTime && itemDate <= endTime
       })
     },
@@ -570,7 +570,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         // Update local state
         setAlertActions((prev) => {
           const newActions = new Map(prev)
-          const existingActions = newActions.get(alertId) || []
+          const existingActions = newActions.get(alertId) ?? []
           newActions.set(alertId, [...existingActions, actionData])
           return newActions
         })
@@ -646,7 +646,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         // Revert local state on error
         setAlertActions((prev) => {
           const newActions = new Map(prev)
-          const existingActions = newActions.get(alertId) || []
+          const existingActions = newActions.get(alertId) ?? []
           newActions.set(alertId, existingActions.slice(0, -1))
           return newActions
         })
@@ -658,7 +658,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   const handleBulkAlertAction = useCallback(
     async (alertIds: string[], action: AlertAction['type']) => {
       try {
-        const promises = alertIds.map((alertId) =>
+        const promises = alertIds.map( async (alertId) =>
           handleAlertAction(alertId, action),
         )
         await Promise.all(promises)
@@ -810,7 +810,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           return
         }
 
-        const message = data as Record<string, unknown>
+        const message = data
 
         const getObject = (
           obj: Record<string, unknown>,
@@ -818,7 +818,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         ): Record<string, unknown> | undefined => {
           if (isObject(obj) && key in obj) {
             const v = obj[key]
-            return isObject(v) ? (v as Record<string, unknown>) : undefined
+            return isObject(v) ? (v) : undefined
           }
           return undefined
         }
@@ -1062,7 +1062,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   // Export dashboard data
 
   // Enhanced export function with progress tracking
-  const exportDataWithOptions = useCallback(() => {
+  const exportDataWithOptions = useCallback( async () => {
     return exportBiasDashboardData({
       format: exportFormat,
       exportDateRange,
@@ -1154,6 +1154,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           icon: <AlertTriangle className='mr-1 h-3 w-3' />,
           pulse: false,
         }
+      case "disconnected": { throw new Error('Not implemented yet: "disconnected" case') }
       default:
         return {
           text: 'Live updates disabled',
@@ -1222,25 +1223,12 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     } satisfies BiasDashboardData)
 
   const {
-    summary = {
-      totalSessions: 0,
-      averageBiasScore: 0,
-      alertsLayerBreakdown: {},
-      alertsLast24h: 0,
-      activeAlerts: 0,
-      trendDirection: 'stable',
-      alerts: { low: 0, medium: 0, high: 0, critical: 0 },
-      complianceScore: 0,
-    },
-    recentAnalyses = [],
-    alerts = [],
-    trends = [],
-    demographics = { age: {}, gender: {}, ethnicity: {} } as {
-      age: Record<string, number>
-      gender: Record<string, number>
-      ethnicity: Record<string, number>
-    },
-    recommendations = [],
+    summary,
+    recentAnalyses,
+    alerts,
+    trends,
+    demographics,
+    recommendations,
   } = resolvedDashboardData
 
   // Apply filters to data with memoization
@@ -1520,7 +1508,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='inAppNotificationsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.inAppEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           inAppEnabled: e.target.checked,
                         })
@@ -1540,7 +1528,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='emailNotificationsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.emailEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           emailEnabled: e.target.checked,
                         })
@@ -1560,7 +1548,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='smsNotificationsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.smsEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           smsEnabled: e.target.checked,
                         })
@@ -1590,7 +1578,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='criticalAlertsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.criticalAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           criticalAlerts: e.target.checked,
                         })
@@ -1609,7 +1597,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='highAlertsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.highAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           highAlerts: e.target.checked,
                         })
@@ -1628,7 +1616,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='mediumAlertsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.mediumAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           mediumAlerts: e.target.checked,
                         })
@@ -1647,7 +1635,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       id='lowAlertsCheckbox'
                       type='checkbox'
                       checked={notificationSettings.lowAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
                         updateNotificationSettings({
                           lowAlerts: e.target.checked,
                         })
@@ -2984,7 +2972,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           <Button
                             variant='outline'
                             size='sm'
-                            onClick={() =>
+                            onClick={ async () =>
                               handleBulkAlertAction(
                                 Array.from(selectedAlerts),
                                 'acknowledge',
@@ -2998,7 +2986,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           <Button
                             variant='outline'
                             size='sm'
-                            onClick={() =>
+                            onClick={ async () =>
                               handleBulkAlertAction(
                                 Array.from(selectedAlerts),
                                 'dismiss',
@@ -3012,7 +3000,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           <Button
                             variant='outline'
                             size='sm'
-                            onClick={() =>
+                            onClick={ async () =>
                               handleBulkAlertAction(
                                 Array.from(selectedAlerts),
                                 'archive',
@@ -3071,7 +3059,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             ) : (
               filteredAlerts.map((alert: AlertItem) => {
                 const isSelected = selectedAlerts.has(alert.alertId)
-                const actions = alertActions.get(alert.alertId) || []
+                const actions = alertActions.get(alert.alertId) ?? []
                 const lastAction = actions[actions.length - 1]
 
                 return (
@@ -3157,7 +3145,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                   <Button
                                     size='sm'
                                     variant='outline'
-                                    onClick={() =>
+                                    onClick={ async () =>
                                       handleAlertAction(
                                         alert.alertId,
                                         'acknowledge',
@@ -3178,7 +3166,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                       void handleAlertAction(
                                         alert.alertId,
                                         'escalate',
-                                        notes || undefined,
+                                        notes ?? undefined,
                                       )
                                     }}
                                   >
@@ -3208,7 +3196,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                               <Button
                                 size='sm'
                                 variant='outline'
-                                onClick={() =>
+                                onClick={ async () =>
                                   handleAlertAction(alert.alertId, 'dismiss')
                                 }
                               >

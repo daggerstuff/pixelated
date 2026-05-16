@@ -62,7 +62,7 @@ export interface PatientResponse {
  */
 export class InterventionAnalysisService {
   private static instance: InterventionAnalysisService
-  private analysisHistory: Map<string, InterventionEffectivenessResult[]> =
+  private readonly analysisHistory: Map<string, InterventionEffectivenessResult[]> =
     new Map()
 
   private constructor() {
@@ -579,7 +579,7 @@ export class InterventionAnalysisService {
   getAnalysisHistory(
     interventionId: string,
   ): InterventionEffectivenessResult[] {
-    return this.analysisHistory.get(interventionId) || []
+    return this.analysisHistory.get(interventionId) ?? []
   }
 
   /**

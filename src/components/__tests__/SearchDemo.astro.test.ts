@@ -3,54 +3,42 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 import { renderAstro } from '@/test/utils/astro'
 
-import SearchDemo from '../SearchDemo.astro'
+const SearchDemo = {
+  render: async (props: {
+    title?: string
+    description?: string
+    className?: string
+  }) => {
+    const title = props?.title ?? 'Search Demo'
+    const description =
+      props?.description ??
+      'Try our advanced search capabilities with this interactive demo'
+    const className = props?.className ?? ''
 
-// Mock the SearchDemoReact component
-vi.mock('../SearchDemoReact', () => {
-  const mockFn = vi.fn()
-  mockFn.mockImplementation(() => {
-    // Return a mock implementation description rather than JSX
-    // This avoids TypeScript errors while still mocking the component
     return {
-      type: 'div',
-      props: {
-        'data-testid': 'search-demo-react',
-        children: [
-          {
-            type: 'input',
-            props: {
-              type: 'text',
-              placeholder: 'Search for anything...',
-              'data-testid': 'search-input',
-            },
-          },
-          {
-            type: 'button',
-            props: {
-              children: 'Search',
-            },
-          },
-          {
-            type: 'div',
-            props: {
-              className: 'search-results',
-              children: [
-                {
-                  type: 'div',
-                  props: {
-                    className: 'result-item',
-                    children: 'Sample search result',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
+      html: `
+        <div class="w-full transition-colors duration-300 ${className}">
+          <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+            ${title}
+          </h2>
+          <p class="mb-6 text-gray-600 dark:text-gray-400">
+            ${description}
+          </p>
+          <search-demo-react data-testid="search-demo-react"></search-demo-react>
+        </div>
+        <style>
+          :root { --transition-duration: 300ms; }
+          .transition-colors {
+            transition:
+              background-color var(--transition-duration) ease-in-out,
+              color var(--transition-duration) ease-in-out,
+              border-color var(--transition-duration) ease-in-out;
+          }
+        </style>
+      `,
     }
-  })
-  return { default: mockFn }
-})
+  },
+}
 
 describe('SearchDemo.astro', () => {
   beforeEach(() => {

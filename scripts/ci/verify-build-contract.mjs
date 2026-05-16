@@ -1,22 +1,43 @@
 #!/usr/bin/env node
-import fs from 'node:fs'
-import path from 'node:path'
+/// <reference types="node" />
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { createRequire } from 'node:module'
+import process from 'node:process'
 
+/** @type {string} */
 const projectRoot = process.cwd()
 const srcRoot = path.join(projectRoot, 'src')
 const nodeModulesRoot = path.join(projectRoot, 'node_modules')
 const requireFromProject = createRequire(path.join(projectRoot, 'package.json'))
-const packageManifest = JSON.parse(
-  fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'),
-)
+const packageManifestText = fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8')
+/** @typedef {{ dependencies?: Record<string, string>, devDependencies?: Record<string, string> }} PackageManifest */
+/** @type {PackageManifest} */
+function isPlainObject(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/**
+ * @param {unknown} value
+ * @returns {value is PackageManifest}
+ */
+function isPackageManifest(value) {
+  if (!isPlainObject(value)) return false
+
+  if ('dependencies' in value && !isPlainObject(value.dependencies)) return false
+  if ('devDependencies' in value && !isPlainObject(value.devDependencies)) return false
+
+  return true
+}
+
+/** @type {unknown} */ const parsedManifest = JSON.parse(packageManifestText)
+const packageManifest = isPackageManifest(parsedManifest) ? parsedManifest : {}
 const declaredDeps = new Set([
-  ...Object.keys(packageManifest.dependencies || {}),
-  ...Object.keys(packageManifest.devDependencies || {}),
+  ...Object.keys(packageManifest.dependencies ?? {}),
+  ...Object.keys(packageManifest.devDependencies ?? {}),
 ])
 
 const TS_IMPORT_EXTENSIONS = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.astro'])
-const STYLE_EXTENSIONS = new Set(['.css', '.pcss', '.scss', '.sass'])
 const IMPORT_REGEXP =
   /(?:import|export)\s+(?:[\s\S]*?)\s+from\s+['"]([^'"]+)['"]|import\(\s*['"]([^'"]+)['"]\s*\)|require\(\s*['"]([^'"]+)['"]\s*\)/g
 const STYLE_IMPORT_REGEXP = /@import\s+(?:url\()?\s*['"]([^'"]+)['"]\)?\s*;?/g
@@ -38,39 +59,46 @@ const LOCAL_IGNORE_FILES = [
 ]
 const LOCAL_IGNORE_PREFIXES = ['src/lib/', 'src/components/', 'src/services/']
 
+/** @type {Set<string>} */
 const unresolved = new Set()
+/** @type {Set<string>} */
 const missingDependencies = new Set()
 
+/** @param {string} specifier
+ * @returns {string} */
 function getPackageRoot(specifier) {
   const segments = specifier.split('/')
   if (!segments.length) return specifier
   return specifier.startsWith('@') ? `${segments[0]}/${segments[1]}` : segments[0]
 }
 
+/** @param {string} issue */
 function pushIssue(issue) {
   unresolved.add(issue)
 }
 
+/** @param {string} value
+ * @returns {boolean} */
 function isExternalUrl(value) {
   return /^([a-z]+:)?\/\//.test(value) || value.startsWith('data:')
 }
 
+/** @param {string} value
+ * @returns {boolean} */
 function isVirtualImport(value) {
   return value.startsWith('astro:')
 }
 
+/** @param {string} value
+ * @returns {boolean} */
 function isAlias(value) {
-  return (
-    value.startsWith('@/') ||
-    value.startsWith('~/') ||
-    value.startsWith('@lib/') ||
-    value.startsWith('@components/') ||
-    value.startsWith('@layouts/') ||
-    value.startsWith('@utils/') ||
-    value.startsWith('@types/')
-  )
+  return ['@/', '~/'].some((prefix) => value.startsWith(prefix)) ||
+    ['@lib/', '@components/', '@layouts/', '@utils/', '@types/'].some((prefix) => value.startsWith(prefix))
 }
 
+/** @param {string} sourcePath
+ * @param {string} specifier
+ * @returns {boolean} */
 function shouldIgnoreUnresolved(sourcePath, specifier) {
   const relativeSource = path.relative(projectRoot, sourcePath).replace(/\\/g, '/')
   if (PACKAGE_IGNORE_SET.has(specifier)) return true
@@ -83,6 +111,8 @@ function shouldIgnoreUnresolved(sourcePath, specifier) {
   return false
 }
 
+/** @param {string} filePath
+ * @returns {string} */
 function normalizeAlias(filePath) {
   const replacements = [
     ['@/', `${srcRoot}/`],
@@ -101,10 +131,15 @@ function normalizeAlias(filePath) {
   return normalized
 }
 
+/** @param {string} filePath
+ * @returns {boolean} */
 function fileExists(filePath) {
   return fs.existsSync(filePath) && !fs.statSync(filePath).isDirectory()
 }
 
+/** @param {string} dir
+ * @param {string[]} results
+ * @returns {string[]} */
 function collectFiles(dir, results = []) {
   const skipDirs = new Set([
     '.git',
@@ -138,6 +173,9 @@ function collectFiles(dir, results = []) {
   return results
 }
 
+/** @param {string} specifier
+ * @param {string} fromDir
+ * @returns {boolean} */
 function tryResolveLocal(specifier, fromDir) {
   const absolute = specifier.startsWith('.') || specifier.startsWith('/')
     ? path.resolve(fromDir, specifier)
@@ -166,6 +204,9 @@ function tryResolveLocal(specifier, fromDir) {
   return false
 }
 
+/** @param {string} specifier
+ * @param {string} fromDir
+ * @returns {string | null} */
 function tryResolveLocalPath(specifier, fromDir) {
   const absolute = specifier.startsWith('.') || specifier.startsWith('/')
     ? path.resolve(fromDir, specifier)
@@ -198,6 +239,8 @@ function tryResolveLocalPath(specifier, fromDir) {
   return null
 }
 
+/** @param {string} specifier
+ * @returns {boolean} */
 function tryResolveNodeModule(specifier) {
   if (specifier.startsWith('node:')) return true
 
@@ -238,6 +281,9 @@ function tryResolveNodeModule(specifier) {
   return false
 }
 
+/** @param {string} specifier
+ * @param {string} fromDir
+ * @param {string} sourcePath */
 function checkImport(specifier, fromDir, sourcePath) {
   if (isExternalUrl(specifier)) return
 
@@ -264,27 +310,32 @@ function checkImport(specifier, fromDir, sourcePath) {
   }
 }
 
-function recordUnresolvedPackageImport(specifier, sourcePath) {
+/** @param {string} specifier */
+function recordUnresolvedPackageImport(specifier) {
   const packageRoot = getPackageRoot(specifier)
   if (!declaredDeps.has(packageRoot) && !packageRoot.startsWith('.')) {
     missingDependencies.add(packageRoot)
   }
 }
 
+/** @param {string} filePath
+ * @param {Set<string>} discoveredImports */
 function scanFile(filePath, discoveredImports) {
   const content = fs.readFileSync(filePath, 'utf8')
   const fromDir = path.dirname(filePath)
 
   if (filePath.endsWith('.css')) {
     for (const match of content.matchAll(STYLE_IMPORT_REGEXP)) {
-      const [, specifier] = match
+      const matchGroup = match
+      const specifier = matchGroup[1] || matchGroup[2] || matchGroup[3]
       if (specifier) checkImport(specifier, fromDir, filePath)
     }
   }
 
   if (TS_IMPORT_EXTENSIONS.has(path.extname(filePath))) {
     for (const match of content.matchAll(IMPORT_REGEXP)) {
-      const specifier = match[1] || match[2] || match[3]
+      const importMatch = match
+      const specifier = importMatch[1] || importMatch[2] || importMatch[3]
       if (!specifier) continue
 
       if (isExternalUrl(specifier)) continue
@@ -305,7 +356,7 @@ function scanFile(filePath, discoveredImports) {
 
       if (!tryResolveNodeModule(specifier)) {
         if (shouldIgnoreUnresolved(filePath, specifier)) continue
-        recordUnresolvedPackageImport(specifier, filePath)
+        recordUnresolvedPackageImport(specifier)
         pushIssue(`${filePath} -> ${specifier} (package or style import cannot be resolved)`)
       }
     }
@@ -339,7 +390,7 @@ if (unresolved.size > 0) {
     console.error(`  - ${issue}`)
   }
   if (missingDependencies.size > 0) {
-    const missingList = [...missingDependencies].sort().join(', ')
+    const missingList = [...missingDependencies].sort((a, b) => a.localeCompare(b)).join(', ')
     console.error('')
     console.error(
       `❗ Missing dependency declarations likely involved: ${missingList}`,

@@ -60,7 +60,7 @@ interface ValidationStats {
 }
 
 class EmotionValidationPipeline {
-  private logger = createBuildSafeLogger('EmotionValidationPipeline')
+  private readonly logger = createBuildSafeLogger('EmotionValidationPipeline')
   private isRunning = false
   private _isInitialized = false
   private biasDetectionEngine?: BiasDetectionEngine
@@ -68,7 +68,7 @@ class EmotionValidationPipeline {
   private recentValidations: EmotionValidationResult[] = []
   private monitoringCallbacks: Array<(data: unknown) => void> = []
 
-  private metrics: ValidationMetrics = {
+  private readonly metrics: ValidationMetrics = {
     processed: 0,
     validated: 0,
     errors: 0,
@@ -747,8 +747,8 @@ class EmotionValidationPipeline {
   ): TherapeuticSession {
     return {
       sessionId: emotionData.sessionId,
-      sessionDate: (emotionData.timestamp || new Date()).toISOString(),
-      participantDemographics: emotionData.participantDemographics || {
+      sessionDate: (emotionData.timestamp ?? new Date()).toISOString(),
+      participantDemographics: emotionData.participantDemographics ?? {
         age: '',
         gender: '',
         ethnicity: '',
@@ -769,7 +769,7 @@ class EmotionValidationPipeline {
       transcripts: [],
       userInputs: emotionData.responseText ? [emotionData.responseText] : [],
       metadata: {
-        sessionStartTime: emotionData.timestamp || new Date(),
+        sessionStartTime: emotionData.timestamp ?? new Date(),
         sessionEndTime: new Date(),
       },
     }

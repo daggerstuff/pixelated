@@ -12,8 +12,8 @@ describe('SessionCard', () => {
     expect(screen.getByText(/Started/)).toBeInTheDocument()
     expect(screen.getByText(mockSession.currentPhase)).toBeInTheDocument()
     expect(
-      screen.getByText(`${mockSession.targetSources.length}`),
-    ).toBeInTheDocument()
+      screen.getByText('Sources:').parentElement,
+    ).toHaveTextContent(/Sources:\s*2/)
   })
 
   it('displays progress percentage correctly', () => {
@@ -60,10 +60,12 @@ describe('SessionCard', () => {
     expect(screen.getByText(/8/)).toBeInTheDocument()
     expect(screen.getByText(/Evaluated:/)).toBeInTheDocument()
     expect(screen.getByText(/3/)).toBeInTheDocument()
-    expect(screen.getByText(/Acquired:/)).toBeInTheDocument()
-    expect(screen.getByText(/2/)).toBeInTheDocument()
-    expect(screen.getByText(/Integrated:/)).toBeInTheDocument()
-    expect(screen.getByText(/1/)).toBeInTheDocument()
+    expect(screen.getByText('Acquired:').parentElement).toHaveTextContent(
+      /Acquired:\s*2/,
+    )
+    expect(screen.getByText('Integrated:').parentElement).toHaveTextContent(
+      /Integrated:\s*1/,
+    )
   })
 
   it('handles missing progress metrics gracefully', () => {

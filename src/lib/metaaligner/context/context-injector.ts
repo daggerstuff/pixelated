@@ -23,7 +23,7 @@ export interface IContextInjector {
  * The ContextInjector class.
  */
 export class ContextInjector implements IContextInjector {
-  private cache = new Map<string, ContextType>()
+  private readonly cache = new Map<string, ContextType>()
 
   public async inject(
     request: UnifiedProcessingRequest,

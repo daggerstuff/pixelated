@@ -1,10 +1,11 @@
 ---
-description: 'Test coverage requirements and guidelines for Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Test coverage requirements and guidelines for Pixelated
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Coverage Requirements
 ---
 
 # Coverage Requirements
@@ -173,7 +174,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6.0.2
 
       - name: Install dependencies
         run: npm ci

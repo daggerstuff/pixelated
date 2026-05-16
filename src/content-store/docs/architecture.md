@@ -1,13 +1,7 @@
 ---
-description:
----
-  'Technical architecture overview of the Pixelated Empathy mental health
-  platform'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['architecture', 'technical', 'documentation']
-draft: false
-toc: true
+description: Technical architecture overview of the Pixelated Empathy mental health platform
+title: Pixelated Empathy Architecture
+pubDate: '2026-05-09'
 ---
 
 # Pixelated Empathy Architecture

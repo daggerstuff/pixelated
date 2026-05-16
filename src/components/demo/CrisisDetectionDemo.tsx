@@ -14,12 +14,12 @@ import {
 } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 
-import Alert from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Textarea } from '@/components/ui/textarea'
+import Alert from '@/components/ui/alert.tsx'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Textarea } from '@/components/ui/textarea.tsx'
 import { apiClient, APIError } from '@/lib/api-client'
 import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
@@ -426,7 +426,7 @@ export default function CrisisDetectionDemo() {
                 {realTimeMonitoring ? 'Disable' : 'Enable'} Real-time
               </Button>
               <Button
-                onClick={() => performCrisisAssessment(false)}
+                onClick={ async () => performCrisisAssessment(false)}
                 disabled={assessing || inputText.trim().length < 5}
                 className='bg-red-600 hover:bg-red-700 flex items-center gap-2'
               >
@@ -706,7 +706,7 @@ export default function CrisisDetectionDemo() {
 
                 <Button
                   variant='outline'
-                  onClick={() => performCrisisAssessment(false)}
+                  onClick={ async () => performCrisisAssessment(false)}
                   disabled={assessing}
                 >
                   Re-assess Risk

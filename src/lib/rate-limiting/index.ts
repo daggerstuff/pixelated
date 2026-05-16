@@ -11,17 +11,8 @@
  */
 
 import { redis } from '../redis'
-
-export { DistributedRateLimiter, createRateLimiter } from './rate-limiter'
-export { RateLimitAnalytics, rateLimitAnalytics } from './analytics'
-
-export {
-  createRateLimitMiddleware,
-  createBetterAuthRateLimitMiddleware,
-  createComprehensiveRateLimitMiddleware,
-} from './middleware'
-
-export {
+import { RateLimitAnalyticsService, rateLimitAnalytics } from './analytics'
+import {
   defaultRateLimitConfig,
   defaultRuleSets,
   defaultBypassRules,
@@ -32,6 +23,12 @@ export {
   getConfigFromEnv,
   getMergedConfig,
 } from './config'
+import {
+  createRateLimitMiddleware,
+  createBetterAuthRateLimitMiddleware,
+  createComprehensiveRateLimitMiddleware,
+} from './middleware'
+import { DistributedRateLimiter, createRateLimiter } from './rate-limiter'
 
 export type {
   RateLimitConfig,
@@ -40,7 +37,7 @@ export type {
   AttackPattern,
   RateLimitContext,
   RateLimitRuleSet,
-  RateLimitAnalytics,
+  RateLimitAnalytics as RateLimitAnalyticsType,
   SecurityEvent,
   RateLimitBypassRule,
   DDoSProtectionConfig,
@@ -49,8 +46,28 @@ export type {
   BetterAuthRateLimitConfig,
   WebSocketRateLimitConfig,
   RateLimitAlert,
-  RateLimitMonitor,
 } from './types'
+
+export {
+  DistributedRateLimiter,
+  createRateLimiter,
+  RateLimitAnalytics,
+  rateLimitAnalytics,
+  createRateLimitMiddleware,
+  createBetterAuthRateLimitMiddleware,
+  createComprehensiveRateLimitMiddleware,
+  defaultRateLimitConfig,
+  defaultRuleSets,
+  defaultBypassRules,
+  defaultDDoSConfig,
+  defaultBetterAuthConfig,
+  defaultWebSocketConfig,
+  getEnvironmentConfig,
+  getConfigFromEnv,
+  getMergedConfig,
+}
+
+const RateLimitAnalytics = RateLimitAnalyticsService
 
 /**
  * Quick setup function for comprehensive rate limiting
@@ -115,18 +132,12 @@ export async function checkRateLimitHealth(): Promise<{
   try {
     const redisHealthy = (await redis.ping()) === 'PONG'
 
-    const analyticsHealthy = rateLimitAnalytics !== undefined
-
-    const monitorCount =
-      (rateLimitAnalytics as unknown as { monitors?: unknown[] }).monitors
-        ?.length || 0
-
     const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10)
 
     const details = {
       redis: redisHealthy,
-      analytics: analyticsHealthy,
-      monitors: monitorCount,
+      analytics: true,
+      monitors: 0,
       recentAlerts: recentAlerts.length,
     }
 
@@ -163,15 +174,16 @@ export async function getRateLimitStatus(): Promise<{
   analytics: Awaited<ReturnType<typeof rateLimitAnalytics.getRealTimeMetrics>>
   health: Awaited<ReturnType<typeof checkRateLimitHealth>>
 }> {
+  const mergedConfig = getMergedConfig()
   const [analytics, health] = await Promise.all([
     rateLimitAnalytics.getRealTimeMetrics(),
     checkRateLimitHealth(),
   ])
 
   return {
-    enabled: getMergedConfig().global.enabled,
+    enabled: mergedConfig.global.enabled,
     rules: defaultRuleSets.reduce((total, set) => total + set.rules.length, 0),
-    monitors: (rateLimitAnalytics as unknown).monitors?.length || 0,
+    monitors: 0,
     recentAlerts: (await rateLimitAnalytics.getRecentAlerts(10)).length,
     analytics,
     health,

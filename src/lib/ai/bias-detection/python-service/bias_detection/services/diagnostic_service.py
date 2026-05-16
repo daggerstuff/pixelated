@@ -22,8 +22,9 @@ class DiagnosticService:
     def __init__(self, warning_threshold: float = 0.3):
         self.warning_threshold = warning_threshold
 
-    async def run_interactive_analysis(self, session_data: dict[str, Any]) -> dict[str, Any]:
-
+    async def run_interactive_analysis(
+        self, session_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze patterns in user interaction and AI response timing/consistency."""
         try:
             result = {
@@ -47,18 +48,22 @@ class DiagnosticService:
             result["bias_score"] = min(result["bias_score"], 1.0)
 
             if result["bias_score"] > self.warning_threshold:
-                result["recommendations"].extend([
-                    "Review interaction patterns for demographic disparities",
-                    "Implement adaptive response strategies",
-                    "Monitor engagement metrics across user groups"
-                ])
+                result["recommendations"].extend(
+                    [
+                        "Review interaction patterns for demographic disparities",
+                        "Implement adaptive response strategies",
+                        "Monitor engagement metrics across user groups",
+                    ]
+                )
 
             return result
         except Exception as e:
             logger.error(f"Interactive analysis failed: {e!s}")
             return {"layer": "interactive", "bias_score": 0.0, "error": str(e)}
 
-    async def run_evaluation_analysis(self, _session_data: dict[str, Any]) -> dict[str, Any]:
+    async def run_evaluation_analysis(
+        self, _session_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze outcome fairness using Hugging Face evaluate and performance disparity metrics."""
         try:
             result = {
@@ -87,18 +92,22 @@ class DiagnosticService:
             result["bias_score"] = min(result["bias_score"], 1.0)
 
             if result["bias_score"] > self.warning_threshold:
-                result["recommendations"].extend([
-                    "Implement post-processing fairness corrections",
-                    "Regular evaluation across demographic groups",
-                    "Establish fairness monitoring dashboards"
-                ])
+                result["recommendations"].extend(
+                    [
+                        "Implement post-processing fairness corrections",
+                        "Regular evaluation across demographic groups",
+                        "Establish fairness monitoring dashboards",
+                    ]
+                )
 
             return result
         except Exception as e:
             logger.error(f"Evaluation analysis failed: {e!s}")
             return {"layer": "evaluation", "bias_score": 0.0, "error": str(e)}
 
-    def _analyze_response_consistency(self, session_data: dict[str, Any]) -> dict[str, Any]:
+    def _analyze_response_consistency(
+        self, session_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze consistency of AI responses in the given session."""
         responses = session_data.get("ai_responses") or []
         if not responses:
@@ -118,10 +127,12 @@ class DiagnosticService:
             "bias_score": bias_score,
             "length_variance": float(length_var),
             "time_variance": float(time_var),
-            "total_responses": len(responses)
+            "total_responses": len(responses),
         }
 
-    async def run_interpretability_analysis(self, _session_data: dict[str, Any]) -> dict[str, Any]:
+    async def run_interpretability_analysis(
+        self, _session_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Perform SHAP or LIME interpretability analysis."""
         try:
             # Placeholder for complex ML interpretability logic
@@ -130,4 +141,3 @@ class DiagnosticService:
         except Exception as e:
             logger.error(f"Interpretability analysis failed: {e!s}")
             return {"bias_score": 0.0, "error": str(e)}
-

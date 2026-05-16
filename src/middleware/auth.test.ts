@@ -1,7 +1,24 @@
+/// <reference types="vitest/node" />
+/** @vitest-environment node */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { withAuth } from './auth'
-import type { Session, ApiKeySession, ValidSession } from './auth'
+
+const mockValidateApiKey = vi.hoisted(() => vi.fn())
+const mockGetSession = vi.hoisted(() => vi.fn())
+const mockIsSessionValid = vi.hoisted(() => vi.fn())
+
+vi.mock('../lib/db/developer-api-keys', () => ({
+  developerApiKeyManager: {
+    validateApiKey: mockValidateApiKey,
+  },
+}))
+
+vi.mock('../lib/auth/session', () => ({
+  getSession: mockGetSession,
+  isSessionValid: mockIsSessionValid,
+}))
 
 describe('withAuth middleware', () => {
   const mockRequest = new Request('https://example.com/api/test')
@@ -10,7 +27,12 @@ describe('withAuth middleware', () => {
     .mockResolvedValue(new Response(JSON.stringify({ success: true })))
 
   beforeEach(() => {
-    vi.clearAllMocks()
+    mockHandler.mockClear()
+    mockValidateApiKey
+      .mockReset()
+      .mockResolvedValue({ valid: false, error: 'Invalid API key' })
+    mockGetSession.mockReset().mockResolvedValue(null)
+    mockIsSessionValid.mockReset().mockReturnValue(false)
   })
 
   it('should allow unauthenticated access to whitelisted paths', async () => {
@@ -31,22 +53,14 @@ describe('withAuth middleware', () => {
   })
 
   it('should validate API key when allowApiKey is true', async () => {
-    // Mock the validateApiKey function
-    vi.mock('@/lib/auth', () => ({
-      ...vi.importActual<'@/lib/auth'>('@/lib/auth'),
-      validateApiKey: vi.fn().mockResolvedValue({
-        user: { id: 'dev_001', role: 'developer' },
-        expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-        authType: 'api-key',
-      } as ApiKeySession),
-    }))
-
-    const { validateApiKey } = await import('@/lib/auth')
-    validateApiKey.mockResolvedValue({
-      user: { id: 'dev_001', role: 'developer' },
-      expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-      authType: 'api-key',
-    } as ApiKeySession)
+    mockValidateApiKey.mockResolvedValue({
+      valid: true,
+      api_key: {
+        user_id: 'dev_001',
+        scopes: ['developer'],
+        rate_limit: 1000,
+      },
+    })
 
     const middleware = withAuth(mockHandler, { allowApiKey: true })
     const request = new Request('https://example.com/api/test', {

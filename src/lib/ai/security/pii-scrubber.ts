@@ -46,10 +46,23 @@ const PLACEHOLDERS: Record<PIICategory, string> = {
   financial: '[FINANCIAL]',
 }
 
+const PII_CATEGORIES: PIICategory[] = [
+  'names',
+  'emails',
+  'phones',
+  'ssn',
+  'addresses',
+  'dates',
+  'financial',
+]
+
 /**
  * Redacts PII from text based on configured categories
  */
-export function scrubPII(text: string, options: ScrubberOptions = {}): string {
+export function scrubPII(
+  text: string | null,
+  options: ScrubberOptions = {},
+): string | null {
   if (!text) return text
 
   const {
@@ -72,8 +85,6 @@ export function scrubPII(text: string, options: ScrubberOptions = {}): string {
   // Apply category-based scrubbing
   for (const category of enabledCategories) {
     const pattern = PII_PATTERNS[category]
-    if (!pattern) continue
-
     if (maskType === 'placeholder') {
       scrubbedText = scrubbedText.replace(pattern, PLACEHOLDERS[category])
     } else if (maskType === 'redacted') {
@@ -104,11 +115,12 @@ export function scanForPII(text: string): {
     count: 0,
   }
 
-  for (const [category, pattern] of Object.entries(PII_PATTERNS)) {
+  for (const category of PII_CATEGORIES) {
+    const pattern = PII_PATTERNS[category]
     const matches = text.match(pattern)
     if (matches && matches.length > 0) {
       result.found = true
-      result.categories.push(category as PIICategory)
+      result.categories.push(category)
       result.count += matches.length
     }
   }

@@ -78,6 +78,7 @@ export interface ChatMessage {
   content: string
   timestamp: number
   metadata?: Record<string, unknown>
+  analysis?: MentalHealthAnalysis
 }
 
 // Therapeutic response
@@ -99,6 +100,9 @@ export interface AnalysisConfig {
   sensitivity: 'low' | 'medium' | 'high'
   maxContextLength: number
   enableAnalysis?: boolean
+  confidenceThreshold?: number
+  interventionThreshold?: number
+  analysisMinLength?: number
 }
 
 // Enhanced mental health analysis

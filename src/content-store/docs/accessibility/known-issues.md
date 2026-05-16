@@ -1,13 +1,7 @@
 ---
-description:
----
-  'Documentation of known accessibility issues and their resolution status'
-pubDate: '2025-01-01'
-author: 'Accessibility Team'
-draft: false
-toc: true
-share: true
-date: '2025-04-12'
+description: Documentation of known accessibility issues and their resolution status
+title: Known Accessibility Issues
+pubDate: '2026-05-09'
 ---
 
 # Known Accessibility Issues

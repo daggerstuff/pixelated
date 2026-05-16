@@ -1,12 +1,9 @@
 ---
-description:
----
-  'Comprehensive optimizations for the thread analytics system including
-  materialized views, caching strategies, and performance improvements'
-pubDate: 2024-12-01
-author: 'System Documentation'
-toc: true
-draft: false
+description: >-
+  Comprehensive optimizations for the thread analytics system including materialized views, caching strategies, and
+  performance improvements
+title: Thread Analytics Optimizations
+pubDate: '2026-05-09'
 ---
 
 # Thread Analytics Optimizations

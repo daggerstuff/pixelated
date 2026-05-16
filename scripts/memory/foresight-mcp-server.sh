@@ -37,6 +37,13 @@ find_uv() {
 
 load_env
 
+# This wrapper is the repo-local stdio entrypoint used by agent tooling. Those
+# clients do not have a safe channel to attach a per-call API key, so keep local
+# stdio usable by default while preserving an explicit auth opt-in.
+if [[ -z "${FORESIGHT_REQUIRE_API_KEY:-}" && -z "${FORESIGHT_ALLOW_UNAUTHENTICATED:-}" ]]; then
+  export FORESIGHT_ALLOW_UNAUTHENTICATED=1
+fi
+
 UV_BIN="$(find_uv || true)"
 if [[ -z "${UV_BIN}" ]]; then
   echo "uv not found in PATH or standard install locations." >&2
@@ -47,4 +54,3 @@ export UV_CACHE_DIR="/home/vivi/.gemini/tmp/uv-cache"
 
 cd "${FORESIGHT_ROOT}"
 exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --active -m foresight_mcp "$@"
-

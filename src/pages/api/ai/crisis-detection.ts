@@ -50,7 +50,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     session = await getSession()
 
     // Check if user is authenticated
-    if (!session || !session.user) {
+    if (!session?.user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -134,7 +134,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
           try {
             await crisisProtocolInstance.handleCrisis(
               session.user.id,
-              session.session?.sessionId?.substring(0, 8) ||
+              session.session?.sessionId?.substring(0, 8) ??
                 `batch-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
               detection.content, // Text sample from CrisisDetectionResult
               detection.confidence, // Detection score from CrisisDetectionResult
@@ -166,7 +166,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         try {
           await CrisisProtocol.getInstance().handleCrisis(
             session.user.id,
-            session.session?.sessionId?.substring(0, 8) ||
+            session.session?.sessionId?.substring(0, 8) ??
               `single-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
             singleResult.content, // Text sample from CrisisDetectionResult
             singleResult.confidence, // Detection score from CrisisDetectionResult
@@ -259,7 +259,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.crisis.error',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       aiResource.id, // resource is a string
       {
         // details instead of metadata

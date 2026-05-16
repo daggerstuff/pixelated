@@ -29,8 +29,8 @@ export interface DiscoveryRequest {
 }
 
 export class PatternDiscoveryService {
-  private config: PatternDiscoveryConfig
-  private queryEngine: ResearchQueryEngine
+  private readonly config: PatternDiscoveryConfig
+  private readonly queryEngine: ResearchQueryEngine
 
   constructor(
     config: PatternDiscoveryConfig = {

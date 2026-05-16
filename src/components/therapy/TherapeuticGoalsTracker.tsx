@@ -1,16 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
-import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card } from '@/components/ui/card/index.ts'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx'
+import { Input } from '@/components/ui/input/index.ts'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Textarea } from '@/components/ui/textarea/index.ts'
 import type { TherapySession } from '@/lib/ai/interfaces/therapy'
 import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
 import { GoalStatus, GoalCategory } from '@/lib/ai/types/TherapeuticGoals'
@@ -226,7 +221,7 @@ export function TherapeuticGoalsTracker({
 
   // Open modal for new or edit
   function openModal(goal?: TherapeuticGoal) {
-    setEditGoal(goal || null)
+    setEditGoal(goal ?? null)
     setForm(
       goal
         ? { ...goal }
@@ -276,10 +271,12 @@ export function TherapeuticGoalsTracker({
   return (
     <div className='therapeutic-goals-tracker bg-white rounded-lg p-4 shadow'>
       <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-lg font-semibold'>Therapeutic Goals</h3>
+          <h3 className='text-lg font-semibold'>Therapeutic Goals Tracker</h3>
         <div className='text-gray-600 text-sm'>
           Session #
-          {patientModel.therapeuticProgress.sessionProgressLog.length + 1}
+          {patientModel?.therapeuticProgress?.sessionProgressLog?.length
+              ? patientModel.therapeuticProgress.sessionProgressLog.length + 1
+              : 1}
         </div>
       </div>
 
@@ -371,8 +368,8 @@ export function TherapeuticGoalsTracker({
       </div>
 
       {/* Error and loading states */}
-      {(error || actionError) && (
-        <div className='text-red-600 mb-2'>{error || actionError}</div>
+      {(error ?? actionError) && (
+        <div className='text-red-600 mb-2'>{error ?? actionError}</div>
       )}
       {(loading || actionLoading) && (
         <div className='text-gray-500 mb-2'>Loading...</div>
@@ -395,7 +392,7 @@ export function TherapeuticGoalsTracker({
             <form onSubmit={handleFormSubmit} className='space-y-4'>
               <Input
                 name='title'
-                value={form.title || ''}
+                value={form.title ?? ''}
                 onChange={handleFormChange}
                 placeholder='Goal Title'
                 required
@@ -404,7 +401,7 @@ export function TherapeuticGoalsTracker({
 
               <Textarea
                 name='description'
-                value={form.description || ''}
+                value={form.description ?? ''}
                 onChange={handleFormChange}
                 placeholder='Description'
                 maxLength={1024}
@@ -412,7 +409,7 @@ export function TherapeuticGoalsTracker({
 
               <select
                 name='category'
-                value={form.category || GoalCategory.EMOTIONAL_REGULATION}
+                value={form.category ?? GoalCategory.EMOTIONAL_REGULATION}
                 onChange={handleFormChange}
                 className='w-full rounded border p-2'
               >
@@ -445,7 +442,7 @@ export function TherapeuticGoalsTracker({
               </select>
               <select
                 name='status'
-                value={form.status || GoalStatus.NOT_STARTED}
+                value={form.status ?? GoalStatus.NOT_STARTED}
                 onChange={handleFormChange}
                 className='w-full rounded border p-2'
               >
@@ -682,14 +679,20 @@ export function TherapeuticGoalsTracker({
 
 // Helper function to generate goals from patient model
 function generateGoalsFromPatientModel(
-  patientModel: CognitiveModel,
+  patientModel: Partial<CognitiveModel> | undefined,
 ): TherapeuticGoal[] {
   const goals: TherapeuticGoal[] = []
   const now = Date.now()
   const sixMonthsFromNow = now + 15768000000 // 6 months in milliseconds
 
+  const presentingIssues = patientModel?.presentingIssues ?? []
+  const goalsForTherapy = patientModel?.goalsForTherapy ?? []
+  const distortionPatterns = patientModel?.distortionPatterns ?? []
+  const sessionProgressLog =
+    patientModel?.therapeuticProgress?.sessionProgressLog ?? []
+
   // Generate goals based on presenting issues
-  patientModel.presentingIssues.forEach((issue, index) => {
+  presentingIssues.forEach((issue, index) => {
     if (index < 3) {
       // Limit to 3 goals from presenting issues
       goals.push({
@@ -705,7 +708,7 @@ function generateGoalsFromPatientModel(
         checkpoints: generateCheckpoints(issue, 4, now),
         progressHistory: generateProgressHistory(now, 3),
         relatedInterventions: generateInterventionTypes(issue),
-        relevantDistortions: patientModel.distortionPatterns
+        relevantDistortions: distortionPatterns
           .slice(0, 2)
           .map((d) => d.type),
         notes:
@@ -717,7 +720,7 @@ function generateGoalsFromPatientModel(
   })
 
   // Generate goals based on therapy goals
-  patientModel.goalsForTherapy.forEach((goal, index) => {
+  goalsForTherapy.forEach((goal, index) => {
     if (index < 2) {
       // Limit to 2 goals from therapy goals
       goals.push({
@@ -742,7 +745,7 @@ function generateGoalsFromPatientModel(
   })
 
   // Add a completed goal if there are enough sessions
-  if (patientModel.therapeuticProgress.sessionProgressLog.length > 5) {
+  if (sessionProgressLog.length > 5) {
     goals.push({
       id: `goal-completed-1`,
       title: 'Develop Emotion Recognition Skills',

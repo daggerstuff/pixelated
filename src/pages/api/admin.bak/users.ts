@@ -16,7 +16,7 @@ import type { APIContext } from 'astro'
  */
 export const GET = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
-  const next = () =>
+  const next =  async () =>
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )
@@ -34,9 +34,9 @@ export const GET = async (context: APIContext) => {
 
     // Parse query parameters for pagination and filtering
     const url = new URL(context.request.url)
-    const limit = Number.parseInt(url.searchParams.get('limit') || '10', 10)
-    const offset = Number.parseInt(url.searchParams.get('offset') || '0', 10)
-    const role = url.searchParams.get('role') || undefined
+    const limit = Number.parseInt(url.searchParams.get('limit') ?? '10', 10)
+    const offset = Number.parseInt(url.searchParams.get('offset') ?? '0', 10)
+    const role = url.searchParams.get('role') ?? undefined
 
     // Get admin service
     const adminService = AdminService.getInstance()
@@ -86,7 +86,7 @@ export const GET = async (context: APIContext) => {
  */
 export const PATCH = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
-  const next = () =>
+  const next =  async () =>
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )

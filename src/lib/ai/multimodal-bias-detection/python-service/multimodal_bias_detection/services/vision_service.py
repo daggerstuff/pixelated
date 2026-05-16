@@ -9,7 +9,7 @@ from typing import Any, Union
 
 import numpy as np
 import structlog
-import torch
+from ..utils.torch_proxy import torch
 from PIL import Image
 from transformers import CLIPModel, CLIPProcessor, pipeline
 

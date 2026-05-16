@@ -208,7 +208,7 @@ const jobsWorker = {
             'jobs.report_generation.duration',
             reportDurationMs,
             {
-              attributes: { format: safeOptions?.format || 'json' },
+              attributes: { format: safeOptions?.format ?? 'json' },
               unit: 'millisecond',
             },
           )
@@ -250,8 +250,8 @@ const jobsWorker = {
 }
 
 // Graceful shutdown
-process.on('SIGTERM', () => jobsWorker.stop())
-process.on('SIGINT', () => jobsWorker.stop())
+process.on('SIGTERM',  async () => jobsWorker.stop())
+process.on('SIGINT',  async () => jobsWorker.stop())
 
 // Start worker
 jobsWorker.start().catch((error) => {

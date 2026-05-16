@@ -12,6 +12,7 @@ import {
 } from '../parameter-optimizer'
 import { SealSchemeType } from '../seal-types'
 import { FHEOperation } from '../types'
+import { fileURLToPath } from 'node:url'
 
 const logger = createBuildSafeLogger('fhe-parameter-optimization-example')
 
@@ -201,7 +202,7 @@ function simulateAdaptiveOptimization() {
 /**
  * Run the demonstration if this module is executed directly
  */
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   demonstrateParameterOptimization()
     .then(() => {
       console.log('Demonstration completed successfully')

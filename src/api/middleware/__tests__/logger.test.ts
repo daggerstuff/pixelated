@@ -14,7 +14,7 @@ interface AuditData {
   action: string
   resource?: string
   resourceId?: string
-  changes?: any
+  changes?: unknown
   timestamp?: number
 }
 
@@ -46,7 +46,7 @@ export async function logAuditEvent(data: AuditData): Promise<void> {
   }
 }
 
-export function getActionType(method: string, path: string): string {
+export function getActionType(method: string): string {
   const methodMap: Record<string, string> = {
     POST: 'CREATE',
     PUT: 'UPDATE',
@@ -57,6 +57,20 @@ export function getActionType(method: string, path: string): string {
 
   return methodMap[method.toUpperCase()] || 'UNKNOWN'
 }
+
+interface MockRequest {
+  method: string
+  url: string
+  ip: string
+  headers?: Record<string, string>
+}
+
+interface MockResponse {
+  statusCode: number
+  on: (event: string, listener: () => void) => void
+}
+
+type MockNext = () => void
 
 export function getResourceType(path: string): string {
   const parts = path.split('/').filter(Boolean)
@@ -83,9 +97,13 @@ export function getResourceId(path: string): string | undefined {
   return parts[parts.length - 1]
 }
 
-export async function requestLogger(req: any, res: any, next: any) {
+export async function requestLogger(
+  req: MockRequest,
+  res: MockResponse,
+  next: MockNext,
+) {
   const startTime = Date.now()
-  const { method, url, ip, headers } = req
+  const { method, url, ip } = req
 
   console.log(`[${new Date().toISOString()}] ${method} ${url} - ${ip}`)
 
@@ -96,13 +114,13 @@ export async function requestLogger(req: any, res: any, next: any) {
     )
   })
 
-  next?.()
+  next()
 }
 
 describe('Logger Middleware', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: MockRequest
+  let mockResponse: MockResponse
+  let mockNext: MockNext
 
   beforeEach(() => {
     mockRequest = {
@@ -149,11 +167,12 @@ describe('Logger Middleware', () => {
       await expect(
         requestLogger(mockRequest, mockResponse, mockNext),
       ).resolves.not.toThrow()
+      expect(consoleErrorSpy).not.toHaveBeenCalled()
     })
 
     it('should capture request duration', async () => {
-      let finishCallback: any
-      mockResponse.on = vi.fn((_, cb) => {
+      let finishCallback: () => void = () => {}
+      mockResponse.on = vi.fn((_: string, cb: () => void) => {
         finishCallback = cb
       })
 
@@ -229,20 +248,20 @@ describe('Logger Middleware', () => {
 
   describe('getActionType', () => {
     it('should map HTTP methods to action types', () => {
-      expect(getActionType('POST', '/api/users')).toBe('CREATE')
-      expect(getActionType('PUT', '/api/users/123')).toBe('UPDATE')
-      expect(getActionType('DELETE', '/api/users/123')).toBe('DELETE')
-      expect(getActionType('GET', '/api/users')).toBe('READ')
+      expect(getActionType('POST')).toBe('CREATE')
+      expect(getActionType('PUT')).toBe('UPDATE')
+      expect(getActionType('DELETE')).toBe('DELETE')
+      expect(getActionType('GET')).toBe('READ')
     })
 
     it('should handle lowercase methods', () => {
-      expect(getActionType('post', '/api/users')).toBe('CREATE')
-      expect(getActionType('get', '/api/users')).toBe('READ')
+      expect(getActionType('post')).toBe('CREATE')
+      expect(getActionType('get')).toBe('READ')
     })
 
     it('should default to UNKNOWN for unrecognized patterns', () => {
-      expect(getActionType('PATCH', '/api/custom')).toBe('UPDATE')
-      expect(getActionType('CUSTOM', '/api/test')).toBe('UNKNOWN')
+      expect(getActionType('PATCH')).toBe('UPDATE')
+      expect(getActionType('CUSTOM')).toBe('UNKNOWN')
     })
   })
 

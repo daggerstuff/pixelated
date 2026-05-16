@@ -2,40 +2,114 @@
 # Nvidia NIM BYOK setup for GitHub Copilot CLI
 # Usage: source .github/copilot/nim-byok.sh
 
+# If this shell has stale legacy helper functions from an older version, drop them
+# so the fixed zsh-compatible implementations below always win in long-lived sessions.
+if typeset -f sanitize_model_sequence >/dev/null 2>&1; then
+  unset -f sanitize_model_sequence sanitize_model is_forbidden_model 2>/dev/null || true
+fi
+
+# Reuse an existing GitHub CLI login when no token is exported yet.
+# This keeps Copilot auth working across new terminals without hardcoding a PAT.
+if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
+  if gh_token="$(gh auth token 2>/dev/null)"; then
+    export GH_TOKEN="${gh_token}"
+    export GITHUB_TOKEN="${GITHUB_TOKEN:-$GH_TOKEN}"
+  fi
+fi
+
 # NIM endpoint (OpenAI-compatible)
 export COPILOT_PROVIDER_BASE_URL="https://integrate.api.nvidia.com/v1"
 export COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"
 export COPILOT_PROVIDER_TYPE="openai"
 
+# Keep qwen/GPT-4o mini drift from being reused as default for this project.
+_nim_byok_is_forbidden_model() {
+  local candidate="$1"
+  [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
+}
+
+_nim_byok_sanitize_model() {
+  local candidate="$1"
+  candidate="$(printf '%s' "$candidate" | xargs)"
+  if _nim_byok_is_forbidden_model "$candidate"; then
+    echo "$NIM_DEFAULT_MODEL"
+    return
+  fi
+  echo "$candidate"
+}
+
+_nim_byok_sanitize_model_sequence() {
+  local raw_sequence="$1"
+  local token normalized
+  local normalized_sequence
+  local output=""
+
+  if [[ -z "$raw_sequence" ]]; then
+    echo "$NIM_DEFAULT_MODEL"
+    return
+  fi
+
+  normalized_sequence="${raw_sequence//,/ }"
+  for token in $normalized_sequence; do
+    normalized="$(_nim_byok_sanitize_model "$token")"
+    [[ -z "$normalized" ]] && continue
+    if [[ " $output " != *" $normalized "* ]]; then
+      output="${output:+$output }$normalized"
+    fi
+  done
+
+  if [[ -z "${output// }" ]]; then
+    echo "$NIM_DEFAULT_MODEL"
+    return
+  fi
+
+  echo "$output"
+}
+
+# Backwards-compatible aliases for any scripts/commands still invoking old helper names.
+sanitize_model() {
+  _nim_byok_sanitize_model "$@"
+}
+
+sanitize_model_sequence() {
+  _nim_byok_sanitize_model_sequence "$@"
+}
+
+is_forbidden_model() {
+  _nim_byok_is_forbidden_model "$@"
+}
+
 # Wire model — exact ID sent to Nvidia NIM. Environment can override these
 # values if you need to temporarily switch providers/models.
-export COPILOT_MODEL="${COPILOT_MODEL:-nvidia/llama-3.1-nemotron-ultra-253b-v1}"
+export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-openai/gpt-oss-120b}"
+export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-2.7}")"
+export COPILOT_MODEL="$(_nim_byok_sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
 
-# Model ID for internal config (token limits, tool support, prompting)
-# Must match a well-known model so Copilot CLI knows capabilities.
-# Default to the same known baseline model when an explicit model ID is not set.
-export COPILOT_PROVIDER_MODEL_ID="${COPILOT_PROVIDER_MODEL_ID:-gpt-5.4}"
+# Provider model ID used by Copilot's BYOK wiring.
+# Default to the NIM baseline model so provider/model ids stay on the NIM side.
+export COPILOT_PROVIDER_MODEL_ID="$(_nim_byok_sanitize_model "${COPILOT_PROVIDER_MODEL_ID:-${NIM_DEFAULT_MODEL}}")"
 
 # Optional fallback sequence for rate-limit recovery (space/comma separated).
-export COPILOT_MODEL_SEQUENCE="${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL} auto}"
-export COPILOT_PROVIDER_MODEL_SEQUENCE="${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID} auto}"
+export COPILOT_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
+export COPILOT_PROVIDER_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
 
-# Token limits for the NIM model (Nemotron Ultra supports 128K context)
+# Token limits for the NIM model.
 export COPILOT_PROVIDER_MAX_PROMPT_TOKENS="120000"
 export COPILOT_PROVIDER_MAX_OUTPUT_TOKENS="8192"
 
 echo "Nvidia NIM BYOK configured:"
 echo "  Base URL: ${COPILOT_PROVIDER_BASE_URL}"
 echo "  Model:    ${COPILOT_MODEL}"
-echo "  Model ID: ${COPILOT_PROVIDER_MODEL_ID}"
+echo "  Provider Model ID: ${COPILOT_PROVIDER_MODEL_ID}"
 echo "  Fallback Models: ${COPILOT_MODEL_SEQUENCE}"
 echo "  Fallback Provider IDs: ${COPILOT_PROVIDER_MODEL_SEQUENCE}"
 echo "  Tokens:   ${COPILOT_PROVIDER_MAX_PROMPT_TOKENS} prompt / ${COPILOT_PROVIDER_MAX_OUTPUT_TOKENS} output"
 echo ""
 echo "Switch model: export COPILOT_MODEL=<model-id>"
-echo "  Qwen 3.5 122B:   qwen/qwen3.5-122b-a10b"
-echo "  Qwen 3.5 397B:   qwen/qwen3.5-397b-a17b"
-echo "  GLM-5:           z-ai/glm5"
+echo "  GPT OSS:         openai/gpt-oss-120b"
+echo "  Nemotron Super:  nvidia/llama-3.3-nemotron-super-49b-v1.5"
+echo "  NIM default:     ${NIM_DEFAULT_MODEL}"
+echo "  GLM-5.1:         z-ai/glm-5.1"
 echo "  DeepSeek V3.2:   deepseek-ai/deepseek-v3.2"
-echo "  Kimi K2.5:       moonshotai/kimi-k2.5"
-echo "  Mistral Large 3: mistralai/mistral-large-3-675b-instruct-2512"
+echo "  Kimi K2.6:       moonshotai/kimi-k2.6"
+echo "  MiniMax 2.7:     minimaxai/minimax-2.7"

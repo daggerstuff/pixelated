@@ -21,9 +21,9 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('pixel-multimodal-ws')
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL || 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY || ''
-const WS_PORT = Number(process.env.WS_PIXEL_PORT || 8091)
+const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
+const WS_PORT = Number(process.env.WS_PIXEL_PORT ?? 8091)
 const REQUEST_TIMEOUT_MS = 45000
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024 // 25MB safety cap
 
@@ -110,10 +110,10 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'complete': {
-            const text = (message.text as string) || state.text || ''
+            const text = (message.text as string) || state.text ?? ''
             const contextType =
               (message.contextType as string) ||
-              state.contextType ||
+              state.contextType ??
               'therapeutic'
             const sessionId = (message.sessionId as string) || state.sessionId
             await handleComplete(ws, state, { text, contextType, sessionId })
@@ -215,7 +215,7 @@ async function handleComplete(
         type: 'result',
         data: {
           ...pixelResponse,
-          latency_ms: pixelResponse['latency_ms'] || latencyMs,
+          latency_ms: pixelResponse['latency_ms'] ?? latencyMs,
         },
       }),
     )
