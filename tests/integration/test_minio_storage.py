@@ -19,6 +19,7 @@ import contextlib
 import os
 import tempfile
 import uuid
+from urllib.parse import urlparse
 from datetime import timedelta
 from io import BytesIO
 from typing import Generator
@@ -27,9 +28,26 @@ import pytest
 from minio import Minio
 from minio.error import S3Error
 
-
 # Test configuration
-MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "localhost:9000")
+def _normalize_minio_endpoint(endpoint: str) -> str:
+    candidate = endpoint.strip()
+    if not candidate:
+        return "localhost:9000"
+
+    # Remove malformed or duplicated URL schemes and path components so
+    # endpoint remains a host[:port] string.
+    while "://" in candidate:
+        candidate = candidate.split("://", 1)[1].strip("/")
+
+    parsed = urlparse(f"scheme://{candidate}")
+    if not parsed.hostname:
+        return candidate.split("/", 1)[0]
+    if parsed.port:
+        return f"{parsed.hostname}:{parsed.port}"
+    return parsed.hostname
+
+
+MINIO_ENDPOINT = _normalize_minio_endpoint(os.getenv("MINIO_ENDPOINT", "localhost:9000"))
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
 MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "minioadmin")
 MINIO_SECURE = os.getenv("MINIO_SECURE", "false").lower() == "true"

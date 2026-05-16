@@ -33,7 +33,7 @@
   // Ensure fonts are loaded
   function checkFontLoading() {
     // Add a class to indicate fonts are loaded
-    if (document.fonts && document.fonts.ready) {
+    if (document.fonts?.ready) {
       void document.fonts.ready.then(() => {
         document.documentElement.classList.add('fonts-loaded')
       })

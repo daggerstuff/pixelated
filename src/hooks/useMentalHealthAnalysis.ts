@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 
 // Interface for mental health analysis result
 export interface MentalHealthAnalysisResult {
-  scores: Record<string, unknown>
+  scores: Record<string, number>
   confidence: number
   category: 'low' | 'medium' | 'high' | 'critical'
   hasMentalHealthIssue: boolean

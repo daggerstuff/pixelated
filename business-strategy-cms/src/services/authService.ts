@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import type { JwtPayload as JwtClaims } from 'jsonwebtoken'
 
 import { redisClient } from '@/config/database'
 import { UserModel } from '@/models/User'
@@ -12,25 +13,86 @@ import {
   UserRole,
 } from '@/types/user'
 
-const JWT_SECRET = process.env['JWT_SECRET'] || 'your-super-secret-jwt-key'
+const JWT_SECRET = process.env['JWT_SECRET'] ?? 'your-super-secret-jwt-key'
 const JWT_REFRESH_SECRET =
-  process.env['JWT_REFRESH_SECRET'] || 'your-super-secret-refresh-key'
-const JWT_EXPIRES_IN = process.env['JWT_EXPIRES_IN'] || '15m'
-const JWT_REFRESH_EXPIRES_IN = process.env['JWT_REFRESH_EXPIRES_IN'] || '7d'
+  process.env['JWT_REFRESH_SECRET'] ?? 'your-super-secret-refresh-key'
+
+const USER_ROLES = new Set<string>(Object.values(UserRole))
+
+const isUserRole = (value: unknown): value is UserRole =>
+  typeof value === 'string' && USER_ROLES.has(value)
+
+const parseDurationToSeconds = (value: string, fallback: number): number => {
+  const match = /^(\d+)(ms|s|m|h|d|w)?$/.exec(value.trim())
+  if (!match) {
+    return fallback
+  }
+
+  const amountText = match[1]
+  if (!amountText) {
+    return fallback
+  }
+
+  const amount = Number.parseInt(amountText, 10)
+  const unit = match[2] ?? 's'
+
+  switch (unit) {
+    case 'ms':
+      return Math.max(1, Math.floor(amount / 1000))
+    case 's':
+      return amount
+    case 'm':
+      return amount * 60
+    case 'h':
+      return amount * 60 * 60
+    case 'd':
+      return amount * 24 * 60 * 60
+    case 'w':
+      return amount * 7 * 24 * 60 * 60
+    default:
+      return fallback
+  }
+}
+
+const isJwtPayload = (value: string | JwtClaims): value is JwtPayload =>
+  typeof value !== 'string' &&
+  typeof value['userId'] === 'string' &&
+  typeof value['email'] === 'string' &&
+  isUserRole(value['role'])
+
+const verifyJwtPayload = (token: string, secret: string): JwtPayload => {
+  const decoded = jwt.verify(token, secret)
+  if (!isJwtPayload(decoded)) {
+    throw new Error('Invalid JWT payload')
+  }
+
+  return decoded
+}
+
+const JWT_EXPIRES_IN = process.env['JWT_EXPIRES_IN'] ?? '15m'
+const JWT_REFRESH_EXPIRES_IN = process.env['JWT_REFRESH_EXPIRES_IN'] ?? '7d'
+
+const JWT_EXPIRES_IN_SECONDS = parseDurationToSeconds(JWT_EXPIRES_IN, 15 * 60)
+const JWT_REFRESH_EXPIRES_IN_SECONDS = parseDurationToSeconds(
+  JWT_REFRESH_EXPIRES_IN,
+  7 * 24 * 60 * 60,
+)
+
+const BCRYPT_ROUNDS = Number.parseInt(process.env['BCRYPT_ROUNDS'] ?? '12', 10)
 
 export class AuthService {
   public static generateTokens(payload: JwtPayload): AuthTokens {
     const accessToken = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN as any, // expiresIn requires a specific StringValue | number type
+      expiresIn: JWT_EXPIRES_IN_SECONDS,
     })
     const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET, {
-      expiresIn: JWT_REFRESH_EXPIRES_IN as any, // expiresIn requires a specific StringValue | number type
+      expiresIn: JWT_REFRESH_EXPIRES_IN_SECONDS,
     })
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: 15 * 60 * 1000, // 15 minutes in milliseconds
+      expiresIn: JWT_EXPIRES_IN_SECONDS * 1000,
     }
   }
 
@@ -47,8 +109,7 @@ export class AuthService {
       throw new Error('Username already taken')
     }
 
-    const saltRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12')
-    const hashedPassword = await bcrypt.hash(userData.password, saltRounds)
+    const hashedPassword = await bcrypt.hash(userData.password, BCRYPT_ROUNDS)
 
     const user = await UserModel.create({
       email: userData.email,
@@ -56,13 +117,17 @@ export class AuthService {
       firstName: userData.firstName,
       lastName: userData.lastName,
       password: hashedPassword,
-      role: userData.role || UserRole.VIEWER,
+      role: userData.role ?? UserRole.VIEWER,
       isActive: true,
       isEmailVerified: false,
     })
 
+    if (!user.id) {
+      throw new Error('Failed to create user')
+    }
+
     const payload: JwtPayload = {
-      userId: user.id!,
+      userId: user.id,
       email: user.email,
       role: user.role,
     }
@@ -70,8 +135,8 @@ export class AuthService {
     const tokens = this.generateTokens(payload)
 
     await redisClient.setEx(
-      `refresh_token:${user.id!}`,
-      7 * 24 * 60 * 60,
+      `refresh_token:${user.id}`,
+      JWT_REFRESH_EXPIRES_IN_SECONDS,
       tokens.refreshToken,
     )
 
@@ -94,6 +159,11 @@ export class AuthService {
     if (!user.password) {
       throw new Error('Invalid credentials')
     }
+
+    if (!user.id) {
+      throw new Error('User ID missing')
+    }
+
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
       user.password,
@@ -102,10 +172,10 @@ export class AuthService {
       throw new Error('Invalid credentials')
     }
 
-    await UserModel.update(user.id!, { lastLoginAt: new Date() })
+    await UserModel.update(user.id, { lastLoginAt: new Date() })
 
     const payload: JwtPayload = {
-      userId: user.id!,
+      userId: user.id,
       email: user.email,
       role: user.role,
     }
@@ -113,8 +183,8 @@ export class AuthService {
     const tokens = this.generateTokens(payload)
 
     await redisClient.setEx(
-      `refresh_token:${user.id!}`,
-      7 * 24 * 60 * 60,
+      `refresh_token:${user.id}`,
+      JWT_REFRESH_EXPIRES_IN_SECONDS,
       tokens.refreshToken,
     )
 
@@ -124,7 +194,7 @@ export class AuthService {
 
   static async refreshToken(refreshToken: string): Promise<AuthTokens> {
     try {
-      const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as JwtPayload
+      const payload = verifyJwtPayload(refreshToken, JWT_REFRESH_SECRET)
 
       const storedToken = await redisClient.get(
         `refresh_token:${payload.userId}`,
@@ -138,8 +208,12 @@ export class AuthService {
         throw new Error('User not found or inactive')
       }
 
+      if (!user.id) {
+        throw new Error('User ID missing')
+      }
+
       const newPayload: JwtPayload = {
-        userId: user.id!,
+        userId: user.id,
         email: user.email,
         role: user.role,
       }
@@ -147,8 +221,8 @@ export class AuthService {
       const tokens = this.generateTokens(newPayload)
 
       await redisClient.setEx(
-        `refresh_token:${user.id!}`,
-        7 * 24 * 60 * 60,
+        `refresh_token:${user.id}`,
+        JWT_REFRESH_EXPIRES_IN_SECONDS,
         tokens.refreshToken,
       )
 
@@ -169,15 +243,19 @@ export class AuthService {
         return null
       }
 
-      const payload = jwt.verify(token, JWT_SECRET) as JwtPayload
+      const payload = verifyJwtPayload(token, JWT_SECRET)
 
       const user = await UserModel.findById(payload.userId)
       if (!user || !user.isActive) {
         return null
       }
 
+      if (!user.id) {
+        return null
+      }
+
       return {
-        userId: user.id!,
+        userId: user.id,
         email: user.email,
         role: user.role,
       }
@@ -205,8 +283,7 @@ export class AuthService {
       throw new Error('Invalid current password')
     }
 
-    const saltRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12')
-    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds)
+    const hashedNewPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS)
 
     await UserModel.update(userId, { password: hashedNewPassword })
     await redisClient.del(`refresh_token:${userId}`)
@@ -221,8 +298,7 @@ export class AuthService {
       throw new Error('User not found')
     }
 
-    const saltRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12')
-    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds)
+    const hashedNewPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS)
 
     await UserModel.update(user.id!, { password: hashedNewPassword })
     await redisClient.del(`refresh_token:${user.id!}`)

@@ -98,9 +98,6 @@ export function initializeTracing(): void {
       '@opentelemetry/instrumentation-redis': {
         enabled: config.instrumentation.redis,
       },
-      '@opentelemetry/instrumentation-fastify': {
-        enabled: config.instrumentation.fastify || false,
-      },
     })
 
     // Initialize SDK
@@ -121,9 +118,14 @@ export function initializeTracing(): void {
 
     isInitialized = true
     logger.info('OpenTelemetry tracing initialized successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to initialize tracing', {
-      error: error instanceof Error ? error.message : String(error),
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
       stack: error instanceof Error ? error.stack : undefined,
     })
     // Don't throw - allow application to continue without tracing
@@ -147,9 +149,14 @@ export async function shutdownTracing(): Promise<void> {
     isInitialized = false
     sdk = null
     logger.info('Tracing shutdown complete')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error during tracing shutdown', {
-      error: error instanceof Error ? error.message : String(error),
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
     })
   }
 }

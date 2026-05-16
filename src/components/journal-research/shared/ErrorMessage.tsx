@@ -4,7 +4,7 @@
 
 import type { ReactNode } from 'react'
 
-import { Alert } from '@/components/ui/alert'
+import { Alert } from '@/components/ui/alert.tsx'
 import { normalizeError, formatErrorForUser, getFieldErrors } from '@/lib/error'
 import { cn } from '@/lib/utils'
 
@@ -40,8 +40,8 @@ export function ErrorMessage({
 
   const normalizedError = error ? normalizeError(error) : null
   const displayMessage =
-    message || (normalizedError ? formatErrorForUser(normalizedError) : null)
-  const fieldErrs = fieldErrors || (error ? getFieldErrors(error) : undefined)
+    message ?? (normalizedError ? formatErrorForUser(normalizedError) : null)
+  const fieldErrs = fieldErrors ?? (error ? getFieldErrors(error) : undefined)
 
   if (fallback && !displayMessage && !fieldErrs) {
     return <>{fallback}</>

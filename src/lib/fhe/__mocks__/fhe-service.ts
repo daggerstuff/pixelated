@@ -4,17 +4,13 @@
 import { vi } from 'vitest'
 
 export const mockFHEService = {
-  encrypt: vi.fn((data: string) => Promise.resolve(`encrypted-${data}`)),
-  decrypt: vi.fn((data: string) =>
-    Promise.resolve(data.replace('encrypted-', '')),
-  ),
-  verifySender: vi.fn(() => Promise.resolve(true)),
-  processEncrypted: vi.fn(() =>
-    Promise.resolve({
+  encrypt: vi.fn(async (data: string) => `encrypted-${data}`),
+  decrypt: vi.fn(async (data: string) => data.replace('encrypted-', '')),
+  verifySender: vi.fn(async () => true),
+  processEncrypted: vi.fn(async () => ({
       success: true,
       metadata: { operation: 'test' },
-    }),
-  ),
+    })),
 }
 
 export default mockFHEService

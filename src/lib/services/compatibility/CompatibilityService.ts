@@ -7,12 +7,10 @@ import { EmailService } from '../email/EmailService'
 const logger = createBuildSafeLogger('compatibility-service')
 if (!logger || typeof logger.info !== 'function') {
   // This will show up in the build or runtime logs if the import fails
-  // eslint-disable-next-line no-console
   console.error(
     '[CompatibilityService] Logger import failed or is not a valid logger instance',
   )
 } else {
-  // eslint-disable-next-line no-console
   console.info('[CompatibilityService] Logger import succeeded')
 }
 
@@ -66,9 +64,9 @@ interface SlackMessage {
  * Service for tracking and alerting on browser compatibility issues
  */
 export class CompatibilityService {
-  private emailService: EmailService
+  private readonly emailService: EmailService
   private options: CompatibilityAlertOptions
-  private issueRegistry: Map<string, CompatibilityIssue[]> = new Map()
+  private readonly issueRegistry: Map<string, CompatibilityIssue[]> = new Map()
   private static instance: CompatibilityService
 
   /**
@@ -98,14 +96,10 @@ export class CompatibilityService {
    */
   public async registerIssue(issue: CompatibilityIssue): Promise<void> {
     // Generate unique ID if not provided
-    if (!issue.id) {
-      issue.id = Date.now()
-    }
+    issue.id ??= Date.now();
 
     // Add timestamp if not provided
-    if (!issue.timestamp) {
-      issue.timestamp = new Date().toISOString()
-    }
+    issue.timestamp ??= new Date().toISOString();
 
     // Add to registry
     const { browser } = issue
@@ -181,7 +175,7 @@ export class CompatibilityService {
    * Get issues by browser
    */
   public getIssuesByBrowser(browser: string): CompatibilityIssue[] {
-    return this.issueRegistry.get(browser) || []
+    return this.issueRegistry.get(browser) ?? []
   }
 
   /**
@@ -225,12 +219,12 @@ export class CompatibilityService {
     const templateData = {
       name: 'Team',
       issueCount: issues.length,
-      projectName: process.env['PROJECT_NAME'] || 'Pixelated Empathy',
-      branchName: process.env['BRANCH_NAME'] || 'main',
-      commitSha: process.env['COMMIT_SHA'] || '',
+      projectName: process.env['PROJECT_NAME'] ?? 'Pixelated Empathy',
+      branchName: process.env['BRANCH_NAME'] ?? 'main',
+      commitSha: process.env['COMMIT_SHA'] ?? '',
       detectionTime: new Date().toISOString(),
-      workflowUrl: process.env['WORKFLOW_URL'] || '',
-      dashboardUrl: process.env['DASHBOARD_URL'] || '',
+      workflowUrl: process.env['WORKFLOW_URL'] ?? '',
+      dashboardUrl: process.env['DASHBOARD_URL'] ?? '',
       browserIssues: Array.from(issuesByBrowser.entries()).map(
         ([browser, browserIssues]) => ({
           browser,
@@ -246,7 +240,7 @@ export class CompatibilityService {
     }
 
     // Send email to all recipients
-    const emailPromises = this.options.recipients.map((recipient) =>
+    const emailPromises = this.options.recipients.map( async (recipient) =>
       this.emailService.queueEmail({
         to: recipient,
         templateAlias: 'browser-compatibility-alert',

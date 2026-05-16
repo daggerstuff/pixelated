@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { Pool } from 'pg'
-import { createClient } from 'redis'
+import { createClient, type RedisClientType } from 'redis'
 
 import { logger } from '@/utils/logger'
 
@@ -8,7 +8,9 @@ import { logger } from '@/utils/logger'
 const MAX_RETRIES = 10
 const RETRY_DELAY = 3000
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = async (ms: number): Promise<void> => {
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 // MongoDB connection
 export const connectMongoDB = async (): Promise<void> => {
@@ -16,7 +18,7 @@ export const connectMongoDB = async (): Promise<void> => {
   while (retries < MAX_RETRIES) {
     try {
       const mongoUri =
-        process.env.MONGODB_URI ||
+        process.env['MONGODB_URI'] ??
         'mongodb://localhost:27017/business-strategy-cms'
 
       await mongoose.connect(mongoUri)
@@ -24,7 +26,7 @@ export const connectMongoDB = async (): Promise<void> => {
       logger.info('MongoDB connected successfully')
 
       // Handle connection events
-      mongoose.connection.on('error', (err) => {
+      mongoose.connection.on('error', (err: unknown) => {
         logger.error('MongoDB connection error:', err)
       })
 
@@ -37,7 +39,7 @@ export const connectMongoDB = async (): Promise<void> => {
       })
 
       return
-    } catch (error) {
+    } catch (error: unknown) {
       retries++
       logger.error(`MongoDB connection attempt ${retries} failed:`, error)
       if (retries >= MAX_RETRIES) throw error
@@ -48,11 +50,11 @@ export const connectMongoDB = async (): Promise<void> => {
 
 // PostgreSQL connection pool
 export const postgresPool = new Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT || '5432'),
-  database: process.env.POSTGRES_DB || 'business_strategy_cms',
-  user: process.env.POSTGRES_USER || 'admin',
-  password: process.env.POSTGRES_PASSWORD || 'password',
+  host: process.env['POSTGRES_HOST'] ?? 'localhost',
+  port: parseInt(process.env['POSTGRES_PORT'] ?? '5432'),
+  database: process.env['POSTGRES_DB'] ?? 'business_strategy_cms',
+  user: process.env['POSTGRES_USER'] ?? 'admin',
+  password: process.env['POSTGRES_PASSWORD'] ?? 'password',
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
@@ -67,7 +69,7 @@ export const testPostgresConnection = async (): Promise<void> => {
       logger.info('PostgreSQL connected successfully')
       client.release()
       return
-    } catch (error) {
+    } catch (error: unknown) {
       retries++
       logger.error(`PostgreSQL connection attempt ${retries} failed:`, error)
       if (retries >= MAX_RETRIES) throw error
@@ -77,10 +79,10 @@ export const testPostgresConnection = async (): Promise<void> => {
 }
 
 // Redis connection
-export const redisClient = createClient({
+export const redisClient: RedisClientType = createClient({
   url:
-    process.env.REDIS_URL ||
-    `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || '6379'}`,
+    process.env['REDIS_URL'] ??
+    `redis://${process.env['REDIS_HOST'] ?? 'localhost'}:${process.env['REDIS_PORT'] ?? '6379'}`,
 })
 
 export const connectRedis = async (): Promise<void> => {
@@ -93,7 +95,7 @@ export const connectRedis = async (): Promise<void> => {
       logger.info('Redis connected successfully')
 
       // Handle connection events
-      redisClient.on('error', (err) => {
+      redisClient.on('error', (err: unknown) => {
         logger.error('Redis connection error:', err)
       })
 
@@ -101,7 +103,7 @@ export const connectRedis = async (): Promise<void> => {
         logger.warn('Redis disconnected')
       })
       return
-    } catch (error) {
+    } catch (error: unknown) {
       retries++
       logger.error(`Redis connection attempt ${retries} failed:`, error)
       if (retries >= MAX_RETRIES) throw error
@@ -119,7 +121,7 @@ export const initializeDatabases = async (): Promise<void> => {
       connectRedis(),
     ])
     logger.info('All database connections established successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to initialize database connections:', error)
     throw error
   }
@@ -134,7 +136,7 @@ export const closeDatabaseConnections = async (): Promise<void> => {
       redisClient.quit(),
     ])
     logger.info('All database connections closed successfully')
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error closing database connections:', error)
   }
 }

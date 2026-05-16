@@ -11,12 +11,11 @@ Tests 50+ edge cases including:
 - Research/academic contexts
 """
 
-import os
-import sys
 import json
 import logging
-from typing import List, Dict, Any
+import sys
 from pathlib import Path
+from typing import Any
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -32,7 +31,7 @@ class ExtensiveValidationSuite:
     """Comprehensive validation with 50+ edge cases."""
 
     def __init__(self):
-        self.test_cases: List[Dict[str, Any]] = []
+        self.test_cases: list[dict[str, Any]] = []
         self._build_test_cases()
 
     def _build_test_cases(self):
@@ -331,7 +330,7 @@ class ExtensiveValidationSuite:
     def run_validation(
         self,
         use_llm: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Run comprehensive validation suite."""
 
         logger.info("=" * 80)
@@ -367,7 +366,7 @@ class ExtensiveValidationSuite:
             logger.info(f"  Difficulty: {test['difficulty']}")
 
             # Handle multi-label expected values
-            expected = test['expected']
+            expected = test["expected"]
             if isinstance(expected, list):
                 expected_str = " OR ".join([e.value for e in expected])
                 logger.info(f"  Expected: {expected_str}")

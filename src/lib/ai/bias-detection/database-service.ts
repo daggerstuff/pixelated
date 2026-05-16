@@ -40,7 +40,7 @@ export class BiasDetectionDatabaseService {
       return db
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
       logger.error('Database connection failed', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -97,8 +97,8 @@ export class BiasDetectionDatabaseService {
       const document = {
         _id: new ObjectId(),
         ...alert,
-        acknowledged: alert.acknowledged || false,
-        resolvedAt: alert.resolvedAt || null,
+        acknowledged: alert.acknowledged ?? false,
+        resolvedAt: alert.resolvedAt ?? null,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -127,7 +127,7 @@ export class BiasDetectionDatabaseService {
     includeDetails?: boolean
   }): Promise<BiasDashboardData> {
     try {
-      const timeRange = options?.timeRange || '24h'
+      const timeRange = options?.timeRange ?? '24h'
       const hoursBack = this.parseTimeRange(timeRange)
       const cutoffTime = new Date(Date.now() - hoursBack * 60 * 60 * 1000)
 
@@ -270,9 +270,9 @@ export class BiasDetectionDatabaseService {
         type: alert['type'],
         message: alert['message'],
         sessionId: alert['sessionId'],
-        biasScore: alert['biasScore'] || 0,
-        acknowledged: alert['acknowledged'] || false,
-        resolvedAt: alert['resolvedAt'] || undefined,
+        biasScore: alert['biasScore'] ?? 0,
+        acknowledged: alert['acknowledged'] ?? false,
+        resolvedAt: alert['resolvedAt'] ?? undefined,
       }))
     } catch (error: unknown) {
       logger.error('Failed to get recent alerts', {
@@ -387,7 +387,7 @@ export class BiasDetectionDatabaseService {
 
       analyses.forEach((analysis) => {
         const demo = analysis['demographics']
-        const biasScore = analysis['overallBiasScore'] || 0
+        const biasScore = analysis['overallBiasScore'] ?? 0
 
         if (demo) {
           // Helper to update aggregation
@@ -461,7 +461,7 @@ export class BiasDetectionDatabaseService {
         overallBiasScore: analysis['overallBiasScore'],
         layerResults: analysis['layerResults'],
         demographics: analysis['demographics'],
-        recommendations: analysis['recommendations'] || [],
+        recommendations: analysis['recommendations'] ?? [],
         alertLevel: analysis['alertLevel'],
         explanation: analysis['explanation'],
         confidence: analysis['confidence'],
@@ -562,7 +562,7 @@ export class BiasDetectionDatabaseService {
         overallBiasScore: analysis['overallBiasScore'],
         layerResults: analysis['layerResults'],
         demographics: analysis['demographics'],
-        recommendations: analysis['recommendations'] || [],
+        recommendations: analysis['recommendations'] ?? [],
         alertLevel: analysis['alertLevel'],
         explanation: analysis['explanation'],
         confidence: analysis['confidence'],

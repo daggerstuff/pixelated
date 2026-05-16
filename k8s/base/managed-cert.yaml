@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: pixelated-empathy-cert
+  namespace: pixelated-empathy
+spec:
+  domains:
+    - pixelatedempathy.com

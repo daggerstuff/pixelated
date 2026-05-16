@@ -253,16 +253,14 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
     return categoryMap[category] === subcategory
   }
 
-  const groupedStats = demographicStats.reduce(
+  const groupedStats = demographicStats.reduce< Record<string, DemographicData[]>>(
     (acc, stat) => {
       const { category } = stat
-      if (!acc[category]) {
-        acc[category] = []
-      }
-      ;(acc[category]).push(stat)
+      acc[category] ??= [];
+      acc[category].push(stat)
       return acc
     },
-    {} as Record<string, DemographicData[]>,
+    {},
   )
 
   return (

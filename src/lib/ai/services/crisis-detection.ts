@@ -20,10 +20,10 @@ export interface CrisisDetectionConfig {
 }
 
 export class CrisisDetectionService {
-  private aiService: AIService
-  private sensitivityLevel: 'low' | 'medium' | 'high'
-  private model?: string
-  private defaultPrompt?: string
+  private readonly aiService: AIService
+  private readonly sensitivityLevel: 'low' | 'medium' | 'high'
+  private readonly model?: string
+  private readonly defaultPrompt?: string
 
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
@@ -139,7 +139,7 @@ export class CrisisDetectionService {
       }
 
       // Combine results
-      const finalScore = Math.max(keywordAnalysis.score, aiAnalysis?.score || 0)
+      const finalScore = Math.max(keywordAnalysis.score, aiAnalysis?.score ?? 0)
 
       const thresholds =
         CrisisDetectionService.SENSITIVITY_THRESHOLDS[this.sensitivityLevel]
@@ -172,7 +172,7 @@ export class CrisisDetectionService {
         confidence: 0,
         category: 'analysis_error',
         content: text,
-        riskLevel: 'unknown',
+        riskLevel: 'low',
         urgency: 'low',
         detectedTerms: [],
         suggestedActions: ['Manual review recommended due to analysis error'],
@@ -187,7 +187,7 @@ export class CrisisDetectionService {
   ): Promise<CrisisDetectionResult[]> {
     try {
       return await Promise.all(
-        texts.map((text) => this.detectCrisis(text, options)),
+        texts.map( async (text) => this.detectCrisis(text, options)),
       )
     } catch (error: unknown) {
       appLogger.error('Error in batch crisis detection:', {
@@ -320,7 +320,7 @@ export class CrisisDetectionService {
       )
 
       // Validate response structure
-      if (!response || !response.content) {
+      if (!response?.content) {
         appLogger.warn(
           'Invalid AI response structure, falling back to keyword analysis',
         )
@@ -330,24 +330,29 @@ export class CrisisDetectionService {
       // Parse AI response
       const { content } = response
       try {
-        const parsed = JSON.parse(content) as unknown
+        const parsed = JSON.parse(content) as Record<string, unknown>
 
         if (typeof parsed === 'object' && parsed !== null) {
           return {
             score: Math.min(Math.max(Number(parsed.score) || 0, 0), 1), // Clamp between 0-1
-            category: parsed.category || 'general_concern',
-            severity: parsed.severity || 'low',
+            category: typeof parsed.category === 'string' ? parsed.category : 'general_concern',
+            severity:
+              typeof parsed.severity === 'string'
+                ? (parsed.severity as 'low' | 'medium' | 'high' | 'critical')
+                : 'low',
             indicators: Array.isArray(parsed.indicators)
-              ? parsed.indicators
+              ? parsed.indicators.filter((indicator) => typeof indicator === 'string')
               : [],
             recommendations: Array.isArray(parsed.recommendations)
-              ? parsed.recommendations
+              ? parsed.recommendations.filter(
+                  (rec) => typeof rec === 'string',
+                )
               : [],
           }
         }
         // Throw an error if parsed content is not a valid object
         throw new Error('Parsed AI response is not a valid object.')
-      } catch {
+      } catch (error: unknown) {
         appLogger.error('AI response parsing failed', {
           error,
           responseContent: content,

@@ -49,11 +49,11 @@ export interface MonitoringConfig {
 }
 
 export class AIMonitoringService extends EventEmitter {
-  private redis: Redis
-  private openai: OpenAI
+  private readonly redis: Redis
+  private readonly openai: OpenAI
   private config: MonitoringConfig
-  private activeAlerts: Map<string, Alert> = new Map()
-  private metricsHistory: Map<string, number[]> = new Map()
+  private readonly activeAlerts: Map<string, Alert> = new Map()
+  private readonly metricsHistory: Map<string, number[]> = new Map()
   private isRunning = false
 
   constructor(redis: Redis, openai: OpenAI, config: MonitoringConfig) {
@@ -72,7 +72,7 @@ export class AIMonitoringService extends EventEmitter {
     this.emit('started')
 
     // Start monitoring loop
-    this.monitoringLoop()
+    void this.monitoringLoop()
 
     // Subscribe to Redis pub/sub for real-time metrics
     this.redis.subscribe('metrics:updates', (err) => {
@@ -83,7 +83,7 @@ export class AIMonitoringService extends EventEmitter {
 
     this.redis.on('message', (channel, message) => {
       if (channel === 'metrics:updates') {
-        this.handleMetricUpdate(JSON.parse(message))
+        void this.handleMetricUpdate(JSON.parse(message))
       }
     })
   }
@@ -102,7 +102,7 @@ export class AIMonitoringService extends EventEmitter {
 
         // Sleep for 30 seconds
         await new Promise((resolve) => setTimeout(resolve, 30000))
-      } catch (error) {
+      } catch (error: unknown) {
         this.emit('error', error)
         await new Promise((resolve) => setTimeout(resolve, 5000))
       }
@@ -331,7 +331,8 @@ export class AIMonitoringService extends EventEmitter {
       })
 
       const insights =
-        response.choices[0]?.message?.content || 'No insights generated'
+        (response as { choices: Array<{ message?: { content?: string } }> })
+          .choices[0]?.message?.content ?? 'No insights generated'
 
       // Update alerts with AI insights
       for (const alert of recentAlerts) {
@@ -340,7 +341,7 @@ export class AIMonitoringService extends EventEmitter {
       }
 
       this.emit('aiInsights', { insights, alertCount: recentAlerts.length })
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('error', error)
     }
   }
@@ -436,7 +437,7 @@ export class AIMonitoringService extends EventEmitter {
   }
 
   getMetricsHistory(metric: string): number[] {
-    return this.metricsHistory.get(metric) || []
+    return this.metricsHistory.get(metric) ?? []
   }
 
   updateConfig(newConfig: Partial<MonitoringConfig>): void {

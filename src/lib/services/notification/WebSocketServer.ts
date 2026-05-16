@@ -50,8 +50,8 @@ interface ServerMessage {
  * Authorization header as a Bearer token.
  */
 export class WebSocketServer {
-  private wss: WSServer
-  private notificationService: NotificationService
+  private readonly wss: WSServer
+  private readonly notificationService: NotificationService
 
   constructor(port: number, notificationService: NotificationService) {
     this.notificationService = notificationService
@@ -63,6 +63,20 @@ export class WebSocketServer {
     logger
       .createBuildSafeLogger('websocket')
       .info('WebSocket server started', { port })
+  }
+
+  /**
+   * Delegate event listeners to internal WebSocket server
+   */
+  public on(event: string, listener: (...args: any[]) => void): void {
+    this.wss.on(event, listener)
+  }
+
+  /**
+   * Close the server
+   */
+  public close(): void {
+    this.wss.close()
   }
 
   /**

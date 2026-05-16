@@ -22,6 +22,7 @@ export const corsOptions = {
       'Accept',
       'X-Requested-With',
       'X-Request-ID',
+      'X-API-Key',
     ],
     exposedHeaders: [
       'X-RateLimit-Limit',
@@ -46,6 +47,7 @@ export const corsOptions = {
       'Accept',
       'X-Requested-With',
       'X-Request-ID',
+      'X-API-Key',
     ],
     exposedHeaders: [
       'X-RateLimit-Limit',
@@ -97,6 +99,7 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
 
   const config = getConfig()
   const origin = request.headers.get('Origin')
+  const hasApiKey = request.headers.has('X-API-Key')
 
   try {
     // Process the request first to catch any errors
@@ -104,8 +107,8 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
 
     // Apply CORS headers if origin is present
     if (origin) {
-      // Check if origin is allowed
-      const allowed = isOriginAllowed(origin, config)
+      // Check if origin is allowed OR if request has an API key
+      const allowed = hasApiKey || isOriginAllowed(origin, config)
 
       if (allowed) {
         response.headers.set('Access-Control-Allow-Origin', origin)

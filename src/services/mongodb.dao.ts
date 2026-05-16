@@ -15,7 +15,7 @@ type MongoRuntime = {
 class MockObjectId {
   public id: string
   constructor(id?: string) {
-    this.id = id || 'mock-object-id'
+    this.id = id ?? 'mock-object-id'
   }
   toString() {
     return this.id
@@ -77,7 +77,7 @@ export class DataExportDAO {
   async create(exportRequest: Omit<DataExport, '_id'>): Promise<DataExport> {
     const collection = await this.getCollection()
     // Ensure files is initialized
-    const data = { ...exportRequest, files: exportRequest.files || [] }
+    const data = { ...exportRequest, files: exportRequest.files ?? [] }
     const result = await collection.insertOne(data)
     const created = await collection.findOne({ _id: result.insertedId })
 
@@ -293,7 +293,7 @@ export class AIMetricsDAO {
         }
       | undefined
 
-    return stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
+    return stats ?? { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
   }
 }
 
@@ -554,3 +554,64 @@ export const treatmentPlanDAO = new TreatmentPlanDAO()
 export const crisisSessionFlagDAO = new CrisisSessionFlagDAO()
 export const consentManagementDAO = new ConsentManagementDAO()
 export const dataExportDAO = new DataExportDAO()
+
+export interface AgentActivityRecord {
+  id: string
+  turnId: string
+  userId: string
+  activities: any[]
+  timestamp: number
+}
+
+export class AgentActivityDAO {
+  private async getCollection(): Promise<MongoCollection<AgentActivityRecord>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<AgentActivityRecord>('agent_activities')
+  }
+
+  async saveActivities(record: AgentActivityRecord): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.updateOne(
+      { turnId: record.turnId },
+      { $set: record },
+      { upsert: true },
+    )
+  }
+
+  async getActivitiesByTurnId(
+    turnId: string,
+  ): Promise<AgentActivityRecord | null> {
+    const collection = await this.getCollection()
+    return collection.findOne({ turnId } as any)
+  }
+}
+
+export interface AgentFeedbackRecord {
+  id: string
+  activityId: string
+  turnId?: string
+  feedback: 'positive' | 'negative' | 'correction'
+  comment?: string
+  userId: string
+  timestamp: number
+}
+
+export class AgentFeedbackDAO {
+  private async getCollection(): Promise<MongoCollection<AgentFeedbackRecord>> {
+    await initializeDependencies()
+    if (!mongodb) {
+      throw new Error('MongoDB client not initialized')
+    }
+    const db = await mongodb.connect()
+    return db.collection<AgentFeedbackRecord>('agent_feedback')
+  }
+
+  async saveFeedback(record: AgentFeedbackRecord): Promise<void> {
+    const collection = await this.getCollection()
+    await collection.insertOne(record)
+  }
+}

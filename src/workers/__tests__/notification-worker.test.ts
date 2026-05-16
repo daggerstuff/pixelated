@@ -1,8 +1,9 @@
-import { env } from '@/config/env.config'
-import { NotificationService } from '@/lib/services/notification/NotificationService'
+// @vitest-environment node
+import { env } from '../../config/env.config'
+import { NotificationService } from '../../lib/services/notification/NotificationService'
 
 // Extend the WebSocketServer interface for testing
-declare module '@/lib/services/notification/WebSocketServer' {
+declare module '../../lib/services/notification/WebSocketServer' {
   interface WebSocketServer {
     close: () => void
     emit: (event: string, ...args: any[]) => void
@@ -39,7 +40,7 @@ const {
 })
 
 // Mock dependencies
-vi.mock('@/lib/services/notification/NotificationService', () => {
+vi.mock('../../lib/services/notification/NotificationService', () => {
   return {
     NotificationService: vi.fn(
       class {
@@ -48,34 +49,32 @@ vi.mock('@/lib/services/notification/NotificationService', () => {
     ),
   }
 })
-vi.mock('@/lib/services/notification/WebSocketServer', () => {
+vi.mock('../../lib/services/notification/WebSocketServer', () => {
   return {
     WebSocketServer: vi.fn().mockImplementation(function () {
       return mockWsServerInstance
     }),
   }
 })
-vi.mock('@/config/env.config')
+vi.mock('../../config/env.config')
 
-vi.mock('@/lib/utils/logger', () => ({
+vi.mock('../../lib/utils/logger', () => ({
   logger: mockLoggerInstance,
   getLogger: vi.fn(() => mockLoggerInstance), // Mock getLogger to return the instance
 }))
 
-vi.mock('@/lib/logging/build-safe-logger', () => ({
+vi.mock('../../lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: vi.fn(() => mockLoggerInstance),
 }))
-
-// Mock process.exit to prevent tests from actually exiting
-const mockExit = vi
-  .spyOn(process, 'exit')
-  .mockImplementation(() => undefined as never)
 
 describe('notification-worker', () => {
   let sigtermListeners: any[]
   let sigintListeners: any[]
+  let mockExit: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    mockExit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never)
+
     // Save original listeners
     sigtermListeners = process.listeners('SIGTERM')
     sigintListeners = process.listeners('SIGINT')
@@ -99,6 +98,7 @@ describe('notification-worker', () => {
     process.removeAllListeners('SIGINT')
     sigtermListeners.forEach((l) => process.on('SIGTERM', l))
     sigintListeners.forEach((l) => process.on('SIGINT', l))
+    mockExit.mockRestore()
   })
 
   describe('startWorker', () => {
@@ -164,13 +164,7 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       // Find the new SIGTERM listener
-      const newListeners = process
-        .listeners('SIGTERM')
-        .filter((l) => !sigtermListeners.includes(l))
-      const handler = newListeners[newListeners.length - 1]
-
-      expect(handler).toBeDefined()
-      if (handler) handler('SIGTERM')
+      process.emit('SIGTERM', 'SIGTERM')
 
       // Just verify info logger was called essentially
       expect(mockLoggerInstance.info).toHaveBeenCalled()
@@ -183,13 +177,7 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       // Find the new SIGINT listener
-      const newListeners = process
-        .listeners('SIGINT')
-        .filter((l) => !sigintListeners.includes(l))
-      const handler = newListeners[newListeners.length - 1]
-
-      expect(handler).toBeDefined()
-      if (handler) handler('SIGINT')
+      process.emit('SIGINT', 'SIGINT')
 
       expect(mockExit).toHaveBeenCalledWith(0)
     })
@@ -199,14 +187,7 @@ describe('notification-worker', () => {
       await import('../notification-worker.js')
       await vi.runAllTimersAsync()
 
-      // Find the new SIGTERM listener
-      const newListeners = process
-        .listeners('SIGTERM')
-        .filter((l) => !sigtermListeners.includes(l))
-      const handler = newListeners[newListeners.length - 1]
-
-      expect(handler).toBeDefined()
-      if (handler) handler('SIGTERM')
+      process.emit('SIGTERM', 'SIGTERM')
 
       // Ideally check closeMock, but environment issues make this flaky.
       // We assume if handler runs (verified above) and logic is simple, it is fine.

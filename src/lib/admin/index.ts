@@ -121,8 +121,7 @@ export class AdminService {
   /**
    * Get therapy sessions with filtering options
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getSessions(_options: {
+  async getSessions(options: {
     limit: number
     offset: number
     therapistId?: string
@@ -130,7 +129,8 @@ export class AdminService {
     startDate?: Date
     endDate?: Date
   }): Promise<SessionsResult> {
-    // ... implementation ...
+    // For now, return empty result. Log options to avoid unused variable warning.
+    console.debug('getSessions called with options:', options)
     return {
       sessions: [], // Your sessions array here
       total: 0, // Total count of all sessions matching the filter
@@ -140,24 +140,24 @@ export class AdminService {
   /**
    * Lock a therapy session
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  lockSession(_sessionId: string): Promise<void> {
+   async lockSession(sessionId: string): Promise<void> {
+    console.debug('lockSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
 
   /**
    * Unlock a therapy session
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  unlockSession(_sessionId: string): Promise<void> {
+   async unlockSession(sessionId: string): Promise<void> {
+    console.debug('unlockSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
 
   /**
    * Archive a therapy session
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  archiveSession(_sessionId: string): Promise<void> {
+   async archiveSession(sessionId: string): Promise<void> {
+    console.debug('archiveSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
 
@@ -206,7 +206,7 @@ export class AdminService {
       }
 
       // Check custom permissions first if they exist
-      if (user.permissions && user.permissions.includes(permission)) {
+      if (user.permissions?.includes(permission)) {
         return true
       }
 
@@ -228,7 +228,7 @@ export class AdminService {
   ): Promise<{ userId: string; role: AdminRole } | null> {
     try {
       const payload = (await verifyToken(token)) as { userId: string }
-      if (!payload || !payload.userId) {
+      if (!payload?.userId) {
         return null
       }
 
@@ -364,16 +364,13 @@ export class AdminService {
       }
 
       // Fallback to direct header access with case-insensitive lookup
-      if (!authHeader) {
-        authHeader =
-          context.request.headers.get('authorization') ||
-          context.request.headers.get('Authorization')
-      }
+      authHeader ??= context.request.headers.get('authorization') ??
+          context.request.headers.get('Authorization');
 
       const tokenFromHeader = authHeader?.replace(/^Bearer\s+/i, '')
 
       // Use token from cookie or header
-      const token = tokenFromCookie || tokenFromHeader
+      const token = tokenFromCookie ?? tokenFromHeader
       if (!token) {
         return false
       }

@@ -85,7 +85,7 @@ vi.mock('otplib', () => ({
 }))
 
 vi.mock('qrcode', () => ({
-  toDataURL: vi.fn(() => Promise.resolve('data:image/png;base64,test')),
+  toDataURL: vi.fn( async () => Promise.resolve('data:image/png;base64,test')),
 }))
 
 describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {

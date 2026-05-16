@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pixelated-empathy-redis-ingress
+  namespace: pixelated-empathy
+spec:
+  podSelector:
+    matchLabels:
+      app: pixelated-empathy-redis
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: pixelated-empathy-api
+    ports:
+    - protocol: TCP
+      port: 6379

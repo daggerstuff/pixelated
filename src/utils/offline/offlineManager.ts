@@ -5,7 +5,8 @@
 
 import { type OfflineState } from '@/hooks/useOfflineDetection'
 
-import requestQueue, { type QueuedRequest } from './requestQueue'
+import { indexedDBRequestQueue } from './indexedDBRequestQueue'
+import { type QueuedRequest } from './indexedDBRequestQueue'
 
 export interface OfflineManagerConfig {
   enableRequestQueue?: boolean
@@ -44,14 +45,19 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
       }
 
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    } catch (error) {
+    } catch (error: unknown) {
       // If offline or network error, queue the request
       if (enableRequestQueue && !navigator.onLine) {
         const priority = isCriticalPath ? 'critical' : 'normal'
+        const method =
+          options.method &&
+          ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method)
+            ? options.method
+            : 'GET'
 
-        const queued = requestQueue.add({
+        const queued = indexedDBRequestQueue.add({
           url,
-          method: (options.method as any) || 'GET',
+          method: method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
           headers: (options.headers as Record<string, string>) || {},
           body: options.body,
           priority,
@@ -60,9 +66,9 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
 
         if (queued && onRequestQueued) {
           onRequestQueued({
-            id: `req_${Date.now()}`,
+            id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             url,
-            method: (options.method as any) || 'GET',
+            method: method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
             headers: (options.headers as Record<string, string>) || {},
             body: options.body,
             timestamp: Date.now(),
@@ -96,10 +102,10 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
  * Offline Manager Class
  */
 class OfflineManager {
-  private config: Required<OfflineManagerConfig>
+  private readonly config: Required<OfflineManagerConfig>
   private syncInterval: NodeJS.Timeout | null = null
   private networkState: OfflineState | null = null
-  private listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
+  private readonly listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
 
   constructor(config: OfflineManagerConfig = {}) {
     this.config = {
@@ -151,7 +157,7 @@ class OfflineManager {
     this.emit('online')
 
     // Immediately try to sync when coming back online
-    setTimeout(() => this.sync(), 1000)
+    setTimeout( async () => this.sync(), 1000)
   }
 
   private handleOffline(): void {
@@ -217,7 +223,10 @@ class OfflineManager {
    * Manual sync trigger
    */
   async sync(): Promise<void> {
-    if (!this.networkState?.isOnline || !requestQueue.hasPendingRequests()) {
+    if (
+      !this.networkState?.isOnline ||
+      !indexedDBRequestQueue.hasPendingRequests()
+    ) {
       return
     }
 
@@ -225,9 +234,9 @@ class OfflineManager {
     this.emit('syncStart')
 
     try {
-      await requestQueue.processQueue(this.config.onRequestProcessed)
+      await indexedDBRequestQueue.processQueue(this.config.onRequestProcessed)
       this.emit('syncComplete')
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Sync failed:', error)
     } finally {
       this.config.onSyncComplete()
@@ -241,13 +250,13 @@ class OfflineManager {
     isOnline: boolean
     isOffline: boolean
     hasPendingRequests: boolean
-    queueStats: ReturnType<typeof requestQueue.getStats>
+    queueStats: ReturnType<typeof indexedDBRequestQueue.getStats>
   } {
     return {
       isOnline: this.networkState?.isOnline ?? true,
       isOffline: this.networkState?.isOffline ?? false,
-      hasPendingRequests: requestQueue.hasPendingRequests(),
-      queueStats: requestQueue.getStats(),
+      hasPendingRequests: indexedDBRequestQueue.hasPendingRequests(),
+      queueStats: indexedDBRequestQueue.getStats(),
     }
   }
 
@@ -262,7 +271,7 @@ class OfflineManager {
    * Clear all queued requests
    */
   clearQueue(): void {
-    requestQueue.clear()
+    indexedDBRequestQueue.clear()
   }
 
   /**

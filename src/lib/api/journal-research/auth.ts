@@ -3,8 +3,9 @@
  * Integrates with Better Auth for session management
  */
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import storageManager from '@/utils/storage/storageManager'
 
 const logger = createBuildSafeLogger('journal-research-auth')
 
@@ -26,18 +27,18 @@ export async function getJournalResearchAuthToken(): Promise<string | null> {
 
     // Fallback to localStorage for backward compatibility
     return (
-      window.localStorage.getItem('auth_token') ??
-      window.localStorage.getItem('authToken') ??
+      storageManager.get('auth_token') ??
+      storageManager.get('authToken') ??
       null
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn('Failed to get auth token from Better Auth', { error })
 
     // Fallback to localStorage
     try {
       return (
-        window.localStorage.getItem('auth_token') ??
-        window.localStorage.getItem('authToken') ??
+        storageManager.get('auth_token') ??
+        storageManager.get('authToken') ??
         null
       )
     } catch (localStorageError) {

@@ -1,11 +1,12 @@
 ---
-title: 'Risk Level Assessment System'
-description: 'Risk Level Assessment System documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Risk Level Assessment System documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Risk Level Assessment System
 ---
 
 # Risk Level Assessment System

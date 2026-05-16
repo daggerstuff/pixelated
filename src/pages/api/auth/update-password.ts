@@ -40,9 +40,6 @@ export const POST = async ({ request, cookies }: APIContext) => {
       )
     }
 
-    const _email = emailCookie.value
-    const _token = tokenCookie.value
-
     // PASSWORD UPDATE DEPRECATED IN MIGRATION TO AUTH0
     // The previous implementation relied on a MongoDB-based auth service that has been replaced.
     // Auth0 handles password resets via its own Universal Login flow and email links.
@@ -61,29 +58,6 @@ export const POST = async ({ request, cookies }: APIContext) => {
         },
       },
     )
-
-    /*
-    Legacy implementation removed:
-    // Update the password using the AuthService with token verification
-    await updatePasswordWithToken(email, token, password)
-    */
-
-    // Clear the recovery cookies
-    cookies.delete('auth_recovery_token')
-    cookies.delete('auth_recovery_email')
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'Password successfully updated',
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    )
   } catch (error: unknown) {
     console.error('Error updating password:', error)
 
@@ -91,7 +65,11 @@ export const POST = async ({ request, cookies }: APIContext) => {
       JSON.stringify({
         success: false,
         message:
-          error instanceof Error ? error.message : 'Failed to update password',
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Failed to update password',
       }),
       {
         status: 500,

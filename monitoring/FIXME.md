@@ -23,5 +23,5 @@ This directory was copied from the `business-strategy-cms` project and has
 4. Mount via `docker-compose.production.yml` (add a `monitoring` profile)
 5. Validate dashboards against actual Prometheus metrics
 
-Until the above is done, do **not** run `docker-compose.monitoring.yml`
-in production — it will create orphaned containers with the wrong project name.
+Until the above is done, do **not** run `docker-compose.monitoring.yml` in
+production — it will create orphaned containers with the wrong project name.

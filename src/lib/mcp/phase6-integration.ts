@@ -7,7 +7,7 @@
 // Stub implementation to prevent build failures
 // The full implementation exists in src/lib/auth/phase6-integration.ts but needs to be migrated
 
-import { secureRandomUUID } from '@/lib/crypto/secure-random' // new import (uses project alias)
+import { secureRandomUUID } from '../crypto/secure-random'
 
 export type AuthenticationEvent =
   | 'user_created'
@@ -50,6 +50,20 @@ export type AuthenticationEvent =
   | `mfa_verification_completed_${string}`
   | `mfa_factor_deleted_${string}`
   | `mfa_preferred_factor_set_${string}`
+  | 'webauthn_registration_options_generated'
+  | 'webauthn_authentication_options_generated'
+  | `webauthn_registration_completed_${string}`
+  | `webauthn_authentication_completed_${string}`
+  | `webauthn_credential_deleted_${string}`
+  | `webauthn_credential_renamed_${string}`
+  | `risk_assessment_${number}`
+  | `role_assigned_${string}`
+  | `role_removed_${string}`
+  | `social_account_linked_${string}`
+  | `social_account_unlinked_${string}`
+  | `impersonation_started_${string}`
+  | `impersonation_ended_${string}`
+  | `impersonation_extended_${string}`
 
 /**
  * Update Phase 6 authentication progress
@@ -80,7 +94,7 @@ export async function updatePhase6AuthenticationProgress(
 
     // For now, just return successfully to not block authentication flows
     return Promise.resolve()
-  } catch (error) {
+  } catch (error: unknown) {
     // Don't throw errors - Phase 6 integration is optional
     console.warn('[Phase6] Failed to update authentication progress:', error)
   }

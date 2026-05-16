@@ -1,19 +1,16 @@
 ---
-title: 'The Physical Impact of Trauma'
-description:
-  'Understanding how trauma affects the nervous system and manifests in physical
-  symptoms'
+title: physical impact
+description: >-
+  Trauma isn't just stored in our memories—it lives in our bodies. This article
 author: 'Dr. Maya Patel'
 pubDate: 2024-03-04
-readingTime: 15
-tags: ['trauma', 'neuroscience', 'body', 'healing']
+tags:
+  - trauma
+  - neuroscience
+  - body
+  - healing
 series: 'Trauma and the Body'
 seriesOrder: 1
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1559757175-7cb036e0d465?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Abstract representation of the nervous system',
-  }
 ---
 
 ## The Physical Impact of Trauma
@@ -156,8 +153,8 @@ Trauma" next={{
 
 #### Join the Discussion
 
-{/_ Comments component temporarily disabled until implementation _/} {/_
-<Comments /> _/}
+{/_Comments component temporarily disabled until implementation_/}
+{/_<Comments />_/}
 
 ### Stay Updated
 

@@ -41,7 +41,7 @@ export interface GestaltAnalysisResponse {
   raw_metadata?: Record<string, unknown>
 }
 
-const PIXEL_API_URL = process.env.PIX_API_URL || 'http://localhost:8001'
+const PIXEL_API_URL = process.env.PIX_API_URL ?? 'http://localhost:8001'
 
 export class GestaltClient {
   /**
@@ -65,7 +65,7 @@ export class GestaltClient {
       }
 
       return (await response.json()) as GestaltAnalysisResponse
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to call Gestalt API', { error })
       throw error
     }
@@ -82,7 +82,7 @@ export class GestaltClient {
       if (!response.ok) {
         throw new Error(`Gestalt reset failed: ${response.status}`)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reset Gestalt session', { error })
     }
   }

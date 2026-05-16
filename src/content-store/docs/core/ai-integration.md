@@ -1,8 +1,8 @@
 ---
-title: 'AI Integration'
-description: 'Understanding Gradiants AI capabilities and integration'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: AI Integration
+description: Understanding Gradiants AI capabilities and integration
+pubDate: '2026-03-01'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true

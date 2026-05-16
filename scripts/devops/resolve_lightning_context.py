@@ -4,10 +4,9 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import re
 import sys
 from dataclasses import dataclass
-import re
-from typing import Dict, List
 from urllib.request import Request, urlopen
 
 
@@ -22,11 +21,11 @@ class LightningStudioContext:
 
 def _read_credentials(path: str) -> tuple[str, str]:
   with open(path, "r", encoding="utf-8") as file:
-    data: Dict[str, str] = json.load(file)
+    data: dict[str, str] = json.load(file)
   return data.get("user_id", ""), data.get("api_key", "")
 
 
-def _api_get(base_url: str, auth: str, path: str) -> Dict:
+def _api_get(base_url: str, auth: str, path: str) -> dict:
   request = Request(f"{base_url}{path}")
   request.add_header("Authorization", f"Basic {auth}")
   with urlopen(request, timeout=30) as response:
@@ -89,7 +88,7 @@ def resolve_lightning_context(creds_path: str, require_studio: bool, preferred_m
 
   studio_name = ""
   if require_studio:
-    cloudspaces: List[Dict] = _api_get(base_url, auth, f"/v1/projects/{project_id}/cloudspaces?userId={owner_id}").get(
+    cloudspaces: list[dict] = _api_get(base_url, auth, f"/v1/projects/{project_id}/cloudspaces?userId={owner_id}").get(
       "cloudspaces",
       [],
     )

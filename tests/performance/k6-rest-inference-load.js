@@ -61,7 +61,7 @@ export const options = {
 }
 
 // API configuration
-const BASE_URL = __ENV.API_URL || 'http://localhost:5173'
+const BASE_URL = __ENV.API_URL ?? 'http://localhost:5173'
 const API_ENDPOINT = `${BASE_URL}/api/ai/pixel/infer`
 
 // Test data - realistic therapeutic messages
@@ -210,7 +210,7 @@ export function handleSummary(data) {
 
 // Text summary helper
 function textSummary(data, options = {}) {
-  const indent = options.indent || ''
+  const indent = options.indent ?? ''
   const colors = options.enableColors
 
   let summary = '\n'

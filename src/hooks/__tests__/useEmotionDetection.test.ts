@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react'
 import { useEmotionDetection } from '../useEmotionDetection'
 
 // Mock the useAIService hook
-const mockGetAIResponse = vi.fn()
+const mockGetAIResponse = vi.fn<() => Promise<unknown>>()
 vi.mock('../useAIService', () => ({
   useAIService: () => ({
     getAIResponse: mockGetAIResponse,

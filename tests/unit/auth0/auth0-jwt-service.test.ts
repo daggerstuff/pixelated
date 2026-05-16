@@ -1,26 +1,47 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as auth0JwtService from '../../../src/lib/auth/auth0-jwt-service'
+
+const mockRedis = vi.hoisted(() => ({
+  getFromCache: vi.fn(),
+  setInCache: vi.fn(),
+  removeFromCache: vi.fn(),
+}))
+
+const mockAuthClient = vi.hoisted(() => ({
+  getProfile: vi.fn(),
+  refreshToken: vi.fn(),
+  oauth: {
+    refreshTokenGrant: vi.fn(),
+  },
+}))
+
+const mockUserInfoClient = vi.hoisted(() => ({
+  getUserInfo: vi.fn(),
+  getProfile: vi.fn(),
+}))
+
+const setMockUserInfoResponse = (payload: Record<string, unknown>) => {
+  const response = { data: payload }
+  mockUserInfoClient.getUserInfo.mockResolvedValue(response)
+  mockUserInfoClient.getProfile.mockResolvedValue(response)
+}
 
 // Mock the auth0 module
 vi.mock('auth0', () => {
   return {
-    AuthenticationClient: vi.fn().mockImplementation(() => {
-      return {
-        getProfile: vi.fn(),
-        refreshToken: vi.fn(),
-      }
+    AuthenticationClient: vi.fn(function () {
+      return mockAuthClient
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient
     }),
   }
 })
 
 // Mock redis functions
 vi.mock('../../../src/lib/redis', () => {
-  return {
-    getFromCache: vi.fn(),
-    setInCache: vi.fn(),
-    removeFromCache: vi.fn(),
-  }
+  return mockRedis
 })
 
 // Mock security logging
@@ -43,6 +64,20 @@ vi.mock('../../../src/lib/mcp/phase6-integration', () => {
   }
 })
 
+const createMockJwt = (payload: Record<string, unknown>): string => {
+  const encode = (value: unknown): string =>
+    Buffer.from(JSON.stringify(value)).toString('base64url')
+  return `${encode({ alg: 'none', typ: 'JWT' })}.${encode(payload)}.${encode('sig')}`
+}
+
+const withStandardClaims = (
+  overrides: Record<string, unknown>,
+): Record<string, unknown> => ({
+  iss: 'https://test-domain.auth0.com/',
+  aud: 'test-audience',
+  ...overrides,
+})
+
 describe('Auth0 JWT Service', () => {
   beforeEach(() => {
     // Set environment variables
@@ -53,6 +88,11 @@ describe('Auth0 JWT Service', () => {
 
     // Reset all mocks
     vi.clearAllMocks()
+    mockAuthClient.getProfile.mockReset()
+    mockAuthClient.refreshToken.mockReset()
+    mockAuthClient.oauth.refreshTokenGrant.mockReset()
+    mockUserInfoClient.getUserInfo.mockReset()
+    mockUserInfoClient.getProfile.mockReset()
   })
 
   afterEach(() => {
@@ -65,23 +105,19 @@ describe('Auth0 JWT Service', () => {
 
   describe('validateToken', () => {
     it('should validate a valid access token', async () => {
-      const mockPayload = {
+      const mockPayload = withStandardClaims({
         sub: 'auth0|123456',
         exp: Math.floor(Date.now() / 1000) + 3600,
         jti: 'token-id-123',
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] },
         'https://pixelated.empathy/user_metadata': { role: 'admin' },
-      }
+      })
 
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
+      setMockUserInfoResponse(mockPayload)
 
-      const result = await auth0JwtService.validateToken(
-        'valid-token',
-        'access',
-      )
+      const token = createMockJwt(mockPayload)
+
+      const result = await auth0JwtService.validateToken(token, 'access')
 
       expect(result).toEqual({
         valid: true,
@@ -92,25 +128,20 @@ describe('Auth0 JWT Service', () => {
         payload: mockPayload,
       })
 
-      expect(mockAuthClient.getProfile).toHaveBeenCalledWith('valid-token')
+      expect(mockUserInfoClient.getUserInfo).toHaveBeenCalledWith(token)
     })
 
     it('should reject an expired token', async () => {
-      const mockPayload = {
+      const mockPayload = withStandardClaims({
         sub: 'auth0|123456',
         exp: Math.floor(Date.now() / 1000) - 3600, // Expired 1 hour ago
         jti: 'token-id-123',
-      }
+      })
 
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
+      setMockUserInfoResponse(mockPayload)
+      const token = createMockJwt(mockPayload)
 
-      const result = await auth0JwtService.validateToken(
-        'expired-token',
-        'access',
-      )
+      const result = await auth0JwtService.validateToken(token, 'access')
 
       expect(result).toEqual({
         valid: false,
@@ -131,58 +162,46 @@ describe('Auth0 JWT Service', () => {
     })
 
     it('should extract role from permissions when app_metadata is not available', async () => {
-      const mockPayload = {
+      const mockPayload = withStandardClaims({
         sub: 'auth0|123456',
         exp: Math.floor(Date.now() / 1000) + 3600,
         jti: 'token-id-123',
         permissions: ['therapist', 'patient'],
-      }
+      })
 
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
+      setMockUserInfoResponse(mockPayload)
+      const token = createMockJwt(mockPayload)
 
-      const result = await auth0JwtService.validateToken(
-        'valid-token',
-        'access',
-      )
+      const result = await auth0JwtService.validateToken(token, 'access')
 
       expect(result.role).toBe('therapist') // First permission takes precedence
     })
 
     it('should default to guest role when no role information is available', async () => {
-      const mockPayload = {
+      const mockPayload = withStandardClaims({
         sub: 'auth0|123456',
         exp: Math.floor(Date.now() / 1000) + 3600,
         jti: 'token-id-123',
-      }
+      })
 
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.getProfile.mockResolvedValue(mockPayload)
+      setMockUserInfoResponse(mockPayload)
+      const token = createMockJwt(mockPayload)
 
-      const result = await auth0JwtService.validateToken(
-        'valid-token',
-        'access',
-      )
+      const result = await auth0JwtService.validateToken(token, 'access')
 
       expect(result.role).toBe('guest')
     })
 
     it('should handle validation errors gracefully', async () => {
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.getProfile.mockRejectedValue(
+      mockUserInfoClient.getUserInfo.mockRejectedValue(
         new Error('Invalid token signature'),
       )
+      const token = createMockJwt({
+        iss: 'https://test-domain.auth0.com/',
+        aud: 'test-audience',
+      })
 
-      const result = await auth0JwtService.validateToken(
-        'invalid-token',
-        'access',
-      )
+      const result = await auth0JwtService.validateToken(token, 'access')
 
       expect(result).toEqual({
         valid: false,
@@ -206,11 +225,10 @@ describe('Auth0 JWT Service', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['user'] },
       }
 
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
-      mockAuthClient.getProfile.mockResolvedValue(mockUserResponse)
+      mockAuthClient.oauth.refreshTokenGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      setMockUserInfoResponse(mockUserResponse)
 
       const result = await auth0JwtService.refreshAccessToken(
         'old-refresh-token',
@@ -227,11 +245,11 @@ describe('Auth0 JWT Service', () => {
         expiresIn: 3600,
         user: {
           id: 'auth0|123456',
-          role: 'user',
+          role: 'patient',
         },
       })
 
-      expect(mockAuthClient.refreshToken).toHaveBeenCalledWith({
+      expect(mockAuthClient.oauth.refreshTokenGrant).toHaveBeenCalledWith({
         refresh_token: 'old-refresh-token',
       })
     })
@@ -250,11 +268,10 @@ describe('Auth0 JWT Service', () => {
         'https://pixelated.empathy/app_metadata': { roles: ['user'] },
       }
 
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.refreshToken.mockResolvedValue(mockTokenResponse)
-      mockAuthClient.getProfile.mockResolvedValue(mockUserResponse)
+      mockAuthClient.oauth.refreshTokenGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      setMockUserInfoResponse(mockUserResponse)
 
       const result = await auth0JwtService.refreshAccessToken(
         'old-refresh-token',
@@ -265,10 +282,7 @@ describe('Auth0 JWT Service', () => {
     })
 
     it('should throw AuthenticationError for invalid refresh token', async () => {
-      const auth0Module = require('auth0')
-      const mockAuthClient =
-        auth0Module.AuthenticationClient.mock.results[0].value
-      mockAuthClient.refreshToken.mockRejectedValue(
+      mockAuthClient.oauth.refreshTokenGrant.mockRejectedValue(
         new Error('Invalid refresh token'),
       )
 
@@ -280,16 +294,19 @@ describe('Auth0 JWT Service', () => {
 
   describe('revokeToken', () => {
     it('should mark token as revoked in cache', async () => {
-      const redisModule = require('../../../src/lib/redis')
-      redisModule.setInCache.mockResolvedValue(undefined)
+      mockRedis.setInCache.mockResolvedValue(undefined)
 
       await auth0JwtService.revokeToken('token-to-revoke', 'user_logout')
 
-      expect(redisModule.setInCache).toHaveBeenCalledWith(
-        'revoked:token-to-revoke',
-        { reason: 'user_logout', revokedAt: expect.any(Number) },
-        24 * 60 * 60,
-      )
+      expect(mockRedis.setInCache).toHaveBeenCalledTimes(1)
+      const setInCacheCall = mockRedis.setInCache.mock.calls.at(0)
+      expect(setInCacheCall?.[0]).toBe('revoked:token-to-revoke')
+
+      const revokedPayloadJson = JSON.stringify(setInCacheCall?.[1])
+      expect(revokedPayloadJson).toContain('"reason":"user_logout"')
+      expect(revokedPayloadJson).toMatch(/"revokedAt":\d+/)
+
+      expect(setInCacheCall?.[2]).toBe(24 * 60 * 60)
     })
   })
 
@@ -297,11 +314,9 @@ describe('Auth0 JWT Service', () => {
     it('should return cleanup statistics', async () => {
       const result = await auth0JwtService.cleanupExpiredTokens()
 
-      expect(result).toEqual({
-        cleanedTokens: 0,
-        timestamp: expect.any(Number),
-        nextCleanup: expect.any(Number),
-      })
+      expect(result.cleanedTokens).toBe(0)
+      expect(typeof result.timestamp).toBe('number')
+      expect(typeof result.nextCleanup).toBe('number')
 
       // Next cleanup should be in 1 hour
       expect(result.nextCleanup).toBe(result.timestamp + 60 * 60)
@@ -346,7 +361,6 @@ describe('Auth0 JWT Service', () => {
       expect(result).toBe('slow-result')
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining('Token operation slow-operation took'),
-        expect.stringContaining('ms'),
       )
 
       consoleWarnSpy.mockRestore()

@@ -4,8 +4,8 @@ import process from 'node:process'
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
-import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
 
@@ -21,8 +21,35 @@ const isBuildCommand =
   process.env.CI === 'true' ||
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
-const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN // Only enable if DSN is actually present
+const hasSentryDSN =
+  !!process.env.SENTRY_DSN ||
+  !!process.env.PUBLIC_SENTRY_DSN ||
+  !!process.env.SENTRY_PUBLIC_DSN ||
+  !!process.env.VITE_SENTRY_DSN // Only enable if DSN is actually present
+const sentryRelease =
+  (process.env.SENTRY_RELEASE ?? process.env.npm_package_version) ?? undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+
+function createScopedSentryVitePlugins({ ssr, assets, filesToDeleteAfterUpload }) {
+  return sentryVitePlugin({
+    org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    telemetry: false,
+    release: sentryRelease ? { name: sentryRelease } : undefined,
+    sourcemaps: {
+      assets,
+      ignore: ['**/node_modules/**'],
+      filesToDeleteAfterUpload,
+    },
+  }).map((plugin) => ({
+    ...plugin,
+    apply(config, env) {
+      return env.command === 'build' && Boolean(config.build?.ssr) === ssr
+    },
+  }))
+}
+
 const preferredPort = (() => {
   const candidates = [
     process.env.PORT,
@@ -43,29 +70,85 @@ const preferredPort = (() => {
 function getChunkName(id) {
   // Memory optimization: consolidate chunks during Docker builds
   if (isDockerBuild) {
-    if (id.includes('node_modules')) {
+    if (id.includes('/node_modules/') || id.includes('node_modules')) {
       return 'vendor'
     }
     // Return null for all other modules to reduce chunk count
     return null
   }
 
-  if (id.includes('react') || id.includes('react-dom')) {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')) {
+    return 'feature-three-emotion'
+  }
+  if (normalizedId.includes('/src/components/three/Particle')) {
+    return 'feature-three-particle'
+  }
+  if (normalizedId.includes('/src/components/analytics/EnhancedChartComponent')) {
+    return 'feature-enhanced-chart'
+  }
+  if (normalizedId.includes('/src/components/ui/SwiperCarousel')) {
+    return 'feature-swiper'
+  }
+  if (
+    normalizedId.includes('/src/components/treatment/TreatmentPlanManager') ||
+    normalizedId.includes('/src/components/therapy/TreatmentPlanManager')
+  ) {
+    return 'feature-treatment-plan'
+  }
+  if (normalizedId.includes('/src/components/security/FHEDemo')) {
+    return 'feature-fhe'
+  }
+  if (normalizedId.includes('/src/components/demo/FHEDemo')) {
+    return 'feature-fhe-demo'
+  }
+  if (normalizedId.includes('/src/components/chat/TherapyChatSystem')) {
+    return 'feature-therapy-chat'
+  }
+  if (normalizedId.includes('/src/components/session/EmotionTemporalAnalysisChart')) {
+    return 'feature-emotion-temporal'
+  }
+
+  if (normalizedId.includes('/react/') || normalizedId.includes('/react-dom/')) {
     return 'react-vendor'
   }
-  if (id.includes('framer-motion') || id.includes('lucide-react')) {
+  if (
+    normalizedId.includes('framer-motion') ||
+    normalizedId.includes('@radix-ui/react-virtualizer') ||
+    normalizedId.includes('lucide-react')
+  ) {
     return 'ui-vendor'
   }
-  if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+  if (
+    normalizedId.includes('/clsx/') ||
+    normalizedId.includes('/date-fns/') ||
+    normalizedId.includes('/axios/')
+  ) {
     return 'utils-vendor'
   }
-  if (id.includes('recharts') || id.includes('chart.js')) {
+  if (
+    normalizedId.includes('/recharts') ||
+    normalizedId.includes('/react-chartjs-2')
+  ) {
     return 'charts-vendor'
   }
-  if (id.includes('three') || id.includes('@react-three')) {
+  if (
+    normalizedId.includes('/chart.js') ||
+    normalizedId.includes('/chart.js/')
+  ) {
+    return 'chartjs-vendor'
+  }
+  if (
+    normalizedId.includes('three') ||
+    normalizedId.includes('@react-three')
+  ) {
     return 'three-vendor'
   }
-  if (id.includes('node_modules')) {
+  if (normalizedId.includes('/swiper')) {
+    return 'swiper-vendor'
+  }
+  if (normalizedId.includes('/node_modules/')) {
     return 'vendor'
   }
   return null
@@ -81,7 +164,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://pixelatedempathy.com',
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -182,8 +265,7 @@ export default defineConfig({
         onwarn(warning, warn) {
           if (
             warning.code === 'SOURCEMAP_ERROR' ||
-            (warning.message &&
-              warning.message.includes("didn't generate a sourcemap"))
+            (warning.message?.includes("didn't generate a sourcemap"))
           ) {
             return
           }
@@ -204,6 +286,23 @@ export default defineConfig({
       },
     },
     plugins: [
+      ...(hasSentryDSN
+        ? [
+            ...createScopedSentryVitePlugins({
+              ssr: false,
+              assets: [
+                './dist/client/_astro/**/*.js',
+                './dist/client/_astro/**/*.js.map',
+              ],
+              filesToDeleteAfterUpload: ['./dist/client/_astro/**/*.map'],
+            }),
+            ...createScopedSentryVitePlugins({
+              ssr: true,
+              assets: ['./dist/server/**/*.mjs', './dist/server/**/*.mjs.map'],
+              filesToDeleteAfterUpload: ['./dist/server/**/*.map'],
+            }),
+          ]
+        : []),
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
         visualizer({
@@ -221,6 +320,7 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'astro-icon/components': path.resolve('./src/components/ui/astro-icon-components.ts'),
         'src/': path.resolve('./src'),
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
@@ -327,46 +427,14 @@ export default defineConfig({
     return [
       ...base,
       UnoCSS({ injectReset: true }),
-      icon({
-        include: {
-          lucide: [
-            'calendar',
-            'user',
-            'settings',
-            'heart',
-            'brain',
-            'shield-check',
-            'info',
-            'arrow-left',
-            'shield',
-            'user-plus',
-          ],
-        },
-        svgdir: './src/icons',
-      }),
       ...(hasSentryDSN
         ? [
             sentry({
-              sourceMapsUploadOptions: {
-                org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-                project: process.env.SENTRY_PROJECT || 'pixel-astro',
-                authToken: process.env.SENTRY_AUTH_TOKEN,
-                // Include release for proper stack trace linking and code mapping
-                release:
-                  process.env.SENTRY_RELEASE ||
-                  process.env.npm_package_version ||
-                  undefined,
-                telemetry: false,
-                sourcemaps: {
-                  assets: [
-                    './.astro/dist/**/*.js',
-                    './.astro/dist/**/*.mjs',
-                    './dist/**/*.js',
-                    './dist/**/*.mjs',
-                  ],
-                  ignore: ['**/node_modules/**'],
-                  filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
-                },
+              telemetry: false,
+              // Upload sourcemaps through the Vite plugin so each Astro build
+              // phase only uploads the files it actually emitted.
+              sourcemaps: {
+                disable: true,
               },
             }),
             // Temporarily disable SpotlightJS due to build issues

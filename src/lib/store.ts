@@ -262,7 +262,7 @@ export const useStore = create<StoreState>()(
           initializeMentalHealthChat: () => {
             if (get().fheService) {
               const mentalHealthChat = createMentalHealthChat(
-                get().fheService as FHEService,
+                get().fheService,
                 {
                   enableAnalysis: get().mentalHealthAnalysisEnabled,
                   useExpertGuidance: get().expertGuidanceEnabled,
@@ -474,7 +474,7 @@ export const useStore = create<StoreState>()(
             })),
           getDraft: (formId) => {
             const draft = get().formDrafts[formId]
-            return draft?.data || null
+            return draft?.data ?? null
           },
           clearDraft: (formId) =>
             set((state) => {

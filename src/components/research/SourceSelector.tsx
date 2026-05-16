@@ -20,7 +20,8 @@ interface SourceSelectorProps {
   onChange: (sources: string[]) => void
 }
 
-export default function SourceSelector({
+// ⚡ Bolt: Wrapped in React.memo to prevent unnecessary re-renders when parent SearchInterface state updates during typing
+const SourceSelector = React.memo(function SourceSelector({
   selectedSources,
   onChange,
 }: SourceSelectorProps) {
@@ -58,10 +59,15 @@ export default function SourceSelector({
     (selectedSources.includes('all') && source === 'all')
 
   return (
-    <div className='flex flex-wrap justify-center gap-2'>
+    <div
+      className='flex flex-wrap justify-center gap-2'
+      role='group'
+      aria-label='Filter by source'
+    >
       <button
         className={`source-chip ${isSelected('all') ? 'active' : ''}`}
         onClick={() => toggleSource('all')}
+        aria-pressed={isSelected('all')}
       >
         All Sources
       </button>
@@ -70,12 +76,14 @@ export default function SourceSelector({
       <button
         className={`source-chip ${isSelected('publisher') ? 'active' : ''}`}
         onClick={() => toggleSource('publisher')}
+        aria-pressed={isSelected('publisher')}
       >
         Publishers
       </button>
       <button
         className={`source-chip ${isSelected('api') ? 'active' : ''}`}
         onClick={() => toggleSource('api')}
+        aria-pressed={isSelected('api')}
       >
         APIs
       </button>
@@ -83,6 +91,7 @@ export default function SourceSelector({
         className={`source-chip ${isSelected('dataset') ? 'active' : ''}`}
         onClick={() => toggleSource('dataset')}
         title='Therapy Datasets (HuggingFace, etc.)'
+        aria-pressed={isSelected('dataset')}
       >
         Datasets
       </button>
@@ -93,21 +102,26 @@ export default function SourceSelector({
       <button
         className={`source-chip ${isSelected('arxiv') ? 'active' : ''}`}
         onClick={() => toggleSource('arxiv')}
+        aria-pressed={isSelected('arxiv')}
       >
         ArXiv
       </button>
       <button
         className={`source-chip ${isSelected('pubmed') ? 'active' : ''}`}
         onClick={() => toggleSource('pubmed')}
+        aria-pressed={isSelected('pubmed')}
       >
         PubMed
       </button>
       <button
         className={`source-chip ${isSelected('apa_publisher') ? 'active' : ''}`}
         onClick={() => toggleSource('apa_publisher')}
+        aria-pressed={isSelected('apa_publisher')}
       >
         APA
       </button>
     </div>
   )
-}
+})
+
+export default SourceSelector

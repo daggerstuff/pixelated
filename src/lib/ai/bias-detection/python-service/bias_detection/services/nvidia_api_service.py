@@ -38,7 +38,9 @@ class NvidiaAPIService:
                 # Find NVIDIA provider configuration
                 for provider in config.get("Providers", []):
                     if provider.get("name") == self.provider_name:
-                        self.api_base_url = provider.get("api_base_url", self.api_base_url)
+                        self.api_base_url = provider.get(
+                            "api_base_url", self.api_base_url
+                        )
                         self.api_key = provider.get("api_key")
 
                         # Verify model is available
@@ -46,33 +48,37 @@ class NvidiaAPIService:
                         if self.model_name not in models:
                             logger.warning(
                                 f"Model {self.model_name} not found in provider configuration",
-                                available_models=models
+                                available_models=models,
                             )
                         break
                 else:
-                    logger.warning(f"Provider {self.provider_name} not found in configuration")
+                    logger.warning(
+                        f"Provider {self.provider_name} not found in configuration"
+                    )
 
             # Fallback to environment variable if not found in config
             if not self.api_key:
                 self.api_key = os.getenv("NVIDIA_API_KEY")
 
             if not self.api_key:
-                raise ValueError("NVIDIA API key not found in configuration or environment")
+                raise ValueError(
+                    "NVIDIA API key not found in configuration or environment"
+                )
 
         except Exception as e:
             logger.error(f"Failed to load NVIDIA API configuration: {e!s}")
             raise
 
     async def chat_completion(
-            self,
-            messages: list[dict[str, str]],
-            max_tokens: int = 16384,
-            temperature: float = 1.0,
-            top_p: float = 1.0,
-            stream: bool = False,
-            thinking: bool = True,
-            timeout: float | None = None
-    ) -> dict[str, Any] | AsyncGenerator[str, None]:
+        self,
+        messages: list[dict[str, str]],
+        max_tokens: int = 16384,
+        temperature: float = 1.0,
+        top_p: float = 1.0,
+        stream: bool = False,
+        thinking: bool = True,
+        timeout: float | None = None,
+    ) -> dict[str, Any] | AsyncGenerator[str]:
         """
         Send chat completion request to Kimi-k2.5 model via NVIDIA API
 
@@ -92,7 +98,7 @@ class NvidiaAPIService:
             # Prepare headers
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
             if stream:
@@ -107,7 +113,7 @@ class NvidiaAPIService:
                 "max_tokens": max_tokens,
                 "temperature": temperature,
                 "top_p": top_p,
-                "stream": stream
+                "stream": stream,
             }
 
             # Add thinking parameter if enabled
@@ -122,7 +128,7 @@ class NvidiaAPIService:
                     self.api_base_url,
                     headers=headers,
                     json=payload,
-                    timeout=timeout or 30.0
+                    timeout=timeout or 30.0,
                 )
 
                 response.raise_for_status()
@@ -137,7 +143,9 @@ class NvidiaAPIService:
                     model=self.model_name,
                     processing_time_ms=int(processing_time * 1000),
                     prompt_tokens=result.get("usage", {}).get("prompt_tokens", 0),
-                    completion_tokens=result.get("usage", {}).get("completion_tokens", 0)
+                    completion_tokens=result.get("usage", {}).get(
+                        "completion_tokens", 0
+                    ),
                 )
                 return result
 
@@ -146,25 +154,23 @@ class NvidiaAPIService:
                 "NVIDIA API HTTP error",
                 status_code=e.response.status_code,
                 response_text=e.response.text,
-                model=self.model_name
+                model=self.model_name,
             )
             raise
         except httpx.RequestError as e:
             logger.error(
-                "NVIDIA API request error",
-                error=str(e),
-                model=self.model_name
+                "NVIDIA API request error", error=str(e), model=self.model_name
             )
             raise
         except Exception as e:
             logger.error(
                 "Unexpected error in NVIDIA API call",
                 error=str(e),
-                model=self.model_name
+                model=self.model_name,
             )
             raise
 
-    async def _stream_response(self, response: httpx.Response) -> AsyncGenerator[str, None]:
+    async def _stream_response(self, response: httpx.Response) -> AsyncGenerator[str]:
         """
         Process streaming response from NVIDIA API
 
@@ -204,7 +210,7 @@ class NvidiaAPIService:
             # Simple model list request to check connectivity
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
 
             async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -218,7 +224,7 @@ class NvidiaAPIService:
                     "model": self.model_name,
                     "api_base_url": self.api_base_url,
                     "response_time_ms": int(response_time * 1000),
-                    "timestamp": time.time()
+                    "timestamp": time.time(),
                 }
 
         except Exception as e:
@@ -228,7 +234,7 @@ class NvidiaAPIService:
                 "provider": self.provider_name,
                 "model": self.model_name,
                 "error": str(e),
-                "timestamp": time.time()
+                "timestamp": time.time(),
             }
 
 
@@ -239,13 +245,13 @@ async def get_nvidia_service() -> NvidiaAPIService:
 
 
 async def kimi_chat_completion(
-        messages: list[dict[str, str]],
-        max_tokens: int = 16384,
-        temperature: float = 1.0,
-        top_p: float = 1.0,
-        stream: bool = False,
-        thinking: bool = True
-) -> dict[str, Any] | AsyncGenerator[str, None]:
+    messages: list[dict[str, str]],
+    max_tokens: int = 16384,
+    temperature: float = 1.0,
+    top_p: float = 1.0,
+    stream: bool = False,
+    thinking: bool = True,
+) -> dict[str, Any] | AsyncGenerator[str]:
     """
     Convenience function for Kimi-k2.5 chat completion
 
@@ -267,7 +273,7 @@ async def kimi_chat_completion(
         temperature=temperature,
         top_p=top_p,
         stream=stream,
-        thinking=thinking
+        thinking=thinking,
     )
 
 
@@ -283,9 +289,7 @@ async def example_usage():
         print(f"Health check: {health}")
 
         # Simple chat completion
-        messages = [
-            {"role": "user", "content": "Hello, how are you?"}
-        ]
+        messages = [{"role": "user", "content": "Hello, how are you?"}]
 
         response = await service.chat_completion(messages)
         print(f"Response: {response}")

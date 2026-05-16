@@ -100,12 +100,19 @@ deploy_vercel() {
     log "✅ Vercel deployment completed"
 }
 
-# Deploy to DigitalOcean
+# Deploy to DigitalOcean (legacy flow)
 deploy_digitalocean() {
+    local enable_legacy_doctl="${ENABLE_LEGACY_DOCTL:-0}"
+
+    if [[ "${enable_legacy_doctl}" != "1" ]]; then
+        error "DigitalOcean deployment is a legacy flow and is disabled by default. Set ENABLE_LEGACY_DOCTL=1 to run it."
+    fi
+
     log "Deploying to DigitalOcean App Platform..."
     
-    # Create/update DigitalOcean app
-    doctl apps create --spec .do/app.yaml --wait
+    # Create/update DigitalOcean app (legacy path)
+    local doctl_cli="${DOCTL_CLI:-doctl}"
+    "${doctl_cli}" apps create --spec .do/app.yaml --wait
     
     log "✅ DigitalOcean deployment completed"
 }
@@ -236,7 +243,7 @@ show_help() {
     echo "Options:"
     echo "  aws          Deploy to AWS ECS only"
     echo "  vercel       Deploy to Vercel only"
-    echo "  digitalocean Deploy to DigitalOcean only"
+    echo "  digitalocean Deploy to DigitalOcean only (legacy, optional)"
     echo "  all          Deploy to all platforms (default)"
     echo "  rollback     Rollback to previous version"
     echo "  help         Show this help message"

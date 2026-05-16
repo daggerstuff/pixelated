@@ -39,16 +39,13 @@ export interface AuditLogEntry {
   id: string
   userId: string
   action: string
-  resource: {
-    id: string
-    type: string | undefined
-  }
+  resource: { id: string; type: string | undefined }
   metadata: Record<string, unknown>
   timestamp: string // Will be parsed as Date in code
 }
 
 // Simple Table wrapper that doesn't require the complex props
-const Table: FC<React.PropsWithChildren> = ({ children }) => {
+const Table: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <UITable
       columns={[]}
@@ -112,11 +109,9 @@ export function AuditLogDashboard() {
         params.append('userId', filters.userId)
       }
       // Optionally handle pagination/limits here if desired
-
       const res = await fetch('/api/admin/audit-logs?' + params.toString())
       const data = await res.json()
-      let fetchedLogs: AuditLogEntry[] = data.logs || []
-
+      let fetchedLogs: AuditLogEntry[] = data.logs ?? []
       // Apply date range filter if set
       if (filters.startDate || filters.endDate) {
         fetchedLogs = fetchedLogs.filter((log) => {
@@ -130,21 +125,17 @@ export function AuditLogDashboard() {
           return true
         })
       }
-
       // Apply search term filter if set
       if (filters.searchTerm) {
         const searchLower = filters.searchTerm.toLowerCase()
         fetchedLogs = fetchedLogs.filter(
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
-            (log.resource.type &&
-              log.resource.type.toLowerCase().includes(searchLower)) ||
-            (log.resource.id &&
-              log.resource.id.toLowerCase().includes(searchLower)) ||
+            ((log.resource.type?.toLowerCase().includes(searchLower)) ??
+            (log.resource.id?.toLowerCase().includes(searchLower))) ||
             log.userId.toLowerCase().includes(searchLower),
         )
       }
-
       setLogs(fetchedLogs)
     } catch (error: unknown) {
       console.error('Error fetching audit logs:', error)
@@ -158,19 +149,15 @@ export function AuditLogDashboard() {
   }, [fetchLogs])
 
   const getEventTypeStats = () => {
-    const stats = logs.reduce(
+    const stats = logs.reduce< Record<string, number>>(
       (acc, log) => {
         const type = log.action
-        acc[type] = (acc[type] || 0) + 1
+        acc[type] = (acc[type] ?? 0) + 1
         return acc
       },
-      {} as Record<string, number>,
+      {},
     )
-
-    return Object.entries(stats).map(([name, value]) => ({
-      name,
-      value,
-    }))
+    return Object.entries(stats).map(([name, value]) => ({ name, value }))
   }
 
   const columns = [
@@ -178,22 +165,13 @@ export function AuditLogDashboard() {
       header: 'Timestamp',
       cell: (log: AuditLogEntry) => format(new Date(log.timestamp), 'PPpp'),
     },
-    {
-      header: 'Action',
-      cell: (log: AuditLogEntry) => log.action,
-    },
-    {
-      header: 'User ID',
-      cell: (log: AuditLogEntry) => log.userId,
-    },
+    { header: 'Action', cell: (log: AuditLogEntry) => log.action },
+    { header: 'User ID', cell: (log: AuditLogEntry) => log.userId },
     {
       header: 'Resource Type',
       cell: (log: AuditLogEntry) => log.resource.type,
     },
-    {
-      header: 'Resource ID',
-      cell: (log: AuditLogEntry) => log.resource.id,
-    },
+    { header: 'Resource ID', cell: (log: AuditLogEntry) => log.resource.id },
     {
       header: 'Details',
       cell: (log: AuditLogEntry) =>
@@ -208,7 +186,8 @@ export function AuditLogDashboard() {
         <CardHeader>
           <CardTitle>Filters</CardTitle>
           <CardDescription>
-            Filter audit logs by various criteria
+            {' '}
+            Filter audit logs by various criteria{' '}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -226,12 +205,12 @@ export function AuditLogDashboard() {
                 <SelectItem value=''>All Events</SelectItem>
                 {eventTypes.map((type) => (
                   <SelectItem key={type} value={type}>
-                    {type}
+                    {' '}
+                    {type}{' '}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-
             <Input
               placeholder='User ID'
               value={filters.userId}
@@ -239,7 +218,6 @@ export function AuditLogDashboard() {
                 setFilters({ ...filters, userId: e.target.value })
               }
             />
-
             <Input
               type='date'
               value={filters.startDate}
@@ -247,7 +225,6 @@ export function AuditLogDashboard() {
                 setFilters({ ...filters, startDate: e.target.value })
               }
             />
-
             <Input
               type='date'
               value={filters.endDate}
@@ -255,7 +232,6 @@ export function AuditLogDashboard() {
                 setFilters({ ...filters, endDate: e.target.value })
               }
             />
-
             <Input
               placeholder='Search...'
               value={filters.searchTerm}
@@ -263,18 +239,17 @@ export function AuditLogDashboard() {
                 setFilters({ ...filters, searchTerm: e.target.value })
               }
             />
-
-            <Button onClick={() => fetchLogs()}>Apply Filters</Button>
+            <Button onClick={ async () => fetchLogs()}>Apply Filters</Button>
           </div>
         </CardContent>
       </Card>
-
       {/* Statistics */}
       <Card>
         <CardHeader>
           <CardTitle>Event Distribution</CardTitle>
           <CardDescription>
-            Distribution of audit events by type
+            {' '}
+            Distribution of audit events by type{' '}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -291,7 +266,6 @@ export function AuditLogDashboard() {
           </div>
         </CardContent>
       </Card>
-
       {/* Logs Table */}
       <Card>
         <CardHeader>
@@ -315,7 +289,8 @@ export function AuditLogDashboard() {
                   <TableRow key={log.id}>
                     {columns.map((column) => (
                       <TableCell key={column.header}>
-                        {column.cell(log)}
+                        {' '}
+                        {column.cell(log)}{' '}
                       </TableCell>
                     ))}
                   </TableRow>

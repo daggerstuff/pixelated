@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import type { ProgressMetrics } from '@/lib/api/journal-research/types'
 import { cn } from '@/lib/utils'
 
@@ -92,7 +92,7 @@ export function MetricsChart({
         },
       ],
     }
-  }, [metrics, timeRange]).slice()
+  }, [metrics, timeRange])
 
   return (
     <Card className={cn('w-full', className)}>

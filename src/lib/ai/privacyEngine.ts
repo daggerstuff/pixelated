@@ -32,11 +32,11 @@ export interface PrivacyEngineResult {
  * Advanced Privacy-Preserving AI Engine
  */
 class PrivacyEngine {
-  private federatedConfig: FederatedLearningConfig
-  private dpConfig: DifferentialPrivacyConfig
+  private readonly federatedConfig: FederatedLearningConfig
+  private readonly dpConfig: DifferentialPrivacyConfig
   private globalModel: any = null
-  private clientModels = new Map<string, any>()
-  private privacyBudgets = new Map<string, number>()
+  private readonly clientModels = new Map<string, any>()
+  private readonly privacyBudgets = new Map<string, number>()
 
   constructor() {
     this.federatedConfig = {
@@ -131,7 +131,7 @@ class PrivacyEngine {
 
     // Update client's privacy budget
     const currentBudget =
-      this.privacyBudgets.get(clientId) || this.federatedConfig.privacyBudget
+      this.privacyBudgets.get(clientId) ?? this.federatedConfig.privacyBudget
     const usedBudget = this.calculatePrivacyCost(modelUpdate, clientData)
     this.privacyBudgets.set(clientId, currentBudget - usedBudget)
 
@@ -282,7 +282,7 @@ class PrivacyEngine {
   private federatedProximal(updates: ModelUpdate[]): ModelUpdate {
     // FedProx: Federated learning with proximal regularization
     const mu = 0.01 // Proximal term weight
-    const globalWeights = this.globalModel?.weights || updates[0].weights
+    const globalWeights = this.globalModel?.weights ?? updates[0].weights
 
     const proximalWeights = Array.from(
       { length: globalWeights.length },
@@ -528,14 +528,14 @@ class PrivacyEngine {
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + (input.moodScore || 0), 0) /
+          inputs.reduce((sum, input) => sum + (input.moodScore ?? 0), 0) /
           (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => input.riskScore || 0))
+        return Math.max(...inputs.map((input) => input.riskScore ?? 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + (input.effectiveness || 0), 0) /
+          inputs.reduce((sum, input) => sum + (input.effectiveness ?? 0), 0) /
           (inputs.length || 1)
         )
       default:

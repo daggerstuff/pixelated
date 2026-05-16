@@ -5,11 +5,21 @@
 
 import { ManagementClient } from 'auth0'
 
+// Type alias for auth0 v5+ compatibility
+export type ManagementClientOptionsWithClientCredentials = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience?: string
+}
+
 import { auth0UserService } from '../../services/auth0.service'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
+
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
 
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
@@ -23,20 +33,18 @@ function initializeAuth0Management() {
     !auth0Config.managementClientId ||
     !auth0Config.managementClientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:users read:logs read:attack-protection update:attack-protection',
-    })
-  }
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  })
 }
 
 // Initialize the management client
@@ -67,11 +75,13 @@ export interface RiskScore {
   recommendedAction: 'allow' | 'challenge' | 'deny'
 }
 
+type RiskFactorValue = Record<string, unknown>
+
 export interface RiskFactor {
   name: string
   weight: number // 0-100
   description: string
-  value: any
+  value: RiskFactorValue
   triggered: boolean
 }
 
@@ -117,7 +127,9 @@ export class Auth0AdaptiveMFAService {
 
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
 
     // Default configuration
@@ -223,7 +235,7 @@ export class Auth0AdaptiveMFAService {
       }
 
       // Log risk assessment
-       logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, {
+      logSecurityEvent(SecurityEventType.RISK_ASSESSMENT, null, {
         userId: context.userId,
         riskScore: normalizedScore,
         factors: factors.map((f) => ({ name: f.name, triggered: f.triggered })),
@@ -243,7 +255,7 @@ export class Auth0AdaptiveMFAService {
         requiresMFA,
         recommendedAction,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to calculate risk score:', error)
 
       // In case of error, default to medium risk requiring MFA
@@ -266,7 +278,7 @@ export class Auth0AdaptiveMFAService {
     let weight = 25 // Base weight
     let triggered = false
     let description = `IP address analysis for ${ipAddress}`
-    let value: any = ipAddress
+    let value: RiskFactorValue = { ipAddress }
 
     try {
       // Check if IP is in whitelist
@@ -293,12 +305,12 @@ export class Auth0AdaptiveMFAService {
 
         // Check if this is a new IP for the user
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin && Math.random() < 0.1) {
+        if (user?.lastLogin && Math.random() < 0.1) {
           triggered = true
           description = `New or unusual IP address for user`
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze IP address:', error)
     }
 
@@ -321,7 +333,7 @@ export class Auth0AdaptiveMFAService {
     let weight = 20 // Base weight
     let triggered = false
     let description = 'Geolocation analysis'
-    let value: any = location
+    let value: RiskFactorValue = { ...location }
 
     try {
       if (this.config.enableGeofencing && location.country) {
@@ -346,7 +358,7 @@ export class Auth0AdaptiveMFAService {
         description = `Unusual location change detected`
         value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze geolocation:', error)
     }
 
@@ -366,7 +378,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 15 // Base weight
     let triggered = false
     let description = 'Time-based analysis'
-    const value: any = {
+    const value: RiskFactorValue = {
       hour: timestamp.getUTCHours(),
       dayOfWeek: timestamp.getUTCDay(),
       timestamp: timestamp.toISOString(),
@@ -399,7 +411,7 @@ export class Auth0AdaptiveMFAService {
           description = `Login within allowed time windows`
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze time context:', error)
     }
 
@@ -422,7 +434,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 20 // Base weight
     let triggered = false
     let description = 'Behavioral analysis'
-    let value: any = { userId, timestamp: timestamp.toISOString() }
+    let value: RiskFactorValue = { userId, timestamp: timestamp.toISOString() }
 
     try {
       if (this.config.enableBehavioralAnalysis) {
@@ -446,7 +458,7 @@ export class Auth0AdaptiveMFAService {
 
         // Check for unusual login patterns (simulated)
         const user = await auth0UserService.getUserById(userId)
-        if (user && user.lastLogin) {
+        if (user?.lastLogin) {
           const lastLoginTime = new Date(user.lastLogin)
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
 
@@ -460,7 +472,7 @@ export class Auth0AdaptiveMFAService {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze user behavior:', error)
     }
 
@@ -480,7 +492,7 @@ export class Auth0AdaptiveMFAService {
     const weight = 10 // Base weight
     let triggered = false
     let description = 'Device analysis'
-    const value: any = { userAgent }
+    const value: RiskFactorValue = { userAgent }
 
     try {
       if (this.config.enableDeviceProfiling) {
@@ -518,7 +530,7 @@ export class Auth0AdaptiveMFAService {
           description = `Potential automated tool detected`
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to analyze device:', error)
     }
 
@@ -540,7 +552,7 @@ export class Auth0AdaptiveMFAService {
     this.config = { ...this.config, ...newConfig }
 
     // Log configuration update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'adaptive_mfa',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString(),
@@ -564,7 +576,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.push(ipAddress)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'add',
         ipAddress,
@@ -582,7 +594,7 @@ export class Auth0AdaptiveMFAService {
       this.config.whitelistedIPs.splice(index, 1)
 
       // Log whitelist update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'ip_whitelist',
         action: 'remove',
         ipAddress,
@@ -599,7 +611,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.push(countryCode)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'add',
         countryCode,
@@ -617,7 +629,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedCountries.splice(index, 1)
 
       // Log country update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'country_allowlist',
         action: 'remove',
         countryCode,
@@ -633,7 +645,7 @@ export class Auth0AdaptiveMFAService {
     this.config.allowedTimeWindows.push(window)
 
     // Log time window update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'time_windows',
       action: 'add',
       window,
@@ -656,7 +668,7 @@ export class Auth0AdaptiveMFAService {
       this.config.allowedTimeWindows.splice(index, 1)
 
       // Log time window update
-       logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, {
+      logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
         configType: 'time_windows',
         action: 'remove',
         window,

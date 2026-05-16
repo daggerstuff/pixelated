@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext } from 'react'
+import React, { useState, useContext, createContext, type FC } from 'react'
 
 interface PopoverContextType {
   isOpen: boolean
@@ -33,7 +33,7 @@ export const Popover: FC<PopoverProps> = ({
   onOpenChange,
   className = '',
 }) => {
-  const [isOpen, setIsOpen] = useState(open || false)
+  const [isOpen, setIsOpen] = useState(open ?? false)
 
   const handleToggle = () => {
     const newOpen = !isOpen

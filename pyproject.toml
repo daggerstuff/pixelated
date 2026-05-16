@@ -18,7 +18,7 @@ dependencies = [
   "shap>=0.41.0",
   "lime",
   "scikit-image>=0.26.0",
-  "spacy>=3.8.11", # Updated to latest secure version
+  "spacy>=3.8.14", # Updated to latest secure version
   "nltk>=3.9.3", # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip)
   "evaluate",
   "cryptography>=46.0.5", # Updated to latest secure version
@@ -31,12 +31,13 @@ dependencies = [
   "psutil>=7.0.0",
   "chardet>=5.2.0,<8.0.0",
   "pydub>=0.25.1",
-  "pyarrow>=21.0.0",
+  "pyarrow>=23.0.1",
   "hatch>=1.14.1",
   "textstat>=0.7.8",
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
   "wandb>=0.21.1",
+  "tqdm>=4.67.0", # Progress bar for data processing scripts
   # Training dependencies
   "datasets>=2.19.0",
   "sentencepiece>=0.2.0",
@@ -44,8 +45,8 @@ dependencies = [
   "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
-  "transformers>=4.48.0", # Required for dataset_pipeline training_runner
-  "torch==2.10.0", # Downgraded to match ai-services/requirements.txt and src/lib/ai/training/requirements.txt
+  "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
+  "torch==2.11.0", # Downgraded to match ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
@@ -53,17 +54,17 @@ dependencies = [
   "openai>=1.107.2",
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
-  "authlib>=1.6.6", # Updated to latest secure version
+  "authlib>=1.6.11", # Updated to latest secure version
   "motor>=3.7.1",
   "structlog>=25.4.0",
   "redis>=6.4.0",
   "bcrypt>=4.3.0",
   "email-validator>=2.3.0",
-  "python-socketio>=5.14.0",
+  "python-socketio>=5.16.1",
   "flask-socketio>=5.3.6",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
-  "neo4j~=6.1.0",
+  "neo4j>=6.1,<6.3",
   # Security: Pin transitive dependencies to secure versions
   "fastmcp>=2.14.0", # Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
   "starlette>=0.49.1", # Fixes GHSA-7f5h-v6xp-fcq8
@@ -71,37 +72,38 @@ dependencies = [
   "keras>=3.12.0", # Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
   "fonttools>=4.61.1", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability, updated to 4.61.1)
   "mcp[cli]>=1.23.0", # Fixes GHSA-9h52-p55h-vw2f
+  "protobuf>=6.33.5", # Fixes CVE-2026-0994
   "urllib3>=2.6.2", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
-  "aiohttp>=3.13.3", # Fixes CVE-2025-69223, CVE-2025-69224, CVE-2025-69228, CVE-2025-69229, CVE-2025-69230
+  "aiohttp>=3.13.5", # Fixes CVE-2025-69223, CVE-2025-69224, CVE-2025-69228, CVE-2025-69229, CVE-2025-69230
   # Security: Pin pillow to fix CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "pillow>=12.1.1",
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "kaggle>=1.8.2",
+  "youtube-transcript-api>=0.6.0",
   "boto3>=1.40.75", # Keep compatible with checkov
   # Google Drive API for direct Drive-to-Drive transfers
   "google-api-python-client>=2.150.0",
   "google-auth-httplib2>=0.2.0",
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
-  "ngcsdk>=4.10.0",
+  "ngcsdk>=4.16.0",
   "onnx>=1.20.1",
-  "onnxscript>=0.5.7",
-  "mem0-mcp-server>=0.2.1",
+  "onnxscript>=0.6.2",
   "fastapi>=0.124.4",
-  "uvicorn>=0.38.0",
+  "uvicorn>=0.44.0",
   "minio>=7.2.20",
   "librosa>=0.11.0",
   "langsmith-fetch>=0.3.1",
-  "ray>=2.53.0",
+  "ray>=2.55.0",
   "pydantic>=2.12.5",
   "clickhouse-driver>=0.2.10",
-  "mem0ai>=1.0.2",
-  "pydantic-ai>=1.56.0",
+  # pydantic-ai removed from core runtime dependencies to avoid incompatible telemetry resolver constraints
+  # until a compatible 1.82+ + traceloop/opentelemetry stack is adopted.
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
   "e2b>=2.6.1",
-  "lancedb>=0.29.2",
+  "lancedb>=0.30.2",
   "openai-whisper>=20250625",
   "faster-whisper>=1.2.0",
   "kernels>=0.12.1",
@@ -113,12 +115,16 @@ dependencies = [
   "lightning-sdk>=2025.12.2",
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
-  "GitPython>=3.1.43",
-  "modal>=1.3.5",
+  "gitpython>=3.1.43",
+  "modal>=1.4.1",
   "gradient-adk>=0.2.11",
-  "honeyhive>=0.2.19",
   "virtualenv>=21.2.0",
   "voyageai>=0.3.7",
+  "aiosqlite>=0.22.1",
+  "semgrep>=1.79.0",
+  "webdriver-manager>=4.0.2",
+  "selenium>=4.43.0",
+  "undetected-chromedriver>=3.5.5",
 ]
 [project.optional-dependencies]
 test = [
@@ -185,7 +191,7 @@ reportPrivateUsage = false
 pythonVersion = "3.13"
 [tool.ruff]
 target-version = "py313"
-line-length = 100
+line-length = 120
 exclude = [
   "node_modules",
   "stubs",
@@ -245,10 +251,10 @@ force_single_line = false
 addopts = "-ra --strict-markers"
 testpaths = ["tests", "ai/core/tests"]
 norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
-filterwarnings = [
-  "ignore:.*WordPiece.*:DeprecationWarning",
-  "ignore:.*swig.*:DeprecationWarning",
-  "ignore:.*Swig.*:DeprecationWarning",
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+  "integration: marks tests as integration tests (require external services)",
+  "slow: marks tests as slow running",
 ]
 [tool.coverage.run]
 branch = true
@@ -256,6 +262,16 @@ source = ["src", "ai"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+fail_under = 70
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@abstractmethod",
+]
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
 exclude = ["ai"]
@@ -278,8 +294,8 @@ dev = [
   "pip-audit>=2.9.0",
   "pytest-asyncio>=1.0.0",
   "pytest-cov>=6.2.1",
-  "pytest-mock>=3.12.0",
-  "pytest>=8.4.2",
+  "pytest-mock>=3.15.1",
+  "pytest>=9.0.3",
   "pyright>=1.1.408",
   "ruff-lsp>=0.0.62",
   "ruff>=0.12.5",

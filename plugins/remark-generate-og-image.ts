@@ -7,11 +7,14 @@ import type { ReactNode } from 'react'
 import type { SatoriOptions } from 'satori'
 import satori from 'satori'
 import type { VFile } from 'vfile'
-import type { VNode, RendererNode, RendererElement } from 'vue'
 
 import { FEATURES } from '../src/config'
 import type { BgType } from '../src/types'
-import { checkFileExistsInDir, unescapeHTML } from '../src/utils/common'
+import {
+  checkFileExistsInDir,
+  unescapeHTML,
+  type VNode,
+} from '../src/utils/common'
 import { getCurrentFormattedTime } from '../src/utils/datetime'
 import { ogImageMarkup } from './og-template/markup'
 
@@ -119,7 +122,7 @@ function remarkGenerateOgImage() {
     }
 
     // check if it need to be skipped
-    if (!title || !title.trim().length) {
+    if (!title?.trim().length) {
       return
     }
     if (pageOgImage === false) {
@@ -157,7 +160,7 @@ function remarkGenerateOgImage() {
     }
 
     // get bgType
-    const bgType = pageBgType || fallbackBgType
+    const bgType = pageBgType ?? fallbackBgType
 
     // generate og images
     await generateOgImage(

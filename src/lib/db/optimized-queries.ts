@@ -5,8 +5,7 @@
 
 import { PoolClient, QueryResult } from 'pg'
 
-import { getLogger } from '@/lib/logging'
-
+import { getLogger } from '../logging'
 import { getPool } from './index'
 
 const logger = getLogger('optimized-queries')
@@ -54,9 +53,9 @@ export async function executeQuery<T = unknown>(
   } = {},
 ): Promise<QueryResult<T>> {
   const startTime = Date.now()
-  const queryName = options.name || 'unnamed'
-  const timeout = options.timeout || QUERY_CONFIG.TIMEOUT_MS
-  const maxRetries = options.retries || QUERY_CONFIG.MAX_RETRIES
+  const queryName = options.name ?? 'unnamed'
+  const timeout = options.timeout ?? QUERY_CONFIG.TIMEOUT_MS
+  const maxRetries = options.retries ?? QUERY_CONFIG.MAX_RETRIES
 
   let lastError: Error | null = null
 
@@ -95,7 +94,7 @@ export async function executeQuery<T = unknown>(
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error instanceof Error ? error : new Error(String(error))
 
       logger.warn(`Query attempt ${attempt} failed`, {
@@ -134,8 +133,8 @@ export async function executeTransaction<T>(
   } = {},
 ): Promise<T> {
   const startTime = Date.now()
-  const transactionName = options.name || 'unnamed'
-  const timeout = options.timeout || QUERY_CONFIG.TIMEOUT_MS
+  const transactionName = options.name ?? 'unnamed'
+  const timeout = options.timeout ?? QUERY_CONFIG.TIMEOUT_MS
 
   const client = await getPool().connect()
 
@@ -157,11 +156,16 @@ export async function executeTransaction<T>(
     })
 
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query('ROLLBACK')
 
     const executionTime = Date.now() - startTime
-    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorMessage =
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : String(error)
 
     logger.error('Transaction failed', {
       transactionName,
@@ -286,7 +290,7 @@ export class OptimizedBiasQueries {
     const countResult = await executeQuery(countQuery, params.slice(0, -2), {
       name: 'getBiasAnalysesCount',
     })
-    const total = parseInt(countResult.rows[0].total)
+    const total = parseInt((countResult.rows[0] as { total: string }).total)
 
     return {
       analyses: result.rows,
@@ -322,7 +326,7 @@ export class OptimizedBiasQueries {
       timeout: 2000, // 2 second timeout for cache lookups
     })
 
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   /**
@@ -369,11 +373,15 @@ export class OptimizedBiasQueries {
 
       if (recentWeek.length > 0 && previousWeek.length > 0) {
         const recentAvg =
-          recentWeek.reduce((sum, day) => sum + parseFloat(day.avg_score), 0) /
-          recentWeek.length
+          recentWeek.reduce(
+            (sum: number, day: { avg_score: string }) =>
+              sum + parseFloat(day.avg_score),
+            0,
+          ) / recentWeek.length
         const previousAvg =
           previousWeek.reduce(
-            (sum, day) => sum + parseFloat(day.avg_score),
+            (sum: number, day: { avg_score: string }) =>
+              sum + parseFloat(day.avg_score),
             0,
           ) / previousWeek.length
 
@@ -468,13 +476,19 @@ export class OptimizedBiasQueries {
     const cacheResult = await executeQuery(cacheHitQuery, [], {
       name: 'getCacheHitRate',
     })
-    const cacheHitRate = cacheResult.rows[0]?.cache_hit_rate || 0
+    const cacheHitRate =
+      (cacheResult.rows[0] as { cache_hit_rate: string } | {}).cache_hit_rate ??
+      0
 
     return {
-      total_analyses: parseInt(row.total_analyses),
-      avg_processing_time: parseFloat(row.avg_processing_time),
+      total_analyses: parseInt(
+        (row as { total_analyses: string }).total_analyses,
+      ),
+      avg_processing_time: parseFloat(
+        (row as { avg_processing_time: string }).avg_processing_time,
+      ),
       cache_hit_rate: parseFloat(cacheHitRate),
-      slow_queries: parseInt(row.slow_queries),
+      slow_queries: parseInt((row as { slow_queries: string }).slow_queries),
       error_rate: 0, // Would need error tracking table for real calculation
     }
   }
@@ -495,7 +509,7 @@ export class DatabaseOptimizer {
         try {
           await executeQuery(indexSql, [], { name: `createIndex_${table}` })
           logger.info(`Created index for ${table}`)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn(`Failed to create index for ${table}`, { error })
         }
       }
@@ -514,7 +528,7 @@ export class DatabaseOptimizer {
       try {
         await executeQuery(`ANALYZE ${table}`, [], { name: `analyze_${table}` })
         logger.info(`Analyzed table ${table}`)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Failed to analyze table ${table}`, { error })
       }
     }
@@ -532,7 +546,7 @@ export class DatabaseOptimizer {
           name: `vacuum_${table}`,
         })
         logger.info(`Vacuumed table ${table}`)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Failed to vacuum table ${table}`, { error })
       }
     }
@@ -596,7 +610,7 @@ export class DatabaseOptimizer {
         name: 'getQueryPerformance',
       })
       queryPerformance = queryPerfResult.rows
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('pg_stat_statements not available', { error })
     }
 

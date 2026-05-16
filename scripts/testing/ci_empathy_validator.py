@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "ai"))
 
-from test_empathy_style_validation import EmpathyStyleValidator  # noqa: E402
-
+from test_empathy_style_validation import EmpathyStyleValidator
 
 def get_changed_files():
     """Get list of changed files in current commit/PR"""

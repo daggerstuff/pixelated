@@ -65,12 +65,12 @@ export class EdgeThreatDetectionSystemCore
   implements EdgeThreatDetectionSystem
 {
   private redis!: Redis
-  private models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
-  private nodeStatus: Map<string, EdgeNodeStatus> = new Map()
+  private readonly models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
+  private readonly nodeStatus: Map<string, EdgeNodeStatus> = new Map()
   private detectionThresholds: DetectionThresholds
-  private modelPerformance: Map<string, ModelPerformance> = new Map()
+  private readonly modelPerformance: Map<string, ModelPerformance> = new Map()
 
-  constructor(private config: EdgeDetectionConfig) {
+  constructor(private readonly config: EdgeDetectionConfig) {
     super()
     this.detectionThresholds = config.detectionThresholds
   }
@@ -93,7 +93,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('system_initialized')
       logger.info('Edge Threat Detection System initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Edge Threat Detection System:', {
         error,
       })
@@ -104,10 +104,10 @@ export class EdgeThreatDetectionSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for edge detection')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -119,7 +119,7 @@ export class EdgeThreatDetectionSystemCore
         await this.loadModel(modelConfig)
       }
       logger.info(`Loaded ${this.config.aiModels.length} AI models`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load AI models:', { error })
       throw error
     }
@@ -135,6 +135,8 @@ export class EdgeThreatDetectionSystemCore
         case 'tensorflow':
           model = await this.loadTensorFlowModel(modelConfig)
           break
+        case "pytorch": { throw new Error('Not implemented yet: "pytorch" case') }
+        case "sklearn": { throw new Error('Not implemented yet: "sklearn" case') }
         default:
           throw new Error(`Unsupported framework: ${modelConfig.framework}`)
       }
@@ -153,7 +155,7 @@ export class EdgeThreatDetectionSystemCore
       })
 
       logger.info(`AI model loaded successfully: ${modelConfig.modelId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to load AI model ${modelConfig.modelId}:`, { error })
       throw error
     }
@@ -194,7 +196,7 @@ export class EdgeThreatDetectionSystemCore
       })
 
       return model
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to build TensorFlow model ${modelConfig.modelId}:`, {
         error,
       })
@@ -397,8 +399,8 @@ export class EdgeThreatDetectionSystemCore
   private async initializeEdgeNodes(): Promise<void> {
     try {
       // Initialize status for configured edge nodes
-      for (const region of this.config.regions || []) {
-        for (const node of region.edgeNodes || []) {
+      for (const region of this.config.regions ?? []) {
+        for (const node of region.edgeNodes ?? []) {
           this.nodeStatus.set(node.nodeId, {
             nodeId: node.nodeId,
             region: region.regionId,
@@ -406,14 +408,14 @@ export class EdgeThreatDetectionSystemCore
             load: 0,
             memoryUsage: 0,
             cpuUsage: 0,
-            activeModels: node.aiModels || [],
+            activeModels: node.aiModels ?? [],
             lastHeartbeat: new Date(),
           })
         }
       }
 
       logger.info(`Initialized ${this.nodeStatus.size} edge nodes`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize edge nodes:', { error })
       throw error
     }
@@ -445,7 +447,7 @@ export class EdgeThreatDetectionSystemCore
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Model monitoring error:', { error })
     }
   }
@@ -514,7 +516,7 @@ export class EdgeThreatDetectionSystemCore
       })
 
       return detectionResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to detect threat at edge:', {
         error,
         threatId: threatData.threatId,
@@ -600,14 +602,14 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = ( anomalyModel.predict(input)) as tf.Tensor
+      const prediction = anomalyModel.predict(input) as tf.Tensor
       const anomalyScore = await prediction.data()
 
       input.dispose()
       prediction.dispose()
 
       return anomalyScore[0]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Anomaly detection failed:', { error })
       return this.fallbackAnomalyDetection(features)
     }
@@ -640,7 +642,7 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = ( classificationModel.predict(input)) as tf.Tensor
+      const prediction = classificationModel.predict(input) as tf.Tensor
       const probabilities = await prediction.data()
 
       input.dispose()
@@ -657,7 +659,7 @@ export class EdgeThreatDetectionSystemCore
         confidence: probabilities[maxIndex],
         probabilities: Array.from(probabilities),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat classification failed:', { error })
       return this.fallbackClassification(features)
     }
@@ -704,14 +706,14 @@ export class EdgeThreatDetectionSystemCore
       }
 
       const input = tf.tensor2d([features])
-      const prediction = ( predictionModel.predict(input)) as tf.Tensor
+      const prediction = predictionModel.predict(input) as tf.Tensor
       const threatProbability = await prediction.data()
 
       input.dispose()
       prediction.dispose()
 
       return threatProbability[0]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat prediction failed:', { error })
       return this.fallbackPrediction(features)
     }
@@ -777,7 +779,7 @@ export class EdgeThreatDetectionSystemCore
           combined: severityScore,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to combine detection results:', { error })
       throw error
     }
@@ -944,7 +946,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('model_deployed', { modelId: modelConfig.modelId, nodeIds })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to deploy AI model:', {
         error,
         modelId: modelConfig.modelId,
@@ -976,7 +978,7 @@ export class EdgeThreatDetectionSystemCore
       status.lastHeartbeat = new Date()
 
       logger.info(`Model ${modelId} deployed to node ${nodeId}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to deploy model to node ${nodeId}:`, { error })
       throw error
     }
@@ -1003,7 +1005,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('thresholds_updated', { thresholds })
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update detection thresholds:', { error })
       return false
     }
@@ -1082,7 +1084,7 @@ export class EdgeThreatDetectionSystemCore
         activeNodes,
         totalNodes,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1095,7 +1097,7 @@ export class EdgeThreatDetectionSystemCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1123,7 +1125,7 @@ export class EdgeThreatDetectionSystemCore
 
       this.emit('system_shutdown')
       logger.info('Edge Threat Detection System shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

@@ -1,12 +1,15 @@
 ---
-title: 'Redis Testing Guide'
-description: 'Guide for testing Redis functionality'
-pubDate: 2025-03-25
+description: Guide for testing Redis functionality
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['redis', 'testing', 'vitest']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - redis
+  - testing
+  - vitest
+author: Pixelated Team
+title: Install dependencies
 ---
 
 ## Redis Service Testing Guide
@@ -42,7 +45,7 @@ recognition
 
 1. Setup Environment
    ```bash
-   # Install dependencies
+# Install dependencies
    pnpm install --no-frozen-lockfile
    ```
 
@@ -75,7 +78,7 @@ pnpm test:redis:watch
 
 3. View Results
    ```bash
-   # Open coverage report
+# Open coverage report
    open coverage/lcov-report/index.html
    ```
 
@@ -204,9 +207,11 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v2
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6.0.2
+      - uses: pnpm/action-setup@v6.0.6
+        with:
+          version: 11.1.1
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -275,39 +280,39 @@ jobs:
 1. Connection Failures
 
    ```bash
-   # Verify Redis is running
+# Verify Redis is running
    docker ps | grep redis
 
-   # Check Redis logs
+# Check Redis logs
    docker logs redis
 
-   # Test connection
+# Test connection
    redis-cli ping
    ```
 
 2. Performance Issues
 
    ```bash
-   # Monitor Redis metrics
+# Monitor Redis metrics
    redis-cli info
 
-   # Check system resources
+# Check system resources
    top -n 1
 
-   # View test metrics
+# View test metrics
    pnpm test:redis:perf
    ```
 
 3. Test Failures
 
    ```bash
-   # Run specific test
+# Run specific test
    pnpm test:redis:unit -t "test name"
 
-   # Debug test
+# Debug test
    NODE_OPTIONS=--inspect pnpm test:redis:unit
 
-   # View detailed logs
+# View detailed logs
    DEBUG=true pnpm test:redis:all
    ```
 
@@ -318,3 +323,4 @@ For issues and questions:
 - GitHub Issues: [Report a bug](https://github.com/your-repo/issues)
 - Documentation: [Redis Service API](./redis-service.mdx)
 - Slack: #redis-service channel
+

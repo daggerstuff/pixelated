@@ -53,7 +53,7 @@ class ApiMentalLLaMAAdapter implements ClientMentalLLaMAAdapter {
 
       const result = await response.json()
       return result as MentalHealthAnalysisResult
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to analyze mental health via API', { error })
 
       // Return a fallback analysis result
@@ -113,7 +113,7 @@ export async function createMentalLLaMAFromEnvSafe(): Promise<{
     try {
       const { createMentalLLaMAFromEnv } = await import('./index.js')
       return await createMentalLLaMAFromEnv()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load server-side MentalLLaMA adapter', { error })
       // Fallback to client adapter even on server if there's an issue
       return createClientMentalLLaMAAdapter()

@@ -5,6 +5,22 @@
 
 set -euo pipefail
 
+diagnose_rollout_failure() {
+  local namespace="$1"
+  local deployment_name="$2"
+
+  echo "Rollout failed or timed out for ${deployment_name} in ${namespace}."
+  kubectl describe deployment "${deployment_name}" -n "${namespace}" || true
+  kubectl get deployment "${deployment_name}" -n "${namespace}" -o wide || true
+  kubectl get pods -n "${namespace}" -l app="${deployment_name}" -o wide || true
+  for pod in $(kubectl get pods -n "${namespace}" -l app="${deployment_name}" --no-headers -o custom-columns=":metadata.name"); do
+    echo "=== Logs for ${pod} (previous) ==="
+    kubectl logs "${pod}" -n "${namespace}" --previous --tail=120 || true
+    echo "=== Logs for ${pod} (current) ==="
+    kubectl logs "${pod}" -n "${namespace}" --tail=120 || true
+  done
+}
+
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -41,6 +57,12 @@ log() {
 error_exit() {
     log ERROR "$1"
     exit 1
+}
+
+run_redis_hardening_audit() {
+    if ! "${PROJECT_ROOT}/scripts/check-redis-hardening.sh"; then
+        error_exit "Redis hardening audit failed"
+    fi
 }
 
 # Check prerequisites
@@ -259,8 +281,10 @@ deploy_application() {
     envsubst < "${PROJECT_ROOT}/k8s/multi-region/ingress.yaml" | kubectl apply -f - -n pixelated
     
     # Wait for deployment
-    kubectl rollout status deployment/pixelated-app -n pixelated --timeout=600s || \
+    if ! kubectl rollout status deployment/pixelated-app -n pixelated --timeout=600s; then
         log WARN "Deployment rollout timeout for $region"
+        diagnose_rollout_failure "pixelated" "pixelated-app"
+    fi
 }
 
 # Deploy GCP applications
@@ -616,6 +640,7 @@ main() {
     # Create log directory
     mkdir -p "$(dirname "$LOG_FILE")"
     
+    run_redis_hardening_audit
     # Run deployment steps
     check_prerequisites
     init_terraform

@@ -92,8 +92,9 @@ const RISK_FACTORS: RiskFactor[] = [
     description: 'Frequency of similar breaches',
     calculateScore: async (breach: SecurityBreach): Promise<number> => {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-      const recentBreaches =
-        await getBreachDataService().getBreachesSince(thirtyDaysAgo)
+      const recentBreaches = await (
+        await getBreachDataService()
+      ).getBreachesSince(thirtyDaysAgo)
       const similarBreaches = recentBreaches.filter(
         (b: SecurityBreach) => b.attackVector === breach.attackVector,
       )
@@ -191,14 +192,19 @@ export async function calculateOverallRisk(
 
     // Base risk level
     let overallScore = BASE_RISK
-    const factorResults = []
+    const factorResults: Array<{
+      name: string
+      score: number
+      contribution: number
+      metadata?: Record<string, unknown>
+    }> = []
 
     // Calculate individual factor scores
     for (const factor of RISK_FACTORS) {
       try {
         // Handle both synchronous and asynchronous score calculations
         const scores = await Promise.all(
-          breaches.map((breach) =>
+          breaches.map( async (breach) =>
             Promise.resolve(factor.calculateScore(breach)),
           ),
         )

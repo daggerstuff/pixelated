@@ -30,7 +30,7 @@ export const POST = async ({ request }) => {
     } catch (error: unknown) {
       logger.warn('Invalid JSON in request body', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        stack: error instanceof Error ? error?.stack : undefined,
       })
       return new Response(
         JSON.stringify({
@@ -69,7 +69,7 @@ export const POST = async ({ request }) => {
 
     // Verify user is authenticated
     const sessionData = await getSession(request)
-    if (!sessionData || !sessionData.user) {
+    if (!sessionData?.user) {
       logger.warn('Unauthorized access attempt to request export API')
       return new Response(
         JSON.stringify({
@@ -124,7 +124,7 @@ export const POST = async ({ request }) => {
   } catch (error: unknown) {
     logger.error('Error processing export request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
     })
 
     return new Response(

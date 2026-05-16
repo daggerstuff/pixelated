@@ -7,12 +7,12 @@ import * as React from 'react'
 
 // In React 19, act has been moved. We need to create a polyfill
 // that works with React Testing Library
-const act = (callback: () => void | Promise<void>): Promise<void> => {
+const act =  async (callback: () => void | Promise<void>): Promise<void> => {
   const result = callback()
 
   // If the callback returns a promise, wait for it
   if (result && typeof result === 'object' && 'then' in result) {
-    return Promise.resolve(result).then(() => {
+    return Promise.resolve(result).then( async () => {
       // Flush any pending updates
       if (typeof queueMicrotask !== 'undefined') {
         return new Promise<void>((resolve) => {
@@ -34,20 +34,43 @@ const act = (callback: () => void | Promise<void>): Promise<void> => {
 }
 
 // Try to add act to React object for React DOM test utils compatibility
-try {
-  if (!React.act || typeof React.act !== 'function') {
-    const reactNamespace = React as unknown as object
+const reactNamespace = React as unknown as object
+const actDescriptor = Object.getOwnPropertyDescriptor(reactNamespace, 'act')
+const reactCjs = React as unknown as Record<string, unknown>
+const cjsActDescriptor = Object.getOwnPropertyDescriptor(reactCjs, 'act')
 
-    Object.defineProperty(reactNamespace, 'act', {
-      value: act,
-      writable: true,
-      configurable: true,
-      enumerable: false,
-    })
+if (!React.act || typeof React.act !== 'function') {
+  if (!actDescriptor || actDescriptor.configurable) {
+    try {
+      Object.defineProperty(reactNamespace, 'act', {
+        value: act,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      })
+    } catch {
+      // If React exposes a non-configurable act implementation, leave it untouched.
+    }
   }
-} catch (defineError) {
-  // If we can't set it, log the error but continue
-  console.warn('Could not set React.act:', defineError)
+}
+
+if (!reactCjs.act || typeof reactCjs.act !== 'function') {
+  if (
+    !cjsActDescriptor ||
+    cjsActDescriptor.configurable ||
+    cjsActDescriptor.writable
+  ) {
+    try {
+      Object.defineProperty(reactCjs, 'act', {
+        value: act,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      })
+    } catch {
+      // Leave the CommonJS export untouched if the runtime locks it down.
+    }
+  }
 }
 
 // Export act for use in tests

@@ -29,10 +29,10 @@ export const options = {
 }
 
 // Base URL - can be overridden with environment variable
-const BASE_URL = globalThis.__ENV?.BASE_URL || 'http://localhost:3000'
+const BASE_URL = globalThis.__ENV?.BASE_URL ?? 'http://localhost:3000'
 
 // Test authentication token (should be provided via environment)
-const AUTH_TOKEN = globalThis.__ENV?.AUTH_TOKEN || 'test-jwt-token'
+const AUTH_TOKEN = globalThis.__ENV?.AUTH_TOKEN ?? 'test-jwt-token'
 
 // Headers for authenticated requests
 const headers = {
@@ -332,7 +332,7 @@ export function handleSummary(data) {
 
 // Helper function for text summary (fallback implementation)
 function textSummary(data, options = {}) {
-  const indent = options.indent || ''
+  const indent = options.indent ?? ''
 
   let summary = `${indent}Bias Detection Engine Load Test Results:\n`
   summary += `${indent}  Total Requests: ${data.metrics.http_reqs.count}\n`
@@ -345,7 +345,7 @@ function textSummary(data, options = {}) {
   }
 
   // Check if thresholds were met
-  const thresholdsMet = Object.entries(data.thresholds || {}).every(
+  const thresholdsMet = Object.entries(data.thresholds ?? {}).every(
     ([, result]) => !result.fails,
   )
   summary += `${indent}  All Thresholds Met: ${thresholdsMet ? '✅ Yes' : '❌ No'}\n`

@@ -3,37 +3,131 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import { AuthenticationClient } from 'auth0'
-import * as jwt from 'jsonwebtoken'
+import * as auth0 from 'auth0'
+
+interface JwtPayload {
+  iss?: string
+  sub?: string
+  aud?: string | string[]
+  exp?: number
+  nbf?: number
+  iat?: number
+  jti?: string
+  sid?: string
+}
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
-import { auth0Config, isAuth0Configured } from './auth0-config'
+import { auth0Config } from './auth0-config'
+
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
+type Auth0UserInfoClient = {
+  getUserInfo?: (
+    accessToken: string,
+  ) => Promise<{ data: Record<string, unknown> }>
+  getProfile?: (
+    accessToken: string,
+  ) => Promise<{ data: Record<string, unknown> }>
+}
+
+type Auth0RuntimeConfig = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience: string
+}
+
+type Auth0UserInfoClientConstructor = new (options: {
+  domain: string
+}) => Auth0UserInfoClient
+
+function getRuntimeAuth0Config(): Auth0RuntimeConfig {
+  return {
+    domain: process.env.AUTH0_DOMAIN ?? auth0Config.domain,
+    clientId: process.env.AUTH0_CLIENT_ID ?? auth0Config.clientId,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET ?? auth0Config.clientSecret,
+    audience: process.env.AUTH0_AUDIENCE ?? auth0Config.audience,
+  }
+}
+
+function isRuntimeAuth0Configured(config: Auth0RuntimeConfig): boolean {
+  return !!(config.domain && config.clientId && config.clientSecret)
+}
+
+function isAuth0UserInfoClientConstructor(
+  value: unknown,
+): value is Auth0UserInfoClientConstructor {
+  return typeof value === 'function'
+}
 
 // Initialize Auth0 authentication client
-let auth0Authentication: AuthenticationClient | null = null
+let auth0Authentication:
+  | (InstanceType<typeof auth0.AuthenticationClient> & Auth0UserInfoClient)
+  | null = null
+let auth0UserInfo: Auth0UserInfoClient | null = null
 
 /**
  * Initialize Auth0 authentication client
  */
 function initializeAuth0Client() {
-  if (!isAuth0Configured()) {
-    console.warn('Auth0 configuration incomplete')
+  const UserInfoClient = Reflect.get(auth0, 'UserInfoClient')
+
+  const runtimeConfig = getRuntimeAuth0Config()
+  if (!isRuntimeAuth0Configured(runtimeConfig)) {
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret,
-    })
+  const Auth0AuthenticationClient = auth0.AuthenticationClient
+  auth0Authentication = new Auth0AuthenticationClient({
+    domain: runtimeConfig.domain,
+    clientId: runtimeConfig.clientId,
+    clientSecret: runtimeConfig.clientSecret,
+  })
+
+  if (isAuth0UserInfoClientConstructor(UserInfoClient)) {
+    try {
+      const userInfoClient = new UserInfoClient({
+        domain: runtimeConfig.domain,
+      })
+      const hasUserInfoMethod =
+        typeof userInfoClient.getUserInfo === 'function' ||
+        typeof userInfoClient.getProfile === 'function'
+      if (hasUserInfoMethod) {
+        auth0UserInfo = userInfoClient
+        return
+      }
+    } catch {
+      auth0UserInfo = null
+    }
+  }
+
+  const hasAuthenticationUserInfoMethod =
+    typeof auth0Authentication.getUserInfo === 'function' ||
+    typeof auth0Authentication.getProfile === 'function'
+  if (hasAuthenticationUserInfoMethod) {
+    auth0UserInfo = auth0Authentication
+    return
+  }
+
+  if (!isAuth0UserInfoClientConstructor(UserInfoClient)) {
+    auth0UserInfo = null
+    return
+  }
+
+  try {
+    auth0UserInfo = new UserInfoClient({ domain: runtimeConfig.domain })
+  } catch {
+    auth0UserInfo = null
   }
 }
 
-// Initialize the client
-initializeAuth0Client()
+// Initialize the client (deferred)
+// initializeAuth0Client();
 
 // Types
 export interface TokenPair {
@@ -53,8 +147,40 @@ export interface TokenValidationResult {
   role?: UserRole
   tokenId?: string
   expiresAt?: number
-  payload?: any
+  payload?: Record<string, unknown>
   error?: string
+  accountId?: string
+  workspaceId?: string
+}
+
+type UnknownRecord = Record<string, unknown>
+type Auth0UserInfoResponse = {
+  data: UnknownRecord
+}
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function toOptionalString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined
+}
+
+async function getAuth0UserInfo(
+  accessToken: string,
+): Promise<Auth0UserInfoResponse> {
+  if (!auth0UserInfo) {
+    throw new AuthenticationError('Auth0 user info client not initialized')
+  }
+
+  if (typeof auth0UserInfo.getUserInfo === 'function') {
+    return await auth0UserInfo.getUserInfo(accessToken)
+  }
+  if (typeof auth0UserInfo.getProfile === 'function') {
+    return await auth0UserInfo.getProfile(accessToken)
+  }
+
+  throw new AuthenticationError('Auth0 user info method not available')
 }
 
 export interface IdTokenPayload {
@@ -73,6 +199,32 @@ export interface ClientInfo {
   ip?: string
   userAgent?: string
   deviceId?: string
+}
+
+type Auth0TokenResponse = {
+  access_token?: unknown
+  refresh_token?: unknown
+  expires_in?: unknown
+  id_token?: unknown
+  token_type?: unknown
+}
+
+function toAuth0TokenResponse(value: unknown): Auth0TokenResponse | null {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  return {
+    access_token: value.access_token,
+    refresh_token: value.refresh_token,
+    expires_in: value.expires_in,
+    id_token: value.id_token,
+    token_type: value.token_type,
+  }
+}
+
+function toStringRecord(value: unknown): UnknownRecord {
+  return isRecord(value) ? value : {}
 }
 
 export type UserRole =
@@ -112,31 +264,151 @@ function currentTimestamp(): number {
   return Math.floor(Date.now() / 1000)
 }
 
+type Auth0TokenClaims = JwtPayload & {
+  'https://pixelated.empathy/app_metadata'?: {
+    roles?: readonly string[]
+  }
+  'https://pixelated.empathy/user_metadata'?: {
+    role?: string
+  }
+  'permissions'?: readonly string[]
+}
+
+function isAuth0TokenClaims(payload: unknown): payload is Auth0TokenClaims {
+  if (!isRecord(payload)) {
+    return false
+  }
+  const tokenClaims = payload
+
+  if (tokenClaims.iss !== undefined && typeof tokenClaims.iss !== 'string') {
+    return false
+  }
+
+  if (tokenClaims.sub !== undefined && typeof tokenClaims.sub !== 'string') {
+    return false
+  }
+
+  if (
+    tokenClaims.aud !== undefined &&
+    typeof tokenClaims.aud !== 'string' &&
+    !Array.isArray(tokenClaims.aud)
+  ) {
+    return false
+  }
+
+  return true
+}
+
+function decodeJwtPayloadSegment(segment: string): unknown {
+  const sanitizedSegment = segment.replace(/-/g, '+').replace(/_/g, '/')
+  const padding = sanitizedSegment.length % 4
+  const paddedSegment =
+    padding === 0
+      ? sanitizedSegment
+      : `${sanitizedSegment}${'='.repeat(4 - padding)}`
+
+  try {
+    const payloadJson =
+      typeof globalThis.atob === 'function'
+        ? globalThis.atob(paddedSegment)
+        : Buffer.from(paddedSegment, 'base64').toString('utf8')
+    const parsedPayload: unknown = JSON.parse(payloadJson)
+    return typeof parsedPayload === 'object' &&
+      parsedPayload !== null &&
+      !Array.isArray(parsedPayload)
+      ? parsedPayload
+      : null
+  } catch {
+    return null
+  }
+}
+
+function decodeAuth0JwtPayload(token: string): Auth0TokenClaims | null {
+  const tokenParts = token.split('.')
+  if (tokenParts.length < 2) {
+    return null
+  }
+
+  const payload = decodeJwtPayloadSegment(tokenParts[1])
+  if (!isAuth0TokenClaims(payload)) {
+    return null
+  }
+
+  return payload
+}
+
+function isUserRole(value: string | undefined | null): value is UserRole {
+  return (
+    value === 'admin' ||
+    value === 'therapist' ||
+    value === 'patient' ||
+    value === 'researcher' ||
+    value === 'guest'
+  )
+}
+
+/**
+ * Map any role string to UserRole
+ * Handles legacy roles ("user", "staff") and Auth0 Management API roles
+ */
+function mapToUserRole(role: string): UserRole {
+  const normalizedRole = role.toLowerCase()
+  switch (normalizedRole) {
+    case 'admin':
+      return 'admin'
+    case 'therapist':
+      return 'therapist'
+    case 'patient':
+      return 'patient'
+    case 'researcher':
+      return 'researcher'
+    case 'user':
+    case 'staff':
+      return 'patient'
+    case 'guest':
+    default:
+      return 'guest'
+  }
+}
+
 /**
  * Extract user role from Auth0 token payload
  * @param payload Auth0 token payload
  * @returns User role
  */
-function extractRoleFromPayload(payload: any): UserRole {
+function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
   // Try to get role from app_metadata first
-  if (payload['https://pixelated.empathy/app_metadata']?.roles?.length > 0) {
-    return payload['https://pixelated.empathy/app_metadata']
-      .roles[0] as UserRole
+  const appMetadataRoles =
+    payload['https://pixelated.empathy/app_metadata']?.roles
+  if (Array.isArray(appMetadataRoles)) {
+    for (const appRole of appMetadataRoles) {
+      if (typeof appRole === 'string') {
+        return mapToUserRole(appRole)
+      }
+    }
   }
 
   // Try user_metadata
-  if (payload['https://pixelated.empathy/user_metadata']?.role) {
-    return payload['https://pixelated.empathy/user_metadata'].role as UserRole
+  const userMetadataRole =
+    payload['https://pixelated.empathy/user_metadata']?.role
+  if (typeof userMetadataRole === 'string') {
+    return mapToUserRole(userMetadataRole)
   }
 
   // Try permissions
   if (payload.permissions?.includes('admin')) {
     return 'admin'
-  } else if (payload.permissions?.includes('therapist')) {
+  }
+
+  if (payload.permissions?.includes('therapist')) {
     return 'therapist'
-  } else if (payload.permissions?.includes('researcher')) {
+  }
+
+  if (payload.permissions?.includes('researcher')) {
     return 'researcher'
-  } else if (payload.permissions?.includes('patient')) {
+  }
+
+  if (payload.permissions?.includes('patient')) {
     return 'patient'
   }
 
@@ -152,56 +424,12 @@ export async function validateToken(
   tokenType: TokenType,
 ): Promise<TokenValidationResult> {
   try {
-    if (!auth0Authentication) {
+    initializeAuth0Client()
+
+    if (!auth0Authentication || !auth0UserInfo) {
       throw new AuthenticationError(
-        'Auth0 authentication client not initialized',
+        'Auth0 authentication clients not initialized',
       )
-    }
-
-    // Decode token to check standard claims (aud, iss) before expensive UserInfo call
-    const decodedToken = jwt.decode(token, { complete: true }) as {
-      payload: jwt.JwtPayload
-      header: any
-    } | null
-
-    if (!decodedToken || !decodedToken.payload) {
-      throw new AuthenticationError('Malformed token')
-    }
-
-    const { payload } = decodedToken
-
-    // Validate Issuer
-    const expectedIssuer = `https://${auth0Config.domain}/`
-    if (!payload.iss) {
-      throw new AuthenticationError('Token missing issuer claim')
-    }
-    if (payload.iss !== expectedIssuer) {
-      throw new AuthenticationError(`Invalid issuer: ${payload.iss}`)
-    }
-
-    // Validate Audience
-    const expectedAudience = auth0Config.audience
-    if (!expectedAudience || expectedAudience.trim() === '') {
-      console.warn(
-        'AUTH0_AUDIENCE not configured - audience validation skipped',
-      )
-    } else {
-      const { aud } = payload
-      if (!aud) {
-        throw new AuthenticationError('Token missing audience claim')
-      }
-      const audValid = Array.isArray(aud)
-        ? aud.includes(expectedAudience)
-        : aud === expectedAudience
-
-      if (!audValid) {
-        throw new AuthenticationError(`Invalid audience: ${String(aud)}`)
-      }
-    }
-
-    // Validate expiration locally first
-    if (payload.exp && payload.exp < currentTimestamp()) {
-      throw new AuthenticationError('Token has expired')
     }
 
     // Validate token type matches expected (access tokens only for now)
@@ -212,21 +440,67 @@ export async function validateToken(
       )
     }
 
+    // Decode token to check standard claims (aud, iss) before expensive response parsing
+    const payload = decodeAuth0JwtPayload(token)
+    if (!payload) {
+      throw new AuthenticationError('Malformed token')
+    }
+
+    // Validate expiration locally before any network calls
+    if (payload.exp && payload.exp < currentTimestamp()) {
+      throw new AuthenticationError('Token has expired')
+    }
+
+    const currentConfig = getRuntimeAuth0Config()
+
+    // Validate Issuer
+    const expectedIssuer = `https://${currentConfig.domain}/`
+    if (typeof payload.iss !== 'string' || !payload.iss) {
+      throw new AuthenticationError('Token missing issuer claim')
+    }
+    if (payload.iss !== expectedIssuer) {
+      throw new AuthenticationError(`Invalid issuer: ${payload.iss}`)
+    }
+
+    // Validate Audience
+    const expectedAudience = currentConfig.audience.trim()
+    if (expectedAudience === '') {
+      console.warn(
+        'AUTH0_AUDIENCE not configured - audience validation skipped',
+      )
+    } else {
+      const { aud } = payload
+      if (typeof aud === 'string') {
+        if (aud !== expectedAudience) {
+          throw new AuthenticationError(`Invalid audience: ${aud}`)
+        }
+      } else if (Array.isArray(aud)) {
+        if (!aud.includes(expectedAudience)) {
+          throw new AuthenticationError(`Invalid audience: ${aud.join(',')}`)
+        }
+      } else {
+        throw new AuthenticationError('Token missing audience claim')
+      }
+    }
+
     // Now verify with UserInfo (acts as online signature/revocation check)
-    // Using auth0Authentication.getProfile instead of auth0UserInfo.getUserInfo
-    const userInfo = await auth0Authentication.getProfile(token)
+    const userInfo = await getAuth0UserInfo(token)
 
     // Extract user information
-    const userId = userInfo.sub || payload.sub
+    const userInfoData = toStringRecord(userInfo.data)
+    const tokenPayload = isAuth0TokenClaims(userInfoData)
+      ? userInfoData
+      : payload
+    const userId = toOptionalString(tokenPayload.sub ?? payload.sub)
     if (!userId) {
       throw new AuthenticationError('Token missing subject claim')
     }
-    const role = extractRoleFromPayload(userInfo)
-    const tokenId = payload.jti || ''
-    const sessionId = payload.sid as string | undefined
+    const role = extractRoleFromPayload(tokenPayload)
+    const tokenId = payload.jti ?? ''
+    const sessionId = payload.sid
 
     // Log successful validation
-    logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, {
+    logSecurityEvent(SecurityEventType.TOKEN_VALIDATED, null, {
       userId: userId,
       tokenId: tokenId,
       tokenType: tokenType,
@@ -243,8 +517,23 @@ export async function validateToken(
       given_name: _given_name,
       family_name: _family_name,
       ...filteredUserInfo
-    } = userInfo
-    const safePayload = { ...filteredUserInfo, ...payload }
+    } = userInfoData
+    const safePayload: Record<string, unknown> = {
+      ...filteredUserInfo,
+      ...payload,
+    }
+
+    // Extract accountId and workspaceId from user info
+    const userMetadata = toStringRecord(userInfoData.user_metadata)
+    const appMetadata = toStringRecord(userInfoData.app_metadata)
+    const accountId =
+      toOptionalString(userInfoData.accountId) ??
+      toOptionalString(userMetadata.accountId) ??
+      toOptionalString(appMetadata.accountId)
+    const workspaceId =
+      toOptionalString(userInfoData.workspaceId) ??
+      toOptionalString(userMetadata.workspaceId) ??
+      toOptionalString(appMetadata.workspaceId)
 
     return {
       valid: true,
@@ -253,10 +542,12 @@ export async function validateToken(
       tokenId: tokenId,
       expiresAt: payload.exp,
       payload: safePayload,
+      accountId,
+      workspaceId,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // Log validation failure
-    logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, {
+    logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
       userId: null,
       error: error instanceof Error ? error.message : 'Unknown error',
       tokenType: tokenType,
@@ -277,32 +568,45 @@ export async function refreshAccessToken(
   _clientInfo: ClientInfo,
 ): Promise<TokenPair> {
   try {
-    if (!auth0Authentication) {
+    initializeAuth0Client()
+    if (!auth0Authentication || !auth0UserInfo) {
       throw new AuthenticationError(
-        'Auth0 authentication client not initialized',
+        'Auth0 authentication clients not initialized',
       )
     }
 
     // Exchange refresh token for new access token
-    const tokenResponse = await auth0Authentication.refreshToken({
+    const tokenResponse = await auth0Authentication.oauth.refreshTokenGrant({
       refresh_token: refreshToken,
     })
+    const tokenResponseData = toAuth0TokenResponse(tokenResponse.data)
+    const accessToken =
+      typeof tokenResponseData?.access_token === 'string'
+        ? tokenResponseData.access_token
+        : undefined
+    if (!accessToken) {
+      throw new AuthenticationError('Invalid token response')
+    }
 
     // Get user info from new access token
-    const userResponse = await auth0Authentication.getProfile(
-      tokenResponse.access_token,
-    )
+    const userResponse = await getAuth0UserInfo(accessToken)
 
     // Extract user information
-    const userId = userResponse.sub || ''
-    const role = extractRoleFromPayload(userResponse)
+    const userResponseData = toStringRecord(userResponse.data)
+    if (!isAuth0TokenClaims(userResponseData)) {
+      throw new AuthenticationError('Invalid user payload')
+    }
+    const userPayload = userResponseData
+    const userId = typeof userPayload.sub === 'string' ? userPayload.sub : ''
+    const accessTokenId = userPayload.jti
+    const role = extractRoleFromPayload(userPayload)
 
     // Log token refresh event
-    logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, {
+    logSecurityEvent(SecurityEventType.TOKEN_REFRESHED, null, {
       userId: userId,
       oldTokenId: 'unknown', // We don't have the old token ID
-      newAccessTokenId: userResponse.jti || '',
-      newRefreshTokenId: tokenResponse.refresh_token
+      newAccessTokenId: accessTokenId ?? '',
+      newRefreshTokenId: tokenResponseData?.refresh_token
         ? 'present'
         : 'not_provided',
     })
@@ -311,14 +615,17 @@ export async function refreshAccessToken(
     await updatePhase6AuthenticationProgress(userId, 'token_refreshed')
 
     return {
-      accessToken: tokenResponse.access_token,
-      refreshToken: tokenResponse.refresh_token || refreshToken, // Use new refresh token if provided
+      accessToken,
+      refreshToken:
+        typeof tokenResponseData?.refresh_token === 'string'
+          ? tokenResponseData.refresh_token
+          : refreshToken, // Use new refresh token if provided
       tokenType: 'Bearer',
-      expiresIn: tokenResponse.expires_in,
-      user: {
-        id: userId,
-        role: role,
-      },
+      expiresIn:
+        typeof tokenResponseData?.expires_in === 'number'
+          ? tokenResponseData.expires_in
+          : 3600,
+      user: { id: userId, role: role },
     }
   } catch {
     throw new AuthenticationError('Invalid refresh token')
@@ -374,7 +681,7 @@ export async function revokeToken(
   )
 
   // Log revocation event
-  logSecurityEvent(SecurityEventType.TOKEN_REVOKED, {
+  logSecurityEvent(SecurityEventType.TOKEN_REVOKED, null, {
     userId: null, // We don't have user ID here
     tokenId: tokenId,
     reason: reason,
@@ -423,7 +730,7 @@ export function startTokenCleanupScheduler(): void {
         console.log(
           `[Auth0-JWT] Cleanup completed: ${result.cleanedTokens} tokens removed`,
         )
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('[Auth0-JWT] Cleanup failed:', error)
       }
     },
@@ -467,7 +774,7 @@ export async function measureTokenOperation<T>(
     }
 
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     const duration = performance.now() - start
     console.error(
       `Token operation ${operationName} failed after ${duration.toFixed(2)}ms:`,

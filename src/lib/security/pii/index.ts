@@ -80,7 +80,7 @@ class PIIDetectionService {
   private config: PIIDetectionConfig
   private initialized = false
   private mlModelLoaded = false
-  private patterns: Record<PIIType, RegExp[]>
+  private readonly patterns: Record<PIIType, RegExp[]>
 
   /**
    * Private constructor to enforce singleton pattern
@@ -205,7 +205,7 @@ class PIIDetectionService {
     }
 
     try {
-      const fheServiceTyped = fheService as RealFHEService
+      const fheServiceTyped = fheService
       await fheServiceTyped.ensureInitialized()
       logger.info(`Initiating FHE key rotation for keyId: ${keyId}`)
 
@@ -217,7 +217,12 @@ class PIIDetectionService {
       logger.info(`FHE key rotation completed for keyId: ${keyId}`)
     } catch (error: unknown) {
       logger.error(`Failed to rotate FHE keys for keyId: ${keyId}`, {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       throw error
     }
@@ -264,7 +269,11 @@ class PIIDetectionService {
       })
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error)
       logger.error('Failed to load ML model', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -472,7 +481,11 @@ class PIIDetectionService {
       return result
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error)
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error)
       logger.error('Error detecting PII', {
         error: errorMessage,
         textLength: text.length,
@@ -504,7 +517,7 @@ class PIIDetectionService {
       }
 
       // Ensure FHE service is available and properly typed
-      const fheServiceTyped = fheService as RealFHEService
+      const fheServiceTyped = fheService
       // Ensure FHE service is initialized
       await fheServiceTyped.ensureInitialized()
 
@@ -522,7 +535,7 @@ class PIIDetectionService {
       )
 
       // Validate FHE operation result
-      if (!result || !result.result) {
+      if (!result?.result) {
         logger.warn('FHE operation returned empty result', {
           encryptedTextLength: encryptedText.length,
         })
@@ -540,7 +553,10 @@ class PIIDetectionService {
         try {
           resultData = JSON.parse(result.result) as PIIFHEResultData
         } catch (e) {
-          throw new Error('Failed to parse FHE operation result: ' + (result.result as string).substring(0, 100))
+          throw new Error(
+            'Failed to parse FHE operation result: ' +
+              (result.result).substring(0, 100),
+          )
         }
       } else if (result.result && typeof result.result === 'object') {
         resultData = result.result as PIIFHEResultData
@@ -549,7 +565,7 @@ class PIIDetectionService {
       }
 
       const hasPII = resultData.hasPII === 'true'
-      const confidence = Number.parseFloat(resultData.confidence || '0') || 0
+      const confidence = Number.parseFloat(resultData.confidence ?? '0') || 0
 
       // Create types array from comma-separated string with validation
       const types = resultData.types
@@ -565,10 +581,12 @@ class PIIDetectionService {
         confidence,
         isEncrypted: true,
         metadata: {
-          operationId: result.metadata?.operation?.toString() || 'unknown',
-          processingTime: result.metadata?.timestamp && typeof result.metadata.timestamp === 'number'
-            ? (Date.now() - result.metadata.timestamp).toString()
-            : '0',
+          operationId: result.metadata?.operation?.toString() ?? 'unknown',
+          processingTime:
+            result.metadata?.timestamp &&
+            typeof result.metadata.timestamp === 'number'
+              ? (Date.now() - result.metadata.timestamp).toString()
+              : '0',
         },
       }
 
@@ -580,7 +598,12 @@ class PIIDetectionService {
       return detectionResult
     } catch (error: unknown) {
       logger.error('Error detecting PII in encrypted text', {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         encryptedTextLength: encryptedText.length,
         timestamp: new Date().toISOString(),
       })
@@ -641,6 +664,7 @@ class PIIDetectionService {
         return '[PATIENT ID REDACTED]'
       case PIIType.INSURANCE_ID:
         return '[INSURANCE ID REDACTED]'
+      case PIIType.OTHER: { throw new Error('Not implemented yet: PIIType.OTHER case') }
       default:
         return '[PII REDACTED]'
     }
@@ -677,7 +701,10 @@ class PIIDetectionService {
       }
 
       if (depth > MAX_DEPTH) {
-        logger.warn('PII processing reached max depth, skipping deeper levels', { key, depth })
+        logger.warn(
+          'PII processing reached max depth, skipping deeper levels',
+          { key, depth },
+        )
         return value
       }
 
@@ -707,7 +734,7 @@ class PIIDetectionService {
 
         if (piiResult.detected) {
           detectedPII = true
-          return piiResult.redacted || value
+          return piiResult.redacted ?? value
         }
 
         return value
@@ -722,10 +749,14 @@ class PIIDetectionService {
         }
 
         const processedObject: Record<string, unknown> = {}
-        const entries = Object.entries(value as object)
+        const entries = Object.entries(value)
 
         for (const [objKey, objValue] of entries) {
-          processedObject[objKey] = await processValue(objValue, objKey, depth + 1)
+          processedObject[objKey] = await processValue(
+            objValue,
+            objKey,
+            depth + 1,
+          )
         }
 
         return processedObject

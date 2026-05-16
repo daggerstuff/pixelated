@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk } from './models/ai-types'
-import { createTogetherAIService } from './services/together'
+import { createLLMService } from './services/llm-provider'
 
 const appLogger = createBuildSafeLogger('ai-providers')
 
@@ -9,7 +9,7 @@ export type AIProviderType =
   | 'anthropic'
   | 'openai'
   | 'azure-openai'
-  | 'together'
+  | 'llm'
   | 'huggingface'
   | 'local'
 
@@ -25,6 +25,16 @@ export interface AIProviderConfig {
 // Provider registry
 const providers = new Map<AIProviderType, AIProviderConfig>()
 const serviceCache = new Map<AIProviderType, AIService>()
+
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function isOpenRouterKey(apiKey: string | undefined): boolean {
+  return !!apiKey && apiKey.startsWith('sk-or-')
+}
 
 /**
  * Helper to fetch environment variables from either process.env (SSR)
@@ -56,10 +66,9 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
     defaultModel: 'gpt-4',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
-  together: {
-    name: 'Together AI',
-    baseUrl: 'https://api.together.xyz',
-    defaultModel: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+  llm: {
+    name: 'LLM API',
+    defaultModel: 'minimaxai/minimax-m2.7',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
   huggingface: {
@@ -76,18 +85,52 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
   },
 }
 
+const LLM_PROVIDER_API_KEYS: readonly string[] = [
+  'LLM_API_KEY',
+  'NVIDIA_API_KEY',
+  'NIM_API_KEY',
+  'NVIDIA_TOKEN',
+]
+
+const LLM_PROVIDER_BASE_URLS: readonly string[] = [
+  'LLM_BASE_URL',
+  'LLM_API_URL',
+  'OPENAI_BASE_URL',
+  'NVIDIA_OPENAI_BASE_URL',
+  'NVIDIA_BASE_URL',
+  'NIM_BASE_URL',
+]
+
+function resolveProviderConfigValue(keys: readonly string[]): string | undefined {
+  for (const key of keys) {
+    const value = getEnvVar(key)
+    if (value) return value
+  }
+  return undefined
+}
+
 /**
  * Initialize AI providers with environment configuration
  */
 export function initializeProviders() {
   try {
-    // Together AI (primary provider)
-    const togetherApiKey = getEnvVar('TOGETHER_API_KEY')
-    if (togetherApiKey) {
-      providers.set('together', {
-        ...defaultConfigs.together,
-        apiKey: togetherApiKey,
+    // Primary LLM provider key
+    const providerApiKey = resolveProviderConfigValue(LLM_PROVIDER_API_KEYS)
+    const isOpenRouterPrimaryProvider =
+      isOpenRouterBaseUrl(
+        resolveProviderConfigValue(LLM_PROVIDER_BASE_URLS),
+      ) || isOpenRouterKey(providerApiKey)
+    const providerBaseUrl = resolveProviderConfigValue(LLM_PROVIDER_BASE_URLS)
+    if (providerApiKey && providerBaseUrl && !isOpenRouterPrimaryProvider) {
+      providers.set('llm', {
+        ...defaultConfigs.llm,
+        apiKey: providerApiKey,
+        ...(providerBaseUrl ? { baseUrl: providerBaseUrl } : {}),
       } as AIProviderConfig)
+    } else if (providerApiKey && isOpenRouterPrimaryProvider) {
+      appLogger.warn(
+        'Skipping LLM provider initialization because OpenRouter configuration is disabled for this environment',
+      )
     }
 
     // OpenAI
@@ -129,7 +172,7 @@ export function initializeProviders() {
     }
 
     // Local GGUF Inference
-    const localAiBaseUrl = getEnvVar('LOCAL_AI_BASE_URL') || 'http://localhost:8000/v1'
+    const localAiBaseUrl = getEnvVar('LOCAL_AI_BASE_URL') ?? 'http://localhost:8000/v1'
     providers.set('local', {
       ...defaultConfigs.local,
       apiKey: 'local-no-key',
@@ -164,8 +207,8 @@ export function getAIServiceByProvider(
 
     let service: AIService | null = null
     switch (providerType) {
-      case 'together':
-        service = createTogetherServiceAdapter(config)
+      case 'llm':
+        service = createLLMServiceAdapter(config)
         break
       case 'anthropic':
         service = createAnthropicServiceAdapter(config)
@@ -179,6 +222,7 @@ export function getAIServiceByProvider(
       case 'local':
         service = createLocalServiceAdapter(config)
         break
+      case "azure-openai": { throw new Error('Not implemented yet: "azure-openai" case') }
       default:
         appLogger.warn(`Unsupported provider type: ${providerType}`)
         return null
@@ -217,38 +261,38 @@ export function isProviderAvailable(providerType: AIProviderType): boolean {
 export function getProviderConfig(
   providerType: AIProviderType,
 ): AIProviderConfig | null {
-  return providers.get(providerType) || null
+  return providers.get(providerType) ?? null
 }
 
 // Provider-specific service adapters
 
-function createTogetherServiceAdapter(config: AIProviderConfig): AIService {
-  const togetherService = createTogetherAIService({
-    togetherApiKey: config.apiKey,
+function createLLMServiceAdapter(config: AIProviderConfig): AIService {
+  const llmService = createLLMService({
     apiKey: config.apiKey,
-    ...(config.baseUrl ? { togetherBaseUrl: config.baseUrl } : {}),
+    ...(config.baseUrl ? { baseUrl: config.baseUrl } : {}),
   })
 
   return {
     createChatCompletion: async (messages, options) => {
-      return (await togetherService.generateCompletion(
+      return (await llmService.generateCompletion(
         messages,
         options,
       )) as AICompletion
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('Streaming not implemented for Together AI'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
+    createStreamingChatCompletion: async (messages, options) =>
+      llmService.createStreamingChatCompletion(messages, {
+        ...options,
+        model: options?.model ?? config.defaultModel,
+      }),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
-      provider: 'together',
+      provider: 'llm',
       capabilities: config.capabilities,
       contextWindow: 8192,
       maxTokens: 8192,
     }),
-    dispose: togetherService.dispose.bind(togetherService),
+    dispose: llmService.dispose.bind(llmService),
   }
 }
 
@@ -325,40 +369,74 @@ function createHuggingFaceServiceAdapter(config: AIProviderConfig): AIService {
 }
 
 function createLocalServiceAdapter(config: AIProviderConfig): AIService {
+  const createLocalCompletion = async (
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+  ): Promise<AICompletion> => {
+    const response = await fetch(`${config.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages,
+        ...options,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Local AI service failed: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const content = data?.choices?.[0]?.message?.content
+    if (content === undefined) {
+      throw new Error('Local AI service returned an empty or malformed response')
+    }
+
+    return {
+      id: data.id ?? 'local-id',
+      created: Date.now(),
+      content,
+      model: config.defaultModel,
+      usage: data.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+    } as AICompletion
+  }
+
   return {
-    createChatCompletion: async (messages, options) => {
-      const response = await fetch(`${config.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages,
-          ...options,
-        }),
-      })
+    createChatCompletion: createLocalCompletion,
+    createStreamingChatCompletion: async (messages, options) => {
+      const completion = await createLocalCompletion(messages, options)
+      const stream = async function* (): AsyncGenerator<AIStreamChunk, void, void> {
+        const normalizedContent = completion.content || ''
+        if (!normalizedContent) {
+          yield {
+            id: completion.id,
+            model: completion.model,
+            created: Date.now(),
+            content: '',
+            done: true,
+          }
+          return
+        }
 
-      if (!response.ok) {
-        throw new Error(`Local AI service failed: ${response.statusText}`)
+        const chunkSize = 80
+        for (let i = 0; i < normalizedContent.length; i += chunkSize) {
+          const contentChunk = normalizedContent.slice(i, i + chunkSize)
+          yield {
+            id: completion.id,
+            model: completion.model,
+            created: completion.created || Date.now(),
+            content: contentChunk,
+            done: i + chunkSize >= normalizedContent.length,
+            ...(i + chunkSize >= normalizedContent.length && {
+              finishReason: 'stop',
+            }),
+          }
+        }
       }
-
-      const data = await response.json()
-      const content = data?.choices?.[0]?.message?.content
-      if (content === undefined) {
-        throw new Error('Local AI service returned an empty or malformed response')
-      }
-
-      return {
-        id: data.id || 'local-id',
-        content,
-        model: config.defaultModel,
-        usage: data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-      } as AICompletion
+      return stream()
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('Local streaming not yet implemented'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
     getModelInfo: (model: string) => ({
       id: model,
       name: model,

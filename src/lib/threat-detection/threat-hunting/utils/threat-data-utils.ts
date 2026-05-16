@@ -10,7 +10,13 @@
 import crypto from 'crypto'
 
 import { isObject } from '@/lib/utils'
-import { ThreatData, ThreatPattern, ThreatFinding, ThreatSeverity } from '../types'
+
+import {
+  ThreatData,
+  ThreatPattern,
+  ThreatFinding,
+  ThreatSeverity,
+} from '../types'
 
 // crypto-backed stable id generation with safe fallback
 function secureId(prefix = ''): string {
@@ -54,11 +60,11 @@ export function processThreatData(rawData: unknown[]): ThreatData[] {
     return {
       id: typeof obj['id'] === 'string' ? obj['id'] : secureId('threat_'),
       timestamp: safeParseTimestamp(obj['timestamp']),
-      source:
-        typeof obj['source'] === 'string' ? obj['source'] : 'unknown',
+      source: typeof obj['source'] === 'string' ? obj['source'] : 'unknown',
       type: typeof obj['type'] === 'string' ? obj['type'] : 'unknown',
-      severity:
-        (typeof obj['severity'] === 'string' ? obj['severity'] : 'medium') as ThreatSeverity,
+      severity: (typeof obj['severity'] === 'string'
+        ? obj['severity']
+        : 'medium') as ThreatSeverity,
       description:
         typeof obj['description'] === 'string' ? obj['description'] : '',
       raw_data: item,
@@ -68,17 +74,14 @@ export function processThreatData(rawData: unknown[]): ThreatData[] {
 }
 
 export function extractPatterns(threatData: ThreatData[]): ThreatPattern[] {
-  const groups = threatData.reduce<Record<string, ThreatData[]>>(
-    (acc, t) => {
-      const key = JSON.stringify({ type: t.type, source: t.source })
-      if (!acc[key]) {
-        acc[key] = []
-      }
-      acc[key].push(t)
-      return acc
-    },
-    {},
-  )
+  const groups = threatData.reduce<Record<string, ThreatData[]>>((acc, t) => {
+    const key = JSON.stringify({ type: t.type, source: t.source })
+    if (!acc[key]) {
+      acc[key] = []
+    }
+    acc[key].push(t)
+    return acc
+  }, {})
 
   const patterns: ThreatPattern[] = []
   for (const [key, items] of Object.entries(groups)) {
@@ -162,10 +165,8 @@ function calculateFindingSeverity(
     critical: 4,
   }
   const avgSeverity =
-    threats.reduce(
-      (sum, t) => sum + (severityMap[t.severity] || 2),
-      0,
-    ) / threats.length
+    threats.reduce((sum, t) => sum + (severityMap[t.severity] || 2), 0) /
+    threats.length
 
   const frequencyScore = Math.min(pattern.frequency / 20, 1)
   const confidenceScore = pattern.confidence
@@ -194,9 +195,7 @@ export function filterBySeverity(
   threatData: ThreatData[],
   severities: ThreatSeverity[],
 ): ThreatData[] {
-  return threatData.filter((t) =>
-    severities.includes(t.severity),
-  )
+  return threatData.filter((t) => severities.includes(t.severity))
 }
 
 export function filterByType(
@@ -257,7 +256,10 @@ export function exportThreatData(
     }
     case 'xml': {
       const xmlItems = data
-        .map((t) => `  <threat>\n    <id>${escapeXml(t.id)}</id>\n    <timestamp>${escapeXml(t.timestamp)}</timestamp>\n    <source>${escapeXml(t.source)}</source>\n    <type>${escapeXml(t.type)}</type>\n    <severity>${escapeXml(t.severity)}</severity>\n    <description>${escapeXml(t.description)}</description>\n  </threat>`)
+        .map(
+          (t) =>
+            `  <threat>\n    <id>${escapeXml(t.id)}</id>\n    <timestamp>${escapeXml(t.timestamp)}</timestamp>\n    <source>${escapeXml(t.source)}</source>\n    <type>${escapeXml(t.type)}</type>\n    <severity>${escapeXml(t.severity)}</severity>\n    <description>${escapeXml(t.description)}</description>\n  </threat>`,
+        )
         .join('\n')
       return `<?xml version="1.0" encoding="UTF-8"?>\n<threat_data>\n  <count>${data.length}</count>\n  <items>\n${xmlItems}\n  </items>\n</threat_data>`
     }

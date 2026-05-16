@@ -2,13 +2,13 @@ import { format } from 'date-fns'
 import { CheckCircle2, Loader2, Play } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button/button'
-import { Table } from '@/components/ui/table'
+import { Button } from '@/components/ui/button/button.tsx'
+import { Table } from '@/components/ui/table.tsx'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
-} from '@/components/ui/table-types'
+} from '@/components/ui/table-types.ts'
 import type {
   Acquisition,
   AcquisitionList as AcquisitionListType,
@@ -54,6 +54,14 @@ export function AcquisitionList({
     currentPage: acquisitions.page ?? 1,
     pageSize: acquisitions.pageSize ?? 10,
   })
+  const handleTableStateChange: (newState: Partial<TableState>) => void = (
+    newState,
+  ) => {
+    setTableState((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
 
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -313,7 +321,7 @@ export function AcquisitionList({
         columns={columns}
         dataSource={tableDataSource}
         tableState={tableState}
-        onStateChange={setTableState}
+        onStateChange={handleTableStateChange}
         hoverable
         striped
         bordered

@@ -1,42 +1,91 @@
 /* ================================================
    PIXELATED BRUTALISM DESIGN SYSTEM
-   A unique blend of Modern + Minimalism + Brutalist
-   Inspired by Antfu's elegant terminal aesthetics
-   
+   Structured, clinical, and direct.
+
    Philosophy:
    - Expose structure, celebrate the grid
-   - Monospace for headings, sans for body
+   - Serious editorial display typography
    - Sharp edges or minimal radius
    - Purposeful animations, no decoration
-   - Terminal-like precision
+   - Precision without novelty styling
    ================================================ */
 
 /* === FONTS === */
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  src: url('/fonts/dm-mono-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* ... existing colors ... */
-  /* === DEEP VOID PALETTE === */
-  /* Pure blacks with purpose */
-  --bg-void: #000000;
-  --bg-primary: #050505;
-  --bg-secondary: #0a0a0a;
-  --bg-tertiary: #111111;
-  --bg-elevated: #151515;
-  --bg-surface: #1a1a1a;
+  /* === CLINICAL NIGHT PALETTE === */
+  --bg-void: #0a0d0d;
+  --bg-primary: #121716;
+  --bg-secondary: #1a211f;
+  --bg-tertiary: #222927;
+  --bg-elevated: #2a312f;
+  --bg-surface: #323937;
+  --surface-paper: #ece9df;
+  --surface-paper-alt: #e4e5da;
+  --surface-paper-strong: rgba(255, 255, 255, 0.72);
+  --ink-primary: #111716;
+  --ink-secondary: rgba(17, 23, 22, 0.78);
+  --ink-muted: rgba(17, 23, 22, 0.58);
+  --ink-border: rgba(17, 23, 22, 0.1);
+  --surface-paper-top: #f3f0e7;
+  --surface-paper-top-soft: #f5f2ea;
+  --surface-paper-top-bright: #f7f4ed;
+  --surface-paper-top-alt: #efede4;
+  --surface-paper-gradient: linear-gradient(
+    180deg,
+    var(--surface-paper) 0%,
+    var(--surface-paper-alt) 52%,
+    var(--surface-paper-top) 100%
+  );
+  --surface-paper-gradient-soft: linear-gradient(
+    180deg,
+    var(--surface-paper-top-soft),
+    var(--surface-paper-top-alt)
+  );
+  --surface-paper-gradient-bright: linear-gradient(
+    180deg,
+    var(--surface-paper-top-bright),
+    var(--surface-paper-top-soft)
+  );
+  --surface-paper-panel: rgba(255, 255, 255, 0.6);
+  --surface-paper-panel-muted: rgba(255, 255, 255, 0.52);
+  --surface-paper-panel-soft: rgba(255, 255, 255, 0.48);
 
   /* === STARK CONTRAST TEXT === */
   --text-primary: #ffffff;
-  --text-secondary: #e0e0e0;
-  --text-tertiary: #888888;
-  --text-muted: #555555;
-  --text-dim: #333333;
+  --text-secondary: #d7ddd9;
+  --text-tertiary: #a9b4ae;
+  --text-muted: #808982;
+  --text-dim: #616a64;
 
-  /* === ELECTRIC ACCENTS === */
-  /* Primary: Electric green - therapeutic, calming, precise */
-  --accent-primary: #00ff88;
-  --accent-primary-dim: #00cc6a;
-  --accent-primary-glow: rgba(0, 255, 136, 0.15);
+  /* === ACCENTS === */
+  --accent-primary: #88c9a5;
+  --accent-primary-dim: #5f9877;
+  --accent-primary-glow: rgba(136, 201, 165, 0.15);
 
   /* Secondary: Pure white for stark contrast */
   --accent-secondary: #ffffff;
@@ -51,45 +100,46 @@
   --color-info: #00aaff;
 
   /* === BRUTALIST BORDERS === */
-  --border-primary: 1px solid #222222;
-  --border-secondary: 1px solid #333333;
+  --border-primary: 1px solid #2a3233;
+  --border-secondary: 1px solid #3a4445;
   --border-accent: 1px solid var(--accent-primary);
   --border-glow: 1px solid var(--accent-primary-glow);
 
   /* Grid exposure - our signature brutalist element */
-  --grid-line: 1px solid rgba(255, 255, 255, 0.03);
-  --grid-line-accent: 1px solid rgba(0, 255, 136, 0.1);
+  --grid-line-color: rgba(255, 255, 255, 0.04);
+  --grid-line-accent-color: rgba(125, 211, 168, 0.12);
 
   /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.035);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: 12px;
 
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: Outfit - Premium, modern */
-  --font-display: "Outfit", sans-serif;
-  
-  /* Body: Outfit - consistent and clean */
-  --font-sans: "Outfit", sans-serif;
+  /* Headings: sharper editorial serif for a less toy-like, more clinical voice */
+  --font-display:
+    'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Baskerville',
+    Georgia, serif;
 
-  /* Technical: JetBrains Mono - terminal precision */
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", ui-monospace, monospace;
+  /* Body: neutral UI sans */
+  --font-sans:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Display: Outfit for that Premium feel */
+  /* Technical accents: restrained mono, no oversized terminal feel */
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
   --font-heading: var(--font-display);
 
-
   /* Fluid Typography Scale */
-  --text-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.75rem);
-  --text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --text-base: clamp(0.875rem, 0.85rem + 0.125vw, 1rem);
-  --text-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-xs: clamp(0.72rem, 0.69rem + 0.12vw, 0.8rem);
+  --text-sm: clamp(0.88rem, 0.82rem + 0.18vw, 0.98rem);
+  --text-base: clamp(0.97rem, 0.92rem + 0.14vw, 1.04rem);
+  --text-lg: clamp(1.08rem, 1.01rem + 0.26vw, 1.22rem);
   --text-xl: clamp(1.125rem, 1rem + 0.625vw, 1.375rem);
   --text-2xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.625rem);
   --text-3xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
-  --text-4xl: clamp(2rem, 1.6rem + 2vw, 3rem);
-  --text-5xl: clamp(2.5rem, 2rem + 2.5vw, 4rem);
-  --text-6xl: clamp(3rem, 2.2rem + 4vw, 5.5rem);
+  --text-4xl: clamp(1.9rem, 1.55rem + 1.75vw, 2.85rem);
+  --text-5xl: clamp(2.2rem, 1.85rem + 1.9vw, 3.45rem);
+  --text-6xl: clamp(2.8rem, 2.2rem + 3vw, 4.6rem);
 
   /* Line Heights - tight for headings */
   --leading-none: 1;
@@ -172,7 +222,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-size: 16px;
+  font-size: 18px;
   background-color: var(--bg-void);
   color-scheme: dark;
 }
@@ -189,7 +239,7 @@ body {
 
 /* ================================================
    TYPOGRAPHY SYSTEM
-   Headings: Monospace, tight, uppercase available
+   Headings: Display sans, tight, assertive
    Body: Sans, readable, spacious
    ================================================ */
 
@@ -199,23 +249,23 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
   margin: 0;
 }
 
 h1 {
   font-size: var(--text-5xl);
-  font-weight: 800;
-  letter-spacing: var(--tracking-tighter);
+  font-weight: 600;
+  letter-spacing: -0.05em;
 }
 
 h2 {
   font-size: var(--text-4xl);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 h3 {
@@ -230,12 +280,12 @@ h4 {
 
 h5 {
   font-size: var(--text-xl);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 h6 {
   font-size: var(--text-lg);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 p {
@@ -256,21 +306,32 @@ a:hover {
   color: var(--accent-secondary);
 }
 
-/* Monospace label - Antfu style section markers */
+/* Section marker */
 .label-mono {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: var(--tracking-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--accent-primary);
+  opacity: 0.9;
+}
+
+.br-home-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  opacity: 0.9;
 }
 
 /* Display heading for hero sections */
 .display-heading {
   font-family: var(--font-display);
   font-size: var(--text-6xl);
-  font-weight: 800;
+  font-weight: 600;
   line-height: var(--leading-none);
   letter-spacing: var(--tracking-tighter);
   color: var(--text-primary);
@@ -331,18 +392,79 @@ pre {
 }
 
 .container-grid::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
   background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
   background-size: 80px 80px;
   pointer-events: none;
   opacity: 0.5;
+}
+
+.pe-home-shell {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.br-home-shell {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.pe-home-section {
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: clamp(4.5rem, 7vw, 7rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7rem);
+}
+
+.pe-home-panel-label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-4);
+}
+
+.br-home-panel-label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .pe-home-shell {
+    padding: 0 var(--space-8);
+  }
+
+  .br-home-shell {
+    padding: 0 var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pe-home-shell {
+    padding: 0 var(--space-10);
+  }
+
+  .br-home-shell {
+    padding: 0 var(--space-10);
+  }
 }
 
 /* Section spacing */
@@ -382,7 +504,7 @@ pre {
 
 /* ================================================
    BRUTALIST BUTTON SYSTEM
-   Hard edges, monospace labels, terminal feel
+   Hard edges, restrained typography
    ================================================ */
 
 .btn {
@@ -390,10 +512,10 @@ pre {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: var(--tracking-mono);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);
@@ -477,7 +599,7 @@ pre {
 }
 
 .btn-terminal::before {
-  content: ">";
+  content: '>';
   position: absolute;
   left: var(--space-4);
   color: var(--accent-primary);
@@ -563,7 +685,7 @@ pre {
 
 /* ================================================
    NAVIGATION SYSTEM
-   Minimal, text-focused, terminal-like
+   Minimal, text-focused
    ================================================ */
 
 .nav {
@@ -573,14 +695,15 @@ pre {
 }
 
 .nav-link {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: var(--tracking-mono);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
   color: var(--text-secondary);
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-out);
   position: relative;
+  text-transform: uppercase;
 }
 
 .nav-link:hover {
@@ -593,7 +716,7 @@ pre {
 
 /* Nav link with underline indicator */
 .nav-link-indicator::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -4px;
   left: 0;
@@ -616,7 +739,7 @@ pre {
 
 .input {
   width: 100%;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   padding: var(--space-3) var(--space-4);
   background: var(--bg-tertiary);
@@ -642,10 +765,10 @@ pre {
 
 .label {
   display: block;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: var(--tracking-mono);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: var(--space-2);
@@ -659,10 +782,10 @@ pre {
 .badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 600;
-  letter-spacing: var(--tracking-mono);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
@@ -804,8 +927,13 @@ pre {
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-float {
@@ -813,8 +941,13 @@ pre {
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .animate-pulse-soft {

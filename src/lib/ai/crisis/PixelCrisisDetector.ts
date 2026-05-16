@@ -22,7 +22,7 @@ import type {
   MentalHealthAnalysis,
   HealthIndicator,
   SentimentScore,
-  MentalHealthCategory,
+  MentalHealthCategoryDetail,
 } from '../../mental-health/types'
 
 export interface PixelCrisisDetectorConfig {
@@ -33,14 +33,14 @@ export interface PixelCrisisDetectorConfig {
 }
 
 export class PixelCrisisDetector {
-  private config: Required<PixelCrisisDetectorConfig>
-  private conversationHistory: Array<{ role: string; content: string }> = []
+  private readonly config: Required<PixelCrisisDetectorConfig>
+  private conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
   constructor(config: PixelCrisisDetectorConfig = {}) {
     this.config = {
-      pixelApiUrl: config.pixelApiUrl || 'http://localhost:8001',
-      pixelApiKey: config.pixelApiKey || '',
-      timeoutMs: config.timeoutMs || 5000,
+      pixelApiUrl: config.pixelApiUrl ?? 'http://localhost:8001',
+      pixelApiKey: config.pixelApiKey ?? '',
+      timeoutMs: config.timeoutMs ?? 5000,
       fallbackToKeywords: config.fallbackToKeywords ?? true,
     }
   }
@@ -55,7 +55,7 @@ export class PixelCrisisDetector {
 
       // Convert Pixel response to MentalHealthAnalysis format
       return this.convertToMentalHealthAnalysis(text, pixelResponse)
-    } catch (error) {
+    } catch (error: unknown) {
       if (this.config.fallbackToKeywords) {
         console.warn(
           'Pixel inference failed, falling back to keyword detection:',
@@ -130,7 +130,7 @@ export class PixelCrisisDetector {
       if (!response.ok) {
         const error = await response.json()
         throw new Error(
-          `Pixel API error: ${error.detail || response.statusText}`,
+          `Pixel API error: ${error.detail ?? response.statusText}`,
         )
       }
 
@@ -195,6 +195,16 @@ export class PixelCrisisDetector {
       indicators,
       recommendations: this.generateRecommendations(indicators, riskLevel),
       requiresIntervention: riskLevel === 'high' || riskLevel === 'critical',
+      category: riskLevel,
+      explanation: `Pixel-based analysis complete with risk level ${riskLevel}.`,
+      expertGuided: true,
+      scores: {
+        riskLevel,
+        crisisSignals: metadata?.crisis_signals?.length ?? 0,
+      },
+      summary: `Crisis analysis completed with ${riskLevel} risk.`,
+      supportingEvidence: indicators.flatMap((indicator) => indicator.evidence),
+      hasMentalHealthIssue: riskLevel !== 'low',
     }
   }
 
@@ -300,7 +310,13 @@ export class PixelCrisisDetector {
    */
   private generateSentiment(eqScores?: EQScores): SentimentScore {
     if (!eqScores) {
-      return { overall: 0, positive: 0, negative: 0, neutral: 1.0 }
+      return {
+        overall: 0,
+        positive: 0,
+        negative: 0,
+        neutral: 1.0,
+        confidence: 1.0,
+      }
     }
 
     // High EQ = positive sentiment, low EQ = negative sentiment
@@ -309,7 +325,13 @@ export class PixelCrisisDetector {
     const neutral = 0.3
     const overall = positive - negative
 
-    return { overall, positive, negative, neutral }
+    return {
+      overall,
+      positive,
+      negative,
+      neutral,
+      confidence: Math.min(1, Math.max(0, positive + negative + neutral)),
+    }
   }
 
   /**
@@ -317,7 +339,7 @@ export class PixelCrisisDetector {
    */
   private categorizeIssues(
     indicators: HealthIndicator[],
-  ): MentalHealthCategory[] {
+  ): MentalHealthCategoryDetail[] {
     return indicators.map((indicator) => ({
       name: indicator.type,
       score: indicator.severity,
@@ -411,13 +433,26 @@ export class PixelCrisisDetector {
       timestamp: Date.now(),
       confidence: 0.6, // Lower confidence for keyword-based
       riskLevel,
+      category: riskLevel,
+      explanation: 'Fallback keyword analysis completed.',
+      expertGuided: false,
+      scores: { source: 'keyword_fallback' },
+      summary: 'Keyword-based crisis fallback analysis completed.',
+      supportingEvidence: indicators.flatMap((indicator) => indicator.evidence),
+      hasMentalHealthIssue: riskLevel === 'high' || riskLevel === 'critical',
       categories: indicators.map((i) => ({
         name: i.type,
         score: i.severity,
         confidence: 0.6,
         keywords: i.evidence,
       })),
-      sentiment: { overall: -0.5, positive: 0, negative: 0.8, neutral: 0.2 },
+      sentiment: {
+        overall: -0.5,
+        positive: 0,
+        negative: 0.8,
+        neutral: 0.2,
+        confidence: 0.8,
+      },
       indicators,
       recommendations: this.generateRecommendations(indicators, riskLevel),
       requiresIntervention: riskLevel === 'high' || riskLevel === 'critical',

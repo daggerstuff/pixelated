@@ -1,8 +1,7 @@
 ---
 title: Advanced Somatic Technologies in Trauma Treatment
 description: >-
-  Exploring cutting-edge technological innovations that harness the body-mind
-  connection for more effective trauma healing and neuroplastic recovery
+  _Next in our series, we'll explore Psychedelic Medicine & Neuroplasticity in
 author: Research & Clinical Team
 pubDate: 2025-05-15T00:00:00.000Z
 draft: false
@@ -14,9 +13,8 @@ tags:
   - innovation
 series: Neuroplasticity & Trauma
 seriesOrder: 3
-category: Research
----
 
+---
 # Advanced Somatic Technologies in Trauma Treatment
 
 ## Introduction

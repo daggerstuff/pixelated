@@ -14,7 +14,7 @@ export const GET: APIRoute = async () => {
         },
       },
       version: '2.0.0',
-      environment: process.env['NODE_ENV'] || 'development',
+      environment: process.env['NODE_ENV'] ?? 'development',
     }
 
     return new Response(JSON.stringify(healthResponse, null, 2), {
@@ -29,7 +29,7 @@ export const GET: APIRoute = async () => {
       JSON.stringify({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 503,

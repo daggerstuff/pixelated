@@ -86,13 +86,7 @@ const techniques = defineCollection({
 })
 
 const pagesSchema = () => pageSchema
-const i18nSchema = ({
-  extend = z.object({}),
-} = {}) =>
-  z
-    .object({})
-    .passthrough()
-    .merge(extend)
+const i18nSchema = () => z.record(z.string())
 
 // Content collection schema setup (using local content-store data).
 const pages = defineCollection({
@@ -102,12 +96,7 @@ const pages = defineCollection({
 
 const i18n = defineCollection({
   loader: glob({ pattern: '**/*.json', base: `${baseDir}/i18n` }),
-  schema: i18nSchema({
-    extend: z.object({
-      'sponsor.thanks': z.string().optional(),
-      'sponsor.to-suport': z.string().optional(),
-    }),
-  }),
+  schema: i18nSchema(),
 })
 
 export const collections = {

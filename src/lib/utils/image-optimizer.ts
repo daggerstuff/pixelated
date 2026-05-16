@@ -6,15 +6,14 @@
 import { existsSync, statSync } from 'fs'
 import { readFile, mkdir } from 'fs/promises'
 
-import { getLogger } from '@/lib/logging'
-
 import {
   ALLOWED_DIRECTORIES,
   safeJoin,
   validatePath,
 } from '../../utils/path-security'
+import { getLogger } from '../logging'
 
-const logger = getLogger('image-optimizer')
+const logger = getLogger({ prefix: 'image-optimizer' })
 
 // Optimization configuration
 const IMAGE_CONFIG = {
@@ -50,7 +49,10 @@ const IMAGE_CONFIG = {
 
   // Output directories
   OUTPUT_DIRS: {
-    optimized: validatePath('public/assets/optimized', ALLOWED_DIRECTORIES.PUBLIC),
+    optimized: validatePath(
+      'public/assets/optimized',
+      ALLOWED_DIRECTORIES.PUBLIC,
+    ),
     webp: validatePath('public/assets/webp', ALLOWED_DIRECTORIES.PUBLIC),
     avif: validatePath('public/assets/avif', ALLOWED_DIRECTORIES.PUBLIC),
   },
@@ -76,7 +78,7 @@ export interface OptimizationResult {
  * Image optimization service
  */
 export class ImageOptimizer {
-  private outputDirs: string[]
+  private readonly outputDirs: string[]
 
   constructor() {
     this.outputDirs = [
@@ -94,7 +96,7 @@ export class ImageOptimizer {
     for (const dir of this.outputDirs) {
       try {
         await mkdir(dir, { recursive: true })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn(`Failed to create output directory: ${dir}`, { error })
       }
     }
@@ -107,7 +109,7 @@ export class ImageOptimizer {
     // Validate path to prevent traversal attacks
     try {
       validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
-    } catch (error) {
+    } catch (error: unknown) {
       throw new Error(
         `Invalid image path: ${error instanceof Error ? error.message : String(error)}`,
       )
@@ -179,7 +181,7 @@ export class ImageOptimizer {
       }
 
       // Calculate total savings
-      const totalOptimizedSize = (result.webpSize || 0) + (result.avifSize || 0)
+      const totalOptimizedSize = (result.webpSize ?? 0) + (result.avifSize ?? 0)
       if (totalOptimizedSize > 0) {
         result.savings = originalSize - totalOptimizedSize / 2 // Average savings
         result.compressionRatio = originalSize / (totalOptimizedSize / 2)
@@ -197,7 +199,7 @@ export class ImageOptimizer {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Image optimization failed', {
         imagePath,
         error: error instanceof Error ? error.message : String(error),
@@ -214,25 +216,25 @@ export class ImageOptimizer {
     // Check file extension first
     const ext = filePath.toLowerCase().split('.').pop()
 
-    if (['jpg', 'jpeg'].includes(ext || '')) return 'jpeg'
+    if (['jpg', 'jpeg'].includes(ext ?? '')) return 'jpeg'
     if (ext === 'png') return 'png'
     if (ext === 'webp') return 'webp'
     if (ext === 'avif') return 'avif'
     if (ext === 'gif') return 'gif'
 
     // Check magic bytes if extension is unclear
-    const magic = buffer.slice(0, 12).toString('hex')
+    const magic = buffer.subarray(0, 12).toString('hex')
 
     if (magic.startsWith('ffd8ff')) return 'jpeg'
     if (magic.startsWith('89504e47')) return 'png'
     if (
       magic.startsWith('52494646') &&
-      buffer.slice(8, 12).toString('hex') === '57454250'
+      buffer.subarray(8, 12).toString('hex') === '57454250'
     )
       return 'webp'
     if (
       magic.startsWith('52494646') &&
-      buffer.slice(8, 12).toString('hex') === '41564946'
+      buffer.subarray(8, 12).toString('hex') === '41564946'
     )
       return 'avif'
 
@@ -269,7 +271,7 @@ export class ImageOptimizer {
         path: outputPath,
         size: estimatedSize,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('WebP generation failed', {
         imagePath,
         error: error instanceof Error ? error.message : String(error),
@@ -307,7 +309,7 @@ export class ImageOptimizer {
         path: outputPath,
         size: estimatedSize,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('AVIF generation failed', {
         imagePath,
         error: error instanceof Error ? error.message : String(error),
@@ -324,7 +326,7 @@ export class ImageOptimizer {
       originalPath
         .split('/')
         .pop()
-        ?.replace(/\.[^/.]+$/, '') || 'image'
+        ?.replace(/\.[^/.]+$/, '') ?? 'image'
     return `${basename}-optimized.${format}`
   }
 
@@ -343,7 +345,7 @@ export class ImageOptimizer {
     for (let i = 0; i < imagePaths.length; i += batchSize) {
       const batch = imagePaths.slice(i, i + batchSize)
 
-      const batchPromises = batch.map((path) => this.optimizeImage(path))
+      const batchPromises = batch.map(async (path) => this.optimizeImage(path))
       const batchResults = await Promise.all(batchPromises)
 
       results.push(...batchResults)
@@ -359,7 +361,7 @@ export class ImageOptimizer {
       0,
     )
     const totalOptimizedSize = results.reduce(
-      (sum, r) => sum + (r.webpSize || r.originalSize),
+      (sum, r) => sum + (r.webpSize ?? r.originalSize),
       0,
     )
     const totalSavings = totalOriginalSize - totalOptimizedSize
@@ -384,7 +386,7 @@ export class ImageOptimizer {
       result.originalPath
         .split('/')
         .pop()
-        ?.replace(/\.[^/.]+$/, '') || 'image'
+        ?.replace(/\.[^/.]+$/, '') ?? 'image'
 
     let html = `<!-- Responsive image: ${alt} -->\n`
     html += `<picture>\n`
@@ -400,7 +402,7 @@ export class ImageOptimizer {
     }
 
     // Original format as fallback
-    const fallbackPath = result.optimizedPath || result.originalPath
+    const fallbackPath = result.optimizedPath ?? result.originalPath
     html += `  <img src="${fallbackPath}" alt="${alt}" loading="lazy">\n`
     html += `</picture>`
 
@@ -424,7 +426,7 @@ export class ImageOptimizer {
     )
     const totalOptimizedSize =
       results.reduce((sum, r) => {
-        return sum + (r.webpSize || r.originalSize) + (r.avifSize || 0)
+        return sum + (r.webpSize ?? r.originalSize) + (r.avifSize ?? 0)
       }, 0) / 2 // Average of available formats
 
     const totalSavings = totalOriginalSize - totalOptimizedSize

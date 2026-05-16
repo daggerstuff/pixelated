@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import { test, expect } from '@playwright/test'
 
 // Ensure screenshots directory exists
-function ensureDirectoryExists(directory): void {
+function ensureDirectoryExists(directory: string): void {
   try {
     fs.mkdirSync(directory, { recursive: true })
   } catch (err: unknown) {
@@ -64,8 +64,7 @@ test('basic browser compatibility check', async ({ page, browser }) => {
   // Wait for results to be populated
   await page.waitForFunction(
     () => {
-      const content = (document.getElementById('results') as HTMLElement)
-        ?.textContent
+      const content = document.getElementById('results')?.textContent
       return content && content !== 'Running tests...'
     },
     { timeout: 5000 },
@@ -75,6 +74,12 @@ test('basic browser compatibility check', async ({ page, browser }) => {
   const content = await page.textContent('#results')
   console.log('Content:', content)
   expect(content).toBeTruthy()
+
+  if (typeof content !== 'string') {
+    throw new Error(
+      'Expected browser compatibility results content to be a string',
+    )
+  }
 
   // Ensure directories exist before taking screenshots
   ensureDirectoryExists('./playwright-report')
@@ -101,7 +106,41 @@ test('basic browser compatibility check', async ({ page, browser }) => {
 
   // Parse and validate the content
   try {
-    const featuresJson = JSON.parse(content) as unknown
+    const parsedContent: unknown = JSON.parse(content)
+    const isFeatureResult = (
+      value: unknown,
+    ): value is {
+      fetch: boolean
+      promise: boolean
+      arrayMethods: boolean
+      css: {
+        flexbox: boolean
+        grid: boolean
+        variables: boolean
+      }
+    } => {
+      return (
+        typeof value === 'object' &&
+        value !== null &&
+        typeof Reflect.get(value, 'fetch') === 'boolean' &&
+        typeof Reflect.get(value, 'promise') === 'boolean' &&
+        typeof Reflect.get(value, 'arrayMethods') === 'boolean' &&
+        typeof Reflect.get(value, 'css') === 'object' &&
+        Reflect.get(value, 'css') !== null &&
+        typeof Reflect.get(Reflect.get(value, 'css'), 'flexbox') ===
+          'boolean' &&
+        typeof Reflect.get(Reflect.get(value, 'css'), 'grid') === 'boolean' &&
+        typeof Reflect.get(Reflect.get(value, 'css'), 'variables') === 'boolean'
+      )
+    }
+
+    if (!isFeatureResult(parsedContent)) {
+      throw new Error(
+        'Feature detection payload does not match expected schema',
+      )
+    }
+
+    const featuresJson = parsedContent
     console.log('Features detected:', featuresJson)
 
     // Verify essential features

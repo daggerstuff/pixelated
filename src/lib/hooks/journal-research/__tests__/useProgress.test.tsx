@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type { Progress, ProgressMetrics } from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 
 import {
@@ -13,8 +14,8 @@ import {
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  getProgress: vi.fn(),
-  getProgressMetrics: vi.fn(),
+  getProgress: vi.fn<() => Promise<Progress>>(),
+  getProgressMetrics: vi.fn<() => Promise<ProgressMetrics>>(),
 }))
 
 const mockProgress = {
@@ -131,13 +132,19 @@ describe('useProgress hooks', () => {
       expect(api.getProgressMetrics).toHaveBeenCalledWith('session-1')
     })
 
-    it('supports refetchInterval', () => {
+    it('supports refetchInterval', async () => {
+      vi.mocked(api.getProgressMetrics).mockResolvedValue(mockProgressMetrics)
+
       const { result } = renderHook(
         () => useProgressMetricsQuery('session-1', { refetchInterval: 5000 }),
         {
           wrapper: createWrapper(),
         },
       )
+
+      await waitFor(() => {
+        expect(result.current.data).toBeDefined()
+      })
 
       expect(result.current.data).toBeDefined()
       // The refetchInterval should be set in the query options

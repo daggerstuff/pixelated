@@ -1,5 +1,4 @@
-import mongodb from '@/config/mongodb.config'
-
+import mongodb from '../../config/mongodb.config'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger
@@ -18,11 +17,11 @@ function createMockClient() {
   logger.warn(message)
 
   return {
-    connect: () =>
+    connect:  async () =>
       Promise.resolve({
         collection: () => ({
-          createIndex: () => Promise.resolve(),
-          insertOne: () => Promise.resolve(),
+          createIndex:  async () => Promise.resolve(),
+          insertOne:  async () => Promise.resolve(),
         }),
       }),
   }

@@ -1,13 +1,13 @@
 # Foundation Model Training Service - GPU Enabled
-# OVH Golden Image Strategy: Datasets baked into image to avoid DATASYNC errors
+# HETZNER Golden Image Strategy: Datasets baked into image to avoid DATASYNC errors
 FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS base
 
-# Install Python 3.11 and system dependencies
+# Install Python 3.13 and system dependencies
 RUN apt-get update && \
-    apt-get install -y \
-    python3.11 \
-    python3.11-venv \
-    python3.11-dev \
+    apt-get install --no-install-recommends -y \
+    python3.13 \
+    python3.13-venv \
+    python3.13-dev \
     python3-pip \
     curl \
     git \
@@ -17,12 +17,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install uv package manager
-RUN python3.11 -m pip install --no-cache-dir uv==0.4.18
+RUN python3.13 -m pip install --no-cache-dir uv==0.4.18
 
 WORKDIR /app
 
-# Create virtual environment with Python 3.11
-RUN python3.11 -m venv /opt/venv
+# Create virtual environment with Python 3.13
+RUN python3.13 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="/app"
 
@@ -78,4 +78,4 @@ HEALTHCHECK --interval=60s --timeout=30s --start-period=120s --retries=3 \
 
 # Default command - run Stage 1 training
 # Override with: --stage stage2 or --stage stage3
-CMD ["python", "/app/ai/training/ready_packages/platforms/ovh/train_ovh.py", "--stage", "stage1"]
+CMD ["python", "/app/ai/training/ready_packages/platforms/hetzner/train_hetzner_canonical.py", "--stage", "stage1"]

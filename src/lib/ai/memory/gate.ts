@@ -9,7 +9,7 @@ const appLogger = createBuildSafeLogger('socratic-gate');
  * Middleman for memory ingestion. Ensures psychological safety and data quality.
  */
 export class SocraticGate {
-  private tagger: MemoryCrisisTagger;
+  private readonly tagger: MemoryCrisisTagger;
 
   constructor(tagger: MemoryCrisisTagger) {
     this.tagger = tagger;
@@ -57,7 +57,7 @@ export class SocraticGate {
     } catch (error: unknown) {
       appLogger.error('Socratic Gate evaluation failed', {
         memoryId: memory.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       });
 
       return {

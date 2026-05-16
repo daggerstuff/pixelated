@@ -9,7 +9,7 @@ const appLogger = createBuildSafeLogger('memory-tagger');
  * Combines high-performance keyword scanning with deep AI analysis.
  */
 export class MemoryCrisisTagger {
-  private crisisService: CrisisDetectionService;
+  private readonly crisisService: CrisisDetectionService;
 
   constructor(crisisService: CrisisDetectionService) {
     this.crisisService = crisisService;
@@ -56,7 +56,7 @@ export class MemoryCrisisTagger {
     } catch (error: unknown) {
       appLogger.error('Crisis tagging failed for memory object', {
         memoryId: memory.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       });
       return ['ERROR_ANALYSIS_FAILED'];
     }

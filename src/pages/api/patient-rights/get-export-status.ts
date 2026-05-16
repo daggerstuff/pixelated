@@ -58,7 +58,7 @@ export const GET = async ({ request, url }) => {
 
     if (!authResult.success) {
       logger.warn('Unauthorized attempt to check export status', {
-        ip: request.headers.get('x-forwarded-for') || 'unknown',
+        ip: request.headers.get('x-forwarded-for') ?? 'unknown',
       })
 
       return new Response(
@@ -78,7 +78,7 @@ export const GET = async ({ request, url }) => {
     // Get the export status
     const result = await getDataExportDetails(
       exportId,
-      authResult.userId || 'unknown',
+      authResult.userId ?? 'unknown',
     )
 
     if (!result.success) {
@@ -124,7 +124,7 @@ export const GET = async ({ request, url }) => {
         JSON.stringify({
           success: false,
           message:
-            result.message || 'An error occurred retrieving export status',
+            result.message ?? 'An error occurred retrieving export status',
         }),
         {
           status: 500,

@@ -2,9 +2,9 @@
 	path = ai
 	url = https://github.com/daggerstuff/ai.git
 	branch = staging
-	ignore = all
-
 [submodule "docs"]
 	path = docs
 	url = https://github.com/daggerstuff/docs.git
-	ignore = all
+[submodule "foresight-mcp"]
+	path = foresight-mcp
+	url = https://github.com/daggerstuff/foresight-mcp.git

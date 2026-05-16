@@ -4,7 +4,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   AIMessage,
   AIServiceOptions,
-  createTogetherAIService,
+  createLLMService,
 } from '../../../lib/ai/AIService'
 import { AIRepository } from '../../../lib/db/ai/repository'
 import { DocumentationService } from '../../../lib/documentation'
@@ -13,19 +13,41 @@ const logger = createBuildSafeLogger('documentation-api')
 
 // Instantiate dependencies for DocumentationService
 const repository = new AIRepository()
-const togetherConfig = {
-  togetherApiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key',
-  apiKey: process.env['TOGETHER_API_KEY'] || 'dummy-key',
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string | undefined {
+  const baseUrl =
+    ((process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL']) ??
+    process.env['OPENAI_BASE_URL']) ??
+    'https://api.openai.com/v1'
+
+  if (isOpenRouterBaseUrl(baseUrl)) {
+    console.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return 'https://api.openai.com/v1'
+  }
+
+  return baseUrl
+}
+const llmConfig = {
+  apiKey: process.env['LLM_API_KEY'] ?? 'dummy-key',
+  baseUrl: resolveSafeLlmBaseUrl(),
 }
 // Create the base service
-const baseAiService = createTogetherAIService(togetherConfig)
+const baseAiService = createLLMService(llmConfig)
 // Add a stub getModelInfo to satisfy the AIService interface
 const aiService = {
   ...baseAiService,
   getModelInfo: () => ({
     id: 'dummy-model',
     name: 'Dummy Model',
-    provider: 'together',
+    provider: 'llm',
     capabilities: ['chat'],
     contextWindow: 2048,
     maxTokens: 1024,
@@ -52,12 +74,12 @@ const aiService = {
           finishReason: 'stop' as const,
         },
       ],
-      usage: result.usage || {
+      usage: result.usage ?? {
         promptTokens: 0,
         completionTokens: 0,
         totalTokens: 0,
       },
-      provider: 'together',
+      provider: 'llm',
       content: result.content,
     } as import('../../../lib/ai/models/ai-types').AICompletion
   },
@@ -69,7 +91,7 @@ export const POST = async ({ request }: APIContext) => {
     // Authenticate request
     // To get cookies in Astro API route, use the request.headers
     // We'll create a minimal cookies API compatible with getCurrentUser
-    const cookieHeader = request.headers.get('cookie') || ''
+    const cookieHeader = request.headers.get('cookie') ?? ''
     const cookies = {
       get: (name: string) => {
         const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))

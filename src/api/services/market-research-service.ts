@@ -3,11 +3,42 @@ import { v4 as uuid } from 'uuid'
 import { slug } from '@/utils/common'
 
 // Market Research Service Layer
+import { getPostgresPool } from '../../lib/database/connection'
 import {
-  getMongoConnection,
-  getPostgresPool,
-} from '../../lib/database/connection'
-import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
+  MarketResearchDocument,
+  MarketResearch as MarketResearchModel,
+} from '../../lib/database/mongodb/schemas'
+import { ForbiddenError, NotFoundError } from '../middleware/error-handler'
+
+type MarketResearchPermissionLevel = 'view' | 'edit' | 'comment'
+
+type MarketResearchPermissions = {
+  view: string[]
+  edit: string[]
+  comment: string[]
+}
+
+const normalizePermissions = (
+  permissions?: MarketResearchPermissions | null,
+): MarketResearchPermissions => ({
+  view: permissions?.view ?? [],
+  edit: permissions?.edit ?? [],
+  comment: permissions?.comment ?? [],
+})
+
+const getPermissionLevel = (
+  permissions: MarketResearchPermissions,
+  permissionLevel: MarketResearchPermissionLevel,
+): string[] => permissions[permissionLevel] ?? []
+
+const hasPermission = (
+  permissions: MarketResearchPermissions | null | undefined,
+  permissionLevel: MarketResearchPermissionLevel,
+  userId: string,
+) => {
+  const normalized = normalizePermissions(permissions)
+  return getPermissionLevel(normalized, permissionLevel).includes(userId)
+}
 
 /**
  * Create a new market research document
@@ -25,7 +56,6 @@ export async function createMarketResearch(data: {
   methodology?: string
   budget?: string
 }) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
   const pool = getPostgresPool()
 
   const researchId = uuid()
@@ -35,15 +65,15 @@ export async function createMarketResearch(data: {
     _id: researchId,
     title: data.title,
     slug: researchSlug,
-    description: data.description || '',
+    description: data.description ?? '',
     owner: data.ownerId,
     status: 'active',
-    researchType: data.researchType || 'market_analysis',
-    targetMarkets: data.targetMarkets || [],
+    researchType: data.researchType ?? 'market_analysis',
+    targetMarkets: data.targetMarkets ?? [],
     findings: [],
     competitiveAnalysis: [],
     recommendations: [],
-    timeline: data.timeline || {
+    timeline: data.timeline ?? {
       startDate: new Date(),
       endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     },
@@ -72,8 +102,6 @@ export async function createMarketResearch(data: {
  * Get market research document
  */
 export async function getMarketResearch(researchId: string, userId: string) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -81,9 +109,10 @@ export async function getMarketResearch(researchId: string, userId: string) {
   }
 
   // Check permissions
+  const researchDoc = research as any
   if (
-    !research.permissions.view.includes(userId) &&
-    research.owner !== userId
+    !hasPermission(research.permissions, 'view', userId) &&
+    researchDoc.owner !== userId
   ) {
     throw new ForbiddenError('Cannot access this research')
   }
@@ -105,8 +134,6 @@ export async function addFinding(
     source?: string
   },
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -115,7 +142,7 @@ export async function addFinding(
 
   // Check edit permission
   if (
-    !research.permissions.edit.includes(userId) &&
+    !hasPermission(research.permissions, 'edit', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
@@ -126,10 +153,10 @@ export async function addFinding(
   research.findings.push({
     _id: findingId,
     title: finding.title,
-    description: finding.description || '',
-    impactLevel: finding.impactLevel || 'medium',
-    supportingData: finding.supportingData || {},
-    source: finding.source || '',
+    description: finding.description ?? '',
+    impactLevel: finding.impactLevel ?? 'medium',
+    supportingData: finding.supportingData ?? {},
+    source: finding.source ?? '',
     createdAt: new Date(),
     updatedAt: new Date(),
   })
@@ -155,8 +182,6 @@ export async function addCompetitiveAnalysis(
     marketShare?: number
   },
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -165,7 +190,7 @@ export async function addCompetitiveAnalysis(
 
   // Check edit permission
   if (
-    !research.permissions.edit.includes(userId) &&
+    !hasPermission(research.permissions, 'edit', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
@@ -176,11 +201,11 @@ export async function addCompetitiveAnalysis(
   research.competitiveAnalysis.push({
     _id: analysisId,
     competitorName: analysis.competitorName,
-    strengths: analysis.strengths || [],
-    weaknesses: analysis.weaknesses || [],
-    opportunities: analysis.opportunities || [],
-    threats: analysis.threats || [],
-    marketShare: analysis.marketShare || 0,
+    strengths: analysis.strengths ?? [],
+    weaknesses: analysis.weaknesses ?? [],
+    opportunities: analysis.opportunities ?? [],
+    threats: analysis.threats ?? [],
+    marketShare: analysis.marketShare ?? 0,
     createdAt: new Date(),
     updatedAt: new Date(),
   })
@@ -204,8 +229,6 @@ export async function addRecommendation(
     expectedImpact?: string
   },
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -214,7 +237,7 @@ export async function addRecommendation(
 
   // Check edit permission
   if (
-    !research.permissions.edit.includes(userId) &&
+    !hasPermission(research.permissions, 'edit', userId) &&
     research.owner !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
@@ -225,9 +248,9 @@ export async function addRecommendation(
   research.recommendations.push({
     _id: recommendationId,
     title: recommendation.title,
-    description: recommendation.description || '',
-    priority: recommendation.priority || 'medium',
-    expectedImpact: recommendation.expectedImpact || '',
+    description: recommendation.description ?? '',
+    priority: recommendation.priority ?? 'medium',
+    expectedImpact: recommendation.expectedImpact ?? '',
     status: 'pending',
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -252,9 +275,8 @@ export async function listMarketResearch(
     industry?: string
   } = {},
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-  const page = options.page || 1
-  const limit = options.limit || 50
+  const page = options.page ?? 1
+  const limit = options.limit ?? 50
 
   let query: any = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
@@ -289,8 +311,6 @@ export async function searchMarketResearch(
   userId: string,
   limit: number = 50,
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   return await MarketResearchModel.find({
     $text: { $search: query },
     $or: [{ owner: userId }, { 'permissions.view': userId }],
@@ -306,8 +326,6 @@ export async function shareMarketResearch(
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const MarketResearchModel = getMongoConnection().model('MarketResearch')
-
   const research = await MarketResearchModel.findById(researchId)
 
   if (!research) {
@@ -321,8 +339,17 @@ export async function shareMarketResearch(
 
   // Add to appropriate permission array
   const permissionKey = permissionLevel
-  if (!research.permissions[permissionKey].includes(targetUserId)) {
-    research.permissions[permissionKey].push(targetUserId)
+  const normalizedPermissions = normalizePermissions(research.permissions)
+  const permissionList = getPermissionLevel(
+    normalizedPermissions,
+    permissionKey,
+  )
+  if (!permissionList.includes(targetUserId)) {
+    const nextPermissions: MarketResearchPermissions = {
+      ...normalizedPermissions,
+      [permissionKey]: [...permissionList, targetUserId],
+    }
+    research.set('permissions', nextPermissions)
     await research.save()
   }
 

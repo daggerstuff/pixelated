@@ -1,37 +1,15 @@
 import { Brain, Heart, Zap, Shield, User } from 'lucide-react'
 import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-// Archetype definitions inspired by Mind-Mirror
-export interface ArchetypeResult {
-  main_archetype: string
-  confidence: number
-  secondary_archetype?: string
-  color: string
-  description: string
-}
-
-export interface MoodVector {
-  emotional_intensity: number
-  cognitive_clarity: number
-  energy_level: number
-  social_connection: number
-  coherence_index: number
-  urgency_score: number
-}
-
-export interface MindMirrorAnalysis {
-  archetype: ArchetypeResult
-  mood_vector: MoodVector
-  timestamp: number
-  session_id: string
-  insights: string[]
-  recommendations: string[]
-}
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import {
+  type MindMirrorAnalysis,
+  type ArchetypeResult,
+  type MoodVector,
+} from '@/lib/mental-health/types'
 
 interface MindMirrorDashboardProps {
   analysis?: MindMirrorAnalysis
@@ -49,7 +27,7 @@ const ARCHETYPES = {
   },
   shadow_strategist: {
     name: 'Shadow Strategist',
-    icon: '🎯',
+    icon: 'target',
     color: '#4ECDC4',
     description: 'Strategic thinker with deep analytical skills',
     gradient: 'from-teal-400 to-cyan-500',
@@ -91,7 +69,10 @@ const ARCHETYPES = {
   },
 }
 
-export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
+type ArchetypeKey = keyof typeof ARCHETYPES
+type ArchetypeInfo = (typeof ARCHETYPES)[ArchetypeKey]
+
+export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   analysis,
   isAnalyzing = false,
   className = '',
@@ -99,13 +80,13 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
   const [activeTab, setActiveTab] = useState('overview')
 
   const archetypeInfo = useMemo(() => {
-    if (!analysis?.archetype) {
+    if (!analysis) {
       return null
     }
     const archetypeKey = analysis.archetype.main_archetype
       .toLowerCase()
       .replace(' ', '_')
-    return ARCHETYPES[archetypeKey as keyof typeof ARCHETYPES] || null
+    return (ARCHETYPES as Record<string, ArchetypeInfo>)[archetypeKey] ?? null
   }, [analysis?.archetype])
 
   const moodMetrics = useMemo(() => {
@@ -297,15 +278,17 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className='space-y-3'>
-                {analysis.insights?.map((insight) => (
-                  <div
-                    key={insight}
-                    className='bg-blue-50 flex items-start space-x-3 rounded-lg p-3'
-                  >
-                    <Sparkles className='text-blue-500 mt-0.5 h-4 w-4 flex-shrink-0' />
-                    <p className='text-gray-700 text-sm'>{insight}</p>
-                  </div>
-                )) || (
+                {analysis.insights.length > 0 ? (
+                  analysis.insights.map((insight) => (
+                    <div
+                      key={insight}
+                      className='bg-blue-50 flex items-start space-x-3 rounded-lg p-3'
+                    >
+                      <Sparkles className='text-blue-500 mt-0.5 h-4 w-4 flex-shrink-0' />
+                      <p className='text-gray-700 text-sm'>{insight}</p>
+                    </div>
+                  ))
+                ) : (
                   <p className='text-gray-500 text-sm italic'>
                     No specific insights available
                   </p>
@@ -325,15 +308,17 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
             </CardHeader>
             <CardContent>
               <div className='space-y-3'>
-                {analysis.recommendations?.map((rec) => (
-                  <div
-                    key={rec}
-                    className='bg-green-50 flex items-start space-x-3 rounded-lg p-3'
-                  >
-                    <Shield className='text-green-500 mt-0.5 h-4 w-4 flex-shrink-0' />
-                    <p className='text-gray-700 text-sm'>{rec}</p>
-                  </div>
-                )) || (
+                {analysis.recommendations.length > 0 ? (
+                  analysis.recommendations.map((rec) => (
+                    <div
+                      key={rec}
+                      className='bg-green-50 flex items-start space-x-3 rounded-lg p-3'
+                    >
+                      <Shield className='text-green-500 mt-0.5 h-4 w-4 flex-shrink-0' />
+                      <p className='text-gray-700 text-sm'>{rec}</p>
+                    </div>
+                  ))
+                ) : (
                   <p className='text-gray-500 text-sm italic'>
                     No specific recommendations available
                   </p>

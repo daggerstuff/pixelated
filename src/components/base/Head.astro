@@ -10,14 +10,24 @@ import { withBasePath } from '@/utils/path'
 interface Props {
   title?: string
   description?: string
+  keywords?: string
   ogImage?: string | boolean
   pubDate?: string
   lastModDate?: string
   cspNonce?: string
 }
 
-const { title, description, ogImage, pubDate, lastModDate, cspNonce } =
-  Astro.props
+const {
+  title,
+  description,
+  keywords,
+  ogImage,
+  pubDate,
+  lastModDate,
+  cspNonce,
+} = Astro.props
+
+const pageKeywords = typeof keywords === 'string' ? keywords.trim() : undefined
 
 const siteName = new URL(SITE.website).hostname
 
@@ -27,6 +37,7 @@ const pageTitle =
 const pageDescription = description || SITE.description
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
 // Simplified OG image handling - just use fallback or provided image
 // File existence checks removed to avoid build issues
@@ -35,9 +46,7 @@ const generatedOgImage = withBasePath(
   `${basename(Astro.url.pathname)}.png`,
 )
 const assignedOgImage =
-  ogImage && ogImage !== true
-    ? withBasePath('og-images', ogImage as string)
-    : undefined
+  ogImage && ogImage !== true ? withBasePath('og-images', ogImage) : undefined
 
 const ogImageURL = new URL(
   assignedOgImage ||
@@ -86,10 +95,11 @@ const webPageData = {
 <title>{pageTitle}</title>
 <meta name="title" content={pageTitle} />
 <meta name="description" content={pageDescription} />
+{pageKeywords && <meta name="keywords" content={pageKeywords} />}
 <meta name="author" content={SITE.author} />
 
 <!-- Color -->
-<meta name="theme-color" content="" />
+<meta name="theme-color" content="#0d9488" />
 <meta name="color-scheme" content="light dark" />
 
 <!-- Open Graph & Facebook -->
@@ -140,6 +150,12 @@ const webPageData = {
 />
 
 <!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap"
+/>
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -151,20 +167,29 @@ const webPageData = {
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(blogPostingData)}
+      set:html={JSON.stringify(blogPostingData)
+        .replace(/<\//g, '\\u003c/')
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')}
     />
   ) : (
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(webPageData)}
+      set:html={JSON.stringify(webPageData)
+        .replace(/<\//g, '\\u003c/')
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')}
     />
   )
 }
 
-<!-- Vercel Speed Insights -->
-<SpeedInsights />
-
 <ClientRouter />
-
-<RybbitAnalytics nonce={cspNonce} trackPageTransitions />
+{
+  shouldRenderAnalytics && (
+    <>
+      <SpeedInsights />
+      <RybbitAnalytics nonce={cspNonce} trackPageTransitions />
+    </>
+  )
+}

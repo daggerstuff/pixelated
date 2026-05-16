@@ -4,12 +4,18 @@ Health, readiness, liveness, and metrics endpoints.
 
 import time
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
+
+try:
+    from prometheus_client import generate_latest
+except Exception:
+    def generate_latest() -> bytes:
+        return b""
+
 from bias_detection.config import settings
 from bias_detection.deps import get_bias_service
 from bias_detection.models import HealthResponse
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import Response
-from prometheus_client import generate_latest
 
 router = APIRouter(tags=["health"])
 
@@ -66,4 +72,4 @@ async def metrics():
 @router.get("/sentry-debug")
 async def sentry_debug():
     """Trigger a test error for Sentry verification."""
-    1 / 0  # noqa: B018
+    raise ZeroDivisionError("Sentry debug error")

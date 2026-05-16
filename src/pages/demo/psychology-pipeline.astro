@@ -8,6 +8,7 @@ import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
+import { ChartBar } from 'lucide-react'
 import Badge from '@/components/ui/Badge.astro'
 ---
 
@@ -106,7 +107,7 @@ import Badge from '@/components/ui/Badge.astro'
 
         <Card class="border border-green-600/30 bg-slate-800/50 backdrop-blur">
           <CardHeader>
-            <div class="text-4xl mb-3">📊</div>
+            <div class="text-4xl mb-3"><ChartBar className="w-10 h-10" /></div>
             <CardTitle class="text-green-100">Analytics & Insights</CardTitle>
           </CardHeader>
           <CardContent>

@@ -31,7 +31,7 @@ function getAccessByType(logs: AuditLog[]): {
   const typeCounts = new Map<string, number>()
 
   logs.forEach((log) => {
-    const count = typeCounts.get(log.resourceType) || 0
+    const count = typeCounts.get(log.resourceType) ?? 0
     typeCounts.set(log.resourceType, count + 1)
   })
 
@@ -52,7 +52,7 @@ export async function generateAuditMetrics(
   logs: AuditLog[],
 ): Promise<AuditMetrics> {
   const { detectUnusualPatterns } = await import('./analysis')
-  const unusualPatterns =  detectUnusualPatterns(logs)
+  const unusualPatterns = detectUnusualPatterns(logs)
 
   return {
     accessByTime: getAccessByTime(logs),

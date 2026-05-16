@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 
-import { DocumentChangeEvent } from './socketService.js'
+type DocumentChangeEvent = Record<string, unknown>
 
 interface DocumentJoinedEvent {
   document: {
@@ -46,7 +46,7 @@ interface DocumentSavedEvent {
 
 export class WebSocketClient {
   private socket: Socket | null = null
-  private token: string
+  private readonly token: string
   private documentId: string | null = null
 
   constructor(token: string) {
@@ -54,9 +54,11 @@ export class WebSocketClient {
   }
 
   connect(): void {
-    const serverUrl =
-      import.meta.env.PUBLIC_WEBSOCKET_URL || 'ws://localhost:3001'
-    this.socket = io(serverUrl, {
+    const resolvedServerUrl =
+      typeof import.meta.env.PUBLIC_WEBSOCKET_URL === 'string'
+        ? import.meta.env.PUBLIC_WEBSOCKET_URL
+        : 'ws://localhost:3001'
+    this.socket = io(resolvedServerUrl, {
       auth: { token: this.token },
       transports: ['websocket'],
     })
@@ -70,7 +72,10 @@ export class WebSocketClient {
     })
 
     this.socket.on('error', (error: { message: string }) => {
-      console.error('WebSocket error:', error.message)
+      console.error(
+        'WebSocket error:',
+        error instanceof Error ? error.message : 'Unknown error',
+      )
     })
   }
 
@@ -81,7 +86,7 @@ export class WebSocketClient {
     }
   }
 
-  joinDocument(documentId: string): Promise<DocumentJoinedEvent> {
+  async joinDocument(documentId: string): Promise<DocumentJoinedEvent> {
     return new Promise((resolve, reject) => {
       if (!this.socket) {
         reject(new Error('Socket not connected'))
@@ -96,7 +101,9 @@ export class WebSocketClient {
       })
 
       this.socket.once('error', (error: { message: string }) => {
-        reject(new Error(error.message))
+        reject(
+          new Error(error instanceof Error ? error.message : 'Unknown error'),
+        )
       })
     })
   }
@@ -186,6 +193,6 @@ export class WebSocketClient {
   }
 
   get isConnected(): boolean {
-    return this.socket?.connected || false
+    return this.socket?.connected ?? false
   }
 }

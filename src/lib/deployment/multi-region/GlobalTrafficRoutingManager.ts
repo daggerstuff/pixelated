@@ -61,10 +61,10 @@ export interface TrafficMetrics {
 }
 
 export class GlobalTrafficRoutingManager extends EventEmitter {
-  private config: RoutingConfig
-  private routeTargets: Map<string, RouteTarget> = new Map()
-  private routingCache: Map<string, RoutingDecision> = new Map()
-  private metrics: TrafficMetrics
+  private readonly config: RoutingConfig
+  private readonly routeTargets: Map<string, RouteTarget> = new Map()
+  private readonly routingCache: Map<string, RoutingDecision> = new Map()
+  private readonly metrics: TrafficMetrics
   private isInitialized = false
   private metricsInterval: NodeJS.Timeout | null = null
 
@@ -94,13 +94,16 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       logger.info('Global Traffic Routing Manager initialized successfully')
 
       this.emit('initialized', { strategy: this.config.strategy })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Global Traffic Routing Manager', {
         error,
       })
-      throw new Error(`Initialization failed: ${error.message}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -128,7 +131,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       }
 
       logger.info(`Initialized ${this.routeTargets.size} route targets`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize route targets', { error })
       throw error
     }
@@ -267,7 +270,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       })
 
       return decision
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Traffic routing failed', {
         error,
         userLocation,
@@ -277,7 +280,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       // Fallback to default region
       const fallbackDecision = this.getFallbackDecision()
       this.emit('traffic-routing-failed', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         fallback: fallbackDecision.target.regionId,
       })
 
@@ -620,7 +623,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     const region = this.loadRegionConfiguration().find(
       (r) => r.id === target.regionId,
     )
-    return region?.complianceRequirements || []
+    return region?.complianceRequirements ?? []
   }
 
   /**
@@ -821,7 +824,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
             ? this.metrics.successfulRequests / this.metrics.totalRequests
             : 0,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Metrics collection failed', { error })
     }
   }
@@ -924,7 +927,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       this.isInitialized = false
 
       logger.info('Global Traffic Routing Manager cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Traffic routing cleanup failed', { error })
       throw error
     }

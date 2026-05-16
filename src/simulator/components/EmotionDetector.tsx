@@ -17,7 +17,8 @@ export const EmotionDetector: React.FC<EmotionDetectorProps> = ({
   text,
   onAnalysisComplete,
 }) => {
-  const { isRunning, isProcessing } = useSimulatorContext()
+  const { state } = useSimulatorContext()
+  const { isRunning, isProcessing } = state
   const { detectEmotions } = useEmotionDetection()
 
   useEffect(() => {

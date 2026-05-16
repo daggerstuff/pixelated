@@ -1,15 +1,15 @@
 import { Lock, Trash, RefreshCw } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Switch } from '@/components/ui/switch'
+} from '@/components/ui/card/index.ts'
+import { Switch } from '@/components/ui/switch.tsx'
 import { AnalyticsService } from '@/lib/analytics'
 
 import { Slider } from '../ui/slider'

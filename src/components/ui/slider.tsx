@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { type FC } from 'react'
 
 interface SliderProps {
   value?: number[]
@@ -24,11 +24,11 @@ const Slider: FC<SliderProps> = ({
   className = '',
 }) => {
   const [internalValue, setInternalValue] = React.useState(
-    value || defaultValue,
+    value ?? defaultValue,
   )
 
-  const currentValue = value || internalValue
-  const sliderValue = currentValue[0] || 0
+  const currentValue = value ?? internalValue
+  const sliderValue = currentValue[0] ?? 0
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = [Number(e.target.value)]

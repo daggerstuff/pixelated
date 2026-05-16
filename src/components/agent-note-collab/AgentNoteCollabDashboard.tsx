@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+
 import { useDebounce } from '../../hooks/useDebounce'
 
 const phaseOrder = [
@@ -159,9 +160,7 @@ export default function AgentNoteCollabDashboard() {
   const groups = useMemo(() => {
     const filtered = turns.filter((turn) =>
       debouncedFilter
-        ? turn.artifactId
-            .toLowerCase()
-            .includes(debouncedFilter.toLowerCase())
+        ? turn.artifactId.toLowerCase().includes(debouncedFilter.toLowerCase())
         : true,
     )
 
@@ -232,7 +231,7 @@ export default function AgentNoteCollabDashboard() {
     <div className='space-y-6'>
       <section className='rounded-lg border p-4'>
         <h1 className='text-2xl font-bold'>Agent Note Collaboration</h1>
-        <p className='text-sm text-muted-foreground mt-1'>
+        <p className='text-muted-foreground mt-1 text-sm'>
           Review unresolved questions, phase progression, and turn summaries
           before handoff.
         </p>
@@ -240,23 +239,23 @@ export default function AgentNoteCollabDashboard() {
 
       <section className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <div className='rounded-lg border p-4'>
-          <p className='text-sm text-muted-foreground'>Artifact Coverage</p>
-          <p className='text-2xl font-semibold mt-1'>{groups.length}</p>
+          <p className='text-muted-foreground text-sm'>Artifact Coverage</p>
+          <p className='mt-1 text-2xl font-semibold'>{groups.length}</p>
         </div>
         <div className='rounded-lg border p-4'>
-          <p className='text-sm text-muted-foreground'>Unresolved Threads</p>
-          <p className='text-2xl font-semibold mt-1'>{unresolvedCount}</p>
+          <p className='text-muted-foreground text-sm'>Unresolved Threads</p>
+          <p className='mt-1 text-2xl font-semibold'>{unresolvedCount}</p>
         </div>
         <div className='rounded-lg border p-4'>
-          <p className='text-sm text-muted-foreground'>Total Turns</p>
-          <p className='text-2xl font-semibold mt-1'>{turns.length}</p>
+          <p className='text-muted-foreground text-sm'>Total Turns</p>
+          <p className='mt-1 text-2xl font-semibold'>{turns.length}</p>
         </div>
       </section>
 
       <section className='rounded-lg border p-4'>
         <label
           htmlFor='artifact-filter'
-          className='mb-2 block text-sm font-medium text-muted-foreground'
+          className='text-muted-foreground mb-2 block text-sm font-medium'
         >
           Filter by Artifact ID
         </label>
@@ -264,25 +263,25 @@ export default function AgentNoteCollabDashboard() {
           id='artifact-filter'
           value={artifactFilter}
           onChange={(event) => setArtifactFilter(event.target.value)}
-          className='w-full rounded border border-border bg-background px-3 py-2'
+          className='border-border w-full rounded border bg-background px-3 py-2'
           placeholder='e.g. artifact://feature-001'
         />
       </section>
 
       {loading && (
-        <p className='text-sm text-muted-foreground'>
+        <p className='text-muted-foreground text-sm'>
           Loading collaboration state...
         </p>
       )}
 
       {error && (
-        <p className='text-sm rounded border border-red-500/50 bg-red-950/20 p-3 text-red-300'>
+        <p className='border-red-500/50 bg-red-950/20 text-red-300 rounded border p-3 text-sm'>
           {error}
         </p>
       )}
 
       {!loading && !error && groups.length === 0 && (
-        <p className='text-sm text-muted-foreground'>
+        <p className='text-muted-foreground text-sm'>
           No turns are available for this filter yet.
         </p>
       )}
@@ -297,8 +296,10 @@ export default function AgentNoteCollabDashboard() {
               <div className='flex flex-col gap-2'>
                 <div className='flex items-start justify-between gap-3'>
                   <div>
-                    <h2 className='text-lg font-semibold'>{group.artifactId}</h2>
-                    <p className='text-sm text-muted-foreground'>
+                    <h2 className='text-lg font-semibold'>
+                      {group.artifactId}
+                    </h2>
+                    <p className='text-muted-foreground text-sm'>
                       {group.totalTurns} total turns · latest phase:{' '}
                       {group.latestPhase}
                     </p>
@@ -309,7 +310,7 @@ export default function AgentNoteCollabDashboard() {
                     onClick={() => {
                       void handleLoadSynthesis(group.artifactId)
                     }}
-                    className='rounded bg-primary px-3 py-1 text-primary-foreground text-sm disabled:opacity-60'
+                    className='bg-primary text-primary-foreground rounded px-3 py-1 text-sm disabled:opacity-60'
                     disabled={state?.loading}
                   >
                     {state?.loading ? 'Building…' : 'Generate Synthesis'}
@@ -317,19 +318,19 @@ export default function AgentNoteCollabDashboard() {
                 </div>
 
                 <div>
-                  <div className='mb-1 flex justify-between text-xs text-muted-foreground'>
+                  <div className='text-muted-foreground mb-1 flex justify-between text-xs'>
                     <span>Phase Progress</span>
                     <span>{progress}%</span>
                   </div>
-                  <div className='h-2 w-full overflow-hidden rounded bg-muted'>
+                  <div className='bg-muted h-2 w-full overflow-hidden rounded'>
                     <div
-                      className='h-full bg-primary transition-[width]'
+                      className='bg-primary h-full transition-[width]'
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
 
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-muted-foreground text-sm'>
                   Open Questions: {group.openQuestions.length}
                 </p>
 
@@ -344,17 +345,17 @@ export default function AgentNoteCollabDashboard() {
                 )}
 
                 {group.openQuestions.length > 3 && (
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-muted-foreground text-xs'>
                     +{group.openQuestions.length - 3} more open questions
                   </p>
                 )}
 
                 {state?.error && (
-                  <p className='text-sm text-red-300'>{state.error}</p>
+                  <p className='text-red-300 text-sm'>{state.error}</p>
                 )}
 
                 {state?.data && (
-                  <div className='rounded bg-card p-3 text-sm'>
+                  <div className='bg-card rounded p-3 text-sm'>
                     <p className='font-semibold'>Synthesis</p>
                     <p>
                       {state.data.synthesis?.summaryText ??

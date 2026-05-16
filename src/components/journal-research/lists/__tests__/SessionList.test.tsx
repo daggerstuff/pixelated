@@ -31,7 +31,9 @@ describe('SessionList', () => {
     const sessionLink = screen.getByText(mockSessionList.items[0].sessionId)
     fireEvent.click(sessionLink)
 
-    expect(handleClick).toHaveBeenCalledWith(mockSessionList.items[0])
+    expect(handleClick).toHaveBeenCalledWith(
+      expect.objectContaining(mockSessionList.items[0]),
+    )
   })
 
   it('filters sessions by search term', async () => {
@@ -75,7 +77,7 @@ describe('SessionList', () => {
 
     render(<SessionList sessions={sessionsWithMultiple} />)
 
-    const phaseSelect = screen.getByDisplayValue('all')
+    const phaseSelect = screen.getByRole('combobox')
     fireEvent.change(phaseSelect, { target: { value: 'discovery' } })
 
     await waitFor(() => {

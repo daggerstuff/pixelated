@@ -223,7 +223,7 @@ const allTemplates = templateService.getAllTemplates()
     // Handle delete template buttons
     const deleteButtons = document.querySelectorAll('.delete-template')
     deleteButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const templateId = (e.currentTarget as HTMLElement)?.getAttribute(
           'data-template-id',
         )

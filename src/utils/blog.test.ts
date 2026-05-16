@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { calculateReadingTime } from './blog'
 
 describe('calculateReadingTime', () => {
@@ -12,9 +13,7 @@ describe('calculateReadingTime', () => {
   })
 
   it('handles null or undefined input', () => {
-    // @ts-expect-error Testing invalid input
-    expect(calculateReadingTime(null)).toBe(0)
-    // @ts-expect-error Testing invalid input
-    expect(calculateReadingTime(undefined)).toBe(0)
+    expect(calculateReadingTime(null as unknown as string)).toBe(0)
+    expect(calculateReadingTime(undefined as unknown as string)).toBe(0)
   })
 })

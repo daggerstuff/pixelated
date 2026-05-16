@@ -1,74 +1,122 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { PolicyEngine, PolicyEvaluationResult } from '../policy-engine';
+import { describe, it, expect, beforeEach } from 'vitest'
+
+import { PolicyEngine } from '../policy-engine'
+import type { GovernancePolicy } from '../types'
 
 describe('PolicyEngine', () => {
-  let policyEngine: PolicyEngine;
+  let engine: PolicyEngine
+  let testPolicy: GovernancePolicy
 
   beforeEach(() => {
-    policyEngine = new PolicyEngine();
-  });
+    testPolicy = {
+      id: 'test-phi-access',
+      version: '1.0.0',
+      rules: [
+        {
+          id: 'rule-1',
+          action: 'access',
+          conditions: [
+            { field: 'userRole', operator: 'equals', value: 'therapist' },
+          ],
+          required: ['fhe_encryption', 'audit_logged'],
+        },
+      ],
+    }
+    engine = new PolicyEngine()
+  })
 
-  describe('evaluate', () => {
-    it('evaluates policy with matching conditions and returns allowed: true', async () => {
-      // Create a policy that allows operations where dataClassification equals 'public'
-      const policy = {
-        policyId: 'test-policy-1',
-        rules: [
-          {
-            ruleId: 'rule-1',
-            conditions: [
-              {
-                field: 'dataClassification',
-                operator: 'equals' as const,
-                value: 'public',
-              },
-            ],
-            action: {
-              type: 'allow' as const,
+  it('evaluates policy with matching conditions', async () => {
+    await engine.loadPolicy(testPolicy)
+    const result = await engine.evaluate({
+      action: 'access',
+      context: {
+        userRole: 'therapist',
+        resourceId: 'phi-123',
+        fheEncryptionActive: true,
+        auditEnabled: true,
+      },
+    })
+    expect(result.allowed).toBe(true)
+  })
+
+  it('denies policy with non-matching conditions', async () => {
+    await engine.loadPolicy(testPolicy)
+    const result = await engine.evaluate({
+      action: 'access',
+      context: {
+        userRole: 'guest',
+        resourceId: 'phi-123',
+        fheEncryptionActive: true,
+        auditEnabled: true,
+      },
+    })
+    expect(result.allowed).toBe(false)
+  })
+
+  it('denies when required security controls are missing', async () => {
+    await engine.loadPolicy(testPolicy)
+    const result = await engine.evaluate({
+      action: 'access',
+      context: {
+        userRole: 'therapist',
+        resourceId: 'phi-123',
+        fheEncryptionActive: false,
+        auditEnabled: true,
+      },
+    })
+    expect(result.allowed).toBe(false)
+    expect(result.reason).toContain('FHE encryption')
+  })
+
+  it('denies when all required controls are missing', async () => {
+    await engine.loadPolicy(testPolicy)
+    const result = await engine.evaluate({
+      action: 'access',
+      context: {
+        userRole: 'therapist',
+        resourceId: 'phi-123',
+        fheEncryptionActive: false,
+        auditEnabled: false,
+      },
+    })
+    expect(result.allowed).toBe(false)
+    expect(result.reason).toContain('FHE encryption')
+    expect(result.reason).toContain('audit logging')
+  })
+})
+
+describe('PolicyEngine regex safety', () => {
+  let engine: PolicyEngine
+
+  beforeEach(() => {
+    engine = new PolicyEngine()
+  })
+
+  it('handles regex patterns safely', async () => {
+    const policy: GovernancePolicy = {
+      id: 'regex-test',
+      version: '1.0.0',
+      rules: [
+        {
+          id: 'rule-1',
+          action: 'test',
+          conditions: [
+            {
+              field: 'email',
+              operator: 'regex',
+              value: '^[a-z]+@[a-z]+\\.com$',
             },
-          },
-        ],
-      };
+          ],
+          required: [],
+        },
+      ],
+    }
+    await engine.loadPolicy(policy)
 
-      policyEngine.loadPolicy(policy);
-
-      const context = { dataClassification: 'public' };
-      const result: PolicyEvaluationResult = await policyEngine.evaluate(context);
-
-      expect(result.allowed).toBe(true);
-      expect(result.policyId).toBe('test-policy-1');
-      expect(result.ruleId).toBe('rule-1');
-    });
-
-    it('denies policy with non-matching conditions and returns allowed: false', async () => {
-      // Create a policy that allows operations where dataClassification equals 'public'
-      const policy = {
-        policyId: 'test-policy-2',
-        rules: [
-          {
-            ruleId: 'rule-1',
-            conditions: [
-              {
-                field: 'dataClassification',
-                operator: 'equals' as const,
-                value: 'public',
-              },
-            ],
-            action: {
-              type: 'allow' as const,
-            },
-          },
-        ],
-      };
-
-      policyEngine.loadPolicy(policy);
-
-      // Context doesn't match the condition (confidential !== public)
-      const context = { dataClassification: 'confidential' };
-      const result: PolicyEvaluationResult = await policyEngine.evaluate(context);
-
-      expect(result.allowed).toBe(false);
-      expect(result.policyId).toBe('test-policy-2');
-    });
-  });
-});
+    const result = await engine.evaluate({
+      action: 'test',
+      context: { email: 'test@example.com' },
+    })
+    expect(result.allowed).toBe(true)
+  })
+})

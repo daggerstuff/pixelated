@@ -35,36 +35,43 @@ describe('Enhanced Monitoring Service', () => {
   beforeEach(() => {
     // Setup mock Redis
     mockRedis = {
-      get: vi.fn(),
-      set: vi.fn(),
-      del: vi.fn(),
-      exists: vi.fn(),
-      incr: vi.fn(),
-      expire: vi.fn(),
-      hget: vi.fn(),
-      hset: vi.fn(),
-      hgetall: vi.fn(),
-      hdel: vi.fn(),
-      hincrby: vi.fn(),
-      hGetAll: vi.fn(),
-      hIncrBy: vi.fn(),
-      lpush: vi.fn(),
-      lrange: vi.fn(),
-      rpop: vi.fn(),
+      get: vi.fn<() => Promise<string | null>>(),
+      set: vi.fn<() => Promise<void>>(),
+      del: vi.fn<() => Promise<number>>(),
+      exists: vi.fn<() => Promise<number>>(),
+      incr: vi.fn<() => Promise<number>>(),
+      expire: vi.fn<() => Promise<number>>(),
+      hget: vi.fn<() => Promise<string | null>>(),
+      hset: vi.fn<() => Promise<number>>(),
+      hgetall: vi.fn<() => Promise<Record<string, string>>>(),
+      hdel: vi.fn<() => Promise<number>>(),
+      hincrby: vi.fn<() => Promise<number>>(),
+      hGetAll: vi.fn<() => Promise<Record<string, string>>>(),
+      hIncrBy: vi.fn<() => Promise<number>>(),
+      lpush: vi.fn<() => Promise<number>>(),
+      lrange: vi.fn<() => Promise<string[]>>(),
+      rpop: vi.fn<() => Promise<string | null>>(),
     }
 
     // Setup mock orchestrator
     mockOrchestrator = {
-      analyzeThreat: vi.fn(),
-      executeResponse: vi.fn(),
-      getStatistics: vi.fn(),
+      analyzeThreat:
+        vi.fn<() => Promise<{ threat: string; severity: string }>>(),
+      executeResponse: vi.fn<() => Promise<{ success: boolean }>>(),
+      getStatistics:
+        vi.fn<() => Promise<{ threats: number; investigations: number }>>(),
     }
 
     // Setup mock AI service
     mockAIService = {
-      analyzePattern: vi.fn(),
-      predictAnomaly: vi.fn(),
-      generateInsights: vi.fn(),
+      analyzePattern:
+        vi.fn<() => Promise<{ pattern: string; confidence: number }>>(),
+      predictAnomaly:
+        vi.fn<() => Promise<{ isAnomaly: boolean; score: number }>>(),
+      generateInsights:
+        vi.fn<
+          () => Promise<{ insights: string[]; recommendations: string[] }>
+        >(),
     }
 
     const config = {
@@ -90,15 +97,11 @@ describe('Enhanced Monitoring Service', () => {
       {
         db: () => ({
           collection: () => ({
-            countDocuments: vi.fn(),
-            find: () => ({
-              sort: () => ({ limit: () => ({ toArray: () => [] }) }),
-              toArray: () => [],
-            }),
-            findOne: vi.fn(),
-            insertOne: vi.fn(),
-            insertMany: vi.fn(),
-            updateOne: vi.fn(),
+            countDocuments: vi.fn<() => Promise<number>>(),
+            findOne: vi.fn<() => Promise<unknown | null>>(),
+            insertOne: vi.fn<() => Promise<{ insertedId: string }>>(),
+            insertMany: vi.fn<() => Promise<{ insertedIds: string[] }>>(),
+            updateOne: vi.fn<() => Promise<{ modifiedCount: number }>>(),
           }),
         }),
       } as any, // mockMongo
@@ -129,14 +132,10 @@ describe('Enhanced Monitoring Service', () => {
         {
           db: () => ({
             collection: () => ({
-              countDocuments: vi.fn(),
-              find: () => ({
-                sort: () => ({ limit: () => ({ toArray: () => [] }) }),
-                toArray: () => [],
-              }),
-              findOne: vi.fn(),
-              insertOne: vi.fn(),
-              insertMany: vi.fn(),
+              countDocuments: vi.fn<() => Promise<number>>(),
+              findOne: vi.fn<() => Promise<unknown | null>>(),
+              insertOne: vi.fn<() => Promise<{ insertedId: string }>>(),
+              insertMany: vi.fn<() => Promise<{ insertedIds: string[] }>>(),
             }),
           }),
         } as any, // mockMongo
@@ -448,20 +447,22 @@ describe('Enhanced Monitoring Service', () => {
         avgResolutionTime: 3600000,
       }
 
-      mockRedis.hGetAll = vi.fn().mockResolvedValue({
-        total: '150',
-        active: '45',
-        resolved: '105',
-        critical: '10',
-        high: '25',
-        medium: '45',
-        low: '70',
-        rate_limiting: '60',
-        behavioral_analysis: '50',
-        threat_intelligence: '40',
-        system_monitoring: '50',
-        avgResolutionTime: '3600000',
-      })
+      mockRedis.hGetAll = vi
+        .fn<() => Promise<Record<string, string>>>()
+        .mockResolvedValue({
+          total: '150',
+          active: '45',
+          resolved: '105',
+          critical: '10',
+          high: '25',
+          medium: '45',
+          low: '70',
+          rate_limiting: '60',
+          behavioral_analysis: '50',
+          threat_intelligence: '40',
+          system_monitoring: '50',
+          avgResolutionTime: '3600000',
+        })
 
       const stats = await getAlertStatistics(mockRedis)
 
@@ -624,11 +625,13 @@ describe('Enhanced Monitoring Service', () => {
         },
       }
 
-      mockRedis.hGetAll = vi.fn().mockResolvedValue({
-        ...performanceMetrics.system,
-        ...performanceMetrics.application,
-        ...performanceMetrics.database,
-      })
+      mockRedis.hGetAll = vi
+        .fn<() => Promise<Record<string, string>>>()
+        .mockResolvedValue({
+          ...performanceMetrics.system,
+          ...performanceMetrics.application,
+          ...performanceMetrics.database,
+        })
       // The utils parsing code expects string values for numeric properties (from redis),
       // we need to make sure the mock returns strings if the implementation parses them.
       // metrics-utils.ts: parseFloat(metricsData.cpu || '0')
@@ -904,7 +907,7 @@ describe('Enhanced Monitoring Service', () => {
       mockRedis.incr.mockResolvedValue(1)
       mockRedis.set.mockResolvedValue('OK')
 
-      const alerts = Array.from({ length: 10 }, (_, i) =>
+      const alerts = Array.from({ length: 10 },  async (_, i) =>
         service.createAlert({ ...alertData, title: `Alert ${i}` }),
       )
 

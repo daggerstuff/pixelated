@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import type {
   Progress,
   ProgressMetrics,
@@ -24,6 +24,8 @@ export function PhaseProgressChart({
   metrics: _metrics,
   className,
 }: PhaseProgressChartProps) {
+  const formatTickLabel = (value: string | number) => `${value}%`
+
   const phaseData = useMemo(() => {
     const phases = [
       { name: 'Discovery', key: 'discovery' },
@@ -142,7 +144,7 @@ export function PhaseProgressChart({
                   beginAtZero: true,
                   max: 100,
                   ticks: {
-                    callback: (value) => `${value}%`,
+                    callback: formatTickLabel,
                   },
                 },
               },

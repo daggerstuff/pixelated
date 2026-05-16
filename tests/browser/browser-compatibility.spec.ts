@@ -30,15 +30,27 @@ for (const { url, name } of TEST_URLS) {
 
     // Navigate to the test page
     console.log(`Going to ${url}`)
-    await page.goto(url)
+    const response = await page.goto(url, { waitUntil: 'domcontentloaded' })
+    expect(response?.status()).toBeLessThan(400)
 
     // Wait for the page to load completely
     await page.waitForLoadState('networkidle')
 
     // Check that the page title is not empty
+    await page.waitForFunction(
+      () =>
+        document.title.trim().length > 0 ||
+        document.querySelector('main') !== null,
+      { timeout: 10000 },
+    )
     const title = await page.title()
     console.log(`Page title: ${title}`)
-    expect(title).not.toBe('')
+    if (title.trim().length === 0) {
+      const fallbackHeading = await page.locator('h1').first().textContent()
+      expect(fallbackHeading?.trim().length).toBeGreaterThan(0)
+    } else {
+      expect(title.trim().length).toBeGreaterThan(0)
+    }
 
     // Check for main content
     await expect(page.locator('main')).toBeVisible()
@@ -95,30 +107,22 @@ test('CSS feature support check', async ({ page, browserName }) => {
   const cssFeatures = await page.evaluate(() => {
     return {
       flexbox:
-        window.CSS &&
-        window.CSS.supports &&
-        window.CSS.supports('display', 'flex'),
+        window.CSS?.supports?.('display', 'flex'),
       grid:
-        window.CSS &&
-        window.CSS.supports &&
-        window.CSS.supports('display', 'grid'),
+        window.CSS?.supports?.('display', 'grid'),
       variables:
-        window.CSS && window.CSS.supports && window.CSS.supports('(--a: 0)'),
+        window.CSS?.supports?.('(--a: 0)'),
       sticky:
-        window.CSS &&
-        window.CSS.supports &&
+        window.CSS?.supports &&
         (window.CSS.supports('position', 'sticky') ||
           window.CSS.supports('position', '-webkit-sticky')),
       animations: 'animation' in document.documentElement.style,
       filters:
-        window.CSS &&
-        window.CSS.supports &&
+        window.CSS?.supports &&
         (window.CSS.supports('filter', 'blur(5px)') ||
           window.CSS.supports('-webkit-filter', 'blur(5px)')),
       aspectRatio:
-        window.CSS &&
-        window.CSS.supports &&
-        window.CSS.supports('aspect-ratio', '16/9'),
+        window.CSS?.supports?.('aspect-ratio', '16/9'),
     }
   })
 

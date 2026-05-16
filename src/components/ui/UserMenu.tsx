@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 import { Avatar } from './avatar'
 
@@ -9,9 +9,15 @@ export interface UserMenuProps {
 }
 
 export function UserMenu({ className = '' }: UserMenuProps) {
-  const { data: user, isPending } = authClient.useSession()
+  const { data: sessionData, isPending } = authClient.useSession()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Type assertion for auth0 session data
+  const user = sessionData as {
+    user_metadata?: { avatar_url?: string; full_name?: string }
+    email?: string
+  } | null
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,10 +82,10 @@ export function UserMenu({ className = '' }: UserMenuProps) {
         <div className='bg-white divide-gray-100 dark:bg-gray-700 dark:divide-gray-600 absolute right-0 z-50 mt-2 w-56 list-none divide-y rounded-lg text-base shadow'>
           <div className='px-4 py-3'>
             <span className='text-gray-900 dark:text-white block text-sm'>
-              {user.user_metadata?.full_name || user.email}
+              {user.user_metadata?.full_name ?? user.email}
             </span>
             <span className='text-gray-500 dark:text-gray-400 block truncate text-sm'>
-              {user.email?.toString() || ''}
+              {user.email?.toString() ?? ''}
             </span>
           </div>
           <ul className='py-2' role='none'>

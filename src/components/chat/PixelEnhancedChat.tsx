@@ -8,8 +8,8 @@
 import { AlertCircle, Zap, AlertTriangle } from 'lucide-react'
 import React, { useState, useCallback, useEffect } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
 import { usePixelConversationIntegration } from '@/hooks/usePixelConversationIntegration'
 import type { PixelInferenceResponse } from '@/types/pixel'
 
@@ -50,7 +50,8 @@ export function PixelEnhancedChat({
   } = usePixelConversationIntegration({
     sessionId,
     userId,
-    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || 'http://localhost:8001',
+    pixelApiUrl:
+      process.env['REACT_APP_PIXEL_API_URL'] ?? 'http://localhost:8001',
   })
 
   // Local state
@@ -197,9 +198,12 @@ export function PixelEnhancedChat({
                   {lastAnalysis.behavioral_pattern}
                 </p>
                 {lastAnalysis.behavioral_pattern_confidence !== undefined && (
-                  <p className='text-sm text-gray-600'>
+                  <p className='text-gray-600 text-sm'>
                     Confidence:{' '}
-                    {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(0)}%
+                    {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(
+                      0,
+                    )}
+                    %
                   </p>
                 )}
               </CardContent>
@@ -221,7 +225,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.emotionalAwareness[
                       eqMetrics.emotionalAwareness.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -229,7 +233,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.empathyRecognition[
                       eqMetrics.empathyRecognition.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -237,7 +241,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.emotionalRegulation[
                       eqMetrics.emotionalRegulation.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -245,7 +249,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.socialCognition[
                       eqMetrics.socialCognition.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -253,7 +257,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.interpersonalSkills[
                       eqMetrics.interpersonalSkills.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
               </CardContent>
@@ -417,7 +421,10 @@ function MessageBubble({
                 {pixelMetrics.behavioral_pattern_confidence !== undefined && (
                   <p className='opacity-75'>
                     Confidence:{' '}
-                    {(pixelMetrics.behavioral_pattern_confidence * 100).toFixed(0)}%
+                    {(pixelMetrics.behavioral_pattern_confidence * 100).toFixed(
+                      0,
+                    )}
+                    %
                   </p>
                 )}
               </div>

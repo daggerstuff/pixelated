@@ -23,15 +23,15 @@ export function parseUserAgent(userAgent: string): UserAgentInfo {
     info.browser = 'Safari'
   }
 
-  // OS detection
+  // OS detection (android before linux since Android UA contains "linux")
   if (ua.includes('windows')) {
     info.os = 'Windows'
   } else if (ua.includes('mac os')) {
     info.os = 'macOS'
-  } else if (ua.includes('linux')) {
-    info.os = 'Linux'
   } else if (ua.includes('android')) {
     info.os = 'Android'
+  } else if (ua.includes('linux')) {
+    info.os = 'Linux'
   } else if (ua.includes('iphone') || ua.includes('ipad')) {
     info.os = 'iOS'
   }

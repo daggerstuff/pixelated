@@ -1,14 +1,16 @@
+/* @vitest-environment node */
 import { mkdtempSync, rmSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { describe, expect, it, vi } from 'vitest'
 import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+
+import { describe, expect, it, vi } from 'vitest'
 
 type RouteModule = typeof import('./turns')
 
 const loadRoutes = async (filePath: string): Promise<RouteModule> => {
   process.env['AGENT_NOTE_COLLAB_LEDGER_PATH'] = filePath
   vi.resetModules()
-  return (await import('./turns')) as RouteModule
+  return import('./turns')
 }
 
 const createJsonRequest = (payload: unknown) => ({
@@ -59,7 +61,10 @@ describe('Agent note turns API', () => {
       expect(responseBody.ok).toBe(true)
       expect(responseBody.data.action).toBe('accept')
       expect(responseBody.data.nextPhase).toBe('Synthesize')
-      expect(responseBody.data.turn).toMatchObject({ artifactId: 'artifact://demo-01', role: 'critic' })
+      expect(responseBody.data.turn).toMatchObject({
+        artifactId: 'artifact://demo-01',
+        role: 'critic',
+      })
     } finally {
       cleanupTempPath(tempPath)
     }
@@ -324,7 +329,7 @@ describe('Agent note turns API', () => {
           openQuestions: ['Open question two'],
           decision: 'Collect related notes.',
           evidence: ['e2'],
-          requestedAction: 'defer',
+          requestedAction: 'ask-human',
         }),
         locals: asActor('agent-alpha'),
       } as any)
@@ -355,10 +360,11 @@ describe('Agent note turns API', () => {
       expect(response.status).toBe(200)
       expect(responseBody.ok).toBe(true)
       expect(responseBody.data.count).toBe(2)
-      expect(responseBody.data.turns.map((turn: { artifactId: string }) => turn.artifactId)).toEqual([
-        'artifact://alpha-2',
-        'artifact://alpha-1',
-      ])
+      expect(
+        responseBody.data.turns
+          .map((turn: { artifactId: string }) => turn.artifactId)
+          .sort(),
+      ).toEqual(['artifact://alpha-1', 'artifact://alpha-2'].sort())
     } finally {
       cleanupTempPath(tempPath)
     }

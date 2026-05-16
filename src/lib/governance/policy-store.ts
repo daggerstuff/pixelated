@@ -1,6 +1,7 @@
-import type { Db } from 'mongodb'
-import { ObjectId } from 'mongodb'
-import { mongoClient } from '../db/mongoClient'
+import type { Db, MongoClient } from 'mongodb'
+import { ObjectId, MongoClient as MongoConstructor } from 'mongodb'
+
+import { mongoClient as sharedMongoClient } from '../db/mongoClient'
 import type { GovernancePolicy } from './types'
 
 const GOVERNANCE_DB_NAME = 'governance'
@@ -12,18 +13,28 @@ const POLICIES_COLLECTION = 'policies'
  */
 export class PolicyStore {
   private db: Db | null = null
+  private client: MongoClient | null = null
 
   /**
    * Initialize the connection to MongoDB
    * @param mongoUri - MongoDB connection URI (optional, uses default if not provided)
    */
   async initialize(mongoUri?: string): Promise<void> {
-    // Connect to MongoDB using the existing client
-    await mongoClient.connect()
-    const clientDb = mongoClient.db
-
-    // Get or create the governance database
-    this.db = clientDb.client.db(GOVERNANCE_DB_NAME)
+    // If URI provided, create dedicated connection (for testing)
+    if (mongoUri) {
+      // Close existing connection if active to prevent leaks
+      if (this.client) {
+        await this.client.close()
+      }
+      this.client = new MongoConstructor(mongoUri)
+      await this.client.connect()
+      this.db = this.client.db(GOVERNANCE_DB_NAME)
+    } else {
+      // Use shared mongoClient singleton (production)
+      await sharedMongoClient.connect()
+      this.client = sharedMongoClient
+      this.db = sharedMongoClient.db
+    }
   }
 
   /**
@@ -35,7 +46,9 @@ export class PolicyStore {
       throw new Error('PolicyStore not initialized. Call initialize() first.')
     }
 
-    const collection = this.db.collection<Pick<GovernancePolicy, 'version' | 'rules'> & { _id: string }>(POLICIES_COLLECTION)
+    const collection = this.db.collection<
+      Pick<GovernancePolicy, 'version' | 'rules'> & { _id: string }
+    >(POLICIES_COLLECTION)
 
     // Upsert: update if exists, insert if doesn't
     await collection.replaceOne(
@@ -45,7 +58,7 @@ export class PolicyStore {
         version: policy.version,
         rules: policy.rules,
       } as any,
-      { upsert: true }
+      { upsert: true },
     )
   }
 
@@ -78,7 +91,10 @@ export class PolicyStore {
    * Disconnect from MongoDB
    */
   async disconnect(): Promise<void> {
-    await mongoClient.disconnect()
+    if (this.client) {
+      await this.client.close()
+      this.client = null
+    }
     this.db = null
   }
 }

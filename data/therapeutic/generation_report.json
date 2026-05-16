@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-05-08T02:17:42.986248",
+  "scenario": "niche_category",
+  "category": "somatic_therapy",
+  "target_count": 5,
+  "generated_count": 5,
+  "filtered_count": 4,
+  "filter_rate": 0.4444444444444444,
+  "iterations": 9,
+  "max_iterations": 50
+}

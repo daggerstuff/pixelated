@@ -2,16 +2,21 @@
 """
 Compliance Monitoring System
 ===========================
+Provides real-time validation of security and regulatory compliance requirements.
 """
 
+import os
 import json
 from contextlib import suppress
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 class ComplianceMonitor:
+    """
+    Monitors system state against SOC2, GDPR, and HIPAA compliance requirements.
+    """
     def __init__(self):
         self.compliance_frameworks = ["SOC2", "GDPR", "HIPAA"]
         self.monitoring_enabled = True
@@ -74,29 +79,31 @@ class ComplianceMonitor:
         }
 
     def check_access_controls(self) -> bool:
-        """Check access control implementation"""
-        # Implementation would check RBAC, MFA, etc.
-        return True
+        """Check access control implementation via environment config"""
+        # Requirements: BOTH JWT_SECRET and ENCRYPTION_KEY must be set
+        has_jwt = bool(os.environ.get("JWT_SECRET"))
+        has_enc = bool(os.environ.get("ENCRYPTION_KEY"))
+        return has_jwt and has_enc
 
     def check_system_monitoring(self) -> bool:
-        """Check system monitoring implementation"""
-        # Implementation would check logging, alerting, etc.
-        return True
+        """Check system monitoring implementation via logging config"""
+        # Requirements: SENTRY_DSN must be configured for error tracking
+        return bool(os.environ.get("SENTRY_DSN"))
 
     def check_data_encryption(self) -> bool:
         """Check data encryption implementation"""
-        # Implementation would check encryption at rest and in transit
-        return True
+        # Requirements: SSL/TLS environment variables or cert files
+        return os.environ.get("FORCE_SSL") == "true"
 
     def check_backup_procedures(self) -> bool:
         """Check backup procedures implementation"""
-        # Implementation would check backup automation, testing, etc.
-        return True
+        # Requirements: Backup schedule environment variable
+        return bool(os.environ.get("BACKUP_SCHEDULE"))
 
     def check_incident_response(self) -> bool:
         """Check incident response procedures"""
-        # Implementation would check incident response plan, procedures, etc.
-        return True
+        # Requirements: Incident response webhook or email
+        return bool(os.environ.get("INCIDENT_NOTIFICATION_URL"))
 
     def check_data_protection(self) -> bool:
         """Check data protection measures"""
@@ -141,7 +148,7 @@ class ComplianceMonitor:
     def generate_compliance_report(self) -> dict[str, Any]:
         """Generate comprehensive compliance report"""
         report = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "compliance_monitoring": {
                 "soc2": self.monitor_soc2_compliance(),
                 "gdpr": self.monitor_gdpr_compliance(),

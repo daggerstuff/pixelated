@@ -174,7 +174,7 @@ test.describe('Bias Detection Dashboard', () => {
       page,
     }) => {
       // Simulate network disconnection by blocking WebSocket requests
-      await page.route('**/ws/**', (route) => route.abort())
+      await page.route('**/ws/**',  async (route) => route.abort())
 
       // Trigger a refresh to attempt WebSocket connection
       await page.click('[data-testid="refresh-button"]')
@@ -646,8 +646,8 @@ test.describe('Bias Detection Dashboard', () => {
       for (let i = 0; i < Math.min(controlCount, 5); i++) {
         const control = formControls.nth(i)
         const hasLabel =
-          (await control.getAttribute('aria-label')) ||
-          (await control.getAttribute('aria-labelledby')) ||
+          ((await control.getAttribute('aria-label')) ??
+          (await control.getAttribute('aria-labelledby'))) ??
           (await page
             .locator(`label[for="${await control.getAttribute('id')}"]`)
             .count()) > 0
@@ -689,7 +689,7 @@ test.describe('Bias Detection Dashboard', () => {
   test.describe('Error Handling and Edge Cases', () => {
     test('handles API errors gracefully', async ({ page }) => {
       // Simulate API failure
-      await page.route('**/api/bias-detection/**', (route) => route.abort())
+      await page.route('**/api/bias-detection/**',  async (route) => route.abort())
 
       // Trigger refresh
       await page.click('[data-testid="refresh-button"]')
@@ -706,7 +706,7 @@ test.describe('Bias Detection Dashboard', () => {
 
     test('handles empty data states', async ({ page }) => {
       // Mock empty data response
-      await page.route('**/api/bias-detection/dashboard', (route) =>
+      await page.route('**/api/bias-detection/dashboard',  async (route) =>
         route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -740,7 +740,7 @@ test.describe('Bias Detection Dashboard', () => {
       // Simulate slow API response
       await page.route(
         '**/api/bias-detection/dashboard',
-        (route) =>
+         async (route) =>
           new Promise((resolve) =>
             setTimeout(() => resolve(route.continue()), 5000),
           ),

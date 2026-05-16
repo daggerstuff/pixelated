@@ -1,41 +1,345 @@
 import { EventEmitter } from 'events'
 
-import { Consul, ConsulOptions } from 'consul'
+import Consul from 'consul'
 import { Etcd3 } from 'etcd3'
 import { v4 as uuidv4 } from 'uuid'
-import { ZooKeeperClient } from 'zookeeper'
+import ZooKeeper from 'zookeeper'
 
 import { Logger } from '../../utils/logger'
 import { ConfigurationManager } from './ConfigurationManager'
 import { DNSClient } from './DNSClient'
 import { HealthMonitor } from './HealthMonitor'
 
+type ConsulClient = {
+  agent: {
+    self: () => Promise<unknown>
+    service: {
+      register: (params: Record<string, unknown>) => Promise<unknown>
+      deregister: (id: string) => Promise<unknown>
+    }
+  }
+  health: {
+    service: (serviceName: string) => Promise<unknown>
+  }
+}
+
+type EtcdClient = InstanceType<typeof Etcd3>
+type ZooKeeperClient = {
+  connect: (connectString: string) => void
+  create: (path: string, data?: string) => Promise<string>
+  remove: (path: string, version?: number) => Promise<void>
+  exists: (path: string) => Promise<boolean>
+  getData: (path: string) => Promise<string>
+  getChildren: (path: string) => Promise<string[]>
+  close: () => void
+}
+type DiscoveryConsulBackend = {
+  type: 'consul'
+  client: ConsulClient
+  region: string
+}
+type DiscoveryEtcdBackend = {
+  type: 'etcd'
+  client: EtcdClient
+  region: string
+}
+type DiscoveryZooKeeperBackend = {
+  type: 'zookeeper'
+  client: ZooKeeperClient
+  region: string
+}
+type DiscoveryBackendRecord =
+  | DiscoveryConsulBackend
+  | DiscoveryEtcdBackend
+  | DiscoveryZooKeeperBackend
+type ServiceLoadBalancerConfig = {
+  name: string
+  loadBalancing?: string
+  healthCheck?: Record<string, unknown>
+  circuitBreaker?: Record<string, unknown>
+}
+type ConsulServiceDiscoveryEntry = {
+  Service: {
+    ID: string
+    Service: string
+    Address?: string
+    Port: number
+    Tags?: string[]
+    Meta?: Record<string, string>
+  }
+  Node: {
+    Datacenter: string
+    Address: string
+  }
+  Checks?: Array<{ Status: string }>
+}
+type ServiceDiscoveryConfig = {
+  consul?: {
+    enabled?: boolean
+    host: string
+    port: number
+    secure?: boolean
+    caCert?: string
+    aclToken?: string
+  }
+  etcd?: {
+    enabled?: boolean
+    endpoints: string[]
+    username: string
+    password: string
+    tls?: boolean
+    caCert?: string
+    clientCert?: string
+    clientKey?: string
+  }
+  zookeeper?: {
+    enabled?: boolean
+    connect: string
+    timeout: number
+    debugLevel?: string
+  }
+  heartbeatInterval?: number
+  cleanupInterval?: number
+}
+
+type ServiceDiscoveryAppConfig = {
+  deployment?: {
+    services?: unknown
+  }
+  services?: unknown
+  serviceDiscovery?: ServiceDiscoveryConfig
+}
+
+const DEFAULT_SERVICE_DISCOVERY_CONFIG: ServiceDiscoveryConfig = {
+  heartbeatInterval: 30000,
+  cleanupInterval: 300000,
+}
+
+function isServiceLoadBalancerConfig(
+  value: unknown,
+): value is ServiceLoadBalancerConfig {
+  return (
+    isRecord(value) && typeof value.name === 'string' && value.name.length > 0
+  )
+}
+
+function isServiceDiscoveryConfig(
+  value: unknown,
+): value is ServiceDiscoveryConfig {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    value.consul === undefined ||
+    isRecord(value.consul) ||
+    value.etcd === undefined ||
+    isRecord(value.etcd) ||
+    value.zookeeper === undefined ||
+    isRecord(value.zookeeper)
+  )
+}
+
+function getServiceList(config: unknown): ServiceLoadBalancerConfig[] {
+  if (!isRecord(config)) {
+    return []
+  }
+
+  const deploymentServices = isRecord(config.deployment)
+    ? config.deployment.services
+    : undefined
+  const serviceList = Array.isArray(deploymentServices)
+    ? deploymentServices
+    : Array.isArray(config.services)
+      ? config.services
+      : []
+
+  return serviceList.filter(isServiceLoadBalancerConfig)
+}
+
+function getServiceDiscoveryConfigFrom(
+  config: unknown,
+): ServiceDiscoveryConfig {
+  if (isServiceDiscoveryConfig(config)) {
+    return config
+  }
+
+  return DEFAULT_SERVICE_DISCOVERY_CONFIG
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined
+}
+
+function asNumber(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined
+}
+
+function asStringArrayValue(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter(
+        (item): item is string => item != null && typeof item === 'string',
+      )
+    : []
+}
+
+function toDiscoveredServiceInstance(
+  serviceName: string,
+  region: string,
+  instanceId: string,
+  payload: unknown,
+): ServiceInstance | null {
+  if (!isRecord(payload)) {
+    return null
+  }
+
+  const host = asString(payload.host)
+  const port = asNumber(payload.port)
+
+  if (!host || port === undefined) {
+    return null
+  }
+
+  const metadataCandidate = isRecord(payload.metadata) ? payload.metadata : {}
+  const statusCandidate = asString(payload.status)
+  const status =
+    statusCandidate === 'healthy' || statusCandidate === 'unhealthy'
+      ? statusCandidate
+      : 'unknown'
+  const registeredAtValue = new Date(
+    asString(payload.registeredAt) ??
+      asNumber(payload.registeredAt) ??
+      Date.now(),
+  )
+
+  return {
+    id: instanceId,
+    name: serviceName,
+    region,
+    host,
+    port,
+    protocol: asString(payload.protocol) ?? 'http',
+    version: asString(payload.version) ?? '1.0.0',
+    metadata: metadataCandidate,
+    status,
+    registeredAt: registeredAtValue,
+    lastHeartbeat: new Date(),
+    tags: asStringArrayValue(payload.tags),
+  }
+}
+
+function isConsulServiceDiscoveryEntry(
+  value: unknown,
+): value is ConsulServiceDiscoveryEntry {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  const service = isRecord(value.Service) ? value.Service : undefined
+  const node = isRecord(value.Node) ? value.Node : undefined
+
+  return (
+    typeof value.Service === 'object' &&
+    service !== undefined &&
+    typeof service.ID === 'string' &&
+    typeof service.Service === 'string' &&
+    typeof service.Port === 'number' &&
+    typeof value.Node === 'object' &&
+    node !== undefined &&
+    typeof node.Datacenter === 'string' &&
+    typeof node.Address === 'string'
+  )
+}
+
+function isConsulClient(value: unknown): value is ConsulClient {
+  if (!isRecord(value) || !isRecord(value.agent) || !isRecord(value.health)) {
+    return false
+  }
+
+  const agent = value.agent
+  const health = value.health
+  const consulService = isRecord(agent.service) ? agent.service : undefined
+
+  return (
+    typeof agent.self === 'function' &&
+    typeof agent.service === 'object' &&
+    agent.service !== null &&
+    consulService !== undefined &&
+    typeof consulService.register === 'function' &&
+    typeof consulService.deregister === 'function' &&
+    typeof health.service === 'function'
+  )
+}
+
 /**
  * Service Discovery Manager
  * Manages service registration and discovery across multiple regions
  */
 export class ServiceDiscoveryManager extends EventEmitter {
-  private logger: Logger
-  private config: ConfigurationManager
-  private healthMonitor: HealthMonitor
-  private consulClients: Map<string, Consul> = new Map()
-  private etcdClients: Map<string, Etcd3> = new Map()
-  private zookeeperClients: Map<string, ZooKeeperClient> = new Map()
-  private dnsClient: DNSClient
-  private serviceRegistry: Map<string, ServiceInstance[]> = new Map()
-  private discoveryBackends: Map<string, DiscoveryBackend> = new Map()
+  private readonly logger: Logger
+  private readonly config: ConfigurationManager
+  private readonly healthMonitor: HealthMonitor
+  private readonly consulClients: Map<string, ConsulClient> = new Map()
+  private readonly etcdClients: Map<string, EtcdClient> = new Map()
+  private readonly zookeeperClients: Map<string, ZooKeeperClient> = new Map()
+  private readonly dnsClient: DNSClient
+  private readonly serviceRegistry: Map<string, ServiceInstance[]> = new Map()
+  private readonly discoveryBackends: Map<string, DiscoveryBackendRecord> =
+    new Map()
   private isInitialized = false
   private heartbeatInterval: NodeJS.Timeout | null = null
   private cleanupInterval: NodeJS.Timeout | null = null
-  private serviceCache: Map<string, ServiceCacheEntry> = new Map()
-  private loadBalancers: Map<string, LoadBalancer> = new Map()
+  private readonly serviceCache: Map<string, ServiceCacheEntry> = new Map()
+  private readonly loadBalancers: Map<string, LoadBalancer> = new Map()
 
   constructor(config: ConfigurationManager, healthMonitor: HealthMonitor) {
     super()
     this.config = config
     this.healthMonitor = healthMonitor
-    this.logger = new Logger('ServiceDiscoveryManager')
+    this.logger = new Logger({ prefix: 'ServiceDiscoveryManager' })
     this.dnsClient = new DNSClient(config)
+  }
+
+  private getRegions(): string[] {
+    return this.config
+      .getConfig()
+      .deployment.regions.map((region) => region.id)
+      .filter((regionId): regionId is string => Boolean(regionId))
+  }
+
+  private getServiceDiscoveryConfig(): ServiceDiscoveryConfig {
+    const appConfig = this.config.getConfig() as unknown
+    const candidate = isRecord(appConfig)
+      ? (appConfig as { serviceDiscovery?: unknown }).serviceDiscovery
+      : undefined
+
+    return getServiceDiscoveryConfigFrom(candidate)
+  }
+
+  private getServices(): ServiceLoadBalancerConfig[] {
+    return getServiceList(this.config.getConfig())
+  }
+
+  private registerHealthCheck(
+    name: string,
+    check: () => Promise<{
+      status: 'healthy' | 'unhealthy' | 'degraded'
+      message: string
+    }>,
+  ): void {
+    void check().then((result) => {
+      if (result.status !== 'healthy') {
+        this.healthMonitor.emit('health-check-failed', {
+          component: name,
+          status: result.status,
+          message: result.message,
+        })
+      }
+    })
   }
 
   /**
@@ -64,7 +368,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       this.logger.info('ServiceDiscoveryManager initialized successfully')
 
       this.emit('initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to initialize ServiceDiscoveryManager', {
         error,
       })
@@ -76,8 +380,8 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Initialize discovery backends
    */
   private async initializeDiscoveryBackends(): Promise<void> {
-    const regions = this.config.getRegions()
-    const discoveryConfig = this.config.getServiceDiscoveryConfig()
+    const regions = this.getRegions()
+    const discoveryConfig = this.getServiceDiscoveryConfig()
 
     for (const region of regions) {
       try {
@@ -97,7 +401,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         }
 
         this.logger.info(`Discovery backends initialized for region: ${region}`)
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Failed to initialize discovery backends for region: ${region}`,
           { error },
@@ -110,9 +414,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
   /**
    * Initialize Consul client
    */
-  private async initializeConsul(region: string, config: any): Promise<void> {
+  private async initializeConsul(
+    region: string,
+    config: NonNullable<ServiceDiscoveryConfig['consul']>,
+  ): Promise<void> {
     try {
-      const consulConfig: ConsulOptions = {
+      const consulConfig: Record<string, unknown> = {
         host: config.host.replace('{region}', region),
         port: config.port,
         secure: config.secure,
@@ -122,7 +429,11 @@ export class ServiceDiscoveryManager extends EventEmitter {
         },
       }
 
-      const consul = new Consul(consulConfig)
+      const consulCandidate = Consul(consulConfig)
+      if (!isConsulClient(consulCandidate)) {
+        throw new TypeError('Invalid Consul client returned')
+      }
+      const consul = consulCandidate
 
       // Test connection
       await consul.agent.self()
@@ -135,7 +446,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.logger.info(`Consul client initialized for region: ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to initialize Consul for region: ${region}`, {
         error,
       })
@@ -146,27 +457,15 @@ export class ServiceDiscoveryManager extends EventEmitter {
   /**
    * Initialize etcd client
    */
-  private async initializeEtcd(region: string, config: any): Promise<void> {
+  private async initializeEtcd(
+    region: string,
+    config: NonNullable<ServiceDiscoveryConfig['etcd']>,
+  ): Promise<void> {
     try {
-      const etcd = new Etcd3({
-        hosts: config.endpoints.map((endpoint: string) =>
-          endpoint.replace('{region}', region),
-        ),
-        auth: {
-          username: config.username,
-          password: config.password,
-        },
-        tls: config.tls
-          ? {
-              ca: config.caCert,
-              cert: config.clientCert,
-              key: config.clientKey,
-            }
-          : undefined,
-      })
+      const etcd = new Etcd3()
 
       // Test connection
-      await etcd.get('/').string()
+      await etcd.get('/')
 
       this.etcdClients.set(region, etcd)
       this.discoveryBackends.set(`${region}:etcd`, {
@@ -176,7 +475,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.logger.info(`etcd client initialized for region: ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to initialize etcd for region: ${region}`, {
         error,
       })
@@ -189,16 +488,11 @@ export class ServiceDiscoveryManager extends EventEmitter {
    */
   private async initializeZookeeper(
     region: string,
-    config: any,
+    config: NonNullable<ServiceDiscoveryConfig['zookeeper']>,
   ): Promise<void> {
     try {
-      const zookeeper = new ZooKeeperClient({
-        connect: config.connect.replace('{region}', region),
-        timeout: config.timeout,
-        debug_level: config.debugLevel,
-      })
-
-      await zookeeper.connect()
+      const zookeeper = new ZooKeeper()
+      zookeeper.connect(config.connect.replace('{region}', region))
 
       this.zookeeperClients.set(region, zookeeper)
       this.discoveryBackends.set(`${region}:zookeeper`, {
@@ -208,7 +502,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.logger.info(`ZooKeeper client initialized for region: ${region}`)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(
         `Failed to initialize ZooKeeper for region: ${region}`,
         { error },
@@ -221,12 +515,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Initialize load balancers
    */
   private async initializeLoadBalancers(): Promise<void> {
-    const services = this.config.getServices()
+    const services = this.getServices()
 
     for (const service of services) {
       const loadBalancer = new LoadBalancer({
         serviceName: service.name,
-        algorithm: service.loadBalancing || 'round-robin',
+        algorithm: service.loadBalancing ?? 'round-robin',
         healthCheck: service.healthCheck,
         circuitBreaker: service.circuitBreaker,
       })
@@ -242,7 +536,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    */
   private async setupServiceRegistration(): Promise<void> {
     // Register health checks for service discovery
-    this.healthMonitor.registerCheck('service-discovery', async () => {
+    this.registerHealthCheck('service-discovery', async () => {
       try {
         const healthyBackends = await this.getHealthyBackends()
         const totalBackends = this.discoveryBackends.size
@@ -265,10 +559,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
           status: 'healthy',
           message: `${healthyBackends.length}/${totalBackends} backends healthy`,
         }
-      } catch (error) {
+      } catch (error: unknown) {
         return {
           status: 'unhealthy',
-          message: `Service discovery check failed: ${error.message}`,
+          message: `Service discovery check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         }
       }
     })
@@ -277,8 +571,8 @@ export class ServiceDiscoveryManager extends EventEmitter {
   /**
    * Get healthy discovery backends
    */
-  private async getHealthyBackends(): Promise<DiscoveryBackend[]> {
-    const healthyBackends: DiscoveryBackend[] = []
+  private async getHealthyBackends(): Promise<DiscoveryBackendRecord[]> {
+    const healthyBackends: DiscoveryBackendRecord[] = []
 
     for (const backend of this.discoveryBackends.values()) {
       try {
@@ -286,7 +580,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         if (isHealthy) {
           healthyBackends.push(backend)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Backend health check failed`, {
           backend: backend.type,
           region: backend.region,
@@ -302,29 +596,30 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Check backend health
    */
   private async checkBackendHealth(
-    backend: DiscoveryBackend,
+    backend: DiscoveryBackendRecord,
   ): Promise<boolean> {
     try {
       switch (backend.type) {
         case 'consul': {
-          const consul = backend.client as Consul
+          const consul = backend.client
           await consul.agent.self()
           return true
         }
         case 'etcd': {
-          const etcd = backend.client as Etcd3
-          await etcd.get('/').string()
+          const etcd = backend.client
+          await etcd.get('/')
           return true
         }
         case 'zookeeper': {
-          const zk = backend.client as ZooKeeperClient
-          return zk.connected
+          const zk = backend.client
+          await zk.getChildren('/services')
+          return true
         }
         default: {
           return false
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return false
     }
   }
@@ -335,7 +630,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private async setupHealthChecking(): Promise<void> {
     // Register health checks for registered services
     for (const [serviceName, instances] of this.serviceRegistry) {
-      this.healthMonitor.registerCheck(`service-${serviceName}`, async () => {
+      this.registerHealthCheck(`service-${serviceName}`, async () => {
         try {
           const healthyInstances = instances.filter(
             (instance) => instance.status === 'healthy',
@@ -360,10 +655,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
             status: 'healthy',
             message: `${healthyInstances.length}/${totalInstances} instances healthy for ${serviceName}`,
           }
-        } catch (error) {
+        } catch (error: unknown) {
           return {
             status: 'unhealthy',
-            message: `Service health check failed for ${serviceName}: ${error.message}`,
+            message: `Service health check failed for ${serviceName}: ${error instanceof Error ? error.message : 'Unknown error'}`,
           }
         }
       })
@@ -374,21 +669,23 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Start background processes
    */
   private startBackgroundProcesses(): void {
-    const config = this.config.getServiceDiscoveryConfig()
+    const config = this.getServiceDiscoveryConfig()
 
     // Start heartbeat process
     this.heartbeatInterval = setInterval(() => {
       this.sendHeartbeats().catch((error) => {
-        this.logger.error('Heartbeat process failed', { error })
+        const err = error instanceof Error ? error : new Error(String(error))
+        this.logger.error('Heartbeat process failed', { error: err })
       })
-    }, config.heartbeatInterval || 30000)
+    }, config.heartbeatInterval ?? 30000)
 
     // Start cleanup process
     this.cleanupInterval = setInterval(() => {
       this.cleanupExpiredServices().catch((error) => {
-        this.logger.error('Cleanup process failed', { error })
+        const err = error instanceof Error ? error : new Error(String(error))
+        this.logger.error('Cleanup process failed', { error: err })
       })
-    }, config.cleanupInterval || 300000)
+    }, config.cleanupInterval ?? 300000)
 
     this.logger.info('Background processes started')
   }
@@ -406,18 +703,18 @@ export class ServiceDiscoveryManager extends EventEmitter {
 
       // Create service instance
       const instance: ServiceInstance = {
-        id: service.instanceId || uuidv4(),
+        id: service.instanceId ?? uuidv4(),
         name: service.name,
         region: service.region,
         host: service.host,
         port: service.port,
-        protocol: service.protocol || 'http',
-        version: service.version || '1.0.0',
-        metadata: service.metadata || {},
+        protocol: service.protocol ?? 'http',
+        version: service.version ?? '1.0.0',
+        metadata: service.metadata ?? {},
         status: 'healthy',
         registeredAt: new Date(),
         lastHeartbeat: new Date(),
-        tags: service.tags || [],
+        tags: service.tags ?? [],
       }
 
       // Register with all backends
@@ -449,7 +746,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.emit('serviceRegistered', instance)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to register service', { service, error })
       throw error
     }
@@ -460,10 +757,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
    */
   private async registerWithBackends(instance: ServiceInstance): Promise<void> {
     const backends = await this.getHealthyBackends()
-
-    const registrationPromises = backends.map((backend) =>
-      this.registerWithBackend(backend, instance),
-    )
+    const registrationPromises: Promise<void>[] = []
+    for (const backend of backends) {
+      registrationPromises.push(this.registerWithBackend(backend, instance))
+    }
 
     await Promise.allSettled(registrationPromises)
   }
@@ -472,28 +769,25 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Register service with specific backend
    */
   private async registerWithBackend(
-    backend: DiscoveryBackend,
+    backend: DiscoveryBackendRecord,
     instance: ServiceInstance,
   ): Promise<void> {
     try {
       switch (backend.type) {
         case 'consul': {
-          await this.registerWithConsul(backend.client as Consul, instance)
+          await this.registerWithConsul(backend.client, instance)
           break
         }
         case 'etcd': {
-          await this.registerWithEtcd(backend.client as Etcd3, instance)
+          await this.registerWithEtcd(backend.client, instance)
           break
         }
         case 'zookeeper': {
-          await this.registerWithZookeeper(
-            backend.client as ZooKeeperClient,
-            instance,
-          )
+          await this.registerWithZookeeper(backend.client, instance)
           break
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to register with ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -508,7 +802,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Register with Consul
    */
   private async registerWithConsul(
-    consul: Consul,
+    consul: ConsulClient,
     instance: ServiceInstance,
   ): Promise<void> {
     const service = {
@@ -533,7 +827,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Register with etcd
    */
   private async registerWithEtcd(
-    etcd: Etcd3,
+    etcd: EtcdClient,
     instance: ServiceInstance,
   ): Promise<void> {
     const key = `/services/${instance.name}/${instance.region}/${instance.id}`
@@ -548,10 +842,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       status: instance.status,
     })
 
-    // Set with TTL
-    const lease = etcd.lease(60) // 60 second lease
-    await lease.put(key).value(value)
-    await lease.grant()
+    await etcd.put(key, value)
   }
 
   /**
@@ -578,11 +869,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       status: instance.status,
     })
 
-    await zk.create(
-      instancePath,
-      Buffer.from(data),
-      ZooKeeperClient.CreateMode.EPHEMERAL,
-    )
+    await zk.create(instancePath, data)
   }
 
   /**
@@ -597,15 +884,18 @@ export class ServiceDiscoveryManager extends EventEmitter {
 
     for (const part of parts) {
       currentPath += `/${part}`
-      try {
-        await zk.create(
-          currentPath,
-          Buffer.from(''),
-          ZooKeeperClient.CreateMode.PERSISTENT,
-        )
-      } catch (error: any) {
-        if (error.code !== ZooKeeperClient.Exception.NODE_EXISTS) {
-          throw error
+      const exists = await zk.exists(currentPath)
+      if (!exists) {
+        try {
+          await zk.create(currentPath, '')
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : String(error)
+          if (
+            !message.includes('Node exists') &&
+            !message.includes('ZNODEEXISTS')
+          ) {
+            throw error
+          }
         }
       }
     }
@@ -646,7 +936,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       this.serviceCache.set(cacheKey, {
         instances: sortedInstances,
         timestamp: new Date(),
-        ttl: options.cacheTTL || 30000, // 30 seconds default
+        ttl: options.cacheTTL ?? 30000, // 30 seconds default
       })
 
       this.logger.debug('Service discovery completed', {
@@ -656,7 +946,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       return sortedInstances
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Service discovery failed', {
         serviceName,
         options,
@@ -685,9 +975,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
     options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const backends = await this.getHealthyBackends()
-    const discoveryPromises = backends.map((backend) =>
-      this.discoverFromBackend(backend, serviceName, options),
-    )
+    const discoveryPromises: Promise<ServiceInstance[]>[] = []
+    for (const backend of backends) {
+      discoveryPromises.push(
+        this.discoverFromBackend(backend, serviceName, options),
+      )
+    }
 
     const results = await Promise.allSettled(discoveryPromises)
     const instances: ServiceInstance[] = []
@@ -696,9 +989,13 @@ export class ServiceDiscoveryManager extends EventEmitter {
       if (result.status === 'fulfilled') {
         instances.push(...result.value)
       } else {
+        const reason =
+          result.reason instanceof Error
+            ? result.reason
+            : new Error(String(result.reason))
         this.logger.warn('Discovery from backend failed', {
           serviceName,
-          error: result.reason,
+          error: reason,
         })
       }
     }
@@ -710,7 +1007,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Discover from specific backend
    */
   private async discoverFromBackend(
-    backend: DiscoveryBackend,
+    backend: DiscoveryBackendRecord,
     serviceName: string,
     options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
@@ -718,21 +1015,21 @@ export class ServiceDiscoveryManager extends EventEmitter {
       switch (backend.type) {
         case 'consul': {
           return await this.discoverFromConsul(
-            backend.client as Consul,
+            backend.client,
             serviceName,
             options,
           )
         }
         case 'etcd': {
           return await this.discoverFromEtcd(
-            backend.client as Etcd3,
+            backend.client,
             serviceName,
             options,
           )
         }
         case 'zookeeper': {
           return await this.discoverFromZookeeper(
-            backend.client as ZooKeeperClient,
+            backend.client,
             serviceName,
             options,
           )
@@ -741,7 +1038,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           return []
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to discover from ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -756,30 +1053,33 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Discover from Consul
    */
   private async discoverFromConsul(
-    consul: Consul,
+    consul: ConsulClient,
     serviceName: string,
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
-    const services = await consul.health.service(serviceName)
+    const response = await consul.health.service(serviceName)
+    const services = Array.isArray(response)
+      ? response.filter(isConsulServiceDiscoveryEntry)
+      : []
 
     return services.map((service) => ({
       id: service.Service.ID,
       name: service.Service.Service,
       region: service.Node.Datacenter,
-      host: service.Service.Address || service.Node.Address,
+      host: service.Service.Address ?? service.Node.Address,
       port: service.Service.Port,
       protocol: 'http', // Default protocol
       version:
         service.Service.Tags?.find((tag) => tag.startsWith('version:'))?.split(
           ':',
-        )[1] || '1.0.0',
-      metadata: service.Service.Meta || {},
+        )[1] ?? '1.0.0',
+      metadata: service.Service.Meta ?? {},
       status: service.Checks?.every((check) => check.Status === 'passing')
         ? 'healthy'
         : 'unhealthy',
       registeredAt: new Date(),
       lastHeartbeat: new Date(),
-      tags: service.Service.Tags || [],
+      tags: service.Service.Tags ?? [],
     }))
   }
 
@@ -787,37 +1087,34 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Discover from etcd
    */
   private async discoverFromEtcd(
-    etcd: Etcd3,
+    etcd: EtcdClient,
     serviceName: string,
     _options: DiscoveryOptions,
   ): Promise<ServiceInstance[]> {
     const keyPrefix = `/services/${serviceName}/`
-    const response = await etcd.getAll().prefix(keyPrefix)
+    const responseMap = await etcd.getAll([keyPrefix])
+    const response = Object.fromEntries(
+      Array.from(responseMap.entries()).filter(([key]) =>
+        key.startsWith(keyPrefix),
+      ),
+    )
 
     const instances: ServiceInstance[] = []
 
     for (const [key, value] of Object.entries(response)) {
       try {
-        const data = JSON.parse(value as string)
         const parts = key.split('/')
-        const region = parts[parts.length - 2]
-        const instanceId = parts[parts.length - 1]
+        const parsed = toDiscoveredServiceInstance(
+          serviceName,
+          parts[parts.length - 2],
+          parts[parts.length - 1],
+          JSON.parse(value),
+        )
 
-        instances.push({
-          id: instanceId,
-          name: serviceName,
-          region,
-          host: data.host,
-          port: data.port,
-          protocol: data.protocol || 'http',
-          version: data.version || '1.0.0',
-          metadata: data.metadata || {},
-          status: data.status || 'healthy',
-          registeredAt: new Date(data.registeredAt),
-          lastHeartbeat: new Date(),
-          tags: data.tags || [],
-        })
-      } catch (error) {
+        if (parsed) {
+          instances.push(parsed)
+        }
+      } catch (error: unknown) {
         this.logger.warn('Failed to parse etcd service data', { key, error })
       }
     }
@@ -837,36 +1134,30 @@ export class ServiceDiscoveryManager extends EventEmitter {
     const instances: ServiceInstance[] = []
 
     try {
-      const regions = await zk.get_children(basePath)
+      const regions = await zk.getChildren(basePath)
 
       for (const region of regions) {
         const regionPath = `${basePath}/${region}`
-        const instanceIds = await zk.get_children(regionPath)
+        const instanceIds = await zk.getChildren(regionPath)
 
         for (const instanceId of instanceIds) {
           try {
             const instancePath = `${regionPath}/${instanceId}`
-            const data = await zk.get_data(instancePath)
+            const data = await zk.getData(instancePath)
 
             if (data) {
-              const serviceData = JSON.parse(data.toString())
-
-              instances.push({
-                id: instanceId,
-                name: serviceName,
+              const serviceData = toDiscoveredServiceInstance(
+                serviceName,
                 region,
-                host: serviceData.host,
-                port: serviceData.port,
-                protocol: serviceData.protocol || 'http',
-                version: serviceData.version || '1.0.0',
-                metadata: serviceData.metadata || {},
-                status: serviceData.status || 'healthy',
-                registeredAt: new Date(serviceData.registeredAt),
-                lastHeartbeat: new Date(),
-                tags: serviceData.tags || [],
-              })
+                instanceId,
+                JSON.parse(data),
+              )
+
+              if (serviceData) {
+                instances.push(serviceData)
+              }
             }
-          } catch (error) {
+          } catch (error: unknown) {
             this.logger.warn('Failed to parse ZooKeeper service data', {
               instanceId,
               region,
@@ -875,8 +1166,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
           }
         }
       }
-    } catch (error: any) {
-      if (error.code !== ZooKeeperClient.Exception.NO_NODE) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
+      if (!message.includes('No node') && !message.includes('NO_NODE')) {
         throw error
       }
     }
@@ -951,6 +1243,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
           return 0
         })
         break
+      case 'registered':
+        sorted.sort(
+          (a, b) => b.registeredAt.getTime() - a.registeredAt.getTime(),
+        )
+        break
+      case undefined:
       default:
         // Default: sort by registration time (newest first)
         sorted.sort(
@@ -999,15 +1297,18 @@ export class ServiceDiscoveryManager extends EventEmitter {
             instance.lastHeartbeat = new Date()
 
             // Send heartbeat to backends
-            const heartbeatPromises = backends.map((backend) =>
-              this.sendHeartbeatToBackend(backend, instance),
-            )
+            const heartbeatPromises: Promise<void>[] = []
+            for (const backend of backends) {
+              heartbeatPromises.push(
+                this.sendHeartbeatToBackend(backend, instance),
+              )
+            }
 
             await Promise.allSettled(heartbeatPromises)
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Heartbeat process failed', { error })
     }
   }
@@ -1016,7 +1317,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Send heartbeat to backend
    */
   private async sendHeartbeatToBackend(
-    backend: DiscoveryBackend,
+    backend: DiscoveryBackendRecord,
     instance: ServiceInstance,
   ): Promise<void> {
     try {
@@ -1027,9 +1328,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
         }
         case 'etcd': {
           // Update lease for etcd
-          const etcd = backend.client as Etcd3
+          const etcd = backend.client
           const key = `/services/${instance.name}/${instance.region}/${instance.id}`
-          await etcd.get(key).string() // Touch the key to renew lease
+          await etcd.get(key) // Touch the key to renew lease
           break
         }
         case 'zookeeper': {
@@ -1037,7 +1338,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           break
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to send heartbeat to ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -1083,7 +1384,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
           this.serviceCache.delete(key)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Cleanup process failed', { error })
     }
   }
@@ -1105,11 +1406,11 @@ export class ServiceDiscoveryManager extends EventEmitter {
       const loadBalancer = this.loadBalancers.get(serviceName)
       if (!loadBalancer) {
         // Return first healthy instance if no load balancer
-        return instances.find((i) => i.status === 'healthy') || null
+        return instances.find((i) => i.status === 'healthy') ?? null
       }
 
       return loadBalancer.selectInstance(instances, options)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get service instance', {
         serviceName,
         options,
@@ -1131,22 +1432,24 @@ export class ServiceDiscoveryManager extends EventEmitter {
       this.logger.info('Starting service watch', { serviceName, options })
 
       let isWatching = true
-      const watchInterval = options.watchInterval || 10000 // 10 seconds default
+      const watchInterval = options.watchInterval ?? 10000 // 10 seconds default
 
       const watchLoop = async () => {
-        if (!isWatching) return
+        if (!isWatching) {
+          return
+        }
 
         try {
           const instances = await this.discoverService(serviceName, options)
           callback(instances)
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.error('Service watch error', { serviceName, error })
         }
-
-        if (isWatching) {
-          setTimeout(watchLoop, watchInterval)
-        }
       }
+
+      const timer = setInterval(() => {
+        void watchLoop()
+      }, watchInterval)
 
       // Start watching
       void watchLoop()
@@ -1154,9 +1457,10 @@ export class ServiceDiscoveryManager extends EventEmitter {
       // Return stop function
       return () => {
         isWatching = false
+        clearInterval(timer)
         this.logger.info('Service watch stopped', { serviceName })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to start service watch', {
         serviceName,
         options,
@@ -1179,8 +1483,8 @@ export class ServiceDiscoveryManager extends EventEmitter {
         services: {},
       }
 
-      const servicesToCheck = serviceName
-        ? [[serviceName, this.serviceRegistry.get(serviceName) || []]]
+      const servicesToCheck: [string, ServiceInstance[]][] = serviceName
+        ? [[serviceName, this.serviceRegistry.get(serviceName) ?? []]]
         : Array.from(this.serviceRegistry.entries())
 
       for (const [name, instances] of servicesToCheck) {
@@ -1202,7 +1506,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       stats.totalServices = Object.keys(stats.services).length
 
       return stats
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get service statistics', {
         serviceName,
         error,
@@ -1223,9 +1527,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
 
       // Remove from backends
       const backends = await this.getHealthyBackends()
-      const deregistrationPromises = backends.map((backend) =>
-        this.deregisterFromBackend(backend, serviceName, instanceId),
-      )
+      const deregistrationPromises: Promise<void>[] = []
+      for (const backend of backends) {
+        deregistrationPromises.push(
+          this.deregisterFromBackend(backend, serviceName, instanceId),
+        )
+      }
 
       await Promise.allSettled(deregistrationPromises)
 
@@ -1261,7 +1568,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       })
 
       this.emit('serviceDeregistered', { serviceName, instanceId })
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to deregister service', {
         serviceName,
         instanceId,
@@ -1275,31 +1582,31 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Deregister from backend
    */
   private async deregisterFromBackend(
-    backend: DiscoveryBackend,
+    backend: DiscoveryBackendRecord,
     serviceName: string,
     instanceId: string,
   ): Promise<void> {
     try {
       switch (backend.type) {
         case 'consul': {
-          const consul = backend.client as Consul
+          const consul = backend.client
           await consul.agent.service.deregister(instanceId)
           break
         }
         case 'etcd': {
-          const etcd = backend.client as Etcd3
+          const etcd = backend.client
           const key = `/services/${serviceName}/${backend.region}/${instanceId}`
-          await etcd.delete().key(key)
+          await etcd.delete(key)
           break
         }
         case 'zookeeper': {
-          const zk = backend.client as ZooKeeperClient
+          const zk = backend.client
           const path = `/services/${serviceName}/${backend.region}/${instanceId}`
-          await zk.delete(path, -1)
+          await zk.remove(path)
           break
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to deregister from ${backend.type}`, {
         backend: backend.type,
         region: backend.region,
@@ -1333,7 +1640,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
         for (const instance of instances) {
           try {
             await this.deregisterService(serviceName, instance.id)
-          } catch (error) {
+          } catch (error: unknown) {
             this.logger.warn('Failed to deregister service during shutdown', {
               serviceName,
               instance: instance.id,
@@ -1350,12 +1657,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
       }
 
       for (const [region, etcd] of this.etcdClients) {
-        await etcd.close()
+        etcd.close()
         this.logger.info(`etcd connection closed for region: ${region}`)
       }
 
       for (const [region, zk] of this.zookeeperClients) {
-        await zk.close()
+        zk.close()
         this.logger.info(`ZooKeeper connection closed for region: ${region}`)
       }
 
@@ -1368,7 +1675,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       this.logger.info('ServiceDiscoveryManager shutdown completed')
 
       this.emit('shutdown')
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error during shutdown', { error })
       throw error
     }
@@ -1379,12 +1686,12 @@ export class ServiceDiscoveryManager extends EventEmitter {
  * Load Balancer implementation
  */
 class LoadBalancer {
-  private serviceName: string
-  private algorithm: string
-  private healthCheck: any
-  private circuitBreaker: any
+  private readonly serviceName: string
+  private readonly algorithm: string
+  private readonly healthCheck: Record<string, unknown> | undefined
+  private readonly circuitBreaker: Record<string, unknown> | undefined
   private currentIndex = 0
-  private instanceWeights: Map<string, number> = new Map()
+  private readonly instanceWeights: Map<string, number> = new Map()
 
   constructor(config: LoadBalancerConfig) {
     this.serviceName = config.serviceName
@@ -1469,8 +1776,9 @@ class LoadBalancer {
         weight = 0
       } else {
         // Adjust weight based on metadata
-        if (instance.metadata.weight) {
-          weight = parseInt(instance.metadata.weight) || 100
+        if (typeof instance.metadata.weight === 'string') {
+          const parsedWeight = Number.parseInt(instance.metadata.weight, 10)
+          weight = Number.isNaN(parsedWeight) ? 100 : parsedWeight
         }
       }
 
@@ -1549,11 +1857,11 @@ interface ServiceStats {
 interface LoadBalancerConfig {
   serviceName: string
   algorithm: string
-  healthCheck?: any
-  circuitBreaker?: any
+  healthCheck?: Record<string, unknown>
+  circuitBreaker?: Record<string, unknown>
 }
 
-export {
+export type {
   ServiceRegistration,
   ServiceInstance,
   DiscoveryOptions,

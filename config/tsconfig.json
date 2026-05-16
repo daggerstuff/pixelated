@@ -3,36 +3,19 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable",
-      "WebWorker"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "~/*": [
-        "./src/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@layouts/*": [
-        "./src/layouts/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@types/*": [
-        "./src/types/*"
-      ]
+      "@/*": ["./src/*"],
+      "~/*": ["./src/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@components/*": ["./src/components/*"],
+      "@layouts/*": ["./src/layouts/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@types/*": ["./src/types/*"]
     },
     "allowJs": true,
     "resolveJsonModule": true,
@@ -64,11 +47,7 @@
     "allowImportingTsExtensions": true,
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
-    "types": [
-      "node",
-      "react",
-      "react-dom"
-    ],
+    "types": ["node", "react", "react-dom"],
     "typeRoots": [
       "../node_modules/@types",
       "./node_modules/@types",
@@ -79,8 +58,7 @@
       {
         "name": "@astrojs/ts-plugin"
       }
-    ],
-    "downlevelIteration": true
+    ]
   },
   "include": [
     "./src/**/*.ts",
@@ -89,7 +67,6 @@
     "./src/types/**/*.d.ts",
     "./*.config.js",
     "./*.config.ts",
-    "./vitest.setup.ts",
     "./api/**/*.ts",
     "./plugins/**/*.ts",
     "./types/**/*.d.ts",

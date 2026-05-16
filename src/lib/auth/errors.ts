@@ -35,7 +35,7 @@ export class TokenValidationError extends AuthenticationError {
  */
 export class TokenExpiredError extends TokenValidationError {
   constructor(message: string = 'Token has expired') {
-    super(message, 'EXPIRED')
+    super(message, TokenValidationReason.EXPIRED)
     this.name = 'TokenExpiredError'
   }
 }
@@ -45,7 +45,7 @@ export class TokenExpiredError extends TokenValidationError {
  */
 export class TokenRevokedError extends TokenValidationError {
   constructor(message: string = 'Token has been revoked') {
-    super(message, 'REVOKED')
+    super(message, TokenValidationReason.REVOKED)
     this.name = 'TokenRevokedError'
   }
 }
@@ -55,7 +55,7 @@ export class TokenRevokedError extends TokenValidationError {
  */
 export class InvalidTokenError extends TokenValidationError {
   constructor(message: string = 'Invalid token format or signature') {
-    super(message, 'INVALID_FORMAT')
+    super(message, TokenValidationReason.INVALID_FORMAT)
     this.name = 'InvalidTokenError'
   }
 }
@@ -67,7 +67,7 @@ export class TokenTypeMismatchError extends TokenValidationError {
   constructor(expected: string, actual: string) {
     super(
       `Invalid token type: expected ${expected}, got ${actual}`,
-      'TYPE_MISMATCH',
+      TokenValidationReason.TYPE_MISMATCH,
     )
     this.name = 'TokenTypeMismatchError'
   }
@@ -78,7 +78,7 @@ export class TokenTypeMismatchError extends TokenValidationError {
  */
 export class SessionContextError extends TokenValidationError {
   constructor(message: string) {
-    super(message, 'SESSION_CONTEXT_INVALID')
+    super(message, TokenValidationReason.SESSION_CONTEXT_INVALID)
     this.name = 'SessionContextError'
   }
 }
@@ -88,7 +88,7 @@ export class SessionContextError extends TokenValidationError {
  */
 export class ReplayAttackError extends TokenValidationError {
   constructor(message: string = 'Potential replay attack detected') {
-    super(message, 'REPLAY_ATTACK')
+    super(message, TokenValidationReason.REPLAY_ATTACK)
     this.name = 'ReplayAttackError'
   }
 }
@@ -195,7 +195,7 @@ export class ErrorResponseFormatter {
       details?: Record<string, unknown>
     } = {
       error: error.name,
-      message: error.message,
+      message: error instanceof Error ? error.message : 'Unknown error',
       code: error.code,
     }
 
@@ -326,7 +326,7 @@ export class AuthenticationErrorLogger {
   ): void {
     const logData = {
       error: error.name,
-      message: error.message,
+      message: error instanceof Error ? error.message : 'Unknown error',
       code: error.code,
       context,
       timestamp: new Date().toISOString(),

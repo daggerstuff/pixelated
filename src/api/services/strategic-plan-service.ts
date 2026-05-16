@@ -1,12 +1,11 @@
 import { v4 as uuid } from 'uuid'
 
-import { slug } from '@/utils/common'
-
 // Strategic Plans Service Layer
 import {
   getMongoConnection,
   getPostgresPool,
 } from '../../lib/database/connection'
+import { slug } from '../../utils/common'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 
 /**
@@ -31,13 +30,13 @@ export async function createStrategicPlan(data: {
     _id: planId,
     title: data.title,
     slug: planSlug,
-    description: data.description || '',
+    description: data.description ?? '',
     owner: data.ownerId,
     status: 'draft',
-    objectives: data.objectives || [],
-    keyResults: data.keyResults || [],
-    budget: data.budget || 0,
-    timeline: data.timeline || {
+    objectives: data.objectives ?? [],
+    keyResults: data.keyResults ?? [],
+    budget: data.budget ?? 0,
+    timeline: data.timeline ?? {
       startDate: new Date(),
       endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     },
@@ -152,9 +151,9 @@ export async function addKPI(
     _id: kpiId,
     name: kpi.name,
     target: kpi.target,
-    current: kpi.current || 0,
-    unit: kpi.unit || '',
-    owner: kpi.owner || userId,
+    current: kpi.current ?? 0,
+    unit: kpi.unit ?? '',
+    owner: kpi.owner ?? userId,
     deadline: kpi.deadline,
     status: 'active',
     createdAt: new Date(),
@@ -228,8 +227,8 @@ export async function listStrategicPlans(
   } = {},
 ) {
   const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
-  const page = options.page || 1
-  const limit = options.limit || 50
+  const page = options.page ?? 1
+  const limit = options.limit ?? 50
 
   let query: any = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],

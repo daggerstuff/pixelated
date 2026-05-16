@@ -129,7 +129,7 @@ export class AllscriptsProvider extends BaseEHRProvider {
 
     // Verify OAuth2 security configuration
     const security = capabilityStatement.rest[0]?.security
-    if (!security || !security.service?.includes('OAuth2')) {
+    if (!security?.service?.includes('OAuth2')) {
       throw new Error('OAuth2 security service is not configured')
     }
 

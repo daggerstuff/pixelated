@@ -52,8 +52,7 @@ export default function vitePluginFlexsearchSSR() {
       // Handle dynamic imports (handles import() patterns)
       if (
         isSSR &&
-        options &&
-        options.dynamicImport &&
+        options?.dynamicImport &&
         (id.includes('flexsearch') || id === 'flexsearch')
       ) {
         console.log(`[flexsearch-ssr] Intercepting dynamic import: ${id}`)
@@ -147,7 +146,7 @@ export default function vitePluginFlexsearchSSR() {
                 : {},
       n = new e.Error().stack
     n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      ((e._sentryDebugIds = e._sentryDebugIds ?? {}),
       (e._sentryDebugIds[n] = 'a0db6a53-f0a3-5748-899c-6016b824b882'))
   } catch (error) {
     // Intentionally empty - silencing Sentry debug errors

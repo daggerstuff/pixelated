@@ -28,8 +28,16 @@ export async function createInvestigation(
     }
     await redis.set(`investigation:inv_${id}`, JSON.stringify(investigation))
     return investigation
-  } catch (error) {
-    return { errors: [error instanceof Error ? error.message : String(error)] }
+  } catch (error: unknown) {
+    return {
+      errors: [
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
+      ],
+    }
   }
 }
 
@@ -43,7 +51,7 @@ export async function updateInvestigation(
     ? (JSON.parse(raw) as Record<string, unknown>)
     : undefined
   const updated = {
-    ...(existing || {
+    ...(existing ?? {
       id: investigationId,
       status: 'active',
       createdAt: new Date().toISOString(),

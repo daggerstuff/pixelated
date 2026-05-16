@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import FHEDemo from '@/components/security/FHEDemo.tsx'
+import { ChartBar } from 'lucide-react'
+import { DynamicFHEDemo } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -59,7 +60,7 @@ import FHEDemo from '@/components/security/FHEDemo.tsx'
 
       <!-- Interactive FHE Demo -->
       <div class="mb-8">
-        <FHEDemo
+        <DynamicFHEDemo
           client:load
           className="w-full"
           showAdvanced={true}
@@ -103,7 +104,7 @@ import FHEDemo from '@/components/security/FHEDemo.tsx'
             <div
               class="bg-purple-100 dark:bg-purple-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
             >
-              <span class="text-2xl">📊</span>
+              <ChartBar className="w-6 h-6" />
             </div>
             <h3 class="text-lg font-semibold mb-2">3. Decrypt Results</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">

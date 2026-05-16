@@ -11,42 +11,35 @@ const scriptUrl =
   config.client.rybbitScriptUrl() ?? 'https://app.rybbit.io/api/script.js'
 const siteId = config.client.rybbitSiteId() ?? '9ee28b13ba40'
 const shouldRender = Boolean(scriptUrl && siteId)
+const pageTransitionScript = `
+  const triggerRybbitPageview = (attempt = 0) => {
+    if (typeof window === 'undefined') return
+
+    if (typeof window.rybbit?.pageview === 'function') {
+      window.rybbit.pageview()
+      return
+    }
+
+    if (attempt < 5) {
+      window.setTimeout(() => {
+        triggerRybbitPageview(attempt + 1)
+      }, 150)
+    }
+  }
+
+  document.addEventListener('astro:after-swap', () => {
+    triggerRybbitPageview()
+  })
+`
 ---
 
 {
   shouldRender && (
     <>
-      <!-- Rybbit Analytics -->
-      <script
-        src={scriptUrl}
-        data-site-id={siteId}
-        defer
-        nonce={nonce}
-      ></script>
-      {
-        trackPageTransitions && (
-          <script is:inline nonce={nonce}>
-            const triggerRybbitPageview = (attempt = 0) => {
-              if (typeof window === 'undefined') return
-
-              if (typeof window.rybbit?.pageview === 'function') {
-                window.rybbit.pageview()
-                return
-              }
-
-              if (attempt < 5) {
-                window.setTimeout(() => {
-                  triggerRybbitPageview(attempt + 1)
-                }, 150)
-              }
-            }
-
-            document.addEventListener('astro:after-swap', () => {
-              triggerRybbitPageview()
-            })
-          </script>
-        )
-      }
+      <script src={scriptUrl} data-site-id={siteId} defer nonce={nonce} />
+      {trackPageTransitions && (
+        <script is:inline nonce={nonce} set:html={pageTransitionScript} />
+      )}
     </>
   )
 }

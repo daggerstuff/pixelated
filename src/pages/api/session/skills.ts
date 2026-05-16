@@ -63,11 +63,11 @@ export const POST: APIRoute = async ({ request }) => {
           'score' in (scoreOrObj as Record<string, unknown>)
         ) {
           const obj = scoreOrObj as Record<string, unknown>
-          score = Number((obj.score as number) ?? (obj.score as string) ?? 0)
+          score = ((obj.score as number) ?? (obj.score as string) ?? 0)
           explicitCategory =
             typeof obj.category === 'string' ? obj.category : undefined
         } else {
-          score = Number((scoreOrObj as number) || 0)
+          score = ((scoreOrObj as number) || 0)
         }
 
         // Determine category using helper mapping (allows expansion without changing this file)
@@ -126,7 +126,7 @@ export const POST: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving skill scores:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -196,7 +196,7 @@ export const GET: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching skill scores:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

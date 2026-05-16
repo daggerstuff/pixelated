@@ -1,187 +1,164 @@
-/**
- * Policy Engine for Data Governance
- *
- * Evaluates policies against context to determine if operations are allowed.
- * Supports condition operators: 'equals', 'contains', 'regex'
- */
+import type {
+  GovernancePolicy,
+  PolicyEvaluationResult,
+  PolicyEvaluationContext,
+  RequiredCondition,
+} from './types'
 
-/**
- * Result of evaluating a policy
- */
-export interface PolicyEvaluationResult {
-  /** Whether the operation is allowed */
-  allowed: boolean;
-  /** Reason for the decision */
-  reason: string;
-  /** ID of the policy that was evaluated */
-  policyId: string;
-  /** ID of the rule that matched (or failed to match) */
-  ruleId: string;
+const logger = {
+  info: (msg: string) => console.log(`[policy-engine] ${msg}`),
 }
 
-/**
- * A condition that checks a field against a value
- */
-export interface PolicyCondition {
-  /** The field to check in the context */
-  field: string;
-  /** The operator to use: 'equals' | 'contains' | 'regex' */
-  operator: "equals" | "contains" | "regex";
-  /** The value to compare against */
-  value: string;
+// Validate regex pattern for safety (prevents catastrophic backtracking)
+function isValidRegexPattern(pattern: string): boolean {
+  // Reject nested quantifiers which cause catastrophic backtracking
+  // Examples of dangerous patterns: (a+)+, (a*)+, (a|b+)+, a{2,3}+
+  if (/[+*][+*]|\{[0-9,]+\}[+*]|\([^)]*[+*][^)]*\)[+*]/.test(pattern)) {
+    logger.info(`Rejected nested quantifier pattern: ${pattern}`)
+    return false
+  }
+  // Reject patterns with excessive backreferences
+  if ((pattern.match(/\\[1-9]/g) ?? []).length > 5) {
+    logger.info(`Rejected pattern with too many backreferences: ${pattern}`)
+    return false
+  }
+  return true
 }
 
-/**
- * An action to take when conditions match
- */
-export interface PolicyAction {
-  /** The type of action: 'allow' | 'deny' */
-  type: "allow" | "deny";
+// Cache for compiled regex patterns
+interface CompiledRule {
+  id: string
+  action: string
+  conditions: Array<{ field: string; test: (value: unknown) => boolean }>
+  required: RequiredCondition[]
 }
 
-/**
- * A rule within a policy
- */
-export interface PolicyRule {
-  /** Unique identifier for the rule */
-  ruleId: string;
-  /** Conditions to evaluate */
-  conditions: PolicyCondition[];
-  /** Action to take if conditions match */
-  action: PolicyAction;
+interface CompiledPolicy {
+  id: string
+  version: string
+  rules: CompiledRule[]
 }
 
-/**
- * A policy definition
- */
-export interface Policy {
-  /** Unique identifier for the policy */
-  policyId: string;
-  /** Rules within the policy */
-  rules: PolicyRule[];
-}
-
-/**
- * Context for policy evaluation
- */
-export type PolicyContext = Record<string, string>;
-
-/**
- * PolicyEngine evaluates policies against context
- */
 export class PolicyEngine {
-  private policies: Map<string, Policy> = new Map();
-  private loadedVersion: string | null = null;
+  private readonly policies: Map<string, CompiledPolicy> = new Map()
+  private loadedVersion: string | null = null
 
-  /**
-   * Load a policy into the engine
-   * @param policy The policy to load
-   * @param version Optional version string for tracking
-   */
-  loadPolicy(policy: Policy, version?: string): void {
-    this.policies.set(policy.policyId, policy);
-    if (version) {
-      this.loadedVersion = version;
-    }
-  }
+  async loadPolicy(policy: GovernancePolicy): Promise<void> {
+    // Pre-compile rules for performance and safety
+    const compiledPolicy: CompiledPolicy = {
+      id: policy.id,
+      version: policy.version,
+      rules: policy.rules.map((rule) => ({
+        id: rule.id,
+        action: rule.action,
+        conditions: rule.conditions.map((cond) => {
+          // Pre-compile regex ONCE during load
+          let compiledRegex: RegExp | null = null
+          if (cond.operator === 'regex') {
+            if (isValidRegexPattern(cond.value)) {
+              compiledRegex = new RegExp(cond.value)
+            }
+          }
 
-  /**
-   * Get the currently loaded policy version
-   * @returns The version string or null if no policies loaded
-   */
-  getVersion(): string | null {
-    return this.loadedVersion;
-  }
-
-  /**
-   * Reload policies from PolicyStore
-   * @param policyStore The PolicyStore instance to load from
-   * @param policyId The policy ID to load
-   */
-  async reloadPolicies(
-    policyStore: { getPolicy: (policyId: string) => Promise<any> },
-    policyId: string,
-  ): Promise<void> {
-    const policy = await policyStore.getPolicy(policyId);
-    if (policy) {
-      // Convert GovernancePolicy to Policy format
-      const convertedPolicy: Policy = {
-        policyId: policy.id,
-        rules: policy.rules.map((rule: any) => ({
-          ruleId: rule.id || rule.ruleId,
-          conditions: rule.conditions || [],
-          action: {
-            type:
-              rule.action === "allow" || rule.action === "deny"
-                ? (rule.action as "allow" | "deny")
-                : ("allow" as const),
-          },
-        })),
-      };
-      this.loadPolicy(convertedPolicy, policy.version);
-    }
-    console.info(`Policy reload triggered for: ${policyId}`);
-  }
-
-  /**
-   * Evaluate context against all loaded policies
-   * @param context The context to evaluate
-   * @returns The evaluation result
-   */
-  async evaluate(context: PolicyContext): Promise<PolicyEvaluationResult> {
-    // Iterate through all policies and rules
-    for (const policy of this.policies.values()) {
-      for (const rule of policy.rules) {
-        const matches = this.evaluateConditions(rule.conditions, context);
-
-        if (matches) {
-          // Conditions matched - return the action
           return {
-            allowed: rule.action.type === "allow",
-            reason: `Policy ${policy.policyId} rule ${rule.ruleId} ${rule.action.type === "allow" ? "allowed" : "denied"}`,
-            policyId: policy.policyId,
-            ruleId: rule.ruleId,
-          };
+            field: cond.field,
+            test: (value: unknown) => {
+              const strValue = String(value ?? '')
+              switch (cond.operator) {
+                case 'equals':
+                  return value === cond.value
+                case 'contains':
+                  return strValue.includes(cond.value)
+                case 'regex':
+                  // Use pre-compiled regex (or reject if unsafe)
+                  if (!compiledRegex) return false
+                  return compiledRegex.test(strValue)
+                default:
+                  return false
+              }
+            },
+          }
+        }),
+        required: rule.required,
+      })),
+    }
+    this.policies.set(compiledPolicy.id, compiledPolicy)
+    this.loadedVersion = policy.version
+    logger.info(`Loaded policy ${policy.id} v${policy.version}`)
+  }
+
+  async evaluate(
+    context: PolicyEvaluationContext,
+  ): Promise<PolicyEvaluationResult> {
+    for (const [, policy] of this.policies) {
+      for (const rule of policy.rules) {
+        if (rule.action !== context.action) continue
+
+        // Check conditions
+        const matches = rule.conditions.every((cond) =>
+          cond.test(context.context[cond.field]),
+        )
+        if (!matches) continue
+
+        // Check required security controls
+        const missingRequired = this.checkRequiredControls(
+          rule.required,
+          context,
+        )
+        if (missingRequired.length > 0) {
+          return {
+            allowed: false,
+            reason: `Missing required controls: ${missingRequired.join(', ')}`,
+            policyId: policy.id,
+            ruleId: rule.id,
+          }
+        }
+
+        return {
+          allowed: true,
+          reason: 'Policy matched',
+          policyId: policy.id,
+          ruleId: rule.id,
         }
       }
     }
-
-    // No rules matched - default deny
-    const firstPolicy = this.policies.values().next().value;
-    return {
-      allowed: false,
-      reason: "No matching policy rules found",
-      policyId: firstPolicy?.policyId || "unknown",
-      ruleId: "none",
-    };
+    return { allowed: false, reason: 'No matching policy', policyId: 'none' }
   }
 
-  /**
-   * Evaluate conditions against context
-   * @param conditions The conditions to evaluate
-   * @param context The context to check against
-   * @returns true if all conditions match
-   */
-  private evaluateConditions(conditions: PolicyCondition[], context: PolicyContext): boolean {
-    return conditions.every((condition) => {
-      const contextValue = context[condition.field];
+  private checkRequiredControls(
+    required: RequiredCondition[],
+    context: PolicyEvaluationContext,
+  ): string[] {
+    const missing: string[] = []
+    const ctx = context.context
 
-      if (contextValue === undefined) {
-        return false;
+    for (const req of required) {
+      switch (req) {
+        case 'fhe_encryption':
+          if (!ctx.fheEncryptionActive) missing.push('FHE encryption')
+          break
+        case 'audit_logged':
+          if (!ctx.auditEnabled) missing.push('audit logging')
+          break
+        case 'consent_verified':
+          if (!ctx.consentVerified) missing.push('consent verification')
+          break
       }
-
-      switch (condition.operator) {
-        case "equals":
-          return contextValue === condition.value;
-        case "contains":
-          return contextValue.includes(condition.value);
-        case "regex": {
-          const regex = new RegExp(condition.value);
-          return regex.test(contextValue);
-        }
-        default:
-          return false;
-      }
-    });
+    }
+    return missing
   }
+
+  async reloadPolicies(): Promise<void> {
+    // TODO: Hot-reload from MongoDB
+    logger.info('Policy reload triggered')
+  }
+
+  getVersion(): string | null {
+    return this.loadedVersion
+  }
+}
+
+export interface PolicyEvaluationContext {
+  action: string
+  context: Record<string, unknown>
 }

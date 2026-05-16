@@ -1,11 +1,12 @@
 ---
-title: 'Litlyx Analytics Integration'
-description: 'Litlyx Analytics Integration documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Litlyx Analytics Integration documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Litlyx Analytics Integration
 ---
 
 # Litlyx Analytics Integration

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
 import { journalResearchApiClient } from '@/lib/api/journal-research'
+import storageManager from '@/utils/storage/storageManager'
 
 const getAuthToken = () => {
   if (typeof window === 'undefined') {
@@ -8,13 +9,15 @@ const getAuthToken = () => {
   }
   try {
     const token =
-      window.localStorage.getItem('auth_token') ??
-      window.localStorage.getItem('authToken')
+      storageManager.get('auth_token') ?? storageManager.get('authToken')
     if (!token) {
       return null
     }
+    if (typeof token !== 'string') {
+      return null
+    }
     return token.startsWith('Bearer ') ? token.slice(7) : token
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Failed to read auth token for WebSocket connection', error)
     return null
   }
@@ -137,7 +140,7 @@ export const useJournalResearchWebSocket = ({
         ) {
           onMessage?.(data as WebSocketMessage)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Failed to parse WebSocket message', error)
         onError?.(error as Error)
       }
@@ -167,7 +170,9 @@ export const useJournalResearchWebSocket = ({
     )
 
     try {
-      socketRef.current = new WebSocket(wsUrl, protocols)
+      const websocketProtocols =
+        protocols && protocols.length > 0 ? protocols : undefined
+      socketRef.current = new WebSocket(wsUrl, websocketProtocols)
 
       socketRef.current.onopen = () => {
         setConnectionState('connected')
@@ -206,9 +211,13 @@ export const useJournalResearchWebSocket = ({
           onError?.(error)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setConnectionState('error')
-      onError?.(error as Error)
+      const normalizedError =
+        error instanceof Error
+          ? error
+          : new Error('WebSocket connection failed')
+      onError?.(normalizedError)
     }
   }, [
     sessionId,
@@ -243,8 +252,33 @@ export const useJournalResearchWebSocket = ({
 
   const send = useCallback(
     (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
-      if (socketRef.current?.readyState === WebSocket.OPEN) {
-        socketRef.current.send(data)
+      if (data instanceof Blob) {
+        const blobUnsupportedError = new Error(
+          'Blob payloads are not supported',
+        )
+        onError?.(blobUnsupportedError)
+        return
+      }
+
+      const payload: string | ArrayBuffer = (() => {
+        if (typeof data === 'string') {
+          return data
+        }
+        if (data instanceof ArrayBuffer) {
+          return data
+        }
+        if (ArrayBuffer.isView(data)) {
+          return data.buffer.slice(
+            data.byteOffset,
+            data.byteOffset + data.byteLength,
+          )
+        }
+        return new TextEncoder().encode(String(data)).buffer
+      })()
+
+      const socket = socketRef.current
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(payload)
       } else {
         const error = new Error('WebSocket is not connected')
         onError?.(error)

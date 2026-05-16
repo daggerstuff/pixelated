@@ -67,9 +67,8 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
           confidence: 0.9 + Math.random() * 0.1,
         }
       }),
-      analyze_session: vi
-        .fn()
-        .mockImplementation(async (session: TherapeuticSession) => {
+      analyze_session: vi.fn().mockImplementation(async (...args: unknown[]) => {
+          const session = args[0] as TherapeuticSession
           await new Promise((resolve) =>
             setTimeout(resolve, Math.random() * 200 + 50),
           )
@@ -98,35 +97,42 @@ const { mockPythonBridge, mockMetricsCollector, mockAlertSystem } = vi.hoisted(
       dispose: vi.fn().mockResolvedValue(undefined),
     }
 
-    const mockMetricsCollector = {
-      initialize: vi.fn().mockResolvedValue(undefined),
-      recordAnalysis: vi.fn().mockImplementation(async () => {
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.random() * 20 + 5),
-        )
-      }),
-      getMetrics: vi.fn().mockImplementation(async () => {
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.random() * 30 + 10),
-        )
-        return {
-          totalAnalyses: Math.floor(Math.random() * 1000),
-          averageBiasScore: Math.random() * 0.5,
-          alertDistribution: {
-            low: Math.floor(Math.random() * 50) + 50,
-            medium: Math.floor(Math.random() * 30) + 20,
-            high: Math.floor(Math.random() * 15) + 5,
-            critical: Math.floor(Math.random() * 5),
-          },
-          responseTimeMetrics: {
-            average: Math.random() * 100 + 50,
-            p95: Math.random() * 150 + 100,
-            p99: Math.random() * 200 + 150,
-          },
-        }
-      }),
-      dispose: vi.fn().mockResolvedValue(undefined),
-    }
+     const mockMetricsCollector = {
+       initialize: vi.fn().mockResolvedValue(undefined),
+       recordAnalysis: vi.fn().mockImplementation(async () => {
+         await new Promise((resolve) =>
+           setTimeout(resolve, Math.random() * 20 + 5),
+         )
+       }),
+       getMetrics: vi.fn().mockImplementation(async () => {
+         await new Promise((resolve) =>
+           setTimeout(resolve, Math.random() * 30 + 10),
+         )
+         return {
+           overall_stats: {
+             total_sessions: Math.floor(Math.random() * 1000),
+             average_bias_score: Math.random() * 0.5,
+             alert_distribution: {
+               low: Math.floor(Math.random() * 50) + 50,
+               medium: Math.floor(Math.random() * 30) + 20,
+               high: Math.floor(Math.random() * 15) + 5,
+               critical: Math.floor(Math.random() * 5),
+             },
+           },
+           responseTimeMetrics: {
+             average: Math.random() * 100 + 50,
+             p95: Math.random() * 150 + 100,
+             p99: Math.random() * 200 + 150,
+           },
+         }
+       }),
+       getCurrentPerformanceMetrics: vi.fn().mockResolvedValue({
+         cpuUsage: Math.random() * 100,
+         memoryUsage: Math.random() * 1000 * 1024 * 1024,
+         responseTime: Math.random() * 100 + 50,
+       }),
+       dispose: vi.fn().mockResolvedValue(undefined),
+     }
 
     const mockAlertSystem = {
       initialize: vi.fn().mockResolvedValue(undefined),
@@ -172,7 +178,8 @@ vi.mock('../alerts-system', () => ({
 
 // Allow CI to skip performance-heavy tests
 const SKIP_PERF = process.env['SKIP_PERFORMANCE_TESTS'] === 'true'
-const ddescribe = SKIP_PERF ? describe.skip : describe
+const noopDescribe = (() => undefined) as typeof describe
+const ddescribe = SKIP_PERF ? noopDescribe : describe
 
 // Performance testing utilities
 interface PerformanceMetrics {
@@ -181,6 +188,11 @@ interface PerformanceMetrics {
     before: number
     after: number
     delta: number
+    memoryUsage?: {
+      before: number
+      after: number
+      delta: number
+    }
   }
   cpuUsage?: number
 }
@@ -198,7 +210,7 @@ interface BenchmarkResult {
 
 const PerformanceBenchmark = {
   getMemoryUsage(): number {
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (process?.memoryUsage) {
       return process.memoryUsage().heapUsed
     }
     return 0

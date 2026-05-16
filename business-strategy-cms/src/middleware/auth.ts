@@ -1,23 +1,34 @@
 import { Request, Response, NextFunction } from 'express'
 
 import { AuthService } from '@/services/authService'
-import { UserRole } from '@/types/user'
+import { type JwtPayload, UserRole } from '@/types/user'
 
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string
-    email: string
-    role: UserRole
-  }
+export interface AuthenticatedRequest<
+  P extends Record<string, string> = Record<string, string>,
+  ResBody = unknown,
+  ReqBody = unknown,
+  ReqQuery = Record<string, string | string[] | undefined>,
+> extends Request<P, ResBody, ReqBody, ReqQuery> {
+  user?: JwtPayload
 }
 
+/**
+ * Middleware to authenticate API requests via JWT.
+ * Extracts the Bearer token from the Authorization header and verifies it.
+ * If valid, attaches the decoded user payload to the request object for downstream use.
+ * This ensures that protected routes have access to verified user context without re-authenticating.
+ *
+ * @param req - The incoming request, extended to potentially hold user data
+ * @param res - The outgoing response
+ * @param next - Function to pass control to the next middleware
+ */
 export const authenticateToken = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+  const token = authHeader?.split(' ')[1]
 
   if (!token) {
     res.status(401).json({

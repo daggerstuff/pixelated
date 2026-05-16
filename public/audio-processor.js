@@ -34,7 +34,7 @@ class AudioProcessor extends AudioWorkletProcessor {
 
   process(inputs, _outputs, _parameters) {
     const input = inputs[0]
-    if (!input || !input.length) {
+    if (!input?.length) {
       return true
     }
 
@@ -44,8 +44,8 @@ class AudioProcessor extends AudioWorkletProcessor {
     }
 
     // Write new samples to ring buffer
-    for (let i = 0; i < inputChannel.length; i++) {
-      this.ringBuffer[this.writeIndex] = inputChannel[i]
+    for (const sample of inputChannel) {
+      this.ringBuffer[this.writeIndex] = sample
       this.writeIndex = (this.writeIndex + 1) % this.ringBuffer.length
     }
 
@@ -92,8 +92,8 @@ class AudioProcessor extends AudioWorkletProcessor {
 
   calculateEnergy(samples) {
     let sum = 0
-    for (let i = 0; i < samples.length; i++) {
-      sum += samples[i] * samples[i]
+    for (const sample of samples) {
+      sum += sample * sample
     }
     return Math.sqrt(sum / samples.length)
   }
@@ -135,7 +135,7 @@ registerProcessor('audio-processor', AudioProcessor)
                 : {},
       n = new e.Error().stack
     n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      ((e._sentryDebugIds = e._sentryDebugIds ?? {}),
       (e._sentryDebugIds[n] = 'd4df62f5-8102-57f4-b98f-792553d7d6d1'))
   } catch (e) {}
 })()

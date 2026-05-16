@@ -13,6 +13,42 @@ import {
 import type { AuditMetadata } from './audit/types'
 import { validateToken } from './auth/auth0-jwt-service'
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const authRoles = new Set<string>(authConfig.roles.hierarchy)
+
+const isAuthRole = (value: unknown): value is AuthRole =>
+  typeof value === 'string' && authRoles.has(value)
+
+const toAuthRole = (value: unknown): AuthRole =>
+  isAuthRole(value) ? value : authConfig.roles.default
+
+const toMetadataRecord = (value: unknown): Record<string, unknown> =>
+  isRecord(value) ? value : {}
+
+const toAuditDetails = (
+  metadata: AuditMetadata | null | undefined,
+): AuditDetails => {
+  if (!metadata) {
+    return {}
+  }
+
+  const details: AuditDetails = {}
+  for (const [key, value] of Object.entries(metadata)) {
+    if (
+      value === null ||
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      details[key] = value
+    }
+  }
+
+  return details
+}
+
 export interface AuthUser {
   id: string
   email: string
@@ -26,22 +62,29 @@ export interface AuthUser {
 /**
  * Get the current authenticated user from cookies
  */
+interface CookieAccessor {
+  get(name: string):
+    | {
+        value: string
+        json: () => unknown
+      }
+    | undefined
+}
+
 export async function getCurrentUser(
-  cookies: AstroCookies,
+  cookies: CookieAccessor,
 ): Promise<AuthUser | null> {
   const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
-
   if (!accessToken) {
     return null
   }
 
   try {
-    const decoded = await validateToken(accessToken)
-    if (!decoded) {
+    const decoded = await validateToken(accessToken, 'access')
+    const userId = decoded.userId
+    if (typeof userId !== 'string') {
       return null
     }
-
-    const { userId } = decoded
 
     // Fetch user from Auth0
     const user = await auth0UserService.getUserById(userId)
@@ -52,11 +95,11 @@ export async function getCurrentUser(
     return {
       id: user.id,
       email: user.email,
-      role: user.role as AuthRole,
+      role: toAuthRole(user.role),
       fullName: user.fullName,
       avatarUrl: user.avatarUrl,
-      lastLogin: user.lastLogin,
-      metadata: (user.userMetadata as Record<string, unknown>) || {},
+      lastLogin: user.lastLogin ? new Date(user.lastLogin) : null,
+      metadata: toMetadataRecord(user.userMetadata),
     }
   } catch (error: unknown) {
     console.error('Error getting current user:', error)
@@ -80,7 +123,7 @@ export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
   }
 
   try {
-    const decoded = await validateToken(accessToken)
+    const decoded = await validateToken(accessToken, 'access')
     return !!decoded
   } catch (error: unknown) {
     console.error('Error checking authentication:', error)
@@ -119,7 +162,7 @@ export async function createAuthAuditLog(entry: {
       action: entry.action,
       resource: entry.resource,
       ...(entry.resourceId && { resourceId: entry.resourceId }),
-      ...(entry.metadata && { details: entry.metadata as AuditDetails }),
+      ...(entry.metadata && { details: toAuditDetails(entry.metadata) }),
       eventType: AuditEventType.SECURITY,
       status: AuditEventStatus.SUCCESS,
     })
@@ -139,11 +182,11 @@ export async function createAuditLogFromParams(
   metadata?: AuditMetadata | null,
 ): Promise<void> {
   await createHIPAACompliantAuditLog({
-    userId: userId || 'system',
+    userId: userId ?? 'system',
     action,
     resource,
     ...(resourceId && { resourceId }),
-    ...(metadata && { details: metadata as AuditDetails }),
+    ...(metadata && { details: toAuditDetails(metadata) }),
     eventType: AuditEventType.SYSTEM,
     status: AuditEventStatus.SUCCESS,
   })
@@ -208,8 +251,8 @@ export class Auth {
     return user ? { userId: user.id } : null
   }
 
-  private getCookiesFromRequest(request: Request): AstroCookies {
-    const cookieHeader = request.headers.get('cookie') || ''
+  private getCookiesFromRequest(request: Request): CookieAccessor {
+    const cookieHeader = request.headers.get('cookie') ?? ''
     const cookies = new Map(
       cookieHeader.split(';').map((c) => {
         const [key, ...v] = c.trim().split('=')
@@ -217,10 +260,21 @@ export class Auth {
       }),
     )
 
-    return {
+    const cookieReader = {
       get: (name: string) => {
         const value = cookies.get(name)
-        return value ? { value, json: () => JSON.parse(value) } : undefined
+        return value
+          ? {
+              value,
+              json: () => {
+                try {
+                  return JSON.parse(value) as unknown
+                } catch {
+                  return {}
+                }
+              },
+            }
+          : undefined
       },
       has: (name: string) => cookies.has(name),
       set: () => {
@@ -235,8 +289,11 @@ export class Auth {
           value,
         }))
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
+    }
+
+    return {
+      ...cookieReader,
+    }
   }
 }
 

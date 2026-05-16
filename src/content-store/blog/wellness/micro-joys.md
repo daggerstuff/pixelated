@@ -1,8 +1,7 @@
 ---
 title: 'The Art of Micro-Joys: Finding Happiness in Small Moments'
 description: >-
-  Discover how cultivating awareness of tiny moments of joy can transform your
-  daily mental wellness and create lasting happiness
+  _Next in our series, we'll explore how friendships can be a powerful source of
 author: Wellness Team
 pubDate: 2024-05-04T00:00:00.000Z
 draft: false
@@ -13,9 +12,8 @@ tags:
   - daily-practices
 series: Everyday Joy
 seriesOrder: 1
-category: Research
----
 
+---
 # The Art of Micro-Joys: Finding Happiness in Small Moments
 
 ## Introduction

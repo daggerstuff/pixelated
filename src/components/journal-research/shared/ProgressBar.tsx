@@ -42,7 +42,7 @@ export function ProgressBar({
       <div
         className='bg-muted relative h-2 w-full overflow-hidden rounded-full'
         role='progressbar'
-        aria-valuenow={value}
+        aria-valuenow={Math.round(percentage)}
         aria-valuemin={0}
         aria-valuemax={max}
         aria-label={label ?? 'Progress'}

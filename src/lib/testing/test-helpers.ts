@@ -23,18 +23,18 @@ import { vi } from 'vitest'
 
 // Test Database Configuration
 export const testDbConfig = {
-  host: process.env['TEST_DB_HOST'] || 'localhost',
-  port: parseInt(process.env['TEST_DB_PORT'] || '5433'),
-  database: process.env['TEST_DB_NAME'] || 'pixelated_test',
-  user: process.env['TEST_DB_USER'] || 'test_user',
-  password: process.env['TEST_DB_PASSWORD'] || 'test_password',
+  host: process.env['TEST_DB_HOST'] ?? 'localhost',
+  port: parseInt(process.env['TEST_DB_PORT'] ?? '5433'),
+  database: process.env['TEST_DB_NAME'] ?? 'pixelated_test',
+  user: process.env['TEST_DB_USER'] ?? 'test_user',
+  password: process.env['TEST_DB_PASSWORD'] ?? 'test_password',
 }
 
 // Test Redis Configuration
 export const testRedisConfig = {
-  host: process.env['TEST_REDIS_HOST'] || 'localhost',
-  port: parseInt(process.env['TEST_REDIS_PORT'] || '6380'),
-  password: process.env['TEST_REDIS_PASSWORD'] || 'test_redis_password',
+  host: process.env['TEST_REDIS_HOST'] ?? 'localhost',
+  port: parseInt(process.env['TEST_REDIS_PORT'] ?? '6380'),
+  password: process.env['TEST_REDIS_PASSWORD'] ?? 'test_redis_password',
 }
 
 // Mock Data Generators
@@ -299,7 +299,7 @@ export class PerformanceTestUtils {
           try {
             await testFn()
             return { success: true }
-          } catch (error) {
+          } catch (error: unknown) {
             return { success: false, error }
           }
         }),
@@ -418,7 +418,7 @@ export class SecurityTestUtils {
             )
           }
         }
-      } catch (error) {
+      } catch (error: unknown) {
         // Connection errors are expected for some payloads
       }
     }
@@ -469,7 +469,7 @@ export class IntegrationTestUtils {
           console.log(`${serviceName} is ready`)
           return
         }
-      } catch (error) {
+      } catch (error: unknown) {
         // Service not ready yet
       }
 

@@ -10,6 +10,7 @@ import type {
   ExportData,
   Demographics,
 } from '../types/bias-detection'
+import { tryRequireNode } from './index'
 
 /**
  * Comprehensive preset scenarios with realistic bias patterns
@@ -562,11 +563,8 @@ export function determineAlertLevel(
  * Check if browser crypto API is available
  */
 const hasBrowserCrypto = (): boolean => {
-  return (
-    typeof window !== 'undefined' &&
-    window.crypto &&
-    window.crypto.getRandomValues !== undefined
-  )
+  const browserCrypto = globalThis.crypto
+  return typeof browserCrypto.getRandomValues === 'function'
 }
 
 /**
@@ -574,9 +572,7 @@ const hasBrowserCrypto = (): boolean => {
  */
 const hasNodeCrypto = (): boolean => {
   return (
-    typeof process !== 'undefined' &&
-    process.versions !== undefined &&
-    process.versions.node !== undefined
+    typeof process !== 'undefined' && typeof process.versions.node === 'string'
   )
 }
 
@@ -585,14 +581,24 @@ const hasNodeCrypto = (): boolean => {
  */
 const generateBrowserRandomValues = (array: Uint32Array): void => {
   if (hasBrowserCrypto()) {
-    window.crypto.getRandomValues(array)
+    const byteArray = new Uint8Array(8)
+    const browserCrypto = globalThis.crypto
+    if (typeof browserCrypto.getRandomValues !== 'function') {
+      return
+    }
+    browserCrypto.getRandomValues.call(browserCrypto, byteArray)
+    array[0] =
+      byteArray[0] * 16777216 +
+      byteArray[1] * 65536 +
+      byteArray[2] * 256 +
+      byteArray[3]
+    array[1] =
+      byteArray[4] * 16777216 +
+      byteArray[5] * 65536 +
+      byteArray[6] * 256 +
+      byteArray[7]
   }
 }
-
-/**
- * Generate random values using Node.js crypto
- */
-import { tryRequireNode } from './index'
 
 /**
  * Generate random values using Node.js crypto
@@ -604,15 +610,41 @@ const generateNodeRandomValues = (array: Uint32Array): void => {
   // Node.js fallback - use guarded runtime require to avoid bundler issues
   // Use tryRequireNode from utils to avoid bundlers including `crypto` in frontend bundles
   // Import dynamically to prevent circular import at module-eval time
-  const crypto = tryRequireNode('crypto') as {
-    randomBytes: (size: number) => Buffer
-  } | null
-  if (!crypto) {
+  const crypto = tryRequireNode('crypto')
+  if (crypto === null || typeof crypto !== 'object') {
     return
   }
-  const buf = crypto.randomBytes(8)
-  array[0] = buf.readUInt32LE(0)
-  array[1] = buf.readUInt32LE(4)
+  const isCallable = (
+    value: unknown,
+  ): value is (...args: unknown[]) => unknown => typeof value === 'function'
+  const randomBytes: unknown = Reflect.get(crypto, 'randomBytes')
+  if (!isCallable(randomBytes)) {
+    return
+  }
+  const bytes: unknown = randomBytes(8)
+  if (bytes === null || typeof bytes !== 'object') {
+    return
+  }
+  const bytesBuffer: unknown = Reflect.get(bytes, 'buffer')
+  const bytesByteOffset: unknown = Reflect.get(bytes, 'byteOffset')
+  const bytesByteLength: unknown = Reflect.get(bytes, 'byteLength')
+  if (!(bytesBuffer instanceof ArrayBuffer)) {
+    return
+  }
+  if (
+    typeof bytesByteOffset !== 'number' ||
+    typeof bytesByteLength !== 'number'
+  ) {
+    return
+  }
+  const buffer = new Uint8Array(bytesBuffer, bytesByteOffset, bytesByteLength)
+  if (buffer.length < 8) {
+    return
+  }
+  array[0] =
+    buffer[0] * 16777216 + buffer[1] * 65536 + buffer[2] * 256 + buffer[3]
+  array[1] =
+    buffer[4] * 16777216 + buffer[5] * 65536 + buffer[6] * 256 + buffer[7]
 }
 
 /**
@@ -630,6 +662,6 @@ export function generateSessionId(): string {
     array[0] = Math.floor(Math.random() * 0xffffffff)
     array[1] = Math.floor(Math.random() * 0xffffffff)
   }
-  const randomStr = (array[0] ?? 0).toString(36) + (array[1] ?? 0).toString(36)
+  const randomStr = array[0].toString(36) + array[1].toString(36)
   return 'demo_' + Date.now() + '_' + randomStr.slice(0, 9)
 }

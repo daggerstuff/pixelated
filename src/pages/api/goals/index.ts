@@ -1,6 +1,5 @@
+import type { APIRoute } from 'astro'
 import { v4 as uuidv4 } from 'uuid'
-// import type { APIRoute } from 'astro'
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod'
 
 import type { TherapeuticGoal } from '../../../lib/ai/types/TherapeuticGoals'
@@ -49,7 +48,7 @@ export const GET = async () => {
   })
 }
 
-export const POST = async ({ request }: { request: any }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json()
     const parsed = goalSchema.safeParse(data)
@@ -67,7 +66,7 @@ export const POST = async ({ request }: { request: any }) => {
       id: uuidv4(),
       createdAt: now,
       updatedAt: now,
-    } as TherapeuticGoal
+    }
     goals.push(newGoal)
     return new Response(JSON.stringify(newGoal), {
       status: 201,
@@ -78,9 +77,7 @@ export const POST = async ({ request }: { request: any }) => {
       JSON.stringify({
         error: 'Server error',
         details:
-          err instanceof Error
-            ? (err)?.message || String(err)
-            : String(err),
+          err instanceof Error ? err?.message || String(err) : String(err),
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

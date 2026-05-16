@@ -82,7 +82,7 @@ pytest tests/integration/test_minio_storage.py -v
 
 ## Test Structure
 
-```
+```text
 tests/integration/test_minio_storage.py
 ├── TestMinIOBucketOperations      # Bucket CRUD operations
 ├── TestMinIOObjectOperations       # Object upload/download/list

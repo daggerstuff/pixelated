@@ -307,7 +307,7 @@ export function useChatCompletion({
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error || `Failed to get AI response: ${response.status}`,
+            errorData.error ?? `Failed to get AI response: ${response.status}`,
           )
         }
 
@@ -350,7 +350,7 @@ export function useChatCompletion({
       // Update conversation stats
       setConversationStats((prev) => ({
         ...prev,
-        startTime: prev.startTime || new Date(),
+        startTime: prev.startTime ?? new Date(),
         messageCount: prev.messageCount + 1,
         userMessages: prev.userMessages + 1,
       }))
@@ -365,7 +365,7 @@ export function useChatCompletion({
           const userMessage: AIMessage = {
             role: 'user',
             content: message,
-            name: context?.name || '',
+            name: context?.name ?? '',
             ...context,
           }
 
@@ -455,7 +455,7 @@ export function useChatCompletion({
           } else {
             // Handle non-streaming response
             const data = await response.json()
-            const assistantMessage = data.choices?.[0]?.message?.content || ''
+            const assistantMessage = data.choices?.[0]?.message?.content ?? ''
 
             setMessages((prev) => [
               ...prev,
@@ -482,12 +482,12 @@ export function useChatCompletion({
               ...prev,
               assistantMessages: prev.assistantMessages + 1,
               avgResponseTime,
-              totalDuration: Date.now() - (prev.startTime?.getTime() || 0),
+              totalDuration: Date.now() - (prev.startTime?.getTime() ?? 0),
             }))
           }
 
           if (onComplete) {
-            onComplete(messages[messages.length - 1]?.content || '')
+            onComplete(messages[messages.length - 1]?.content ?? '')
           }
 
           success = true
@@ -561,7 +561,7 @@ export function useChatCompletion({
         const userMessage: AIMessage = {
           role: 'user',
           content: message,
-          name: context?.name || '',
+          name: context?.name ?? '',
           ...context,
         }
 
@@ -696,7 +696,7 @@ export function useChatCompletion({
   const resendMessage = useCallback(
     async (index: number) => {
       const messageToResend = messages[index]
-      if (messageToResend && messageToResend.role === 'user') {
+      if (messageToResend?.role === 'user') {
         // Remove all messages after this one
         setMessages((prev) => prev.slice(0, index))
         // Resend the message

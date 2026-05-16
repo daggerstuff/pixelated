@@ -151,7 +151,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
       } catch (err: unknown) {
         setError(
           err instanceof Error
-            ? (err)?.message || String(err)
+            ? err?.message || String(err)
             : 'Analysis failed',
         )
       } finally {
@@ -204,7 +204,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
     const exportData = createExportData(
       analysisResults,
       counterfactualScenarios,
-      historicalComparison || {
+      historicalComparison ?? {
         thirtyDayAverage: 0,
         sevenDayTrend: 'stable' as const,
         percentileRank: 50,

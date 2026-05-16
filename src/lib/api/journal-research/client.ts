@@ -4,6 +4,7 @@ import { config } from '@/lib/config/env'
 import { normalizeError, NetworkError, ValidationError } from '@/lib/error'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { validateApiResponse } from '@/lib/validation/api'
+import storageManager from '@/utils/storage/storageManager'
 
 const logger = createBuildSafeLogger('journal-research-api-client')
 
@@ -307,7 +308,7 @@ async function getAuthTokenFromBetterAuth(): Promise<string | null> {
 
   try {
     // Try to get session from Better Auth client
-    const { authClient } = await import('@/lib/auth-client')
+    const { authClient } = await import('@/lib/auth-client.ts')
     const session = await authClient.getSession()
 
     if (session?.data?.session?.token) {
@@ -316,18 +317,18 @@ async function getAuthTokenFromBetterAuth(): Promise<string | null> {
 
     // Fallback to localStorage for backward compatibility
     return (
-      window.localStorage.getItem('auth_token') ??
-      window.localStorage.getItem('authToken') ??
+      storageManager.get('auth_token') ??
+      storageManager.get('authToken') ??
       null
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn('Failed to get auth token from Better Auth', { error })
 
     // Fallback to localStorage
     try {
       return (
-        window.localStorage.getItem('auth_token') ??
-        window.localStorage.getItem('authToken') ??
+        storageManager.get('auth_token') ??
+        storageManager.get('authToken') ??
         null
       )
     } catch (localStorageError) {

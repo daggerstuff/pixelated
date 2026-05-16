@@ -1,0 +1,11 @@
+[Unit]
+Description=Backup Pixelated shared memory SQLite database
+After=network.target
+
+[Service]
+Type=oneshot
+User=__USER__
+Group=__GROUP__
+WorkingDirectory=__WORKDIR__
+EnvironmentFile=__ENV_FILE__
+ExecStart=__BACKUP_SCRIPT__

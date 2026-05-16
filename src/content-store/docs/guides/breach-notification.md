@@ -1,12 +1,15 @@
 ---
-title: 'Breach Notification Guide'
-description: 'User guide for implementing and managing breach notifications'
-pubDate: 2025-03-25
+description: User guide for implementing and managing breach notifications
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['guides', 'security', 'breach-notification']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - guides
+  - security
+  - breach-notification
+author: Pixelated Team
+title: Breach Notification System Guide
 ---
 
 # Breach Notification System Guide

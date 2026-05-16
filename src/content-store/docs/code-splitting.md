@@ -1,11 +1,12 @@
 ---
-title: 'Code Splitting Best Practices'
-description: 'Code Splitting Best Practices documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Code Splitting Best Practices documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Code Splitting Best Practices
 ---
 
 # Code Splitting Best Practices

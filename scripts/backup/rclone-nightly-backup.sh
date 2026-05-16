@@ -68,5 +68,5 @@ fi
 echo "Backup process completed."
 
 # CRON SETUP INSTRUCTIONS:
-# To run this every night at 2:00 AM, run 'crontab -e' and add:
-# 0 2 * * * /home/vivi/pixelated/scripts/rclone-nightly-backup.sh >> /home/vivi/pixelated/scripts/backup.log 2>&1
+# To run this every 6 hours (or copy your preferred interval), run 'crontab -e' and add:
+# 0 */6 * * * /home/vivi/pixelated/scripts/rclone-nightly-backup.sh >> /home/vivi/pixelated/scripts/backup.log 2>&1

@@ -7,36 +7,40 @@ import {
 } from 'unocss'
 
 export default defineConfig({
+  content: {
+    pipeline: {
+      include: [/\.(astro|[jt]sx|html)($|\?)/],
+      exclude: [
+        /node_modules/,
+        /dist/,
+        /content-store/,
+        /business-strategy-cms/,
+        /docs\//,
+        /tests?\//,
+        /public\//,
+      ],
+    },
+  },
   theme: {
     colors: {
       primary: {
-        50: '#ecfdf5',
-        100: '#d1fae5',
-        200: '#a7f3d0',
-        300: '#6ee7b7',
-        400: '#34d399',
-        500: '#10b981',
-        600: '#059669',
-        700: '#047857',
-        800: '#065f46',
-        900: '#064e3b',
-        950: '#022c22',
+        500: '#FF8533',
+        600: '#FF6B00',
+        700: '#CC5600',
       },
       secondary: {
-        50: '#f0f9ff',
-        100: '#e0f2fe',
-        200: '#bae6fd',
-        300: '#7dd3fc',
-        400: '#38bdf8',
-        500: '#0ea5e9',
-        600: '#0284c7',
-        700: '#0369a1',
-        800: '#075985',
-        900: '#0c4a6e',
-        950: '#082f49',
+        500: '#007aff',
+        600: '#0056b3',
+        700: '#004080',
+        800: '#002f66',
       },
-      foreground: '#f8fafc',
-      background: '#0f172a',
+      foreground: '#fdfcfc',
+      background: '#201d1d',
+    },
+    fontFamily: {
+      sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      mono: '"Berkeley Mono", "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+      display: '"Berkeley Mono", monospace',
     },
   },
   presets: [
@@ -54,14 +58,13 @@ export default defineConfig({
             fonts: {
               sans: 'Inter:400,600,800',
               mono: 'DM Mono:400,600',
-              condensed: 'Roboto Condensed',
             },
           }),
         ]),
   ],
   shortcuts: {
-    btn: 'px-4 py-2 rounded inline-block bg-primary-600 text-white cursor-pointer hover:bg-primary-700',
+    btn: 'px-4 py-2 rounded inline-block bg-primary-500 text-white cursor-pointer hover:bg-primary-600',
     'btn-primary': 'btn bg-primary-600 hover:bg-primary-700',
-    'btn-secondary': 'btn bg-secondary-600 hover:bg-secondary-700',
+    'btn-secondary': 'btn bg-secondary-700 hover:bg-secondary-800',
   },
 })

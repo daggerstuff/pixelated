@@ -93,12 +93,12 @@ export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url)
     const type =
       (url.searchParams.get('type') as ChartDataRequest['type']) || 'line'
-    const timeRange = parseInt(url.searchParams.get('timeRange') || '30', 10)
+    const timeRange = parseInt(url.searchParams.get('timeRange') ?? '30', 10)
     const clientId = url.searchParams.get('clientId')
     const sessionId = url.searchParams.get('sessionId')
-    const dataPoints = parseInt(url.searchParams.get('dataPoints') || '50', 10)
+    const dataPoints = parseInt(url.searchParams.get('dataPoints') ?? '50', 10)
     const category =
-      (url.searchParams.get('category') as ChartDataRequest['category']) ||
+      (url.searchParams.get('category') as ChartDataRequest['category']) ??
       'progress'
 
     const repository = new AIRepository()
@@ -203,7 +203,12 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-analytics',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -211,7 +216,12 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,

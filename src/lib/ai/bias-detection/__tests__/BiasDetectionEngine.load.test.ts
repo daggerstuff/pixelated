@@ -1,32 +1,47 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+
 // Vitest globals are available due to globals: true in vitest.config.ts
 import { BiasDetectionEngine } from '../BiasDetectionEngine'
+import type { AnalysisResult } from '../types'
 import type { TherapeuticSession } from '../types'
 import { baselineAnxietyScenario, ageBiasYoungPatient } from './fixtures'
 
 // Mock the Python bridge to avoid network calls
-vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: class {
-    initialize = vi.fn().mockResolvedValue(undefined)
-    analyzeSession = vi.fn().mockImplementation(async () => {
-      // Simulate realistic API response time (50-150ms)
-      const delay = 50 + Math.random() * 100
-      await new Promise((resolve) => setTimeout(resolve, delay))
-      return {
-        sessionId: 'test-session',
-        overallBiasScore: 0.3 + Math.random() * 0.4,
-        alertLevel: 'medium',
-        layerResults: {
-          preprocessing: { biasScore: 0.2 + Math.random() * 0.3 },
-          modelLevel: { biasScore: 0.3 + Math.random() * 0.3 },
-          interactive: { biasScore: 0.4 + Math.random() * 0.3 },
-          evaluation: { biasScore: 0.3 + Math.random() * 0.3 },
-        },
-      }
-    })
-    checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
-    dispose = vi.fn().mockResolvedValue(undefined)
-  },
-}))
+vi.mock('../python-bridge', () => {
+  function buildMockLayerResult(base: number) {
+    return {
+      biasScore: base,
+    }
+  }
+
+  return {
+    PythonBiasDetectionBridge: class {
+      initialize = vi.fn().mockResolvedValue(undefined)
+      runPreprocessingAnalysis = vi.fn().mockImplementation(async () => {
+        const delay = 50 + Math.random() * 100
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        return buildMockLayerResult(0.2 + Math.random() * 0.3)
+      })
+      runModelLevelAnalysis = vi.fn().mockImplementation(async () => {
+        const delay = 50 + Math.random() * 100
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        return buildMockLayerResult(0.3 + Math.random() * 0.3)
+      })
+      runInteractiveAnalysis = vi.fn().mockImplementation(async () => {
+        const delay = 50 + Math.random() * 100
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        return buildMockLayerResult(0.4 + Math.random() * 0.3)
+      })
+      runEvaluationAnalysis = vi.fn().mockImplementation(async () => {
+        const delay = 50 + Math.random() * 100
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        return buildMockLayerResult(0.3 + Math.random() * 0.3)
+      })
+      checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
+      dispose = vi.fn().mockResolvedValue(undefined)
+    },
+  }
+})
 
 // Mock the metrics collector
 vi.mock('../metrics-collector', () => ({
@@ -76,19 +91,24 @@ interface LoadTestMetrics {
 async function runConcurrentSessions(
   engine: BiasDetectionEngine,
   sessions: TherapeuticSession[],
-): Promise<{ results: unknown[]; metrics: LoadTestMetrics }> {
+): Promise<{ results: (AnalysisResult | null)[]; metrics: LoadTestMetrics }> {
   const startTime = Date.now()
   const startMemory = process.memoryUsage()
 
-  const results = await Promise.allSettled(
-    sessions.map((session) => engine.analyzeSession(session)),
+  const results = await Promise.allSettled<AnalysisResult>(
+    sessions.map(async (session) => engine.analyzeSession(session)),
   )
 
   const endTime = Date.now()
   const endMemory = process.memoryUsage()
 
-  const successful = results.filter((r) => r.status === 'fulfilled').length
-  const failed = results.filter((r) => r.status === 'rejected')
+  const successful = results.filter(
+    (result): result is PromiseFulfilledResult<AnalysisResult> =>
+      result.status === 'fulfilled',
+  ).length
+  const failed = results.filter(
+    (result): result is PromiseRejectedResult => result.status === 'rejected',
+  )
   const executionTime = endTime - startTime
 
   const metrics: LoadTestMetrics = {
@@ -98,7 +118,12 @@ async function runConcurrentSessions(
     successRate: (successful / sessions.length) * 100,
     throughput: sessions.length / (executionTime / 1000),
     memoryDelta: endMemory.heapUsed - startMemory.heapUsed,
-    errors: failed.map((f) => f.reason?.message || 'Unknown error'),
+    errors: failed.map((f) => {
+      if (f.reason instanceof Error) {
+        return f.reason.message
+      }
+      return 'Unknown error'
+    }),
   }
 
   return {
@@ -144,6 +169,9 @@ describe('Bias Detection Engine - Load Testing', () => {
     biasEngine = new BiasDetectionEngine({
       pythonServiceUrl: 'http://localhost:5000',
       thresholds: {
+        warning: 0.3,
+        high: 0.6,
+        critical: 0.8,
         warningLevel: 0.3,
         highLevel: 0.6,
         criticalLevel: 0.8,

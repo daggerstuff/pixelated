@@ -28,7 +28,6 @@ class Anonymizer {
   async anonymize(payload: unknown): Promise<{ text: string }> {
     // Safely extract text if payload is the expected shape
     if (typeof payload === 'object' && payload !== null && 'text' in payload) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const obj = payload as { text?: unknown }
       if (typeof obj.text === 'string') {
         return Promise.resolve({ text: obj.text })
@@ -41,17 +40,17 @@ class Anonymizer {
 }
 
 // Mock implementation of memoize since the original is not accessible
-function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
+function memoize<T extends (...args: any[]) => any>(fn: T): T {
   const cache = new Map<string, ReturnType<T>>()
 
   return ((...args: Parameters<T>): ReturnType<T> => {
     const key = JSON.stringify(args)
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>
+      return cache.get(key)!
     }
 
-    // Call the function with unknown args and assert the return type
+    // Call the function with args and return the result
     const result = fn(...(args as unknown[])) as ReturnType<T>
     cache.set(key, result)
     return result
@@ -239,7 +238,7 @@ export class PresidioPHIDetector {
     } catch (error: unknown) {
       logger.error('Error detecting PHI', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        stack: error instanceof Error ? error?.stack : undefined,
       })
 
       // Use fallback detection in case of error
@@ -278,11 +277,19 @@ export class PresidioPHIDetector {
     try {
       if (this.initialized && this.anonymizer) {
         // Use Presidio for redaction
+        // Create entity-specific anonymizers mapping
+        const anonymizers: Record<string, { type: string; newValue: string }> =
+          {}
+        entities.forEach((entity) => {
+          anonymizers[entity.type] = {
+            type: 'replace',
+            newValue: this.getPlaceholderForEntityType(entity.type),
+          }
+        })
+
         const anonymizerPayload = {
           text,
-          anonymizers: {
-            DEFAULT: { type: 'replace', newValue: '[REDACTED]' },
-          },
+          anonymizers,
           analyzer_results: entities.map((entity) => ({
             entity_type: entity.type,
             start: entity.start,
@@ -307,10 +314,39 @@ export class PresidioPHIDetector {
     }
   }
 
+  private getPlaceholderForEntityType(type: PHIEntityType): string {
+    switch (type) {
+      case PHIEntityType.US_SSN:
+        return '[ID]'
+      case PHIEntityType.EMAIL_ADDRESS:
+        return '[EMAIL]'
+      case PHIEntityType.PHONE_NUMBER:
+        return '[PHONE]'
+      case PHIEntityType.PERSON:
+        return '[NAME]'
+      case PHIEntityType.ADDRESS: { throw new Error('Not implemented yet: PHIEntityType.ADDRESS case') }
+      case PHIEntityType.LOCATION: { throw new Error('Not implemented yet: PHIEntityType.LOCATION case') }
+      case PHIEntityType.MEDICAL_RECORD_NUMBER: { throw new Error('Not implemented yet: PHIEntityType.MEDICAL_RECORD_NUMBER case') }
+      case PHIEntityType.DATE_TIME: { throw new Error('Not implemented yet: PHIEntityType.DATE_TIME case') }
+      case PHIEntityType.AGE: { throw new Error('Not implemented yet: PHIEntityType.AGE case') }
+      case PHIEntityType.IP_ADDRESS: { throw new Error('Not implemented yet: PHIEntityType.IP_ADDRESS case') }
+      case PHIEntityType.URL: { throw new Error('Not implemented yet: PHIEntityType.URL case') }
+      case PHIEntityType.US_PASSPORT: { throw new Error('Not implemented yet: PHIEntityType.US_PASSPORT case') }
+      case PHIEntityType.US_DRIVER_LICENSE: { throw new Error('Not implemented yet: PHIEntityType.US_DRIVER_LICENSE case') }
+      case PHIEntityType.CREDIT_CARD: { throw new Error('Not implemented yet: PHIEntityType.CREDIT_CARD case') }
+      case PHIEntityType.US_BANK_NUMBER: { throw new Error('Not implemented yet: PHIEntityType.US_BANK_NUMBER case') }
+      case PHIEntityType.IBAN_CODE: { throw new Error('Not implemented yet: PHIEntityType.IBAN_CODE case') }
+      case PHIEntityType.US_ITIN: { throw new Error('Not implemented yet: PHIEntityType.US_ITIN case') }
+      case PHIEntityType.MEDICAL_LICENSE: { throw new Error('Not implemented yet: PHIEntityType.MEDICAL_LICENSE case') }
+      case PHIEntityType.ORGANIZATION: { throw new Error('Not implemented yet: PHIEntityType.ORGANIZATION case') }
+      default:
+        return '[REDACTED]'
+    }
+  }
   /**
    * Fallback method for detecting PHI entities using regex patterns
    */
-  private fallbackDetection = memoize((text: string): PHIEntity[] => {
+  private readonly fallbackDetection = memoize((text: string): PHIEntity[] => {
     const entities: PHIEntity[] = []
 
     // Common PHI regex patterns
@@ -320,61 +356,12 @@ export class PresidioPHIDetector {
         'gi',
       ),
       [PHIEntityType.PHONE_NUMBER]: new RegExp(
-        '\\b(\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b',
+        '(?:\\+\\d{1,3}[-.\\s]?)?(?:\\(\\d{3}\\)|\\d{3})[\\s.-]?\\d{3}[\\s.-]?\\d{4}(?:\\s*(?:ext|x)\\s*\\d{1,5})?(?!\\d)',
         'g',
       ),
       [PHIEntityType.US_SSN]: new RegExp('\\b\\d{3}-?\\d{2}-?\\d{4}\\b', 'g'),
-      [PHIEntityType.IP_ADDRESS]: new RegExp(
-        '\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b',
-        'g',
-      ),
-      [PHIEntityType.CREDIT_CARD]: new RegExp(
-        '\\b(?:\\d{4}[-\\s]?){3}\\d{4}\\b',
-        'g',
-      ),
-      [PHIEntityType.DATE_TIME]: new RegExp(
-        '\\b\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{2,4}\\b',
-        'g',
-      ),
-      [PHIEntityType.AGE]: new RegExp(
-        '\\b\\d{1,3}\\s+(?:years?|yrs?|y)(?:\\s+old)?\\b',
-        'gi',
-      ),
-      // Simplified patterns for other types
       [PHIEntityType.PERSON]: new RegExp(
-        '\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b',
-        'g',
-      ),
-      [PHIEntityType.ADDRESS]: new RegExp(
-        '\\b\\d+\\s+[A-Za-z\\s]+(?:Avenue|Lane|Road|Boulevard|Drive|Street|Ave|Ln|Rd|Blvd|Dr|St)\\.?\\s+(?:#\\w+)?\\b',
-        'gi',
-      ),
-      [PHIEntityType.LOCATION]: new RegExp(
-        '\\b[A-Z][a-z]+(?:,\\s+[A-Z]{2})?\\b',
-        'g',
-      ),
-      [PHIEntityType.MEDICAL_RECORD_NUMBER]: new RegExp(
-        '\\bMR[N#]?\\s*:?\\s*\\d+\\b',
-        'gi',
-      ),
-      [PHIEntityType.URL]: new RegExp(
-        "\\bhttps?://[\\w.-]+\\.[a-zA-Z]{2,}[\\w\\-._~:/?#[\\]@!$&'()*+,;=]+\\b",
-        'gi',
-      ),
-      [PHIEntityType.US_PASSPORT]: new RegExp('\\b[A-Z]\\d{8}\\b', 'g'),
-      [PHIEntityType.US_DRIVER_LICENSE]: new RegExp(
-        '\\b[A-Z]\\d{3}-\\d{3}-\\d{3}\\b',
-        'g',
-      ),
-      [PHIEntityType.US_BANK_NUMBER]: new RegExp('\\b\\d{10,12}\\b', 'g'),
-      [PHIEntityType.IBAN_CODE]: new RegExp(
-        '\\b[A-Z]{2}\\d{2}[A-Z0-9]{4}\\d{7}[A-Z0-9]{0,16}\\b',
-        'g',
-      ),
-      [PHIEntityType.US_ITIN]: new RegExp('\\b9\\d{2}-?\\d{2}-?\\d{4}\\b', 'g'),
-      [PHIEntityType.MEDICAL_LICENSE]: new RegExp('\\b[A-Z]{2}\\d{6}\\b', 'g'),
-      [PHIEntityType.ORGANIZATION]: new RegExp(
-        '\\b[A-Z][a-z]+\\s+(?:Hospital|Medical Center|Clinic|Healthcare|Health)\\b',
+        '\\b(?!Patient\\b)[A-Z][a-z]+\\s+[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*\\b',
         'g',
       ),
     }
@@ -410,11 +397,12 @@ export class PresidioPHIDetector {
     // Create a copy of the text to modify
     let redactedText = text
 
-    // Replace each entity with [REDACTED]
     for (const entity of sortedEntities) {
+      const replacement = this.getPlaceholderForEntityType(entity.type)
+
       redactedText =
         redactedText.substring(0, entity.start) +
-        '[REDACTED]' +
+        replacement +
         redactedText.substring(entity.end)
     }
 
@@ -447,7 +435,7 @@ if (require.main === module) {
 export async function detectAndRedactPHIAsync(text: string): Promise<string> {
   const detector = PresidioPHIDetector.getInstance()
   const result = await detector.detectPHI(text)
-  return result.redactedText || text
+  return result.redactedText ?? text
 }
 
 /**
@@ -460,7 +448,9 @@ export function detectAndRedactPHI(text: string): string {
   try {
     // For simplicity, we'll fall back to regex-based detection in the sync version
     const detector = PresidioPHIDetector.getInstance()
-    const entities = detector['fallbackDetection'](text)
+    const entities = (
+      detector['fallbackDetection'] as (text: string) => PHIEntity[]
+    )(text)
 
     if (entities.length === 0) {
       return text

@@ -119,11 +119,11 @@ export interface PatternEvolutionModel {
  */
 export class AdvancedPatternAnalysisService {
   private static instance: AdvancedPatternAnalysisService
-  private neuralNetworkModels: Map<string, NeuralNetworkEnhancement> = new Map()
-  private correlationCache: Map<string, EffectivenessCorrelationMetrics> =
+  private readonly neuralNetworkModels: Map<string, NeuralNetworkEnhancement> = new Map()
+  private readonly correlationCache: Map<string, EffectivenessCorrelationMetrics> =
     new Map()
-  private insightHistory: Map<string, TherapeuticInsight[]> = new Map()
-  private patternEvolutionModels: Map<string, PatternEvolutionModel> = new Map()
+  private readonly insightHistory: Map<string, TherapeuticInsight[]> = new Map()
+  private readonly patternEvolutionModels: Map<string, PatternEvolutionModel> = new Map()
 
   private constructor() {
     logger.info('AdvancedPatternAnalysisService initialized')
@@ -393,7 +393,7 @@ export class AdvancedPatternAnalysisService {
           results.reduce((sum, r) => sum + r.confidence, 0) / results.length
         insights = results.flatMap((r) => r.insights)
       } else {
-        enhancement = this.neuralNetworkModels.get(enhancementType) || null
+        enhancement = this.neuralNetworkModels.get(enhancementType) ?? null
         if (!enhancement) {
           throw new Error(`Enhancement model ${enhancementType} not found`)
         }
@@ -478,7 +478,7 @@ export class AdvancedPatternAnalysisService {
   private groupInterventionsByTechnique(
     interventions: InterventionEffectivenessResult[],
   ): Record<string, InterventionEffectivenessResult[]> {
-    return interventions.reduce(
+    return interventions.reduce< Record<string, InterventionEffectivenessResult[]>>(
       (groups, intervention) => {
         // Extract technique type from intervention ID or metadata
         const techniqueType = this.extractTechniqueType(intervention)
@@ -490,7 +490,7 @@ export class AdvancedPatternAnalysisService {
 
         return groups
       },
-      {} as Record<string, InterventionEffectivenessResult[]>,
+      {},
     )
   }
 
@@ -877,7 +877,7 @@ export class AdvancedPatternAnalysisService {
    * Get insights for a specific session
    */
   getSessionInsights(sessionId: string): TherapeuticInsight[] {
-    return this.insightHistory.get(sessionId) || []
+    return this.insightHistory.get(sessionId) ?? []
   }
 }
 

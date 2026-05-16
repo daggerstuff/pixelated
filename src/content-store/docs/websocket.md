@@ -1,12 +1,15 @@
 ---
-title: 'WebSocket Implementation'
-description: 'Guide to implementing and using WebSocket connections'
-pubDate: 2025-03-24
+title: WebSocket Implementation
+description: Guide to implementing and using WebSocket connections
+pubDate: '2025-03-24'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['websocket', 'real-time', 'communication']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - websocket
+  - real-time
+  - communication
+author: Pixelated Team
 ---
 
 ## WebSocket System

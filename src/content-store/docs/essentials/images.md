@@ -1,12 +1,12 @@
 ---
-title: 'Images and Embeds'
-description: 'Add image, video, and other HTML elements'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: Images and Embeds
+description: Add image, video, and other HTML elements
+pubDate: '2026-03-01'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
-icon: 'image'
+icon: image
 ---
 
 ## Image

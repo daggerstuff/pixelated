@@ -26,6 +26,18 @@ type WSCloseHandler = () => void
 // Define type for mock calls
 type MockCall = [string, WSMessageHandler | WSCloseHandler]
 
+type MockWebSocket = WebSocket & {
+  send: MockFn
+  on: MockFn
+  readyState: number
+}
+
+const createMockWebSocket = (): MockWebSocket => ({
+  send: vi.fn(),
+  on: vi.fn(),
+  readyState: 1,
+}) as MockWebSocket
+
 // Helper function to type-check mock calls
 const findMockCall = (calls: unknown[], type: string): MockCall | undefined => {
   return calls.find(
@@ -35,21 +47,31 @@ const findMockCall = (calls: unknown[], type: string): MockCall | undefined => {
 }
 
 // --- Mock for 'ws' module ---
-const mockWssInstance = {
-  on: vi.fn(),
-  // Add other methods/properties if TherapyChatWebSocketServer uses them later
-}
-vi.mock('ws', () => ({
-  // Mock the WebSocketServer class constructor
-  WebSocketServer: vi.fn().mockImplementation(() => mockWssInstance),
-  // Mock the WebSocket class constructor
-  WebSocket: vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
+vi.mock('ws', () => {
+  const mockWssInstance = {
     on: vi.fn(),
-    readyState: 1, // Simulate WebSocket.OPEN
-    // Add other necessary WebSocket properties/methods if needed by the code
-  })),
-}))
+    // Add other methods/properties if TherapyChatWebSocketServer uses them later
+  }
+
+  const mockWebSocketConstructor = vi.fn().mockImplementation(function () {
+    return {
+      send: vi.fn(),
+      on: vi.fn(),
+      readyState: 1, // Simulate WebSocket.OPEN
+      // Add other necessary WebSocket properties/methods if needed by the code
+    }
+  })
+  mockWebSocketConstructor.OPEN = 1
+
+  return {
+    // Mock the WebSocketServer class constructor
+    WebSocketServer: vi.fn().mockImplementation(function () {
+      return mockWssInstance
+    }),
+    // Mock the WebSocket class constructor
+    WebSocket: mockWebSocketConstructor,
+  }
+})
 // --- End Mock ---
 
 describe('therapyChatWebSocketServer', () => {
@@ -69,12 +91,8 @@ describe('therapyChatWebSocketServer', () => {
     // Mock the underlying HTTP server (minimal object, likely sufficient)
     mockHttpServer = {}
 
-    // Create a mock WebSocket client instance for tests using the mock constructor
-    mockWebSocket = new MockWebSocket() as WebSocket & {
-      send: MockFn
-      on: MockFn
-      readyState: number
-    }
+    // Create a mock WebSocket client instance for tests
+    mockWebSocket = createMockWebSocket()
 
     // Create TherapyChatWebSocketServer instance, passing the mock HTTP server.
     // Its internal `new WebSocketServer({ server })` will use the mock from vi.mock('ws').
@@ -83,32 +101,11 @@ describe('therapyChatWebSocketServer', () => {
     // Store reference to internal clients map (optional, if needed for assertions)
     mockClients = (wss as unknown).clients
 
-    // Important: Clear the listeners attached to the *mock server instance* before each test
-    vi.mocked(mockWssInstance.on).mockClear()
   })
 
   afterEach(() => {
     vi.clearAllMocks()
   })
-
-  // Helper to simulate a connection event on the mocked WebSocketServer
-  const simulateConnection = (wsInstance: WebSocket) => {
-    // Find the 'connection' handler registered by TherapyChatWebSocketServer constructor
-    const connectionHandler = vi
-      .mocked(mockWssInstance.on)
-      .mock.calls.find(
-        (call: [string, ConnectionHandler]) => call[0] === 'connection',
-      )?.[1] as ConnectionHandler
-    if (connectionHandler) {
-      // Invoke the handler, passing the mock WebSocket client
-      connectionHandler(wsInstance)
-    } else {
-      // This error means TherapyChatWebSocketServer didn't attach its listener as expected
-      throw new Error(
-        "WebSocketServer 'connection' handler not registered by TherapyChatWebSocketServer constructor",
-      )
-    }
-  }
 
   describe('handleConnection', () => {
     it('should add new client on connection', () => {
@@ -127,8 +124,8 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle message events', async () => {
-      // Simulate connection
-      simulateConnection(mockWebSocket)
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      handleConnection(mockWebSocket)
 
       // Get message handler attached to the mock *client*
       const messageHandler = findMockCall(
@@ -251,7 +248,7 @@ describe('therapyChatWebSocketServer', () => {
   describe('broadcast methods', () => {
     it('should broadcast to specific session', () => {
       const sessionId = '123'
-      const clientId = process.env.CLIENT_ID || 'example-client-id'
+      const clientId = process.env.CLIENT_ID ?? 'example-client-id'
 
       // Add client to session
       mockClients.set(clientId, mockWebSocket)

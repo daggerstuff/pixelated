@@ -225,7 +225,7 @@ export function SecurityProvider({
     }
 
     try {
-      const result = (await fheService.decrypt?.(data)) || data
+      const result = (await fheService.decrypt?.(data)) ?? data
       // Try to parse the result as JSON if it's a string
       if (typeof result === 'string') {
         try {
