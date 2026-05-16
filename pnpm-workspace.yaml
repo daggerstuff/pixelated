@@ -38,4 +38,10 @@ minimumReleaseAgeExclude:
 overrides:
   path-to-regexp@>=4.0.0 <6.3.0: ^6.3.0
   yaml@>=2.0.0 <2.8.3: ^2.8.3
+  devalue@<5.8.1: ^5.8.1
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': '8.0.2'
+<<<<<<< HEAD
+  devalue: 5.8.1
+=======
+  devalue@<5.8.1: ^5.8.1
+>>>>>>> origin/staging
