@@ -62,6 +62,44 @@ const DASHBOARD_TAB_ICONS: Record<
 const isTimeRange = (value: string): value is TimeRange =>
   (TIME_RANGES as readonly string[]).includes(value)
 
+// Mock data - defined at module scope to maintain referential identity across renders
+const MOCK_PATIENTS: PatientSummary[] = [
+  {
+    id: '1',
+    name: 'Sarah Johnson',
+    lastSession: new Date('2024-01-15'),
+    riskLevel: 'medium',
+    progress: 65,
+    nextAppointment: new Date('2024-01-22'),
+    alerts: ['Missed last homework', 'Anxiety spike detected'],
+  },
+  {
+    id: '2',
+    name: 'Michael Chen',
+    lastSession: new Date('2024-01-14'),
+    riskLevel: 'low',
+    progress: 80,
+    nextAppointment: new Date('2024-01-21'),
+    alerts: [],
+  },
+  {
+    id: '3',
+    name: 'Emily Rodriguez',
+    lastSession: new Date('2024-01-13'),
+    riskLevel: 'high',
+    progress: 45,
+    nextAppointment: new Date('2024-01-20'),
+    alerts: ['Requires immediate attention', 'Family session needed'],
+  },
+]
+
+const MOCK_SESSION_METRICS: SessionMetrics = {
+  totalSessions: 47,
+  avgSessionLength: 52, // minutes
+  completionRate: 94,
+  patientSatisfaction: 4.2, // out of 5
+}
+
 /**
  * Comprehensive Therapist Dashboard for Mental Health Professionals
  */
@@ -80,43 +118,21 @@ export const TherapistDashboard: FC = () => {
     [],
   )
 
-  // Mock data - in real app would come from API
-  const patients: PatientSummary[] = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      lastSession: new Date('2024-01-15'),
-      riskLevel: 'medium',
-      progress: 65,
-      nextAppointment: new Date('2024-01-22'),
-      alerts: ['Missed last homework', 'Anxiety spike detected'],
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      lastSession: new Date('2024-01-14'),
-      riskLevel: 'low',
-      progress: 80,
-      nextAppointment: new Date('2024-01-21'),
-      alerts: [],
-    },
-    {
-      id: '3',
-      name: 'Emily Rodriguez',
-      lastSession: new Date('2024-01-13'),
-      riskLevel: 'high',
-      progress: 45,
-      nextAppointment: new Date('2024-01-20'),
-      alerts: ['Requires immediate attention', 'Family session needed'],
-    },
-  ]
+  // Use module-level mock data to maintain referential identity
+  const patients = MOCK_PATIENTS
+  const sessionMetrics = MOCK_SESSION_METRICS
 
-  const sessionMetrics: SessionMetrics = {
-    totalSessions: 47,
-    avgSessionLength: 52, // minutes
-    completionRate: 94,
-    patientSatisfaction: 4.2, // out of 5
-  }
+  // ⚡ Bolt: Memoize the patient selection handler to prevent unnecessary re-renders of child tabs
+  const handlePatientSelect = React.useCallback(
+    (patientId: string) => {
+      setSelectedPatients((prev) =>
+        prev.includes(patientId)
+          ? prev.filter((id) => id !== patientId)
+          : [...prev, patientId],
+      )
+    },
+    [setSelectedPatients],
+  )
 
   const analyticsData = patients.map((patient, _index) => ({
     patientId: patient.id,
@@ -207,15 +223,7 @@ export const TherapistDashboard: FC = () => {
             <OverviewTab
               patients={patients}
               metrics={sessionMetrics}
-              onPatientSelect={(patientId) => {
-                if (selectedPatients.includes(patientId)) {
-                  setSelectedPatients((prev) =>
-                    prev.filter((id) => id !== patientId),
-                  )
-                } else {
-                  setSelectedPatients((prev) => [...prev, patientId])
-                }
-              }}
+              onPatientSelect={handlePatientSelect}
               selectedPatients={selectedPatients}
               timeRange={timeRange}
             />
@@ -224,15 +232,7 @@ export const TherapistDashboard: FC = () => {
           {dashboardView === 'patients' && (
             <PatientsTab
               patients={patients}
-              onPatientSelect={(patientId) => {
-                if (selectedPatients.includes(patientId)) {
-                  setSelectedPatients((prev) =>
-                    prev.filter((id) => id !== patientId),
-                  )
-                } else {
-                  setSelectedPatients((prev) => [...prev, patientId])
-                }
-              }}
+              onPatientSelect={handlePatientSelect}
               selectedPatients={selectedPatients}
             />
           )}
