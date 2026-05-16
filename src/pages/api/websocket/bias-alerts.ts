@@ -16,17 +16,17 @@ const logger = createBuildSafeLogger('BiasAlertsWebSocketAPI')
 let wsServer: BiasWebSocketServer | null = null
 
 const wsConfig = {
-  port: parseInt(process.env['WS_PORT'] || '8080'),
+  port: parseInt(process.env['WS_PORT'] ?? '8080'),
   heartbeatInterval: 30000, // 30 seconds
-  maxConnections: parseInt(process.env['WS_MAX_CONNECTIONS'] || '1000'),
+  maxConnections: parseInt(process.env['WS_MAX_CONNECTIONS'] ?? '1000'),
   authRequired: process.env['WS_AUTH_REQUIRED'] === 'true',
-  corsOrigins: process.env['WS_CORS_ORIGINS']?.split(',') || [
+  corsOrigins: process.env['WS_CORS_ORIGINS']?.split(',') ?? [
     'http://localhost:3000',
     'http://localhost:4321',
   ],
   rateLimitConfig: {
-    maxMessagesPerMinute: parseInt(process.env['WS_RATE_LIMIT'] || '60'),
-    banDurationMs: parseInt(process.env['WS_BAN_DURATION'] || '300000'), // 5 minutes
+    maxMessagesPerMinute: parseInt(process.env['WS_RATE_LIMIT'] ?? '60'),
+    banDurationMs: parseInt(process.env['WS_BAN_DURATION'] ?? '300000'), // 5 minutes
   },
 }
 
@@ -124,9 +124,9 @@ export const POST = async ({ request }: { request: Request }) => {
       alertId: `test_${Date.now()}`,
       type,
       level,
-      message: message || `Test bias alert - ${level} level`,
+      message: message ?? `Test bias alert - ${level} level`,
       timestamp: new Date(),
-      sessionId: sessionId || `test_session_${Date.now()}`,
+      sessionId: sessionId ?? `test_session_${Date.now()}`,
       acknowledged: false,
       details: {
         test: true,

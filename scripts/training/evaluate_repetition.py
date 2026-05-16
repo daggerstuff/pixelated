@@ -29,7 +29,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 try:
     from peft import PeftModel
-except ImportError:  # pragma: no cover - optional dependency at runtime
+except ImportError:
     PeftModel = None
 
 

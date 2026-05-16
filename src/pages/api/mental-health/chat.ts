@@ -690,7 +690,7 @@ export const POST: APIRoute = async ({ request }) => {
       metadata: {
         responseGenerated: new Date().toISOString(),
         processingTime,
-        conversationLength: body.userContext?.previousMessages?.length || 1,
+        conversationLength: body.userContext?.previousMessages?.length ?? 1,
         flags,
       },
     }
@@ -700,7 +700,7 @@ export const POST: APIRoute = async ({ request }) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Session-ID': response.sessionId,
-        'X-Risk-Level': riskAssessment?.crisisLevel || 'none',
+        'X-Risk-Level': riskAssessment?.crisisLevel ?? 'none',
         'X-Processing-Time': processingTime.toString(),
       },
     })

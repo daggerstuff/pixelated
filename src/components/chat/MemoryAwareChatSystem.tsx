@@ -12,21 +12,21 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card/index.ts'
+import { Label } from '@/components/ui/label.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from '@/components/ui/tooltip.tsx'
 import {
   useChatWithMemory,
   UseChatWithMemoryReturn,
 } from '@/hooks/useChatWithMemory'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 
@@ -60,7 +60,7 @@ export function MemoryAwareChatSystem({
 
   const { messages, isLoading, sendMessage, memory }: UseChatWithMemoryReturn =
     useChatWithMemory({
-      sessionId: sessionId as string,
+      sessionId: sessionId!,
       enableMemory,
       enableAnalysis,
       maxMemoryContext: 15,
@@ -133,7 +133,7 @@ export function MemoryAwareChatSystem({
           <div className='grid grid-cols-3 gap-3 text-sm'>
             <div className='bg-blue-50 dark:bg-blue-950/20 rounded p-2 text-center'>
               <div className='text-blue-700 dark:text-blue-300 font-semibold'>
-                {memory.stats?.totalMemories || 0}
+                {memory.stats?.totalMemories ?? 0}
               </div>
               <div className='text-blue-600 dark:text-blue-400 text-xs'>
                 Total Memories
@@ -372,7 +372,7 @@ export function MemoryAwareChatSystem({
           <div className='flex items-center gap-2'>
             {user && (
               <div className='text-gray-500 dark:text-gray-400 text-xs'>
-                User: {String(user.fullName || user.email)}
+                User: {(user.fullName ?? user.email)}
               </div>
             )}
             <Brain className='text-blue-600 h-5 w-5' />
@@ -391,7 +391,7 @@ export function MemoryAwareChatSystem({
             <span className='text-sm font-medium'>Error</span>
           </div>
           <p className='text-red-600 dark:text-red-400 mt-1 text-sm'>
-            {memory.error.toString()}
+            {memory.error}
           </p>
         </div>
       )}

@@ -70,8 +70,8 @@ export interface WeightAdjustment {
 import { getContextualObjectiveWeights } from '../prioritization/context-objective-mapper'
 
 export class ObjectiveWeightingEngine {
-  private adjustmentParams: WeightAdjustmentParams
-  private performanceHistory: Map<string, number[]> = new Map()
+  private readonly adjustmentParams: WeightAdjustmentParams
+  private readonly performanceHistory: Map<string, number[]> = new Map()
   private adjustmentHistory: WeightAdjustment[] = []
 
   constructor(adjustmentParams: WeightAdjustmentParams) {
@@ -254,7 +254,7 @@ export class ObjectiveWeightingEngine {
 
     // Adaptive weighting based on recent performance and context changes
     for (const [objectiveId, baseWeight] of Object.entries(baseWeights)) {
-      const performanceHistory = this.performanceHistory.get(objectiveId) || []
+      const performanceHistory = this.performanceHistory.get(objectiveId) ?? []
 
       if (performanceHistory.length > 0) {
         const recentPerformance = performanceHistory.slice(-5) // Last 5 evaluations
@@ -300,7 +300,7 @@ export class ObjectiveWeightingEngine {
     const weights = { ...baseWeights }
 
     for (const objective of objectives) {
-      const history = this.performanceHistory.get(objective.id) || []
+      const history = this.performanceHistory.get(objective.id) ?? []
 
       if (history.length >= this.adjustmentParams.performanceWindow) {
         const recentHistory = history.slice(
@@ -387,12 +387,12 @@ export class ObjectiveWeightingEngine {
     if (total === 0) {
       // Equal weights if all are zero
       const equalWeight = 1.0 / Object.keys(weights).length
-      return Object.keys(weights).reduce(
+      return Object.keys(weights).reduce< Record<string, number>>(
         (normalized, id) => {
           normalized[id] = equalWeight
           return normalized
         },
-        {} as Record<string, number>,
+        {},
       )
     }
 
@@ -439,6 +439,9 @@ export class ObjectiveWeightingEngine {
       case ContextType.EDUCATIONAL:
         clarity += 0.1
         break
+      case ContextType.SUPPORT: { throw new Error('Not implemented yet: ContextType.SUPPORT case') }
+      case ContextType.INFORMATIONAL: { throw new Error('Not implemented yet: ContextType.INFORMATIONAL case') }
+      case ContextType.GENERAL: { throw new Error('Not implemented yet: ContextType.GENERAL case') }
     }
 
     return Math.min(1.0, clarity)

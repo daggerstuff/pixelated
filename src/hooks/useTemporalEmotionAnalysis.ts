@@ -81,7 +81,7 @@ export function useTemporalEmotionAnalysis(
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.error || 'Unknown error')
+        throw new Error(result.error ?? 'Unknown error')
       }
 
       setData(result.data)
@@ -157,7 +157,7 @@ export function useEmotionProgression(
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.error || 'Unknown error')
+        throw new Error(result.error ?? 'Unknown error')
       }
 
       setProgression(result.data.progression)
@@ -234,7 +234,7 @@ export function useEmotionPatterns(
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.error || 'Unknown error')
+        throw new Error(result.error ?? 'Unknown error')
       }
 
       setPatterns(result.data.patterns)

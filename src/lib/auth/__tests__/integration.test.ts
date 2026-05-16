@@ -101,19 +101,29 @@ vi.mock('bcryptjs', () => ({
   genSalt: vi.fn(),
 }))
 
+
 // Mock Node.js built-in modules with node: prefix
+const { mockRandomBytes, mockRandomUUID } = vi.hoisted(() => ({
+  mockRandomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
+  mockRandomUUID: vi.fn().mockReturnValue('test-uuid'),
+}))
+
 vi.mock('node:buffer', () => ({
   Buffer: globalThis.Buffer,
 }))
 
 vi.mock('node:crypto', () => ({
-  default: {
-    randomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
-    randomUUID: vi.fn().mockReturnValue('test-uuid'),
-  },
-  randomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
-  randomUUID: vi.fn().mockReturnValue('test-uuid'),
+  Buffer: globalThis.Buffer,
+  createHash: vi.fn(),
+  createHmac: vi.fn(),
+  randomBytes: mockRandomBytes,
+  randomUUID: mockRandomUUID,
+  randomFillSync: vi.fn(),
+  pbkdf2Sync: vi.fn(),
+  randomFill: vi.fn(),
+  randomInt: vi.fn(),
 }))
+
 
 import {
   GET as profileGetHandler,
@@ -305,7 +315,7 @@ describe('Authentication System Integration', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer access.token.456',
+          'Authorization': 'Bearer access.token.456',
           'X-CSRF-Token': 'valid-csrf-token',
         },
       })
@@ -686,10 +696,12 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      const refreshContext: Parameters<typeof refreshHandler>[0] = {
+      const refreshContext = {
         request: refreshRequest,
+        clientAddress: mockClientInfo.ip,
       }
 
+      // @ts-expect-error APIRoute context type requires full Astro API context in tests.
       await refreshHandler(refreshContext)
 
       expect(
@@ -709,7 +721,7 @@ describe('Authentication System Integration', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer valid.token',
+          'Authorization': 'Bearer valid.token',
           'X-CSRF-Token': 'valid-csrf-token',
         },
       })
@@ -809,7 +821,7 @@ describe('Authentication System Integration', () => {
       const request = new Request('https://example.com/api/auth/profile', {
         method: 'PUT',
         headers: {
-          Authorization: 'Bearer valid.token',
+          'Authorization': 'Bearer valid.token',
           'Content-Type': 'application/json',
           'X-CSRF-Token': 'valid-token',
         },

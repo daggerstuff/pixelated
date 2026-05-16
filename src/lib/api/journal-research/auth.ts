@@ -3,7 +3,7 @@
  * Integrates with Better Auth for session management
  */
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import storageManager from '@/utils/storage/storageManager'
 

@@ -132,13 +132,19 @@ describe('useProgress hooks', () => {
       expect(api.getProgressMetrics).toHaveBeenCalledWith('session-1')
     })
 
-    it('supports refetchInterval', () => {
+    it('supports refetchInterval', async () => {
+      vi.mocked(api.getProgressMetrics).mockResolvedValue(mockProgressMetrics)
+
       const { result } = renderHook(
         () => useProgressMetricsQuery('session-1', { refetchInterval: 5000 }),
         {
           wrapper: createWrapper(),
         },
       )
+
+      await waitFor(() => {
+        expect(result.current.data).toBeDefined()
+      })
 
       expect(result.current.data).toBeDefined()
       // The refetchInterval should be set in the query options

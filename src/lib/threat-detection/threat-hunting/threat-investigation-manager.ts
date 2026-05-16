@@ -16,10 +16,10 @@ const MAX_FINDINGS_PER_INVESTIGATION = 500
  */
 export class ThreatInvestigationManager extends EventEmitter {
   constructor(
-    private repository: ThreatInvestigationRepository,
-    private reportGenerator: ThreatReportGenerator,
-    private aiService?: any,
-    private behavioralService?: any,
+    private readonly repository: ThreatInvestigationRepository,
+    private readonly reportGenerator: ThreatReportGenerator,
+    private readonly aiService?: any,
+    private readonly behavioralService?: any,
   ) {
     super()
   }
@@ -95,13 +95,13 @@ export class ThreatInvestigationManager extends EventEmitter {
           if (this.behavioralService) {
             // Extract userId from params or investigation context
             const userId =
-              params.userId ||
-              params.user_id ||
-              investigation.assignedTo ||
+              ((params.userId ??
+              params.user_id) ??
+              investigation.assignedTo) ??
               'unknown'
             // Map timeWindow (ms) to timeframe format or use provided timeframe
             const timeframe =
-              params.timeframe || this.formatTimeframe(params.timeWindow)
+              params.timeframe ?? this.formatTimeframe(params.timeWindow)
             stepFindings = await this.behavioralService.analyzeUserBehavior(
               String(userId),
               timeframe,
@@ -118,7 +118,7 @@ export class ThreatInvestigationManager extends EventEmitter {
 
         case 'generate_report':
           const report = this.reportGenerator.generateHuntReport(
-            investigation.huntId || 'manual',
+            investigation.huntId ?? 'manual',
             investigation.findings as any[],
           )
           this.emit('report_generated', { investigationId, report })

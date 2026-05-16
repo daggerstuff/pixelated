@@ -6,7 +6,7 @@ import {
   calculateWordCount,
   formatBlogDate,
   validateBlogPost,
-} from '@/utils/blog'
+} from '../../utils/blog'
 
 describe('Blog utilities', () => {
   describe('calculateReadingTime', () => {

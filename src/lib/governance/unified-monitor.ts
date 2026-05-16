@@ -20,13 +20,13 @@ const MAX_EVENTS_PER_SOURCE = 1000 // Memory limit
 
 export class UnifiedMonitor {
   // Source-keyed storage for O(1) lookups
-  private eventsBySource: Map<string, MonitorEvent[]> = new Map()
-  private alertHandlers: AlertHandler[] = []
-  private failureCounts: Map<string, number> = new Map()
+  private readonly eventsBySource: Map<string, MonitorEvent[]> = new Map()
+  private readonly alertHandlers: AlertHandler[] = []
+  private readonly failureCounts: Map<string, number> = new Map()
 
   async record(event: MonitorEvent): Promise<void> {
     // Store event in source-keyed map (O(1) insertion)
-    const sourceEvents = this.eventsBySource.get(event.source) || []
+    const sourceEvents = this.eventsBySource.get(event.source) ?? []
     sourceEvents.push(event)
 
     // Enforce memory limit - remove oldest events if exceeded
@@ -41,7 +41,7 @@ export class UnifiedMonitor {
     // Check alert thresholds synchronously before any await
     if (event.event === 'compliance_failure') {
       const key = `${event.source}:compliance_failure`
-      const count = (this.failureCounts.get(key) || 0) + 1
+      const count = (this.failureCounts.get(key) ?? 0) + 1
       this.failureCounts.set(key, count)
 
       // Trigger alert synchronously if threshold reached
@@ -63,7 +63,7 @@ export class UnifiedMonitor {
   }
 
   getEvents(source: string): MonitorEvent[] {
-    return this.eventsBySource.get(source) || []
+    return this.eventsBySource.get(source) ?? []
   }
 
   getAllEvents(): MonitorEvent[] {

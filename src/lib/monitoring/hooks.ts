@@ -59,7 +59,7 @@ export function useMonitoring() {
     (path: string, referrer?: string, details?: Record<string, unknown>) => {
       trackEvent('page_view', {
         path,
-        referrer: referrer || document.referrer,
+        referrer: referrer ?? document.referrer,
         title: document.title,
         ...details,
         timestamp: Date.now(),

@@ -4,10 +4,7 @@ import {
   CloudWatchClient,
   PutMetricDataCommand,
 } from '@aws-sdk/client-cloudwatch'
-import {
-  LambdaClient,
-  InvokeCommand,
-} from '@aws-sdk/client-lambda'
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
 import {
   Route53Client,
   ChangeResourceRecordSetsCommand,
@@ -1281,9 +1278,9 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
             : response.Payload instanceof Uint8Array
               ? new TextDecoder().decode(response.Payload)
               : null
-      if (!decodedPayload) {
-        return null
-      }
+        if (!decodedPayload) {
+          return null
+        }
 
         const parsedPayload = this.parseLambdaPayload(decodedPayload)
         if (
@@ -1334,16 +1331,16 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
     this.healthMonitor.on(
       'healthStatusChanged',
       async (data: { region: string; status: 'healthy' | 'unhealthy' }) => {
-      if (
-        data.region === this.currentPrimaryRegion &&
-        data.status === 'unhealthy'
-      ) {
-        this.logger.warn(
-          'Primary region health status changed to unhealthy',
-          data,
-        )
-        await this.evaluateFailover()
-      }
+        if (
+          data.region === this.currentPrimaryRegion &&
+          data.status === 'unhealthy'
+        ) {
+          this.logger.warn(
+            'Primary region health status changed to unhealthy',
+            data,
+          )
+          await this.evaluateFailover()
+        }
       },
     )
 

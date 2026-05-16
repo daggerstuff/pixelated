@@ -19,7 +19,7 @@ export function resolveActorIdentity(
   const actorId = locals?.user?.id?.trim()
   const role = locals?.user?.role?.trim()
   return {
-    actorId: actorId || undefined,
+    actorId: actorId ?? undefined,
     role,
     hasPrivilege: role ? PRIVILEGED_ROLES.has(role) : false,
   }

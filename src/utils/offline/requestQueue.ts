@@ -31,7 +31,7 @@ export interface RequestQueueOptions {
 class RequestQueue {
   private queue: QueuedRequest[] = []
   private isProcessing = false
-  private options: Required<RequestQueueOptions>
+  private readonly options: Required<RequestQueueOptions>
 
   constructor(options: RequestQueueOptions = {}) {
     this.options = {

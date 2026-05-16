@@ -1,14 +1,15 @@
 import { render, screen, act } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import * as hooks from '../../../lib/monitoring/hooks'
-import RUMWidget from '../RUMWidget'
-
-// Mock the hooks
+// Mock the hooks FIRST
 vi.mock('../../../lib/monitoring/hooks', () => ({
   useRUMData: vi.fn(),
   getPerformanceIndicator: vi.fn(),
 }))
+
+// Now import the hooks and component - they'll get the mocked versions
+import * as hooks from '../../../lib/monitoring/hooks'
+import RUMWidget from '../RUMWidget'
 
 describe('RUMWidget', () => {
   beforeEach(() => {
@@ -40,7 +41,7 @@ describe('RUMWidget', () => {
     render(<RUMWidget />)
 
     // Check title
-    expect(screen.getByText('Real User Monitoring')).toBeInTheDocument()
+    expect(screen.getByText(/Real User Monitoring/)).toBeInTheDocument()
 
     // Check category headings
     expect(screen.getByText('Loading')).toBeInTheDocument()

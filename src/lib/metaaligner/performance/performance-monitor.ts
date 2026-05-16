@@ -20,7 +20,7 @@ export interface IPerformanceMonitor {
  * The PerformanceMonitor class.
  */
 export class PerformanceMonitor implements IPerformanceMonitor {
-  private timings: Map<
+  private readonly timings: Map<
     string,
     { start: number; end?: number; duration?: number }
   > = new Map()

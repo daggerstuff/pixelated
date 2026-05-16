@@ -108,7 +108,7 @@ class ExportError extends Error {
 export class ExportService {
   private static instance: ExportService
 
-  private fheService: FHEServiceInterface
+  private readonly fheService: FHEServiceInterface
   private initialized = false
 
   /**
@@ -262,7 +262,7 @@ export class ExportService {
         id: msg.id,
         role: msg.role,
         content: msg.content,
-        timestamp: msg.timestamp || Date.now(),
+        timestamp: msg.timestamp ?? Date.now(),
       })),
       metadata: options.includeMetadata
         ? {

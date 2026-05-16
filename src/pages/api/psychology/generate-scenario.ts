@@ -451,7 +451,7 @@ export const POST = async ({ request }: APIContext) => {
       )
     }
 
-    const framework = body.framework || 'CBT'
+    const framework = body.framework ?? 'CBT'
     const options = {
       includeAssessment: true,
       includeLearningObjectives: true,

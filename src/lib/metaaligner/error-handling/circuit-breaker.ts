@@ -35,8 +35,8 @@ export class CircuitBreaker implements ICircuitBreaker {
   private nextAttempt: number = Date.now()
 
   constructor(
-    private failureThreshold = 3,
-    private resetTimeout = 10000,
+    private readonly failureThreshold = 3,
+    private readonly resetTimeout = 10000,
   ) {}
 
   public async fire<T>(fn: () => Promise<T>): Promise<T> {

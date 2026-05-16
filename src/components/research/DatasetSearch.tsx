@@ -18,16 +18,16 @@ export default function DatasetSearch() {
 
   // Automatically search when filters change
   React.useEffect(() => {
-    return undefined
-    if (hasSearched) {
-      const timer = setTimeout(() => {
-        void handleSearch().catch((err) => {
-          console.error('Auto-search failure:', err)
-        })
-      }, 250)
-      return () => clearTimeout(timer)
+    if (!hasSearched) {
+      return
     }
-  }, [minTurns, minQuality])
+    const timer = setTimeout(() => {
+      void handleSearch().catch((err) => {
+        console.error('Auto-search failure:', err)
+      })
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [hasSearched, minTurns, minQuality])
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -55,7 +55,7 @@ export default function DatasetSearch() {
     } catch (err: any) {
       console.error('Dataset search error:', err)
       setError(
-        err.message ||
+        err.message ??
           'Failed to fetch datasets. Please ensure the backend services are running.',
       )
     } finally {
@@ -64,74 +64,74 @@ export default function DatasetSearch() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-6xl p-4' role='main'>
-      <div className='flex flex-col gap-8'>
+    <div className="mx-auto w-full max-w-6xl p-4" role="main">
+      <div className="flex flex-col gap-8">
         {/* Search Header & Controls */}
         <div
-          className='bg-slate-800/50 border-slate-700 flex flex-col items-end gap-4 rounded-2xl border p-6 md:flex-row'
-          role='search'
+          className="bg-slate-800/50 border-slate-700 flex flex-col items-end gap-4 rounded-2xl border p-6 md:flex-row"
+          role="search"
         >
-          <div className='w-full flex-grow'>
+          <div className="w-full flex-grow">
             <label
-              htmlFor='dataset-search'
-              className='text-slate-300 mb-2 block text-sm font-medium'
+              htmlFor="dataset-search"
+              className="text-slate-300 mb-2 block text-sm font-medium"
             >
               Search Datasets
             </label>
-            <div className='relative'>
+            <div className="relative">
               <input
-                id='dataset-search'
-                type='text'
+                id="dataset-search"
+                type="text"
                 disabled={loading}
-                className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 focus:border-transparent w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50'
-                placeholder='e.g., cbt therapy, depression, multi-turn'
+                className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 focus:border-transparent w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="e.g., cbt therapy, depression, multi-turn"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) =>
                   e.key === 'Enter' && !loading && void handleSearch()
                 }
-                aria-label='Search therapeutic datasets'
+                aria-label="Search therapeutic datasets"
               />
-              <div className='absolute right-2 top-1/2 -translate-y-1/2 transform'>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 transform">
                 <button
                   onClick={() => void handleSearch()}
                   disabled={loading}
-                  className='bg-pink-600 hover:bg-pink-700 focus:ring-pink-500 text-white focus:ring-offset-slate-900 rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                  className="bg-pink-600 hover:bg-pink-700 focus:ring-pink-500 text-white focus:ring-offset-slate-900 rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={loading ? 'Searching datasets' : 'Run search'}
                 >
                   {loading ? (
                     <svg
-                      className='h-5 w-5 animate-spin'
-                      fill='none'
-                      viewBox='0 0 24 24'
+                      className="h-5 w-5 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
                     >
                       <circle
-                        className='opacity-25'
-                        cx='12'
-                        cy='12'
-                        r='10'
-                        stroke='currentColor'
-                        strokeWidth='4'
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
                       ></circle>
                       <path
-                        className='opacity-75'
-                        fill='currentColor'
-                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
                   ) : (
                     <svg
-                      className='h-5 w-5'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                      aria-hidden='true'
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                       ></path>
                     </svg>
                   )}
@@ -140,47 +140,47 @@ export default function DatasetSearch() {
             </div>
           </div>
 
-          <div className='flex w-full gap-4 md:w-auto'>
-            <div className='w-full md:w-40'>
-              <div className='mb-1 flex justify-between'>
-                <label htmlFor='min-turns' className='text-slate-400 text-xs'>
+          <div className="flex w-full gap-4 md:w-auto">
+            <div className="w-full md:w-40">
+              <div className="mb-1 flex justify-between">
+                <label htmlFor="min-turns" className="text-slate-400 text-xs">
                   Min Turns
                 </label>
-                <span className='text-pink-400 font-mono text-xs'>
+                <span className="text-pink-400 font-mono text-xs">
                   {minTurns}
                 </span>
               </div>
               <input
-                id='min-turns'
-                type='range'
-                min='1'
-                max='50'
+                id="min-turns"
+                type="range"
+                min="1"
+                max="50"
                 value={minTurns}
                 onChange={(e) => setMinTurns(parseInt(e.target.value))}
-                className='bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg'
-                aria-label='Minimum conversation turns'
+                className="bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg"
+                aria-label="Minimum conversation turns"
               />
             </div>
 
-            <div className='w-full md:w-40'>
-              <div className='mb-1 flex justify-between'>
-                <label htmlFor='min-quality' className='text-slate-400 text-xs'>
+            <div className="w-full md:w-40">
+              <div className="mb-1 flex justify-between">
+                <label htmlFor="min-quality" className="text-slate-400 text-xs">
                   Min Quality
                 </label>
-                <span className='text-pink-400 font-mono text-xs'>
+                <span className="text-pink-400 font-mono text-xs">
                   {minQuality.toFixed(1)}
                 </span>
               </div>
               <input
-                id='min-quality'
-                type='range'
-                min='0'
-                max='1'
-                step='0.1'
+                id="min-quality"
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
                 value={minQuality}
                 onChange={(e) => setMinQuality(parseFloat(e.target.value))}
-                className='bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg'
-                aria-label='Minimum dataset quality score'
+                className="bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg"
+                aria-label="Minimum dataset quality score"
               />
             </div>
           </div>
@@ -188,7 +188,7 @@ export default function DatasetSearch() {
 
         {/* Results Area */}
         <div>
-          <div aria-live='polite' className='sr-only'>
+          <div aria-live="polite" className="sr-only">
             {loading && 'Searching datasets...'}
             {!loading &&
               hasSearched &&
@@ -196,37 +196,37 @@ export default function DatasetSearch() {
           </div>
           {loading && (
             <div
-              className='grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'
-              aria-busy='true'
+              className="grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+              aria-busy="true"
             >
               {[...Array(6)].map((_, i) => (
-                <div key={i} className='bg-slate-800 h-64 rounded-xl'></div>
+                <div key={i} className="bg-slate-800 h-64 rounded-xl"></div>
               ))}
             </div>
           )}
 
           {error && (
             <div
-              className='bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center'
-              role='alert'
+              className="bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center"
+              role="alert"
             >
               {error}
             </div>
           )}
 
           {!loading && !hasSearched && (
-            <div className='py-20 text-center'>
-              <ChartBar className='h-24 w-24 opacity-20' />
-              <h3 className='text-slate-200 mb-2 text-2xl font-bold'>
+            <div className="py-20 text-center">
+              <ChartBar className="h-24 w-24 opacity-20" />
+              <h3 className="text-slate-200 mb-2 text-2xl font-bold">
                 Explore Therapy Datasets
               </h3>
-              <p className='text-slate-400 mx-auto max-w-lg'>
+              <p className="text-slate-400 mx-auto max-w-lg">
                 Search across HuggingFace, Kaggle, and open repositories for
                 high-quality, multi-turn therapeutic conversations.
               </p>
               <button
                 onClick={() => void handleSearch()}
-                className='bg-slate-800 hover:bg-slate-700 text-pink-400 border-slate-700 mt-6 rounded-full border px-6 py-2 transition-colors'
+                className="bg-slate-800 hover:bg-slate-700 text-pink-400 border-slate-700 mt-6 rounded-full border px-6 py-2 transition-colors"
               >
                 Browse All Datasets
               </button>
@@ -234,7 +234,7 @@ export default function DatasetSearch() {
           )}
 
           {!loading && hasSearched && results.length === 0 && !error && (
-            <div className='text-slate-400 py-20 text-center'>
+            <div className="text-slate-400 py-20 text-center">
               <p>
                 No datasets found matching your criteria. Try adjusting the
                 filters.

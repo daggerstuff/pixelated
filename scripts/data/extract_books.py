@@ -26,6 +26,10 @@ Usage:
     python scripts/data/extract_books.py --input books/ --upload-s3 --s3-prefix books_extracted/
 """
 
+import argparse
+import html
+import json
+import logging
 import re
 import sys
 import time
@@ -35,9 +39,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import argparse
-import json
-import logging
 import os
 
 # PDF processing
@@ -57,13 +58,58 @@ except ImportError:
     EPUB_AVAILABLE = False
 
 # Pipeline components
+# Attempt to import optional pipeline components
 try:
     from ai.pipelines.design.hybrid_classifier import HybridTaxonomyClassifier
+except ImportError:
+
+    @dataclass(frozen=True)
+    class _FallbackTaxonomyCategory:
+        """Fallback taxonomy category returned when no classifier is installed."""
+
+        value: str = "therapeutic_conversation"
+
+    @dataclass(frozen=True)
+    class _FallbackClassification:
+        """Fallback classification result interface."""
+
+        category: _FallbackTaxonomyCategory
+
+    class _FallbackTaxonomyClassifier:
+        """Fallback classifier used when the optional taxonomy module is unavailable."""
+
+        def __init__(self, *args: object, **kwargs: object) -> None:
+            del args
+            del kwargs
+
+        def classify_record(self, _: dict[str, object]) -> _FallbackClassification:
+            return _FallbackClassification(_FallbackTaxonomyCategory())
+
+    HybridTaxonomyClassifier = _FallbackTaxonomyClassifier
+
+# Crisis detector is essential for safety filtering; import it separately
+try:
     from ai.safety.crisis_detection.production_crisis_detector import CrisisDetector
 
-    PIPELINE_COMPONENTS_AVAILABLE = True
+    CRISIS_DETECTOR_AVAILABLE = True
 except ImportError:
-    PIPELINE_COMPONENTS_AVAILABLE = False
+    CRISIS_DETECTOR_AVAILABLE = False
+
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+
+    BOTO3_AVAILABLE = True
+except ImportError:
+    boto3 = None
+
+    class _ClientError(Exception):
+        """Fallback error type when botocore is unavailable."""
+
+    ClientError: type[Exception] = _ClientError
+    BOTO3_AVAILABLE = False
+
+PIPELINE_COMPONENTS_AVAILABLE = HybridTaxonomyClassifier is not None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -178,16 +224,18 @@ class BooksExtractor:
         self.classifier = None
 
         # Initialize pipeline components
-        if PIPELINE_COMPONENTS_AVAILABLE:
-            if config.apply_safety_filter:
-                self.crisis_detector = CrisisDetector()
-                logger.info("✅ Crisis detector initialized (100% sensitivity)")
+        # Initialize optional components separately
+        if config.apply_safety_filter and PIPELINE_COMPONENTS_AVAILABLE and CRISIS_DETECTOR_AVAILABLE:
+            self.crisis_detector = CrisisDetector()
+            logger.info("✅ Crisis detector initialized (100% sensitivity)")
+        elif config.apply_safety_filter:
+            logger.warning("⚠️ Crisis detector unavailable - safety filtering disabled")
 
-            if config.apply_classification:
-                self.classifier = HybridTaxonomyClassifier(enable_llm=False)
-                logger.info("✅ Taxonomy classifier initialized")
-        else:
-            logger.warning("⚠️ Pipeline components not available - safety filtering disabled")
+        if config.apply_classification and PIPELINE_COMPONENTS_AVAILABLE:
+            self.classifier = HybridTaxonomyClassifier(enable_llm=False)
+            logger.info("✅ Taxonomy classifier initialized")
+        elif config.apply_classification:
+            logger.warning("⚠️ Classification component unavailable - classification disabled")
 
     def extract_from_pdf(self, file_path: Path) -> list[BookSegment]:
         """Extract text segments from a PDF file."""
@@ -198,83 +246,96 @@ class BooksExtractor:
         segments = []
         try:
             reader = PdfReader(str(file_path))
-            total_pages = len(reader.pages)
-
-            if self.config.max_pages:
-                total_pages = min(total_pages, self.config.max_pages)
+            total_pages = self._get_page_limit(len(reader.pages))
 
             logger.info(f"📖 Processing PDF: {file_path.name} ({total_pages} pages)")
 
-            # Extract book metadata from first pages
-            book_title = file_path.stem
-            author = "Unknown"
-            current_chapter = ""
-
-            # Try to extract title/author from first page
-            if total_pages > 0:
-                first_page_text = reader.pages[0].extract_text() or ""
-                title_author = self._extract_book_metadata(first_page_text)
-                if title_author.get("title"):
-                    book_title = title_author["title"]
-                if title_author.get("author"):
-                    author = title_author["author"]
-
-            # Process pages
-            full_text_by_chapter: dict[str, list[tuple[int, str]]] = {}
-            current_chapter_pages: list[tuple[int, str]] = []
-
-            for page_num in range(total_pages):
-                page = reader.pages[page_num]
-                page_text = page.extract_text() or ""
-
-                if not page_text.strip():
-                    continue
-
-                # Check for chapter markers
-                detected_chapter = self._detect_chapter(page_text)
-
-                if detected_chapter and detected_chapter != current_chapter:
-                    # Save previous chapter
-                    if current_chapter_pages:
-                        full_text_by_chapter[current_chapter] = current_chapter_pages
-
-                    current_chapter = detected_chapter
-                    current_chapter_pages = [(page_num + 1, page_text)]
-                else:
-                    current_chapter_pages.append((page_num + 1, page_text))
-
-            # Save last chapter
-            if current_chapter_pages:
-                full_text_by_chapter[current_chapter] = current_chapter_pages
+            book_title, author = self._extract_book_identity(reader, file_path, total_pages)
+            full_text_by_chapter = self._collect_pdf_chapters(reader, total_pages)
 
             # Create segments from chapters
             source_id_base = self._create_source_id(book_title)
-
             for chapter_name, pages in full_text_by_chapter.items():
-                combined_text = "\n\n".join(text for _, text in pages)
-                page_numbers = [p for p, _ in pages]
-
-                if len(combined_text) < self.config.min_content_length:
-                    continue
-
-                segment = BookSegment(
-                    source_id=f"{source_id_base}_{chapter_name or 'intro'}".replace(" ", "_").lower(),
-                    title=book_title,
-                    author=author,
-                    content_text=self._clean_text(combined_text),
-                    chapter=chapter_name,
-                    page_number=page_numbers[0] if page_numbers else 0,
-                    file_format="pdf",
-                    extraction_timestamp=datetime.now(timezone.utc).isoformat(),
-                )
-
-                segments.append(segment)
+                segment = self._create_segment_from_pages(source_id_base, (book_title, author), chapter_name, pages)
+                if segment is not None:
+                    segments.append(segment)
 
         except Exception as e:
             logger.error(f"Error processing PDF {file_path}: {e}")
 
         logger.info(f"✅ Extracted {len(segments)} segments from PDF")
         return segments
+
+    def _get_page_limit(self, total_pages: int) -> int:
+        """Apply configured max pages value."""
+        if self.config.max_pages:
+            return min(total_pages, self.config.max_pages)
+        return total_pages
+
+    def _extract_book_identity(self, reader: "PdfReader", file_path: Path, total_pages: int) -> tuple[str, str]:
+        """Extract title and author metadata from the first PDF page."""
+        book_title = file_path.stem
+        author = "Unknown"
+        if total_pages == 0:
+            return book_title, author
+
+        first_page_text = reader.pages[0].extract_text() or ""
+        metadata = self._extract_book_metadata(first_page_text)
+        if metadata.get("title"):
+            book_title = metadata["title"]
+        if metadata.get("author"):
+            author = metadata["author"]
+        return book_title, author
+
+    def _collect_pdf_chapters(self, reader: "PdfReader", total_pages: int) -> dict[str, list[tuple[int, str]]]:
+        """Collect text for each chapter from a PDF."""
+        full_text_by_chapter: dict[str, list[tuple[int, str]]] = {}
+        current_chapter_pages: list[tuple[int, str]] = []
+        current_chapter = ""
+
+        for page_num in range(total_pages):
+            page_text = reader.pages[page_num].extract_text() or ""
+            if not page_text.strip():
+                continue
+
+            detected_chapter = self._detect_chapter(page_text)
+            if detected_chapter and detected_chapter != current_chapter:
+                if current_chapter_pages:
+                    full_text_by_chapter[current_chapter] = current_chapter_pages
+                current_chapter = detected_chapter
+                current_chapter_pages = [(page_num + 1, page_text)]
+            else:
+                current_chapter_pages.append((page_num + 1, page_text))
+
+        if current_chapter_pages:
+            full_text_by_chapter[current_chapter] = current_chapter_pages
+
+        return full_text_by_chapter
+
+    def _create_segment_from_pages(
+        self,
+        source_id_base: str,
+        book_info: tuple[str, str],
+        chapter_name: str,
+        pages: list[tuple[int, str]],
+    ) -> BookSegment | None:
+        """Create a segment from chapter pages."""
+        combined_text = "\n\n".join(text for _, text in pages)
+        if len(combined_text) < self.config.min_content_length:
+            return None
+
+        book_title, author = book_info
+        page_numbers = [page_number for page_number, _ in pages]
+        return BookSegment(
+            source_id=f"{source_id_base}_{chapter_name or 'intro'}".replace(" ", "_").lower(),
+            title=book_title,
+            author=author,
+            content_text=self._clean_text(combined_text),
+            chapter=chapter_name,
+            page_number=page_numbers[0] if page_numbers else 0,
+            file_format="pdf",
+            extraction_timestamp=datetime.now(timezone.utc).isoformat(),
+        )
 
     def extract_from_epub(self, file_path: Path) -> list[BookSegment]:
         """Extract text segments from an EPUB file."""
@@ -340,7 +401,7 @@ class BooksExtractor:
         """Extract text segments from a plain text file."""
         segments = []
         try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 full_text = f.read()
 
             logger.info(f"📖 Processing TXT: {file_path.name}")
@@ -401,8 +462,8 @@ class BooksExtractor:
 
         lines = text.split("\n")[:20]  # Check first 20 lines
 
-        for line in lines:
-            line = line.strip()
+        for raw_line in lines:
+            line = raw_line.strip()
             if not line:
                 continue
 
@@ -428,8 +489,8 @@ class BooksExtractor:
         """Detect chapter name from text."""
         lines = text.split("\n")[:10]  # Check first 10 lines
 
-        for line in lines:
-            line = line.strip()
+        for raw_line in lines:
+            line = raw_line.strip()
             if not line:
                 continue
 
@@ -472,9 +533,6 @@ class BooksExtractor:
         # Remove HTML tags
         text = re.sub(r"<[^>]+>", " ", html_content)
 
-        # Decode HTML entities
-        import html
-
         text = html.unescape(text)
 
         # Normalize whitespace
@@ -495,8 +553,8 @@ class BooksExtractor:
         lines = text.split("\n")
         cleaned_lines = []
 
-        for line in lines:
-            line = line.strip()
+        for raw_line in lines:
+            line = raw_line.strip()
             if not line:
                 cleaned_lines.append("")
                 continue
@@ -605,21 +663,20 @@ class BooksExtractor:
 
         Requires HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY environment variables.
         """
-        try:
-            import boto3
-            from botocore.exceptions import ClientError
+        if not BOTO3_AVAILABLE or boto3 is None:
+            logger.error("❌ boto3 is not installed - cannot upload to S3")
+            return False
 
+        try:
             # Get S3 credentials from environment
             endpoint_url = os.getenv("HETZNER_S3_ENDPOINT", "https://hel1.your-objectstorage.com")
-            access_key = os.getenv("HETZNER_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
-            secret_key = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
+            access_key = os.getenv("HETZNER_S3_ACCESS_KEY")
+            secret_key = os.getenv("HETZNER_S3_SECRET_KEY")
             region = os.getenv("HETZNER_S3_REGION", "hel1")
             bucket = os.getenv("HETZNER_S3_BUCKET", "pixel-data")
 
             if not access_key or not secret_key:
-                logger.error(
-                    "❌ S3 credentials not found. Set HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY"
-                )
+                logger.error("❌ S3 credentials not found. Set HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY")
                 return False
 
             # Create S3 client
@@ -646,9 +703,7 @@ class BooksExtractor:
 
 def main():
     """Main entry point for books extraction."""
-    parser = argparse.ArgumentParser(
-        description="PIX-2: Extract therapeutic content from books (PDF/EPUB/TXT)"
-    )
+    parser = argparse.ArgumentParser(description="PIX-2: Extract therapeutic content from books (PDF/EPUB/TXT)")
 
     parser.add_argument(
         "--input",
@@ -702,126 +757,107 @@ def main():
 
     args = parser.parse_args()
 
-    # Initialize configuration
     config = BooksExtractionConfig(
         apply_safety_filter=not args.skip_safety,
         apply_classification=not args.skip_classification,
         max_pages=args.max_pages,
         min_content_length=args.min_length,
     )
-
-    # Initialize extractor
     extractor = BooksExtractor(config)
-
-    # Collect input files
-    input_files = []
-    if args.input.is_file():
-        input_files = [args.input]
-    elif args.input.is_dir():
-        # Find all book files in directory
-        for ext in ["*.pdf", "*.epub", "*.txt"]:
-            input_files.extend(args.input.glob(ext))
-        input_files = sorted(set(input_files))
-    else:
-        logger.error(f"❌ Input path does not exist: {args.input}")
-        return 1
-
+    input_files = _collect_input_files(args.input, args.format)
     if not input_files:
-        logger.error("❌ No book files found at input path")
         return 1
 
     logger.info(f"📚 Found {len(input_files)} book(s) to process")
-
-    # Process all books
-    all_segments = []
+    all_segments: list[BookSegment] = []
 
     for i, file_path in enumerate(input_files, 1):
         logger.info(f"Processing book {i}/{len(input_files)}: {file_path.name}")
-
-        # Determine format
-        file_format = args.format
-        if file_format == "auto":
-            suffix = file_path.suffix.lower()
-            if suffix == ".pdf":
-                file_format = "pdf"
-            elif suffix == ".epub":
-                file_format = "epub"
-            elif suffix == ".txt":
-                file_format = "txt"
-            else:
-                logger.warning(f"⚠️ Unknown format for {file_path}, skipping")
-                continue
-
-        # Extract based on format
-        if file_format == "pdf":
-            segments = extractor.extract_from_pdf(file_path)
-        elif file_format == "epub":
-            segments = extractor.extract_from_epub(file_path)
-        elif file_format == "txt":
-            segments = extractor.extract_from_txt(file_path)
-        else:
-            logger.warning(f"⚠️ Unsupported format: {file_format}")
+        file_format = _resolve_format(file_path, args.format)
+        if file_format is None:
             continue
 
-        # Process each segment
+        segments = _extract_segments(extractor, file_path, file_format)
         for segment in segments:
             processed = extractor.process_segment(segment)
-            if processed:
+            if processed is not None:
                 all_segments.append(processed)
-
-        # Rate limiting
         time.sleep(0.5)
 
-    # Save results
-    if all_segments:
-        extractor.save_to_jsonl(all_segments, args.output)
-
-        # Upload to S3 if requested
-        if args.upload_s3:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"{args.s3_prefix}books_extracted_{timestamp}.jsonl"
-            extractor.upload_to_s3(args.output, s3_key)
-
-        # Print summary
-        print("\n" + "=" * 80)
-        print("📊 PIX-2 EXTRACTION SUMMARY")
-        print("=" * 80)
-        print(f"Total books processed: {len(input_files)}")
-        print(f"Total segments extracted: {len(all_segments)}")
-        print(f"Crisis-flagged segments: {sum(1 for s in all_segments if s.crisis_flag)}")
-        print(f"Total words extracted: {sum(s.word_count for s in all_segments):,}")
-        print(f"Output file: {args.output}")
-        if args.upload_s3:
-            print(f"S3 upload: {args.s3_prefix}")
-        print("=" * 80)
-
-        # Print category breakdown
-        categories: dict[str, int] = {}
-        for segment in all_segments:
-            cat = segment.therapeutic_category or "uncategorized"
-            categories[cat] = categories.get(cat, 0) + 1
-
-        print("\nTherapeutic Categories:")
-        for cat, count in sorted(categories.items(), key=lambda x: x[1], reverse=True):
-            print(f" - {cat}: {count}")
-
-        # Print book breakdown
-        books: dict[str, int] = {}
-        for segment in all_segments:
-            books[segment.title] = books.get(segment.title, 0) + 1
-
-        print("\nBooks Processed:")
-        for book, count in sorted(books.items(), key=lambda x: x[1], reverse=True)[:10]:
-            print(f" - {book}: {count} segments")
-
-        if len(books) > 10:
-            print(f"   ... and {len(books) - 10} more books")
-
-    else:
+    if not all_segments:
         logger.warning("⚠️ No therapeutic content extracted")
         return 1
 
+    extractor.save_to_jsonl(all_segments, args.output)
+    if args.upload_s3:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        s3_key = f"{args.s3_prefix}books_extracted_{timestamp}.jsonl"
+        extractor.upload_to_s3(args.output, s3_key)
+    _log_summary(all_segments)
+
     return 0
+
+
+def _collect_input_files(input_path: Path, file_format: str) -> list[Path]:
+    """Collect files to process from a file path or directory."""
+    if input_path.is_file():
+        return [input_path]
+    if not input_path.is_dir():
+        logger.error(f"❌ Input path does not exist: {input_path}")
+        return []
+
+    patterns = {"auto": ["*.pdf", "*.epub", "*.txt"], "pdf": ["*.pdf"], "epub": ["*.epub"], "txt": ["*.txt"]}
+    resolved_patterns = patterns.get(file_format, ["*.pdf", "*.epub", "*.txt"])
+    discovered: set[Path] = set()
+    for pattern in resolved_patterns:
+        discovered.update(input_path.glob(pattern))
+    return sorted(discovered)
+
+
+def _resolve_format(file_path: Path, requested_format: str) -> str | None:
+    """Resolve effective extraction format."""
+    if requested_format != "auto":
+        return requested_format
+
+    match file_path.suffix.lower():
+        case ".pdf":
+            return "pdf"
+        case ".epub":
+            return "epub"
+        case ".txt":
+            return "txt"
+        case _:
+            logger.warning(f"⚠️ Unknown format for {file_path}, skipping")
+            return None
+
+
+def _extract_segments(extractor: BooksExtractor, file_path: Path, file_format: str) -> list[BookSegment]:
+    """Dispatch extraction by format."""
+    if file_format == "pdf":
+        return extractor.extract_from_pdf(file_path)
+    if file_format == "epub":
+        return extractor.extract_from_epub(file_path)
+    return extractor.extract_from_txt(file_path)
+
+
+def _log_summary(segments: list[BookSegment]) -> None:
+    """Log extraction summary."""
+    categories: dict[str, int] = {}
+    books: dict[str, int] = {}
+
+    for segment in segments:
+        category = segment.therapeutic_category or "uncategorized"
+        categories[category] = categories.get(category, 0) + 1
+        books[segment.title] = books.get(segment.title, 0) + 1
+
+    for category, _count in sorted(categories.items(), key=lambda item: item[1], reverse=True):
+        logger.info("📂 Category: %s", category)
+
+    for book_title, _count in sorted(books.items(), key=lambda item: item[1], reverse=True)[:10]:
+        logger.info("📚 Book: %s", book_title)
+
+    if len(books) > 10:
+        logger.info("... and %s additional books", len(books) - 10)
 
 
 if __name__ == "__main__":

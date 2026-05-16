@@ -15,7 +15,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
   NODE_VERSION: 24.14.1
-  PNPM_VERSION: 11.0.9
+  PNPM_VERSION: 11.1.2
   NODE_ENV: test
   DISABLE_AUTH: 'true'
 
@@ -37,9 +37,9 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.0.6
+        uses: pnpm/action-setup@v6.0.8
         with:
-          version: 11.0.9
+          version: 11.1.2
 
       - name: Setup pnpm cache
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
@@ -154,7 +154,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: browser-test-results-${{ github.run_id }}
           path: |
@@ -177,7 +177,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Download all test artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: all-test-results
           pattern: '*-test-results-*'
@@ -284,7 +284,7 @@ jobs:
           echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
       - name: Upload consolidated report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: browser-compatibility-report-${{ github.run_id }}
           path: report.html

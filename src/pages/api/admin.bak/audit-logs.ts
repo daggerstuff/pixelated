@@ -10,8 +10,8 @@ export const GET = async ({ url }) => {
 
     const eventType = searchParams.get('eventType')
     const userId = searchParams.get('userId')
-    const limit = parseInt(searchParams.get('limit') || '100', 10)
-    const offset = parseInt(searchParams.get('offset') || '0', 10)
+    const limit = parseInt(searchParams.get('limit') ?? '100', 10)
+    const offset = parseInt(searchParams.get('offset') ?? '0', 10)
 
     let logs: AuditLogEntry[] = []
     // getAuditLogs returns all logs; filter by userId if provided

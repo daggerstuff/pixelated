@@ -163,7 +163,7 @@ export class CrisisSessionFlaggingService {
       }
       if (
         !['low', 'medium', 'high', 'critical'].includes(
-          String(request.severity),
+          request.severity,
         )
       ) {
         throw new Error('Invalid severity')
@@ -397,7 +397,7 @@ export class CrisisSessionFlaggingService {
 
   private mapFlagFromDb(flagData: CrisisSessionFlagDbData): CrisisSessionFlag {
     return {
-      id: flagData.id || (flagData._id ? flagData._id.toString() : ''),
+      id: flagData.id ?? (flagData._id ? flagData._id.toString() : ''),
       userId: flagData.user_id,
       sessionId: flagData.session_id,
       crisisId: flagData.crisis_id,

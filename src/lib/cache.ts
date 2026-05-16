@@ -13,14 +13,14 @@ interface CacheEntry<T> {
 }
 
 export class Cache {
-  private store: Map<string, CacheEntry<unknown>>
+  private readonly store: Map<string, CacheEntry<unknown>>
   private readonly ttl: number
   private readonly maxSize: number
 
   constructor(options: CacheOptions) {
     this.store = new Map()
     this.ttl = options.ttl * 1000 // Convert to milliseconds
-    this.maxSize = options.maxSize || 1000
+    this.maxSize = options.maxSize ?? 1000
   }
 
   /**
@@ -50,7 +50,7 @@ export class Cache {
    * @param value Value to cache
    * @param ttl Optional TTL override
    */
-  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+  async set(key: string, value: unknown, ttl?: number): Promise<void> {
     // Enforce max size limit
     if (this.store.size >= this.maxSize) {
       const oldestKey = this.store.keys().next().value

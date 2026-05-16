@@ -20,8 +20,8 @@ describe('privacy utilities', () => {
       expect(parts[1]?.length).toBeGreaterThan(0)
       expect(parts[2]?.length).toBeGreaterThan(0)
       // Check that the segments contain only alphanumeric characters (base36)
-      expect(/^[0-9a-z]+$/.test(parts[1] as string)).toBe(true)
-      expect(/^[0-9a-z]+$/.test(parts[2] as string)).toBe(true)
+      expect(/^[0-9a-z]+$/.test(parts[1])).toBe(true)
+      expect(/^[0-9a-z]+$/.test(parts[2])).toBe(true)
     })
   })
 
@@ -50,24 +50,24 @@ describe('privacy utilities', () => {
   describe('getUserConsentPreference', () => {
     it('returns true when localStorage has "true"', () => {
       // Use spyOn for cleaner testing closer to the runtime environment (Review suggestion)
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('true')
+      vi.spyOn(window.localStorage, 'getItem').mockReturnValue('true')
       expect(getUserConsentPreference()).toBe(true)
     })
 
     it('returns false when localStorage has "false"', () => {
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('false')
+      vi.spyOn(window.localStorage, 'getItem').mockReturnValue('false')
       expect(getUserConsentPreference()).toBe(false)
     })
 
     it('returns false when localStorage is empty', () => {
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
+      vi.spyOn(window.localStorage, 'getItem').mockReturnValue(null)
       expect(getUserConsentPreference()).toBe(false)
     })
   })
 
   describe('setUserConsentPreference', () => {
     it('stores the preference correctly', () => {
-      const setSpy = vi.spyOn(Storage.prototype, 'setItem')
+      const setSpy = vi.spyOn(window.localStorage, 'setItem')
       setUserConsentPreference(true)
       expect(setSpy).toHaveBeenCalledWith('simulator_metrics_consent', 'true')
 

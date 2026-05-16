@@ -13,9 +13,9 @@ import { SocketService } from './services/socketService'
 import 'dotenv/config'
 
 type RedisLike = {
-  connect?: () => Promise<unknown>
-  quit: () => Promise<unknown>
   on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+  connect: () => Promise<unknown>
+  quit: () => Promise<unknown>
 }
 
 type SentryExpressErrorHandler = (app: express.Application) => void
@@ -103,7 +103,7 @@ const redisOptions = REDIS_URL.startsWith('rediss://')
     } as RedisOptions)
   : ({ lazyConnect: true } as RedisOptions)
 
-let redis: RedisLike = new Redis(REDIS_URL, redisOptions)
+let redis: RedisLike | Redis = new Redis(REDIS_URL, redisOptions)
 
 redis.on('error', (err: unknown) => {
   // We handle connection errors in the connect().catch() block below
@@ -122,9 +122,11 @@ if (typeof redis.connect === 'function') {
       )
       // Create a simple mock compatible with ioredis interface
       const redisMock: RedisLike = {
+        connect: async () => undefined,
         quit: async () => 'OK',
         on: (event: string, listener: (...args: unknown[]) => void) => {
           if (event === 'connect' || event === 'ready') listener()
+          // Return this to allow chaining
           return redisMock
         },
       }

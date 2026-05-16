@@ -19,7 +19,7 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
   private isInitialized: boolean = false
   private mlModelLoaded: boolean = false
 
-  constructor(private config: BehavioralConfig) {
+  constructor(private readonly config: BehavioralConfig) {
     super()
   }
 

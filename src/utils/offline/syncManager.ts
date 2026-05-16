@@ -21,16 +21,16 @@ export interface SyncManagerOptions {
 }
 
 class SyncManager {
-  private options: Required<SyncManagerOptions>
+  private readonly options: Required<SyncManagerOptions>
   private isOnline: boolean =
-    typeof navigator !== 'undefined' && navigator.onLine
+    navigator?.onLine
   private isSyncing = false
   private backoffMultiplier = 1
   private syncTimeout: NodeJS.Timeout | null = null
-  private listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
-  private onlineHandler: () => void
-  private offlineHandler: () => void
-  private visibilityChangeHandler: () => void
+  private readonly listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
+  private readonly onlineHandler: () => void
+  private readonly offlineHandler: () => void
+  private readonly visibilityChangeHandler: () => void
 
   constructor(options: SyncManagerOptions = {}) {
     this.options = {
@@ -51,7 +51,7 @@ class SyncManager {
         this.isOnline &&
         this.options.enableAutoSync
       ) {
-        this.attemptSync()
+        void this.attemptSync()
       }
     }
 
@@ -69,14 +69,14 @@ class SyncManager {
     }
 
     if (this.options.enableAutoSync && this.isOnline) {
-      this.attemptSync()
+      void this.attemptSync()
     }
   }
 
   private handleOnline(): void {
     this.isOnline = true
     if (this.options.enableAutoSync) {
-      this.attemptSync()
+      void this.attemptSync()
     }
   }
 
@@ -144,7 +144,7 @@ class SyncManager {
       this.options.maxDelay,
     )
     this.syncTimeout = setTimeout(() => {
-      this.attemptSync()
+      void this.attemptSync()
     }, delay)
   }
 

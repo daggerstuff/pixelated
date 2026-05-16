@@ -39,7 +39,6 @@ export default function SearchBox({
     setIsSearching(true)
     const timer = setTimeout(() => {
       setDebouncedQuery(query)
-      setIsSearching(false)
     }, 300)
     return () => clearTimeout(timer)
   }, [query])

@@ -40,7 +40,7 @@ export const POST = async ({
       await createAuditLog(
         AuditEventType.SECURITY,
         'validation-pipeline-run-unauthorized',
-        authResult['user']?.['id'] || 'unknown',
+        authResult['user']?.['id'] ?? 'unknown',
         'validation-api',
         {
           userId: authResult['user']?.['id'],
@@ -80,15 +80,15 @@ export const POST = async ({
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'validation-pipeline-run',
-      (authResult as unknown as { user?: { id?: string } })?.user?.id ||
+      (authResult as unknown as { user?: { id?: string } })?.user?.id ??
         'system',
       'validation-api',
       {
         userId: (authResult as unknown as { user?: { id?: string } })?.user?.id,
-        resultsCount: results?.length || 0,
+        resultsCount: results?.length ?? 0,
         passedCount:
           results?.filter?.((r: unknown) => (r as { passed?: boolean })?.passed)
-            ?.length || 0,
+            ?.length ?? 0,
       },
       AuditEventStatus.SUCCESS,
     )
@@ -97,7 +97,7 @@ export const POST = async ({
       JSON.stringify({
         success: true,
         message: 'Validation run completed successfully',
-        resultsCount: results?.length || 0,
+        resultsCount: results?.length ?? 0,
       }),
       {
         status: 200,

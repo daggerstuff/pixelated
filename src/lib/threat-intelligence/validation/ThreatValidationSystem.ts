@@ -62,12 +62,12 @@ export class ThreatValidationSystemCore
   private redis!: Redis
   private mongoClient!: MongoClient
   private db!: Db
-  private validationRules: Map<string, ValidationRule> = new Map()
-  private activeValidations: Map<string, ThreatValidation> = new Map()
-  private threatIntelligenceCache: Map<string, GlobalThreatIntelligence> =
+  private readonly validationRules: Map<string, ValidationRule> = new Map()
+  private readonly activeValidations: Map<string, ThreatValidation> = new Map()
+  private readonly threatIntelligenceCache: Map<string, GlobalThreatIntelligence> =
     new Map()
 
-  constructor(private config: ValidationConfig) {
+  constructor(private readonly config: ValidationConfig) {
     super()
     this.initializeValidationRules()
   }
@@ -108,7 +108,7 @@ export class ThreatValidationSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat validation')
     } catch (error: unknown) {
@@ -120,7 +120,7 @@ export class ThreatValidationSystemCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ||
+        process.env.MONGODB_URI ??
           'mongodb://localhost:27017/threat_validation',
       )
       await this.mongoClient.connect()
@@ -556,7 +556,7 @@ export class ThreatValidationSystemCore
 
     for (const indicator of indicators) {
       const key = `${indicator.indicatorType}:${indicator.value}`
-      seen.set(key, (seen.get(key) || 0) + 1)
+      seen.set(key, (seen.get(key) ?? 0) + 1)
     }
 
     for (const [key, count] of seen) {
@@ -760,7 +760,7 @@ export class ThreatValidationSystemCore
         )
         if (!conditionResult.passed) {
           issues.push(conditionResult.message)
-          score -= condition.weight || 10
+          score -= condition.weight ?? 10
         }
       }
 

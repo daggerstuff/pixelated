@@ -14,7 +14,7 @@ router.get('/login', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const redirectUri =
-    process.env.AUTH0_CALLBACK_URL ||
+    process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
   if (!auth0Domain || !clientId) {
@@ -62,7 +62,7 @@ router.get('/callback', async (req: Request, res: Response) => {
   const clientId = process.env.AUTH0_CLIENT_ID
   const clientSecret = process.env.AUTH0_CLIENT_SECRET
   const redirectUri =
-    process.env.AUTH0_CALLBACK_URL ||
+    process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
   if (!auth0Domain || !clientId || !clientSecret) {
@@ -210,7 +210,7 @@ router.post('/logout', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const returnTo =
-    process.env.AUTH0_LOGOUT_URL || `${req.protocol}://${req.get('host')}`
+    process.env.AUTH0_LOGOUT_URL ?? `${req.protocol}://${req.get('host')}`
 
   if (!auth0Domain || !clientId) {
     res.status(500).json({
@@ -258,8 +258,8 @@ router.get('/me', (req: Request, res: Response) => {
       picture: user.picture,
       emailVerified: user.emailVerified,
       role: user.role,
-      roles: user.roles || [user.role].filter(Boolean),
-      permissions: user.permissions || [],
+      roles: user.roles ?? [user.role].filter(Boolean),
+      permissions: user.permissions ?? [],
     },
   })
 })

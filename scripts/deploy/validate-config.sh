@@ -3,9 +3,16 @@
 # Validates that the environment file for the given environment exists and has required keys.
 
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 ENVIRONMENT="${1:-staging}"
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ENV_FILE="${PROJECT_ROOT}/.env.${ENVIRONMENT}"
 EXAMPLE_FILE="${PROJECT_ROOT}/.env.example"
 

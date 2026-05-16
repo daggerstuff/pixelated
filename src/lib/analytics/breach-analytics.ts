@@ -282,7 +282,7 @@ async function calculateAverageResponseTime(
   }
 
   const responseTimes = await Promise.all(
-    breaches.map((breach) => calculateResponseTime(breach)),
+    breaches.map( async (breach) => calculateResponseTime(breach)),
   )
 
   return responseTimes.reduce((sum, time) => sum + time, 0) / breaches.length

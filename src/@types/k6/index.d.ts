@@ -19,7 +19,7 @@ declare module 'k6/http' {
   export interface Response {
     status: number
     body: string
-    json<T = unknown>(selector?: string): T
+    json(selector?: string): unknown
   }
 
   export interface HttpParams {
