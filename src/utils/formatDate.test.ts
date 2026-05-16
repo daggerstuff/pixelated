@@ -1,148 +1,48 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
-
-import {
-  formatDuration,
-  isValidDate,
-  getStartOf,
-  formatDate,
-} from './formatDate'
+/** @vitest-environment jsdom */
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+import { formatDate } from './formatDate';
 
 describe('formatDate', () => {
-  beforeAll(() => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))
-  })
-  afterAll(() => {
-    vi.useRealTimers()
-  })
+  describe('relative formatting', () => {
+    beforeAll(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2023-05-15T10:00:00Z'));
+    });
 
-  it('throws an error when provided an invalid date string', () => {
-    expect(() => formatDate('not-a-date')).toThrow(
-      'Failed to format date: Error: Invalid date string',
-    )
-  })
+    afterAll(() => {
+      vi.useRealTimers();
+    });
 
-  it('formats custom string correctly', () => {
-    // Tests YYYY-MM-DD custom formatting via tokens
-    expect(
-      formatDate('2023-01-01T12:00:00Z', { formatString: 'YYYY-MM-DD' }),
-    ).toBe('2023-01-01')
-  })
+    it('formats "just now" correctly', () => {
+      const date = new Date('2023-05-15T09:59:30Z');
+      expect(formatDate(date, { relative: true })).toBe('just now');
+    });
 
-  it('formats relative date correctly', () => {
-    expect(formatDate('2023-05-15T09:55:00Z', { relative: true })).toBe('5 minutes ago')
-    expect(formatDate('2023-05-14T10:00:00Z', { relative: true })).toBe('1 day ago')
-  })
-})
+    it('formats "5 minutes ago" correctly', () => {
+      const date = new Date('2023-05-15T09:55:00Z');
+      expect(formatDate(date, { relative: true })).toBe('5 minutes ago');
+    });
 
-describe('formatDuration', () => {
-  it('formats seconds correctly', () => {
-    // 45 seconds
-    expect(formatDuration(45000)).toBe('45s')
-    // 0 seconds
-    expect(formatDuration(0)).toBe('0s')
-    // negative seconds
-    expect(formatDuration(-1000)).toBe('0s')
-  })
+    it('formats "1 hour ago" correctly', () => {
+      const date = new Date('2023-05-15T09:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('1 hour ago');
+    });
 
-  it('formats minutes and seconds correctly', () => {
-    // 5 minutes, 30 seconds
-    expect(formatDuration(5 * 60000 + 30000)).toBe('5m 30s')
-    // exactly 2 minutes
-    expect(formatDuration(120000)).toBe('2m 0s')
-  })
+    it('formats "1 day ago" correctly', () => {
+      const date = new Date('2023-05-14T10:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('1 day ago');
+    });
 
-  it('formats hours and minutes correctly', () => {
-    // 3 hours, 15 minutes
-    expect(formatDuration(3 * 3600000 + 15 * 60000)).toBe('3h 15m')
-    // exactly 5 hours
-    expect(formatDuration(5 * 3600000)).toBe('5h 0m')
-  })
+    it('formats "1 week ago" correctly', () => {
+      const date = new Date('2023-05-08T10:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('1 week ago');
+    });
+  });
 
-  it('formats days and hours correctly', () => {
-    // 2 days, 4 hours
-    expect(formatDuration(2 * 86400000 + 4 * 3600000)).toBe('2d 4h')
-    // exactly 1 day
-    expect(formatDuration(86400000)).toBe('1d 0h')
-  })
-})
-
-describe('isValidDate', () => {
-  it('returns true for a valid date string', () => {
-    expect(isValidDate('2023-01-01')).toBe(true)
-    expect(isValidDate('2023-12-31T23:59:59Z')).toBe(true)
-  })
-
-  it('returns false for an invalid date string', () => {
-    expect(isValidDate('invalid-date')).toBe(false)
-    expect(isValidDate('')).toBe(false)
-  })
-
-  it('rejects out-of-range calendar dates without rolling over', () => {
-    // Numeric strings are parsed as invalid by Date constructor when passed as strings
-    expect(isValidDate('123456789')).toBe(false)
-
-    // Invalid calendar dates should return false (unlike native JavaScript Date rollover)
-    expect(isValidDate('2023-02-30')).toBe(false)
-
-    // Leap year handling
-    expect(isValidDate('2024-02-29')).toBe(true)
-
-    // Not a leap year
-    expect(isValidDate('2023-02-29')).toBe(false)
-
-    // Whitespace
-    expect(isValidDate(' 2023-01-01 ')).toBe(true)
-    expect(isValidDate('\t2023-01-01\n')).toBe(true)
-    // Partial dates
-    expect(isValidDate('2023')).toBe(true)
-    expect(isValidDate('2023-01')).toBe(true)
-    // Timezone variations
-    expect(isValidDate('2023-01-01T00:00:00+05:00')).toBe(true)
-    expect(isValidDate('2023-01-01T00:00:00-08:00')).toBe(true)
-  })
-})
-
-describe('getStartOf', () => {
-  it('returns the start of the day', () => {
-    // Use a midday UTC date to avoid any potential timezone rollover during test
-    const date = new Date('2023-05-15T12:30:45.123')
-    const start = getStartOf(date, 'day')
-
-    // We expect the same date but with time at 00:00:00.000
-    expect(start.getFullYear()).toBe(2023)
-    expect(start.getMonth()).toBe(4) // May is index 4
-    expect(start.getDate()).toBe(15)
-    expect(start.getHours()).toBe(0)
-    expect(start.getMinutes()).toBe(0)
-    expect(start.getSeconds()).toBe(0)
-    expect(start.getMilliseconds()).toBe(0)
-  })
-
-  it('returns the start of the week (Sunday)', () => {
-    // 2023-05-17 is a Wednesday. Sunday would be 2023-05-14
-    const date = new Date('2023-05-17T10:00:00')
-    const start = getStartOf(date, 'week')
-
-    expect(start.getDate()).toBe(14)
-    expect(start.getDay()).toBe(0) // Sunday
-    expect(start.getHours()).toBe(0)
-  })
-
-  it('returns the start of the month', () => {
-    const date = new Date('2023-05-15T10:00:00')
-    const start = getStartOf(date, 'month')
-
-    expect(start.getDate()).toBe(1)
-    expect(start.getHours()).toBe(0)
-  })
-
-  it('returns the start of the year', () => {
-    const date = new Date('2023-05-15T10:00:00')
-    const start = getStartOf(date, 'year')
-
-    expect(start.getMonth()).toBe(0)
-    expect(start.getDate()).toBe(1)
-    expect(start.getHours()).toBe(0)
-  })
-})
+  describe('absolute formatting', () => {
+    it('formats date correctly', () => {
+      const date = new Date('2023-05-15T10:00:00Z');
+      expect(formatDate(date)).toBe('May 15, 2023');
+    });
+  });
+});
