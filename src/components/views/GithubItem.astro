@@ -55,6 +55,45 @@ const content = collectionType === 'releases' ? item.desc : item.bodyHTML
 const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : ''
 =======
 
+<<<<<<< HEAD
+const sanitizedContent = content
+  ? DOMPurify.sanitize(content, {
+      ALLOWED_TAGS: [
+        'a',
+        'b',
+        'strong',
+        'i',
+        'em',
+        'u',
+        's',
+        'code',
+        'pre',
+        'p',
+        'br',
+        'hr',
+        'ul',
+        'ol',
+        'li',
+        'blockquote',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'img'
+      ],
+      ALLOWED_ATTR: [
+        'href',
+        'title',
+        'rel',
+        'target',
+        'src',
+        'alt'
+      ]
+    })
+  : undefined
+=======
 const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : undefined
 >>>>>>> origin/staging
 =======
@@ -147,5 +186,10 @@ const sanitizedContent = content ? DOMPurify.sanitize(content as string) : ''
       </div>
     </div>
   </summary>
+<<<<<<< HEAD
+  <div class="prose github-item-prose" set:html={sanitizedContent || ''} />
+</details>
+=======
   <div class="prose github-item-prose" set:html={sanitizedContent} />
 </details>
+>>>>>>> origin/staging
