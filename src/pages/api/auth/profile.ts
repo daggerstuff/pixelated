@@ -21,14 +21,13 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
-  try {
-    // Extract client info for logging
-    const clientInfo = {
-      ip: clientAddress || 'unknown',
-      userAgent: request.headers.get('user-agent') ?? 'unknown',
-      deviceId: request.headers.get('x-device-id') ?? 'unknown',
-    }
+  const clientInfo = {
+    ip: clientAddress || 'unknown',
+    userAgent: request.headers.get('user-agent') ?? 'unknown',
+    deviceId: request.headers.get('x-device-id') ?? 'unknown',
+  }
 
+  try {
     // Rate limit profile reads (e.g. 60 per minute)
     const rateLimitResult = await rateLimitMiddleware(
       request,
@@ -43,7 +42,7 @@ export const GET = async ({
     let userId: string | null = null
 
     if (session?.user) {
-      userId = session.user.id || (session.user as any)._id?.toString() ?? null
+      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
@@ -56,11 +55,11 @@ export const GET = async ({
 
         if (cookieToken) {
           const v = await verifyAuthToken(cookieToken)
-          userId = v.userId
+          userId = v.userId ?? null
         }
       } else {
         const v = await verifyAuthToken(authHeader)
-        userId = v.userId
+        userId = v.userId ?? null
       }
     }
 
@@ -172,12 +171,12 @@ export const PUT = async ({
     let userId: string | null = null
 
     if (session?.user) {
-      userId = session.user.id || (session.user as any)._id?.toString() ?? null
+      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
         const v = await verifyAuthToken(authHeader)
-        userId = v.userId
+        userId = v.userId ?? null
       }
     }
 
@@ -230,7 +229,7 @@ export const PUT = async ({
 
     // Create Audit Log
     await createAuditLog(
-      AuditEventType.USER_MODIFIED,
+      AuditEventType.MODIFY,
       'profile.update',
       userId,
       'user',
