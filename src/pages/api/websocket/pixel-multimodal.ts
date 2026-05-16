@@ -113,7 +113,12 @@ function ensureServer(): WebSocketServer {
 <<<<<<< HEAD
             const text = ((message.text as string) || state.text) ?? ''
             const contextType =
+<<<<<<< HEAD
+              ((message.contextType as string) ||
+              state.contextType) ??
+=======
               ((message.contextType as string) || state.contextType) ??
+>>>>>>> origin/staging
               'therapeutic'
 =======
             const text = (message.text as string) || (state.text ?? '')
