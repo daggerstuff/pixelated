@@ -26,8 +26,22 @@ Action: Use loop variables to provide specific, dynamically generated aria-label
 - Action: Added `aria-pressed={true/false}` and grouped them with `role="group"`
   and an explicit `aria-label`.
 
+<<<<<<< HEAD
+## 2026-05-20 - Search Box Accessibility
+
+- Learning: Real-time search inputs need aria-live regions to announce result counts.
+- Action: Added an sr-only aria-live polite region to announce the number of search results found.
+=======
 ## 2026-05-16 - Analytics Dashboard Accessibility
 
+<<<<<<< HEAD
+- Learning: Custom chart bars and progress bars made with `div` elements are
+  invisible to screen readers and keyboard users without explicit ARIA roles,
+  labels, and `tabIndex`.
+- Action: Added `role="img"`, `tabIndex={-1}`, and `aria-label` to chart bars.
+  Added `role="progressbar"` and related ARIA attributes to custom progress
+  elements, and ensured visual icons have screen-reader fallbacks.
+=======
 - Learning: Custom chart bars and progress bars made with `div` elements are invisible to screen readers and keyboard users without explicit ARIA roles, labels, and `tabIndex`.
 - Action: Added `role="img"`, `tabIndex={-1}`, and `aria-label` to chart bars. Added `role="progressbar"` and related ARIA attributes to custom progress elements, and ensured visual icons have screen-reader fallbacks.
 
@@ -35,3 +49,9 @@ Action: Use loop variables to provide specific, dynamically generated aria-label
 
 Learning: Custom time range buttons visually act as toggle buttons, but without aria-pressed state fails.
 Action: Added `aria-pressed={true/false}` and grouped them with role="group".
+<<<<<<< HEAD
+=======
+>>>>>>> origin/staging
+>>>>>>> origin/staging
+>>>>>>> origin/staging
+>>>>>>> origin/staging

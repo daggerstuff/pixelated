@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 <!-- markdownlint-disable MD013 MD026 -->
 
+=======
+>>>>>>> origin/staging
 ## 2024-06-01 - Extract Tooltip
 
 - Learning: Inline components in Recharts cause unnecessary re-renders
@@ -23,5 +26,14 @@
 
 ## 2025-03-20 - Inline Callback Re-renders
 
+<<<<<<< HEAD
 - Learning: Inline arrow functions passed as props to child components cause unnecessary re-renders. When using useCallback to memoize state updater callbacks, use the functional update pattern to avoid adding state variables to the dependency array.
 - Action: Wrapped inline patient selection handler in useCallback using a functional state update.
+=======
+- Learning: Inline arrow functions passed as props to child components cause
+  unnecessary re-renders. When using `useCallback` to memoize state updater
+  callbacks, use the functional update pattern to avoid adding state variables
+  to the dependency array.
+- Action: Wrapped inline patient selection handler in `useCallback` using a
+  functional state update.
+>>>>>>> origin/staging

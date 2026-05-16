@@ -110,10 +110,39 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'complete': {
+<<<<<<< HEAD
+<<<<<<< HEAD
+            const text = ((message.text as string) || state.text) ?? ''
+            const contextType =
+              ((message.contextType as string) || state.contextType) ??
+              'therapeutic'
+=======
+=======
+=======
+<<<<<<< HEAD
+            const text = ((message.text as string) || state.text) ?? ''
+            const contextType =
+<<<<<<< HEAD
+              ((message.contextType as string) ||
+              state.contextType) ??
+=======
+              ((message.contextType as string) || state.contextType) ??
+>>>>>>> origin/staging
+              'therapeutic'
+=======
+>>>>>>> origin/staging
+>>>>>>> origin/staging
             const text = (message.text as string) || (state.text ?? '')
             const contextType =
               (message.contextType as string) ||
               (state.contextType ?? 'therapeutic')
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> origin/staging
+>>>>>>> origin/staging
+>>>>>>> origin/staging
             const sessionId = (message.sessionId as string) || state.sessionId
             await handleComplete(ws, state, { text, contextType, sessionId })
             break

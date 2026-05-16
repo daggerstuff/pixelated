@@ -43,13 +43,25 @@ Action: Use `Object.defineProperty` to temporarily mock and restore navigator me
 
 Action: Use `Object.defineProperty` to temporarily mock and restore
 navigator.mediaDevices
+<<<<<<< HEAD
+## 2026-05-13 - QA: Add test for liveRegion edge case
+
+Pattern: Mocking browser globals (like window.LiveRegionSystem) in Vitest with jsdom
+
+Action: Use vi.useFakeTimers() and clear window globals to ensure isolated tests for browser utilities
+=======
 
 ## 2026-05-11 - QA: Add test for getRecommendedScenario fallback edge case
 
 Pattern: Finding untested branches in utility functions and adding targeted tests
 
 Action: Ensure both positive and negative branches for scenario recommendation are systematically tested
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/staging
+=======
+>>>>>>> origin/staging
 ## 2026-05-09 QA Add test for formatDate relative edge case
 Pattern: Use `vi.useFakeTimers()` with a fixed system time to make relative-time assertions deterministic
 Action: Call `vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))` in `beforeAll` then assert `formatDate(date, { relative: true })` returns expected strings like 5 minutes ago or 1 day ago Restore with `vi.useRealTimers()` in `afterAll`
