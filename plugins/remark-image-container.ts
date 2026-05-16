@@ -96,7 +96,7 @@ function remarkImageContainer() {
             hProperties: attributes,
           },
           children: content,
-        })
+        } as unknown as never)
       } else if (d.name === 'image-a') {
         /* image-a */
         if (!d.attributes?.['href']) {

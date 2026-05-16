@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   MemoryServiceRequestSigner,
   resolveInternalMemoryServiceConfig,
-} from '@/lib/server/internal-memory-service-auth'
+} from './internal-memory-service-auth'
 
 const ORIGINAL_ENV = { ...process.env }
 

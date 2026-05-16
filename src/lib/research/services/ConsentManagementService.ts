@@ -33,8 +33,8 @@ export interface ConsentAuditLog {
 }
 
 export class ConsentManagementService {
-  private config: ConsentConfig
-  private consentStore: Map<string, ConsentRecord> = new Map()
+  private readonly config: ConsentConfig
+  private readonly consentStore: Map<string, ConsentRecord> = new Map()
   private auditLog: ConsentAuditLog[] = []
 
   constructor(
@@ -72,7 +72,7 @@ export class ConsentManagementService {
           reason: 'Initial consent',
           ipAddress: metadata?.ipAddress,
           userAgent: metadata?.userAgent,
-          consentFormVersion: metadata?.consentFormVersion || '1.0',
+          consentFormVersion: metadata?.consentFormVersion ?? '1.0',
         },
       ],
       lastUpdated: new Date().toISOString(),
@@ -118,13 +118,13 @@ export class ConsentManagementService {
     const updatedConsent: ConsentRecord = {
       ...existingConsent,
       currentLevel: newLevel,
-      lastUpdated: (effectiveDate || new Date()).toISOString(),
+      lastUpdated: (effectiveDate ?? new Date()).toISOString(),
       consentHistory: [
         ...existingConsent.consentHistory,
         {
           level: newLevel,
-          timestamp: (effectiveDate || new Date()).toISOString(),
-          reason: reason || 'User requested change',
+          timestamp: (effectiveDate ?? new Date()).toISOString(),
+          reason: reason ?? 'User requested change',
           ipAddress: undefined, // Would be populated from request context
           userAgent: undefined, // Would be populated from request context
           consentFormVersion: '1.0',
@@ -255,7 +255,7 @@ export class ConsentManagementService {
    * Get detailed consent record
    */
   async getConsentRecord(clientId: string): Promise<ConsentRecord | null> {
-    return this.consentStore.get(clientId) || null
+    return this.consentStore.get(clientId) ?? null
   }
 
   /**
@@ -291,7 +291,7 @@ export class ConsentManagementService {
     }
 
     const permissions = consentMapping[consentLevel]
-    return permissions[researchUse] || false
+    return permissions[researchUse] ?? false
   }
 
   /**

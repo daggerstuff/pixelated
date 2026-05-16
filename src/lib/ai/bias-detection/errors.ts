@@ -50,7 +50,7 @@ export abstract class BiasDetectionError extends Error {
     this.severity = severity
     this.category = category
     this.timestamp = new Date()
-    this.context = options.context || {}
+    this.context = options.context ?? {}
     this.recoverable = options.recoverable ?? false
     this.userMessage = options.userMessage
 
@@ -64,7 +64,7 @@ export abstract class BiasDetectionError extends Error {
    * Get a user-friendly error message
    */
   public getUserMessage(): string {
-    return this.userMessage || this.getDefaultUserMessage()
+    return this.userMessage ?? this.getDefaultUserMessage()
   }
 
   /**
@@ -752,8 +752,8 @@ export function getMetrics(error: unknown): Record<string, unknown> {
  * Error aggregation for monitoring and alerting
  */
 export class BiasErrorAggregator {
-  private errorCounts: Map<string, number> = new Map()
-  private errorSamples: Map<string, BiasDetectionError[]> = new Map()
+  private readonly errorCounts: Map<string, number> = new Map()
+  private readonly errorSamples: Map<string, BiasDetectionError[]> = new Map()
   private readonly maxSamplesPerType = 10
 
   /**
@@ -762,7 +762,7 @@ export class BiasErrorAggregator {
   recordError(error: unknown): void {
     if (error instanceof BiasDetectionError) {
       const key = `${error.code}_${error.severity}`
-      this.errorCounts.set(key, (this.errorCounts.get(key) || 0) + 1)
+      this.errorCounts.set(key, (this.errorCounts.get(key) ?? 0) + 1)
 
       if (!this.errorSamples.has(key)) {
         this.errorSamples.set(key, [])

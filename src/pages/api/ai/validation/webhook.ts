@@ -20,8 +20,8 @@ export const POST = async ({
 
     // Get webhook details from request
     const payload = await request.json()
-    const event = request.headers.get('x-github-event') || 'unknown'
-    const signature = request.headers.get('x-hub-signature-256') || ''
+    const event = request.headers.get('x-github-event') ?? 'unknown'
+    const signature = request.headers.get('x-hub-signature-256') ?? ''
 
     // Validate the webhook and handle the event
     const result = await validationRunner.handleWebhook(payload)

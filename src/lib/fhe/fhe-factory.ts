@@ -12,6 +12,8 @@ import { SealOperations } from './seal-operations'
 import { SealScheme } from './seal-scheme'
 import { SealService } from './seal-service'
 import { SealSchemeType } from './seal-types'
+import type { SealCipherText } from './seal-service'
+import type { SealOperationResult } from './seal-types'
 import type { FHEOperation } from './types'
 import type {
   FHEConfig,
@@ -24,9 +26,7 @@ import type {
 
 // Add version to mock scheme
 if (
-  mockFHEService &&
-  typeof mockFHEService.scheme === 'object' &&
-  mockFHEService.scheme !== null
+  typeof mockFHEService.scheme === 'object'
 ) {
   ;(mockFHEService.scheme as { version?: string }).version = '1.0.0'
 } else {
@@ -50,7 +50,10 @@ let defaultServiceInstance: FHEService | null = null
 
 // Initialize tenant manager (placeholder - actual implementation would be more complex)
 const tenantManager = {
-  getTenant: (tenantId: string) => {
+  getTenant: (tenantId: string): { tenantId: string; isolationLevel: string } | undefined => {
+    if (!tenantId) {
+      return undefined
+    }
     // Simplified implementation - using string type to allow dynamic values
     return { tenantId, isolationLevel: 'shared' as string }
   },
@@ -96,7 +99,7 @@ const sealFHEService: FHEService = {
 
   isInitialized(): boolean {
     // Check if service has been initialized by checking if the singleton has expected properties
-    return Boolean(sealService && sealService.getContext)
+    return typeof sealService.getContext === 'function'
   },
 
   supportsOperation(operation: FHEOperation): boolean {
@@ -118,7 +121,7 @@ const sealFHEService: FHEService = {
     }
   },
 
-  async encrypt<T>(data: T, _options?: unknown): Promise<EncryptedData> {
+  async encrypt(data: unknown, _options?: unknown): Promise<EncryptedData> {
     try {
       if (
         !Array.isArray(data) ||
@@ -126,29 +129,61 @@ const sealFHEService: FHEService = {
       ) {
         throw new Error('SEAL encryption requires a number array input')
       }
-      const encrypted = await sealService.encrypt(data as number[])
-      return createEncryptedData(encrypted, data as number[])
+      const encrypted = await sealService.encrypt(data)
+      return createEncryptedData(encrypted.save(), data)
     } catch (error: unknown) {
       logger.error('SEAL encryption failed', { error })
       throw error
     }
   },
 
-  async decrypt<T>(
+  async decrypt(
     encryptedData: EncryptedData,
     _options?: unknown,
-  ): Promise<T> {
+  ): Promise<any> {
     try {
       // Extract serializedCiphertext from metadata if available
-      const ciphertext =
-        encryptedData.metadata?.serializedCiphertext ||
-        (encryptedData.data as string)
+      const serializedCiphertext = getSerializedCiphertext(encryptedData)
 
-      if (!ciphertext) {
+      if (!serializedCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
-      return (await sealService.decrypt(ciphertext)) as T
+      const ciphertext = deserializeCiphertext(serializedCiphertext)
+      try {
+        const decryptedValue = await sealService.decrypt(ciphertext)
+        if (encryptedData.dataType === 'number') {
+          if (typeof decryptedValue !== 'number') {
+            throw new TypeError('Expected number decryption result')
+          }
+          return decryptedValue
+        }
+        if (encryptedData.dataType === 'string') {
+          if (typeof decryptedValue !== 'string') {
+            throw new TypeError('Expected string decryption result')
+          }
+          return decryptedValue
+        }
+        if (encryptedData.dataType === 'boolean') {
+          if (typeof decryptedValue !== 'boolean') {
+            throw new TypeError('Expected boolean decryption result')
+          }
+          return decryptedValue
+        }
+        if (encryptedData.dataType === 'array') {
+          if (!Array.isArray(decryptedValue)) {
+            throw new TypeError('Expected array decryption result')
+          }
+          return decryptedValue
+        }
+
+        if (!isRecord(decryptedValue)) {
+          throw new TypeError('Expected object decryption result')
+        }
+        return decryptedValue
+      } finally {
+        ciphertext.delete()
+      }
     } catch (error: unknown) {
       logger.error('SEAL decryption failed', { error })
       throw error
@@ -166,23 +201,16 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext || (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext || (b.data as string)
+      const aCiphertext = toSealCipherText(a)
+      const bCiphertext = toSealCipherText(b)
 
-      if (!aCiphertext || !bCiphertext) {
-        throw new Error('Invalid encrypted data: missing ciphertext')
-      }
-
-      const result = await sealOperations.add(
-        aCiphertext as string,
-        bCiphertext as string,
-      )
+      const result = await sealOperations.add(aCiphertext, bCiphertext)
 
       if (!result.success) {
-        throw new Error(result.error || 'Addition operation failed')
+        throw new Error(result.error ?? 'Addition operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(serializeAndReleaseCiphertext(extractOperationResultCiphertext(result)))
     } catch (error: unknown) {
       logger.error('SEAL addition failed', { error })
       throw error
@@ -200,23 +228,16 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext || (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext || (b.data as string)
+      const aCiphertext = toSealCipherText(a)
+      const bCiphertext = toSealCipherText(b)
 
-      if (!aCiphertext || !bCiphertext) {
-        throw new Error('Invalid encrypted data: missing ciphertext')
-      }
-
-      const result = await sealOperations.subtract(
-        aCiphertext as string,
-        bCiphertext as string,
-      )
+      const result = await sealOperations.subtract(aCiphertext, bCiphertext)
 
       if (!result.success) {
-        throw new Error(result.error || 'Subtraction operation failed')
+        throw new Error(result.error ?? 'Subtraction operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(serializeAndReleaseCiphertext(extractOperationResultCiphertext(result)))
     } catch (error: unknown) {
       logger.error('SEAL subtraction failed', { error })
       throw error
@@ -234,23 +255,16 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext || (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext || (b.data as string)
+      const aCiphertext = toSealCipherText(a)
+      const bCiphertext = toSealCipherText(b)
 
-      if (!aCiphertext || !bCiphertext) {
-        throw new Error('Invalid encrypted data: missing ciphertext')
-      }
-
-      const result = await sealOperations.multiply(
-        aCiphertext as string,
-        bCiphertext as string,
-      )
+      const result = await sealOperations.multiply(aCiphertext, bCiphertext)
 
       if (!result.success) {
-        throw new Error(result.error || 'Multiplication operation failed')
+        throw new Error(result.error ?? 'Multiplication operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(serializeAndReleaseCiphertext(extractOperationResultCiphertext(result)))
     } catch (error: unknown) {
       logger.error('SEAL multiplication failed', { error })
       throw error
@@ -260,20 +274,15 @@ const sealFHEService: FHEService = {
   async negate(value: EncryptedData): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
-      const ciphertext =
-        value.metadata?.serializedCiphertext || (value.data as string)
-
-      if (!ciphertext) {
-        throw new Error('Invalid encrypted data: missing ciphertext')
-      }
+      const ciphertext = toSealCipherText(value)
 
       const result = await sealOperations.negate(ciphertext)
 
       if (!result.success) {
-        throw new Error(result.error || 'Negation operation failed')
+        throw new Error(result.error ?? 'Negation operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(serializeAndReleaseCiphertext(extractOperationResultCiphertext(result)))
     } catch (error: unknown) {
       logger.error('SEAL negation failed', { error })
       throw error
@@ -286,20 +295,15 @@ const sealFHEService: FHEService = {
   ): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
-      const ciphertext =
-        value.metadata?.serializedCiphertext || (value.data as string)
-
-      if (!ciphertext) {
-        throw new Error('Invalid encrypted data: missing ciphertext')
-      }
+      const ciphertext = toSealCipherText(value)
 
       const result = await sealOperations.polynomial(ciphertext, coefficients)
 
       if (!result.success) {
-        throw new Error(result.error || 'Polynomial operation failed')
+        throw new Error(result.error ?? 'Polynomial operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(serializeAndReleaseCiphertext(extractOperationResultCiphertext(result)))
     } catch (error: unknown) {
       logger.error('SEAL polynomial failed', { error })
       throw error
@@ -309,20 +313,15 @@ const sealFHEService: FHEService = {
   async rotate(vector: EncryptedData, steps: number): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
-      const ciphertext =
-        vector.metadata?.serializedCiphertext || (vector.data as string)
-
-      if (!ciphertext) {
-        throw new Error('Invalid encrypted data: missing ciphertext')
-      }
+      const ciphertext = toSealCipherText(vector)
 
       const result = await sealOperations.rotate(ciphertext, steps)
 
       if (!result.success) {
-        throw new Error(result.error || 'Rotation operation failed')
+        throw new Error(result.error ?? 'Rotation operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(serializeAndReleaseCiphertext(extractOperationResultCiphertext(result)))
     } catch (error: unknown) {
       logger.error('SEAL rotation failed', { error })
       throw error
@@ -334,9 +333,12 @@ const sealFHEService: FHEService = {
  * Helper function to create an EncryptedData object from a SEAL ciphertext
  */
 function createEncryptedData(
-  serializedCiphertext: string,
+  ciphertext: string | SealCipherText,
   originalData?: number[],
 ): EncryptedData {
+  const serializedCiphertext =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.save()
+
   return {
     id: `seal-encrypted-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`,
     data: serializedCiphertext,
@@ -364,6 +366,75 @@ interface FHEFactoryOptions {
   tenantConfig?: TenantConfig // Add tenant configuration to the interface
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === 'object'
+
+const getSerializedCiphertext = (encryptedData: EncryptedData): string | undefined => {
+  const metadata = encryptedData.metadata
+  if (isRecord(metadata) && typeof metadata.serializedCiphertext === 'string') {
+    return metadata.serializedCiphertext
+  }
+  return typeof encryptedData.data === 'string' ? encryptedData.data : undefined
+}
+
+const formatTenantIdForLog = (tenantId: unknown): string => {
+  if (typeof tenantId === 'string') {
+    return tenantId
+  }
+  if (tenantId == null) {
+    return 'unknown'
+  }
+  return JSON.stringify(tenantId)
+}
+
+const isSealCipherText = (value: unknown): value is SealCipherText => {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    typeof value.copy === 'function' &&
+    typeof value.save === 'function' &&
+    typeof value.load === 'function' &&
+    typeof value.delete === 'function'
+  )
+}
+
+const deserializeCiphertext = (serializedCiphertext: string): SealCipherText => {
+  const seal = sealService.getSeal()
+  const context = sealService.getContext()
+  const ciphertext = seal.CipherText()
+  ciphertext.load(context, serializedCiphertext)
+  return ciphertext
+}
+
+const serializeAndReleaseCiphertext = (ciphertext: SealCipherText): string => {
+  try {
+    return ciphertext.save()
+  } finally {
+    ciphertext.delete()
+  }
+}
+
+const toSealCipherText = (encryptedData: EncryptedData): SealCipherText => {
+  const serializedCiphertext = getSerializedCiphertext(encryptedData)
+  if (!serializedCiphertext) {
+    throw new Error('Invalid encrypted data: missing ciphertext')
+  }
+  return deserializeCiphertext(serializedCiphertext)
+}
+
+const extractOperationResultCiphertext = (result: SealOperationResult): SealCipherText => {
+  if (!result.success || !isSealCipherText(result.result)) {
+    throw new Error(result.error ?? 'SEAL operation failed')
+  }
+  return result.result
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unknown FHE implementation: ${String(value)}`)
+}
+
 /**
  * Get the appropriate FHE service implementation based on environment and requirements
  */
@@ -384,10 +455,7 @@ export async function getFHEService(
 
   // For non-tenant specific requests, use the standard logic
   const isDevelopment =
-    typeof window !== 'undefined' ||
-    (typeof process !== 'undefined' &&
-      (process.env as unknown as { NODE_ENV?: string })?.['NODE_ENV'] ===
-        'development')
+    typeof window !== 'undefined' || process.env.NODE_ENV === 'development'
 
   // Determine which implementation to use
   let selectedImplementation: FHEImplementation
@@ -441,7 +509,7 @@ export async function getFHEService(
       return sealFHEService
 
     default:
-      throw new Error(`Unknown FHE implementation: ${selectedImplementation}`)
+      return assertNever(selectedImplementation)
   }
 }
 
@@ -459,7 +527,6 @@ export async function getTenantFHEService(
     return tenantServiceInstances.get(tenantId)!
   }
 
-  // Get tenant configuration
   const tenant = tenantManager.getTenant(tenantId)
   if (!tenant) {
     logger.warn(
@@ -475,10 +542,26 @@ export async function getTenantFHEService(
         registeredAt: Date.now(),
       },
     })
+    const registeredTenant = tenantManager.getTenant(tenantId)
+    if (!registeredTenant) {
+      throw new Error(`Failed to register tenant ${tenantId}`)
+    }
+    return await getTenantFHEServiceWithTenant(tenantId, options, registeredTenant)
   }
 
+  return await getTenantFHEServiceWithTenant(tenantId, options, tenant)
+}
+
+const getTenantFHEServiceWithTenant = async (
+  tenantId: string,
+  options: FHEFactoryOptions,
+  tenant: {
+    tenantId: string
+    isolationLevel: string
+  },
+): Promise<FHEService> => {
   // For "dedicated" isolation, we need to create a unique service instance
-  if (tenant && tenant.isolationLevel === 'dedicated') {
+  if (tenant.isolationLevel === 'dedicated') {
     logger.info(`Creating dedicated FHE service for tenant ${tenantId}`)
 
     // Create a dedicated service instance
@@ -525,7 +608,7 @@ export async function getTenantFHEService(
     ...baseService,
 
     // Override encrypt to use tenant-specific context
-    encrypt: async <T>(data: T, options?: unknown): Promise<EncryptedData> => {
+    encrypt: async (data: unknown, options?: unknown): Promise<EncryptedData> => {
       // Track operation for rate limiting
       if (!tenantManager.trackOperation(tenantId)) {
         throw new Error(`Rate limit exceeded for tenant ${tenantId}`)
@@ -534,11 +617,10 @@ export async function getTenantFHEService(
       // Add tenant ID to the metadata
       const result = await baseService.encrypt(data, options)
 
-      if (result && typeof result === 'object') {
-        result.metadata = {
-          ...result.metadata,
-          tenantId,
-        }
+      const tenantMetadata = result.metadata ?? {}
+      result.metadata = {
+        ...tenantMetadata,
+        tenantId,
       }
 
       return result
@@ -546,18 +628,24 @@ export async function getTenantFHEService(
 
     // Override decrypt to verify tenant ownership
     decrypt: async <T>(
-      encryptedData: EncryptedData,
+      encryptedData: EncryptedData<T>,
       options?: unknown,
     ): Promise<T> => {
       // Verify tenant ownership if metadata contains tenant ID
-      if (
-        encryptedData &&
-        encryptedData.metadata &&
-        encryptedData.metadata.tenantId &&
-        encryptedData.metadata.tenantId !== tenantId
-      ) {
+      const metadata = encryptedData.metadata
+      if (!isRecord(metadata)) {
+        throw new Error('Invalid encrypted metadata')
+      }
+      const tenantIdMismatch =
+        typeof metadata.tenantId === 'string' &&
+        metadata.tenantId !== tenantId
+
+      if (tenantIdMismatch) {
+        const ownerTenantId = metadata.tenantId ?? 'unknown'
         logger.warn(
-          `Tenant ${tenantId} attempted to decrypt data owned by tenant ${encryptedData.metadata.tenantId}`,
+          `Tenant ${tenantId} attempted to decrypt data owned by tenant ${formatTenantIdForLog(
+            ownerTenantId,
+          )}`,
         )
         throw new Error(
           'Access denied: cannot decrypt data from another tenant',
@@ -577,9 +665,7 @@ export async function getTenantFHEService(
  * Get the default FHE service for the current environment
  */
 export async function getDefaultFHEService(): Promise<FHEService> {
-  if (!defaultServiceInstance) {
-    defaultServiceInstance = await getFHEService()
-  }
+  defaultServiceInstance ??= await getFHEService();
   return defaultServiceInstance
 }
 

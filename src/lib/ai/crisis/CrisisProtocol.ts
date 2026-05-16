@@ -10,17 +10,15 @@ const appLogger = createBuildSafeLogger('app')
 export class CrisisProtocol {
   private static instance: CrisisProtocol | null = null
   private config: CrisisProtocolConfig | null = null
-  private activeEvents: Map<string, CrisisEvent> = new Map()
-  private alertTimers: Map<string, NodeJS.Timeout> = new Map()
+  private readonly activeEvents: Map<string, CrisisEvent> = new Map()
+  private readonly alertTimers: Map<string, NodeJS.Timeout> = new Map()
 
   private constructor() {
     // Singleton pattern
   }
 
   static getInstance(): CrisisProtocol {
-    if (!CrisisProtocol.instance) {
-      CrisisProtocol.instance = new CrisisProtocol()
-    }
+    CrisisProtocol.instance ??= new CrisisProtocol();
     return CrisisProtocol.instance
   }
 
@@ -133,7 +131,7 @@ export class CrisisProtocol {
     appLogger.info('Crisis event escalated', {
       eventId,
       handledBy,
-      newLevel: nextLevel || event.alertLevel,
+      newLevel: nextLevel ?? event.alertLevel,
     })
   }
 
@@ -239,7 +237,7 @@ export class CrisisProtocol {
     return (
       this.config.alertConfigurations.find(
         (config) => config.level === level,
-      ) || null
+      ) ?? null
     )
   }
 

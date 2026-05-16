@@ -330,7 +330,7 @@ describe('BiasDetectionEngine Integration Tests', () => {
       const startTime = Date.now()
 
       // Analyze sessions concurrently
-      const analysisPromises = sampleSessions.map((session) =>
+      const analysisPromises = sampleSessions.map( async (session) =>
         engine.analyzeSession(session),
       )
 

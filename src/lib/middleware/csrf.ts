@@ -190,7 +190,7 @@ export const csrfMiddleware = defineMiddleware(
       const clonedRequest = request.clone()
 
       // Check content type to determine how to parse the body
-      const contentType = request.headers.get('Content-Type') || ''
+      const contentType = request.headers.get('Content-Type') ?? ''
 
       if (contentType.includes('application/x-www-form-urlencoded')) {
         try {

@@ -49,7 +49,7 @@ interface DatasetWriter {
 }
 
 class JSONLWriter implements DatasetWriter {
-  constructor(private writeStream: NodeJS.WritableStream) {}
+  constructor(private readonly writeStream: NodeJS.WritableStream) {}
   init() {}
   writeRecord(record: ConversationRecord): void {
     this.writeStream.write(JSON.stringify(record) + "\n");
@@ -58,7 +58,7 @@ class JSONLWriter implements DatasetWriter {
 }
 
 class JSONWriter implements DatasetWriter {
-  constructor(private writeStream: NodeJS.WritableStream) {}
+  constructor(private readonly writeStream: NodeJS.WritableStream) {}
   init(): void {
     this.writeStream.write("[\n");
   }
@@ -74,9 +74,9 @@ class JSONWriter implements DatasetWriter {
 }
 
 class CSVWriter implements DatasetWriter {
-  private headers: string[];
+  private readonly headers: string[];
 
-  constructor(private writeStream: NodeJS.WritableStream) {
+  constructor(private readonly writeStream: NodeJS.WritableStream) {
     this.headers = generateCSVHeaders();
   }
 
@@ -100,6 +100,7 @@ function createWriter(
       return new JSONWriter(writeStream);
     case "csv":
       return new CSVWriter(writeStream);
+    case "jsonl": { throw new Error('Not implemented yet: "jsonl" case') }
     default:
       return new JSONLWriter(writeStream);
   }
@@ -181,7 +182,7 @@ function recordToCSVRow(record: ConversationRecord, headers: string[]): string {
   return values.join(",");
 }
 
-function awaitStreamFinish(stream: NodeJS.WritableStream): Promise<void> {
+ async function awaitStreamFinish(stream: NodeJS.WritableStream): Promise<void> {
   return new Promise((resolve, reject) => {
     stream.once("finish", resolve);
     stream.once("error", reject);
@@ -237,7 +238,7 @@ export async function mergeAllDatasets(
         const record: ConversationRecord = JSON.parse(line);
         totalSamples++;
 
-        if (dedup && dedup.has(record.conversation_id)) {
+        if (dedup?.has(record.conversation_id)) {
           duplicatesRemoved++;
           continue;
         }
@@ -488,6 +489,7 @@ export async function validateMergedDataset(filePath: string): Promise<{
       case "csv":
         sampleCount = await validateCSVDataset(validatedPath, errors);
         break;
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         sampleCount = await validateJSONLDataset(validatedPath, errors);
     }

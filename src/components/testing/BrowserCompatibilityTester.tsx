@@ -93,7 +93,7 @@ export function BrowserCompatibilityTester() {
           if (typeof window === 'undefined' || !window.matchMedia) {
             return false
           }
-          return !!window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          return window.matchMedia('(prefers-reduced-motion: reduce)').matches
         },
       },
       {
@@ -102,7 +102,7 @@ export function BrowserCompatibilityTester() {
           if (typeof window === 'undefined' || !window.matchMedia) {
             return false
           }
-          return !!window.matchMedia('(forced-colors: active)').matches
+          return window.matchMedia('(forced-colors: active)').matches
         },
       },
     ]

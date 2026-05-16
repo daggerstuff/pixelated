@@ -178,7 +178,7 @@ export interface RecommendationOptions {
  * Provides evidence-based, personalized treatment recommendations using AI-driven analysis
  */
 export class RecommendationService {
-  private knowledgeBase: ClinicalKnowledgeBase
+  private readonly knowledgeBase: ClinicalKnowledgeBase
   private readonly DEFAULT_VALID_DURATION = 14 * 24 * 60 * 60 * 1000 // 14 days in milliseconds
 
   constructor() {
@@ -526,7 +526,7 @@ export class RecommendationService {
         context.clientProfile.currentStatus.treatmentMotivation,
       supportSystemStrength: context.clientProfile.currentStatus.supportSystem,
       riskIndicators,
-      emergentIssues: context.emergentIssues || [],
+      emergentIssues: context.emergentIssues ?? [],
     }
   }
 
@@ -582,13 +582,13 @@ export class RecommendationService {
       // Create full recommendation with personalization
       const recommendation: TreatmentRecommendation = {
         id,
-        title: base.title || 'Therapeutic Intervention',
+        title: base.title ?? 'Therapeutic Intervention',
         description: await this.generatePersonalizedDescription(
           base,
           context,
           currentState,
         ),
-        priority: base.priority || 'medium',
+        priority: base.priority ?? 'medium',
         techniques: await this.selectAppropriateTechniques(base, context),
         evidenceStrength: this.calculateEvidenceStrength(base, context),
         supportingPatterns: this.identifySupportingPatterns(
@@ -602,16 +602,16 @@ export class RecommendationService {
         validUntil: new Date(
           Date.now() + this.DEFAULT_VALID_DURATION,
         ).toISOString(),
-        timeframe: base.timeframe || 'Within 2-4 weeks',
+        timeframe: base.timeframe ?? 'Within 2-4 weeks',
         rationale:
-          base.rationale ||
+          base.rationale ??
           'Evidence-based intervention for presenting concerns',
         expectedOutcomes: this.generateExpectedOutcomes(base, context),
         riskConsiderations: this.identifyRiskConsiderations(base, context),
         progressMetrics: this.generateProgressMetrics(base, context),
         metadata: {
           generatedAt: new Date().toISOString(),
-          basedOnSessions: context.recentSessions.map((s) => s.sessionId || ''),
+          basedOnSessions: context.recentSessions.map((s) => s.sessionId ?? ''),
           clinicalContext: currentState.primaryConcerns.join(', '),
           reviewRequired:
             currentState.riskLevel === 'critical' ||
@@ -647,7 +647,7 @@ export class RecommendationService {
     })
 
     // Limit to max recommendations if specified
-    const maxRecs = options.maxRecommendations || 10
+    const maxRecs = options.maxRecommendations ?? 10
     return prioritized.slice(0, maxRecs)
   }
 
@@ -796,20 +796,20 @@ export class RecommendationService {
   ): ClientProfile {
     return {
       id: clientId,
-      demographics: partialProfile?.demographics || {},
-      clinicalHistory: partialProfile?.clinicalHistory || {},
-      treatmentHistory: partialProfile?.treatmentHistory || {
+      demographics: partialProfile?.demographics ?? {},
+      clinicalHistory: partialProfile?.clinicalHistory ?? {},
+      treatmentHistory: partialProfile?.treatmentHistory ?? {
         previousTherapies: [],
         effectiveInterventions: [],
         ineffectiveInterventions: [],
       },
-      currentStatus: partialProfile?.currentStatus || {
+      currentStatus: partialProfile?.currentStatus ?? {
         riskLevel: 'moderate',
         functionalStatus: 'unknown',
         supportSystem: 'moderate',
         treatmentMotivation: 'moderate',
       },
-      preferences: partialProfile?.preferences || {
+      preferences: partialProfile?.preferences ?? {
         preferredModalities: [],
       },
     }
@@ -1063,7 +1063,7 @@ export class RecommendationService {
   }
 
   private identifyCulturalAdaptations(profile: ClientProfile): string[] {
-    return profile.demographics.culturalBackground || []
+    return profile.demographics.culturalBackground ?? []
   }
 
   private identifyIndividualAdaptations(
@@ -1105,6 +1105,7 @@ export class RecommendationService {
         return ['1 week', '2 weeks', '4 weeks']
       case 'medium':
         return ['2 weeks', '4 weeks', '8 weeks']
+      case "low": { throw new Error('Not implemented yet: "low" case') }
       default:
         return ['4 weeks', '8 weeks', '12 weeks']
     }

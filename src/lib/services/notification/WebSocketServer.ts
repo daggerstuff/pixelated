@@ -50,8 +50,8 @@ interface ServerMessage {
  * Authorization header as a Bearer token.
  */
 export class WebSocketServer {
-  private wss: WSServer
-  private notificationService: NotificationService
+  private readonly wss: WSServer
+  private readonly notificationService: NotificationService
 
   constructor(port: number, notificationService: NotificationService) {
     this.notificationService = notificationService

@@ -24,8 +24,8 @@ interface RateLimitInfo {
  * outdated scores are removed (zremrangebyscore) before counting the current size of the set (zcard).
  */
 export class RateLimiter {
-  private redis: Redis
-  private options: RateLimiterOptions
+  private readonly redis: Redis
+  private readonly options: RateLimiterOptions
 
   constructor(options: RateLimiterOptions) {
     this.options = options

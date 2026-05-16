@@ -222,25 +222,25 @@ function evaluateCorrectness(
   let score = 0
   const criteria =
     CORE_MENTAL_HEALTH_OBJECTIVES.find((obj) => obj.id === 'correctness')
-      ?.criteria || []
+      ?.criteria ?? []
 
   // Factual accuracy check (would integrate with medical knowledge base)
   const factualScore = assessFactualAccuracy(response, context)
   score +=
     factualScore *
-    (criteria.find((c) => c.criterion === 'factual_accuracy')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'factual_accuracy')?.weight ?? 0)
 
   // Evidence-based assessment (would check for citations, research references)
   const evidenceScore = assessEvidenceBasis(response, context)
   score +=
     evidenceScore *
-    (criteria.find((c) => c.criterion === 'evidence_based')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'evidence_based')?.weight ?? 0)
 
   // Clinical soundness evaluation (would use clinical decision support rules)
   const clinicalScore = assessClinicalSoundness(response, context)
   score +=
     clinicalScore *
-    (criteria.find((c) => c.criterion === 'clinical_soundness')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'clinical_soundness')?.weight ?? 0)
 
   return Math.min(1.0, Math.max(0.0, score))
 }
@@ -252,25 +252,25 @@ function evaluateInformativeness(
   let score = 0
   const criteria =
     CORE_MENTAL_HEALTH_OBJECTIVES.find((obj) => obj.id === 'informativeness')
-      ?.criteria || []
+      ?.criteria ?? []
 
   // Comprehensiveness assessment
   const comprehensivenessScore = assessComprehensiveness(response, context)
   score +=
     comprehensivenessScore *
-    (criteria.find((c) => c.criterion === 'comprehensiveness')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'comprehensiveness')?.weight ?? 0)
 
   // Relevance evaluation
   const relevanceScore = assessRelevance(response, context)
   score +=
     relevanceScore *
-    (criteria.find((c) => c.criterion === 'relevance')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'relevance')?.weight ?? 0)
 
   // Actionability assessment
   const actionabilityScore = assessActionability(response, context)
   score +=
     actionabilityScore *
-    (criteria.find((c) => c.criterion === 'actionability')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'actionability')?.weight ?? 0)
 
   return Math.min(1.0, Math.max(0.0, score))
 }
@@ -282,25 +282,25 @@ function evaluateProfessionalism(
   let score = 0
   const criteria =
     CORE_MENTAL_HEALTH_OBJECTIVES.find((obj) => obj.id === 'professionalism')
-      ?.criteria || []
+      ?.criteria ?? []
 
   // Clinical tone assessment
   const toneScore = assessClinicalTone(response, context)
   score +=
     toneScore *
-    (criteria.find((c) => c.criterion === 'clinical_tone')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'clinical_tone')?.weight ?? 0)
 
   // Boundaries evaluation
   const boundariesScore = assessBoundaries(response, context)
   score +=
     boundariesScore *
-    (criteria.find((c) => c.criterion === 'boundaries')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'boundaries')?.weight ?? 0)
 
   // Ethical standards check
   const ethicsScore = assessEthicalStandards(response, context)
   score +=
     ethicsScore *
-    (criteria.find((c) => c.criterion === 'ethical_standards')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'ethical_standards')?.weight ?? 0)
 
   return Math.min(1.0, Math.max(0.0, score))
 }
@@ -327,26 +327,26 @@ function evaluateEmpathy(response: string, context: AlignmentContext): number {
   let score = 0
   const criteria =
     CORE_MENTAL_HEALTH_OBJECTIVES.find((obj) => obj.id === 'empathy')
-      ?.criteria || []
+      ?.criteria ?? []
 
   // Emotional validation assessment
   const validationScore = assessEmotionalValidation(response, context)
   score +=
     validationScore *
-    (criteria.find((c) => c.criterion === 'emotional_validation')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'emotional_validation')?.weight ?? 0)
 
   // Understanding demonstration evaluation
   const understandingScore = assessUnderstandingDemonstration(response, context)
   score +=
     understandingScore *
     (criteria.find((c) => c.criterion === 'understanding_demonstration')
-      ?.weight || 0)
+      ?.weight ?? 0)
 
   // Supportive tone assessment
   const supportiveScore = assessSupportiveTone(response, context)
   score +=
     supportiveScore *
-    (criteria.find((c) => c.criterion === 'supportive_tone')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'supportive_tone')?.weight ?? 0)
 
   return Math.min(1.0, Math.max(0.0, score))
 }
@@ -355,25 +355,25 @@ function evaluateSafety(response: string, context: AlignmentContext): number {
   let score = 0
   const criteria =
     CORE_MENTAL_HEALTH_OBJECTIVES.find((obj) => obj.id === 'safety')
-      ?.criteria || []
+      ?.criteria ?? []
 
   // Harm prevention check
   const harmPreventionScore = assessHarmPrevention(response, context)
   score +=
     harmPreventionScore *
-    (criteria.find((c) => c.criterion === 'harm_prevention')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'harm_prevention')?.weight ?? 0)
 
   // Crisis recognition evaluation
   const crisisScore = assessCrisisRecognition(response, context)
   score +=
     crisisScore *
-    (criteria.find((c) => c.criterion === 'crisis_recognition')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'crisis_recognition')?.weight ?? 0)
 
   // Resource provision assessment
   const resourceScore = assessResourceProvision(response, context)
   score +=
     resourceScore *
-    (criteria.find((c) => c.criterion === 'resource_provision')?.weight || 0)
+    (criteria.find((c) => c.criterion === 'resource_provision')?.weight ?? 0)
 
   return Math.min(1.0, Math.max(0.0, score))
 }
@@ -540,12 +540,12 @@ export function validateObjectiveWeights(): boolean {
 }
 
 export function getDefaultObjectiveWeights(): Record<string, number> {
-  return CORE_MENTAL_HEALTH_OBJECTIVES.reduce(
+  return CORE_MENTAL_HEALTH_OBJECTIVES.reduce< Record<string, number>>(
     (weights, obj) => {
       weights[obj.id] = obj.weight
       return weights
     },
-    {} as Record<string, number>,
+    {},
   )
 }
 

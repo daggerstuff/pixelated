@@ -284,25 +284,25 @@ describe('error-handler middleware', () => {
   })
 
   describe('asyncHandler', () => {
-    it('should catch errors and pass them to next', () => {
+    it('should catch errors and pass them to next', async () => {
       const error = new Error('Async error')
       const failingAsyncFn = async () => {
         throw error
       }
 
       const wrappedFn = asyncHandler(failingAsyncFn)
-      wrappedFn(req, res, next)
+       wrappedFn(req, res, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
 
-    it('should call next on success if wrapped function returns correctly', () => {
+    it('should call next on success if wrapped function returns correctly', async () => {
       const successAsyncFn = async () => {
         return 'success'
       }
 
       const wrappedFn = asyncHandler(successAsyncFn)
-      wrappedFn(req, res, next)
+       wrappedFn(req, res, next)
 
       expect(next).not.toHaveBeenCalled()
     })

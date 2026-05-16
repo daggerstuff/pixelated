@@ -13,7 +13,7 @@ const logger = getClinicalAnalysisLogger('helpers')
  * recommendations generation, and quality metrics calculation.
  */
 export class ClinicalAnalysisHelpers {
-  constructor(private modelProvider?: IModelProvider) {}
+  constructor(private readonly modelProvider?: IModelProvider) {}
 
   /**
    * Builds clinical prompt for LLM analysis.
@@ -26,14 +26,14 @@ export class ClinicalAnalysisHelpers {
     const guidelinesText =
       expertGuidance?.guidelines
         .map((g) => `- ${g.rule} (${g.source})`)
-        .join('\n') || 'No specific guidelines available'
+        .join('\n') ?? 'No specific guidelines available'
 
     const riskFactorsText =
       expertGuidance?.riskFactors
         .map(
           (rf) => `- ${rf.factor}: ${rf.description} (${rf.severity} severity)`,
         )
-        .join('\n') || 'No specific risk factors identified'
+        .join('\n') ?? 'No specific risk factors identified'
 
     return [
       {
@@ -589,7 +589,7 @@ Provide a comprehensive clinical analysis in JSON format:
       return {
         explanation: baseAnalysis.explanation,
         confidence: baseAnalysis.confidence,
-        supportingEvidence: baseAnalysis.supportingEvidence || [],
+        supportingEvidence: baseAnalysis.supportingEvidence ?? [],
       }
     }
 
@@ -623,7 +623,7 @@ Provide a comprehensive clinical analysis in JSON format:
       return {
         explanation: `${baseAnalysis.explanation} [Clinical analysis enhanced with expert guidelines]`,
         confidence: baseAnalysis.confidence * 0.9, // Slightly reduce confidence due to error
-        supportingEvidence: baseAnalysis.supportingEvidence || [],
+        supportingEvidence: baseAnalysis.supportingEvidence ?? [],
       }
     }
   }

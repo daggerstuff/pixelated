@@ -118,9 +118,9 @@ function createFallbackClient(): ISearchClient {
 
 // Client-side search implementation
 class BrowserSearchClient implements ISearchClient {
-  private index: FlexSearchDocumentInstance
-  private documents: Map<string | number, SearchDocument> = new Map()
-  private config: SearchConfig
+  private readonly index: FlexSearchDocumentInstance
+  private readonly documents: Map<string | number, SearchDocument> = new Map()
+  private readonly config: SearchConfig
 
   constructor(
     Document: FlexSearchDocumentConstructor,
@@ -148,7 +148,7 @@ class BrowserSearchClient implements ISearchClient {
     this.index = new Document({
       document: {
         id: 'id',
-        index: this.config.fields || ['title', 'content', 'tags'],
+        index: this.config.fields ?? ['title', 'content', 'tags'],
         store: true,
       },
       ...this.config.indexOptions,
@@ -241,7 +241,7 @@ export async function initBrowserSearch(
       // First attempt - standard import path for ESM
       const flexsearchPath = 'flexsearch'
       const flexsearch = await import(flexsearchPath)
-      Document = (flexsearch.default?.Document ||
+      Document = (flexsearch.default?.Document ??
         flexsearch.Document) as FlexSearchDocumentConstructor
     } catch (err: unknown) {
       console.warn(

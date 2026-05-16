@@ -2,9 +2,9 @@ import { Brain, Heart, Zap, Shield, User } from 'lucide-react'
 import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import {
   type MindMirrorAnalysis,
   type ArchetypeResult,

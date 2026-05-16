@@ -1,4 +1,4 @@
-import type { InternalMemoryScopeInput } from '@/lib/server/internal-memory-service-client'
+import type { InternalMemoryScopeInput } from './internal-memory-service-client'
 
 export function buildScopePayload(scope: InternalMemoryScopeInput) {
   const payload: Record<string, unknown> = {

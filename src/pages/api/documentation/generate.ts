@@ -21,9 +21,9 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 
 function resolveSafeLlmBaseUrl(): string | undefined {
   const baseUrl =
-    process.env['LLM_BASE_URL'] ||
-    process.env['LLM_API_URL'] ||
-    process.env['OPENAI_BASE_URL'] ||
+    ((process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL']) ??
+    process.env['OPENAI_BASE_URL']) ??
     'https://api.openai.com/v1'
 
   if (isOpenRouterBaseUrl(baseUrl)) {
@@ -36,7 +36,7 @@ function resolveSafeLlmBaseUrl(): string | undefined {
   return baseUrl
 }
 const llmConfig = {
-  apiKey: process.env['LLM_API_KEY'] || 'dummy-key',
+  apiKey: process.env['LLM_API_KEY'] ?? 'dummy-key',
   baseUrl: resolveSafeLlmBaseUrl(),
 }
 // Create the base service
@@ -74,7 +74,7 @@ const aiService = {
           finishReason: 'stop' as const,
         },
       ],
-      usage: result.usage || {
+      usage: result.usage ?? {
         promptTokens: 0,
         completionTokens: 0,
         totalTokens: 0,
@@ -91,7 +91,7 @@ export const POST = async ({ request }: APIContext) => {
     // Authenticate request
     // To get cookies in Astro API route, use the request.headers
     // We'll create a minimal cookies API compatible with getCurrentUser
-    const cookieHeader = request.headers.get('cookie') || ''
+    const cookieHeader = request.headers.get('cookie') ?? ''
     const cookies = {
       get: (name: string) => {
         const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))

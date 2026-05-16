@@ -33,7 +33,7 @@ export const Popover: FC<PopoverProps> = ({
   onOpenChange,
   className = '',
 }) => {
-  const [isOpen, setIsOpen] = useState(open || false)
+  const [isOpen, setIsOpen] = useState(open ?? false)
 
   const handleToggle = () => {
     const newOpen = !isOpen

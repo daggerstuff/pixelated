@@ -70,7 +70,7 @@ function getSecurityLogger(scope) {
 }
 
 function getAdvancedPHILogger(config) {
-  const loggerConfig = config || {}
+  const loggerConfig = config ?? {}
   return getLogger(
     `advanced-phi${loggerConfig.enableLogCollection ? ':collect' : ''}`,
   )

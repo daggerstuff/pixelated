@@ -36,7 +36,7 @@ const defaultRetryOn = (res: Response | null, err: unknown | null) => {
   return false
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const sleep =  async (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 export async function fetchWithRetry(
   input: RequestInfo | URL,
@@ -96,7 +96,7 @@ export async function fetchWithRetry(
       return response
     } catch (err: unknown) {
       // If external abort triggered, rethrow immediately
-      if (externalSignal && externalSignal.aborted) {
+      if (externalSignal?.aborted) {
         clearTimeout(timeoutId)
         if (externalSignal) {
           externalSignal.removeEventListener('abort', abortExternal)
@@ -142,7 +142,7 @@ export async function fetchJSONWithRetry<T = unknown>(
   options: RetryOptions = {},
 ): Promise<T> {
   const res = await fetchWithRetry(input, init, options)
-  const contentType = res.headers.get('content-type') || ''
+  const contentType = res.headers.get('content-type') ?? ''
   if (!res.ok) {
     const text = await res.text().catch(() => '')
     throw new Error(`Request failed: ${res.status} ${res.statusText} ${text}`)

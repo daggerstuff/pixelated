@@ -71,12 +71,12 @@ export interface HealthAlert {
 }
 
 export class HealthMonitor extends EventEmitter {
-  private config: HealthCheckConfig
+  private readonly config: HealthCheckConfig
   private regions: RegionConfig[] = []
-  private healthMetrics: Map<string, HealthMetrics[]> = new Map()
-  private healthScores: Map<string, HealthScore> = new Map()
-  private activeAlerts: Map<string, HealthAlert> = new Map()
-  private customHealthChecks: Map<
+  private readonly healthMetrics: Map<string, HealthMetrics[]> = new Map()
+  private readonly healthScores: Map<string, HealthScore> = new Map()
+  private readonly activeAlerts: Map<string, HealthAlert> = new Map()
+  private readonly customHealthChecks: Map<
     string,
     () => Promise<{
       status: 'healthy' | 'degraded' | 'unhealthy'
@@ -194,7 +194,7 @@ export class HealthMonitor extends EventEmitter {
    */
   private async performHealthChecks(): Promise<void> {
     try {
-      const checkPromises = this.regions.map((region) =>
+      const checkPromises = this.regions.map( async (region) =>
         this.performRegionHealthCheck(region),
       )
 
@@ -296,7 +296,7 @@ export class HealthMonitor extends EventEmitter {
         },
         status: 'critical',
         lastUpdated: new Date(),
-        trends: this.healthScores.get(region.id)?.trends || {
+        trends: this.healthScores.get(region.id)?.trends ?? {
           '1h': 0,
           '24h': 0,
           '7d': 0,
@@ -379,7 +379,7 @@ export class HealthMonitor extends EventEmitter {
    * Store health metrics
    */
   private storeHealthMetrics(regionId: string, metrics: HealthMetrics): void {
-    const metricsHistory = this.healthMetrics.get(regionId) || []
+    const metricsHistory = this.healthMetrics.get(regionId) ?? []
     metricsHistory.push(metrics)
 
     // Keep only last 1000 metrics per region (about 8.3 hours at 30-second intervals)
@@ -397,7 +397,7 @@ export class HealthMonitor extends EventEmitter {
     regionId: string,
     currentMetrics: HealthMetrics,
   ): HealthScore {
-    const metricsHistory = this.healthMetrics.get(regionId) || []
+    const metricsHistory = this.healthMetrics.get(regionId) ?? []
 
     // Calculate component scores
     const performanceScore = this.calculatePerformanceScore(
@@ -830,7 +830,7 @@ export class HealthMonitor extends EventEmitter {
     regionId: string,
     limit: number = 100,
   ): HealthMetrics[] {
-    const metrics = this.healthMetrics.get(regionId) || []
+    const metrics = this.healthMetrics.get(regionId) ?? []
     return metrics.slice(-limit)
   }
 

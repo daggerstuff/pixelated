@@ -7,11 +7,11 @@ import { mongodb } from '../../config/mongodb.config'
  * Provides access to the database instance.
  */
 class MongoClientBridge {
-  public connect() {
+  public  async connect() {
     return mongodb.connect()
   }
 
-  public disconnect() {
+  public  async disconnect() {
     return mongodb.disconnect()
   }
 

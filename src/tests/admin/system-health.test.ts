@@ -5,6 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // Create a mock fetch function that can be modified per test
 const mockFetch = vi.fn()
 
+const createHealthResponse = (payload: unknown): Response =>
+  new Response(JSON.stringify(payload), {
+    status: 200,
+    statusText: 'OK',
+    headers: { 'Content-Type': 'application/json' },
+  })
+
 // Helper function to render mock Astro component HTML
 async function renderMockComponent(options?: {
   apiStatus?: string
@@ -45,64 +52,56 @@ describe('System Health Dashboard Page', () => {
   beforeEach(() => {
     // Set up default mock for each test
     mockFetch.mockReset()
-    mockFetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      headers: new Headers(),
-      redirected: false,
-      type: 'basic',
-      url: '',
-      json: () =>
-        Promise.resolve({
+    mockFetch.mockResolvedValue(
+      createHealthResponse({
+        status: 'healthy',
+        api: {
           status: 'healthy',
-          api: {
-            status: 'healthy',
-            timestamp: '2025-04-10T12:00:00.000Z',
-            version: 'v1',
-            responseTimeMs: 42,
+          timestamp: '2025-04-10T12:00:00.000Z',
+          version: 'v1',
+          responseTimeMs: 42,
+        },
+        mongodb: {
+          status: 'healthy',
+          timestamp: '2025-04-10T12:00:00.000Z',
+        },
+        redis: {
+          status: 'healthy',
+        },
+        system: {
+          memory: {
+            total: '16 GB',
+            free: '8 GB',
+            used: '8 GB',
+            usagePercent: 50,
           },
-          mongodb: {
-            status: 'healthy',
-            timestamp: '2025-04-10T12:00:00.000Z',
-          },
-          redis: {
-            status: 'healthy',
-          },
-          system: {
-            memory: {
-              total: '16 GB',
-              free: '8 GB',
-              used: '8 GB',
-              usagePercent: 50,
-            },
-            cpu: {
-              model: 'Intel(R) Core(TM) i7-10700K',
-              cores: 8,
-              loadAverage: {
-                '1m': '1.50',
-                '5m': '1.20',
-                '15m': '0.90',
-              },
-            },
-            os: {
-              platform: 'linux',
-              release: '5.10.0-15-amd64',
-              uptime: '1d 0h 0m 0s',
-            },
-            runtime: {
-              nodeVersion: 'v16.14.0',
-              processMemory: {
-                rss: '190.73 MB',
-                heapTotal: '95.37 MB',
-                heapUsed: '76.29 MB',
-                external: '9.54 MB',
-              },
-              processUptime: '1d 0h 0m 0s',
+          cpu: {
+            model: 'Intel(R) Core(TM) i7-10700K',
+            cores: 8,
+            loadAverage: {
+              '1m': '1.50',
+              '5m': '1.20',
+              '15m': '0.90',
             },
           },
-        }),
-    } as Response)
+          os: {
+            platform: 'linux',
+            release: '5.10.0-15-amd64',
+            uptime: '1d 0h 0m 0s',
+          },
+          runtime: {
+            nodeVersion: 'v16.14.0',
+            processMemory: {
+              rss: '190.73 MB',
+              heapTotal: '95.37 MB',
+              heapUsed: '76.29 MB',
+              external: '9.54 MB',
+            },
+            processUptime: '1d 0h 0m 0s',
+          },
+        },
+      }),
+    )
     vi.stubGlobal('fetch', mockFetch)
   })
 
@@ -164,65 +163,57 @@ describe('System Health Dashboard Page', () => {
 
   it('handles unhealthy status correctly', async () => {
     // Mock unhealthy status
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      headers: new Headers(),
-      redirected: false,
-      type: 'basic',
-      url: '',
-      json: () =>
-        Promise.resolve({
+    mockFetch.mockResolvedValueOnce(
+      createHealthResponse({
+        status: 'unhealthy',
+        api: {
+          status: 'healthy',
+          timestamp: '2025-04-10T12:00:00.000Z',
+          version: 'v1',
+          responseTimeMs: 42,
+        },
+        mongodb: {
           status: 'unhealthy',
-          api: {
-            status: 'healthy',
-            timestamp: '2025-04-10T12:00:00.000Z',
-            version: 'v1',
-            responseTimeMs: 42,
+          error: 'Database connection failed',
+          timestamp: '2025-04-10T12:00:00.000Z',
+        },
+        redis: {
+          status: 'healthy',
+        },
+        system: {
+          memory: {
+            total: '16 GB',
+            free: '8 GB',
+            used: '8 GB',
+            usagePercent: 50,
           },
-          mongodb: {
-            status: 'unhealthy',
-            error: 'Database connection failed',
-            timestamp: '2025-04-10T12:00:00.000Z',
-          },
-          redis: {
-            status: 'healthy',
-          },
-          system: {
-            memory: {
-              total: '16 GB',
-              free: '8 GB',
-              used: '8 GB',
-              usagePercent: 50,
-            },
-            cpu: {
-              model: 'Intel(R) Core(TM) i7-10700K',
-              cores: 8,
-              loadAverage: {
-                '1m': '1.50',
-                '5m': '1.20',
-                '15m': '0.90',
-              },
-            },
-            os: {
-              platform: 'linux',
-              release: '5.10.0-15-amd64',
-              uptime: '1d 0h 0m 0s',
-            },
-            runtime: {
-              nodeVersion: 'v16.14.0',
-              processMemory: {
-                rss: '190.73 MB',
-                heapTotal: '95.37 MB',
-                heapUsed: '76.29 MB',
-                external: '9.54 MB',
-              },
-              processUptime: '1d 0h 0m 0s',
+          cpu: {
+            model: 'Intel(R) Core(TM) i7-10700K',
+            cores: 8,
+            loadAverage: {
+              '1m': '1.50',
+              '5m': '1.20',
+              '15m': '0.90',
             },
           },
-        }),
-    } as Response)
+          os: {
+            platform: 'linux',
+            release: '5.10.0-15-amd64',
+            uptime: '1d 0h 0m 0s',
+          },
+          runtime: {
+            nodeVersion: 'v16.14.0',
+            processMemory: {
+              rss: '190.73 MB',
+              heapTotal: '95.37 MB',
+              heapUsed: '76.29 MB',
+              external: '9.54 MB',
+            },
+            processUptime: '1d 0h 0m 0s',
+          },
+        },
+      }),
+    )
 
     await renderMockComponent({
       apiStatus: 'healthy',

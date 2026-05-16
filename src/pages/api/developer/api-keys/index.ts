@@ -40,7 +40,7 @@ export const POST = withAuth(async (request, session) => {
 
   const existingKeys = await developerApiKeyManager.listApiKeys(session.user.id)
   if (existingKeys.length >= MAX_KEYS_PER_USER) {
-    await logSecurityEvent(
+     logSecurityEvent(
       SecurityEventType.AUTHORIZATION_FAILED,
       session.user.id,
       {
@@ -64,7 +64,7 @@ export const POST = withAuth(async (request, session) => {
     expires_in_days,
   })
 
-  await logSecurityEvent(
+   logSecurityEvent(
     SecurityEventType.AUTHENTICATION_SUCCESS,
     session.user.id,
     {

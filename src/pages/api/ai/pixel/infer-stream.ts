@@ -5,13 +5,13 @@ import { v4 as uuidv4 } from 'uuid'
 
 const logger = createBuildSafeLogger('pixel-inference-stream')
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL || 'http://localhost:8001'
+const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json()
-    const turnId = body.turnId || uuidv4()
-    const userId = body.user_id || 'anonymous'
+    const turnId = body.turnId ?? uuidv4()
+    const userId = body.user_id ?? 'anonymous'
     
     // Forward the request to the Python backend
     const response = await fetch(`${PIXEL_API_URL}/infer-stream`, {
@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
             // Parse activities for persistence
             buffer += decoder.decode(value, { stream: true })
             const parts = buffer.split('\n\n')
-            buffer = parts.pop() || ''
+            buffer = parts.pop() ?? ''
 
             for (const part of parts) {
               if (!part.trim()) continue

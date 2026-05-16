@@ -13,7 +13,7 @@ import { UserManagementService } from './user-management'
 import { WorkflowEngineService } from './workflow-engine'
 
 export class ServiceFactory {
-  private static instances: Map<string, any> = new Map()
+  private static readonly instances: Map<string, any> = new Map()
 
   /**
    * Get DocumentManagementService instance

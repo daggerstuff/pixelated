@@ -29,7 +29,7 @@ export async function getServerMongoExports() {
       ObjectId: class MockObjectId {
         public id: string
         constructor(id?: string) {
-          this.id = id || 'mock-object-id'
+          this.id = id ?? 'mock-object-id'
         }
         toString() {
           return this.id
@@ -52,7 +52,7 @@ export async function getServerMongoExports() {
       ObjectId: class MockObjectId {
         public id: string
         constructor(id?: string) {
-          this.id = id || 'mock-object-id'
+          this.id = id ?? 'mock-object-id'
         }
         toString() {
           return this.id

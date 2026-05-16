@@ -48,8 +48,8 @@ services:
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     command:
-      redis-server --appendonly yes --protected-mode yes --requirepass
-      ${REDIS_PASSWORD}
+      redis-server --bind 0.0.0.0 --appendonly yes --protected-mode yes --requirepass
+      ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - redis_data:/data
     ports:

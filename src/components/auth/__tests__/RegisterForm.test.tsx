@@ -2,12 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 import { RegisterForm } from '../RegisterForm'
 
 // Mock the authClient
-vi.mock('@/lib/auth-client', () => ({
+vi.mock('@/lib/auth-client.ts', () => ({
   authClient: {
     signUp: {
       email: vi.fn(),

@@ -90,18 +90,18 @@ export interface PixelIntegrationConfig {
 // ============================================================================
 
 export class PixelConversationIntegration {
-  private state: ConversationIntegrationState
-  private config: Required<PixelIntegrationConfig>
-  private pixelApiUrl: string
+  private readonly state: ConversationIntegrationState
+  private readonly config: Required<PixelIntegrationConfig>
+  private readonly pixelApiUrl: string
 
   constructor(config: PixelIntegrationConfig = {}) {
     this.config = {
-      pixelApiUrl: config.pixelApiUrl || 'http://localhost:8001',
-      pixelApiKey: config.pixelApiKey || '',
+      pixelApiUrl: config.pixelApiUrl ?? 'http://localhost:8001',
+      pixelApiKey: config.pixelApiKey ?? '',
       autoAnalyzeResponses: config.autoAnalyzeResponses !== false,
-      crisisThreshold: config.crisisThreshold || 0.7,
-      biasThreshold: config.biasThreshold || 0.3,
-      contextWindowSize: config.contextWindowSize || 10,
+      crisisThreshold: config.crisisThreshold ?? 0.7,
+      biasThreshold: config.biasThreshold ?? 0.3,
+      contextWindowSize: config.contextWindowSize ?? 10,
       enableMetricsTracking: config.enableMetricsTracking !== false,
       enableBiasDetection: config.enableBiasDetection !== false,
       enableCrisisDetection: config.enableCrisisDetection !== false,
@@ -206,7 +206,7 @@ export class PixelConversationIntegration {
           content: turn.content,
           timestamp: new Date(turn.timestamp).toISOString(),
         })),
-        context_type: contextType || 'support',
+        context_type: contextType ?? 'support',
         user_id: this.state.userId,
         session_id: this.state.sessionId,
         use_eq_awareness: this.config.enableMetricsTracking,
@@ -321,7 +321,7 @@ export class PixelConversationIntegration {
 
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(`Pixel API error: ${error.detail || response.statusText}`)
+      throw new Error(`Pixel API error: ${error.detail ?? response.statusText}`)
     }
 
     return response.json() as Promise<PixelInferenceResponse>
@@ -386,7 +386,7 @@ export class PixelConversationIntegration {
    * Process crisis detection from metadata
    */
   private processCrisisDetection(metadata: ConversationMetadata): void {
-    const crisisSignals = metadata.crisis_signals || []
+    const crisisSignals = metadata.crisis_signals ?? []
 
     if (crisisSignals.length > 0) {
       const signals: CrisisSignal[] = crisisSignals.map((signal) => ({
@@ -442,9 +442,7 @@ let instance: PixelConversationIntegration | null = null
 export function getPixelIntegration(
   config?: PixelIntegrationConfig,
 ): PixelConversationIntegration {
-  if (!instance) {
-    instance = new PixelConversationIntegration(config)
-  }
+  instance ??= new PixelConversationIntegration(config);
   return instance
 }
 

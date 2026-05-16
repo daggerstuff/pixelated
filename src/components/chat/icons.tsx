@@ -84,12 +84,12 @@ export function IconChevronDown(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}
@@ -103,12 +103,12 @@ export function IconMaximize(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}
@@ -122,12 +122,12 @@ export function IconMinimize(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}
@@ -141,12 +141,12 @@ export function IconMessage(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}
@@ -160,12 +160,12 @@ export function IconX(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}
@@ -180,12 +180,12 @@ export function IconBrain(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}
@@ -201,12 +201,12 @@ export function IconUser(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size || 24}
-      height={props.size || 24}
+      width={props.size ?? 24}
+      height={props.size ?? 24}
       viewBox='0 0 24 24'
       fill='none'
       stroke='currentColor'
-      strokeWidth={props.strokeWidth || 1.5}
+      strokeWidth={props.strokeWidth ?? 1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
       className={props.className}

@@ -165,11 +165,11 @@ Focus on compassionate understanding and accurate assessment.`
  * Support Context Identification Engine
  */
 export class SupportContextIdentifier {
-  private aiService: AIService
-  private model: string
-  private enableEmotionalAnalysis: boolean
-  private enableCopingAssessment!: boolean
-  private adaptToEmotionalState!: boolean
+  private readonly aiService: AIService
+  private readonly model: string
+  private readonly enableEmotionalAnalysis: boolean
+  private readonly enableCopingAssessment!: boolean
+  private readonly adaptToEmotionalState!: boolean
 
   // Emotional expression patterns for quick detection
   private readonly emotionalPatterns = {
@@ -274,7 +274,7 @@ export class SupportContextIdentifier {
 
   constructor(config: SupportIdentifierConfig) {
     this.aiService = config.aiService
-    this.model = config.model || 'claude-4-sonnet'
+    this.model = config.model ?? 'claude-4-sonnet'
     this.enableEmotionalAnalysis = config.enableEmotionalAnalysis ?? true
     this.enableCopingAssessment = config.enableCopingAssessment ?? true
     this.adaptToEmotionalState = config.adaptToEmotionalState ?? true
@@ -411,10 +411,7 @@ export class SupportContextIdentifier {
               fallback.isSupport = true
             }
             // Ensure isSupport is always defined for batch processing
-            if (fallback.isSupport === undefined) {
-              fallback.isSupport =
-                fallback.confidence > 0 || fallback.emotionalIntensity > 0.3
-            }
+            fallback.isSupport ??= fallback.confidence > 0 || fallback.emotionalIntensity > 0.3;
             return fallback
           }
         },
@@ -440,7 +437,7 @@ export class SupportContextIdentifier {
     }
   } {
     const baseResources = this.getRelevantResources(result)
-    const resources = baseResources.map((r) => String(r))
+    const resources = baseResources.map((r) => r)
     if (result.urgency === 'high') {
       // Proactively include an explicit crisis/hotline reference for high urgency cases
       // But require human-in-the-loop review before automated crisis intervention
@@ -465,17 +462,17 @@ export class SupportContextIdentifier {
       result.metadata.crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
-    const urgCheck = String(result.urgency || '')
+    const urgCheck = (result.urgency || '')
       .toLowerCase()
       .trim()
     if (
       (urgCheck === 'high' ||
-        String(result.recommendedApproach || '')
+        (result.recommendedApproach || '')
           .toLowerCase()
           .includes('crisis') ||
         (Array.isArray(result.supportNeeds) &&
           result.supportNeeds.some((n) =>
-            String(n).toLowerCase().includes('safety'),
+            n.toLowerCase().includes('safety'),
           ))) &&
       !resources.some((x) => /crisis|hotline|emergency/i.test(x))
     ) {
@@ -495,8 +492,8 @@ export class SupportContextIdentifier {
       if (typeof r === 'string') return r
       if (r && typeof r === 'object') {
         const resource = r as ResourceWithLabel
-        if (resource.label) return String(resource.label)
-        if (resource.name) return String(resource.name)
+        if (resource.label) return resource.label
+        if (resource.name) return resource.name
       }
       return String(r)
     })
@@ -869,10 +866,10 @@ export class SupportContextIdentifier {
     // Add user emotional profile context if available
     if (userEmotionalProfile) {
       contextualPrompt += `\n\nUser Emotional Profile:
-- Baseline Emotional State: ${userEmotionalProfile.baselineEmotionalState || 'unknown'}
-- Typical Coping Strategies: ${userEmotionalProfile.typicalCopingStrategies?.join(', ') || 'unknown'}
-- Emotional Triggers: ${userEmotionalProfile.emotionalTriggers?.join(', ') || 'unknown'}
-- Support Preferences: ${userEmotionalProfile.supportPreferences?.join(', ') || 'unknown'}
+- Baseline Emotional State: ${userEmotionalProfile.baselineEmotionalState ?? 'unknown'}
+- Typical Coping Strategies: ${userEmotionalProfile.typicalCopingStrategies?.join(', ') ?? 'unknown'}
+- Emotional Triggers: ${userEmotionalProfile.emotionalTriggers?.join(', ') ?? 'unknown'}
+- Support Preferences: ${userEmotionalProfile.supportPreferences?.join(', ') ?? 'unknown'}
 
 Consider this context in your assessment.`
     }
@@ -891,7 +888,7 @@ Consider this context in your assessment.`
       const text = await aiServiceWithGenerateText.generateText(
         `${contextualPrompt}\n\n${queryWithContext}`,
       )
-      return this.parseAIResponse(String(text))
+      return this.parseAIResponse(text)
     }
 
     const messages: Array<{ role: string; content: string }> = [
@@ -934,7 +931,7 @@ Consider this context in your assessment.`
         jsonStr = trimmed
       } else {
         const jsonMatch =
-          content.match(/```json\n([\s\S]*?)\n```/) ||
+          content.match(/```json\n([\s\S]*?)\n```/) ??
           content.match(/```\n([\s\S]*?)\n```/)
         if (jsonMatch) {
           jsonStr = jsonMatch[1] ?? jsonMatch[0]
@@ -982,23 +979,23 @@ Consider this context in your assessment.`
 
       return {
         isSupport: Boolean(parsed.isSupport),
-        confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
-        supportType: this.validateSupportType(parsed.supportType || ''),
+        confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
+        supportType: this.validateSupportType(parsed.supportType ?? ''),
         emotionalState: this.validateEmotionalState(
-          parsed.emotionalState || '',
+          parsed.emotionalState ?? '',
         ),
-        urgency: this.validateUrgency(parsed.urgency || ''),
+        urgency: this.validateUrgency(parsed.urgency ?? ''),
         supportNeeds: Array.isArray(parsed.supportNeeds)
           ? parsed.supportNeeds
               .map((n: unknown) => this.validateSupportNeed(n as string))
               .filter((need): need is SupportNeed => need !== null)
           : [],
         recommendedApproach: this.validateRecommendedApproach(
-          parsed.recommendedApproach || '',
+          parsed.recommendedApproach ?? '',
         ),
         emotionalIntensity: Math.max(
           0,
-          Math.min(1, parsed.emotionalIntensity || 0.5),
+          Math.min(1, parsed.emotionalIntensity ?? 0.5),
         ),
         metadata: {
           emotionalIndicators: Array.isArray(
@@ -1007,10 +1004,10 @@ Consider this context in your assessment.`
             ? (parsed.metadata.emotionalIndicators as string[])
             : [],
           copingCapacity: this.validateCopingCapacity(
-            parsed.metadata?.copingCapacity || '',
+            parsed.metadata?.copingCapacity ?? '',
           ),
           socialSupport: this.validateSocialSupport(
-            parsed.metadata?.socialSupport || '',
+            parsed.metadata?.socialSupport ?? '',
           ),
           immediateNeeds: Array.isArray(parsed.metadata?.immediateNeeds)
             ? (parsed.metadata.immediateNeeds as string[])

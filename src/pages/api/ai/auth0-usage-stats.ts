@@ -67,8 +67,8 @@ export const GET: APIRoute = async ({ request, url }) => {
     userId = user.id
 
     // Parse query parameters
-    const timeframe = url.searchParams.get('timeframe') || '7d'
-    const model = url.searchParams.get('model') || 'all'
+    const timeframe = url.searchParams.get('timeframe') ?? '7d'
+    const model = url.searchParams.get('model') ?? 'all'
 
     // Get usage stats
     const stats = await getAIUsageStats({

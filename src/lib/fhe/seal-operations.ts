@@ -7,7 +7,7 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SealResourceScope } from './seal-memory'
 import { SealService } from './seal-service'
-import type { SealCipherText, SealPlainText } from './seal-service'
+import type { SealCipherText } from './seal-service'
 import { SealSchemeType, SEAL_SUPPORTED_OPERATIONS } from './seal-types'
 import type { SealOperationResult } from './seal-types'
 import { FHEOperation, OperationError } from './types'
@@ -18,10 +18,10 @@ const logger = createBuildSafeLogger('seal-operations')
  * Homomorphic operations using Microsoft SEAL
  */
 export class SealOperations {
-  private service: SealService
+  private readonly service: SealService
 
   constructor(service?: SealService) {
-    this.service = service || SealService.getInstance()
+    this.service = service ?? SealService.getInstance()
   }
 
   /**
@@ -47,41 +47,32 @@ export class SealOperations {
     b: SealCipherText | number[],
   ): Promise<SealOperationResult> {
     try {
-      const {
-        getSchemeType,
-        getCKKSEncoder,
-        getBatchEncoder,
-        getEvaluator,
-        getSeal,
-      } = this.service
       if (!this.isOperationSupported(FHEOperation.Addition)) {
         throw new OperationError(
-          `Addition not supported in scheme ${getSchemeType()}`,
+          `Addition not supported in scheme ${this.service.getSchemeType()}`,
         )
       }
 
       const scope = new SealResourceScope()
-      const seal = getSeal()
-      const evaluator = getEvaluator()
+      const seal = this.service.getSeal()
+      const evaluator = this.service.getEvaluator()
 
       // If b is a number array, encrypt it first
       let bOpCiphertext: SealCipherText
       if (Array.isArray(b)) {
         const bPlaintext = scope.track(seal.PlainText())
-        const currentSchemeType = getSchemeType()
+        const currentSchemeType = this.service.getSchemeType()
         const bNumArray: number[] = Array.from(b) // b is number[] in this scope, using Array.from
         if (currentSchemeType === SealSchemeType.CKKS) {
           const scale = BigInt(1) << BigInt(40) // Default CKKS scale
-          const ckksEncoder = getCKKSEncoder()
+          const ckksEncoder = this.service.getCKKSEncoder()
           // Using number array
           ckksEncoder.encode(bNumArray, Number(scale), bPlaintext)
         } else {
           // BFV/BGV
-          const batchEncoder = getBatchEncoder()
+          const batchEncoder = this.service.getBatchEncoder()
           // The batchEncoder.encode expects number[] and SealPlainText
-          // The TypeScript error is due to a mismatch in the type definition
-          // but the implementation accepts this combination
-          batchEncoder.encode(bNumArray, bPlaintext as unknown as SealPlainText)
+          batchEncoder.encode(bNumArray, bPlaintext)
         }
         // Use the encryptor directly instead of the encrypt function
         const encryptor = this.service.getEncryptor()
@@ -126,41 +117,32 @@ export class SealOperations {
     b: SealCipherText | number[],
   ): Promise<SealOperationResult> {
     try {
-      const {
-        getSchemeType,
-        getCKKSEncoder,
-        getBatchEncoder,
-        getEvaluator,
-        getSeal,
-      } = this.service
       if (!this.isOperationSupported(FHEOperation.Subtraction)) {
         throw new OperationError(
-          `Subtraction not supported in scheme ${getSchemeType()}`,
+          `Subtraction not supported in scheme ${this.service.getSchemeType()}`,
         )
       }
 
       const scope = new SealResourceScope()
-      const seal = getSeal()
-      const evaluator = getEvaluator()
+      const seal = this.service.getSeal()
+      const evaluator = this.service.getEvaluator()
 
       // If b is a number array, encrypt it first
       let bOpCiphertext: SealCipherText
       if (Array.isArray(b)) {
         const bPlaintext = scope.track(seal.PlainText())
-        const currentSchemeType = getSchemeType()
+        const currentSchemeType = this.service.getSchemeType()
         const bNumArray: number[] = Array.from(b) // b is number[] in this scope, using Array.from
         if (currentSchemeType === SealSchemeType.CKKS) {
           const scale = BigInt(1) << BigInt(40) // Default CKKS scale
-          const ckksEncoder = getCKKSEncoder()
+          const ckksEncoder = this.service.getCKKSEncoder()
           // Using number array
           ckksEncoder.encode(bNumArray, Number(scale), bPlaintext)
         } else {
           // BFV/BGV
-          const batchEncoder = getBatchEncoder()
+          const batchEncoder = this.service.getBatchEncoder()
           // The batchEncoder.encode expects number[] and SealPlainText
-          // The TypeScript error is due to a mismatch in the type definition
-          // but the implementation accepts this combination
-          batchEncoder.encode(bNumArray, bPlaintext as unknown as SealPlainText)
+          batchEncoder.encode(bNumArray, bPlaintext)
         }
         // Use the encryptor directly instead of the encrypt function
         const encryptor = this.service.getEncryptor()
@@ -205,31 +187,18 @@ export class SealOperations {
     b: SealCipherText | number[],
   ): Promise<SealOperationResult> {
     try {
-      const {
-        getSchemeType,
-        getCKKSEncoder,
-        getBatchEncoder,
-        getEvaluator,
-        getSeal,
-        getRelinKeys,
-      } = this.service
       if (!this.isOperationSupported(FHEOperation.Multiplication)) {
         throw new OperationError(
-          `Multiplication not supported in scheme ${getSchemeType()}`,
+          `Multiplication not supported in scheme ${this.service.getSchemeType()}`,
         )
       }
 
       const scope = new SealResourceScope()
-      const seal = getSeal()
-      const evaluator = getEvaluator()
+      const seal = this.service.getSeal()
+      const evaluator = this.service.getEvaluator()
 
       // Get relinearization keys (required for multiplication)
-      const relinKeys = getRelinKeys()
-      if (!relinKeys) {
-        throw new Error(
-          'Relinearization keys required for multiplication are not available',
-        )
-      }
+      const relinKeys = this.service.getRelinKeys()
 
       // If b is a number array, we can use plain multiplication which is more efficient
       if (Array.isArray(b)) {
@@ -238,13 +207,13 @@ export class SealOperations {
         const plaintext = scope.track(seal.PlainText(), 'plaintext')
 
         // Encode the plaintext based on scheme
-        if (getSchemeType() === SealSchemeType.CKKS) {
+        if (this.service.getSchemeType() === SealSchemeType.CKKS) {
           // Default scale for CKKS
           const scale = BigInt(1) << BigInt(40)
-          const ckksEncoder = getCKKSEncoder()
+          const ckksEncoder = this.service.getCKKSEncoder()
           ckksEncoder.encode(bAsNumberArray, Number(scale), plaintext)
         } else {
-          const batchEncoder = getBatchEncoder()
+          const batchEncoder = this.service.getBatchEncoder()
 
           const { slotCount } = batchEncoder
           // Ensure the array has enough elements or pad with zeros
@@ -260,7 +229,7 @@ export class SealOperations {
             }
             coefArray[i] = bAsNumberArray[i]
           }
-          batchEncoder.encode(coefArray, plaintext as unknown as SealPlainText)
+          batchEncoder.encode(coefArray, plaintext)
         }
 
         // Create result ciphertext
@@ -383,10 +352,6 @@ export class SealOperations {
 
       // Get Galois keys (required for rotation)
       const galoisKeys = this.service.getGaloisKeys()
-      if (!galoisKeys) {
-        throw new Error('Galois keys required for rotation are not available')
-      }
-
       // Create result ciphertext
       const result = scope.track(seal.CipherText(), 'result')
 
@@ -438,12 +403,6 @@ export class SealOperations {
 
       // Get relinearization keys (required for squaring)
       const relinKeys = this.service.getRelinKeys()
-      if (!relinKeys) {
-        throw new Error(
-          'Relinearization keys required for squaring are not available',
-        )
-      }
-
       // Create result ciphertext
       const result = scope.track(seal.CipherText(), 'result')
 
@@ -501,42 +460,33 @@ export class SealOperations {
       }
 
       const scope = new SealResourceScope()
-      const {
-        getSchemeType,
-        getCKKSEncoder,
-        getBatchEncoder,
-        getEvaluator,
-        getSeal,
-        getRelinKeys,
-      } = this.service
-      const evaluator = getEvaluator()
-      const relinKeys = getRelinKeys()
+      const evaluator = this.service.getEvaluator()
+      const relinKeys = this.service.getRelinKeys()
 
-      if (!relinKeys) {
-        throw new Error(
-          'Relinearization keys required for polynomial evaluation are not available',
-        )
-      }
+      // Relin keys were verified by getRelinKeys()
 
       // If only a0 is provided, return the constant
       if (coefficients.length === 1) {
-        const seal = getSeal()
+        const seal = this.service.getSeal()
         // Create a plaintext for the constant
         const plaintext = scope.track(seal.PlainText(), 'plaintext')
-        const currentSchemeType = getSchemeType()
+        const currentSchemeType = this.service.getSchemeType()
         // Encode the constant based on scheme
         if (currentSchemeType === SealSchemeType.CKKS) {
           const scale = Number(BigInt(1) << BigInt(40))
-          const ckksEncoder = getCKKSEncoder()
+          const ckksEncoder = this.service.getCKKSEncoder()
           const currentCoeff: number[] = [coefficients[0]]
           // Using array with single coefficient
           ckksEncoder.encode(currentCoeff, scale, plaintext)
         } else {
           // For BFV/BGV, we need to create an array of the same size as the batch
-          const batchEncoder = getBatchEncoder()
+          const batchEncoder = this.service.getBatchEncoder()
           const { slotCount } = batchEncoder
-          const constArray: number[] = Array(slotCount).fill(coefficients[0])
-          batchEncoder.encode(constArray, plaintext as unknown as SealPlainText)
+          const constArray: number[] = Array.from(
+            { length: slotCount },
+            () => coefficients[0],
+          )
+          batchEncoder.encode(constArray, plaintext)
         }
         const result = seal.CipherText()
         this.service.getEncryptor().encrypt(plaintext, result)
@@ -552,23 +502,23 @@ export class SealOperations {
       let n = coefficients.length - 1
 
       // Get SEAL instance once and reuse it
-      const seal = getSeal()
+      const seal = this.service.getSeal()
       // Encode the highest coefficient
       const highestCoef = scope.track(seal.PlainText(), 'highestCoef')
-      const currentSchemeType = getSchemeType()
+      const currentSchemeType = this.service.getSchemeType()
 
       if (currentSchemeType === SealSchemeType.CKKS) {
         const scale = BigInt(1) << BigInt(40)
-        const ckksEncoder = getCKKSEncoder() // Already destructured
+        const ckksEncoder = this.service.getCKKSEncoder()
         // Using array with single coefficient
         ckksEncoder.encode([coefficients[n]], Number(scale), highestCoef)
       } else {
-        const batchEncoder = getBatchEncoder() // Already destructured
+        const batchEncoder = this.service.getBatchEncoder()
         const { slotCount } = batchEncoder
         const coefArray: number[] = new Array<number>(slotCount).fill(
           coefficients[n],
         )
-        batchEncoder.encode(coefArray, highestCoef as unknown as SealPlainText)
+        batchEncoder.encode(coefArray, highestCoef)
       }
 
       // Initialize result with the highest coefficient
@@ -593,15 +543,15 @@ export class SealOperations {
 
         if (currentSchemeType === SealSchemeType.CKKS) {
           const scale = BigInt(1) << BigInt(40)
-          const ckksEncoder = getCKKSEncoder() // Already destructured
+          const ckksEncoder = this.service.getCKKSEncoder()
           ckksEncoder.encode([coefficients[i]], Number(scale), nextCoef)
         } else {
-          const batchEncoder = getBatchEncoder()
+          const batchEncoder = this.service.getBatchEncoder()
           const { slotCount } = batchEncoder
           const coefArray: number[] = new Array<number>(slotCount).fill(
             coefficients[i],
           )
-          batchEncoder.encode(coefArray, nextCoef as unknown as SealPlainText)
+          batchEncoder.encode(coefArray, nextCoef)
         }
 
         const afterAdd = scope.track(seal.CipherText(), 'afterAdd')

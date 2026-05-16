@@ -1,6 +1,5 @@
 // Array.prototype.findLast polyfill
-if (!Array.prototype.findLast) {
-  Array.prototype.findLast = function(callback, thisArg) {
+Array.prototype.findLast ??= function(callback, thisArg) {
     if (this == null) {
       throw new TypeError('Array.prototype.findLast called on null or undefined');
     }
@@ -20,4 +19,3 @@ if (!Array.prototype.findLast) {
 
     return undefined;
   };
-}

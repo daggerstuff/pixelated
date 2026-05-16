@@ -31,7 +31,7 @@ function getAccessByType(logs: AuditLog[]): {
   const typeCounts = new Map<string, number>()
 
   logs.forEach((log) => {
-    const count = typeCounts.get(log.resourceType) || 0
+    const count = typeCounts.get(log.resourceType) ?? 0
     typeCounts.set(log.resourceType, count + 1)
   })
 

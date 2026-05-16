@@ -9,9 +9,9 @@ import { EHRError, ehrProviderSchema } from '../types'
 import { createFHIRClient } from './fhir.client'
 
 export class EHRServiceImpl implements EHRService {
-  private providers: Map<string, EHRProvider> = new Map()
-  private clients: Map<string, FHIRClient> = new Map()
-  private logger: Console
+  private readonly providers: Map<string, EHRProvider> = new Map()
+  private readonly clients: Map<string, FHIRClient> = new Map()
+  private readonly logger: Console
 
   constructor(logger: Console = console) {
     this.logger = logger

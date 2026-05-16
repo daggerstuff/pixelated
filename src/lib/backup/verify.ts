@@ -31,9 +31,9 @@ interface BackupVerificationResult {
 }
 
 export class BackupVerificationService extends EventEmitter {
-  private redis: RedisService
-  private config: BackupConfig
-  private backupDir: string
+  private readonly redis: RedisService
+  private readonly config: BackupConfig
+  private readonly backupDir: string
 
   constructor(redis: RedisService, config: Partial<BackupConfig> = {}) {
     super()
@@ -83,7 +83,7 @@ export class BackupVerificationService extends EventEmitter {
           results.push({
             file,
             isValid: false,
-            error: error?.['message'] || 'Unknown error',
+            error: error?.['message'] ?? 'Unknown error',
           })
         }
       }
@@ -93,7 +93,7 @@ export class BackupVerificationService extends EventEmitter {
       return results
     } catch (error: unknown) {
       throw new Error(
-        `Failed to verify backups: ${error?.['message'] || 'Unknown error'}`,
+        `Failed to verify backups: ${error?.['message'] ?? 'Unknown error'}`,
         {
           cause: error,
         },
@@ -261,13 +261,13 @@ export class BackupVerificationService extends EventEmitter {
       >
 
       // Verify backup structure
-      if (!(backup as Record<string, unknown>).data || !backup.metadata) {
+      if (!(backup).data || !backup.metadata) {
         throw new Error('Invalid backup structure')
       }
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        this.verifyDataIntegrity((backup as Record<string, unknown>).data)
+        this.verifyDataIntegrity((backup).data)
       }
 
       // Verify restoration capability

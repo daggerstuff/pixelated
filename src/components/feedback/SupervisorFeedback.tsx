@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardFooter,
-} from '@/components/ui/card'
+} from '@/components/ui/card/index.ts'
 import { TherapeuticTechnique } from '@/simulator/types'
 import { analyzeTherapeuticTechniques } from '@/simulator/utils/speechRecognition'
 

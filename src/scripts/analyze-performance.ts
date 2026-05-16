@@ -72,7 +72,7 @@ async function generateReport(days = 7): Promise<PerformanceReport> {
       totalRequests > 0 ? (cachedRequests / totalRequests) * 100 : 0,
     averageTokens:
       totalRequests > 0
-        ? metrics.reduce((sum, m) => sum + (m.totalTokens || 0), 0) /
+        ? metrics.reduce((sum, m) => sum + (m.totalTokens ?? 0), 0) /
           totalRequests
         : 0,
     errorDistribution,

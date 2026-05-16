@@ -31,7 +31,7 @@ export interface AuditEventInput {
 }
 
 export class AuditService {
-  private auditCollection: Collection<AuditLog>
+  private readonly auditCollection: Collection<AuditLog>
 
   constructor() {
     const db = getDatabaseConfig()
@@ -47,8 +47,8 @@ export class AuditService {
     try {
       const auditLog: AuditLog = {
         id: crypto.randomUUID(),
-        entityId: event.resourceId || '',
-        entityType: event.resource || 'system',
+        entityId: event.resourceId ?? '',
+        entityType: event.resource ?? 'system',
         action: event.action,
         userId: event.userId,
         timestamp: event.timestamp,
@@ -279,7 +279,7 @@ export class AuditService {
     minRiskScore?: number
   }): Promise<AuditLog[]> {
     const filter: Record<string, unknown> = {
-      'metadata.riskScore': { $gte: options?.minRiskScore || 50 },
+      'metadata.riskScore': { $gte: options?.minRiskScore ?? 50 },
     }
 
     if (options?.startDate || options?.endDate) {
