@@ -266,7 +266,7 @@ jobs:
           node scripts/utils/check-pnpm-audit.js --fail-on high audit-results.json
 
       - name: Upload audit results
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7
         with:
           name: security-audit-results
           path: audit-results.json
