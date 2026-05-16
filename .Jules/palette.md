@@ -1,8 +1,13 @@
 <<<<<<< HEAD
+<!-- markdownlint-disable MD013 -->
+
+=======
+<<<<<<< HEAD
 <!-- markdownlint-disable MD013 MD026 -->
 
 ## 2026-04-14 - Async Search Accessibility | Learning: Async search needs both visual spinners (which do not shift layout like text does) and invisible live regions for screen readers. | Action: Replaced text with spinner and added sr-only aria-live polite region.
 =======
+>>>>>>> origin/staging
 ## 2026-04-14 - Async Search Accessibility
 >>>>>>> origin/staging
 
@@ -49,14 +54,14 @@ Action: Use loop variables to provide specific, dynamically generated aria-label
 =======
 - Learning: Custom chart bars and progress bars made with `div` elements are invisible to screen readers and keyboard users without explicit ARIA roles, labels, and `tabIndex`.
 - Action: Added `role="img"`, `tabIndex={-1}`, and `aria-label` to chart bars. Added `role="progressbar"` and related ARIA attributes to custom progress elements, and ensured visual icons have screen-reader fallbacks.
-=======
-Learning: Elements with role="group" need an accessible name (aria-label).
-Action: Added aria-label to role="group" and comprehensive styling to SessionControls buttons.
 
 ## 2026-05-15 - Time Range Selectors
 
 Learning: Custom time range buttons visually act as toggle buttons, but without aria-pressed state fails.
 Action: Added `aria-pressed={true/false}` and grouped them with role="group".
+<<<<<<< HEAD
+=======
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
