@@ -22,7 +22,7 @@
     "dev:all-services": "concurrently \"pnpm dev\" \"pnpm dev:bias-detection\" \"pnpm dev:ai-service\" \"pnpm dev:analytics\" \"pnpm dev:worker\" \"pnpm dev:training-server\" \"pnpm dev:websocket\" \"pnpm dev:academic-sourcing\" \"pnpm bias:py\"",
     "setup:dev": "./scripts/setup-dev.sh",
     "jules:setup": "bash scripts/devops/jules-setup.sh",
-    "jules:check": "git status | grep 'on branch staging' || (echo '❌ ERROR: Jules must work on staging branch' && exit 1) && pnpm check:all",
+    "jules:check": "git status | grep 'on branch staging' || (echo '\u274c ERROR: Jules must work on staging branch' && exit 1) && pnpm check:all",
     "hooks:install": "[ -f scripts/devops/install-git-hooks.sh ] && bash scripts/devops/install-git-hooks.sh || echo \"Skipping git hooks install: scripts/devops/install-git-hooks.sh not found.\"",
     "prepare": "pnpm run -s hooks:install",
     "build": "CI=true node scripts/ci/build-with-pipe-handling.mjs",
@@ -156,7 +156,7 @@
     "ts:check:debug": "tsc --noEmit --project config/tsconfig.debug.json",
     "ts:check:main": "tsc --noEmit --project config/tsconfig.json",
     "ts:check:aws": "tsc --noEmit --project config/tsconfig.aws.json",
-    "ts:compare": "pnpm run ts:check:debug && echo '✅ Debug config works' && pnpm run ts:check:main && echo '✅ Main config works'",
+    "ts:compare": "pnpm run ts:check:debug && echo '\u2705 Debug config works' && pnpm run ts:check:main && echo '\u2705 Main config works'",
     "ts:switch:debug": "cp config/tsconfig.json config/tsconfig.json.backup && cp config/tsconfig.debug.json config/tsconfig.json",
     "ts:switch:main": "cp config/tsconfig.json.backup config/tsconfig.json",
     "ts:logs": "echo 'TypeScript logs location varies by system. Run: ./debug-typescript.sh normal'",
@@ -556,7 +556,11 @@
       "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0": "npm:path-to-regexp@6.3.0",
       "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp": "npm:path-to-regexp@6.3.0",
       "@astrojs/vercel>@vercel/routing-utils>path-to-regexp": "npm:path-to-regexp@6.3.0",
+<<<<<<< HEAD
+      "@vercel/routing-utils>path-to-regexp": "6.3.0",
+=======
       "@vercel/routing-utils>path-to-regexp": "^6.3.0",
+>>>>>>> origin/staging
 >>>>>>> origin/staging
       "yaml": "npm:yaml@2.8.4",
       "yaml@2.7.1": "npm:yaml@2.8.4",
@@ -633,6 +637,9 @@
       "kysely": ">=0.28.14",
       "effect": ">=3.20.0",
       "teeny-request": "10.1.2",
+<<<<<<< HEAD
+      "path-to-regexp@<6.3.0": "6.3.0"
+=======
       "@grpc/proto-loader>protobufjs": ">=8.0.2",
       "@opentelemetry/otlp-transformer>protobufjs": ">=8.0.2",
       "astro>devalue": ">=5.8.1",
@@ -652,6 +659,7 @@
       "path-to-regexp-updated": "8.4.2",
       "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp-updated": "8.4.2",
       "@vercel/routing-utils>path-to-regexp-updated": "8.4.2"
+>>>>>>> origin/staging
     }
   },
   "trustedDependencies": [
