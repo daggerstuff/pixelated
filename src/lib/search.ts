@@ -108,7 +108,7 @@ export const blogSearch: BlogSearchInterface = {
       title: post.data.title,
       content: summary,
       url: `/blog/${post.slug}`,
-      tags: post.data.tags || [],
+      tags: post.data.tags ?? [],
     }
 
     if (post.data.category) {
@@ -119,14 +119,14 @@ export const blogSearch: BlogSearchInterface = {
     this._posts.push(doc)
 
     // If client is available, also add to search index
-    if (typeof window !== 'undefined' && window.searchClient) {
+    if (window?.searchClient) {
       window.searchClient.importDocuments([doc])
     }
   },
 
   search(query: string): SearchResult[] {
     // In browser, use the real search client
-    if (typeof window !== 'undefined' && window.searchClient) {
+    if (window?.searchClient) {
       return window.searchClient.search(query)
     }
 
@@ -252,7 +252,7 @@ if (typeof window !== 'undefined') {
 export const searchClient = searchClientInstance
 
 // Add CommonJS compatibility for server contexts that may use require()
-if (typeof module !== 'undefined' && module.exports) {
+if (module?.exports) {
   module.exports = {
     // Use the already-exported blogSearch
     get blogSearch() {

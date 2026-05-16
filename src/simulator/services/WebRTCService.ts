@@ -5,15 +5,17 @@ import type { WebRTCServiceInterface, WebRTCConnectionConfig } from '../types'
  * Implements privacy-first architecture with zero data retention
  */
 export class WebRTCService implements WebRTCServiceInterface {
+  private sessionId: string = ''
+  private userId: string = ''
   private peerConnection: RTCPeerConnection | null = null
   private localStream: MediaStream | null = null
   private remoteStream: MediaStream | null = null
   private connectionConfig: WebRTCConnectionConfig | null = null
-  private streamListeners: Array<(stream: MediaStream) => void> = []
-  private disconnectListeners: Array<() => void> = []
+  private readonly streamListeners: Array<(stream: MediaStream) => void> = []
+  private readonly disconnectListeners: Array<() => void> = []
   private connectionAttempts = 0
-  private maxConnectionAttempts = 3
-  private connectionRetryIntervalMs = 3000
+  private readonly maxConnectionAttempts = 3
+  private readonly connectionRetryIntervalMs = 3000
   private connectionRetryTimeout: ReturnType<typeof setTimeout> | null = null
   private connectionMonitorInterval: ReturnType<typeof setInterval> | null =
     null
@@ -89,10 +91,6 @@ export class WebRTCService implements WebRTCServiceInterface {
 
       // Get the audio track from the stream
       const audioTrack = stream.getAudioTracks()[0]
-      if (!audioTrack) {
-        console.warn('No audio track found in stream')
-        return
-      }
 
       // Configure audio track constraints for built-in noise suppression and echo cancellation
       audioTrack
@@ -170,36 +168,32 @@ export class WebRTCService implements WebRTCServiceInterface {
       const processedAudioTrack = destination.stream.getAudioTracks()[0]
 
       // Replace the original audio track with the processed one
-      if (processedAudioTrack) {
-        // Configure the processed track with the same constraints
-        processedAudioTrack
-          .applyConstraints({
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          })
-          .catch((err) =>
-            console.warn('Could not apply processed track constraints:', err),
-          )
-
-        // Stop the original track
-        audioTrack.stop()
-
-        // Remove the original track from the stream
-        stream.removeTrack(audioTrack)
-
-        // Add the processed track to the stream
-        stream.addTrack(processedAudioTrack)
-
-        console.log(
-          'Applied professional audio processing for therapeutic clarity',
+      // Configure the processed track with the same constraints
+      processedAudioTrack
+        .applyConstraints({
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        })
+        .catch((err) =>
+          console.warn('Could not apply processed track constraints:', err),
         )
 
-        // Set up audio monitoring and visualization if needed
-        this.setupAudioMonitoring(analyzer)
-      } else {
-        console.warn('Failed to create processed audio track')
-      }
+      // Stop the original track
+      audioTrack.stop()
+
+      // Remove the original track from the stream
+      stream.removeTrack(audioTrack)
+
+      // Add the processed track to the stream
+      stream.addTrack(processedAudioTrack)
+
+      console.log(
+        'Applied professional audio processing for therapeutic clarity',
+      )
+
+      // Set up audio monitoring and visualization if needed
+      this.setupAudioMonitoring(analyzer)
     } catch (error: unknown) {
       console.error('Error applying audio processing:', error)
       // Fall back to unprocessed audio if processing fails
@@ -503,11 +497,13 @@ export class WebRTCService implements WebRTCServiceInterface {
     console.log(`Connection state changed: ${state}`)
 
     switch (state) {
+      case 'new':
+      case 'connecting':
+        break
       case 'connected':
         // Reset connection attempts on successful connection
         this.connectionAttempts = 0
         break
-
       case 'disconnected':
       case 'failed':
       case 'closed':
@@ -515,6 +511,8 @@ export class WebRTCService implements WebRTCServiceInterface {
           this.handleConnectionFailure()
         }
         break
+      default:
+        throw new Error('Unhandled connection state')
     }
   }
 
@@ -531,6 +529,12 @@ export class WebRTCService implements WebRTCServiceInterface {
     console.log(`ICE connection state changed: ${state}`)
 
     switch (state) {
+      case 'new':
+      case 'checking':
+        break
+      case 'connected':
+      case 'completed':
+        break
       case 'disconnected':
       case 'failed':
       case 'closed':
@@ -538,6 +542,8 @@ export class WebRTCService implements WebRTCServiceInterface {
           this.handleConnectionFailure()
         }
         break
+      default:
+        throw new Error('Unhandled ICE connection state')
     }
   }
 
@@ -598,6 +604,34 @@ export class WebRTCService implements WebRTCServiceInterface {
       clearInterval(this.connectionMonitorInterval)
       this.connectionMonitorInterval = null
     }
+  }
+
+  /**
+   * Connect to a session (WebRTCServiceInterface implementation)
+   */
+  async connect(sessionId: string, userId: string): Promise<void> {
+    this.sessionId = sessionId
+    this.userId = userId
+    await this.initializeConnection({
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      iceTransportPolicy: 'all',
+    })
+    await this.createLocalStream(true, false)
+    await this.connectToPeer()
+  }
+
+  /**
+   * Disconnect from session (WebRTCServiceInterface implementation)
+   */
+  disconnect(): void {
+    this.disconnectFromPeer()
+  }
+
+  /**
+   * Send a message via data channel (WebRTCServiceInterface implementation)
+   */
+  sendMessage(message: unknown): void {
+    console.log('WebRTC sendMessage:', message)
   }
 
   /**

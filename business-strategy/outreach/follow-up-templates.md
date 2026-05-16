@@ -157,22 +157,22 @@ Best, [Your Name]
 
 ## Quick Response Templates
 
-### Positive Response:
+### Positive Response
 
 "Great! When works for a 15-minute call this week? I'm available [TIMES] or can
 work around your schedule."
 
-### Schedule Request:
+### Schedule Request
 
 "I'm available [DAY] at [TIME], [DAY] at [TIME], or [DAY] at [TIME]. What works
 best for you?"
 
-### Contract Question:
+### Contract Question
 
 "The agreement is intentionally simple - one page, covers the basics. Full
 refund guarantee removes all risk. Happy to walk through it on a quick call."
 
-### Technical Question:
+### Technical Question
 
 "The platform is web-based - no installation needed. Students just need internet
 access. We handle all technical setup and provide 24/7 support."

@@ -65,15 +65,15 @@ export async function createMarketResearch(data: {
     _id: researchId,
     title: data.title,
     slug: researchSlug,
-    description: data.description || '',
+    description: data.description ?? '',
     owner: data.ownerId,
     status: 'active',
-    researchType: data.researchType || 'market_analysis',
-    targetMarkets: data.targetMarkets || [],
+    researchType: data.researchType ?? 'market_analysis',
+    targetMarkets: data.targetMarkets ?? [],
     findings: [],
     competitiveAnalysis: [],
     recommendations: [],
-    timeline: data.timeline || {
+    timeline: data.timeline ?? {
       startDate: new Date(),
       endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     },
@@ -153,10 +153,10 @@ export async function addFinding(
   research.findings.push({
     _id: findingId,
     title: finding.title,
-    description: finding.description || '',
-    impactLevel: finding.impactLevel || 'medium',
-    supportingData: finding.supportingData || {},
-    source: finding.source || '',
+    description: finding.description ?? '',
+    impactLevel: finding.impactLevel ?? 'medium',
+    supportingData: finding.supportingData ?? {},
+    source: finding.source ?? '',
     createdAt: new Date(),
     updatedAt: new Date(),
   })
@@ -201,11 +201,11 @@ export async function addCompetitiveAnalysis(
   research.competitiveAnalysis.push({
     _id: analysisId,
     competitorName: analysis.competitorName,
-    strengths: analysis.strengths || [],
-    weaknesses: analysis.weaknesses || [],
-    opportunities: analysis.opportunities || [],
-    threats: analysis.threats || [],
-    marketShare: analysis.marketShare || 0,
+    strengths: analysis.strengths ?? [],
+    weaknesses: analysis.weaknesses ?? [],
+    opportunities: analysis.opportunities ?? [],
+    threats: analysis.threats ?? [],
+    marketShare: analysis.marketShare ?? 0,
     createdAt: new Date(),
     updatedAt: new Date(),
   })
@@ -248,9 +248,9 @@ export async function addRecommendation(
   research.recommendations.push({
     _id: recommendationId,
     title: recommendation.title,
-    description: recommendation.description || '',
-    priority: recommendation.priority || 'medium',
-    expectedImpact: recommendation.expectedImpact || '',
+    description: recommendation.description ?? '',
+    priority: recommendation.priority ?? 'medium',
+    expectedImpact: recommendation.expectedImpact ?? '',
     status: 'pending',
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -275,8 +275,8 @@ export async function listMarketResearch(
     industry?: string
   } = {},
 ) {
-  const page = options.page || 1
-  const limit = options.limit || 50
+  const page = options.page ?? 1
+  const limit = options.limit ?? 50
 
   let query: any = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],

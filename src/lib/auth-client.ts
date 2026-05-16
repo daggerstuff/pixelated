@@ -115,7 +115,7 @@ class AuthClient {
       const data = await response.json()
 
       if (!response.ok) {
-        return { error: data.error || 'Login failed' }
+        return { error: data.error ?? 'Login failed' }
       }
 
       this._session = {
@@ -151,7 +151,7 @@ class AuthClient {
       const data = await response.json()
 
       if (!response.ok) {
-        return { error: data.error || 'Registration failed' }
+        return { error: data.error ?? 'Registration failed' }
       }
 
       return { data, error: null }
@@ -193,7 +193,7 @@ class AuthClient {
       social: async ({ provider, callbackURL }: any) => {
         // Implementation for social login using server-side flow
         console.log(`Social login with ${provider} initiated`)
-        const returnTo = callbackURL || window.location.pathname
+        const returnTo = callbackURL ?? window.location.pathname
         window.location.href = `/api/auth/login?connection=${provider === 'google' ? 'google-oauth2' : provider}&returnTo=${encodeURIComponent(returnTo)}`
       },
     }

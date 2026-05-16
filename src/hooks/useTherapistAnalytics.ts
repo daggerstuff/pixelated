@@ -377,7 +377,7 @@ export function useTherapistAnalytics(
 
     // Generate progress snapshots from session data
     const progressSnapshots = sessions.flatMap(
-      (session) => session.progressSnapshots || [],
+      (session) => session.progressSnapshots ?? [],
     )
 
     return {

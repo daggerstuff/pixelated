@@ -45,6 +45,6 @@ Treatment typically involves a multi-modal approach:
 
 ## Navigation
 
-- [Detailed Symptoms](/mental/I-CPTSD/symptoms)
-- [Treatment Options](/mental/I-CPTSD/treatment)
-- [Additional Resources](/mental/I-CPTSD/resources)
+- [Detailed Symptoms](./symptoms.md)
+- [Treatment Options](./treatment.md)
+- [Additional Resources](./resources.md)

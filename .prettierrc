@@ -29,7 +29,7 @@
       "files": ["*.tsx", "*.jsx"],
       "options": {
         "parser": "typescript",
-        "jsxBracketSameLine": false,
+        "bracketSameLine": false,
         "jsxSingleQuote": false,
         "semi": false,
         "singleQuote": true

@@ -32,7 +32,7 @@ fi
 
 # 3. Configure pnpm and Install Node dependencies
 echo "🟢 Configuring pnpm..."
-corepack enable pnpm
+npm install -g pnpm@11.1.1
 pnpm install --frozen-lockfile || pnpm install
 bash scripts/devops/install-git-hooks.sh
 

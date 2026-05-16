@@ -1,13 +1,7 @@
 ---
-title: 'Compliance & Standards'
-description:
----
-  'Learn about Pixelated Healths compliance framework and security standards'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
-draft: false
-toc: true
-share: true
+title: Compliance & Standards
+description: Learn about Pixelated Healths compliance framework and security standards
+pubDate: '2026-05-09'
 ---
 
 ## Compliance & Standards

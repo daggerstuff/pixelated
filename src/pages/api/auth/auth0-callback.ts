@@ -7,6 +7,7 @@ import mongodb from '@/config/mongodb.config'
 import { AuditEventType, createAuditLog } from '@/lib/audit'
 import { auth0SocialAuth } from '@/lib/auth/auth0-social-auth-service'
 import { auth0UserService } from '@/services/auth0.service'
+import type { AuthenticatedUser } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -29,6 +30,23 @@ export const GET = async ({
   const state = url.searchParams.get('state')
   const error = url.searchParams.get('error')
   const errorDescription = url.searchParams.get('error_description')
+
+  const sanitizeStateRedirect = (rawState: string | null): string => {
+    if (!rawState) {
+      return '/dashboard'
+    }
+
+    try {
+      const decodedState = decodeURIComponent(rawState)
+      if (!decodedState.startsWith('/')) {
+        return '/dashboard'
+      }
+      return decodedState
+    } catch (decodeError) {
+      console.error('Invalid auth callback state:', decodeError)
+      return '/dashboard'
+    }
+  }
 
   // Handle OAuth errors
   if (error) {
@@ -56,7 +74,7 @@ export const GET = async ({
     )
 
     // Check if we can/should sync with Auth0 Management API (optional)
-    let existingUser = null
+    let existingUser: AuthenticatedUser | null = null
     try {
       existingUser = await auth0UserService.findUserByEmail(socialUser.email)
     } catch (e) {
@@ -70,8 +88,8 @@ export const GET = async ({
     // In a social login flow, Auth0 has already created/linked the user.
     // We just need a reference to the user ID and role.
     // If we couldn't fetch from Management API, we use the identity from the token.
-    const userId = existingUser?.id || socialUser.id
-    const userRole = existingUser?.role || 'user' // Default role if we can't fetch real role
+    const userId: string = existingUser?.id ?? socialUser.id
+    const userRole: string = existingUser?.role ?? 'user' // Default role if we can't fetch real role
 
     // Set cookies for session management
     cookies.set('auth-token', tokens.accessToken, {
@@ -105,10 +123,8 @@ export const GET = async ({
       // Create a profile for the user
       await profilesCollection.insertOne({
         userId: userId,
-        fullName:
-          socialUser.name ||
-          `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
-        avatarUrl: socialUser.picture || null,
+        fullName: socialUser.name,
+        avatarUrl: socialUser.picture ?? null,
         role: userRole,
         provider: socialUser.provider,
         createdAt: new Date(),
@@ -120,10 +136,8 @@ export const GET = async ({
         { userId: userId },
         {
           $set: {
-            fullName:
-              socialUser.name ||
-              `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
-            avatarUrl: socialUser.picture || existingProfile.avatarUrl,
+            fullName: socialUser.name,
+            avatarUrl: socialUser.picture ?? existingProfile.avatarUrl,
             provider: socialUser.provider,
             updatedAt: new Date(),
           },
@@ -145,8 +159,8 @@ export const GET = async ({
     )
 
     // Redirect to dashboard or original destination
-    const destination = state ? decodeURIComponent(state) : '/dashboard'
-    return redirect(destination.startsWith('/') ? destination : '/dashboard')
+    const destination = sanitizeStateRedirect(state)
+    return redirect(destination)
   } catch (error: unknown) {
     console.error('Auth0 callback error:', error)
     return new Response(

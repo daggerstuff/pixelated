@@ -14,10 +14,10 @@ const appLogger = createBuildSafeLogger('memory-system');
  * Coordinates ingestion, tagging, and gatekeeping of memories.
  */
 export class MemorySystem {
-  private gate: SocraticGate;
-  private tagger: MemoryCrisisTagger;
-  private synthesizer: MemorySynthesizer;
-  private linker: MemoryLinker;
+  private readonly gate: SocraticGate;
+  private readonly tagger: MemoryCrisisTagger;
+  private readonly synthesizer: MemorySynthesizer;
+  private readonly linker: MemoryLinker;
 
   constructor(crisisDetectionService: CrisisDetectionService) {
     this.tagger = new MemoryCrisisTagger(crisisDetectionService);

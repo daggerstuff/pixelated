@@ -120,17 +120,17 @@ export interface PerformanceMetrics {
 }
 
 export class ModelServingServer extends EventEmitter {
-  private models: Map<string, tf.LayersModel>
-  private modelConfigs: Map<string, ModelConfig>
+  private readonly models: Map<string, tf.LayersModel>
+  private readonly modelConfigs: Map<string, ModelConfig>
   private redis: Redis
   private mongoClient: MongoClient
   private featureStore: FeatureStore
   private modelRegistry: ModelRegistry
   private monitoring: ModelMonitoring
-  private performanceCache: Map<string, PerformanceMetrics>
+  private readonly performanceCache: Map<string, PerformanceMetrics>
 
   constructor(
-    private config: {
+    private readonly config: {
       redisUrl: string
       mongoUrl: string
       modelRegistryUrl: string
@@ -264,7 +264,7 @@ export class ModelServingServer extends EventEmitter {
     try {
       // Get individual predictions
       const individualPredictions = await Promise.all(
-        modelIds.map((modelId) => this.predict(modelId, input)),
+        modelIds.map( async (modelId) => this.predict(modelId, input)),
       )
 
       // Aggregate predictions
@@ -377,6 +377,7 @@ export class ModelServingServer extends EventEmitter {
         return this.zScoreNormalize(data, config?.parameters)
       case 'robust':
         return this.robustNormalize(data, config?.parameters)
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return data
     }
@@ -509,7 +510,7 @@ export class ModelServingServer extends EventEmitter {
 
   private updatePerformanceCache(modelId: string, latency: number): void {
     const cacheKey = `perf_${modelId}`
-    const existing = this.performanceCache.get(cacheKey) || {
+    const existing = this.performanceCache.get(cacheKey) ?? {
       modelId,
       avgLatency: 0,
       throughput: 0,
@@ -553,7 +554,7 @@ export class ModelServingServer extends EventEmitter {
         return {
           modelId,
           status: metrics ? 'healthy' : 'unknown',
-          metrics: metrics || null,
+          metrics: metrics ?? null,
           drift,
         }
       }),
@@ -584,7 +585,7 @@ export class ModelServingServer extends EventEmitter {
 
 // Helper classes for dependencies
 class RedisFeatureStore implements FeatureStore {
-  constructor(private redis: Redis) {}
+  constructor(private readonly redis: Redis) {}
 
   async getFeatures(featureSetId: string): Promise<FeatureSet> {
     const data = await this.redis.get(`features:${featureSetId}`)
@@ -618,7 +619,7 @@ class RedisFeatureStore implements FeatureStore {
 }
 
 class MongoModelRegistry implements ModelRegistry {
-  constructor(private mongoClient: MongoClient) {}
+  constructor(private readonly mongoClient: MongoClient) {}
 
   async registerModel(config: ModelConfig): Promise<void> {
     const db = this.mongoClient.db('threat_detection')
@@ -673,8 +674,8 @@ class MongoModelRegistry implements ModelRegistry {
 
 class ComprehensiveModelMonitoring implements ModelMonitoring {
   constructor(
-    private redis: Redis,
-    private mongoClient: MongoClient,
+    private readonly redis: Redis,
+    private readonly mongoClient: MongoClient,
   ) {}
 
   async trackPrediction(prediction: ModelPrediction): Promise<void> {

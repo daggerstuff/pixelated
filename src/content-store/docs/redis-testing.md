@@ -1,11 +1,15 @@
 ---
-description: 'Guide for testing Redis functionality'
-pubDate: 2025-03-25
+description: Guide for testing Redis functionality
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['redis', 'testing', 'vitest']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - redis
+  - testing
+  - vitest
+author: Pixelated Team
+title: Install dependencies
 ---
 
 ## Redis Service Testing Guide
@@ -203,9 +207,11 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v2
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6.0.2
+      - uses: pnpm/action-setup@v6.0.6
+        with:
+          version: 11.1.1
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -317,3 +323,4 @@ For issues and questions:
 - GitHub Issues: [Report a bug](https://github.com/your-repo/issues)
 - Documentation: [Redis Service API](./redis-service.mdx)
 - Slack: #redis-service channel
+

@@ -6,7 +6,7 @@ dotenv.config()
 
 // Use the DATABASE_URL from .env or default to Neon connection string
 const databaseUrl =
-  process.env.DATABASE_URL ||
+  process.env.DATABASE_URL ??
   'postgresql://neondb_owner:npg_ukNgWx9FZw4G@ep-falling-dew-a8eovkvn-pooler.eastus2.azure.neon.tech/neondb?channel_binding=require&sslmode=require'
 
 console.log('Using database URL:', databaseUrl.replace(/:[^:@]+@/, ':***@')) // Hide password in logs

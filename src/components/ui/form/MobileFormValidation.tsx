@@ -323,7 +323,7 @@ export function MobileFormValidation({
   useEffect(() => {
     const form = formRef.current
     if (!form) {
-      return
+      return () => {}
     }
 
     const inputs = form.querySelectorAll('input, textarea, select')
@@ -346,7 +346,6 @@ export function MobileFormValidation({
     })
 
     // Clean up
-    // eslint-disable-next-line consistent-return
     return () => {
       inputs.forEach((input) => {
         if (isFormField(input)) {

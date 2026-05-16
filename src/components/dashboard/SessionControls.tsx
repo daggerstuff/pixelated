@@ -1,6 +1,4 @@
-// Replaced entire file with a single authoritative implementation to remove merge residues.
-import React, { useState, useEffect, useRef } from 'react'
-
+import React, { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import type { TherapistSession } from '@/types/dashboard'
 
@@ -21,9 +19,6 @@ export function SessionControls({
 
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
-  // Focus management for keyboard navigation
-  const [, setFocusedButton] = useState<string | null>(null)
-
   const handleControlClick = (
     action: 'start' | 'pause' | 'resume' | 'end',
     sessionId?: string,
@@ -38,16 +33,6 @@ export function SessionControls({
     }
   }
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        Object.values(buttonRefs.current).forEach((b) => b?.blur())
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [])
-
   // Keyboard event handling for session controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -56,7 +41,6 @@ export function SessionControls({
         Object.values(buttonRefs.current).forEach((button) => {
           button?.blur()
         })
-        setFocusedButton(null)
       }
     }
 

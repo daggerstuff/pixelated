@@ -1,19 +1,19 @@
-import { Alert } from '@/components/ui/alert'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Alert } from '../ui/alert.tsx'
+import { Card } from '../ui/card/index.ts'
+import { Input } from '../ui/input.tsx'
+import { Label } from '../ui/label.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Switch } from '@/components/ui/switch'
-import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
-import { cn } from '@/lib/utils'
+} from '../ui/select.tsx'
+import { Skeleton } from '../ui/skeleton.tsx'
+import { Switch } from '../ui/switch.tsx'
+import { useNotificationPreferences } from '../hooks/useNotificationPreferences'
+import { NotificationChannel } from '../../lib/services/notification/NotificationService'
+import { cn } from '../../lib/utils'
 
 type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'weekly'
 
@@ -76,7 +76,7 @@ export function NotificationPreferences({
             <Switch
               id='in-app'
               checked={preferences.channels[NotificationChannel.IN_APP]}
-              onCheckedChange={(checked) =>
+              onCheckedChange={ async (checked) =>
                 updateChannel(NotificationChannel.IN_APP, checked)
               }
             />
@@ -87,7 +87,7 @@ export function NotificationPreferences({
             <Switch
               id='email'
               checked={preferences.channels[NotificationChannel.EMAIL]}
-              onCheckedChange={(checked) =>
+              onCheckedChange={ async (checked) =>
                 updateChannel(NotificationChannel.EMAIL, checked)
               }
             />
@@ -98,7 +98,7 @@ export function NotificationPreferences({
             <Switch
               id='push'
               checked={preferences.channels[NotificationChannel.PUSH]}
-              onCheckedChange={(checked) =>
+              onCheckedChange={ async (checked) =>
                 updateChannel(NotificationChannel.PUSH, checked)
               }
             />
@@ -109,7 +109,7 @@ export function NotificationPreferences({
             <Switch
               id='sms'
               checked={preferences.channels[NotificationChannel.SMS]}
-              onCheckedChange={(checked) =>
+              onCheckedChange={ async (checked) =>
                 updateChannel(NotificationChannel.SMS, checked)
               }
             />
@@ -133,7 +133,7 @@ export function NotificationPreferences({
             </Label>
             <Select
               value={preferences.frequency}
-              onValueChange={(value) =>
+              onValueChange={ async (value) =>
                 updateFrequency(value as NotificationFrequency)
               }
               placeholder='Select frequency'
@@ -166,7 +166,7 @@ export function NotificationPreferences({
             <Switch
               id='quiet-hours'
               checked={preferences.quiet_hours.enabled}
-              onCheckedChange={(checked) =>
+              onCheckedChange={ async (checked) =>
                 updateQuietHours({
                   ...preferences.quiet_hours,
                   enabled: checked,
@@ -185,7 +185,7 @@ export function NotificationPreferences({
                   id='start-time'
                   type='time'
                   value={preferences.quiet_hours.start}
-                  onChange={(e) =>
+                  onChange={ async (e) =>
                     updateQuietHours({
                       ...preferences.quiet_hours,
                       start: e.target.value,
@@ -199,7 +199,7 @@ export function NotificationPreferences({
                   id='end-time'
                   type='time'
                   value={preferences.quiet_hours.end}
-                  onChange={(e) =>
+                  onChange={ async (e) =>
                     updateQuietHours({
                       ...preferences.quiet_hours,
                       end: e.target.value,
@@ -232,7 +232,7 @@ export function NotificationPreferences({
                   <Switch
                     id={category}
                     checked={enabled}
-                    onCheckedChange={(checked) =>
+                    onCheckedChange={ async (checked) =>
                       updateCategory(category, checked)
                     }
                   />

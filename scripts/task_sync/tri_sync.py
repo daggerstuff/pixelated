@@ -1,4 +1,4 @@
-"""Tri-directional task sync coordinator for beads, Asana, and Jira."""
+"""Tri-directional task sync coordinator for beads, Asana, Jira, GitHub, and Linear."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import shlex
 import subprocess
 import sys
@@ -20,21 +21,27 @@ from scripts.task_sync.provider_bridge import (
     apply_provider_action,
     export_asana_tasks,
     export_jira_issues,
+    export_github_issues,
+    export_linear_issues,
     extract_provider_target_id,
 )
 
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "jira")
+DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "github", "linear", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
     "jira": "PIXELATED_JIRA_EXPORT_PATH",
+    "github": "PIXELATED_GITHUB_EXPORT_PATH",
+    "linear": "PIXELATED_LINEAR_EXPORT_PATH",
 }
 PROVIDER_APPLY_COMMAND_ENV_VARS = {
     "asana": "PIXELATED_ASANA_APPLY_COMMAND",
     "jira": "PIXELATED_JIRA_APPLY_COMMAND",
+    "github": "PIXELATED_GITHUB_APPLY_COMMAND",
+    "linear": "PIXELATED_LINEAR_APPLY_COMMAND",
 }
 DEFAULT_APPLY_MAX_WORKERS = 8
 DEFAULT_APPLY_MAX_PASSES = 2
@@ -61,6 +68,8 @@ STATUS_ALIASES = {
 PROVIDER_PRIORITY = {
     "beads": 4,
     "asana": 3,
+    "github": 2,
+    "linear": 2,
     "jira": 2,
 }
 
@@ -513,19 +522,31 @@ def cleanup_beads_duplicates(
 
 
 def _run_command(command: Sequence[str], *, input_text: str | None = None) -> str:
-    completed = subprocess.run(
-        list(command),
-        input=input_text,
-        capture_output=True,
-        check=True,
-        text=True,
-    )
-    return completed.stdout.strip()
+    try:
+        completed = subprocess.run(
+            list(command),
+            input=input_text,
+            capture_output=True,
+            check=True,
+            text=True,
+        )
+        return completed.stdout.strip()
+    except FileNotFoundError as exc:
+        return ""
 
 
 def _run_process(
     command: Sequence[str], *, input_text: str | None = None
 ) -> subprocess.CompletedProcess[str]:
+    executable = command[0] if command else "<unknown>"
+    if not shutil.which(executable):
+        return subprocess.CompletedProcess(
+            args=list(command),
+            returncode=127,
+            stdout="",
+            stderr=f"{executable} command not found",
+        )
+
     return subprocess.run(
         list(command),
         input=input_text,
@@ -615,6 +636,45 @@ def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
         raw=fields if isinstance(fields, Mapping) else payload,
+    )
+
+
+def normalize_github_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
+    body = _string_or_empty(_first_present(payload, "body", "description", "content"))
+    clean_body, metadata = parse_sync_metadata(body)
+    status = normalize_status(_string_or_empty(_first_present(payload, "state")) or "open")
+
+    return TaskRecord(
+        provider="github",
+        external_id=_string_or_empty(_first_present(payload, "number", "id")),
+        title=_string_or_empty(_first_present(payload, "title")),
+        body=body,
+        status=status,
+        updated_at=_parse_updated_at(payload, "updated_at", "updated", "created_at", "created") or datetime.now(timezone.utc),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
+        provider_ids=_parse_provider_ids(metadata),
+        clean_body=clean_body,
+        raw=payload,
+    )
+
+
+def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
+    body = _string_or_empty(_first_present(payload, "description", "body", "content"))
+    clean_body, metadata = parse_sync_metadata(body)
+    raw_state = _first_present(payload, "state", "state.name")
+    status = normalize_status(_string_or_empty(raw_state) or "open")
+
+    return TaskRecord(
+        provider="linear",
+        external_id=_string_or_empty(_first_present(payload, "id", "identifier")),
+        title=_string_or_empty(_first_present(payload, "title")),
+        body=body,
+        status=status,
+        updated_at=_parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created") or datetime.now(timezone.utc),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
+        provider_ids=_parse_provider_ids(metadata),
+        clean_body=clean_body,
+        raw=payload,
     )
 
 
@@ -753,6 +813,8 @@ def get_provider_normalizer(provider: str):
         "asana": normalize_asana_payload,
         "jira": normalize_jira_payload,
         "beads": normalize_beads_payload,
+        "github": normalize_github_payload,
+        "linear": normalize_linear_payload,
     }
     try:
         return normalizers[provider]
@@ -861,6 +923,8 @@ def _resolve_direct_provider_exporter(provider: str) -> Any:
     exporters: dict[str, Any] = {
         "asana": export_asana_tasks,
         "jira": export_jira_issues,
+        "github": export_github_issues,
+        "linear": export_linear_issues,
     }
     return exporters.get(provider)
 
@@ -1078,7 +1142,7 @@ def _apply_bridge_action(
 def _apply_direct_provider_action(action: SyncAction) -> SyncExecutionResult:
     payload = dataclass_to_dict(action)
     applier = _resolve_direct_provider_applier(action.provider)
-    if applier is None:  # pragma: no cover - guarded by apply_sync_action
+    if applier is None:
         raise RuntimeError(f"Unsupported direct provider apply for '{action.provider}'.")
     response = applier(payload)
 
@@ -1094,7 +1158,7 @@ def _apply_direct_provider_action(action: SyncAction) -> SyncExecutionResult:
 
 
 def _resolve_direct_provider_applier(provider: str) -> Any:
-    if provider in {"asana", "jira"}:
+    if provider in {"asana", "jira", "github", "linear"}:
         return lambda payload: apply_provider_action(provider, payload)
     return None
 

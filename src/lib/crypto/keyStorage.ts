@@ -41,11 +41,11 @@ import {
  * Manages encryption keys with AWS KMS and DynamoDB for storage
  */
 export class KeyStorage {
-  private namespace: string
-  private kmsClient: KMSClient
-  private dynamoClient: DynamoDBDocumentClient
-  private useKms: boolean
-  private kmsKeyId?: string
+  private readonly namespace: string
+  private readonly kmsClient: KMSClient
+  private readonly dynamoClient: DynamoDBDocumentClient
+  private readonly useKms: boolean
+  private readonly kmsKeyId?: string
   private readonly tableName = 'encryption-keys'
 
   /**
@@ -222,7 +222,7 @@ export class KeyStorage {
         }
 
     const result = await this.dynamoClient.send(new QueryCommand(queryParams))
-    return (result.Items || []).map((item) => item.keyId)
+    return (result.Items ?? []).map((item) => item.keyId)
   }
 
   /**

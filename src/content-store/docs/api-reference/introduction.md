@@ -1,10 +1,11 @@
 ---
-description: 'Example section for showcasing API endpoints'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Example section for showcasing API endpoints
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Api Reference
 ---
 
 If you're not looking to build API reference documentation, you can delete this

@@ -8,11 +8,11 @@ import {
 } from 'lucide-react'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Input } from '@/components/ui/input.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 
 interface Framework {
   id: string
@@ -112,7 +112,7 @@ export default function PsychologyFrameworksDemo() {
 
       // Auto-select first framework if available
       if (result.frameworks.length > 0) {
-        setSelectedFramework(result.frameworks[0] || null)
+        setSelectedFramework(result.frameworks[0] ?? null)
       }
     } catch (error: unknown) {
       console.error('Failed to load frameworks:', error)
@@ -226,7 +226,7 @@ export default function PsychologyFrameworksDemo() {
         'Humanistic',
       ])
       if (demoFrameworks.length > 0) {
-        setSelectedFramework(demoFrameworks[0] || null)
+        setSelectedFramework(demoFrameworks[0] ?? null)
       }
     } finally {
       setLoading(false)

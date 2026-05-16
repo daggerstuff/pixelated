@@ -10,7 +10,7 @@ import { getLogger } from '../utils/logger'
  */
 export const loggingMiddleware = defineMiddleware(async ({ request }, next) => {
   // Generate or get request ID
-  const requestId = request.headers.get('x-request-id') || uuidv4()
+  const requestId = request.headers.get('x-request-id') ?? uuidv4()
 
   // Create a logger for this request
   const logger = getLogger(requestId)
@@ -19,11 +19,11 @@ export const loggingMiddleware = defineMiddleware(async ({ request }, next) => {
   const { method } = request
   const url = new URL(request.url)
   const path = url.pathname
-  const userAgent = request.headers.get('user-agent') || 'unknown'
-  const referer = request.headers.get('referer') || 'direct'
+  const userAgent = request.headers.get('user-agent') ?? 'unknown'
+  const referer = request.headers.get('referer') ?? 'direct'
   const ip =
-    request.headers.get('x-forwarded-for') ||
-    request.headers.get('cf-connecting-ip') ||
+    (request.headers.get('x-forwarded-for') ??
+    request.headers.get('cf-connecting-ip')) ??
     'unknown'
 
   // Try to get user from session
@@ -68,7 +68,7 @@ export const loggingMiddleware = defineMiddleware(async ({ request }, next) => {
       response: {
         status: response?.status,
         duration: Math.round(duration),
-        contentType: response?.headers.get('content-type') || 'unknown',
+        contentType: response?.headers.get('content-type') ?? 'unknown',
       },
     })
 

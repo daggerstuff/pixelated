@@ -1,10 +1,12 @@
 ---
-description: 'Test Patterns Documentation documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Test Patterns Documentation documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Test Patterns Documentation
 ---
 
 # Test Patterns Documentation

@@ -61,10 +61,10 @@ export default function ExportPanel({
       const rows = results.map((r) => [
         `"${r.title.replace(/"/g, '""')}"`,
         `"${r.authors.join('; ').replace(/"/g, '""')}"`,
-        r.publication_year || '',
-        `"${(r.publisher || '').replace(/"/g, '""')}"`,
-        r.source || '',
-        r.doi || '',
+        r.publication_year ?? '',
+        `"${(r.publisher ?? '').replace(/"/g, '""')}"`,
+        r.source ?? '',
+        r.doi ?? '',
         r.therapeutic_relevance_score || '',
       ])
       content = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
@@ -73,14 +73,14 @@ export default function ExportPanel({
     } else if (format === 'bibtex') {
       content = results
         .map((r, i) => {
-          const key = `${r.authors[0]?.split(' ').pop() || 'Unknown'}${r.publication_year || '0000'}${i}`
+          const key = `${r.authors[0]?.split(' ').pop() ?? 'Unknown'}${r.publication_year ?? '0000'}${i}`
           return `@book{${key},
   title = {${r.title}},
   author = {${r.authors.join(' and ')}},
-  year = {${r.publication_year || ''}},
-  publisher = {${r.publisher || ''}},
-  doi = {${r.doi || ''}},
-  url = {${r.url || ''}}
+  year = {${r.publication_year ?? ''}},
+  publisher = {${r.publisher ?? ''}},
+  doi = {${r.doi ?? ''}},
+  url = {${r.url ?? ''}}
 }`
         })
         .join('\n\n')

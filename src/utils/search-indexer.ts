@@ -65,13 +65,13 @@ async function getCollection(
           : null
 
         const title =
-          titleMatch?.[1]?.trim() || file.name.replace(/\.(md|mdx)$/, '')
+          titleMatch?.[1]?.trim() ?? file.name.replace(/\.(md|mdx)$/, '')
         const tags = tagsMatch?.[1]
           ? tagsMatch[1]
               .split(',')
               .map((tag) => tag.trim().replace(/["']/g, ''))
           : []
-        const category = categoryMatch?.[1]?.trim() || collectionName
+        const category = categoryMatch?.[1]?.trim() ?? collectionName
 
         // Remove frontmatter and get body content
         const body = content.replace(/---\n[\s\S]*?\n---/, '').trim()
@@ -154,9 +154,9 @@ export async function buildSearchIndex(
           const url = `/${collectionName}/${slug}/`
 
           // Extract metadata from entry
-          const title = data.title || ''
-          const tags = data.tags || []
-          const category = data.category || collectionName
+          const title = data.title ?? ''
+          const tags = data.tags ?? []
+          const category = data.category ?? collectionName
 
           // Create unique ID for document
           const documentId = `${collectionName}_${id}`

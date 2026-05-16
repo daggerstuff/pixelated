@@ -7,16 +7,16 @@ export function join(...parts) {
 }
 
 export function dirname(p) {
-  return p.split('/').slice(0, -1).join('/') || '.'
+  return p.split('/').slice(0, -1).join('/') ?? '.'
 }
 
 export function basename(p, ext) {
-  const base = p.split('/').pop() || ''
+  const base = p.split('/').pop() ?? ''
   return ext && base.endsWith(ext) ? base.slice(0, -ext.length) : base
 }
 
 export function extname(p) {
-  const base = p.split('/').pop() || ''
+  const base = p.split('/').pop() ?? ''
   const idx = base.lastIndexOf('.')
   return idx !== -1 ? base.slice(idx) : ''
 }

@@ -1,8 +1,8 @@
 import { Brain, Activity, Zap } from 'lucide-react'
 import React, { FC, useEffect, useRef, useMemo, useCallback } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
 
 interface BrainRegion {
   id: string

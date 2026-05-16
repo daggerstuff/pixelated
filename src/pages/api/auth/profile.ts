@@ -25,8 +25,8 @@ export const GET = async ({
     // Extract client info for logging
     const clientInfo = {
       ip: clientAddress || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
-      deviceId: request.headers.get('x-device-id') || 'unknown',
+      userAgent: request.headers.get('user-agent') ?? 'unknown',
+      deviceId: request.headers.get('x-device-id') ?? 'unknown',
     }
 
     // Rate limit profile reads (e.g. 60 per minute)
@@ -42,8 +42,8 @@ export const GET = async ({
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
-    if (session && session.user) {
-      userId = session.user.id || (session.user as any)._id?.toString() || null
+    if (session?.user) {
+      userId = session.user.id || (session.user as any)._id?.toString() ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
@@ -65,7 +65,7 @@ export const GET = async ({
     }
 
     if (!userId) {
-      await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
+       logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
         action: 'get_profile',
         reason: 'No user ID found in session or token',
         clientInfo,
@@ -80,7 +80,7 @@ export const GET = async ({
     const user = await auth0UserService.getUserById(userId)
 
     if (!user) {
-      await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
+       logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
         action: 'get_profile',
         reason: 'User not found in database',
         clientInfo,
@@ -106,8 +106,8 @@ export const GET = async ({
           emailVerified: user.emailVerified,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
-          userMetadata: user.userMetadata || {},
-          appMetadata: user.appMetadata || {},
+          userMetadata: user.userMetadata ?? {},
+          appMetadata: user.appMetadata ?? {},
         },
       }),
       {
@@ -118,7 +118,7 @@ export const GET = async ({
   } catch (error: any) {
     console.error('Get profile error:', error)
 
-    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+     logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
       error: detectAndRedactPHI(
         error instanceof Error ? error.message : 'Unknown error',
@@ -149,8 +149,8 @@ export const PUT = async ({
   try {
     clientInfo = {
       ip: clientAddress || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
-      deviceId: request.headers.get('x-device-id') || 'unknown',
+      userAgent: request.headers.get('user-agent') ?? 'unknown',
+      deviceId: request.headers.get('x-device-id') ?? 'unknown',
     }
 
     // Apply CSRF protection for updates
@@ -171,8 +171,8 @@ export const PUT = async ({
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
-    if (session && session.user) {
-      userId = session.user.id || (session.user as any)._id?.toString() || null
+    if (session?.user) {
+      userId = session.user.id || (session.user as any)._id?.toString() ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
@@ -223,7 +223,7 @@ export const PUT = async ({
       })
     }
 
-    await logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
+     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
       updates: Object.keys(auth0Updates),
       clientInfo,
     })
@@ -256,7 +256,7 @@ export const PUT = async ({
   } catch (error: unknown) {
     console.error('Update profile error:', error)
 
-    await logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
+     logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
       action: 'update_profile',
       success: false,
       error: detectAndRedactPHI(

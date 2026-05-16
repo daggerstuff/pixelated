@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { APIRequestContext, APIResponse } from '@playwright/test'
 
 // Test configuration
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5173'
+const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:5173'
 
 // Helper functions
 async function getAuthHeaders(): Promise<Record<string, string>> {
@@ -35,7 +35,7 @@ async function makeRequest(
 
   const headers = {
     ...(await getAuthHeaders()),
-    ...(options.headers || {}),
+    ...(options.headers ?? {}),
   }
 
   switch (method) {

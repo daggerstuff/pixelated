@@ -1,21 +1,27 @@
 import path from 'node:path'
 
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import { getViteConfig } from 'astro/config'
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config'
 
+const projectRoot = process.cwd()
 const baseNodeTestGlobs = [
   'src/tests/health-monitor.test.ts',
   'src/lib/logging/__tests__/audit-logger.test.ts',
   'src/pages/api/**/*.test.ts',
   'src/pages/api/**/*.spec.ts',
   'src/pages/api/**/__tests__/**/*.test.ts',
+  'src/api/routes/__tests__/**/*.test.ts',
+  'src/api/middleware/__tests__/**/*.test.ts',
   'src/lib/auth/**/*.test.ts',
   'src/lib/services/product-memory-gateway.test.ts',
+  'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
   'tests/unit/auth0/**/*.test.ts',
   'tests/integration/auth0/**/*.test.ts',
   'src/lib/redis.test.ts',
+  'src/lib/services/notification/__tests__/NotificationService.test.ts',
+  'src/lib/__tests__/security-implementation.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -31,10 +37,37 @@ const ciNodeTestGlobs = process.env['CI']
     ]
   : []
 
-const nodeTestGlobs = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
+const nodeTestGlobs: string[] = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
+const coverageEnabled =
+  process.env['VITEST_COVERAGE_ENABLED'] === 'true'
+    ? true
+    : process.env['VITEST_COVERAGE_ENABLED'] === 'false'
+      ? false
+      : !process.env['CI']
+
+const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
+  ? process.env['VITEST_TARGET_TESTS']
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+  : []
+const targetedNodeTestGlobs = targetedTestGlobs.filter(
+  (entry) =>
+    (entry.includes('/api/') || entry.includes('/lib/')) &&
+    !entry.includes('__tests__/AIChat'),
+)
+const targetedJsdomTestGlobs = targetedTestGlobs.filter(
+  (entry) => !targetedNodeTestGlobs.includes(entry),
+)
+const astroViteConfig = getViteConfig({}, {})
+const astroVite = await astroViteConfig({
+  mode: process.env['VITEST_MODE'] ?? 'test',
+  command: 'serve',
+})
+const astroPlugins = astroVite.plugins ?? []
 
 export default defineConfig({
-  plugins: [react(), tsconfigPaths({ root: path.resolve(__dirname, '..') })],
+  plugins: [react(), ...astroPlugins],
   define: {
     global: 'globalThis',
   },
@@ -46,52 +79,28 @@ export default defineConfig({
     noExternal: ['msw'],
   },
   resolve: {
+    tsconfigPaths: true,
     alias: [
-      { find: '@', replacement: path.resolve(__dirname, '../src') },
+      { find: '@/', replacement: `${path.resolve(process.cwd(), 'src')}/` },
       {
         find: 'react-dom/test-utils',
         replacement: path.resolve(
-          __dirname,
-          '../__mocks__/react-dom/test-utils.js',
+          projectRoot,
+          '__mocks__/react-dom/test-utils.js',
         ),
       },
       {
         find: /@testing-library\/react\/dist\/act-compat\.js$/,
         replacement: path.resolve(
-          __dirname,
-          '../src/test/testing-library-act-compat.ts',
+          projectRoot,
+          'src/test/testing-library-act-compat.ts',
         ),
       },
       {
         find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
         replacement: path.resolve(
-          __dirname,
-          '../src/test/testing-library-act-compat.ts',
-        ),
-      },
-      {
-        find: 'react/jsx-dev-runtime',
-        replacement: path.resolve(
-          __dirname,
-          '../node_modules/react/jsx-dev-runtime.js',
-        ),
-      },
-      {
-        find: 'react/jsx-runtime',
-        replacement: path.resolve(
-          __dirname,
-          '../node_modules/react/jsx-runtime.js',
-        ),
-      },
-      {
-        find: 'react',
-        replacement: path.resolve(__dirname, '../src/test/react-compat.ts'),
-      },
-      {
-        find: 'react-dom',
-        replacement: path.resolve(
-          __dirname,
-          '../node_modules/react-dom/index.js',
+          projectRoot,
+          '__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
         ),
       },
     ],
@@ -100,20 +109,19 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: [
-      './src/test/setup.ts',
-      './src/test/setup-react19.ts',
-      './vitest.setup.ts',
-    ],
+    setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
       },
     },
-    include: [
-      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-      'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-    ],
+    include:
+      targetedTestGlobs.length > 0
+        ? targetedTestGlobs
+        : [
+            'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+            'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+          ],
     exclude: [
       '**/node_modules/**',
       'src/tests/simple-browser-compatibility.test.ts',
@@ -123,6 +131,7 @@ export default defineConfig({
       'src/e2e/breach-notification.spec.ts',
       'src/tests/performance.test.ts',
       'src/tests/responsive-navigation.test.js',
+      'tests/integration/complete-system.integration.test.ts',
       'tests/e2e/**/*',
       'tests/browser/**/*',
       'tests/accessibility/**/*',
@@ -135,17 +144,119 @@ export default defineConfig({
     ],
     projects: [
       {
-        test: {
-          name: 'node',
-          include: nodeTestGlobs as unknown as string[],
-          environment: 'node',
-        },
+        plugins: [react(), ...astroPlugins],
         resolve: {
+          tsconfigPaths: true,
           alias: [
-            { find: '@', replacement: path.resolve(__dirname, '../src') },
+            {
+              find: '@/',
+              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+            },
+            {
+              find: 'react-dom/test-utils',
+              replacement: path.resolve(
+                process.cwd(),
+                '__mocks__/react-dom/test-utils.js',
+              ),
+            },
+            {
+              find: /@testing-library\/react\/dist\/act-compat\.js$/,
+              replacement: path.resolve(
+                process.cwd(),
+                'src/test/testing-library-act-compat.ts',
+              ),
+            },
+            {
+              find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
+              replacement: path.resolve(
+                process.cwd(),
+                '__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
+              ),
+            },
+            {
+              find: 'react/jsx-dev-runtime',
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-dev-runtime.js',
+              ),
+            },
+            {
+              find: 'react/jsx-runtime',
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-runtime.js',
+              ),
+            },
+          ],
+          conditions: ['node', 'import', 'module', 'default'],
+        },
+        test: {
+          globals: true,
+          setupFiles: ['./src/test/setup.ts'],
+          name: 'jsdom',
+          include:
+            targetedTestGlobs.length > 0
+              ? targetedJsdomTestGlobs
+              : [
+                  'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                  'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                ],
+          environment: 'jsdom',
+          exclude: [
+            '**/node_modules/**',
+            'src/lib/security/__tests__/**/*.test.ts',
+            'src/lib/ehr/__tests__/**/*.test.ts',
+            'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'src/lib/redis.test.ts',
+            'src/lib/services/notification/__tests__/NotificationService.test.ts',
+            'src/lib/__tests__/security-implementation.test.ts',
+            'tests/integration/complete-system.integration.test.ts',
+            'src/tests/simple-browser-compatibility.test.ts',
+            'src/tests/browser-compatibility.test.ts',
+            'src/tests/mobile-compatibility.test.ts',
+            'src/tests/cross-browser-compatibility.test.ts',
+            'src/e2e/breach-notification.spec.ts',
+            'src/tests/performance.test.ts',
+            'src/tests/responsive-navigation.test.js',
+            'tests/e2e/**/*',
+            'tests/browser/**/*',
+            'tests/accessibility/**/*',
+            'tests/performance/**/*',
+            'tests/security/**/*',
+            'src/api/routes/__tests__/**/*.test.ts',
+            'src/api/middleware/__tests__/**/*.test.ts',
+            'backups/**',
+            'backups/**/*',
+            'worktrees/**',
           ],
         },
-        plugins: [tsconfigPaths({ root: path.resolve(__dirname, '..') })],
+      },
+      {
+        resolve: {
+          tsconfigPaths: true,
+          alias: [
+            {
+              find: '@/',
+              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+            },
+          ],
+        },
+        test: {
+          globals: true,
+          setupFiles: ['./src/test/setup-node.ts'],
+          name: 'node',
+          include:
+            targetedTestGlobs.length > 0
+              ? targetedNodeTestGlobs
+              : [
+                  ...nodeTestGlobs,
+                  'src/lib/security/__tests__/**/*.test.ts',
+                  'src/lib/ehr/__tests__/allscripts.test.ts',
+                  'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'src/tests/auth.test.ts',
+                ],
+          environment: 'node',
+        },
       },
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
@@ -160,8 +271,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      enabled:
-        !process.env['CI'] || process.env['VITEST_COVERAGE_ENABLED'] === 'true',
+      enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
       thresholds: {

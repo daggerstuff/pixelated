@@ -57,14 +57,14 @@ export interface OptimizationConfig {
 
 export class PerformanceOptimizer {
   private metricsIntervalId: NodeJS.Timeout | null
-  private config: OptimizationConfig
-  private metrics: PerformanceMetrics
-  private connectionPool: Map<string, unknown[]>
-  private cache: Map<
+  private readonly config: OptimizationConfig
+  private readonly metrics: PerformanceMetrics
+  private readonly connectionPool: Map<string, unknown[]>
+  private readonly cache: Map<
     string,
     { value: unknown; timestamp: number; accessCount: number }
   >
-  private circuitBreakers: Map<
+  private readonly circuitBreakers: Map<
     string,
     {
       failures: number
@@ -72,12 +72,12 @@ export class PerformanceOptimizer {
       state: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
     }
   >
-  private batchQueues: Map<
+  private readonly batchQueues: Map<
     string,
     { items: unknown[]; timer: NodeJS.Timeout | null }
   >
-  private metricsHistory: PerformanceMetrics[]
-  private activeCounts: Map<string, number>
+  private readonly metricsHistory: PerformanceMetrics[]
+  private readonly activeCounts: Map<string, number>
 
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
@@ -392,16 +392,14 @@ export class PerformanceOptimizer {
     }
 
     // Set timer for batch processing if not already set
-    if (!batch.timer) {
-      batch.timer = setTimeout(async () => {
+    batch.timer ??= setTimeout(async () => {
         await this.processBatch(batchName, processor)
-      }, this.config.batching.batchTimeout)
-    }
+      }, this.config.batching.batchTimeout);
   }
 
-  private async processBatch<T>(
+  private async processBatch(
     batchName: string,
-    processor: (items: T[]) => Promise<void>,
+    processor: (items: unknown[]) => Promise<void>,
   ): Promise<void> {
     const batch = this.batchQueues.get(batchName)
     if (!batch || batch.items.length === 0) {
@@ -409,7 +407,7 @@ export class PerformanceOptimizer {
     }
 
     // stored items are any[]; cast to T[] for the processor
-    const items = [...batch.items] as unknown as T[]
+    const items = [...batch.items] as unknown as unknown[]
     batch.items = []
 
     if (batch.timer) {
@@ -453,7 +451,7 @@ export class PerformanceOptimizer {
     ).reduce((sum, pool) => sum + pool.length, 0)
 
     // Update memory usage
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (process?.memoryUsage) {
       const memUsage = process.memoryUsage()
       this.metrics.memoryUsage = memUsage.heapUsed / memUsage.heapTotal
     }

@@ -89,8 +89,8 @@ interface ModelStatusResponse {
 // Configuration
 // ============================================================================
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL || 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY || ''
+const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
 const REQUEST_TIMEOUT_MS = 30000
 const MAX_RETRIES = 3
 
@@ -297,13 +297,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     const pixelRequest: PixelInferenceRequest = {
       user_query: body.user_query,
-      conversation_history: body.conversation_history || [],
+      conversation_history: body.conversation_history ?? [],
       context_type: body.context_type,
-      user_id: body.user_id || session.user.id,
+      user_id: body.user_id ?? session.user.id,
       session_id: body.session_id,
       use_eq_awareness: body.use_eq_awareness !== false,
       include_metrics: body.include_metrics !== false,
-      max_tokens: body.max_tokens || 200,
+      max_tokens: body.max_tokens ?? 200,
       plutchik_scores: body.plutchik_scores,
       ocean_scores: body.ocean_scores,
     }

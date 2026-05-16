@@ -4,13 +4,15 @@ export async function getAssetUrl(path: string): Promise<string> {
     return path
   }
 
+  type AssetMapModule = {
+    default: Record<string, string>
+  }
+
   // Try to import the asset map, fallback to empty object if not available
   let assetMap: Record<string, string> = {}
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    assetMap = (await import('../cdn-asset-map.json').then(
-      (m) => m.default,
-    )) as Record<string, string>
+    const mapModule = (await import('../cdn-asset-map.json')) as AssetMapModule
+    assetMap = mapModule.default
   } catch {
     // Asset map not found, use fallback
   }

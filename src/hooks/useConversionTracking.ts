@@ -34,7 +34,7 @@ export default function useConversionTracking(
   const log = useCallback(
     (message: string, data?: unknown) => {
       if (debug) {
-        console.log(`🔍 Conversion Tracking: ${message}`, data || '')
+        console.log(`🔍 Conversion Tracking: ${message}`, data ?? '')
       }
     },
     [debug],
@@ -72,7 +72,7 @@ export default function useConversionTracking(
         // - Mixpanel: mixpanel.track(eventName, data)
 
         // For demonstration, we're just logging to console
-        if (typeof window !== 'undefined' && window.dataLayer) {
+        if (window?.dataLayer) {
           window.dataLayer.push({
             event: eventName,
             ...data,

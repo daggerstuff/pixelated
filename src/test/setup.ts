@@ -3,76 +3,65 @@
  * This file is automatically loaded by Vitest before tests are run
  */
 
-import { cleanup } from '@testing-library/react'
-import * as React from 'react'
 import { vi } from 'vitest'
+import './patch-react-act.cjs'
+import { flushSync } from 'react-dom'
 
-// React 19 compatibility: delegate to setup-react19.ts which has proper error handling
-import { act } from './setup-react19'
+// React 19 compatibility shim for environments that do not provide `act` directly.
+const act = async (callback: () => void | Promise<void>): Promise<void> => {
+  const result = typeof flushSync === 'function' ? flushSync(callback) : callback()
+  if (result && typeof result === 'object' && 'then' in result) {
+    await Promise.resolve(result)
+  }
+
+  if (typeof queueMicrotask !== 'undefined') {
+    await new Promise<void>((resolve) => {
+      queueMicrotask(() => resolve())
+    })
+  }
+
+  return
+}
 
 import '@testing-library/jest-dom'
 
 // Keep auth-config imports from exploding in test/bootstrap contexts.
 process.env.JWT_SECRET ??= 'test-jwt-secret'
 
-const reactCompat = React as typeof React & {
-  act?: typeof act
-}
-
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>()
   const patchedAct = typeof actual.act === 'function' ? actual.act : act
+
   return {
     ...actual,
     act: patchedAct,
-    default: {
-      ...(actual.default ?? actual),
-      act: patchedAct,
-    },
   }
 })
 
-vi.mock('react-dom/test-utils', () => ({
-  act,
-}))
-
-// Make act available on React for components that import it directly
-if (!reactCompat.act || typeof reactCompat.act !== 'function') {
-  try {
-    Object.defineProperty(reactCompat, 'act', {
-      value: act,
-      writable: true,
-      configurable: true,
-      enumerable: false,
-    })
-  } catch (e) {
-    // React.act may already be defined in React 19.2.4 - safe to skip
-    console.debug('Failed to define reactCompat.act, might already exist', e)
+vi.mock('react-dom/test-utils', async () => {
+  const actual = await vi.importActual<typeof import('react-dom/test-utils')>(
+    'react-dom/test-utils',
+  )
+  return {
+    ...actual,
+    act,
   }
-}
+})
 
-// Add type declarations for DOM testing matchers
-declare module 'vitest' {
-  interface Assertion<T = any> {
-    toBeInTheDocument(): T
-    toHaveAttribute(attr: string, value?: string): T
-    toHaveClass(...classNames: string[]): T
-    toHaveValue(value?: string | number): T
-    toBeVisible(): T
-    toBeDisabled(): T
-    toBeEnabled(): T
-    toHaveTextContent(text: string | RegExp): T
-    toHaveDisplayValue(value: string | RegExp | Array<string | RegExp>): T
-    toBeChecked(): T
-    toHaveFocus(): T
-    toBeRequired(): T
-    toBeInvalid(): T
-    toBeValid(): T
-    toHaveStyle(css: string | Record<string, unknown>): T
-    toHaveAccessibleName(name?: string | RegExp): T
-    toHaveAccessibleDescription(description?: string | RegExp): T
-  }
-}
+void import('react')
+  .then((reactModule) => {
+    if (!('act' in reactModule) || reactModule.act !== act) {
+      Object.defineProperty(reactModule, 'act', {
+        value: act,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      })
+    }
+  })
+  .catch((error: unknown) => {
+    console.debug('Failed to define React act helper', error)
+  })
 
 // Mock window.matchMedia
 if (typeof window !== 'undefined') {
@@ -133,7 +122,11 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class MockIntersectionObserver {
+const MockIntersectionObserver = class {
+  constructor(
+    _callback: IntersectionObserverCallback,
+    _options?: IntersectionObserverInit,
+  ) {}
   root: Element | Document | null = null
   rootMargin = '0px'
   thresholds: ReadonlyArray<number> = [0]
@@ -144,7 +137,13 @@ global.IntersectionObserver = class MockIntersectionObserver {
   takeRecords(): IntersectionObserverEntry[] {
     return []
   }
-} as unknown as typeof IntersectionObserver
+}
+
+Object.defineProperty(globalThis, 'IntersectionObserver', {
+  value: MockIntersectionObserver,
+  writable: true,
+  configurable: true,
+})
 
 // Mock localStorage
 const localStorageMock = {
@@ -180,6 +179,8 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  cleanup()
+  void import('@testing-library/react')
+    .then(({ cleanup }) => cleanup())
+    .catch(() => {})
   vi.restoreAllMocks()
 })

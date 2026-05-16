@@ -1,22 +1,22 @@
 export const heroContent = {
-  title: 'Practice the hard conversations before they reach a real session.',
+  title: 'Clinical Simulation for Therapist Training Programs',
   subtitle:
-    'Pixelated Empathy gives counseling programs and supervision teams a calmer way to rehearse risk, rupture, silence, disclosure, and repair in a repeatable training space.',
+    'Pixelated Empathy provides counseling programs and supervision teams with an evidence-based platform to rehearse risk assessment, rupture repair, crisis intervention, and clinical documentation in a secure, repeatable training environment.',
   helperText:
-    'Built for counseling programs, clinical supervisors, training clinics, and behavioral health teams.',
-  kicker: 'Clinical simulation for therapist education',
+    'HIPAA-ready platform for counseling programs, clinical supervisors, training clinics, and behavioral health teams.',
+  kicker: 'Enterprise Clinical Training Platform',
   proofPoints: [
     {
-      label: 'For trainees',
-      text: 'Work through intake, rupture repair, crisis response, and motivational interviewing with AI clients that respond like real people.',
+      label: 'For Training Programs',
+      text: 'Accreditation-ready simulation with AI clients that respond authentically to intake, crisis response, motivational interviewing, and rupture repair scenarios.',
     },
     {
-      label: 'For supervisors',
-      text: 'Review the exact exchange, pinpoint the clinical choice, and decide what should be practiced again.',
+      label: 'For Clinical Supervisors',
+      text: 'Review session transcripts, track competency development, and provide targeted feedback with timestamped clinical decision points.',
     },
   ],
-  primaryCTA: { text: 'Book a pilot', href: '/contact' },
-  secondaryCTA: { text: 'Watch the demo', href: '/demo-hub' },
+  primaryCTA: { text: 'Request Demo', href: '/contact' },
+  secondaryCTA: { text: 'View Case Studies', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Inside the product',
     status: 'A practice room connected to a supervisor review desk.',

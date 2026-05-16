@@ -1,4 +1,4 @@
-<!-- markdownlint-disable -->\n\n# Therapeutic AI API - Status Dashboard
+# Therapeutic AI API - Status Dashboard
 
 **Status**: 🟢 **ONLINE**  
 **Host**: `${THERAPEUTIC_API_HOST}`  
@@ -88,4 +88,4 @@ bash test-api.sh
 
 ---
 
-_Last Updated: 2026-01-24_
+### Last Updated: 2026-01-24

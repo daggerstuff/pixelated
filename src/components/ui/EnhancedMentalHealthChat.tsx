@@ -1,15 +1,14 @@
 import { Send, Brain, User, Bot, Sparkles, Activity } from 'lucide-react'
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, type FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Textarea } from '@/components/ui/textarea.tsx'
+import type { MindMirrorAnalysis } from '@/lib/mental-health/types'
 
 import BrainVisualization from './BrainVisualization'
-import MindMirrorDashboard, {
-  type MindMirrorAnalysis,
-} from './MindMirrorDashboard'
+import MindMirrorDashboard from './MindMirrorDashboard'
 
 interface Message {
   id: string
@@ -25,6 +24,8 @@ interface EnhancedMentalHealthChatProps {
   showBrainViz?: boolean
   showAnalysisPanel?: boolean
 }
+
+type Archetype = MindMirrorAnalysis['archetype']['main_archetype']
 
 // Mock analysis function for demo purposes
 const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
@@ -67,34 +68,34 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
     confidence = 0.78
   }
 
+  const matchCount = (expression: RegExp): number =>
+    (words.match(expression) ?? []).length
+
   const emotional_intensity = Math.min(
     0.9,
-    (words.match(/feel|emotion|sad|happy|angry|excited/g) || []).length * 0.2 +
-      0.3,
+    matchCount(/feel|emotion|sad|happy|angry|excited/g) * 0.2 + 0.3,
   )
   const cognitive_clarity = Math.min(
     0.9,
-    (words.match(/think|understand|realize|know|clear/g) || []).length * 0.15 +
-      0.4,
+    matchCount(/think|understand|realize|know|clear/g) * 0.15 + 0.4,
   )
   const energy_level = Math.min(
     0.9,
-    (words.match(/energy|tired|excited|motivated|drive/g) || []).length * 0.2 +
-      0.5,
+    matchCount(/energy|tired|excited|motivated|drive/g) * 0.2 + 0.5,
   )
   const social_connection = Math.min(
     0.9,
-    (words.match(/friend|family|people|together|alone/g) || []).length * 0.25 +
-      0.4,
+    matchCount(/friend|family|people|together|alone/g) * 0.25 + 0.4,
   )
   const coherence_index = (cognitive_clarity + energy_level) / 2
   // Use cryptographically secure random if available, otherwise use a deterministic value for demo
   const getRandomValue = () => {
     try {
-      const { crypto } = globalThis
-      if (crypto && typeof crypto.getRandomValues === 'function') {
-        const randomArray = crypto.getRandomValues(new Uint32Array(1))
-        if (Array.isArray(randomArray) && randomArray.length > 0) {
+      if (typeof globalThis.crypto.getRandomValues === 'function') {
+        const randomArray = globalThis.crypto.getRandomValues(
+          new Uint32Array(1),
+        )
+        if (randomArray.length > 0) {
           const randomValue = randomArray[0]
           if (
             typeof randomValue === 'number' &&
@@ -245,7 +246,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
       return "I notice some urgency in your message. It's important that you know support is available. Would you like to talk about what's concerning you most right now?"
     }
 
-    const responses = {
+    const responses: Record<Archetype, string> = {
       wounded_healer:
         'I can sense the depth of your experience. Your ability to transform challenges into wisdom is remarkable. How has this journey shaped your perspective?',
       shadow_strategist:
@@ -263,7 +264,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
     }
 
     return (
-      responses[archetype as keyof typeof responses] ||
+      responses[archetype] ??
       "Thank you for sharing. I can see there's a lot going on for you right now. What would be most helpful to explore together?"
     )
   }
@@ -378,10 +379,10 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
       {showAnalysisPanel && (
         <div className='w-[40%] space-y-6'>
           {/* Brain Visualization */}
-          {showBrainViz && (
+          {showBrainViz && currentAnalysis && (
             <BrainVisualization
-              moodVector={currentAnalysis?.mood_vector}
-              archetype={currentAnalysis?.archetype.main_archetype}
+              moodVector={currentAnalysis.mood_vector}
+              archetype={currentAnalysis.archetype.main_archetype}
             />
           )}
 

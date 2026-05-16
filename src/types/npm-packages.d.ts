@@ -1,32 +1,5 @@
 // Additional type declarations for npm packages
 
-// Mongoose - using actual mongoose types
-// Type augmentation for mongoose models
-import 'mongoose'
-
-declare module 'mongoose' {
-  interface SchemaOptions {
-    timestamps?: boolean
-    strict?: boolean
-    collection?: string
-  }
-
-  interface SchemaDefinition {
-    [key: string]: SchemaDefinitionProperty | SchemaDefinition
-  }
-
-  interface SchemaDefinitionProperty {
-    type?: any
-    required?: boolean
-    unique?: boolean
-    index?: boolean
-    enum?: string[]
-    default?: any
-    ref?: string
-    lowercase?: boolean
-  }
-}
-
 // @nestjs/common
 declare module '@nestjs/common' {
   export function Injectable(): ClassDecorator
@@ -73,21 +46,6 @@ declare module 'bcrypt' {
   export function compareSync(data: string, hash: string): boolean
   export function getRounds(hash: string): number
   export function saltSync(rounds: number): string
-}
-
-// mongoose
-declare module 'mongoose' {
-  export function connect(uri: string, options?: unknown): Promise<void>
-  export function disconnect(): Promise<void>
-  export function model<T>(name: string, schema?: unknown): unknown
-  export class Schema<T = unknown> {
-    constructor(definition?: T)
-  }
-  export class Document<T = unknown> {
-    _id: string
-    save(): Promise<this>
-    toJSON(): T
-  }
 }
 
 // typeorm

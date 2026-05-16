@@ -1,4 +1,5 @@
 import { DocumentModel } from '@/models/Document'
+import type { DocumentVersionDocument } from '@/models/DocumentMongoose'
 import { UserModel } from '@/models/User'
 import {
   Document,
@@ -156,7 +157,9 @@ export class DocumentService {
     return DocumentModel.removeCollaborator(documentId, userId)
   }
 
-  static async getDocumentVersions(documentId: string): Promise<any[]> {
+  static async getDocumentVersions(
+    documentId: string,
+  ): Promise<DocumentVersionDocument[]> {
     const document = await DocumentModel.findById(documentId)
     if (!document) {
       throw new Error('Document not found')
@@ -168,7 +171,7 @@ export class DocumentService {
   static async getDocumentVersion(
     documentId: string,
     version: number,
-  ): Promise<any> {
+  ): Promise<DocumentVersionDocument | null> {
     const document = await DocumentModel.findById(documentId)
     if (!document) {
       throw new Error('Document not found')

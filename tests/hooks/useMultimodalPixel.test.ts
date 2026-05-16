@@ -14,9 +14,19 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { useMultimodalPixel } from '../../src/hooks/useMultimodalPixel'
+const createMockResponse = (
+  body: unknown,
+  init: ResponseInit = {},
+): Response => {
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    ...init,
+  })
+}
 
 // Mock dependencies
-// (removed top-level global.fetch assignment)
+// (removed top-level globalThis.fetch assignment)
 
 // Mock WebSocket
 class MockWebSocket {
@@ -76,16 +86,14 @@ describe('useMultimodalPixel', () => {
         latency_ms: 125,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
-      let inferenceResult: any = null
-      await act(async () => {
-        inferenceResult = await result.current.infer({
+      const inferenceResult = await act(async () => {
+        return result.current.infer({
           text: 'How are you feeling?',
           sessionId: 'session-123',
         })
@@ -106,10 +114,9 @@ describe('useMultimodalPixel', () => {
         latency_ms: 110,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -162,16 +169,14 @@ describe('useMultimodalPixel', () => {
         latency_ms: 165,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
-      let inferenceResult: any = null
-      await act(async () => {
-        inferenceResult = await result.current.infer({
+      const inferenceResult = await act(async () => {
+        return result.current.infer({
           text: 'I am very anxious',
           audioBlob,
           sessionId: 'session-456',
@@ -197,10 +202,9 @@ describe('useMultimodalPixel', () => {
         latency_ms: 150,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -227,10 +231,9 @@ describe('useMultimodalPixel', () => {
         latency_ms: 140,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -398,10 +401,9 @@ describe('useMultimodalPixel', () => {
         latency_ms: 100,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -437,7 +439,7 @@ describe('useMultimodalPixel', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    it.skip('should disconnect streaming', async () => {
+    it('should disconnect streaming', async () => {
       const { result } = renderHook(() => useMultimodalPixel())
 
       await act(async () => {
@@ -460,8 +462,10 @@ describe('useMultimodalPixel', () => {
   })
 
   describe('Error Handling', () => {
-    it.skip('should handle network errors', async () => {
-      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'))
+    it('should handle network errors', async () => {
+      vi.mocked(globalThis.fetch).mockRejectedValueOnce(
+        new Error('Network error'),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -473,12 +477,13 @@ describe('useMultimodalPixel', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    it.skip('should handle HTTP error responses', async () => {
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: async () => 'Internal server error',
-      } as any)
+    it('should handle HTTP error responses', async () => {
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(
+          { message: 'Internal server error' },
+          { status: 500 },
+        ),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -489,8 +494,8 @@ describe('useMultimodalPixel', () => {
       expect(result.current.error).toBeDefined()
     })
 
-    it.skip('should handle timeout gracefully', async () => {
-      vi.mocked(global.fetch).mockRejectedValueOnce(
+    it('should handle timeout gracefully', async () => {
+      vi.mocked(globalThis.fetch).mockRejectedValueOnce(
         new Error('Request timeout'),
       )
 
@@ -505,16 +510,15 @@ describe('useMultimodalPixel', () => {
   })
 
   describe('Latency Tracking', () => {
-    it.skip('should track inference latency', async () => {
+    it('should track inference latency', async () => {
       const mockResponse = {
         response: 'Test',
         latency_ms: 142,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -525,16 +529,15 @@ describe('useMultimodalPixel', () => {
       expect(result.current.latencyMs).toBe(142)
     })
 
-    it.skip('should validate latency under 200ms target', async () => {
+    it('should validate latency under 200ms target', async () => {
       const mockResponse = {
         response: 'Test',
         latency_ms: 198,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -547,16 +550,15 @@ describe('useMultimodalPixel', () => {
   })
 
   describe('Session & Context Tracking', () => {
-    it.skip('should pass session ID through inference', async () => {
+    it('should pass session ID through inference', async () => {
       const mockResponse = {
         response: 'Test',
         latency_ms: 100,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() => useMultimodalPixel())
 
@@ -568,7 +570,7 @@ describe('useMultimodalPixel', () => {
       })
 
       // Verify fetch was called with session ID
-      expect(vi.mocked(global.fetch)).toHaveBeenCalledWith(
+      expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
           method: 'POST',
@@ -576,16 +578,15 @@ describe('useMultimodalPixel', () => {
       )
     })
 
-    it.skip('should track context type (therapeutic, crisis, etc)', async () => {
+    it('should track context type (therapeutic, crisis, etc)', async () => {
       const mockResponse = {
         response: 'Test',
         latency_ms: 100,
       }
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as any)
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        createMockResponse(mockResponse),
+      )
 
       const { result } = renderHook(() =>
         useMultimodalPixel({ defaultContextType: 'crisis_response' }),
@@ -598,7 +599,7 @@ describe('useMultimodalPixel', () => {
         })
       })
 
-      expect(vi.mocked(global.fetch)).toHaveBeenCalled()
+      expect(vi.mocked(globalThis.fetch)).toHaveBeenCalled()
     })
   })
 })

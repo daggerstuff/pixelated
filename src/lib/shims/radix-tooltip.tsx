@@ -1,6 +1,8 @@
 import React from 'react'
 
-export function Provider(props: { children?: React.ReactNode }): React.JSX.Element {
+export function Provider(props: {
+  children?: React.ReactNode
+}): React.JSX.Element {
   return <>{props.children}</>
 }
 
@@ -12,14 +14,8 @@ export const Trigger = React.forwardRef<
   HTMLElement,
   React.HTMLAttributes<HTMLElement> & { asChild?: boolean }
 >(({ asChild, children, ...rest }, ref) => {
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement, {
-      ...rest,
-      ref,
-    })
-  }
   return (
-    <span ref={ref as any} {...rest}>
+    <span ref={ref} {...rest}>
       {children}
     </span>
   )
@@ -37,4 +33,3 @@ export const Content = React.forwardRef<
   )
 })
 Content.displayName = 'Tooltip.Content'
-

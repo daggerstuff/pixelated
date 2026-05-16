@@ -5,12 +5,15 @@
 
 import Redis from 'ioredis'
 
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
     // Prioritize REDIS_URL for ioredis connection (rediss://) over REST URL (https://)
     connectionUrl:
-      process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
+      process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL'],
     restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
   }
 }
@@ -34,7 +37,7 @@ const isTestEnvironment = () => {
 }
 
 // Create a mock Redis client for development
-function createMockRedisClient() {
+function createMockRedisClient(): RedisClient {
   const message = isProduction()
     ? 'CRITICAL: Using mock Redis client in production. This should never happen.'
     : 'Using mock Redis client for development. Redis operations will be mocked.'
@@ -54,7 +57,7 @@ function createMockRedisClient() {
   }
 
   const parseJsonArray = (value: string): string[] => {
-    const parsed = JSON.parse(value)
+    const parsed: unknown = JSON.parse(value)
     return Array.isArray(parsed) &&
       parsed.every((item) => typeof item === 'string')
       ? parsed
@@ -62,7 +65,7 @@ function createMockRedisClient() {
   }
 
   const parseStringRecord = (value: string): Record<string, string> => {
-    const parsed = JSON.parse(value)
+    const parsed: unknown = JSON.parse(value)
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       const result: Record<string, string> = {}
       for (const [key, rawValue] of Object.entries(parsed)) {
@@ -70,13 +73,13 @@ function createMockRedisClient() {
           result[key] = rawValue
         }
       }
-      return result
+        return result
     }
     return {}
   }
 
   const parseNumberRecord = (value: string): Record<string, number> => {
-    const parsed = JSON.parse(value)
+    const parsed: unknown = JSON.parse(value)
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       const result: Record<string, number> = {}
       for (const [key, rawValue] of Object.entries(parsed)) {
@@ -92,7 +95,7 @@ function createMockRedisClient() {
   // Return a mock client with all Redis operations needed by the threat detection system
   return {
     // Basic operations
-    get: async (key: string) => mockStore.get(key) || null,
+    get: async (key: string) => mockStore.get(key) ?? null,
     set: async (key: string, value: string, ..._args: (string | number)[]) => {
       mockStore.set(key, value)
       return 'OK'
@@ -113,17 +116,17 @@ function createMockRedisClient() {
     },
     hincrby: async (key: string, field: string, increment: number) => {
       const hashKey = `${key}:${field}`
-      const current = parseInt(mockStore.get(hashKey) || '0')
+      const current = parseInt(mockStore.get(hashKey) ?? '0')
       const newValue = current + increment
       mockStore.set(hashKey, newValue.toString())
       return newValue
     },
     hgetall: async (key: string) => {
       const result: Record<string, string> = {}
-      for (const [k, v] of mockStore.entries()) {
+    for (const [k, v] of Array.from(mockStore.entries())) {
         if (k.startsWith(`${key}:`)) {
           const field = k.substring(key.length + 1)
-          result[field] = v
+        result[field] = v
         }
       }
       return result
@@ -157,26 +160,25 @@ function createMockRedisClient() {
     ping: async () => 'PONG',
     quit: async () => 'OK',
     disconnect: () => {},
-    status: 'ready',
 
     // List operations
     lpush: async (key: string, ...values: string[]) => {
       const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      const list = parseJsonArray(mockStore.get(listKey) ?? '[]')
       list.unshift(...values)
       mockStore.set(listKey, JSON.stringify(list))
       return list.length
     },
     lRange: async (key: string, start: number, stop: number) => {
       const listKey = `list:${key}`
-      return parseJsonArray(mockStore.get(listKey) || '[]').slice(
+      return parseJsonArray(mockStore.get(listKey) ?? '[]').slice(
         start,
         stop + 1,
       )
     },
     lrem: async (key: string, count: number, value: string) => {
       const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      const list = parseJsonArray(mockStore.get(listKey) ?? '[]')
       const filtered = list.filter((item: string) => item !== value)
       mockStore.set(listKey, JSON.stringify(filtered))
       return list.length - filtered.length
@@ -184,7 +186,7 @@ function createMockRedisClient() {
     rpoplpush: async (source: string, destination: string) => {
       const sourceKey = `list:${source}`
       const destinationKey = `list:${destination}`
-      const sourceList = parseJsonArray(mockStore.get(sourceKey) || '[]')
+      const sourceList = parseJsonArray(mockStore.get(sourceKey) ?? '[]')
       if (sourceList.length === 0) {
         return null
       }
@@ -194,7 +196,7 @@ function createMockRedisClient() {
       }
       mockStore.set(sourceKey, JSON.stringify(sourceList))
       const destinationList = parseJsonArray(
-        mockStore.get(destinationKey) || '[]',
+        mockStore.get(destinationKey) ?? '[]',
       )
       destinationList.unshift(value)
       mockStore.set(destinationKey, JSON.stringify(destinationList))
@@ -202,28 +204,28 @@ function createMockRedisClient() {
     },
     llen: async (key: string) => {
       const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      const list = parseJsonArray(mockStore.get(listKey) ?? '[]')
       return list.length
     },
 
     // Sorted set operations
     zadd: async (key: string, score: number, member: string) => {
       const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
+      const zset = parseNumberRecord(mockStore.get(zsetKey) ?? '{}')
       zset[member] = score
       mockStore.set(zsetKey, JSON.stringify(zset))
       return 1
     },
     zrangebyscore: async (key: string, min: number, max: number) => {
       const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
+      const zset = parseNumberRecord(mockStore.get(zsetKey) ?? '{}')
       return Object.entries(zset)
         .filter(([, score]) => score >= min && score <= max)
         .map(([member]) => member)
     },
     zremrangebyscore: async (key: string, min: number, max: number) => {
       const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
+      const zset = parseNumberRecord(mockStore.get(zsetKey) ?? '{}')
       let removed = 0
       for (const [member, score] of Object.entries(zset)) {
         if (score >= min && score <= max) {
@@ -250,22 +252,39 @@ function createMockRedisClient() {
     on: () => {},
     off: () => {},
     emit: () => false,
-  }
+  } as RedisClient
 }
 
 /**
  * Create Redis client with appropriate configuration (lazy)
  * Returns a real Redis client if credentials are present, otherwise a mock client.
  */
-function createRedisClient() {
+function createRedisClient(): RedisClient {
   const { connectionUrl, restToken } = getRedisConfig()
 
-  if (connectionUrl && connectionUrl.startsWith('redis')) {
-    // Initialize ioredis client with credentials
-    return new Redis(connectionUrl, {
-      password: restToken,
-      // Add any additional options here if needed
-    })
+  if (connectionUrl?.startsWith('redis')) {
+    try {
+      const parsed = new URL(connectionUrl)
+      if (!parsed.hostname) {
+        throw new Error('Missing Redis host')
+      }
+      // Initialize ioredis client with credentials
+      const client = new Redis(connectionUrl, {
+        password: restToken,
+        // Add any additional options here if needed
+      })
+      return client as RedisClient
+    } catch (error: unknown) {
+      if (isTestEnvironment()) {
+        console.warn('Invalid REDIS_URL; using mock Redis client for tests.')
+        return createMockRedisClient()
+      }
+      console.error(
+        'Invalid REDIS_URL configuration in non-test environment:',
+        error,
+      )
+      throw error
+    }
   }
 
   if (isTestEnvironment()) {
@@ -281,13 +300,9 @@ function createRedisClient() {
   return createMockRedisClient()
 }
 
-export const redis = createRedisClient()
-if (typeof (redis as { on?: (...args: unknown[]) => void }).on === 'function') {
-  ;(
-    redis as {
-      on: (event: string, handler: (...args: unknown[]) => void) => void
-    }
-  ).on('error', (error: unknown) => {
+export const redis: RedisClient = createRedisClient()
+if (typeof redis.on === 'function') {
+  redis.on('error', (error: unknown) => {
     console.warn('Redis connection warning:', error)
   })
 }
@@ -304,16 +319,26 @@ export async function getFromCache<T = unknown>(
   key: string,
 ): Promise<T | null> {
   try {
-    const raw = await redis.get(key)
+    const raw: string | null = await redis.get(key)
     if (raw === null) {
       return null
     }
     try {
-      const parsed = JSON.parse(raw)
-      return parsed as T
+      const parsed: unknown = JSON.parse(raw)
+      if (
+        typeof parsed === 'string' ||
+        typeof parsed === 'number' ||
+        typeof parsed === 'boolean' ||
+        parsed === null ||
+        Array.isArray(parsed) ||
+        typeof parsed === 'object'
+      ) {
+        return parsed as T
+      }
+      return null as unknown as T
     } catch {
       // If not JSON, return as-is
-      return raw as T
+      return raw as unknown as T
     }
   } catch (error: unknown) {
     console.error(`Error getting key ${key} from Redis:`, error)
@@ -360,12 +385,13 @@ export async function removeFromCache(key: string): Promise<boolean> {
  * Attach safe error handling to the redis client to avoid unhandled error events.
  */
 function attachRedisErrorHandling() {
-  if (redis && typeof (redis as { on: unknown }).on === 'function') {
-    ;(
-      redis as {
+  const redisWithEvents = redis as
+    | {
         on: (event: string, handler: (...args: unknown[]) => void) => void
       }
-    ).on('error', (err: unknown) => {
+    | undefined
+  if (typeof redisWithEvents?.on === 'function') {
+    redisWithEvents.on('error', (err: unknown) => {
       console.warn('Redis connection warning:', err)
     })
   }

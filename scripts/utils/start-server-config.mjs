@@ -1,5 +1,6 @@
-import path from 'node:path'
-import { pathToFileURL } from 'node:url'
+import process from 'process'
+import path from 'path'
+import { pathToFileURL } from 'url'
 
 function hasConfiguredValue(value) {
   return value !== undefined && value !== null && String(value).trim().length > 0

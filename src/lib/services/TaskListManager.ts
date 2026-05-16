@@ -36,7 +36,7 @@ export interface TaskListFile {
 }
 
 export class TaskListManager {
-  private ollamaService: OllamaCheckInService
+  private readonly ollamaService: OllamaCheckInService
 
   constructor() {
     this.ollamaService = new OllamaCheckInService()
@@ -92,7 +92,7 @@ export class TaskListManager {
         }
 
         if (parentTask) {
-          parentTask.children = parentTask.children || []
+          parentTask.children = parentTask.children ?? []
           parentTask.children.push(task)
         } else {
           tasks.push(task)
@@ -308,7 +308,7 @@ export class TaskListManager {
           // Add as child of specific parent task
           const parentTask = this.findTaskById(tasks, parentTaskId)
           if (parentTask) {
-            parentTask.children = parentTask.children || []
+            parentTask.children = parentTask.children ?? []
             parentTask.children.push(newTask)
           } else {
             newTasks.push(newTask)

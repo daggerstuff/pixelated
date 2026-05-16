@@ -3,6 +3,15 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
+
 REMOTE_USER="${REMOTE_USER:-vivi}"
 REMOTE_HOST="${REMOTE_HOST:-194.113.75.34}"
 REMOTE_PATH="${REMOTE_PATH:-~/nemo-microservices}"

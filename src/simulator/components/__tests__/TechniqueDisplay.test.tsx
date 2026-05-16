@@ -7,27 +7,25 @@ import { TechniqueDisplay } from '../TechniqueDisplay'
 const mockTechniques: DetectedTechnique[] = [
   {
     name: 'Cognitive Reframing',
-    description: 'Test',
+    technique: 'Test',
     confidence: 0.95,
     timestamp: Date.now(),
   },
   {
     name: 'Active Listening',
-    description: 'Test',
+    technique: 'Test',
     confidence: 0.75,
     timestamp: Date.now(),
   },
   {
     name: 'Validation',
-    description: 'Test',
+    technique: 'Test',
     confidence: 0.85,
     timestamp: Date.now(),
   },
 ]
 
-const renderWithContext = (
-  techniques: DetectedTechnique[] | undefined = undefined,
-) => {
+const renderWithContext = (techniques?: DetectedTechnique[]) => {
   return render(
     <SimulatorProvider initialState={{ detectedTechniques: techniques }}>
       <TechniqueDisplay />

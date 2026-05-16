@@ -3,7 +3,7 @@
 Unit tests for bias detection service improvements.
 
 This module contains comprehensive unit tests for the improvements made to the
-bias detection service, including placeholder adapters, real Fairlearn analysis,
+bias detection service, including adapter-based outputs, real Fairlearn analysis,
 SHAP/LIME interpretability, and other enhancements.
 """
 
@@ -16,33 +16,33 @@ from unittest.mock import AsyncMock, patch
 import numpy as np
 import pandas as pd
 import pytest
-
-# Import the service and related classes
-from bias_detection_service import (
-    AuditLogger,
-    BiasDetectionConfig,
-    BiasDetectionService,
-    SecurityManager,
-    SessionData,
-    app,
-)
+from fastapi.testclient import TestClient
 from bias_utils import (
     create_minimal_test_session_data,
     create_synthetic_dataset,
     create_test_session_data,
 )
 from placeholder_adapters import PlaceholderAdapters
-from werkzeug.exceptions import Unauthorized
+
+# Import the service and related classes
+from bias_detection.app import app
+from bias_detection.compat import (
+    AuditLogger,
+    BiasDetectionConfig,
+    SecurityManager,
+    SessionData,
+)
+from bias_detection.services.bias_detection_service import BiasDetectionService
 
 # Create instance for testing
-placeholder_adapters = PlaceholderAdapters()
+analysis_adapters = PlaceholderAdapters()
 
 
-class TestPlaceholderAdapters(unittest.TestCase):
-    """Test placeholder adapters functionality"""
+class TestAnalysisAdapters(unittest.TestCase):
+    """Test adapter-backed analysis output behavior."""
 
-    def test_fairlearn_placeholder_predictions(self):
-        """Test Fairlearn placeholder predictions"""
+    def test_fairlearn_analysis_predictions(self):
+        """Test Fairlearn-based predictions fallback behavior."""
         # Create test data
         y_true = np.array([0, 1, 0, 1, 1, 0])
         sensitive_features_df = pd.DataFrame(
@@ -51,7 +51,7 @@ class TestPlaceholderAdapters(unittest.TestCase):
         sensitive_features = sensitive_features_df.to_numpy()
 
         # Test deterministic predictions
-        predictions = placeholder_adapters.fairlearn_placeholder_predictions(
+        predictions = analysis_adapters.fairlearn_placeholder_predictions(
             y_true, sensitive_features
         )
 
@@ -60,14 +60,14 @@ class TestPlaceholderAdapters(unittest.TestCase):
         # Should be binary predictions
         assert all(pred in [0, 1] for pred in predictions)
         # Should be deterministic (same input should produce same output)
-        predictions2 = placeholder_adapters.fairlearn_placeholder_predictions(
+        predictions2 = analysis_adapters.fairlearn_placeholder_predictions(
             y_true, sensitive_features
         )
         assert np.array_equal(predictions, predictions2)
 
-    def test_interpretability_placeholder_analysis(self):
-        """Test interpretability placeholder analysis"""
-        result = placeholder_adapters.interpretability_placeholder_analysis()
+    def test_interpretability_analysis_output_shape(self):
+        """Test interpretability analysis output structure."""
+        result = analysis_adapters.interpretability_placeholder_analysis()
 
         # Should return expected structure
         assert "bias_score" in result
@@ -76,9 +76,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["bias_score"], float)
         assert 0.0 <= result["bias_score"] <= 1.0
 
-    def test_hf_evaluate_placeholder_analysis(self):
-        """Test HF evaluate placeholder analysis"""
-        result = placeholder_adapters.hf_evaluate_placeholder_analysis()
+    def test_hf_evaluate_analysis_output_shape(self):
+        """Test HF evaluation output structure."""
+        result = analysis_adapters.hf_evaluate_placeholder_analysis()
 
         # Should return expected structure
         assert "bias_score" in result
@@ -87,9 +87,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["bias_score"], float)
         assert 0.0 <= result["bias_score"] <= 1.0
 
-    def test_interaction_patterns_placeholder(self):
-        """Test interaction patterns placeholder"""
-        result = placeholder_adapters.interaction_patterns_placeholder()
+    def test_interaction_patterns_analysis_output(self):
+        """Test interaction patterns analysis output."""
+        result = analysis_adapters.interaction_patterns_placeholder()
 
         # Should return expected structure
         assert "bias_score" in result
@@ -98,9 +98,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["bias_score"], float)
         assert 0.0 <= result["bias_score"] <= 1.0
 
-    def test_engagement_levels_placeholder(self):
-        """Test engagement levels placeholder"""
-        result = placeholder_adapters.engagement_levels_placeholder()
+    def test_engagement_levels_analysis_output(self):
+        """Test engagement levels analysis output."""
+        result = analysis_adapters.engagement_levels_placeholder()
 
         # Should return expected structure
         assert "bias_score" in result
@@ -109,9 +109,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["bias_score"], float)
         assert 0.0 <= result["bias_score"] <= 1.0
 
-    def test_outcome_fairness_placeholder(self):
-        """Test outcome fairness placeholder"""
-        result = placeholder_adapters.outcome_fairness_placeholder()
+    def test_outcome_fairness_analysis_output(self):
+        """Test outcome fairness analysis output."""
+        result = analysis_adapters.outcome_fairness_placeholder()
 
         # Should return expected structure
         assert "bias_score" in result
@@ -120,9 +120,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["bias_score"], float)
         assert 0.0 <= result["bias_score"] <= 1.0
 
-    def test_performance_disparities_placeholder(self):
-        """Test performance disparities placeholder"""
-        result = placeholder_adapters.performance_disparities_placeholder()
+    def test_performance_disparities_analysis_output(self):
+        """Test performance disparities analysis output."""
+        result = analysis_adapters.performance_disparities_placeholder()
 
         # Should return expected structure
         assert "bias_score" in result
@@ -131,9 +131,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["bias_score"], float)
         assert 0.0 <= result["bias_score"] <= 1.0
 
-    def test_dashboard_data_placeholder(self):
-        """Test dashboard data placeholder"""
-        result = placeholder_adapters.dashboard_data_placeholder()
+    def test_dashboard_data_output_shape(self):
+        """Test dashboard data output structure."""
+        result = analysis_adapters.dashboard_data_placeholder()
 
         # Should return expected structure
         assert "summary" in result
@@ -142,9 +142,9 @@ class TestPlaceholderAdapters(unittest.TestCase):
         assert isinstance(result["summary"]["total_sessions_analyzed"], int)
         assert isinstance(result["summary"]["average_bias_score"], float)
 
-    def test_export_data_placeholder(self):
-        """Test export data placeholder"""
-        result = placeholder_adapters.export_data_placeholder()
+    def test_export_data_output_shape(self):
+        """Test export data output structure."""
+        result = analysis_adapters.export_data_placeholder()
 
         # Should return list of session data
         assert isinstance(result, list)
@@ -186,7 +186,7 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
             # Should return structured result
             assert "bias_score" in result
             assert isinstance(result["bias_score"], float)
-            # Should not be the old random placeholder
+            # Should not be a random fallback implementation
             assert "predictions_generated" in result
             assert result["predictions_generated"] is True
 
@@ -252,90 +252,58 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         self._assert_bias_score_valid(result)
 
 
-class TestDashboardAndExportEndpoints(unittest.TestCase):
-    """Test dashboard and export endpoints with real data"""
+class TestAnalyticsEndpoint(unittest.TestCase):
+    """Test analytics endpoint behavior with real data."""
 
     def setUp(self):
-        """Set up Flask test client"""
-        os.environ["FLASK_SECRET_KEY"] = "test-flask-secret"
+        """Set up FastAPI test client"""
+        os.environ["ENVIRONMENT"] = "development"
         os.environ["JWT_SECRET_KEY"] = "test-jwt-secret"
-        os.environ["ENV"] = "development"  # Disable auth for testing
+        os.environ["ENCRYPTION_PASSWORD"] = "test-encryption-password"
+        os.environ["ENCRYPTION_SALT"] = "test-encryption-salt"
+        self.client = TestClient(app)
 
-        app.config["TESTING"] = True
-        self.client = app.test_client()
+    def test_analytics_summary_endpoint(self):
+        """Test analytics summary endpoint with mocked repository data."""
+        mock_db = AsyncMock()
+        mock_db.get_analytics_summary.return_value = {
+            "summary": {
+                "total_sessions_analyzed": 1500,
+                "average_bias_score": 0.25,
+                "high_risk_sessions": 50,
+                "critical_alerts": 5,
+            },
+            "trends": {
+                "daily_bias_scores": [0.25, 0.30, 0.20, 0.35, 0.25, 0.22, 0.28],
+                "alert_counts": [3, 4, 2, 6, 3, 2, 4],
+            },
+            "demographics": {
+                "bias_by_age_group": {
+                    "18-25": 0.20,
+                    "26-35": 0.25,
+                    "36-45": 0.28,
+                    "46-55": 0.30,
+                    "55+": 0.33,
+                },
+                "bias_by_gender": {"male": 0.23, "female": 0.27, "other": 0.21},
+            },
+        }
 
-    def test_dashboard_endpoint_real_data(self):
-        """Test dashboard endpoint with real placeholder data"""
-        # Mock the placeholder adapter
+        # Mock the analytics database dependency
         with patch(
-            "bias_detection_service.placeholder_adapters.dashboard_data_placeholder"
+            "bias_detection.routers.analytics.get_database_service",
+            return_value=mock_db,
         ) as mock_dashboard:
-            mock_dashboard.return_value = {
-                "summary": {
-                    "total_sessions_analyzed": 1500,
-                    "average_bias_score": 0.25,
-                    "high_risk_sessions": 50,
-                    "critical_alerts": 5,
-                },
-                "trends": {
-                    "daily_bias_scores": [0.25, 0.30, 0.20, 0.35, 0.25, 0.22, 0.28],
-                    "alert_counts": [3, 4, 2, 6, 3, 2, 4],
-                },
-                "demographics": {
-                    "bias_by_age_group": {
-                        "18-25": 0.20,
-                        "26-35": 0.25,
-                        "36-45": 0.28,
-                        "46-55": 0.30,
-                        "55+": 0.33,
-                    },
-                    "bias_by_gender": {"male": 0.23, "female": 0.27, "other": 0.21},
-                },
-            }
-
-            response = self.client.get("/dashboard")
+            response = self.client.get("/api/analytics/summary", params={"days": 30})
             assert response.status_code == 200
+            assert mock_dashboard.call_count == 1
+            mock_db.get_analytics_summary.assert_awaited_once_with(days=30)
 
-            data = response.get_json()
+            data = response.json()
             assert "summary" in data
             assert "trends" in data
             assert "demographics" in data
             assert data["summary"]["total_sessions_analyzed"] == 1500
-
-    def test_export_endpoint_real_data(self):
-        """Test export endpoint with real placeholder data"""
-        # Mock the placeholder adapter
-        with patch(
-            "bias_detection_service.placeholder_adapters.export_data_placeholder"
-        ) as mock_export:
-            mock_export.return_value = [
-                {
-                    "session_id": "test_session_001",
-                    "bias_score": 0.30,
-                    "alert_level": "warning",
-                    "timestamp": "2024-01-01T10:00:00Z",
-                },
-                {
-                    "session_id": "test_session_002",
-                    "bias_score": 0.20,
-                    "alert_level": "low",
-                    "timestamp": "2024-01-01T11:00:00Z",
-                },
-            ]
-
-            export_data = {
-                "format": "json",
-                "date_range": {"start": "2024-01-01", "end": "2024-01-31"},
-            }
-
-            response = self.client.post("/export", json=export_data)
-            assert response.status_code == 200
-
-            data = response.get_json()
-            assert "sessions" in data
-            assert "metadata" in data
-            assert len(data["sessions"]) == 2
-            assert data["sessions"][0]["session_id"] == "test_session_001"
 
 
 class TestErrorHandlingAndLogging(unittest.TestCase):
@@ -354,7 +322,7 @@ class TestErrorHandlingAndLogging(unittest.TestCase):
         # Test with invalid JWT token
         security_manager = SecurityManager()
 
-        with pytest.raises(Unauthorized):
+        with pytest.raises(ValueError):
             security_manager.verify_jwt_token("invalid.token.here")
 
     def test_audit_logger_error_handling(self):
@@ -462,10 +430,9 @@ class TestSyntheticDatasetGenerator(unittest.TestCase):
 
 if __name__ == "__main__":
     # Set environment variables for testing
-    os.environ["FLASK_SECRET_KEY"] = "test-flask-secret-key"
     os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key"
     os.environ["ENCRYPTION_PASSWORD"] = "test-encryption-password"
     os.environ["ENCRYPTION_SALT"] = "test-encryption-salt"
-    os.environ["ENV"] = "development"
+    os.environ["ENVIRONMENT"] = "development"
 
     unittest.main()

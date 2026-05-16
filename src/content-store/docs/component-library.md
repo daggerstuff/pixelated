@@ -1,10 +1,13 @@
 ---
-description: 'Astro Component Library documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'components']
+description: Astro Component Library documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - components
 draft: false
 toc: true
+title: Astro Component Library
 ---
 
 # Astro Component Library
@@ -24,7 +27,7 @@ including usage examples, available props, and best practices.
   - [Alert](#alert)
   - [Button](#button)
   - [ThemeToggle](#themetoggle)
-  - [Link](#link)
+  - [Link component](#link)
 - [Dashboard Components](#dashboard-components)
   - [AdminDashboard](#admindashboard)
   - [SecurityDashboard](#securitydashboard)

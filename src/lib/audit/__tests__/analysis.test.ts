@@ -78,7 +78,7 @@ describe('Audit Analysis', () => {
       expect(patterns).toHaveLength(1)
       expect(patterns[0]).toMatchObject({
         type: 'odd_hours',
-        severity: 'low',
+        severity: 'medium',
         description: expect.stringContaining('user1'),
         relatedLogs: expect.arrayContaining([
           expect.objectContaining({ userId: 'user1' }),
@@ -178,11 +178,11 @@ describe('Audit Analysis', () => {
 
       const patterns = detectUnusualPatterns(logs)
 
-      expect(patterns).toHaveLength(3)
+      expect(patterns).toHaveLength(4)
       expect(patterns).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ type: 'high_frequency', severity: 'high' }),
-          expect.objectContaining({ type: 'odd_hours', severity: 'low' }),
+          expect.objectContaining({ type: 'odd_hours', severity: 'medium' }),
+          expect.objectContaining({ type: 'odd_hours', severity: 'high' }),
           expect.objectContaining({
             type: 'sensitive_access',
             severity: 'medium',

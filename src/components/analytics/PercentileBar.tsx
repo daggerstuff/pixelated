@@ -33,7 +33,7 @@ export const PercentileBar: FC<PercentileBarProps> = ({ rank, label }) => {
         aria-valuenow={validRank}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={label || `Percentile rank: ${validRank}%`}
+        aria-label={label ?? `Percentile rank: ${validRank}%`}
       >
         <div
           style={{

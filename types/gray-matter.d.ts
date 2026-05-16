@@ -21,8 +21,8 @@ declare module 'gray-matter' {
   ): GrayMatterFile<T>
 
   namespace matter {
-    export function stringify<T = string>(
-      content: T,
+    export function stringify(
+      content: unknown,
       data: Record<string, unknown>,
       options?: { language?: string; delimiters?: [string, string] },
     ): string

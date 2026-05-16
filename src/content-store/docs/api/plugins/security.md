@@ -1,10 +1,13 @@
 ---
-description: 'Plugin Security documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'security']
+description: Plugin Security documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - security
 draft: false
 toc: true
+title: Plugin Security
 ---
 
 # Plugin Security

@@ -1,6 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import BrutalistHero from '@/components/BrutalistHero.astro'
+import ProfessionalHero from '@/components/ProfessionalHero.astro'
 import IntroSection from '@/components/homepage/IntroSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
@@ -47,7 +47,7 @@ const organizationSchema = {
         .replace(/>/g, '\\u003e')}
     />
 
-    <BrutalistHero
+    <ProfessionalHero
       kicker={homepageContent.hero.kicker}
       title={homepageContent.hero.title}
       subtitle={homepageContent.hero.subtitle}
@@ -55,7 +55,6 @@ const organizationSchema = {
       proofPoints={homepageContent.hero.proofPoints}
       primaryCTA={homepageContent.hero.primaryCTA}
       secondaryCTA={homepageContent.hero.secondaryCTA}
-      artifact={homepageContent.hero.artifact}
     />
 
     <IntroSection content={homepageContent.intro} />

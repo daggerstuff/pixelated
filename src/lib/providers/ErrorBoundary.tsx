@@ -2,6 +2,16 @@ import type { ReactNode } from 'react'
 import React, { Component } from 'react'
 import { toast } from 'react-hot-toast'
 
+interface SentryClient {
+  captureException: (
+    error: Error,
+    context?: {
+      contexts?: Record<string, Record<string, unknown>>
+      extra?: Record<string, unknown>
+    },
+  ) => void
+}
+
 interface Props {
   children: ReactNode
   fallback?: ReactNode
@@ -11,6 +21,23 @@ interface Props {
 interface State {
   hasError: boolean
   error: Error | null
+}
+
+const getSentryClient = (): SentryClient | null => {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const globalWindow = window as Window & {
+    Sentry?: {
+      captureException?: SentryClient['captureException']
+    }
+  }
+  const sentryClient = globalWindow.Sentry
+
+  return sentryClient?.captureException
+    ? { captureException: sentryClient.captureException }
+    : null
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -30,7 +57,27 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to error reporting service
+    // Log error to Sentry
+    const sentryClient = getSentryClient()
+    if (sentryClient) {
+      try {
+        sentryClient.captureException(error, {
+          contexts: {
+            react: {
+              componentStack: errorInfo.componentStack,
+            },
+          },
+          extra: {
+            errorName: error.name,
+            errorMessage: error.message,
+          },
+        })
+      } catch (sentryError: unknown) {
+        console.error('Failed to forward error to Sentry:', sentryError)
+      }
+    }
+
+    // Log error to console for development
     console.error('Error caught by boundary:', error, errorInfo)
 
     // Show error toast
@@ -40,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo)
   }
 
-  public override render() {
+  public override render(): ReactNode {
     if (this.state.hasError) {
       // Render fallback UI if provided, otherwise render default error UI
       if (this.props.fallback) {

@@ -27,7 +27,7 @@ export function createRateLimitMiddleware(
 ) {
   const mergedConfig = {
     ruleSets: config.ruleSets || defaultRuleSets,
-    bypassRules: config.bypassRules || defaultBypassRules,
+    bypassRules: config.bypassRules ?? defaultBypassRules,
     ddosProtection: config.ddosProtection,
     globalConfig: config.globalConfig,
     redisConfig: config.redisConfig,
@@ -165,9 +165,9 @@ async function extractRateLimitContext(
   const forwarded = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
   const identifier =
-    forwarded?.split(',')[0].trim() ||
-    realIp ||
-    context.clientAddress ||
+    ((forwarded?.split(',')[0].trim() ??
+    realIp) ??
+    context.clientAddress) ||
     'unknown'
 
   // Get user role if authenticated (Better-Auth integration)
@@ -178,7 +178,7 @@ async function extractRateLimitContext(
     if (authHeader) {
       // This would need to be implemented based on your Better-Auth setup
       // For now, we'll check for a simple role header
-      userRole = request.headers.get('x-user-role') || undefined
+      userRole = request.headers.get('x-user-role') ?? undefined
     }
   } catch (error: unknown) {
     logger.debug('Could not extract user role', { error })
@@ -188,7 +188,7 @@ async function extractRateLimitContext(
     identifier,
     method: request.method,
     path: url.pathname,
-    userAgent: request.headers.get('user-agent') || undefined,
+    userAgent: request.headers.get('user-agent') ?? undefined,
     userRole,
     metadata: {
       url: url.toString(),
@@ -417,7 +417,7 @@ export function createBetterAuthRateLimitMiddleware(
   const authRuleSet = {
     name: 'betterauth',
     description: 'Better-Auth specific rate limiting',
-    rules: Object.values(authConfig.authRules || {}).filter(Boolean),
+    rules: Object.values(authConfig.authRules ?? {}).filter(Boolean),
   }
 
   const authBypassRules: RateLimitBypassRule[] = []
@@ -468,10 +468,10 @@ export function createComprehensiveRateLimitMiddleware(
     betterAuthConfig?: BetterAuthRateLimitConfig
   } = {},
 ) {
-  const ruleSets = [...(options.customRuleSets || []), ...defaultRuleSets]
+  const ruleSets = [...(options.customRuleSets ?? []), ...defaultRuleSets]
 
   const bypassRules = [
-    ...(options.customBypassRules || []),
+    ...(options.customBypassRules ?? []),
     ...defaultBypassRules,
   ]
 
@@ -484,7 +484,7 @@ export function createComprehensiveRateLimitMiddleware(
   // Add Better-Auth integration if enabled
   if (options.enableBetterAuth) {
     const authMiddleware = createBetterAuthRateLimitMiddleware(
-      options.betterAuthConfig || { enabled: true },
+      options.betterAuthConfig ?? { enabled: true },
     )
 
     // Chain middlewares

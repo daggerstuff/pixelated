@@ -327,7 +327,7 @@ export function generateDeviceFingerprint(
   ip?: string,
 ): string {
   // Simple hash function for device fingerprinting
-  const data = `${userAgent}|${acceptLanguage}|${ip || ''}`
+  const data = `${userAgent}|${acceptLanguage}|${ip ?? ''}`
 
   // Simple DJB2 hash algorithm
   let hash = 5381
@@ -343,7 +343,7 @@ export function generateDeviceFingerprint(
 /**
  * Sleep function for rate limiting
  */
-export function sleep(ms: number): Promise<void> {
+export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 

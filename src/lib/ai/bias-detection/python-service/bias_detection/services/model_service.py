@@ -1,9 +1,11 @@
 """
 Model service for TensorFlow and PyTorch integration
 """
+
 from __future__ import annotations
 
 import hashlib
+import os
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -11,19 +13,104 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import structlog
-import torch
-from transformers import AutoTokenizer, BertModel, TFBertForSequenceClassification
 
 if TYPE_CHECKING:
     import tensorflow as tf
+    import torch
 
-# Optional TensorFlow import
-try:
-    import tensorflow as tf
-    TENSORFLOW_AVAILABLE = True
-except ImportError:
-    TENSORFLOW_AVAILABLE = False
-    tf: Any = None
+TRANSFORMER_IMPORT_ATTEMPTED = False
+TRANSFORMERS_AVAILABLE = False
+AutoTokenizer = None
+BertModel = None
+TFBertForSequenceClassification = None
+
+TENSORFLOW_IMPORT_ATTEMPTED = False
+TENSORFLOW_AVAILABLE = False
+_tensorflow_module: Any | None = None
+
+TORCH_IMPORT_ATTEMPTED = False
+TORCH_AVAILABLE = False
+_torch_module: Any | None = None
+
+
+def _transformer_available() -> bool:
+    _load_transformers()
+    return (
+        TRANSFORMERS_AVAILABLE and AutoTokenizer is not None and BertModel is not None
+    )
+
+
+def _load_transformers() -> None:
+    global TRANSFORMER_IMPORT_ATTEMPTED
+    global TRANSFORMERS_AVAILABLE
+    global AutoTokenizer
+    global BertModel
+    global TFBertForSequenceClassification
+
+    if TRANSFORMER_IMPORT_ATTEMPTED:
+        return
+
+    TRANSFORMER_IMPORT_ATTEMPTED = True
+
+    try:
+        from transformers import AutoTokenizer, BertModel
+        from transformers import TFBertForSequenceClassification
+
+        TRANSFORMERS_AVAILABLE = True
+    except Exception:
+        AutoTokenizer = None
+        BertModel = None
+        TFBertForSequenceClassification = None
+        TRANSFORMERS_AVAILABLE = False
+
+
+def _load_tensorflow() -> Any | None:
+    global TENSORFLOW_IMPORT_ATTEMPTED
+    global TENSORFLOW_AVAILABLE
+    global _tensorflow_module
+
+    if TENSORFLOW_IMPORT_ATTEMPTED:
+        return _tensorflow_module
+
+    TENSORFLOW_IMPORT_ATTEMPTED = True
+
+    try:
+        import tensorflow as tf
+
+        _tensorflow_module = tf
+        TENSORFLOW_AVAILABLE = True
+    except ImportError:
+        _tensorflow_module = None
+        TENSORFLOW_AVAILABLE = False
+
+    return _tensorflow_module
+
+
+def _load_torch() -> Any | None:
+    global TORCH_IMPORT_ATTEMPTED
+    global TORCH_AVAILABLE
+    global _torch_module
+
+    if TORCH_IMPORT_ATTEMPTED:
+        return _torch_module
+
+    TORCH_IMPORT_ATTEMPTED = True
+
+    try:
+        import torch
+
+        _torch_module = torch
+        TORCH_AVAILABLE = True
+    except Exception:
+        _torch_module = None
+        TORCH_AVAILABLE = False
+
+    return _torch_module
+
+
+def _ml_services_enabled() -> bool:
+    flag = os.getenv("BIAS_DETECTION_DISABLE_LOCAL_ML_SERVICES", "").lower().strip()
+    return flag not in {"1", "true", "yes", "on"}
 
 from bias_detection.config import settings
 from bias_detection.models import BiasType, ConfidenceLevel
@@ -68,11 +155,14 @@ class TensorFlowModelService(ModelService):
     """TensorFlow model service for bias detection"""
 
     def __init__(self, model_path: str | None = None):
-        if not TENSORFLOW_AVAILABLE:
+        self._tf = _load_tensorflow()
+        if self._tf is None:
             raise ImportError(
                 "TensorFlow is not available. Install it with: pip install tensorflow"
             )
-        super().__init__(model_path or settings.tensorflow_model_path, "tensorflow_bias_detector")
+        super().__init__(
+            model_path or settings.tensorflow_model_path, "tensorflow_bias_detector"
+        )
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
 
@@ -82,6 +172,7 @@ class TensorFlowModelService(ModelService):
             logger.info(f"Loading TensorFlow model from {self.model_path}")
             start_time = time.time()
 
+            tf = self._tf
             # Check if model exists
             if not self.model_path.exists():
                 logger.warning(f"Model path {self.model_path} does not exist")
@@ -94,8 +185,12 @@ class TensorFlowModelService(ModelService):
             # Load tokenizer
             tokenizer_path = self.model_path / "tokenizer"
             if tokenizer_path.exists():
-                # For BERT-based models
-                self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                _load_transformers()
+                if AutoTokenizer is not None:
+                    # For BERT-based models
+                    self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
             else:
                 # For custom models, create basic tokenizer
                 self.tokenizer = self._create_basic_tokenizer()
@@ -133,13 +228,25 @@ class TensorFlowModelService(ModelService):
         model.save(str(self.model_path))
 
         # Save tokenizer
-        tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        _load_transformers()
+        if AutoTokenizer is not None:
+            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        else:
+            logger.warning(
+                "AutoTokenizer unavailable; skipping tokenizer persistence for TensorFlow model."
+            )
 
         logger.info("Pretrained model downloaded and saved")
 
     def _create_basic_model(self) -> Any:
         """Create a basic bias detection model"""
+        _load_transformers()
+        if TFBertForSequenceClassification is None:
+            raise ImportError(
+                "TFBertForSequenceClassification is not available in the installed "
+                "transformers version."
+            )
         return TFBertForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=len(BiasType.__members__)
         )
@@ -153,7 +260,9 @@ class TensorFlowModelService(ModelService):
                 self.vocab = {}
                 self.word_index = 1
 
-            def encode_plus(self, text: str, max_length: int = 512, **_kwargs) -> dict[str, Any]:
+            def encode_plus(
+                self, text: str, max_length: int = 512, **_kwargs
+            ) -> dict[str, Any]:
                 words = text.lower().split()
                 tokens = []
                 for word in words:
@@ -195,6 +304,7 @@ class TensorFlowModelService(ModelService):
                 encoded = self.tokenizer.encode_plus(text, max_length=self.max_length)
 
             # Make prediction
+            tf = self._tf
             if isinstance(encoded, dict) and "input_ids" in encoded:
                 # BERT-style input
                 predictions = self.model(encoded)
@@ -232,10 +342,14 @@ class TensorFlowModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: Any, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(
+        self, probabilities: Any, text: str
+    ) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
-        probs = probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
+        probs = (
+            probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
+        )
 
         # Handle different output shapes
         if len(probs.shape) == 2:
@@ -301,7 +415,7 @@ class TensorFlowModelService(ModelService):
         return {
             "name": self.model_name,
             "framework": "tensorflow",
-            "version": tf.__version__ if tf is not None else "unavailable",
+            "version": self._tf.__version__ if self._tf is not None else "unavailable",
             "loaded": self.is_loaded,
             "load_time_ms": int(self.load_time * 1000),
             "model_path": str(self.model_path),
@@ -314,9 +428,24 @@ class PyTorchModelService(ModelService):
     """PyTorch model service for bias detection"""
 
     def __init__(self, model_path: str | None = None):
-        super().__init__(model_path or settings.pytorch_model_path, "pytorch_bias_detector")
+        self._torch = _load_torch()
+        if self._torch is None:
+            raise ImportError(
+                "PyTorch is not available. Install a working PyTorch build or disable "
+                "PyTorch-backed inference."
+            )
+        _load_transformers()
+        if not _transformer_available():
+            raise ImportError(
+                "transformers is not available. Install a working transformers build or "
+                "disable PyTorch-backed inference."
+            )
+        super().__init__(
+            model_path or settings.pytorch_model_path, "pytorch_bias_detector"
+        )
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
+        torch = self._torch
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     async def load_model(self) -> bool:
@@ -332,6 +461,7 @@ class PyTorchModelService(ModelService):
 
             # Load model
             model_file = self.model_path / "model.pt"
+            torch = self._torch
             if model_file.exists():
                 self.model = torch.load(model_file, map_location=self.device)
             else:
@@ -341,9 +471,17 @@ class PyTorchModelService(ModelService):
             # Load tokenizer
             tokenizer_path = self.model_path / "tokenizer"
             if tokenizer_path.exists():
-                self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                _load_transformers()
+                if AutoTokenizer is not None:
+                    self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
             else:
-                self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+                _load_transformers()
+                if AutoTokenizer is not None:
+                    self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
 
             self.model.to(self.device)
             self.model.eval()
@@ -378,11 +516,18 @@ class PyTorchModelService(ModelService):
         model = self._create_basic_model()
 
         # Save model
+        torch = self._torch
         torch.save(model, str(self.model_path / "model.pt"))
 
         # Save tokenizer
-        tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-        tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        _load_transformers()
+        if AutoTokenizer is not None:
+            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+        else:
+            logger.warning(
+                "AutoTokenizer unavailable; skipping tokenizer persistence for PyTorch model."
+            )
 
         logger.info("Pretrained model downloaded and saved")
 
@@ -390,11 +535,20 @@ class PyTorchModelService(ModelService):
         """Create a basic bias detection model"""
         # Simple BERT-based model for bias detection using top-level BertModel
 
+        torch = self._torch
+        _load_transformers()
+        if BertModel is None:
+            raise ImportError(
+                "transformers BertModel is not available for PyTorch model creation."
+            )
+
         class BiasDetectionModel(torch.nn.Module):
             def __init__(self, num_labels: int = len(BiasType.__members__)):
                 super().__init__()
                 self.bert = BertModel.from_pretrained("bert-base-uncased")
-                self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
+                self.classifier = torch.nn.Linear(
+                    self.bert.config.hidden_size, num_labels
+                )
                 self.dropout = torch.nn.Dropout(0.1)
 
             def forward(self, input_ids, attention_mask):
@@ -426,6 +580,7 @@ class PyTorchModelService(ModelService):
             attention_mask = encoded["attention_mask"].to(self.device)
 
             # Make prediction
+            torch = self._torch
             with torch.no_grad():
                 outputs = self.model(input_ids, attention_mask)
                 probabilities = torch.nn.functional.softmax(outputs, dim=-1)
@@ -459,7 +614,9 @@ class PyTorchModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(
+        self, probabilities: torch.Tensor, text: str
+    ) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
@@ -523,10 +680,11 @@ class PyTorchModelService(ModelService):
 
     def get_model_info(self) -> dict[str, Any]:
         """Get PyTorch model information"""
+        torch = self._torch
         return {
             "name": self.model_name,
             "framework": "pytorch",
-            "version": torch.__version__,
+            "version": torch.__version__ if torch is not None else "unavailable",
             "loaded": self.is_loaded,
             "load_time_ms": int(self.load_time * 1000),
             "model_path": str(self.model_path),
@@ -541,8 +699,15 @@ class ModelEnsembleService:
 
     def __init__(self):
         self.services = []
+        if not _ml_services_enabled():
+            logger.info("Skipping local ML model services due test-time configuration.")
+            self.tf_service = None
+            self.pt_service = None
+            self.nvidia_service = None
+            return
+
         # Only add TensorFlow service if available
-        if TENSORFLOW_AVAILABLE:
+        if _load_tensorflow() is not None:
             try:
                 self.tf_service = TensorFlowModelService()
                 self.services.append(self.tf_service)
@@ -552,13 +717,27 @@ class ModelEnsembleService:
         else:
             self.tf_service = None
 
-        # PyTorch service (required)
-        self.pt_service = PyTorchModelService()
-        self.services.append(self.pt_service)
+        # PyTorch service (optional)
+        self.pt_service = None
+        if _load_torch() is not None:
+            if _transformer_available():
+                try:
+                    self.pt_service = PyTorchModelService()
+                    self.services.append(self.pt_service)
+                except Exception as e:
+                    logger.debug(f"PyTorch service not available: {e}")
+            else:
+                logger.info(
+                    "PyTorch service skipped because transformers is not available."
+                )
+                self.pt_service = None
+        else:
+            self.pt_service = None
 
         # NVIDIA API service for Kimi-k2.5 (optional)
         try:
             from bias_detection.services.nvidia_api_service import NvidiaAPIService
+
             self.nvidia_service = NvidiaAPIService()
             # Note: We don't add this to services list automatically as it's a different type of service
         except ImportError as e:
@@ -571,6 +750,9 @@ class ModelEnsembleService:
     async def load_all_models(self) -> bool:
         """Load all models"""
         results = []
+        if not self.services:
+            logger.warning("No model services are configured.")
+            return False
         for service in self.services:
             result = await service.load_model()
             results.append(result)
@@ -586,7 +768,9 @@ class ModelEnsembleService:
                 result = await service.predict(text)
                 results.append(result)
             except Exception as e:
-                logger.warning(f"Model {service.model_name} failed: {str(e)!s}", error=str(e))
+                logger.warning(
+                    f"Model {service.model_name} failed: {str(e)!s}", error=str(e)
+                )
 
         if not results:
             raise RuntimeError("All models failed to predict")
@@ -596,6 +780,8 @@ class ModelEnsembleService:
 
         # Use first available service for text hash
         hash_service = self.tf_service or self.pt_service
+        if hash_service is None:
+            raise RuntimeError("No model service is available for predictions.")
         return {
             "ensemble_results": combined_results,
             "individual_results": results,
@@ -619,7 +805,9 @@ class ModelEnsembleService:
         combined_results = []
         for bias_type, results_list in bias_groups.items():
             avg_score = sum(r["score"] for r in results_list) / len(results_list)
-            avg_confidence = sum(r["confidence"] for r in results_list) / len(results_list)
+            avg_confidence = sum(r["confidence"] for r in results_list) / len(
+                results_list
+            )
 
             # Use highest confidence level
             confidence_levels = [r["confidence_level"] for r in results_list]

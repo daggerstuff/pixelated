@@ -54,7 +54,7 @@ export interface DatabaseConfig {
 const DB_CONFIG = {
   mongodb: {
     databaseName:
-      process.env.BUSINESS_STRATEGY_DB_NAME || 'pixelated_business_strategy',
+      process.env.BUSINESS_STRATEGY_DB_NAME ?? 'pixelated_business_strategy',
     collections: {
       documents: 'documents',
       users: 'users',

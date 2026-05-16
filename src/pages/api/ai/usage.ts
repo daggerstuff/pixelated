@@ -37,7 +37,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    const role = session.user.role || 'user'
+    const role = session.user.role ?? 'user'
     const { allowed, limit, remaining, reset } = rateLimiter.check(
       `${session.user.id}:/api/ai/usage`,
       role,
@@ -88,7 +88,7 @@ export const GET: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'ai.usage.validation_error',
-        session?.user?.id || 'anonymous',
+        session?.user?.id ?? 'anonymous',
         'ai_usage',
         {
           error: validationError.error,
@@ -126,7 +126,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.request',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai_usage',
       {
         period: params!.period,
@@ -179,7 +179,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.error',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai_usage',
       {
         error: error instanceof Error ? String(error) : String(error),

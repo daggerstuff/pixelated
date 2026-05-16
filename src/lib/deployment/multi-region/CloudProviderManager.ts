@@ -9,7 +9,6 @@ import { EC2Client } from '@aws-sdk/client-ec2'
 import { EKSClient } from '@aws-sdk/client-eks'
 import { RDSClient } from '@aws-sdk/client-rds'
 import { S3Client } from '@aws-sdk/client-s3'
-import { Compute, DNS, Storage } from '@google-cloud/compute'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { RegionConfig } from './MultiRegionDeploymentManager'
@@ -24,10 +23,25 @@ interface AWSClients {
   s3: S3Client
 }
 
+interface GCPComputeClient {
+  projectId: string
+  keyFilename: string
+}
+
+interface GCPDnsClient {
+  projectId: string
+  keyFilename: string
+}
+
+interface GCPStorageClient {
+  projectId: string
+  keyFilename: string
+}
+
 interface GCPClients {
-  compute: Compute
-  dns: DNS
-  storage: Storage
+  compute: GCPComputeClient
+  dns: GCPDnsClient
+  storage: GCPStorageClient
 }
 
 interface AzureClients {
@@ -72,10 +86,10 @@ export interface DeploymentResult {
 }
 
 export class CloudProviderManager {
-  private awsClients: Map<string, AWSClients> = new Map()
-  private gcpClients: Map<string, GCPClients> = new Map()
-  private azureClients: Map<string, AzureClients> = new Map()
-  private config: CloudProviderConfig
+  private readonly awsClients: Map<string, AWSClients> = new Map()
+  private readonly gcpClients: Map<string, GCPClients> = new Map()
+  private readonly azureClients: Map<string, AzureClients> = new Map()
+  private readonly config: CloudProviderConfig
 
   constructor() {
     this.config = this.loadConfiguration()
@@ -87,19 +101,19 @@ export class CloudProviderManager {
   private loadConfiguration(): CloudProviderConfig {
     return {
       aws: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
-        region: process.env.AWS_REGION || 'us-east-1',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
+        region: process.env.AWS_REGION ?? 'us-east-1',
       },
       gcp: {
-        projectId: process.env.GOOGLE_CLOUD_PROJECT || '',
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS || '',
+        projectId: process.env.GOOGLE_CLOUD_PROJECT ?? '',
+        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '',
       },
       azure: {
-        subscriptionId: process.env.AZURE_SUBSCRIPTION_ID || '',
-        clientId: process.env.AZURE_CLIENT_ID || '',
-        clientSecret: process.env.AZURE_CLIENT_SECRET || '',
-        tenantId: process.env.AZURE_TENANT_ID || '',
+        subscriptionId: process.env.AZURE_SUBSCRIPTION_ID ?? '',
+        clientId: process.env.AZURE_CLIENT_ID ?? '',
+        clientSecret: process.env.AZURE_CLIENT_SECRET ?? '',
+        tenantId: process.env.AZURE_TENANT_ID ?? '',
       },
     }
   }
@@ -127,12 +141,14 @@ export class CloudProviderManager {
       )
 
       logger.info('Cloud provider connections initialized successfully')
-    } catch (error: any) {
-      logger.error('Failed to initialize cloud provider connections', { error })
-      throw new Error(
-        `Cloud provider initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        { cause: error },
-      )
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error('Failed to initialize cloud provider connections', {
+        message,
+      })
+      throw new Error(`Cloud provider initialization failed: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -193,9 +209,12 @@ export class CloudProviderManager {
       }
 
       logger.info(`Initialized AWS clients for ${awsRegions.length} regions`)
-    } catch (error: any) {
-      logger.error('Failed to initialize AWS clients', { error })
-      throw error
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error('Failed to initialize AWS clients', { error: message })
+      throw new Error(`Failed to initialize AWS clients: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -209,23 +228,22 @@ export class CloudProviderManager {
 
     try {
       for (const region of gcpRegions) {
-        // Initialize Compute client
-        const computeClient = new Compute({
-          projectId: this.config.gcp!.projectId,
-          keyFilename: this.config.gcp!.keyFilename,
-        })
+        const gcpConfig = {
+          projectId: this.config.gcp?.projectId ?? '',
+          keyFilename: this.config.gcp?.keyFilename ?? '',
+        }
 
-        // Initialize DNS client
-        const dnsClient = new DNS({
-          projectId: this.config.gcp!.projectId,
-          keyFilename: this.config.gcp!.keyFilename,
-        })
+        const computeClient: GCPComputeClient = {
+          ...gcpConfig,
+        }
 
-        // Initialize Storage client
-        const storageClient = new Storage({
-          projectId: this.config.gcp!.projectId,
-          keyFilename: this.config.gcp!.keyFilename,
-        })
+        const dnsClient: GCPDnsClient = {
+          ...gcpConfig,
+        }
+
+        const storageClient: GCPStorageClient = {
+          ...gcpConfig,
+        }
 
         this.gcpClients.set(region.id, {
           compute: computeClient,
@@ -235,9 +253,12 @@ export class CloudProviderManager {
       }
 
       logger.info(`Initialized GCP clients for ${gcpRegions.length} regions`)
-    } catch (error: any) {
-      logger.error('Failed to initialize GCP clients', { error })
-      throw error
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error('Failed to initialize GCP clients', { error: message })
+      throw new Error(`Failed to initialize GCP clients: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -260,9 +281,12 @@ export class CloudProviderManager {
       logger.info(
         `Initialized Azure clients for ${azureRegions.length} regions`,
       )
-    } catch (error: any) {
-      logger.error('Failed to initialize Azure clients', { error })
-      throw error
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error('Failed to initialize Azure clients', { error: message })
+      throw new Error(`Failed to initialize Azure clients: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -289,24 +313,24 @@ export class CloudProviderManager {
           result = await this.deployAzureRegion(region)
           break
         default:
-          throw new Error(`Unsupported cloud provider: ${region.provider}`)
+          throw new Error(
+            `Unsupported cloud provider: ${String(region.provider)}`,
+          )
       }
 
       logger.info(
         `Infrastructure deployment completed for region: ${region.name}`,
       )
       return result
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
       logger.error(
         `Failed to deploy infrastructure to region: ${region.name}`,
-        { error },
+        { error: message },
       )
-      throw new Error(
-        `Region deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        {
-          cause: error,
-        },
-      )
+      throw new Error(`Region deployment failed: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -364,9 +388,12 @@ export class CloudProviderManager {
           deploymentTime: new Date().toISOString(),
         },
       }
-    } catch (error: any) {
-      logger.error(`AWS region deployment failed: ${region.name}`, { error })
-      throw error
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error(`AWS region deployment failed: ${region.name}`, { message })
+      throw new Error(`AWS region deployment failed: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -424,9 +451,12 @@ export class CloudProviderManager {
           deploymentTime: new Date().toISOString(),
         },
       }
-    } catch (error: any) {
-      logger.error(`GCP region deployment failed: ${region.name}`, { error })
-      throw error
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error(`GCP region deployment failed: ${region.name}`, { message })
+      throw new Error(`GCP region deployment failed: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -458,6 +488,17 @@ export class CloudProviderManager {
         deploymentTime: new Date().toISOString(),
       },
     }
+  }
+
+  /**
+   * Normalize error instances for safe messages.
+   */
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message
+    }
+
+    return 'Unknown error'
   }
 
   /**
@@ -591,10 +632,12 @@ export class CloudProviderManager {
       logger.info(`Updating capacity for region: ${regionId}`, { capacity })
 
       // Find the region configuration
-      const region =
-        Array.from(this.awsClients.keys()).find((id) => id === regionId) ||
-        Array.from(this.gcpClients.keys()).find((id) => id === regionId) ||
-        Array.from(this.azureClients.keys()).find((id) => id === regionId)
+      const regionFromAws = this.awsClients.has(regionId) ? regionId : undefined
+      const regionFromGcp = this.gcpClients.has(regionId) ? regionId : undefined
+      const regionFromAzure = this.azureClients.has(regionId)
+        ? regionId
+        : undefined
+      const region = regionFromAws ?? regionFromGcp ?? regionFromAzure
 
       if (!region) {
         throw new Error(`Region not found: ${regionId}`)
@@ -610,11 +653,14 @@ export class CloudProviderManager {
       }
 
       logger.info(`Capacity updated successfully for region: ${regionId}`)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
       logger.error(`Failed to update capacity for region: ${regionId}`, {
-        error,
+        error: message,
       })
-      throw error
+      throw new Error(`Failed to update capacity for region: ${message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -673,13 +719,12 @@ export class CloudProviderManager {
       'apac-tokyo': 'ap-northeast-1',
     }
 
-    return regionMap[location] || location
+    return regionMap[location] ?? location
   }
 
   /**
    * Get GCP region name from location
    */
-  // @ts-ignore - Unused function for now
   private getGCPRegionName(location: string): string {
     const regionMap: Record<string, string> = {
       'us-east': 'us-east1',
@@ -689,7 +734,7 @@ export class CloudProviderManager {
       'apac-tokyo': 'asia-northeast1',
     }
 
-    return regionMap[location] || location
+    return regionMap[location] ?? location
   }
 
   /**
@@ -719,9 +764,12 @@ export class CloudProviderManager {
       this.azureClients.clear()
 
       logger.info('Cloud provider resources cleaned up successfully')
-    } catch (error: any) {
-      logger.error('Cloud provider cleanup failed', { error })
-      throw error
+    } catch (error: unknown) {
+      const message = this.getErrorMessage(error)
+      logger.error('Cloud provider cleanup failed', { error: message })
+      throw new Error(`Cloud provider cleanup failed: ${message}`, {
+        cause: error,
+      })
     }
   }
 

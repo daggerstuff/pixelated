@@ -1,10 +1,12 @@
 ---
-description: 'Plugin Lifecycle Management documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Plugin Lifecycle Management documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Plugin Lifecycle Management
 ---
 
 # Plugin Lifecycle Management

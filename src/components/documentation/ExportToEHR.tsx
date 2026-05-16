@@ -25,7 +25,7 @@ export function ExportToEHR({
 
   // Reset success details when export result changes
   useEffect(() => {
-    if (exportResult && exportResult.success) {
+    if (exportResult?.success) {
       setShowSuccessDetails(true)
     } else {
       setShowSuccessDetails(false)

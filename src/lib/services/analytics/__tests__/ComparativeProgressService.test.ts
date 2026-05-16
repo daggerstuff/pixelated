@@ -36,7 +36,7 @@ describe('ComparativeProgressService', () => {
       info: vi.fn(),
       error: vi.fn(),
     }
-    service = new TestComparativeProgressService(mockLogger as any)
+    service = new TestComparativeProgressService(mockLogger)
   })
 
   afterEach(() => {

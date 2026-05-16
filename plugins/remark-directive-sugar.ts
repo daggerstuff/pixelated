@@ -2,8 +2,6 @@
  * @description Register directive nodes in mdast.
  * @see https://github.com/remarkjs/remark-directive?tab=readme-ov-file#types
  */
-/// <reference types="mdast-util-directive" />
-
 import type { Root } from 'mdast'
 import type { Directives } from 'mdast-util-directive'
 import type { Node } from 'unist'
@@ -71,6 +69,15 @@ const VALID_BADGES = new Set(Object.keys(CONFIG.badge.preset))
  *  - `:badge`/`:badge-*`: customizable badge-like markers.
  */
 function remarkDirectiveSugar() {
+  const isDirectiveNode = (node: Node): node is Directives =>
+    (node.type === 'containerDirective' ||
+      node.type === 'leafDirective' ||
+      node.type === 'textDirective') &&
+    'name' in node &&
+    'attributes' in node &&
+    'children' in node &&
+    'data' in node
+
   /**
    * @param {import('mdast').Root} tree
    *   Tree.
@@ -78,206 +85,202 @@ function remarkDirectiveSugar() {
    *   File.
    */
   return (tree: Root, file: VFile) => {
-    visit(tree, (node) => {
-      if (
-        node.type === 'containerDirective' ||
-        node.type === 'leafDirective' ||
-        node.type === 'textDirective'
-      ) {
-        const d = node as Directives
-        const data = d.data || (d.data = {})
-        const attributes = d.attributes || {}
-        const { children } = d
+    visit(tree, (node: Node) => {
+      if (!isDirectiveNode(node)) {
+        return
+      }
 
-        if (d.name === 'video') {
-          /* ::video */
-          if (d.type === 'textDirective') {
-            file.fail(
-              'Unexpected `:video` text directive. Use double colons (`::`) for an `video` leaf directive.',
-              d,
-            )
-          }
+      const d = node
+      const data = d.data ?? (d.data = {})
+      const attributes = d.attributes ?? {}
+      const { children } = d
 
-          if (d.type === 'containerDirective') {
-            file.fail(
-              'Unexpected `:::video` container directive. Use double colons (`::`) for an `video` leaf directive.',
-              d,
-            )
-          }
-
-          // handle attributes
-          let src = ''
-          const { youtubeId, bilibiliId, vimeoId, iframeSrc } = attributes
-
-          if (!youtubeId && !bilibiliId && !vimeoId && !iframeSrc) {
-            file.fail(
-              'Invalid `video` directive. Unexpectedly missing one of the following: `youtubeId`, `bilibiliId`, `iframeSrc`.',
-              d,
-            )
-          } else {
-            for (const [key, id] of Object.entries({
-              youtubeId,
-              bilibiliId,
-              vimeoId,
-            })) {
-              if (id) {
-                const platformFn = VIDEO_PLATFORMS[key]
-                if (platformFn) {
-                  src = platformFn(id)
-                  break
-                }
-              }
-            }
-            if (!src && iframeSrc) {
-              src = iframeSrc
-            }
-          }
-
-          // nested in div（otherwise, the transform style won't apply）
-          data.hName = 'div'
-          data.hProperties = {
-            class: 'sugar-video',
-            style: `${attributes['noScale'] && 'margin: 1rem 0'}`,
-          }
-          data.hChildren = [
-            {
-              type: 'element',
-              tagName: 'iframe',
-              properties: {
-                style: `${attributes['noScale'] && 'transform: none'}`,
-                src,
-                title: attributes['title'] || 'Video Player',
-                loading: 'lazy',
-                allow:
-                  'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-                allowFullScreen: true,
-              },
-              children: [],
-            },
-          ]
-        } else if (d.name === 'link') {
-          /* :link */
-          if (d.type === 'leafDirective') {
-            file.fail(
-              'Unexpected `::link` text directive. Use single colon (`:`) for an `link` text directive.',
-              d,
-            )
-          }
-
-          if (d.type === 'containerDirective') {
-            file.fail(
-              'Unexpected `:::link` container directive. Use single colon (`:`) for an `link` text directive.',
-              d,
-            )
-          }
-
-          let _resolvedText = ''
-          let _resolvedStyle = ''
-          // Reserved for potential future use in link processing
-          let _resolvedTab = ''
-          let _isOrg = false
-
-          const { id, link, tab, style } = attributes
-
-          // check label
-          if (children.length > 0 && children[0]?.type === 'text') {
-            _resolvedText = (children[0] as any).value
-          } else if (!id) {
-            file.fail(
-              'Invalid `link` directive. The text in the `[]` of `:link[]{}` is required if `id` attribute is not specified.',
-              d,
-            )
-          }
-
-          // check type
-          if (style && (LINK_STYLE as readonly string[]).includes(style)) {
-            _resolvedStyle = style as typeof _resolvedStyle
-          } else if (
-            style &&
-            !(LINK_STYLE as readonly string[]).includes(style)
-          ) {
-            file.fail(
-              'Invalid `link` directive. The `style` must be one of "square", "rounded", or "github".',
-              d,
-            )
-          }
-
-          // check tab
-          if (tab && !GITHUB_TAB.includes(tab)) {
-            file.fail(
-              'Invalid `link` directive. The `tab` must be one of the following: "repositories", "projects", "packages", "stars", "sponsoring", "sponsors", "org-repositories", "org-projects", "org-packages", "org-sponsoring", or "org-people".',
-              d,
-            )
-          } else if (tab) {
-            const match = tab.match(TAB_ORG_REGEXP)
-            if (match && match[1]) {
-              _isOrg = true
-              _resolvedTab = match[1]
-            } else {
-              _resolvedTab = tab
-            }
-          }
-
-          // handle
-          if (!id && link) {
-            // non github scope
-            _resolvedStyle = _resolvedStyle || 'square'
-          } else if (id) {
-            // github scope
-            if (id.match(GITHUB_USERNAME_REGEXP)) {
-              _resolvedStyle = _resolvedStyle || 'rounded'
-              _resolvedText = _resolvedText || id.substring(1)
-            } else if (id.match(GITHUB_REPO_REGEXP)) {
-              _resolvedStyle = _resolvedStyle || 'rounded'
-              _resolvedText = _resolvedText || id.substring(1)
-            }
-          }
-        } else if (d.name === 'badge') {
-          /* :badge */
-          if (d.type === 'textDirective') {
-            file.fail(
-              'Unexpected `:badge` text directive. Use single colon (`:`) for an `badge` text directive.',
-              d,
-            )
-          }
-
-          if (d.type === 'containerDirective') {
-            file.fail(
-              'Unexpected `:::badge` container directive. Use single colon (`:`) for an `badge` text directive.',
-              d,
-            )
-          }
-
-          let resolvedBadgeText = ''
-          let resolvedBadgeColor = ''
-
-          const { id: badgeId } = attributes
-
-          if (badgeId && VALID_BADGES.has(badgeId)) {
-            const badge = CONFIG.badge.preset[badgeId]
-            if (badge) {
-              resolvedBadgeText = badge.text
-              resolvedBadgeColor = badge.color
-            }
-          } else if (!badgeId) {
-            file.fail(
-              'Invalid `badge` directive. The text in the `[]` of `:badge[]{}` is required if `id` attribute is not specified.',
-              d,
-            )
-          }
-
-          data.hName = 'span'
-          data.hProperties = {
-            class: 'sugar-badge',
-            style: `background-color: ${resolvedBadgeColor};`,
-          }
-          data.hChildren = [
-            {
-              type: 'text',
-              value: resolvedBadgeText,
-            },
-          ]
+      if (d.name === 'video') {
+        /* ::video */
+        if (d.type === 'textDirective') {
+          file.fail(
+            'Unexpected `:video` text directive. Use double colons (`::`) for an `video` leaf directive.',
+            d,
+          )
         }
+
+        if (d.type === 'containerDirective') {
+          file.fail(
+            'Unexpected `:::video` container directive. Use double colons (`::`) for an `video` leaf directive.',
+            d,
+          )
+        }
+
+        // handle attributes
+        let src = ''
+        const { youtubeId, bilibiliId, vimeoId, iframeSrc } = attributes
+
+        if (!youtubeId && !bilibiliId && !vimeoId && !iframeSrc) {
+          file.fail(
+            'Invalid `video` directive. Unexpectedly missing one of the following: `youtubeId`, `bilibiliId`, `iframeSrc`.',
+            d,
+          )
+        } else if (youtubeId) {
+          src = VIDEO_PLATFORMS.youtubeId(youtubeId)
+        } else if (bilibiliId) {
+          src = VIDEO_PLATFORMS.bilibiliId(bilibiliId)
+        } else if (vimeoId) {
+          src = VIDEO_PLATFORMS.vimeoId(vimeoId)
+        }
+
+        if (!src && iframeSrc) {
+          src = iframeSrc
+        }
+
+        // nested in div（otherwise, the transform style won't apply）
+        data.hName = 'div'
+        data.hProperties = {
+          class: 'sugar-video',
+          style: `${attributes['noScale'] && 'margin: 1rem 0'}`,
+        }
+        data.hChildren = [
+          {
+            type: 'element',
+            tagName: 'iframe',
+            properties: {
+              style: `${attributes['noScale'] && 'transform: none'}`,
+              src,
+              title: attributes['title'] ?? 'Video Player',
+              loading: 'lazy',
+              allow:
+                'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+              allowFullScreen: true,
+            },
+            children: [],
+          },
+        ]
+      } else if (d.name === 'link') {
+        /* :link */
+        if (d.type === 'leafDirective') {
+          file.fail(
+            'Unexpected `::link` text directive. Use single colon (`:`) for an `link` text directive.',
+            d,
+          )
+        }
+
+        if (d.type === 'containerDirective') {
+          file.fail(
+            'Unexpected `:::link` container directive. Use single colon (`:`) for an `link` text directive.',
+            d,
+          )
+        }
+
+        let resolvedText = ''
+        let resolvedStyle = ''
+        // Reserved for potential future use in link processing
+        let resolvedTab = ''
+        let isOrg = false
+
+        const { id, link, tab, style } = attributes
+
+        // check label
+        const firstChild = children[0]
+        if (firstChild?.type === 'text') {
+          resolvedText = firstChild.value
+        } else if (!id) {
+          file.fail(
+            'Invalid `link` directive. The text in the `[]` of `:link[]{}` is required if `id` attribute is not specified.',
+            d,
+          )
+        }
+
+        // check type
+        if (style && (LINK_STYLE as readonly string[]).includes(style)) {
+          resolvedStyle = style
+        } else if (
+          style &&
+          !(LINK_STYLE as readonly string[]).includes(style)
+        ) {
+          file.fail(
+            'Invalid `link` directive. The `style` must be one of "square", "rounded", or "github".',
+            d,
+          )
+        }
+
+        // check tab
+        if (tab && !GITHUB_TAB.includes(tab)) {
+          file.fail(
+            'Invalid `link` directive. The `tab` must be one of the following: "repositories", "projects", "packages", "stars", "sponsoring", "sponsors", "org-repositories", "org-projects", "org-packages", "org-sponsoring", or "org-people".',
+            d,
+          )
+        } else if (tab) {
+          const match = TAB_ORG_REGEXP.exec(tab)
+          if (match?.[1]) {
+            isOrg = true
+            resolvedTab = match[1]
+          } else {
+            resolvedTab = tab
+          }
+        }
+
+        // handle
+        if (!id && link) {
+          // non github scope
+          resolvedStyle = resolvedStyle === '' ? 'square' : resolvedStyle
+        } else if (id) {
+          // github scope
+          if (id.match(GITHUB_USERNAME_REGEXP)) {
+            resolvedStyle = resolvedStyle === '' ? 'rounded' : resolvedStyle
+            resolvedText = resolvedText || id.substring(1)
+          } else if (id.match(GITHUB_REPO_REGEXP)) {
+            resolvedStyle = resolvedStyle === '' ? 'rounded' : resolvedStyle
+            resolvedText = resolvedText || id.substring(1)
+          }
+        }
+
+        void resolvedTab
+        void isOrg
+        void link
+        void resolvedText
+        void resolvedStyle
+      } else if (d.name === 'badge') {
+        /* :badge */
+        if (d.type === 'textDirective') {
+          file.fail(
+            'Unexpected `:badge` text directive. Use single colon (`:`) for an `badge` text directive.',
+            d,
+          )
+        }
+
+        if (d.type === 'containerDirective') {
+          file.fail(
+            'Unexpected `:::badge` container directive. Use single colon (`:`) for an `badge` text directive.',
+            d,
+          )
+        }
+
+        let resolvedBadgeText = ''
+        let resolvedBadgeColor = ''
+
+        const { id: badgeId } = attributes
+
+        if (badgeId && VALID_BADGES.has(badgeId)) {
+          const badge = CONFIG.badge.preset[badgeId]
+          resolvedBadgeText = badge.text
+          resolvedBadgeColor = badge.color
+        } else if (!badgeId) {
+          file.fail(
+            'Invalid `badge` directive. The text in the `[]` of `:badge[]{}` is required if `id` attribute is not specified.',
+            d,
+          )
+        }
+
+        data.hName = 'span'
+        data.hProperties = {
+          class: 'sugar-badge',
+          style: `background-color: ${resolvedBadgeColor};`,
+        }
+        data.hChildren = [
+          {
+            type: 'text',
+            value: resolvedBadgeText,
+          },
+        ]
       }
     })
   }

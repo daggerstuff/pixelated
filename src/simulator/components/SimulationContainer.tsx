@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 
 import { useSimulator } from '../context/SimulatorContext'
 import type {
   SimulationContainerProps,
   TherapeuticTechnique,
   RealTimeFeedback,
-  Scenario,
 } from '../types'
 import { checkBrowserCompatibility } from '../utils/privacy'
 import SimulationControls from './SimulationControls'
@@ -32,24 +31,11 @@ export function SimulationContainer({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const responseInputRef = useRef<HTMLTextAreaElement>(null)
 
-  const { state } = useSimulator()
-  const typedState = state as {
-    currentScenario?: Scenario
-    isProcessing?: boolean
-    realtimeFeedback?: RealTimeFeedback[]
-    startSimulation?: (id: string) => Promise<void>
-    endSimulation?: () => Promise<void>
-    transcribedText?: string
-    isConnected?: boolean
-  }
+  const { state, dispatch } = useSimulator()
 
-  const currentScenario = typedState?.currentScenario
-  const isProcessing = typedState?.isProcessing ?? false
-  const realtimeFeedback = typedState?.realtimeFeedback ?? []
-  const startSimulation = typedState?.startSimulation
-  const endSimulation = typedState?.endSimulation
-  const transcribedText = typedState?.transcribedText ?? ''
-  const isConnected = typedState?.isConnected ?? false
+  const isProcessing = state.isProcessing
+  const isConnected = state.connectionStatus === 'connected'
+  const realtimeFeedback: RealTimeFeedback[] = useMemo(() => [], [])
 
   // Conversation history for the current session
   const [conversation, setConversation] = useState<
@@ -76,33 +62,23 @@ export function SimulationContainer({
       setUserResponse('')
 
       // Start new simulation
-      if (startSimulation) {
-        startSimulation(scenarioId)
-          .then(() => {
-            // Focus on response input after simulation starts
-            if (responseInputRef.current) {
-              responseInputRef.current.focus()
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to start simulation:', error)
-          })
+      dispatch({ type: 'START_SIMULATION' })
+
+      // Focus on response input after simulation starts
+      if (responseInputRef.current) {
+        responseInputRef.current.focus()
       }
     }
 
     // Clean up on unmount
     return () => {
-      if (endSimulation) {
-        endSimulation().catch((err) =>
-          console.error('Error ending simulation:', err),
-        )
-      }
+      dispatch({ type: 'STOP_SIMULATION' })
     }
-  }, [scenarioId, startSimulation, endSimulation])
+  }, [scenarioId, dispatch])
 
-  // Add scenario information to conversation when scenario changes
+  // Add scenario information to conversation when scenarioId changes
   useEffect(() => {
-    if (currentScenario) {
+    if (scenarioId) {
       setConversation((prev) => {
         // Check if we already have the scenario information
         if (prev.some((item) => item.type === 'scenario')) {
@@ -112,14 +88,14 @@ export function SimulationContainer({
         // Add scenario information
         return [
           {
-            type: 'scenario',
-            content: `${currentScenario?.['contextDescription'] || ''} ${currentScenario?.['clientBackground'] || ''}`,
+            type: 'scenario' as const,
+            content: `Scenario ${scenarioId} loaded`,
             timestamp: Date.now(),
           },
         ]
       })
     }
-  }, [currentScenario])
+  }, [scenarioId])
 
   // Auto-scroll to bottom of conversation when new messages arrive
   useEffect(() => {
@@ -128,45 +104,39 @@ export function SimulationContainer({
     }
   }, [conversation, autoScrollEnabled])
 
-  // Update user response when transcription changes
-  useEffect(() => {
-    if (transcribedText) {
-      setUserResponse(transcribedText)
-    }
-  }, [transcribedText])
-
   // Add feedback to conversation when it arrives
   useEffect(() => {
-    if (realtimeFeedback && realtimeFeedback.length > 0) {
+    if (realtimeFeedback.length > 0) {
       const latestFeedback: RealTimeFeedback = realtimeFeedback[0]
 
       // Add feedback to conversation if it has content
-      if (latestFeedback.content || latestFeedback.suggestion) {
-        setConversation((prev) => {
-          // Check if we've already added this feedback
-          if (
-            prev.some(
-              (item) =>
-                item.type === 'feedback' &&
-                item.timestamp === latestFeedback.timestamp,
-            )
-          ) {
-            return prev
-          }
+      let content = latestFeedback.suggestion
 
-          return [
-            ...prev,
-            {
-              type: 'feedback',
-              content:
-                latestFeedback.content ||
-                latestFeedback.suggestion ||
-                'No feedback available',
-              timestamp: latestFeedback.timestamp,
-            },
-          ]
-        })
+      if (typeof latestFeedback.content === 'string') {
+        content = latestFeedback.content
       }
+
+      setConversation((prev) => {
+        // Check if we've already added this feedback
+        if (
+          prev.some(
+            (item) =>
+              item.type === 'feedback' &&
+              item.timestamp === latestFeedback.timestamp,
+          )
+        ) {
+          return prev
+        }
+
+        return [
+          ...prev,
+          {
+            type: 'feedback',
+            content,
+            timestamp: latestFeedback.timestamp,
+          },
+        ]
+      })
 
       // Update detected techniques if available
       if (latestFeedback.suggestedTechnique) {
@@ -184,7 +154,7 @@ export function SimulationContainer({
     async (e: React.FormEvent) => {
       e.preventDefault()
 
-      if (!userResponse.trim() || isProcessing || !currentScenario) {
+      if (!userResponse.trim() || isProcessing || !state.isRunning) {
         return
       }
 
@@ -202,7 +172,7 @@ export function SimulationContainer({
       // Clear input
       setUserResponse('')
     },
-    [userResponse, isProcessing, currentScenario, detectedTechniques],
+    [userResponse, isProcessing, state.isRunning, detectedTechniques],
   )
 
   // Handle text area growing as content is added
@@ -241,11 +211,7 @@ export function SimulationContainer({
       )}
 
       <div className='simulation-header'>
-        <h2>
-          {(currentScenario && 'title' in currentScenario
-            ? currentScenario.title
-            : null) || 'Therapeutic Simulation'}
-        </h2>
+        <h2>Therapeutic Simulation</h2>
         {onBackToScenarios && (
           <button onClick={onBackToScenarios} className='back-button'>
             ← Back to Scenarios

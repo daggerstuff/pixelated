@@ -1,114 +1,13 @@
 ---
-description: 'Understanding Pixelated authentication and authorization system'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Understanding Pixelated authentication and authorization system
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Authentication
 ---
 
-## Overview
-
-Pixelated uses Supabase Auth for secure user authentication and authorization.
-This system provides robust security features while maintaining a smooth user
-experience.
-
-## Authentication Flow
-
-## Authentication Methods
-
-### Email and Password
-
-```typescript
-const { data, error } = await supabase.auth.signInWithPassword({
-  email: 'user@example.com',
-  password: 'secure-password',
-})
-```
-
-### Magic Link
-
-```typescript
-const { data, error } = await supabase.auth.signInWithOtp({
-  email: 'user@example.com',
-})
-```
-
-### OAuth Providers
-
-```typescript
-const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: 'google',
-})
-```
-
-## Session Management
-
-### Token Lifecycle
-
-1. **Access Token**
-   - JWT format
-   - Short expiration (1 hour)
-   - Contains user claims
-
-2. **Refresh Token**
-   - Long-lived (7 days)
-   - Used to obtain new access tokens
-   - Secure storage required
-
-### Session Refresh
-
-```typescript
-const { data, error } = await supabase.auth.refreshSession()
-```
-
-## Authorization
-
-### Role-Based Access Control
-
-Available roles:
-
-- `client`: Regular user role
-- `therapist`: Professional role
-- `admin`: System administrator
-
-### Row Level Security
-
-```sql
--- Example RLS policy for sessions
-CREATE POLICY "Users can only access their own sessions"
-ON sessions
-FOR SELECT
-USING (
-  auth.uid() = user_id
-);
-```
-
-## Security Features
-
-### Password Requirements
-
-- Minimum 8 characters
-- At least one uppercase letter
-- At least one number
-- At least one special character
-
-### Rate Limiting
-
-```typescript
-const rateLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-})
-```
-
-### JWT Configuration
-
-```typescript
-const jwtConfig = {
-  expiresIn: '1h',
-  algorithm: 'RS256',
-  audience: 'https://api.gemcity.xyz',
 }
 ```
 

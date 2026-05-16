@@ -1,33 +1,36 @@
 import { EmailService } from '../EmailService'
 
-// Mock environment configuration
-vi.mock('@/lib/env', () => ({
-  env: {
-    email: {
-      resendApiKey: vi.fn(() => 'test-api-key'),
-    },
-  },
-}))
+const { mockSend, mockRedisMethods, mockLogger } = vi.hoisted(() => {
+  const mockLogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  }
 
-// Create mock implementation of Redis methods
-const mockRedisMethods = {
-  lpush: vi.fn(),
-  rpoplpush: vi.fn(),
-  lrem: vi.fn(),
-  llen: vi.fn(),
-  lrange: vi.fn(),
-  zadd: vi.fn(),
-  zrangebyscore: vi.fn(),
-  zremrangebyscore: vi.fn(),
-  keys: vi.fn(),
-  hget: vi.fn(),
-  hgetall: vi.fn(),
-  hset: vi.fn(),
-  hdel: vi.fn(),
-  del: vi.fn(),
-  on: vi.fn().mockReturnThis(),
-  quit: vi.fn().mockResolvedValue('OK'),
-}
+  return {
+    mockSend: vi.fn(),
+    mockLogger,
+    mockRedisMethods: {
+      lpush: vi.fn(),
+      rpoplpush: vi.fn(),
+      lrem: vi.fn(),
+      llen: vi.fn(),
+      lrange: vi.fn(),
+      zadd: vi.fn(),
+      zrangebyscore: vi.fn(),
+      zremrangebyscore: vi.fn(),
+      keys: vi.fn(),
+      hget: vi.fn(),
+      hgetall: vi.fn(),
+      hset: vi.fn(),
+      hdel: vi.fn(),
+      del: vi.fn(),
+      on: vi.fn().mockReturnThis(),
+      quit: vi.fn().mockResolvedValue('OK'),
+    },
+  }
+})
 
 // Mock Redis service with proper getClient implementation
 vi.mock('@/lib/services/redis', () => ({
@@ -36,6 +39,7 @@ vi.mock('@/lib/services/redis', () => ({
     connect: vi.fn().mockResolvedValue(undefined),
     disconnect: vi.fn().mockResolvedValue(undefined),
   })),
+  redis: mockRedisMethods,
 }))
 
 // Mock ioredis more completely
@@ -47,14 +51,6 @@ vi.mock('ioredis', () => {
   }
 })
 
-// Create mock logger
-const mockLogger = {
-  info: vi.fn(),
-  error: vi.fn(),
-  warn: vi.fn(),
-  debug: vi.fn(),
-}
-
 vi.mock('@/lib/utils/logger', async () => {
   return {
     getLogger: vi.fn(() => mockLogger),
@@ -62,29 +58,34 @@ vi.mock('@/lib/utils/logger', async () => {
   }
 })
 
-vi.mock('@/config/env.config')
+vi.mock('@/config/env.config', () => ({
+  config: {
+    email: {
+      resendApiKey: () => 'test-api-key',
+    },
+  },
+}))
 vi.mock('@postmark/core')
 
 // Mock Resend with proper types
 vi.mock('resend', () => {
-  const mockSend = vi.fn()
   return {
-    Resend: vi.fn().mockImplementation(() => ({
-      emails: {
-        send: mockSend,
-      },
-    })),
+    Resend: vi.fn(function () {
+      return {
+        emails: {
+          send: mockSend,
+        },
+      }
+    }),
   }
 })
 
 describe('emailService', () => {
   let emailService: EmailService
-  let mockSend: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     vi.clearAllMocks()
     emailService = new EmailService()
-    mockSend = vi.fn()
   })
 
   afterEach(() => {
@@ -168,7 +169,7 @@ describe('emailService', () => {
       expect(mockSend).toHaveBeenCalledWith({
         from: 'test@example.com',
         to: 'test@example.com',
-        subject: 'Welcome Test User',
+        subject: 'Welcome {{name}}',
         html: '<p>Hello Test User</p>',
         text: 'Hello Test User',
       })

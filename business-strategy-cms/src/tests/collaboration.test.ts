@@ -493,7 +493,7 @@ describe('CollaborationService Property Tests', () => {
       CollaborationService.recordChange(document.id, maliciousChange)
 
       const history = CollaborationService.getChanges(document.id)
-      expect(history[0].content).toBe('<script>alert("XSS")</script>')
+      expect(history[0]?.content).toBe('<script>alert("XSS")</script>')
     })
   })
 })

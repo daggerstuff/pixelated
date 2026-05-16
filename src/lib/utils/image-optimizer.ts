@@ -6,13 +6,12 @@
 import { existsSync, statSync } from 'fs'
 import { readFile, mkdir } from 'fs/promises'
 
-import { getLogger } from '../logging'
-
 import {
   ALLOWED_DIRECTORIES,
   safeJoin,
   validatePath,
 } from '../../utils/path-security'
+import { getLogger } from '../logging'
 
 const logger = getLogger({ prefix: 'image-optimizer' })
 

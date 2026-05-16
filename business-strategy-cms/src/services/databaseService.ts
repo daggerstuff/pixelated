@@ -126,8 +126,8 @@ export class DatabaseService {
     return {
       id: row.id,
       name: row.name,
-      metrics: JSON.parse(row.metrics || '{}'),
-      widgets: JSON.parse(row.widgets || '[]'),
+      metrics: JSON.parse(row.metrics ?? '{}'),
+      widgets: JSON.parse(row.widgets ?? '[]'),
       lastUpdated: row.last_updated,
       isShared: row.is_shared,
     }
@@ -178,8 +178,8 @@ export class DatabaseService {
       title: row.title,
       description: row.description,
       severity: row.severity,
-      conditions: JSON.parse(row.conditions || '[]'),
-      recipients: JSON.parse(row.recipients || '[]'),
+      conditions: JSON.parse(row.conditions ?? '[]'),
+      recipients: JSON.parse(row.recipients ?? '[]'),
       isActive: row.is_active,
       createdAt: row.created_at,
     }))
@@ -299,12 +299,12 @@ export class DatabaseService {
 
     // Note: The previous SQL implementation might have been assuming something else.
     // Adjusted logic:
-    const data = result[0] || {}
+    const data = result[0] ?? {}
     return {
-      totalRevenue: data.avgRevenue || 0, // Using avg for now as it's likely a run-rate
+      totalRevenue: data.avgRevenue ?? 0, // Using avg for now as it's likely a run-rate
       totalCustomers: 0, // Not available in this model
-      avgCustomerLifetimeValue: data.avgCLV || 0,
-      monthlyGrowthRate: data.avgGrowth || 0,
+      avgCustomerLifetimeValue: data.avgCLV ?? 0,
+      monthlyGrowthRate: data.avgGrowth ?? 0,
     }
   }
 
@@ -318,8 +318,8 @@ export class DatabaseService {
     return result.rows.map((row) => ({
       id: row.id,
       name: row.name,
-      metrics: JSON.parse(row.metrics || '{}'),
-      widgets: JSON.parse(row.widgets || '[]'),
+      metrics: JSON.parse(row.metrics ?? '{}'),
+      widgets: JSON.parse(row.widgets ?? '[]'),
       lastUpdated: row.last_updated,
       isShared: row.is_shared,
     }))
@@ -370,11 +370,11 @@ export class DatabaseService {
       },
     ])
 
-    const data = result[0] || {}
+    const data = result[0] ?? {}
     return {
-      totalIndustries: data.totalIndustries || 0,
-      avgMarketSize: data.avgMarketSize || 0,
-      avgGrowthRate: data.avgGrowthRate || 0,
+      totalIndustries: data.totalIndustries ?? 0,
+      avgMarketSize: data.avgMarketSize ?? 0,
+      avgGrowthRate: data.avgGrowthRate ?? 0,
     }
   }
 }

@@ -68,7 +68,7 @@ export function useMultidimensionalEmotions(
         const errorData = await mapsResponse.json().catch(() => ({}))
         throw new Error(
           `Failed to fetch dimensional maps: ${mapsResponse.statusText} - ${
-            errorData.message || 'Unknown error'
+            errorData.message ?? 'Unknown error'
           }`,
         )
       }
@@ -87,7 +87,7 @@ export function useMultidimensionalEmotions(
         const errorData = await patternsResponse.json().catch(() => ({}))
         throw new Error(
           `Failed to fetch patterns: ${patternsResponse.statusText} - ${
-            errorData.message || 'Unknown error'
+            errorData.message ?? 'Unknown error'
           }`,
         )
       }

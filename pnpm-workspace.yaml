@@ -1,6 +1,6 @@
 allowBuilds:
   '@letta-ai/letta-code': true
-  '@modelcontextprotocol/ext-apps': true
+  '@modelcontextprotocol/ext-apps': false
   '@parcel/watcher': true
   '@sentry-internal/node-cpu-profiler': true
   '@sentry/cli': true
@@ -18,3 +18,24 @@ allowBuilds:
   protobufjs: true
   sharp: true
   utf-8-validate: true
+minimumReleaseAgeExclude:
+  - path-to-regexp@6.3.0
+  - yaml@2.8.3
+  - axios@0.28.0
+  - jsonwebtoken@8.5.2
+  - jsonwebtoken@9.0.0
+  - dompurify@3.2.4
+  - axios@0.30.0
+  - '@tootallnate/once@3.0.1'
+  - nodemailer@8.0.4
+  - dompurify@3.3.2
+  - nodemailer@8.0.5
+  - dompurify@3.3.4
+  - axios@0.31.0
+  - dompurify@3.4.0
+  - axios@0.31.1
+  - axios@0.30.3
+overrides:
+  path-to-regexp@>=4.0.0 <6.3.0: ^6.3.0
+  yaml@>=2.0.0 <2.8.3: ^2.8.3
+  '@opentelemetry/otlp-transformer@0.217.0>protobufjs': '8.0.2'

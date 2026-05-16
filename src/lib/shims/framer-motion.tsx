@@ -17,6 +17,8 @@ type MotionProps = {
   onAnimationComplete?: unknown
 }
 
+type MotionComponentMap = Record<string, React.ComponentType<any>>
+
 export function AnimatePresence(props: {
   children?: React.ReactNode
 }): React.JSX.Element {
@@ -24,35 +26,36 @@ export function AnimatePresence(props: {
 }
 
 function createMotionComponent(tag: string) {
-  const Component = React.forwardRef<unknown, React.ComponentPropsWithoutRef<any> & MotionProps>(
-    (props, ref) => {
-      const {
-        initial,
-        animate,
-        exit,
-        transition,
-        variants,
-        whileHover,
-        whileTap,
-        whileFocus,
-        whileInView,
-        viewport,
-        layout,
-        layoutId,
-        onAnimationStart,
-        onAnimationComplete,
-        ...rest
-      } = props
+  const Component = React.forwardRef<
+    unknown,
+    React.ComponentPropsWithoutRef<any> & MotionProps
+  >((props, ref) => {
+    const {
+      initial,
+      animate,
+      exit,
+      transition,
+      variants,
+      whileHover,
+      whileTap,
+      whileFocus,
+      whileInView,
+      viewport,
+      layout,
+      layoutId,
+      onAnimationStart,
+      onAnimationComplete,
+      ...rest
+    } = props
 
-      return React.createElement(tag, { ...rest, ref })
-    },
-  )
+    return React.createElement(tag, { ...rest, ref })
+  })
 
   Component.displayName = `motion.${tag}`
   return Component
 }
 
-export const motion = new Proxy(
+export const motion: MotionComponentMap = new Proxy(
   {},
   {
     get(_target, prop) {
@@ -60,5 +63,4 @@ export const motion = new Proxy(
       return createMotionComponent(prop)
     },
   },
-) as unknown as Record<string, React.ComponentType<any>>
-
+)

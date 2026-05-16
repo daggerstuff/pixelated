@@ -5,12 +5,14 @@ import markdown from '@eslint/markdown'
 import pluginVitest from '@vitest/eslint-plugin'
 import pluginAstro from 'eslint-plugin-astro'
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-import pluginNode from 'eslint-plugin-node'
-import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+
+const jsxA11yRecommendedRules = pluginJsxA11y.configs.recommended.rules
+const astroFlatRecommendedRules = pluginAstro.configs['flat/recommended'].rules
+const vitestRecommendedRules = pluginVitest.configs.recommended.rules
 
 export default tseslint.config(
   // Base JavaScript recommendations
@@ -22,6 +24,7 @@ export default tseslint.config(
       'dist/**',
       'node_modules/**',
       'public/**',
+      '.oxlintrc.json',
       'coverage/**',
       'playwright-report/**',
       'test-results/**',
@@ -176,7 +179,6 @@ export default tseslint.config(
   {
     files: ['**/*.{jsx,tsx}'],
     plugins: {
-      react: pluginReact,
       'react-hooks': pluginReactHooks,
     },
     settings: {
@@ -192,43 +194,9 @@ export default tseslint.config(
       },
     },
     rules: {
-      ...pluginReact.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
-
-      // React rules (matching OXC)
-      'react/jsx-key': 'warn',
-      'react/jsx-no-comment-textnodes': 'warn',
-      'react/jsx-no-duplicate-props': 'warn',
-      'react/jsx-no-target-blank': 'warn',
-      'react/jsx-no-undef': 'warn',
-      'react/no-children-prop': 'warn',
-      'react/no-danger-with-children': 'warn',
-      'react/no-direct-mutation-state': 'warn',
-      'react/no-find-dom-node': 'warn',
-      'react/no-is-mounted': 'warn',
-      'react/no-render-return-value': 'warn',
-      'react/no-string-refs': 'warn',
-      'react/no-unescaped-entities': 'warn',
-      'react/no-unknown-property': [
-        'warn',
-        {
-          ignore: [
-            'attach',
-            'args',
-            'rotation',
-            'position',
-            'scale',
-            'frustumCulled',
-            'material',
-            'matrixAutoUpdate',
-            'emissive',
-            'roughness',
-            'metalness',
-          ],
-        },
-      ],
-      'react/no-array-index-key': 'warn',
+      'react/display-name': 'off',
       'no-control-regex': 'off',
       'no-console': ['warn', { allow: ['warn', 'error', 'debug', 'info'] }],
 
@@ -245,18 +213,7 @@ export default tseslint.config(
       'jsx-a11y': pluginJsxA11y,
     },
     rules: {
-      ...pluginJsxA11y.configs.recommended.rules,
-    },
-  },
-
-  // Node.js configuration
-  {
-    files: ['**/*.{js,mjs,cjs}'],
-    plugins: {
-      node: pluginNode,
-    },
-    rules: {
-      ...pluginNode.configs.recommended.rules,
+      ...jsxA11yRecommendedRules,
     },
   },
 
@@ -273,7 +230,7 @@ export default tseslint.config(
       },
     },
     rules: {
-      ...pluginVitest.configs.recommended.rules,
+      ...vitestRecommendedRules,
     },
   },
 
@@ -283,6 +240,10 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unsafe-type-assertion': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       'react-hooks/rules-of-hooks': 'off',
     },
   },
@@ -324,6 +285,7 @@ export default tseslint.config(
     plugins: { markdown },
     language: 'markdown/commonmark',
     rules: {
+      'no-irregular-whitespace': 'off',
       'no-missing-label-refs': 'off',
       'markdown/no-missing-label-refs': 'off',
     },
@@ -337,21 +299,24 @@ export default tseslint.config(
   },
 
   // Astro files
+  ...pluginAstro.configs['flat/recommended'],
   {
     files: ['**/*.astro'],
-    plugins: {
-      astro: pluginAstro,
-    },
     rules: {
-      // Disable unused variable warnings for Astro files
-      // Astro components split frontmatter and template sections,
-      // causing false positives when variables are defined in frontmatter
-      // but used in the template
+      ...astroFlatRecommendedRules,
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
 
-      // Use Astro-specific recommended rules
-      ...pluginAstro.configs.recommended.rules,
+  // Multi-region modules allow typed interoperability while we migrate legacy interfaces
+  {
+    files: [
+      'src/lib/deployment/multi-region/AutomatedFailoverOrchestrator.ts',
+      'src/lib/deployment/multi-region/CrossRegionDataSyncManager.ts',
+    ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 )

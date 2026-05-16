@@ -4,8 +4,8 @@
  */
 
 export class APITestUtils {
-  private baseUrl: string
-  private testUsers: Map<string, any> = new Map()
+  private readonly baseUrl: string
+  private readonly testUsers: Map<string, any> = new Map()
   private testConversations: string[] = []
   private testFiles: string[] = []
 
@@ -38,7 +38,7 @@ export class APITestUtils {
    */
   async getValidToken(): Promise<string> {
     const testUser = this.testUsers.get('primary')
-    if (testUser && testUser.token) {
+    if (testUser?.token) {
       return testUser.token
     }
 
@@ -114,7 +114,7 @@ export class APITestUtils {
    * Create a test conversation
    */
   async createTestConversation(token?: string): Promise<string> {
-    const authToken = token || (await this.getValidToken())
+    const authToken = token ?? (await this.getValidToken())
 
     const response = await fetch(`${this.baseUrl}/api/chat/conversations`, {
       method: 'POST',
@@ -141,7 +141,7 @@ export class APITestUtils {
    * Upload a test file
    */
   async uploadTestFile(token?: string): Promise<string> {
-    const authToken = token || (await this.getValidToken())
+    const authToken = token ?? (await this.getValidToken())
     const testContent = `Test file content ${Date.now()}`
 
     const formData = new FormData()
@@ -383,7 +383,7 @@ export class APITestUtils {
 
     for (let i = 0; i < requests.length; i += concurrency) {
       const batch = requests.slice(i, i + concurrency)
-      const batchResults = await Promise.all(batch.map((req) => req()))
+      const batchResults = await Promise.all(batch.map( async (req) => req()))
       results.push(...(batchResults as any))
     }
 

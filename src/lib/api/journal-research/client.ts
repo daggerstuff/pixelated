@@ -308,7 +308,7 @@ async function getAuthTokenFromBetterAuth(): Promise<string | null> {
 
   try {
     // Try to get session from Better Auth client
-    const { authClient } = await import('@/lib/auth-client')
+    const { authClient } = await import('@/lib/auth-client.ts')
     const session = await authClient.getSession()
 
     if (session?.data?.session?.token) {

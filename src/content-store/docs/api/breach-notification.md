@@ -1,11 +1,15 @@
 ---
-description: 'API documentation for the breach notification system'
-pubDate: 2025-03-25
+description: API documentation for the breach notification system
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['api', 'security', 'breach-notification']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - api
+  - security
+  - breach-notification
+author: Pixelated Team
+title: Breach Notification API Reference
 ---
 
 # Breach Notification API Reference

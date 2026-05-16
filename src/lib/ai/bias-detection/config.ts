@@ -14,7 +14,7 @@ export const DEFAULT_CONFIG: BiasDetectionConfig = {
   environment: 'development',
   // Python service configuration
   pythonServiceUrl:
-    process.env.BIAS_DETECTION_SERVICE_URL || 'http://localhost:5000',
+    process.env.BIAS_DETECTION_SERVICE_URL ?? 'http://localhost:5000',
   pythonServiceTimeout: 30000, // 30 seconds
   pythonServicePort: 5000, // Default port
 
@@ -134,7 +134,7 @@ export function validateConfig(
   config?: Partial<BiasDetectionConfig>,
 ): string[] {
   const configToValidate =
-    config || BiasDetectionConfigManager.getInstance().getConfig()
+    config ?? BiasDetectionConfigManager.getInstance().getConfig()
   const errors: string[] = []
 
   // Validate threshold values
@@ -546,7 +546,7 @@ export function createConfigWithEnvOverrides(
   const combinedConfig = deepMergeConfigs(
     DEFAULT_CONFIG,
     envConfig,
-    userConfig || {},
+    userConfig ?? {},
   )
 
   return combinedConfig as BiasDetectionConfig
@@ -575,9 +575,7 @@ export class BiasDetectionConfigManager {
   }
 
   public static getInstance(): BiasDetectionConfigManager {
-    if (!BiasDetectionConfigManager.instance) {
-      BiasDetectionConfigManager.instance = new BiasDetectionConfigManager()
-    }
+    BiasDetectionConfigManager.instance ??= new BiasDetectionConfigManager();
     return BiasDetectionConfigManager.instance
   }
 
@@ -606,7 +604,7 @@ export class BiasDetectionConfigManager {
       },
       pythonService: {
         url: this.config.pythonServiceUrl,
-        port: this.config.pythonServicePort || 5000,
+        port: this.config.pythonServicePort ?? 5000,
         timeout: this.config.pythonServiceTimeout,
       },
     }
@@ -779,14 +777,14 @@ export class BiasDetectionConfigManager {
 
     // Check for JWT secret
     const jwtSecret =
-      process.env.JWT_SECRET || this.config.securityConfig?.jwtSecret
+      process.env.JWT_SECRET ?? this.config.securityConfig?.jwtSecret
     if (!jwtSecret || jwtSecret.length < 32) {
       errors.push('JWT secret is missing or too short (minimum 32 characters)')
     }
 
     // Check for encryption key
     const encryptionKey =
-      process.env.ENCRYPTION_KEY || this.config.securityConfig?.encryptionKey
+      process.env.ENCRYPTION_KEY ?? this.config.securityConfig?.encryptionKey
     if (!encryptionKey || encryptionKey.length < 32) {
       errors.push(
         'Encryption key is missing or too short (minimum 32 characters)',

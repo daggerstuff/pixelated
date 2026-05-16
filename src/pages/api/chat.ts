@@ -1,36 +1,56 @@
 import { anthropic } from '@ai-sdk/anthropic'
-import { supermemoryTools } from '@supermemory/tools/ai-sdk'
 import { streamText } from 'ai'
+import type { ModelMessage } from 'ai'
 import { NextRequest } from 'next/server'
 
-import { getContextWithProfile, storeConversation } from '@/lib/supermemory'
+type MessageRequestBody = {
+  userId: string
+  message: string
+}
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const toMessageRequestBody = (value: unknown): MessageRequestBody | null => {
+  if (!isObject(value)) return null
+
+  const { userId, message } = value
+  if (typeof userId !== 'string' || typeof message !== 'string') {
+    return null
+  }
+
+  return { userId, message }
+}
 
 export async function POST(request: NextRequest) {
-  const { userId, message } = await request.json()
+  const requestBody = toMessageRequestBody(await request.json())
+  if (!requestBody) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Invalid request format',
+      }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
 
-  // Get context with profile + search
-  const { context, profile } = await getContextWithProfile(userId, message)
+  const message = requestBody.message
 
-  // Build messages with context
-  const messages = [
+  const messages: ModelMessage[] = [
     {
       role: 'system',
-      content: `User context:\nStatic facts: ${profile.static.join('\n')}\nRecent context: ${profile.dynamic.join('\n')}\nSearch context: ${context.join('\n')}`,
+      content: `You are a helpful AI therapist assistant.`,
     },
     { role: 'user', content: message },
   ]
 
-  // Stream response with Supermemory tools
   const result = streamText({
     model: anthropic('claude-3-5-sonnet-20241022'),
     messages,
-    tools: supermemoryTools(process.env.SUPERMEMORY_API_KEY ?? '', {
-      containerTags: [userId],
-    }),
   })
 
-  // Store conversation
-  await storeConversation(userId, message, result)
-
-  return result.toDataStreamResponse()
+  return result.toTextStreamResponse()
 }

@@ -29,6 +29,6 @@ export async function getAIUsageStats(
     successfulRequests: 0,
     failedRequests: 0,
     averageResponseTime: 0,
-    period: options.period || 'day',
+    period: options.period ?? 'day',
   }
 }

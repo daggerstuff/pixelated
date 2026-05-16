@@ -73,10 +73,10 @@ export interface ThreatIntelligenceEvent {
 }
 
 export class ThreatIntelligenceNetwork extends EventEmitter {
-  private components: Map<string, any> = new Map()
+  private readonly components: Map<string, any> = new Map()
   private isInitialized = false
-  private metrics: ThreatIntelligenceMetrics
-  private networkConfig: ThreatIntelligenceNetworkConfig
+  private readonly metrics: ThreatIntelligenceMetrics
+  private readonly networkConfig: ThreatIntelligenceNetworkConfig
 
   constructor(config?: Partial<ThreatIntelligenceNetworkConfig>) {
     super()
@@ -424,7 +424,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
             type: 'indicator',
             data: event,
             source: 'global_network',
-            confidence: event.confidence || 0.5,
+            confidence: event.confidence ?? 0.5,
             timestamp: new Date(),
             metadata: {},
           },
@@ -640,7 +640,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       this.emit('system_alert', {
         type: 'response_triggered',
         timestamp: new Date(),
-        severity: event.severity || 'medium',
+        severity: event.severity ?? 'medium',
         data: event,
         source: 'response_orchestrator',
       })
@@ -759,7 +759,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
     }
 
     try {
-      const threatId = threatData.id || `threat-${Date.now()}`
+      const threatId = threatData.id ?? `threat-${Date.now()}`
       const pipelineResults: Record<string, any> = {}
 
       logger.info('Processing threat through complete pipeline', {
@@ -791,12 +791,12 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         const validationId = await validationSystem.requestValidation(
           {
             id: threatId,
-            type: threatData.type || 'unknown',
+            type: threatData.type ?? 'unknown',
             data: threatData,
-            source: threatData.source || 'unknown',
-            confidence: threatData.confidence || 0.5,
+            source: threatData.source ?? 'unknown',
+            confidence: threatData.confidence ?? 0.5,
             timestamp: new Date(),
-            metadata: threatData.metadata || {},
+            metadata: threatData.metadata ?? {},
           },
           ['accuracy', 'completeness', 'reliability'],
         )
@@ -816,9 +816,9 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
           pipelineResults.response =
             await responseOrchestrator.orchestrateResponse({
               threat_id: threatId,
-              severity: threatData.severity || 'medium',
-              confidence: threatData.confidence || 0.5,
-              affected_regions: threatData.regions || ['global'],
+              severity: threatData.severity ?? 'medium',
+              confidence: threatData.confidence ?? 0.5,
+              affected_regions: threatData.regions ?? ['global'],
               correlation_data: pipelineResults.correlation,
             })
         }
@@ -854,7 +854,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Get component by name
    */
-  getComponent<T>(name: string): T | undefined {
+  getComponent(name: string): unknown | undefined {
     return this.components.get(name)
   }
 
@@ -886,7 +886,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       for (const componentName of shutdownOrder) {
         const component = this.components.get(componentName)
-        if (component && component.shutdown) {
+        if (component?.shutdown) {
           logger.info(`Shutting down ${componentName} component`)
           await component.shutdown()
         }

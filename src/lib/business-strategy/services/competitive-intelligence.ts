@@ -44,7 +44,7 @@ export class CompetitiveIntelligenceService extends BaseService {
   ): Promise<void> {
     await this.validatePermissions(userId, 'competitor', 'update')
 
-    const id = competitor.id || this.generateId()
+    const id = competitor.id ?? this.generateId()
     const update = {
       ...competitor,
       id,

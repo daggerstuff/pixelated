@@ -58,7 +58,7 @@ const createMockAIService = (): AIService => {
       .mockImplementation(async (messages) => {
         // Simple mock responses based on user input
         const userMessage =
-          messages.find((m: any) => m.role === 'user')?.content || ''
+          messages.find((m: any) => m.role === 'user')?.content ?? ''
 
         let detectedContext = ContextType.GENERAL
         let confidence = 0.7
@@ -319,7 +319,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
         const transition = transitionDetector.addEvent(event)
 
-        if (transition && transition.detected) {
+        if (transition?.detected) {
           await objectiveSwitcher.onContextTransition(transition)
 
           expect(transition.from.contextType).toBe(previousContext!)
@@ -422,7 +422,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       const transition = transitionDetector.addEvent(event2)
 
-      if (transition && transition.detected) {
+      if (transition?.detected) {
         await objectiveSwitcher.onContextTransition(transition)
 
         // Allow async notifications
@@ -460,7 +460,7 @@ describe('Adaptive Selection Integration Tests', () => {
         }
 
         const transition = transitionDetector.addEvent(event)
-        if (transition && transition.detected) {
+        if (transition?.detected) {
           await objectiveSwitcher.onContextTransition(transition)
         }
       }
