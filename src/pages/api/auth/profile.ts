@@ -21,14 +21,9 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
-  let clientInfo = {
-    ip: clientAddress || 'unknown',
-    userAgent: 'unknown',
-    deviceId: 'unknown',
-  }
   try {
     // Extract client info for logging
-    clientInfo = {
+    const clientInfo = {
       ip: clientAddress || 'unknown',
       userAgent: request.headers.get('user-agent') ?? 'unknown',
       deviceId: request.headers.get('x-device-id') ?? 'unknown',
@@ -48,11 +43,7 @@ export const GET = async ({
     let userId: string | null = null
 
     if (session?.user) {
-<<<<<<< HEAD
-      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
-=======
-      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
->>>>>>> origin/staging
+      userId = session.user.id || (session.user as any)._id?.toString() ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
@@ -65,11 +56,11 @@ export const GET = async ({
 
         if (cookieToken) {
           const v = await verifyAuthToken(cookieToken)
-          userId = v.userId ?? null
+          userId = v.userId
         }
       } else {
         const v = await verifyAuthToken(authHeader)
-        userId = v.userId ?? null
+        userId = v.userId
       }
     }
 
@@ -181,16 +172,12 @@ export const PUT = async ({
     let userId: string | null = null
 
     if (session?.user) {
-<<<<<<< HEAD
-      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
-=======
-      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
->>>>>>> origin/staging
+      userId = session.user.id || (session.user as any)._id?.toString() ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
         const v = await verifyAuthToken(authHeader)
-        userId = v.userId ?? null
+        userId = v.userId
       }
     }
 
@@ -243,7 +230,7 @@ export const PUT = async ({
 
     // Create Audit Log
     await createAuditLog(
-      AuditEventType.MODIFY,
+      AuditEventType.USER_MODIFIED,
       'profile.update',
       userId,
       'user',
