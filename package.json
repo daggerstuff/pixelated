@@ -255,7 +255,11 @@
     "date-fns": "latest",
     "dayjs": "latest",
     "devalue": "^5.8.1",
+<<<<<<< HEAD
+    "dompurify": "^3.4.2",
+=======
     "dompurify": "^3.4.3",
+>>>>>>> origin/staging
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
     "events": "latest",
@@ -613,7 +617,11 @@
       "fast-xml-parser": "5.7.0",
       "axios": ">=1.15.1",
       "cookie": ">=1.0.3",
+<<<<<<< HEAD
+      "devalue": "^5.8.1",
+=======
       "devalue": ">=5.8.1",
+>>>>>>> origin/staging
       "yauzl": "^3.2.1",
       "minimatch": "^10.2.3",
       "@tootallnate/once": "^3.0.1",
