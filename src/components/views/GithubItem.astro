@@ -51,6 +51,9 @@ const secondLinkText = collectionType === 'prs' ? item.repository?.nameWithOwner
 const time = collectionType === 'releases' ? item.publishedAt : item.createdAt
 const content = collectionType === 'releases' ? item.desc : item.bodyHTML
 <<<<<<< HEAD
+<<<<<<< HEAD
+const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : ''
+=======
 
 <<<<<<< HEAD
 const sanitizedContent = content
