@@ -27,7 +27,7 @@ export const mongodb = {
   ObjectId: class MockObjectId {
     id: string
     constructor(id?: string) {
-      this.id = id || 'mock-object-id'
+      this.id = id ?? 'mock-object-id'
     }
     toString() {
       return this.id
@@ -69,9 +69,7 @@ export const crypto = {
   randomUUID: () => {
     // Use the Web Crypto API if available
     if (
-      typeof window !== 'undefined' &&
-      window.crypto &&
-      window.crypto.randomUUID
+      window.crypto?.randomUUID
     ) {
       return window.crypto.randomUUID()
     }
@@ -99,7 +97,7 @@ export const crypto = {
 
   // Add subtle crypto API for modern browsers
   subtle:
-    typeof window !== 'undefined' && window.crypto
+    window?.crypto
       ? window.crypto.subtle
       : {
           digest: async (_algorithm: string, _data: BufferSource) => {
@@ -112,7 +110,7 @@ export const crypto = {
 
   // Add randomBytes implementation
   randomBytes: (size: number) => {
-    if (typeof window !== 'undefined' && window.crypto) {
+    if (window?.crypto) {
       const bytes = new Uint8Array(size)
       window.crypto.getRandomValues(bytes)
       return {
@@ -149,7 +147,7 @@ export const crypto = {
 export const path = {
   join: (...paths: string[]) => paths.join('/').replace(/\/+/g, '/'),
   resolve: (...paths: string[]) => paths.join('/').replace(/\/+/g, '/'),
-  basename: (path: string) => path.split('/').pop() || '',
+  basename: (path: string) => path.split('/').pop() ?? '',
   dirname: (path: string) => {
     const parts = path.split('/')
     parts.pop()
@@ -162,7 +160,7 @@ export const path = {
   sep: '/',
   delimiter: ':',
   parse: (pathString: string) => {
-    const basename = pathString.split('/').pop() || ''
+    const basename = pathString.split('/').pop() ?? ''
     const extname = basename.includes('.')
       ? '.' + basename.split('.').pop()
       : ''
@@ -178,8 +176,8 @@ export const path = {
   },
   format: (pathObject: Record<string, string | undefined>) => {
     const { dir, root, base, name, ext } = pathObject
-    const rootPath = dir || root || ''
-    const fileName = base || name + (ext || '')
+    const rootPath = (dir ?? root) ?? ''
+    const fileName = base ?? name + (ext ?? '')
     return rootPath ? `${rootPath}/${fileName}` : fileName
   },
 }
@@ -370,7 +368,7 @@ export const events = {
 // Util polyfill
 export const util = {
   promisify: (fn: (...args: unknown[]) => unknown) => {
-    return (...args: unknown[]) => {
+    return  async (...args: unknown[]) => {
       return new Promise((resolve, reject) => {
         fn(...args, (err: Error | null, ...results: unknown[]) => {
           if (err) {

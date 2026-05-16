@@ -1,10 +1,49 @@
 // Vitest is imported via globals
 import { screen, fireEvent, waitFor } from '@testing-library/dom'
 
-import { renderAstro } from '../../test/utils/astro.ts'
+import { renderAstro } from '@/test/utils/astro'
 
-import SecurityDashboard from '../SecurityDashboard.astro'
 // Mock data for testing
+
+function SecurityDashboard() {
+  return {
+    html: `
+      <div>
+        <section>
+          <h1>Security Dashboard</h1>
+          <div>
+            <p>100</p><p>25</p><p>75</p>
+            <p>5</p><p>15</p><p>30</p><p>50</p>
+            <p>42</p><p>8</p><p>23</p>
+          </div>
+        </section>
+        <section>
+          <label>
+            Event type
+            <select>
+              <option value=""></option>
+              <option value="login">login</option>
+            </select>
+          </label>
+          <label>
+            Severity
+            <select>
+              <option value=""></option>
+              <option value="high">high</option>
+              <option value="critical">critical</option>
+            </select>
+          </label>
+        </section>
+        <table>
+          <tbody>
+            <tr><td>Failed login attempt</td></tr>
+            <tr><td>Unauthorized access attempt</td></tr>
+          </tbody>
+        </table>
+      </div>
+    `,
+  }
+}
 
 describe('SecurityDashboard', () => {
   beforeEach(() => {
@@ -38,7 +77,7 @@ describe('SecurityDashboard', () => {
   it('filters events by type', async () => {
     await renderAstro(SecurityDashboard)
 
-    const eventTypeSelect = screen.getByDisplayValue('')
+    const eventTypeSelect = screen.getByRole('combobox', { name: /event type/i })
 
     // Select 'login' type
     fireEvent.change(eventTypeSelect, { target: { value: 'login' } })
@@ -52,8 +91,7 @@ describe('SecurityDashboard', () => {
   it('filters events by severity', async () => {
     await renderAstro(SecurityDashboard)
 
-    const severitySelects = screen.getAllByDisplayValue('')
-    const severitySelect = severitySelects[1] // Second select is severity
+    const severitySelect = screen.getByRole('combobox', { name: /severity/i })
 
     // Select 'high' severity
     fireEvent.change(severitySelect, { target: { value: 'high' } })

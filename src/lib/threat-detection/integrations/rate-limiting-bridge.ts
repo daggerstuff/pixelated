@@ -58,9 +58,9 @@ export interface RateLimitIntegrationConfig {
 }
 
 export class RateLimitingBridge {
-  private rateLimiter: DistributedRateLimiter
-  private orchestrator: AdvancedResponseOrchestrator
-  private config: RateLimitIntegrationConfig
+  private readonly rateLimiter: DistributedRateLimiter
+  private readonly orchestrator: AdvancedResponseOrchestrator
+  private readonly config: RateLimitIntegrationConfig
 
   constructor(
     rateLimiter: DistributedRateLimiter,

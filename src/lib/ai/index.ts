@@ -124,9 +124,7 @@ let aiServiceInstance: AIService | null = null
  * Get the default AI service instance
  */
 export function getAIService(): AIService {
-  if (!aiServiceInstance) {
-    aiServiceInstance = new MockAIService()
-  }
+  aiServiceInstance ??= new MockAIService();
   return aiServiceInstance
 }
 

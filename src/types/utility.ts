@@ -289,6 +289,6 @@ export function assertType<T>(
 }
 
 /** Creates a type predicate function */
-export function createTypePredicate<T>(predicate: (value: unknown) => boolean) {
-  return (value: unknown): value is T => predicate(value)
+export function createTypePredicate(predicate: (value: unknown) => boolean) {
+  return (value: unknown): value is unknown => predicate(value)
 }

@@ -40,8 +40,8 @@ export interface EdgeComputeResult {
  * Edge Computing Service for AI workloads
  */
 export class EdgeComputing {
-  private config: EdgeComputeConfig
-  private activeConnections = new Map<string, WebSocket>()
+  private readonly config: EdgeComputeConfig
+  private readonly activeConnections = new Map<string, WebSocket>()
   private taskQueue: EdgeComputeTask[] = []
   private isProcessing = false
 
@@ -127,7 +127,7 @@ export class EdgeComputing {
     })
 
     if (!this.isProcessing) {
-      this.processQueue()
+      void this.processQueue()
     }
   }
 

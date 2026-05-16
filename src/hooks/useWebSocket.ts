@@ -100,7 +100,7 @@ export function useWebSocket({
               }
               break
             case 'error':
-              wsError = new Error(message.data?.message || 'Unknown error')
+              wsError = new Error(message.data?.message ?? 'Unknown error')
               setError(wsError)
               if (onError) {
                 onError(wsError)

@@ -30,12 +30,12 @@ const logger = createBuildSafeLogger('PythonBiasDetectionBridge')
  * Connects to Flask service running on localhost:5000 (configurable)
  */
 export class PythonBiasDetectionBridge {
-  private baseUrl: string
-  private timeout: number
-  private authToken?: string | undefined
-  private retryAttempts: number = 10
-  private retryDelay: number = 2000 // ms
-  private requestQueue: Array<{
+  private readonly baseUrl: string
+  private readonly timeout: number
+  private readonly authToken?: string | undefined
+  private readonly retryAttempts: number = 10
+  private readonly retryDelay: number = 2000 // ms
+  private readonly requestQueue: Array<{
     id: string
     request: () => Promise<unknown>
     resolve: (value: unknown) => void
@@ -43,13 +43,13 @@ export class PythonBiasDetectionBridge {
     priority: number
   }> = []
   private processingQueue = false
-  private maxConcurrentRequests = 5
+  private readonly maxConcurrentRequests = 5
   private activeRequests = 0
   private healthStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
   private lastHealthCheck = new Date()
-  private healthCheckInterval = 30000 // 30 seconds
+  private readonly healthCheckInterval = 30000 // 30 seconds
   private consecutiveFailures = 0
-  private metrics = {
+  private readonly metrics = {
     totalRequests: 0,
     successfulRequests: 0,
     failedRequests: 0,
@@ -58,7 +58,7 @@ export class PythonBiasDetectionBridge {
     cacheMisses: 0,
     deduplicatedRequests: 0,
   }
-  private connectionPool: ConnectionPool
+  private readonly connectionPool: ConnectionPool
   private healthCheckTimer?: NodeJS.Timeout
 
   constructor(
@@ -70,7 +70,7 @@ export class PythonBiasDetectionBridge {
     this.baseUrl = url.replace(/\/$/, '') // Remove trailing slash
     this.timeout = timeoutMs
     this.authToken = process.env['BIAS_DETECTION_AUTH_TOKEN']
-    this.connectionPool = connectionPool || new ConnectionPool(poolConfig)
+    this.connectionPool = connectionPool ?? new ConnectionPool(poolConfig)
     // Start queue processor
     void this.processQueue()
     // Start health monitoring
@@ -125,7 +125,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonHealthResponse
       if (response.status !== 'healthy') {
         throw new Error(
-          `Python service not healthy: ${response.message || 'Unknown error'}`,
+          `Python service not healthy: ${response.message ?? 'Unknown error'}`,
         )
       }
       logger.info('PythonBiasDetectionBridge initialized successfully', {
@@ -332,7 +332,7 @@ export class PythonBiasDetectionBridge {
     }
 
     throw new Error(
-      `Request failed after ${this.retryAttempts} attempts: ${lastError?.message || 'Unknown error'}`,
+      `Request failed after ${this.retryAttempts} attempts: ${lastError?.message ?? 'Unknown error'}`,
     )
   }
 

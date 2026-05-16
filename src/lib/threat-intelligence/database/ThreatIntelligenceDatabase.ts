@@ -100,10 +100,10 @@ export class ThreatIntelligenceDatabaseCore
   private mongoClient!: MongoClient
   private db!: Db
   private redis!: Redis
-  private stixConfig: STIXConfig
-  private taxiiConfig: TAXIIConfig
+  private readonly stixConfig: STIXConfig
+  private readonly taxiiConfig: TAXIIConfig
 
-  constructor(private config: DatabaseConfig) {
+  constructor(private readonly config: DatabaseConfig) {
     super()
     this.stixConfig = config.stixSupport
     this.taxiiConfig = config.taxiiSupport
@@ -171,8 +171,8 @@ export class ThreatIntelligenceDatabaseCore
   private async initializeRedis(): Promise<void> {
     try {
       this.redis = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
+        host: process.env.REDIS_HOST ?? 'localhost',
+        port: parseInt(process.env.REDIS_PORT ?? '6379'),
         password: process.env.REDIS_PASSWORD,
         db: 1, // Use database 1 for threat intelligence cache
       })
@@ -471,7 +471,7 @@ export class ThreatIntelligenceDatabaseCore
         pattern: `[${indicator.indicatorType} = '${indicator.value}']`,
         valid_from: indicator.firstSeen,
         valid_until:
-          indicator.expirationDate ||
+          indicator.expirationDate ??
           new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
         confidence: Math.round(indicator.confidence * 100),
       }
@@ -850,7 +850,7 @@ export class ThreatIntelligenceDatabaseCore
       const collectionName = `stix_${objectType.toLowerCase()}`
       const collection = this.db.collection(collectionName)
 
-      const query = filters || {}
+      const query = filters ?? {}
       const objects = await collection.find(query).toArray()
 
       return objects
@@ -919,7 +919,7 @@ export class ThreatIntelligenceDatabaseCore
       const threats = await threatsCollection
         .find(searchQuery)
         .sort({
-          [pagination.sortBy || 'firstSeen']:
+          [pagination.sortBy ?? 'firstSeen']:
             pagination.sortOrder === 'desc' ? -1 : 1,
         })
         .skip((pagination.page - 1) * pagination.limit)

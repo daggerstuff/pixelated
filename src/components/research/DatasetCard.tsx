@@ -66,7 +66,7 @@ const DatasetStats = ({
       <div className='bg-slate-700 mt-1 h-1.5 w-full rounded-full'>
         <div
           className='bg-pink-500 h-1.5 rounded-full'
-          style={{ width: `${(therapeutic_relevance || 0) * 100}%` }}
+          style={{ width: `${(therapeutic_relevance ?? 0) * 100}%` }}
         ></div>
       </div>
     </div>

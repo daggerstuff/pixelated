@@ -41,6 +41,18 @@ vi.mock('../../logger', () => ({
   },
 }))
 
+const { mockRandomBytes, mockRandomUUID } = vi.hoisted(() => ({
+  mockRandomBytes: vi.fn().mockReturnValue(Buffer.from('breach-random')),
+  mockRandomUUID: vi.fn().mockReturnValue('test-breach-uuid'),
+}))
+
+vi.mock('crypto', () => ({
+  Buffer: globalThis.Buffer,
+  randomBytes: mockRandomBytes,
+  randomUUID: mockRandomUUID,
+}))
+
+
 import { fheService } from '../../fhe' // Corrected import
 import { logger } from '../../logger'
 import { redis } from '../../redis'
@@ -139,7 +151,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       await reportBreach(largeBreach)
 
       const expectedAuthorityEmail =
-        process.env['HHS_NOTIFICATION_EMAIL'] || 'hhs-notifications@example.gov'
+        process.env['HHS_NOTIFICATION_EMAIL'] ?? 'hhs-notifications@example.gov'
 
       expect(mockSendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -168,8 +180,8 @@ describe('breachNotificationSystem Integration Tests', () => {
         .mockResolvedValueOnce(userOne)
         .mockResolvedValueOnce(userTwo)
       mockSendEmail
-        .mockImplementationOnce(() => Promise.reject(new Error('Email error')))
-        .mockImplementationOnce(() => Promise.resolve())
+        .mockImplementationOnce( async () => Promise.reject(new Error('Email error')))
+        .mockImplementationOnce( async () => Promise.resolve())
 
       const breachWithMultipleUsers = {
         ...mockBreach,

@@ -10,9 +10,7 @@ class MockAuthService {
   private constructor() {}
 
   static getInstance(): MockAuthService {
-    if (!MockAuthService.instance) {
-      MockAuthService.instance = new MockAuthService()
-    }
+    MockAuthService.instance ??= new MockAuthService();
     return MockAuthService.instance
   }
 
@@ -63,7 +61,7 @@ const breachTest = test.extend<BreachTestFixtures>({
   redis: async (_: unknown, use: (r: RedisService) => Promise<void>) => {
     // Initialize services
     const redis = new RedisService({
-      url: process.env['REDIS_URL'] || 'redis://localhost:6379',
+      url: process.env['REDIS_URL'] ?? 'redis://localhost:6379',
       keyPrefix: 'test:breach:',
       maxRetries: 3,
       retryDelay: 100,

@@ -36,9 +36,9 @@ export interface SyncManager {
     defaultValue?: T,
     options?: Record<string, any>,
   ): T | undefined
-  setState<T>(
+  setState(
     key: string,
-    value: T,
+    value: unknown,
     options?: {
       sync?: boolean
       sourceId?: string

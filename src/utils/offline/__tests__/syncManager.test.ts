@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import SyncManager from '../syncManager'
-import { indexedDBRequestQueue } from './indexedDBRequestQueue'
+import { indexedDBRequestQueue } from '../indexedDBRequestQueue'
+import { SyncManager } from '../syncManager'
 
 describe('SyncManager', () => {
   let syncManager: SyncManager
@@ -51,7 +51,6 @@ describe('SyncManager', () => {
     it('should set isOnline to false and clear sync timeout', () => {
       ;(syncManager as any).isOnline = true
       ;(syncManager as any).syncTimeout = setTimeout(() => {}, 1000) as any
-
       ;(syncManager as any).handleOffline()
 
       expect((syncManager as any).isOnline).toBe(false)
@@ -123,7 +122,6 @@ describe('SyncManager', () => {
       ;(syncManager as any).options.enableAutoSync = true
       ;(syncManager as any).isOnline = true
       ;(syncManager as any).backoffMultiplier = 3
-
       ;(syncManager as any).scheduleNextSync()
 
       expect((syncManager as any).syncTimeout).not.toBeNull()

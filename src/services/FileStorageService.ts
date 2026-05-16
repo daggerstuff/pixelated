@@ -48,19 +48,19 @@ export interface UploadConfig {
 }
 
 export class FileStorageService {
-  private s3Client: S3Client
-  private bucketName: string
-  private cloudFrontDomain?: string
+  private readonly s3Client: S3Client
+  private readonly bucketName: string
+  private readonly cloudFrontDomain?: string
 
   constructor() {
     this.s3Client = new S3Client({
-      region: process.env.AWS_REGION || 'us-east-1',
+      region: process.env.AWS_REGION ?? 'us-east-1',
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
       },
     })
-    this.bucketName = process.env.AWS_S3_BUCKET || 'pixelated-business-docs'
+    this.bucketName = process.env.AWS_S3_BUCKET ?? 'pixelated-business-docs'
     this.cloudFrontDomain = process.env.AWS_CLOUDFRONT_DOMAIN
   }
 
@@ -116,8 +116,8 @@ export class FileStorageService {
       uploadedAt: new Date(),
       folderId: config.folder,
       version: 1,
-      isPublic: config.isPublic || false,
-      tags: config.tags || [],
+      isPublic: config.isPublic ?? false,
+      tags: config.tags ?? [],
       metadata: {},
     }
 
@@ -199,7 +199,7 @@ export class FileStorageService {
     })
 
     const response = await this.s3Client.send(command)
-    return response.Contents?.map((obj) => obj.Key || '') || []
+    return response.Contents?.map((obj) => obj.Key ?? '') ?? []
   }
 
   async createFolder(
@@ -225,13 +225,13 @@ export class FileStorageService {
 
   private validateFile(file: Express.Multer.File, config: UploadConfig): void {
     // Check file size
-    const maxSize = config.maxSize || 10 * 1024 * 1024 // 10MB default
+    const maxSize = config.maxSize ?? 10 * 1024 * 1024 // 10MB default
     if (file.size > maxSize) {
       throw new Error(`File size exceeds limit of ${maxSize} bytes`)
     }
 
     // Check file type
-    const allowedTypes = config.allowedTypes || [
+    const allowedTypes = config.allowedTypes ?? [
       'image/jpeg',
       'image/png',
       'image/gif',

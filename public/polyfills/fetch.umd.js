@@ -10,7 +10,7 @@
     (typeof globalThis !== 'undefined' && globalThis) ||
     (typeof self !== 'undefined' && self) ||
     // eslint-disable-next-line no-undef
-    (typeof global !== 'undefined' && global) ||
+    (typeof global !== 'undefined' && global) ??
     {};
 
   const support = {
@@ -54,7 +54,7 @@
       ArrayBuffer.isView
         ? function (obj) { return ArrayBuffer.isView(obj) }
         : function (obj) {
-          return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+          return obj && viewClasses.includes(Object.prototype.toString.call(obj))
         };
   }
 
@@ -169,7 +169,7 @@
     Headers.prototype[Symbol.iterator] = Headers.prototype.entries;
   }
 
-  const consumed = function (body) {
+  const consumed =  async function (body) {
     if (body._noBody) {
       return
     }
@@ -179,7 +179,7 @@
     body.bodyUsed = true;
   };
 
-  const fileReaderReady = function (reader) {
+  const fileReaderReady =  async function (reader) {
     return new Promise(function (resolve, reject) {
       reader.onload = function () {
         resolve(reader.result);
@@ -190,14 +190,14 @@
     })
   };
 
-  const readBlobAsArrayBuffer = function (blob) {
+  const readBlobAsArrayBuffer =  async function (blob) {
     const reader = new FileReader();
     const promise = fileReaderReady(reader);
     reader.readAsArrayBuffer(blob);
     return promise
   };
 
-  const readBlobAsText = function (blob) {
+  const readBlobAsText =  async function (blob) {
     const reader = new FileReader();
     const promise = fileReaderReady(reader);
     const match = /charset=([A-Za-z0-9_-]+)/.exec(blob.type);
@@ -271,7 +271,7 @@
       if (!this.headers.get('content-type')) {
         if (typeof finalBody === 'string' && finalBody !== '') {
           this.headers.set('content-type', 'text/plain;charset=UTF-8');
-        } else if (this._bodyBlob && this._bodyBlob.type) {
+        } else if (this._bodyBlob?.type) {
           this.headers.set('content-type', this._bodyBlob.type);
         } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
           this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
@@ -280,7 +280,7 @@
     };
 
     if (support.blob) {
-      this.blob = function () {
+      this.blob =  async function () {
         const rejected = consumed(this);
         if (rejected) {
           return rejected
@@ -320,7 +320,7 @@
       }
     };
 
-    this.text = function () {
+    this.text =  async function () {
       const rejected = consumed(this);
       if (rejected) {
         return rejected
@@ -355,7 +355,7 @@
 
   const normalizeMethod = function (method) {
     const upcased = method.toUpperCase();
-    return methods.indexOf(upcased) > -1 ? upcased : method
+    return methods.includes(upcased) ? upcased : method
   };
 
   const Request = function (input, options) {
@@ -363,7 +363,7 @@
       throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.')
     }
 
-    const requestOptions = options || {};
+    const requestOptions = options ?? {};
     let requestBody = requestOptions.body;
 
     if (input instanceof Request) {
@@ -386,13 +386,13 @@
       this.url = String(input);
     }
 
-    this.credentials = requestOptions.credentials || this.credentials || 'same-origin';
+    this.credentials = (requestOptions.credentials ?? this.credentials) ?? 'same-origin';
     if (requestOptions.headers || !this.headers) {
       this.headers = new Headers(requestOptions.headers);
     }
-    this.method = normalizeMethod(requestOptions.method || this.method || 'GET');
-    this.mode = requestOptions.mode || this.mode || null;
-    this.signal = requestOptions.signal || this.signal || (function () {
+    this.method = normalizeMethod((requestOptions.method ?? this.method) ?? 'GET');
+    this.mode = (requestOptions.mode ?? this.mode) ?? null;
+    this.signal = (requestOptions.signal ?? this.signal) ?? (function () {
       if ('AbortController' in g) {
         const ctrl = new AbortController();
         return ctrl.signal;
@@ -472,7 +472,7 @@
     if (!(this instanceof Response)) {
       throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.')
     }
-    const responseOptions = options || {};
+    const responseOptions = options ?? {};
 
     this.type = 'default';
     this.status = responseOptions.status === undefined ? 200 : responseOptions.status;
@@ -482,7 +482,7 @@
     this.ok = this.status >= 200 && this.status < 300;
     this.statusText = responseOptions.statusText === undefined ? '' : '' + responseOptions.statusText;
     this.headers = new Headers(responseOptions.headers);
-    this.url = responseOptions.url || '';
+    this.url = responseOptions.url ?? '';
     this._initBody(bodyInit);
   };
 
@@ -508,7 +508,7 @@
   const redirectStatuses = [301, 302, 303, 307, 308];
 
   Response.redirect = function (url, status) {
-    if (redirectStatuses.indexOf(status) === -1) {
+    if (!redirectStatuses.includes(status)) {
       throw new RangeError('Invalid status code')
     }
 
@@ -529,11 +529,11 @@
     exports.DOMException.prototype.constructor = exports.DOMException;
   }
 
-  const fetch = function (input, init) {
+  const fetch =  async function (input, init) {
     return new Promise(function (resolve, reject) {
       const request = new Request(input, init);
 
-      if (request.signal && request.signal.aborted) {
+      if (request.signal?.aborted) {
         return reject(new exports.DOMException('Aborted', 'AbortError'))
       }
 
@@ -613,7 +613,7 @@
           xhr.setRequestHeader(name, normalizeValue(init.headers[name]));
         });
         request.headers.forEach(function (value, name) {
-          if (names.indexOf(name) === -1) {
+          if (!names.includes(name)) {
             xhr.setRequestHeader(name, value);
           }
         });
@@ -655,5 +655,5 @@
   Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-!function () { try { const e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {}, n = (new e.Error).stack; n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "e4c59632-941c-5fa2-b90f-a1952bb6b3c4") } catch (e) { } }();
+!function () { try { const e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {}, n = (new e.Error).stack; n && (e._sentryDebugIds = e._sentryDebugIds ?? {}, e._sentryDebugIds[n] = "e4c59632-941c-5fa2-b90f-a1952bb6b3c4") } catch (e) { } }();
 //# debugId=e4c59632-941c-5fa2-b90f-a1952bb6b3c4

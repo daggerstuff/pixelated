@@ -22,7 +22,7 @@ export class DistributedRateLimiter {
   private readonly attackPrefix = 'attack_pattern:'
   private readonly analyticsPrefix = 'rate_analytics:'
 
-  constructor(private config: RateLimitConfig) {}
+  constructor(private readonly config: RateLimitConfig) {}
 
   /**
    * Check if request should be rate limited
@@ -319,8 +319,8 @@ export class DistributedRateLimiter {
       ])
 
       analytics[dateStr] = {
-        usage: usage || {},
-        blocked: blocked || {},
+        usage: usage ?? {},
+        blocked: blocked ?? {},
       }
     }
 

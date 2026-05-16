@@ -44,18 +44,16 @@ interface NotificationTemplate {
 const getBreachEnv = () => {
   const configuredStakeholders = process.env['SECURITY_STAKEHOLDERS']
   const stakeholderList =
-    configuredStakeholders === undefined
-      ? 'admin@example.com'
-      : configuredStakeholders
+    configuredStakeholders ?? 'admin@example.com'
 
   return {
     ORGANIZATION_NAME:
-      process.env['ORGANIZATION_NAME'] || 'Pixelated Empathy Health',
-    SECURITY_CONTACT: process.env['SECURITY_CONTACT'] || 'security@example.com',
+      process.env['ORGANIZATION_NAME'] ?? 'Pixelated Empathy Health',
+    SECURITY_CONTACT: process.env['SECURITY_CONTACT'] ?? 'security@example.com',
     ORGANIZATION_ADDRESS:
-      process.env['ORGANIZATION_ADDRESS'] || '123 Health St, MedCity',
+      process.env['ORGANIZATION_ADDRESS'] ?? '123 Health St, MedCity',
     HHS_NOTIFICATION_EMAIL:
-      process.env['HHS_NOTIFICATION_EMAIL'] || 'hhs-notifications@example.gov',
+      process.env['HHS_NOTIFICATION_EMAIL'] ?? 'hhs-notifications@example.gov',
     SECURITY_STAKEHOLDERS: stakeholderList
       .split(',')
       .map((value) => value.trim())
@@ -192,7 +190,7 @@ async function notifyAffectedUsers(
     try {
       const user = await auth.getUserById(userId)
 
-      if (!user || !user.email) {
+      if (!user?.email) {
         logger.warn(`User ${userId} has no email, skipping notification`)
         return
       }
@@ -211,7 +209,7 @@ async function notifyAffectedUsers(
         subject: template.subject,
         textContent: template.textContent.replace(
           '[User]',
-          user.name || 'Valued User',
+          user.name ?? 'Valued User',
         ),
       })
     } catch (error: unknown) {
@@ -275,7 +273,7 @@ async function notifyInternalStakeholders(
 ): Promise<void> {
   try {
     const env = getBreachEnv()
-    const notifications = env.SECURITY_STAKEHOLDERS.map((email) =>
+    const notifications = env.SECURITY_STAKEHOLDERS.map( async (email) =>
       sendEmail({
         to: email,
         subject: `Security Breach Alert - ${breach.severity.toUpperCase()} - ${breach.id}`,
@@ -444,7 +442,7 @@ async function calculateAverageNotificationTime(
   breach: BreachDetails,
 ): Promise<number> {
   const breachData = await getBreachStatus(breach.id)
-  if (!breachData || breachData.notificationStatus !== 'completed') {
+  if (breachData?.notificationStatus !== 'completed') {
     return 0
   }
 

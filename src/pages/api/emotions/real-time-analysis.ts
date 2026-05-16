@@ -93,7 +93,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       success: true,
       analysis: {
         primary: emotionResult.primary,
-        secondary: emotionResult.secondary || [],
+        secondary: emotionResult.secondary ?? [],
         confidence: emotionResult.confidence,
         valence: emotionResult.dimensions.valence,
         arousal: emotionResult.dimensions.arousal,
@@ -102,7 +102,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
         metadata: {
           processingTime: Date.now() - startTime,
           timestamp: Date.now(),
-          sessionId: sessionId || emotionResult.sessionId,
+          sessionId: sessionId ?? emotionResult.sessionId,
         },
       },
     }

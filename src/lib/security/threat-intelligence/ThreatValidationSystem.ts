@@ -181,9 +181,9 @@ export class ThreatValidationSystem extends EventEmitter {
   private isInitialized = false
   private validationQueue: ValidationQueueItem[] = []
   private isProcessing = false
-  private activeValidations = new Map<string, ThreatValidation>()
+  private readonly activeValidations = new Map<string, ThreatValidation>()
 
-  constructor(private config: ThreatValidationSystemConfig) {
+  constructor(private readonly config: ThreatValidationSystemConfig) {
     super()
     this.setMaxListeners(0)
   }

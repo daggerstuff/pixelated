@@ -8,6 +8,20 @@ import {
 } from '@/lib/research/types/research-types'
 
 const logger = getLogger('HIPAADataService')
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+type RolePermissions = {
+  permissions: string[]
+  restrictions: string[]
+}
+
+interface EncryptionMetadata {
+  keyId: string
+  iv: string
+  tag?: string
+  algorithm: string
+}
 
 export interface HIPAAConfig {
   encryptionAlgorithm: string
@@ -41,10 +55,10 @@ export interface DataAccessResult {
 }
 
 export class HIPAADataService {
-  private config: HIPAAConfig
-  private encryptionKeys: Map<string, Buffer> = new Map()
+  private readonly config: HIPAAConfig
+  private readonly encryptionKeys: Map<string, Buffer> = new Map()
   private auditLog: AuditLog[] = []
-  private activeSessions: Map<string, { userId: string; expiration: Date }> =
+  private readonly activeSessions: Map<string, { userId: string; expiration: Date }> =
     new Map()
 
   constructor(
@@ -54,7 +68,7 @@ export class HIPAADataService {
       auditRetentionDays: 2555, // 7 years for HIPAA
       accessControlMatrix: {
         roles: {
-          researcher: {
+          'researcher': {
             permissions: ['read-anonymized', 'aggregate-analysis'],
             restrictions: ['no-identifiable', 'no-raw-phi'],
           },
@@ -67,7 +81,7 @@ export class HIPAADataService {
             ],
             restrictions: ['no-identifiable', 'audit-required'],
           },
-          therapist: {
+          'therapist': {
             permissions: [
               'read-own-clients',
               'write-notes',
@@ -75,7 +89,7 @@ export class HIPAADataService {
             ],
             restrictions: ['own-clients-only', 'no-research-export'],
           },
-          admin: {
+          'admin': {
             permissions: ['full-access', 'user-management', 'audit-review'],
             restrictions: ['audit-required', 'dual-authorization'],
           },
@@ -113,7 +127,7 @@ export class HIPAADataService {
    * Initialize encryption keys for field-level encryption
    */
   private initializeEncryptionKeys(): void {
-    const masterKey = process.env.HIPAA_MASTER_KEY || this.generateMasterKey()
+    const masterKey = process.env.HIPAA_MASTER_KEY ?? this.generateMasterKey()
     this.encryptionKeys.set('master', Buffer.from(masterKey, 'hex'))
 
     // Generate data-specific keys
@@ -159,14 +173,18 @@ export class HIPAADataService {
   }> {
     try {
       const key =
-        this.encryptionKeys.get(dataType) || this.encryptionKeys.get('master')!
+        this.encryptionKeys.get(dataType) ??
+        this.encryptionKeys.get('master')
+      if (!key) {
+        throw new Error(`Missing encryption key for dataType: ${dataType}`)
+      }
       const _iv = crypto.randomBytes(16)
-
-      const cipher = crypto.createCipher(this.config.encryptionAlgorithm, key)
+      const normalizedAlgorithm = this.config.encryptionAlgorithm
+      const cipher = crypto.createCipheriv(normalizedAlgorithm, key, _iv)
       let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex')
       encrypted += cipher.final('hex')
 
-      const tag = cipher.getAuthTag ? cipher.getAuthTag().toString('hex') : ''
+      const tag = ''
 
       const metadata = {
         algorithm: this.config.encryptionAlgorithm,
@@ -181,7 +199,7 @@ export class HIPAADataService {
         action: 'encrypt',
         userId: 'system',
         dataType,
-        clientId,
+        clientIds: clientId ? [clientId] : undefined,
         timestamp: new Date().toISOString(),
         details: { keyId: dataType },
       })
@@ -206,33 +224,33 @@ export class HIPAADataService {
     clientId?: string,
   ): Promise<unknown> {
     try {
-      const metadataObj = metadata as {
-        keyId: string
-        iv: string
-        tag?: string
-        algorithm: string
-      }
+      const metadataObj = this.parseMetadata(metadata)
       const key =
-        this.encryptionKeys.get(metadataObj.keyId) ||
-        this.encryptionKeys.get('master')!
+        this.encryptionKeys.get(metadataObj.keyId) ??
+        this.encryptionKeys.get('master')
+      if (!key) {
+        throw new Error(
+          `Missing encryption key for dataType: ${metadataObj.keyId}`,
+        )
+      }
       const _iv = Buffer.from(metadataObj.iv, 'hex')
-
-      const decipher = crypto.createDecipher(metadataObj.algorithm, key)
-      if (metadataObj.tag && decipher.setAuthTag) {
-        decipher.setAuthTag(Buffer.from(metadataObj.tag, 'hex'))
+      const normalizedAlgorithm = metadataObj.algorithm
+      const decipher = crypto.createDecipheriv(normalizedAlgorithm, key, _iv)
+      if (metadataObj.tag) {
+        void decipher
       }
 
       let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
       decrypted += decipher.final('utf8')
 
-      const data = JSON.parse(decrypted)
+      const data = JSON.parse(decrypted) as unknown
 
       // Log decryption event
       this.logAudit({
         action: 'decrypt',
         userId: 'system',
         dataType,
-        clientId,
+        clientIds: clientId ? [clientId] : undefined,
         timestamp: new Date().toISOString(),
         details: { keyId: metadataObj.keyId },
       })
@@ -262,7 +280,7 @@ export class HIPAADataService {
 
     try {
       // Check role permissions
-      const rolePermissions = this.config.accessControlMatrix.roles[role]
+      const rolePermissions = this.getRolePermissions(role)
       if (!rolePermissions) {
         return { granted: false }
       }
@@ -289,7 +307,7 @@ export class HIPAADataService {
         clientIds,
       )
       const expirationDate =
-        request.expirationDate || new Date(Date.now() + 24 * 60 * 60 * 1000)
+        request.expirationDate ?? new Date(Date.now() + 24 * 60 * 60 * 1000)
 
       // Log successful access
       this.logAudit({
@@ -317,19 +335,65 @@ export class HIPAADataService {
    * Check if data type is allowed for the given role
    */
   private isDataTypeAllowed(role: string, dataType: string): boolean {
-    const rolePermissions = this.config.accessControlMatrix.roles[role]
-    if (!rolePermissions) return false
+    if (!this.roleHasPermissions(role)) {
+      return false
+    }
 
     // Check specific data type restrictions
-    const dataTypeRestrictions = {
+    const dataTypeRestrictions: Record<string, string[]> = {
       'session-data': ['researcher', 'data-scientist', 'therapist', 'admin'],
       'clinical-notes': ['therapist', 'admin'],
       'research-data': ['researcher', 'data-scientist', 'admin'],
       'audit-logs': ['admin'],
     }
 
-    const allowedRoles = dataTypeRestrictions[dataType] || []
+    const allowedRoles = dataTypeRestrictions[dataType] ?? []
     return allowedRoles.includes(role)
+  }
+
+  private parseMetadata(metadata: unknown): EncryptionMetadata {
+    if (!isRecord(metadata)) {
+      throw new Error('Invalid encryption metadata')
+    }
+
+    const keyId = metadata.keyId
+    const iv = metadata.iv
+    const algorithm = metadata.algorithm
+    const tag = metadata.tag
+
+    if (
+      typeof keyId !== 'string' ||
+      typeof iv !== 'string' ||
+      typeof algorithm !== 'string'
+    ) {
+      throw new Error('Invalid encryption metadata')
+    }
+
+    if (tag !== undefined && typeof tag !== 'string') {
+      throw new Error('Invalid encryption metadata')
+    }
+
+    return { keyId, iv, tag, algorithm }
+  }
+
+  private getRolePermissions(role: string): RolePermissions | undefined {
+    if (!Object.hasOwn(this.config.accessControlMatrix.roles, role)) {
+      return undefined
+    }
+
+    const rolePermissions = this.config.accessControlMatrix.roles[role]
+    if (
+      !Array.isArray(rolePermissions.permissions) ||
+      !Array.isArray(rolePermissions.restrictions)
+    ) {
+      return undefined
+    }
+
+    return rolePermissions
+  }
+
+  private roleHasPermissions(role: string): role is string {
+    return this.getRolePermissions(role) !== undefined
   }
 
   /**
@@ -607,7 +671,7 @@ export class HIPAADataService {
     const roles = this.config.accessControlMatrix.roles
     const requiredRoles = ['researcher', 'data-scientist', 'therapist', 'admin']
 
-    return requiredRoles.every((role) => roles[role] && roles[role].permissions)
+    return requiredRoles.every((role) => this.getRolePermissions(role)?.permissions)
   }
 
   /**

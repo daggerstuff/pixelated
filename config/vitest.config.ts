@@ -1,9 +1,11 @@
 import path from 'node:path'
 
 import react from '@vitejs/plugin-react'
+import { getViteConfig } from 'astro/config'
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config'
 
+const projectRoot = process.cwd()
 const baseNodeTestGlobs = [
   'src/tests/health-monitor.test.ts',
   'src/lib/logging/__tests__/audit-logger.test.ts',
@@ -18,6 +20,8 @@ const baseNodeTestGlobs = [
   'tests/unit/auth0/**/*.test.ts',
   'tests/integration/auth0/**/*.test.ts',
   'src/lib/redis.test.ts',
+  'src/lib/services/notification/__tests__/NotificationService.test.ts',
+  'src/lib/__tests__/security-implementation.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -55,9 +59,15 @@ const targetedNodeTestGlobs = targetedTestGlobs.filter(
 const targetedJsdomTestGlobs = targetedTestGlobs.filter(
   (entry) => !targetedNodeTestGlobs.includes(entry),
 )
+const astroViteConfig = getViteConfig({}, {})
+const astroVite = await astroViteConfig({
+  mode: process.env['VITEST_MODE'] ?? 'test',
+  command: 'serve',
+})
+const astroPlugins = astroVite.plugins ?? []
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), ...astroPlugins],
   define: {
     global: 'globalThis',
   },
@@ -71,29 +81,28 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
     alias: [
-      { find: /^@\//, replacement: `${path.resolve(__dirname, '../src')}/` },
+      { find: '@/', replacement: `${path.resolve(process.cwd(), 'src')}/` },
       {
         find: 'react-dom/test-utils',
         replacement: path.resolve(
-          __dirname,
-          '../__mocks__/react-dom/test-utils.js',
+          projectRoot,
+          '__mocks__/react-dom/test-utils.js',
         ),
       },
       {
         find: /@testing-library\/react\/dist\/act-compat\.js$/,
         replacement: path.resolve(
-          __dirname,
-          '../src/test/testing-library-act-compat.ts',
+          projectRoot,
+          'src/test/testing-library-act-compat.ts',
         ),
       },
       {
         find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
         replacement: path.resolve(
-          __dirname,
-          '../__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
+          projectRoot,
+          '__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
         ),
       },
-      
     ],
     conditions: ['node', 'import', 'module', 'default'],
   },
@@ -135,6 +144,52 @@ export default defineConfig({
     ],
     projects: [
       {
+        plugins: [react(), ...astroPlugins],
+        resolve: {
+          tsconfigPaths: true,
+          alias: [
+            {
+              find: '@/',
+              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+            },
+            {
+              find: 'react-dom/test-utils',
+              replacement: path.resolve(
+                process.cwd(),
+                '__mocks__/react-dom/test-utils.js',
+              ),
+            },
+            {
+              find: /@testing-library\/react\/dist\/act-compat\.js$/,
+              replacement: path.resolve(
+                process.cwd(),
+                'src/test/testing-library-act-compat.ts',
+              ),
+            },
+            {
+              find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
+              replacement: path.resolve(
+                process.cwd(),
+                '__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
+              ),
+            },
+            {
+              find: 'react/jsx-dev-runtime',
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-dev-runtime.js',
+              ),
+            },
+            {
+              find: 'react/jsx-runtime',
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-runtime.js',
+              ),
+            },
+          ],
+          conditions: ['node', 'import', 'module', 'default'],
+        },
         test: {
           globals: true,
           setupFiles: ['./src/test/setup.ts'],
@@ -148,6 +203,13 @@ export default defineConfig({
                 ],
           environment: 'jsdom',
           exclude: [
+            '**/node_modules/**',
+            'src/lib/security/__tests__/**/*.test.ts',
+            'src/lib/ehr/__tests__/**/*.test.ts',
+            'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'src/lib/redis.test.ts',
+            'src/lib/services/notification/__tests__/NotificationService.test.ts',
+            'src/lib/__tests__/security-implementation.test.ts',
             'tests/integration/complete-system.integration.test.ts',
             'src/tests/simple-browser-compatibility.test.ts',
             'src/tests/browser-compatibility.test.ts',
@@ -167,54 +229,18 @@ export default defineConfig({
             'backups/**/*',
             'worktrees/**',
           ],
-          resolve: {
-            tsconfigPaths: true,
-            alias: [
-              {
-                find: /^@\//,
-                replacement: `${path.resolve(__dirname, '../src')}/`,
-              },
-              {
-                find: 'react-dom/test-utils',
-                replacement: path.resolve(
-                  __dirname,
-                  '../__mocks__/react-dom/test-utils.js',
-                ),
-              },
-              {
-                find: /@testing-library\/react\/dist\/act-compat\.js$/,
-                replacement: path.resolve(
-                  __dirname,
-                  '../src/test/testing-library-act-compat.ts',
-                ),
-              },
-              {
-                find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
-                replacement: path.resolve(
-                  __dirname,
-                  '../__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
-                ),
-              },
-              {
-                find: 'react/jsx-dev-runtime',
-                replacement: path.resolve(
-                  __dirname,
-                  '../node_modules/react/jsx-dev-runtime.js',
-                ),
-              },
-              {
-                find: 'react/jsx-runtime',
-                replacement: path.resolve(
-                  __dirname,
-                  '../node_modules/react/jsx-runtime.js',
-                ),
-              },
-            ],
-            conditions: ['node', 'import', 'module', 'default'],
-          },
         },
       },
       {
+        resolve: {
+          tsconfigPaths: true,
+          alias: [
+            {
+              find: '@/',
+              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+            },
+          ],
+        },
         test: {
           globals: true,
           setupFiles: ['./src/test/setup-node.ts'],
@@ -222,19 +248,16 @@ export default defineConfig({
           include:
             targetedTestGlobs.length > 0
               ? targetedNodeTestGlobs
-              : [...nodeTestGlobs, 'src/tests/auth.test.ts'],
+              : [
+                  ...nodeTestGlobs,
+                  'src/lib/security/__tests__/**/*.test.ts',
+                  'src/lib/ehr/__tests__/allscripts.test.ts',
+                  'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'src/tests/auth.test.ts',
+                ],
           environment: 'node',
         },
-          resolve: {
-            tsconfigPaths: true,
-            alias: [
-              {
-                find: /^@\//,
-                replacement: `${path.resolve(__dirname, '../src')}/`,
-              },
-            ],
-          },
-        },
+      },
     ],
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,

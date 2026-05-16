@@ -30,7 +30,7 @@ vi.mock('../../../logging/build-safe-logger', () => ({
 class MockWebSocket {
   public readonly url: string
   public sent: string[] = []
-  private handlers = new Map<string, Array<() => void>>()
+  private readonly handlers = new Map<string, Array<() => void>>()
 
   constructor(url: string) {
     this.url = url

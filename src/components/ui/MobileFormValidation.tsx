@@ -311,7 +311,7 @@ export function MobileFormValidation({
   }
 
   // Clone the form element and inject our handlers
-  const enhancedForm = React.Children.map(children, (child) => {
+  const enhancedForm = React.Children.map(children,  async (child) => {
     if (React.isValidElement(child) && child.type === 'form') {
       const specificChild = child as React.ReactElement<
         React.FormHTMLAttributes<HTMLFormElement>
@@ -401,11 +401,11 @@ export const ValidationRules = {
   }),
   minLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length >= length,
-    message: message || `Must be at least ${length} characters`,
+    message: message ?? `Must be at least ${length} characters`,
   }),
   maxLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length <= length,
-    message: message || `Must be no more than ${length} characters`,
+    message: message ?? `Must be no more than ${length} characters`,
   }),
   pattern: (regex: RegExp, message: string): ValidationRule => ({
     test: (value) => regex.test(value),
@@ -416,7 +416,7 @@ export const ValidationRules = {
       const matchField = document.querySelector(
         `[name="${fieldName}"]`,
       ) as HTMLInputElement
-      return matchField && matchField.value === value
+      return matchField?.value === value
     },
     message,
   }),

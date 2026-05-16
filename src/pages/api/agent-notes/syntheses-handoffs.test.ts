@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'

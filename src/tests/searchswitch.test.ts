@@ -12,7 +12,7 @@ function safePopulateResults(
   container.innerHTML = ''
   for (const item of items) {
     const a = document.createElement('a')
-    a.href = item.url || '#'
+    a.href = item.url ?? '#'
     a.className = 'search-results-item'
 
     const titleDiv = document.createElement('div')

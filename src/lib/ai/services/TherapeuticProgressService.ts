@@ -38,9 +38,7 @@ export class TherapeuticProgressService {
     relatedBeliefText?: string,
   ): PatientProfile {
     if (
-      !profile ||
-      !profile.cognitiveModel ||
-      !profile.cognitiveModel.therapeuticProgress
+      !profile?.cognitiveModel?.therapeuticProgress
     ) {
       appLogger.warn('addInsight: Invalid profile provided.', {
         profileId: profile?.id,
@@ -56,7 +54,7 @@ export class TherapeuticProgressService {
 
     const newInsight: TherapeuticInsight = {
       insight: insightText.trim(),
-      belief: relatedBeliefText || 'General Insight', // Link to a belief text or mark as general
+      belief: relatedBeliefText ?? 'General Insight', // Link to a belief text or mark as general
       dateAchieved: new Date().toISOString(),
     }
 
@@ -98,9 +96,7 @@ export class TherapeuticProgressService {
     changeFactor: number,
   ): PatientProfile {
     if (
-      !profile ||
-      !profile.cognitiveModel ||
-      !profile.cognitiveModel.coreBeliefs
+      !profile?.cognitiveModel?.coreBeliefs
     ) {
       appLogger.warn(
         'updateBeliefStrength: Invalid profile or coreBeliefs missing.',
@@ -169,9 +165,7 @@ export class TherapeuticProgressService {
     applicationContext?: string[],
   ): PatientProfile {
     if (
-      !profile ||
-      !profile.cognitiveModel ||
-      !profile.cognitiveModel.therapeuticProgress
+      !profile?.cognitiveModel?.therapeuticProgress
     ) {
       appLogger.warn('acquireSkill: Invalid profile provided.', {
         profileId: profile?.id,
@@ -213,7 +207,7 @@ export class TherapeuticProgressService {
         proficiency: Math.max(0, Math.min(1, initialProficiency)), // Use the new proficiency directly
         dateAchieved: new Date().toISOString(),
         applicationContext:
-          applicationContext || existingSkill.applicationContext || [],
+          (applicationContext ?? existingSkill.applicationContext) ?? [],
       }
       appLogger.info(
         `acquireSkill: Skill "${skillName}" already existed, updated details.`,
@@ -224,7 +218,7 @@ export class TherapeuticProgressService {
         skillName,
         proficiency: Math.max(0, Math.min(1, initialProficiency)),
         dateAchieved: new Date().toISOString(),
-        applicationContext: applicationContext || [],
+        applicationContext: applicationContext ?? [],
       }
       skills.push(newSkill)
       appLogger.info(
@@ -258,10 +252,7 @@ export class TherapeuticProgressService {
     newProficiency: number,
   ): PatientProfile {
     if (
-      !profile ||
-      !profile.cognitiveModel ||
-      !profile.cognitiveModel.therapeuticProgress ||
-      !profile.cognitiveModel.therapeuticProgress.skillsAcquired
+      !profile?.cognitiveModel?.therapeuticProgress?.skillsAcquired
     ) {
       appLogger.warn(
         'updateSkillProficiency: Invalid profile or skillsAcquired missing.',

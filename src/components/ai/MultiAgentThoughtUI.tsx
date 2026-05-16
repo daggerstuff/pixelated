@@ -263,14 +263,14 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
                           </div>
                           <div className="relative">
                             <textarea 
-                              value={correctionText[activity.id] || ''}
+                              value={correctionText[activity.id] ?? ''}
                               onChange={(e) => setCorrectionText(prev => ({ ...prev, [activity.id]: e.target.value }))}
                               placeholder="Describe how the agent should have reasoned..."
                               className="w-full bg-black/40 border border-indigo-500/30 rounded-md p-2 text-xs text-white focus:outline-none focus:border-indigo-500/60 min-h-[60px] resize-none"
                             />
                             <button 
-                              onClick={() => handleFeedbackClick(activity.id, 'correction')}
-                              disabled={isSubmitting[activity.id] || !correctionText[activity.id]?.trim()}
+                              onClick={ async () => handleFeedbackClick(activity.id, 'correction')}
+                              disabled={isSubmitting[activity.id] ?? !correctionText[activity.id]?.trim()}
                               className="absolute bottom-2 right-2 p-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors disabled:opacity-50"
                             >
                               {isSubmitting[activity.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
@@ -288,7 +288,7 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
                         {onFeedback && (
                           <div className="flex items-center gap-2">
                             <button 
-                              onClick={(e) => { e.stopPropagation(); handleFeedbackClick(activity.id, 'positive'); }}
+                              onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'positive'); }}
                               disabled={isSubmitting[activity.id]}
                               className={cn(
                                 "p-1.5 rounded-md transition-all",
@@ -301,7 +301,7 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
                               <ThumbsUp className="w-3 h-3" />
                             </button>
                             <button 
-                              onClick={(e) => { e.stopPropagation(); handleFeedbackClick(activity.id, 'negative'); }}
+                              onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'negative'); }}
                               disabled={isSubmitting[activity.id]}
                               className={cn(
                                 "p-1.5 rounded-md transition-all",
@@ -314,7 +314,7 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
                               <ThumbsDown className="w-3 h-3" />
                             </button>
                             <button 
-                              onClick={(e) => { e.stopPropagation(); handleFeedbackClick(activity.id, 'correction'); }}
+                              onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'correction'); }}
                               disabled={isSubmitting[activity.id]}
                               className={cn(
                                 "flex items-center gap-1 px-2 py-1 rounded-md transition-all text-[10px] font-bold uppercase",

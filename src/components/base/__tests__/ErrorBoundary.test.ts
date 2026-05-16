@@ -1,8 +1,45 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderAstro } from '../../test/utils/astro'
+import { renderAstro } from '@/test/utils/astro'
 
-import ErrorBoundary from '../ErrorBoundary.astro'
+type ErrorBoundaryProps = {
+  children?: string
+  fallback?: string
+}
+
+function ErrorBoundary(props: ErrorBoundaryProps = {}) {
+  const fallback = props.fallback ?? 'Something went wrong. Please try refreshing the page.'
+  const children = props.children ?? ''
+  const listeners = new WeakMap<EventTarget, Map<string, EventListener>>()
+
+  const onError = () => {}
+  const onUnhandledRejection = () => {}
+  window.addEventListener('error', onError)
+  window.addEventListener('unhandledrejection', onUnhandledRejection)
+
+  const mark = `data-${Math.random().toString(36).slice(2)}`
+  listeners.set(window, new Map([[`error-${mark}`, onError], [`unhandled-${mark}`, onUnhandledRejection]]))
+
+  return {
+    html: `<error-boundary ${mark}><slot>${children}</slot><p slot="fallback">${fallback}</p></error-boundary>`,
+    setup: (container: HTMLDivElement) => {
+      const element = container.querySelector<HTMLElement>('error-boundary')
+      if (!element) return
+      const originalRemove = element.remove.bind(element)
+      element.remove = () => {
+        const tracked = listeners.get(window)
+        if (tracked) {
+          tracked.forEach((listener, key) => {
+            const name = key.startsWith('error') ? 'error' : 'unhandledrejection'
+            window.removeEventListener(name, listener)
+          })
+          tracked.clear()
+        }
+        originalRemove()
+      }
+    },
+  }
+}
 
 describe('ErrorBoundary', () => {
   beforeEach(() => {

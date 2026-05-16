@@ -207,7 +207,7 @@ export interface CriterionTemplate {
  * Implementation of ObjectiveBuilder
  */
 export class StandardObjectiveBuilder implements ObjectiveBuilder {
-  private objective: Partial<ObjectiveDefinition> = {}
+  private readonly objective: Partial<ObjectiveDefinition> = {}
   protected criteria: ObjectiveCriteria[] = []
 
   setId(id: string): ObjectiveBuilder {
@@ -415,7 +415,7 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
  * Implementation of ObjectiveRegistry
  */
 export class StandardObjectiveRegistry implements ObjectiveRegistry {
-  private objectives = new Map<string, ObjectiveDefinition>()
+  private readonly objectives = new Map<string, ObjectiveDefinition>()
 
   register(objective: ObjectiveDefinition): void {
     // Validate objective before registration

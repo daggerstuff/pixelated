@@ -4,7 +4,7 @@ import type { SecurityLevel } from '../../hooks/useSecurity'
 import type { Message } from '../../types/chat'
 
 // Lazy load the heavy analytics dashboard
-const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'))
+const AnalyticsDashboardReact = lazy( async () => import('./AnalyticsDashboardReact'))
 
 interface LazyAnalyticsDashboardProps {
   messages: Message[]

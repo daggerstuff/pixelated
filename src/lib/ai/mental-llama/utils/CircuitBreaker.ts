@@ -7,8 +7,8 @@ export class CircuitBreaker {
   private state: 'closed' | 'open' | 'half-open' = 'closed'
 
   constructor(
-    private threshold: number,
-    private resetTimeMs: number,
+    private readonly threshold: number,
+    private readonly resetTimeMs: number,
   ) {}
 
   canExecute(): boolean {

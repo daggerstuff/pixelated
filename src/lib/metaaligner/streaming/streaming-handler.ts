@@ -30,9 +30,9 @@ export interface IStreamingHandler {
  * The StreamingHandler class.
  */
 export class StreamingHandler implements IStreamingHandler {
-  private api: IUnifiedMetaAlignerAPI
+  private readonly api: IUnifiedMetaAlignerAPI
   private buffer: string[] = []
-  private bufferSize: number
+  private readonly bufferSize: number
 
   constructor(api: IUnifiedMetaAlignerAPI, bufferSize = 5) {
     this.api = api

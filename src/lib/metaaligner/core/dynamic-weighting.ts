@@ -107,7 +107,7 @@ export const DEFAULT_DYNAMIC_WEIGHTING_CONFIG: DynamicWeightingConfig = {
 export class DynamicWeightingEngine {
   private config: DynamicWeightingConfig
   private weightHistory: WeightHistoryEntry[] = []
-  private oscillationTrackers: Map<string, OscillationTracker> = new Map()
+  private readonly oscillationTrackers: Map<string, OscillationTracker> = new Map()
   private cache: {
     weights: Record<string, number> | null
     context: ContextType | null
@@ -597,9 +597,7 @@ let defaultDynamicWeightingEngine: DynamicWeightingEngine | null = null
  * Get or create the default dynamic weighting engine
  */
 export function getDynamicWeightingEngine(): DynamicWeightingEngine {
-  if (!defaultDynamicWeightingEngine) {
-    defaultDynamicWeightingEngine = new DynamicWeightingEngine()
-  }
+  defaultDynamicWeightingEngine ??= new DynamicWeightingEngine();
   return defaultDynamicWeightingEngine
 }
 

@@ -36,7 +36,7 @@ export class MemoryLinker {
       ...memory,
       content: '[ARCHIVED_GHOST_NODE]', // Redact primary content
       is_ghost: true,
-      gist: memory.gist || this.generateGist(memory.content),
+      gist: memory.gist ?? this.generateGist(memory.content),
     };
   }
 

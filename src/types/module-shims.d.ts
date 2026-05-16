@@ -212,10 +212,70 @@ declare module 'ioredis' {
   interface Pipeline {
     incr(key: string): this
     expire(key: string, seconds: number): this
+    del(...keys: string[]): this
     exec(): Promise<Array<[unknown, unknown] | null>>
   }
 
   export default class Redis {
+    [key: string]: unknown
+    call(
+      command: string,
+      ...args: Array<string | number | Buffer>
+    ): Promise<unknown>
+    callBuffer(
+      command: string,
+      ..._args: Array<string | number | Buffer>
+    ): Promise<unknown>
+    set(key: string, value: string, ...options: unknown[]): Promise<unknown>
+    setex(key: string, seconds: number, value: string): Promise<unknown>
+    exists(key: string): Promise<number>
+    pttl(key: string): Promise<number>
+    ttl(key: string): Promise<number>
+    keys(pattern: string): Promise<string[]>
+    scan(cursor: string, ...args: unknown[]): Promise<[string, string[]]>
+    info(section?: string): Promise<string>
+    subscribe(channel: string): Promise<number>
+    publish(channel: string, message: string): Promise<number>
+    unsubscribe(channel: string): Promise<number>
+    lpush(key: string, ...values: string[]): Promise<number>
+    rpoplpush(source: string, destination: string): Promise<string | null>
+    lrem(key: string, count: number, value: string): Promise<number>
+    llen(key: string): Promise<number>
+    hset(key: string, field: string, value: string): Promise<number>
+    hget(key: string, field: string): Promise<string | null>
+    hgetall(key: string): Promise<Record<string, string>>
+    hdel(key: string, field: string): Promise<number>
+    hlen(key: string): Promise<number>
+    zadd(key: string, ...args: Array<string | number>): Promise<number>
+    zrem(key: string, member: string): Promise<number>
+    zrange(key: string, start: number, stop: number): Promise<string[]>
+    zrange(
+      key: string,
+      start: number,
+      stop: number,
+      withScores: 'WITHSCORES',
+    ): Promise<string[]>
+    zpopmin(key: string): Promise<Array<[string, string]>>
+    zcard(key: string): Promise<number>
+    zrangebyscore(
+      key: string,
+      min: string | number,
+      max: string | number,
+      withscores?: string,
+      offset?: number,
+      count?: number,
+    ): Promise<string[]>
+    zremrangebyscore(
+      key: string,
+      min: string | number,
+      max: string | number,
+    ): Promise<number>
+    deletePattern(pattern: string): Promise<number>
+    multi(..._commands: unknown[]): this
+    pipeline(): {
+      del(...keys: string[]): Pipeline
+      exec(): Promise<[Error | null, unknown][]>
+    }
     constructor(url: string, options?: RedisOptions)
     on(event: string, listener: RedisListener): this
     connect(): Promise<unknown>

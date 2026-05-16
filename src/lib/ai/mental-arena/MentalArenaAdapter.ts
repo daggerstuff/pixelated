@@ -190,15 +190,15 @@ interface EncryptedData {
  * Production-grade Mental Arena Adapter for generating synthetic therapeutic conversations
  */
 export class MentalArenaAdapter {
-  private provider: MentalArenaProvider
-  private fheService: FHEService
-  private baseUrl: string
-  private apiKey: string
-  private pythonBridgeEnabled: boolean
-  private pythonBridge: MentalArenaPythonBridge | undefined
-  private performanceMetrics: PerformanceMetrics
-  private validationEnabled: boolean
-  private encryptionEnabled: boolean
+  private readonly provider: MentalArenaProvider
+  private readonly fheService: FHEService
+  private readonly baseUrl: string
+  private readonly apiKey: string
+  private readonly pythonBridgeEnabled: boolean
+  private readonly pythonBridge: MentalArenaPythonBridge | undefined
+  private readonly performanceMetrics: PerformanceMetrics
+  private readonly validationEnabled: boolean
+  private readonly encryptionEnabled: boolean
 
   constructor(
     provider: MentalArenaProvider,
@@ -303,7 +303,7 @@ export class MentalArenaAdapter {
         // Process conversations with validation if enabled
         if (options.enableValidation !== false) {
           // Validate all conversations concurrently
-          const validationPromises = disorderConversations.map((conversation) =>
+          const validationPromises = disorderConversations.map( async (conversation) =>
             this.validateConversation(conversation),
           )
           const validations = await Promise.all(validationPromises)
@@ -609,7 +609,7 @@ export class MentalArenaAdapter {
         const patientResponse = await this.provider.generateText(
           patientPrompt,
           {
-            temperature: options.temperature || 0.9,
+            temperature: options.temperature ?? 0.9,
             maxTokens: 150,
           },
         )
@@ -760,7 +760,7 @@ export class MentalArenaAdapter {
     // LOG: Fixed unterminated string literal and parenthesis at validation check
 
     return {
-      sessionId: conversation.sessionSummary || crypto.randomUUID(),
+      sessionId: conversation.sessionSummary ?? crypto.randomUUID(),
       isValid,
       issues,
       qualityScore: Math.max(0, qualityScore),
@@ -790,7 +790,7 @@ export class MentalArenaAdapter {
 
     // Process all conversations concurrently to avoid await in loop
     const allMetrics = await Promise.all(
-      conversations.map((conversation) =>
+      conversations.map( async (conversation) =>
         this.calculateSingleConversationMetrics(conversation),
       ),
     )
@@ -1184,8 +1184,8 @@ export class MentalArenaAdapter {
   }> {
     // Simplified metrics calculation
     return {
-      coherence: conversation.accuracyScore || 75,
-      clinical: conversation.accuracyScore || 75,
+      coherence: conversation.accuracyScore ?? 75,
+      clinical: conversation.accuracyScore ?? 75,
       flow: 80, // Would calculate based on conversation structure
       therapeutic: 75, // Would calculate based on therapeutic techniques used
     }

@@ -35,8 +35,8 @@ export function parsePagination(url: URL): {
   limit: number
   offset: number
 } {
-  const rawLimit = Number.parseInt(url.searchParams.get('limit') || '10', 10)
-  const rawOffset = Number.parseInt(url.searchParams.get('offset') || '0', 10)
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '10', 10)
+  const rawOffset = Number.parseInt(url.searchParams.get('offset') ?? '0', 10)
 
   return {
     limit:

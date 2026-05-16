@@ -236,7 +236,7 @@ export function generateShortId(length = 8): string {
  * @param ms - Delay in milliseconds
  * @returns Promise that resolves after delay
  */
-export function delay(ms: number): Promise<void> {
+export async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
@@ -275,7 +275,7 @@ export async function retry<T>(
     }
   }
 
-  throw lastError!
+  throw lastError
 }
 
 /**
@@ -917,7 +917,7 @@ export function getStorageItem<T>(key: string, defaultValue: T): T {
  * @param key - Storage key
  * @param value - Value to store
  */
-export function setStorageItem<T>(key: string, value: T): void {
+export function setStorageItem(key: string, value: unknown): void {
   if (typeof window === 'undefined') {
     return
   }
@@ -1062,7 +1062,7 @@ export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
     const key = args.length === 1 ? String(args[0]) : JSON.stringify(args)
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>
+      return cache.get(key)!
     }
 
     const result = fn(...args) as ReturnType<T>

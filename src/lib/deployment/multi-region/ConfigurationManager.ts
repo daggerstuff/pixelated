@@ -169,8 +169,8 @@ export interface ComplianceConfig {
 export class ConfigurationManager extends EventEmitter {
   private config: MultiRegionConfig
   private isInitialized = false
-  private configWatchers: Map<string, NodeJS.Timeout> = new Map()
-  private featureFlagCache: Map<string, boolean> = new Map()
+  private readonly configWatchers: Map<string, NodeJS.Timeout> = new Map()
+  private readonly featureFlagCache: Map<string, boolean> = new Map()
 
   constructor(initialConfig: MultiRegionConfig) {
     super()
@@ -254,7 +254,7 @@ export class ConfigurationManager extends EventEmitter {
     }
 
     // Validate edge computing configuration
-    if (config.edgeComputing && config.edgeComputing.locations.length === 0) {
+    if (config.edgeComputing?.locations.length === 0) {
       errors.push(
         'Edge computing configuration must include at least one location',
       )
@@ -279,7 +279,7 @@ export class ConfigurationManager extends EventEmitter {
     }
 
     // Validate secrets (basic structure check)
-    if (!config.secrets || !config.secrets.cloudProviders) {
+    if (!config.secrets?.cloudProviders) {
       errors.push('Secrets configuration is required')
     }
 
@@ -293,7 +293,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   private async loadEnvironmentConfig(): Promise<void> {
     try {
-      const environment = process.env.NODE_ENV || 'development'
+      const environment = process.env.NODE_ENV ?? 'development'
       logger.info(`Loading configuration for environment: ${environment}`)
 
       // Load environment-specific overrides
@@ -853,9 +853,9 @@ export class ConfigurationManager extends EventEmitter {
         this.config.deployment.regions[0]?.name ??
         'example.com',
       hostedZoneId:
-        process.env.MULTI_REGION_HOSTED_ZONE_ID || 'Z00000000000000000000',
+        process.env.MULTI_REGION_HOSTED_ZONE_ID ?? 'Z00000000000000000000',
       cloudflareZoneId:
-        process.env.MULTI_REGION_CLOUDFLARE_ZONE_ID || undefined,
+        process.env.MULTI_REGION_CLOUDFLARE_ZONE_ID ?? undefined,
       ttl: Number.parseInt(process.env.MULTI_REGION_DNS_TTL ?? '60', 10),
     }
   }
@@ -864,7 +864,7 @@ export class ConfigurationManager extends EventEmitter {
    * Get current environment name
    */
   getEnvironment(): string {
-    return process.env.NODE_ENV || 'production'
+    return process.env.NODE_ENV ?? 'production'
   }
 
   /**
@@ -896,7 +896,7 @@ export class ConfigurationManager extends EventEmitter {
    * Check if feature flag is enabled
    */
   isFeatureEnabled(flag: keyof FeatureFlags): boolean {
-    return this.featureFlagCache.get(flag) || false
+    return this.featureFlagCache.get(flag) ?? false
   }
 
   /**
@@ -986,7 +986,7 @@ export class ConfigurationManager extends EventEmitter {
       deployment: {
         ...base.deployment,
         ...updates.deployment,
-        regions: updates.deployment?.regions || base.deployment.regions,
+        regions: updates.deployment?.regions ?? base.deployment.regions,
       },
       featureFlags: {
         ...base.featureFlags,

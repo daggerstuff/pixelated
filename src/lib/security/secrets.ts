@@ -31,7 +31,7 @@ const MANDATORY_SECRETS = [
  * @throws Error if the secret is mandatory and missing in production
  */
 export function getSecret(name: string, defaultValue?: string): string {
-  const value = process.env[name] || defaultValue
+  const value = process.env[name] ?? defaultValue
 
   if (!value) {
     const isProduction = process.env.NODE_ENV === 'production'
@@ -51,7 +51,7 @@ export function getSecret(name: string, defaultValue?: string): string {
     }
   }
 
-  return value || ''
+  return value ?? ''
 }
 
 /**

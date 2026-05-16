@@ -215,7 +215,7 @@ export class BackupSecurityManager {
   private config: BackupConfig
   private encryptionKey!: Uint8Array // MODIFIED: Definite assignment assertion
   private isInitialized = false
-  private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
+  private readonly storageProviders: Map<StorageLocation, StorageProvider> = new Map()
 
   constructor(config?: Partial<BackupConfig>) {
     // Default configuration
@@ -315,7 +315,7 @@ export class BackupSecurityManager {
    * Generate a UUID for backup IDs
    */
   private generateUUID(): string {
-    if (isBrowser && window.crypto && window.crypto.randomUUID) {
+    if (isBrowser && window.crypto?.randomUUID) {
       return window.crypto.randomUUID()
     }
 
@@ -337,7 +337,7 @@ export class BackupSecurityManager {
 
     for (let i = 0; i < 16; i++) {
       const byte = randBytes[i]
-      const hex = (byte !== undefined ? byte : 0).toString(16).padStart(2, '0')
+      const hex = (byte ?? 0).toString(16).padStart(2, '0')
       // Insert dashes at the appropriate positions
       if (i === 4 || i === 6 || i === 8 || i === 10) {
         uuid += '-'
@@ -857,7 +857,7 @@ export class BackupSecurityManager {
     try {
       const mongooseModule = 'mongoose'
       const mongoose =
-        (await import(/* @vite-ignore */ mongooseModule)).default ||
+        (await import(/* @vite-ignore */ mongooseModule)).default ??
         (await import(/* @vite-ignore */ mongooseModule))
       const models = mongoose.modelNames()
 
@@ -868,7 +868,7 @@ export class BackupSecurityManager {
         const requireFull = type === BackupType.DIFFERENTIAL
         const lastBackupTime = await this.getLastBackupTime(requireFull)
         baselineTime =
-          lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000)
+          lastBackupTime ?? new Date(Date.now() - 24 * 60 * 60 * 1000)
       }
 
       for (const modelName of models) {
@@ -1028,7 +1028,7 @@ export class BackupSecurityManager {
 
         const provider = await getStorageProvider(
           locationConfig.provider,
-          locationConfig.providerConfig || locationConfig.config,
+          locationConfig.providerConfig ?? locationConfig.config,
         )
 
         await provider.initialize()

@@ -97,7 +97,7 @@ class LLMServiceError extends Error {
 }
 
 class RateLimitManager {
-  private rateLimitInfo: RateLimitInfo
+  private readonly rateLimitInfo: RateLimitInfo
 
   constructor(config: { requestsPerMinute: number; tokensPerMinute: number }) {
     this.rateLimitInfo = {
@@ -264,6 +264,32 @@ function normalizeBaseUrl(baseUrl: string): string {
     .replace(/\/v1$/i, '')
 }
 
+function isRateLimitError(
+  status: number,
+  message: string,
+  code?: string,
+): boolean {
+  if (status === 429) {
+    return true
+  }
+
+  if (status !== 400) {
+    return false
+  }
+
+  const normalizedMessage = message.toLowerCase()
+  const normalizedCode = (code ?? '').toLowerCase()
+
+  return (
+    normalizedMessage.includes('rate limit') ||
+    normalizedMessage.includes('monthly_request_count') ||
+    normalizedMessage.includes('you have reached the limit') ||
+    normalizedMessage.includes('quota') ||
+    normalizedMessage.includes('limit reached') ||
+    normalizedCode === '402'
+  )
+}
+
 export function createLLMService(config: LLMClientConfig): LLMService {
   if (!config.baseUrl) {
     throw new LLMServiceError(
@@ -274,11 +300,11 @@ export function createLLMService(config: LLMClientConfig): LLMService {
   }
   const baseUrl = normalizeBaseUrl(config.baseUrl)
   const apiKey = config.apiKey
-  const timeoutMs = config.timeoutMs || 30000
-  const rateLimitRpm = config.rateLimitRpm || 60
+  const timeoutMs = config.timeoutMs ?? 30000
+  const rateLimitRpm = config.rateLimitRpm ?? 60
 
   const retryConfig: RetryConfig = {
-    maxRetries: config.maxRetries || 3,
+    maxRetries: config.maxRetries ?? 3,
     baseDelayMs: 1000,
     maxDelayMs: 30000,
     backoffMultiplier: 2,
@@ -297,20 +323,36 @@ export function createLLMService(config: LLMClientConfig): LLMService {
   }
 
   const handleAPIError = (response: Response, data?: unknown): never => {
-    const isRetryable = response.status >= 500 || response.status === 429
-
     let errorMessage = `LLM API error: ${response.status} ${response.statusText}`
     let errorCode = response.status.toString()
+    let extractedMessage = ''
+    let extractedCode: string | undefined
 
-    if (data && typeof data === 'object' && 'error' in data) {
-      const errorData = data as { error: { message?: string; code?: string } }
+    if (data && typeof data === 'object') {
+      const errorData = data as {
+        error?: { message?: string; code?: string; reason?: string }
+        message?: string
+        reason?: string
+        code?: string
+      }
       const fallbackMessage =
-        errorData.error?.message ||
-        (errorData as { message?: unknown }).message?.toString() ||
+        ((errorData.error?.message ??
+          (errorData as { message?: unknown }).message?.toString()) ??
+          errorData.error?.reason?.toString()) ??
+        errorData.reason?.toString() ??
         'Unknown error'
       errorMessage = `LLM API error: ${fallbackMessage}`
-      errorCode = errorData.error.code || errorCode
+      errorCode = (errorData.error?.code ?? errorData.code) ?? errorCode
+      extractedMessage = fallbackMessage
+      extractedCode = errorCode
     }
+
+    const retryableMessage = extractedMessage || response.statusText
+    const isRetryable = isRateLimitError(
+      response.status,
+      retryableMessage,
+      extractedCode ?? errorCode,
+    )
 
     throw new LLMServiceError(
       errorMessage,
@@ -352,7 +394,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
     stream = false,
   ): Promise<T extends Response ? Response : T> => {
     const messages = body['messages'] as AIMessage[] | undefined
-    const estimatedTokens = estimateTokenCount(messages || [])
+    const estimatedTokens = estimateTokenCount(messages ?? [])
     await rateLimitManager.checkRateLimit(estimatedTokens)
 
     const controller = createAbortController(timeoutMs)
@@ -404,12 +446,12 @@ export function createLLMService(config: LLMClientConfig): LLMService {
             }
 
             const model =
-              options?.model || 'minimaxai/minimax-m2.7'
+              options?.model ?? 'minimaxai/minimax-m2.7'
             const requestBody = normalizeToolCallPayload({
               model,
               messages,
-              temperature: options?.temperature || 0.7,
-              max_tokens: options?.maxTokens || 1024,
+              temperature: options?.temperature ?? 0.7,
+              max_tokens: options?.maxTokens ?? 1024,
               stop: options?.stop,
             })
 
@@ -458,9 +500,9 @@ export function createLLMService(config: LLMClientConfig): LLMService {
                 },
               ],
               usage: {
-                promptTokens: data.usage?.prompt_tokens || 0,
-                completionTokens: data.usage?.completion_tokens || 0,
-                totalTokens: data.usage?.total_tokens || 0,
+                promptTokens: data.usage?.prompt_tokens ?? 0,
+                completionTokens: data.usage?.completion_tokens ?? 0,
+                totalTokens: data.usage?.total_tokens ?? 0,
               },
               provider: 'llm',
               content:
@@ -520,7 +562,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
       return {
         id: `llm-${Date.now()}`,
         created: Date.now(),
-        model: options?.model || 'minimaxai/minimax-m2.7',
+        model: options?.model ?? 'minimaxai/minimax-m2.7',
         choices: [
           {
             message: {
@@ -530,7 +572,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
             finishReason: 'stop',
           },
         ],
-        usage: result.usage || {
+        usage: result.usage ?? {
           promptTokens: 0,
           completionTokens: 0,
           totalTokens: 0,
@@ -550,12 +592,12 @@ export function createLLMService(config: LLMClientConfig): LLMService {
           throw new LLMServiceError('LLM API key is not configured')
         }
 
-        const model = options?.model || 'minimaxai/minimax-m2.7'
+        const model = options?.model ?? 'minimaxai/minimax-m2.7'
         const requestBody = normalizeToolCallPayload({
           model,
           messages,
-          temperature: options?.temperature || 0.7,
-          max_tokens: options?.maxTokens || 1024,
+          temperature: options?.temperature ?? 0.7,
+          max_tokens: options?.maxTokens ?? 1024,
           stop: options?.stop,
         })
 
@@ -598,7 +640,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
 
               buffer += decoder.decode(value, { stream: true })
               const lines = buffer.split('\n')
-              buffer = lines.pop() || '' // Keep incomplete line in buffer
+              buffer = lines.pop() ?? '' // Keep incomplete line in buffer
 
               for (const line of lines) {
                 const trimmedLine = line.trim()
@@ -629,7 +671,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
                     Array.isArray(choice?.delta?.tool_calls)
                   ) {
                     const deltaContent =
-                      choice.delta.content ||
+                      choice.delta.content ??
                       (Array.isArray(choice.delta.tool_calls)
                         ? choice.delta.tool_calls
                             .map((toolCall) => extractToolCallSummary(toolCall))

@@ -54,7 +54,7 @@ export function formatDate(
       formatOptions.second = options.second
     }
 
-    return date.toLocaleDateString(options.locale || 'en-US', formatOptions)
+    return date.toLocaleDateString(options.locale ?? 'en-US', formatOptions)
   } catch (error: unknown) {
     throw new Error(
       `Failed to format date: ${error instanceof Error ? String(error) : 'Unknown error'}`,
@@ -84,8 +84,11 @@ function formatRelativeDate(date: Date): string {
     return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`
   } else if (diffHours < 24) {
     return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`
-  } else if (diffDays < 30) {
+  } else if (diffDays < 7) {
     return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7)
+    return `${weeks} week${weeks === 1 ? '' : 's'} ago`
   } else if (diffMonths < 12) {
     return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`
   } else {

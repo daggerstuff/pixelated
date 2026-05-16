@@ -11,7 +11,7 @@ from bias_detection.services.nvidia_api_service import (
 )
 
 
-class TestNvidiaAPIService(unittest.TestCase):
+class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
     """Test cases for NVIDIA API service"""
 
     def setUp(self):
@@ -89,14 +89,14 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = AsyncMock()
+        mock_response = MagicMock()
         mock_response.json.return_value = {
             "choices": [
                 {"message": {"content": "Hello! I'm doing well, thank you for asking."}}
             ],
             "usage": {"prompt_tokens": 10, "completion_tokens": 20},
         }
-        mock_response.raise_for_status = AsyncMock()
+        mock_response.raise_for_status = MagicMock()
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance
@@ -117,8 +117,8 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = AsyncMock()
-        mock_response.raise_for_status.side_effect = Exception("HTTP Error")
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock(side_effect=Exception("HTTP Error"))
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance
@@ -136,8 +136,8 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = AsyncMock()
-        mock_response.raise_for_status = AsyncMock()
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance

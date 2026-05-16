@@ -4,9 +4,9 @@
  */
 
 export class KVStore {
-  private storagePrefix: string
-  private cache: Map<string, unknown> = new Map()
-  private useLocalStorage: boolean
+  private readonly storagePrefix: string
+  private readonly cache: Map<string, unknown> = new Map()
+  private readonly useLocalStorage: boolean
 
   /**
    * Create a new KV Store instance
@@ -31,7 +31,7 @@ export class KVStore {
   /**
    * Store a value with the given key
    */
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: unknown): Promise<void> {
     const prefixedKey = this.prefixKey(key)
 
     try {
@@ -176,7 +176,7 @@ export class KVStore {
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i)
-          if (key && key.startsWith(fullPrefix)) {
+          if (key?.startsWith(fullPrefix)) {
             const normalizedKey = key.substring(this.storagePrefix.length)
             if (!keys.includes(normalizedKey)) {
               keys.push(normalizedKey)
@@ -208,7 +208,7 @@ export class KVStore {
 
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i)
-            if (key && key.startsWith(this.storagePrefix)) {
+            if (key?.startsWith(this.storagePrefix)) {
               keysToRemove.push(key)
             }
           }

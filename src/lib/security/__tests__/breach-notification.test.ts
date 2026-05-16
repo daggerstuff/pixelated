@@ -1,4 +1,10 @@
 // Mock dependencies
+vi.mock('crypto', () => ({
+  Buffer: globalThis.Buffer,
+  randomBytes: vi.fn(() => Buffer.from('unit-test-seed')),
+  randomUUID: vi.fn(() => '00000000-0000-0000-0000-000000000000'),
+}))
+
 vi.mock('../../redis', () => ({
   redis: {
     set: vi.fn(),
