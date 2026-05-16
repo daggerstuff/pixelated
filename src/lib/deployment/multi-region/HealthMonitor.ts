@@ -71,11 +71,18 @@ export interface HealthAlert {
 }
 
 export class HealthMonitor extends EventEmitter {
-  private config: HealthCheckConfig
+  private readonly config: HealthCheckConfig
   private regions: RegionConfig[] = []
-  private healthMetrics: Map<string, HealthMetrics[]> = new Map()
-  private healthScores: Map<string, HealthScore> = new Map()
-  private activeAlerts: Map<string, HealthAlert> = new Map()
+  private readonly healthMetrics: Map<string, HealthMetrics[]> = new Map()
+  private readonly healthScores: Map<string, HealthScore> = new Map()
+  private readonly activeAlerts: Map<string, HealthAlert> = new Map()
+  private readonly customHealthChecks: Map<
+    string,
+    () => Promise<{
+      status: 'healthy' | 'degraded' | 'unhealthy'
+      message: string
+    }>
+  > = new Map()
   private isInitialized = false
   private healthCheckInterval: NodeJS.Timeout | null = null
   private metricsRetentionInterval: NodeJS.Timeout | null = null
@@ -107,11 +114,14 @@ export class HealthMonitor extends EventEmitter {
       logger.info('Health Monitor initialized successfully')
 
       this.emit('initialized', { regions: regions.length })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Health Monitor', { error })
-      throw new Error(`Initialization failed: ${error.message}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -184,13 +194,64 @@ export class HealthMonitor extends EventEmitter {
    */
   private async performHealthChecks(): Promise<void> {
     try {
-      const checkPromises = this.regions.map((region) =>
+      const checkPromises = this.regions.map( async (region) =>
         this.performRegionHealthCheck(region),
       )
 
       await Promise.allSettled(checkPromises)
-    } catch (error) {
+
+      for (const [name, check] of this.customHealthChecks) {
+        const result = await check()
+        if (result.status !== 'healthy') {
+          this.emit('custom-health-check-failed', {
+            checkName: name,
+            status: result.status,
+            message: result.message,
+          })
+        }
+      }
+    } catch (error: unknown) {
       logger.error('Health check cycle failed', { error })
+    }
+  }
+
+  /**
+   * Register custom health check
+   */
+  registerCheck(
+    name: string,
+    check: () => Promise<{
+      status: 'healthy' | 'degraded' | 'unhealthy'
+      message: string
+    }>,
+  ): void {
+    this.customHealthChecks.set(name, check)
+  }
+
+  /**
+   * Get region health status for a specific region
+   */
+  getRegionHealth(regionId: string): {
+    status: 'healthy' | 'degraded' | 'unhealthy'
+    message: string
+  } {
+    const healthScore = this.healthScores.get(regionId)
+
+    if (!healthScore) {
+      return {
+        status: 'unhealthy',
+        message: `No health score found for region ${regionId}`,
+      }
+    }
+
+    return {
+      status:
+        healthScore.status === 'healthy'
+          ? 'healthy'
+          : healthScore.status === 'degraded'
+            ? 'degraded'
+            : 'unhealthy',
+      message: `Health score ${healthScore.overallScore} for region ${regionId}`,
     }
   }
 
@@ -220,7 +281,7 @@ export class HealthMonitor extends EventEmitter {
         overallScore: healthScore.overallScore,
         status: healthScore.status,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Health check failed for region: ${region.name}`, { error })
 
       // Create degraded health score on failure
@@ -235,7 +296,7 @@ export class HealthMonitor extends EventEmitter {
         },
         status: 'critical',
         lastUpdated: new Date(),
-        trends: this.healthScores.get(region.id)?.trends || {
+        trends: this.healthScores.get(region.id)?.trends ?? {
           '1h': 0,
           '24h': 0,
           '7d': 0,
@@ -245,7 +306,7 @@ export class HealthMonitor extends EventEmitter {
       this.updateHealthScore(region.id, failedScore)
       this.emit('health-check-failed', {
         regionId: region.id,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
     }
   }
@@ -286,7 +347,7 @@ export class HealthMonitor extends EventEmitter {
       }
 
       return metrics
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to collect health metrics for region: ${region.name}`,
         { error },
@@ -318,7 +379,7 @@ export class HealthMonitor extends EventEmitter {
    * Store health metrics
    */
   private storeHealthMetrics(regionId: string, metrics: HealthMetrics): void {
-    const metricsHistory = this.healthMetrics.get(regionId) || []
+    const metricsHistory = this.healthMetrics.get(regionId) ?? []
     metricsHistory.push(metrics)
 
     // Keep only last 1000 metrics per region (about 8.3 hours at 30-second intervals)
@@ -336,7 +397,7 @@ export class HealthMonitor extends EventEmitter {
     regionId: string,
     currentMetrics: HealthMetrics,
   ): HealthScore {
-    const metricsHistory = this.healthMetrics.get(regionId) || []
+    const metricsHistory = this.healthMetrics.get(regionId) ?? []
 
     // Calculate component scores
     const performanceScore = this.calculatePerformanceScore(
@@ -716,7 +777,7 @@ export class HealthMonitor extends EventEmitter {
           `Generated ${alerts.length} health alerts for region: ${regionId}`,
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to check for health alerts for region: ${regionId}`,
         { error },
@@ -769,7 +830,7 @@ export class HealthMonitor extends EventEmitter {
     regionId: string,
     limit: number = 100,
   ): HealthMetrics[] {
-    const metrics = this.healthMetrics.get(regionId) || []
+    const metrics = this.healthMetrics.get(regionId) ?? []
     return metrics.slice(-limit)
   }
 
@@ -883,7 +944,7 @@ export class HealthMonitor extends EventEmitter {
           )
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cleanup old metrics', { error })
     }
   }
@@ -911,7 +972,7 @@ export class HealthMonitor extends EventEmitter {
       this.isInitialized = false
 
       logger.info('Health Monitor cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health Monitor cleanup failed', { error })
       throw error
     }

@@ -3,7 +3,6 @@
  *
  * Provides comprehensive state persistence management including:
  * - Jotai enhanced storage initialization
- * - Offline synchronization setup
  * - Cross-tab state synchronization
  * - State backup and recovery
  * - Performance monitoring
@@ -21,6 +20,8 @@ import React, {
 
 import { logger } from '@/lib/logger'
 import { persistenceManager } from '@/lib/state/jotai-persistence'
+
+import { SyncProvider } from './SyncContext'
 
 // ============================================================================
 // Types
@@ -77,6 +78,86 @@ export function StatePersistenceProvider({
     isHealthy: true,
   })
 
+  // Refresh storage statistics
+  const refreshStats = useCallback(() => {
+    try {
+      const storageStats = persistenceManager.getStorageStats()
+
+      setStats((prev) => ({
+        ...prev,
+        totalKeys: storageStats.totalKeys,
+        totalSize: storageStats.totalSize,
+        isHealthy: true,
+      }))
+
+      if (debug) {
+        logger.debug('Storage stats updated:', storageStats)
+      }
+    } catch (error: unknown) {
+      logger.error('Failed to refresh storage stats:', error)
+      setStats((prev) => ({ ...prev, isHealthy: false }))
+    }
+  }, [debug])
+
+  // Export all persisted state
+  const exportState = useCallback(() => {
+    try {
+      const exported = persistenceManager.exportPersistedState()
+
+      if (debug) {
+        logger.info('State exported:', Object.keys(exported))
+      }
+
+      return exported
+    } catch (error: unknown) {
+      logger.error('Failed to export state:', error)
+      throw error
+    }
+  }, [debug])
+
+  // Create a backup of current state
+  const createBackup = useCallback(async () => {
+    try {
+      const state = exportState()
+      const timestamp = Date.now()
+      const backupKey = `state_backup_${timestamp}`
+
+      // Store backup in a separate storage area
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(
+            backupKey,
+            JSON.stringify({
+              timestamp,
+              state,
+              version: '1.0',
+            }),
+          )
+
+          // Clean up old backups (keep only last 5)
+          const backupKeys = Object.keys(localStorage)
+            .filter((key) => key.startsWith('state_backup_'))
+            .sort()
+
+          if (backupKeys.length > 5) {
+            const keysToRemove = backupKeys.slice(0, backupKeys.length - 5)
+            keysToRemove.forEach((key) => localStorage.removeItem(key))
+          }
+
+          setStats((prev) => ({ ...prev, lastBackup: timestamp }))
+
+          if (debug) {
+            logger.info(`State backup created: ${backupKey}`)
+          }
+        } catch (storageError) {
+          logger.warn('Failed to store backup to localStorage:', storageError)
+        }
+      }
+    } catch (error: unknown) {
+      logger.error('Failed to create state backup:', error)
+    }
+  }, [exportState, debug])
+
   // Initialize persistence system
   useEffect(() => {
     let backupTimer: NodeJS.Timeout | null = null
@@ -88,6 +169,9 @@ export function StatePersistenceProvider({
         }
 
         // Offline sync initialization removed: initializeOfflineSync does not exist
+
+        // Note: tabSyncManager lifecycle is now managed solely by SyncProvider
+        // to ensure a single source of truth for the sync layer's runtime state.
 
         // Set up automatic backups if enabled
         if (enableBackups && typeof window !== 'undefined') {
@@ -117,7 +201,7 @@ export function StatePersistenceProvider({
 
     void initializePersistence()
 
-    // Cleanup function
+    // Cleanup function — only manage backup timer, sync layer is handled by SyncProvider
     return () => {
       if (backupTimer) {
         clearInterval(backupTimer)
@@ -173,27 +257,6 @@ export function StatePersistenceProvider({
     }
   }, [isInitialized])
 
-  // Refresh storage statistics
-  const refreshStats = useCallback(() => {
-    try {
-      const storageStats = persistenceManager.getStorageStats()
-
-      setStats((prev) => ({
-        ...prev,
-        totalKeys: storageStats.totalKeys,
-        totalSize: storageStats.totalSize,
-        isHealthy: true,
-      }))
-
-      if (debug) {
-        logger.debug('Storage stats updated:', storageStats)
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to refresh storage stats:', error)
-      setStats((prev) => ({ ...prev, isHealthy: false }))
-    }
-  }, [debug])
-
   // Clear all persisted state
   const clearAllState = useCallback(async () => {
     try {
@@ -208,22 +271,6 @@ export function StatePersistenceProvider({
       throw error
     }
   }, [refreshStats, debug])
-
-  // Export all persisted state
-  const exportState = useCallback(() => {
-    try {
-      const exported = persistenceManager.exportPersistedState()
-
-      if (debug) {
-        logger.info('State exported:', Object.keys(exported))
-      }
-
-      return exported
-    } catch (error: unknown) {
-      logger.error('Failed to export state:', error)
-      throw error
-    }
-  }, [debug])
 
   // Import persisted state
   const importState = useCallback(
@@ -243,49 +290,6 @@ export function StatePersistenceProvider({
     [refreshStats, debug],
   )
 
-  // Create a backup of current state
-  const createBackup = useCallback(async () => {
-    try {
-      const state = exportState()
-      const timestamp = Date.now()
-      const backupKey = `state_backup_${timestamp}`
-
-      // Store backup in a separate storage area
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem(
-            backupKey,
-            JSON.stringify({
-              timestamp,
-              state,
-              version: '1.0',
-            }),
-          )
-
-          // Clean up old backups (keep only last 5)
-          const backupKeys = Object.keys(localStorage)
-            .filter((key) => key.startsWith('state_backup_'))
-            .sort()
-
-          if (backupKeys.length > 5) {
-            const keysToRemove = backupKeys.slice(0, backupKeys.length - 5)
-            keysToRemove.forEach((key) => localStorage.removeItem(key))
-          }
-
-          setStats((prev) => ({ ...prev, lastBackup: timestamp }))
-
-          if (debug) {
-            logger.info(`State backup created: ${backupKey}`)
-          }
-        } catch (storageError) {
-          logger.warn('Failed to store backup to localStorage:', storageError)
-        }
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to create state backup:', error)
-    }
-  }, [exportState, debug])
-
   // Context value
   const contextValue: StatePersistenceContextType = {
     stats,
@@ -298,9 +302,11 @@ export function StatePersistenceProvider({
   }
 
   return (
-    <StatePersistenceContext.Provider value={contextValue}>
-      <JotaiProvider>{children}</JotaiProvider>
-    </StatePersistenceContext.Provider>
+    <SyncProvider>
+      <StatePersistenceContext.Provider value={contextValue}>
+        <JotaiProvider>{children}</JotaiProvider>
+      </StatePersistenceContext.Provider>
+    </SyncProvider>
   )
 }
 
@@ -359,7 +365,10 @@ export function StatePersistenceDebugger() {
     const reader = new FileReader()
     reader.onload = async (e) => {
       try {
-        const state = JSON.parse(e.target?.result as string) as unknown
+        const state = JSON.parse(e.target?.result as string) as Record<
+          string,
+          unknown
+        >
         await importState(state)
         alert('State imported successfully!')
       } catch (error: unknown) {
@@ -413,13 +422,13 @@ export function StatePersistenceDebugger() {
         />
         <button
           onClick={() =>
-            (document.getElementById('import-input') as HTMLElement)?.click()
+            (document.getElementById('import-input'))?.click()
           }
         >
           Import
         </button>
         <button onClick={createBackup}>Backup</button>
-        <button onClick={() => confirm('Clear all state?') && clearAllState()}>
+        <button onClick={ async () => confirm('Clear all state?') && clearAllState()}>
           Clear
         </button>
       </div>

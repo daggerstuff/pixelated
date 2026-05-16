@@ -55,9 +55,9 @@ export interface CacheOptions {
 // =============================================================================
 
 export class BiasDetectionCache {
-  private memoryCache = new Map<string, CacheEntry>()
-  private config: CacheConfig
-  private stats: CacheStats
+  private readonly memoryCache = new Map<string, CacheEntry>()
+  private readonly config: CacheConfig
+  private readonly stats: CacheStats
   private cleanupTimer?: ReturnType<typeof setInterval> | undefined
   private cacheService: {
     get(key: string): Promise<string | null>
@@ -86,7 +86,7 @@ export class BiasDetectionCache {
       return []
     }
     return (
-      (await this.cacheService.keys?.(`${this.config.redisKeyPrefix}*`)) || []
+      (await this.cacheService.keys?.(`${this.config.redisKeyPrefix}*`)) ?? []
     )
   }
 
@@ -94,7 +94,7 @@ export class BiasDetectionCache {
     if (!this.cacheService) {
       return null
     }
-    return (await this.cacheService.get(key)) || null
+    return (await this.cacheService.get(key)) ?? null
   }
 
   public async deleteFromRedisCache(key: string): Promise<void> {
@@ -166,21 +166,21 @@ export class BiasDetectionCache {
   /**
    * Store a value in the cache (Redis + Memory)
    */
-  async set<T>(
+  async set(
     key: string,
-    value: T,
+    value: unknown,
     options: CacheOptions = {},
   ): Promise<void> {
     try {
       const now = new Date()
-      const ttl = options.ttl || this.config.defaultTtl
+      const ttl = options.ttl ?? this.config.defaultTtl
       const ttlSeconds = Math.floor(ttl / 1000)
       const expiresAt = new Date(now.getTime() + ttl)
 
       // Compress data if enabled
       let processedValue = value
       if (this.config.enableCompression && options.compress !== false) {
-        processedValue = (await this.compressData(value)) as T
+        processedValue = (await this.compressData(value))
       }
 
       // Store in Redis first (distributed cache)
@@ -195,11 +195,11 @@ export class BiasDetectionCache {
             value: processedValue,
             timestamp: now.toISOString(),
             expiresAt: expiresAt.toISOString(),
-            tags: options.tags || [],
+            tags: options.tags ?? [],
             metadata: {
               biasCache: true,
               version: '1.0',
-              priority: options.priority || 'medium',
+              priority: options.priority ?? 'medium',
             },
           }
 
@@ -233,14 +233,14 @@ export class BiasDetectionCache {
           await this.evictLeastRecentlyUsed()
         }
 
-        const entry: CacheEntry<T> = {
+        const entry: CacheEntry<unknown> = {
           key,
           value: processedValue,
           timestamp: now,
           expiresAt,
           accessCount: 0,
           lastAccessed: now,
-          tags: options.tags || [],
+          tags: options.tags ?? [],
         }
 
         this.memoryCache.set(key, entry)
@@ -392,9 +392,9 @@ export class BiasDetectionCache {
   /**
    * Store Redis result in memory cache for fast future access
    */
-  private async storeInMemoryFromRedis<T>(
+  private async storeInMemoryFromRedis(
     key: string,
-    value: T,
+    value: unknown,
   ): Promise<void> {
     try {
       if (this.memoryCache.size >= this.config.maxSize) {
@@ -402,7 +402,7 @@ export class BiasDetectionCache {
       }
 
       const now = new Date()
-      const entry: CacheEntry<T> = {
+      const entry: CacheEntry<unknown> = {
         key,
         value,
         timestamp: now,
@@ -517,7 +517,7 @@ export class BiasDetectionCache {
 
     // Invalidate in-memory cache
     for (const [key, entry] of Array.from(this.memoryCache.entries())) {
-      if (entry.tags && entry.tags.some((tag) => tags.includes(tag))) {
+      if (entry.tags?.some((tag) => tags.includes(tag))) {
         this.memoryCache.delete(key)
         invalidatedKeys.add(key)
       }
@@ -543,8 +543,7 @@ export class BiasDetectionCache {
           }
 
           if (
-            cacheData.tags &&
-            cacheData.tags.some((tag: string) => tags.includes(tag))
+            cacheData.tags?.some((tag: string) => tags.includes(tag))
           ) {
             const logicalKey = redisKey.startsWith(this.config.redisKeyPrefix)
               ? redisKey.slice(this.config.redisKeyPrefix.length)
@@ -776,7 +775,7 @@ export class BiasDetectionCache {
  * Cache manager for bias analysis results
  */
 export class BiasAnalysisCache {
-  private cache: BiasDetectionCache
+  private readonly cache: BiasDetectionCache
 
   constructor(config?: Partial<CacheConfig>) {
     this.cache = new BiasDetectionCache({
@@ -823,8 +822,8 @@ export class BiasAnalysisCache {
     const key = `session:${session.sessionId}`
     const tags = [
       'session-data',
-      `participant:${session.participantDemographics.age}:${session.participantDemographics.gender}`,
-      `scenario:${session.scenario.type}`,
+      `participant:${session.participantDemographics?.age ?? 'unknown'}:${session.participantDemographics?.gender ?? 'unknown'}`,
+      `scenario:${session.scenario?.type ?? 'unknown'}`,
     ]
 
     await this.cache.set(key, session, { tags })
@@ -862,7 +861,7 @@ export class BiasAnalysisCache {
 
     // Invalidate in-memory cache
     for (const [key, entry] of this.cache.getMemoryCacheEntries()) {
-      if (entry && entry.tags) {
+      if (entry?.tags) {
         let shouldInvalidate = false
         for (const tag of entry.tags) {
           if (tag.startsWith('participant:')) {
@@ -956,7 +955,7 @@ export class BiasAnalysisCache {
  * Cache manager for dashboard data
  */
 export class DashboardCache {
-  private cache: BiasDetectionCache
+  private readonly cache: BiasDetectionCache
 
   constructor(config?: Partial<CacheConfig>) {
     this.cache = new BiasDetectionCache({
@@ -1018,7 +1017,7 @@ export class DashboardCache {
  * Cache manager for reports
  */
 export class ReportCache {
-  private cache: BiasDetectionCache
+  private readonly cache: BiasDetectionCache
 
   constructor(config?: Partial<CacheConfig>) {
     this.cache = new BiasDetectionCache({
@@ -1085,9 +1084,7 @@ export class CacheManager {
   }
 
   static getInstance(): CacheManager {
-    if (!CacheManager.instance) {
-      CacheManager.instance = new CacheManager()
-    }
+    CacheManager.instance ??= new CacheManager();
     return CacheManager.instance
   }
 

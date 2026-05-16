@@ -361,7 +361,7 @@ export const generateScenarioBatch = async (
       averageQualityScore,
       averageBalanceScore,
       processingTime,
-      balanceAchieved: averageBalanceScore >= (options?.qualityThreshold || 80),
+      balanceAchieved: averageBalanceScore >= (options?.qualityThreshold ?? 80),
     },
   }
 }
@@ -696,13 +696,15 @@ interface ConversationRequest {
 function calculateConversationQuality(request: ConversationRequest): void {
   // Simulate quality calculation based on knowledge integration
   const baseScore = 80
+  const kb = request.knowledgeBase as { dsm5Criteria?: unknown[] }
+  const cp = request.conversationParameters as { targetTechniques?: unknown[] }
   const knowledgeIntegration = Math.min(
     95,
-    baseScore + request.knowledgeBase.dsm5Criteria.length * 2,
+    baseScore + (kb.dsm5Criteria?.length ?? 0) * 2,
   )
   const therapeuticAccuracy = Math.min(
     92,
-    baseScore + request.conversationParameters.targetTechniques.length * 3,
+    baseScore + (cp.targetTechniques?.length ?? 0) * 3,
   )
   const authenticity = Math.min(88, baseScore + Math.random() * 10)
   const conversationFlow = Math.min(90, baseScore + 5)
@@ -724,20 +726,27 @@ function calculateConversationQuality(request: ConversationRequest): void {
 }
 
 function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
-  return dialogue.map((turn, index) => ({
-    dialogueTurn: index + 1,
-    appliedKnowledge: [
-      {
-        source: turn.knowledgeSource.type,
-        content: turn.knowledgeSource.reference,
-        application:
-          turn.speaker === 'therapist'
-            ? 'therapeutic_intervention'
-            : 'client_response_pattern',
-        confidence: turn.knowledgeSource.confidence,
-      },
-    ],
-  }))
+  return dialogue.map((turn, index) => {
+    const ks = turn.knowledgeSource as {
+      type: string
+      reference: string
+      confidence: number
+    }
+    return {
+      dialogueTurn: index + 1,
+      appliedKnowledge: [
+        {
+          source: ks.type,
+          content: ks.reference,
+          application:
+            turn.speaker === 'therapist'
+              ? 'therapeutic_intervention'
+              : 'client_response_pattern',
+          confidence: ks.confidence,
+        },
+      ],
+    }
+  })
 }
 
 // Export types for conversation converter

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { GET } from '@/pages/api/bias-detection/export'
+import { GET } from './export'
 
 // Mock logger
-vi.mock('@/lib/logging/build-safe-logger', () => ({
+vi.mock('../../../../lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => ({
     info: vi.fn(),
     error: vi.fn(),

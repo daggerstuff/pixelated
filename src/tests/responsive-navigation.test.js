@@ -254,7 +254,7 @@ test.describe('Responsive Design and Navigation Tests', () => {
     isMobile,
   }) => {
     if (!isMobile) {
-      test.skip('Skipping touch test on non-mobile device')
+      return
     }
 
     await page.setViewportSize({ width: 375, height: 667 })

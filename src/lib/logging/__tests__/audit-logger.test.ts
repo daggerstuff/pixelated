@@ -1,4 +1,6 @@
-import fs from 'node:fs'
+/// <reference types="vitest" />
+// @vitest-environment node
+import fs from 'fs'
 
 import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 import { logAudit } from '../audit-logger'

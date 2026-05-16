@@ -11,7 +11,7 @@ import '../../../../config/instrument.mjs'
 
 const appLogger = createBuildSafeLogger('bias-detection-server')
 
-const BIAS_DETECTION_PORT = parseInt(process.env['PORT'] || '8001', 10)
+const BIAS_DETECTION_PORT = parseInt(process.env['PORT'] ?? '8001', 10)
 
 interface ApiResponse {
   success: boolean
@@ -22,7 +22,7 @@ interface ApiResponse {
 class BiasDetectionServer {
   private server: ReturnType<typeof createServer> | null = null
   private isRunning = false
-  private engine: BiasDetectionEngine
+  private readonly engine: BiasDetectionEngine
 
   constructor() {
     // Initialize bias detection engine
@@ -56,7 +56,7 @@ class BiasDetectionServer {
       const engineHealthy =
         typeof engineHealth.overall === 'string'
           ? engineHealth.overall === 'healthy'
-          : Boolean(engineHealth.overall)
+          : engineHealth.overall
       const overallHealth =
         engineHealthy && this.isRunning ? 'healthy' : 'degraded'
 
@@ -69,14 +69,14 @@ class BiasDetectionServer {
             server: serverHealth,
             engine: engineHealth,
           },
-          version: process.env['npm_package_version'] || '1.0.0',
+          version: process.env['npm_package_version'] ?? '1.0.0',
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Health check failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Health check failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Health check failed',
       })
     }
   }
@@ -88,7 +88,7 @@ class BiasDetectionServer {
     try {
       const { session } = body as { session: TherapeuticSession }
 
-      if (!session || !session.sessionId) {
+      if (!session?.sessionId) {
         this.sendJsonResponse(res, 400, {
           success: false,
           error: 'Session data with sessionId is required',
@@ -127,11 +127,11 @@ class BiasDetectionServer {
           processingTime,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Bias analysis failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Bias analysis failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Bias analysis failed',
       })
     }
   }
@@ -178,8 +178,8 @@ class BiasDetectionServer {
 
       const startTime = Date.now()
       const result = await this.engine.batchAnalyzeSessions(sessionData, {
-        concurrency: options.concurrency || 3,
-        batchSize: options.batchSize || 10,
+        concurrency: options.concurrency ?? 3,
+        batchSize: options.batchSize ?? 10,
         logProgress: options.logProgress !== false,
         logErrors: options.logErrors !== false,
       })
@@ -197,11 +197,11 @@ class BiasDetectionServer {
           },
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Batch analysis failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
-        error: error instanceof Error ? error.message : 'Batch analysis failed',
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Batch analysis failed',
       })
     }
   }
@@ -225,13 +225,13 @@ class BiasDetectionServer {
         success: true,
         data: dashboardData,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Dashboard data retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
           error instanceof Error
-            ? error.message
+            ? (error instanceof Error ? error.message : "Unknown error")
             : 'Dashboard data retrieval failed',
       })
     }
@@ -256,13 +256,13 @@ class BiasDetectionServer {
         success: true,
         data: result,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Session analysis retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
           error instanceof Error
-            ? error.message
+            ? (error instanceof Error ? error.message : "Unknown error")
             : 'Session analysis retrieval failed',
       })
     }
@@ -276,13 +276,13 @@ class BiasDetectionServer {
         success: true,
         data: stats,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Performance stats retrieval failed:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
           error instanceof Error
-            ? error.message
+            ? (error instanceof Error ? error.message : "Unknown error")
             : 'Performance stats retrieval failed',
       })
     }
@@ -310,7 +310,7 @@ class BiasDetectionServer {
     res: NodeServerResponse,
   ): Promise<void> {
     const { method, url } = req
-    const parsedUrl = parse(url || '', true)
+    const parsedUrl = parse(url ?? '', true)
     const path = parsedUrl.pathname
 
     // Handle CORS preflight
@@ -366,7 +366,7 @@ class BiasDetectionServer {
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       appLogger.error('Request handling error:', error)
       this.sendJsonResponse(res, 500, {
         success: false,
@@ -432,7 +432,7 @@ class BiasDetectionServer {
       // Dispose of the engine
       try {
         await this.engine.dispose()
-      } catch (error) {
+      } catch (error: unknown) {
         appLogger.error('Error disposing engine:', error)
       }
 
@@ -452,10 +452,10 @@ class BiasDetectionServer {
 const biasDetectionServer = new BiasDetectionServer()
 
 // Graceful shutdown
-process.on('SIGTERM', () =>
+process.on('SIGTERM',  async () =>
   biasDetectionServer.stop().then(() => process.exit(0)),
 )
-process.on('SIGINT', () =>
+process.on('SIGINT',  async () =>
   biasDetectionServer.stop().then(() => process.exit(0)),
 )
 

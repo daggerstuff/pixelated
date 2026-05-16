@@ -7,9 +7,9 @@ import type {
 import { parseApiResponse, ValidationResult } from './utils/json-validator'
 
 export class EnterpriseAPIClient {
-  private baseURL: string
-  private maxRetries: number = 3
-  private retryDelay: number = 1000
+  private readonly baseURL: string
+  private readonly maxRetries: number = 3
+  private readonly retryDelay: number = 1000
 
   constructor(baseURL: string = '') {
     this.baseURL = baseURL
@@ -81,13 +81,13 @@ export class EnterpriseAPIClient {
 
           if (retryOn.includes(response.status)) {
             throw new APIRetryableError(
-              `HTTP ${response.status}: ${errorData.error || response.statusText}`,
+              `HTTP ${response.status}: ${errorData.error ?? response.statusText}`,
               response.status,
             )
           }
 
           throw new APIError(
-            `HTTP ${response.status}: ${errorData.error || response.statusText}`,
+            `HTTP ${response.status}: ${errorData.error ?? response.statusText}`,
             response.status,
             errorData,
           )
@@ -109,7 +109,7 @@ export class EnterpriseAPIClient {
       } catch (error: unknown) {
         clearTimeout(timeoutId)
 
-        if (error instanceof Error && (error)?.name === 'AbortError') {
+        if (error instanceof Error && error?.name === 'AbortError') {
           throw new APITimeoutError(`Request timeout after ${timeout}ms`)
         }
 

@@ -1,9 +1,8 @@
 ---
 title: The Dance of Wounded Souls
-description:
-  Understanding codependency, narcissism, and the journey toward healing from
-  complex relationship trauma
-generated: 1726987605982
+description: >-
+  In our journey to understand relationships, we often encounter the term
+  "codependency" and its complexities in emotional healing.
 author: Dr. Lisa Anderson
 pubDate: 2024-02-21
 ---

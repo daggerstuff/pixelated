@@ -2,6 +2,10 @@
  * Browser compatibility testing utilities
  */
 
+/**
+ * Information about the current browser environment and feature support.
+ * Used to adjust UI and functionality based on compatibility.
+ */
 export interface BrowserInfo {
   name: string
   version: string
@@ -37,19 +41,19 @@ export function detectBrowser(): BrowserInfo {
   // Detect browser
   if (userAgent.includes('Firefox')) {
     browserName = 'Firefox'
-    browserVersion = userAgent.match(/Firefox\/([0-9.]+)/)?.[1] || 'Unknown'
+    browserVersion = userAgent.match(/Firefox\/([0-9.]+)/)?.[1] ?? 'Unknown'
   } else if (userAgent.includes('Edg')) {
     browserName = 'Edge'
-    browserVersion = userAgent.match(/Edg\/([0-9.]+)/)?.[1] || 'Unknown'
+    browserVersion = userAgent.match(/Edg\/([0-9.]+)/)?.[1] ?? 'Unknown'
   } else if (userAgent.includes('Chrome')) {
     browserName = 'Chrome'
-    browserVersion = userAgent.match(/Chrome\/([0-9.]+)/)?.[1] || 'Unknown'
+    browserVersion = userAgent.match(/Chrome\/([0-9.]+)/)?.[1] ?? 'Unknown'
   } else if (userAgent.includes('Safari')) {
     browserName = 'Safari'
-    browserVersion = userAgent.match(/Version\/([0-9.]+)/)?.[1] || 'Unknown'
+    browserVersion = userAgent.match(/Version\/([0-9.]+)/)?.[1] ?? 'Unknown'
   } else if (userAgent.includes('MSIE') || userAgent.includes('Trident')) {
     browserName = 'Internet Explorer'
-    browserVersion = userAgent.match(/(?:MSIE |rv:)([0-9.]+)/)?.[1] || 'Unknown'
+    browserVersion = userAgent.match(/(?:MSIE |rv:)([0-9.]+)/)?.[1] ?? 'Unknown'
   }
 
   // Detect OS

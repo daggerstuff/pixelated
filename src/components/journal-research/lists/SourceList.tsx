@@ -2,12 +2,12 @@ import { format } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
-import { Table } from '@/components/ui/table'
+import { Table } from '@/components/ui/table.tsx'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
-} from '@/components/ui/table-types'
+} from '@/components/ui/table-types.ts'
 import type {
   Source,
   SourceList as SourceListType,
@@ -31,6 +31,11 @@ export function SourceList({
     currentPage: sources.page ?? 1,
     pageSize: sources.pageSize ?? 10,
   })
+  const handleTableStateChange: (newState: Partial<TableState>) => void = (
+    newState,
+  ) => {
+    setTableState((prevState) => ({ ...prevState, ...newState }))
+  }
 
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
@@ -232,7 +237,7 @@ export function SourceList({
         columns={columns}
         dataSource={tableDataSource}
         tableState={tableState}
-        onStateChange={setTableState}
+        onStateChange={handleTableStateChange}
         hoverable
         striped
         bordered

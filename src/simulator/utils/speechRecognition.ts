@@ -24,13 +24,9 @@ interface SpeechGrammarListInterface {
   addFromString(string: string, weight: number): void
 }
 
-interface SpeechRecognitionConstructor {
-  new (): SpeechRecognitionInterface
-}
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInterface
 
-interface SpeechGrammarListConstructor {
-  new (): SpeechGrammarListInterface
-}
+type SpeechGrammarListConstructor = new () => SpeechGrammarListInterface
 
 // Define the speech recognition window interface
 declare global {
@@ -84,12 +80,12 @@ export function createSpeechRecognition(
   const recognition = new SpeechRecognitionConstructor()
 
   // Apply configuration
-  recognition.lang = config.language || 'en-US'
+  recognition.lang = config.language ?? 'en-US'
   recognition.continuous =
-    config.continuous !== undefined ? config.continuous : true
+    config.continuous ?? true
   recognition.interimResults =
-    config.interimResults !== undefined ? config.interimResults : true
-  recognition.maxAlternatives = config.maxAlternatives || 1
+    config.interimResults ?? true
+  recognition.maxAlternatives = config.maxAlternatives ?? 1
 
   // Add grammar list if specified and supported
   if (config.grammarList && window.SpeechGrammarList) {
@@ -231,7 +227,6 @@ export function getKeywordPatterns(domain: string): RegExp[] {
     ],
   }
 
-  // eslint-disable-next-line @typescript-eslint/dot-notation
   return patterns[domain] || patterns['general'] || []
 }
 
@@ -395,8 +390,7 @@ export function getTherapeuticPrompts(
       ],
     }
 
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    const domainPrompts = generalPrompts[domain] || generalPrompts['general']
+    const domainPrompts = generalPrompts[domain] || generalPrompts.general
     if (domainPrompts) {
       const selectedPrompt =
         domainPrompts[Math.floor(Math.random() * domainPrompts.length)]

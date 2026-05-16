@@ -4,6 +4,18 @@ set -euo pipefail
 # Production deployment script using Helm
 # Requirements: kubectl, helm, access to cluster context
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+run_redis_hardening_audit() {
+  if ! "${PROJECT_ROOT}/scripts/check-redis-hardening.sh"; then
+    echo "Redis hardening audit failed"
+    exit 1
+  fi
+}
+
+run_redis_hardening_audit
+
 usage() {
   cat <<EOF
 Usage: $0 -r <release> -n <namespace> -i <image> -t <tag> [-f <values.yaml>] [--set key=val]...
@@ -64,12 +76,21 @@ helm upgrade --install "$REL" ./helm \
 
 if $WAIT; then
   echo "Waiting for rollout..."
-  kubectl rollout status deploy/"$REL" -n "$NS" --timeout="$TIMEOUT" || {
+  if ! kubectl rollout status deploy/"$REL" -n "$NS" --timeout="$TIMEOUT"; then
     echo "Rollout failed" >&2
-    kubectl get pods -n "$NS" -o wide
-    kubectl describe deploy/"$REL" -n "$NS"
+    kubectl describe deploy/"$REL" -n "$NS" || true
+    echo "Deployment status:"
+    kubectl get deploy/"$REL" -n "$NS" -o wide || true
+    echo "Current pods:"
+    kubectl get pods -n "$NS" -l app="${REL}" -o wide || true
+    for pod in $(kubectl get pods -n "$NS" --no-headers -o custom-columns=":metadata.name" -l app="${REL}"); do
+      echo "=== Logs for ${pod} (previous) ==="
+      kubectl logs "${pod}" -n "$NS" --previous --tail=120 || true
+      echo "=== Logs for ${pod} (current) ==="
+      kubectl logs "${pod}" -n "$NS" --tail=120 || true
+    done
     exit 1
-  }
+  fi
 fi
 
 echo "Deployment completed: release=$REL namespace=$NS image=$IMG:$TAG"

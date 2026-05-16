@@ -1,11 +1,13 @@
 ---
-title: 'Security Policy'
-description: 'Security Policy documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'security']
+description: Security Policy documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - security
 draft: false
 toc: true
+title: Security Policy
 ---
 
 # Security Policy

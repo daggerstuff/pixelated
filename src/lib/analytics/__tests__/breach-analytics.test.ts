@@ -1,3 +1,4 @@
+import type { EncryptedData } from '@/lib/fhe/types'
 import * as BreachAnalytics from '@/lib/analytics/breach-analytics'
 /// <reference types="vitest/globals" />
 import * as ComplianceMetrics from '@/lib/analytics/compliance'
@@ -8,6 +9,7 @@ import { StatisticalAnalysis } from '@/lib/analytics/statistics'
 import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
 import { redis } from '@/lib/redis'
+import type { BreachDetails } from '@/lib/security/breach-notification'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
 
 // Mock dependencies
@@ -68,7 +70,25 @@ describe('breachAnalytics', () => {
     to: new Date('2025-03-07'),
   }
 
-  const mockBreaches = [
+const mockedListRecentBreaches = vi.mocked(listRecentBreaches)
+const mockedRedisGet = vi.mocked(redis.get)
+const mockedCalculateOverallRisk = vi.mocked(RiskScoring.calculateOverallRisk)
+const mockedCalculateDailyRisk = vi.mocked(RiskScoring.calculateDailyRisk)
+const mockedCalculateScore = vi.mocked(ComplianceMetrics.calculateScore)
+const mockedCalculateNotificationEffectiveness = vi.mocked(
+  NotificationEffectiveness.calculate,
+)
+const mockedCalculateDailyNotification = vi.mocked(
+  NotificationEffectiveness.calculateDaily,
+)
+const mockedDetectAnomalies = vi.mocked(MachineLearning.detectAnomalies)
+const mockedPredictBreaches = vi.mocked(MachineLearning.predictBreaches)
+const mockedGetFactors = vi.mocked(RiskScoring.getFactors)
+const mockedAnalyzeTrends = vi.mocked(SecurityTrends.analyze)
+const mockedCalculateTrend = vi.spyOn(StatisticalAnalysis, 'calculateTrend')
+const mockedFheEncrypt = vi.spyOn(fheService, 'encrypt')
+
+  const mockBreaches: BreachDetails[] = [
     {
       id: 'breach_1',
       type: 'unauthorized_access',
@@ -76,6 +96,10 @@ describe('breachAnalytics', () => {
       timestamp: new Date('2025-03-02').getTime(),
       affectedUsers: ['user1', 'user2'],
       notificationStatus: 'completed',
+      description: 'Unauthorized access to account',
+      affectedData: ['passwords', 'emails'],
+      detectionMethod: 'monitoring',
+      remediation: 'Rotated credentials and forced logout',
     },
     {
       id: 'breach_2',
@@ -84,35 +108,48 @@ describe('breachAnalytics', () => {
       timestamp: new Date('2025-03-03').getTime(),
       affectedUsers: ['user3', 'user4', 'user5'],
       notificationStatus: 'completed',
+      description: 'Sensitive data exposed in logs',
+      affectedData: ['medical_records'],
+      detectionMethod: 'siem',
+      remediation: 'Patched exposed endpoint and rotated keys',
     },
   ]
+
+  const mockEncryptedData: EncryptedData = {
+    id: 'encrypted_mock',
+    data: 'encrypted_data',
+    dataType: 'string',
+    metadata: {
+      source: 'test',
+    },
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    ;(listRecentBreaches as unknown).mockResolvedValue(mockBreaches)
-    ;(redis.get as unknown).mockResolvedValue(
+    mockedListRecentBreaches.mockResolvedValue(mockBreaches)
+    mockedRedisGet.mockResolvedValue(
       JSON.stringify({
         completedAt: Date.now(),
       }),
     )
-    ;(RiskScoring.calculateOverallRisk as unknown).mockResolvedValue({
+    mockedCalculateOverallRisk.mockResolvedValue({
       overallScore: 0.75,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
       recommendations: [],
     })
-    ;(RiskScoring.calculateDailyRisk as unknown).mockResolvedValue({
+    mockedCalculateDailyRisk.mockResolvedValue({
       overallScore: 0.65,
       factors: [],
       timestamp: new Date(),
       confidence: 0.9,
       recommendations: [],
     })
-    ;(ComplianceMetrics.calculateScore as unknown).mockResolvedValue(0.98)
-    ;(NotificationEffectiveness.calculate as unknown).mockResolvedValue({
+    mockedCalculateScore.mockResolvedValue(0.98)
+    mockedCalculateNotificationEffectiveness.mockResolvedValue({
       overall: 0.95,
       delivery: 0.98,
       timing: 0.92,
@@ -128,7 +165,7 @@ describe('breachAnalytics', () => {
         complianceRate: 0.99,
       },
     })
-    ;(NotificationEffectiveness.calculateDaily as unknown).mockResolvedValue({
+    mockedCalculateDailyNotification.mockResolvedValue({
       overall: 0.92,
       delivery: 0.95,
       timing: 0.88,
@@ -144,21 +181,33 @@ describe('breachAnalytics', () => {
         complianceRate: 0.96,
       },
     })
-    ;(MachineLearning.detectAnomalies as unknown).mockResolvedValue([0.1, 0.2])
-    ;(MachineLearning.predictBreaches as unknown).mockResolvedValue([
+    mockedDetectAnomalies.mockResolvedValue([0.1, 0.2])
+    mockedPredictBreaches.mockResolvedValue([
       { value: 3, confidence: 0.8 },
       { value: 4, confidence: 0.7 },
     ])
-    ;(RiskScoring.getFactors as unknown).mockResolvedValue([
-      { name: 'factor1', weight: 0.8, score: 0.9 },
-      { name: 'factor2', weight: 0.6, score: 0.7 },
+    mockedGetFactors.mockResolvedValue([
+      {
+        name: 'factor1',
+        weight: 0.8,
+        score: 0.9,
+        description: 'Access controls not segmented by role',
+        calculateScore: async () => 0.9,
+      },
+      {
+        name: 'factor2',
+        weight: 0.6,
+        score: 0.7,
+        description: 'Patch cadence below target',
+        calculateScore: async () => 0.7,
+      },
     ])
-    ;(SecurityTrends.analyze as unknown).mockResolvedValue([
+    mockedAnalyzeTrends.mockResolvedValue([
       'increasing',
       'stable',
     ])
-    ;(StatisticalAnalysis.calculateTrend as unknown).mockReturnValue(0.15)
-    ;(fheService.encrypt as unknown).mockResolvedValue('encrypted_data')
+    mockedCalculateTrend.mockReturnValue(0.15)
+    mockedFheEncrypt.mockResolvedValue(mockEncryptedData)
   })
 
   afterEach(() => {
@@ -169,7 +218,7 @@ describe('breachAnalytics', () => {
     it('should generate breach metrics for the given timeframe', async () => {
       const metrics = await BreachAnalytics.generateMetrics(mockTimeframe)
 
-      expect(metrics).toEqual({
+      expect(metrics).toMatchObject({
         totalBreaches: 2,
         bySeverity: {
           high: 1,
@@ -179,26 +228,92 @@ describe('breachAnalytics', () => {
           unauthorized_access: 1,
           data_leak: 1,
         },
-        averageResponseTime: expect.any(Number),
         riskScore: 0.75,
         complianceScore: 0.98,
         notificationEffectiveness: 0.95,
       })
+      expect(typeof metrics.averageResponseTime).toBe('number')
 
       expect(listRecentBreaches).toHaveBeenCalled()
       expect(RiskScoring.calculateOverallRisk).toHaveBeenCalledWith(
-        mockBreaches,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'breach_1',
+            severity: 'high',
+            affectedUsers: ['user1', 'user2'],
+            dataTypes: undefined,
+            attackVector: undefined,
+            description: undefined,
+            metadata: {},
+            remediationStatus: 'completed',
+            timestamp: new Date(mockBreaches[0].timestamp),
+            detectionTime: new Date(mockBreaches[0].timestamp),
+            responseTime: new Date(mockBreaches[0].timestamp + 3_600_000),
+          }),
+          expect.objectContaining({
+            id: 'breach_2',
+            severity: 'critical',
+            affectedUsers: ['user3', 'user4', 'user5'],
+            dataTypes: undefined,
+            attackVector: undefined,
+            description: undefined,
+            metadata: {},
+            remediationStatus: 'completed',
+            timestamp: new Date(mockBreaches[1].timestamp),
+            detectionTime: new Date(mockBreaches[1].timestamp),
+            responseTime: new Date(mockBreaches[1].timestamp + 3_600_000),
+          }),
+        ]),
       )
       expect(ComplianceMetrics.calculateScore).toHaveBeenCalledWith(
         mockBreaches,
       )
       expect(NotificationEffectiveness.calculate).toHaveBeenCalledWith(
-        mockBreaches,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'breach_1',
+            timestamp: new Date(mockBreaches[0].timestamp),
+            severity: {
+              level: 'high',
+              score: 0.8,
+            },
+            notificationStatus: 'completed',
+            notifications: {
+              acknowledged: 1,
+              actioned: 1,
+              delivered: 1,
+              failed: 0,
+              timeToAcknowledge: 2,
+              timeToNotify: 1,
+              total: 1,
+            },
+            regulatoryFrameworks: ['GDPR'],
+          }),
+          expect.objectContaining({
+            id: 'breach_2',
+            timestamp: new Date(mockBreaches[1].timestamp),
+            severity: {
+              level: 'critical',
+              score: 1,
+            },
+            notificationStatus: 'completed',
+            notifications: {
+              acknowledged: 1,
+              actioned: 1,
+              delivered: 1,
+              failed: 0,
+              timeToAcknowledge: 2,
+              timeToNotify: 1,
+              total: 1,
+            },
+            regulatoryFrameworks: ['GDPR'],
+          }),
+        ]),
       )
     })
 
     it('should handle empty breach list', async () => {
-      ;(listRecentBreaches as unknown).mockResolvedValue([])
+      mockedListRecentBreaches.mockResolvedValue([])
 
       const metrics = await BreachAnalytics.generateMetrics(mockTimeframe)
 
@@ -219,15 +334,16 @@ describe('breachAnalytics', () => {
       const trends = await BreachAnalytics.analyzeTrends(mockTimeframe)
 
       expect(trends).toHaveLength(7) // 7 days
-      expect(trends[0]).toEqual({
+      const firstTrend = trends[0]
+      expect(firstTrend).toMatchObject({
         timestamp: mockTimeframe.from.getTime(),
-        breaches: expect.any(Number),
-        affectedUsers: expect.any(Number),
         notificationRate: 0.92,
-        responseTime: expect.any(Number),
         riskScore: 0.65,
-        anomalyScore: expect.any(Number),
       })
+      expect(typeof firstTrend.breaches).toBe('number')
+      expect(typeof firstTrend.affectedUsers).toBe('number')
+      expect(typeof firstTrend.responseTime).toBe('number')
+      expect(typeof firstTrend.anomalyScore).toBe('number')
 
       expect(MachineLearning.detectAnomalies).toHaveBeenCalled()
       expect(NotificationEffectiveness.calculateDaily).toHaveBeenCalled()
@@ -240,12 +356,13 @@ describe('breachAnalytics', () => {
       const predictions = await BreachAnalytics.predictBreaches(7)
 
       expect(predictions).toHaveLength(2)
-      expect(predictions[0]).toEqual({
-        timestamp: expect.any(Number),
+      const firstPrediction = predictions[0]
+      expect(firstPrediction).toMatchObject({
         predictedBreaches: 3,
         confidence: 0.8,
         factors: ['factor1'],
       })
+      expect(typeof firstPrediction.timestamp).toBe('number')
 
       expect(MachineLearning.predictBreaches).toHaveBeenCalled()
       expect(RiskScoring.getFactors).toHaveBeenCalled()
@@ -284,13 +401,23 @@ describe('breachAnalytics', () => {
       // console.log('Actual Insights:', JSON.stringify(insights, null, 2));
 
       // Adjusted expectation based on log output
-      expect(insights).toContainEqual({
+      const responseTimeInsight = insights.find(
+        (item) => item.type === 'response_time',
+      )
+      expect(responseTimeInsight).toMatchObject({
         type: 'response_time', // Changed from 'critical_breaches'
         severity: 'medium',
-        description: expect.stringContaining('Response time'), // Made less specific
-        recommendation: expect.stringContaining('Review incident response'), // Made less specific
-        relatedMetrics: expect.arrayContaining(['averageResponseTime']),
       })
+      expect(responseTimeInsight).toBeDefined()
+      expect(responseTimeInsight?.description).toEqual(
+        expect.stringContaining('Response time'),
+      )
+      expect(responseTimeInsight?.recommendation).toEqual(
+        expect.stringContaining('Review incident response'),
+      )
+      expect(responseTimeInsight?.relatedMetrics).toEqual(
+        expect.arrayContaining(['averageResponseTime']),
+      )
 
       // Keep the original assertion commented out for reference
       // expect(insights).toContainEqual({
@@ -305,7 +432,7 @@ describe('breachAnalytics', () => {
     })
 
     it('should include notification effectiveness insights when below threshold', async () => {
-      ;(NotificationEffectiveness.calculate as unknown).mockResolvedValue({
+      mockedCalculateNotificationEffectiveness.mockResolvedValue({
         overall: 0.94,
         delivery: 0.95,
         timing: 0.88,
@@ -324,19 +451,25 @@ describe('breachAnalytics', () => {
 
       const insights = await BreachAnalytics.generateInsights()
 
-      expect(insights).toContainEqual({
+      const notificationInsight = insights.find(
+        (item) => item.type === 'notification_effectiveness',
+      )
+      expect(notificationInsight).toMatchObject({
         type: 'notification_effectiveness',
         severity: 'high',
-        description: expect.stringContaining('below 95%'),
-        recommendation: expect.stringContaining(
-          'Review notification delivery system',
-        ),
         relatedMetrics: ['notificationEffectiveness', 'averageResponseTime'],
       })
+      expect(notificationInsight).toBeDefined()
+      expect(notificationInsight?.description).toEqual(
+        expect.stringContaining('below 95%'),
+      )
+      expect(notificationInsight?.recommendation).toEqual(
+        expect.stringContaining('Review notification delivery system'),
+      )
     })
 
     it('should include compliance insights when below threshold', async () => {
-      ;(ComplianceMetrics.calculateScore as unknown).mockResolvedValue(0.97)
+      mockedCalculateScore.mockResolvedValue(0.97)
 
       const insights = await BreachAnalytics.generateInsights()
 
@@ -354,7 +487,7 @@ describe('breachAnalytics', () => {
     it('should generate a comprehensive analytics report', async () => {
       const report = await BreachAnalytics.generateReport(mockTimeframe)
 
-      expect(report).toEqual({
+      expect(report).toMatchObject({
         timeframe: {
           from: mockTimeframe.from.toISOString(),
           to: mockTimeframe.to.toISOString(),
@@ -369,24 +502,25 @@ describe('breachAnalytics', () => {
             unauthorized_access: 1,
             data_leak: 1,
           },
-          averageResponseTime: expect.any(Number),
           riskScore: 0.75,
           complianceScore: 0.98,
           notificationEffectiveness: 0.95,
           encryptedData: 'encrypted_data',
         },
-        trends: expect.any(Array),
-        predictions: expect.any(Array),
-        riskFactors: expect.any(Array),
-        insights: expect.any(Array),
-        generatedAt: expect.any(String),
+        generatedAt: '',
       })
+      expect(Array.isArray(report.trends)).toBe(true)
+      expect(Array.isArray(report.predictions)).toBe(true)
+      expect(Array.isArray(report.riskFactors)).toBe(true)
+      expect(Array.isArray(report.insights)).toBe(true)
+      expect(typeof report.metrics.averageResponseTime).toBe('number')
+      expect(typeof report.generatedAt).toBe('string')
 
-      expect(fheService.encrypt).toHaveBeenCalled()
+      expect(mockedFheEncrypt).toHaveBeenCalled()
     })
 
     it('should handle errors during report generation', async () => {
-      ;(listRecentBreaches as unknown).mockRejectedValue(
+      mockedListRecentBreaches.mockRejectedValue(
         new Error('Failed to fetch breaches'),
       )
 

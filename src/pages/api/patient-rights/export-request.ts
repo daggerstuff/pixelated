@@ -33,7 +33,7 @@ export const POST = async ({ request }) => {
       // Log the JSON parsing error
       logger.error('Invalid JSON in request body', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        stack: error instanceof Error ? error?.stack : undefined,
         url: request.url,
         method: request.method,
       })
@@ -100,10 +100,10 @@ export const POST = async ({ request }) => {
     const exportResult = await createDataExportRequest({
       patientId,
       formats: [format as ExportFormat],
-      dataTypes: includeCategories || ['all'],
+      dataTypes: includeCategories ?? ['all'],
       reason: 'User-initiated export',
       priority: 'normal',
-      requestedBy: userId || 'unknown',
+      requestedBy: userId ?? 'unknown',
     })
 
     if (!exportResult.success) {
@@ -151,7 +151,7 @@ export const POST = async ({ request }) => {
     // Log the error
     logger.error('Error creating export request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
     })
 
     // Return a generic error response

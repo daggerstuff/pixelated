@@ -1,13 +1,77 @@
 import { v4 as uuid } from 'uuid'
 
-import { slug } from '@/utils/common'
-
 // Sales Opportunities Service Layer
 import {
   getMongoConnection,
   getPostgresPool,
 } from '../../lib/database/connection'
+import { slug } from '../../utils/common'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
+
+type SalesOpportunityPermissions = {
+  view: string[]
+  edit: string[]
+  comment: string[]
+}
+
+type SalesOpportunity = {
+  _id?: string
+  opportunityId: string
+  title: string
+  slug: string
+  description: string
+  account?: string
+  accountName?: string
+  owner: string
+  amount: number
+  probability: number
+  stage: string
+  closeDate?: Date
+  value: number
+  status: string
+  activity: unknown[]
+  contacts: SalesOpportunityContact[]
+  competitors: unknown[]
+  permissions: SalesOpportunityPermissions
+  expectedCloseDate?: Date
+  currency?: string
+  createdAt: Date
+  updatedAt: Date
+  save: () => Promise<SalesOpportunity>
+}
+
+type SalesOpportunityModelData = Omit<SalesOpportunity, 'save'>
+type SalesOpportunityQuery = Record<string, unknown>
+type SalesOpportunityQueryChain = {
+  limit: (limit: number) => SalesOpportunityQueryChain
+  skip: (count: number) => SalesOpportunityQueryChain
+  sort: (sort: { createdAt: -1 | 1 }) => Promise<SalesOpportunity[]>
+}
+type SalesOpportunityModel = {
+  new (data: SalesOpportunityModelData): SalesOpportunity
+  findById(id: string): Promise<SalesOpportunity | null>
+  find(query: SalesOpportunityQuery): SalesOpportunityQueryChain
+  countDocuments(query: SalesOpportunityQuery): Promise<number>
+  findByIdAndDelete(id: string): Promise<SalesOpportunity | null>
+}
+
+type SalesOpportunityContact = {
+  _id?: string
+  name: string
+  email?: string
+  phone?: string
+  title?: string
+  department?: string
+  role?: string
+  lastContact?: Date
+  createdAt?: Date
+}
+
+function getSalesOpportunityModel(): SalesOpportunityModel {
+  return getMongoConnection().model<SalesOpportunityModelData, SalesOpportunityModel>(
+    'SalesOpportunity',
+  )
+}
 
 /**
  * Create a new sales opportunity
@@ -22,25 +86,27 @@ export async function createSalesOpportunity(data: {
   stage?: string
   closeDate?: Date
 }) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const pool = getPostgresPool()
 
   const opportunityId = uuid()
   const opportunitySlug = slug(data.title)
 
   const opportunity = new SalesOpportunityModel({
-    _id: opportunityId,
+    opportunityId,
     title: data.title,
     slug: opportunitySlug,
-    description: data.description || '',
+    description: data.description ?? '',
+    account: data.accountName ?? '',
     owner: data.ownerId,
     status: 'active',
-    accountName: data.accountName || '',
-    amount: data.amount || 0,
-    probability: data.probability || 0.5,
-    stage: data.stage || 'qualification',
+    accountName: data.accountName ?? '',
+    amount: data.amount ?? 0,
+    probability: data.probability ?? 0.5,
+    stage: data.stage ?? 'qualification',
+    value: data.amount ?? 0,
     closeDate:
-      data.closeDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      data.closeDate ?? new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     activity: [],
     contacts: [],
     competitors: [],
@@ -64,7 +130,7 @@ export async function createSalesOpportunity(data: {
       data.title,
       opportunitySlug,
       data.ownerId,
-      data.stage || 'qualification',
+      data.stage ?? 'qualification',
       'active',
     ],
   )
@@ -79,7 +145,7 @@ export async function getSalesOpportunity(
   opportunityId: string,
   userId: string,
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -106,7 +172,7 @@ export async function updateStage(
   userId: string,
   newStage: string,
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const pool = getPostgresPool()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
@@ -159,13 +225,13 @@ export async function updateSalesOpportunity(
     title?: string
     value?: number
     stage?: string
-    contacts?: any[]
+    contacts?: SalesOpportunityContact[]
     expectedCloseDate?: Date
     probability?: number
     status?: string
   },
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -202,7 +268,7 @@ export async function deleteSalesOpportunity(
   opportunityId: string,
   userId: string,
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const pool = getPostgresPool()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
@@ -236,10 +302,10 @@ export async function addActivity(
   activity: {
     type: 'call' | 'email' | 'meeting' | 'note'
     description: string
-    metadata?: any
+    metadata?: Record<string, unknown>
   },
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -261,7 +327,7 @@ export async function addActivity(
     _id: activityId,
     type: activity.type,
     description: activity.description,
-    metadata: activity.metadata || {},
+    metadata: activity.metadata ?? {},
     createdBy: userId,
     createdAt: new Date(),
   })
@@ -285,7 +351,7 @@ export async function addContact(
     role?: string
   },
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -306,9 +372,9 @@ export async function addContact(
   opportunity.contacts.push({
     _id: contactId,
     name: contact.name,
-    email: contact.email || '',
-    phone: contact.phone || '',
-    role: contact.role || '',
+    email: contact.email ?? '',
+    phone: contact.phone ?? '',
+    role: contact.role ?? '',
     createdAt: new Date(),
   })
 
@@ -330,11 +396,11 @@ export async function listSalesOpportunities(
     status?: string
   } = {},
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
-  const page = options.page || 1
-  const limit = options.limit || 50
+  const SalesOpportunityModel = getSalesOpportunityModel()
+  const page = options.page ?? 1
+  const limit = options.limit ?? 50
 
-  let query: any = {
+  const query: Record<string, unknown> = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   }
 
@@ -363,21 +429,21 @@ export async function listSalesOpportunities(
  * Calculate sales forecast
  */
 export async function calculateForecast(userId: string) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunities = await SalesOpportunityModel.find({
     $or: [{ owner: userId }, { 'permissions.view': userId }],
-  })
+  }).sort({ createdAt: -1 })
 
   let totalForecast = 0
   let weightedForecast = 0
   let opportunityCount = 0
 
-  opportunities.forEach((opp: any) => {
+  opportunities.forEach((opp) => {
     if (opp.status === 'active') {
       opportunityCount++
-      totalForecast += opp.amount || 0
-      weightedForecast += (opp.amount || 0) * (opp.probability || 0.5)
+      totalForecast += opp.amount
+      weightedForecast += opp.amount * opp.probability
     }
   })
 
@@ -399,7 +465,7 @@ export async function shareSalesOpportunity(
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 

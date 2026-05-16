@@ -33,7 +33,17 @@ export function WebSocketProgressBar(props: {
   } = props
   const [progress, setProgress] = useState(0)
   const [stage, setStage] = useState('initializing')
-  const [statusText, setStatusText] = useState('connecting')
+  const [statusText, setStatusText] = useState(() => {
+    if (!webSocket) return 'disconnected'
+    if (webSocket.readyState === WebSocket.OPEN) return 'live updates'
+    if (
+      webSocket.readyState === WebSocket.CLOSED ||
+      webSocket.readyState === WebSocket.CLOSING
+    ) {
+      return 'disconnected'
+    }
+    return 'connecting'
+  })
 
   useEffect(() => {
     if (!webSocket) {
@@ -50,9 +60,7 @@ export function WebSocketProgressBar(props: {
         if (msg.executionId && msg.executionId !== executionId) return
         if (msg.type === 'progress_update') {
           const data = msg.data as Record<string, unknown> | undefined
-          const p = Number(
-            (data?.['progress'] as number) ?? Number(data?.['progress'] ?? 0),
-          )
+          const p = ((data?.['progress'] as number) ?? Number(data?.['progress'] ?? 0))
           const st = (data?.['stage'] as string) ?? ''
           setProgress(p)
           setStage(st)
@@ -66,7 +74,6 @@ export function WebSocketProgressBar(props: {
         }
       } catch (err) {
         // swallow parse errors
-        // eslint-disable-next-line no-console
         console.error('Failed to parse WebSocket message:', err)
       }
     }
@@ -171,7 +178,7 @@ export function WebSocketMessageLogger(props: {
   maxMessages?: number
   autoScroll?: boolean
 }) {
-  const { messages = [], maxMessages = 100 } = props
+  const { messages, maxMessages = 100 } = props
   const shown = messages.slice(0, maxMessages)
 
   if (messages.length === 0) {

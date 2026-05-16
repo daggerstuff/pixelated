@@ -108,7 +108,7 @@ class ExportError extends Error {
 export class ExportService {
   private static instance: ExportService
 
-  private fheService: FHEServiceInterface
+  private readonly fheService: FHEServiceInterface
   private initialized = false
 
   /**
@@ -262,7 +262,7 @@ export class ExportService {
         id: msg.id,
         role: msg.role,
         content: msg.content,
-        timestamp: msg.timestamp || Date.now(),
+        timestamp: msg.timestamp ?? Date.now(),
       })),
       metadata: options.includeMetadata
         ? {
@@ -357,9 +357,7 @@ export class ExportService {
 
       // Set up error handling for PDF generation
       doc.on('error', (err: Error) => {
-        throw new Error(
-          `PDF generation error: ${(err)?.message || String(err)}`,
-        )
+        throw new Error(`PDF generation error: ${err?.message || String(err)}`)
       })
 
       // Create a buffer to store the PDF with timeout

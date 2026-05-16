@@ -271,35 +271,35 @@ professional community building and value demonstration
 
 #### Monthly Content Themes
 
-**January: "New Beginnings in Mental Health Training"**
+### January: "New Beginnings in Mental Health Training"
 
 - Focus on New Year professional development goals
 - Setting training objectives for the year
 - Resolution-related mental health scenarios
 - Planning for cultural competency improvement
 
-**February: "Cultural Competency and Bias Recognition"**
+### February: "Cultural Competency and Bias Recognition"
 
 - Focus on cultural sensitivity in therapeutic contexts
 - Bias detection training scenarios
 - Multicultural therapy simulation challenges
 - Cultural adaptation case studies
 
-**March: "Women in Mental Health Training"**
+### March: "Women in Mental Health Training"
 
 - Focus on gender-specific training needs
 - Female practitioner success stories
 - Treatment approaches for women's mental health
 - Gender bias recognition scenarios
 
-**April: "Training for Tough Conversations"**
+### April: "Training for Tough Conversations"
 
 - Focus on difficult therapeutic scenarios
 - Crisis intervention training techniques
 - Edge case scenario development
 - Professional growth through challenging training
 
-**May: "Mental Health Awareness Month"**
+### May: "Mental Health Awareness Month"
 
 - Focus on mental health stigma reduction
 - Training quality improvement initiatives

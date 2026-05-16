@@ -48,7 +48,7 @@ export const POST = async ({ request, cookies }) => {
 
     // Check permissions
     const hasPermission =
-      user.permissions?.includes('data:export:create') ||
+      user.permissions?.includes('data:export:create') ??
       user.permissions?.includes('admin:patient-rights')
 
     if (!hasPermission) {

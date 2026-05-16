@@ -3,31 +3,65 @@
  * This file is automatically loaded by Vitest before tests are run
  */
 
+import { vi } from 'vitest'
+import './patch-react-act.cjs'
+import { flushSync } from 'react-dom'
+
+// React 19 compatibility shim for environments that do not provide `act` directly.
+const act = async (callback: () => void | Promise<void>): Promise<void> => {
+  const result = typeof flushSync === 'function' ? flushSync(callback) : callback()
+  if (result && typeof result === 'object' && 'then' in result) {
+    await Promise.resolve(result)
+  }
+
+  if (typeof queueMicrotask !== 'undefined') {
+    await new Promise<void>((resolve) => {
+      queueMicrotask(() => resolve())
+    })
+  }
+
+  return
+}
+
 import '@testing-library/jest-dom'
 
-// Add type declarations for DOM testing matchers
-declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  interface Assertion<T = any> {
-    toBeInTheDocument(): T
-    toHaveAttribute(attr: string, value?: string): T
-    toHaveClass(...classNames: string[]): T
-    toHaveValue(value?: string | number): T
-    toBeVisible(): T
-    toBeDisabled(): T
-    toBeEnabled(): T
-    toHaveTextContent(text: string | RegExp): T
-    toHaveDisplayValue(value: string | RegExp | Array<string | RegExp>): T
-    toBeChecked(): T
-    toHaveFocus(): T
-    toBeRequired(): T
-    toBeInvalid(): T
-    toBeValid(): T
-    toHaveStyle(css: string | Record<string, unknown>): T
-    toHaveAccessibleName(name?: string | RegExp): T
-    toHaveAccessibleDescription(description?: string | RegExp): T
+// Keep auth-config imports from exploding in test/bootstrap contexts.
+process.env.JWT_SECRET ??= 'test-jwt-secret'
+
+vi.mock('react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react')>()
+  const patchedAct = typeof actual.act === 'function' ? actual.act : act
+
+  return {
+    ...actual,
+    act: patchedAct,
   }
-}
+})
+
+vi.mock('react-dom/test-utils', async () => {
+  const actual = await vi.importActual<typeof import('react-dom/test-utils')>(
+    'react-dom/test-utils',
+  )
+  return {
+    ...actual,
+    act,
+  }
+})
+
+void import('react')
+  .then((reactModule) => {
+    if (!('act' in reactModule) || reactModule.act !== act) {
+      Object.defineProperty(reactModule, 'act', {
+        value: act,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      })
+    }
+  })
+  .catch((error: unknown) => {
+    console.debug('Failed to define React act helper', error)
+  })
 
 // Mock window.matchMedia
 if (typeof window !== 'undefined') {
@@ -46,6 +80,40 @@ if (typeof window !== 'undefined') {
   })
 }
 
+if (typeof HTMLCanvasElement !== 'undefined') {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+    value: vi.fn(() => ({
+      canvas: {},
+      clearRect: vi.fn(),
+      fillRect: vi.fn(),
+      getImageData: vi.fn(() => ({ data: [] })),
+      putImageData: vi.fn(),
+      createImageData: vi.fn(() => []),
+      setTransform: vi.fn(),
+      drawImage: vi.fn(),
+      save: vi.fn(),
+      fillText: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      stroke: vi.fn(),
+      translate: vi.fn(),
+      scale: vi.fn(),
+      rotate: vi.fn(),
+      arc: vi.fn(),
+      fill: vi.fn(),
+      measureText: vi.fn(() => ({ width: 0 })),
+      transform: vi.fn(),
+      rect: vi.fn(),
+      clip: vi.fn(),
+    })),
+    writable: true,
+    configurable: true,
+  })
+}
+
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
   observe() {}
@@ -54,7 +122,11 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class MockIntersectionObserver {
+const MockIntersectionObserver = class {
+  constructor(
+    _callback: IntersectionObserverCallback,
+    _options?: IntersectionObserverInit,
+  ) {}
   root: Element | Document | null = null
   rootMargin = '0px'
   thresholds: ReadonlyArray<number> = [0]
@@ -65,7 +137,13 @@ global.IntersectionObserver = class MockIntersectionObserver {
   takeRecords(): IntersectionObserverEntry[] {
     return []
   }
-} as unknown as typeof IntersectionObserver
+}
+
+Object.defineProperty(globalThis, 'IntersectionObserver', {
+  value: MockIntersectionObserver,
+  writable: true,
+  configurable: true,
+})
 
 // Mock localStorage
 const localStorageMock = {
@@ -98,4 +176,11 @@ beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
   vi.spyOn(console, 'info').mockImplementation(() => {})
   vi.spyOn(console, 'debug').mockImplementation(() => {})
+})
+
+afterEach(() => {
+  void import('@testing-library/react')
+    .then(({ cleanup }) => cleanup())
+    .catch(() => {})
+  vi.restoreAllMocks()
 })

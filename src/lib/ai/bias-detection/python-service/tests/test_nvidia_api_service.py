@@ -2,23 +2,23 @@
 Tests for NVIDIA API service
 """
 
-import asyncio
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from bias_detection.services.nvidia_api_service import NvidiaAPIService, kimi_chat_completion
+from bias_detection.services.nvidia_api_service import (
+    NvidiaAPIService,
+    kimi_chat_completion,
+)
 
 
-class TestNvidiaAPIService(unittest.TestCase):
+class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
     """Test cases for NVIDIA API service"""
 
     def setUp(self):
         """Set up test fixtures"""
         # Mock environment for testing
         self.mock_api_key = "test-api-key"
-        self.mock_messages = [
-            {"role": "user", "content": "Hello, how are you?"}
-        ]
+        self.mock_messages = [{"role": "user", "content": "Hello, how are you?"}]
 
     @patch("bias_detection.services.nvidia_api_service.os.path.exists")
     @patch("bias_detection.services.nvidia_api_service.open")
@@ -34,12 +34,14 @@ class TestNvidiaAPIService(unittest.TestCase):
                     "name": "nvidia",
                     "api_base_url": "https://test.api.nvidia.com/v1/chat/completions",
                     "api_key": self.mock_api_key,
-                    "models": ["moonshotai/kimi-k2.5"]
+                    "models": ["moonshotai/kimi-k2.5"],
                 }
             ]
         }
         mock_file = MagicMock()
-        mock_file.__enter__.return_value.read.return_value = str(mock_config).replace("'", '"')
+        mock_file.__enter__.return_value.read.return_value = str(mock_config).replace(
+            "'", '"'
+        )
         mock_open.return_value = mock_file
 
         # Create service instance
@@ -47,10 +49,15 @@ class TestNvidiaAPIService(unittest.TestCase):
 
         # Verify configuration was loaded
         self.assertEqual(service.api_key, self.mock_api_key)
-        self.assertEqual(service.api_base_url, "https://test.api.nvidia.com/v1/chat/completions")
+        self.assertEqual(
+            service.api_base_url, "https://test.api.nvidia.com/v1/chat/completions"
+        )
 
     @patch("bias_detection.services.nvidia_api_service.os.path.exists")
-    @patch.dict("bias_detection.services.nvidia_api_service.os.environ", {"NVIDIA_API_KEY": "env-api-key"})
+    @patch.dict(
+        "bias_detection.services.nvidia_api_service.os.environ",
+        {"NVIDIA_API_KEY": "env-api-key"},
+    )
     def test_init_with_env_var(self, mock_exists):
         """Test initialization with environment variable"""
         # Mock config file not existing
@@ -69,7 +76,9 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_exists.return_value = False
 
         # Mock environment variable not set
-        with patch.dict("bias_detection.services.nvidia_api_service.os.environ", {}, clear=True):
+        with patch.dict(
+            "bias_detection.services.nvidia_api_service.os.environ", {}, clear=True
+        ):
             with self.assertRaises(ValueError):
                 NvidiaAPIService()
 
@@ -80,12 +89,14 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = AsyncMock()
+        mock_response = MagicMock()
         mock_response.json.return_value = {
-            "choices": [{"message": {"content": "Hello! I'm doing well, thank you for asking."}}],
-            "usage": {"prompt_tokens": 10, "completion_tokens": 20}
+            "choices": [
+                {"message": {"content": "Hello! I'm doing well, thank you for asking."}}
+            ],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 20},
         }
-        mock_response.raise_for_status = AsyncMock()
+        mock_response.raise_for_status = MagicMock()
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance
@@ -106,8 +117,8 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = AsyncMock()
-        mock_response.raise_for_status.side_effect = Exception("HTTP Error")
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock(side_effect=Exception("HTTP Error"))
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance
@@ -125,8 +136,8 @@ class TestNvidiaAPIService(unittest.TestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = AsyncMock()
-        mock_response.raise_for_status = AsyncMock()
+        mock_response = MagicMock()
+        mock_response.raise_for_status = MagicMock()
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance
@@ -143,7 +154,9 @@ class TestNvidiaAPIService(unittest.TestCase):
     async def test_convenience_functions(self):
         """Test convenience functions"""
         # Mock the service
-        with patch("bias_detection.services.nvidia_api_service.NvidiaAPIService") as mock_service_class:
+        with patch(
+            "bias_detection.services.nvidia_api_service.NvidiaAPIService"
+        ) as mock_service_class:
             mock_service_instance = AsyncMock()
             mock_service_class.return_value = mock_service_instance
 
@@ -155,7 +168,7 @@ class TestNvidiaAPIService(unittest.TestCase):
                 temperature=1.0,
                 top_p=1.0,
                 stream=False,
-                thinking=True
+                thinking=True,
             )
 
 

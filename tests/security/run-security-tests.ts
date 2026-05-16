@@ -115,7 +115,7 @@ async function runTestSuite(suite: TestSuite): Promise<TestResultOutput> {
 
     const childProcess = spawn('ts-node', [scriptPath], {
       env: {
-        ...(process.env),
+        ...process.env,
         BASE_URL: config.baseUrl,
         AUTH_TOKEN: config.authToken,
         ADMIN_TOKEN: config.adminToken,
@@ -376,7 +376,7 @@ function generateReport(results: TestResultOutput[]): string {
                   <br>
                   <strong>Category:</strong> ${item.category}
                   <br>
-                  <strong>Response Time:</strong> ${((item.responseTime || 0) / 1000).toFixed(2)}s
+                  <strong>Response Time:</strong> ${((item.responseTime ?? 0) / 1000).toFixed(2)}s
                 </div>
               </div>
             `,

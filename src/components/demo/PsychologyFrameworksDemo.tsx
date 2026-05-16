@@ -6,13 +6,13 @@ import {
   Target,
   ChevronRight,
 } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Input } from '@/components/ui/input.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 
 interface Framework {
   id: string
@@ -40,7 +40,6 @@ interface FrameworksResponse {
 
 export default function PsychologyFrameworksDemo() {
   const [frameworks, setFrameworks] = useState<Framework[]>([])
-  const [filteredFrameworks, setFilteredFrameworks] = useState<Framework[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedFramework, setSelectedFramework] = useState<Framework | null>(
@@ -50,7 +49,9 @@ export default function PsychologyFrameworksDemo() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedCondition, setSelectedCondition] = useState<string>('all')
 
-  const filterFrameworks = useCallback(() => {
+  // ⚡ Bolt: Derived state computed using useMemo directly from existing state variables
+  // to avoid unnecessary double re-renders triggered by useEffect synchronizing state.
+  const filteredFrameworks = useMemo(() => {
     let filtered = frameworks
 
     // Filter by search term
@@ -82,18 +83,13 @@ export default function PsychologyFrameworksDemo() {
       )
     }
 
-    setFilteredFrameworks(filtered)
+    return filtered
   }, [frameworks, searchTerm, selectedCategory, selectedCondition])
 
   // Load frameworks on component mount
   useEffect(() => {
     void loadFrameworks()
   }, [])
-
-  // Filter frameworks when search/filter criteria change
-  useEffect(() => {
-    filterFrameworks()
-  }, [filterFrameworks])
 
   const loadFrameworks = async () => {
     setLoading(true)
@@ -116,7 +112,7 @@ export default function PsychologyFrameworksDemo() {
 
       // Auto-select first framework if available
       if (result.frameworks.length > 0) {
-        setSelectedFramework(result.frameworks[0] || null)
+        setSelectedFramework(result.frameworks[0] ?? null)
       }
     } catch (error: unknown) {
       console.error('Failed to load frameworks:', error)
@@ -230,7 +226,7 @@ export default function PsychologyFrameworksDemo() {
         'Humanistic',
       ])
       if (demoFrameworks.length > 0) {
-        setSelectedFramework(demoFrameworks[0] || null)
+        setSelectedFramework(demoFrameworks[0] ?? null)
       }
     } finally {
       setLoading(false)

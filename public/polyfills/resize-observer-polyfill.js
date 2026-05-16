@@ -54,7 +54,7 @@
             class_1.prototype.get = function (key) {
                 var index = getIndex(this.__entries__, key);
                 var entry = this.__entries__[index];
-                return entry && entry[1];
+                return entry?.[1];
             };
             /**
              * @param {*} key
@@ -120,13 +120,13 @@
         if (typeof globalThis !== 'undefined' && globalThis.Math === Math) {
             return globalThis;
         }
-        if (typeof global !== 'undefined' && global.Math === Math) {
+        if (global.Math === Math) {
             return global;
         }
-        if (typeof self !== 'undefined' && self.Math === Math) {
+        if (self.Math === Math) {
             return self;
         }
-        if (typeof window !== 'undefined' && window.Math === Math) {
+        if (window.Math === Math) {
             return window;
         }
         return {};
@@ -404,9 +404,7 @@
          * @returns {ResizeObserverController}
          */
         ResizeObserverController.getInstance = function () {
-            if (!this.instance_) {
-                this.instance_ = new ResizeObserverController();
-            }
+            this.instance_ ??= new ResizeObserverController();
             return this.instance_;
         };
         /**
@@ -448,10 +446,10 @@
         // Assume that the element is an instance of Node, which means that it
         // has the "ownerDocument" property from which we can retrieve a
         // corresponding global object.
-        var ownerGlobal = target && target.ownerDocument && target.ownerDocument.defaultView;
+        var ownerGlobal = target?.ownerDocument?.defaultView;
         // Return the local global object if it's not possible extract one from
         // provided element.
-        return ownerGlobal || global$1;
+        return ownerGlobal ?? global$1;
     });
 
     // Placeholder of an empty content rectangle.

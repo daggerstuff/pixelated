@@ -63,7 +63,7 @@ export async function recordCrisisEventToDb(
   } catch (error: unknown) {
     logger.error('Failed to record crisis event to database', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
       caseId,
     })
     // Rethrow to allow calling code to handle the error if needed

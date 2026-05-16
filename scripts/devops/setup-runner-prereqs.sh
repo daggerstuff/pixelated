@@ -9,7 +9,7 @@ cd $HOME
 
 echo "Updating system..."
 apt-get update -y
-apt-get install -y ca-certificates curl gnupg lsb-release build-essential make g++ python3 python3-dev jq git libssl-dev libffi-dev python3-pip
+apt-get install -y ca-certificates curl gnupg lsb-release build-essential make g++ python3 python3-dev jq git libssl-dev libffi-dev python3-pip unzip
 
 echo "Installing Docker..."
 mkdir -p /etc/apt/keyrings
@@ -27,7 +27,7 @@ chmod 666 /var/run/docker.sock
 echo "Installing Node.js 20..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
-corepack enable pnpm
+npm install -g pnpm@11.1.1
 
 echo "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sudo -u azureuser sh

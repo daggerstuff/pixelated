@@ -37,9 +37,10 @@ export function AccessibilityAnnouncer({
       // This ensures screen readers do not announce stale or empty messages.
       // See: https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19 for best practices.
     } else {
-      setCurrentMessage('') // Immediately clear message for accessibility when clearDelay <= 0
+      setCurrentMessage('') // Immediately clear message for accessibility when message is falsy
     }
-    // Implicitly returns undefined if no timer was set, which is valid for useEffect cleanup.
+    // Explicitly return undefined to satisfy TypeScript
+    return undefined
   }, [message, clearDelay])
 
   return (

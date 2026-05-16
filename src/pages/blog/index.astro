@@ -35,8 +35,8 @@ const posts = allPosts
 
 // Get tags sorted by frequency and select the top 6
 const tagFrequency = {}
-allPosts.forEach((post) => {
-  ;(post.data.tags || []).forEach((tag) => {
+allPosts.forEach((post: any) => {
+  ;(post.data.tags || []).forEach((tag: any) => {
     tagFrequency[tag] = (tagFrequency[tag] || 0) + 1
   })
 })

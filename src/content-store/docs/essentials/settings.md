@@ -1,14 +1,7 @@
 ---
-title: 'Global Settings'
-description:
-  'Mintlify gives you complete control over the look and feel of your
-  documentation using the mint.json file'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
-draft: false
-toc: true
-share: true
-icon: 'gear'
+description: Mintlify gives you complete control over the look and feel of your documentation using the mint.json file
+title: Settings
+pubDate: '2026-05-09'
 ---
 
 Every Mintlify site needs a `mint.json` file with the core configuration
@@ -46,7 +39,6 @@ of the button.
 
     Example: `Contact us`
     The url once you click on the button. Example: `https://mintlify.com/contact`
-
 
     Link shows a button. GitHub shows the repo information at the url provided including the number of GitHub stars.
     If `link`: What the button links to.
@@ -103,9 +95,13 @@ user can toggle.
 A string or an array of strings of URL(s) or relative path(s) pointing to your
 OpenAPI file.
 
-Examples: `json Absolute     "openapi": "https://example.com/openapi.json"     `
-`json Relative     "openapi": "/openapi.json"     `
-`json Multiple     "openapi": ["https://example.com/openapi1.json", "/openapi2.json", "/openapi3.json"]     `
+Examples:
+
+`"openapi": "https://example.com/openapi.json"`
+
+`"openapi": "/openapi.json"`
+
+`"openapi": ["https://example.com/openapi1.json", "/openapi2.json", "/openapi3.json"]`
 
 An object of social media accounts where the key:property pair represents the
 social media platform and the account url.

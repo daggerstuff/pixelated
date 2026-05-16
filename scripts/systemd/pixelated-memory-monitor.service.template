@@ -1,0 +1,11 @@
+[Unit]
+Description=Monitor Pixelated shared memory service health and disk usage
+After=network.target
+
+[Service]
+Type=oneshot
+User=__USER__
+Group=__GROUP__
+WorkingDirectory=__WORKDIR__
+EnvironmentFile=__ENV_FILE__
+ExecStart=__MONITOR_SCRIPT__

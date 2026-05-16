@@ -1,3 +1,4 @@
+import type { TherapeuticSession } from '../types'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { PythonBiasDetectionBridge } from '../python-bridge'
@@ -20,7 +21,7 @@ describe('analysis methods', () => {
     ;(global.fetch as any).mockResolvedValue({
       ok: true,
       status: 200,
-      json: () => Promise.resolve({ status: 'healthy', timestamp: Date.now() }),
+      json:  async () => Promise.resolve({ status: 'healthy', timestamp: Date.now() }),
     })
 
     // Create a fresh bridge instance for each test
@@ -56,7 +57,7 @@ describe('analysis methods', () => {
     const mockSession: TherapeuticSession = {
       sessionId: 'test-session-123',
       timestamp: new Date(),
-      content: 'Test session content for bias analysis',
+      content: { transcript: 'Test session content for bias analysis' },
       participantDemographics: {
         age: '30',
         gender: 'female',
@@ -99,7 +100,7 @@ describe('analysis methods', () => {
       const mockSession: TherapeuticSession = {
         sessionId: 'error-test',
         timestamp: new Date(),
-        content: 'Test content',
+        content: { transcript: 'Test content' },
       }
 
       // Mock a network failure
@@ -124,7 +125,7 @@ describe('analysis methods', () => {
       const mockSession: TherapeuticSession = {
         sessionId: 'timeout-test',
         timestamp: new Date(),
-        content: 'Test content',
+        content: { transcript: 'Test content' },
       }
 
       // Create bridge with very short timeout
@@ -149,7 +150,7 @@ describe('analysis methods', () => {
       const mockSession: TherapeuticSession = {
         sessionId: 'pool-test',
         timestamp: new Date(),
-        content: 'Test content',
+        content: { transcript: 'Test content' },
       }
 
       const result = await bridge.runPreprocessingAnalysis(mockSession)
@@ -162,12 +163,12 @@ describe('analysis methods', () => {
       const mockSession: TherapeuticSession = {
         sessionId: 'concurrency-test',
         timestamp: new Date(),
-        content: 'Test content',
+        content: { transcript: 'Test content' },
       }
 
       const promises = Array(5)
         .fill(null)
-        .map(() => bridge.runPreprocessingAnalysis(mockSession))
+        .map( async () => bridge.runPreprocessingAnalysis(mockSession))
 
       const results = await Promise.allSettled(promises)
       expect(results.length).toBe(5)
@@ -179,7 +180,7 @@ describe('analysis methods', () => {
       const mockSession: TherapeuticSession = {
         sessionId: 'metrics-test',
         timestamp: new Date(),
-        content: 'Test content',
+        content: { transcript: 'Test content' },
       }
 
       await bridge.runPreprocessingAnalysis(mockSession)
@@ -193,7 +194,7 @@ describe('analysis methods', () => {
       const mockSession: TherapeuticSession = {
         sessionId: 'perf-test',
         timestamp: new Date(),
-        content: 'Test content',
+        content: { transcript: 'Test content' },
       }
 
       const result = await bridge.runPreprocessingAnalysis(mockSession)

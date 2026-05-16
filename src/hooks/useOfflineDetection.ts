@@ -20,6 +20,16 @@ export interface UseOfflineDetectionOptions {
  * Hook for detecting online/offline status and network conditions
  * Provides real-time network state and connection quality metrics
  */
+type NetworkInformationLike = {
+  type?: string
+  effectiveType?: string
+  downlink?: number
+  rtt?: number
+  saveData?: boolean
+  addEventListener?: (type: string, listener: () => void) => void
+  removeEventListener?: (type: string, listener: () => void) => void
+}
+
 export function useOfflineDetection({
   onOnline,
   onOffline,
@@ -39,31 +49,22 @@ export function useOfflineDetection({
     if (typeof navigator === 'undefined') return
 
     const isOnline = navigator.onLine
-    type NetworkInformationLike = {
-      type?: string
-      effectiveType?: string
-      downlink?: number
-      rtt?: number
-      saveData?: boolean
-      addEventListener?: (type: string, listener: () => void) => void
-      removeEventListener?: (type: string, listener: () => void) => void
-    }
     const nav = navigator as unknown as {
       connection?: NetworkInformationLike
       mozConnection?: NetworkInformationLike
       webkitConnection?: NetworkInformationLike
     }
     const connection =
-      nav.connection || nav.mozConnection || nav.webkitConnection
+      (nav.connection ?? nav.mozConnection) ?? nav.webkitConnection
 
     setNetworkState({
       isOnline,
       isOffline: !isOnline,
-      connectionType: connection?.type || 'unknown',
-      effectiveType: connection?.effectiveType || 'unknown',
-      downlink: connection?.downlink || 0,
-      rtt: connection?.rtt || 0,
-      saveData: connection?.saveData || false,
+      connectionType: connection?.type ?? 'unknown',
+      effectiveType: connection?.effectiveType ?? 'unknown',
+      downlink: connection?.downlink ?? 0,
+      rtt: connection?.rtt ?? 0,
+      saveData: connection?.saveData ?? false,
     })
 
     // Trigger callbacks
@@ -88,7 +89,7 @@ export function useOfflineDetection({
       }
       const connection = nav2.connection
       if (connection) {
-        connection.addEventListener('change', updateNetworkState)
+        connection.addEventListener?.('change', updateNetworkState)
       }
     }
 
@@ -102,7 +103,7 @@ export function useOfflineDetection({
         }
         const connection = nav2.connection
         if (connection) {
-          connection.removeEventListener('change', updateNetworkState)
+          connection.removeEventListener?.('change', updateNetworkState)
         }
       }
     }

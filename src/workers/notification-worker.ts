@@ -1,6 +1,6 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { NotificationService } from '@/lib/services/notification/NotificationService'
-import { WebSocketServer } from '@/lib/services/notification/WebSocketServer'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { NotificationService } from '../lib/services/notification/NotificationService'
+import { WebSocketServer } from '../lib/services/notification/WebSocketServer'
 
 // Create logger
 const logger = createBuildSafeLogger('notification-worker')
@@ -18,13 +18,19 @@ async function startWorker() {
   const notificationService = new NotificationService()
 
   // Create WebSocket server
-  wsServer = new WebSocketServer()
+  const port = Number(process.env.NOTIFICATION_WS_PORT) || 8082
+  wsServer = new WebSocketServer(port, notificationService)
 
   // Handle WebSocket errors
   wsServer.on('error', (error: Error) => {
     logger.error('WebSocket server error', {
       workerId: WORKER_ID,
-      error: error instanceof Error ? error.message : String(error),
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
     })
   })
 

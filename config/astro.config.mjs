@@ -4,10 +4,11 @@ import process from 'node:process'
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
-import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { createLogger } from 'vite'
 
 const isRailwayDeploy =
   process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT
@@ -18,6 +19,28 @@ const isFlyioDeploy =
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+/**
+ * @typedef {{ code: string, message: string, chunkName: string }} RollupWarningShape
+ */
+/**
+ * @typedef {{ ssr: boolean, assets: string[], filesToDeleteAfterUpload: string[] }} SentryPluginOptions
+ */
+const viteLogger = createLogger()
+
+/**
+ * @param {RollupWarningShape} warning
+ * @returns {boolean}
+ */
+function shouldIgnoreEmptyMentalHealthWarning(warning) {
+  const message = warning.message
+  const chunkName = warning.chunkName
+  return (
+    message.includes('Generated an empty chunk') &&
+    (message.includes('MentalHealthChatDemo') ||
+      chunkName.includes('MentalHealthChatDemo'))
+  )
+}
 // Detect if we're running a build command (not dev server)
 const isBuildCommand =
   process.argv.includes('build') ||
@@ -25,8 +48,50 @@ const isBuildCommand =
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN =
-  !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+  !!process.env.SENTRY_DSN ||
+  !!process.env.PUBLIC_SENTRY_DSN ||
+  !!process.env.SENTRY_PUBLIC_DSN ||
+  !!process.env.VITE_SENTRY_DSN
+const sentryRelease =
+  process.env.SENTRY_RELEASE ?? process.env.npm_package_version ?? undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+
+/**
+ * @param {SentryPluginOptions} opts
+ * @returns {Array<import('vite').Plugin>}
+ */
+function createScopedSentryVitePlugins({
+  ssr,
+  assets,
+  filesToDeleteAfterUpload,
+}) {
+  return sentryVitePlugin({
+    org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    telemetry: false,
+    release: sentryRelease ? { name: sentryRelease } : undefined,
+    sourcemaps: {
+      assets,
+      ignore: ['**/node_modules/**'],
+      filesToDeleteAfterUpload,
+    },
+  }).map((plugin) => ({
+    ...plugin,
+    /**
+     * @param {{build?: { ssr?: boolean }}} config
+     * @param {{ command: string }} env
+     * @returns {boolean}
+     */
+    apply(config, env) {
+      if (env.command !== 'build') {
+        return false
+      }
+      return Boolean(config.build?.ssr) === ssr
+    },
+  }))
+}
+
 const preferredPort = (() => {
   const candidates = [
     process.env.PORT,
@@ -44,23 +109,135 @@ const preferredPort = (() => {
   return 4321
 })()
 
+/**
+ * @param {string} id
+ * @returns {string | null}
+ */
 function getChunkName(id) {
-  if (id.includes('react') || id.includes('react-dom')) {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (normalizedId.includes('/src/components/')) {
+    const componentSubPath = normalizedId.split('/src/components/')[1]
+    if (!componentSubPath) {
+      return null
+    }
+    const componentSegments = componentSubPath.split('/')
+    const componentImport = componentSegments[0]?.split('?')[0]
+    const componentExtension = componentImport
+      ? path.extname(componentImport)
+      : ''
+    if (!['.ts', '.tsx', '.js', '.jsx'].includes(componentExtension)) {
+      return null
+    }
+    const componentRoot = componentImport
+      ? path.basename(componentImport, path.extname(componentImport))
+      : ''
+    if (componentRoot) {
+      return `components-${componentRoot}`
+    }
+  }
+
+  if (
+    normalizedId.includes('/src/components/three/MultidimensionalEmotionChart')
+  ) {
+    return 'feature-three-emotion'
+  }
+  if (normalizedId.includes('/src/components/three/Particle')) {
+    return 'feature-three-particle'
+  }
+  if (
+    normalizedId.includes('/src/components/analytics/EnhancedChartComponent')
+  ) {
+    return 'feature-enhanced-chart'
+  }
+  if (normalizedId.includes('/src/components/ui/SwiperCarousel')) {
+    return 'feature-swiper'
+  }
+  if (
+    normalizedId.includes('/src/components/treatment/TreatmentPlanManager') ||
+    normalizedId.includes('/src/components/therapy/TreatmentPlanManager')
+  ) {
+    return 'feature-treatment-plan'
+  }
+  if (normalizedId.includes('/src/components/security/FHEDemo')) {
+    return 'feature-fhe'
+  }
+  if (normalizedId.includes('/src/components/demo/FHEDemo')) {
+    return 'feature-fhe-demo'
+  }
+  if (normalizedId.includes('/src/components/chat/TherapyChatSystem')) {
+    return 'feature-therapy-chat'
+  }
+  if (
+    normalizedId.includes(
+      '/src/components/session/EmotionTemporalAnalysisChart',
+    )
+  ) {
+    return 'feature-emotion-temporal'
+  }
+
+  if (
+    normalizedId.includes('/react/') ||
+    normalizedId.includes('/react-dom/')
+  ) {
     return 'react-vendor'
   }
-  if (id.includes('framer-motion') || id.includes('lucide-react')) {
+  if (
+    normalizedId.includes('framer-motion') ||
+    normalizedId.includes('@radix-ui/react-virtualizer') ||
+    normalizedId.includes('lucide-react')
+  ) {
     return 'ui-vendor'
   }
-  if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+  if (
+    normalizedId.includes('/clsx/') ||
+    normalizedId.includes('/date-fns/') ||
+    normalizedId.includes('/axios/')
+  ) {
     return 'utils-vendor'
   }
-  if (id.includes('recharts') || id.includes('chart.js')) {
+  if (
+    normalizedId.includes('/recharts') ||
+    normalizedId.includes('/react-chartjs-2')
+  ) {
     return 'charts-vendor'
   }
-  if (id.includes('three') || id.includes('@react-three')) {
+  if (
+    normalizedId.includes('/chart.js') ||
+    normalizedId.includes('/chart.js/')
+  ) {
+    return 'chartjs-vendor'
+  }
+  if (normalizedId.includes('three') || normalizedId.includes('@react-three')) {
     return 'three-vendor'
   }
-  if (id.includes('node_modules')) {
+  if (normalizedId.includes('/swiper')) {
+    return 'swiper-vendor'
+  }
+  if (normalizedId.includes('/node_modules/')) {
+    const relativePath = normalizedId.split('/node_modules/')[1] || ''
+    const segments = relativePath.split('/')
+    if (segments.length > 0 && segments[0] === '.pnpm' && segments.length > 1) {
+      const packageName =
+        segments[1].includes('@') && segments[1].includes('/')
+          ? `${segments[1]}-${segments[2]}`
+          : segments[1]
+      const sanitizedName = packageName
+        .replace('@', 'at-')
+        .replace(/[^a-zA-Z0-9-]/g, '-')
+      return `vendor-${sanitizedName}`
+    }
+    if (segments.length > 0 && segments[0]) {
+      const packageName =
+        segments[0].startsWith('@') && segments.length > 1
+          ? `${segments[0]}-${segments[1]}`
+          : segments[0]
+      const sanitizedName = packageName
+        .replace('@', 'at-')
+        .replace(/[^a-zA-Z0-9-]/g, '-')
+      return `vendor-${sanitizedName}`
+    }
+
     return 'vendor'
   }
   return null
@@ -98,7 +275,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://pixelatedempathy.com',
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -113,6 +290,14 @@ export default defineConfig({
       },
     ],
     rollupOptions: {
+      /**
+       * @param {RollupWarningShape} warning
+       */
+      onwarn(warning) {
+        if (shouldIgnoreEmptyMentalHealthWarning(warning)) {
+          return
+        }
+      },
       output: {
         // Manual chunk splitting for better caching
         manualChunks: getChunkName,
@@ -124,6 +309,34 @@ export default defineConfig({
     },
   },
   vite: {
+    customLogger: {
+      warn(msg, options) {
+        if (
+          msg.includes('Generated an empty chunk: "MentalHealthChatDemo"') ||
+          msg.includes("Generated an empty chunk: 'MentalHealthChatDemo'") ||
+          msg.includes('Generated an empty chunk: MentalHealthChatDemo')
+        ) {
+          return
+        }
+        viteLogger.warn(msg, options)
+      },
+      error: viteLogger.error.bind(viteLogger),
+      warnOnce: viteLogger.warnOnce.bind(viteLogger),
+      clearScreen: viteLogger.clearScreen.bind(viteLogger),
+    },
+    logLevel: 'error',
+    environments: {
+      client: {
+        build: {
+          chunkSizeWarningLimit: isProduction ? 5000 : 10000,
+        },
+      },
+      server: {
+        build: {
+          chunkSizeWarningLimit: isProduction ? 5000 : 10000,
+        },
+      },
+    },
     server: {
       watch: {
         ignored: [
@@ -146,9 +359,9 @@ export default defineConfig({
       // Enable hidden source maps in production for Sentry upload (not served to users)
       sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
-      chunkSizeWarningLimit: isProduction ? 500 : 1500,
+      chunkSizeWarningLimit: isProduction ? 5000 : 10000,
       // Temporarily disabled minification to debug build hang
-      minify: false,
+      minify: process.env.CI === 'true' || isProduction ? 'terser' : false,
       // minify: isProduction ? 'terser' : false,
       terserOptions: isProduction
         ? {
@@ -193,34 +406,48 @@ export default defineConfig({
           'recharts',
           'chart.js',
           '@opentelemetry/api',
-        '@opentelemetry/otlp-exporter-base',
-        '@opentelemetry/exporter-trace-otlp-http',
-        '@opentelemetry/exporter-metrics-otlp-http',
-        '@opentelemetry/otlp-transformer',
-        /^@opentelemetry\//,
-        'stream-browserify',
-        'path-browserify',
-        'crypto-browserify',
-        'util',
+          '@opentelemetry/otlp-exporter-base',
+          '@opentelemetry/exporter-trace-otlp-http',
+          '@opentelemetry/exporter-metrics-otlp-http',
+          '@opentelemetry/otlp-transformer',
+          /^@opentelemetry\//,
+          'stream-browserify',
+          'path-browserify',
+          'crypto-browserify',
+          'util',
         ],
+        /**
+         * @param {RollupWarningShape} warning
+         * @param {(warning: RollupWarningShape) => void} warn
+         */
         onwarn(warning, warn) {
+          if (shouldIgnoreEmptyMentalHealthWarning(warning)) {
+            return
+          }
           if (
             warning.code === 'SOURCEMAP_ERROR' ||
-            (warning.message &&
-              warning.message.includes("didn't generate a sourcemap"))
+            warning.message.includes("didn't generate a sourcemap")
           ) {
             return
           }
           if (
-            warning.message &&
+            warning.code === 'EMPTY_CHUNK' &&
             (warning.message.includes(
+              'Generated an empty chunk: "MentalHealthChatDemo"',
+            ) ||
+              warning.chunkName === 'MentalHealthChatDemo')
+          ) {
+            return
+          }
+          if (
+            warning.message.includes(
               'externalized for browser compatibility',
             ) ||
-              warning.message.includes('experimentalDisableStreaming') ||
-              (warning.message.includes('dynamically imported') &&
-                warning.message.includes('statically imported')) ||
-              warning.message.includes('icon "-"') ||
-              warning.message.includes("failed to load icon '-'"))
+            warning.message.includes('experimentalDisableStreaming') ||
+            (warning.message.includes('dynamically imported') &&
+              warning.message.includes('statically imported')) ||
+            warning.message.includes('icon "-"') ||
+            warning.message.includes("failed to load icon '-'")
           ) {
             return
           }
@@ -229,6 +456,23 @@ export default defineConfig({
       },
     },
     plugins: [
+      ...(hasSentryDSN
+        ? [
+            ...createScopedSentryVitePlugins({
+              ssr: false,
+              assets: [
+                './dist/client/_astro/**/*.js',
+                './dist/client/_astro/**/*.js.map',
+              ],
+              filesToDeleteAfterUpload: ['./dist/client/_astro/**/*.map'],
+            }),
+            ...createScopedSentryVitePlugins({
+              ssr: true,
+              assets: ['./dist/server/**/*.mjs', './dist/server/**/*.mjs.map'],
+              filesToDeleteAfterUpload: ['./dist/server/**/*.map'],
+            }),
+          ]
+        : []),
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
         visualizer({
@@ -246,12 +490,15 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'astro-icon/components': path.resolve(
+          './src/components/ui/astro-icon-components.ts',
+        ),
         'stream-browserify': 'node:stream',
         'path-browserify': 'node:path',
         'crypto-browserify': 'node:crypto',
-        'buffer': 'node:buffer',
-        'events': 'node:events',
-        'util': 'node:util',
+        buffer: 'node:buffer',
+        events: 'node:events',
+        util: 'node:util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
@@ -362,46 +609,14 @@ export default defineConfig({
     return [
       ...base,
       UnoCSS({ injectReset: true }),
-      icon({
-        include: {
-          lucide: [
-            'calendar',
-            'user',
-            'settings',
-            'heart',
-            'brain',
-            'shield-check',
-            'info',
-            'arrow-left',
-            'shield',
-            'user-plus',
-          ],
-        },
-        svgdir: './src/icons',
-      }),
       ...(hasSentryDSN
         ? [
             sentry({
-              sourceMapsUploadOptions: {
-                org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-                project: process.env.SENTRY_PROJECT || 'pixel-astro',
-                authToken: process.env.SENTRY_AUTH_TOKEN,
-                // Include release for proper stack trace linking and code mapping
-                release:
-                  process.env.SENTRY_RELEASE ||
-                  process.env.npm_package_version ||
-                  undefined,
-                telemetry: false,
-                sourcemaps: {
-                  assets: [
-                    './.astro/dist/**/*.js',
-                    './.astro/dist/**/*.mjs',
-                    './dist/**/*.js',
-                    './dist/**/*.mjs',
-                  ],
-                  ignore: ['**/node_modules/**'],
-                  filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
-                },
+              telemetry: false,
+              // Upload sourcemaps through the Vite plugin so each Astro build
+              // phase only uploads the files it actually emitted.
+              sourcemaps: {
+                disable: true,
               },
             }),
             // Temporarily disable SpotlightJS due to build issues
@@ -427,13 +642,17 @@ export default defineConfig({
       followSymlinks: false,
       ignored: [
         // Hard guard first: function ignore for node_modules and .venv anywhere
-        (p) =>
-          p.includes('/node_modules/') ||
-          p.includes('\\node_modules\\') ||
-          p.includes('/.venv/') ||
-          p.includes('\\.venv\\') ||
-          p.includes('/ai/') ||
-          p.includes('\\ai\\'),
+        (p) => {
+          const normalizedPath = String(p)
+          return (
+            normalizedPath.includes('/node_modules/') ||
+            normalizedPath.includes('\\node_modules\\') ||
+            normalizedPath.includes('/.venv/') ||
+            normalizedPath.includes('\\.venv\\') ||
+            normalizedPath.includes('/ai/') ||
+            normalizedPath.includes('\\ai\\')
+          )
+        },
         // Python virtual environments and cache
         '**/.venv/**',
         '.venv/**',

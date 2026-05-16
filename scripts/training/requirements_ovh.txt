@@ -1,7 +1,0 @@
-torchmetrics
-peft
-lightning
-wandb
-boto3
-bitsandbytes
-accelerate

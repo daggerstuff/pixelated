@@ -40,7 +40,7 @@ export interface RateLimitMetrics {
  * Advanced Rate Limiter with multiple strategies
  */
 class RateLimiter {
-  private config: RateLimitConfig
+  private readonly config: RateLimitConfig
   private metrics = {
     totalRequests: 0,
     blockedRequests: 0,
@@ -64,7 +64,7 @@ class RateLimiter {
     this.metrics.totalRequests++
 
     const results = await Promise.all(
-      this.config.rules.map((rule) => this.checkRule(request, rule)),
+      this.config.rules.map( async (rule) => this.checkRule(request, rule)),
     )
 
     // Request is allowed if ANY rule passes (OR logic) or if ALL rules pass (AND logic)
@@ -76,7 +76,7 @@ class RateLimiter {
 
       // Track offender
       const clientKey = this.getClientKey(request)
-      const currentCount = this.metrics.requestCounts.get(clientKey) || 0
+      const currentCount = this.metrics.requestCounts.get(clientKey) ?? 0
       this.metrics.requestCounts.set(clientKey, currentCount + 1)
 
       // Return the most restrictive rule's result
@@ -156,7 +156,7 @@ class RateLimiter {
         remaining: rule.maxRequests - currentCount,
         resetTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Rate limiter error:', error)
 
       // On Redis error, allow request but log the issue
@@ -179,10 +179,10 @@ class RateLimiter {
     const realIp = request.headers.get('x-real-ip')
     const clientIp = request.headers.get('x-client-ip')
 
-    const ip = forwardedFor?.split(',')[0] || realIp || clientIp || 'unknown'
+    const ip = ((forwardedFor?.split(',')[0] ?? realIp) ?? clientIp) ?? 'unknown'
 
     // Include user agent for more granular limiting
-    const userAgent = request.headers.get('user-agent') || 'unknown'
+    const userAgent = request.headers.get('user-agent') ?? 'unknown'
 
     return `rl:${ip}:${Buffer.from(userAgent).toString('base64').slice(0, 16)}`
   }
@@ -201,7 +201,7 @@ class RateLimiter {
       }
 
       return false
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to reset rate limit:', error)
       return false
     }
@@ -264,7 +264,7 @@ class RateLimiter {
       }
 
       return cleanedCount
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Rate limiter cleanup error:', error)
       return 0
     }
@@ -281,13 +281,13 @@ export const RATE_LIMIT_RULES = {
       windowMs: 15 * 60 * 1000, // 15 minutes
       maxRequests: 5, // 5 auth attempts per 15 minutes
       keyGenerator: (req: Request) =>
-        `auth:${req.headers.get('x-forwarded-for') || 'unknown'}`,
+        `auth:${req.headers.get('x-forwarded-for') ?? 'unknown'}`,
     },
     {
       windowMs: 60 * 1000, // 1 minute
       maxRequests: 3,
       keyGenerator: (req: Request) =>
-        `auth_burst:${req.headers.get('x-forwarded-for') || 'unknown'}`,
+        `auth_burst:${req.headers.get('x-forwarded-for') ?? 'unknown'}`,
     },
   ],
 

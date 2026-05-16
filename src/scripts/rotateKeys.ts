@@ -104,7 +104,7 @@ async function main(): Promise<void> {
             )
           }
         } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : String(error)
+          const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
           await log(`Error rotating key ${keyId}: ${message}`)
         }
       }
@@ -129,7 +129,7 @@ async function main(): Promise<void> {
     await log('Key rotation process completed successfully')
     process.exit(0)
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error)
+    const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
     await log(`Key rotation process failed: ${message}`)
     process.exit(1)
   }
@@ -137,7 +137,7 @@ async function main(): Promise<void> {
 
 // Run the main function
 main().catch(async (error) => {
-  const message = error instanceof Error ? error.message : String(error)
+  const message = error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
   await log(`Unhandled error: ${message}`)
   process.exit(1)
 })

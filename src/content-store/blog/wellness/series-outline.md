@@ -1,13 +1,12 @@
 ---
-title: 'Everyday Joy: Simple Practices for Mental Wellness'
-description:
-  'A heartwarming exploration of practical, accessible approaches to nurturing
-  mental health and finding joy in daily life'
+title: series outline
+description: >-
+  _This series aims to bring light and joy to mental wellness through accessible,
 author: 'Wellness Team'
 pubDate: 2024-04-19
 draft: false
----
 
+---
 # 🌟 Everyday Joy Series
 
 ## Series Blueprint 📋
@@ -17,11 +16,6 @@ title: 'Everyday Joy: Simple Practices for Mental Wellness'
 description:
   'Discovering accessible ways to enhance mental wellbeing through daily
   practices and mindful living'
-timeframe: 'May-June 2024'
-articles: 5
-frequency: 'Bi-weekly (between Neuroplasticity series)'
-audience: 'General public, wellness enthusiasts, mental health advocates'
-impact_goal: 'Empower individuals with practical tools for mental wellness'
 ```
 
 ## 🎯 Series Vision
@@ -37,7 +31,7 @@ impact_goal: 'Empower individuals with practical tools for mental wellness'
 
 ### 1. The Art of Micro-Joys: Finding Happiness in Small Moments
 
-_May 4, 2024_
+#### May 4, 2024
 
 - Mindful appreciation practices
 - Creating joy rituals
@@ -46,7 +40,7 @@ _May 4, 2024_
 
 ### 2. Friendship as Medicine: Nurturing Social Wellness
 
-_May 11, 2024_
+#### May 11, 2024
 
 - Building meaningful connections
 - Creating support networks
@@ -55,7 +49,7 @@ _May 11, 2024_
 
 ### 3. Creative Expression for Mental Wellness
 
-_May 18, 2024_
+#### May 18, 2024
 
 - Art therapy for everyone
 - Writing for emotional release
@@ -64,7 +58,7 @@ _May 18, 2024_
 
 ### 4. Nature's Therapy: Outdoor Wellness Practices
 
-_May 25, 2024_
+#### May 25, 2024
 
 - Forest bathing basics
 - Garden therapy
@@ -73,7 +67,7 @@ _May 25, 2024_
 
 ### 5. Joy at Work: Creating a Mentally Healthy Workplace
 
-_June 1, 2024_
+#### June 1, 2024
 
 - Desk wellness practices
 - Work-life harmony

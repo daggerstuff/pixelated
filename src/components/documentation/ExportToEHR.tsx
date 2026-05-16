@@ -25,7 +25,7 @@ export function ExportToEHR({
 
   // Reset success details when export result changes
   useEffect(() => {
-    if (exportResult && exportResult.success) {
+    if (exportResult?.success) {
       setShowSuccessDetails(true)
     } else {
       setShowSuccessDetails(false)
@@ -173,9 +173,9 @@ export function ExportToEHR({
                     ? 'Documentation exported successfully'
                     : 'Failed to export documentation'}
                 </h3>
-                {exportResult.error && (
+                {exportResult.errors && exportResult.errors.length > 0 && (
                   <div className='text-red-700 dark:text-red-300 mt-2 text-sm'>
-                    {exportResult.error}
+                    {exportResult.errors[0]}
                   </div>
                 )}
 
@@ -186,17 +186,17 @@ export function ExportToEHR({
                     </p>
                     {typeof exportResult === 'object' &&
                       'documentId' in exportResult &&
-                      exportResult.documentId && (
+                      Boolean(exportResult.documentId) && (
                         <p className='text-green-700 dark:text-green-300 text-sm'>
-                          Document ID: {exportResult.documentId as string}
+                          Document ID: {String(exportResult.documentId)}
                         </p>
                       )}
                     {typeof exportResult === 'object' &&
                       'documentUrl' in exportResult &&
-                      exportResult.documentUrl && (
+                      Boolean(exportResult.documentUrl) && (
                         <div className='mt-1'>
                           <a
-                            href={exportResult.documentUrl as string}
+                            href={String(exportResult.documentUrl)}
                             target='_blank'
                             rel='noopener noreferrer'
                             className='text-green-600 dark:text-green-400 text-sm font-medium hover:underline'

@@ -19,8 +19,6 @@ interface PerformancePaintEntry extends PerformanceEntry {
   startTime: number
 }
 
-// Not using these interfaces directly as we're using intermediate type casting
-// Instead defining the types inline where they're used
 interface PerformanceResourceEntry extends PerformanceEntry {
   encodedBodySize: number
 }
@@ -35,10 +33,10 @@ interface PageMetrics {
   domContentLoaded: number
   domComplete: number
   loadEvent: number
-  resourceCounttt: number
+  resourceCount: number
   resourceSize: number
   jsSize: number
-  jsExecutionTime: number
+  jsExecutionCount: number
   FID?: number
 }
 
@@ -103,12 +101,33 @@ const API_ENDPOINTS = [
     path: '/api/ai/completion',
     method: 'POST',
     payload: {
-      model: 'Together-ai-default',
+      model: 'llm-default',
       messages: [{ role: 'user', content: 'Hello' }],
     },
   },
   { path: '/api/ai/usage', method: 'GET' },
 ]
+
+const isPerformanceResults = (
+  value: unknown,
+): value is { pages: Record<string, PageMetrics> } => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  if (!Reflect.has(value, 'pages')) {
+    return false
+  }
+
+  return (
+    typeof Reflect.get(value, 'pages') === 'object' &&
+    Reflect.get(value, 'pages') !== null
+  )
+}
+
+const parseJson = (value: string): unknown => {
+  return JSON.parse(value)
+}
 
 describe('performance Tests', () => {
   let browser: Browser
@@ -124,7 +143,7 @@ describe('performance Tests', () => {
     browser = await chromium.launch({ headless: true })
     results = {
       timestamp: new Date().toISOString(),
-      environment: process.env['NODE_ENV'] || 'development',
+      environment: process.env['NODE_ENV'] ?? 'development',
       pages: {},
       api: {},
     }
@@ -169,35 +188,31 @@ describe('performance Tests', () => {
         const navigationTime = performance.now() - startTime
 
         // Collect performance metrics
-        const metrics = await page.evaluate(() => {
-          // Using type assertion with unknown as intermediate step for safer conversion
-          const perfEntries = performance.getEntriesByType(
-            'navigation',
-          )[0] as unknown as PerformanceNavigationEntry
-          const paintEntries = performance.getEntriesByType(
-            'paint',
-          ) as unknown as PerformancePaintEntry[]
-
-          // Use type assertion for custom browser API methods
-          const lcpEntry = (
-            performance as unknown as {
-              getEntriesByType: (type: string) => { startTime: number }[]
-            }
-          ).getEntriesByType('largest-contentful-paint')[0] || { startTime: 0 }
-
-          const layoutShiftEntries =
-            (
-              performance as unknown as {
-                getEntriesByType: (type: string) => { value: number }[]
-              }
-            ).getEntriesByType('layout-shift') || []
-
-          const resources = performance.getEntriesByType(
-            'resource',
-          ) as unknown as PerformanceResourceEntry[]
+        const metrics = await page.evaluate<EvaluatedMetrics>(() => {
+          const timing = performance.timing
+          const paintEntries = performance.getEntriesByType('paint')
+          const lcpEntries = performance.getEntriesByType(
+            'largest-contentful-paint',
+          )
+          const lcpStartTime =
+            lcpEntries.length > 0 ? lcpEntries[0].startTime : 0
+          const isLayoutShiftEntry = (
+            entry: PerformanceEntry,
+          ): entry is PerformanceEntry & { value: number } =>
+            typeof Reflect.get(entry, 'value') === 'number'
+          const layoutShiftEntries = performance
+            .getEntriesByType('layout-shift')
+            .filter(isLayoutShiftEntry)
+          const isResourceTimingEntry = (
+            entry: PerformanceEntry,
+          ): entry is PerformanceResourceEntry =>
+            typeof Reflect.get(entry, 'encodedBodySize') === 'number'
+          const resources = performance.getEntriesByType('resource')
           const resourceCount = resources.length
           const resourceSize = resources.reduce(
-            (total, resource) => total + resource.encodedBodySize,
+            (total, resource) =>
+              total +
+              (isResourceTimingEntry(resource) ? resource.encodedBodySize : 0),
             0,
           )
 
@@ -211,39 +226,39 @@ describe('performance Tests', () => {
           const firstContentfulPaint =
             paintEntries.find(
               (entry) => entry.name === 'first-contentful-paint',
-            )?.startTime || 0
+            )?.startTime ?? 0
 
           return {
             // Core Web Vitals
-            LCP: lcpEntry.startTime,
+            LCP: lcpStartTime,
             CLS: cumulativeLayoutShift,
             // We'll measure FID through interaction in a separate test
 
             // Additional metrics
             FCP: firstContentfulPaint,
             domContentLoaded:
-              perfEntries.domContentLoadedEventEnd -
-              perfEntries.domContentLoadedEventStart,
-            domComplete: perfEntries.domComplete,
-            loadEvent: perfEntries.loadEventEnd - perfEntries.loadEventStart,
+              timing.domContentLoadedEventEnd -
+              timing.domContentLoadedEventStart,
+            domComplete: timing.domComplete,
+            loadEvent: timing.loadEventEnd - timing.loadEventStart,
 
             // Resource metrics
             resourceCount,
             resourceSize,
-          } as EvaluatedMetrics
+          }
         })
 
         // Stop JS coverage
         const jsCoverage = await page.coverage.stopJSCoverage()
         const jsSize = jsCoverage.reduce(
-          (total, entry) => total + (entry.source?.length || 0),
+          (total, entry) => total + (entry.source?.length ?? 0),
           0,
         )
         const jsExecutionCount = jsCoverage.reduce((total, entry) => {
-          const functions = entry.functions || []
+          const functions = entry.functions
           return (
             total +
-            functions.reduce((sum, fn) => sum + (fn.ranges[0]?.count || 0), 0)
+            functions.reduce((sum, fn) => sum + (fn.ranges[0]?.count ?? 0), 0)
           )
         }, 0)
 
@@ -287,7 +302,7 @@ describe('performance Tests', () => {
           try {
             const [inputDelay] = await Promise.all([
               page
-                .evaluate(() => {
+                .evaluate(async () => {
                   return new Promise<number>((resolve) => {
                     let startTime: number
 
@@ -321,9 +336,9 @@ describe('performance Tests', () => {
 
             // Assert
             expect(inputDelay).toBeLessThan(PERFORMANCE_THRESHOLDS.FID)
-          } catch (error) {
+          } catch (error: unknown) {
             console.warn(
-              `Failed to measure FID on ${name}: ${error instanceof Error ? error.message : String(error)}`,
+              `Failed to measure FID on ${name}: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
             )
           }
         } else {
@@ -355,33 +370,37 @@ describe('performance Tests', () => {
       })
 
       // Execute request
-      let response
+      let response: { status: number; ok: boolean } | undefined
       if (method === 'GET') {
-        response = await page.evaluate(async (url: string) => {
-          const response = await fetch(url)
-          return {
-            status: response.status,
-            ok: response.ok,
-          }
-        }, `http://localhost:3000${path}`)
+        response = await page.evaluate<{ status: number; ok: boolean }, string>(
+          async (url) => {
+            const response = await fetch(url)
+            return {
+              status: response.status,
+              ok: response.ok,
+            }
+          },
+          `http://localhost:3000${path}`,
+        )
       } else if (method === 'POST') {
-        response = await page.evaluate(
-          ({ url, data }) => {
-            return fetch(url, {
+        response = await page.evaluate<
+          { status: number; ok: boolean },
+          { url: string; data: unknown }
+        >(
+          async ({ url, data }) => {
+            const response = await fetch(url, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify(data),
-            }).then((response) => ({
+            })
+            return {
               status: response.status,
               ok: response.ok,
-            }))
+            }
           },
-          {
-            url: `http://localhost:3000${path}`,
-            data: payload,
-          },
+          { url: `http://localhost:3000${path}`, data: payload },
         )
       }
 
@@ -423,43 +442,41 @@ describe('performance Tests', () => {
         jsonFiles.sort().reverse()
 
         // Load the most recent previous result
-        const previousResults = JSON.parse(
+        const previousResultsRaw = parseJson(
           await fs.readFile(join(resultsDir, jsonFiles[0]), 'utf-8'),
-        ) as { pages: Record<string, PageMetrics> }
+        )
+        if (!isPerformanceResults(previousResultsRaw)) {
+          return
+        }
+        const previousResults = previousResultsRaw
 
         // Compare with current results
         for (const [pageName, pageMetrics] of Object.entries(results.pages)) {
           const previousPageMetrics = previousResults.pages[pageName]
 
-          if (previousPageMetrics) {
-            // Check for significant regressions (>20% worse)
-            for (const metricName of ['LCP', 'FID', 'CLS', 'FCP']) {
-              const current = pageMetrics[metricName as keyof PageMetrics]
-              const previous =
-                previousPageMetrics[metricName as keyof PageMetrics]
+          // Check for significant regressions (>20% worse)
+          for (const metricName of ['LCP', 'FID', 'CLS', 'FCP'] as const) {
+            const current = pageMetrics[metricName]
+            const previous = previousPageMetrics[metricName]
 
-              if (current !== undefined && previous !== undefined) {
-                const currentValue = current as number
-                const previousValue = previous as number
-                const percentChange =
-                  ((currentValue - previousValue) / previousValue) * 100
+            if (current !== undefined && previous !== undefined) {
+              const percentChange = ((current - previous) / previous) * 100
 
-                // Log warnings for significant regressions
-                if (percentChange > 20) {
-                  console.warn(
-                    `Regression detected in ${pageName} - ${metricName}: ${previousValue} -> ${currentValue} (${percentChange.toFixed(2)}% worse)`,
-                  )
-                }
+              // Log warnings for significant regressions
+              if (percentChange > 20) {
+                console.warn(
+                  `Regression detected in ${pageName} - ${metricName}: ${previous} -> ${current} (${percentChange.toFixed(2)}% worse)`,
+                )
+              }
 
-                // For critical metrics, log severe regressions (>100% worse)
-                if (
-                  ['LCP', 'FID', 'CLS'].includes(metricName) &&
-                  percentChange > 100
-                ) {
-                  console.error(
-                    `SEVERE Regression detected in ${pageName} - ${metricName}: ${previousValue} -> ${currentValue} (${percentChange.toFixed(2)}% worse)`,
-                  )
-                }
+              // For critical metrics, log severe regressions (>100% worse)
+              if (
+                ['LCP', 'FID', 'CLS'].includes(metricName) &&
+                percentChange > 100
+              ) {
+                console.error(
+                  `SEVERE Regression detected in ${pageName} - ${metricName}: ${previous} -> ${current} (${percentChange.toFixed(2)}% worse)`,
+                )
               }
             }
           }
@@ -472,7 +489,7 @@ describe('performance Tests', () => {
   })
 })
 
-export async function simulateUserInteraction(page: Page): void {
+export async function simulateUserInteraction(page: Page): Promise<void> {
   // Simulate scrolling
   await page.evaluate(() => {
     window.scrollBy(0, 500)

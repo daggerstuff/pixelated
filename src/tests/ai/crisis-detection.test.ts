@@ -1,10 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, type MockInstance } from 'vitest'
 
 import type {
   CrisisDetectionOptions,
   CrisisDetectionResult,
 } from '../../lib/ai/crisis/types'
-import type { AICompletion } from '../../lib/ai/models/ai-types'
+import type { AICompletion, AIModelInfo, AIService } from '../../lib/ai/models/ai-types'
+import { CrisisDetectionService } from '../../lib/ai/services/crisis-detection'
 
 // Mock the logger first
 vi.mock('../../lib/logging/build-safe-logger', () => ({
@@ -17,22 +18,35 @@ vi.mock('../../lib/logging/build-safe-logger', () => ({
 }))
 
 describe('crisisDetectionService', () => {
-  let CrisisDetectionService: any
-  let crisisService: any
-
-  const mockAIService = {
-    createChatCompletion: vi.fn(),
-    createStreamingChatCompletion: vi.fn(),
+  const mockAIService: AIService = {
+    createChatCompletion: async () => {
+      throw new Error('Chat completion mock not initialized')
+    },
+    createStreamingChatCompletion: async () => {
+      const asyncGenerator: AsyncGenerator<never, void, void> = (async function* () {})()
+      return asyncGenerator
+    },
+    getModelInfo(model: string): AIModelInfo {
+      return {
+        id: model,
+        name: model,
+        provider: 'test',
+        capabilities: [],
+        contextWindow: 2048,
+        maxTokens: 2048,
+      }
+    },
+    dispose: vi.fn(),
   }
 
-  beforeEach(async () => {
+  let crisisService: CrisisDetectionService
+  let createChatCompletionSpy: MockInstance<AIService['createChatCompletion']>
+
+  beforeEach(() => {
     vi.resetModules()
     vi.clearAllMocks()
 
-    // Dynamically import the service after mocks are set up
-    const serviceModule = await import('../../lib/ai/services/crisis-detection')
-    CrisisDetectionService = serviceModule.CrisisDetectionService
-
+    createChatCompletionSpy = vi.spyOn(mockAIService, 'createChatCompletion')
     crisisService = new CrisisDetectionService({
       aiService: mockAIService,
       sensitivityLevel: 'high' as const,
@@ -48,7 +62,7 @@ describe('crisisDetectionService', () => {
         source: 'test',
       }
 
-      mockAIService.createChatCompletion.mockResolvedValue({
+      createChatCompletionSpy.mockResolvedValue({
         content: JSON.stringify({
           score: 0.9,
           category: 'suicide_risk',
@@ -61,6 +75,7 @@ describe('crisisDetectionService', () => {
         id: 'test-id',
         created: Date.now(),
         choices: [],
+        provider: 'test',
       } as AICompletion)
 
       const result: CrisisDetectionResult = await crisisService.detectCrisis(
@@ -82,7 +97,7 @@ describe('crisisDetectionService', () => {
         source: 'test',
       }
 
-      mockAIService.createChatCompletion.mockResolvedValue({
+      createChatCompletionSpy.mockResolvedValue({
         content: JSON.stringify({
           score: 0.6,
           category: 'severe_depression',
@@ -95,6 +110,7 @@ describe('crisisDetectionService', () => {
         id: 'test-id',
         created: Date.now(),
         choices: [],
+        provider: 'test',
       } as AICompletion)
 
       const result = await crisisService.detectCrisis(text, options)
@@ -119,7 +135,7 @@ describe('crisisDetectionService', () => {
       expect(result.isCrisis).toBe(false)
       expect(result.confidence).toBeLessThan(0.3)
       expect(result.riskLevel).toBe('low')
-      expect(mockAIService.createChatCompletion).not.toHaveBeenCalled()
+      expect(createChatCompletionSpy).not.toHaveBeenCalled()
     })
 
     it('should handle invalid JSON responses', async () => {
@@ -130,13 +146,14 @@ describe('crisisDetectionService', () => {
         source: 'test',
       }
 
-      mockAIService.createChatCompletion.mockResolvedValue({
+      createChatCompletionSpy.mockResolvedValue({
         content: 'invalid json response',
         usage: { promptTokens: 50, completionTokens: 100, totalTokens: 150 },
         model: 'test-model',
         id: 'test-id',
         created: Date.now(),
         choices: [],
+        provider: 'test',
       } as AICompletion)
 
       const result = await crisisService.detectCrisis(text, options)
@@ -154,7 +171,7 @@ describe('crisisDetectionService', () => {
         source: 'test',
       }
 
-      mockAIService.createChatCompletion.mockRejectedValue(
+      createChatCompletionSpy.mockRejectedValue(
         new Error('AI service error'),
       )
 
@@ -180,7 +197,7 @@ describe('crisisDetectionService', () => {
         source: 'test',
       }
 
-      mockAIService.createChatCompletion.mockResolvedValue({
+      createChatCompletionSpy.mockResolvedValue({
         content: JSON.stringify({
           score: 0.8,
           category: 'suicide_risk',
@@ -193,6 +210,7 @@ describe('crisisDetectionService', () => {
         id: 'test-id',
         created: Date.now(),
         choices: [],
+        provider: 'test',
       } as AICompletion)
 
       const results = await crisisService.detectBatch(texts, options)
@@ -211,9 +229,8 @@ describe('crisisDetectionService', () => {
       }
 
       // Mock the detectCrisis method to throw an error
-      const originalDetectCrisis = crisisService.detectCrisis
-      crisisService.detectCrisis = vi
-        .fn()
+      const detectCrisisSpy = vi
+        .spyOn(crisisService, 'detectCrisis')
         .mockRejectedValue(new Error('Detection failed'))
 
       await expect(crisisService.detectBatch(texts, options)).rejects.toThrow(
@@ -221,7 +238,7 @@ describe('crisisDetectionService', () => {
       )
 
       // Restore original method
-      crisisService.detectCrisis = originalDetectCrisis
+      detectCrisisSpy.mockRestore()
     })
   })
 

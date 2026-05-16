@@ -10,9 +10,9 @@ permissions:
 
 # Environment variables can be defined here
 env:
-  FORCE_JS_TO_NODE24: true
-  NODE_VERSION: 24.14.0
-  PNPM_VERSION: 10.33.0
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  NODE_VERSION: 24.14.1
+  PNPM_VERSION: 11.1.1
   NODE_ENV: production
 
 jobs:
@@ -26,14 +26,14 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6.0.6
         with:
-          version: 10.33.0
+          version: 11.1.1
 
       - name: Get pnpm store directory
         id: pnpm-store
@@ -41,18 +41,24 @@ jobs:
         run: echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.store_path }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          npm install -g node-gyp
+
       - name: Clean pnpm cache
         run: pnpm store prune
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Configure Git
         run: |

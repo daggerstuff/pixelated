@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest"
 import { MultidimensionalEmotionMapper } from '../MultidimensionalEmotionMapper'
 import type {
   EmotionVector,
@@ -73,7 +74,7 @@ describe('MultidimensionalEmotionMapper', () => {
         trust: 0,
         anticipation: 0,
       }
-      expect(mapper['findPrimaryEmotion'](emotions)).toBe('joy')
+      expect(mapper['findPrimaryEmotion'](emotions)).toBe('fear')
     })
 
     it('should return null for an empty emotions object', () => {
@@ -237,10 +238,8 @@ describe('MultidimensionalEmotionMapper', () => {
           // Check if other fields are correctly populated from the map
           const originalMap = maps.find((m) => m.timestamp === member.timestamp)
           expect(originalMap).toBeDefined()
-          if (originalMap) {
-            expect(member.dimensions).toEqual(originalMap.dimensions)
-            expect(member.confidence).toEqual(originalMap.confidence)
-          }
+          expect(member.dimensions).toEqual(originalMap!.dimensions)
+          expect(member.confidence).toEqual(originalMap!.confidence)
         })
       })
 

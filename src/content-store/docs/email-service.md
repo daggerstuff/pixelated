@@ -1,13 +1,9 @@
 ---
-title: 'Email Service'
-description:
-  'Guide to Pixelated Healths email service implementation and configuration'
-pubDate: 2025-03-24
-share: true
-toc: true
-lastModDate: 2025-03-25
-tags: ['email', 'services', 'communication']
-author: 'Pixelated Team'
+description: >-
+  Guide to Pixelated Healths email service implementation and configuration' share: true lastModDate: 2025-03-25 tags:
+  ['email',
+title: Email Service
+pubDate: '2026-05-09'
 ---
 
 # Email Service

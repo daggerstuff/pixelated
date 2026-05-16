@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ -f "${SCRIPT_DIR}/lib/vault-env.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "${SCRIPT_DIR}/lib/vault-env.sh"
+  load_vault_env 0 || true
+else
+  echo "⚠️ Missing helper script: ${SCRIPT_DIR}/lib/vault-env.sh"
+fi
 
 ENTRYPOINT_SCRIPT_REL="scripts/devops/start_lightning_stage1_entrypoint.sh"
 ENTRYPOINT_SCRIPT=""

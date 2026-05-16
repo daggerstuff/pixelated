@@ -35,8 +35,8 @@ export interface VersionConfig {
  * API Version Manager
  */
 class ApiVersionManager {
-  private config: VersionConfig
-  private endpoints = new Map<string, VersionedEndpoint[]>()
+  private readonly config: VersionConfig
+  private readonly endpoints = new Map<string, VersionedEndpoint[]>()
 
   constructor() {
     this.config = {
@@ -70,7 +70,7 @@ class ApiVersionManager {
    * Register a versioned endpoint
    */
   registerEndpoint(endpoint: VersionedEndpoint): void {
-    const existing = this.endpoints.get(endpoint.path) || []
+    const existing = this.endpoints.get(endpoint.path) ?? []
     existing.push(endpoint)
     this.endpoints.set(endpoint.path, existing)
   }
@@ -79,7 +79,7 @@ class ApiVersionManager {
    * Get all versions of an endpoint
    */
   getEndpointVersions(path: string): VersionedEndpoint[] {
-    return this.endpoints.get(path) || []
+    return this.endpoints.get(path) ?? []
   }
 
   /**
@@ -112,8 +112,8 @@ class ApiVersionManager {
    */
   parseVersionFromRequest(request: Request): ApiVersion | null {
     const versionHeader =
-      request.headers.get('X-API-Version') ||
-      request.headers.get('API-Version') ||
+      (request.headers.get('X-API-Version') ??
+      request.headers.get('API-Version')) ??
       request.url
         .match(/\/v(\d+)\/(\d+)\/(\d+)\//)
         ?.slice(1)
@@ -162,7 +162,7 @@ class ApiVersionManager {
     if (!this.isDeprecated(endpoint)) return null
 
     const sunsetDate =
-      endpoint.sunsetDate || this.calculateSunsetDate(endpoint.version)
+      endpoint.sunsetDate ?? this.calculateSunsetDate(endpoint.version)
 
     return `This API version (${endpoint.version.major}.${endpoint.version.minor}.${endpoint.version.patch}) is deprecated and will be removed on ${sunsetDate.toISOString().split('T')[0]}. Please migrate to v${this.config.currentVersion.major}.${this.config.currentVersion.minor}.${this.config.currentVersion.patch}.`
   }

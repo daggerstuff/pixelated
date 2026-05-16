@@ -9,6 +9,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { MockFHEService } from './mock/mock-fhe-service'
 import type {
   FHEOperation,
+  FHEOperationResult,
   FHEService,
   FHEServiceOptions,
   FHEConfig,
@@ -25,6 +26,11 @@ export interface EnhancedFHEService extends FHEService {
   // Additional methods for enhanced service
   clearCache(): Promise<void>
   getStats(): Record<string, number>
+  processEncrypted?: (
+    encryptedData: string,
+    operation: FHEOperation | string,
+    params?: Record<string, unknown>,
+  ) => Promise<FHEOperationResult<string>>
 }
 
 /**
@@ -70,7 +76,7 @@ export function createEnhancedFHEService(
     },
 
     // Pass through with stats tracking
-    generateKeys: async (config?: FHEConfig  ) => {
+    generateKeys: async (config?: FHEConfig) => {
       try {
         return await baseService.generateKeys(config)
       } catch (error: unknown) {
@@ -85,10 +91,7 @@ export function createEnhancedFHEService(
       baseService.supportsOperation(operation),
 
     // Enhanced encrypt with stats tracking
-    async encrypt<T>(
-      value: T,
-      options?: unknown,
-    ): Promise<EncryptedData> {
+    async encrypt(value: unknown, options?: unknown): Promise<EncryptedData> {
       try {
         stats.encryptCount++
         return await baseService.encrypt(value, options)
@@ -101,7 +104,7 @@ export function createEnhancedFHEService(
 
     // Enhanced decrypt with stats tracking
     async decrypt<T>(
-      encryptedData: EncryptedData,
+      encryptedData: EncryptedData<T>,
       options?: unknown,
     ): Promise<T> {
       try {
@@ -125,15 +128,16 @@ export function createEnhancedFHEService(
 
   // Add operation methods if available on base service
   if (baseService.processEncrypted) {
+    const processEncrypted = baseService.processEncrypted
     enhancedService.processEncrypted = async (
       encryptedData: string,
       operation: FHEOperation | string,
       params?: Record<string, unknown>,
-    ): Promise<unknown> => {
+    ): Promise<FHEOperationResult<string>> => {
       try {
         stats.operationCount++
         logger.debug('Processing encrypted data', { operation })
-        return await baseService.processEncrypted(
+        return await processEncrypted(
           encryptedData,
           operation,
           params,

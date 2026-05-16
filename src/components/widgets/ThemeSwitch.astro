@@ -11,7 +11,7 @@
   <div u-i-ri-sun-line u-dark:i-ri-moon-line></div>
 </button>
 
-<!-- Initialize as inline scripts for faster response, avoiding FOUC  -->
+<!-- Initialize, avoiding FOUC  -->
 <script is:inline data-astro-rerun>
   function initTheme() {
     let theme
@@ -44,10 +44,14 @@
 </script>
 
 <script>
+  interface UserAgentData {
+    brands?: { brand: string; version: string }[]
+  }
+
   // related to #45
   const chooseFill = (): FillMode => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uach = (navigator as any).userAgentData
+    const uach = (navigator as Navigator & { userAgentData?: UserAgentData })
+      .userAgentData
 
     if (uach?.brands?.length) {
       const brands: { brand: string; version: string }[] = uach.brands
@@ -104,19 +108,20 @@
     /* Handle user toggle button */
     const handleToggle = (event: MouseEvent) => {
       const currentTarget = event.currentTarget
+      if (!(currentTarget instanceof HTMLElement)) return
 
       const toggle = () => {
         document.documentElement.classList.toggle('dark')
         isDark = document.documentElement.classList.contains('dark')
         changeGiscusTheme(isDark)
-        updateAria(currentTarget as HTMLElement)
+        updateAria(currentTarget)
         setColorTheme()
         saveTheme()
       }
 
       const isAppearanceTransition =
-        // @ts-expect-error (View Transitions API)
-        document.startViewTransition &&
+        (document as Document & { startViewTransition?: () => void })
+          .startViewTransition !== undefined &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
       if (!isAppearanceTransition) {
@@ -131,7 +136,13 @@
         Math.max(y, innerHeight - y),
       )
 
-      const transition = document.startViewTransition(() => toggle())
+      const transition = (
+        document as Document & {
+          startViewTransition: () => {
+            ready: Promise<{ finished: Promise<void> }>
+          }
+        }
+      ).startViewTransition(() => toggle())
 
       transition.ready.then(() => {
         const clipPath = [

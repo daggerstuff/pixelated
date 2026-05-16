@@ -71,7 +71,7 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
         const detection = await phiDetector.detectPHI(input)
         if (detection && Array.isArray(detection.entities)) {
           summary.redactedTextEntities = detection.entities.map((e) => ({
-            type: String(e.type),
+            type: e.type,
             start: e.start,
             end: e.end,
           }))
@@ -127,7 +127,6 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
       })
     } else {
       // Node/server context
-      // eslint-disable-next-line no-console
       console.error('Anonymization pipeline error', {
         auditId,
         error: summary.errors[0],

@@ -32,22 +32,22 @@ export const AnimationDemo: FC = () => {
     {
       title: 'Enhanced UX',
       description: 'Smooth animations create better user experiences',
-      icon: '✨',
+      icon: 'sparkle',
     },
     {
       title: 'Accessibility',
       description: 'Respects reduced motion preferences',
-      icon: '♿',
+      icon: 'accessibility',
     },
     {
       title: 'Performance',
       description: 'Optimized animations with GPU acceleration',
-      icon: '⚡',
+      icon: 'lightning',
     },
     {
       title: 'Responsive',
       description: 'Animations adapt to different screen sizes',
-      icon: '📱',
+      icon: 'device',
     },
   ]
 

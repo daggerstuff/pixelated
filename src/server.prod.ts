@@ -1,20 +1,77 @@
 import { readFileSync } from 'fs'
-import { createServer } from 'https'
+import { createServer as createHttpServer, Server as HttpServer } from 'http'
+import { createServer as createHttpsServer, Server as HttpsServer } from 'https'
 
 import compression from 'compression'
 import cors from 'cors'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import Redis from 'ioredis'
+import Redis, { type RedisOptions } from 'ioredis'
 import { Pool } from 'pg'
 
+import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import { productionConfig } from './config/production.js'
 import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
 
 const app = express()
+type SentryExpressErrorHandler = (app: express.Application) => void
+type SentryErrorHandler = (
+  options?: Record<string, string>,
+) => express.ErrorRequestHandler
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isSentryExpressErrorHandler = (
+  value: unknown,
+): value is SentryExpressErrorHandler => typeof value === 'function'
+
+const isSentryExpressErrorRequestHandler = (
+  value: unknown,
+): value is SentryErrorHandler => typeof value === 'function'
+
+const getSentryHandlers = (
+  source: unknown,
+): {
+  setupExpressErrorHandler?: SentryExpressErrorHandler
+  expressErrorHandler?: SentryErrorHandler
+} => {
+  if (!isRecord(source)) {
+    return {}
+  }
+
+  const handlers: {
+    setupExpressErrorHandler?: SentryExpressErrorHandler
+    expressErrorHandler?: SentryErrorHandler
+  } = {}
+
+  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
+    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
+  }
+
+  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
+    handlers.expressErrorHandler = source['expressErrorHandler']
+  }
+
+  return handlers
+}
+
+const { setupExpressErrorHandler, expressErrorHandler } =
+  getSentryHandlers(Sentry)
+
+const hasSentryErrorHandler =
+  Boolean(setupExpressErrorHandler) || Boolean(expressErrorHandler)
+
+// The Sentry request handler must be the first middleware on the app
+app.use(sentryMiddleware)
+if (typeof setupExpressErrorHandler === 'function') {
+  setupExpressErrorHandler(app)
+} else if (typeof expressErrorHandler === 'function') {
+  app.use(expressErrorHandler())
+}
 
 // Environment setup
 const PORT = productionConfig.port
@@ -22,7 +79,10 @@ const isProduction = productionConfig.environment === 'production'
 
 // Database connection
 const db = new Pool(productionConfig.database)
-const redis = new Redis(productionConfig.redis)
+const redis = new Redis(productionConfig.redis.url, {
+  lazyConnect: true,
+  tls: productionConfig.redis.tls,
+} as RedisOptions)
 
 // Security middleware
 app.use(
@@ -68,7 +128,7 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -82,21 +142,21 @@ app.use('/api/files', createFileRoutes(db))
 app.use('/api/business-intelligence', createBusinessIntelligenceRoutes(db))
 
 // SSL configuration
-let server
+let server: HttpServer | HttpsServer
 if (isProduction) {
   try {
     const options = {
       key: readFileSync('/etc/ssl/private/server.key'),
       cert: readFileSync('/etc/ssl/certs/server.crt'),
     }
-    server = createServer(options, app)
+    server = createHttpsServer(options, app)
     console.log('🔒 HTTPS server configured')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ SSL certificates not found, falling back to HTTP:', error)
-    server = createServer(app)
+    server = createHttpServer(app)
   }
 } else {
-  server = createServer(app)
+  server = createHttpServer(app)
 }
 
 // Socket.IO configuration
@@ -106,6 +166,7 @@ const socketService = new SocketService(server, redis, db)
 process.on('SIGTERM', async () => {
   console.log('🔄 SIGTERM received, shutting down gracefully')
 
+  await closeSentry()
   await redis.quit()
   await db.end()
   server.close(() => {
@@ -118,20 +179,27 @@ process.on('SIGTERM', async () => {
 app.use(
   (
     error: Error,
-    req: express.Request,
+    _req: express.Request,
     res: express.Response,
     _next: express.NextFunction,
   ) => {
     console.error('❌ Error:', error)
+    if (!hasSentryErrorHandler) {
+      Sentry.captureException(error)
+    }
     res.status(500).json({
       error: 'Internal server error',
-      message: isProduction ? 'Something went wrong' : error.message,
+      message: isProduction
+        ? 'Something went wrong'
+        : error instanceof Error
+          ? error.message
+          : 'Unknown error',
     })
   },
 )
 
 // 404 handler
-app.use((req, res) => {
+app.use((_req, res) => {
   res.status(404).json({
     error: 'Not found',
     message: 'The requested resource was not found',
@@ -149,7 +217,9 @@ const startServer = () => {
 }
 
 // Only start the server if this file is run directly
-const isMain = process.argv[1]?.includes('server.prod.js') || process.argv[1]?.includes('server.prod.ts')
+const isMain =
+  process.argv[1]?.includes('server.prod.js') ||
+  process.argv[1]?.includes('server.prod.ts')
 if (isMain) {
   startServer()
 }

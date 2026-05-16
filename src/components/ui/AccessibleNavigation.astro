@@ -97,7 +97,7 @@ const containerClasses = `
         {
           items.map((item) => (
             <div class="relative group">
-              {item.dropdown ?
+              {item.dropdown ? (
                 <button
                   class="flex items-center space-x-1 text-secondary-foreground hover:text-primary transition-colors duration-200"
                   aria-expanded="false"
@@ -118,7 +118,8 @@ const containerClasses = `
                     />
                   </svg>
                 </button>
-              : <a
+              ) : (
+                <a
                   href={item.href}
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noopener noreferrer' : undefined}
@@ -126,7 +127,7 @@ const containerClasses = `
                 >
                   {item.label}
                 </a>
-              }
+              )}
 
               {/* Dropdown Menu */}
               {item.dropdown && (
@@ -211,7 +212,7 @@ const containerClasses = `
         {
           items.map((item) => (
             <div>
-              {item.dropdown ?
+              {item.dropdown ? (
                 <div class="space-y-2">
                   <div class="font-medium text-secondary-foreground">
                     {item.label}
@@ -227,7 +228,8 @@ const containerClasses = `
                     ))}
                   </div>
                 </div>
-              : <a
+              ) : (
+                <a
                   href={item.href}
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noopener noreferrer' : undefined}
@@ -235,7 +237,7 @@ const containerClasses = `
                 >
                   {item.label}
                 </a>
-              }
+              )}
             </div>
           ))
         }

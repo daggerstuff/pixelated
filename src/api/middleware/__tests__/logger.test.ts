@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock dependencies
 const mockAuditLog = vi.fn()
@@ -14,7 +14,7 @@ interface AuditData {
   action: string
   resource?: string
   resourceId?: string
-  changes?: any
+  changes?: unknown
   timestamp?: number
 }
 
@@ -32,14 +32,21 @@ export async function logAuditEvent(data: AuditData): Promise<void> {
     await mockAuditLog(
       `INSERT INTO audit_logs (user_id, action, resource, resource_id, changes, created_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [userId, action, resource, resourceId, JSON.stringify(changes), timestamp]
+      [
+        userId,
+        action,
+        resource,
+        resourceId,
+        JSON.stringify(changes),
+        timestamp,
+      ],
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to log audit event:', error)
   }
 }
 
-export function getActionType(method: string, path: string): string {
+export function getActionType(method: string): string {
   const methodMap: Record<string, string> = {
     POST: 'CREATE',
     PUT: 'UPDATE',
@@ -50,6 +57,20 @@ export function getActionType(method: string, path: string): string {
 
   return methodMap[method.toUpperCase()] || 'UNKNOWN'
 }
+
+interface MockRequest {
+  method: string
+  url: string
+  ip: string
+  headers?: Record<string, string>
+}
+
+interface MockResponse {
+  statusCode: number
+  on: (event: string, listener: () => void) => void
+}
+
+type MockNext = () => void
 
 export function getResourceType(path: string): string {
   const parts = path.split('/').filter(Boolean)
@@ -63,29 +84,43 @@ export function getResourceType(path: string): string {
 export function getResourceId(path: string): string | undefined {
   const parts = path.split('/').filter(Boolean)
 
-  if (parts.length < 2) return undefined
+  if (parts.length === 0) return undefined
 
+  // /api/users/123 → '123', but /api/users → undefined (need 3+ segments with api prefix)
+  if (parts[0] === 'api') {
+    if (parts.length < 3) return undefined
+    return parts[parts.length - 1]
+  }
+
+  // /users/456 → '456', but /users → undefined
+  if (parts.length < 2) return undefined
   return parts[parts.length - 1]
 }
 
-export async function requestLogger(req: any, res: any, next: any) {
+export async function requestLogger(
+  req: MockRequest,
+  res: MockResponse,
+  next: MockNext,
+) {
   const startTime = Date.now()
-  const { method, url, ip, headers } = req
+  const { method, url, ip } = req
 
   console.log(`[${new Date().toISOString()}] ${method} ${url} - ${ip}`)
 
   res.on('finish', () => {
     const duration = Date.now() - startTime
-    console.log(`[${new Date().toISOString()}] ${method} ${url} - ${res.statusCode} - ${duration}ms`)
+    console.log(
+      `[${new Date().toISOString()}] ${method} ${url} - ${res.statusCode} - ${duration}ms`,
+    )
   })
 
-  next?.()
+  next()
 }
 
 describe('Logger Middleware', () => {
-  let mockRequest: any
-  let mockResponse: any
-  let mockNext: any
+  let mockRequest: MockRequest
+  let mockResponse: MockResponse
+  let mockNext: MockNext
 
   beforeEach(() => {
     mockRequest = {
@@ -112,7 +147,7 @@ describe('Logger Middleware', () => {
       await requestLogger(mockRequest, mockResponse, mockNext)
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('GET /api/users/123')
+        expect.stringContaining('GET /api/users/123'),
       )
       expect(mockNext).toHaveBeenCalled()
     })
@@ -120,18 +155,24 @@ describe('Logger Middleware', () => {
     it('should attach finish listener to response', async () => {
       await requestLogger(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.on).toHaveBeenCalledWith('finish', expect.any(Function))
+      expect(mockResponse.on).toHaveBeenCalledWith(
+        'finish',
+        expect.any(Function),
+      )
     })
 
     it('should handle logging errors gracefully', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error')
 
-      await expect(requestLogger(mockRequest, mockResponse, mockNext)).resolves.not.toThrow()
+      await expect(
+        requestLogger(mockRequest, mockResponse, mockNext),
+      ).resolves.not.toThrow()
+      expect(consoleErrorSpy).not.toHaveBeenCalled()
     })
 
     it('should capture request duration', async () => {
-      let finishCallback: any
-      mockResponse.on = vi.fn((_, cb) => {
+      let finishCallback: () => void = () => {}
+      mockResponse.on = vi.fn((_: string, cb: () => void) => {
         finishCallback = cb
       })
 
@@ -147,7 +188,9 @@ describe('Logger Middleware', () => {
 
       await requestLogger(mockRequest, mockResponse, mockNext)
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('POST /api/users'))
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('POST /api/users'),
+      )
     })
   })
 
@@ -172,7 +215,7 @@ describe('Logger Middleware', () => {
           '123',
           expect.any(String),
           expect.any(Number),
-        ])
+        ]),
       )
     })
 
@@ -190,7 +233,7 @@ describe('Logger Middleware', () => {
 
       expect(mockAuditLog).toHaveBeenCalledWith(
         expect.any(String),
-        expect.arrayContaining(['system'])
+        expect.arrayContaining(['system']),
       )
     })
 
@@ -205,20 +248,20 @@ describe('Logger Middleware', () => {
 
   describe('getActionType', () => {
     it('should map HTTP methods to action types', () => {
-      expect(getActionType('POST', '/api/users')).toBe('CREATE')
-      expect(getActionType('PUT', '/api/users/123')).toBe('UPDATE')
-      expect(getActionType('DELETE', '/api/users/123')).toBe('DELETE')
-      expect(getActionType('GET', '/api/users')).toBe('READ')
+      expect(getActionType('POST')).toBe('CREATE')
+      expect(getActionType('PUT')).toBe('UPDATE')
+      expect(getActionType('DELETE')).toBe('DELETE')
+      expect(getActionType('GET')).toBe('READ')
     })
 
     it('should handle lowercase methods', () => {
-      expect(getActionType('post', '/api/users')).toBe('CREATE')
-      expect(getActionType('get', '/api/users')).toBe('READ')
+      expect(getActionType('post')).toBe('CREATE')
+      expect(getActionType('get')).toBe('READ')
     })
 
     it('should default to UNKNOWN for unrecognized patterns', () => {
-      expect(getActionType('PATCH', '/api/custom')).toBe('UPDATE')
-      expect(getActionType('CUSTOM', '/api/test')).toBe('UNKNOWN')
+      expect(getActionType('PATCH')).toBe('UPDATE')
+      expect(getActionType('CUSTOM')).toBe('UNKNOWN')
     })
   })
 

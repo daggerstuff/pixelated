@@ -643,7 +643,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
   database: {
     mongodb: {
       uri:
-        process.env.MONGODB_URI ||
+        process.env.MONGODB_URI ??
         'mongodb://localhost:27017/threat_intelligence',
       database: 'threat_intelligence',
       collections: [
@@ -684,9 +684,9 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       authEnabled: true,
     },
     redis: {
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
+      url: process.env.REDIS_URL ?? 'redis://localhost:6379',
       cluster: false,
-      nodes: [process.env.REDIS_URL || 'redis://localhost:6379'],
+      nodes: [process.env.REDIS_URL ?? 'redis://localhost:6379'],
       db: 0,
       keyPrefix: 'threat_intel:',
       ttl: 3600, // 1 hour
@@ -751,7 +751,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
         service: 'firewall',
         endpoint: 'https://firewall.internal/api/v1/block',
         authType: 'api_key',
-        credentials: { apiKey: process.env.FIREWALL_API_KEY || '' },
+        credentials: { apiKey: process.env.FIREWALL_API_KEY ?? '' },
         enabled: true,
         timeout: 30000,
         retryPolicy: {
@@ -1140,7 +1140,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info(
         'Threat Intelligence Configuration Manager initialized successfully',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Configuration Manager:', { error })
       throw error
     }
@@ -1148,10 +1148,10 @@ export class ThreatIntelligenceConfigManager {
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for configuration manager')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -1160,13 +1160,13 @@ export class ThreatIntelligenceConfigManager {
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ||
+        process.env.MONGODB_URI ??
           'mongodb://localhost:27017/threat_intelligence',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_intelligence')
       logger.info('MongoDB connection established for configuration manager')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -1187,7 +1187,7 @@ export class ThreatIntelligenceConfigManager {
         await this.storeConfiguration()
         logger.info('Default configuration stored in database')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load configuration:', { error })
     }
   }
@@ -1218,7 +1218,7 @@ export class ThreatIntelligenceConfigManager {
       }
 
       logger.info('Configuration validation passed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Configuration validation failed:', { error })
       throw error
     }
@@ -1243,7 +1243,7 @@ export class ThreatIntelligenceConfigManager {
         3600, // 1 hour
         JSON.stringify(this.config),
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store configuration:', { error })
       throw error
     }
@@ -1317,7 +1317,7 @@ export class ThreatIntelligenceConfigManager {
       await this.storeConfiguration()
 
       logger.info('Configuration updated successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update configuration:', { error })
       throw error
     }
@@ -1333,7 +1333,7 @@ export class ThreatIntelligenceConfigManager {
           typeof source[key] === 'object' &&
           !Array.isArray(source[key])
         ) {
-          result[key] = this.deepMerge(result[key] || {}, source[key])
+          result[key] = this.deepMerge(result[key] ?? {}, source[key])
         } else {
           result[key] = source[key]
         }
@@ -1368,7 +1368,7 @@ export class ThreatIntelligenceConfigManager {
       await this.storeConfiguration()
 
       logger.info('Region configuration updated', { regionId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update region configuration:', {
         error,
         regionId,
@@ -1393,7 +1393,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info('Region configuration added', {
         regionId: regionConfig.regionId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to add region configuration:', {
         error,
         regionId: regionConfig.regionId,
@@ -1421,7 +1421,7 @@ export class ThreatIntelligenceConfigManager {
       await this.storeConfiguration()
 
       logger.info('Region configuration removed', { regionId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to remove region configuration:', {
         error,
         regionId,
@@ -1441,7 +1441,7 @@ export class ThreatIntelligenceConfigManager {
       await this.loadConfiguration()
 
       logger.info('Configuration refreshed successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to refresh configuration:', { error })
       throw error
     }
@@ -1482,14 +1482,20 @@ export class ThreatIntelligenceConfigManager {
       // Test database connections
       try {
         await this.redis.ping()
-      } catch (error) {
-        issues.push('Redis connection failed: ' + error.message)
+      } catch (error: unknown) {
+        issues.push(
+          'Redis connection failed: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        )
       }
 
       try {
         await this.mongoClient.db().admin().ping()
-      } catch (error) {
-        issues.push('MongoDB connection failed: ' + error.message)
+      } catch (error: unknown) {
+        issues.push(
+          'MongoDB connection failed: ' +
+            (error instanceof Error ? error.message : 'Unknown error'),
+        )
       }
 
       return {
@@ -1497,8 +1503,11 @@ export class ThreatIntelligenceConfigManager {
           issues.filter((i) => i.startsWith('Missing required')).length === 0,
         issues,
       }
-    } catch (error) {
-      issues.push('Environment validation error: ' + error.message)
+    } catch (error: unknown) {
+      issues.push(
+        'Environment validation error: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
+      )
       return { valid: false, issues }
     }
   }
@@ -1518,7 +1527,7 @@ export class ThreatIntelligenceConfigManager {
       logger.info(
         'Threat Intelligence Configuration Manager shutdown completed',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }

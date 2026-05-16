@@ -51,21 +51,7 @@ military-grade protection system that enables HIPAA++ compliance **Key Points:**
 
 ---
 
-### **4. Four-Phase Learning Journey**
-
-**File:** `4-learning-journey.svg` **Purpose:** Visual roadmap of accelerated
-skill development from beginner to supervision-ready **Key Points:**
-
-- Phase 1: Foundation Building (Weeks 1-4)
-- Phase 2: Complex Case Management (Weeks 5-12)
-- Phase 3: Edge Case Mastery (Weeks 13-20)
-- Phase 4: Supervision Readiness (Weeks 21-24)
-
-**Usage:** Perfect for student onboarding and program curriculum explanations
-
----
-
-### **5. Global Impact & Benefits**
+### **4. Global Impact & Benefits**
 
 **File:** `5-impact-benefits.svg` **Purpose:** Showcases transformational
 benefits for all stakeholders in mental health education **Key Points:**
@@ -115,8 +101,7 @@ benefits for all stakeholders in mental health education **Key Points:**
 1. Use graphics in sequence to tell the complete story
 2. Start with traditional vs AI comparison to establish the problem
 3. Deep dive into specific capabilities (edge cases, privacy)
-4. Show the learning journey and timeline
-5. Close with global impact and benefits
+4. Close with global impact and benefits
 
 ### **For Website Integration**
 

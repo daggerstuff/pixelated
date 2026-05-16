@@ -3,7 +3,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
 
 import { ReportGenerator, ReportViewer } from '../features'
@@ -22,7 +22,13 @@ export function ReportsPage({ sessionId, reportId }: ReportsPageProps) {
             <CardTitle>Report Viewer</CardTitle>
           </CardHeader>
           <CardContent>
-            <ReportViewer reportId={reportId} />
+            {sessionId ? (
+              <ReportViewer reportId={reportId} sessionId={sessionId} />
+            ) : (
+              <div className='text-muted-foreground py-4 text-center'>
+                Select a session to view the report.
+              </div>
+            )}
           </CardContent>
         </Card>
       ) : (

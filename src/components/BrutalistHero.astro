@@ -1,122 +1,181 @@
 ---
 /**
  * Brutalist Hero Component
- * High-impact mission statement
+ * Product-first homepage entry built around one coaching artifact.
  */
+import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
+import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
+import HeroContent from '@/components/homepage/HeroContent.astro'
+import HeroStage from '@/components/homepage/HeroStage.astro'
+
 export interface Props {
-  title?: string;
-  subtitle?: string;
-  primaryCTA?: { text: string; href: string };
-  secondaryCTA?: { text: string; href: string };
-  ctaPrimary?: { text: string; href: string };
-  ctaSecondary?: { text: string; href: string };
-  stats?: Array<{ value: string; label: string }>;
+  kicker?: string
+  title?: string
+  subtitle?: string
+  helperText?: string
+  proofPoints?: readonly { label: string; text: string }[]
+  primaryCTA?: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
+  artifact?: {
+    eyebrow: string
+    status: string
+    chip: string
+    mode: string
+    image?: string
+    imageAlt?: string
+    context: readonly { label: string; value: string }[]
+    outputs: readonly { label: string; value: string }[]
+    readout: readonly { label: string; value: string }[]
+  }
 }
 
 const {
-  title = "Where Emotional Intelligence Meets Artificial Precision",
-  subtitle = "Master complex therapeutic dialogues in high-fidelity, risk-free simulations. Transform difficult conversations into clinical mastery with the Empathy Gym™.",
+  kicker,
+  title,
+  subtitle,
+  helperText,
+  proofPoints = [],
   primaryCTA,
   secondaryCTA,
-  ctaPrimary,
-  ctaSecondary,
-  stats,
-} = Astro.props;
-
-// Support both prop naming conventions
-const primaryAction = primaryCTA || ctaPrimary || { text: "Enter the Gym", href: "/training" };
-const secondaryAction = secondaryCTA || ctaSecondary || { text: "Explore Intelligence", href: "/ai-engine" };
+  artifact,
+} = Astro.props
 ---
 
-<section class="hero relative min-h-screen flex items-center pt-20 overflow-hidden" data-component="brutalist-hero">
-  <!-- Background Layer -->
-  <div class="absolute inset-0 z-0">
-    <div class="absolute inset-0 bg-void"></div>
-    <div class="absolute inset-0 opacity-40 mix-blend-screen grayscale hover:grayscale-0 transition-all duration-ultra brightness-50">
-      <img src="/assets/hero-bg.png" alt="Empathy Gym Background" class="w-full h-full object-cover" />
-    </div>
-<!-- Grain/Noise Overlay -->
-  <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);"></div>
-    <!-- Radial Focal Glow -->
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]"></div>
+<section class="hero hero-section" data-component="brutalist-hero">
+  <div class="hero-background">
+    <HeroAtmosphere />
   </div>
 
-  <div class="container relative z-10">
-    <div class="max-w-4xl">
-      <!-- Tag/Status -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft">
-        <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-accent-primary">Intelligence Engine Active // v2.4.0</span>
+  <div class="container hero-shell">
+    <HeroStage>
+      <div class="hero-layout">
+        <HeroContent
+          {kicker}
+          {title}
+          {subtitle}
+          {helperText}
+          {proofPoints}
+          {primaryCTA}
+          {secondaryCTA}
+        />
+
+        {
+          artifact && (
+            <div class="hero-artifact-shell">
+              <BrutalistHeroArtifact artifact={artifact} />
+            </div>
+          )
+        }
       </div>
-
-      <h1 class="font-display font-black text-6xl md:text-8xl leading-tight mb-8 tracking-tighter text-white">
-        Architecting <span class="text-accent-primary">Empathy</span><br />
-        in the <span class="stark-outline">Code.</span>
-      </h1>
-
-      <p class="text-xl md:text-2xl text-secondary max-w-2xl mb-12 leading-relaxed font-light">
-        {subtitle}
-      </p>
-
-      <div class="flex flex-wrap gap-6 items-center">
-        <a href={primaryAction.href} class="btn-premium group">
-          <span class="relative z-10">{primaryAction.text}</span>
-          <div class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"></div>
-        </a>
-
-        <a href={secondaryAction.href} class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline">
-          <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryAction.text}</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="transform group-hover:translate-x-2 transition-transform">
-            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
-          </svg>
-        </a>
-      </div>
-
-      <!-- Stats Section -->
-      {stats && stats.length > 0 && (
-        <div class="stats-grid mt-16 pt-8" style="border-top: var(--border-primary);">
-          <div class="grid grid-cols-3 gap-8">
-            {stats.map((stat) => (
-              <div class="stat-item text-center md:text-left">
-                <span class="stat-value font-display font-black text-4xl md:text-5xl text-accent-primary block">{stat.value}</span>
-                <span class="stat-label mt-2 font-mono text-xs uppercase tracking-widest text-secondary block">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    </HeroStage>
   </div>
 
-  <!-- Perspective Grid Footer -->
-  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent"></div>
+  <div class="hero-fadeout"></div>
 </section>
 
 <style>
-  .stark-outline {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
-    color: transparent;
-  }
-  
-  .btn-premium {
+  .hero {
     position: relative;
-    padding: 1.25rem 2.5rem;
-    background: transparent;
-    border: 1px solid var(--accent-primary);
-    color: white;
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
+    display: flex;
+    align-items: flex-start;
     overflow: hidden;
-    text-decoration: none;
-    display: inline-block;
-    transition: color 0.3s ease;
+    min-height: min(100dvh, 50rem);
+    padding: clamp(5.6rem, 9vh, 7.6rem) 0 clamp(4rem, 6vh, 5rem);
+    background: var(--bg-primary);
   }
-  
-  .btn-premium:hover {
-    color: black;
+
+  .hero-section {
+    border-top: 1px solid rgba(253, 252, 252, 0.08);
+  }
+
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 80rem);
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 2.8vw, 3rem);
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 3vw, 3.2rem);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-artifact-shell {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    min-width: 0;
+    isolation: isolate;
+    width: 100%;
+    max-width: 42rem;
+  }
+
+  .hero-fadeout {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 8rem;
+    background: linear-gradient(to top, var(--bg-primary), transparent);
+  }
+
+  @media (min-width: 1040px) {
+    .hero {
+      align-items: center;
+      min-height: min(88dvh, 52rem);
+      padding-top: clamp(3.8rem, 6vh, 5.5rem);
+      padding-bottom: clamp(3rem, 5vh, 4.25rem);
+    }
+
+    .hero-layout {
+      grid-template-columns: minmax(0, 1.08fr) minmax(23rem, 0.92fr);
+      gap: clamp(2.75rem, 4vw, 4.5rem);
+      align-items: center;
+    }
+
+    .hero-artifact-shell {
+      justify-content: flex-end;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      min-height: auto;
+      padding-top: 4.25rem;
+      padding-bottom: 3rem;
+    }
+
+    .hero-shell {
+      max-width: 100%;
+    }
+
+    .hero-artifact-shell {
+      max-width: 100%;
+    }
+
+    .hero-background {
+      opacity: 0.74;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding-top: 4.55rem;
+      padding-bottom: 2.8rem;
+    }
   }
 </style>
-

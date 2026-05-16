@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 
-import { createTogetherAIService } from '../ai/AIService'
+import { createLLMService } from '../ai/AIService'
 import { AIRepository } from '../db/ai/repository'
 import { createFHIRClient } from '../ehr/services/fhir.client'
 import type { FHIRClient } from '../ehr/types'
@@ -61,30 +61,47 @@ let aiRepositoryInstance: AIRepository | null = null
 let refCount = 0
 
 const getAIRepositoryInstance = (): AIRepository => {
-  if (!aiRepositoryInstance) {
-    aiRepositoryInstance = new AIRepository()
-  }
+  aiRepositoryInstance ??= new AIRepository();
   return aiRepositoryInstance
+}
+
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string {
+  const baseUrl =
+    ((process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL']) ??
+    process.env['OPENAI_BASE_URL']) ??
+    ''
+
+  if (isOpenRouterBaseUrl(baseUrl)) {
+    return ''
+  }
+
+  return baseUrl
 }
 
 const getDocumentationSystemInstance =
   async (): Promise<DocumentationSystem> => {
     if (!documentationSystemInstance) {
-      const togetherService = createTogetherAIService({
-        togetherApiKey: process.env['TOGETHER_API_KEY'] || '',
-        apiKey: process.env['TOGETHER_API_KEY'] || '',
+      const llmService = createLLMService({
+        apiKey: process.env['LLM_API_KEY'] ?? '',
+        baseUrl: resolveSafeLlmBaseUrl(),
       })
 
       const aiService = {
-        createChatCompletion:
-          togetherService.createChatCompletion.bind(togetherService),
+        createChatCompletion: llmService.createChatCompletion.bind(llmService),
         createStreamingChatCompletion:
-          togetherService.createStreamingChatCompletion.bind(togetherService),
-        dispose: togetherService.dispose.bind(togetherService),
+          llmService.createStreamingChatCompletion.bind(llmService),
+        dispose: llmService.dispose.bind(llmService),
         getModelInfo: (model: string) => ({
           id: model,
           name: model,
-          provider: 'together',
+          provider: 'llm',
           capabilities: ['chat', 'completion'],
           contextWindow: 32768,
           maxTokens: 4096,
@@ -222,7 +239,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
           safeSetState(setDocumentation, docWithMeta)
         }
       } catch (error: unknown) {
-        if (error instanceof Error && (error)?.name === 'AbortError') {
+        if (error instanceof Error && error?.name === 'AbortError') {
           return
         }
         const errorObj = handleError(error, 'loadDocumentation')
@@ -264,7 +281,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
 
         toast.success('Documentation generated successfully')
       } catch (error: unknown) {
-        if (error instanceof Error && (error)?.name === 'AbortError') {
+        if (error instanceof Error && error?.name === 'AbortError') {
           return
         }
         const errorObj = handleError(error, 'generateDocumentation')
@@ -376,7 +393,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
       try {
         validateSessionId(sessionId)
 
-        if (!options || !options.providerId || !options.format) {
+        if (!options?.providerId || !options.format) {
           throw new Error('Valid export options are required')
         }
 
@@ -394,7 +411,13 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
         const rawResult = (await documentationSystem.exportToEHR(
           sessionId,
           options,
-        )) as unknown
+        )) as {
+          success?: boolean
+          format?: string
+          metadata?: unknown
+          data?: unknown
+          errors?: unknown[]
+        }
 
         // Construct a fully type-safe EHRExportResult
         const result: EHRExportResult = {

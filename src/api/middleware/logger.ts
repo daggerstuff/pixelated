@@ -1,7 +1,7 @@
 // Logging Middleware
 // Request logging and activity tracking
 
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 import { getPostgresPool } from '../../lib/database/connection'
 
@@ -48,7 +48,7 @@ const RATE_LIMIT_WINDOW = 60000 // 1 minute
 const RATE_LIMIT_MAX = 100 // requests per window
 
 export function rateLimiter(req: Request, res: Response, next: NextFunction) {
-  const ip = req.ip || 'unknown'
+  const ip = req.ip ?? 'unknown'
   const now = Date.now()
 
   let record = requestCounts.get(ip)
@@ -102,7 +102,7 @@ async function logAuditEvent(
        (user_id, action, resource_type, resource_id, changes, ip_address, user_agent, status, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
       [
-        req.user?.id || null,
+        req.user?.id ?? null,
         action,
         getResourceType(req),
         getResourceId(req),
@@ -112,7 +112,7 @@ async function logAuditEvent(
         res.statusCode >= 400 ? 'error' : 'success',
       ],
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to log audit event:', error)
     // Don't throw - audit logging failures shouldn't break the app
   }
@@ -142,18 +142,31 @@ function getResourceType(req: Request): string {
   return 'unknown'
 }
 
-function getResourceId(req: Request): string | null {
-  const parts = req.path.split('/')
-  const lastPart = parts[parts.length - 1]
+function getResourceId(req: Request): string | undefined {
+  const parts = req.path.split('/').filter(Boolean)
 
-  // Check if last part looks like an ID
-  if (lastPart && lastPart !== '' && !lastPart.includes('?')) {
-    return lastPart
+  if (parts.length === 0) return undefined
+
+  // Only return a resource ID if path follows resource/id pattern
+  // /api/users/123 → '123', but /api/users → undefined (need 3+ segments with api prefix)
+  if (parts[0] === 'api') {
+    if (parts.length >= 3) {
+      const lastPart = parts[parts.length - 1]
+      if (lastPart && !lastPart.includes('?')) {
+        return lastPart
+      }
+    }
+  } else if (parts.length >= 2) {
+    // /users/456 → '456', but /users → undefined
+    const lastPart = parts[parts.length - 1]
+    if (lastPart && !lastPart.includes('?')) {
+      return lastPart
+    }
   }
 
   // Try to extract from query params
   const id = (req.query.id as string) || (req.query.documentId as string)
-  return id || null
+  return id || undefined
 }
 
 function extractChanges(req: Request): string | null {
@@ -198,5 +211,5 @@ function createRequestId(): string {
 }
 
 export function getRequestId(req: Request): string {
-  return (req as any).requestId || 'unknown'
+  return (req as any).requestId ?? 'unknown'
 }

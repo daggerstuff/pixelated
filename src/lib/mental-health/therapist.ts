@@ -52,7 +52,7 @@ export class TherapeuticResponseGenerator {
       return 'crisis'
     }
 
-    const hasThoughtPatterns = analysis.indicators.some(
+    const hasThoughtPatterns = analysis.indicators?.some(
       (i) =>
         i.type === 'depression' &&
         i.evidence.some(
@@ -63,7 +63,7 @@ export class TherapeuticResponseGenerator {
         ),
     )
 
-    const hasBehavioralIssues = analysis.indicators.some(
+    const hasBehavioralIssues = analysis.indicators?.some(
       (i) =>
         i.type === 'isolation' ||
         (i.type === 'depression' &&
@@ -108,10 +108,11 @@ export class TherapeuticResponseGenerator {
         Math.floor(Math.random() * this.crisisResponses.length)
       ]
 
-    const crisisIndicator = analysis.indicators.find((i) => i.type === 'crisis')
+    const crisisIndicator = analysis.indicators?.find(
+      (i) => i.type === 'crisis',
+    )
     if (
-      crisisIndicator &&
-      crisisIndicator.evidence.some(
+      crisisIndicator?.evidence?.some(
         (e) =>
           e.includes('suicide') || e.includes('kill') || e.includes('hurt'),
       )
@@ -223,7 +224,7 @@ export class TherapeuticResponseGenerator {
     }
 
     // Add specific techniques based on indicators
-    analysis.indicators.forEach((indicator) => {
+    analysis.indicators?.forEach((indicator) => {
       switch (indicator.type) {
         case 'anxiety':
           techniques.push('Breathing exercises', 'Grounding techniques')
@@ -291,6 +292,7 @@ export class TherapeuticResponseGenerator {
         followUp.push('What makes it difficult to reach out to people?')
         followUp.push('Who in your life has been supportive in the past?')
         break
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         followUp.push('How long have you been feeling this way?')
         followUp.push('What brought you to share this today?')
@@ -303,18 +305,20 @@ export class TherapeuticResponseGenerator {
   private getPrimaryIndicator(
     analysis: MentalHealthAnalysis,
   ): HealthIndicator | undefined {
-    if (analysis.indicators.length === 0) {
+    if (!analysis.indicators?.length) {
       return undefined
     }
 
     // Crisis indicators take priority
-    const crisisIndicator = analysis.indicators.find((i) => i.type === 'crisis')
+    const crisisIndicator = analysis.indicators?.find(
+      (i) => i.type === 'crisis',
+    )
     if (crisisIndicator) {
       return crisisIndicator
     }
 
     // Otherwise, return the indicator with highest severity
-    return analysis.indicators.reduce((prev, current) =>
+    return analysis.indicators?.reduce((prev, current) =>
       current.severity > prev.severity ? current : prev,
     )
   }

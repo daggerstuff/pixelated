@@ -26,7 +26,7 @@ import {
 
 // Simulated crisis detector (would use real CrisisDetectionEngine in integration tests)
 class MockCrisisDetector {
-  private SUICIDAL_INDICATORS = {
+  private readonly SUICIDAL_INDICATORS = {
     immediate: [
       /i (?:have a gun|plan to|am going to|will|can't|don't want to) (?:kill|shoot|hurt|end)/i,
       /i have a gun and i'm done/i,
@@ -46,7 +46,7 @@ class MockCrisisDetector {
     ],
   }
 
-  private SELF_HARM_INDICATORS = {
+  private readonly SELF_HARM_INDICATORS = {
     active: [
       /cutting right now|cutting.*now|am cutting|hurting myself right now/i,
       /deep wounds|making.*wounds|severe injury/i,
@@ -59,7 +59,7 @@ class MockCrisisDetector {
     ],
   }
 
-  private PANIC_INDICATORS = {
+  private readonly PANIC_INDICATORS = {
     acute: [
       /can't breathe|crushing.*chest|heart attack|going to die|everything.*spinning/i,
       /severe.*panic|acute panic|panic attack.*severe/i,
@@ -75,7 +75,7 @@ class MockCrisisDetector {
     ],
   }
 
-  private SUBSTANCE_INDICATORS = {
+  private readonly SUBSTANCE_INDICATORS = {
     active: [
       /heroin|cocaine|methamphetamine|opiate|overdose|took.*pills|took too many/i,
       /using.*right now|using currently/i,
@@ -87,7 +87,7 @@ class MockCrisisDetector {
     ],
   }
 
-  private PSYCHOSIS_INDICATORS = {
+  private readonly PSYCHOSIS_INDICATORS = {
     command: [
       /voices?.*(?:tell|telling|command|order).*(?:hurt|kill|harm|stopped|evil)/i,
       /voices?.*telling me.*(?:hurt|kill|harm)/i,

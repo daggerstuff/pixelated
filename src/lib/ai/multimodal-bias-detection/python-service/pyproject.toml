@@ -28,7 +28,7 @@ dependencies = [
   "gunicorn>=22.0.0",
   "pydantic>=2.11.9",
   "pydantic-settings>=2.11.0",
-  "python-dotenv>=1.0.0",
+"python-dotenv>=1.2.2",
   "structlog>=25.4.0",
   "prometheus-client>=0.19.0",
   # Sentry SDK for error tracking and metrics
@@ -38,9 +38,9 @@ dependencies = [
   "torch>=2.8.0",
   "torchvision>=0.21.0",
   "torchaudio>=2.8.0",
-  "transformers>=4.30.0",
+  "transformers>=5.7.0",
   "opencv-python>=4.8.0",
-  "pillow>=12.1.1", # Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
+  "pillow>=12.2.0", # Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "librosa>=0.10.0",
   "soundfile>=0.12.0",
   "moviepy>=1.0.3",
@@ -72,7 +72,7 @@ dependencies = [
   "starlette>=0.49.1", # Fixes GHSA-7f5h-v6xp-fcq8
   "werkzeug>=3.1.4", # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "fonttools>=4.61.0", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
-  "urllib3>=2.6.2", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+  "urllib3>=2.7.0", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
 ]
 
 [project.scripts]

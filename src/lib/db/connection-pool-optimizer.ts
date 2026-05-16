@@ -7,7 +7,7 @@ import { EventEmitter } from 'events'
 
 import { Pool, PoolClient, PoolConfig } from 'pg'
 
-import { getLogger } from '@/lib/logging'
+import { getLogger } from '../logging'
 
 // Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
 
@@ -62,11 +62,11 @@ interface PoolMetrics {
  */
 export class OptimizedConnectionPool extends EventEmitter {
   private pool: Pool | null = null
-  private config: OptimizedPoolConfig
+  private readonly config: OptimizedPoolConfig
   private metrics: PoolMetrics
   private healthCheckTimer?: NodeJS.Timeout
   private metricsTimer?: NodeJS.Timeout
-  private startTime: number
+  private readonly startTime: number
   private queryStats: Array<{
     duration: number
     success: boolean
@@ -141,7 +141,10 @@ export class OptimizedConnectionPool extends EventEmitter {
       })
 
       this.pool.on('error', (error, client) => {
-        logger.error('Pool error', { error: error.message, client: !!client })
+        logger.error('Pool error', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          client: !!client,
+        })
         this.metrics.failedQueries++
         this.updateHealthScore()
         this.emit('connection-error', error, client)
@@ -150,10 +153,10 @@ export class OptimizedConnectionPool extends EventEmitter {
       logger.info('Connection pool initialized', {
         min: this.config.min,
         max: this.config.max,
-        host: this.config.host || 'localhost',
-        database: this.config.database || 'pixelated',
+        host: this.config.host ?? 'localhost',
+        database: this.config.database ?? 'pixelated',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize connection pool', { error })
       throw error
     }
@@ -191,7 +194,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       })
 
       return client
-    } catch (error) {
+    } catch (error: unknown) {
       this.metrics.waitingClients++
       this.updateMetrics()
 
@@ -222,7 +225,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         this.metrics.activeConnections - 1,
       )
       this.updateMetrics()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to release client', { error })
       this.metrics.failedQueries++
       this.updateMetrics()
@@ -232,10 +235,10 @@ export class OptimizedConnectionPool extends EventEmitter {
   /**
    * Execute a query with enhanced monitoring
    */
-  async query<T = unknown>(
+  async query(
     text: string,
     params?: unknown[],
-  ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
+  ): Promise<{ rows: unknown[]; rowCount: number; duration: number }> {
     const startTime = Date.now()
     let client: PoolClient | null = null
 
@@ -267,17 +270,22 @@ export class OptimizedConnectionPool extends EventEmitter {
 
       return {
         rows: result.rows,
-        rowCount: result.rowCount || 0,
+        rowCount: result.rowCount ?? 0,
         duration,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime
       this.recordQueryStats(duration, false)
 
       logger.error('Query execution failed', {
         query: text.substring(0, 100),
         duration,
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
 
       throw error
@@ -306,7 +314,7 @@ export class OptimizedConnectionPool extends EventEmitter {
       this.recordQueryStats(duration, true)
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime
       this.recordQueryStats(duration, false)
 
@@ -445,7 +453,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         healthScore: this.metrics.healthScore,
         activeConnections: this.metrics.activeConnections,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed', { error })
       this.metrics.healthScore = Math.max(0, this.metrics.healthScore - 30)
       this.emit('health-changed', this.metrics.healthScore, 'unhealthy')
@@ -568,9 +576,7 @@ let connectionPool: OptimizedConnectionPool | null = null
  * Get the global connection pool
  */
 export function getConnectionPool(): OptimizedConnectionPool {
-  if (!connectionPool) {
-    connectionPool = new OptimizedConnectionPool()
-  }
+  connectionPool ??= new OptimizedConnectionPool();
   return connectionPool
 }
 
@@ -591,7 +597,7 @@ export function initializeConnectionPool(
 /**
  * Enhanced query function with pool optimization
  */
-export async function optimizedQuery<T = unknown>(
+export async function optimizedQuery(
   text: string,
   params?: unknown[],
   options: {
@@ -599,7 +605,7 @@ export async function optimizedQuery<T = unknown>(
     retries?: number
     client?: PoolClient
   } = {},
-): Promise<{ rows: T[]; rowCount: number; duration: number }> {
+): Promise<{ rows: unknown[]; rowCount: number; duration: number }> {
   const pool = getConnectionPool()
 
   // Use provided client or acquire from pool
@@ -610,7 +616,7 @@ export async function optimizedQuery<T = unknown>(
 
     return {
       rows: result.rows,
-      rowCount: result.rowCount || 0,
+      rowCount: result.rowCount ?? 0,
       duration,
     }
   }

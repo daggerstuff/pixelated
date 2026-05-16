@@ -1,8 +1,8 @@
 import { Brain, Activity, Zap } from 'lucide-react'
-import React, { useEffect, useRef, useMemo, useCallback } from 'react'
+import React, { FC, useEffect, useRef, useMemo, useCallback } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
 
 interface BrainRegion {
   id: string
@@ -33,7 +33,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>(undefined)
+  const animationRef = useRef<number | null>(null)
   const timeRef = useRef(0)
 
   // Generate brain regions based on mood vector
@@ -214,7 +214,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) {
-      return
+      return () => {}
     }
 
     // Set canvas size
@@ -225,13 +225,15 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
     animate()
 
     return () => {
-      if (animationRef.current) {
+      if (animationRef.current !== null) {
         cancelAnimationFrame(animationRef.current)
       }
     }
   }, [animate])
 
-  const getActivityLevel = (activity: number) => {
+  const getActivityLevel = (
+    activity: number,
+  ): { label: string; color: string } => {
     if (activity > 0.8) {
       return { label: 'Very High', color: 'bg-red-500' }
     }
@@ -309,8 +311,12 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
                 <Zap className='text-yellow-500 h-4 w-4' />
                 <span className='font-medium'>
                   {Math.round(
-                    (Object.values(moodVector).reduce((a, b) => a + b, 0) /
-                      Object.values(moodVector).length) *
+                    (Object.values(moodVector as Record<string, number>).reduce(
+                      (a: number, b: number) => a + b,
+                      0,
+                    ) /
+                      Object.values(moodVector as Record<string, number>)
+                        .length) *
                       100,
                   )}
                   %

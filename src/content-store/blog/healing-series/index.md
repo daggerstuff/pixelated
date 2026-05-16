@@ -1,8 +1,7 @@
 ---
 title: 'Healing Journey Series'
-description:
-  'Exploring the path to recovery and personal growth through understanding and
-  self-discovery'
+description: >-
+  This series focuses on the transformative journey of healing from trauma and
 author: 'Pixelated Empathy Team'
 pubDate: 2024-03-15
 ---
@@ -15,28 +14,26 @@ aspects of the recovery process and personal growth.
 
 ## Featured Articles
 
-### [Understanding Emotional Unavailability](/blog/healing-series/emotional-unavailability)
+### [Understanding Emotional Unavailability](./emotional-unavailability.md)
 
 <ArticleCard title="Understanding Emotional Unavailability" description="Explore
 the roots of emotional unavailability and its connection to trauma, with
 practical steps toward emotional connection." author="Dr. Rachel Kim"
-date="2024-02-19" readingTime="11 min" tags={['emotional health',
-'relationships', 'trauma', 'healing']} />
+date="2024-02-19" readingTime="11 min" tags="emotional health, relationships, trauma, healing" />
 
-### [Codependency and Complex Trauma](/blog/healing-series/codependency-and-trauma)
+### [Codependency and Complex Trauma](./codependency-and-trauma.md)
 
 <ArticleCard title="Codependency and Complex Trauma" description="A deep dive
 into the intersection of codependency and complex trauma, offering insights for
 recovery and growth." author="Dr. David Thompson" date="2024-02-20"
-readingTime="16 min" tags={['codependency', 'trauma', 'recovery',
-'relationships']} />
+readingTime="16 min" tags="codependency, trauma, recovery, relationships" />
 
-### [The Dance of Wounded Souls](/blog/healing-series/dance-of-wounded-souls)
+### [The Dance of Wounded Souls](./dance-of-wounded-souls.md)
 
 <ArticleCard title="The Dance of Wounded Souls" description="Understanding the
 intricate patterns of trauma recovery and the journey toward wholeness and
 authentic connection." author="Dr. Lisa Anderson" date="2024-02-21"
-readingTime="14 min" tags={['healing', 'trauma', 'spirituality', 'growth']} />
+readingTime="14 min" tags="healing, trauma, spirituality, growth" />
 
 ## Series Overview
 
@@ -89,9 +86,9 @@ reading order for the most comprehensive understanding:
 
 ## Additional Resources
 
-- [Management Strategies](/mental/IV-Management/strategies)
-- [Support Systems](/mental/IV-Management/support-systems)
-- [Crisis Planning](/mental/IV-Management/crisis-planning)
+- [Management Strategies](../.mental/IV-Management/strategies.md)
+- [Support Systems](../.mental/IV-Management/support-systems.md)
+- [Crisis Planning](../.mental/IV-Management/overview.md)
 
 ## Practical Applications
 
@@ -107,7 +104,7 @@ Each article includes:
 
 Subscribe to receive notifications about new articles in this series:
 
-[Subscribe to Updates](/subscribe?series=healing)
+[Subscribe to Updates](https://pixelatedempathy.com/subscribe?series=healing)
 
 ## Share This Series
 

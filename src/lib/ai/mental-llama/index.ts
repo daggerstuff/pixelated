@@ -51,7 +51,7 @@ export async function createMentalLLaMAFactory(
 
   const env = getEnv()
   const modelTier =
-    config.defaultModelTier || env.MENTALLAMA_DEFAULT_MODEL_TIER || '7B'
+    (config.defaultModelTier ?? env.MENTALLAMA_DEFAULT_MODEL_TIER) ?? '7B'
   const modelProvider = new MentalLLaMAModelProvider(modelTier)
 
   // The LLMInvoker for the router needs to return LLMResponse, not string
@@ -186,8 +186,8 @@ export async function createMentalLLaMAFactoryFromEnv(): Promise<{
 }> {
   const env = getEnv()
   const config: MentalLLaMAFactoryConfig = {
-    defaultModelTier: env.MENTALLAMA_DEFAULT_MODEL_TIER || '7B',
-    enablePythonBridge: env.MENTALLAMA_ENABLE_PYTHON_BRIDGE || false,
+    defaultModelTier: env.MENTALLAMA_DEFAULT_MODEL_TIER ?? '7B',
+    enablePythonBridge: env.MENTALLAMA_ENABLE_PYTHON_BRIDGE ?? false,
   }
 
   if (env.MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH) {

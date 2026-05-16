@@ -7,9 +7,9 @@
  * Represents the state of the circuit breaker.
  */
 export enum CircuitBreakerState {
-  CLOSED,
-  OPEN,
-  HALF_OPEN,
+  CLOSED = 0,
+  OPEN = 1,
+  HALF_OPEN = 2,
 }
 
 /**
@@ -35,8 +35,8 @@ export class CircuitBreaker implements ICircuitBreaker {
   private nextAttempt: number = Date.now()
 
   constructor(
-    private failureThreshold = 3,
-    private resetTimeout = 10000,
+    private readonly failureThreshold = 3,
+    private readonly resetTimeout = 10000,
   ) {}
 
   public async fire<T>(fn: () => Promise<T>): Promise<T> {
@@ -51,7 +51,7 @@ export class CircuitBreaker implements ICircuitBreaker {
       const result = await fn()
       this.success()
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.fail(error as Error)
       throw error
     }

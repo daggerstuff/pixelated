@@ -29,36 +29,87 @@ import type { Event } from '@sentry/astro'
  * by setting whichever env var they support, without changing app code.
  */
 export function resolveSentryRelease(fallback: string = '0.0.1'): string {
-  const candidates = [
+  const env = import.meta.env as Record<string, unknown>
+  const procEnv = process.env as Record<string, unknown>
+
+  const toOptionalString = (value: unknown): string | undefined =>
+    typeof value === 'string' && value.length > 0 ? value : undefined
+
+  const candidates: (string | undefined)[] = [
     // Explicit app / Sentry release
-    import.meta.env['PUBLIC_SENTRY_RELEASE'],
-    import.meta.env['PUBLIC_APP_VERSION'],
-    import.meta.env['SENTRY_RELEASE'],
+    toOptionalString(env['PUBLIC_SENTRY_RELEASE']),
+    toOptionalString(env['PUBLIC_APP_VERSION']),
+    toOptionalString(env['SENTRY_RELEASE']),
 
     // Common hosting providers
-    import.meta.env['VERCEL_GIT_COMMIT_SHA'],
-    import.meta.env['RENDER_GIT_COMMIT'],
-    import.meta.env['NETLIFY_COMMIT_REF'],
-    import.meta.env['RAILWAY_GIT_COMMIT_SHA'],
+    toOptionalString(env['VERCEL_GIT_COMMIT_SHA']),
+    toOptionalString(env['RENDER_GIT_COMMIT']),
+    toOptionalString(env['NETLIFY_COMMIT_REF']),
+    toOptionalString(env['RAILWAY_GIT_COMMIT_SHA']),
 
     // Generic CI / git environments
-    import.meta.env['GITHUB_SHA'],
-    import.meta.env['CI_COMMIT_SHA'],
+    toOptionalString(env['GITHUB_SHA']),
+    toOptionalString(env['CI_COMMIT_SHA']),
+    // Fallback to process.env for Node.js environments (server-side)
+    toOptionalString(procEnv['SENTRY_RELEASE']),
+    toOptionalString(procEnv['PUBLIC_SENTRY_RELEASE']),
+    toOptionalString(procEnv['PUBLIC_APP_VERSION']),
+    toOptionalString(procEnv['npm_package_version']),
+    toOptionalString(procEnv['GITHUB_SHA']),
+    toOptionalString(procEnv['CI_COMMIT_SHA']),
   ]
 
   const release = candidates.find(
-    (value) => typeof value === 'string' && value.length > 0,
+    (value): value is string => typeof value === 'string' && value.length > 0,
   )
 
   return release ?? fallback
 }
 
-export const SENTRY_CONFIG = {
-  dsn:
-    import.meta.env['PUBLIC_SENTRY_DSN'] ||
-    'https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032',
+export function resolveSentryDsn(): string | undefined {
+  const env = import.meta.env as Record<string, unknown>
+  const procEnv = process.env as Record<string, unknown>
 
-  environment: import.meta.env.MODE || 'production',
+  const toTrimmedString = (value: unknown): string | undefined => {
+    if (typeof value !== 'string') return undefined
+
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  }
+
+  const candidates: (string | undefined)[] = [
+    toTrimmedString(env['PUBLIC_SENTRY_DSN']),
+    toTrimmedString(env['SENTRY_DSN']),
+    toTrimmedString(env['SENTRY_PUBLIC_DSN']),
+    toTrimmedString(env['VITE_SENTRY_DSN']),
+    // Fallback to process.env for Node.js environments (server-side)
+    toTrimmedString(procEnv['SENTRY_DSN']),
+    toTrimmedString(procEnv['PUBLIC_SENTRY_DSN']),
+    toTrimmedString(procEnv['SENTRY_PUBLIC_DSN']),
+    toTrimmedString(procEnv['VITE_SENTRY_DSN']),
+  ]
+
+  const dsn = candidates.find(
+    (value): value is string => typeof value === 'string' && value.length > 0,
+  )
+
+  if (
+    import.meta.env.DEV ||
+    process.env.NODE_ENV !== 'production' ||
+    process.env.SENTRY_DEBUG
+  ) {
+    console.log(
+      `[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`,
+    )
+  }
+
+  return dsn
+}
+
+export const SENTRY_CONFIG = {
+  dsn: resolveSentryDsn(),
+
+  environment: import.meta.env.MODE,
   release: resolveSentryRelease('0.0.1'),
 
   // Enable Release Health - automatic session tracking for crash-free metrics

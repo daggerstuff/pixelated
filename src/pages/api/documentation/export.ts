@@ -50,9 +50,9 @@ export const GET = async ({ request }) => {
 
     // Parse query parameters
     const url = new URL(request.url)
-    const format = url.searchParams.get('format') || 'json'
+    const format = url.searchParams.get('format') ?? 'json'
     const sessionId =
-      url.searchParams.get('session') || url.searchParams.get('section')
+      url.searchParams.get('session') ?? url.searchParams.get('section')
 
     if (!sessionId) {
       return new Response(

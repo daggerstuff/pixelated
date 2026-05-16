@@ -1,4 +1,4 @@
-import { ALLOWED_DOMAINS } from '@/lib/constants'
+import { ALLOWED_DOMAINS } from '../constants'
 
 // Build hostname to IP mapping at runtime or use a static list
 const hostnameToIPMap: Record<string, string[]> = {
@@ -17,7 +17,7 @@ export const validateUrlForSSRF = (urlString: string): boolean => {
 
     // Additional IP validation to prevent DNS rebinding
     // Note: In production, resolve hostname to IP and check against ALLOWED_IPS
-    if (hostnameToIPMap[url.hostname]) {
+    if (Object.hasOwn(hostnameToIPMap, url.hostname)) {
       // Check resolved IP against whitelist
       // This requires DNS resolution with security considerations
     }
@@ -54,7 +54,8 @@ export const safeFetch = async (
   url: string | URL | Request,
   options?: RequestInit & { timeout?: number; maxResponseSize?: number },
 ): Promise<Response> => {
-  const urlString = typeof url === 'string' ? url : url.toString()
+  const urlString =
+    typeof url === 'string' ? url : url instanceof URL ? url.href : url.url
 
   if (!validateUrlForSSRF(urlString)) {
     throw new Error(
@@ -63,8 +64,8 @@ export const safeFetch = async (
   }
 
   // Apply security defaults
-  const timeout = options?.timeout || 10000 // 10 second timeout by default
-  const maxResponseSize = options?.maxResponseSize || 10 * 1024 * 1024 // 10MB max by default
+  const timeout = options?.timeout ?? 10000 // 10 second timeout by default
+  const maxResponseSize = options?.maxResponseSize ?? 10 * 1024 * 1024 // 10MB max by default
 
   // Create AbortController for timeout
   const controller = new AbortController()
@@ -86,8 +87,11 @@ export const safeFetch = async (
 
     // Check response size by streaming, as Content-Length can be missing or spoofed.
     let receivedLength = 0
-    const counterStream = new TransformStream({
-      transform(chunk, controller) {
+    const counterStream = new TransformStream<Uint8Array, Uint8Array>({
+      transform(
+        chunk: Uint8Array,
+        controller: TransformStreamDefaultController<Uint8Array>,
+      ) {
         receivedLength += chunk.length
         if (receivedLength > maxResponseSize) {
           controller.error(
@@ -109,7 +113,7 @@ export const safeFetch = async (
       statusText: response.statusText,
       headers: response.headers,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     clearTimeout(timeoutId)
 
     if (error instanceof Error && error.name === 'AbortError') {

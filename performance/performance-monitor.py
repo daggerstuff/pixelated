@@ -6,7 +6,6 @@ Performance Monitoring System
 
 import json
 import time
-from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -250,7 +249,7 @@ if __name__ == "__main__":
 
     # Save report using pathlib and contextlib.suppress for cleaner error handling
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    report_file = Path(f'/tmp/performance-monitoring-{timestamp}.json')
+    report_file = Path(f"/tmp/performance-monitoring-{timestamp}.json")
 
     try:
         with report_file.open("w") as f:

@@ -5,13 +5,13 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 env:
-  NODE_VERSION: 24.14.0
-  PNPM_VERSION: 10.33.0
-  FORCE_JS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  NODE_VERSION: 24.14.1
+  PNPM_VERSION: 11.1.1
 
 jobs:
   health-check:
@@ -27,7 +27,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6.0.6
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -38,7 +38,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Notify on failure (optional)
         if: failure() && env.HAS_SLACK_WEBHOOK == 'true'
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@v3.0.3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:

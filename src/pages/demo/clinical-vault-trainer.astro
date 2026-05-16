@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import { Target } from 'lucide-react'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import { Target as TargetIcon } from 'lucide-react'
 // import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
@@ -345,7 +347,7 @@ const universityResults = [
   <section class="brutalist-section">
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-6xl mb-6">🎯</div>
+        <div class="text-6xl mb-6"><TargetIcon className="w-24 h-24" /></div>
 
         <div
           class="status-indicator status-indicator--warning inline-flex mb-6"
@@ -402,19 +404,6 @@ const universityResults = [
 </BaseLayout>
 
 <script>
-  // Type definitions
-  declare global {
-    interface Window {
-      gtag?: (
-        command: 'event',
-        action: string,
-        params: {
-          [key: string]: any
-        },
-      ) => void
-    }
-  }
-
   // Analytics tracking for demo interactions
   document.addEventListener('DOMContentLoaded', () => {
     // Track page view
@@ -423,14 +412,14 @@ const universityResults = [
         page_title: 'ClinicalVault Trainer Demo',
         page_location: window.location.href,
         ab_variant:
-          document.querySelector('[data-variant]')?.dataset?.variant ||
-          'unknown',
+          (document.querySelector('[data-variant]') as HTMLElement | null)
+            ?.dataset?.variant || 'unknown',
       })
     }
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -443,8 +432,8 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             interaction_type: action,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset.variant ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement | null)
+                ?.dataset.variant || 'unknown',
           })
         }
 
@@ -459,8 +448,8 @@ const universityResults = [
             timestamp: new Date().toISOString(),
             session_id: sessionStorage.getItem('session_id') || 'anonymous',
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset?.variant ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement | null)
+                ?.dataset?.variant || 'unknown',
           }),
         }).catch(console.error)
       })
@@ -468,7 +457,7 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -516,8 +505,8 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             scroll_depth: maxScroll,
             ab_variant:
-              document.querySelector('[data-variant]')?.dataset?.['variant'] ||
-              'unknown',
+              (document.querySelector('[data-variant]') as HTMLElement | null)
+                ?.dataset?.['variant'] || 'unknown',
           })
         }
       }

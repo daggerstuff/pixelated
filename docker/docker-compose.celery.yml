@@ -12,6 +12,7 @@ services:
       - ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - REDIS_DB=0
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -51,6 +52,7 @@ services:
       - ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - REDIS_DB=0
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -90,6 +92,7 @@ services:
       - ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - REDIS_DB=0
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -129,6 +132,7 @@ services:
       - ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - REDIS_DB=0
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -169,6 +173,7 @@ services:
       - ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - REDIS_DB=0
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -208,6 +213,7 @@ services:
       - ENV=production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       - REDIS_DB=0
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432

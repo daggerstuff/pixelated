@@ -25,7 +25,7 @@ export class RealTimeAnalyzer {
         sessionConsistency: consistency,
         goals: sessionContext.patientProfile.therapeuticGoals || [],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Progress analysis failed:', error)
       throw new Error(`Failed to analyze progress: ${error}`)
     }
@@ -292,10 +292,10 @@ export class RealTimeAnalyzer {
     const intervals: number[] = []
     for (let i = 1; i < historicalContext.length; i++) {
       const prevTime = new Date(
-        historicalContext[i - 1].timestamp || Date.now(),
+        historicalContext[i - 1].timestamp ?? Date.now(),
       ).getTime()
       const currTime = new Date(
-        historicalContext[i].timestamp || Date.now(),
+        historicalContext[i].timestamp ?? Date.now(),
       ).getTime()
       intervals.push(currTime - prevTime)
     }

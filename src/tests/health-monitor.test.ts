@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+// @vitest-environment node
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HealthMonitor } from '../lib/services/health-monitor'
 

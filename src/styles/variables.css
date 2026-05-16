@@ -1,44 +1,71 @@
 /* ================================================
-   UNIFIED BLENDED THEME - CORE VARIABLES
-   Combining: Brutalist + Minimalist Dark + Corporate Sleek + Enterprise + Antfu Elegance
-   ================================================ */
+PROFESSIONAL HEALTHCARE SaaS DESIGN SYSTEM
+Dark-first enterprise clinical training platform
+=============================================== */
 
 :root {
-  /* === DEEP DARK FOUNDATION === */
-  --bg-void: #000000;
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #111111;
-  --bg-tertiary: #181818;
-  --bg-elevated: #1f1f1f;
-  --bg-card: #151515;
-  --bg-glass: rgba(15, 15, 15, 0.85);
-  --bg-overlay: rgba(0, 0, 0, 0.92);
+  /* === THE CANVAS (Dark Metal - DESIGN.md) === */
+  --bg-primary: #1a1a1e; /* Dark metal background */
+  --bg-secondary: #24242a; /* Elevated gunmetal panel */
+  --bg-glass: rgba(36, 36, 42, 0.8); /* Glassmorphic Base */
+  --text-primary: #f5f5f0; /* Warm off-white */
+  --text-secondary: #a1a1aa; /* Muted pale steel */
+  --text-muted: #71717a; /* Subdued dark-silver grey */
 
-  /* === TEXT HIERARCHY - CLEAN & ELEGANT === */
-  --text-primary: #ffffff;
-  --text-secondary: #e5e5e5;
-  --text-tertiary: #b3b3b3;
-  --text-muted: #888888;
-  --text-subtle: #666666;
-  --text-accent: #10b981;
-  --text-link: #34d399;
-  --text-link-hover: #6ee7b7;
+  /* === TRUST ACCENTS (Sunset Orange - DESIGN.md) === */
+  --accent-primary: #f97316; /* Sunset orange - vivid and warm */
+  --accent-primary-rgb: 249, 115, 22;
+  --accent-secondary: #fb923c; /* Brighter mandarin orange hover */
+  --accent-success: #10b981; /* Clinical success/green */
 
-  /* === ACCENT SYSTEM - GREEN PRIMARY === */
-  --accent-primary: #10b981;
-  --accent-primary-hover: #34d399;
-  --accent-primary-dark: #059669;
-  --accent-secondary: #3b82f6;
-  --accent-tertiary: #6366f1;
-  --accent-purple: #8b5cf6;
-  --accent-warm: #f59e0b;
+  /* === SEMANTIC COLORS (Accessible) === */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
-  /* === Z-INDEX SYSTEM === */
+  /* === STRUCTURAL === */
+  --border-subtle: rgba(255, 255, 255, 0.08); /* Hairline */
+  --border-primary: rgba(255, 255, 255, 0.12);
+  --border-primary-rgb: 255, 255, 255;
+  --divider-dotted: rgba(255, 255, 255, 0.15); /* Dotted lines */
+  --divider-weak: rgba(255, 255, 255, 0.08); /* Very weak divider */
+  --bg-surface-ghost: rgba(255, 255, 255, 0.03); /* Ghostly background */
+  --radius-sm: 6px; /* Standard components */
+  --radius-md: 8px; /* Inputs */
+  --radius-lg: 12px; /* Cards */
+  --radius-xl: 16px; /* Large containers */
+  --radius-button: 8px; /* Buttons */
+  --radius-card: 12px; /* Cards */
+
+  /* === ANIMATION === */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.2s;
+  --duration-slow: 0.3s;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* Apple-style ease-out */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Legacy/Composite Transitions for Compatibility */
+  --transition-fast: var(--duration-fast) var(--ease-out);
+  --transition-normal: var(--duration-normal) var(--ease-out);
+  --transition-slow: var(--duration-slow) var(--ease-out);
+  --transition-spring: var(--duration-normal) var(--ease-spring);
+
+  /* === LAYOUT === */
+  --max-content-width: 76rem;
+  --max-editorial-width: 55rem;
+  --grid-unit: 8px;
+  --section-padding-y: 5rem; /* Mapping to var(--spacing-20) / 80px */
+
+  /* Additional Spacing */
+  --spacing-5: 20px;
+  --spacing-20: 80px;
+
+  /* === Z-INDEX === */
   --z-base: 1;
   --z-elevated: 10;
   --z-sticky: 50;
-  --z-dropdown: 100;
   --z-overlay: 200;
   --z-modal: 300;
-  --z-tooltip: 400;
 }

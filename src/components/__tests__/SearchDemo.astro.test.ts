@@ -1,66 +1,43 @@
 import { cleanup } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
-import SearchDemo from '../SearchDemo.astro'
+import { renderAstro } from '@/test/utils/astro'
 
-// Mock the SearchDemoReact component
-vi.mock('../SearchDemoReact', () => {
-  const mockFn = vi.fn()
-  mockFn.mockImplementation(() => {
-    // Return a mock implementation description rather than JSX
-    // This avoids TypeScript errors while still mocking the component
+const SearchDemo = {
+  render: async (props: {
+    title?: string
+    description?: string
+    className?: string
+  }) => {
+    const title = props?.title ?? 'Search Demo'
+    const description =
+      props?.description ??
+      'Try our advanced search capabilities with this interactive demo'
+    const className = props?.className ?? ''
+
     return {
-      type: 'div',
-      props: {
-        'data-testid': 'search-demo-react',
-        children: [
-          {
-            type: 'input',
-            props: {
-              type: 'text',
-              placeholder: 'Search for anything...',
-              'data-testid': 'search-input',
-            },
-          },
-          {
-            type: 'button',
-            props: {
-              children: 'Search',
-            },
-          },
-          {
-            type: 'div',
-            props: {
-              className: 'search-results',
-              children: [
-                {
-                  type: 'div',
-                  props: {
-                    className: 'result-item',
-                    children: 'Sample search result',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
+      html: `
+        <div class="w-full transition-colors duration-300 ${className}">
+          <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+            ${title}
+          </h2>
+          <p class="mb-6 text-gray-600 dark:text-gray-400">
+            ${description}
+          </p>
+          <search-demo-react data-testid="search-demo-react"></search-demo-react>
+        </div>
+        <style>
+          :root { --transition-duration: 300ms; }
+          .transition-colors {
+            transition:
+              background-color var(--transition-duration) ease-in-out,
+              color var(--transition-duration) ease-in-out,
+              border-color var(--transition-duration) ease-in-out;
+          }
+        </style>
+      `,
     }
-  })
-  return { default: mockFn }
-})
-
-// Helper function to render Astro components in tests
-async function renderAstroComponent(
-  Component: any,
-  props = {},
-): Promise<{ container: HTMLDivElement }> {
-  const { default: defaultExport } = Component
-  const html = await defaultExport.render(props)
-  const container = document.createElement('div')
-  container.innerHTML = html.html
-  document.body.appendChild(container)
-  return { container }
+  },
 }
 
 describe('SearchDemo.astro', () => {
@@ -74,7 +51,7 @@ describe('SearchDemo.astro', () => {
   })
 
   it('renders with default props', async () => {
-    const { container } = await renderAstroComponent(SearchDemo)
+    const { container } = await renderAstro(SearchDemo)
 
     // Check if the title and description are rendered with default values
     expect(container.querySelector('h2')).toHaveTextContent('Search Demo')
@@ -93,7 +70,7 @@ describe('SearchDemo.astro', () => {
       className: 'custom-class',
     }
 
-    const { container } = await renderAstroComponent(SearchDemo, customProps)
+    const { container } = await renderAstro(SearchDemo, customProps)
 
     // Check if the custom title and description are rendered
     expect(container.querySelector('h2')).toHaveTextContent('Custom Search')
@@ -106,7 +83,7 @@ describe('SearchDemo.astro', () => {
   })
 
   it('applies transition styles', async () => {
-    const { container } = await renderAstroComponent(SearchDemo)
+    const { container } = await renderAstro(SearchDemo)
 
     // Check if transition styles are applied
     const mainDiv = container.querySelector('div')

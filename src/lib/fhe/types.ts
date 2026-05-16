@@ -304,19 +304,24 @@ export interface EncryptedData<T = unknown> {
   dataType: 'number' | 'string' | 'boolean' | 'array' | 'object'
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
 /**
  * Type guard for EncryptedData
  */
 export function isEncryptedData(obj: unknown): obj is EncryptedData {
-  if (!obj || typeof obj !== 'object') {
+  if (!isRecord(obj)) {
     return false
   }
-  const record = obj as Record<string, unknown>
+
+  const id = obj.id
+  const dataType = obj.dataType
+  const data = obj.data
 
   return (
-    typeof record['id'] === 'string' &&
-    typeof record['dataType'] === 'string' &&
-    'data' in record
+    typeof id === 'string' && typeof dataType === 'string' && data !== undefined
   )
 }
 
@@ -456,17 +461,14 @@ export interface FHEService {
    * @param value The value to encrypt
    * @returns The encrypted data
    */
-  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData>
+  encrypt(value: unknown, options?: unknown): Promise<EncryptedData>
 
   /**
    * Decrypt encrypted data
    * @param encryptedData The encrypted data to decrypt
    * @returns The decrypted value
    */
-  decrypt<T>(
-    encryptedData: EncryptedData,
-    options?: unknown,
-  ): Promise<T>
+  decrypt<T>(encryptedData: EncryptedData<T>, options?: unknown): Promise<T>
 
   /**
    * Add two encrypted values
@@ -474,10 +476,7 @@ export interface FHEService {
    * @param b Second encrypted value or scalar
    * @returns Result of addition
    */
-  add?(
-    a: EncryptedData,
-    b: EncryptedData | number,
-  ): Promise<EncryptedData>
+  add?(a: EncryptedData, b: EncryptedData | number): Promise<EncryptedData>
 
   /**
    * Subtract one encrypted value from another
@@ -485,10 +484,7 @@ export interface FHEService {
    * @param b Second encrypted value or scalar
    * @returns Result of subtraction
    */
-  subtract?(
-    a: EncryptedData,
-    b: EncryptedData | number,
-  ): Promise<EncryptedData>
+  subtract?(a: EncryptedData, b: EncryptedData | number): Promise<EncryptedData>
 
   /**
    * Multiply encrypted value
@@ -496,10 +492,7 @@ export interface FHEService {
    * @param b Another encrypted value or scalar
    * @returns Result of multiplication
    */
-  multiply?(
-    a: EncryptedData,
-    b: EncryptedData | number,
-  ): Promise<EncryptedData>
+  multiply?(a: EncryptedData, b: EncryptedData | number): Promise<EncryptedData>
 
   /**
    * Negate an encrypted value
@@ -525,10 +518,7 @@ export interface FHEService {
    * @param steps Number of steps to rotate (positive for right, negative for left)
    * @returns Rotated encrypted vector
    */
-  rotate?(
-    vector: EncryptedData,
-    steps: number,
-  ): Promise<EncryptedData>
+  rotate?(vector: EncryptedData, steps: number): Promise<EncryptedData>
 
   /**
    * Process encrypted data

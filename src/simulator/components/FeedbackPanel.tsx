@@ -54,8 +54,30 @@ const getBorderColor = (type: FeedbackType): string => {
       return 'border-l-purple'
     case FeedbackType.TECHNIQUE_APPLICATION:
       return 'border-l-green'
-    default:
+    case FeedbackType.COMMUNICATION_STYLE:
       return 'border-l-blue'
+    case FeedbackType.THERAPEUTIC_ALLIANCE:
+      return 'border-l-yellow'
+    case FeedbackType.QUESTION_FORMULATION:
+      return 'border-l-indigo'
+    case FeedbackType.ACTIVE_LISTENING:
+      return 'border-l-pink'
+    case FeedbackType.FRAMEWORK_ADHERENCE:
+      return 'border-l-teal'
+    case FeedbackType.INTERVENTION_TIMING:
+      return 'border-l-orange'
+    case FeedbackType.POSITIVE:
+      return 'border-l-green'
+    case FeedbackType.DEVELOPMENTAL:
+      return 'border-l-blue'
+    case FeedbackType.TECHNIQUE_SUGGESTION:
+      return 'border-l-indigo'
+    case FeedbackType.ALTERNATIVE_APPROACH:
+      return 'border-l-teal'
+    default: {
+      const exhaustiveCheck: never = type
+      throw new Error(`Unhandled feedback type: ${String(exhaustiveCheck)}`)
+    }
   }
 }
 
@@ -63,7 +85,10 @@ const getBorderColor = (type: FeedbackType): string => {
  * Component for displaying real-time feedback during a simulation
  */
 const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
-  const { realtimeFeedback, clearFeedback, isConnected } = useSimulator()
+  const { state } = useSimulator()
+  const realtimeFeedback: RealTimeFeedback[] = []
+  const isConnected = state.connectionStatus === 'connected'
+  const clearFeedback = () => {}
 
   // Handle clearing feedback
   const handleClearFeedback = () => {
@@ -116,9 +141,9 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
       )}
 
       <div className='mt-2 max-h-[500px] space-y-3 overflow-y-auto pr-1'>
-        {realtimeFeedback.map((feedback: RealTimeFeedback, index: number) => (
+        {realtimeFeedback.map((feedback: RealTimeFeedback) => (
           <div
-            key={`${feedback.timestamp}-${index}`}
+            key={`${feedback.timestamp}-${feedback.type}-${feedback.suggestion}`}
             className={`rounded-md border-l-4 p-3 ${priorityColors[feedback.priority]} ${getBorderColor(feedback.type)}-500`}
           >
             <div className='mb-1 flex items-start justify-between'>

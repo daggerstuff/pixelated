@@ -1,11 +1,12 @@
 ---
-title: 'Live Region System'
-description: 'Live Region System documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Live Region System documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Live Region System
 ---
 
 # Live Region System

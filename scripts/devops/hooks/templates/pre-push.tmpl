@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Colors
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+if [ "${SKIP_PUSH_CHECKS:-}" = "true" ]; then
+  echo -e "${YELLOW}⏩ [Hook] Skipping push checks (SKIP_PUSH_CHECKS is true)${NC}"
+  exit 0
+fi
+
+echo -e "${BLUE}🚀 [Hook] Running pre-push verification (tests)...${NC}"
+echo -e "${YELLOW}💡 TIP: Use 'SKIP_PUSH_CHECKS=true git push' to skip if your tests are verified elsewhere.${NC}"
+
+# If we have a dedicated smoke test suite, prefer it for speed.
+if [ -f scripts/testing/smoke-tests.sh ]; then
+    bash scripts/testing/smoke-tests.sh
+else
+    # Run a subset or quick test if possible, fallback to full suite
+    pnpm test
+fi

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 export interface SearchFiltersState {
   yearFrom?: number
@@ -60,6 +60,12 @@ export default function SearchFilters({
     })
   }
 
+  // ⚡ Bolt: Convert topics array to Set to prevent O(N^2) lookups inside rendering map loop
+  const selectedTopicsSet = useMemo(
+    () => new Set(localFilters.topics),
+    [localFilters.topics],
+  )
+
   return (
     <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
       <div className='mb-6 flex items-center justify-between'>
@@ -85,7 +91,7 @@ export default function SearchFilters({
               placeholder='From'
               aria-label='Year From'
               className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
-              value={localFilters.yearFrom || ''}
+              value={localFilters.yearFrom ?? ''}
               onChange={(e) =>
                 setLocalFilters({
                   ...localFilters,
@@ -103,7 +109,7 @@ export default function SearchFilters({
               placeholder='To'
               aria-label='Year To'
               className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
-              value={localFilters.yearTo || ''}
+              value={localFilters.yearTo ?? ''}
               onChange={(e) =>
                 setLocalFilters({
                   ...localFilters,
@@ -150,29 +156,36 @@ export default function SearchFilters({
             Therapeutic Topics
           </label>
           <div className='flex flex-wrap gap-2'>
-            {COMMON_TOPICS.map((topic) => (
-              <button
-                key={topic}
-                onClick={() => toggleTopic(topic)}
-                aria-pressed={localFilters.topics.includes(topic)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  localFilters.topics.includes(topic)
-                    ? 'bg-pink-600/20 text-pink-300 border-pink-600'
-                    : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
-                }`}
-              >
-                {topic}
-              </button>
-            ))}
+            {COMMON_TOPICS.map((topic) => {
+              const isSelected = selectedTopicsSet.has(topic)
+              return (
+                <button
+                  key={topic}
+                  onClick={() => toggleTopic(topic)}
+                  aria-pressed={isSelected}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    isSelected
+                      ? 'bg-pink-600/20 text-pink-300 border-pink-600'
+                      : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
+                  }`}
+                >
+                  {topic}
+                </button>
+              )
+            })}
           </div>
         </div>
 
         {/* Sort By */}
         <div>
-          <label className='text-slate-300 mb-2 block text-sm font-medium'>
+          <label
+            htmlFor='sort-by'
+            className='text-slate-300 mb-2 block text-sm font-medium'
+          >
             Sort By
           </label>
           <select
+            id='sort-by'
             className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
             value={localFilters.sortBy}
             onChange={(e) =>

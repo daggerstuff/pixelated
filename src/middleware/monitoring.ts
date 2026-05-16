@@ -33,10 +33,10 @@ export async function monitoringMiddleware(
   const startTime = Date.now()
   const { url } = context
   const { method } = context.request
-  const userAgent = context.request.headers.get('user-agent') || 'unknown'
+  const userAgent = context.request.headers.get('user-agent') ?? 'unknown'
   const ip =
-    context.request.headers.get('x-forwarded-for') ||
-    context.request.headers.get('x-real-ip') ||
+    (context.request.headers.get('x-forwarded-for') ??
+    context.request.headers.get('x-real-ip')) ??
     'unknown'
 
   // Extract user ID from session if available
@@ -49,7 +49,9 @@ export async function monitoringMiddleware(
       ?.split('=')[1]
 
     if (sessionCookie) {
-      const session = JSON.parse(decodeURIComponent(sessionCookie) as unknown)
+      const session = JSON.parse(decodeURIComponent(sessionCookie)) as {
+        userId?: string
+      }
       userId = session.userId
     }
   } catch {
@@ -68,7 +70,7 @@ export async function monitoringMiddleware(
     azureInsights.trackPageView(url.pathname, url.toString(), {
       userAgent,
       ip,
-      userId: userId || 'anonymous',
+      userId: userId ?? 'anonymous',
     })
   }
 
@@ -98,7 +100,7 @@ export async function monitoringMiddleware(
         method,
         userAgent,
         ip,
-        userId: userId || 'anonymous',
+        userId: userId ?? 'anonymous',
         pathname: url.pathname,
       },
       measurements: {
@@ -141,7 +143,7 @@ export async function monitoringMiddleware(
             statusCode: statusCode.toString(),
             userAgent,
             ip,
-            userId: userId || 'anonymous',
+            userId: userId ?? 'anonymous',
           },
         })
       } else if (statusCode === 404) {
@@ -152,7 +154,7 @@ export async function monitoringMiddleware(
             pathname: url.pathname,
             userAgent,
             ip,
-            userId: userId || 'anonymous',
+            userId: userId ?? 'anonymous',
           },
         })
       } else if (statusCode === 401 || statusCode === 403) {
@@ -164,7 +166,7 @@ export async function monitoringMiddleware(
             statusCode: statusCode.toString(),
             userAgent,
             ip,
-            userId: userId || 'anonymous',
+            userId: userId ?? 'anonymous',
           },
         })
       }
@@ -180,7 +182,7 @@ export async function monitoringMiddleware(
           pathname: url.pathname,
           userAgent,
           ip,
-          userId: userId || 'anonymous',
+          userId: userId ?? 'anonymous',
         },
         measurements: {
           duration,
@@ -195,7 +197,7 @@ export async function monitoringMiddleware(
       statusCode,
       duration,
       success,
-      userId: userId || 'anonymous',
+      userId: userId ?? 'anonymous',
       ip,
     })
 
@@ -217,7 +219,7 @@ export async function monitoringMiddleware(
         pathname: url.pathname,
         userAgent,
         ip,
-        userId: userId || 'anonymous',
+        userId: userId ?? 'anonymous',
       },
       measurements: {
         duration,
@@ -236,7 +238,7 @@ export async function monitoringMiddleware(
         method,
         userAgent,
         ip,
-        userId: userId || 'anonymous',
+        userId: userId ?? 'anonymous',
         pathname: url.pathname,
         error: error instanceof Error ? String(error) : String(error),
       },
@@ -262,8 +264,8 @@ export async function monitoringMiddleware(
       pathname: url.pathname,
       duration,
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
-      userId: userId || 'anonymous',
+      stack: error instanceof Error ? error?.stack : undefined,
+      userId: userId ?? 'anonymous',
       ip,
     })
 
@@ -334,7 +336,7 @@ export function trackAIUsage(
       provider,
       model,
       success: success.toString(),
-      userId: userId || 'anonymous',
+      userId: userId ?? 'anonymous',
     },
     measurements: {
       tokens,
@@ -366,7 +368,7 @@ export function trackAIUsage(
     tokens,
     duration,
     success,
-    userId: userId || 'anonymous',
+    userId: userId ?? 'anonymous',
   })
 }
 

@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type { Evaluation, EvaluationList } from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 import { useEvaluationStore } from '@/lib/stores/journal-research'
 
@@ -16,15 +17,15 @@ import {
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  listEvaluations: vi.fn(),
-  getEvaluation: vi.fn(),
-  initiateEvaluation: vi.fn(),
-  updateEvaluation: vi.fn(),
+  listEvaluations: vi.fn<() => Promise<EvaluationList>>(),
+  getEvaluation: vi.fn<() => Promise<Evaluation>>(),
+  initiateEvaluation: vi.fn<() => Promise<Evaluation>>(),
+  updateEvaluation: vi.fn<() => Promise<Evaluation>>(),
 }))
 
 // Mock store
 vi.mock('@/lib/stores/journal-research', () => ({
-  useEvaluationStore: vi.fn(),
+  useEvaluationStore: vi.fn<() => unknown>(),
 }))
 
 const mockEvaluation = {
@@ -63,23 +64,39 @@ const createWrapper = () => {
 }
 
 describe('useEvaluation hooks', () => {
+  const baseStoreState = {
+    filters: {
+      priorityTiers: [],
+      minimumScore: null,
+      maximumScore: null,
+      sortBy: 'overall_score',
+      sortDirection: 'desc',
+    },
+    selectedEvaluationId: null,
+    setSelectedEvaluationId: vi.fn<(id: string | null) => void>(),
+    editingEvaluationId: null,
+    setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
+    isBulkEditMode: false,
+    toggleBulkEditMode: vi.fn<() => void>(),
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
-    useEvaluationStore.mockReturnValue({
-      filters: {
-        priorityTiers: [],
-        minimumScore: null,
-        maximumScore: null,
-        sortBy: 'overall_score',
-        sortDirection: 'desc',
-      },
-      selectedEvaluationId: null,
-      setSelectedEvaluationId: vi.fn(),
-      editingEvaluationId: null,
-      setEditingEvaluationId: vi.fn(),
-      isBulkEditMode: false,
-      toggleBulkEditMode: vi.fn(),
-    })
+    const storeState = {
+      ...baseStoreState,
+      setSelectedEvaluationId: vi.fn<(id: string | null) => void>(),
+      setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
+      toggleBulkEditMode: vi.fn<() => void>(),
+    }
+    useEvaluationStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(
+      useEvaluationStore as typeof useEvaluationStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
   })
 
   describe('useEvaluationListQuery', () => {
@@ -103,7 +120,8 @@ describe('useEvaluation hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listEvaluations).mockResolvedValue(mockEvaluationList)
-      useEvaluationStore.mockReturnValue({
+      const filteredStoreState = {
+        ...baseStoreState,
         filters: {
           priorityTiers: ['high'],
           minimumScore: 0.8,
@@ -111,7 +129,18 @@ describe('useEvaluation hooks', () => {
           sortBy: 'therapeutic_relevance',
           sortDirection: 'asc',
         },
-      })
+      }
+      useEvaluationStore.mockImplementation(
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
+          typeof selector === 'function'
+            ? selector(filteredStoreState)
+            : filteredStoreState,
+      )
+      ;(
+        useEvaluationStore as typeof useEvaluationStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(() => useEvaluationListQuery('session-1'), {
         wrapper: createWrapper(),
@@ -199,11 +228,17 @@ describe('useEvaluation hooks', () => {
   describe('useEvaluationInitiateMutation', () => {
     it('initiates evaluation successfully', async () => {
       vi.mocked(api.initiateEvaluation).mockResolvedValue(mockEvaluation)
-      const setSelectedEvaluationId = vi.fn()
+      const setSelectedEvaluationId = vi.fn<(id: string) => void>()
 
-      vi.spyOn(useEvaluationStore, 'getState').mockReturnValue({
+      ;(
+        useEvaluationStore as typeof useEvaluationStore & {
+          getState?: () => {
+            setSelectedEvaluationId: typeof setSelectedEvaluationId
+          }
+        }
+      ).getState = () => ({
         setSelectedEvaluationId,
-      } as any)
+      })
 
       const { result } = renderHook(
         () => useEvaluationInitiateMutation('session-1'),
@@ -308,11 +343,11 @@ describe('useEvaluation hooks', () => {
     it('returns selection state from store', () => {
       const mockState = {
         selectedEvaluationId: 'eval-1',
-        setSelectedEvaluationId: vi.fn(),
+        setSelectedEvaluationId: vi.fn<(id: string | null) => void>(),
         editingEvaluationId: 'eval-2',
-        setEditingEvaluationId: vi.fn(),
+        setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
         isBulkEditMode: true,
-        toggleBulkEditMode: vi.fn(),
+        toggleBulkEditMode: vi.fn<() => void>(),
       }
 
       useEvaluationStore.mockReturnValue(mockState)

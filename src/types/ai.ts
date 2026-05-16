@@ -7,6 +7,19 @@ export interface SessionData {
   stressLevel: number
   effectiveness?: number
   riskScore?: number
+  transcript?: string
+  emotionAnalysis?: {
+    moodScore?: number
+    anxiety?: number
+    dominantEmotion?: string
+  }
+  therapeuticMetrics?: {
+    rapport?: number
+  }
+  homeworkAssigned?: boolean
+  homeworkCompleted?: boolean
+  medicationAdherence?: number
+  [key: string]: unknown
 }
 
 export interface PatientData {
@@ -18,6 +31,97 @@ export interface PatientData {
   diagnosis?: string | null
   treatment?: string | null
   progress?: number
+}
+
+// Patient profile for AI analysis
+export interface PatientProfile {
+  id: string
+  name: string
+  age?: number
+  gender?: string
+  diagnosis?: string
+  treatmentHistory?: string[]
+  currentMedications?: string[]
+  riskFactors?: string[]
+  preferences?: Record<string, unknown>
+  baselineMetrics?: {
+    anxiety?: number
+    mood?: number
+    stress?: number
+  }
+  sessionHistory?: Array<{
+    emotionAnalysis?: {
+      dominantEmotion?: string
+      moodScore?: number
+    }
+  }>
+  medication?: string | string[]
+  daysSinceLastSession?: number
+}
+
+// Intervention type for treatment
+export interface Intervention {
+  id: string
+  type: 'therapy' | 'medication' | 'behavioral' | 'support' | string
+  name: string
+  title?: string
+  description?: string
+  startDate?: Date
+  endDate?: Date
+  category?: string
+  actions?: string[]
+  frequency?: string
+  dosage?: string
+  notes?: string[]
+  priority?: 'low' | 'medium' | 'high' | 'critical'
+}
+
+// Model performance metrics
+export interface ModelMetrics {
+  accuracy: number
+  precision: number
+  recall: number
+  f1Score: number
+  auc?: number
+  loss?: number
+  epoch?: number
+  timestamp: Date
+  inferenceTime?: number
+  memoryUsage?: number
+  privacyScore?: number
+}
+
+// Training configuration
+export interface TrainingConfig {
+  epochs: number
+  batchSize: number
+  learningRate: number
+  optimizer: 'adam' | 'sgd' | 'rmsprop'
+  lossFunction: string
+  validationSplit?: number
+  earlyStopping?: boolean
+  patience?: number
+}
+
+// Real-time metrics for monitoring
+export interface RealTimeMetrics {
+  timestamp: Date
+  cpuUsage: number
+  memoryUsage: number
+  latency: number
+  throughput: number
+  errorRate: number
+  activeConnections: number
+}
+
+// Processing configuration
+export interface ProcessingConfig {
+  maxConcurrency: number
+  timeout: number
+  retryAttempts: number
+  retryDelay: number
+  batchSize: number
+  queueSize: number
 }
 
 export interface ModelUpdateMetadata {

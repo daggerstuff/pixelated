@@ -76,9 +76,7 @@ function scrubForClient(input: unknown): unknown {
     seen.add(value)
 
     if (Array.isArray(value)) {
-      return value
-        .map((v) => scrub(v))
-        .filter((v) => v !== undefined)
+      return value.map((v) => scrub(v)).filter((v) => v !== undefined)
     }
 
     const out: Record<string, unknown> = {}
@@ -124,13 +122,16 @@ export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now()
 
   // Validate environment configuration
-  const missingVars = REQUIRED_ENV_VARS.filter(v => !process.env[v])
+  const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v])
   if (missingVars.length > 0) {
-    logger.error('Missing critical environment variables', { requestId, missingVars })
+    logger.error('Missing critical environment variables', {
+      requestId,
+      missingVars,
+    })
     if (isProduction) {
       return new Response(
         JSON.stringify({ error: 'Service configuration error', requestId }),
-        { status: 500, headers: CACHE_HEADERS }
+        { status: 500, headers: CACHE_HEADERS },
       )
     }
   }
@@ -169,7 +170,7 @@ export const POST: APIRoute = async ({ request }) => {
     try {
       const rawBody = await request.json()
       body = AnalyzeBiasRequestSchema.parse(rawBody)
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return new Response(
           JSON.stringify(
@@ -269,7 +270,7 @@ export const POST: APIRoute = async ({ request }) => {
         'X-Cached': metrics.cached.toString(),
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     // Replace detailed exposure with sanitized handling and controlled logging
     metrics.totalTime = Date.now() - startTime
     const safe = safeErrorForLogging(error)
@@ -285,7 +286,11 @@ export const POST: APIRoute = async ({ request }) => {
     })
 
     // Return sanitized error to client (no stack)
-    if (error instanceof Error && error.message === 'Analysis timeout') {
+    if (
+      error instanceof Error &&
+      (error instanceof Error ? error.message : 'Unknown error') ===
+        'Analysis timeout'
+    ) {
       return new Response(
         JSON.stringify(
           scrubForClient({
@@ -333,7 +338,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Get query parameters
     const url = new URL(request.url)
     const therapistId = url.searchParams.get('therapistId')
-    const days = parseInt(url.searchParams.get('days') || '30')
+    const days = parseInt(url.searchParams.get('days') ?? '30')
 
     if (!therapistId) {
       return new Response(
@@ -386,7 +391,7 @@ export const GET: APIRoute = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     const totalTime = Date.now() - startTime
     const safe = safeErrorForLogging(error)
     const safeMessage = isProduction ? 'Internal server error' : safe.message
@@ -398,7 +403,11 @@ export const GET: APIRoute = async ({ request }) => {
       ...(isProduction ? {} : { stack: safe.stack }),
     })
 
-    if (error instanceof Error && error.message === 'Summary timeout') {
+    if (
+      error instanceof Error &&
+      (error instanceof Error ? error.message : 'Unknown error') ===
+        'Summary timeout'
+    ) {
       return new Response(
         JSON.stringify(
           scrubForClient({
@@ -464,7 +473,7 @@ export const PUT: APIRoute = async ({ request }) => {
     try {
       const rawBody = await request.json()
       body = BatchRequestSchema.parse(rawBody)
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return new Response(
           JSON.stringify(
@@ -494,7 +503,7 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Process all items in parallel with per-item timeouts
     const perItemTimeoutMs = 30000 // 30s per item
-    const analysisPromises = body.items.map((item) =>
+    const analysisPromises = body.items.map( async (item) =>
       Promise.race([
         biasService.analyzeBias({
           text: item.text,
@@ -579,7 +588,7 @@ export const PUT: APIRoute = async ({ request }) => {
         },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     const totalTime = Date.now() - startTime
     const safe = safeErrorForLogging(error)
     const safeMessage = isProduction ? 'Internal server error' : safe.message
@@ -591,7 +600,11 @@ export const PUT: APIRoute = async ({ request }) => {
       ...(isProduction ? {} : { stack: safe.stack }),
     })
 
-    if (error instanceof Error && error.message === 'Analysis timeout') {
+    if (
+      error instanceof Error &&
+      (error instanceof Error ? error.message : 'Unknown error') ===
+        'Analysis timeout'
+    ) {
       return new Response(
         JSON.stringify(
           scrubForClient({

@@ -1,9 +1,19 @@
 #!/bin/bash
 
 # Production Deployment Script for Business Strategy CMS
-# Supports multiple cloud platforms: Vercel, AWS, DigitalOcean
+# Supports multiple cloud platforms: Vercel, AWS, Legacy DigitalOcean, Hetzner AI
 
 set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+run_redis_hardening_audit() {
+  if ! "$REDIS_AUDIT"; then
+    echo "Redis hardening audit failed"
+    exit 1
+  fi
+}
 
 echo "🚀 Starting Production Deployment for Business Strategy CMS..."
 
@@ -19,6 +29,7 @@ command -v npm >/dev/null 2>&1 || { echo -e "${RED}npm is required but not insta
 
 # Function to deploy to Vercel
 deploy_vercel() {
+    run_redis_hardening_audit
     echo -e "${YELLOW}🎯 Deploying to Vercel...${NC}"
     
     # Check if Vercel CLI is installed
@@ -34,6 +45,7 @@ deploy_vercel() {
 
 # Function to deploy to AWS
 deploy_aws() {
+    run_redis_hardening_audit
     echo -e "${YELLOW}🎯 Deploying to AWS ECS...${NC}"
     
     # Check if AWS CLI is installed
@@ -68,12 +80,24 @@ deploy_aws() {
     echo -e "${GREEN}✅ Successfully deployed to AWS ECS!${NC}"
 }
 
-# Function to deploy to DigitalOcean
+# Function to deploy to DigitalOcean (legacy)
 deploy_digitalocean() {
-    echo -e "${YELLOW}🎯 Deploying to DigitalOcean App Platform...${NC}"
+    run_redis_hardening_audit
+    local enable_legacy_doctl="${ENABLE_LEGACY_DOCTL:-0}"
+
+    echo -e "${YELLOW}⚠️  Legacy flow: This DigitalOcean deployment path is deprecated.${NC}"
+    echo "   Use only when running in legacy environments."
+    if [[ "${enable_legacy_doctl}" != "1" ]]; then
+        echo -e "${YELLOW}⚠️  Set ENABLE_LEGACY_DOCTL=1 to opt in to DigitalOcean (legacy) deployment.${NC}"
+        return 1
+    fi
+
+    echo -e "${YELLOW}🎯 Deploying to DigitalOcean App Platform (legacy flow)...${NC}"
     
     # Check if doctl is installed
-    if ! command -v doctl &> /dev/null; then
+    local doctl_cli="${DOCTL_CLI:-doctl}"
+
+    if ! command -v "${doctl_cli}" &> /dev/null; then
         echo -e "${RED}doctl is required but not installed.${NC}"
         echo "Install it from: https://docs.digitalocean.com/reference/doctl/"
         exit 1
@@ -117,8 +141,8 @@ services:
     value: \${AWS_S3_BUCKET}
 EOF
     
-    doctl apps create --spec app.yaml
-    echo -e "${GREEN}✅ Successfully deployed to DigitalOcean!${NC}"
+    "${doctl_cli}" apps create --spec app.yaml
+    echo -e "${GREEN}✅ Successfully deployed to DigitalOcean (legacy flow)!${NC}"
 }
 
 # Function to run production tests
@@ -143,7 +167,7 @@ main() {
     echo "Select deployment platform:"
     echo "1) Vercel (Recommended for serverless)"
     echo "2) AWS ECS (Scalable containers)"
-    echo "3) DigitalOcean (Simple and cost-effective)"
+    echo "3) DigitalOcean (legacy flow, opt-in via ENABLE_LEGACY_DOCTL=1)"
     echo "4) Run tests only"
     echo ""
     

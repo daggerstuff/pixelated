@@ -1,5 +1,5 @@
 {
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "ai"],
   "exclude": [
     "**/node_modules/**",
     "business-strategy-cms/node_modules",
@@ -78,10 +78,12 @@
     "pixelated.egg-info"
   ],
   "extraPaths": ["stubs"],
+  "venvPath": "/home/vivi/pixelated/ai",
+  "venv": ".venv",
   "typeCheckingMode": "basic",
   "reportMissingTypeStubs": false,
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
   "reportPrivateUsage": false,
-  "pythonVersion": "3.11"
+  "pythonVersion": "3.13"
 }

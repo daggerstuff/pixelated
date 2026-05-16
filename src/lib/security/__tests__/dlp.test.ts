@@ -32,7 +32,7 @@ vi.mock('../../audit/log', () => {
     logAuditEvent: vi.fn().mockResolvedValue(undefined),
     createResourceAuditLog: vi
       .fn()
-      .mockImplementation((action, userId, resource, metadata) => {
+      .mockImplementation( async (action, userId, resource, metadata) => {
         return Promise.resolve({
           id: 'mock-uuid-1234567890',
           timestamp: new Date(),
@@ -57,6 +57,7 @@ vi.mock('../../audit/log', () => {
 
 vi.mock('../../audit', () => {
   return {
+    logAuditEvent: vi.fn().mockResolvedValue(undefined),
     AuditEventType: {
       DLP_ALLOWED: 'dlp_allowed',
       DLP_BLOCKED: 'dlp_blocked',

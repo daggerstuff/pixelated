@@ -5,6 +5,17 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ -f "$SCRIPT_DIR/lib/vault-env.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "$SCRIPT_DIR/lib/vault-env.sh"
+  # Optional: preload system Vault credentials for downstream services without hard-failing.
+  load_vault_env 0 || true
+else
+  echo "⚠️ Missing helper script: $SCRIPT_DIR/lib/vault-env.sh"
+fi
+
 echo "🚀 Starting Pixelated Monitoring Stack..."
 
 # Change to project root

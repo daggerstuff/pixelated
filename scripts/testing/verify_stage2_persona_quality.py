@@ -6,7 +6,7 @@ Streams the S3 artifact, validates schema (messages, metadata.gestalt_simulation
 runs extra quality checks (lengths, directive, refusal/fallback, human-likeness,
 persona distribution, duplicate detection), and reports counts + samples.
 
-Requires OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY.
+Requires HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY.
 
 Pipeline-level upgrades (beyond this script):
 - Write-time validation in batch_regenerate.py: validate each record before
@@ -60,7 +60,7 @@ from ai.core.validation.persona_quality import (
     validate_record,
 )
 
-BUCKET = os.getenv("OVH_S3_BUCKET", "pixel-data")
+BUCKET = os.getenv("HETZNER_S3_BUCKET", "pixel-data")
 KEY = "final_dataset/shards/curriculum/stage2/synthetic_persona_batch_10000.jsonl"
 S3_PATH = f"s3://{BUCKET}/{KEY}"
 
@@ -270,8 +270,8 @@ def _report_sample_records(sample_records: list[tuple[int, dict]]) -> None:
 
 
 def main() -> int:
-    if not os.getenv("OVH_S3_ACCESS_KEY") or not os.getenv("OVH_S3_SECRET_KEY"):
-        logger.error("OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY must be set.")
+    if not os.getenv("HETZNER_S3_ACCESS_KEY") or not os.getenv("HETZNER_S3_SECRET_KEY"):
+        logger.error("HETZNER_S3_ACCESS_KEY and HETZNER_S3_SECRET_KEY must be set.")
         return 1
 
     loader = S3DatasetLoader(bucket=BUCKET)

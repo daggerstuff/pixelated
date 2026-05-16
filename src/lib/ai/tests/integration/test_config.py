@@ -3,10 +3,8 @@ Test configuration for integration tests
 Provides test data, fixtures, and configuration for all integration tests
 """
 
-import os
-import json
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Any
 
 # Test environment configuration
 TEST_ENVIRONMENT = {
@@ -105,7 +103,7 @@ MEMORY_TEST_CONFIG = {
 }
 
 # Test data generators
-def generate_test_conversation_data(message_count: int = 10) -> Dict[str, Any]:
+def generate_test_conversation_data(message_count: int = 10) -> dict[str, Any]:
     """Generate test conversation data"""
     messages = []
     for i in range(message_count):
@@ -118,7 +116,7 @@ def generate_test_conversation_data(message_count: int = 10) -> Dict[str, Any]:
                 "sentiment": "positive" if i % 3 == 0 else "neutral" if i % 3 == 1 else "negative"
             }
         })
-    
+
     return {
         "conversation_id": f"test_conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
         "messages": messages,
@@ -130,7 +128,7 @@ def generate_test_conversation_data(message_count: int = 10) -> Dict[str, Any]:
         }
     }
 
-def generate_test_research_articles(count: int = 5) -> List[Dict[str, Any]]:
+def generate_test_research_articles(count: int = 5) -> list[dict[str, Any]]:
     """Generate test research articles"""
     articles = []
     for i in range(count):
@@ -144,13 +142,13 @@ def generate_test_research_articles(count: int = 5) -> List[Dict[str, Any]]:
             "citations": 10 + i * 5,
             "relevance_score": 0.9 - (i * 0.1)
         })
-    
+
     return articles
 
-def generate_test_training_scenarios(scenario_type: str = "cultural", count: int = 10) -> List[Dict[str, Any]]:
+def generate_test_training_scenarios(scenario_type: str = "cultural", count: int = 10) -> list[dict[str, Any]]:
     """Generate test training scenarios"""
     scenarios = []
-    
+
     if scenario_type == "cultural":
         cultural_contexts = ["asian", "hispanic", "african", "middle_eastern"]
         for i in range(count):
@@ -171,7 +169,7 @@ def generate_test_training_scenarios(scenario_type: str = "cultural", count: int
                     "bias_recognition": 0.6
                 }
             })
-    
+
     elif scenario_type == "trauma":
         trauma_types = ["acute", "chronic", "complex"]
         for i in range(count):
@@ -192,19 +190,19 @@ def generate_test_training_scenarios(scenario_type: str = "cultural", count: int
                 "difficulty_level": "advanced",
                 "sensitivity_level": "high"
             })
-    
+
     return scenarios
 
-def generate_test_bias_detection_results(count: int = 20) -> List[Dict[str, Any]]:
+def generate_test_bias_detection_results(count: int = 20) -> list[dict[str, Any]]:
     """Generate test bias detection results"""
     results = []
     bias_types = ["gender", "racial", "age", "cultural", "socioeconomic"]
     contexts = ["hiring", "promotion", "interview", "performance_review"]
-    
+
     for i in range(count):
         bias_type = bias_types[i % len(bias_types)]
         context = contexts[i % len(contexts)]
-        
+
         results.append({
             "detection_id": f"detection_{i+1}",
             "bias_type": bias_type,
@@ -215,13 +213,13 @@ def generate_test_bias_detection_results(count: int = 20) -> List[Dict[str, Any]
             "mitigation_applied": i % 3 == 0,
             "user_feedback": "accurate" if i % 2 == 0 else "inaccurate"
         })
-    
+
     return results
 
-def generate_test_memory_updates(count: int = 10) -> List[Dict[str, Any]]:
+def generate_test_memory_updates(count: int = 10) -> list[dict[str, Any]]:
     """Generate test memory updates"""
     updates = []
-    
+
     for i in range(count):
         updates.append({
             "update_id": f"update_{i+1}",
@@ -235,7 +233,7 @@ def generate_test_memory_updates(count: int = 10) -> List[Dict[str, Any]]:
             "timestamp": datetime.now().isoformat(),
             "priority": "high" if i % 4 == 0 else "medium"
         })
-    
+
     return updates
 
 # Performance test configuration
@@ -302,7 +300,7 @@ TEST_VALIDATION_CRITERIA = {
     }
 }
 
-def get_test_configuration(test_type: str) -> Dict[str, Any]:
+def get_test_configuration(test_type: str) -> dict[str, Any]:
     """Get test configuration for specific test type"""
     configurations = {
         "ieee_integration": IEEE_TEST_CONFIG,
@@ -312,34 +310,34 @@ def get_test_configuration(test_type: str) -> Dict[str, Any]:
         "performance": PERFORMANCE_TEST_CONFIG,
         "error_simulation": ERROR_TEST_CONFIG
     }
-    
+
     return configurations.get(test_type, {})
 
-def validate_test_results(test_type: str, results: Dict[str, Any]) -> bool:
+def validate_test_results(test_type: str, results: dict[str, Any]) -> bool:
     """Validate test results against criteria"""
     criteria = TEST_VALIDATION_CRITERIA.get(test_type.replace("_tests", "_tests"), {})
-    
+
     if not criteria:
         return True  # No specific criteria defined
-    
+
     # Check pass rate
     if "pass_rate" in criteria:
         pass_rate = results.get("pass_rate", 0)
         if pass_rate < criteria["pass_rate"]:
             return False
-    
+
     # Check execution time
     if "execution_time_limit" in criteria:
         execution_time = results.get("execution_time", 0)
         if execution_time > criteria["execution_time_limit"]:
             return False
-    
+
     # Check coverage
     if "coverage_minimum" in criteria:
         coverage = results.get("coverage", 0)
         if coverage < criteria["coverage_minimum"]:
             return False
-    
+
     return True
 
 # Environment-specific configurations
@@ -370,7 +368,7 @@ ENVIRONMENT_CONFIGS = {
     }
 }
 
-def get_environment_config(environment: str) -> Dict[str, Any]:
+def get_environment_config(environment: str) -> dict[str, Any]:
     """Get environment-specific configuration"""
     return ENVIRONMENT_CONFIGS.get(environment, ENVIRONMENT_CONFIGS["testing"])
 

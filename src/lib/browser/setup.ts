@@ -11,6 +11,14 @@ import {
   getAllFeatures,
 } from './feature-detection'
 
+// Type declaration for global logger
+declare const logger: {
+  info: (message: string, ...args: unknown[]) => void
+  debug: (message: string, ...args: unknown[]) => void
+  warn: (message: string, ...args: unknown[]) => void
+  error: (message: string, ...args: unknown[]) => void
+}
+
 /**
  * Setup browser environment
  * Initializes feature detection, loads polyfills, and sets up browser-specific functionality
@@ -150,9 +158,9 @@ function setupReducedDataDetection() {
     connection?: { saveData?: boolean }
   }
   const saveData =
-    connection?.saveData ||
-    /save-data=on/.test(document.cookie) ||
-    /save-data=on/.test(navigator.userAgent)
+    (connection?.saveData ??
+    document.cookie.includes('save-data=on')) ||
+    navigator.userAgent.includes('save-data=on')
 
   if (saveData) {
     document.documentElement.classList.add('save-data')
@@ -206,7 +214,7 @@ function setupDeviceSpecificFixes() {
   }
 
   // Safari specific fixes (including macOS)
-  if (/safari/.test(userAgent) && !/chrome/.test(userAgent)) {
+  if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
     document.documentElement.classList.add('safari')
 
     // Fix for position:sticky support
@@ -214,7 +222,7 @@ function setupDeviceSpecificFixes() {
   }
 
   // Firefox specific fixes
-  if (/firefox/.test(userAgent)) {
+  if (userAgent.includes('firefox')) {
     document.documentElement.classList.add('firefox')
   }
 }

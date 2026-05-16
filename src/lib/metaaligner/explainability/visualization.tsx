@@ -3,9 +3,9 @@
  * Provides React components for visualizing objective evaluation results and alignment metrics
  */
 
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { LineChart, PieChart } from '@/components/ui/charts'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card } from '@/components/ui/card/index.ts'
+import { LineChart, PieChart } from '@/components/ui/LazyChart.tsx'
 
 import {
   ObjectiveMetrics,
@@ -468,9 +468,9 @@ export function generateAlignmentExplanation(
   )
 
   const bestObjName =
-    objectives.find((o) => o.id === bestObjective.id)?.name || 'Unknown'
+    objectives.find((o) => o.id === bestObjective.id)?.name ?? 'Unknown'
   const worstObjName =
-    objectives.find((o) => o.id === worstObjective.id)?.name || 'Unknown'
+    objectives.find((o) => o.id === worstObjective.id)?.name ?? 'Unknown'
 
   let explanation = `The response achieved an overall alignment score of ${overallScore.toFixed(1)}%. `
 

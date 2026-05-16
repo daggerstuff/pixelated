@@ -1,3 +1,4 @@
+import type { AuthRole } from '../../config/auth.config'
 import type {
   ProtectRouteOptions,
   ProtectedAPIRoute,
@@ -20,7 +21,7 @@ export function protectRoute(options: ProtectRouteOptions = {}) {
 
       if (!authResult.success || !authResult.request) {
         return (
-          authResult.response ||
+          authResult.response ??
           new Response(JSON.stringify({ error: 'Unauthorized' }), {
             status: 401,
             headers: { 'Content-Type': 'application/json' },
@@ -35,7 +36,7 @@ export function protectRoute(options: ProtectRouteOptions = {}) {
         ])
         if (!roleResult.success) {
           return (
-            roleResult.response ||
+            roleResult.response ??
             new Response(JSON.stringify({ error: 'Forbidden' }), {
               status: 403,
               headers: { 'Content-Type': 'application/json' },
@@ -46,10 +47,20 @@ export function protectRoute(options: ProtectRouteOptions = {}) {
 
       // 3. Attach user to locals for the handler and convert context
       const user = authResult.request.user!
+      const role = normalizeAuthRole(user.role)
+      const userRole = normalizeUserRole(user.role)
       const authUser: AuthUser = {
-        ...user,
+        id: user.id,
+        email: user.email,
+        role,
+        fullName: user.fullName,
         emailVerified: user.emailVerified ?? false,
-        permissions: getRolePermissions(user.role as UserRole),
+        permissions: getRolePermissions(userRole),
+        avatarUrl: user.avatarUrl,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        appMetadata: user.appMetadata,
+        userMetadata: user.userMetadata,
         name: user.fullName,
       }
 
@@ -59,11 +70,33 @@ export function protectRoute(options: ProtectRouteOptions = {}) {
           ...context.locals,
           user: authUser,
         },
-      } as any
+        request: context.request,
+      }
 
       return handler(authContext)
     }
   }
+}
+
+function normalizeAuthRole(value: unknown): AuthRole {
+  return value === 'admin' ||
+    value === 'staff' ||
+    value === 'therapist' ||
+    value === 'user' ||
+    value === 'guest'
+    ? value
+    : 'guest'
+}
+
+function normalizeUserRole(value: unknown): UserRole {
+  return value === 'admin' ||
+    value === 'therapist' ||
+    value === 'patient' ||
+    value === 'researcher' ||
+    value === 'support' ||
+    value === 'guest'
+    ? value
+    : 'guest'
 }
 
 /**

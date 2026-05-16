@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Astro SSR Functionality Tests', () => {
   test('Page loads with pre-rendered HTML (SSR)', async ({ page }) => {
     // Disable JavaScript to test pure SSR content
-    await page.context().route('**/*.js', (route) => route.abort())
+    await page.context().route('**/*.js',  async (route) => route.abort())
 
     // Go to the homepage
     await page.goto('/')
@@ -19,7 +19,7 @@ test.describe('Astro SSR Functionality Tests', () => {
 
   test('Blog content is pre-rendered (SSR)', async ({ page }) => {
     // Disable JavaScript to test pure SSR content
-    await page.context().route('**/*.js', (route) => route.abort())
+    await page.context().route('**/*.js',  async (route) => route.abort())
 
     // Go to the blog page
     await page.goto('/blog')
@@ -37,7 +37,7 @@ test.describe('Astro SSR Functionality Tests', () => {
     page,
   }) => {
     // First visit with JavaScript disabled
-    await page.context().route('**/*.js', (route) => route.abort())
+    await page.context().route('**/*.js',  async (route) => route.abort())
     await page.goto('/admin')
 
     // Check that basic structure is visible
@@ -134,8 +134,8 @@ test.describe('Astro SSR Functionality Tests', () => {
     // by verifying it maintains the same position
     const newHeaderBounds = await header.boundingBox()
 
-    expect(initialHeaderBounds?.x).toBeCloseTo(newHeaderBounds?.x || 0, 0)
-    expect(initialHeaderBounds?.y).toBeCloseTo(newHeaderBounds?.y || 0, 0)
+    expect(initialHeaderBounds?.x).toBeCloseTo(newHeaderBounds?.x ?? 0, 0)
+    expect(initialHeaderBounds?.y).toBeCloseTo(newHeaderBounds?.y ?? 0, 0)
 
     // Check that the page has the view-transition attribute
     const hasViewTransition = await page.evaluate(() => {

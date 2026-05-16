@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { useConversationMemory } from '../hooks/useConversationMemory'
 import { tokens } from '../lib/design-tokens'
@@ -9,7 +9,16 @@ interface TrainingSessionProps {
   className?: string
 }
 
-function AIErrorBoundary({ children }: { children: React.ReactNode }) {
+const getMockClientResponse = (value: unknown): string => {
+  if (!value || typeof value !== 'object') {
+    return ''
+  }
+
+  const { response } = value as Record<string, unknown>
+  return typeof response === 'string' ? response : ''
+}
+
+ async function AIErrorBoundary({ children }: { children: React.ReactNode }) {
   const [hasError] = useState(false)
   const [error] = useState<Error | null>(null)
 
@@ -20,7 +29,7 @@ function AIErrorBoundary({ children }: { children: React.ReactNode }) {
         className='bg-destructive text-destructive-foreground rounded-md p-4'
       >
         <strong>AI Service Error:</strong>{' '}
-        {error?.message || 'The AI service is temporarily unavailable.'}
+        {error?.message ?? 'The AI service is temporarily unavailable.'}
       </div>
     )
   }
@@ -42,7 +51,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
   const [feedback, setFeedback] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Session control types
+  // ⚡ Bolt: Moved static SESSION_CONTROLS outside component rendering scope (or memoized it) to prevent unnecessary array allocations on every render
   const SESSION_CONTROLS = [
     { key: 'start', label: 'Start Session' },
     { key: 'pause', label: 'Pause' },
@@ -51,28 +60,32 @@ function TrainingSession({ className }: TrainingSessionProps) {
   ]
 
   // Control handlers
-  const handleControl = (control: string) => {
-    switch (control) {
-      case 'start':
-        setSessionState('active')
-        setProgress(0)
-        addProgressSnapshot(0)
-        break
-      case 'pause':
-        setSessionState('paused')
-        break
-      case 'resume':
-        setSessionState('active')
-        break
-      case 'end':
-        setSessionState('ended')
-        setProgress(100)
-        addProgressSnapshot(100)
-        break
-      default:
-        break
-    }
-  }
+  // ⚡ Bolt: Wrapped handleControl in useCallback to provide a stable function reference
+  const handleControl = useCallback(
+    (control: string) => {
+      switch (control) {
+        case 'start':
+          setSessionState('active')
+          setProgress(0)
+          addProgressSnapshot(0)
+          break
+        case 'pause':
+          setSessionState('paused')
+          break
+        case 'resume':
+          setSessionState('active')
+          break
+        case 'end':
+          setSessionState('ended')
+          setProgress(100)
+          addProgressSnapshot(100)
+          break
+        default:
+          break
+      }
+    },
+    [setSessionState, setProgress, addProgressSnapshot],
+  )
 
   // Send therapist message to mock client API
   const sendToMockClient = async (message: string) => {
@@ -86,14 +99,15 @@ function TrainingSession({ className }: TrainingSessionProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message }),
       })
-      const data = await res.json()
+      const rawData = (await res.json()) as unknown
+      const response = getMockClientResponse(rawData)
 
       // Add client response to conversation memory
-      if (data.response) {
-        addMessage('client', data.response)
+      if (response) {
+        addMessage('client', response)
       }
 
-      setClientResponse(data.response || '')
+      setClientResponse(response)
 
       // Update progress based on conversation flow
       const newProgress = Math.min(100, memory.progress + 10)
@@ -226,7 +240,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
               <div className='mt-4'>
                 <strong>Client Response:</strong>
                 <div className='bg-muted mt-2 min-h-[60px] rounded-md p-3 text-sm'>
-                  {clientResponse || 'Waiting for client response...'}
+                  {clientResponse ?? 'Waiting for client response...'}
                 </div>
               </div>
             </section>

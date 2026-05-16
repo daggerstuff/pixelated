@@ -40,9 +40,9 @@ export interface SelectionResult {
 }
 
 export class AdaptiveSelector {
-  private aiService: AIService
-  private contextDetector: ContextDetector
-  private weightingEngine: ObjectiveWeightingEngine
+  private readonly aiService: AIService
+  private readonly contextDetector: ContextDetector
+  private readonly weightingEngine: ObjectiveWeightingEngine
   private lastDetectedContext: ContextType | null = null
 
   constructor(config: AdaptiveSelectorConfig) {
@@ -111,7 +111,7 @@ export class AdaptiveSelector {
       this.lastDetectedContext !== detection.detectedContext
     ) {
       detection.metadata = detection.metadata || {}
-      ;(detection.metadata)['transition'] = {
+      detection.metadata['transition'] = {
         from: this.lastDetectedContext,
         to: detection.detectedContext,
       }

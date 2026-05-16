@@ -3,7 +3,11 @@
  * Tests the complete end-to-end functionality including evaluation, enhancement, and integration
  */
 
-import type { AIMessage, AIService, AICompletion } from '../../ai/models/ai-types'
+import type {
+  AIMessage,
+  AIService,
+  AICompletion,
+} from '../../ai/models/ai-types'
 import { MetaAlignerAPI, IntegratedAIService } from '../api/alignment-api'
 import {
   DEFAULT_WEIGHT_ADJUSTMENT_PARAMS,
@@ -18,38 +22,40 @@ import { getContextualObjectiveWeights } from '../prioritization/context-objecti
 // Mock logger
 vi.mock('../../logging', () => ({
   getLogger: () => ({
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
+    info: vi.fn<() => void>(),
+    error: vi.fn<() => void>(),
+    warn: vi.fn<() => void>(),
+    debug: vi.fn<() => void>(),
   }),
 }))
 
 // Mock AI service for testing enhancement
 const createMockAIService = (enhancedResponse?: string): AIService => {
   const mockService: Partial<AIService> = {
-    createChatCompletion: vi.fn().mockResolvedValue({
-      id: 'test-response',
-      created: Date.now(),
-      model: 'test-model',
-      choices: [
-        {
-          message: {
-            role: 'assistant',
-            content: enhancedResponse || 'Enhanced response...',
+    createChatCompletion: vi
+      .fn<() => Promise<AICompletion>>()
+      .mockResolvedValue({
+        id: 'test-response',
+        created: Date.now(),
+        model: 'test-model',
+        choices: [
+          {
+            message: {
+              role: 'assistant',
+              content: enhancedResponse ?? 'Enhanced response...',
+            },
+            finishReason: 'stop',
           },
-          finishReason: 'stop',
-        },
-      ],
-      usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
-      provider: 'test',
-      content: enhancedResponse || 'Enhanced response...',
-    } as AICompletion),
-    createStreamingChatCompletion: vi.fn(),
-    getModelInfo: vi.fn(),
-    dispose: vi.fn(),
-    createChatCompletionWithTracking: vi.fn(),
-    generateCompletion: vi.fn(),
+        ],
+        usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
+        provider: 'test',
+        content: enhancedResponse ?? 'Enhanced response...',
+      } as AICompletion),
+    createStreamingChatCompletion: vi.fn<() => Promise<unknown>>(),
+    getModelInfo: vi.fn<() => Promise<unknown>>(),
+    dispose: vi.fn<() => void>(),
+    createChatCompletionWithTracking: vi.fn<() => Promise<unknown>>(),
+    generateCompletion: vi.fn<() => Promise<unknown>>(),
   }
   return mockService as AIService
 }
@@ -442,7 +448,7 @@ describe('MetaAligner Integration Tests', () => {
       }))
 
       const evaluations = await Promise.all(
-        requests.map((request) => metaAligner.evaluateResponse(request)),
+        requests.map( async (request) => metaAligner.evaluateResponse(request)),
       )
 
       expect(evaluations).toHaveLength(5)
@@ -478,7 +484,7 @@ describe('MetaAligner Integration Tests', () => {
 
       for (const response of malformedResponses) {
         const evaluation = await metaAligner.evaluateResponse({
-          response: response as string,
+          response: response!,
           context: {
             userQuery: 'Test query',
             detectedContext: ContextType.GENERAL,

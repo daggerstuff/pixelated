@@ -46,6 +46,12 @@ export interface SessionCreateOptions {
   permissions?: string[]
 }
 
+type SessionCacheRecord = {
+  sessionId: string
+  expiresAt: number
+  lastActivity: number
+}
+
 const SESSION_TIMEOUT = 3600000 // 1 hour
 const EXTENDED_SESSION_TIMEOUT = 86400000 // 24 hours
 const MAX_CONCURRENT_SESSIONS = 5
@@ -72,14 +78,18 @@ export async function createSession(
   const timeout = rememberMe ? EXTENDED_SESSION_TIMEOUT : SESSION_TIMEOUT
 
   // Check concurrent session limit
-  const existingSessions = (await getFromCache(`user:sessions:${userId}`)) || []
+  const existingSessionsRaw =
+    (await getFromCache<SessionCacheRecord[]>(`user:sessions:${userId}`)) ?? []
+  const existingSessions = existingSessionsRaw || []
   if (existingSessions.length >= MAX_CONCURRENT_SESSIONS) {
     // Remove oldest session
-    const oldestSession = existingSessions.sort(
+    const sortedSessions = existingSessions.sort(
       (a, b) => a.lastActivity - b.lastActivity,
-    )[0]
-    await removeFromCache(`session:${oldestSession.sessionId}`)
-    await removeFromCache(`session:device:${oldestSession.sessionId}`)
+    )
+    if (sortedSessions[0]) {
+      await removeFromCache(`session:${sortedSessions[0].sessionId}`)
+      await removeFromCache(`session:device:${sortedSessions[0].sessionId}`)
+    }
   }
 
   const sessionData: SessionData = {
@@ -128,7 +138,7 @@ export async function createSession(
   )
 
   // Log security event
-  await logSecurityEvent('SESSION_CREATED', userId, {
+   logSecurityEvent('SESSION_CREATED', userId, {
     sessionId,
     deviceId: deviceInfo.deviceId,
     ipAddress,
@@ -156,7 +166,7 @@ export async function validateSession(
   securityAlert?: string
 }> {
   try {
-    const session = await getFromCache(`session:${sessionId}`)
+    const session = await getFromCache<SessionData>(`session:${sessionId}`)
 
     if (!session) {
       return { valid: false, error: 'Session not found' }
@@ -171,7 +181,9 @@ export async function validateSession(
 
     // Check device binding
     const deviceFingerprint = `${deviceInfo.deviceId}:${ipAddress}:${userAgent}`
-    const storedFingerprint = await getFromCache(`session:device:${sessionId}`)
+    const storedFingerprint = await getFromCache<{ fingerprint: string }>(
+      `session:device:${sessionId}`,
+    )
 
     if (
       storedFingerprint &&
@@ -194,7 +206,9 @@ export async function validateSession(
 
     // Update user's session list
     const userSessions =
-      (await getFromCache(`user:sessions:${session.userId}`)) || []
+      (await getFromCache<SessionCacheRecord[]>(
+        `user:sessions:${session.userId}`,
+      )) ?? []
     const updatedSessions = userSessions.map((s) =>
       s.sessionId === sessionId
         ? { ...s, lastActivity: session.lastActivity }
@@ -207,7 +221,7 @@ export async function validateSession(
     )
 
     // Log security event
-    await logSecurityEvent('SESSION_VALIDATED', session.userId, {
+     logSecurityEvent('SESSION_VALIDATED', session.userId, {
       sessionId,
       deviceId: deviceInfo.deviceId,
     })
@@ -222,7 +236,7 @@ export async function validateSession(
  * Invalidate a session
  */
 export async function invalidateSession(sessionId: string): Promise<void> {
-  const session = await getFromCache(`session:${sessionId}`)
+  const session = await getFromCache<SessionData>(`session:${sessionId}`)
 
   if (session) {
     await removeFromCache(`session:${sessionId}`)
@@ -230,14 +244,16 @@ export async function invalidateSession(sessionId: string): Promise<void> {
 
     // Update user's session list
     const userSessions =
-      (await getFromCache(`user:sessions:${session.userId}`)) || []
+      (await getFromCache<SessionCacheRecord[]>(
+        `user:sessions:${session.userId}`,
+      )) ?? []
     const updatedSessions = userSessions.filter(
       (s) => s.sessionId !== sessionId,
     )
     await setInCache(`user:sessions:${session.userId}`, updatedSessions)
 
     // Log security event
-    await logSecurityEvent('SESSION_INVALIDATED', session.userId, {
+     logSecurityEvent('SESSION_INVALIDATED', session.userId, {
       sessionId,
       reason: 'manual_invalidation',
     })
@@ -248,14 +264,17 @@ export async function invalidateSession(sessionId: string): Promise<void> {
  * Get all active sessions for a user
  */
 export async function getUserSessions(userId: string): Promise<SessionData[]> {
-  const sessionList = (await getFromCache(`user:sessions:${userId}`)) || []
+  const sessionList =
+    (await getFromCache<SessionCacheRecord[]>(`user:sessions:${userId}`)) ?? []
   const now = Date.now()
 
   const activeSessions: SessionData[] = []
 
   for (const sessionInfo of sessionList) {
     if (sessionInfo.expiresAt > now) {
-      const session = await getFromCache(`session:${sessionInfo.sessionId}`)
+      const session = await getFromCache<SessionData>(
+        `session:${sessionInfo.sessionId}`,
+      )
       if (session) {
         activeSessions.push(session)
       }

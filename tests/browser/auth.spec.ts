@@ -1,11 +1,13 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+
+import { getLoginFormLocator } from '../helpers/test-utils'
 
 // Test for login page structure
 test('login page has correct form elements', async ({ page }) => {
   await page.goto('/login')
 
   // Check for form elements
-  await expect(page.locator('form')).toBeVisible()
+  await expect(getLoginFormLocator(page)).toBeVisible()
   await expect(page.locator('input[type="email"]')).toBeVisible()
   await expect(page.locator('input[type="password"]')).toBeVisible()
   await expect(page.locator('button[type="submit"]')).toBeVisible()
@@ -24,7 +26,9 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Wait for React component to hydrate (LoginForm uses client:load)
   // Wait for form to be visible and interactive
-  await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
+  await expect(getLoginFormLocator(page)).toBeVisible({
+    timeout: 10000,
+  })
   await expect(page.locator('button[type="submit"]')).toBeVisible({
     timeout: 10000,
   })
@@ -69,8 +73,8 @@ test('login form shows validation errors', async ({ page }) => {
     () => {
       const emailErrorEl = document.getElementById('email-error')
       const passwordErrorEl = document.getElementById('password-error')
-      const emailText = emailErrorEl?.textContent?.trim() || ''
-      const passwordText = passwordErrorEl?.textContent?.trim() || ''
+      const emailText = emailErrorEl?.textContent?.trim() ?? ''
+      const passwordText = passwordErrorEl?.textContent?.trim() ?? ''
       return (
         emailText.length > 0 &&
         /required|email/i.test(emailText) &&
@@ -113,7 +117,7 @@ test('login form is properly visible on mobile viewport', async ({
   await page.goto('/login')
 
   // Check that all form elements are visible without scrolling
-  await expect(page.locator('form')).toBeVisible()
+  await expect(getLoginFormLocator(page)).toBeVisible()
   await expect(page.locator('input[type="email"]')).toBeVisible()
   await expect(page.locator('input[type="password"]')).toBeVisible()
   await expect(page.locator('button[type="submit"]')).toBeVisible()
@@ -133,7 +137,9 @@ test('login page has proper transitions', async ({ page }) => {
 
   // Wait for React components to hydrate (LoginForm uses client:load)
   // Wait for form to be visible and interactive
-  await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
+  await expect(getLoginFormLocator(page)).toBeVisible({
+    timeout: 10000,
+  })
   await expect(page.locator('input[type="email"]')).toBeVisible({
     timeout: 10000,
   })
@@ -201,7 +207,9 @@ test('login page visual comparison', async ({ page }) => {
   await page.waitForLoadState('networkidle')
 
   // Wait for React component to hydrate
-  await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
+  await expect(getLoginFormLocator(page)).toBeVisible({
+    timeout: 10000,
+  })
   await expect(page.locator('input[type="email"]')).toBeVisible({
     timeout: 10000,
   })

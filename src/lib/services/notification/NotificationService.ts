@@ -1,11 +1,11 @@
 import type { WebSocket } from 'ws'
 import { z } from 'zod'
 
-import { config } from '@/config/env.config'
-import type { RoutingContext } from '@/lib/ai/mental-llama/routing/MentalHealthTaskRouter'
-import { EmailService, type EmailConfig } from '@/lib/email'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { redis } from '@/lib/redis'
+import { config } from '../../../config/env.config'
+import type { RoutingContext } from '../../../lib/ai/mental-llama/routing/MentalHealthTaskRouter'
+import { EmailService, type EmailConfig } from '../../../lib/email'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { redis } from '../../../lib/redis'
 
 import type { IRedisService } from '../redis/types'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
@@ -164,9 +164,9 @@ export interface ICrisisNotificationHandler {
 }
 
 export class NotificationService {
-  private emailService: EmailService
-  private wsClients: Map<string, WebSocket>
-  private templates: Map<string, NotificationTemplate>
+  private readonly emailService: EmailService
+  private readonly wsClients: Map<string, WebSocket>
+  private readonly templates: Map<string, NotificationTemplate>
   private vapidKeys: { publicKey: string; privateKey: string } | null = null
   private readonly queueKey = 'notification_queue'
   private readonly processingKey = 'notification_processing'
@@ -175,10 +175,10 @@ export class NotificationService {
   constructor() {
     const emailConfig: EmailConfig = {
       provider: 'smtp',
-      fromEmail: config.email.from() || 'noreply@example.com',
+      fromEmail: config.email.from() ?? 'noreply@example.com',
       fromName: 'Pixelated Empathy',
       smtpHost: process.env['SMTP_HOST'],
-      smtpPort: Number.parseInt(process.env['SMTP_PORT'] || '587'),
+      smtpPort: Number.parseInt(process.env['SMTP_PORT'] ?? '587'),
       smtpUser: process.env['SMTP_USER'],
       smtpPassword: process.env['SMTP_PASSWORD'],
       apiKey: process.env['EMAIL_API_KEY'],
@@ -188,12 +188,22 @@ export class NotificationService {
     this.templates = new Map()
     this.initializeVAPIDKeys().catch((error) => {
       logger.error('Failed to initialize VAPID keys', {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
     })
     this.initializeCrisisTemplate().catch((error) => {
       logger.error('Failed to initialize crisis template', {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
     })
   }
@@ -215,8 +225,7 @@ export class NotificationService {
   private async initializeCrisisTemplate(): Promise<void> {
     if (!this.templates.has(CRISIS_ALERT_TEMPLATE_ID)) {
       // adminEmail may not be present on config.notifications type, but is expected here.
-      // @ts-expect-error - adminEmail may not be typed in config.notifications, but is expected at runtime.
-      const adminEmail = config.notifications.adminEmail?.()
+      const adminEmail = (config.notifications as any).adminEmail?.()
       if (!adminEmail) {
         logger.warn(
           'Admin email not configured. Crisis email alerts will not be sent by default template.',
@@ -295,7 +304,7 @@ export class NotificationService {
         alias: template.id,
         subject: template.title,
         htmlBody: template.body,
-        from: config.email.from() || 'noreply@example.com',
+        from: config.email.from() ?? 'noreply@example.com',
       })
     }
   }
@@ -321,8 +330,8 @@ export class NotificationService {
       title: template.title,
       body: template.body,
       data: data.data,
-      channels: data.channels || template.channels,
-      priority: data.priority || template.priority,
+      channels: data.channels ?? template.channels,
+      priority: data.priority ?? template.priority,
       status: NotificationStatus.PENDING,
       createdAt: Date.now(),
       deliveredAt: null,
@@ -356,7 +365,7 @@ export class NotificationService {
     while (true) {
       try {
         await this.processQueue()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error in notification processing loop', {
           error: error instanceof Error ? String(error) : String(error),
         })
@@ -499,9 +508,7 @@ export class NotificationService {
 
     return Object.values(notifications)
       .map((n) =>
-        NotificationItemSchema.parse(
-          JSON.parse(n) as NotificationItem,
-        ),
+        NotificationItemSchema.parse(JSON.parse(n) as NotificationItem),
       )
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(offset, offset + limit)
@@ -520,9 +527,7 @@ export class NotificationService {
 
     return Object.values(notifications)
       .map((n) =>
-        NotificationItemSchema.parse(
-          JSON.parse(n) as NotificationItem,
-        ),
+        NotificationItemSchema.parse(JSON.parse(n) as NotificationItem),
       )
       .filter((n) => n.status !== NotificationStatus.READ).length
   }
@@ -621,7 +626,7 @@ export class NotificationService {
     } catch (error: unknown) {
       if (
         error instanceof Error &&
-        (error)?.name === 'ExpiredSubscriptionError'
+        error?.name === 'ExpiredSubscriptionError'
       ) {
         await this.removePushSubscription(notification.userId)
         logger.info('Removed expired push subscription', {
@@ -741,7 +746,7 @@ export class NotificationService {
  * (e.g., email, SMS, PagerDuty, Slack, dedicated monitoring dashboard).
  */
 export class ConsoleNotificationService implements ICrisisNotificationHandler {
-  private logger = console // Or use a more sophisticated logger
+  private readonly logger = console // Or use a more sophisticated logger
 
   async sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void> {
     this.logger.error(

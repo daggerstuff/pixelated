@@ -1,4 +1,4 @@
-// import type { APIRoute } from 'astro'
+import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -6,6 +6,18 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getSession } from '../../../lib/auth/session'
 
 const logger = createBuildSafeLogger('api:patient-rights:update-export')
+
+const parseJsonBody = (bodyText: string): unknown => {
+  if (!bodyText) {
+    return null
+  }
+
+  try {
+    return JSON.parse(bodyText)
+  } catch {
+    return null
+  }
+}
 
 // Schema for validating the request body
 const updateExportSchema = z.object({
@@ -30,11 +42,11 @@ const updateExportSchema = z.object({
     .optional(),
 })
 
-export const put = async ({ request }) => {
+export const put: APIRoute = async ({ request }) => {
   try {
     // Verify user is authenticated and authorized
     const sessionData = await getSession(request)
-    if (!sessionData || !sessionData.user) {
+    if (!sessionData) {
       return new Response(
         JSON.stringify({ success: false, message: 'Unauthorized' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } },
@@ -44,7 +56,7 @@ export const put = async ({ request }) => {
     const { user } = sessionData
 
     // Check if user has permission to update export requests
-    if (!user.app_metadata?.permissions?.includes('update:data_exports')) {
+    if (!user.permissions?.includes('update:data_exports')) {
       return new Response(
         JSON.stringify({ success: false, message: 'Insufficient permissions' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } },
@@ -52,12 +64,20 @@ export const put = async ({ request }) => {
     }
 
     // Parse and validate request body
-    const requestData = await request.json()
+    const requestDataText = await request.text()
+    const requestData = parseJsonBody(requestDataText)
+    if (!requestData || typeof requestData !== 'object') {
+      return new Response(
+        JSON.stringify({ success: false, message: 'Invalid request data' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+
     const validationResult = updateExportSchema.safeParse(requestData)
 
     if (!validationResult.success) {
       logger.warn('Invalid export update data', {
-        errors: validationResult.error.errors,
+        errors: validationResult.error.issues,
         userId: user.id,
       })
 
@@ -65,7 +85,7 @@ export const put = async ({ request }) => {
         JSON.stringify({
           success: false,
           message: 'Invalid request data',
-          errors: validationResult.error.errors,
+          errors: validationResult.error.issues,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

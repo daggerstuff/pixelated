@@ -254,13 +254,13 @@ solution for mental health professional training, featuring:
 
 ### Version history
 
-| Date | Version | Summary |
-| --- | --- | --- |
-| Dec 2025 | 1.0 | Initial consolidated strategy; METRICS-SOURCES and pipeline stages added |
+| Date     | Version | Summary                                                                  |
+| -------- | ------- | ------------------------------------------------------------------------ |
+| Dec 2025 | 1.0     | Initial consolidated strategy; METRICS-SOURCES and pipeline stages added |
 
-Key numbers and their sources are documented in [METRICS-SOURCES.md](METRICS-SOURCES.md).
-Pilot pipeline stages and tracker definitions are in
-[outreach/README.md](outreach/README.md).
+Key numbers and their sources are documented in
+[METRICS-SOURCES.md](METRICS-SOURCES.md). Pilot pipeline stages and tracker
+definitions are in [outreach/README.md](outreach/README.md).
 
 ## Conclusion
 
@@ -293,4 +293,6 @@ Empathy brand.
 ---
 
 _Created for the Pixelated Empathy AI Platform Business Strategy Development._
-_Last Updated: December 2025. Document Version: 1.0. See [Strategy review and version](#strategy-review-and-version) and [METRICS-SOURCES.md](METRICS-SOURCES.md)._
+_Last Updated: December 2025. Document Version: 1.0. See
+[Strategy review and version](#strategy-review-and-version) and
+[METRICS-SOURCES.md](METRICS-SOURCES.md)._

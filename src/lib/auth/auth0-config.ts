@@ -25,7 +25,7 @@ function getSecret(envVar: string, fileEnvVar: string): string {
   if (filePath && fs.existsSync(filePath)) {
     try {
       return fs.readFileSync(filePath, 'utf8').trim()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `[Auth0Config] Failed to read secret from ${filePath}:`,
         error,
@@ -50,9 +50,9 @@ export const auth0Config: Auth0Config = {
     'AUTH0_MANAGEMENT_CLIENT_SECRET_FILE',
   ),
   publicDomain:
-    process.env.PUBLIC_AUTH0_DOMAIN || process.env.AUTH0_DOMAIN || '',
+    process.env.PUBLIC_AUTH0_DOMAIN ?? process.env.AUTH0_DOMAIN ?? '',
   publicClientId:
-    process.env.PUBLIC_AUTH0_CLIENT_ID || process.env.AUTH0_CLIENT_ID || '',
+    process.env.PUBLIC_AUTH0_CLIENT_ID ?? process.env.AUTH0_CLIENT_ID ?? '',
 }
 
 /**
@@ -105,4 +105,6 @@ export function logAuth0Status(): void {
 }
 
 // Run status check immediately on module load
-logAuth0Status()
+if (process.env.NODE_ENV !== 'test') {
+  logAuth0Status()
+}

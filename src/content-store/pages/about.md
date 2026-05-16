@@ -1,5 +1,4 @@
 ---
-title: About Pixelated Empathy
 date: '2025-01-29'
 ---
 

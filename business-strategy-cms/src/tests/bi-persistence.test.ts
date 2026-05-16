@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, it } from 'vitest'
+
 import { DatabaseService } from '../services/databaseService'
 import {
   MarketData,
@@ -42,8 +44,8 @@ describe('Business Intelligence Persistence Tests', () => {
     expect(results).toHaveLength(1)
     const result = results[0]
     expect(result).toBeDefined()
-    expect(result.industry).toBe(marketData.industry)
-    expect(result.marketSize).toBe(marketData.marketSize)
+    expect(result!.industry).toBe(marketData.industry)
+    expect(result!.marketSize).toBe(marketData.marketSize)
   })
 
   it('should store and retrieve competitor analysis correctly in MongoDB', async () => {
@@ -57,7 +59,9 @@ describe('Business Intelligence Persistence Tests', () => {
       lastUpdated: new Date(),
     }
 
-    await expect(dbService.storeCompetitorAnalysis(analysis)).resolves.toBeUndefined()
+    await expect(
+      dbService.storeCompetitorAnalysis(analysis),
+    ).resolves.toBeUndefined()
   })
 
   it('should store and retrieve business metrics correctly in MongoDB', async () => {

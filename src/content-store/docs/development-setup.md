@@ -1,11 +1,12 @@
 ---
-title: 'Development Environment Setup'
-description: 'Development Environment Setup documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Development Environment Setup documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Development Environment Setup
 ---
 
 # Development Environment Setup

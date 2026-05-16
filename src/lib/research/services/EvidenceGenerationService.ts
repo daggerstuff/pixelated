@@ -36,9 +36,9 @@ export interface EvidenceRequest {
 }
 
 export class EvidenceGenerationService {
-  private config: EvidenceConfig
-  private patternService: PatternDiscoveryService
-  private queryEngine: ResearchQueryEngine
+  private readonly config: EvidenceConfig
+  private readonly patternService: PatternDiscoveryService
+  private readonly queryEngine: ResearchQueryEngine
 
   constructor(
     config: EvidenceConfig = {
@@ -120,10 +120,14 @@ export class EvidenceGenerationService {
       })
 
       return report
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Evidence generation failed', { error })
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Unknown error'
       throw new Error(`Evidence generation failed: ${errorMessage}`, {
         cause: error,
       })
@@ -697,7 +701,7 @@ export class EvidenceGenerationService {
     return sign * y
   }
 
-  private generatePDFReport(report: EvidenceReport): Promise<string> {
+  private  async generatePDFReport(report: EvidenceReport): Promise<string> {
     // In real implementation, use PDF generation library
     return Promise.resolve(`PDF Report: ${report.title}`)
   }

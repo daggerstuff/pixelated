@@ -76,11 +76,11 @@ export interface QueryPerformanceMetrics {
 }
 
 export class ResearchQueryEngineService {
-  private queryCache: Map<string, { result: QueryResult; expiry: number }> =
+  private readonly queryCache: Map<string, { result: QueryResult; expiry: number }> =
     new Map()
-  private queryHistory: Map<string, ResearchQuery[]> = new Map()
-  private pendingApprovals: Map<string, QueryApprovalRequest> = new Map()
-  private performanceMetrics: QueryPerformanceMetrics = {
+  private readonly queryHistory: Map<string, ResearchQuery[]> = new Map()
+  private readonly pendingApprovals: Map<string, QueryApprovalRequest> = new Map()
+  private readonly performanceMetrics: QueryPerformanceMetrics = {
     averageExecutionTime: 2.5, // seconds
     cacheHitRate: 0.75,
     queryComplexityScore: 0.6,
@@ -148,7 +148,7 @@ export class ResearchQueryEngineService {
       }
 
       // Store query in history
-      const userHistory = this.queryHistory.get(userId) || []
+      const userHistory = this.queryHistory.get(userId) ?? []
       userHistory.push(query)
       this.queryHistory.set(userId, userHistory)
 
@@ -158,7 +158,7 @@ export class ResearchQueryEngineService {
       }
 
       return query
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error translating natural language query:', error)
       throw new Error(
         `Query translation failed: ${error?.message ?? 'Unknown error'}`,
@@ -179,7 +179,7 @@ export class ResearchQueryEngineService {
       const startTime = performance.now()
 
       // Find query in user's history
-      const userHistory = this.queryHistory.get(userId) || []
+      const userHistory = this.queryHistory.get(userId) ?? []
       const query = userHistory.find((q) => q.id === queryId)
 
       if (!query) {
@@ -273,10 +273,10 @@ export class ResearchQueryEngineService {
       this.updatePerformanceMetrics(executionTime, false)
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error executing research query:', error)
       throw new Error(
-        `Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Query execution failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -301,9 +301,9 @@ export class ResearchQueryEngineService {
       researchContext: {
         studyTitle: researchContext.studyTitle,
         principalInvestigator:
-          researchContext.principalInvestigator || 'Not specified',
-        institution: researchContext.institution || 'Not specified',
-        researchPurpose: researchContext.researchPurpose || 'Research analysis',
+          researchContext.principalInvestigator ?? 'Not specified',
+        institution: researchContext.institution ?? 'Not specified',
+        researchPurpose: researchContext.researchPurpose ?? 'Research analysis',
         dataJustification: `Query requires access to ${query.dataClassification} data for research purposes`,
       },
       requestedPermissions: query.requiredPermissions,
@@ -333,7 +333,7 @@ export class ResearchQueryEngineService {
     systemPerformance: QueryPerformanceMetrics
     optimizationSuggestions: string[]
   }> {
-    const userHistory = this.queryHistory.get(userId) || []
+    const userHistory = this.queryHistory.get(userId) ?? []
 
     const totalQueries = userHistory.length
     const approvedQueries = userHistory.filter(
@@ -348,7 +348,7 @@ export class ResearchQueryEngineService {
       query.requiredPermissions.forEach((permission) => {
         dataTypeFrequency.set(
           permission,
-          (dataTypeFrequency.get(permission) || 0) + 1,
+          (dataTypeFrequency.get(permission) ?? 0) + 1,
         )
       })
     })
@@ -639,7 +639,7 @@ export class ResearchQueryEngineService {
 
   private async estimateQueryExecutionTime(sql: string): Promise<number> {
     // Simplified estimation based on query complexity
-    const complexity = sql.length + (sql.match(/JOIN/g) || []).length * 100
+    const complexity = sql.length + (sql.match(/JOIN/g) ?? []).length * 100
     return Math.min(complexity / 200, 30) // Max 30 seconds
   }
 

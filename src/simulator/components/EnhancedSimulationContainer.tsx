@@ -4,15 +4,13 @@ import { v4 as uuidv4 } from 'uuid'
 import { cn } from '../../lib/utils'
 import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
-import type {
-  Scenario,
+import {
+  FeedbackType,
   ScenarioDifficulty,
   TherapeuticDomain,
-  RealTimeFeedback,
   TherapeuticTechnique,
-  DetectedTechnique,
 } from '../types'
-import { FeedbackType } from '../types'
+import type { Scenario, RealTimeFeedback, DetectedTechnique } from '../types'
 import { checkBrowserCompatibility } from '../utils/privacy'
 import EmpathyMeter from './EmpathyMeter'
 import RealTimeFeedbackPanel from './RealTimeFeedbackPanel'
@@ -70,8 +68,8 @@ export function EnhancedSimulationContainer({
     ? ({
         id: scenarioId,
         title: `Scenario ${scenarioId}`,
-        domain: 'DEPRESSION' as TherapeuticDomain,
-        difficulty: 'BEGINNER' as ScenarioDifficulty,
+        domain: TherapeuticDomain.DEPRESSION,
+        difficulty: ScenarioDifficulty.BEGINNER,
         initialPrompt: 'Welcome to the simulation. How are you feeling today?',
         description: 'Practice scenario for depression treatment',
         techniques: [],
@@ -83,55 +81,33 @@ export function EnhancedSimulationContainer({
     : null
 
   // Real-time analysis
-  const {
-    startAnalysis,
-    stopAnalysis,
-    emotionState,
-    detectedTechniques = [],
-  } = useRealTimeAnalysis()
+  const { startAnalysis, stopAnalysis, emotionState, detectedTechniques } =
+    useRealTimeAnalysis()
 
   // Convert DetectedTechnique[] to TherapeuticTechnique[] for the component
-  const mappedTechniques: TherapeuticTechnique[] = detectedTechniques.map(
-    (technique: DetectedTechnique) => technique.name as TherapeuticTechnique,
-  )
+  const therapeuticTechniqueValues = Object.values(
+    TherapeuticTechnique,
+  ) as readonly string[]
+  const mappedTechniques: TherapeuticTechnique[] = detectedTechniques
+    .map((technique: DetectedTechnique) => technique.name)
+    .filter((name): name is TherapeuticTechnique =>
+      therapeuticTechniqueValues.includes(name),
+    )
 
   // Speech recognition
-  const {
-    isListening,
-    isSupported,
-    interimTranscript,
-    detectedKeywords,
-    error: speechError,
-    stopListening,
-    resetTranscript,
-    toggleListening,
-  } = useSpeechRecognition({
-    domain: scenario?.domain.toLowerCase() || 'general',
-    onFinalResult: (result) => {
-      // Update user response with the final recognized text
-      if (result.text.trim()) {
-        setUserResponse((prev) => `${prev} ${result.text}`.trim())
+  const { isListening, transcript, startListening, stopListening } =
+    useSpeechRecognition()
 
-        // Update technique scores based on detected techniques
-        if (Object.keys(result.detectedTechniques).length > 0) {
-          setTechniqueScores((prev) => ({
-            ...prev,
-            ...result.detectedTechniques,
-          }))
+  // Browser support check for speech recognition
+  const isSupported =
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 
-          // Calculate overall empathy score
-          // This is a simplified calculation - in a real app this would be more sophisticated
-          if (result.detectedTechniques['empathy']) {
-            setEmpathyScore((prev) => Math.min(1, prev + 0.1))
-          } else if (result.detectedTechniques['validation']) {
-            setEmpathyScore((prev) => Math.min(1, prev + 0.05))
-          } else if (result.detectedTechniques['reflection']) {
-            setEmpathyScore((prev) => Math.min(1, prev + 0.05))
-          }
-        }
-      }
-    },
-  })
+  // Toggle listening state
+  const toggleListening = useCallback(() => {
+    if (isListening) stopListening()
+    else startListening()
+  }, [isListening, startListening, stopListening])
 
   // Refs
   const formRef = useRef<HTMLFormElement>(null)
@@ -161,7 +137,7 @@ export function EnhancedSimulationContainer({
       setConversationHistory([
         {
           role: 'system',
-          text: currentScenario.initialPrompt || 'Welcome to the simulation.',
+          text: currentScenario.initialPrompt ?? 'Welcome to the simulation.',
         },
       ])
 
@@ -393,9 +369,9 @@ export function EnhancedSimulationContainer({
             className='flex-1 space-y-4 overflow-y-auto p-4'
             key={conversationKey}
           >
-            {conversationHistory.map((message, index: number) => (
+            {conversationHistory.map((message) => (
               <div
-                key={`message-${index}-${message.role}-${message.text.slice(0, 20)}`}
+                key={`${message.role}-${message.text.slice(0, 20)}-${message.text.length}`}
                 className={cn(
                   'flex p-3 rounded-lg max-w-3/4',
                   message.role === 'user' ? 'bg-blue-50 ml-auto' : 'bg-gray-50',
@@ -405,11 +381,11 @@ export function EnhancedSimulationContainer({
               </div>
             ))}
 
-            {/* Display interim transcript if speech recognition is active */}
-            {isListening && interimTranscript && (
+            {/* Display transcript if speech recognition is active */}
+            {isListening && transcript && (
               <div className='bg-blue-50 max-w-3/4 ml-auto flex rounded-lg p-3 opacity-70'>
                 <div className='text-gray-700 text-sm italic'>
-                  {interimTranscript}...
+                  {transcript}...
                 </div>
               </div>
             )}
@@ -486,16 +462,14 @@ export function EnhancedSimulationContainer({
 
             {/* Therapeutic prompts */}
             <RealTimePrompts
-              detectedKeywords={detectedKeywords}
+              detectedKeywords={[]}
               domain={scenario.domain.toLowerCase()}
               onPromptClick={handlePromptSelect}
             />
 
             <div className='mt-3 flex justify-between'>
               <div className='text-gray-500 text-xs'>
-                {speechError ? (
-                  <span className='text-red-500'>{speechError}</span>
-                ) : isListening ? (
+                {isListening ? (
                   <span className='text-green-500'>Listening...</span>
                 ) : null}
               </div>
@@ -580,9 +554,7 @@ export function EnhancedSimulationContainer({
             <RealTimeFeedbackPanel
               feedback={feedback}
               detectedTechniques={mappedTechniques}
-              emotionInsights={
-                emotionState || { energy: 0.5, valence: 0.5, dominance: 0.5 }
-              }
+              emotionInsights={emotionState}
             />
           </div>
 
@@ -596,13 +568,12 @@ export function EnhancedSimulationContainer({
                     {
                       role: 'system',
                       text:
-                        scenario.initialPrompt || 'Welcome to the simulation.',
+                        scenario.initialPrompt ?? 'Welcome to the simulation.',
                     },
                   ])
                   setUserResponse('')
                   setEmpathyScore(0.5)
                   setTechniqueScores({})
-                  resetTranscript()
                 }}
                 className='bg-gray-200 text-gray-700 hover:bg-gray-300 rounded px-3 py-1.5 text-sm transition-colors'
               >

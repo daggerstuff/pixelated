@@ -8,20 +8,20 @@
 import type { PerformanceSnapshot } from './types'
 
 class PerformanceMonitor {
-  private startTime = Date.now()
+  private readonly startTime = Date.now()
 
   // Granular stats for endpoints/methods
   private requestCount = 0
   private errorCount = 0
   private totalResponseTime = 0
-  private requestDetails: {
+  private readonly requestDetails: {
     endpoint: string
     method: string
     duration: number
     statusCode: number
     timestamp: number
   }[] = []
-  private analysisDetails: {
+  private readonly analysisDetails: {
     duration: number
     biasScore: number
     timestamp: number

@@ -32,13 +32,13 @@ interface PageConfig {
 }
 
 export class UniversalDemoAnalytics {
-  private pageName: DemoPageName
-  private pageConfig: PageConfig
-  private sessionId: string
-  private startTime: number
-  private abTestVariant: string
-  private scrollDepths: Set<number>
-  private sectionViews: Set<string>
+  private readonly pageName: DemoPageName
+  private readonly pageConfig: PageConfig
+  private readonly sessionId: string
+  private readonly startTime: number
+  private readonly abTestVariant: string
+  private readonly scrollDepths: Set<number>
+  private readonly sectionViews: Set<string>
   private eventQueue: AnalyticsEventData[]
   private isInitialized: boolean
 
@@ -130,13 +130,13 @@ export class UniversalDemoAnalytics {
     // Update headline
     const headlineElement = document.getElementById(
       'headline-text',
-    ) as HTMLElement
+    )!
     if (headlineElement && config.headline[variant]) {
       headlineElement.textContent = config.headline[variant]
     }
 
     // Update CTA
-    const ctaElement = document.getElementById('cta-text') as HTMLElement
+    const ctaElement = document.getElementById('cta-text')!
     if (ctaElement && config.cta[variant]) {
       ctaElement.textContent = config.cta[variant]
     }
@@ -144,7 +144,7 @@ export class UniversalDemoAnalytics {
     // Update urgency badge
     const urgencyElement = document.getElementById(
       'urgency-text',
-    ) as HTMLElement
+    )!
     if (urgencyElement && config.urgency[variant]) {
       urgencyElement.textContent = config.urgency[variant]
     }
@@ -238,7 +238,7 @@ export class UniversalDemoAnalytics {
       .forEach((element) => {
         element.addEventListener('click', (e) => {
           const target = e.target as HTMLElement
-          const location = target.getAttribute('data-location') || 'unknown'
+          const location = target.getAttribute('data-location') ?? 'unknown'
           const text = target.textContent?.trim() || 'unknown'
           const href = target.getAttribute('href')
 
@@ -276,7 +276,7 @@ export class UniversalDemoAnalytics {
         void this.trackEvent(ANALYTICS_EVENTS.DEMO_INTERACTION, {
           interaction_type: 'input_focus',
           element_type: target.tagName.toLowerCase(),
-          input_name: target.getAttribute('name') || 'unknown',
+          input_name: target.getAttribute('name') ?? 'unknown',
         })
       }
     })
@@ -406,7 +406,7 @@ export class UniversalDemoAnalytics {
   }
 
   private async sendEvents(events: AnalyticsEventData[]): Promise<void> {
-    const promises = events.map((event) => this.sendSingleEvent(event))
+    const promises = events.map( async (event) => this.sendSingleEvent(event))
     await Promise.allSettled(promises)
   }
 
@@ -488,7 +488,7 @@ export function initializeDemoAnalytics(
   const analytics = new UniversalDemoAnalytics(pageName)
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => analytics.initialize())
+    document.addEventListener('DOMContentLoaded',  async () => analytics.initialize())
   } else {
     void analytics.initialize()
   }
@@ -498,3 +498,4 @@ export function initializeDemoAnalytics(
 
   return analytics
 }
+declare function gtag(...args: any[]): void

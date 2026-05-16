@@ -7,105 +7,108 @@
 
 // Export rate limiting bridge
 export {
-  RateLimitingBridge,
   type RateLimitIntegrationConfig,
+  RateLimitingBridge,
 } from './rate-limiting-bridge'
 
 // Import and export API middleware
 import type { Request } from 'express'
 
 import {
-  ThreatDetectionMiddleware,
-  createThreatDetectionMiddleware,
   type ApiMiddlewareConfig,
+  createThreatDetectionMiddleware,
   type ThreatDetectionContext,
+  ThreatDetectionMiddleware,
 } from './api-middleware'
+
 export {
-  ThreatDetectionMiddleware,
-  createThreatDetectionMiddleware,
   type ApiMiddlewareConfig,
+  createThreatDetectionMiddleware,
   type ThreatDetectionContext,
+  ThreatDetectionMiddleware,
 }
 
 // Import and export main threat detection service
 import {
-  ThreatDetectionService,
   createThreatDetectionService,
   type ThreatDetectionConfig,
+  ThreatDetectionService,
 } from './threat-detection-service'
-export {
-  ThreatDetectionService,
-  createThreatDetectionService,
-  type ThreatDetectionConfig,
-}
 
 // Export utility functions
 export * from './utils'
+export {
+  createThreatDetectionService,
+  type ThreatDetectionConfig,
+  ThreatDetectionService,
+}
 
 // Import and export AI-enhanced monitoring
 import {
   AIEnhancedMonitoringService,
-  type MonitoringConfig,
-  type SecurityMetrics,
   type AIInsight,
   type Alert,
+  type MonitoringConfig,
+  type SecurityMetrics,
 } from '../monitoring/ai-enhanced-monitoring'
+
 export {
   AIEnhancedMonitoringService,
-  type MonitoringConfig,
-  type SecurityMetrics,
   type AIInsight,
   type Alert,
+  type MonitoringConfig,
+  type SecurityMetrics,
 }
 
 // Import and export threat hunting service
 import {
-  ThreatHuntingService,
-  type ThreatHuntingConfig,
-  type HuntingRule,
-  type InvestigationTemplate,
-  type HuntResult,
   type HuntFinding,
+  type HuntingRule,
+  type HuntResult,
   type Investigation,
   type InvestigationFinding,
+  type InvestigationTemplate,
+  type ThreatHuntingConfig,
+  ThreatHuntingService,
 } from '../threat-hunting/threat-hunting-service'
+
 export {
-  ThreatHuntingService,
-  type ThreatHuntingConfig,
-  type HuntingRule,
-  type InvestigationTemplate,
-  type HuntResult,
   type HuntFinding,
+  type HuntingRule,
+  type HuntResult,
   type Investigation,
   type InvestigationFinding,
+  type InvestigationTemplate,
+  type ThreatHuntingConfig,
+  ThreatHuntingService,
 }
 
 // Import and export external threat intelligence
 import {
   ExternalThreatIntelligenceService,
+  type ThreatIntelligence,
   type ThreatIntelligenceConfig,
   type ThreatIntelligenceFeed,
-  type ThreatIntelligence,
   type ThreatIntelligenceQuery,
   type ThreatIntelligenceResult,
 } from './external-threat-intelligence'
-export {
-  ExternalThreatIntelligenceService,
-  type ThreatIntelligenceConfig,
-  type ThreatIntelligenceFeed,
-  type ThreatIntelligence,
-  type ThreatIntelligenceQuery,
-  type ThreatIntelligenceResult,
-}
 
 // Import and re-export types from response orchestration
 export type {
+  RateLimitResult,
+  ResponseAction,
+  ThreatAnalysis,
   ThreatData,
   ThreatResponse,
-  ResponseAction,
-  RateLimitResult,
-  ThreatAnalysis,
 } from '../response-orchestration'
+export {
+  ExternalThreatIntelligenceService,
+  type ThreatIntelligence,
+  type ThreatIntelligenceConfig,
+  type ThreatIntelligenceFeed,
+  type ThreatIntelligenceQuery,
+  type ThreatIntelligenceResult,
+}
 
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
 import { redis } from '../../redis'
@@ -133,9 +136,9 @@ export function createThreatDetectionIntegration(
     bridge: threatDetectionService['rateLimitingBridge'],
 
     // Convenience methods
-    analyzeThreat: (threatData: unknown) =>
+    analyzeThreat:  async (threatData: unknown) =>
       threatDetectionService.analyzeThreat(threatData as ThreatData),
-    checkRequest: (identifier: string, context: unknown) =>
+    checkRequest:  async (identifier: string, context: unknown) =>
       threatDetectionService.checkRequest(
         identifier,
         context as {
@@ -147,8 +150,8 @@ export function createThreatDetectionIntegration(
           headers?: Record<string, string>
         },
       ),
-    getHealthStatus: () => threatDetectionService.getHealthStatus(),
-    getStatistics: () => threatDetectionService.getStatistics(),
+    getHealthStatus:  async () => threatDetectionService.getHealthStatus(),
+    getStatistics:  async () => threatDetectionService.getStatistics(),
   }
 }
 
@@ -260,7 +263,7 @@ export const expressMiddlewareConfig = {
         )
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(', ') : value || '',
+          Array.isArray(value) ? value.join(', ') : value ?? '',
         ]),
     ),
   }),
@@ -407,254 +410,7 @@ export function createExternalThreatIntelligence(
   return new ExternalThreatIntelligenceService(config)
 }
 
-/**
- * Create complete Phase 8 threat detection system
- */
-export function createCompleteThreatDetectionSystem(
-  orchestrator: AdvancedResponseOrchestrator,
-  rateLimiter: DistributedRateLimiter,
-  options?: {
-    threatDetection?: Partial<ThreatDetectionConfig>
-    monitoring?: Partial<MonitoringConfig>
-    hunting?: Partial<ThreatHuntingConfig>
-    intelligence?: Partial<ThreatIntelligenceConfig>
-  },
-) {
-  // Create main threat detection service
-  const threatDetectionService = createThreatDetectionService(
-    orchestrator,
-    rateLimiter,
-    options?.threatDetection,
-  )
-
-  // Create AI-enhanced monitoring
-  const monitoringService = createAIEnhancedMonitoring({
-    enabled: true,
-    aiInsightsEnabled: true,
-    alertThresholds: {
-      critical: 100,
-      high: 50,
-      medium: 20,
-      low: 5,
-    },
-    monitoringIntervals: {
-      realTime: 30000, // 30 seconds
-      batch: 300000, // 5 minutes
-      anomalyDetection: 60000, // 1 minute
-    },
-    notificationChannels: [
-      {
-        name: 'dashboard',
-        type: 'dashboard',
-        enabled: true,
-        priority: 1,
-        config: {},
-      },
-      {
-        name: 'security_team',
-        type: 'email',
-        enabled: true,
-        priority: 3,
-        config: {
-          recipients: ['security@pixelatedempathy.com'],
-        },
-      },
-    ],
-    aiModelConfig: {
-      modelPath: './models/anomaly_detection',
-      confidenceThreshold: 0.7,
-      predictionWindow: 24,
-    },
-    ...options?.monitoring,
-  })
-
-  // Create threat hunting service
-  const huntingService = createThreatHuntingService(
-    redis,
-    orchestrator,
-    monitoringService, // AI service
-    null as any, // Behavioral service (to be implemented)
-    null as any, // Predictive service (to be implemented)
-    {
-      enabled: true,
-      huntingFrequency: 300000, // 5 minutes
-      investigationTimeout: 1800000, // 30 minutes
-      mlModelConfig: {
-        enabled: true,
-        modelPath: './models/threat_hunting',
-        confidenceThreshold: 0.8,
-      },
-      huntingRules: [
-        {
-          ruleId: 'high_threat_volume',
-          name: 'High Threat Volume Detection',
-          description:
-            'Detect unusually high volume of threats in recent period',
-          query: {
-            recentThreats: true,
-            timeWindow: 3600000, // 1 hour
-          },
-          severity: 'high',
-          enabled: true,
-          autoInvestigate: true,
-          investigationPriority: 3,
-        },
-        {
-          ruleId: 'suspicious_ip_patterns',
-          name: 'Suspicious IP Patterns',
-          description: 'Detect patterns in suspicious IP addresses',
-          query: {
-            suspiciousIPs: true,
-            patternAnalysis: true,
-          },
-          severity: 'medium',
-          enabled: true,
-          autoInvestigate: false,
-          investigationPriority: 2,
-        },
-        {
-          ruleId: 'rate_limit_anomalies',
-          name: 'Rate Limiting Anomalies',
-          description: 'Detect unusual rate limiting activity',
-          query: {
-            rateLimitViolations: true,
-            threshold: 20,
-          },
-          severity: 'low',
-          enabled: true,
-          autoInvestigate: false,
-          investigationPriority: 1,
-        },
-      ],
-      investigationTemplates: [
-        {
-          templateId: 'standard_threat_investigation',
-          name: 'Standard Threat Investigation',
-          description:
-            'Comprehensive investigation template for general threats',
-          steps: [
-            {
-              stepId: 'analyze_logs',
-              name: 'Analyze System Logs',
-              description: 'Review system logs for suspicious activity',
-              action: 'analyze_logs',
-              parameters: {
-                timeRange: 3600000, // 1 hour
-                logLevels: ['error', 'warning'],
-              },
-              validationRules: [
-                {
-                  type: 'threshold',
-                  condition: 'error_count',
-                  expectedValue: 10,
-                  operator: 'less_than',
-                },
-              ],
-              timeout: 300000, // 5 minutes
-            },
-            {
-              stepId: 'check_iocs',
-              name: 'Check Indicators of Compromise',
-              description: 'Verify IOCs against threat intelligence',
-              action: 'check_iocs',
-              parameters: {
-                iocTypes: ['ip', 'domain', 'hash'],
-              },
-              validationRules: [],
-              timeout: 180000, // 3 minutes
-            },
-            {
-              stepId: 'analyze_behavior',
-              name: 'Analyze Behavioral Patterns',
-              description: 'Identify anomalous user behavior',
-              action: 'analyze_behavior',
-              parameters: {
-                timeWindow: 86400000, // 24 hours
-              },
-              validationRules: [],
-              timeout: 600000, // 10 minutes
-            },
-            {
-              stepId: 'correlate_data',
-              name: 'Correlate Security Data',
-              description: 'Correlate findings across multiple data sources',
-              action: 'correlate_data',
-              parameters: {
-                dataSources: ['logs', 'metrics', 'threats'],
-              },
-              validationRules: [],
-              timeout: 300000, // 5 minutes
-            },
-            {
-              stepId: 'generate_report',
-              name: 'Generate Investigation Report',
-              description: 'Create comprehensive investigation report',
-              action: 'generate_report',
-              parameters: {
-                includeRecommendations: true,
-                format: 'json',
-              },
-              validationRules: [],
-              timeout: 120000, // 2 minutes
-            },
-          ],
-          requiredData: ['threat_id', 'user_id', 'timestamp'],
-          estimatedDuration: 1800000, // 30 minutes
-        },
-      ],
-    },
-  )
-
-  // Create external threat intelligence service
-  const intelligenceService = createExternalThreatIntelligence({
-    enabled: true,
-    feeds: [
-      {
-        name: 'abuse_ch',
-        type: 'open_source',
-        url: 'https://urlhaus-api.abuse.ch/v1/urls',
-        authType: 'none',
-        rateLimit: {
-          requestsPerMinute: 60,
-          burstLimit: 10,
-        },
-        supportedIOCTypes: ['url', 'domain', 'ip'],
-        updateFrequency: 3600000, // 1 hour
-        enabled: true,
-        priority: 1,
-      },
-      {
-        name: 'alienvault_otx',
-        type: 'community',
-        url: 'https://otx.alienvault.com/api/v1',
-        authType: 'api_key',
-        apiKey: process.env.ALIENVAULT_API_KEY,
-        rateLimit: {
-          requestsPerMinute: 30,
-          burstLimit: 5,
-        },
-        supportedIOCTypes: ['ip', 'domain', 'hash', 'url'],
-        updateFrequency: 7200000, // 2 hours
-        enabled: true,
-        priority: 2,
-      },
-    ],
-    updateInterval: 3600000, // 1 hour
-    cacheTimeout: 86400000, // 24 hours
-    apiKeys: {
-      alienvault: process.env.ALIENVAULT_API_KEY || '',
-      virustotal: process.env.VIRUSTOTAL_API_KEY || '',
-      abuseipdb: process.env.ABUSEIPDB_API_KEY || '',
-    },
-  })
-
-  return {
-    threatDetectionService,
-    monitoringService,
-    huntingService,
-    intelligenceService,
-  }
-}
+export { createCompleteThreatDetectionSystem } from './production-system'
 
 /**
  * Default monitoring configuration
@@ -867,8 +623,8 @@ export const defaultThreatIntelligenceConfig: ThreatIntelligenceConfig = {
   updateInterval: 3600000, // 1 hour
   cacheTimeout: 86400000, // 24 hours
   apiKeys: {
-    alienvault: process.env.ALIENVAULT_API_KEY || '',
-    virustotal: process.env.VIRUSTOTAL_API_KEY || '',
-    abuseipdb: process.env.ABUSEIPDB_API_KEY || '',
+    alienvault: process.env.ALIENVAULT_API_KEY ?? '',
+    virustotal: process.env.VIRUSTOTAL_API_KEY ?? '',
+    abuseipdb: process.env.ABUSEIPDB_API_KEY ?? '',
   },
 }

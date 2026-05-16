@@ -3,6 +3,10 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type {
+  IntegrationPlan,
+  IntegrationPlanList,
+} from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 import { useIntegrationStore } from '@/lib/stores/journal-research'
 
@@ -15,14 +19,14 @@ import {
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  listIntegrationPlans: vi.fn(),
-  getIntegrationPlan: vi.fn(),
-  initiateIntegration: vi.fn(),
+  listIntegrationPlans: vi.fn<() => Promise<IntegrationPlanList>>(),
+  getIntegrationPlan: vi.fn<() => Promise<IntegrationPlan>>(),
+  initiateIntegration: vi.fn<() => Promise<IntegrationPlan>>(),
 }))
 
 // Mock store
 vi.mock('@/lib/stores/journal-research', () => ({
-  useIntegrationStore: vi.fn(),
+  useIntegrationStore: vi.fn<() => unknown>(),
 }))
 
 const mockIntegrationPlan = {
@@ -59,20 +63,36 @@ const createWrapper = () => {
 }
 
 describe('useIntegration hooks', () => {
+  const baseStoreState = {
+    filters: {
+      targetFormats: [],
+      complexityLevels: [],
+      maxEffortHours: null,
+    },
+    selectedPlanId: null,
+    setSelectedPlanId: vi.fn<(id: string | null) => void>(),
+    comparePlanIds: [],
+    toggleComparePlanId: vi.fn<(id: string) => void>(),
+    clearCompare: vi.fn<() => void>(),
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
-    useIntegrationStore.mockReturnValue({
-      filters: {
-        targetFormats: [],
-        complexityLevels: [],
-        maxEffortHours: null,
-      },
-      selectedPlanId: null,
-      setSelectedPlanId: vi.fn(),
-      comparePlanIds: [],
-      toggleComparePlanId: vi.fn(),
-      clearCompare: vi.fn(),
-    })
+    const storeState = {
+      ...baseStoreState,
+      setSelectedPlanId: vi.fn<(id: string | null) => void>(),
+      toggleComparePlanId: vi.fn<(id: string) => void>(),
+      clearCompare: vi.fn<() => void>(),
+    }
+    useIntegrationStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(
+      useIntegrationStore as typeof useIntegrationStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
   })
 
   describe('useIntegrationPlanListQuery', () => {
@@ -103,13 +123,25 @@ describe('useIntegration hooks', () => {
       vi.mocked(api.listIntegrationPlans).mockResolvedValue(
         mockIntegrationPlanList,
       )
-      useIntegrationStore.mockReturnValue({
+      const filteredStoreState = {
+        ...baseStoreState,
         filters: {
           targetFormats: ['jsonl'],
           complexityLevels: ['medium'],
           maxEffortHours: 10,
         },
-      })
+      }
+      useIntegrationStore.mockImplementation(
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
+          typeof selector === 'function'
+            ? selector(filteredStoreState)
+            : filteredStoreState,
+      )
+      ;(
+        useIntegrationStore as typeof useIntegrationStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(
         () => useIntegrationPlanListQuery('session-1'),
@@ -206,11 +238,15 @@ describe('useIntegration hooks', () => {
   describe('useIntegrationInitiateMutation', () => {
     it('initiates integration successfully', async () => {
       vi.mocked(api.initiateIntegration).mockResolvedValue(mockIntegrationPlan)
-      const setSelectedPlanId = vi.fn()
+      const setSelectedPlanId = vi.fn<(id: string) => void>()
 
-      vi.spyOn(useIntegrationStore, 'getState').mockReturnValue({
+      ;(
+        useIntegrationStore as typeof useIntegrationStore & {
+          getState?: () => { setSelectedPlanId: typeof setSelectedPlanId }
+        }
+      ).getState = () => ({
         setSelectedPlanId,
-      } as any)
+      })
 
       const { result } = renderHook(
         () => useIntegrationInitiateMutation('session-1'),
@@ -264,10 +300,10 @@ describe('useIntegration hooks', () => {
     it('returns selection state from store', () => {
       const mockState = {
         selectedPlanId: 'plan-1',
-        setSelectedPlanId: vi.fn(),
+        setSelectedPlanId: vi.fn<(id: string | null) => void>(),
         comparePlanIds: ['plan-1', 'plan-2'],
-        toggleComparePlanId: vi.fn(),
-        clearCompare: vi.fn(),
+        toggleComparePlanId: vi.fn<(id: string) => void>(),
+        clearCompare: vi.fn<() => void>(),
       }
 
       useIntegrationStore.mockReturnValue(mockState)

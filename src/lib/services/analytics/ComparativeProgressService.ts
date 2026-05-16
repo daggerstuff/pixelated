@@ -15,7 +15,7 @@ interface Logger {
  * Provides comparative insights while maintaining privacy and security.
  */
 export class ComparativeProgressService {
-  private logger: Logger
+  private readonly logger: Logger
 
   constructor(logger: Logger) {
     this.logger = logger
@@ -137,7 +137,7 @@ export class ComparativeProgressService {
    * @param params Parameters to identify the cohort and metric
    * @returns Benchmark data or null if not available
    */
-  private async fetchBenchmarkData(
+  protected async fetchBenchmarkData(
     params: ComparativeProgressParams,
   ): Promise<Benchmark | null> {
     // NOTE: This is mock data for development purposes.

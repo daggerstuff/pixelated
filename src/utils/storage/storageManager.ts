@@ -21,8 +21,8 @@ export interface StorageManagerOptions {
 }
 
 class StorageManager {
-  private options: Required<StorageManagerOptions>
-  private memoryStorage = new Map<string, any>()
+  private readonly options: Required<StorageManagerOptions>
+  private readonly memoryStorage = new Map<string, any>()
   private storageQuota: number
 
   constructor(options: StorageManagerOptions = {}) {
@@ -39,14 +39,20 @@ class StorageManager {
   private calculateStorageQuota(): number {
     try {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
-        void navigator.storage.estimate().then((estimate) => {
-          // Use 80% of available quota or default, whichever is smaller
-          const availableQuota = estimate.quota || this.options.maxStorageSize
-          this.storageQuota = Math.min(
-            availableQuota * 0.8,
-            this.options.maxStorageSize,
-          )
-        })
+        void navigator.storage
+          .estimate()
+          .then((estimate) => {
+            // Use 80% of available quota or default, whichever is smaller
+            const availableQuota = estimate.quota ?? this.options.maxStorageSize
+            this.storageQuota = Math.min(
+              availableQuota * 0.8,
+              this.options.maxStorageSize,
+            )
+          })
+          .catch(() => {
+            // Fallback to default quota on rejection
+            this.storageQuota = this.options.maxStorageSize
+          })
       }
     } catch {
       // Fallback to default quota
@@ -61,7 +67,7 @@ class StorageManager {
   private serialize(data: any): string {
     try {
       return JSON.stringify(data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to serialize data:', error)
       return '{}'
     }
@@ -70,7 +76,7 @@ class StorageManager {
   private deserialize(data: string): any {
     try {
       return JSON.parse(data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to deserialize data:', error)
       return null
     }
@@ -157,7 +163,7 @@ class StorageManager {
       }
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to set storage item:', error)
       return false
     }
@@ -197,7 +203,7 @@ class StorageManager {
       }
 
       return storageData.value ?? config.defaultValue
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to get storage item:', error)
       return config.defaultValue
     }
@@ -213,7 +219,7 @@ class StorageManager {
       }
       this.memoryStorage.delete(fullKey)
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to remove storage item:', error)
       return false
     }
@@ -227,7 +233,7 @@ class StorageManager {
         const keysToRemove: string[] = []
         for (let i = 0; i < storage.length; i++) {
           const key = storage.key(i)
-          if (key && key.startsWith(this.options.prefix)) {
+          if (key?.startsWith(this.options.prefix)) {
             keysToRemove.push(key)
           }
         }
@@ -235,7 +241,7 @@ class StorageManager {
       }
       this.memoryStorage.clear()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to clear storage:', error)
       return false
     }
@@ -254,15 +260,15 @@ class StorageManager {
       if (storage) {
         for (let i = 0; i < storage.length; i++) {
           const storageKey = storage.key(i)
-          if (storageKey && storageKey.startsWith(this.options.prefix)) {
-            const value = storage.getItem(storageKey) || ''
+          if (storageKey?.startsWith(this.options.prefix)) {
+            const value = storage.getItem(storageKey) ?? ''
             totalSize += value.length
           }
         }
       }
 
       return totalSize + this.memoryStorage.size
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Failed to calculate storage size:', error)
       return 0
     }

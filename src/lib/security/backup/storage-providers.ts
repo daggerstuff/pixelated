@@ -19,6 +19,16 @@ import { securePathJoin } from '../../utils/server'
 
 const logger = createBuildSafeLogger('backup-storage')
 
+function hasUnsafeControlCharacters(value: string): boolean {
+  for (let i = 0; i < value.length; i += 1) {
+    const charCode = value.charCodeAt(i)
+    if (charCode <= 31 || charCode === 127) {
+      return true
+    }
+  }
+  return false
+}
+
 // Define interfaces for cloud storage clients to avoid 'any' types
 interface S3Client {
   send(command: unknown): Promise<unknown>
@@ -122,7 +132,7 @@ export interface StorageProvider {
  * Stores backups on the local file system
  */
 export class FileSystemStorageProvider implements StorageProvider {
-  private config: {
+  private readonly config: {
     basePath: string
   }
 
@@ -248,7 +258,7 @@ export class FileSystemStorageProvider implements StorageProvider {
  * Stores backups in memory - not persistent between restarts
  */
 export class InMemoryStorageProvider implements StorageProvider {
-  private storage: Map<string, Uint8Array> = new Map()
+  private readonly storage: Map<string, Uint8Array> = new Map()
 
   async initialize(): Promise<void> {
     this.storage.clear()
@@ -289,7 +299,7 @@ export class InMemoryStorageProvider implements StorageProvider {
  * Simulates cloud storage behavior with local files
  */
 export class MockCloudStorageProvider implements StorageProvider {
-  private config: {
+  private readonly config: {
     provider: string
     bucket: string
     basePath: string
@@ -523,7 +533,7 @@ export class MockCloudStorageProvider implements StorageProvider {
  */
 export class AWSS3StorageProvider implements StorageProvider {
   private s3Client: S3Client | null = null
-  private config: {
+  private readonly config: {
     bucket: string
     region: string
     prefix: string
@@ -626,7 +636,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         })
       }
 
-      await (this.s3Client as S3Client).send(
+      await (this.s3Client!).send(
         new PutObjectCommand({
           Bucket: this.config.bucket,
           Key: fullKey,
@@ -667,7 +677,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         })
       }
 
-      const response = await (this.s3Client as S3Client).send(
+      const response = await (this.s3Client!).send(
         new GetObjectCommand({
           Bucket: this.config.bucket,
           Key: fullKey,
@@ -678,8 +688,7 @@ export class AWSS3StorageProvider implements StorageProvider {
       return await new Promise<Uint8Array>((resolve, reject) => {
         const chunks: Uint8Array[] = []
         // The type is handled at runtime - AWS SDK v3 provides proper typed responses
-        const body = (response as { Body: NodeJS.ReadableStream })
-          .Body
+        const body = (response as { Body: NodeJS.ReadableStream }).Body
         body.on('data', (chunk: Uint8Array) => chunks.push(chunk))
         body.on('end', () => resolve(concatUint8Arrays(chunks)))
         body.on('error', reject)
@@ -720,7 +729,7 @@ export class AWSS3StorageProvider implements StorageProvider {
           ContinuationToken: continuationToken,
         })
 
-        const response = await (this.s3Client as S3Client).send(listCommand)
+        const response = await (this.s3Client!).send(listCommand)
         const typedResponse = response as {
           Contents?: Array<{ Key?: string }>
           NextContinuationToken?: string
@@ -774,7 +783,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         })
       }
 
-      await (this.s3Client as S3Client).send(
+      await (this.s3Client!).send(
         new DeleteObjectCommand({
           Bucket: this.config.bucket,
           Key: fullKey,
@@ -814,9 +823,8 @@ export class AWSS3StorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    // eslint-disable-next-line no-control-regex
-    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
-    if (unsafeChars.test(key)) {
+    const hasReservedChars = /[<>:"|?*]/.test(key)
+    if (hasReservedChars || hasUnsafeControlCharacters(key)) {
       throw new Error('Key contains unsafe characters')
     }
 
@@ -836,7 +844,7 @@ export class AWSS3StorageProvider implements StorageProvider {
 export class GoogleCloudStorageProvider implements StorageProvider {
   private storage: GCSStorage | null = null
   private bucket: GCSBucket | null = null
-  private config: {
+  private readonly config: {
     bucketName: string
     prefix: string
     keyFilename?: string
@@ -924,7 +932,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   async storeFile(key: string, data: Uint8Array): Promise<void> {
     try {
       const fullKey = this.getFullKey(key)
-      const file = (this.bucket as GCSBucket).file(fullKey)
+      const file = (this.bucket!).file(fullKey)
 
       await file.save(data, {
         contentType: 'application/octet-stream',
@@ -948,7 +956,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   async getFile(key: string): Promise<Uint8Array> {
     try {
       const fullKey = this.getFullKey(key)
-      const file = (this.bucket as GCSBucket).file(fullKey)
+      const file = (this.bucket!).file(fullKey)
 
       const [contents] = await file.download()
       return new Uint8Array(contents)
@@ -967,7 +975,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         options['prefix'] = this.config.prefix
       }
 
-      const [files] = await (this.bucket as GCSBucket).getFiles(options)
+      const [files] = await (this.bucket!).getFiles(options)
 
       const results: string[] = []
       for (const file of files) {
@@ -998,7 +1006,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   async deleteFile(key: string): Promise<void> {
     try {
       const fullKey = this.getFullKey(key)
-      const file = (this.bucket as GCSBucket).file(fullKey)
+      const file = (this.bucket!).file(fullKey)
 
       await file.delete()
       logger.debug(
@@ -1034,9 +1042,8 @@ export class GoogleCloudStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    // eslint-disable-next-line no-control-regex
-    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
-    if (unsafeChars.test(key)) {
+    const hasReservedChars = /[<>:"|?*]/.test(key)
+    if (hasReservedChars || hasUnsafeControlCharacters(key)) {
       throw new Error('Key contains unsafe characters')
     }
 
@@ -1056,7 +1063,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 export class AzureBlobStorageProvider implements StorageProvider {
   private blobServiceClient: AzureBlobServiceClient | null = null
   private containerClient: AzureContainerClient | null = null
-  private config: {
+  private readonly config: {
     connectionString?: string
     accountName?: string
     accountKey?: string
@@ -1158,7 +1165,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
     try {
       const fullKey = this.getFullKey(key)
       const blockBlobClient = (
-        this.containerClient as AzureContainerClient
+        this.containerClient!
       ).getBlockBlobClient(fullKey)
 
       await blockBlobClient.upload(data, data.length, {
@@ -1185,7 +1192,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
     try {
       const fullKey = this.getFullKey(key)
       const blockBlobClient = (
-        this.containerClient as AzureContainerClient
+        this.containerClient!
       ).getBlockBlobClient(fullKey)
 
       const downloadResponse = await blockBlobClient.download(0)
@@ -1221,7 +1228,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
 
       // List all blobs in the container
       for await (const blob of (
-        this.containerClient as AzureContainerClient
+        this.containerClient!
       ).listBlobsFlat(options)) {
         // Remove the prefix to get the relative path
         const key = blob.name
@@ -1251,7 +1258,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
     try {
       const fullKey = this.getFullKey(key)
       const blockBlobClient = (
-        this.containerClient as AzureContainerClient
+        this.containerClient!
       ).getBlockBlobClient(fullKey)
 
       await blockBlobClient.delete()
@@ -1288,9 +1295,8 @@ export class AzureBlobStorageProvider implements StorageProvider {
     }
 
     // Reject keys with unsafe characters
-    // eslint-disable-next-line no-control-regex
-    const unsafeChars = /[<>:"|?*\u0000-\u001f]/
-    if (unsafeChars.test(key)) {
+    const hasReservedChars = /[<>:"|?*]/.test(key)
+    if (hasReservedChars || hasUnsafeControlCharacters(key)) {
       throw new Error('Key contains unsafe characters')
     }
 

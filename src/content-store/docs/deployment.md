@@ -1,11 +1,12 @@
 ---
-title: 'Deployment Guide'
-description: 'Deployment Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Deployment Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Deployment Guide
 ---
 
 # Deployment Guide
@@ -235,17 +236,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: '22'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6.0.6
         with:
-          version: 10
+          version: 11.1.1
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
