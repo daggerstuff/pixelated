@@ -124,9 +124,9 @@ class ExportError extends Error {
 export class ExportService {
   private static instance: ExportService
 
-  private fheService: FHEServiceInterface
+  private readonly fheService: FHEServiceInterface
   private initialized = false
-  private options: ExportOptions
+  private readonly options: ExportOptions
 
   /**
    * Private constructor to enforce singleton pattern
@@ -309,7 +309,7 @@ export class ExportService {
           return JSON.stringify(jwe, null, 2)
         } catch (err: unknown) {
           throw new Error(
-            `Encryption failed: ${err instanceof Error ? (err)?.message || String(err) : String(err)}`,
+            `Encryption failed: ${err instanceof Error ? err?.message || String(err) : String(err)}`,
             { cause: err },
           )
         }

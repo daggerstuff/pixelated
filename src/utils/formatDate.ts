@@ -54,7 +54,7 @@ export function formatDate(
       formatOptions.second = options.second
     }
 
-    return date.toLocaleDateString(options.locale || 'en-US', formatOptions)
+    return date.toLocaleDateString(options.locale ?? 'en-US', formatOptions)
   } catch (error: unknown) {
     throw new Error(
       `Failed to format date: ${error instanceof Error ? String(error) : 'Unknown error'}`,
@@ -129,8 +129,25 @@ function formatCustomDate(date: Date, formatString: string): string {
  */
 export function isValidDate(dateString: string): boolean {
   try {
+    if (typeof dateString !== 'string' || !dateString.trim()) return false
+
+    // Check if the overall format is parsable by native Date
     const date = new Date(dateString)
-    return !isNaN(date.getTime())
+    if (isNaN(date.getTime())) return false
+
+    // strictly validate calendar dates to prevent JavaScript Date rollover
+    const isoMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
+    if (isoMatch) {
+      const year = parseInt(isoMatch[1], 10)
+      const month = parseInt(isoMatch[2], 10)
+      const day = parseInt(isoMatch[3], 10)
+
+      if (month < 1 || month > 12) return false
+      const daysInMonth = new Date(year, month, 0).getDate()
+      if (day < 1 || day > daysInMonth) return false
+    }
+
+    return true
   } catch {
     return false
   }
@@ -175,6 +192,7 @@ export function getStartOf(
  * @returns The formatted duration string
  */
 export function formatDuration(ms: number): string {
+  if (ms < 0) return '0s'
   const seconds = Math.floor(ms / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)

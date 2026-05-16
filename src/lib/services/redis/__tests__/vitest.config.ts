@@ -7,14 +7,10 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['**/*.test.ts', '**/*.perf.test.ts', '**/*.integration.test.ts'],
-    setupFiles: ['./vitest.setup.ts'],
-    globalSetup: './vitest.global.setup.ts',
+    setupFiles: ['../../../../src/test/setup-node.ts'],
     testTimeout: 30000,
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
+    maxWorkers: 1,
+    isolate: false,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
@@ -29,7 +25,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../../../'),
+      '@': path.resolve(__dirname, '../../../../src'),
     },
   },
 })

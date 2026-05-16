@@ -4,20 +4,20 @@ permissions:
   contents: read
   packages: write
 
-env:
-  FORCE_JS_TO_NODE24: true
-
 on:
   push:
-    branches: [main, staging]
+    branches: [main, master, staging]
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
     runs-on: ubuntu-24.04
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: '--max-old-space-size=4096'
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -26,23 +26,48 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6.0.6
         with:
-          version: 10.33.0
+          version: 11.1.1
 
       - name: Use Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
-          node-version: "24"
-          cache: "pnpm"
+          node-version: 24.14.1
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: |
+          echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          npm install -g node-gyp
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.0.0
+        with:
+          driver: docker-container
 
       - name: Build (with Sentry envs if provided)
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
           PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
+          SENTRY_PUBLIC_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
           SENTRY_RELEASE: ${{ github.sha }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
@@ -50,7 +75,7 @@ jobs:
           pnpm build
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4.0.0
+        uses: docker/login-action@v4.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -66,17 +91,18 @@ jobs:
         run: |
           curl -sL https://sentry.io/get-cli/ | bash
           sentry-cli --version
-          sentry-cli releases new ${SENTRY_RELEASE}
-          sentry-cli sourcemaps upload ./dist --rewrite --strip-prefix ./ --strip-common-prefix --release ${SENTRY_RELEASE}
-          sentry-cli releases finalize ${SENTRY_RELEASE}
+          sentry-cli releases new "${SENTRY_RELEASE}"
+          sentry-cli sourcemaps upload ./dist --rewrite --strip-prefix ./ --strip-common-prefix --release "${SENTRY_RELEASE}"
+          sentry-cli releases finalize "${SENTRY_RELEASE}"
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v7.0.0
+        uses: docker/build-push-action@v7.1.0
         with:
           context: .
           file: ./Dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+          tags:
+            ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false

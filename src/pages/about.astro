@@ -1,14 +1,13 @@
 ---
-import PageHeader from '@/components/ui/PageHeader.astro'
-import Surface from '@/components/ui/Surface.astro'
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   'name': 'Pixelated Empathy',
   'url': 'https://pixelatedempathy.com',
-  'logo': 'https://pixelatedempathy.com/android-chrome-192x192.png',
+  'logo': 'https://pixelatedempathy.com/favicon.svg',
   'description': 'AI-powered training platform for mental health professionals',
   'foundingDate': '2025',
   'address': {
@@ -21,114 +20,160 @@ const organizationSchema = {
     'contactType': 'Customer Service',
   },
 }
+const principles = [
+  'Keep the case, transcript, and coaching lane attached to the same run.',
+  'Make difficult sessions repeatable enough for teams to compare judgment.',
+  'Treat privacy, retention, and review controls as product design decisions.',
+]
+const shifts = [
+  {
+    label: 'Before',
+    quote:
+      'Supervision depends on memory, side notes, and whoever was in the room.',
+  },
+  {
+    label: 'After',
+    quote:
+      'Supervisors can point at the exact intervention, miss, or repair that should change next.',
+  },
+]
 ---
 
-<BaseLayout title="About Us - Pixelated Empathy">
+<BaseLayout
+  title="About Pixelated Empathy"
+  description="Why Pixelated Empathy exists and how it helps therapist training teams run clearer, more specific supervision."
+  fullWidthMain
+>
   <script
+    is:inline
     type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema)}
+    set:html={JSON.stringify(organizationSchema)
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')}
   />
-  <section class="brutalist-section pt-20 md:pt-24 pb-16">
-    <div class="brutalist-container">
-      <PageHeader
-        eyebrow="About"
-        title="About Pixelated Empathy"
-        lede="We build safe AI simulation for therapists to practice the hardest sessions before they happen in real life."
-      />
-
-      <div class="divider my-12"></div>
-
-      <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-        <Surface class="p-6">
-          <h2 class="text-2xl md:text-3xl font-semibold text-white">
-            What we built
+  <MarketingPageHero
+    eyebrow="About"
+    title="We built Pixelated Empathy to make supervision more specific."
+    lede="Therapist training teams do not need more abstract AI. They need a realistic case, a saved record, and a better way to coach the moment that changed the room."
+    note="Founder-led since 2025"
+    trustLine={[
+      'Built in the United States',
+      'Designed for sensitive workflows',
+      'Focused on training and supervision',
+    ]}
+    primaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    secondaryCTA={{ text: 'Plan a pilot review', href: '/contact' }}
+    stats={[
+      {
+        label: 'Built for',
+        value: 'Clinical training teams',
+        detail: 'Supervisors, educators, and cohort-based programs',
+      },
+      {
+        label: 'Core outcome',
+        value: 'Sharper coaching',
+        detail: 'Point to the exact turn that should change next',
+      },
+      {
+        label: 'Workflow',
+        value: 'One hard case',
+        detail: 'Run, review, compare, and retry from the same record',
+      },
+    ]}
+  />
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2">
+        <article class="marketing-card">
+          <span class="marketing-card__label">Why this exists</span>
+          <h2 class="marketing-title marketing-title--medium">
+            Training breaks when the useful moment disappears.
           </h2>
-          <p class="mt-4 text-gray-300 leading-relaxed">
-            An enterprise‑grade training simulator that lets programs run
-            unlimited high‑stakes role‑plays with adversarial AI clients,
-            real‑time bias cues, and post‑session coaching. Practice escalations
-            safely. Build measurable competence. Reduce risk.
+          <p>
+            Roleplay often ends with a strong feeling that something mattered,
+            but without a reliable way to revisit the exact exchange that caused
+            it. That turns supervision into interpretation instead of coaching.
           </p>
-        </Surface>
-        <Surface class="p-6">
-          <h2 class="text-2xl md:text-3xl font-semibold text-white">
-            Why it matters
+        </article>
+        <article class="marketing-card marketing-card--accent">
+          <span class="marketing-card__label">What changes</span>
+          <h2 class="marketing-title marketing-title--medium">
+            The case stays reviewable long enough to teach from.
           </h2>
-          <p class="mt-4 text-gray-300 leading-relaxed">
-            Students see a handful of curated cases. Real practice isn’t
-            curated. We give universities, clinics, and practitioners a way to
-            train for the edge‑cases that actually break sessions—without
-            putting patients at risk.
+          <p>
+            Pixelated Empathy keeps the conversation believable, preserves the
+            record, and makes it easier for a supervisor to coach one concrete
+            next move instead of offering broad impressions.
           </p>
-        </Surface>
-      </div>
-
-      <div class="divider my-12"></div>
-
-      <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <div class="brutalist-caption mb-2 text-teal-400">Founded</div>
-          <p class="text-white font-medium">2025</p>
-          <p class="text-gray-400 text-sm mt-1">
-            Built deliberately, production‑ready
-          </p>
-        </div>
-        <div>
-          <div class="brutalist-caption mb-2 text-teal-400">Location</div>
-          <p class="text-white font-medium">United States</p>
-          <p class="text-gray-400 text-sm mt-1">Serving clients globally</p>
-        </div>
-        <div>
-          <div class="brutalist-caption mb-2 text-teal-400">Who we serve</div>
-          <p class="text-white font-medium">
-            Universities, clinics, practitioners
-          </p>
-          <p class="text-gray-400 text-sm mt-1">Competency you can measure</p>
-        </div>
-      </div>
-
-      <div class="divider my-12"></div>
-
-      <div class="mt-16">
-        <Surface class="p-6">
-          <h2 class="text-2xl md:text-3xl font-semibold text-white mb-4">
-            Company Information
-          </h2>
-          <div class="grid md:grid-cols-2 gap-6 mt-4">
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Legal Entity</div>
-              <div class="text-white font-medium">Pixelated Empathy</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Founded</div>
-              <div class="text-white font-medium">2025</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Location</div>
-              <div class="text-white font-medium">United States</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500 mb-1">Status</div>
-              <div class="text-white font-medium">Early-stage startup</div>
-            </div>
-          </div>
-          <p class="mt-6 text-gray-400">
-            Learn more about our team and mission on our
-            <a href="/team" class="text-teal-400 hover:text-teal-300"
-              >team page</a
-            >.
-          </p>
-        </Surface>
-      </div>
-
-      <div class="mt-16 text-center">
-        <a
-          href="/contact"
-          class="brutalist-button brutalist-button--primary px-8 py-4 font-semibold"
-        >
-          Partner with us
-        </a>
+        </article>
       </div>
     </div>
   </section>
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-proof-band">
+        <div>
+          <span class="marketing-eyebrow">What we optimize for</span>
+          <h2 class="marketing-title marketing-title--medium">
+            A coaching workflow that survives past the session.
+          </h2>
+          <p class="marketing-section-copy">
+            The product decisions are guided by whether a team can learn faster
+            from one difficult case, not by whether the interface sounds
+            impressive.
+          </p>
+        </div>
+        <div class="marketing-proof-band__items">
+          {
+            principles.map((item, index) => (
+              <div class="marketing-proof-item">
+                <span>Principle {String(index + 1).padStart(2, '0')}</span>
+                <strong>{item}</strong>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-section-header">
+        <span class="marketing-eyebrow"
+          >What better supervision sounds like</span
+        >
+        <h2 class="marketing-title marketing-title--medium">
+          The difference is whether the team can name the moment.
+        </h2>
+      </div>
+      <div class="marketing-quote-grid">
+        {
+          shifts.map((item) => (
+            <article
+              class:list={[
+                'marketing-quote-card',
+                item.label === 'After' && 'marketing-card--accent',
+              ]}
+            >
+              <span class="marketing-quote-label">{item.label}</span>
+              <blockquote>{item.quote}</blockquote>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+  <MarketingCTA
+    eyebrow="Start with one case"
+    title="If the review gets more specific, the product is doing its job."
+    body="You do not need a massive rollout to evaluate Pixelated Empathy. Bring one difficult session, look at the transcript together, and decide whether the coaching got sharper."
+    checklist={[
+      'A case your team already finds hard to coach',
+      'One supervisor or educator who can judge the review quality',
+      'A willingness to stop if the workflow does not make feedback clearer',
+    ]}
+    primaryCTA={{ text: 'Plan a pilot review', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    note="Use one case to judge the workflow, not a sales deck."
+  />
 </BaseLayout>

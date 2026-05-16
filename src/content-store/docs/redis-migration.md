@@ -1,12 +1,15 @@
 ---
-title: 'Redis Migration'
-description: 'Guide for migrating Redis data and configurations'
-pubDate: 2025-03-25
+description: Guide for migrating Redis data and configurations
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['redis', 'migration', 'data-transfer']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - redis
+  - migration
+  - data-transfer
+author: Pixelated Team
+title: .env
 ---
 
 ## Redis Migration Guide
@@ -29,7 +32,7 @@ maintaining system stability.
 2. Configure Environment Variables
 
    ```bash
-   # .env
+# .env
    REDIS_URL=redis://localhost:6379
    REDIS_KEY_PREFIX="gradiant:"
    REDIS_MAX_RETRIES=3

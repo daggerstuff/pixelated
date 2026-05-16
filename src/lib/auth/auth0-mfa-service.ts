@@ -5,13 +5,50 @@
 
 import { ManagementClient, AuthenticationClient } from 'auth0'
 
+type GuardianEnrollment = {
+  id: string
+  type: string
+  name?: string
+  enrolled_at?: string
+  last_used_at?: string
+  status?: MFAFactorStatus
+}
+
+type GuardianFactor = {
+  name: string
+  type?: string
+  enabled: boolean
+}
+
+type EnrollmentTicketResponse = {
+  ticket_id: string
+}
+
+// Type alias for auth0 v5+ compatibility
+export type ManagementClientOptionsWithClientCredentials = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience?: string
+}
+
+type ExtendedAuthenticationClient = AuthenticationClient
+
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 // Initialize Auth0 clients
-let auth0Authentication: AuthenticationClient | null = null
-let auth0Management: ManagementClient | null = null
+type ExtendedManagementClient = ManagementClient & {
+  users: ManagementClient['users'] & {
+    getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
+  }
+}
+
+let auth0Authentication: ExtendedAuthenticationClient | null = null
+let auth0Management: ExtendedManagementClient | null = null
 
 /**
  * Initialize Auth0 clients
@@ -22,17 +59,17 @@ function initializeAuth0Clients() {
     !auth0Config.clientId ||
     !auth0Config.clientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Authentication) {
-    auth0Authentication = new AuthenticationClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret,
-    })
-  }
+  auth0Authentication ??= new AuthenticationClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.clientId,
+    clientSecret: auth0Config.clientSecret,
+  })
 
   if (
     !auth0Management &&
@@ -44,9 +81,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:users update:users create:users read:guardian_factors update:guardian_factors',
-    })
+    }) as ExtendedManagementClient
   }
 }
 
@@ -76,11 +111,70 @@ export interface MFAChallenge {
   oobCode?: string
 }
 
+type MFAFactorStatus = 'enabled' | 'disabled' | 'pending'
+
+type UnknownRecord = Record<string, unknown>
+
 export interface MFAVerification {
   challengeType: string
   oobCode?: string
   bindingCode?: string
   authenticatorCode?: string
+}
+
+type SupportedFactorType = Extract<
+  MFAFactor['factorType'],
+  'otp' | 'sms' | 'webauthn-roaming' | 'webauthn-platform'
+>
+
+function isGuardianEnrollment(value: unknown): value is GuardianEnrollment {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.type === 'string'
+  )
+}
+
+function isGuardianFactor(value: unknown): value is GuardianFactor {
+  return (
+    isRecord(value) &&
+    typeof value.name === 'string' &&
+    typeof value.enabled === 'boolean'
+  )
+}
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null
+}
+
+function parseGuardianEnrollments(value: unknown): GuardianEnrollment[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.filter(isGuardianEnrollment)
+}
+
+function parseGuardianFactors(value: unknown): GuardianFactor[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.filter(isGuardianFactor)
+}
+
+function parseEnrollmentTicket(
+  value: unknown,
+): EnrollmentTicketResponse | undefined {
+  if (!isRecord(value)) {
+    return undefined
+  }
+
+  if (typeof value.ticket_id === 'string') {
+    return { ticket_id: value.ticket_id }
+  }
+
+  return undefined
 }
 
 /**
@@ -90,7 +184,9 @@ export interface MFAVerification {
 export class Auth0MFAService {
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
   }
 
@@ -103,30 +199,31 @@ export class Auth0MFAService {
     }
 
     try {
-      // Get user's enrolled factors
-      const enrolledFactors = await auth0Management.getGuardianEnrollments({
-        id: userId,
-      })
+      const enrolledFactors = parseGuardianEnrollments(
+        await this.getGuardianEnrollmentsForUser(userId),
+      )
 
       // Get all available factors
-      const availableFactors = await auth0Management.getGuardianFactors()
+      const availableFactors = parseGuardianFactors(
+        await auth0Management.getGuardianFactors(),
+      )
 
       // Filter out already enrolled factors
       const enrolledFactorTypes = enrolledFactors.map(
-        (factor: any) => factor.type,
+        (factor: GuardianEnrollment) => factor.type,
       )
       const availableFactorTypes = availableFactors
         .filter(
-          (factor: any) =>
+          (factor: GuardianFactor) =>
             factor.enabled && !enrolledFactorTypes.includes(factor.name),
         )
-        .map((factor: any) => factor.name)
+        .map((factor: GuardianFactor) => factor.name)
 
       return availableFactorTypes
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get available MFA factors:', error)
       throw new Error(
-        `Failed to get available MFA factors: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to get available MFA factors: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -148,11 +245,15 @@ export class Auth0MFAService {
       switch (factor.factorType) {
         case 'otp':
           // For OTP, we generate a QR code for authenticator apps
-          const otpEnrollment =
+          const otpEnrollment = parseEnrollmentTicket(
             await auth0Management.createGuardianEnrollmentTicket({
               user_id: userId,
               send_mail: false,
-            })
+            }),
+          )
+          if (!otpEnrollment?.ticket_id) {
+            throw new Error('Unable to initialize OTP enrollment ticket')
+          }
 
           challenge = {
             challengeType: 'otp',
@@ -184,15 +285,10 @@ export class Auth0MFAService {
             oobCode: `webauthn-${userId}`, // Placeholder - actual implementation would get this from Auth0
           }
           break
-
-        default:
-          throw new Error(
-            `Unsupported factor type: ${(factor as any).factorType}`,
-          )
       }
 
       // Log enrollment start event
-      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, {
+      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, null, {
         userId: userId,
         factorType: factor.factorType,
         timestamp: new Date().toISOString(),
@@ -205,10 +301,10 @@ export class Auth0MFAService {
       )
 
       return challenge
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to start MFA enrollment:', error)
       throw new Error(
-        `Failed to start MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to start MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -230,13 +326,13 @@ export class Auth0MFAService {
 
       const enrolledFactor: MFAFactor = {
         id: `factor-${Date.now()}`,
-        factorType: verification.challengeType as any,
+        factorType: this.resolveFactorType(verification.challengeType),
         enrolledAt: new Date().toISOString(),
         status: 'enabled',
       }
 
       // Log enrollment completion event
-      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, {
+      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, null, {
         userId: userId,
         factorType: verification.challengeType,
         factorId: enrolledFactor.id,
@@ -250,10 +346,10 @@ export class Auth0MFAService {
       )
 
       return enrolledFactor
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to complete MFA enrollment:', error)
       throw new Error(
-        `Failed to complete MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to complete MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -267,21 +363,25 @@ export class Auth0MFAService {
     }
 
     try {
-      const enrollments = await auth0Management.getGuardianEnrollments({
-        id: userId,
-      })
+      const enrollments = parseGuardianEnrollments(
+        await this.getGuardianEnrollmentsForUser(userId),
+      )
 
-      const factors: MFAFactor[] = enrollments.map((enrollment: any) => ({
-        id: enrollment.id,
-        factorType: enrollment.type,
-        friendlyName: enrollment.name,
-        enrolledAt: enrollment.enrolled_at,
-        lastUsedAt: enrollment.last_used_at,
-        status: enrollment.status || 'enabled',
-      }))
+      const factors: MFAFactor[] = enrollments
+        .filter((enrollment: GuardianEnrollment) =>
+          this.isSupportedFactorType(enrollment.type),
+        )
+        .map((enrollment: GuardianEnrollment) => ({
+          id: enrollment.id,
+          factorType: this.resolveFactorType(enrollment.type),
+          friendlyName: enrollment.name,
+          enrolledAt: enrollment.enrolled_at ?? new Date(0).toISOString(),
+          lastUsedAt: enrollment.last_used_at,
+          status: this.normalizeFactorStatus(enrollment.status),
+        }))
 
       return factors
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user MFA factors:', error)
       return []
     }
@@ -299,7 +399,7 @@ export class Auth0MFAService {
       await auth0Management.deleteGuardianEnrollment({ id: factorId })
 
       // Log factor deletion event
-      logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {
+      logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, null, {
         userId: userId,
         factorId: factorId,
         timestamp: new Date().toISOString(),
@@ -310,13 +410,13 @@ export class Auth0MFAService {
         userId,
         `mfa_factor_deleted_${factorId}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         `Failed to delete MFA factor ${factorId} for user ${userId}:`,
         error,
       )
       throw new Error(
-        `Failed to delete MFA factor: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to delete MFA factor: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -343,7 +443,7 @@ export class Auth0MFAService {
       }
 
       // Log challenge event
-      logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, {
+      logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, null, {
         userId: userId,
         factorType: factorType,
         challengeId: challenge.oobCode,
@@ -357,10 +457,10 @@ export class Auth0MFAService {
       )
 
       return challenge
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to challenge user for MFA:', error)
       throw new Error(
-        `Failed to challenge user for MFA: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to challenge user for MFA: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -381,7 +481,7 @@ export class Auth0MFAService {
       // For now, we'll simulate successful verification
 
       // Log verification event
-      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, {
+      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, null, {
         userId: userId,
         challengeType: verification.challengeType,
         success: true,
@@ -395,14 +495,19 @@ export class Auth0MFAService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to verify MFA challenge:', error)
 
       // Log failed verification event
-      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, {
+      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, null, {
         userId: userId,
         challengeType: verification.challengeType,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
@@ -435,7 +540,7 @@ export class Auth0MFAService {
   ): Promise<void> {
     // In a real implementation, this would update the user's preferred factor in Auth0
     // For now, we'll just log the event
-    logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, {
+    logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, null, {
       userId: userId,
       factorId: factorId,
       timestamp: new Date().toISOString(),
@@ -446,6 +551,48 @@ export class Auth0MFAService {
       userId,
       `mfa_preferred_factor_set_${factorId}`,
     )
+  }
+
+  private resolveFactorType(value: string): SupportedFactorType {
+    switch (value) {
+      case 'otp':
+      case 'sms':
+      case 'webauthn-roaming':
+      case 'webauthn-platform':
+        return value
+      default:
+        throw new Error(`Unsupported factor type: ${value}`)
+    }
+  }
+
+  private isSupportedFactorType(value: string): value is SupportedFactorType {
+    return (
+      value === 'otp' ||
+      value === 'sms' ||
+      value === 'webauthn-roaming' ||
+      value === 'webauthn-platform'
+    )
+  }
+
+  private async getGuardianEnrollmentsForUser(
+    userId: string,
+  ): Promise<unknown> {
+    if (!auth0Management) {
+      throw new Error('Auth0 management client not initialized')
+    }
+
+    const getGuardianEnrollments = auth0Management.users
+      .getGuardianEnrollments as (params: { id: string }) => Promise<unknown>
+
+    return await getGuardianEnrollments({ id: userId })
+  }
+
+  private normalizeFactorStatus(value: unknown): MFAFactorStatus {
+    if (value === 'enabled' || value === 'disabled' || value === 'pending') {
+      return value
+    }
+
+    return 'enabled'
   }
 }
 

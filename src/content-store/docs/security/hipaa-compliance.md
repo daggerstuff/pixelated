@@ -1,11 +1,12 @@
 ---
-title: 'HIPAA Security Compliance Guide'
-description: 'HIPAA Security Compliance Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: HIPAA Security Compliance Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: HIPAA Security Compliance Guide
 ---
 
 # HIPAA Security Compliance Guide

@@ -26,7 +26,7 @@ function getEnvSource(): EnvSource {
 export function getEnv(key: string, defaultValue?: string): string | undefined {
   const source = getEnvSource()
   const val = source[key]
-  if (val !== undefined && val !== null && val !== '') {
+  if (val !== undefined && val !== '') {
     return val
   }
   if (defaultValue !== undefined) {
@@ -45,7 +45,7 @@ export function isEnvTrue(key: string): boolean {
   if (!val) {
     return false
   }
-  const normalized = val.toString().trim().toLowerCase()
+  const normalized = val.trim().toLowerCase()
   return ['1', 'true', 'yes', 'on'].includes(normalized)
 }
 
@@ -55,7 +55,10 @@ export function isEnvTrue(key: string): boolean {
 export const env = new Proxy(
   {},
   {
-    get(_target, prop: string): void {
+    get(_target, prop: string | symbol): string {
+      if (typeof prop === 'symbol') {
+        return ''
+      }
       return getEnv(prop) ?? ''
     },
   },

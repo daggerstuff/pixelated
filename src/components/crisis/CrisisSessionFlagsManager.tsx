@@ -45,12 +45,12 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
       }
 
       const data = await response.json()
-      setFlags(data.flags || [])
-      setUserStatus(data.status || null)
+      setFlags(data.flags ?? [])
+      setUserStatus(data.status ?? null)
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'Failed to load crisis flags',
       )
     } finally {
@@ -100,7 +100,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err)?.message || String(err)
+          ? err?.message || String(err)
           : 'Failed to update flag',
       )
     } finally {
@@ -339,7 +339,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                     ].map((status) => (
                       <button
                         key={status}
-                        onClick={() =>
+                        onClick={ async () =>
                           updateFlagStatus(selectedFlag.id, status)
                         }
                         disabled={updating === selectedFlag.id}

@@ -61,7 +61,7 @@ export const post = async ({ request }) => {
     const forecasts = recommend({
       context,
       desiredOutcomes,
-      maxResults: maxResults || 5,
+      maxResults: maxResults ?? 5,
     })
 
     // Structure response

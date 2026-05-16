@@ -131,7 +131,7 @@ export function validateBiasDetectionConfig(config: any): void {
   if (!config || typeof config !== 'object') {
     throw new Error('Invalid bias detection configuration')
   }
-  const t = config.thresholds || {}
+  const t = config.thresholds ?? {}
   if (
     !(t.warningLevel ?? t.warning) ||
     !(t.highLevel ?? t.high) ||
@@ -145,7 +145,7 @@ export function validateBiasDetectionConfig(config: any): void {
   if (!(warning < high && high < critical)) {
     throw new Error('Invalid bias detection configuration')
   }
-  const w = config.layerWeights || {}
+  const w = config.layerWeights ?? {}
   const sum = ['preprocessing', 'modelLevel', 'interactive', 'evaluation']
     .map((k) => Number(w[k] ?? 0))
     .reduce((a, b) => a + b, 0)
@@ -267,7 +267,7 @@ export function calculateOverallBiasScore(
     const clamped = Math.min(1, Math.max(0, raw))
     return sum + (weights?.[k] ?? 0) * clamped
   }, 0)
-  return Number(score)
+  return score
 }
 
 export function calculateConfidenceScore(
@@ -407,7 +407,7 @@ export function handleBiasDetectionError(
 ): { shouldRetry: boolean; alertLevel: AlertLevel } {
   if (isBiasDetectionError(error)) {
     return {
-      shouldRetry: !!error.retryable,
+      shouldRetry: error.retryable,
       alertLevel: 'medium' as AlertLevel,
     }
   }
@@ -430,7 +430,7 @@ export function transformSessionForPython(session: TherapeuticSession): any {
     },
     scenario: session.scenario,
     content: session.content,
-    ai_responses: session.aiResponses.map((r) => ({
+    ai_responses: (session.aiResponses ?? []).map((r) => ({
       response_id: r.responseId,
       timestamp: r.timestamp.toISOString(),
       type: r.type,
@@ -439,7 +439,7 @@ export function transformSessionForPython(session: TherapeuticSession): any {
       model_used: r.modelUsed,
     })),
     expected_outcomes: session.expectedOutcomes,
-    transcripts: session.transcripts.map((t) => ({
+    transcripts: (session.transcripts ?? []).map((t) => ({
       speaker_id: t.speakerId,
       timestamp: t.timestamp.toISOString(),
       content: t.content,

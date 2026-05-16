@@ -1,11 +1,12 @@
 ---
-title: 'Plugin Development Best Practices'
-description: 'Plugin Development Best Practices documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Plugin Development Best Practices documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Plugin Development Best Practices
 ---
 
 # Plugin Development Best Practices

@@ -1,11 +1,12 @@
 ---
-title: 'NLP Features in Behavioral Analysis'
-description: 'NLP Features in Behavioral Analysis documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: NLP Features in Behavioral Analysis documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: NLP Features in Behavioral Analysis
 ---
 
 # NLP Features in Behavioral Analysis

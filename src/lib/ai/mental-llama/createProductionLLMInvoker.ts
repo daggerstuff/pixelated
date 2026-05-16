@@ -129,6 +129,11 @@ export async function createProductionLLMInvoker(
           ? 'Model provider temporarily unavailable, using fallback'
           : 'No model provider configured, using stub response'
         break
+      case LLMInvokerErrorType.INVALID_RESPONSE: { throw new Error('Not implemented yet: LLMInvokerErrorType.INVALID_RESPONSE case') }
+      case LLMInvokerErrorType.PARSING_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.PARSING_ERROR case') }
+      case LLMInvokerErrorType.NETWORK_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.NETWORK_ERROR case') }
+      case LLMInvokerErrorType.VALIDATION_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.VALIDATION_ERROR case') }
+      case LLMInvokerErrorType.UNKNOWN_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.UNKNOWN_ERROR case') }
       default:
         // Keep base response
         break
@@ -178,7 +183,14 @@ export async function createProductionLLMInvoker(
     }
 
     // Rate limiting is retryable with backoff
-    if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+    if (
+      errorMessage.includes('rate limit') ||
+      errorMessage.includes('monthly_request_count') ||
+      errorMessage.includes('limit reached') ||
+      errorMessage.includes('quota') ||
+      errorMessage.includes('402') ||
+      errorMessage.includes('429')
+    ) {
       return true
     }
 
@@ -194,7 +206,18 @@ export async function createProductionLLMInvoker(
 
     // Client errors (4xx except rate limiting) are generally not retryable
     if (
-      errorMessage.includes('400') ||
+      errorMessage.includes('400') &&
+      !(
+        errorMessage.includes('rate limit') ||
+        errorMessage.includes('monthly_request_count') ||
+        errorMessage.includes('limit reached') ||
+        errorMessage.includes('quota')
+      )
+    ) {
+      return false
+    }
+
+    if (
       errorMessage.includes('401') ||
       errorMessage.includes('403') ||
       errorMessage.includes('404')
@@ -225,7 +248,14 @@ export async function createProductionLLMInvoker(
       return LLMInvokerErrorType.TIMEOUT
     }
 
-    if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+    if (
+      errorMessage.includes('rate limit') ||
+      errorMessage.includes('monthly_request_count') ||
+      errorMessage.includes('limit reached') ||
+      errorMessage.includes('quota') ||
+      errorMessage.includes('402') ||
+      errorMessage.includes('429')
+    ) {
       return LLMInvokerErrorType.RATE_LIMITED
     }
 

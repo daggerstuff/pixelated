@@ -577,14 +577,14 @@ const frequencyOptions = [
     cancelButton?.addEventListener('click', closeModal)
 
     // Close when clicking outside the modal content
-    modal?.addEventListener('click', (e) => {
+    modal?.addEventListener('click', (e: any) => {
       if (e.target === modal) {
         closeModal()
       }
     })
 
     // Form submission
-    requirementForm?.addEventListener('submit', (e) => {
+    requirementForm?.addEventListener('submit', (e: any) => {
       e.preventDefault()
 
       // In a real implementation, this would save the requirement via API
@@ -598,7 +598,7 @@ const frequencyOptions = [
     // Handle edit buttons
     const editButtons = document.querySelectorAll('.edit-requirement')
     editButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const reqId = (e.target as HTMLElement).getAttribute('data-req-id')
         // In a real implementation, this would open the modal with the requirement data
         alert(
@@ -610,7 +610,7 @@ const frequencyOptions = [
     // Handle delete buttons
     const deleteButtons = document.querySelectorAll('.delete-requirement')
     deleteButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: any) => {
         const reqId = (e.target as HTMLElement).getAttribute('data-req-id')
         if (
           reqId &&

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { formatDate, getRelativeTime } from './date'
 
 describe('date utils', () => {
@@ -6,7 +7,9 @@ describe('date utils', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2024-03-15T12:00:00.000Z'))
   })
-  afterEach(() => { vi.useRealTimers() })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
 
   it('formatDate formats a date string correctly', () => {
     const formatted = formatDate('2024-03-15T00:00:00.000Z')

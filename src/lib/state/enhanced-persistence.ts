@@ -19,7 +19,6 @@ function tryRequireNode(moduleName: string): any | null {
   try {
     if (typeof window === 'undefined' && typeof process !== 'undefined') {
       // Use eval to avoid bundlers rewriting/including the require call.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const globalRequire = (globalThis as any).require
       if (typeof globalRequire === 'function') {
         return globalRequire(moduleName)
@@ -29,8 +28,9 @@ function tryRequireNode(moduleName: string): any | null {
       const module = (globalThis as any)[moduleName]
       if (module) return module
     }
-  } catch {
-    // ignore failures and return null to trigger fallback logic
+  } catch (e) {
+    logger.debug(`Failed to require ${moduleName}:`, e)
+    // return null to trigger fallback logic
   }
   return null
 }
@@ -137,9 +137,9 @@ interface PersistenceConfig {
 
 class EnhancedStatePersistence {
   private static instance: EnhancedStatePersistence
-  private config: PersistenceConfig
+  private readonly config: PersistenceConfig
   private cleanupTimer: NodeJS.Timeout | null = null
-  private storageChangeListeners: Set<
+  private readonly storageChangeListeners: Set<
     (key: string, newValue: unknown) => void
   > = new Set()
   private static fallbackCounter = 0
@@ -248,7 +248,7 @@ class EnhancedStatePersistence {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       if (key) {
-        const value = localStorage.getItem(key) || ''
+        const value = localStorage.getItem(key) ?? ''
         totalSize += new Blob([key + value]).size
       }
     }
@@ -289,7 +289,7 @@ class EnhancedStatePersistence {
     if (
       sessionState['lastActivity'] &&
       typeof sessionState['lastActivity'] === 'number' &&
-      now - (sessionState['lastActivity']) > sessionTimeout
+      now - sessionState['lastActivity'] > sessionTimeout
     ) {
       this.setStoredValue('session_state', {
         lastRoute: '/',
@@ -321,7 +321,7 @@ class EnhancedStatePersistence {
         const draftWithTimestamp = draft as Record<string, unknown> & {
           timestamp: number
         }
-        if (now - (draftWithTimestamp['timestamp']) > draftTimeout) {
+        if (now - draftWithTimestamp['timestamp'] > draftTimeout) {
           delete formDrafts[key]
         }
       }
@@ -446,8 +446,7 @@ class EnhancedStatePersistence {
     let secureSuffix: string
     try {
       if (
-        typeof window !== 'undefined' &&
-        window.crypto &&
+        window?.crypto &&
         typeof window.crypto.getRandomValues === 'function'
       ) {
         const arr = new Uint8Array(8)
@@ -469,11 +468,9 @@ class EnhancedStatePersistence {
       // In case anything unexpected happens while generating secure suffix,
       // fall back to a non-cryptographic but unique-enough suffix.
       // This ensures the function remains robust in constrained environments.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const e: any = err
       logger.warn(
         'Secure suffix generation failed, falling back to timestamp+counter:',
-        e,
+        err instanceof Error ? err.message : 'Unknown error',
       )
       secureSuffix = `${Date.now().toString(36)}_${EnhancedStatePersistence.fallbackCounter++}`
     }

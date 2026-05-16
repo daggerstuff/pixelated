@@ -252,18 +252,18 @@ Expansion**: Adjacent markets and advanced applications
 
 ### Geographic Market Prioritization Matrix
 
-| Market | Market Size | Regulatory | Competition | Opportunity | Priority |
-| --- | --- | --- | --- | --- | --- |
-| USA | High | Medium | High | High | 1 |
-| Canada | Medium | Low | Medium | High | 1 |
-| UK | Medium | Medium | Medium | High | 2 |
-| Australia | Medium | Low | Medium | High | 2 |
-| Germany | High | High | Medium | Medium | 3 |
-| Netherlands | Medium | Low | Low | High | 3 |
-| Switzerland | Medium | High | Low | Medium | 3 |
-| Japan | High | High | High | Low | 4 |
-| Singapore | Medium | Medium | Medium | Medium | 4 |
-| France | High | High | High | Low | 4 |
+| Market      | Market Size | Regulatory | Competition | Opportunity | Priority |
+| ----------- | ----------- | ---------- | ----------- | ----------- | -------- |
+| USA         | High        | Medium     | High        | High        | 1        |
+| Canada      | Medium      | Low        | Medium      | High        | 1        |
+| UK          | Medium      | Medium     | Medium      | High        | 2        |
+| Australia   | Medium      | Low        | Medium      | High        | 2        |
+| Germany     | High        | High       | Medium      | Medium      | 3        |
+| Netherlands | Medium      | Low        | Low         | High        | 3        |
+| Switzerland | Medium      | High       | Low         | Medium      | 3        |
+| Japan       | High        | High       | High        | Low         | 4        |
+| Singapore   | Medium      | Medium     | Medium      | Medium      | 4        |
+| France      | High        | High       | High        | Low         | 4        |
 
 ## 4. Product Expansion Strategy
 

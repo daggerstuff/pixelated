@@ -5,7 +5,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import {
   useEvaluationListQuery,
   useEvaluationInitiateMutation,
@@ -80,12 +80,15 @@ export function EvaluationPanel({
           </CardHeader>
           <CardContent>
             <EvaluationForm
-              onSubmit={(payload) => {
-                initiateMutation.mutate(payload, {
-                  onSuccess: () => {
-                    setIsInitiating(false)
+              onSubmit={() => {
+                initiateMutation.mutate(
+                  {},
+                  {
+                    onSuccess: () => {
+                      setIsInitiating(false)
+                    },
                   },
-                })
+                )
               }}
               onCancel={() => setIsInitiating(false)}
             />

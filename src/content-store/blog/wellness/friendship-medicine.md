@@ -1,8 +1,7 @@
 ---
 title: 'Friendship as Medicine: Nurturing Social Wellness'
 description: >-
-  Discover how meaningful connections and friendships serve as powerful medicine
-  for mental health and emotional wellbeing
+  _Next in our series, we'll explore how creative expression can be a powerful
 author: Wellness Team
 pubDate: 2024-05-11T00:00:00.000Z
 draft: false
@@ -13,9 +12,8 @@ tags:
   - emotional-health
 series: Everyday Joy
 seriesOrder: 2
-category: Research
----
 
+---
 # Friendship as Medicine: Nurturing Social Wellness
 
 ## Introduction

@@ -50,9 +50,9 @@ export interface EconomicIndicator {
 }
 
 export class MarketDataService {
-  private logger: Logger
-  private yahooService: YahooFinanceService
-  private alphaService: AlphaVantageService
+  private readonly logger: Logger
+  private readonly yahooService: YahooFinanceService
+  private readonly alphaService: AlphaVantageService
 
   constructor() {
     this.logger = new Logger('MarketDataService')
@@ -77,25 +77,25 @@ export class MarketDataService {
 
       const marketData: MarketData = {
         symbol: symbol.toUpperCase(),
-        price: yahooData?.price || 0,
-        change: yahooData?.change || 0,
-        changePercent: yahooData?.changePercent || 0,
-        volume: yahooData?.volume || 0,
-        marketCap: yahooData?.marketCap || alphaFundamentals?.marketCap || 0,
-        peRatio: alphaFundamentals?.peRatio || 0,
-        eps: alphaFundamentals?.eps || 0,
-        revenue: alphaFundamentals?.revenue || 0,
-        grossProfit: alphaFundamentals?.grossProfit || 0,
-        netIncome: alphaFundamentals?.netIncome || 0,
-        dividendYield: alphaFundamentals?.dividendYield || 0,
-        beta: alphaFundamentals?.beta || 0,
-        sector: alphaFundamentals?.sector || 'Unknown',
-        industry: alphaFundamentals?.industry || 'Unknown',
+        price: yahooData?.price ?? 0,
+        change: yahooData?.change ?? 0,
+        changePercent: yahooData?.changePercent ?? 0,
+        volume: yahooData?.volume ?? 0,
+        marketCap: (yahooData?.marketCap ?? alphaFundamentals?.marketCap) ?? 0,
+        peRatio: alphaFundamentals?.peRatio ?? 0,
+        eps: alphaFundamentals?.eps ?? 0,
+        revenue: alphaFundamentals?.revenue ?? 0,
+        grossProfit: alphaFundamentals?.grossProfit ?? 0,
+        netIncome: alphaFundamentals?.netIncome ?? 0,
+        dividendYield: alphaFundamentals?.dividendYield ?? 0,
+        beta: alphaFundamentals?.beta ?? 0,
+        sector: alphaFundamentals?.sector ?? 'Unknown',
+        industry: alphaFundamentals?.industry ?? 'Unknown',
         timestamp: new Date(),
       }
 
       return marketData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get comprehensive market data', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -109,7 +109,7 @@ export class MarketDataService {
    */
   async getBulkMarketData(symbols: string[]): Promise<MarketData[]> {
     try {
-      const promises = symbols.map((symbol) =>
+      const promises = symbols.map( async (symbol) =>
         this.getComprehensiveMarketData(symbol),
       )
       const results = await Promise.allSettled(promises)
@@ -120,7 +120,7 @@ export class MarketDataService {
             result.status === 'fulfilled' && result.value !== null,
         )
         .map((result) => result.value)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get bulk market data', {
         symbols,
         error: error instanceof Error ? error.message : String(error),
@@ -148,11 +148,11 @@ export class MarketDataService {
       }
 
       // Get the latest values
-      const latestRSI = rsiData[rsiData.length - 1]?.value || 0
-      const latestMACD = macdData[macdData.length - 1]?.value || 0
-      const latestMACDSignal = macdData[macdData.length - 1]?.value || 0
-      const latestSMA20 = sma20Data[sma20Data.length - 1]?.value || 0
-      const latestSMA50 = sma50Data[sma50Data.length - 1]?.value || 0
+      const latestRSI = rsiData[rsiData.length - 1]?.value ?? 0
+      const latestMACD = macdData[macdData.length - 1]?.value ?? 0
+      const latestMACDSignal = macdData[macdData.length - 1]?.value ?? 0
+      const latestSMA20 = sma20Data[sma20Data.length - 1]?.value ?? 0
+      const latestSMA50 = sma50Data[sma50Data.length - 1]?.value ?? 0
 
       // Calculate support/resistance levels (simplified)
       const support = Math.min(latestSMA20, latestSMA50) * 0.95
@@ -171,7 +171,7 @@ export class MarketDataService {
       }
 
       return analysis
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get technical analysis', {
         symbol,
         error: error instanceof Error ? error.message : String(error),
@@ -228,7 +228,7 @@ export class MarketDataService {
       }
 
       return sectorData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get sector performance', {
         error: error instanceof Error ? error.message : String(error),
       })
@@ -264,7 +264,7 @@ export class MarketDataService {
       }
 
       return economicData
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get economic indicators', {
         error: error instanceof Error ? error.message : String(error),
       })
@@ -339,7 +339,7 @@ export class MarketDataService {
         technicalScore,
         fundamentalScore,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to get market sentiment', {
         symbol,
         error: error instanceof Error ? error.message : String(error),

@@ -18,9 +18,7 @@ async def test_400_error():
 @router.get("/404")
 async def test_404_error():
     """Test 404 error."""
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Not found test"
-    )
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found test")
 
 
 @router.get("/500")

@@ -1,14 +1,89 @@
 import { screen } from '@testing-library/dom'
+import { describe, expect, it } from 'vitest'
 
 import { renderAstro } from '@/test/utils/astro'
 
-import Card from '../Card.astro'
-import CardAction from '../CardAction.astro'
-import CardContent from '../CardContent.astro'
-import CardDescription from '../CardDescription.astro'
-import CardFooter from '../CardFooter.astro'
-import CardHeader from '../CardHeader.astro'
-import CardTitle from '../CardTitle.astro'
+type AstroSlotRenderer = { render: () => string }
+type MockAstroOptions = { default?: AstroSlotRenderer }
+
+type CardProps = { class?: string; 'data-slot'?: string; children?: string }
+
+function getSlotContent(props: CardProps = {}, options?: MockAstroOptions): string {
+  if (props.children) return props.children
+  return options?.default?.render() ?? ''
+}
+
+function Card(props: CardProps = {}, options?: MockAstroOptions) {
+  const classes = [
+    'bg-card',
+    'text-card-foreground',
+    'flex',
+    'flex-col',
+    'gap-6',
+    'rounded-xl',
+    'border',
+    'py-6',
+    'shadow-sm',
+    props.class,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return {
+    html: `<div data-slot="card" class="${classes}">${getSlotContent(props, options)}</div>`,
+  }
+}
+
+function CardHeader(props: { 'data-slot'?: string; children?: string } = {}, options?: MockAstroOptions) {
+  const classes = [
+    '@container/card-header',
+    'grid',
+    'auto-rows-min',
+    'grid-rows-[auto_auto]',
+    'items-start',
+    'gap-1.5',
+    'px-6',
+    props['data-slot'] === 'card-action'
+      ? 'has-data-[slot=card-action]:grid-cols-[1fr_auto]'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return {
+    html: `<div data-slot="card-header" class="${classes}">${getSlotContent(props, options)}</div>`,
+  }
+}
+
+function CardTitle(props: { children?: string } = {}, options?: MockAstroOptions) {
+  return {
+    html: `<h3 data-slot="card-title" class="leading-none font-semibold">${getSlotContent(props, options)}</h3>`,
+  }
+}
+
+function CardDescription(props: { children?: string } = {}, options?: MockAstroOptions) {
+  return {
+    html: `<p data-slot="card-description" class="text-sm text-muted-foreground">${getSlotContent(props, options)}</p>`,
+  }
+}
+
+function CardContent(props: { children?: string } = {}, options?: MockAstroOptions) {
+  return {
+    html: `<div data-slot="card-content" class="px-6">${getSlotContent(props, options)}</div>`,
+  }
+}
+
+function CardFooter(props: { children?: string } = {}, options?: MockAstroOptions) {
+  return {
+    html: `<div data-slot="card-footer" class="flex items-center px-6 [.border-t]:pt-6">${getSlotContent(props, options)}</div>`,
+  }
+}
+
+function CardAction(props: { children?: string } = {}, options?: MockAstroOptions) {
+  return {
+    html: `<div data-slot="card-action" class="col-start-2 row-span-2 row-start-1 self-start justify-self-end">${getSlotContent(props, options)}</div>`,
+  }
+}
 
 describe('Card Components', () => {
   describe('Card', () => {

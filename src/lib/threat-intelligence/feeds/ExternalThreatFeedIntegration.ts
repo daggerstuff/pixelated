@@ -78,11 +78,11 @@ export class ExternalThreatFeedIntegrationCore
   private mongoClient!: MongoClient
   private db!: Db
   private httpClient!: AxiosInstance
-  private subscriptions: Map<string, FeedSubscription> = new Map()
-  private feedProcessors: Map<string, FeedProcessor> = new Map()
-  private activeTimers: Map<string, NodeJS.Timeout> = new Map()
+  private readonly subscriptions: Map<string, FeedSubscription> = new Map()
+  private readonly feedProcessors: Map<string, FeedProcessor> = new Map()
+  private readonly activeTimers: Map<string, NodeJS.Timeout> = new Map()
 
-  constructor(private config: FeedConfig) {
+  constructor(private readonly config: FeedConfig) {
     super()
     this.initializeHttpClient()
     this.initializeFeedProcessors()
@@ -108,7 +108,7 @@ export class ExternalThreatFeedIntegrationCore
         })
         return config
       },
-      (error) => {
+       async (error) => {
         logger.error('HTTP request error', { error })
         return Promise.reject(error)
       },
@@ -123,9 +123,9 @@ export class ExternalThreatFeedIntegrationCore
         })
         return response
       },
-      (error) => {
+       async (error) => {
         logger.error('HTTP response error', {
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
           status: error.response?.status,
           url: error.config?.url,
         })
@@ -167,7 +167,7 @@ export class ExternalThreatFeedIntegrationCore
       logger.info(
         'External Threat Feed Integration System initialized successfully',
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         'Failed to initialize External Threat Feed Integration System:',
         { error },
@@ -179,10 +179,10 @@ export class ExternalThreatFeedIntegrationCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for feed integration')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to Redis:', { error })
       throw new Error('Redis connection failed', { cause: error })
     }
@@ -191,12 +191,12 @@ export class ExternalThreatFeedIntegrationCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_feeds',
+        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_feeds',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_feeds')
       logger.info('MongoDB connection established for feed integration')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })
       throw new Error('MongoDB connection failed', { cause: error })
     }
@@ -217,7 +217,7 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       logger.info(`Loaded ${subscriptions.length} active feed subscriptions`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load subscriptions:', { error })
     }
   }
@@ -227,7 +227,7 @@ export class ExternalThreatFeedIntegrationCore
     setInterval(async () => {
       try {
         await this.processAllActiveFeeds()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Feed processing error:', { error })
       }
     }, 300000)
@@ -238,7 +238,7 @@ export class ExternalThreatFeedIntegrationCore
     setInterval(async () => {
       try {
         await this.collectMetrics()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Metrics collection error:', { error })
       }
     }, 600000)
@@ -270,7 +270,7 @@ export class ExternalThreatFeedIntegrationCore
       })
 
       return subscription.subscriptionId
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to subscribe to feed:', { error })
       throw error
     }
@@ -332,9 +332,9 @@ export class ExternalThreatFeedIntegrationCore
       feedType: feedConfig.feedType,
       endpoint: feedConfig.endpoint,
       apiKey: feedConfig.apiKey,
-      parameters: feedConfig.parameters || {},
-      filters: feedConfig.filters || {},
-      updateFrequency: feedConfig.updateFrequency || 'hourly',
+      parameters: feedConfig.parameters ?? {},
+      filters: feedConfig.filters ?? {},
+      updateFrequency: feedConfig.updateFrequency ?? 'hourly',
       status: 'active',
       createdAt: new Date(),
       lastFetchTime: undefined,
@@ -353,7 +353,7 @@ export class ExternalThreatFeedIntegrationCore
       await subscriptionsCollection.insertOne(subscription)
 
       this.subscriptions.set(subscription.subscriptionId, subscription)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store subscription:', { error })
       throw error
     }
@@ -370,7 +370,7 @@ export class ExternalThreatFeedIntegrationCore
       const timer = setInterval(async () => {
         try {
           await this.processFeedForSubscription(subscription)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Feed processing failed for subscription:', {
             error,
             subscriptionId: subscription.subscriptionId,
@@ -384,7 +384,7 @@ export class ExternalThreatFeedIntegrationCore
         subscriptionId: subscription.subscriptionId,
         interval: interval,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to start feed processing for subscription:', {
         error,
       })
@@ -440,7 +440,8 @@ export class ExternalThreatFeedIntegrationCore
         (subscription.itemsProcessed ?? 0) + processingResult.itemsProcessed
 
       if (processingResult.errors > 0) {
-        subscription.errors = (subscription.errors ?? 0) + processingResult.errors
+        subscription.errors =
+          (subscription.errors ?? 0) + processingResult.errors
       }
 
       // Update subscription in database
@@ -452,7 +453,7 @@ export class ExternalThreatFeedIntegrationCore
         threatsDiscovered: processingResult.threatsDiscovered,
         errors: processingResult.errors,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Feed processing failed for subscription:', {
         error,
         subscriptionId: subscription.subscriptionId,
@@ -498,7 +499,7 @@ export class ExternalThreatFeedIntegrationCore
       )
 
       return deduplicatedItems
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch feed items:', {
         error,
         subscriptionId: subscription.subscriptionId,
@@ -535,6 +536,7 @@ export class ExternalThreatFeedIntegrationCore
             password: subscription.apiKey,
           }
           break
+        case undefined: { throw new Error('Not implemented yet: undefined case') }
       }
     }
 
@@ -620,7 +622,7 @@ export class ExternalThreatFeedIntegrationCore
       await this.redis.expire(cacheKey, 24 * 60 * 60)
 
       return deduplicatedItems
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to deduplicate feed items:', { error })
       return items // Return original items if deduplication fails
     }
@@ -681,7 +683,7 @@ export class ExternalThreatFeedIntegrationCore
           threatsDiscovered += batchResult.threatsDiscovered
           errors += batchResult.errors
           processedThreats.push(...batchResult.threats)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Batch processing failed:', {
             error,
             subscriptionId,
@@ -708,7 +710,7 @@ export class ExternalThreatFeedIntegrationCore
       this.emit('feed_items_processed', result)
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process feed items:', { error, subscriptionId })
       throw error
     }
@@ -736,7 +738,7 @@ export class ExternalThreatFeedIntegrationCore
           }
 
           itemsProcessed++
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process feed item:', {
             error,
             itemId: item.itemId,
@@ -752,7 +754,7 @@ export class ExternalThreatFeedIntegrationCore
         errors,
         threats,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Batch processing failed:', { error })
       throw error
     }
@@ -786,7 +788,7 @@ export class ExternalThreatFeedIntegrationCore
         subscriptionId: subscription.subscriptionId,
         threatCount: threats.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store processed threats:', { error })
       throw error
     }
@@ -803,7 +805,7 @@ export class ExternalThreatFeedIntegrationCore
       )
 
       this.subscriptions.set(subscription.subscriptionId, subscription)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update subscription:', { error })
       throw error
     }
@@ -836,7 +838,7 @@ export class ExternalThreatFeedIntegrationCore
       this.emit('feed_unsubscribed', { subscriptionId })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to unsubscribe from feed:', {
         error,
         subscriptionId,
@@ -864,7 +866,7 @@ export class ExternalThreatFeedIntegrationCore
         errors: subscription.errors ?? 0,
         nextFetchTime,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get feed status:', { error, subscriptionId })
       throw error
     }
@@ -874,7 +876,7 @@ export class ExternalThreatFeedIntegrationCore
     const interval = this.getFeedProcessingInterval(
       subscription.updateFrequency,
     )
-    const lastFetch = subscription.lastFetchTime || new Date()
+    const lastFetch = subscription.lastFetchTime ?? new Date()
 
     return new Date(lastFetch.getTime() + interval)
   }
@@ -887,7 +889,7 @@ export class ExternalThreatFeedIntegrationCore
         .toArray()) as unknown as FeedSubscription[]
 
       return subscriptions
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get all subscriptions:', { error })
       throw error
     }
@@ -923,7 +925,7 @@ export class ExternalThreatFeedIntegrationCore
       this.emit('feed_config_updated', { subscriptionId })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update feed configuration:', {
         error,
         subscriptionId,
@@ -964,7 +966,7 @@ export class ExternalThreatFeedIntegrationCore
         feedsByType,
         feedsByProvider,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get feed metrics:', { error })
       return {
         totalSubscriptions: 0,
@@ -987,8 +989,8 @@ export class ExternalThreatFeedIntegrationCore
         ])
         .toArray()
 
-      return result[0]?.totalItems || 0
-    } catch (error) {
+      return result[0]?.totalItems ?? 0
+    } catch (error: unknown) {
       logger.error('Failed to calculate total items processed:', { error })
       return 0
     }
@@ -1005,8 +1007,8 @@ export class ExternalThreatFeedIntegrationCore
         ])
         .toArray()
 
-      return result[0]?.avgTime || 0
-    } catch (error) {
+      return result[0]?.avgTime ?? 0
+    } catch (error: unknown) {
       logger.error('Failed to calculate average processing time:', { error })
       return 0
     }
@@ -1030,7 +1032,7 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       return feedsByType
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get feeds by type:', { error })
       return {}
     }
@@ -1054,7 +1056,7 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       return feedsByProvider
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get feeds by provider:', { error })
       return {}
     }
@@ -1073,14 +1075,14 @@ export class ExternalThreatFeedIntegrationCore
       for (const subscription of activeSubscriptions) {
         try {
           await this.processFeedForSubscription(subscription)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process feed for subscription:', {
             error,
             subscriptionId: subscription.subscriptionId,
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process all active feeds:', { error })
     }
   }
@@ -1090,7 +1092,7 @@ export class ExternalThreatFeedIntegrationCore
       const metrics = await this.getFeedMetrics()
 
       this.emit('metrics_collected', metrics)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Metrics collection failed:', { error })
     }
   }
@@ -1133,7 +1135,7 @@ export class ExternalThreatFeedIntegrationCore
         activeFeeds: metrics.activeSubscriptions,
         successRate,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
@@ -1146,7 +1148,7 @@ export class ExternalThreatFeedIntegrationCore
     try {
       const result = await this.redis.ping()
       return result === 'PONG'
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Redis health check failed:', { error })
       return false
     }
@@ -1156,7 +1158,7 @@ export class ExternalThreatFeedIntegrationCore
     try {
       await this.db.admin().ping()
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MongoDB health check failed:', { error })
       return false
     }
@@ -1192,7 +1194,7 @@ export class ExternalThreatFeedIntegrationCore
 
       this.emit('feed_integration_shutdown')
       logger.info('External Threat Feed Integration System shutdown completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown:', { error })
       throw error
     }
@@ -1273,9 +1275,9 @@ class STIXFeedProcessor implements FeedProcessor {
               indicator: obj.pattern,
               indicatorType: this.extractIndicatorType(obj.pattern),
               severity: this.mapSTIXThreatLevel(obj.labels),
-              confidence: obj.confidence || 0.5,
+              confidence: obj.confidence ?? 0.5,
               timestamp: new Date(obj.created),
-              description: obj.description || '',
+              description: obj.description ?? '',
               source: subscription.provider,
               metadata: {
                 stixVersion: data.spec_version,
@@ -1288,7 +1290,7 @@ class STIXFeedProcessor implements FeedProcessor {
       }
 
       return items
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('STIX feed parsing failed:', { error })
       return []
     }
@@ -1319,11 +1321,7 @@ class STIXFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1350,7 +1348,7 @@ class STIXFeedProcessor implements FeedProcessor {
           description: item.description,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('STIX threat conversion failed:', { error })
       return null
     }
@@ -1392,14 +1390,14 @@ class TAXIIFeedProcessor implements FeedProcessor {
               indicator: this.extractIndicatorFromTAXII(obj),
               indicatorType: this.extractIndicatorTypeFromTAXII(obj),
               severity: this.mapTAXIIThreatLevel(obj),
-              confidence: obj.confidence || 0.5,
+              confidence: obj.confidence ?? 0.5,
               timestamp: new Date(obj.created),
-              description: obj.description || '',
+              description: obj.description ?? '',
               source: subscription.provider,
               metadata: {
                 taxiiVersion: data.spec_version,
                 objectType: obj.type,
-                labels: obj.labels || [],
+                labels: obj.labels ?? [],
               },
             })
           }
@@ -1407,7 +1405,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
       }
 
       return items
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('TAXII feed parsing failed:', { error })
       return []
     }
@@ -1418,7 +1416,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
     if (obj.name) return obj.name
     if (obj.external_references && obj.external_references.length > 0) {
       return (
-        obj.external_references[0].url || obj.external_references[0].external_id
+        obj.external_references[0].url ?? obj.external_references[0].external_id
       )
     }
     return obj.id
@@ -1435,8 +1433,8 @@ class TAXIIFeedProcessor implements FeedProcessor {
   }
 
   private mapTAXIIThreatLevel(obj: any): string {
-    if (obj.labels && obj.labels.includes('malicious-activity')) return 'high'
-    if (obj.labels && obj.labels.includes('suspicious-activity'))
+    if (obj.labels?.includes('malicious-activity')) return 'high'
+    if (obj.labels?.includes('suspicious-activity'))
       return 'medium'
     return 'low'
   }
@@ -1452,11 +1450,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1483,7 +1477,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
           description: item.description,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('TAXII threat conversion failed:', { error })
       return null
     }
@@ -1514,7 +1508,7 @@ class MISPFeedProcessor implements FeedProcessor {
       // Parse MISP format
       if (data.response) {
         for (const event of data.response) {
-          if (event.Event && event.Event.Attribute) {
+          if (event.Event?.Attribute) {
             for (const attribute of event.Event.Attribute) {
               items.push({
                 itemId: attribute.id,
@@ -1523,7 +1517,7 @@ class MISPFeedProcessor implements FeedProcessor {
                 severity: this.mapMISPSeverity(attribute.comment),
                 confidence: this.mapMISPConfidence(attribute.comment),
                 timestamp: new Date(attribute.timestamp * 1000),
-                description: attribute.comment || '',
+                description: attribute.comment ?? '',
                 source: subscription.provider,
                 metadata: {
                   eventId: event.Event.id,
@@ -1538,7 +1532,7 @@ class MISPFeedProcessor implements FeedProcessor {
       }
 
       return items
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MISP feed parsing failed:', { error })
       return []
     }
@@ -1585,11 +1579,7 @@ class MISPFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1617,7 +1607,7 @@ class MISPFeedProcessor implements FeedProcessor {
           eventId: item.metadata?.eventId,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MISP threat conversion failed:', { error })
       return null
     }
@@ -1659,14 +1649,14 @@ class OTXFeedProcessor implements FeedProcessor {
                 severity: this.mapOTXSeverity(pulse.tlp),
                 confidence: 0.7, // OTX default confidence
                 timestamp: new Date(indicator.created),
-                description: pulse.description || '',
+                description: pulse.description ?? '',
                 source: subscription.provider,
                 metadata: {
                   pulseId: pulse.id,
                   pulseName: pulse.name,
                   pulseAuthor: pulse.author_name,
                   tlp: pulse.tlp,
-                  tags: pulse.tags || [],
+                  tags: pulse.tags ?? [],
                 },
               })
             }
@@ -1675,7 +1665,7 @@ class OTXFeedProcessor implements FeedProcessor {
       }
 
       return items
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('OTX feed parsing failed:', { error })
       return []
     }
@@ -1718,11 +1708,7 @@ class OTXFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1751,7 +1737,7 @@ class OTXFeedProcessor implements FeedProcessor {
           tags: item.metadata?.tags,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('OTX threat conversion failed:', { error })
       return null
     }
@@ -1783,9 +1769,9 @@ class VirusTotalFeedProcessor implements FeedProcessor {
       // Parse VirusTotal format
       if (data.data) {
         for (const file of data.data) {
-          if (file.attributes && file.attributes.last_analysis_stats) {
+          if (file.attributes?.last_analysis_stats) {
             const stats = file.attributes.last_analysis_stats
-            const maliciousCount = stats.malicious || 0
+            const maliciousCount = stats.malicious ?? 0
             const totalCount =
               stats.malicious +
               stats.suspicious +
@@ -1801,7 +1787,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
                 confidence: maliciousCount / totalCount,
                 timestamp: new Date(file.attributes.last_analysis_date * 1000),
                 description:
-                  file.attributes.meaningful_name || 'Malicious file',
+                  file.attributes.meaningful_name ?? 'Malicious file',
                 source: subscription.provider,
                 metadata: {
                   fileName: file.attributes.meaningful_name,
@@ -1818,7 +1804,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
       }
 
       return items
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('VirusTotal feed parsing failed:', { error })
       return []
     }
@@ -1850,11 +1836,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: 'malware',
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1885,7 +1867,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
           vtLink: item.metadata?.vtLink,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('VirusTotal threat conversion failed:', { error })
       return null
     }
@@ -1906,13 +1888,13 @@ class GenericFeedProcessor implements FeedProcessor {
         for (const item of data) {
           if (item.indicator || item.value || item.ioc) {
             items.push({
-              itemId: item.id || item.indicator || item.value || item.ioc,
-              indicator: item.indicator || item.value || item.ioc,
-              indicatorType: item.type || item.indicator_type || 'unknown',
-              severity: item.severity || item.threat_level || 'medium',
-              confidence: item.confidence || item.reliability || 0.5,
-              timestamp: new Date(item.timestamp || item.created || Date.now()),
-              description: item.description || item.notes || '',
+              itemId: ((item.id ?? item.indicator) ?? item.value) ?? item.ioc,
+              indicator: (item.indicator ?? item.value) ?? item.ioc,
+              indicatorType: (item.type ?? item.indicator_type) ?? 'unknown',
+              severity: (item.severity ?? item.threat_level) ?? 'medium',
+              confidence: (item.confidence ?? item.reliability) ?? 0.5,
+              timestamp: new Date((item.timestamp ?? item.created) ?? Date.now()),
+              description: (item.description ?? item.notes) ?? '',
               source: subscription.provider,
               metadata: {
                 rawData: item,
@@ -1925,13 +1907,13 @@ class GenericFeedProcessor implements FeedProcessor {
         // Handle nested indicator format
         for (const indicator of data.indicators) {
           items.push({
-            itemId: indicator.id || indicator.value,
+            itemId: indicator.id ?? indicator.value,
             indicator: indicator.value,
-            indicatorType: indicator.type || 'unknown',
-            severity: indicator.severity || 'medium',
-            confidence: indicator.confidence || 0.5,
-            timestamp: new Date(indicator.timestamp || Date.now()),
-            description: indicator.description || '',
+            indicatorType: indicator.type ?? 'unknown',
+            severity: indicator.severity ?? 'medium',
+            confidence: indicator.confidence ?? 0.5,
+            timestamp: new Date(indicator.timestamp ?? Date.now()),
+            description: indicator.description ?? '',
             source: subscription.provider,
             metadata: {
               rawData: indicator,
@@ -1942,7 +1924,7 @@ class GenericFeedProcessor implements FeedProcessor {
       }
 
       return items
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Generic feed parsing failed:', { error })
       return []
     }
@@ -1959,11 +1941,7 @@ class GenericFeedProcessor implements FeedProcessor {
         ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapGenericToThreatType(item.indicatorType),
-        severity: item.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical',
+        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1991,7 +1969,7 @@ class GenericFeedProcessor implements FeedProcessor {
           rawData: item.metadata?.rawData,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Generic threat conversion failed:', { error })
       return null
     }

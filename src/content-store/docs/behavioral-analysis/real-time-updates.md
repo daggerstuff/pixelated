@@ -1,11 +1,12 @@
 ---
-title: 'Real-Time Updates System'
-description: 'Real-Time Updates System documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Real-Time Updates System documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Real-Time Updates System
 ---
 
 # Real-Time Updates System

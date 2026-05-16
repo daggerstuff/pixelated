@@ -14,6 +14,14 @@ import process from 'process'
 
 import dotenv from 'dotenv'
 
+// Remove stale build output before every build.
+// This avoids rare runtime mismatches where the manifest references hashed assets
+// that were removed/renamed in a previous build output (for example, 500*.mjs chunks).
+const distDir = path.resolve(process.cwd(), 'dist')
+if (fs.existsSync(distDir)) {
+  fs.rmSync(distDir, { recursive: true, force: true })
+}
+
 const verifyCommand = ['node', 'scripts/ci/verify-build-contract.mjs']
 const verify = spawnSync(verifyCommand[0], verifyCommand.slice(1), {
   stdio: 'inherit',
@@ -64,7 +72,8 @@ process.on('SIGPIPE', () => {
 })
 
 // Spawn the actual Astro build
-const build = spawn('astro', ['build'], {
+const pnpmCmd = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
+const build = spawn(pnpmCmd, ['exec', 'astro', 'build'], {
   stdio: 'inherit',
 })
 

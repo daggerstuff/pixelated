@@ -1,11 +1,11 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.12.0-bookworm-slim AS base
+FROM node:24.14.1-bookworm-slim AS base
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
 ENV NODE_ENV=production
-ARG PNPM_VERSION=10.33.0
+ARG PNPM_VERSION=11.1.1
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -17,12 +17,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     g++ \
     curl \
-    && corepack enable \
-    && ( \
-    PNPM_SUCCESS=0; \
+    && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
-    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
+    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
     echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
     PNPM_SUCCESS=1 && \
     break; \
@@ -35,14 +33,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "❌ Failed to install pnpm after 5 attempts" && \
     exit 1; \
     fi \
-    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package manifests first for better layer caching
 COPY package.json pnpm-lock.yaml* ./
 # Include patch files and npm configuration required during installation
 COPY patches ./patches
-COPY .npmrc ./.npmrc
+COPY config/package/.npmrc ./.npmrc
 
 # Install all dependencies (dev + prod) required for build
 # Retry logic with fallback for lockfile mismatches
@@ -50,7 +47,7 @@ RUN ( \
     INSTALL_SUCCESS=0; \
     for i in 1 2 3; do \
     echo "Attempt $i: Installing dependencies with frozen lockfile..." && \
-    if pnpm install --frozen-lockfile --prod=false; then \
+    if pnpm install --frozen-lockfile --prod=false --ignore-scripts; then \
     echo "✅ Dependencies installed successfully" && \
     INSTALL_SUCCESS=1 && \
     break; \
@@ -59,7 +56,7 @@ RUN ( \
     echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
     if [ $i -eq 3 ]; then \
     echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
-    if pnpm install --no-frozen-lockfile --prod=false; then \
+    if pnpm install --no-frozen-lockfile --prod=false --ignore-scripts; then \
     echo "✅ Dependencies installed with lockfile update" && \
     INSTALL_SUCCESS=1 && \
     break; \
@@ -78,8 +75,12 @@ RUN ( \
 # Copy source and run the build
 COPY . .
 
+# Ensure templates directory exists so it can be safely copied in the runtime phase
+RUN mkdir -p /app/templates
+
 # Copy required server and instrumentation files into builder context
 COPY scripts/utils/start-server.mjs /app/start-server.mjs
+COPY scripts/utils/start-server-config.mjs /app/start-server-config.mjs
 COPY config/instrument.mjs /app/instrument.mjs
 
 # Limit Node.js memory usage to prevent OOM on small VPS
@@ -98,19 +99,17 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=10.33.0
+ARG PNPM_VERSION=11.1.1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
     git \
     curl \
-    && corepack enable \
-    && ( \
-    PNPM_SUCCESS=0; \
+    && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Preparing pnpm@$PNPM_VERSION..." && \
-    if corepack prepare pnpm@$PNPM_VERSION --activate && pnpm --version; then \
+    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
+    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
     echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
     PNPM_SUCCESS=1 && \
     break; \
@@ -123,7 +122,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "❌ Failed to install pnpm after 5 attempts" && \
     exit 1; \
     fi \
-    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -140,7 +138,7 @@ RUN ( \
     INSTALL_SUCCESS=0; \
     for i in 1 2 3; do \
     echo "Attempt $i: Installing production dependencies with frozen lockfile..." && \
-    if pnpm install --prod --frozen-lockfile; then \
+    if pnpm install --prod --frozen-lockfile --ignore-scripts; then \
     echo "✅ Production dependencies installed successfully" && \
     INSTALL_SUCCESS=1 && \
     break; \
@@ -149,7 +147,7 @@ RUN ( \
     echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
     if [ $i -eq 3 ]; then \
     echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
-    if pnpm install --prod --no-frozen-lockfile; then \
+    if pnpm install --prod --no-frozen-lockfile --ignore-scripts; then \
     echo "✅ Production dependencies installed with lockfile update" && \
     INSTALL_SUCCESS=1 && \
     break; \
@@ -183,7 +181,9 @@ RUN ( \
 # Copy built output and public assets from builder
 COPY --from=builder --chown=astro:astro /app/dist ./dist
 COPY --from=builder --chown=astro:astro /app/public ./public
+COPY --from=builder --chown=astro:astro /app/templates ./templates
 COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
+COPY --from=builder --chown=astro:astro /app/start-server-config.mjs ./start-server-config.mjs
 COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
 USER astro
 

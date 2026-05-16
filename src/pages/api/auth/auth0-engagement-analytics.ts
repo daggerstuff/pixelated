@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro'
 
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { getUserById } from '@/services/auth0.service'
@@ -15,8 +15,13 @@ import type {
   ChartData,
   InteractionMetric,
   ActivityEntry,
-  AnalyticsError,
-} from '../analytics/engagement/types'
+} from '../analytics/types'
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isServerError = (value: unknown): value is Record<string, unknown> =>
+  isObject(value) && 'status' in value
 
 // Disable prerendering since this API route uses request.headers
 export const prerender = false
@@ -24,7 +29,7 @@ export const prerender = false
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -63,7 +68,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        AuditEventType.ACCESS_DENIED,
         'auth.analytics.engagement.forbidden',
         user.id,
         'auth-analytics',
@@ -182,7 +187,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'analytics_access',
+      AuditEventType.ANALYTICS_ACCESS,
       'auth.analytics.engagement.access',
       user.id,
       'auth-analytics',
@@ -202,29 +207,36 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM_ERROR,
       'auth.analytics.engagement.error',
       'anonymous',
       'auth-analytics',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
 
-    const apiError: AnalyticsError = {
+    const apiError = {
+      message: 'Failed to fetch engagement metrics',
       code: 'PROCESSING_ERROR',
       errorMessage: 'Failed to fetch engagement metrics',
+      status: 500,
       details: {
         source: 'engagement',
         message: error instanceof Error ? String(error) : String(error),
       },
     }
 
-    const status =
-      error && typeof error === 'object' && 'status' in error
-        ? (error as { status: number }).status
-        : 500
+    const errorStatus = isServerError(error)
+      ? Reflect.get(error, 'status')
+      : undefined
+    const status = typeof errorStatus === 'number' ? errorStatus : 500
 
     return new Response(JSON.stringify(apiError), {
       status,

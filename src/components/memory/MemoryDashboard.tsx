@@ -26,16 +26,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/alert-dialog.tsx'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/card/index.ts'
 import {
   Dialog,
   DialogContent,
@@ -44,24 +44,24 @@ import {
   DialogHeader,
   DialogTitle,
   useDialog,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+} from '@/components/ui/dialog.tsx'
+import { Input } from '@/components/ui/input.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/components/ui/select.tsx'
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
+} from '@/components/ui/table.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import { Textarea } from '@/components/ui/textarea.tsx'
 import { useMemory, useUserPreferences } from '@/hooks/useMemory'
 import type { MemoryEntry } from '@/lib/memory/memory-client'
 
@@ -439,7 +439,7 @@ export function MemoryDashboard({
                           </TableCell>
                           <TableCell>
                             <Badge variant='secondary'>
-                              {mem.metadata?.category || 'general'}
+                              {mem.metadata?.category ?? 'general'}
                             </Badge>
                           </TableCell>
                           <TableCell className='text-muted-foreground whitespace-nowrap text-xs'>
@@ -537,7 +537,7 @@ export function MemoryDashboard({
                                       Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() =>
+                                      onClick={ async () =>
                                         mem.id && handleDeleteMemory(mem.id)
                                       }
                                       className='bg-destructive hover:bg-destructive/90'
@@ -631,7 +631,7 @@ export function MemoryDashboard({
                 </CardHeader>
                 <CardContent>
                   <div className='text-2xl font-bold'>
-                    {memory.stats.recentActivity.length}
+                    {memory.stats.recentActivity?.length ?? 0}
                   </div>
                 </CardContent>
               </Card>
@@ -648,29 +648,29 @@ export function MemoryDashboard({
               </CardHeader>
               <CardContent>
                 <div className='space-y-3'>
-                  {(
-                    Object.entries(memory.stats.categoryCounts)
-                  ).map(([category, count]) => (
-                    <div
-                      key={category}
-                      className='flex items-center justify-between'
-                    >
-                      <div className='flex items-center gap-2'>
-                        <Badge variant='outline'>{category}</Badge>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <div className='bg-secondary h-2 w-24 rounded-full'>
-                          <div
-                            className='bg-primary h-2 rounded-full'
-                            style={{
-                              width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
-                            }}
-                          />
+                  {Object.entries(memory.stats.categoryCounts).map(
+                    ([category, count]) => (
+                      <div
+                        key={category}
+                        className='flex items-center justify-between'
+                      >
+                        <div className='flex items-center gap-2'>
+                          <Badge variant='outline'>{category}</Badge>
                         </div>
-                        <span className='text-sm font-medium'>{count}</span>
+                        <div className='flex items-center gap-2'>
+                          <div className='bg-secondary h-2 w-24 rounded-full'>
+                            <div
+                              className='bg-primary h-2 rounded-full'
+                              style={{
+                                width: `${(count / (memory.stats?.totalMemories ?? 1)) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          <span className='text-sm font-medium'>{count}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -699,7 +699,7 @@ export function MemoryDashboard({
                       <Button
                         variant='ghost'
                         size='sm'
-                        onClick={() =>
+                        onClick={ async () =>
                           pref.id && userPrefs.deleteMemory(pref.id)
                         }
                       >

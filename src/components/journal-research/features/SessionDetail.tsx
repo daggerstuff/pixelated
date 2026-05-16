@@ -1,12 +1,13 @@
 import { format } from 'date-fns'
 import { useState } from 'react'
 
+import { LazyProgressCharts } from '@/components/journal-research/lazy'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import {
   useSessionQuery,
   useUpdateSessionMutation,
@@ -18,7 +19,6 @@ import {
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 
-import { ProgressCharts } from '../charts/ProgressCharts'
 import { SessionForm } from '../forms/SessionForm'
 import { SessionCard } from '../shared/SessionCard'
 
@@ -122,7 +122,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
             <CardTitle>Progress Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressCharts
+            <LazyProgressCharts
               progress={progress}
               metrics={metrics ?? undefined}
             />
@@ -187,7 +187,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Sources Identified
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.sources_identified ?? 0}
+                      {session.progressMetrics['sources_identified'] ?? 0}
                     </p>
                   </div>
                   <div>
@@ -195,7 +195,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Datasets Evaluated
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.datasets_evaluated ?? 0}
+                      {session.progressMetrics['datasets_evaluated'] ?? 0}
                     </p>
                   </div>
                   <div>
@@ -203,7 +203,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Datasets Acquired
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.datasets_acquired ?? 0}
+                      {session.progressMetrics['datasets_acquired'] ?? 0}
                     </p>
                   </div>
                   <div>
@@ -211,7 +211,8 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                       Integration Plans
                     </p>
                     <p className='text-lg font-semibold'>
-                      {session.progressMetrics.integration_plans_created ?? 0}
+                      {session.progressMetrics['integration_plans_created'] ??
+                        0}
                     </p>
                   </div>
                 </div>

@@ -5,14 +5,14 @@ import {
   ErrorMessage,
   FieldError,
 } from '@/components/journal-research/shared/ErrorMessage'
-import { Button } from '@/components/ui/button/button'
+import { Button } from '@/components/ui/button/button.tsx'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/card/card.tsx'
+import { Label } from '@/components/ui/label.tsx'
 import {
   CreateSessionPayloadSchema,
   UpdateSessionPayloadSchema,
@@ -51,7 +51,7 @@ export function SessionForm({
     CreateSessionPayload | UpdateSessionPayload
   >({
     sessionId: session?.sessionId,
-    targetSources: session?.targetSources ?? ['pubmed', 'doaj'],
+    targetSources: session?.['targetSources'] ?? ['pubmed', 'doaj'],
     searchKeywords: session?.searchKeywords ?? {},
     weeklyTargets: session?.weeklyTargets ?? {},
   })
@@ -65,7 +65,7 @@ export function SessionForm({
   useEffect(() => {
     if (session) {
       setFormData({
-        targetSources: session.targetSources,
+        targetSources: session['targetSources'],
         searchKeywords: session.searchKeywords,
         weeklyTargets: session.weeklyTargets,
         currentPhase: session.currentPhase,
@@ -114,11 +114,11 @@ export function SessionForm({
   }
 
   const handleSourceToggle = (source: string) => {
-    const current = formData.targetSources ?? []
+    const current = formData['targetSources'] ?? []
     const updated = current.includes(source)
       ? current.filter((s) => s !== source)
       : [...current, source]
-    setFormData({ ...formData, targetSources: updated })
+    setFormData({ ...formData, ['targetSources']: updated })
   }
 
   const handleAddKeyword = () => {
@@ -181,7 +181,7 @@ export function SessionForm({
                 value={(formData as CreateSessionPayload).sessionId ?? ''}
                 onChange={(e) => {
                   setFormData({ ...formData, sessionId: e.target.value })
-                  if (touched.sessionId) {
+                  if (touched['sessionId']) {
                     validateField('sessionId', e.target.value)
                   }
                 }}
@@ -194,22 +194,22 @@ export function SessionForm({
                 }}
                 className={cn(
                   'w-full rounded-md border bg-background px-3 py-2 text-sm',
-                  errors.sessionId && touched.sessionId
+                  errors['sessionId'] && touched['sessionId']
                     ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                     : 'border-input',
                 )}
                 placeholder='Leave empty for auto-generated ID'
-                aria-invalid={!!errors.sessionId && touched.sessionId}
+                aria-invalid={!!errors['sessionId'] && touched['sessionId']}
                 aria-describedby={
-                  errors.sessionId && touched.sessionId
+                  errors['sessionId'] && touched['sessionId']
                     ? 'sessionId-error'
                     : undefined
                 }
               />
               <FieldError
                 error={
-                  errors.sessionId && touched.sessionId
-                    ? errors.sessionId
+                  errors['sessionId'] && touched['sessionId']
+                    ? errors['sessionId']
                     : undefined
                 }
               />
@@ -226,7 +226,7 @@ export function SessionForm({
                 >
                   <input
                     type='checkbox'
-                    checked={(formData.targetSources ?? []).includes(source)}
+                    checked={(formData['targetSources'] ?? []).includes(source)}
                     onChange={() => handleSourceToggle(source)}
                     className='rounded'
                   />
@@ -234,7 +234,7 @@ export function SessionForm({
                 </label>
               ))}
             </div>
-            <FieldError error={errors.targetSources} />
+            <FieldError error={errors['targetSources']} />
           </div>
 
           <div className='space-y-2'>
@@ -316,7 +316,7 @@ export function SessionForm({
                     type='number'
                     min='0'
                     value={
-                      (formData.weeklyTargets ?? {})[week]?.toString() ?? '0'
+                      formData.weeklyTargets?.[week]?.toString() ?? '0'
                     }
                     onChange={(e) =>
                       handleWeeklyTargetChange(week, e.target.value)

@@ -1,106 +1,134 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ---------------------------------------------------------------------------
+# init-submodules.sh
+# ---------------------------------------------------------------------------
+# Robust submodule initialization for Pixelated Empathy.
+# Defaults to GitHub source repositories.
+# ---------------------------------------------------------------------------
+
+echo "🚀 Starting Pixelated Submodule Initialization"
+
 DRY_RUN=false
 if [[ "${1:-}" == "--dry-run" ]]; then
   DRY_RUN=true
+  echo "[dry-run mode enabled]"
 fi
 
 PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "${PROJECT_ROOT}"
 
+sanitize_token() {
+  local token="${1:-}"
+  case "${token}" in
+    ""|'$('*) printf '' ;;
+    *) printf '%s' "${token}" ;;
+  esac
+}
+
 # ---------------------------------------------------------------------------
-# Azure Pipelines authentication
-# When running inside Azure Pipelines (TF_BUILD=True), inject the pipeline
-# OAuth token as a git extraheader so HTTPS submodule clones can authenticate
-# without interactive prompts. The token is cleared after use.
+# Authentication Configuration
 # ---------------------------------------------------------------------------
-_AZ_AUTH_CONFIGURED=false
-configure_azure_credentials() {
-  if [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]; then
-    local token="${SYSTEM_ACCESSTOKEN:-}"
-    if [[ -z "${token}" ]]; then
-      echo '##[warning]SYSTEM_ACCESSTOKEN is empty. Expose it via env: SYSTEM_ACCESSTOKEN: $(System.AccessToken)'
-      return 0
-    fi
-    # Use extraHeader for Bearer token authentication. This is more secure than
-    # embedding the token in the URL and more reliable to clean up.
-    git config --local "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
-    _AZ_AUTH_CONFIGURED=true
-    echo 'Azure DevOps git credential header (extraHeader) configured.'
+AUTH_GIT_ARGS=()
+
+configure_credentials() {
+  # GitHub Credentials (via GITHUB_PAT or GITHUB_TOKEN)
+  local github_token
+  github_token="$(sanitize_token "${GITHUB_PAT:-${GITHUB_TOKEN:-}}")"
+  if [[ -n "${github_token}" ]]; then
+    echo "🔑 Configuring GitHub credentials..."
+    local auth_header
+    auth_header="$(printf 'x-access-token:%s' "${github_token}" | base64 -w0)"
+    
+    AUTH_GIT_ARGS+=(
+      -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
+      -c "credential.helper="
+      -c "url.https://x-access-token:${github_token}@github.com/.insteadOf=https://github.com/"
+    )
+    echo "✅ GitHub credentials configured"
   fi
 }
 
-cleanup_azure_credentials() {
-  if [[ "${_AZ_AUTH_CONFIGURED}" == "true" ]]; then
-    git config --local --unset "http.https://dev.azure.com/.extraHeader" 2>/dev/null || true
-    echo 'Azure DevOps git credential header (extraHeader) cleared.'
+cleanup_credentials() {
+  if (( ${#AUTH_GIT_ARGS[@]} > 0 )); then
+    AUTH_GIT_ARGS=()
+    echo "🧹 Temporary Git credential headers cleared"
   fi
 }
-trap cleanup_azure_credentials EXIT
 
-configure_azure_credentials
+trap cleanup_credentials EXIT
 
 run() {
   if [[ "${DRY_RUN}" == "true" ]]; then
     printf '[dry-run] %q' "$1"
     shift
-    for arg in "$@"; do
-      printf ' %q' "${arg}"
-    done
+    for arg in "$@"; do printf ' %q' "${arg}"; done
     printf '\n'
     return 0
   fi
-
   "$@"
 }
 
-azure_repo_url() {
-  local repo_name="$1"
-  printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
-}
-
-github_repo_url() {
-  local repo_name="$1"
-  printf 'https://github.com/daggerstuff/%s.git' "${repo_name}"
-}
-
-select_submodule_url() {
-  local repo_name="$1"
-  local env_key="$2"
-
-  if [[ -n "${!env_key:-}" ]]; then
-    printf '%s' "${!env_key}"
+git_with_auth() {
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    run git "${AUTH_GIT_ARGS[@]}" "$@"
     return 0
   fi
-
-  if [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]; then
-    azure_repo_url "${repo_name}"
-    return 0
-  fi
-
-  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
-    github_repo_url "${repo_name}"
-    return 0
-  fi
-
-  git config -f .gitmodules --get "submodule.${repo_name}.url"
+  git "${AUTH_GIT_ARGS[@]}" "$@"
 }
 
-configure_submodule() {
-  local name="$1"
-  local path
-  local url
+# ---------------------------------------------------------------------------
+# Main Execution
+# ---------------------------------------------------------------------------
+configure_credentials
 
-  path="$(git config -f .gitmodules --get "submodule.${name}.path")"
-  url="$(select_submodule_url "${name}" "$(printf '%s_SUBMODULE_URL' "$(printf '%s' "${name}" | tr '[:lower:]' '[:upper:]')")")"
+# 1. Pre-initialize submodules to register them in .git/config
+echo "📦 Initializing submodules..."
+git_with_auth submodule init
+git_with_auth submodule sync --recursive
 
-  echo "Configuring submodule ${name} (${path}) -> ${url}"
-  run git submodule set-url "${path}" "${url}"
-}
+# 2. Configure URLs for target submodules
+# Dynamically get list of submodules from .gitmodules
+SUBMODULE_NAMES=$(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk -F. '{print $2}')
 
-configure_submodule ai
-configure_submodule docs
+for name in ${SUBMODULE_NAMES}; do
+  path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
+  # Use the URL from .gitmodules as the source of truth
+  url="$(git config -f .gitmodules --get "submodule.${name}.url")"
+  
+  echo "🔧 Configuring submodule '${name}' at '${path}'"
+  echo "   URL: ${url}"
+  
+  # Set the URL directly in .git/config
+  run git config "submodule.${name}.url" "${url}"
 
-run git submodule sync --recursive
-run git submodule update --init --recursive --depth 1
+  if [[ -d "${path}/.git" ]]; then
+    run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+  elif [[ -f "${path}/.git" ]]; then
+    gitdir_content=$(cat "${path}/.git")
+    if [[ "${gitdir_content}" == "gitdir: "* ]]; then
+      gitdir="${gitdir_content#gitdir: }"
+      if [[ "${gitdir}" != /* ]]; then
+        gitdir="$(cd "${path}" && cd "${gitdir}" && pwd)"
+      fi
+      if [[ -d "${gitdir}" ]]; then
+        run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+      fi
+    fi
+  fi
+
+  modules_config="${PROJECT_ROOT}/.git/modules/${name}/config"
+  if [[ -f "${modules_config}" ]]; then
+    run git -C ".git/modules/${name}" config remote.origin.url "${url}" 2>/dev/null || true
+  fi
+done
+
+# 3. Update (fetch and checkout)
+echo "📥 Updating submodules (depth=1)..."
+if ! git_with_auth submodule update --recursive --force --depth 1; then
+  echo "##[warning]Shallow submodule update failed. Retrying with full history..."
+  git_with_auth submodule update --recursive --force
+fi
+
+echo "✅ Submodule initialization complete!"

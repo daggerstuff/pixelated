@@ -48,12 +48,12 @@ export function Tabs({
   const [tabValues, setTabValues] = useState<string[]>([])
 
   // Initialize with controlled value, defaultValue, or first registered tab
-  const [internalValue, setInternalValue] = useState<string>(
-    value || defaultValue || '',
+  const [internalValue, setInternalValue] = useState(
+    value ?? defaultValue ?? '',
   )
 
   // If this is a controlled component, use the provided value
-  const activeValue = value !== undefined ? value : internalValue
+  const activeValue = value ?? internalValue
 
   // Update internal value when controlled value changes
   useEffect(() => {
@@ -122,9 +122,15 @@ export function TabsList({ children, className = '' }: TabsListProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const list = e.currentTarget
     const tabs = Array.from(
-      list.querySelectorAll('[role="tab"]:not([disabled])'),
+      list.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'),
     )
-    const index = tabs.indexOf(document.activeElement as HTMLElement)
+    const activeElement = document.activeElement
+
+    if (!(activeElement instanceof HTMLElement)) {
+      return
+    }
+
+    const index = tabs.indexOf(activeElement)
 
     if (index < 0) return
 
@@ -148,8 +154,10 @@ export function TabsList({ children, className = '' }: TabsListProps) {
     }
 
     e.preventDefault()
-    tabs[nextIndex].focus()
-    tabs[nextIndex].click()
+    const activeTab = tabs[nextIndex]
+    if (!activeTab) return
+    activeTab.focus()
+    activeTab.click()
   }
 
   return (

@@ -1,15 +1,13 @@
 ---
-title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
-description:
-  'Exploring the intersection of artificial intelligence and emotional
-  wellbeing, from digital therapeutics to AI-enhanced mental health support'
+title: series outline
+description: >-
+  _This series explores the exciting intersection of AI and emotional
+  wellbeing across healthcare, ethics, and daily life._
 author: 'AI & Psychology Team'
 pubDate: 2024-04-26
 draft: false
-timeframe: 'May-June 2024'
 ---
-
-# 🤖 AI & Emotional Intelligence Series
+## AI & Emotional Intelligence Series
 
 ## Series Blueprint 📋
 
@@ -18,11 +16,6 @@ title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
 description:
   'Investigating how AI is transforming our understanding and support of
   emotional wellbeing'
-timeframe: 'June-July 2024'
-articles: 5
-frequency: 'Weekly'
-audience: 'Mental health professionals, tech enthusiasts, general public'
-impact_goal: 'Bridge the gap between AI technology and emotional wellness'
 ```
 
 ## 🎯 Series Vision
@@ -38,7 +31,7 @@ impact_goal: 'Bridge the gap between AI technology and emotional wellness'
 
 ### 1. AI Companions: The Future of Emotional Support
 
-_May 6, 2024_
+#### May 6, 2024
 
 #### Key Topics
 
@@ -49,7 +42,7 @@ _May 6, 2024_
 
 ### 2. Digital Therapeutics: AI-Enhanced Mental Health Tools
 
-_May 13, 2024_
+#### May 13, 2024
 
 #### Innovation Areas
 
@@ -60,7 +53,7 @@ _May 13, 2024_
 
 ### 3. Emotional AI: Understanding Human Feelings
 
-_May 20, 2024_
+#### May 20, 2024
 
 #### Core Concepts
 
@@ -71,7 +64,7 @@ _May 20, 2024_
 
 ### 4. AI in Mental Health Crisis Prevention
 
-_May 27, 2024_
+#### May 27, 2024
 
 #### Applications
 
@@ -82,7 +75,7 @@ _May 27, 2024_
 
 ### 5. The Future of AI-Human Connection
 
-_June 3, 2024_
+#### June 3, 2024
 
 #### Emerging Trends
 

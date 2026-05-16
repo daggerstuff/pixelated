@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 import {
   parseSemanticEvidenceResponse,
   validateEvidenceItem,
@@ -5,11 +7,11 @@ import {
 
 // Mock logger
 vi.mock('@/lib/utils/logger', () => ({
-  getLogger: () => ({
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  }),
+  getLogger: vi.fn<() => { info: Mock; warn: Mock; error: Mock }>(() => ({
+    info: vi.fn<() => void>(),
+    warn: vi.fn<() => void>(),
+    error: vi.fn<() => void>(),
+  })),
 }))
 
 describe('SemanticEvidenceParser', () => {

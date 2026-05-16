@@ -41,7 +41,7 @@ interface HIPAAServiceStatus {
  * Coordinates all compliance components and provides unified interface
  */
 export class HIPAAComplianceService {
-  private static instance: HIPAAComplianceService
+  private static instance: HIPAAComplianceService | undefined
   private isInitialized = false
   private initializationPromise: Promise<void> | null = null
 
@@ -50,9 +50,7 @@ export class HIPAAComplianceService {
   }
 
   public static getInstance(): HIPAAComplianceService {
-    if (!HIPAAComplianceService.instance) {
-      HIPAAComplianceService.instance = new HIPAAComplianceService()
-    }
+    HIPAAComplianceService.instance ??= new HIPAAComplianceService()
     return HIPAAComplianceService.instance
   }
 
@@ -126,11 +124,12 @@ export class HIPAAComplianceService {
         timestamp: new Date().toISOString(),
       })
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
       logger.error('HIPAA++ Compliance Service initialization failed', {
-        error,
+        error: message,
       })
       throw new Error(
-        `HIPAA++ initialization failed: ${(error as Error).message}`,
+        `HIPAA++ initialization failed: ${message}`,
         { cause: error },
       )
     }
@@ -152,11 +151,20 @@ export class HIPAAComplianceService {
 
     // Monitor key rotation events
     hipaaKeyRotationService.on('key-rotated', ({ keyId, rotationTime }) => {
-      logger.info('Key rotation monitored', { keyId, rotationTime })
+      if (typeof keyId !== 'string') {
+        return
+      }
+      logger.info('Key rotation monitored', {
+        keyId,
+        rotationTime: String(rotationTime),
+      })
     })
 
     hipaaKeyRotationService.on('rotation-failed', ({ error, rotationId }) => {
-      logger.error('Key rotation failure monitored', { error, rotationId })
+      logger.error('Key rotation failure monitored', {
+        error: error instanceof Error ? error.message : String(error),
+        rotationId: String(rotationId),
+      })
     })
   }
 
@@ -432,7 +440,8 @@ export class HIPAAComplianceService {
       logger.info('HIPAA++ service shutdown completed')
       process.exit(0)
     } catch (error: unknown) {
-      logger.error('Error during graceful shutdown', { error })
+      const message = error instanceof Error ? error.message : String(error)
+      logger.error('Error during graceful shutdown', { error: message })
       process.exit(1)
     }
   }
@@ -453,9 +462,10 @@ export class HIPAAComplianceService {
     try {
       return await Promise.race([this.performHealthCheck(), timeoutPromise])
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
       return {
         status: 'unhealthy',
-        details: { error: (error as Error).message },
+        details: { error: message },
         timestamp: new Date().toISOString(),
       }
     }
@@ -484,7 +494,11 @@ export class HIPAAComplianceService {
 
     return {
       status: overallStatus,
-      details: status as unknown as Record<string, unknown>,
+      details: {
+        keyRotation: status.keyRotation,
+        monitoring: status.monitoring,
+        compliance: status.compliance,
+      },
       timestamp: new Date().toISOString(),
     }
   }

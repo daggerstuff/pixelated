@@ -1,5 +1,7 @@
 // API endpoint for bias detection analysis
 
+import type { APIRoute } from 'astro'
+
 import type {
   SessionData,
   BiasAnalysisResults,
@@ -34,13 +36,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create session data
     const sessionData: SessionData = {
-      sessionId: body.sessionId || generateSessionId(),
+      sessionId: body.sessionId ?? generateSessionId(),
       scenario: body.scenario,
       demographics: {
-        age: body.demographics.age || '26-35',
-        gender: body.demographics.gender || 'female',
-        ethnicity: body.demographics.ethnicity || 'white',
-        primaryLanguage: body.demographics.primaryLanguage || 'en',
+        age: body.demographics.age ?? '26-35',
+        gender: body.demographics.gender ?? 'female',
+        ethnicity: body.demographics.ethnicity ?? 'white',
+        primaryLanguage: body.demographics.primaryLanguage ?? 'en',
       },
       content: body.content,
       timestamp: new Date(),

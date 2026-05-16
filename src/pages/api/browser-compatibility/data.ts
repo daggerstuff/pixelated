@@ -86,7 +86,12 @@ export const GET = async ({ request }) => {
       const sanitizedFile = sanitizeFilename(file)
       const reportPath = validatePath(sanitizedFile, reportsDir)
       const fileContent = fs.readFileSync(reportPath, 'utf8')
-      const report = JSON.parse(fileContent) as unknown
+      const report = JSON.parse(fileContent) as {
+        timestamp: string
+        browsers?: Record<string, unknown>
+        issues?: Array<{ browser: string }>
+        tests?: unknown
+      }
 
       // Skip reports older than the threshold
       const reportDate = new Date(report.timestamp)

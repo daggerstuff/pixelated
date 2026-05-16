@@ -35,8 +35,8 @@ export class MentalLLaMAPythonBridge {
   private pythonProcess: ChildProcessWithoutNullStreams | null = null
   private isInitialized = false
   private isFunctional = false
-  private pythonScriptPath: string
-  private requestQueue: Map<
+  private readonly pythonScriptPath: string
+  private readonly requestQueue: Map<
     string,
     {
       resolve: (value: unknown) => void
@@ -49,7 +49,7 @@ export class MentalLLaMAPythonBridge {
 
   constructor(pythonScriptPath?: string) {
     this.pythonScriptPath =
-      pythonScriptPath || './scripts/mental_llama_python_handler.py'
+      pythonScriptPath ?? './scripts/mental_llama_python_handler.py'
     this.pythonBridgeDisabled = false
     logger.info('MentalLLaMAPythonBridge instance created.', {
       scriptPath: this.pythonScriptPath,
@@ -58,15 +58,19 @@ export class MentalLLaMAPythonBridge {
 
   /**
    * Initializes the Python bridge by spawning the Python process and establishing communication.
-   * @returns {Promise<boolean>} True if the bridge is functional and ready for requests, false otherwise.
+   * @returns {Promise<void>} Resolves when the bridge is functional.
+   * @throws {PythonBridgeError} If initialization fails.
    */
 
-  public async initialize(): Promise<boolean> {
+  public async initialize(): Promise<void> {
     if (this.isInitialized) {
       logger.info(
         `PythonBridge already attempted initialization. Functional: ${this.isFunctional}`,
       )
-      return this.isFunctional
+      if (!this.isFunctional) {
+        throw new PythonBridgeError('PythonBridge initialization previously failed.')
+      }
+      return
     }
     logger.info('Attempting to initialize PythonBridge...')
     try {
@@ -82,21 +86,21 @@ export class MentalLLaMAPythonBridge {
           .filter(Boolean)
           .forEach((line) => {
             try {
-              const response: PythonBridgeResponse & { id?: string } =
-                JSON.parse(line) as unknown
-              if (
-                response &&
-                response.id &&
-                this.requestQueue.has(response.id)
-              ) {
-                const { resolve, timeout } = this.requestQueue.get(response.id)!
-                clearTimeout(timeout)
-                this.requestQueue.delete(response.id)
-                if (response.success) {
-                  resolve(response.data)
-                } else {
-                  resolve(response) // Let caller handle error
-                }
+              const parsed: unknown = JSON.parse(line)
+              if (!this.isPythonBridgeResponse(parsed)) {
+                return
+              }
+              const queueItem = this.requestQueue.get(parsed.id)
+              if (!queueItem) {
+                return
+              }
+              const { resolve, timeout } = queueItem
+              clearTimeout(timeout)
+              this.requestQueue.delete(parsed.id)
+              if (parsed.success) {
+                resolve(parsed.data)
+              } else {
+                resolve(parsed) // Let caller handle error
               }
             } catch (err: unknown) {
               logger.error('Failed to parse PythonBridge response', line, err)
@@ -124,13 +128,12 @@ export class MentalLLaMAPythonBridge {
       this.isInitialized = true
       this.isFunctional = true
       logger.info('PythonBridge initialized and functional.')
-      return true
     } catch (error: unknown) {
       logger.error('PythonBridge initialization failed.', { error })
       this.isInitialized = true
       this.isFunctional = false
       this.pythonProcess = null
-      return false
+      throw new PythonBridgeError(`PythonBridge initialization failed: ${String(error)}`)
     }
   }
 
@@ -154,12 +157,8 @@ export class MentalLLaMAPythonBridge {
     }
     const payload = { text, modelParams }
     const response = await this.sendRequest('analyze_text', payload)
-    if (
-      response &&
-      typeof response === 'object' &&
-      'hasMentalHealthIssue' in response
-    ) {
-      return response as MentalLLaMAAnalysisResult
+    if (this.isMentalLLaMAAnalysisResult(response)) {
+      return response
     }
     logger.error(
       'Unexpected response from PythonBridge analyzeTextWithPythonModel',
@@ -184,10 +183,13 @@ export class MentalLLaMAPythonBridge {
       )
       throw new PythonBridgeError('PythonBridge is not functional.')
     }
-    return this.sendRequest(
-      'run_imhi_evaluation',
-      params as unknown as Record<string, unknown>,
-    )
+    const payload: Record<string, unknown> = {
+      modelPath: params.modelPath,
+      outputPath: params.outputPath,
+      testDataset: params.testDataset,
+      isLlama: params.isLlama,
+    }
+    return this.sendRequest('run_imhi_evaluation', payload)
   }
 
   /**
@@ -228,7 +230,42 @@ export class MentalLLaMAPythonBridge {
    * @param payload Payload object
    * @returns {Promise<unknown>} The response from the Python process.
    */
-  private sendRequest(
+  private isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null
+  }
+
+  private isMentalLLaMAAnalysisResult(
+    value: unknown,
+  ): value is MentalLLaMAAnalysisResult {
+    if (!this.isObject(value)) {
+      return false
+    }
+
+    const candidate = value
+    return (
+      typeof candidate.hasMentalHealthIssue === 'boolean' &&
+      typeof candidate.confidence === 'number' &&
+      typeof candidate.riskLevel === 'string'
+    )
+  }
+
+  private isPythonBridgeResponse(
+    value: unknown,
+  ): value is PythonBridgeResponse & { id: string } {
+    if (!this.isObject(value)) {
+      return false
+    }
+
+    const candidate = value
+    return (
+      typeof candidate.id === 'string' &&
+      typeof candidate.success === 'boolean' &&
+      (candidate.error === undefined || typeof candidate.error === 'string') &&
+      (candidate.logs === undefined || Array.isArray(candidate.logs))
+    )
+  }
+
+  private async sendRequest(
     command: string,
     payload: Record<string, unknown>,
   ): Promise<unknown> {
@@ -250,7 +287,7 @@ export class MentalLLaMAPythonBridge {
       }, this.REQUEST_TIMEOUT_MS)
       this.requestQueue.set(id, { resolve, reject, timeout })
       try {
-        this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
+      this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
       } catch {
         clearTimeout(timeout)
         this.requestQueue.delete(id)

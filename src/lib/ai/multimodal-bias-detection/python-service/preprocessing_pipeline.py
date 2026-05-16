@@ -15,11 +15,10 @@ from typing import Any, Union
 
 import librosa
 import numpy as np
-import torch
 from PIL import Image
 from transformers import (
-    ViTImageProcessor,
     VideoMAEImageProcessor,
+    ViTImageProcessor,
     Wav2Vec2Processor,
     WhisperProcessor,
 )
@@ -29,6 +28,13 @@ from .config import settings
 logger = logging.getLogger(__name__)
 
 
+def _load_torch():
+    """Load torch lazily to avoid eager import-time dependency issues."""
+    from .utils.torch_proxy import torch
+
+    return torch
+
+
 class AudioPreprocessingPipeline:
     """Audio preprocessing pipeline for bias detection"""
 
@@ -36,6 +42,7 @@ class AudioPreprocessingPipeline:
         self.whisper_processor = None
         self.wav2vec_processor = None
         self.is_loaded = False
+        torch = _load_torch()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     async def load_processors(self) -> bool:

@@ -55,7 +55,7 @@ function detectUnusualPatterns(logs: AuditLog[]): UnusualPattern[] {
   // High frequency access detection
   const actionCounts = new Map<string, number>()
   logs.forEach((log: AuditLog) => {
-    actionCounts.set(log.action, (actionCounts.get(log.action) || 0) + 1)
+    actionCounts.set(log.action, (actionCounts.get(log.action) ?? 0) + 1)
   })
 
   actionCounts.forEach((count, action) => {
@@ -112,7 +112,7 @@ export const GET: APIRoute = async () => {
 
       // Count access types using the action property
       const type = log.action
-      accessTypes.set(type, (accessTypes.get(type) || 0) + 1)
+      accessTypes.set(type, (accessTypes.get(type) ?? 0) + 1)
     })
 
     // Detect unusual patterns

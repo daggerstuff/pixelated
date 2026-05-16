@@ -143,12 +143,12 @@ const DEFAULT_CONFIG: IntelligentCacheConfig = {
  * Multi-tier Intelligent Cache
  */
 export class IntelligentCache {
-  private config: IntelligentCacheConfig
-  private memoryCache = new Map<string, CacheEntry<unknown>>()
-  private redisPool = getRedisPoolManager().createPool('intelligent-cache')
-  private cacheService = getCacheService()
+  private readonly config: IntelligentCacheConfig
+  private readonly memoryCache = new Map<string, CacheEntry<unknown>>()
+  private readonly redisPool = getRedisPoolManager().createPool('intelligent-cache')
+  private readonly cacheService = getCacheService()
 
-  private analytics: CacheAnalytics = {
+  private readonly analytics: CacheAnalytics = {
     totalRequests: 0,
     hits: { memory: 0, redis: 0, cdn: 0, total: 0 },
     misses: 0,
@@ -162,7 +162,7 @@ export class IntelligentCache {
     prefetches: 0,
   }
 
-  private batchQueue: Array<{
+  private readonly batchQueue: Array<{
     operation: 'get' | 'set' | 'delete'
     key: string
     value?: unknown
@@ -172,10 +172,10 @@ export class IntelligentCache {
   }> = []
 
   private batchTimer?: ReturnType<typeof setTimeout>
-  private analyticsInterval?: ReturnType<typeof setInterval>
+  private readonly analyticsInterval?: ReturnType<typeof setInterval>
 
   // Predefined cache strategies for different data types
-  private strategies: Map<string, CacheStrategy> = new Map([
+  private readonly strategies: Map<string, CacheStrategy> = new Map([
     [
       'analysis-result',
       {
@@ -260,7 +260,7 @@ export class IntelligentCache {
 
       this.updateResponseTime()
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache get error', { key, error })
       this.analytics.misses++
       return null
@@ -270,9 +270,9 @@ export class IntelligentCache {
   /**
    * Set value in cache with intelligent tier distribution
    */
-  async set<T>(
+  async set(
     key: string,
-    value: T,
+    value: unknown,
     options: CacheOptions = {},
   ): Promise<void> {
     if (this.config.enableBatching) {
@@ -291,7 +291,7 @@ export class IntelligentCache {
         ? { ...restOptions, strategy: optStrategy }
         : { ...restOptions }
       await this.setToTiers(key, value, internalOptions as any)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache set error', { key, error })
     }
   }
@@ -321,7 +321,7 @@ export class IntelligentCache {
       if (this.config.enableCDNCache) {
         await this.cacheService.delete(key)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Cache delete error', { key, error })
     }
   }
@@ -357,7 +357,7 @@ export class IntelligentCache {
       const redisResults = await this.redisPool.execute(async (redis) => {
         const redisKeys = remainingKeys.map((k) => this.getRedisKey(k))
         // RedisService does not support mget, use batched get
-        const values = await Promise.all(redisKeys.map((k) => redis.get(k)))
+        const values = await Promise.all(redisKeys.map( async (k) => redis.get(k)))
 
         const parsed: Record<string, T | null> = {}
         for (let i = 0; i < remainingKeys.length; i++) {
@@ -484,7 +484,7 @@ export class IntelligentCache {
           this.setMemoryCache(
             key,
             redisResult,
-            strategy?.ttl || this.config.memoryTtl,
+            strategy?.ttl ?? this.config.memoryTtl,
           )
         }
 
@@ -506,14 +506,14 @@ export class IntelligentCache {
           await this.setToRedis(
             key,
             cdnResult,
-            strategy?.ttl || this.config.redisTtl,
+            strategy?.ttl ?? this.config.redisTtl,
           )
         }
         if (this.config.enableMemoryCache) {
           this.setMemoryCache(
             key,
             cdnResult,
-            strategy?.ttl || this.config.memoryTtl,
+            strategy?.ttl ?? this.config.memoryTtl,
           )
         }
 
@@ -527,13 +527,13 @@ export class IntelligentCache {
   /**
    * Set to appropriate cache tiers
    */
-  private async setToTiers<T>(
+  private async setToTiers(
     key: string,
-    value: T,
+    value: unknown,
     options: CacheOptions & { strategy?: CacheStrategy | null },
   ): Promise<void> {
     const { strategy, ttl, tags = [] } = options
-    const effectiveTtl = ttl || strategy?.ttl || this.config.memoryTtl
+    const effectiveTtl = (ttl ?? strategy?.ttl) ?? this.config.memoryTtl
     const shouldCompress =
       strategy?.compress !== false && this.config.enableCompression
 
@@ -562,8 +562,8 @@ export class IntelligentCache {
     }
   }
 
-  private getFromMemory<T>(key: string): T | null {
-    const entry = this.memoryCache.get(key) as CacheEntry<T> | undefined
+  private getFromMemory(key: string): unknown | null {
+    const entry = this.memoryCache.get(key)
     if (!entry) {
       return null
     }
@@ -609,9 +609,9 @@ export class IntelligentCache {
     }
   }
 
-  private setMemoryCache<T>(
+  private setMemoryCache(
     key: string,
-    value: T,
+    value: unknown,
     ttl: number,
     tags: string[] = [],
   ): void {
@@ -620,7 +620,7 @@ export class IntelligentCache {
       this.evictLRU()
     }
 
-    const entry: CacheEntry<T> = {
+    const entry: CacheEntry<unknown> = {
       key,
       value,
       tier: 'memory',
@@ -636,9 +636,9 @@ export class IntelligentCache {
     this.memoryCache.set(key, entry)
   }
 
-  private async setToRedis<T>(
+  private async setToRedis(
     key: string,
-    value: T,
+    value: unknown,
     ttl: number,
     tags: string[] = [],
     compress: boolean = false,
@@ -650,14 +650,14 @@ export class IntelligentCache {
         const serialized = JSON.stringify(value)
         if (serialized.length > this.config.compressionThreshold) {
           const compressedData = zlib.gzipSync(Buffer.from(serialized))
-          serializedValue = compressedData.toString('base64') as unknown as T
+          serializedValue = compressedData.toString('base64') as unknown
           compressed = true
         }
       }
 
-      const entry: CacheEntry<T> = {
+      const entry: CacheEntry<unknown> = {
         key,
-        value: serializedValue as unknown as T,
+        value: serializedValue as unknown,
         tier: 'redis',
         size: this.estimateSize(serializedValue),
         compressed,
@@ -672,10 +672,10 @@ export class IntelligentCache {
     })
   }
 
-  private async setToCDN<T>(key: string, value: T, ttl: number): Promise<void> {
+  private async setToCDN(key: string, value: unknown, ttl: number): Promise<void> {
     try {
       await this.cacheService.set(key, JSON.stringify(value), ttl)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('CDN cache set error', { key, error })
     }
   }
@@ -774,9 +774,9 @@ export class IntelligentCache {
     })
   }
 
-  private async batchSet<T>(
+  private async batchSet(
     key: string,
-    value: T,
+    value: unknown,
     options: CacheOptions,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -850,7 +850,7 @@ export class IntelligentCache {
               const internalOptions = str ? { ...rest, strategy: str } : rest
               await this.setToTiers(op.key, op.value, internalOptions as any)
               op.resolve(undefined)
-            } catch (error) {
+            } catch (error: unknown) {
               op.reject(error as Error)
             }
           }),
@@ -863,13 +863,13 @@ export class IntelligentCache {
             try {
               await this.delete(op.key)
               op.resolve(undefined)
-            } catch (error) {
+            } catch (error: unknown) {
               op.reject(error as Error)
             }
           }),
         )
       }
-    } catch (error) {
+    } catch (error: unknown) {
       batch.forEach((op) => op.reject(error as Error))
     }
     // Schedule next batch if queue is not empty
@@ -968,9 +968,7 @@ export class IntelligentCache {
 let intelligentCache: IntelligentCache | null = null
 
 export function getIntelligentCache(): IntelligentCache {
-  if (!intelligentCache) {
-    intelligentCache = new IntelligentCache(DEFAULT_CONFIG)
-  }
+  intelligentCache ??= new IntelligentCache(DEFAULT_CONFIG);
   // The '!' assures TypeScript intelligentCache is not null here.
   return intelligentCache
 }

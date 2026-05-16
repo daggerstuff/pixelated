@@ -1,11 +1,12 @@
 ---
-title: 'Content Security Policy (CSP) Configuration'
-description: 'Content Security Policy (CSP) Configuration documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Content Security Policy (CSP) Configuration documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Content Security Policy (CSP) Configuration
 ---
 
 # Content Security Policy (CSP) Configuration
@@ -36,7 +37,7 @@ security against cross-site scripting (XSS) and data injection attacks.
 
 The CSP is now organized by purpose:
 
-- **AI/ML APIs**: OpenAI, Together.xyz, Replicate, etc.
+- **AI/ML APIs**: OpenAI, LLM API endpoint, Replicate, etc.
 - **Analytics & Monitoring**: Vercel, Google Analytics, Sentry
 - **Authentication**: Google OAuth
 - **CDN & Assets**: Fonts, images, static resources

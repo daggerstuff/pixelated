@@ -47,7 +47,7 @@ app.use(
 // CORS configuration
 app.use(
   cors({
-    origin: process.env['FRONTEND_URL'] || 'http://localhost:3000',
+    origin: process.env['FRONTEND_URL'] ?? 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -82,7 +82,7 @@ app.get('/health', (_req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
-    version: process.env['npm_package_version'] || '1.0.0',
+    version: process.env['npm_package_version'] ?? '1.0.0',
   })
 })
 
@@ -129,7 +129,7 @@ const startServer = async () => {
         `Export functionality: ${config.enableExport ? 'enabled' : 'disabled'}`,
       )
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to start server:', error)
     process.exit(1)
   }
@@ -162,15 +162,15 @@ const gracefulShutdown = async (signal: string) => {
       logger.error('Forced shutdown after timeout')
       process.exit(1)
     }, 30000)
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error during graceful shutdown:', error)
     process.exit(1)
   }
 }
 
 // Handle shutdown signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
-process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+process.on('SIGTERM',  async () => gracefulShutdown('SIGTERM'))
+process.on('SIGINT',  async () => gracefulShutdown('SIGINT'))
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {

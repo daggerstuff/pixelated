@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
 import { journalResearchApiClient } from '@/lib/api/journal-research'
+import storageManager from '@/utils/storage/storageManager'
 
 import type { WebSocketMessage } from './useWebSocket'
 
@@ -40,13 +41,12 @@ const getAuthToken = () => {
   }
   try {
     const token =
-      window.localStorage.getItem('auth_token') ??
-      window.localStorage.getItem('authToken')
+      storageManager.get('auth_token') ?? storageManager.get('authToken')
     if (!token) {
       return null
     }
     return token.startsWith('Bearer ') ? token.slice(7) : token
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Failed to read auth token for SSE connection', error)
     return null
   }
@@ -95,7 +95,7 @@ export const useJournalResearchSSE = ({
         ) {
           onMessage?.(data as WebSocketMessage)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Failed to parse SSE message', error)
         onError?.(error as Error)
       }
@@ -169,7 +169,7 @@ export const useJournalResearchSSE = ({
           onError?.(error)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setConnectionState('error')
       onError?.(error as Error)
     }

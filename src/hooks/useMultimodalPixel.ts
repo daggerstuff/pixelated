@@ -93,7 +93,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
   if (streamUrl === undefined && typeof window !== 'undefined') {
     try {
       streamUrl =
-        (import.meta.env?.PUBLIC_PIXEL_WS_URL as string | undefined) ||
+        (import.meta.env?.PUBLIC_PIXEL_WS_URL as string | undefined) ??
         `${window.location.origin.replace('http', 'ws')}/api/websocket/pixel-multimodal`
     } catch {
       streamUrl = `${window.location.origin.replace('http', 'ws')}/api/websocket/pixel-multimodal`
@@ -229,19 +229,19 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
               setState((prev) => ({
                 ...prev,
                 lastResponse: data,
-                transcription: data?.transcription || null,
-                textEmotion: data?.text_emotion || null,
-                audioEmotion: data?.audio_emotion || null,
-                fusedEmotion: data?.fused_emotion || null,
-                behavioralPattern: data?.behavioral_pattern || null,
+                transcription: data?.transcription ?? null,
+                textEmotion: data?.text_emotion ?? null,
+                audioEmotion: data?.audio_emotion ?? null,
+                fusedEmotion: data?.fused_emotion ?? null,
+                behavioralPattern: data?.behavioral_pattern ?? null,
                 behavioralPatternConfidence:
                   data?.behavioral_pattern_confidence ?? null,
                 conflictDetected: Boolean(
-                  data?.conflict_detected ||
+                  data?.conflict_detected ??
                   (data?.fused_emotion?.conflict_score &&
                     data.fused_emotion.conflict_score > 0.5),
                 ),
-                latencyMs: data?.latency_ms || prev.latencyMs,
+                latencyMs: data?.latency_ms ?? prev.latencyMs,
                 streamStatus: 'result',
               }))
             } else if (type === 'error') {
@@ -280,7 +280,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
           type: 'text',
           text,
           contextType:
-            streamConfigRef.current.contextType || defaultContextType,
+            streamConfigRef.current.contextType ?? defaultContextType,
           sessionId: streamConfigRef.current.sessionId,
         }),
       )
@@ -312,10 +312,10 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
         JSON.stringify({
           type: 'complete',
           text,
-          sessionId: sessionId || streamConfigRef.current.sessionId,
+          sessionId: sessionId ?? streamConfigRef.current.sessionId,
           contextType:
-            contextType ||
-            streamConfigRef.current.contextType ||
+            (contextType ??
+            streamConfigRef.current.contextType) ??
             defaultContextType,
         }),
       )
@@ -361,7 +361,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
             },
             body: JSON.stringify({
               user_query: text,
-              context_type: contextType || defaultContextType,
+              context_type: contextType ?? defaultContextType,
               session_id: sessionId,
             }),
             signal: abortRef.current.signal,
@@ -370,7 +370,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
           if (!response.ok) {
             const errorData = await response.json()
             throw new Error(
-              errorData.message || `API error: ${response.status}`,
+              errorData.message ?? `API error: ${response.status}`,
             )
           }
 
@@ -382,15 +382,15 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
             loading: false,
             error: null,
             lastResponse: json,
-            transcription: json.transcription || null,
-            textEmotion: json.text_emotion || null,
-            audioEmotion: json.audio_emotion || null,
-            fusedEmotion: json.fused_emotion || null,
-            behavioralPattern: json.behavioral_pattern || null,
+            transcription: json.transcription ?? null,
+            textEmotion: json.text_emotion ?? null,
+            audioEmotion: json.audio_emotion ?? null,
+            fusedEmotion: json.fused_emotion ?? null,
+            behavioralPattern: json.behavioral_pattern ?? null,
             behavioralPatternConfidence:
               json.behavioral_pattern_confidence ?? null,
             conflictDetected: Boolean(
-              json.conflict_detected ||
+              json.conflict_detected ??
               (json.fused_emotion?.conflict_score &&
                 json.fused_emotion.conflict_score > 0.5),
             ),
@@ -402,7 +402,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
 
         const form = new FormData()
         form.append('text', text)
-        form.append('context_type', contextType || defaultContextType)
+        form.append('context_type', contextType ?? defaultContextType)
         if (sessionId) form.append('session_id', sessionId)
         form.append('audio', audioBlob, 'audio.webm')
 
@@ -414,7 +414,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.message || `API error: ${response.status}`)
+          throw new Error(errorData.message ?? `API error: ${response.status}`)
         }
 
         const json = (await response.json()) as MultimodalInferenceResponse
@@ -425,15 +425,15 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
           loading: false,
           error: null,
           lastResponse: json,
-          transcription: json.transcription || null,
-          textEmotion: json.text_emotion || null,
-          audioEmotion: json.audio_emotion || null,
-          fusedEmotion: json.fused_emotion || null,
-            behavioralPattern: json.behavioral_pattern || null,
-            behavioralPatternConfidence:
-              json.behavioral_pattern_confidence ?? null,
+          transcription: json.transcription ?? null,
+          textEmotion: json.text_emotion ?? null,
+          audioEmotion: json.audio_emotion ?? null,
+          fusedEmotion: json.fused_emotion ?? null,
+          behavioralPattern: json.behavioral_pattern ?? null,
+          behavioralPatternConfidence:
+            json.behavioral_pattern_confidence ?? null,
           conflictDetected: Boolean(
-            json.conflict_detected ||
+            json.conflict_detected ??
             (json.fused_emotion?.conflict_score &&
               json.fused_emotion.conflict_score > 0.5),
           ),

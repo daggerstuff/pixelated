@@ -106,7 +106,7 @@ function matchTopicArea(query: string): TopicArea {
 }
 
 export class EducationalContextRecognizer {
-  private config: EducationalRecognizerConfig
+  private readonly config: EducationalRecognizerConfig
 
   constructor(config: EducationalRecognizerConfig = {}) {
     this.config = {
@@ -239,7 +239,7 @@ export class EducationalContextRecognizer {
       },
       {
         role: 'user',
-        content: `Analyze: "${query}". User: ${JSON.stringify(userProfile || {})}`,
+        content: `Analyze: "${query}". User: ${JSON.stringify(userProfile ?? {})}`,
       },
     ]
 
@@ -256,10 +256,17 @@ export class EducationalContextRecognizer {
     }
 
     try {
-      const parsed = JSON.parse(content) as unknown
+      const parsed = JSON.parse(content) as {
+        isEducational?: unknown
+        confidence?: number
+        complexity?: unknown
+        learningObjectives?: unknown
+        recommendedResources?: unknown
+        priorKnowledgeRequired?: unknown
+      }
       return {
         isEducational: Boolean(parsed.isEducational),
-        confidence: Math.max(0, Math.min(1, parsed.confidence || 0.8)),
+        confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.8)),
         educationalType: type, // Use pattern-detected type
         complexity: this.validateComplexity(parsed.complexity),
         topicArea, // Use pattern-detected topic
@@ -275,7 +282,7 @@ export class EducationalContextRecognizer {
         metadata: {
           conceptualDepth: Math.max(
             0,
-            Math.min(1, parsed.metadata?.conceptualDepth || 0.5),
+            Math.min(1, parsed.metadata?.conceptualDepth ?? 0.5),
           ),
           practicalApplications: Array.isArray(
             parsed.metadata?.practicalApplications,
@@ -368,7 +375,7 @@ export class EducationalContextRecognizer {
     queries: { query: string }[],
   ): Promise<EducationalContextResult[]> {
     return Promise.all(
-      queries.map((q) => this.recognizeEducationalContext(q.query)),
+      queries.map( async (q) => this.recognizeEducationalContext(q.query)),
     )
   }
 
@@ -377,7 +384,7 @@ export class EducationalContextRecognizer {
       currentTopic: `${result.educationalType} - ${result.topicArea}`,
       nextSteps: ['Learn about symptoms'],
       estimatedTimeToComplete: '15-30 minutes',
-      relatedConcepts: result.metadata.relatedTopics || [],
+      relatedConcepts: result.metadata.relatedTopics ?? [],
     }
   }
 }

@@ -116,12 +116,12 @@ export interface AdvancedClassificationMetrics {
  */
 export class EnhancedTechniqueClassificationService {
   private static instance: EnhancedTechniqueClassificationService
-  private effectivenessDatabase: Map<
+  private readonly effectivenessDatabase: Map<
     TherapeuticTechnique,
     TechniqueEffectivenessDatabase
   > = new Map()
-  private sessionTracking: Map<string, SessionToSessionTracking> = new Map()
-  private classificationModel: unknown = null // Would be actual ML model in production
+  private readonly sessionTracking: Map<string, SessionToSessionTracking> = new Map()
+  private readonly classificationModel: unknown = null // Would be actual ML model in production
   private isModelTrained = false
   private metrics: AdvancedClassificationMetrics | null = null
 
@@ -298,7 +298,7 @@ export class EnhancedTechniqueClassificationService {
 
       // Update contextual effectiveness
       const currentContextEffectiveness =
-        data.contextualEffectiveness.get(context) || 0.5
+        data.contextualEffectiveness.get(context) ?? 0.5
       const updatedEffectiveness =
         (currentContextEffectiveness + effectiveness) / 2
       data.contextualEffectiveness.set(context, updatedEffectiveness)
@@ -571,7 +571,7 @@ export class EnhancedTechniqueClassificationService {
     _historicalData: any,
   ): Promise<TechniqueClassificationResult['expectedOutcome']> {
     const effectiveness =
-      this.effectivenessDatabase.get(primary.technique)?.overallEffectiveness ||
+      this.effectivenessDatabase.get(primary.technique)?.overallEffectiveness ??
       0.7
 
     return {

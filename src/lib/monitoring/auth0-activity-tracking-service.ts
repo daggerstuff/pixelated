@@ -12,9 +12,9 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+  domain: process.env.AUTH0_DOMAIN ?? '',
+  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? '',
+  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? '',
 }
 
 // Initialize Auth0 management client
@@ -34,15 +34,13 @@ function initializeAuth0Management() {
     )
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
+  auth0Management ??= new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
       scope: 'read:logs read:users',
-    })
-  }
+    });
 }
 
 // Initialize the management client
@@ -105,8 +103,8 @@ export interface SecurityEvent {
  */
 export class Auth0ActivityTrackingService {
   private db: Db | null = null
-  private collectionName = 'user_activities'
-  private securityEventsCollectionName = 'security_events'
+  private readonly collectionName = 'user_activities'
+  private readonly securityEventsCollectionName = 'security_events'
   private config: RealTimeActivityConfig
   private pollingInterval: NodeJS.Timeout | null = null
   private lastLogId: string | null = null
@@ -141,9 +139,7 @@ export class Auth0ActivityTrackingService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    if (!this.db) {
-      this.db = await mongodb.connect()
-    }
+    this.db ??= await mongodb.connect();
     return this.db
   }
 
@@ -211,7 +207,7 @@ export class Auth0ActivityTrackingService {
         .filter((log) => log.user_id) // Only logs with user ID
         .map((log) => ({
           userId: log.user_id!,
-          eventType: log.type || 'unknown',
+          eventType: log.type ?? 'unknown',
           timestamp: new Date(log.date),
           ipAddress: log.ip,
           userAgent: log.user_agent,
@@ -238,7 +234,7 @@ export class Auth0ActivityTrackingService {
 
       // Process security events
       await this.processSecurityEvents(logs)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch and store recent activities:', error)
     }
   }
@@ -256,7 +252,7 @@ export class Auth0ActivityTrackingService {
       if (activities.length > 0) {
         await collection.insertMany(activities)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to store activities:', error)
     }
   }
@@ -285,7 +281,7 @@ export class Auth0ActivityTrackingService {
               userId: log.user_id,
               timestamp: new Date(log.date),
               severity: 'medium',
-              description: log.description || 'Failed login attempt',
+              description: log.description ?? 'Failed login attempt',
               ipAddress: log.ip,
               userAgent: log.user_agent,
               details: {
@@ -302,7 +298,7 @@ export class Auth0ActivityTrackingService {
               userId: log.user_id,
               timestamp: new Date(log.date),
               severity: 'medium',
-              description: log.description || 'Failed password login attempt',
+              description: log.description ?? 'Failed password login attempt',
               ipAddress: log.ip,
               userAgent: log.user_agent,
               details: {
@@ -319,7 +315,7 @@ export class Auth0ActivityTrackingService {
               userId: log.user_id,
               timestamp: new Date(log.date),
               severity: 'medium',
-              description: log.description || 'Failed signup attempt',
+              description: log.description ?? 'Failed signup attempt',
               ipAddress: log.ip,
               userAgent: log.user_agent,
               details: {
@@ -336,7 +332,7 @@ export class Auth0ActivityTrackingService {
               userId: log.user_id,
               timestamp: new Date(log.date),
               severity: 'high',
-              description: log.description || 'Rate limit exceeded',
+              description: log.description ?? 'Rate limit exceeded',
               ipAddress: log.ip,
               userAgent: log.user_agent,
               details: {
@@ -353,7 +349,7 @@ export class Auth0ActivityTrackingService {
               userId: log.user_id,
               timestamp: new Date(log.date),
               severity: 'high',
-              description: log.description || 'Signup rate limit exceeded',
+              description: log.description ?? 'Signup rate limit exceeded',
               ipAddress: log.ip,
               userAgent: log.user_agent,
               details: {
@@ -365,7 +361,7 @@ export class Auth0ActivityTrackingService {
 
           case 's': // Success login
             // Log successful authentication
-            await logSecurityEvent(
+             logSecurityEvent(
               SecurityEventType.AUTHENTICATION_SUCCESS,
               log.user_id,
               {
@@ -383,7 +379,7 @@ export class Auth0ActivityTrackingService {
           await collection.insertOne(securityEvent)
 
           // Also log to the main security event system
-          await logSecurityEvent(securityEvent.type, securityEvent.userId, {
+           logSecurityEvent(securityEvent.type, securityEvent.userId, {
             logId: securityEvent.id,
             severity: securityEvent.severity,
             description: securityEvent.description,
@@ -394,7 +390,7 @@ export class Auth0ActivityTrackingService {
           })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to process security events:', error)
     }
   }
@@ -447,7 +443,7 @@ export class Auth0ActivityTrackingService {
       // Execute query
       const activities = await collection.find(query, options).toArray()
       return activities
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user activities:', error)
       return []
     }
@@ -502,7 +498,7 @@ export class Auth0ActivityTrackingService {
         activeDays,
         ipAddressCount: ipAddresses.length,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user activity summary:', error)
       return null
     }
@@ -537,7 +533,7 @@ export class Auth0ActivityTrackingService {
         .toArray()
 
       return events
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get security events:', error)
       return []
     }
@@ -560,7 +556,7 @@ export class Auth0ActivityTrackingService {
         .toArray()
 
       return activities
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get real-time activity stream:', error)
       return []
     }
@@ -593,7 +589,7 @@ export class Auth0ActivityTrackingService {
             }
           : undefined,
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get user sessions:', error)
       return []
     }
@@ -618,7 +614,7 @@ export class Auth0ActivityTrackingService {
       })
 
       // Log session termination
-      await logSecurityEvent(SecurityEventType.SESSION_TERMINATED, userId, {
+       logSecurityEvent(SecurityEventType.SESSION_TERMINATED, userId, {
         sessionId: sessionId,
         timestamp: new Date().toISOString(),
       })
@@ -630,16 +626,21 @@ export class Auth0ActivityTrackingService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to terminate user session:', error)
 
       // Log session termination error
-      await logSecurityEvent(
+       logSecurityEvent(
         SecurityEventType.SESSION_TERMINATION_ERROR,
         userId,
         {
           sessionId: sessionId,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -662,7 +663,7 @@ export class Auth0ActivityTrackingService {
     }
 
     // Log configuration update
-    await logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'activity_tracking',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString(),
@@ -697,7 +698,7 @@ export class Auth0ActivityTrackingService {
       })
 
       console.log(`Cleaned up ${result.deletedCount} old activity logs`)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to cleanup old logs:', error)
     }
   }
@@ -738,7 +739,7 @@ export class Auth0ActivityTrackingService {
         recentActivity,
         securityEvents,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get activity statistics:', error)
       return {
         totalActivities: 0,
@@ -775,7 +776,7 @@ export class Auth0ActivityTrackingService {
         .toArray()
 
       return activities
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to search activities:', error)
       return []
     }

@@ -25,7 +25,7 @@ export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
     const key = JSON.stringify(args)
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>
+      return cache.get(key)!
     }
 
     const result = fn(...args) as ReturnType<T>

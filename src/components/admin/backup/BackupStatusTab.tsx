@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/card/index.ts'
 
 import {
   BackupType,
@@ -89,6 +89,7 @@ const renderStatusBadge = (status: BackupStatus) => {
         </Badge>
       )
 
+    case BackupStatus.DELETED: { throw new Error('Not implemented yet: BackupStatus.DELETED case') }
     default:
       return null
   }
@@ -127,6 +128,7 @@ const renderTypeBadge = (type: BackupType) => {
         </Badge>
       )
 
+    case BackupType.INCREMENTAL: { throw new Error('Not implemented yet: BackupType.INCREMENTAL case') }
     default:
       return null
   }

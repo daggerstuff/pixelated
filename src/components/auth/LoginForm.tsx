@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import { Input } from '@/components/ui/input'
-import { toast } from '@/components/ui/toast'
-import { authClient } from '@/lib/auth-client'
+import { Input } from '@/components/ui/input.tsx'
+import { toast } from '@/components/ui/toast.tsx'
+import { authClient } from '@/lib/auth-client.ts'
 
 import '@/styles/login-form-responsive.css'
 
@@ -142,7 +142,7 @@ export function LoginForm({
       if (result.error) {
         const errorMessage =
           typeof result.error === 'object' && result.error !== null
-            ? (result.error as { message?: string }).message ||
+            ? (result.error as { message?: string }).message ??
               'Login failed. Please check your credentials.'
             : 'Login failed. Please check your credentials.'
 
@@ -229,7 +229,7 @@ export function LoginForm({
     try {
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: redirectTo || '/dashboard',
+        callbackURL: redirectTo ?? '/dashboard',
       })
       // OAuth redirect will happen automatically
       toast.info('Redirecting to Google authentication...')
@@ -319,6 +319,7 @@ export function LoginForm({
         noValidate
         onSubmit={handleSubmit}
         className='auth-form form-responsive'
+        data-testid='login-form'
       >
         <div className='form-group form-group-responsive'>
           <label htmlFor='email' className='form-label text-responsive--small'>

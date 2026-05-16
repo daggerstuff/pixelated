@@ -64,7 +64,7 @@ export interface StorageProvider {
  * Stores backups in memory - not persistent between page reloads
  */
 export class InMemoryStorageProvider implements StorageProvider {
-  private storage: Map<string, Uint8Array> = new Map()
+  private readonly storage: Map<string, Uint8Array> = new Map()
 
   async initialize(): Promise<void> {
     this.storage.clear()
@@ -105,7 +105,7 @@ export class InMemoryStorageProvider implements StorageProvider {
  * Uses browser's localStorage API (with size limitations)
  */
 export class LocalStorageProvider implements StorageProvider {
-  private prefix: string
+  private readonly prefix: string
 
   constructor(config: Record<string, unknown>) {
     this.prefix = (config.prefix as string) || 'backup-'
@@ -158,7 +158,7 @@ export class LocalStorageProvider implements StorageProvider {
     for (let i = 0; i < localStorage.length; i++) {
       const fullKey = localStorage.key(i)
 
-      if (fullKey && fullKey.startsWith(this.prefix)) {
+      if (fullKey?.startsWith(this.prefix)) {
         // Remove prefix to get the actual key
         const key = fullKey.substring(this.prefix.length)
 
@@ -183,8 +183,8 @@ export class LocalStorageProvider implements StorageProvider {
  * Uses IndexedDB for larger storage capabilities
  */
 export class IndexedDBStorageProvider implements StorageProvider {
-  private dbName: string
-  private storeName: string
+  private readonly dbName: string
+  private readonly storeName: string
   private db: IDBDatabase | null = null
 
   constructor(config: Record<string, unknown>) {
@@ -204,7 +204,7 @@ export class IndexedDBStorageProvider implements StorageProvider {
       request.onerror = (event) => {
         logger.error('Failed to open IndexedDB', {
           error:
-            (event.target as IDBOpenDBRequest)?.error?.message ||
+            (event.target as IDBOpenDBRequest)?.error?.message ??
             'Unknown error',
         })
         reject(new Error('Failed to open IndexedDB'))

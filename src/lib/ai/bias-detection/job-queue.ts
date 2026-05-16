@@ -16,9 +16,9 @@ export interface Job<T = any, R = any> {
 }
 
 export class JobQueue<T = any, R = any> {
-  private jobs: Map<string, Job<T, R>> = new Map()
-  private queue: string[] = []
-  private processing = false
+  private readonly jobs: Map<string, Job<T, R>> = new Map()
+  private readonly queue: string[] = []
+  private readonly processing = false
 
   submit(data: T): string {
     const id = Math.random().toString(36).slice(2) + Date.now()

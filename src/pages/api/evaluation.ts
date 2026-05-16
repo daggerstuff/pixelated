@@ -17,9 +17,9 @@ const rateLimiter = createEnhancedRateLimiter(30, 60 * 1000) // 30 requests per 
 // Helper function to get client IP
 function getClientIP(request: Request): string {
   return (
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    request.headers.get('cf-connecting-ip') ||
+    ((request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    request.headers.get('x-real-ip')) ??
+    request.headers.get('cf-connecting-ip')) ??
     'unknown'
   )
 }
@@ -48,8 +48,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       role: user.role,
       path: '/api/evaluation',
       clientIp: clientIP,
-      userAgent: request.headers.get('user-agent') || 'unknown',
-      referer: request.headers.get('referer') || 'unknown',
+      userAgent: request.headers.get('user-agent') ?? 'unknown',
+      referer: request.headers.get('referer') ?? 'unknown',
     })
 
     if (!rateLimitResult.allowed) {
@@ -125,7 +125,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching evaluations:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -157,8 +157,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     role: user.role,
     path: '/api/evaluation',
     clientIp: clientIP,
-    userAgent: request.headers.get('user-agent') || 'unknown',
-    referer: request.headers.get('referer') || 'unknown',
+    userAgent: request.headers.get('user-agent') ?? 'unknown',
+    referer: request.headers.get('referer') ?? 'unknown',
   })
 
   if (!rateLimitResult.allowed) {
@@ -256,7 +256,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (transactionStarted) {
       try {
         await client.query('ROLLBACK')

@@ -12,17 +12,6 @@ class Signals:
     harm: float  # [0,1] (higher is worse)
 
 
-# Try to import production implementation
-try:
-    from scripts.quality_scoring.production_scoring import (
-        compute_signals as compute_signals_production,
-    )
-
-    PRODUCTION_AVAILABLE = True
-except ImportError:
-    PRODUCTION_AVAILABLE = False
-
-
 @dataclass
 class ScoreResult:
     signals: Signals
@@ -46,14 +35,6 @@ def compute_signals(text: str) -> Signals:
     - domain: look for therapy-related keywords
     - harm: detect simple toxic/unsafe tokens
     """
-    # Use production implementation if available
-    if PRODUCTION_AVAILABLE:
-        try:
-            return compute_signals_production(text)
-        except Exception:
-            # Fall through to fallback
-            pass
-
     # Fallback: Simple heuristics (original stub implementation)
     lower = text.lower()
     supportive = ["i understand", "it makes sense", "thank you for sharing", "you are not alone"]

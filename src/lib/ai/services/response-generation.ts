@@ -16,10 +16,10 @@ export interface ResponseGenerationConfig {
 }
 
 export class ResponseGenerationService {
-  private aiService: AIService
-  private model: string
-  private temperature: number
-  private maxResponseTokens: number
+  private readonly aiService: AIService
+  private readonly model: string
+  private readonly temperature: number
+  private readonly maxResponseTokens: number
 
   constructor(config: ResponseGenerationConfig) {
     this.aiService = config.aiService

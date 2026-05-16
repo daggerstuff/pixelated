@@ -75,11 +75,11 @@ export interface ThreatDetectionConfig {
 }
 
 export class ThreatDetectionService {
-  private orchestrator: AdvancedResponseOrchestrator
-  private rateLimiter: DistributedRateLimiter
-  private rateLimitingBridge: RateLimitingBridge
-  private middleware: ThreatDetectionMiddleware
-  private config: ThreatDetectionConfig
+  private readonly orchestrator: AdvancedResponseOrchestrator
+  private readonly rateLimiter: DistributedRateLimiter
+  private readonly rateLimitingBridge: RateLimitingBridge
+  private readonly middleware: ThreatDetectionMiddleware
+  private readonly config: ThreatDetectionConfig
 
   constructor(
     orchestrator: AdvancedResponseOrchestrator,
@@ -149,7 +149,7 @@ export class ThreatDetectionService {
       })
 
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Threat analysis failed:', {
         error,
         threatId: threatData.threatId,
@@ -198,7 +198,7 @@ export class ThreatDetectionService {
         threatResponse: result.threatResponse,
         shouldBlock: result.shouldBlock,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Request check failed:', { error, identifier })
       // Fail open - allow request if check fails
       return {
@@ -246,6 +246,7 @@ export class ThreatDetectionService {
         }
         break
 
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         analysis.confidence = this.analyzeGenericThreat(threatData)
         analysis.patterns = this.detectGenericPatterns(threatData)
@@ -264,8 +265,8 @@ export class ThreatDetectionService {
    * Analyze rate limiting related threats
    */
   private analyzeRateLimitingThreat(threatData: ThreatData): number {
-    const violationCount = threatData.riskFactors?.violationCount || 0
-    const timeWindow = threatData.riskFactors?.timeWindow || 60000
+    const violationCount = threatData.riskFactors?.violationCount ?? 0
+    const timeWindow = threatData.riskFactors?.timeWindow ?? 60000
 
     // Calculate violation rate
     const violationRate = violationCount / (timeWindow / 1000) // violations per second
@@ -281,8 +282,8 @@ export class ThreatDetectionService {
    */
   private detectRateLimitingPatterns(threatData: ThreatData): string[] {
     const patterns: string[] = []
-    const violationCount = threatData.riskFactors?.violationCount || 0
-    const timeWindow = threatData.riskFactors?.timeWindow || 60000
+    const violationCount = threatData.riskFactors?.violationCount ?? 0
+    const timeWindow = threatData.riskFactors?.timeWindow ?? 60000
 
     // Check for burst patterns
     if (violationCount > timeWindow / 1000) {
@@ -360,6 +361,7 @@ export class ThreatDetectionService {
         return 0.5
       case 'low':
         return 0.3
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return 0.5
     }
@@ -428,6 +430,7 @@ export class ThreatDetectionService {
       case 'low':
         recommendations.push('continue_monitoring', 'update_baseline')
         break
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
     }
 
     return recommendations
@@ -498,7 +501,7 @@ export class ThreatDetectionService {
         recentThreats: 0, // Would be populated from analytics
         recentResponses: bridgeStatus.recentIntegrations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get health status:', { error })
       return {
         healthy: false,
@@ -534,7 +537,7 @@ export class ThreatDetectionService {
         threatDistribution: {},
         responseDistribution: {},
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get statistics:', { error })
       return {
         totalThreats: 0,
@@ -623,9 +626,5 @@ export function createThreatDetectionService(
   }
 
   const config = { ...defaultConfig, ...customConfig }
-  return new ThreatDetectionService(
-    orchestrator,
-    rateLimiter,
-    config,
-  )
+  return new ThreatDetectionService(orchestrator, rateLimiter, config)
 }

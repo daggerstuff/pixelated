@@ -5,7 +5,7 @@
 
 import { z } from 'zod'
 
-import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+import { getClinicalAnalysisLogger } from '../../../../logging/standardized-logger'
 
 // Import shared types to avoid circular dependencies
 import type { EvidenceItem } from '../types'

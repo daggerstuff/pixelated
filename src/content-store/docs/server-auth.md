@@ -1,11 +1,13 @@
 ---
-title: 'Server-Side Authentication Security'
-description: 'Server-Side Authentication Security documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'authentication']
+description: Server-Side Authentication Security documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - authentication
 draft: false
 toc: true
+title: Server-Side Authentication Security
 ---
 
 # Server-Side Authentication Security

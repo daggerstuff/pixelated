@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { AuditEventType, AuditSeverity } from '../events'
+
 const mocks = vi.hoisted(() => ({
   info: vi.fn(),
   warn: vi.fn(),
@@ -40,15 +42,16 @@ describe('AuditLogger', () => {
     const { AuditLogger } = await import('../logger')
     const auditLogger = AuditLogger.getInstance()
 
-    vi.spyOn(auditLogger as unknown as { persistEventWithRetry: () => Promise<void> }, 'persistEventWithRetry').mockRejectedValueOnce(
-      new Error('MongoDB unavailable'),
-    )
+    vi.spyOn(
+      auditLogger as unknown as { persistEventWithRetry: () => Promise<void> },
+      'persistEventWithRetry',
+    ).mockRejectedValueOnce(new Error('MongoDB unavailable'))
 
     const payload = {
       userId: 'user-1',
-      type: 'security' as const,
+      type: AuditEventType.SECURITY,
       action: 'login',
-      severity: 'high' as const,
+      severity: AuditSeverity.HIGH,
       metadata: {
         patientName: 'Alice Example',
         email: 'alice@example.com',

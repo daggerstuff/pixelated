@@ -54,14 +54,14 @@ export interface WebSocketServerConfig {
 
 export class BiasWebSocketServer {
   private wss: WebSocketServer | null = null
-  private clients: Map<string, WebSocketClient> = new Map()
+  private readonly clients: Map<string, WebSocketClient> = new Map()
   private isRunning = false
   private heartbeatInterval?: NodeJS.Timeout
   private metricsInterval?: NodeJS.Timeout
-  private bannedIPs: Map<string, Date> = new Map()
-  private messageRateLimits: Map<string, Array<Date>> = new Map()
+  private readonly bannedIPs: Map<string, Date> = new Map()
+  private readonly messageRateLimits: Map<string, Array<Date>> = new Map()
 
-  constructor(private config: WebSocketServerConfig) {}
+  constructor(private readonly config: WebSocketServerConfig) {}
 
   async start(): Promise<void> {
     if (this.isRunning) {
@@ -153,15 +153,15 @@ export class BiasWebSocketServer {
     const { origin, req } = info as { origin?: string; req: IncomingMessage }
     const remoteAddress = req.socket?.remoteAddress
 
-    if (this.bannedIPs.has(remoteAddress || 'unknown')) {
-      const banExpiry = this.bannedIPs.get(remoteAddress || 'unknown')!
+    if (this.bannedIPs.has(remoteAddress ?? 'unknown')) {
+      const banExpiry = this.bannedIPs.get(remoteAddress ?? 'unknown')!
       if (banExpiry > new Date()) {
         logger.warn('Rejected connection from banned IP', {
           ipAddress: remoteAddress,
         })
         return false
       } else {
-        this.bannedIPs.delete(remoteAddress || 'unknown')
+        this.bannedIPs.delete(remoteAddress ?? 'unknown')
       }
     }
 
@@ -196,7 +196,7 @@ export class BiasWebSocketServer {
     const clientId = this.generateClientId()
     const { socket, headers } = request
     const remoteAddress = socket?.remoteAddress
-    const userAgent = headers['user-agent'] || 'unknown'
+    const userAgent = headers['user-agent'] ?? 'unknown'
 
     const client: WebSocketClient = {
       id: clientId,
@@ -205,7 +205,7 @@ export class BiasWebSocketServer {
       filters: {},
       lastPing: new Date(),
       isAuthenticated: !this.config.authRequired,
-      ipAddress: remoteAddress || 'unknown',
+      ipAddress: remoteAddress ?? 'unknown',
       userAgent,
     }
 
@@ -313,8 +313,8 @@ export class BiasWebSocketServer {
       return
     }
 
-    const channels = message.channels || []
-    const filters = message.filters || {}
+    const channels = message.channels ?? []
+    const filters = message.filters ?? {}
 
     for (const channel of channels) {
       client.subscriptions.add(channel)
@@ -355,7 +355,7 @@ export class BiasWebSocketServer {
       return
     }
 
-    const channels = message.channels || []
+    const channels = message.channels ?? []
     for (const channel of channels) {
       client.subscriptions.delete(channel)
     }
@@ -393,7 +393,7 @@ export class BiasWebSocketServer {
       return
     }
 
-    const filters = message.filters || {}
+    const filters = message.filters ?? {}
     client.filters = { ...client.filters, ...filters }
 
     logger.debug('Client updated subscription filters', {
@@ -733,7 +733,7 @@ export class BiasWebSocketServer {
       return false
     }
 
-    const messages = this.messageRateLimits.get(clientId) || []
+    const messages = this.messageRateLimits.get(clientId) ?? []
     const recentMessages = messages.filter(
       (time) => now.getTime() - time.getTime() < 60000,
     )

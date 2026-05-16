@@ -8,7 +8,7 @@ import type {
   TherapeuticResponse,
 } from '@/lib/ai/models/ai-types'
 import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
-import { createTogetherAIService } from '@/lib/ai/services/together'
+import { createLLMService } from '@/lib/ai/services/llm-provider'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { aiRepository } from '@/lib/db/ai'
@@ -21,6 +21,56 @@ import {
   AuditEventType,
   AuditEventStatus,
 } from '../../../lib/audit'
+
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+const LLM_PROVIDER_API_KEYS: readonly string[] = [
+  'LLM_API_KEY',
+  'NVIDIA_API_KEY',
+  'NIM_API_KEY',
+  'NVIDIA_TOKEN',
+]
+
+const LLM_PROVIDER_BASE_URLS: readonly string[] = [
+  'LLM_BASE_URL',
+  'LLM_API_URL',
+  'OPENAI_BASE_URL',
+  'NVIDIA_OPENAI_BASE_URL',
+  'NVIDIA_BASE_URL',
+  'NIM_BASE_URL',
+]
+
+function getEnvValue(key: string): string | undefined {
+  const importMetaEnv = import.meta.env as Record<string, string | undefined>
+  return process.env[key] ?? importMetaEnv?.[key]
+}
+
+function resolveProviderApiKey(): string | undefined {
+  for (const key of LLM_PROVIDER_API_KEYS) {
+    const value = getEnvValue(key)
+    if (value) return value
+  }
+  return undefined
+}
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string | undefined {
+  const llmBaseUrl = LLM_PROVIDER_BASE_URLS.map((key) => getEnvValue(key)).find(
+    Boolean,
+  )
+
+  if (isOpenRouterBaseUrl(llmBaseUrl)) {
+    console.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return undefined
+  }
+
+  return llmBaseUrl
+}
 
 /**
  * GET handler - returns information about the AI response endpoint
@@ -73,7 +123,7 @@ export const GET: APIRoute = async ({ request }) => {
         status: 'active',
         authentication: 'required',
         supportedModels: [
-          'mistralai/Mixtral-8x7B-Instruct-v0.2',
+          'minimaxai/minimax-m2.7',
           'gpt-4',
           'claude-3',
         ],
@@ -92,7 +142,7 @@ export const GET: APIRoute = async ({ request }) => {
           'audit logging',
           'token usage tracking',
         ],
-        defaultModel: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        defaultModel: 'minimaxai/minimax-m2.7',
         maxTokens: 1024,
       }),
       {
@@ -185,16 +235,14 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    // Create Together AI service
-    const togetherService = createTogetherAIService({
-      togetherApiKey: import.meta.env['TOGETHER_API_KEY'] || '',
-      togetherBaseUrl:
-        import.meta.env['TOGETHER_BASE_URL'] || 'https://api.together.xyz',
-      apiKey: '',
+    // Create LLM service
+    const llmService = createLLMService({
+      apiKey: resolveProviderApiKey() ?? '',
+      baseUrl: resolveSafeLlmBaseUrl(),
     })
 
     // Use the model from the request or the default
-    const modelId = model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+    const modelId = model ?? 'minimaxai/minimax-m2.7'
 
     // Create an adapter for the AI service
     const serviceAdapter: AIService = {
@@ -202,14 +250,14 @@ export const POST: APIRoute = async ({ request }) => {
         messages: AIMessage[],
         options?: AIServiceOptions,
       ) => {
-        const response = await togetherService.generateCompletion(
+        const response = await llmService.generateCompletion(
           messages,
           options,
         )
         return {
-          id: `together${Date.now()}`,
+          id: `llm-${Date.now()}`,
           created: Date.now(),
-          model: options?.model || modelId,
+          model: options?.model ?? modelId,
           choices: [
             {
               message: {
@@ -230,25 +278,19 @@ export const POST: APIRoute = async ({ request }) => {
             response !== null &&
             'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
+                  promptTokens: ((response.usage as { promptTokens: number })
+                      ?.promptTokens || 0),
+                  completionTokens: ((response.usage as { completionTokens: number })
+                      ?.completionTokens || 0),
+                  totalTokens: ((response.usage as { totalTokens: number })?.totalTokens ||
+                      0),
                 }
               : {
                   promptTokens: 0,
                   completionTokens: 0,
                   totalTokens: 0,
                 },
-          provider: 'together',
+          provider: 'llm',
           content:
             typeof response === 'object' &&
             response !== null &&
@@ -261,23 +303,15 @@ export const POST: APIRoute = async ({ request }) => {
         _messages: AIMessage[],
         options?: AIServiceOptions,
       ): Promise<AsyncGenerator<AIStreamChunk, void, void>> => {
-        const generator = async function* () {
-          // Minimal implementation - streaming not fully supported
-          yield {
-            id: `together_${Date.now()}`,
-            model: options?.model || modelId,
-            created: Date.now(),
-            content: '',
-            done: true,
-          } as AIStreamChunk
-          throw new Error('Streaming not supported in this implementation')
-        }
-        return generator()
+        return llmService.createStreamingChatCompletion(_messages, {
+          ...(options ?? {}),
+          model: options?.model ?? modelId,
+        })
       },
       getModelInfo: (model: string) => ({
         id: model,
         name: model,
-        provider: 'together',
+          provider: 'llm',
         capabilities: ['chat'],
         contextWindow: 8192,
         maxTokens: 8192,
@@ -286,14 +320,14 @@ export const POST: APIRoute = async ({ request }) => {
         messages: AIMessage[],
         options?: AIServiceOptions,
       ) => {
-        const response = await togetherService.generateCompletion(
+        const response = await llmService.generateCompletion(
           messages,
           options,
         )
         return {
-          id: `together${Date.now()}`,
+          id: `llm-${Date.now()}`,
           created: Date.now(),
-          model: options?.model || modelId,
+          model: options?.model ?? modelId,
           choices: [
             {
               message: {
@@ -314,25 +348,19 @@ export const POST: APIRoute = async ({ request }) => {
             response !== null &&
             'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
+                  promptTokens: ((response.usage as { promptTokens: number })
+                      ?.promptTokens || 0),
+                  completionTokens: ((response.usage as { completionTokens: number })
+                      ?.completionTokens || 0),
+                  totalTokens: ((response.usage as { totalTokens: number })?.totalTokens ||
+                      0),
                 }
               : {
                   promptTokens: 0,
                   completionTokens: 0,
                   totalTokens: 0,
                 },
-          provider: 'together',
+          provider: 'llm',
           content:
             typeof response === 'object' &&
             response !== null &&
@@ -343,7 +371,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
       // generateCompletion is not required for this adapter in current usage. Omitting to simplify typing.
       dispose: () => {
-        togetherService.dispose()
+        llmService.dispose()
       },
     }
 
@@ -361,7 +389,7 @@ export const POST: APIRoute = async ({ request }) => {
       userId || 'anonymous',
       'response-generation',
       {
-        model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
         temperature,
         maxResponseTokens,
         messageCount: messages ? messages.length : 1,
@@ -391,28 +419,28 @@ export const POST: APIRoute = async ({ request }) => {
     trackApiRequest(endpoint, 'POST', 200, latencyMs)
     apiMetrics.responseTime(endpoint, latencyMs, 'POST')
     countMetric('ai.response.generated', 1, {
-      model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      provider: 'together',
+      model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      provider: 'llm',
       success: true,
     })
 
     // Store the result in the database
     await aiRepository.storeResponseGeneration({
       userId: userId || 'anonymous',
-      modelId: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      modelProvider: 'together',
+      modelId: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      modelProvider: 'llm',
       latencyMs,
       success: true,
       error: null,
-      prompt: currentMessage || (messages ? JSON.stringify(messages) : ''),
+      prompt: currentMessage ?? (messages ? JSON.stringify(messages) : ''),
       response: result?.content,
       context: '',
       instructions,
       temperature,
       maxTokens: maxResponseTokens,
-      requestTokens: result?.usage?.promptTokens || 0,
-      responseTokens: result?.usage?.completionTokens || 0,
-      totalTokens: result?.usage?.totalTokens || 0,
+      requestTokens: result?.usage?.promptTokens ?? 0,
+      responseTokens: result?.usage?.completionTokens ?? 0,
+      totalTokens: result?.usage?.totalTokens ?? 0,
       metadata: {
         messageCount: messages ? messages.length : 1,
       },
@@ -425,7 +453,7 @@ export const POST: APIRoute = async ({ request }) => {
       userId || 'anonymous',
       'response-generation',
       {
-        model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
         responseLength: result?.content.length,
         latencyMs,
       },
@@ -454,7 +482,7 @@ export const POST: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.response.error',
-      userId || 'anonymous',
+      userId ?? 'anonymous',
       'response-generation',
       {
         error: error instanceof Error ? error?.message : String(error),

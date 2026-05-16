@@ -53,21 +53,20 @@ const EmailQueueItemSchema = z.object({
 type EmailQueueItem = z.infer<typeof EmailQueueItemSchema>
 
 export class EmailService {
-  private resend: Resend
-  private isEnabled = false
-  private queueKey = 'email:queue'
-  private processingKey = 'email:processing'
-  private maxAttempts = 3
-  private retryDelays = [60, 300, 900] // 1min, 5min, 15min
-  private templates = new Map<string, EmailTemplate>()
-  private isShuttingDown = false
+  private readonly resend: Resend | undefined
+  private readonly isEnabled: boolean = false
+  private readonly queueKey = 'email:queue'
+  private readonly processingKey = 'email:processing'
+  private readonly maxAttempts = 3
+  private readonly retryDelays = [60, 300, 900] // 1min, 5min, 15min
+  private readonly templates = new Map<string, EmailTemplate>()
+  private readonly isShuttingDown = false
 
   constructor() {
     const apiKey = env.email.resendApiKey()
     if (!apiKey) {
       // Do not throw; run in disabled mode so upstream APIs don't 500
       this.isEnabled = false
-      // @ts-expect-error - initialized later only when enabled
       this.resend = undefined
       logger.warn(
         'Email service is disabled: missing RESEND_API_KEY. Emails will be skipped.',

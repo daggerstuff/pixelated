@@ -6,7 +6,7 @@ import { Logger } from '../utils/logger'
 // import { DatabaseService } from './databaseService'
 
 export class MarketAnalyticsService {
-  private logger: Logger
+  private readonly logger: Logger
   constructor() {
     this.logger = new Logger('MarketAnalyticsService')
   }
@@ -20,9 +20,10 @@ export class MarketAnalyticsService {
     try {
       const segmentData = await this.fetchSegmentData(targetSegments)
       const penetrationAnalysis: MarketPenetration[] = []
+      const fallbackSegmentData = { current: 0, total: 1000 }
 
       for (const segment of targetSegments) {
-        const data = segmentData[segment]
+        const data = segmentData[segment] ?? fallbackSegmentData
         const penetration = (data.current / data.total) * 100
         const opportunity = data.total - data.current
 
@@ -40,7 +41,7 @@ export class MarketAnalyticsService {
       }
 
       return penetrationAnalysis.sort((a, b) => b.opportunity - a.opportunity)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to analyze market penetration', {
         error,
         targetSegments,
@@ -290,7 +291,7 @@ export class MarketAnalyticsService {
 
     const forecast = []
     let currentMarketSize =
-      historicalData[historicalData.length - 1]?.marketSize || 1000000
+      historicalData[historicalData.length - 1]?.marketSize ?? 1000000
 
     for (let month = 1; month <= forecastPeriod; month++) {
       const growthMultiplier = 1 + trends.growthRate / 100 / 12
@@ -336,7 +337,7 @@ export class MarketAnalyticsService {
     return Object.fromEntries(
       segments.map((segment) => [
         segment,
-        mockData[segment] || { current: 0, total: 1000 },
+        mockData[segment] ?? { current: 0, total: 1000 },
       ]),
     )
   }
@@ -427,7 +428,7 @@ export class MarketAnalyticsService {
     const seasonalFactors = [
       1.0, 0.95, 1.05, 1.1, 1.05, 1.0, 0.9, 0.85, 0.9, 1.0, 1.1, 1.15,
     ]
-    return seasonalFactors[(month - 1) % 12]
+    return seasonalFactors[(month - 1) % 12] ?? 1
   }
 }
 

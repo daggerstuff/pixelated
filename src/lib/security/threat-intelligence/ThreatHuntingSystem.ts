@@ -172,18 +172,18 @@ export interface HuntTemplate {
 }
 
 export class ThreatHuntingSystem extends EventEmitter {
-  private mongoClient: MongoClient
-  private db: Db
-  private huntsCollection: Collection<ThreatHunt>
-  private resultsCollection: Collection<HuntResult>
-  private falsePositivesCollection: Collection<FalsePositive>
-  private redis: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private huntsCollection!: Collection<ThreatHunt>
+  private resultsCollection!: Collection<HuntResult>
+  private falsePositivesCollection!: Collection<FalsePositive>
+  private redis!: Redis
   private isInitialized = false
   private huntQueue: string[] = []
   private isProcessing = false
-  private activeHunts = new Map<string, ThreatHunt>()
+  private readonly activeHunts = new Map<string, ThreatHunt>()
 
-  constructor(private config: ThreatHuntingSystemConfig) {
+  constructor(private readonly config: ThreatHuntingSystemConfig) {
     super()
     this.setMaxListeners(0)
   }
@@ -229,12 +229,12 @@ export class ThreatHuntingSystem extends EventEmitter {
       logger.info('Threat Hunting System initialized successfully')
 
       this.emit('initialized', { timestamp: new Date() })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Threat Hunting System', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw new Error(
-        `Failed to initialize threat hunting system: ${error.message}`,
+        `Failed to initialize threat hunting system: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -267,9 +267,9 @@ export class ThreatHuntingSystem extends EventEmitter {
       ])
 
       logger.info('Database indexes created successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create database indexes', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw error
     }
@@ -288,9 +288,9 @@ export class ThreatHuntingSystem extends EventEmitter {
         try {
           const huntData = JSON.parse(message)
           await this.executeHunt(huntData.hunt_id)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process hunt execution request', {
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
           })
         }
       })
@@ -300,16 +300,18 @@ export class ThreatHuntingSystem extends EventEmitter {
         try {
           const dataInfo = JSON.parse(message)
           await this.handleNewDataAvailable(dataInfo)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to process data availability event', {
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
           })
         }
       })
 
       logger.info('Redis pub/sub setup completed')
-    } catch (error) {
-      logger.error('Failed to setup Redis pub/sub', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to setup Redis pub/sub', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -344,9 +346,9 @@ export class ThreatHuntingSystem extends EventEmitter {
           logger.info('Hunt template initialized', { hunt_id: template.id })
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize hunt templates', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
       throw error
     }
@@ -366,12 +368,12 @@ export class ThreatHuntingSystem extends EventEmitter {
 
       const hunt: ThreatHunt = {
         id: huntId,
-        name: huntData.name || 'Untitled Hunt',
-        description: huntData.description || '',
-        hunt_type: huntData.hunt_type || 'network',
+        name: huntData.name ?? 'Untitled Hunt',
+        description: huntData.description ?? '',
+        hunt_type: huntData.hunt_type ?? 'network',
         status: 'active',
-        priority: huntData.priority || 'medium',
-        scope: huntData.scope || {
+        priority: huntData.priority ?? 'medium',
+        scope: huntData.scope ?? {
           regions: ['global'],
           systems: ['all'],
           time_range: {
@@ -380,14 +382,14 @@ export class ThreatHuntingSystem extends EventEmitter {
           },
           data_sources: ['logs', 'network', 'endpoint'],
         },
-        query: huntData.query || {
+        query: huntData.query ?? {
           type: 'custom',
           query: '',
         },
         schedule: huntData.schedule,
         results: [],
         false_positives: [],
-        created_by: huntData.created_by || 'system',
+        created_by: huntData.created_by ?? 'system',
         created_at: now,
         updated_at: now,
       }
@@ -404,8 +406,10 @@ export class ThreatHuntingSystem extends EventEmitter {
       this.emit('hunt:created', { hunt_id: huntId })
 
       return huntId
-    } catch (error) {
-      logger.error('Failed to create threat hunt', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to create threat hunt', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -534,9 +538,9 @@ export class ThreatHuntingSystem extends EventEmitter {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to execute threat hunt', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hunt_id: huntId,
       })
 
@@ -551,7 +555,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           {
             timestamp: new Date(),
             level: 'error',
-            message: `Hunt execution failed: ${error.message}`,
+            message: `Hunt execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
           },
         ],
         status: 'failed',
@@ -594,7 +598,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'suspicious_network_connection',
           severity: this.determineNetworkFindingSeverity(connection),
-          confidence: connection.confidence || 0.7,
+          confidence: connection.confidence ?? 0.7,
           description: `Suspicious network connection detected: ${connection.source_ip} -> ${connection.dest_ip}`,
           evidence: [
             {
@@ -602,20 +606,20 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: connection,
               source: 'network_monitoring',
               timestamp: new Date(),
-              confidence: connection.confidence || 0.7,
+              confidence: connection.confidence ?? 0.7,
             },
           ],
           indicators: [
             {
               type: 'ip',
               value: connection.source_ip,
-              confidence: connection.confidence || 0.7,
+              confidence: connection.confidence ?? 0.7,
               source: 'network_hunt',
             },
             {
               type: 'ip',
               value: connection.dest_ip,
-              confidence: connection.confidence || 0.7,
+              confidence: connection.confidence ?? 0.7,
               source: 'network_hunt',
             },
           ],
@@ -640,8 +644,10 @@ export class ThreatHuntingSystem extends EventEmitter {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
-        message: `Network hunt failed: ${error.message}`,
-        details: { error: error.message },
+        message: `Network hunt failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        details: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
       })
       throw error
     }
@@ -679,7 +685,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'suspicious_process',
           severity: this.determineProcessFindingSeverity(process),
-          confidence: process.confidence || 0.8,
+          confidence: process.confidence ?? 0.8,
           description: `Suspicious process detected: ${process.name} (PID: ${process.pid})`,
           evidence: [
             {
@@ -687,14 +693,14 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: process,
               source: 'endpoint_detection',
               timestamp: new Date(),
-              confidence: process.confidence || 0.8,
+              confidence: process.confidence ?? 0.8,
             },
           ],
           indicators: [
             {
               type: 'hash',
               value: process.hash,
-              confidence: process.confidence || 0.8,
+              confidence: process.confidence ?? 0.8,
               source: 'endpoint_hunt',
             },
           ],
@@ -713,7 +719,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
-        message: `Endpoint hunt failed: ${error.message}`,
+        message: `Endpoint hunt failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
       throw error
     }
@@ -748,7 +754,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'anomalous_user_behavior',
           severity: this.determineBehaviorFindingSeverity(behavior),
-          confidence: behavior.confidence || 0.6,
+          confidence: behavior.confidence ?? 0.6,
           description: `Anomalous user behavior detected for user: ${behavior.user_id}`,
           evidence: [
             {
@@ -756,18 +762,18 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: behavior,
               source: 'user_behavior_analytics',
               timestamp: new Date(),
-              confidence: behavior.confidence || 0.6,
+              confidence: behavior.confidence ?? 0.6,
             },
           ],
           indicators: [
             {
               type: 'behavior',
               value: behavior.activity_type,
-              confidence: behavior.confidence || 0.6,
+              confidence: behavior.confidence ?? 0.6,
               source: 'user_behavior_hunt',
             },
           ],
-          affected_systems: behavior.affected_systems || [],
+          affected_systems: behavior.affected_systems ?? [],
           remediation_suggested: [
             'Review user access permissions',
             'Investigate unusual activity',
@@ -782,7 +788,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
-        message: `User behavior hunt failed: ${error.message}`,
+        message: `User behavior hunt failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
       throw error
     }
@@ -820,7 +826,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'malware_indicator',
           severity: this.determineMalwareFindingSeverity(indicator),
-          confidence: indicator.confidence || 0.9,
+          confidence: indicator.confidence ?? 0.9,
           description: `Malware indicator detected: ${indicator.description}`,
           evidence: [
             {
@@ -828,18 +834,18 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: indicator,
               source: 'malware_detection',
               timestamp: new Date(),
-              confidence: indicator.confidence || 0.9,
+              confidence: indicator.confidence ?? 0.9,
             },
           ],
           indicators: [
             {
               type: 'hash',
               value: indicator.file_hash,
-              confidence: indicator.confidence || 0.9,
+              confidence: indicator.confidence ?? 0.9,
               source: 'malware_hunt',
             },
           ],
-          affected_systems: indicator.affected_systems || [],
+          affected_systems: indicator.affected_systems ?? [],
           remediation_suggested: [
             'Quarantine affected files',
             'Run antivirus scan',
@@ -854,7 +860,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
-        message: `Malware hunt failed: ${error.message}`,
+        message: `Malware hunt failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
       throw error
     }
@@ -889,7 +895,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'lateral_movement',
           severity: this.determineLateralMovementSeverity(movement),
-          confidence: movement.confidence || 0.8,
+          confidence: movement.confidence ?? 0.8,
           description: `Potential lateral movement detected: ${movement.user_id} accessing ${movement.target_system}`,
           evidence: [
             {
@@ -897,14 +903,14 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: movement,
               source: 'authentication_logs',
               timestamp: new Date(),
-              confidence: movement.confidence || 0.8,
+              confidence: movement.confidence ?? 0.8,
             },
           ],
           indicators: [
             {
               type: 'behavior',
               value: 'unusual_access_pattern',
-              confidence: movement.confidence || 0.8,
+              confidence: movement.confidence ?? 0.8,
               source: 'lateral_movement_hunt',
             },
           ],
@@ -923,7 +929,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
-        message: `Lateral movement hunt failed: ${error.message}`,
+        message: `Lateral movement hunt failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
       throw error
     }
@@ -1110,7 +1116,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
-        message: `AI assistance failed: ${error.message}`,
+        message: `AI assistance failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
     }
   }
@@ -1198,7 +1204,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     try {
       const hunt = await this.huntsCollection.findOne({ id: huntId })
 
-      if (!hunt || !hunt.schedule?.enabled) {
+      if (!hunt?.schedule?.enabled) {
         return
       }
 
@@ -1231,9 +1237,9 @@ export class ThreatHuntingSystem extends EventEmitter {
         hunt_id: huntId,
         next_run: nextRun,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to schedule next hunt run', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hunt_id: huntId,
       })
     }
@@ -1258,9 +1264,9 @@ export class ThreatHuntingSystem extends EventEmitter {
           await this.queueHuntForExecution(hunt.id)
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to handle new data availability', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
     }
   }
@@ -1295,9 +1301,9 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       logger.debug('Hunt queued for execution', { hunt_id: huntId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to queue hunt for execution', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hunt_id: huntId,
       })
     }
@@ -1337,9 +1343,9 @@ export class ThreatHuntingSystem extends EventEmitter {
       const executionPromises = huntIds.map(async (huntId) => {
         try {
           return await this.executeHunt(huntId)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to execute hunt', {
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             hunt_id: huntId,
           })
           return null
@@ -1347,8 +1353,10 @@ export class ThreatHuntingSystem extends EventEmitter {
       })
 
       await Promise.allSettled(executionPromises)
-    } catch (error) {
-      logger.error('Failed to process hunt queue', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to process hunt queue', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
     } finally {
       this.isProcessing = false
     }
@@ -1370,9 +1378,9 @@ export class ThreatHuntingSystem extends EventEmitter {
       for (const hunt of scheduledHunts) {
         await this.queueHuntForExecution(hunt.id)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process scheduled hunts', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       })
     }
   }
@@ -1401,9 +1409,9 @@ export class ThreatHuntingSystem extends EventEmitter {
         finding_id: findingId,
         reason,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to mark false positive', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         finding_id: findingId,
       })
       throw error
@@ -1416,9 +1424,9 @@ export class ThreatHuntingSystem extends EventEmitter {
   async getHuntById(huntId: string): Promise<ThreatHunt | null> {
     try {
       return await this.huntsCollection.findOne({ id: huntId })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get hunt by ID', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hunt_id: huntId,
       })
       throw error
@@ -1438,9 +1446,9 @@ export class ThreatHuntingSystem extends EventEmitter {
         .sort({ timestamp: -1 })
         .limit(limit)
         .toArray()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get hunt results', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         hunt_id: huntId,
       })
       throw error
@@ -1491,8 +1499,10 @@ export class ThreatHuntingSystem extends EventEmitter {
         by_severity: bySeverity,
         false_positive_rate: falsePositiveRate,
       }
-    } catch (error) {
-      logger.error('Failed to get hunting statistics', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Failed to get hunting statistics', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }
@@ -1534,8 +1544,10 @@ export class ThreatHuntingSystem extends EventEmitter {
       this.emit('shutdown', { timestamp: new Date() })
 
       logger.info('Threat Hunting System shutdown completed')
-    } catch (error) {
-      logger.error('Error during shutdown', { error: error.message })
+    } catch (error: unknown) {
+      logger.error('Error during shutdown', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
       throw error
     }
   }

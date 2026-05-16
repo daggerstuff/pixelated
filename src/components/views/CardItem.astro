@@ -1,8 +1,9 @@
 ---
 import { Image } from 'astro:assets'
+import DOMPurify from 'isomorphic-dompurify'
 
 import Link from '@/components/base/Link.astro'
-import SwiperCarousel from '@/components/widgets/SwiperCarousel.astro'
+import ImageCarousel from '@/components/widgets/ImageCarousel.astro'
 import { formatDate } from '@/utils/datetime'
 
 import type { HTMLAttributes } from 'astro/types'
@@ -72,6 +73,14 @@ const MAX_DETAILS = 3
 const { date, text, html, link, images, video, external, quote, details } = item
 const MediaContainer = link ? Link : 'div'
 const Content = details ? 'collapsible-content' : 'div'
+
+// ⚡ Bolt: Sanitize HTML in the frontmatter instead of inline to reduce SSR overhead
+const sanitizedHtml = html
+  ? DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
+  : undefined
+const sanitizedDetails = details
+  ? details.map((d) => DOMPurify.sanitize(d, { USE_PROFILES: { html: true } }))
+  : undefined
 ---
 
 <section class={className}>
@@ -89,7 +98,7 @@ const Content = details ? 'collapsible-content' : 'div'
           {images &&
             images.length > 0 &&
             (images.length > 1 ? (
-              <SwiperCarousel
+              <ImageCarousel
                 images={images}
                 imageProps={{
                   width: 1200,
@@ -176,16 +185,20 @@ const Content = details ? 'collapsible-content' : 'div'
       )
     }
     <Content class="p-4 pb-3">
-      {html && <div class="prose card-item-prose" set:html={html} />}
+      {
+        sanitizedHtml && (
+          <div class="prose card-item-prose" set:html={sanitizedHtml} />
+        )
+      }
       {text && <p class="prose card-item-prose">{text}</p>}
       {
-        details && (
+        sanitizedDetails && (
           <div
             class="card-item-details"
             style="max-height: 0; overflow-y: clip;"
           >
             <ol class="relative border-s border-gray-200 dark:border-gray-700">
-              {details
+              {sanitizedDetails
                 .slice(0, MAX_DETAILS + 1)
                 .map((detail: string, idx: number) => (
                   <li class="ms-4 mb-6 last:mb-0">
@@ -214,8 +227,13 @@ const Content = details ? 'collapsible-content' : 'div'
             ) : (
               <p class="op-60">{formatDate(date, false)}</p>
             )}
-            {details && (
-              <button class="details-switch op-50 op-transition hover:op-100">
+            {sanitizedDetails && (
+              <button
+                type="button"
+                aria-expanded="false"
+                aria-label="Toggle details"
+                class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]"
+              >
                 <div u-i-lucide-chevron-down class="icon-down" />
                 <div u-i-lucide-chevron-up class="icon-up hidden" />
               </button>
@@ -263,11 +281,13 @@ const Content = details ? 'collapsible-content' : 'div'
           this.#detailsContainer.style.maxHeight = `${this.#detailsContainer.scrollHeight}px`
           this.#upIcon.classList.remove('hidden')
           this.#downIcon.classList.add('hidden')
+          this.#button.setAttribute('aria-expanded', 'true')
         } else {
           this.#detailsContainer.style.marginTop = '0'
           this.#detailsContainer.style.maxHeight = '0'
           this.#upIcon.classList.add('hidden')
           this.#downIcon.classList.remove('hidden')
+          this.#button.setAttribute('aria-expanded', 'false')
         }
       }
 

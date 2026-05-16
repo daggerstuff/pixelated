@@ -25,7 +25,6 @@ class AuthClient {
   private _isLoading: boolean = false
 
   /**
-   * Hook-like method for React components (mimicking better-auth useSession)
    * Note: In a real React app, you should use a Context Provider to avoid duplicate fetches.
    */
   useSession() {
@@ -53,7 +52,6 @@ class AuthClient {
   }
 
   /**
-   * Get the current session (Promise-based, mimicking better-auth client)
    */
   async getSession() {
     if (this._session) {
@@ -117,7 +115,7 @@ class AuthClient {
       const data = await response.json()
 
       if (!response.ok) {
-        return { error: data.error || 'Login failed' }
+        return { error: data.error ?? 'Login failed' }
       }
 
       this._session = {
@@ -128,7 +126,11 @@ class AuthClient {
 
       return { data, error: null }
     } catch (error: any) {
-      return { error: error.message || 'An unexpected error occurred' }
+      return {
+        error:
+          (error instanceof Error ? error.message : 'Unknown error') ||
+          'An unexpected error occurred',
+      }
     } finally {
       this._isLoading = false
     }
@@ -149,12 +151,16 @@ class AuthClient {
       const data = await response.json()
 
       if (!response.ok) {
-        return { error: data.error || 'Registration failed' }
+        return { error: data.error ?? 'Registration failed' }
       }
 
       return { data, error: null }
     } catch (error: any) {
-      return { error: error.message || 'An unexpected error occurred' }
+      return {
+        error:
+          (error instanceof Error ? error.message : 'Unknown error') ||
+          'An unexpected error occurred',
+      }
     } finally {
       this._isLoading = false
     }
@@ -173,7 +179,7 @@ class AuthClient {
 
       this._session = null
       window.location.href = '/'
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Sign out failed:', error)
     }
   }
@@ -187,14 +193,13 @@ class AuthClient {
       social: async ({ provider, callbackURL }: any) => {
         // Implementation for social login using server-side flow
         console.log(`Social login with ${provider} initiated`)
-        const returnTo = callbackURL || window.location.pathname
+        const returnTo = callbackURL ?? window.location.pathname
         window.location.href = `/api/auth/login?connection=${provider === 'google' ? 'google-oauth2' : provider}&returnTo=${encodeURIComponent(returnTo)}`
       },
     }
   }
 
   /**
-   * Sign up getter for better-auth compatibility
    */
   get signUp() {
     return {
@@ -203,7 +208,6 @@ class AuthClient {
   }
 
   /**
-   * Mimic better-auth forgetPassword
    */
   async forgetPassword({ email, redirectTo }: any) {
     console.log(
@@ -214,7 +218,6 @@ class AuthClient {
   }
 
   /**
-   * Reset password getter for better-auth compatibility
    */
   get resetPassword() {
     return {

@@ -53,7 +53,7 @@ body.enhanced-dark-theme {
 /* Enhanced main content area */
 .main-content {
   flex: 1;
-  padding-top: var(--space-16);
+  padding-top: var(--spacing-16);
   transition: all 300ms ease-out;
 }
 
@@ -88,14 +88,14 @@ body.enhanced-dark-theme {
 
   /* Container responsive padding */
   .container-refined {
-    padding: 0 var(--space-4);
+    padding: 0 var(--spacing-4);
     max-width: 100%;
   }
 
   /* Main content area responsive adjustments */
   .main-content {
-    padding-top: var(--space-16);
-    padding-bottom: var(--space-8);
+    padding-top: var(--spacing-16);
+    padding-bottom: var(--spacing-8);
   }
 
   /* Glass surface responsive improvements */
@@ -166,13 +166,13 @@ body.enhanced-dark-theme {
   }
 
   .container-refined {
-    padding: 0 var(--space-6);
+    padding: 0 var(--spacing-6);
     max-width: 640px;
   }
 
   .main-content {
-    padding-top: var(--space-20);
-    padding-bottom: var(--space-10);
+    padding-top: var(--spacing-20);
+    padding-bottom: var(--spacing-10);
   }
 
   .glass-surface {
@@ -210,13 +210,13 @@ body.enhanced-dark-theme {
   }
 
   .container-refined {
-    padding: 0 var(--space-8);
+    padding: 0 var(--spacing-8);
     max-width: 768px;
   }
 
   .main-content {
-    padding-top: var(--space-20);
-    padding-bottom: var(--space-12);
+    padding-top: var(--spacing-20);
+    padding-bottom: var(--spacing-12);
   }
 
   .glass-surface {
@@ -246,13 +246,13 @@ body.enhanced-dark-theme {
 /* Desktop optimizations (1024px - 1279px) */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .container-refined {
-    padding: 0 var(--space-12);
+    padding: 0 var(--spacing-12);
     max-width: 1024px;
   }
 
   .main-content {
-    padding-top: var(--space-20);
-    padding-bottom: var(--space-16);
+    padding-top: var(--spacing-20);
+    padding-bottom: var(--spacing-16);
   }
 
   .glass-surface {
@@ -269,13 +269,13 @@ body.enhanced-dark-theme {
 /* Large desktop optimizations (1280px - 1535px) */
 @media (min-width: 1280px) and (max-width: 1535px) {
   .container-refined {
-    padding: 0 var(--space-16);
+    padding: 0 var(--spacing-16);
     max-width: 1280px;
   }
 
   .main-content {
-    padding-top: var(--space-20);
-    padding-bottom: var(--space-20);
+    padding-top: var(--spacing-20);
+    padding-bottom: var(--spacing-20);
   }
 
   .glass-surface {
@@ -292,13 +292,13 @@ body.enhanced-dark-theme {
 /* Ultra-wide optimizations (1536px+) */
 @media (min-width: 1536px) {
   .container-refined {
-    padding: 0 var(--space-20);
+    padding: 0 var(--spacing-20);
     max-width: 1536px;
   }
 
   .main-content {
-    padding-top: var(--space-24);
-    padding-bottom: var(--space-24);
+    padding-top: var(--spacing-24);
+    padding-bottom: var(--spacing-24);
   }
 
   .glass-surface {
@@ -343,18 +343,18 @@ body.enhanced-dark-theme {
   }
 
   .main-content {
-    padding-top: calc(var(--space-16) + env(safe-area-inset-top, 0));
-    padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0));
+    padding-top: calc(var(--spacing-16) + env(safe-area-inset-top, 0));
+    padding-bottom: calc(var(--spacing-8) + env(safe-area-inset-bottom, 0));
   }
 
   .skip-link {
     padding-left: max(
-      var(--space-2),
-      env(safe-area-inset-left, var(--space-2))
+      var(--spacing-2),
+      env(safe-area-inset-left, var(--spacing-2))
     );
     padding-right: max(
-      var(--space-2),
-      env(safe-area-inset-right, var(--space-2))
+      var(--spacing-2),
+      env(safe-area-inset-right, var(--spacing-2))
     );
   }
 }
@@ -367,8 +367,8 @@ body.enhanced-dark-theme {
   }
 
   .main-content {
-    padding-top: var(--space-16);
-    padding-bottom: var(--space-6);
+    padding-top: var(--spacing-16);
+    padding-bottom: var(--spacing-6);
   }
 
   .skip-link {
@@ -488,12 +488,12 @@ body.enhanced-dark-theme {
 @media (min-width: 1920px) {
   .container-refined {
     max-width: 1800px;
-    padding: 0 var(--space-24);
+    padding: 0 var(--spacing-24);
   }
 
   .main-content {
-    padding-top: var(--space-28);
-    padding-bottom: var(--space-28);
+    padding-top: var(--spacing-28);
+    padding-bottom: var(--spacing-28);
   }
 
   .glass-surface {

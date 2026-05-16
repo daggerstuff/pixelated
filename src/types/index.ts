@@ -47,7 +47,7 @@ export const isBgType = (value: string): value is BgType => {
     'particle',
     'animated',
   ] as const
-  return validTypes.includes(value as BgType)
+  return (validTypes as readonly string[]).includes(value)
 }
 
 // ============================================================================
@@ -85,8 +85,8 @@ export type NavItemInput = {
 export const createNavItem = (input: NavItemInput): NavItem => ({
   name: input.name,
   link: input.link,
-  icon: input.icon || null,
-  desc: input.desc || null,
+  icon: input.icon ?? null,
+  desc: input.desc ?? null,
   isExternal: input.isExternal ?? false,
   ariaLabel: input.ariaLabel ?? input.name,
 })
@@ -202,6 +202,66 @@ export type ThemeConfig = StrictRequired<{
 }>
 
 // ============================================================================
+// SIMULATOR THERAPEUTIC ENUMS
+// ============================================================================
+
+export enum TherapeuticDomain {
+  DEPRESSION = 'DEPRESSION',
+  ANXIETY = 'ANXIETY',
+  TRAUMA = 'TRAUMA',
+  SUBSTANCE_USE = 'SUBSTANCE_USE',
+  GRIEF = 'GRIEF',
+  RELATIONSHIP = 'RELATIONSHIP',
+  STRESS_MANAGEMENT = 'STRESS_MANAGEMENT',
+  CRISIS_INTERVENTION = 'CRISIS_INTERVENTION',
+  EATING_DISORDERS = 'EATING_DISORDERS',
+  SELF_HARM = 'SELF_HARM',
+  PERSONALITY_DISORDERS = 'PERSONALITY_DISORDERS',
+  DEVELOPMENTAL_DISORDERS = 'DEVELOPMENTAL_DISORDERS',
+  PSYCHOSIS = 'PSYCHOSIS',
+  BIPOLAR_DISORDER = 'BIPOLAR_DISORDER',
+  SOMATIC_DISORDERS = 'SOMATIC_DISORDERS',
+  SLEEP_DISORDERS = 'SLEEP_DISORDERS',
+}
+
+export enum ScenarioDifficulty {
+  BEGINNER = 'BEGINNER',
+  INTERMEDIATE = 'INTERMEDIATE',
+  ADVANCED = 'ADVANCED',
+  EXPERT = 'EXPERT',
+}
+
+export enum TherapeuticTechnique {
+  ACTIVE_LISTENING = 'ACTIVE_LISTENING',
+  REFLECTIVE_STATEMENTS = 'REFLECTIVE_STATEMENTS',
+  OPEN_ENDED_QUESTIONS = 'OPEN_ENDED_QUESTIONS',
+  COGNITIVE_RESTRUCTURING = 'COGNITIVE_RESTRUCTURING',
+  MINDFULNESS = 'MINDFULNESS',
+  VALIDATION = 'VALIDATION',
+  GROUNDING_TECHNIQUES = 'GROUNDING_TECHNIQUES',
+  MOTIVATIONAL_INTERVIEWING = 'MOTIVATIONAL_INTERVIEWING',
+  BEHAVIORAL_ACTIVATION = 'BEHAVIORAL_ACTIVATION',
+  GOAL_SETTING = 'GOAL_SETTING',
+  STRENGTH_BASED = 'STRENGTH_BASED',
+  REFRAMING = 'REFRAMING',
+}
+
+export enum FeedbackType {
+  EMPATHETIC_RESPONSE = 'EMPATHETIC_RESPONSE',
+  TECHNIQUE_APPLICATION = 'TECHNIQUE_APPLICATION',
+  THERAPEUTIC_ALLIANCE = 'THERAPEUTIC_ALLIANCE',
+  QUESTION_FORMULATION = 'QUESTION_FORMULATION',
+  COMMUNICATION_STYLE = 'COMMUNICATION_STYLE',
+  ACTIVE_LISTENING = 'ACTIVE_LISTENING',
+  FRAMEWORK_ADHERENCE = 'FRAMEWORK_ADHERENCE',
+  INTERVENTION_TIMING = 'INTERVENTION_TIMING',
+  POSITIVE = 'POSITIVE',
+  DEVELOPMENTAL = 'DEVELOPMENTAL',
+  TECHNIQUE_SUGGESTION = 'TECHNIQUE_SUGGESTION',
+  ALTERNATIVE_APPROACH = 'ALTERNATIVE_APPROACH',
+}
+
+// ============================================================================
 // TYPE COMPATIBILITY & LEGACY SUPPORT
 // ============================================================================
 
@@ -222,17 +282,30 @@ export * from './chat'
 export * from './user'
 export * from './analytics'
 export * from './treatment'
+export type {
+  AlertLevel,
+  AlertStatus,
+  BiasAlert,
+  AlertItem,
+  BiasScoreFilterLiteral,
+  BiasScoreFilter,
+} from './bias-detection'
+export * from './backup'
 
 // ============================================================================
 // TYPE GUARDS
 // ============================================================================
 
+const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null
+}
+
 /** Type guard for navigation items */
 export const isNavItem = (value: unknown): value is NavItem => {
-  if (typeof value !== 'object' || value === null) {
+  if (!isObjectRecord(value)) {
     return false
   }
-  const item = value as Record<string, unknown>
+  const item = value
 
   return (
     typeof item['name'] === 'string' &&

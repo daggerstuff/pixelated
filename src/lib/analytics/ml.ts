@@ -17,9 +17,10 @@ export async function detectAnomalies(trends: unknown[]): Promise<number[]> {
   // Mock implementation
   return trends.map((trend) => {
     // Calculate mock anomaly score based on breach count and response time
+    const t = trend as { breaches?: number; responseTime?: number }
     const baseScore = Math.random() * 0.2 // Random baseline
-    const breachFactor = trend.breaches > 5 ? 0.3 : 0
-    const responseFactor = trend.responseTime > 3600000 ? 0.2 : 0 // 1 hour threshold
+    const breachFactor = (t.breaches ?? 0) > 5 ? 0.3 : 0
+    const responseFactor = (t.responseTime ?? 0) > 3600000 ? 0.2 : 0 // 1 hour threshold
 
     return Math.min(1, baseScore + breachFactor + responseFactor)
   })
@@ -37,10 +38,12 @@ export async function predictBreaches(
   days: number,
 ): Promise<Array<{ value: number; confidence: number }>> {
   // Mock implementation
-  const predictions = []
+  const predictions: Array<{ value: number; confidence: number }> = []
 
   // Use simple moving average for "prediction"
-  const recentBreaches = trends.slice(-7).map((t) => t.breaches)
+  const recentBreaches = trends
+    .slice(-7)
+    .map((t: unknown) => (t as { breaches: number }).breaches)
   const avgBreaches =
     recentBreaches.reduce((sum, val) => sum + val, 0) / recentBreaches.length
 

@@ -1,22 +1,27 @@
 import { Server } from 'http'
 
-import Redis from 'ioredis'
 import { Pool } from 'pg'
 import { Server as SocketIOServer, Socket } from 'socket.io'
 
-export class SocketService {
-  private io: SocketIOServer
-  private redis: Redis
-  private db: Pool
+type RedisLike = {
+  on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+  connect?: () => Promise<unknown>
+  quit: () => Promise<unknown>
+}
 
-  constructor(server: Server, redis: Redis, db: Pool) {
+export class SocketService {
+  private readonly io: SocketIOServer
+  private readonly redis: RedisLike
+  private readonly db: Pool
+
+  constructor(server: Server, redis: RedisLike, db: Pool) {
     this.redis = redis
     this.db = db
 
     // Initialize Socket.IO
     this.io = new SocketIOServer(server, {
       cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
         methods: ['GET', 'POST'],
         credentials: true,
       },

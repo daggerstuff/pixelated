@@ -3,27 +3,32 @@ name: 'CodeQL'
 permissions:
   contents: read
   security-events: write
-  actions: read
+  actions: write
 
 on:
   push:
-    branches: [master, staging]
+    branches: [main, master, staging]
   pull_request:
-    branches: [master, staging]
+    branches: [main, master, staging]
   schedule:
     # Run every Monday at 2:00 AM UTC
     - cron: '0 2 * * 1'
 
 env:
-  NODE_VERSION: 24.13.0
-  PYTHON_VERSION: 3.13
-  PNPM_VERSION: 10.30.1
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  NODE_VERSION: 24.14.1
+  PYTHON_VERSION: 3.13.13
 
 jobs:
   analyze:
     name: Analyze
+    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
+    # Skip CodeQL on Dependabot PRs to avoid transient GitHub action download rate-limit failures.
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: codeql-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
@@ -45,25 +50,21 @@ jobs:
           config-file: .github/codeql/codeql-config.yml
           queries: +security-and-quality,security-extended
           # Enable ML-powered alerts for JavaScript/TypeScript
-          setup-python-dependencies: ${{ matrix.language == 'python' }}
           # Increase RAM allocation for analysis
           ram: 16384
+          trap-caching: false
 
       - name: Setup Node.js
         if: matrix.language == 'javascript'
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack
-        if: matrix.language == 'javascript'
-        run: corepack enable
-
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v6.0.6
         with:
-          version: ${{ env.PNPM_VERSION }}
+          version: 11.1.1
           run_install: false
 
       - name: Get pnpm store directory
@@ -75,16 +76,29 @@ jobs:
 
       - name: Setup pnpm cache
         if: matrix.language == 'javascript'
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Clean pnpm workspace artifacts
+        if: matrix.language == 'javascript'
+        run: rm -rf node_modules
+
+      - name: Install native build dependencies
+        if: matrix.language == 'javascript'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          npm install -g node-gyp
+
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run: pnpm install --no-frozen-lockfile --ignore-scripts
+        run:
+          NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+          --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'
@@ -151,18 +165,36 @@ jobs:
           # Configure output format
           output: sarif-latest
 
-      - name: Upload SARIF results as artifact
-        uses: actions/upload-artifact@v7.0.0
+      - name: Collect CodeQL SARIF results
+        id: codeql-sarif
         if: always()
+        shell: bash
+        run: |
+          mapfile -t SARIF_FILES < <(find "${RUNNER_TEMP}/codeql_databases" -type f -name "*.sarif")
+          if [ "${#SARIF_FILES[@]}" -eq 0 ]; then
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+            echo "No CodeQL SARIF files were found under ${RUNNER_TEMP}/codeql_databases."
+          else
+            echo "found=true" >> "${GITHUB_OUTPUT}"
+            {
+              echo "paths<<EOF"
+              printf "%s\n" "${SARIF_FILES[@]}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Upload SARIF results as artifact
+        uses: actions/upload-artifact@v7.0.1
+        if: always() && steps.codeql-sarif.outputs.found == 'true'
         with:
           name: codeql-sarif-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases/*/results/*.sarif
+          path: ${{ steps.codeql-sarif.outputs.paths }}
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases
+          path: ${{ runner.temp }}/codeql_databases
           retention-days: 7

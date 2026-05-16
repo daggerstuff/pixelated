@@ -13,10 +13,10 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 
 interface PerformanceMetric {
   id: string
@@ -410,7 +410,7 @@ export default function EnterpriseMonitoringDashboard() {
                     <div className='flex items-center gap-3'>
                       <Badge
                         variant='outline'
-                        className={`${getStatusColor(api.status)}`}
+                        className={getStatusColor(api.status)}
                       >
                         {getStatusIcon(api.status)}
                         <span className='ml-1 capitalize'>{api.status}</span>
@@ -449,9 +449,9 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className='text-gray-600 text-sm'>Status</span>
                     <Badge
                       variant='outline'
-                      className={`${getStatusColor(systemHealth?.database.status || '')}`}
+                      className={getStatusColor(systemHealth?.database.status ?? '')}
                     >
-                      {getStatusIcon(systemHealth?.database.status || '')}
+                      {getStatusIcon(systemHealth?.database.status ?? '')}
                       <span className='ml-1 capitalize'>
                         {systemHealth?.database.status}
                       </span>
@@ -472,8 +472,8 @@ export default function EnterpriseMonitoringDashboard() {
                   </div>
                   <Progress
                     value={
-                      ((systemHealth?.database.connections || 0) /
-                        (systemHealth?.database.maxConnections || 1)) *
+                      ((systemHealth?.database.connections ?? 0) /
+                        (systemHealth?.database.maxConnections ?? 1)) *
                       100
                     }
                     className='h-2'
@@ -495,9 +495,9 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className='text-gray-600 text-sm'>Status</span>
                     <Badge
                       variant='outline'
-                      className={`${getStatusColor(systemHealth?.cache.status || '')}`}
+                      className={getStatusColor(systemHealth?.cache.status ?? '')}
                     >
-                      {getStatusIcon(systemHealth?.cache.status || '')}
+                      {getStatusIcon(systemHealth?.cache.status ?? '')}
                       <span className='ml-1 capitalize'>
                         {systemHealth?.cache.status}
                       </span>
@@ -518,8 +518,8 @@ export default function EnterpriseMonitoringDashboard() {
                   </div>
                   <Progress
                     value={
-                      ((systemHealth?.cache.memory || 0) /
-                        (systemHealth?.cache.maxMemory || 1)) *
+                      ((systemHealth?.cache.memory ?? 0) /
+                        (systemHealth?.cache.maxMemory ?? 1)) *
                       100
                     }
                     className='h-2'
@@ -672,8 +672,8 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className='text-gray-600 text-sm'>Success Rate</span>
                     <span className='font-medium'>
                       {(
-                        ((usageAnalytics?.successfulInterventions || 0) /
-                          (usageAnalytics?.crisisInterventions || 1)) *
+                        ((usageAnalytics?.successfulInterventions ?? 0) /
+                          (usageAnalytics?.crisisInterventions ?? 1)) *
                         100
                       ).toFixed(1)}
                       %
@@ -681,8 +681,8 @@ export default function EnterpriseMonitoringDashboard() {
                   </div>
                   <Progress
                     value={
-                      ((usageAnalytics?.successfulInterventions || 0) /
-                        (usageAnalytics?.crisisInterventions || 1)) *
+                      ((usageAnalytics?.successfulInterventions ?? 0) /
+                        (usageAnalytics?.crisisInterventions ?? 1)) *
                       100
                     }
                     className='h-3'

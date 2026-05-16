@@ -13,34 +13,39 @@ Features:
 """
 
 import json
-import sqlite3
-import os
 import random
+import sqlite3
 import string
-import datetime
-import subprocess
-from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
 
 # --------------------------- Paths ---------------------------
-CONFIG_PATH = "/home/vivi/pixelated/workflow/config.yaml"
-SAMPLE_DATA_PATH = "/home/vivi/pixelated/workflow/sample_data/annotations.json"
-DB_PATH = "/home/vivi/pixelated/workflow/state.db"
-LOG_PATH = "/home/vivi/pixelated/workflow/log/audit.log"
+# Use relative paths where possible or project-aware roots
+BASE_DIR = Path(__file__).parent.absolute()
+CONFIG_PATH = BASE_DIR / "config.yaml"
+SAMPLE_DATA_PATH = BASE_DIR / "sample_data" / "annotations.json"
+DB_PATH = BASE_DIR / "state.db"
+LOG_PATH = BASE_DIR / "log" / "audit.log"
 
 # --------------------------- Safety Triggers ---------------------------
 SAFETY_TRIGGERS = {"suicidal", "self-harm", "harm to others", "weapon", "plan"}
 
 # --------------------------- Logging ---------------------------
 def log_event(event_id: str, message: str):
-    timestamp = datetime.datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat()
     entry = json.dumps({"event_id": event_id, "timestamp": timestamp, "message": message})
-    with open(LOG_PATH, "a") as f:
+
+    # Ensure log directory exists (Review suggestion)
+    log_file = Path(LOG_PATH)
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with log_file.open("a") as f:
         f.write(entry + "\n")
 
 # --------------------------- Opaque IDs ---------------------------
 def generate_opaque_id(length: int = 8) -> str:
     alphabet = string.ascii_lowercase + string.digits
-    return ''.join(random.choice(alphabet) for _ in range(length))
+    return "".join(random.choice(alphabet) for _ in range(length))
 
 # --------------------------- Schema Setup ---------------------------
 CREATE_SCHEMA = """
@@ -148,7 +153,7 @@ def compute_kappa_on_validation():
     return 0.85
 
 def store_kappa(kappa: float):
-    ts = datetime.datetime.utcnow().isoformat()
+    ts = datetime.now(timezone.utc).isoformat()
     conn = sqlite3.connect(DB_PATH)
     conn.execute(INSERT_KAPPA, (ts, kappa))
     conn.commit()

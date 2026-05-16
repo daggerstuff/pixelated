@@ -6,7 +6,8 @@ import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
 import Badge from '@/components/ui/Badge.astro'
-import { Button } from '@/components/ui/button/button'
+import { Button } from '@/components/ui/button/button.tsx'
+import { ChartBar } from 'lucide-react'
 
 export const prerender = false // Enable SSR for real-time data
 
@@ -495,9 +496,10 @@ const demoPages = [
         {/* Export and Actions */}
         <div class="flex justify-center gap-4">
           <Button
+            variant="outline"
             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3"
           >
-            📊 Export All Data
+            <ChartBar className="w-4 h-4 mr-2" /> Export All Data
           </Button>
           <Button
             variant="outline"

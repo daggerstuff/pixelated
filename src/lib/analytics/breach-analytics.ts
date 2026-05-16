@@ -213,7 +213,7 @@ async function calculateResponseTime(breach: Breach): Promise<number> {
     return 0
   }
 
-  const notificationData = JSON.parse(notifications) as unknown
+  const notificationData = JSON.parse(notifications) as { completedAt: number }
   return notificationData.completedAt - breach.timestamp
 }
 
@@ -282,7 +282,7 @@ async function calculateAverageResponseTime(
   }
 
   const responseTimes = await Promise.all(
-    breaches.map((breach) => calculateResponseTime(breach)),
+    breaches.map( async (breach) => calculateResponseTime(breach)),
   )
 
   return responseTimes.reduce((sum, time) => sum + time, 0) / breaches.length
@@ -482,7 +482,7 @@ export async function generateReport(
       },
       metrics: {
         ...metrics,
-        encryptedData,
+        encryptedData: String(encryptedData),
       },
       trends,
       predictions,

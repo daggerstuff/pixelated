@@ -170,7 +170,7 @@ test.describe('Keyboard Navigation', () => {
       })
 
       expect(['main', 'MAIN']).toContain(
-        focusedElement.id || focusedElement.tagName || focusedElement.role,
+        (focusedElement.id ?? focusedElement.tagName) ?? focusedElement.role,
       )
     }
   })

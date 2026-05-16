@@ -24,8 +24,7 @@ const {
 >
 </image-viewer>
 
-<script>
-  import Viewer from 'viewerjs'
+<script lang="ts">
   import { lockScroll, unlockScroll } from '@/utils/misc'
 
   // global default config
@@ -60,13 +59,14 @@ const {
     #lastViewedImage: HTMLImageElement | null = null
 
     connectedCallback() {
-      const selector = this.dataset.selector || 'img'
+      const selector = this.dataset['selector'] || 'img'
       const container = document.querySelector(selector) as HTMLElement | null
       if (!container) return
 
       let userOptions: Viewer.Options = {}
       try {
-        if (this.dataset.options) userOptions = JSON.parse(this.dataset.options)
+        if (this.dataset['options'])
+          userOptions = JSON.parse(this.dataset['options'])
       } catch (err) {
         console.error('[ImageViewer] Failed to parse options:', err)
       }
@@ -97,13 +97,17 @@ const {
             }),
           })
 
+          const viewerWithLifecycle = this.#viewer as InstanceType<
+            typeof Viewer
+          > & {
+            open: () => void
+            close: () => void
+          }
           // https://github.com/fengyuanchen/viewerjs/issues/197
-          // @ts-expect-error (ignore)
-          this.#viewer.open = function () {
+          viewerWithLifecycle.open = function () {
             lockScroll()
           }
-          // @ts-expect-error (ignore)
-          this.#viewer.close = function () {
+          viewerWithLifecycle.close = function () {
             unlockScroll()
           }
         }

@@ -39,7 +39,7 @@ const securityAlerts = [
 ]
 
 // Helper function to format dates
-function formatDate(date) {
+function formatDate(date: any) {
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
@@ -50,7 +50,7 @@ function formatDate(date) {
 }
 
 // Helper function to get alert level badge classes
-function getAlertLevelClass(level) {
+function getAlertLevelClass(level: any) {
   switch (level) {
     case 'critical':
       return 'bg-red-100 text-red-800'

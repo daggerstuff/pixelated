@@ -6,6 +6,7 @@
 
 import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import * as Sentry from '@sentry/astro'
 
 const tracer = trace.getTracer('pixelated-empathy')
 
@@ -39,10 +40,15 @@ export async function withSpan<T>(
     const result = await fn(span)
     span.setStatus({ code: SpanStatusCode.OK })
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     span.setStatus({
       code: SpanStatusCode.ERROR,
-      message: error instanceof Error ? error.message : String(error),
+      message:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
     })
     span.recordException(
       error instanceof Error ? error : new Error(String(error)),
@@ -69,10 +75,15 @@ export function withSpanSync<T>(
     const result = fn(span)
     span.setStatus({ code: SpanStatusCode.OK })
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     span.setStatus({
       code: SpanStatusCode.ERROR,
-      message: error instanceof Error ? error.message : String(error),
+      message:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
     })
     span.recordException(
       error instanceof Error ? error : new Error(String(error)),
@@ -114,11 +125,14 @@ export function addSpanEvent(
  * Mark the current span with an error
  */
 export function markSpanError(error: Error): void {
+  // Capture in Sentry
+  Sentry.captureException(error)
+
   const activeSpan = trace.getActiveSpan()
   if (activeSpan) {
     activeSpan.setStatus({
       code: SpanStatusCode.ERROR,
-      message: error.message,
+      message: error instanceof Error ? error.message : 'Unknown error',
     })
     activeSpan.recordException(error)
   }

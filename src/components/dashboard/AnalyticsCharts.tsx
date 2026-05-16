@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import type { FC } from 'react'
 
 import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
@@ -36,7 +36,9 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
         <h4 className='text-red-800 font-medium'>
           Unable to load analytics data
         </h4>
-        <p className='text-red-600 mt-1 text-sm'>{String(error)}</p>
+        <p className='text-red-600 mt-1 text-sm'>
+          {error instanceof Error ? error.message : String(error)}
+        </p>
       </div>
       <button
         onClick={onRetry}
@@ -48,38 +50,52 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
   </div>
 )
 
+// Time range selector options
+const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last 90 days' },
+  { value: '1y', label: 'Last year' },
+]
+
 // Time range selector component
 interface TimeRangeSelectorProps {
   value: TimeRange
   onChange: (range: TimeRange) => void
 }
 
-const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
-  const options: { value: TimeRange; label: string }[] = [
-    { value: '7d', label: 'Last 7 days' },
-    { value: '30d', label: 'Last 30 days' },
-    { value: '90d', label: 'Last 90 days' },
-    { value: '1y', label: 'Last year' },
-  ]
-
-  return (
-    <div className='flex space-x-2'>
-      {options.map((option) => (
-        <button
-          key={option.value}
-          onClick={() => onChange(option.value)}
-          className={`rounded px-3 py-1 text-sm transition-colors ${
-            value === option.value
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  )
-}
+/**
+ * Memoized time range selector to prevent unnecessary re-renders. (Review suggestion)
+ */
+const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
+  ({ value, onChange }) => {
+    return (
+      <div
+        className='flex space-x-2'
+        role='radiogroup'
+        aria-label='Select time range'
+      >
+        {TIME_RANGE_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type='button'
+            role='radio'
+            onClick={() => onChange(option.value)}
+            aria-checked={value === option.value}
+            className={`rounded px-3 py-1 text-sm transition-colors ${
+              value === option.value
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    )
+  },
+)
+TimeRangeSelector.displayName = 'TimeRangeSelector'
 
 // Session activity chart component
 interface SessionChartProps {
@@ -141,6 +157,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
       case 'down':
         return '↘'
       case 'stable':
+      default:
         return '→'
     }
   }
@@ -152,6 +169,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
       case 'down':
         return 'text-red-600'
       case 'stable':
+      default:
         return 'text-gray-600'
     }
   }
@@ -215,6 +233,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
         return 'text-orange-600'
       case 'red':
         return 'text-red-600'
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return 'text-gray-600'
     }
@@ -312,13 +331,13 @@ export const AnalyticsCharts: FC = () => {
       </div>
 
       {/* Summary Statistics */}
-      <SummaryStats data={data?.summaryStats || []} isLoading={isLoading} />
+      <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
 
       {/* Session Activity Chart */}
-      <SessionChart data={data?.sessionMetrics || []} isLoading={isLoading} />
+      <SessionChart data={data?.sessionMetrics ?? []} isLoading={isLoading} />
 
       {/* Skill Progress */}
-      <SkillProgress data={data?.skillProgress || []} isLoading={isLoading} />
+      <SkillProgress data={data?.skillProgress ?? []} isLoading={isLoading} />
 
       {/* Data freshness indicator */}
       {data && !isLoading && (

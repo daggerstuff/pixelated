@@ -300,7 +300,7 @@ function DialogModal<TData>({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          handleBackdropClick(e as React.MouseEvent<HTMLDivElement>)
+          handleBackdropClick(e as unknown as React.MouseEvent<HTMLDivElement>)
         }
       }}
       tabIndex={-1}
@@ -508,11 +508,11 @@ function useConfirmDialog<TData>(): ConfirmDialogHookResult<TData> {
   >({
     title: 'Confirm',
     message: '',
-    onConfirm: () => Promise.resolve(),
+    onConfirm:  async () => Promise.resolve(),
   })
 
   const confirm = useCallback(
-    (props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>) => {
+     async (props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>) => {
       setConfirmProps(props)
       setIsOpen(true)
 

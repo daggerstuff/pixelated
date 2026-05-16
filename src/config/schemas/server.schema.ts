@@ -6,7 +6,10 @@ export const serverEnvSchema = z.object({
     .default('development'),
   PORT: z.coerce.number().default(3000),
   LOG_LEVEL: z
-    .enum(['error', 'warn', 'info', 'verbose', 'debug'])
+    .preprocess(
+      (value) => (typeof value === 'string' ? value.toLowerCase() : value),
+      z.enum(['error', 'warn', 'info', 'verbose', 'debug']),
+    )
     .default('info'),
   ENABLE_RATE_LIMITING: z
     .string()

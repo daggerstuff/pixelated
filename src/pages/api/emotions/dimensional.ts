@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Get cache service
     const cacheService = getCacheService()
-    const cacheKey = `emotions:dimensional:${clientId}:${startDateStr || 'none'}:${endDateStr || 'none'}:${limit}`
+    const cacheKey = `emotions:dimensional:${clientId}:${startDateStr ?? 'none'}:${endDateStr ?? 'none'}:${limit}`
 
     // Generate ETag from cache key
     const etag = `"${hashString(cacheKey)}"`

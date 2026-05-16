@@ -24,8 +24,6 @@ entryPoints:
   websecure:
     address: ':443'
     http:
-      tls:
-        certResolver: letsencrypt
       middlewares:
         - security-headers@file
         - rate-limit@file
@@ -39,14 +37,18 @@ certificatesResolvers:
     acme:
       email: admin@pixelatedempathy.com
       storage: /ssl-certs/acme.json
-      tlsChallenge: {}
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
 
 # Providers
 providers:
   docker:
     endpoint: 'unix:///var/run/docker.sock'
     exposedByDefault: false
-    network: pixelated_network
+    network: pixelated-network
   file:
     filename: /etc/traefik/dynamic.yml
     watch: true

@@ -1,347 +1,123 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
-const teamMembers = [
+const founder = {
+  name: 'Chad',
+  role: 'Founder',
+  bio: 'Pixelated Empathy is currently founder-led. Product direction, implementation, and customer conversations are still tightly connected while the training workflow is being shaped in public.',
+  expertise:
+    'Product engineering, platform architecture, and AI workflow design',
+}
+
+const futureRoles = [
   {
-    name: 'Chad',
-    role: 'Founder & CEO',
-    bio: 'Software engineer with 15+ years of experience in Python, TypeScript, and Rust. Passionate about applying cutting-edge AI technology to solve real problems in mental health training. Built Pixelated Empathy to address the gap between academic training and real-world clinical practice.',
-    expertise: 'Software Engineering, AI Development, Mental Health Technology',
-    image: '/images/team/chad.jpg',
-    linkedin: 'https://www.linkedin.com/in/chad',
+    label: 'Clinical guidance',
+    body: 'Advisors who can pressure-test scenarios, feedback language, and training use cases against real clinical workflows.',
+  },
+  {
+    label: 'Design and UX',
+    body: 'Product design support that makes difficult workflows readable, teachable, and trustworthy for care teams.',
+  },
+  {
+    label: 'Platform engineering',
+    body: 'Engineering depth around privacy, analytics, and scalable simulation workflows.',
   },
 ]
-
-const companyInfo = {
-  founded: '2025',
-  location: 'United States',
-  legalEntity: 'Pixelated Empathy',
-  status: 'Early-stage startup',
-}
 ---
 
 <BaseLayout
-  title="Our Team - Pixelated Empathy"
-  description="Meet the experienced team of researchers, engineers, and mental health professionals revolutionizing therapy education through AI technology."
+  title="Team - Pixelated Empathy"
+  description="Learn who is currently building Pixelated Empathy and how the company is structured today."
+  fullWidthMain
 >
-  <main class="flex-1 pt-14">
-    <!-- Hero Section -->
-    <section class="brutalist-section py-20 mesh-bg-1">
-      <div class="container mx-auto px-4">
-        <div class="text-center max-w-4xl mx-auto">
-          <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
-            Our Team
-          </h1>
-          <p class="text-xl text-gray-300 leading-relaxed">
-            We're a small but dedicated team building the future of mental
-            health training. Founded in 2025, Pixelated Empathy combines deep
-            technical expertise with a passion for improving therapy education.
-          </p>
-        </div>
-      </div>
-    </section>
+  <MarketingPageHero
+    eyebrow="Team"
+    title="A founder-led build shaped close to the workflow."
+    lede="This page is meant to be accurate about the company’s current shape. Pixelated Empathy is founder-led today, with future growth centered on clinical quality, trustworthy UX, and privacy-aware platform depth."
+    note="Current team structure as of April 9, 2026"
+    trustLine={['Founder-led', 'United States', 'Clinical workflow focus']}
+    primaryCTA={{ text: 'Talk to the founder', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    stats={[
+      {
+        label: 'Current structure',
+        value: 'Founder-led',
+        detail:
+          'Product, engineering, and customer conversations stay close together',
+      },
+      {
+        label: 'Founded',
+        value: '2025',
+        detail: 'Company stage is still early and deliberate',
+      },
+      {
+        label: 'Hiring direction',
+        value: 'Quality first',
+        detail: 'Future roles should strengthen training quality and trust',
+      },
+    ]}
+  />
 
-    <!-- Leadership Team -->
-    <section class="brutalist-section py-20 bg-gray-900">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-white mb-4">Leadership Team</h2>
-          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            Our founder brings over 15 years of software engineering experience
-            and a deep understanding of mental health technology. We're actively
-            growing our team and seeking advisors who share our vision.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {
-            teamMembers.map((member) => (
-              <div class="glass-card p-6 text-center">
-                <div class="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center">
-                  <span class="text-2xl font-bold text-white">
-                    {member.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </span>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">{member.name}</h3>
-                <p class="text-teal-400 font-medium mb-4">{member.role}</p>
-                <p class="text-gray-300 text-sm mb-4 leading-relaxed">
-                  {member.bio}
-                </p>
-                <div class="text-xs text-gray-400 mb-4">
-                  <strong>Expertise:</strong> {member.expertise}
-                </div>
-                {member.linkedin && (
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center text-teal-400 hover:text-teal-300 transition-colors"
-                  >
-                    <svg
-                      class="w-4 h-4 mr-2"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                    </svg>
-                    LinkedIn
-                  </a>
-                )}
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- Vision & Mission -->
-    <section class="brutalist-section py-20 bg-black">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-white mb-4">
-            Building the Future
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2">
+        <article class="marketing-card marketing-card--accent">
+          <span class="marketing-card__label">{founder.role}</span>
+          <h2 class="marketing-title marketing-title--medium">
+            {founder.name}
           </h2>
-          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            As a solo founder, I'm focused on building an innovative solution to
-            transform mental health education. Looking to grow the team with
-            passionate individuals who share this vision.
+          <p>{founder.bio}</p>
+          <p><strong>Focus:</strong> {founder.expertise}</p>
+        </article>
+
+        <article class="marketing-card">
+          <span class="marketing-card__label">Why stay close to the work</span>
+          <p>
+            The product is still being shaped around how supervisors, educators,
+            and training teams actually evaluate a difficult case. Keeping
+            product, implementation, and conversations close together reduces
+            drift.
           </p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="glass-card p-6 text-center">
-            <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-teal-600 flex items-center justify-center"
-            >
-              <svg
-                class="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                ></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-white mb-2">Innovation</h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Building cutting-edge AI technology to solve real problems in
-              mental health training
-            </p>
-          </div>
-
-          <div class="glass-card p-6 text-center">
-            <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center"
-            >
-              <svg
-                class="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                ></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-white mb-2">Impact</h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Focused on creating meaningful change in how mental health
-              professionals are trained
-            </p>
-          </div>
-
-          <div class="glass-card p-6 text-center">
-            <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center"
-            >
-              <svg
-                class="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-white mb-2">Speed</h3>
-            <p class="text-gray-300 text-sm leading-relaxed">
-              Moving fast to bring this solution to market and start making a
-              difference
-            </p>
-          </div>
-        </div>
+        </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Founder Stats -->
-    <section class="brutalist-section py-20 bg-gray-900">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-white mb-4">Founder Background</h2>
-          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            Combining deep technical expertise with emerging mental health
-            knowledge to build something meaningful.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-4 gap-8">
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">15+</div>
-            <p class="text-gray-300">Years Programming Experience</p>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">3</div>
-            <p class="text-gray-300">
-              Core Languages (Python, TypeScript, Rust)
-            </p>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">
-              {companyInfo.founded}
-            </div>
-            <p class="text-gray-300">Company Founded</p>
-          </div>
-          <div class="text-center">
-            <div class="text-4xl font-bold text-teal-400 mb-2">100%</div>
-            <p class="text-gray-300">Mission-Driven Focus</p>
-          </div>
-        </div>
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-section-header">
+        <span class="marketing-eyebrow">How the team should grow</span>
+        <h2 class="marketing-title marketing-title--medium">
+          The next additions should sharpen quality, not add noise.
+        </h2>
       </div>
-    </section>
 
-    <!-- Company Information -->
-    <section class="brutalist-section py-20 bg-black">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-white mb-4">
-            Company Information
-          </h2>
-        </div>
-        <div class="max-w-3xl mx-auto">
-          <div class="glass-card p-8">
-            <div class="grid md:grid-cols-2 gap-6">
-              <div>
-                <div class="text-sm text-gray-500 mb-1">Legal Entity</div>
-                <div class="text-lg font-semibold text-white">
-                  {companyInfo.legalEntity}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 mb-1">Founded</div>
-                <div class="text-lg font-semibold text-white">
-                  {companyInfo.founded}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 mb-1">Location</div>
-                <div class="text-lg font-semibold text-white">
-                  {companyInfo.location}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 mb-1">Status</div>
-                <div class="text-lg font-semibold text-white">
-                  {companyInfo.status}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="marketing-grid marketing-grid--3">
+        {
+          futureRoles.map((role) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{role.label}</span>
+              <p>{role.body}</p>
+            </article>
+          ))
+        }
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Advisors & Consultants -->
-    <section class="brutalist-section py-20 bg-gray-900">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-white mb-4">
-            Advisors & Consultants
-          </h2>
-          <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-            We're actively seeking experienced advisors in mental health,
-            clinical training, AI/ML, and healthcare technology. If you're
-            interested in advising, please
-            <a href="/contact" class="text-teal-400 hover:text-teal-300"
-              >get in touch</a
-            >.
-          </p>
-        </div>
-        <div class="max-w-2xl mx-auto glass-card p-8 text-center">
-          <p class="text-gray-400">
-            We're building our advisory board. Interested in contributing your
-            expertise? We'd love to hear from you.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Careers CTA -->
-    <section class="brutalist-section py-20 bg-gray-900">
-      <div class="container mx-auto px-4 text-center">
-        <h2 class="text-4xl font-bold text-white mb-6">Join Our Mission</h2>
-        <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-          We're always looking for passionate individuals who want to make a
-          meaningful impact in mental healthcare through technology. Whether
-          you're interested in engineering, AI research, or clinical
-          applications, we'd love to hear from you.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="/careers"
-            class="nav-pill px-8 py-4 text-lg font-semibold text-white hover:bg-teal-600 transition-colors"
-            style="background: #14b8a6;"
-          >
-            View Careers →
-          </a>
-          <a
-            href="/contact"
-            class="nav-pill px-8 py-4 text-lg font-semibold text-white border-2 border-teal-400 hover:bg-teal-400/10 transition-colors"
-          >
-            Get in Touch
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
+  <MarketingCTA
+    eyebrow="Talk to the person building it"
+    title="If you are evaluating the workflow, bring the actual supervision problem."
+    body="The fastest way to understand whether Pixelated Empathy fits your team is to discuss the case type, coaching challenge, or trust requirement you are trying to solve first."
+    checklist={[
+      'The training scenario or supervision problem you want to improve',
+      'What a successful pilot would need to prove for your team',
+      'Any trust, privacy, or rollout constraints that matter early',
+    ]}
+    primaryCTA={{ text: 'Talk to the founder', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    note="Clarity around the problem matters more than a perfect org chart."
+  />
 </BaseLayout>
-
-<style>
-  .glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-  }
-
-  .glass-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-4px);
-  }
-
-  .mesh-bg-1 {
-    background: linear-gradient(
-      135deg,
-      #1a1a1a 0%,
-      #2d1b69 25%,
-      #11203a 50%,
-      #1a1a1a 100%
-    );
-  }
-</style>

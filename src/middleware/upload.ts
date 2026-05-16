@@ -47,7 +47,7 @@ export const createUploadMiddleware = (config: UploadConfig = {}) => {
     storage,
     fileFilter,
     limits: {
-      fileSize: config.maxSize || 10 * 1024 * 1024, // 10MB default
+      fileSize: config.maxSize ?? 10 * 1024 * 1024, // 10MB default
     },
   })
 }

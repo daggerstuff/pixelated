@@ -1,11 +1,13 @@
 ---
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import { FEATURES } from '@/config'
 
 export interface Props {
   title?: string
 }
 const { title = 'Chat' } = Astro.props
 const { cspNonce } = Astro.locals
+const { nprogress, mediumZoom } = FEATURES
 ---
 
 <html lang="en" class="dark scroll-smooth">
@@ -28,6 +30,11 @@ const { cspNonce } = Astro.locals
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
+    {
+      (nprogress || mediumZoom) && (
+        <script src="/js/nprogress-and-zoom.js" type="module" />
+      )
+    }
 
     <RybbitAnalytics nonce={cspNonce} />
   </head>

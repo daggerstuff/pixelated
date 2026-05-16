@@ -1,13 +1,7 @@
 ---
-title: 'Accessibility Developer Guide'
-description:
-  'Best practices and standards for implementing accessible components'
-pubDate: '2025-01-01'
-author: 'Accessibility Team'
-draft: false
-toc: true
-share: true
-date: '2025-04-12'
+description: Best practices and standards for implementing accessible components
+title: Accessibility Developer Guide
+pubDate: '2026-05-09'
 ---
 
 # Accessibility Developer Guide
@@ -264,7 +258,6 @@ describe('YourComponent accessibility', () => {
    - Use appropriate list markup
 
    ```astro
-
 
    ```
 

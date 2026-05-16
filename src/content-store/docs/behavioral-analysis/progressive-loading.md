@@ -1,11 +1,12 @@
 ---
-title: 'Progressive Loading Implementation'
-description: 'Progressive Loading Implementation documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Progressive Loading Implementation documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Progressive Loading Implementation
 ---
 
 # Progressive Loading Implementation

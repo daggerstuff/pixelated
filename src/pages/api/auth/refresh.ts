@@ -12,8 +12,8 @@ import { logSecurityEvent } from '../../../lib/security'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   // Extract client information early so it's available in the catch block
-  const userAgent = request.headers.get('user-agent') || 'unknown'
-  const deviceId = request.headers.get('x-device-id') || 'unknown'
+  const userAgent = request.headers.get('user-agent') ?? 'unknown'
+  const deviceId = request.headers.get('x-device-id') ?? 'unknown'
   const clientInfo = {
     ip: clientAddress || 'unknown',
     userAgent,
@@ -36,7 +36,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Parse and validate request body
     const body = await request.json()
 
-    if (!body || !body.refreshToken) {
+    if (!body?.refreshToken) {
       return new Response(
         JSON.stringify({
           error: 'Missing refresh token',
@@ -55,7 +55,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const tokenPair = await refreshAccessToken(refreshToken, clientInfo)
 
     // Log successful token refresh
-    await logSecurityEvent('token_refreshed', {
+     logSecurityEvent('token_refreshed', {
       clientInfo,
       timestamp: Date.now(),
     })
@@ -82,14 +82,17 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
-      await logSecurityEvent('token_validation_failed', {
-        error: error.message,
+       logSecurityEvent('token_validation_failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
         clientInfo,
         timestamp: Date.now(),
       })
 
       return new Response(
-        JSON.stringify({ error: error.message, details: error.details || {} }),
+        JSON.stringify({
+          error: error instanceof Error ? error.message : 'Unknown error',
+          details: error.details ?? {},
+        }),
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
@@ -100,8 +103,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Handle unexpected errors
     console.error('Token refresh error:', err)
 
-    await logSecurityEvent('error', {
-      error: error.message || String(err),
+     logSecurityEvent('error', {
+      error:
+        (error instanceof Error ? error.message : 'Unknown error') ||
+        String(err),
       clientInfo,
       timestamp: Date.now(),
     })
@@ -124,7 +129,7 @@ export const OPTIONS: APIRoute = async ({ request }) => {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Origin': request.headers.get('origin') ?? '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers':
         'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',

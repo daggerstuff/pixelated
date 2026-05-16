@@ -302,19 +302,68 @@ const MarketResearchSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    owner: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    permissions: {
+      view: {
+        type: [String],
+        default: [],
+      },
+      edit: {
+        type: [String],
+        default: [],
+      },
+      comment: {
+        type: [String],
+        default: [],
+      },
+    },
 
     // Research Data
     findings: [
       {
-        id: String,
+        _id: String,
         title: String,
         description: String,
-        impact: {
+        impactLevel: {
           type: String,
           enum: ['high', 'medium', 'low'],
         },
-        evidence: [String],
-        implications: String,
+        supportingData: {},
+        source: String,
+        createdAt: Date,
+        updatedAt: Date,
+      },
+    ],
+    competitiveAnalysis: [
+      {
+        _id: String,
+        competitorName: String,
+        strengths: [String],
+        weaknesses: [String],
+        opportunities: [String],
+        threats: [String],
+        marketShare: Number,
+        createdAt: Date,
+        updatedAt: Date,
+      },
+    ],
+    recommendations: [
+      {
+        _id: String,
+        title: String,
+        description: String,
+        priority: {
+          type: String,
+          enum: ['high', 'medium', 'low'],
+        },
+        expectedImpact: String,
+        status: String,
+        createdAt: Date,
+        updatedAt: Date,
       },
     ],
 
@@ -362,7 +411,6 @@ const MarketResearchSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     status: {
       type: String,
@@ -737,24 +785,52 @@ const KnowledgeArticleSchema = new mongoose.Schema(
 KnowledgeArticleSchema.index({ author: 1, status: 1 })
 KnowledgeArticleSchema.index({ category: 1, status: 1 })
 
+type BusinessDocumentDocument = mongoose.InferSchemaType<
+  typeof BusinessDocumentSchema
+>
+export type MarketResearchDocument = mongoose.InferSchemaType<
+  typeof MarketResearchSchema
+>
+
+export type SalesOpportunityDocument = mongoose.InferSchemaType<
+  typeof SalesOpportunitySchema
+> & {
+  status: string
+  amount: number
+  stage: string
+  closeDate?: Date
+  activity: unknown[]
+  contacts: unknown[]
+  competitors: unknown[]
+  permissions: {
+    view: string[]
+    edit: string[]
+    comment: string[]
+  }
+  currency?: string
+  accountName?: string
+  expectedCloseDate?: Date
+}
+
 // ============================================================================
 // EXPORT MODELS
 // ============================================================================
 
-export const BusinessDocument = mongoose.model(
-  'BusinessDocument',
-  BusinessDocumentSchema,
-)
+export const BusinessDocument =
+  mongoose.models.BusinessDocument ??
+  mongoose.model<BusinessDocumentDocument>(
+    'BusinessDocument',
+    BusinessDocumentSchema,
+  )
 export const Project = mongoose.model('Project', ProjectSchema)
-export const MarketResearch = mongoose.model(
-  'MarketResearch',
-  MarketResearchSchema,
-)
+export const MarketResearch =
+  mongoose.models.MarketResearch ??
+  mongoose.model<MarketResearchDocument>('MarketResearch', MarketResearchSchema)
 export const StrategicPlan = mongoose.model(
   'StrategicPlan',
   StrategicPlanSchema,
 )
-export const SalesOpportunity = mongoose.model(
+export const SalesOpportunity = mongoose.model<SalesOpportunityDocument>(
   'SalesOpportunity',
   SalesOpportunitySchema,
 )

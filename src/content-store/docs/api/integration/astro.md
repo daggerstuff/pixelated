@@ -1,11 +1,12 @@
 ---
-title: 'Astro API Integration'
-description: 'Astro API Integration documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Astro API Integration documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Astro API Integration
 ---
 
 # Astro API Integration

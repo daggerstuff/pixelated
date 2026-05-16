@@ -223,7 +223,13 @@ export interface ResponseStrategy {
   responseActions: ResponseAction[]
   conditions: ResponseCondition[]
   priority: number
-  primaryType?: 'block' | 'isolate' | 'alert' | 'investigate' | 'mitigate' | 'rate_limit'
+  primaryType?:
+    | 'block'
+    | 'isolate'
+    | 'alert'
+    | 'investigate'
+    | 'mitigate'
+    | 'rate_limit'
 }
 
 export interface ResponseAction {
@@ -543,6 +549,7 @@ export interface HuntSchedule {
   enabled?: boolean
   scheduleId: string
   patternId: string
+  regions?: string[]
   scope?: string[]
   parameters?: Record<string, unknown>
   lastExecution?: Date | string
@@ -569,7 +576,13 @@ export interface HuntExecution {
   patternId: string
   startTime: Date
   completedTime?: Date
-  status: 'preparing' | 'executing' | 'completed' | 'failed' | 'cancelled' | 'timeout'
+  status:
+    | 'preparing'
+    | 'executing'
+    | 'completed'
+    | 'failed'
+    | 'cancelled'
+    | 'timeout'
   scope: string[]
   dataSources: string[]
   regions: string[]
@@ -589,11 +602,11 @@ export interface HuntFinding {
 }
 
 export interface HuntMetadata {
-  executionTime: number
-  dataProcessed: number
-  falsePositives: number
-  truePositives: number
-  coverage: number
+  executionTime?: number
+  dataProcessed?: number
+  falsePositives?: number
+  truePositives?: number
+  coverage?: number
   [key: string]: unknown
 }
 
@@ -760,4 +773,62 @@ export interface SystemMetrics {
   networkLatency: number
   activeConnections: number
   queueSize: number
+}
+
+// Additional types for hunting and response
+export interface HuntingConfig {
+  enabled: boolean
+  maxHunts: number
+  defaultTimeout: number
+  autoEscalate: boolean
+  huntPatterns?: HuntPattern[]
+}
+
+export interface HuntPattern {
+  patternId: string
+  name: string
+  description: string
+  type:
+    | 'behavioral'
+    | 'signature'
+    | 'anomaly'
+    | 'network'
+    | 'endpoint'
+    | 'user_behavior'
+    | 'malware'
+    | 'lateral_movement'
+  patternType?:
+    | 'network'
+    | 'endpoint'
+    | 'user_behavior'
+    | 'malware'
+    | 'lateral_movement'
+    | 'custom'
+  confidence: number
+  query: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  indicators?: string[]
+  conditions?: string[]
+  actions?: string[]
+  metadata?: Record<string, unknown>
+}
+
+export interface ThreatResponse {
+  responseId: string
+  threatId: string
+  responseType: 'block' | 'isolate' | 'alert' | 'mitigate'
+  status: 'pending' | 'executing' | 'completed' | 'failed'
+  actions: ResponseAction[]
+  timestamp: Date
+  metadata?: Record<string, unknown>
+}
+
+// Threat context for context field
+export interface ThreatContext {
+  geographicLocation?: string
+  affectedSystems?: string[]
+  industrySector?: string
+  timeWindow?: TimeWindow
+  threatActor?: string
+  campaign?: string
 }

@@ -76,6 +76,38 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
 }
 
 /**
+ * Determines if a permission grants access to high-risk or administrative operations.
+ *
+ * Why it exists: Sensitive operations (like deletions or admin access) must be
+ * explicitly separated from routine, high-volume actions (like reading messages)
+ * so that they can trigger mandatory audit logging for security monitoring and compliance.
+ */
+function isSensitivePermission(permission: Permission): boolean {
+  return (
+    permission.startsWith('delete:') ||
+    permission.includes(':admin') ||
+    permission.startsWith('manage:')
+  )
+}
+
+async function logPermissionCheck(
+  userId: string,
+  permission: Permission,
+  granted: boolean,
+): Promise<void> {
+  await createAuditLog(
+    AuditEventType.ACCESS,
+    'permission_check',
+    userId,
+    'access_control',
+    {
+      permission,
+      granted,
+    },
+  )
+}
+
+/**
  * Check if a role has a specific permission
  */
 export function roleHasPermission(role: Role, permission: Permission): boolean {
@@ -99,21 +131,8 @@ export async function hasPermission(
   const hasPermission = roleHasPermission(userRole, permission)
 
   // Log access control check for sensitive operations
-  if (
-    permission.startsWith('delete:') ||
-    permission.includes(':admin') ||
-    permission.startsWith('manage:')
-  ) {
-    await createAuditLog(
-      AuditEventType.ACCESS,
-      'permission_check',
-      user.id,
-      'access_control',
-      {
-        permission,
-        granted: hasPermission,
-      },
-    )
+  if (isSensitivePermission(permission)) {
+    await logPermissionCheck(user.id, permission, hasPermission)
   }
 
   return hasPermission
@@ -134,7 +153,9 @@ export async function isStaffOrAdmin(cookies: AstroCookies): Promise<boolean> {
   if (!user) {
     return false
   }
-  return hasRole(cookies, ROLES.STAFF) || hasRole(cookies, ROLES.ADMIN)
+
+  const userRole = user.role as Role
+  return userRole === ROLES.STAFF || userRole === ROLES.ADMIN
 }
 
 /**
@@ -162,16 +183,7 @@ export function requirePermission(permission: Permission) {
     const hasPermission = roleHasPermission(userRole, permission)
 
     // Log access control check
-    await createAuditLog(
-      AuditEventType.ACCESS,
-      'permission_check',
-      user.id,
-      'access_control',
-      {
-        permission,
-        granted: hasPermission,
-      },
-    )
+    await logPermissionCheck(user.id, permission, hasPermission)
 
     if (!hasPermission) {
       return redirect(

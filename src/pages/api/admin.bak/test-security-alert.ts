@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // Get request body
     const body = await request.json()
-    const alertType = body.alertType || 'suspicious_login'
+    const alertType = body.alertType ?? 'suspicious_login'
 
     // Validate alert type
     if (

@@ -27,10 +27,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
     switch (sortBy) {
       case 'likelihood': {
         const likelihoodOrder = { high: 3, medium: 2, low: 1 }
-        return (
-          likelihoodOrder[b.likelihood] -
-          likelihoodOrder[a.likelihood]
-        )
+        return likelihoodOrder[b.likelihood] - likelihoodOrder[a.likelihood]
       }
       case 'impact':
         return Math.abs(b.biasScoreChange) - Math.abs(a.biasScoreChange)

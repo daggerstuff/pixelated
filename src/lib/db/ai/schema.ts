@@ -24,7 +24,7 @@ export async function initializeAICollections(): Promise<boolean> {
   const db: Db = await mongodb.connect()
   try {
     await Promise.all(
-      Object.values(AI_COLLECTIONS).map((name) =>
+      Object.values(AI_COLLECTIONS).map( async (name) =>
         Promise.all([
           db.collection(name).createIndex({ user_id: 1 }),
           db.collection(name).createIndex({ created_at: 1 }),

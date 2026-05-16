@@ -3,13 +3,15 @@
 
 import Redis from 'ioredis'
 import mongoose from 'mongoose'
-import { Pool, Client } from 'pg'
+import type { Connection } from 'mongoose'
+import { Pool, PoolClient } from 'pg'
 
 // ============================================================================
 // CONNECTION INSTANCES
 // ============================================================================
 
-let mongoConnection: typeof mongoose | null = null
+type MongoConnection = Connection
+let mongoConnection: MongoConnection | null = null
 let postgresPool: Pool | null = null
 let redisClient: Redis | null = null
 
@@ -17,7 +19,7 @@ let redisClient: Redis | null = null
 // MONGODB CONNECTION
 // ============================================================================
 
-export async function connectMongoDB() {
+export async function connectMongoDB(): Promise<MongoConnection> {
   if (mongoConnection) {
     return mongoConnection
   }
@@ -28,7 +30,7 @@ export async function connectMongoDB() {
       throw new Error('MONGODB_URI is not defined in environment variables')
     }
 
-    mongoConnection = await mongoose.connect(mongoUri, {
+    await mongoose.connect(mongoUri, {
       maxPoolSize: 10,
       minPoolSize: 2,
       serverSelectionTimeoutMS: 5000,
@@ -36,6 +38,7 @@ export async function connectMongoDB() {
       retryWrites: true,
       w: 'majority',
     })
+    mongoConnection = mongoose.connection
 
     // Event listeners
     mongoose.connection.on('connected', () => {
@@ -51,7 +54,7 @@ export async function connectMongoDB() {
     })
 
     return mongoConnection
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('MongoDB connection failed:', error)
     throw error
   }
@@ -61,7 +64,7 @@ export async function connectMongoDB() {
 // POSTGRESQL CONNECTION
 // ============================================================================
 
-export async function connectPostgreSQL() {
+export async function connectPostgreSQL(): Promise<Pool> {
   if (postgresPool) {
     return postgresPool
   }
@@ -91,7 +94,7 @@ export async function connectPostgreSQL() {
     })
 
     return postgresPool
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('PostgreSQL connection failed:', error)
     throw error
   }
@@ -101,7 +104,7 @@ export async function connectPostgreSQL() {
 // REDIS CONNECTION
 // ============================================================================
 
-export async function connectRedis() {
+export async function connectRedis(): Promise<Redis> {
   if (redisClient) {
     return redisClient
   }
@@ -133,7 +136,7 @@ export async function connectRedis() {
     console.log('Redis connection test: PONG')
 
     return redisClient
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Redis connection failed:', error)
     throw error
   }
@@ -143,14 +146,14 @@ export async function connectRedis() {
 // GETTERS
 // ============================================================================
 
-export function getMongoConnection() {
+export function getMongoConnection(): MongoConnection {
   if (!mongoConnection) {
     throw new Error('MongoDB not connected. Call connectMongoDB() first.')
   }
   return mongoConnection
 }
 
-export function getPostgresPool() {
+export function getPostgresPool(): Pool {
   if (!postgresPool) {
     throw new Error(
       'PostgreSQL pool not created. Call connectPostgreSQL() first.',
@@ -159,7 +162,7 @@ export function getPostgresPool() {
   return postgresPool
 }
 
-export function getRedisClient() {
+export function getRedisClient(): Redis {
   if (!redisClient) {
     throw new Error('Redis not connected. Call connectRedis() first.')
   }
@@ -170,7 +173,7 @@ export function getRedisClient() {
 // DISCONNECT FUNCTIONS
 // ============================================================================
 
-export async function disconnectMongoDB() {
+export async function disconnectMongoDB(): Promise<void> {
   if (mongoConnection) {
     await mongoose.disconnect()
     mongoConnection = null
@@ -178,7 +181,7 @@ export async function disconnectMongoDB() {
   }
 }
 
-export async function disconnectPostgreSQL() {
+export async function disconnectPostgreSQL(): Promise<void> {
   if (postgresPool) {
     await postgresPool.end()
     postgresPool = null
@@ -186,7 +189,7 @@ export async function disconnectPostgreSQL() {
   }
 }
 
-export async function disconnectRedis() {
+export async function disconnectRedis(): Promise<void> {
   if (redisClient) {
     await redisClient.quit()
     redisClient = null
@@ -207,7 +210,7 @@ export async function disconnectAll() {
 // ============================================================================
 
 export async function withPostgresTransaction<T>(
-  callback: (client: Client) => Promise<T>,
+  callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   const pool = getPostgresPool()
   const client = await pool.connect()
@@ -217,7 +220,7 @@ export async function withPostgresTransaction<T>(
     const result = await callback(client)
     await client.query('COMMIT')
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query('ROLLBACK')
     throw error
   } finally {
@@ -236,7 +239,7 @@ export async function withMongoSession<T>(
     const result = await callback(session)
     await session.commitTransaction()
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     await session.abortTransaction()
     throw error
   } finally {

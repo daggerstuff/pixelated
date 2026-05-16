@@ -1,8 +1,7 @@
 ---
-title: Quantum Biology & Trauma
+title: 'Quantum Biology & Trauma: A New Frontier'
 description: >-
-  Exploring the emerging field of quantum biology and its revolutionary
-  implications for understanding and treating trauma
+  _This article is part of our Neuroplasticity & Trauma series, exploring
 author: Research & Clinical Team
 pubDate: 2025-05-08T00:00:00.000Z
 draft: false
@@ -13,9 +12,8 @@ tags:
   - healing
 series: Neuroplasticity & Trauma
 seriesOrder: 2
-category: Research
----
 
+---
 # Quantum Biology & Trauma: A New Frontier
 
 ## Introduction
@@ -351,15 +349,12 @@ The evolution of quantum biology in trauma healing will likely advance through:
 - Clinical integration
 - Outcome validation
 
----
-
 _Next in our series, we'll explore Advanced Somatic Technologies and their role
 in trauma healing._
 
 ## References
 
-[Include detailed references to support the research findings and clinical
-applications discussed]
+Include detailed references to support the research findings and clinical applications discussed.
 
 ---
 

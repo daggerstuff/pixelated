@@ -483,7 +483,7 @@ describe('BiasAnalysisCache', () => {
         typeof retrieved!.timestamp === 'string'
           ? new Date(retrieved!.timestamp)
           : retrieved!.timestamp
-      expect(retrievedTimestamp.getTime()).toBe(mockSession.timestamp.getTime())
+      expect(retrievedTimestamp?.getTime()).toBe(mockSession.timestamp?.getTime())
     })
 
     it('should return null for non-existent sessions', async () => {
@@ -714,26 +714,26 @@ describe('ReportCache', () => {
 
       // Handle Date field comparisons (might be serialized as strings)
       const retrievedGeneratedAt =
-        typeof retrieved!.generatedAt === 'string'
-          ? new Date(retrieved!.generatedAt)
-          : retrieved!.generatedAt
-      expect(retrievedGeneratedAt.getTime()).toBe(
-        mockReport.generatedAt.getTime(),
+        typeof retrieved?.generatedAt === 'string'
+          ? new Date(retrieved.generatedAt)
+          : retrieved?.generatedAt
+      expect(retrievedGeneratedAt?.getTime()).toBe(
+        mockReport.generatedAt?.getTime(),
       )
 
       const retrievedStart =
-        typeof retrieved!.timeRange.start === 'string'
-          ? new Date(retrieved!.timeRange.start)
-          : retrieved!.timeRange.start
-      expect(retrievedStart.getTime()).toBe(
-        mockReport.timeRange.start.getTime(),
+        typeof retrieved?.timeRange?.start === 'string'
+          ? new Date(retrieved.timeRange.start)
+          : retrieved?.timeRange?.start
+      expect(retrievedStart?.getTime()).toBe(
+        mockReport.timeRange?.start?.getTime(),
       )
 
       const retrievedEnd =
-        typeof retrieved!.timeRange.end === 'string'
-          ? new Date(retrieved!.timeRange.end)
-          : retrieved!.timeRange.end
-      expect(retrievedEnd.getTime()).toBe(mockReport.timeRange.end.getTime())
+        typeof retrieved?.timeRange?.end === 'string'
+          ? new Date(retrieved.timeRange.end)
+          : retrieved?.timeRange?.end
+      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime())
     })
 
     it('should return null for non-existent reports', async () => {
@@ -794,7 +794,7 @@ describe('CacheManager', () => {
         sessionId: 'session-1',
         timestamp: new Date(),
         overallBiasScore: 0.3,
-        layerResults: {} as unknown,
+        layerResults: {} as BiasAnalysisResult['layerResults'],
         demographics: {} as unknown,
         recommendations: [],
         alertLevel: 'low',
@@ -817,14 +817,14 @@ describe('CacheManager', () => {
       const manager = getCacheManager()
 
       // This should not throw
-      expect(() => manager.clearAll()).not.toThrow()
+      expect( async () => manager.clearAll()).not.toThrow()
     })
 
     it('should destroy cache manager', () => {
       const manager = getCacheManager()
 
       // This should not throw
-      expect(() => manager.destroy()).not.toThrow()
+      expect( async () => manager.destroy()).not.toThrow()
     })
   })
 })
@@ -844,7 +844,7 @@ describe('Convenience Functions', () => {
         sessionId: 'session-123',
         timestamp: new Date(),
         overallBiasScore: 0.3,
-        layerResults: {} as unknown,
+        layerResults: {} as BiasAnalysisResult['layerResults'],
         demographics: {} as unknown,
         recommendations: [],
         alertLevel: 'medium',
@@ -920,8 +920,8 @@ describe('Convenience Functions', () => {
           end: new Date('2024-01-31'),
         },
         overallFairnessScore: 0.8,
-        executiveSummary: {} as unknown,
-        detailedAnalysis: {} as unknown,
+        executiveSummary: {} as BiasReport['executiveSummary'],
+        detailedAnalysis: {} as BiasReport['detailedAnalysis'],
         recommendations: [],
         appendices: [],
       }
@@ -937,26 +937,26 @@ describe('Convenience Functions', () => {
 
       // Handle Date field comparisons (might be serialized as strings)
       const retrievedGeneratedAt =
-        typeof retrieved!.generatedAt === 'string'
-          ? new Date(retrieved!.generatedAt)
-          : retrieved!.generatedAt
-      expect(retrievedGeneratedAt.getTime()).toBe(
-        mockReport.generatedAt.getTime(),
+        typeof retrieved?.generatedAt === 'string'
+          ? new Date(retrieved.generatedAt)
+          : retrieved?.generatedAt
+      expect(retrievedGeneratedAt?.getTime()).toBe(
+        mockReport.generatedAt?.getTime(),
       )
 
       const retrievedStart =
-        typeof retrieved!.timeRange.start === 'string'
-          ? new Date(retrieved!.timeRange.start)
-          : retrieved!.timeRange.start
-      expect(retrievedStart.getTime()).toBe(
-        mockReport.timeRange.start.getTime(),
+        typeof retrieved?.timeRange?.start === 'string'
+          ? new Date(retrieved.timeRange.start)
+          : retrieved?.timeRange?.start
+      expect(retrievedStart?.getTime()).toBe(
+        mockReport.timeRange?.start?.getTime(),
       )
 
       const retrievedEnd =
-        typeof retrieved!.timeRange.end === 'string'
-          ? new Date(retrieved!.timeRange.end)
-          : retrieved!.timeRange.end
-      expect(retrievedEnd.getTime()).toBe(mockReport.timeRange.end.getTime())
+        typeof retrieved?.timeRange?.end === 'string'
+          ? new Date(retrieved.timeRange.end)
+          : retrieved?.timeRange?.end
+      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime())
     })
 
     it('should return null for non-existent reports', async () => {

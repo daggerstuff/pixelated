@@ -169,8 +169,8 @@ export interface ComplianceConfig {
 export class ConfigurationManager extends EventEmitter {
   private config: MultiRegionConfig
   private isInitialized = false
-  private configWatchers: Map<string, NodeJS.Timeout> = new Map()
-  private featureFlagCache: Map<string, boolean> = new Map()
+  private readonly configWatchers: Map<string, NodeJS.Timeout> = new Map()
+  private readonly featureFlagCache: Map<string, boolean> = new Map()
 
   constructor(initialConfig: MultiRegionConfig) {
     super()
@@ -203,11 +203,14 @@ export class ConfigurationManager extends EventEmitter {
         environments: Object.keys(this.config.environments),
         regions: this.config.deployment.regions.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Configuration Manager', { error })
-      throw new Error(`Initialization failed: ${error.message}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -251,7 +254,7 @@ export class ConfigurationManager extends EventEmitter {
     }
 
     // Validate edge computing configuration
-    if (config.edgeComputing && config.edgeComputing.locations.length === 0) {
+    if (config.edgeComputing?.locations.length === 0) {
       errors.push(
         'Edge computing configuration must include at least one location',
       )
@@ -276,7 +279,7 @@ export class ConfigurationManager extends EventEmitter {
     }
 
     // Validate secrets (basic structure check)
-    if (!config.secrets || !config.secrets.cloudProviders) {
+    if (!config.secrets?.cloudProviders) {
       errors.push('Secrets configuration is required')
     }
 
@@ -290,7 +293,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   private async loadEnvironmentConfig(): Promise<void> {
     try {
-      const environment = process.env.NODE_ENV || 'development'
+      const environment = process.env.NODE_ENV ?? 'development'
       logger.info(`Loading configuration for environment: ${environment}`)
 
       // Load environment-specific overrides
@@ -303,7 +306,7 @@ export class ConfigurationManager extends EventEmitter {
 
       // Load secrets from environment variables
       await this.loadSecretsFromEnvironment()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load environment configuration', { error })
       throw error
     }
@@ -322,6 +325,29 @@ export class ConfigurationManager extends EventEmitter {
       const envOverrides: Record<string, Partial<MultiRegionConfig>> = {
         development: {
           deployment: {
+            globalServices: {
+              trafficManager: true,
+              threatIntelligence: false,
+              complianceManager: false,
+            },
+            edgeComputing: {
+              enabled: true,
+              locations: ['us-east-1-edge'],
+              cacheSize: '2Gi',
+            },
+            dataSync: {
+              strategy: 'active-passive',
+              consistencyLevel: 'eventual',
+              conflictResolution: 'timestamp',
+            },
+            failover: {
+              automatic: false,
+              detectionTime: 30_000,
+              recoveryTime: 120_000,
+              healthCheckInterval: 30_000,
+              maxDataSyncLag: 5000,
+              failoverCooldown: 180_000,
+            },
             regions: this.config.deployment.regions.map((region) => ({
               ...region,
               capacity: {
@@ -347,7 +373,12 @@ export class ConfigurationManager extends EventEmitter {
               retention: 7,
               aggregation: 'average',
             },
-            alerting: { enabled: false, channels: [], severityLevels: [] },
+            alerting: {
+              enabled: false,
+              channels: [],
+              severityLevels: [],
+              escalationRules: {},
+            },
             logging: {
               level: 'debug',
               format: 'json',
@@ -358,6 +389,29 @@ export class ConfigurationManager extends EventEmitter {
         },
         staging: {
           deployment: {
+            globalServices: {
+              trafficManager: true,
+              threatIntelligence: false,
+              complianceManager: true,
+            },
+            edgeComputing: {
+              enabled: true,
+              locations: ['us-east-1-edge', 'us-west-2-edge'],
+              cacheSize: '4Gi',
+            },
+            dataSync: {
+              strategy: 'active-passive',
+              consistencyLevel: 'strong',
+              conflictResolution: 'timestamp',
+            },
+            failover: {
+              automatic: true,
+              detectionTime: 20_000,
+              recoveryTime: 60_000,
+              healthCheckInterval: 20_000,
+              maxDataSyncLag: 3000,
+              failoverCooldown: 120_000,
+            },
             regions: this.config.deployment.regions.map((region) => ({
               ...region,
               capacity: {
@@ -387,6 +441,7 @@ export class ConfigurationManager extends EventEmitter {
               enabled: true,
               channels: ['slack'],
               severityLevels: ['warning', 'error'],
+              escalationRules: {},
             },
             logging: {
               level: 'info',
@@ -398,6 +453,29 @@ export class ConfigurationManager extends EventEmitter {
         },
         production: {
           deployment: {
+            globalServices: {
+              trafficManager: true,
+              threatIntelligence: true,
+              complianceManager: true,
+            },
+            edgeComputing: {
+              enabled: true,
+              locations: ['global'],
+              cacheSize: '8Gi',
+            },
+            dataSync: {
+              strategy: 'active-active',
+              consistencyLevel: 'strong',
+              conflictResolution: 'vector-clock',
+            },
+            failover: {
+              automatic: true,
+              detectionTime: 15_000,
+              recoveryTime: 45_000,
+              healthCheckInterval: 10_000,
+              maxDataSyncLag: 1000,
+              failoverCooldown: 90_000,
+            },
             regions: this.config.deployment.regions.map((region) => ({
               ...region,
               capacity: {
@@ -430,6 +508,7 @@ export class ConfigurationManager extends EventEmitter {
               enabled: true,
               channels: ['slack', 'email', 'pagerduty'],
               severityLevels: ['info', 'warning', 'error', 'critical'],
+              escalationRules: {},
             },
             logging: {
               level: 'warn',
@@ -442,7 +521,7 @@ export class ConfigurationManager extends EventEmitter {
       }
 
       return envOverrides[environment] || null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load environment overrides', { error })
       return null
     }
@@ -545,7 +624,7 @@ export class ConfigurationManager extends EventEmitter {
       }
 
       logger.info('Secrets loaded from environment variables')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load secrets from environment', { error })
       throw error
     }
@@ -586,7 +665,7 @@ export class ConfigurationManager extends EventEmitter {
           .filter(([, value]) => value)
           .map(([key]) => key),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize feature flags', { error })
       throw error
     }
@@ -607,7 +686,7 @@ export class ConfigurationManager extends EventEmitter {
       this.setupFeatureFlagWatchers()
 
       logger.info('Configuration watchers setup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to setup configuration watchers', { error })
       throw error
     }
@@ -662,7 +741,7 @@ export class ConfigurationManager extends EventEmitter {
         logger.info('Configuration updates detected')
         await this.reloadConfiguration()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking for configuration updates', { error })
     }
   }
@@ -695,7 +774,7 @@ export class ConfigurationManager extends EventEmitter {
       if (hasChanges) {
         await this.reloadConfiguration()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking for environment changes', { error })
     }
   }
@@ -713,7 +792,7 @@ export class ConfigurationManager extends EventEmitter {
         logger.info('Feature flag changes detected')
         await this.reloadFeatureFlags()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error checking for feature flag changes', { error })
     }
   }
@@ -730,6 +809,62 @@ export class ConfigurationManager extends EventEmitter {
    */
   getDeploymentConfig(): DeploymentConfig {
     return { ...this.config.deployment }
+  }
+
+  /**
+   * Get primary region identifier
+   */
+  getPrimaryRegion(): string {
+    const sortedRegions = [...this.config.deployment.regions].sort(
+      (a, b) => a.priority - b.priority,
+    )
+    return sortedRegions[0]?.id || ''
+  }
+
+  /**
+   * Get backup region identifiers
+   */
+  getBackupRegions(): string[] {
+    const sortedRegions = [...this.config.deployment.regions].sort(
+      (a, b) => a.priority - b.priority,
+    )
+    return sortedRegions.slice(1).map((region) => region.id)
+  }
+
+  /**
+   * Get failover configuration
+   */
+  getFailoverConfig(): DeploymentConfig['failover'] {
+    return { ...this.config.deployment.failover }
+  }
+
+  /**
+   * Get DNS failover configuration
+   */
+  getDNSConfig(): {
+    domainName: string
+    hostedZoneId: string
+    cloudflareZoneId?: string
+    ttl?: number
+  } {
+    return {
+      domainName:
+        process.env.MULTI_REGION_DOMAIN_NAME ??
+        this.config.deployment.regions[0]?.name ??
+        'example.com',
+      hostedZoneId:
+        process.env.MULTI_REGION_HOSTED_ZONE_ID ?? 'Z00000000000000000000',
+      cloudflareZoneId:
+        process.env.MULTI_REGION_CLOUDFLARE_ZONE_ID ?? undefined,
+      ttl: Number.parseInt(process.env.MULTI_REGION_DNS_TTL ?? '60', 10),
+    }
+  }
+
+  /**
+   * Get current environment name
+   */
+  getEnvironment(): string {
+    return process.env.NODE_ENV ?? 'production'
   }
 
   /**
@@ -761,7 +896,7 @@ export class ConfigurationManager extends EventEmitter {
    * Check if feature flag is enabled
    */
   isFeatureEnabled(flag: keyof FeatureFlags): boolean {
-    return this.featureFlagCache.get(flag) || false
+    return this.featureFlagCache.get(flag) ?? false
   }
 
   /**
@@ -784,7 +919,7 @@ export class ConfigurationManager extends EventEmitter {
 
       logger.info(`Feature flag updated: ${flag} = ${enabled}`)
       this.emit('feature-flag-updated', { flag, enabled })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update feature flag', { error, flag, enabled })
       throw error
     }
@@ -832,7 +967,7 @@ export class ConfigurationManager extends EventEmitter {
 
       logger.info('Configuration updated successfully')
       this.emit('configuration-updated', { updates: Object.keys(updates) })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update configuration', { error })
       throw error
     }
@@ -851,7 +986,7 @@ export class ConfigurationManager extends EventEmitter {
       deployment: {
         ...base.deployment,
         ...updates.deployment,
-        regions: updates.deployment?.regions || base.deployment.regions,
+        regions: updates.deployment?.regions ?? base.deployment.regions,
       },
       featureFlags: {
         ...base.featureFlags,
@@ -902,7 +1037,7 @@ export class ConfigurationManager extends EventEmitter {
           components: affectedComponents,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reinitialize affected components', { error })
       throw error
     }
@@ -931,7 +1066,7 @@ export class ConfigurationManager extends EventEmitter {
         logger.info('Configuration reloaded successfully')
         this.emit('configuration-reloaded')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reload configuration', { error })
       throw error
     }
@@ -968,7 +1103,7 @@ export class ConfigurationManager extends EventEmitter {
 
       logger.info('Feature flags reloaded successfully')
       this.emit('feature-flags-reloaded')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to reload feature flags', { error })
       throw error
     }
@@ -1086,7 +1221,7 @@ export class ConfigurationManager extends EventEmitter {
 
       this.isInitialized = false
       logger.info('Configuration Manager cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Configuration Manager cleanup failed', { error })
       throw error
     }

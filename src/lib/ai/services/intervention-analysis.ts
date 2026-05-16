@@ -46,7 +46,7 @@ export class InterventionAnalysisService {
   constructor(config: InterventionAnalysisServiceConfig) {
     const {
       aiService,
-      model = 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      model = 'minimaxai/minimax-m2.7',
       systemPrompt = 'You are an expert mental-health assistant. Return ONLY valid JSON with the requested keys, no markdown or additional commentary.',
     } = config
 
@@ -94,7 +94,7 @@ User response:
       const completionProvider =
         (this.aiService.createChatCompletion?.bind(this.aiService) as
           | typeof this.aiService.createChatCompletion
-          | undefined) ||
+          | undefined) ??
         (this.aiService.generateCompletion?.bind(this.aiService))
 
       if (!completionProvider) {
@@ -111,12 +111,12 @@ User response:
       // Extract content from common response shapes
       const completionRecord = completion as unknown as Record<string, unknown>
       const rawContent =
-        (completionRecord['content'] as string | undefined) ||
+        ((completionRecord['content'] as string | undefined) ??
         (
           completionRecord['choices'] as
             | Array<{ message?: { content?: string } }>
             | undefined
-        )?.[0]?.message?.content ||
+        )?.[0]?.message?.content) ??
         ''
 
       let parsed: Record<string, unknown>
@@ -159,7 +159,7 @@ User response:
     batch: InterventionAnalysisBatchItem[],
   ): Promise<InterventionAnalysisResult[]> {
     return Promise.all(
-      batch.map((item) =>
+      batch.map( async (item) =>
         this.analyzeIntervention(
           item.conversation,
           item.interventionMessage,

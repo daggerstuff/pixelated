@@ -50,7 +50,7 @@ vi.mock('@lib/db/mongoClient', () => ({
             toArray: async () => {
               return Array.from(collectionState.values()).filter((doc) => {
                 if (query.user_id && doc.user_id !== query.user_id) return false
-                if (query.status && query.status.$nin) {
+                if (query.status?.$nin) {
                   return !query.status.$nin.includes(doc.status)
                 }
                 return true

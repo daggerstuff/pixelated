@@ -18,7 +18,7 @@ export async function validateData<T extends z.ZodTypeAny>(
 ): Promise<z.infer<T>> {
   try {
     return await schema.parseAsync(data)
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       throw new Error(
         `Validation failed: ${error.issues.map((e) => e.message).join(', ')}`,

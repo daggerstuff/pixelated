@@ -1,11 +1,11 @@
 ---
-title: 'API Overview'
-description: 'Learn about Pixelated API architecture and capabilities'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+description: Learn about Pixelated API architecture and capabilities
+pubDate: '2026-05-09'
+author: Pixelated Empathy Team
 draft: false
 toc: true
 share: true
+title: Overview
 ---
 
 ## API Overview

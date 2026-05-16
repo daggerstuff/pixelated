@@ -112,17 +112,17 @@ export interface ThreatIndicator {
 }
 
 export class EdgeThreatDetectionSystem extends EventEmitter {
-  private redis: Redis
-  private models: Map<string, tf.LayersModel> = new Map()
-  private biasDetector: BiasDetectionEngine
+  private readonly redis: Redis
+  private readonly models: Map<string, tf.LayersModel> = new Map()
+  private readonly biasDetector: BiasDetectionEngine
   private isInitialized = false
-  private processingQueue: DetectionInput[] = []
+  private readonly processingQueue: DetectionInput[] = []
   private isProcessing = false
-  private cache: Map<string, ThreatDetection> = new Map()
-  private performanceMetrics: Map<string, number[]> = new Map()
+  private readonly cache: Map<string, ThreatDetection> = new Map()
+  private readonly performanceMetrics: Map<string, number[]> = new Map()
 
   constructor(
-    private config: EdgeDetectionConfig,
+    private readonly config: EdgeDetectionConfig,
     redis: Redis,
   ) {
     super()
@@ -164,14 +164,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         region: this.config.region,
         timestamp: new Date(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Edge Threat Detection System', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
         region: this.config.region,
       })
       throw new Error(
-        `Failed to initialize edge threat detection: ${error.message}`,
+        `Failed to initialize edge threat detection: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -204,10 +204,10 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
             version: config.version,
             location: this.config.location,
           })
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(`Failed to load model`, {
             model: name,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             location: this.config.location,
           })
         }
@@ -217,9 +217,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         count: this.models.size,
         location: this.config.location,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to load models', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
       throw error
@@ -258,9 +258,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       })
 
       return model
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create model', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         model: config.name,
         location: this.config.location,
       })
@@ -283,9 +283,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           try {
             const request = JSON.parse(message)
             await this.processDetectionRequest(request)
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error('Failed to process detection request', {
-              error: error.message,
+              error: error instanceof Error ? error.message : 'Unknown error',
               location: this.config.location,
             })
           }
@@ -297,9 +297,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         try {
           const update = JSON.parse(message)
           await this.handleModelUpdate(update)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Failed to handle model update', {
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             location: this.config.location,
           })
         }
@@ -308,9 +308,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       logger.info('Redis pub/sub setup completed', {
         location: this.config.location,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to setup Redis pub/sub', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
       throw error
@@ -378,7 +378,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         final_result: finalResult,
         processing_time: Date.now() - startTime,
         metadata: {
-          priority: request.priority || 'medium',
+          priority: request.priority ?? 'medium',
           cache_hit: false,
           model_versions: this.getModelVersions(),
         },
@@ -416,9 +416,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       })
 
       return detection
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process detection request', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         detectionId,
         location: this.config.location,
       })
@@ -453,9 +453,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
 
       // Normalize features
       return this.normalizeFeatures(features)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to preprocess input', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         inputType: input.type,
         location: this.config.location,
       })
@@ -468,14 +468,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractNetworkFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.packet_count || 0,
-      data.bytes_transferred || 0,
-      data.unique_destinations || 0,
-      data.connection_duration || 0,
-      data.protocol_type || 0,
-      data.port_number || 0,
-      data.flag_count || 0,
-      data.error_rate || 0,
+      data.packet_count ?? 0,
+      data.bytes_transferred ?? 0,
+      data.unique_destinations ?? 0,
+      data.connection_duration ?? 0,
+      data.protocol_type ?? 0,
+      data.port_number ?? 0,
+      data.flag_count ?? 0,
+      data.error_rate ?? 0,
     ]
 
     return features.slice(0, 10) // Ensure consistent length
@@ -486,14 +486,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractBehavioralFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.login_attempts || 0,
-      data.failed_logins || 0,
-      data.access_frequency || 0,
-      data.time_of_access || 0,
-      data.resource_access_count || 0,
-      data.privilege_escalation_attempts || 0,
-      data.anomalous_actions || 0,
-      data.session_duration || 0,
+      data.login_attempts ?? 0,
+      data.failed_logins ?? 0,
+      data.access_frequency ?? 0,
+      data.time_of_access ?? 0,
+      data.resource_access_count ?? 0,
+      data.privilege_escalation_attempts ?? 0,
+      data.anomalous_actions ?? 0,
+      data.session_duration ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -504,14 +504,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractContentFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.content_length || 0,
-      data.keyword_density || 0,
-      data.suspicious_keywords || 0,
-      data.encoding_type || 0,
-      data.attachment_count || 0,
-      data.link_count || 0,
-      data.script_count || 0,
-      data.obfuscation_level || 0,
+      data.content_length ?? 0,
+      data.keyword_density ?? 0,
+      data.suspicious_keywords ?? 0,
+      data.encoding_type ?? 0,
+      data.attachment_count ?? 0,
+      data.link_count ?? 0,
+      data.script_count ?? 0,
+      data.obfuscation_level ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -522,14 +522,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractSystemFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.cpu_usage || 0,
-      data.memory_usage || 0,
-      data.disk_io || 0,
-      data.network_io || 0,
-      data.process_count || 0,
-      data.thread_count || 0,
-      data.handle_count || 0,
-      data.error_count || 0,
+      data.cpu_usage ?? 0,
+      data.memory_usage ?? 0,
+      data.disk_io ?? 0,
+      data.network_io ?? 0,
+      data.process_count ?? 0,
+      data.thread_count ?? 0,
+      data.handle_count ?? 0,
+      data.error_count ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -565,7 +565,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         const inputTensor = tf.tensor2d([features])
 
         // Run model prediction
-        const prediction = ( model.predict(inputTensor)) as tf.Tensor
+        const prediction = model.predict(inputTensor) as tf.Tensor
         const predictions = await prediction.data()
 
         // Clean up tensors
@@ -590,10 +590,10 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           confidence: results[modelName].confidence,
           location: this.config.location,
         })
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Model prediction failed', {
           model: modelName,
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
           location: this.config.location,
         })
 
@@ -700,9 +700,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         explanation: biasResult.explanation,
         mitigation_suggested: biasResult.mitigation_steps,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Bias analysis failed', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
 
@@ -782,9 +782,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         explanation,
         recommended_actions: recommendedActions,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate final result', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
       throw error
@@ -1063,7 +1063,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private updatePerformanceMetrics(detection: ThreatDetection): void {
     const metric = `processing_time_${detection.final_result.severity}`
-    const times = this.performanceMetrics.get(metric) || []
+    const times = this.performanceMetrics.get(metric) ?? []
     times.push(detection.processing_time)
 
     // Keep only last 100 measurements
@@ -1100,9 +1100,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       const processingPromises = batch.map(async (input) => {
         try {
           return await this.processDetectionRequest({ input })
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Queue processing failed for input', {
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error',
             location: this.config.location,
           })
           return null
@@ -1110,9 +1110,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       })
 
       await Promise.all(processingPromises)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Queue processing batch failed', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
     } finally {
@@ -1149,9 +1149,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           location: this.config.location,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to handle model update', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
     }
@@ -1224,8 +1224,8 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
     // Sort queue by priority
     this.processingQueue.sort((a, b) => {
       const priorityOrder = { high: 3, medium: 2, low: 1 }
-      const aPriority = priorityOrder[a.metadata?.priority || 'medium']
-      const bPriority = priorityOrder[b.metadata?.priority || 'medium']
+      const aPriority = priorityOrder[a.metadata?.priority ?? 'medium']
+      const bPriority = priorityOrder[b.metadata?.priority ?? 'medium']
       return bPriority - aPriority
     })
 
@@ -1268,9 +1268,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       logger.info('Edge Threat Detection System shutdown completed', {
         location: this.config.location,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error during shutdown', {
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         location: this.config.location,
       })
       throw error

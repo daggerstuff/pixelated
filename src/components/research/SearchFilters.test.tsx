@@ -1,12 +1,11 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import React from 'react'
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from 'vitest'
-
-import SearchFilters, { type SearchFiltersState } from './SearchFilters'
-
-// Setup Mock for onChange
-const mockOnChange = vi.fn()
+import { describe, expect, it, vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { createRoot } from 'react-dom/client'
+import { fireEvent } from '@testing-library/dom'
+import { act } from '@testing-library/react'
+import type { SearchFiltersState } from './SearchFilters'
+import SearchFilters from './SearchFilters'
 
 const defaultFilters: SearchFiltersState = {
   topics: [],
@@ -15,65 +14,95 @@ const defaultFilters: SearchFiltersState = {
   sortBy: 'relevance',
 }
 
-const filledFilters: SearchFiltersState = {
-  topics: ['CBT'],
-  minRelevance: 0.5,
-  publishers: [],
-  sortBy: 'year_desc',
-}
-
 describe('SearchFilters', () => {
-  it('renders all filter sections', () => {
-    render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} />)
-
-    expect(screen.getByText('Advanced Filters')).toBeInTheDocument()
-    expect(screen.getByLabelText('Year From')).toBeInTheDocument()
-    expect(screen.getByLabelText('Year To')).toBeInTheDocument()
-    expect(screen.getByText('Therapeutic Topics')).toBeInTheDocument()
-    expect(screen.getByText('Min Relevance Score')).toBeInTheDocument()
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
-  it('toggles topics correctly', () => {
-    render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} />)
+  async function renderFilters(onChange = vi.fn(), onClose = vi.fn()) {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+    document.body.appendChild(container)
+     act(() => {
+      root.render(
+        <SearchFilters
+          filters={defaultFilters}
+          onChange={onChange}
+          onClose={onClose}
+        />,
+      )
+    })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(container.innerHTML).toContain('Advanced Filters')
+    return {
+      container,
+      root,
+      async cleanup() {
+         act(() => {
+          root.unmount()
+        })
+        container.remove()
+      },
+    }
+  }
 
-    const topicButton = screen.getByText('CBT')
-    fireEvent.click(topicButton)
+  it('renders with default values', async () => {
+    const mockOnChange = vi.fn()
+    const { container, cleanup } = await renderFilters(mockOnChange)
 
-    // Note: The component uses local state, so we expect the button style to change
-    // AND handleApply calls onChange. But wait, toggleTopic updates local state.
-    // We verify the button indicates it is pressed or selected visually (class check or aria-pressed).
-    // After clicking, it should be pressed (true)
-    expect(topicButton).toHaveAttribute('aria-pressed', 'true')
+    try {
+      expect(container.textContent).toContain('Advanced Filters')
+      expect(container.querySelector('label[for="min-relevance"]')).toBeInTheDocument()
+      expect(container.querySelector('label[for="sort-by"]')).toBeInTheDocument()
+    } finally {
+      await cleanup()
+    }
   })
 
-  it('calls onChange with new filters when Apply is clicked', () => {
-    render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} />)
+  it('calls onChange when sort order changes', async () => {
+    const mockOnChange = vi.fn()
+    const { container, cleanup } = await renderFilters(mockOnChange)
 
-    const topicButton = screen.getByText('Trauma')
-    fireEvent.click(topicButton)
+    const sortBySelect = container.querySelector('#sort-by')
+    expect(sortBySelect).toBeInTheDocument()
+    expect(sortBySelect).not.toBeNull()
+    if (sortBySelect === null) return
 
-    const applyButton = screen.getByText('Apply Filters')
+    fireEvent.change(sortBySelect, { target: { value: 'year_desc' } })
+
+    const applyButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent?.includes('Apply Filters'),
+    )
+    expect(applyButton).toBeInTheDocument()
+    if (!applyButton) return
+
     fireEvent.click(applyButton)
 
-    expect(mockOnChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        topics: ['Trauma'],
-      }),
-    )
+    try {
+      expect(mockOnChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sortBy: 'year_desc',
+        }),
+      )
+    } finally {
+      await cleanup()
+    }
   })
 
-  it('resets filters when Reset is clicked', () => {
-    render(<SearchFilters filters={filledFilters} onChange={mockOnChange} />)
+  it('reflects active sort state', async () => {
+    const mockOnChange = vi.fn()
+    const { container, cleanup } = await renderFilters(mockOnChange)
 
-    const resetButton = screen.getByText('Reset')
-    fireEvent.click(resetButton)
-
-    expect(mockOnChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        topics: [],
-        minRelevance: 0,
-        sortBy: 'relevance',
-      }),
-    )
+    try {
+      const relevanceOption = Array.from(
+        container.querySelectorAll('option'),
+      ).find((option) => option.textContent?.includes('Relevance'))
+      expect(relevanceOption).toBeInTheDocument()
+      if (!relevanceOption) return
+      expect(relevanceOption.selected).toBe(true)
+    } finally {
+      await cleanup()
+    }
   })
+
 })

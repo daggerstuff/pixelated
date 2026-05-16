@@ -133,26 +133,26 @@ def create_s3_client(env: Mapping[str, str]) -> Any:
         env: Dictionary of environment variables loaded from .env file.
 
     Returns:
-        boto3 S3 client configured with OVH credentials.
+        boto3 S3 client configured with HETZNER credentials.
 
     Raises:
         ValueError: If any of the required S3 credentials are missing.
     """
-    endpoint = env.get("OVH_S3_ENDPOINT")
-    access_key = env.get("OVH_S3_ACCESS_KEY")
-    secret = env.get("OVH_S3_SECRET_KEY")
+    endpoint = env.get("HETZNER_S3_ENDPOINT")
+    access_key = env.get("HETZNER_S3_ACCESS_KEY")
+    secret = env.get("HETZNER_S3_SECRET_KEY")
 
     # Prefer environment variables over .env file for CI/CD compatibility
     if not endpoint:
-        endpoint = os.environ.get("OVH_S3_ENDPOINT")
+        endpoint = os.environ.get("HETZNER_S3_ENDPOINT")
     if not access_key:
-        access_key = os.environ.get("OVH_S3_ACCESS_KEY")
+        access_key = os.environ.get("HETZNER_S3_ACCESS_KEY")
     if not secret:
-        secret = os.environ.get("OVH_S3_SECRET_KEY")
+        secret = os.environ.get("HETZNER_S3_SECRET_KEY")
 
     if not all((endpoint, access_key, secret)):
         raise ValueError(
-            "OVH_S3_ENDPOINT, OVH_S3_ACCESS_KEY, and OVH_S3_SECRET_KEY must be provided as environment variables or in .env"
+            "HETZNER_S3_ENDPOINT, HETZNER_S3_ACCESS_KEY, and HETZNER_S3_SECRET_KEY must be provided as environment variables or in .env"
         )
 
     return boto3.client(
@@ -282,7 +282,7 @@ def main() -> None:
     """Script entry point for generating S3 coverage reports.
 
     Loads environment variables from .env file or OS environment,
-    creates an S3 client using OVH credentials, builds a coverage
+    creates an S3 client using HETZNER credentials, builds a coverage
     report by scanning dataset families in the S3 bucket, and writes
     the results as a markdown file to docs/tracking.
 
@@ -307,7 +307,7 @@ def main() -> None:
         # Fallback to environment variables from OS when .env file is absent
         # or inaccessible in CI/CD environments
         env = os.environ.copy()
-    bucket = env.get("OVH_S3_BUCKET", "pixel-data")
+    bucket = env.get("HETZNER_S3_BUCKET", "pixel-data")
     client = create_s3_client(env)
     report = build_coverage_report(bucket, client)
     destination = Path("docs/tracking/mental-health-datasets-expansion-release-0.coverage.md")

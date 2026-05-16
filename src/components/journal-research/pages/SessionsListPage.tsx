@@ -3,7 +3,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
 import { useSessionListQuery } from '@/lib/hooks/journal-research'
 

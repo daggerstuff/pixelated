@@ -22,12 +22,12 @@ async function basicEncryptionExample() {
 
   // Encrypt some data
   const sensitiveData = 'This is sensitive patient information'
-  const encrypted =  crypto.encrypt(sensitiveData, 'patient-data')
+  const encrypted = crypto.encrypt(sensitiveData, 'patient-data')
 
   logger.info('Data encrypted successfully', { encrypted })
 
   // Decrypt the data
-  const decrypted =  crypto.decrypt(encrypted, 'patient-data')
+  const decrypted = crypto.decrypt(encrypted, 'patient-data')
 
   logger.info('Data decrypted successfully', { decrypted })
 
@@ -108,7 +108,7 @@ async function reencryptionExample() {
 
   // Encrypt some data
   const sensitiveData = 'This is sensitive patient information'
-  const encrypted =  crypto.encrypt(sensitiveData, 'patient-data')
+  const encrypted = crypto.encrypt(sensitiveData, 'patient-data')
 
   logger.info('Original data encrypted', { encrypted })
 
@@ -129,13 +129,13 @@ async function reencryptionExample() {
     })
 
     // Re-encrypt the data with the new key
-    const decrypted =  crypto.decrypt(encrypted, 'patient-data')
-    const reencrypted =  crypto.encrypt(decrypted, 'patient-data')
+    const decrypted = crypto.decrypt(encrypted, 'patient-data')
+    const reencrypted = crypto.encrypt(decrypted, 'patient-data')
 
     logger.info('Data re-encrypted with new key', { reencrypted })
 
     // Verify the re-encryption worked correctly
-    const redecrypted =  crypto.decrypt(reencrypted, 'patient-data')
+    const redecrypted = crypto.decrypt(reencrypted, 'patient-data')
     logger.info('Re-encryption verification', {
       success: redecrypted === sensitiveData,
     })

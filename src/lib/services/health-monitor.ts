@@ -1,5 +1,5 @@
-import os from 'node:os'
-import { performance } from 'node:perf_hooks'
+import os from 'os'
+import { performance } from 'perf_hooks'
 
 export interface HealthCheck {
   name: string
@@ -33,7 +33,7 @@ export interface SystemHealth {
 }
 
 export class HealthMonitor {
-  private checks: Map<string, () => Promise<HealthCheck>> = new Map()
+  private readonly checks: Map<string, () => Promise<HealthCheck>> = new Map()
 
   constructor() {
     // Register default health checks
@@ -70,11 +70,14 @@ export class HealthMonitor {
           ])
           result.responseTime = performance.now() - checkStart
           return result
-        } catch (error) {
+        } catch (error: unknown) {
           return {
             name,
             status: 'unhealthy' as const,
-            message: _error instanceof Error ? _String(error) : 'Unknown error',
+            message:
+              error instanceof Error
+                ? (error instanceof Error ? error.message : 'Unknown error')
+                : 'Unknown error',
             responseTime: performance.now() - startTime,
           }
         }
@@ -141,7 +144,7 @@ export class HealthMonitor {
           release: os.release(),
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'system',
         status: 'unhealthy',
@@ -181,7 +184,7 @@ export class HealthMonitor {
           usagePercent: Math.round(usagePercent * 100) / 100,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'memory',
         status: 'unhealthy',
@@ -217,7 +220,7 @@ export class HealthMonitor {
           heapUsagePercent: Math.round(heapUsagePercent * 100) / 100,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         name: 'disk',
         status: 'unhealthy',

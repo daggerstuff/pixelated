@@ -734,6 +734,16 @@ export interface Features {
   slideEnterAnim: FeatureConfig<slideEnterAnimConfig>
 
   /**
+   * Controls whether to enable the top progress bar during page transitions.
+   */
+  nprogress?: boolean
+
+  /**
+   * Controls whether to enable medium-zoom for supported content images.
+   */
+  mediumZoom?: boolean
+
+  /**
    * Controls whether to enable the search feature and related options.
    */
   search: FeatureConfig<SearchConfig>
@@ -779,7 +789,7 @@ export interface ExtendedRequest extends IncomingMessage {
     remoteAddress?: string
     remotePort?: number
   }
-  body?: unknown
+  body?: Record<string, unknown>
   query?: Record<string, string | string[] | undefined>
   params?: Record<string, string>
   cookies?: Record<string, string>

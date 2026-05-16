@@ -1,0 +1,12 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "reasoning_effort": "medium",
+  "log_level": "warning",
+  "auto_update": true,
+  "ask_user": false,
+  "include_co_authored_by": true,
+  "disabled_skills": [],
+  "disable_all_hooks": false,
+  "include_gitignored": false,
+  "copy_on_select": false
+}

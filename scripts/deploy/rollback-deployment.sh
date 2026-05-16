@@ -1,6 +1,14 @@
 #!/bin/bash
 # Rollback deployment script for GKE
 set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 echo "🔄 Starting deployment rollback..."
 echo "Deployment: $GKE_DEPLOYMENT_NAME"
@@ -12,7 +20,19 @@ kubectl rollout undo deployment/"$GKE_DEPLOYMENT_NAME" -n "$GKE_NAMESPACE"
 
 # Wait for rollback to complete
 echo "⏳ Waiting for rollback to complete..."
-kubectl rollout status deployment/"$GKE_DEPLOYMENT_NAME" -n "$GKE_NAMESPACE" --timeout="${HEALTH_CHECK_TIMEOUT}s"
+if ! kubectl rollout status deployment/"$GKE_DEPLOYMENT_NAME" -n "$GKE_NAMESPACE" --timeout="${HEALTH_CHECK_TIMEOUT}s"; then
+  echo "Rollback rollout failed or timed out."
+  kubectl describe deployment "$GKE_DEPLOYMENT_NAME" -n "$GKE_NAMESPACE" || true
+  kubectl get deployment "$GKE_DEPLOYMENT_NAME" -n "$GKE_NAMESPACE" -o wide || true
+  kubectl get pods -l app="${GKE_DEPLOYMENT_NAME}" -n "$GKE_NAMESPACE" -o wide || true
+  for pod in $(kubectl get pods -l app="$GKE_DEPLOYMENT_NAME" -n "$GKE_NAMESPACE" --no-headers -o custom-columns=":metadata.name"); do
+    echo "=== Logs for ${pod} (previous) ==="
+    kubectl logs "${pod}" -n "$GKE_NAMESPACE" --previous --tail=120 || true
+    echo "=== Logs for ${pod} (current) ==="
+    kubectl logs "${pod}" -n "$GKE_NAMESPACE" --tail=120 || true
+  done
+  exit 1
+fi
 
 # Clean up canary or blue-green deployments if they exist
 echo "🧹 Cleaning up variant deployments..."

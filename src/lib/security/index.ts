@@ -61,6 +61,7 @@ export function getSecurityMonitoring(): SecurityMonitoringService {
  */
 export function logSecurityEvent(
   type: string,
+  _userId: string | null,
   metadata: Record<string, unknown>,
 ): void {
   if (!securityMonitoringService) {
@@ -186,7 +187,7 @@ async function simulateEncrypt(message: string): Promise<string> {
   // Simple XOR-based "encryption" for simulation only
   // This is NOT secure and is only for development illustration
   const key =
-    process.env['SIMULATION_KEY'] ||
+    process.env['SIMULATION_KEY'] ??
     crypto.randomBytes(32).toString('hex').slice(0, 24)
   let result = ''
   for (let i = 0; i < message.length; i++) {
@@ -207,7 +208,7 @@ async function simulateDecrypt(ciphertext: string): Promise<string> {
 
   // Simple XOR-based "decryption" for simulation only
   const key =
-    process.env['SIMULATION_KEY'] ||
+    process.env['SIMULATION_KEY'] ??
     crypto.randomBytes(32).toString('hex').slice(0, 24)
   let result = ''
   for (let i = 0; i < encryptedContent.length; i++) {

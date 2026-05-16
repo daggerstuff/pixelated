@@ -1,11 +1,12 @@
 ---
-title: 'AI System Architecture'
-description: 'AI System Architecture documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: AI System Architecture documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: AI System Architecture
 ---
 
 # AI System Architecture

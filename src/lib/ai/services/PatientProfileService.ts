@@ -14,7 +14,7 @@ export type ProfileIdentifier = {
  * Service for managing patient profiles (CRUD operations and history).
  */
 export class PatientProfileService {
-  private kvStore: KVStore
+  private readonly kvStore: KVStore
   private readonly PROFILE_PREFIX = 'profile_'
 
   constructor(kvStore: KVStore) {

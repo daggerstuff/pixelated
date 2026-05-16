@@ -1,20 +1,50 @@
 ---
 import { FEATURES } from '@/config'
 import { withBasePath } from '@/utils/path'
-import { parseTuple } from '@/utils/data'
 
 const { search } = FEATURES
-if (!search || (Array.isArray(search) && !search[0])) return
+if (!Array.isArray(search) || !search[0] || !search[1]) return
 
-const { includes, filter, navHighlight, batchLoadSize, maxItemsPerPage } =
-  search[1]
+const [, searchConfig] = search
+const {
+  includes: rawIncludes,
+  filter = false,
+  navHighlight = false,
+  batchLoadSize,
+  maxItemsPerPage,
+} = searchConfig
+
+const parseSearchTuple = (
+  tuple: boolean | [boolean, readonly number[]] | undefined,
+  name: string,
+) => {
+  if (!Array.isArray(tuple) || !tuple[0] || !Array.isArray(tuple[1])) {
+    throw new Error(
+      `Search feature enabled, but ${name} is not configured correctly. Please check 'src/config.ts'.`,
+    )
+  }
+  if (tuple[1].length === 0) {
+    throw new Error(
+      `Search feature enabled, but ${name} is empty. Please check 'src/config.ts'.`,
+    )
+  }
+  const value = tuple[1][0]
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    throw new Error(
+      `Search feature enabled, but ${name} has an invalid value. Please check 'src/config.ts'.`,
+    )
+  }
+  return value
+}
+
+const includes = Array.isArray(rawIncludes) ? rawIncludes : []
 if (includes.length === 0)
   throw new Error(
     "Search feature enabled, but `includes` array is empty. Please check 'src/config.ts' for the correct configuration."
   )
 const filterEnabled = filter && includes.length > 1
-const batchSize = parseTuple(batchLoadSize, 'batchLoadSize')
-const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
+const batchSize = parseSearchTuple(batchLoadSize, 'batchLoadSize')
+const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 ---
 
 <!-- Search Switch -->
@@ -203,6 +233,57 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
     excerpt: string
   }
 
+  interface PagefindResultRecord {
+    meta?: {
+      title?: string
+    }
+    title: string
+    url: string
+    excerpt: string
+    sub_results: SubResult[]
+  }
+
+  interface PagefindResultData extends PagefindResultRecord {}
+
+  interface PagefindResultHandle {
+    data: () => Promise<PagefindResultData>
+  }
+
+  interface PagefindSearchResponse {
+    results: PagefindResultHandle[]
+  }
+
+  interface PagefindSearchOptions {
+    filters?: Record<string, string | string[]>
+  }
+
+  interface PagefindInstance {
+    options: (options: Record<string, unknown>) => Promise<void>
+    init: () => Promise<void> | void
+    debouncedSearch: (
+      query: string,
+      options: PagefindSearchOptions,
+      debounceDelay: number,
+    ) => Promise<PagefindSearchResponse>
+  }
+
+  interface WindowWithPagefind extends Window {
+    pagefind?: PagefindInstance
+    pagefindHighlight?: {
+      highlight: () => void
+    }
+    PagefindHighlight?: new (
+      options: {
+        markContext: string
+        markOptions?: {
+          exclude: string[]
+        }
+      },
+    ) => {
+      destroy?: () => void
+    }
+  }
+
   const fakeResults = [
     {
       meta: {
@@ -230,34 +311,33 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
     #btnAll: HTMLButtonElement | null = null
     #selectedItem: HTMLAnchorElement | null = null
 
-    #filter = this.dataset.filter === 'true'
+  #filter = this.dataset['filter'] === 'true'
     #tabs: HTMLElement[] = []
     #currentTab = 0
 
     #activeRequestId = 0
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    #allResults: any[] = []
+    #allResults: PagefindResultHandle[] = []
     #renderedCount = 0
-    #maxItems = this.dataset.maxItems
-      ? parseInt(this.dataset.maxItems || '10', 10)
+  #maxItems = this.dataset['maxItems']
+      ? parseInt(this.dataset['maxItems'], 10)
       : undefined
 
     #batchLoading = false
-    #batchSize = this.dataset.batchSize
-      ? parseInt(this.dataset.batchSize || '5', 10)
+  #batchSize = this.dataset['batchSize']
+      ? parseInt(this.dataset['batchSize'], 10)
       : undefined
 
     connectedCallback() {
-      this.#input = this.querySelector('#search-input')
-      this.#label = this.querySelector('#search-label')
-      this.#results = this.querySelector('#search-results')
-      this.#feedback = this.querySelector('#search-feedback')
-      this.#content = this.querySelector('#search-content')
+      this.#input = this.querySelector<HTMLInputElement>('#search-input')
+      this.#label = this.querySelector<HTMLLabelElement>('#search-label')
+      this.#results = this.querySelector<HTMLElement>('#search-results')
+      this.#feedback = this.querySelector<HTMLElement>('#search-feedback')
+      this.#content = this.querySelector<HTMLElement>('#search-content')
 
       this.#initFilter()
       this.#initPagination()
 
-      this.#input?.addEventListener('input', this.#handleInput)
+      this.#input?.addEventListener('input', this.#handleInputEvent)
 
       this.#content?.addEventListener('click', this.#handleResultClick)
       this.#content?.addEventListener(
@@ -269,7 +349,7 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
     }
 
     disconnectedCallback() {
-      this.#input?.removeEventListener('input', this.#handleInput)
+      this.#input?.removeEventListener('input', this.#handleInputEvent)
 
       this.#content?.removeEventListener('click', this.#handleResultClick)
       this.#content?.removeEventListener(
@@ -298,50 +378,61 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
       const storedTab = localStorage.getItem('search-tab')
       this.#currentTab = storedTab ? parseInt(storedTab, 10) : 0
 
-      this.#tabs = Array.from(this.querySelectorAll('[role="tab"]'))
+      this.#tabs = Array.from(this.querySelectorAll<HTMLElement>('[role="tab"]'))
       for (let i = 0; i < this.#tabs.length; i++) {
-        const isSelected = i === this.#currentTab
-        this.#tabs[i].setAttribute('aria-selected', isSelected.toString())
-        if (isSelected) this.#updateHint(this.#tabs[i].dataset.type || '')
+      const tab = this.#tabs[i]
+      if (!tab) continue
+      const isSelected = i === this.#currentTab
+      tab.setAttribute('aria-selected', isSelected.toString())
+      if (isSelected) this.#updateHint(tab.dataset['type'] || '')
 
-        this.#tabs[i].addEventListener('click', () => this.#activateTab(i))
+      tab.addEventListener('click', () => this.#activateTab(i))
       }
     }
 
     #initPagination = () => {
       if (!this.#batchSize) return
 
-      this.#pagination = this.querySelector('#search-pagination')
-      this.#btnMore = this.querySelector('[data-action="more"]')
-      this.#btnAll = this.querySelector('[data-action="all"]')
+      this.#pagination = this.querySelector<HTMLElement>('#search-pagination')
+      this.#btnMore = this.querySelector<HTMLButtonElement>('[data-action="more"]')
+      this.#btnAll = this.querySelector<HTMLButtonElement>('[data-action="all"]')
 
       this.#btnMore?.addEventListener('click', this.#handlePaginateClick)
       this.#btnAll?.addEventListener('click', this.#handlePaginateClick)
     }
 
-    #handleInput = async (event: Event) => {
+  #handleInputEvent = (event: Event) => {
+      const input = event.target as HTMLInputElement | null
+      this.#handleInput(input?.value ?? '')
+  }
+
+  #handleInput = async (value: string) => {
+      const normalizedValue = value.trim()
+
       if (!this.#content) return
-      const value = (event.target as HTMLInputElement).value.trim()
 
       if (import.meta.env.PROD) {
         const requestId = ++this.#activeRequestId
         this.#resetView()
-        if (value.length === 0) return
+        if (normalizedValue.length === 0) return
 
         // start search
         try {
           const options: { filters?: Record<string, string | string[]> } = {}
           if (this.#filter && this.#tabs[this.#currentTab]) {
-            const type = this.#tabs[this.#currentTab].dataset.type
+            const type = this.#tabs[this.#currentTab]?.dataset['type']
             if (type) options.filters = { collection: type }
           }
 
           this.#showLoading(requestId)
 
-          // @ts-expect-error (for Cannot find name 'pagefind'.ts(2304))
-          const res = await pagefind.debouncedSearch(value, options, 300)
+        const res = await (window as WindowWithPagefind).pagefind?.debouncedSearch(
+            normalizedValue,
+            options,
+            300,
+          )
+          if (!res) return
           // a more recent search call has been made, nothing to do
-          if (res === null) return
           if (requestId !== this.#activeRequestId) return
 
           // when no results
@@ -357,19 +448,19 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
           this.#showOnlyError(requestId)
         }
       } else {
-        if (this.#content.innerHTML && value) return
-        if (!value) {
+        if (this.#content.innerHTML && normalizedValue) return
+        if (!normalizedValue) {
           this.#content.innerHTML = ''
           return
         }
         for (const result of fakeResults) {
           this.#content.innerHTML += `
-            <a href="${this.#results?.dataset.base}" class="search-result-item">
+            <a href="${this.#results?.dataset['base']}" class="search-result-item">
               <div class="search-result-title">${result.meta.title}</div>
               <div class="search-result-excerpt">${result.excerpt}</div>
             </a>`
         }
-        this.#selectedItem = this.#content.querySelector('a')
+        this.#selectedItem = this.#content.querySelector<HTMLAnchorElement>('a')
         this.#selectedItem?.setAttribute('aria-selected', 'true')
       }
     }
@@ -412,8 +503,8 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
       if (!target) {
         target =
           key === 'ArrowDown'
-            ? (this.#content?.querySelector('a') ?? null)
-            : (this.#content?.querySelector('a:last-child') ?? null)
+            ? (this.#content?.querySelector<HTMLAnchorElement>('a') ?? null)
+            : (this.#content?.querySelector<HTMLAnchorElement>('a:last-child') ?? null)
       }
 
       if (target) {
@@ -442,23 +533,24 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
       this.#currentTab = idx
       localStorage.setItem('search-tab', idx.toString())
 
-      const type = this.#tabs[idx]?.dataset.type || ''
+      const type = this.#tabs[idx]?.dataset['type'] || ''
       this.#updateHint(type)
 
-      if (this.#input?.value) {
+      const input = this.#input
+      if (input?.value) {
         this.#resetView()
-        await this.#handleInput({ target: this.#input } as unknown as Event)
-        this.#input?.focus()
+        await this.#handleInput(input.value)
+        input.focus()
       }
     }
 
     #handlePaginateClick = async (ev: MouseEvent) => {
-      const btn = ev.currentTarget as HTMLButtonElement
+      const btn = ev.currentTarget as HTMLButtonElement | null
       if (!btn || this.#batchLoading) return
 
       const requestId = this.#activeRequestId
 
-      const action = btn.dataset.action
+      const action = btn.dataset['action']
       if (action === 'more') {
         await this.#render({ requestId, next: true, all: false })
         this.#input?.focus()
@@ -493,45 +585,46 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
         const slice = this.#allResults.slice(start, end)
         const settled = await Promise.allSettled(slice.map((r) => r.data()))
         if (requestId !== this.#activeRequestId) return
-        const fulfilled = settled.filter((s) => s.status === 'fulfilled')
+        const fulfilled = settled.filter(
+          (s): s is PromiseFulfilledResult<PagefindResultData> =>
+            s.status === 'fulfilled',
+        )
         if (fulfilled.length === 0) {
           this.#showOnlyError(requestId)
           return
         }
 
         const frag = document.createDocumentFragment()
-        for (let r = 0; r < fulfilled.length; r++) {
+        for (const result of fulfilled) {
           if (requestId !== this.#activeRequestId) return
-          const data = fulfilled[r].value
+          const data = result.value
 
           const h1 = document.createElement('div')
           h1.className = 'search-result-h1'
-          h1.textContent = data.meta?.title ?? ''
+          h1.textContent = data.meta?.title ?? data.title ?? ''
           frag.appendChild(h1)
 
           let subResults = data.sub_results
           if (this.#maxItems)
             subResults = this.#sortSubResults(subResults, this.#maxItems)
 
-          for (let s = 0; s < subResults.length; s++) {
+          for (const subResult of subResults) {
             const a = document.createElement('a')
-            a.href = subResults[s].url
+            a.href = subResult.url
             a.className = 'search-result-item'
             a.setAttribute('role', 'option')
             a.setAttribute('tabindex', '-1')
 
-            if (r === 0 && s === 0) {
+            if (!this.#selectedItem) {
               a.setAttribute('aria-selected', 'true')
-              if (this.#selectedItem)
-                this.#selectedItem.setAttribute('aria-selected', 'false')
               this.#selectedItem = a
             } else {
               a.setAttribute('aria-selected', 'false')
             }
 
             a.innerHTML = `
-              <div class="search-result-title">${subResults[s].title}</div>
-              <div class="search-result-excerpt">${subResults[s].excerpt}</div>`
+              <div class="search-result-title">${subResult.title}</div>
+              <div class="search-result-excerpt">${subResult.excerpt}</div>`
             frag.appendChild(a)
           }
         }
@@ -681,7 +774,8 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
 {import.meta.env.PROD &&
   <script is:inline define:vars={{scriptUrl: withBasePath('/pagefind/pagefind.js'), navHighlight}}>
     async function loadPagefind() {
-      const pagefind = await import(scriptUrl)
+      const module = await import(scriptUrl)
+      const pagefind = module.default || module
 
       // https://pagefind.app/docs/search-config/
       await pagefind.options({
@@ -699,7 +793,7 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
         }
       })
 
-      pagefind.init()
+      await pagefind.init()
       window.pagefind = pagefind
     }
 
@@ -737,7 +831,6 @@ const maxItems = parseTuple(maxItemsPerPage, 'maxItemsPerPage')
       const params = new URLSearchParams(location.search)
       if(!params.has('search')) return
 
-      // @ts-expect-error (for Cannot find name 'pagefindHighlight'.ts(2304))
-      pagefindHighlight.highlight()
+      ;(window as { pagefindHighlight?: { highlight: () => void } }).pagefindHighlight?.highlight()
     })
   </script>}

@@ -1,17 +1,72 @@
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 
 /* global vi, describe, it, expect, beforeEach */
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+
+vi.mock('../lib/services/notification/NotificationService', () => ({
+  NotificationChannel: {
+    IN_APP: 'in_app',
+    EMAIL: 'email',
+    PUSH: 'push',
+    SMS: 'sms',
+  },
+}))
+
+vi.mock('@/lib/services/notification/NotificationService', () => ({
+  NotificationChannel: {
+    IN_APP: 'in_app',
+    EMAIL: 'email',
+    PUSH: 'push',
+    SMS: 'sms',
+  },
+}))
 
 import { useNotificationPreferences } from '../useNotificationPreferences'
 
+const NotificationChannel = {
+  IN_APP: 'in_app',
+  EMAIL: 'email',
+  PUSH: 'push',
+  SMS: 'sms',
+} as const
+
 // Mock fetch
-const mockFetch = vi.fn()
+const mockFetch = vi.fn<() => Promise<Response>>()
 global.fetch = mockFetch
+
+function createMockResponse(body: unknown): Response {
+  return {
+    ok: true,
+    async json() {
+      return body
+    },
+  } as unknown as Response
+}
+
+const defaultPreferences = {
+  channels: {
+    [NotificationChannel.IN_APP]: true,
+    [NotificationChannel.EMAIL]: true,
+    [NotificationChannel.PUSH]: false,
+    [NotificationChannel.SMS]: false,
+  },
+  frequency: 'immediate',
+  quiet_hours: {
+    enabled: false,
+    start: '22:00',
+    end: '07:00',
+  },
+  categories: {
+    system: true,
+    security: true,
+    updates: true,
+    reminders: true,
+  },
+}
 
 describe('useNotificationPreferences', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockFetch.mockResolvedValue(createMockResponse(defaultPreferences))
   })
 
   it('loads preferences on mount', async () => {
@@ -34,20 +89,14 @@ describe('useNotificationPreferences', () => {
       },
     }
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockPreferences),
-    })
+    mockFetch.mockResolvedValueOnce(createMockResponse(mockPreferences))
 
     const { result } = renderHook(() => useNotificationPreferences())
 
     // Initially loading
     expect(result.current.isLoading).toBe(true)
 
-    // Wait for preferences to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.preferences).toEqual(mockPreferences)
@@ -59,9 +108,7 @@ describe('useNotificationPreferences', () => {
 
     const { result } = renderHook(() => useNotificationPreferences())
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(result.current.isLoading).toBe(false)
     expect(result.current.error).toBeInstanceOf(Error)
@@ -81,25 +128,27 @@ describe('useNotificationPreferences', () => {
     const { result } = renderHook(() => useNotificationPreferences())
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          channels: {
-            ...result.current.preferences.channels,
-            [NotificationChannel.EMAIL]: false,
-          },
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        channels: {
+          ...result.current.preferences.channels,
+          [NotificationChannel.EMAIL]: false,
+        },
+      }),
+    )
 
     await act(async () => {
       await result.current.updateChannel(NotificationChannel.EMAIL, false)
     })
+
+    await waitFor(() =>
+      expect(
+        result.current.preferences.channels[NotificationChannel.EMAIL],
+      ).toBe(false),
+    )
 
     expect(result.current.preferences.channels[NotificationChannel.EMAIL]).toBe(
       false,
@@ -117,22 +166,22 @@ describe('useNotificationPreferences', () => {
     const { result } = renderHook(() => useNotificationPreferences())
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          frequency: 'daily',
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        frequency: 'daily',
+      }),
+    )
 
     await act(async () => {
       await result.current.updateFrequency('daily')
     })
+
+    await waitFor(() =>
+      expect(result.current.preferences.frequency).toBe('daily'),
+    )
 
     expect(result.current.preferences.frequency).toBe('daily')
     expect(mockFetch).toHaveBeenCalledWith(
@@ -148,9 +197,7 @@ describe('useNotificationPreferences', () => {
     const { result } = renderHook(() => useNotificationPreferences())
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     const newQuietHours = {
       enabled: true,
@@ -158,18 +205,20 @@ describe('useNotificationPreferences', () => {
       end: '08:00',
     }
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          quiet_hours: newQuietHours,
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        quiet_hours: newQuietHours,
+      }),
+    )
 
     await act(async () => {
       await result.current.updateQuietHours(newQuietHours)
     })
+
+    await waitFor(() =>
+      expect(result.current.preferences.quiet_hours).toEqual(newQuietHours),
+    )
 
     expect(result.current.preferences.quiet_hours).toEqual(newQuietHours)
     expect(mockFetch).toHaveBeenCalledWith(
@@ -187,25 +236,25 @@ describe('useNotificationPreferences', () => {
     const { result } = renderHook(() => useNotificationPreferences())
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          ...result.current.preferences,
-          categories: {
-            ...result.current.preferences.categories,
-            updates: false,
-          },
-        }),
-    })
+    mockFetch.mockResolvedValueOnce(
+      createMockResponse({
+        ...result.current.preferences,
+        categories: {
+          ...result.current.preferences.categories,
+          updates: false,
+        },
+      }),
+    )
 
     await act(async () => {
       await result.current.updateCategory('updates', false)
     })
+
+    await waitFor(() =>
+      expect(result.current.preferences.categories['updates']).toBe(false),
+    )
 
     expect(result.current.preferences.categories['updates']).toBe(false)
     expect(mockFetch).toHaveBeenCalledWith(
@@ -221,9 +270,7 @@ describe('useNotificationPreferences', () => {
     const { result } = renderHook(() => useNotificationPreferences())
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     const initialPreferences = { ...result.current.preferences }
     mockFetch.mockRejectedValueOnce(new Error('Network error'))
@@ -231,6 +278,8 @@ describe('useNotificationPreferences', () => {
     await act(async () => {
       await result.current.updateChannel(NotificationChannel.EMAIL, false)
     })
+
+    await waitFor(() => expect(result.current.error).toBeInstanceOf(Error))
 
     expect(result.current.error).toBeInstanceOf(Error)
     expect(result.current.preferences).toEqual(initialPreferences)

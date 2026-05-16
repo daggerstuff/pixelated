@@ -88,4 +88,4 @@ bash test-api.sh
 
 ---
 
-_Last Updated: 2026-01-24_
+### Last Updated: 2026-01-24

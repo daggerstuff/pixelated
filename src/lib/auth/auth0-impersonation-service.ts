@@ -11,6 +11,8 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
 
@@ -23,19 +25,18 @@ function initializeAuth0Management() {
     !auth0Config.managementClientId ||
     !auth0Config.managementClientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-      scope: 'read:users update:users create:users impersonate:users',
-    })
-  }
+  auth0Management ??= new ManagementClient({
+    domain: auth0Config.domain,
+    clientId: auth0Config.managementClientId,
+    clientSecret: auth0Config.managementClientSecret,
+    audience: `https://${auth0Config.domain}/api/v2/`,
+  })
 }
 
 // Initialize the management client
@@ -80,12 +81,14 @@ export interface ImpersonationLogEntry {
  * Implements secure user impersonation with comprehensive audit logging
  */
 export class Auth0ImpersonationService {
-  private activeSessions: Map<string, ImpersonationSession> = new Map()
-  private impersonationLogs: ImpersonationLogEntry[] = []
+  private readonly activeSessions: Map<string, ImpersonationSession> = new Map()
+  private readonly impersonationLogs: ImpersonationLogEntry[] = []
 
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
 
     // Periodically clean up expired sessions
@@ -109,7 +112,7 @@ export class Auth0ImpersonationService {
 
       // Only admins can impersonate users
       if (adminUser.role !== 'admin') {
-         logSecurityEvent(
+        logSecurityEvent(
           SecurityEventType.IMPERSONATION_DENIED,
           request.adminUserId,
           {
@@ -129,7 +132,7 @@ export class Auth0ImpersonationService {
         request.targetUserId,
       )
       if (!targetUser) {
-         logSecurityEvent(
+        logSecurityEvent(
           SecurityEventType.IMPERSONATION_DENIED,
           request.adminUserId,
           {
@@ -146,7 +149,7 @@ export class Auth0ImpersonationService {
 
       // Check if admin is trying to impersonate themselves
       if (request.adminUserId === request.targetUserId) {
-         logSecurityEvent(
+        logSecurityEvent(
           SecurityEventType.IMPERSONATION_DENIED,
           request.adminUserId,
           {
@@ -164,7 +167,7 @@ export class Auth0ImpersonationService {
       // Check if admin is already impersonating someone
       const existingSession = this.getActiveSessionForAdmin(request.adminUserId)
       if (existingSession) {
-         logSecurityEvent(
+        logSecurityEvent(
           SecurityEventType.IMPERSONATION_DENIED,
           request.adminUserId,
           {
@@ -198,7 +201,7 @@ export class Auth0ImpersonationService {
       this.activeSessions.set(sessionId, session)
 
       // Log impersonation start
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.IMPERSONATION_STARTED,
         request.adminUserId,
         {
@@ -231,18 +234,23 @@ export class Auth0ImpersonationService {
       )
 
       return sessionId
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to request impersonation:', error)
 
       // Log impersonation error
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.IMPERSONATION_ERROR,
         request.adminUserId,
         {
           targetUserId: request.targetUserId,
           reason: request.reason,
           ipAddress: request.ipAddress,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )
@@ -266,16 +274,12 @@ export class Auth0ImpersonationService {
 
       // Verify that the admin user is the one who started the session
       if (session.adminUserId !== adminUserId) {
-         logSecurityEvent(
-          SecurityEventType.IMPERSONATION_DENIED,
-          adminUserId,
-          {
-            targetUserId: session.targetUserId,
-            sessionId: sessionId,
-            error: 'Unauthorized to end this impersonation session',
-            timestamp: new Date().toISOString(),
-          },
-        )
+        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, adminUserId, {
+          targetUserId: session.targetUserId,
+          sessionId: sessionId,
+          error: 'Unauthorized to end this impersonation session',
+          timestamp: new Date().toISOString(),
+        })
 
         throw new Error('Unauthorized to end this impersonation session')
       }
@@ -288,16 +292,12 @@ export class Auth0ImpersonationService {
       this.activeSessions.delete(sessionId)
 
       // Log impersonation end
-       logSecurityEvent(
-        SecurityEventType.IMPERSONATION_ENDED,
-        adminUserId,
-        {
-          targetUserId: session.targetUserId,
-          sessionId: sessionId,
-          duration: session.endTime.getTime() - session.startTime.getTime(),
-          timestamp: session.endTime.toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.IMPERSONATION_ENDED, adminUserId, {
+        targetUserId: session.targetUserId,
+        sessionId: sessionId,
+        duration: session.endTime.getTime() - session.startTime.getTime(),
+        timestamp: session.endTime.toISOString(),
+      })
 
       // Log to impersonation logs
       this.impersonationLogs.push({
@@ -319,19 +319,20 @@ export class Auth0ImpersonationService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to end impersonation:', error)
 
       // Log impersonation error
-       logSecurityEvent(
-        SecurityEventType.IMPERSONATION_ERROR,
-        adminUserId,
-        {
-          sessionId: sessionId,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, adminUserId, {
+        sessionId: sessionId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
 
       return false
     }
@@ -354,7 +355,7 @@ export class Auth0ImpersonationService {
    */
   getActiveSessionById(sessionId: string): ImpersonationSession | null {
     const session = this.activeSessions.get(sessionId)
-    return session && session.isActive ? session : null
+    return session?.isActive ? session : null
   }
 
   /**
@@ -414,30 +415,22 @@ export class Auth0ImpersonationService {
 
       // Verify that the admin user is the one who started the session
       if (session.adminUserId !== adminUserId) {
-         logSecurityEvent(
-          SecurityEventType.IMPERSONATION_DENIED,
-          adminUserId,
-          {
-            targetUserId: session.targetUserId,
-            sessionId: sessionId,
-            error: 'Unauthorized to extend this impersonation session',
-            timestamp: new Date().toISOString(),
-          },
-        )
+        logSecurityEvent(SecurityEventType.IMPERSONATION_DENIED, adminUserId, {
+          targetUserId: session.targetUserId,
+          sessionId: sessionId,
+          error: 'Unauthorized to extend this impersonation session',
+          timestamp: new Date().toISOString(),
+        })
 
         throw new Error('Unauthorized to extend this impersonation session')
       }
 
       // Log session extension
-       logSecurityEvent(
-        SecurityEventType.IMPERSONATION_EXTENDED,
-        adminUserId,
-        {
-          targetUserId: session.targetUserId,
-          sessionId: sessionId,
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.IMPERSONATION_EXTENDED, adminUserId, {
+        targetUserId: session.targetUserId,
+        sessionId: sessionId,
+        timestamp: new Date().toISOString(),
+      })
 
       // Log to impersonation logs
       this.impersonationLogs.push({
@@ -458,19 +451,20 @@ export class Auth0ImpersonationService {
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to extend impersonation:', error)
 
       // Log impersonation error
-       logSecurityEvent(
-        SecurityEventType.IMPERSONATION_ERROR,
-        adminUserId,
-        {
-          sessionId: sessionId,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, adminUserId, {
+        sessionId: sessionId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
 
       return false
     }
@@ -519,7 +513,7 @@ export class Auth0ImpersonationService {
       // - Checking if the session is being used from the same IP address
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to validate impersonation session:', error)
       return false
     }

@@ -17,9 +17,9 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+  domain: process.env.AUTH0_DOMAIN ?? '',
+  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? '',
+  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? '',
 }
 
 // Initialize Auth0 management client
@@ -39,15 +39,13 @@ function initializeAuth0Management() {
     )
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
+  auth0Management ??= new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
       scope: 'read:users create:users update:users create:user_tickets',
-    })
-  }
+    });
 }
 
 // Initialize the management client
@@ -138,9 +136,7 @@ export class Auth0BulkImportExportService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    if (!this.db) {
-      this.db = await mongodb.connect()
-    }
+    this.db ??= await mongodb.connect();
     return this.db
   }
 
@@ -185,8 +181,8 @@ export class Auth0BulkImportExportService {
               user_metadata: user.user_metadata,
               password: user.password,
               connection:
-                user.connection ||
-                options.connection ||
+                (user.connection ??
+                options.connection) ??
                 'Username-Password-Authentication',
               verify_email: options.verifyEmail !== false, // Default to true
             })
@@ -212,7 +208,7 @@ export class Auth0BulkImportExportService {
             result.successfulImports++
 
             // Log successful import
-             logSecurityEvent(
+            logSecurityEvent(
               SecurityEventType.USER_BULK_IMPORT_SUCCESS,
               auth0User.user_id,
               {
@@ -222,26 +218,32 @@ export class Auth0BulkImportExportService {
                 timestamp: new Date().toISOString(),
               },
             )
-          } catch (error) {
+          } catch (error: unknown) {
             result.failedImports++
             result.errors.push({
               row: rowIndex,
               email: user.email,
-              error: error instanceof Error ? error.message : 'Unknown error',
+              error:
+                error instanceof Error
+                  ? error instanceof Error
+                    ? error.message
+                    : 'Unknown error'
+                  : 'Unknown error',
             })
 
             // Log import error
-             logSecurityEvent(
-              SecurityEventType.USER_BULK_IMPORT_ERROR,
-              null,
-              {
-                importedBy: initiatedBy,
-                email: user.email,
-                rowIndex: rowIndex,
-                error: error instanceof Error ? error.message : 'Unknown error',
-                timestamp: new Date().toISOString(),
-              },
-            )
+            logSecurityEvent(SecurityEventType.USER_BULK_IMPORT_ERROR, null, {
+              importedBy: initiatedBy,
+              email: user.email,
+              rowIndex: rowIndex,
+              error:
+                error instanceof Error
+                  ? error instanceof Error
+                    ? error.message
+                    : 'Unknown error'
+                  : 'Unknown error',
+              timestamp: new Date().toISOString(),
+            })
           }
         }
 
@@ -252,7 +254,7 @@ export class Auth0BulkImportExportService {
       }
 
       // Log bulk import completion
-       logSecurityEvent(SecurityEventType.BULK_IMPORT_COMPLETED, null, {
+      logSecurityEvent(SecurityEventType.BULK_IMPORT_COMPLETED, null, {
         importedBy: initiatedBy,
         totalProcessed: result.totalProcessed,
         successfulImports: result.successfulImports,
@@ -267,18 +269,23 @@ export class Auth0BulkImportExportService {
       )
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to import users from JSON:', error)
 
       // Log bulk import error
-       logSecurityEvent(SecurityEventType.BULK_IMPORT_ERROR, null, {
+      logSecurityEvent(SecurityEventType.BULK_IMPORT_ERROR, null, {
         importedBy: initiatedBy,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to import users: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to import users: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -329,18 +336,23 @@ export class Auth0BulkImportExportService {
 
       // Import users
       return await this.importUsersFromJson(users, options, initiatedBy)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to import users from CSV:', error)
 
       // Log CSV import error
-       logSecurityEvent(SecurityEventType.BULK_IMPORT_ERROR, null, {
+      logSecurityEvent(SecurityEventType.BULK_IMPORT_ERROR, null, {
         importedBy: initiatedBy,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to import users from CSV: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to import users from CSV: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -403,7 +415,7 @@ export class Auth0BulkImportExportService {
         }))
 
         allUsers.push(...users)
-        total = response.total || 0
+        total = response.total ?? 0
         page++
       } while (allUsers.length < total)
 
@@ -412,7 +424,7 @@ export class Auth0BulkImportExportService {
       const fileSize = Buffer.byteLength(jsonData, 'utf8')
 
       // Log export completion
-       logSecurityEvent(SecurityEventType.BULK_EXPORT_COMPLETED, null, {
+      logSecurityEvent(SecurityEventType.BULK_EXPORT_COMPLETED, null, {
         exportedBy: initiatedBy,
         format: 'json',
         totalExported: allUsers.length,
@@ -432,19 +444,24 @@ export class Auth0BulkImportExportService {
         fileSize: fileSize,
         fileName: `users-export-${new Date().toISOString().slice(0, 10)}.json`,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to export users to JSON:', error)
 
       // Log export error
-       logSecurityEvent(SecurityEventType.BULK_EXPORT_ERROR, null, {
+      logSecurityEvent(SecurityEventType.BULK_EXPORT_ERROR, null, {
         exportedBy: initiatedBy,
         format: 'json',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to export users to JSON: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to export users to JSON: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -513,7 +530,7 @@ export class Auth0BulkImportExportService {
         }))
 
         allUsers.push(...users)
-        total = response.total || 0
+        total = response.total ?? 0
         page++
       } while (allUsers.length < total)
 
@@ -558,7 +575,7 @@ export class Auth0BulkImportExportService {
       const fileSize = allUsers.length * 200 // Approximate size
 
       // Log export completion
-       logSecurityEvent(SecurityEventType.BULK_EXPORT_COMPLETED, null, {
+      logSecurityEvent(SecurityEventType.BULK_EXPORT_COMPLETED, null, {
         exportedBy: initiatedBy,
         format: 'csv',
         totalExported: allUsers.length,
@@ -578,19 +595,24 @@ export class Auth0BulkImportExportService {
         fileSize: fileSize,
         fileName: `users-export-${new Date().toISOString().slice(0, 10)}.csv`,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to export users to CSV:', error)
 
       // Log export error
-       logSecurityEvent(SecurityEventType.BULK_EXPORT_ERROR, null, {
+      logSecurityEvent(SecurityEventType.BULK_EXPORT_ERROR, null, {
         exportedBy: initiatedBy,
         format: 'csv',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 
       throw new Error(
-        `Failed to export users to CSV: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to export users to CSV: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -608,15 +630,11 @@ export class Auth0BulkImportExportService {
       // For now, we'll return a simulated response
 
       // Log job status check
-       logSecurityEvent(
-        SecurityEventType.BULK_IMPORT_JOB_STATUS_CHECK,
-        null,
-        {
-          jobId: jobId,
-          checkedBy: initiatedBy,
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.BULK_IMPORT_JOB_STATUS_CHECK, null, {
+        jobId: jobId,
+        checkedBy: initiatedBy,
+        timestamp: new Date().toISOString(),
+      })
 
       // Update Phase 6 MCP server with job status check
       await updatePhase6AuthenticationProgress(
@@ -634,23 +652,24 @@ export class Auth0BulkImportExportService {
           failed: 0,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get import job status:', error)
 
       // Log job status check error
-       logSecurityEvent(
-        SecurityEventType.BULK_IMPORT_JOB_STATUS_ERROR,
-        null,
-        {
-          jobId: jobId,
-          checkedBy: initiatedBy,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.BULK_IMPORT_JOB_STATUS_ERROR, null, {
+        jobId: jobId,
+        checkedBy: initiatedBy,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
 
       throw new Error(
-        `Failed to get import job status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to get import job status: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
     }
   }
@@ -790,7 +809,7 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
         .toArray()
 
       return exports
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get export history:', error)
       return []
     }
@@ -819,16 +838,12 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
       })
 
       // Log scheduled export creation
-       logSecurityEvent(
-        SecurityEventType.RECURRING_EXPORT_SCHEDULED,
-        null,
-        {
-          scheduledBy: initiatedBy,
-          cronExpression: cronExpression,
-          options: options,
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.RECURRING_EXPORT_SCHEDULED, null, {
+        scheduledBy: initiatedBy,
+        cronExpression: cronExpression,
+        options: options,
+        timestamp: new Date().toISOString(),
+      })
 
       // Update Phase 6 MCP server with scheduled export
       await updatePhase6AuthenticationProgress(
@@ -837,17 +852,22 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
       )
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to schedule recurring export:', error)
 
       // Log scheduled export error
-       logSecurityEvent(
+      logSecurityEvent(
         SecurityEventType.RECURRING_EXPORT_SCHEDULE_ERROR,
         null,
         {
           scheduledBy: initiatedBy,
           cronExpression: cronExpression,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           timestamp: new Date().toISOString(),
         },
       )

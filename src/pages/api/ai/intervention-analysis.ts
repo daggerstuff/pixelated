@@ -5,9 +5,31 @@ import { aiRepository } from '@/lib/db/ai'
 import type { AIMessage } from '../../../lib/ai/models/ai-types.js'
 // Import the type expected by InterventionAnalysisService
 import { InterventionAnalysisService } from '../../../lib/ai/services/intervention-analysis'
-import { createTogetherAIService } from '../../../lib/ai/services/together'
+import { createLLMService } from '../../../lib/ai/services/llm-provider'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
+
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(envVars: Record<string, string | undefined>): string | undefined {
+  const llmBaseUrl =
+    (envVars['LLM_BASE_URL'] ??
+    envVars['LLM_API_URL']) ??
+    envVars['OPENAI_BASE_URL']
+
+  if (isOpenRouterBaseUrl(llmBaseUrl)) {
+    console.warn(
+      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
+    )
+    return undefined
+  }
+
+  return llmBaseUrl
+}
 
 /**
  * API route for intervention effectiveness analysis
@@ -44,21 +66,18 @@ export const POST = async ({ request }) => {
       )
     }
 
-    // Create AI service
+    // Create LLM service
     const envVars = import.meta.env as Record<string, string | undefined>
-    const {
-      TOGETHER_API_KEY: togetherApiKey = '',
-      TOGETHER_BASE_URL: togetherBaseUrl,
-    } = envVars
+    const llmApiKey = envVars['LLM_API_KEY'] ?? ''
+    const llmBaseUrl = resolveSafeLlmBaseUrl(envVars)
 
-    const aiService = createTogetherAIService(
-      togetherBaseUrl
-        ? { togetherApiKey, togetherBaseUrl, apiKey: '' }
-        : { togetherApiKey, apiKey: '' },
-    )
+    const aiService = createLLMService({
+      apiKey: llmApiKey,
+      baseUrl: llmBaseUrl,
+    })
 
     // Use the model from the request or the default model
-    const modelId = model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+    const modelId = model ?? 'minimaxai/minimax-m2.7'
 
     // Create intervention analysis service
     const interventionService = new InterventionAnalysisService({
@@ -96,7 +115,7 @@ export const POST = async ({ request }) => {
         await aiRepository.storeInterventionAnalysis({
           userId: session?.user?.id,
           modelId,
-          modelProvider: 'together',
+      modelProvider: 'llm',
           requestTokens: 0, // No usage information available
           responseTokens: 0, // No usage information available
           totalTokens: 0, // No usage information available
@@ -137,7 +156,7 @@ export const POST = async ({ request }) => {
       await aiRepository.storeInterventionAnalysis({
         userId: session?.user?.id || 'anonymous',
         modelId,
-        modelProvider: 'together',
+      modelProvider: 'llm',
         requestTokens: 0, // No usage information available
         responseTokens: 0, // No usage information available
         totalTokens: 0, // No usage information available
@@ -191,7 +210,7 @@ export const POST = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.intervention.error',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'intervention-analysis',
       {
         error: error instanceof Error ? String(error) : String(error),

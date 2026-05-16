@@ -44,7 +44,6 @@ async function testObjectAuth() {
 }
 
 // Run the test and handle any unhandled rejections
-testObjectAuth()
-  .catch((error) => {
-    console.error('Unhandled error:', error)
-  })
+testObjectAuth().catch((error) => {
+  console.error('Unhandled error:', error)
+})

@@ -3,10 +3,9 @@ import type {
   RoutingInput,
   RoutingDecision,
   LLMInvoker,
-  RoutingContext,
 } from '../types/mentalLLaMATypes'
 
-export interface RoutingContext {
+export interface RoutingContextInput {
   userId?: string
   sessionId?: string
   sessionType?: string
@@ -51,7 +50,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) {}
+  constructor(private readonly llmInvoker: LLMInvoker) {}
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()
@@ -110,7 +109,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
         input.context,
       )
       // If LLM returned a meaningful decision, use it
-      if (llmDecision && llmDecision.targetAnalyzer) {
+      if (llmDecision?.targetAnalyzer) {
         return llmDecision
       }
     } catch {
@@ -212,7 +211,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
     if (!content) return null
     // Strip markdown code fences
     const fencedMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/im)
-    if (fencedMatch && fencedMatch[1]) {
+    if (fencedMatch?.[1]) {
       return fencedMatch[1].trim()
     }
     // Sometimes models respond with a JSON-like line or object
@@ -227,13 +226,13 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
   // Perform a structured LLM classification call and return a RoutingDecision when possible
   private async performBroadClassificationLLM(
     text: string,
-    context?: RoutingContext,
+    context?: RoutingContextInput,
   ): Promise<RoutingDecision | null> {
     const system =
       `You are a classification assistant. Classify the user's text into one of: crisis, depression, anxiety, general, none, unknown. Respond with a JSON object: { "category": "<one of the categories>", "confidence": 0.0, "is_critical": false, "reason": "explain briefly" }`.trim()
     const user = `Text: ${text}\nContext: ${context ? JSON.stringify(context) : '{}'}\nRespond only with the JSON object described.`
 
-    const messages = [
+    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
       { role: 'system', content: system },
       { role: 'user', content: user },
     ]
@@ -267,7 +266,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
         reason?: string
       }
       const category = parsed.category ?? 'general'
-      const mapped = this.mapLlmCategoryToAnalyzer(String(category))
+      const mapped = this.mapLlmCategoryToAnalyzer(category)
       const confidence = Math.max(
         0,
         Math.min(1, Number(parsed.confidence) || 0.5),
@@ -279,7 +278,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
         isCritical,
         method: 'llm',
         insights: {
-          llmReasoning: parsed.reason || raw,
+          llmReasoning: parsed.reason ?? raw,
           llmCategory: parsed.category,
         },
       }

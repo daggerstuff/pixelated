@@ -39,11 +39,14 @@ export function usePatientModel() {
 
       try {
         const models = await service.getAvailableModels()
-        setAvailableModels(models)
+        const modelIds = models
+          .map((model) => model.id)
+          .filter((id): id is string => typeof id === 'string' && id.length > 0)
+        setAvailableModels(modelIds)
 
         // If models exist and no current model selected, select the first one
-        if (models.length > 0 && !currentModelId) {
-          setCurrentModelId(models[0].id)
+        if (modelIds.length > 0 && !currentModelId) {
+          setCurrentModelId(modelIds[0])
         }
       } catch (err: unknown) {
         console.error('Failed to load patient models:', err)
@@ -67,7 +70,7 @@ export function usePatientModel() {
       setError(null)
 
       try {
-        const model = await patientService.getModelById(currentModelId)
+        const model = await patientService.getModel(currentModelId)
 
         if (model) {
           setCurrentModel(model)
@@ -77,7 +80,7 @@ export function usePatientModel() {
       } catch (err: unknown) {
         console.error(`Failed to load patient model ${currentModelId}:`, err)
         setError(
-          `Error loading patient model: ${err instanceof Error ? (err)?.message || String(err) : String(err)}`,
+          `Error loading patient model: ${err instanceof Error ? err?.message || String(err) : String(err)}`,
         )
       } finally {
         setIsLoading(false)

@@ -14,7 +14,7 @@ router.get('/login', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const redirectUri =
-    process.env.AUTH0_CALLBACK_URL ||
+    process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
   if (!auth0Domain || !clientId) {
@@ -62,7 +62,7 @@ router.get('/callback', async (req: Request, res: Response) => {
   const clientId = process.env.AUTH0_CLIENT_ID
   const clientSecret = process.env.AUTH0_CLIENT_SECRET
   const redirectUri =
-    process.env.AUTH0_CALLBACK_URL ||
+    process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
   if (!auth0Domain || !clientId || !clientSecret) {
@@ -76,20 +76,17 @@ router.get('/callback', async (req: Request, res: Response) => {
   try {
     // ── Step 1: Exchange auth code for tokens ─────────────────────────────
 
-    const tokenEndpointRes = await fetch(
-      `https://${auth0Domain}/oauth/token`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          client_id: clientId,
-          client_secret: clientSecret,
-          code,
-          redirect_uri: redirectUri,
-        }),
-      },
-    )
+    const tokenEndpointRes = await fetch(`https://${auth0Domain}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        redirect_uri: redirectUri,
+      }),
+    })
 
     if (!tokenEndpointRes.ok) {
       const errorBody = await tokenEndpointRes.json().catch(() => ({}))
@@ -191,9 +188,13 @@ router.get('/callback', async (req: Request, res: Response) => {
       tokenType: tokens.token_type,
       expiresIn: tokens.expires_in,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : 'Authentication failed'
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Authentication failed'
     res.status(500).json({
       error: errorMessage,
       code: 'AUTH_ERROR',
@@ -209,7 +210,7 @@ router.post('/logout', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const returnTo =
-    process.env.AUTH0_LOGOUT_URL || `${req.protocol}://${req.get('host')}`
+    process.env.AUTH0_LOGOUT_URL ?? `${req.protocol}://${req.get('host')}`
 
   if (!auth0Domain || !clientId) {
     res.status(500).json({
@@ -257,8 +258,8 @@ router.get('/me', (req: Request, res: Response) => {
       picture: user.picture,
       emailVerified: user.emailVerified,
       role: user.role,
-      roles: user.roles || [user.role].filter(Boolean),
-      permissions: user.permissions || [],
+      roles: user.roles ?? [user.role].filter(Boolean),
+      permissions: user.permissions ?? [],
     },
   })
 })
@@ -296,19 +297,16 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 
   try {
-    const tokenEndpointRes = await fetch(
-      `https://${auth0Domain}/oauth/token`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          client_id: clientId,
-          client_secret: clientSecret,
-          refresh_token: refreshToken,
-        }),
-      },
-    )
+    const tokenEndpointRes = await fetch(`https://${auth0Domain}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+      }),
+    })
 
     if (!tokenEndpointRes.ok) {
       const errorBody = await tokenEndpointRes.json().catch(() => ({}))
@@ -336,9 +334,13 @@ router.post('/refresh', async (req: Request, res: Response) => {
       tokenType: tokens.token_type,
       expiresIn: tokens.expires_in,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : 'Token refresh failed'
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Token refresh failed'
     res.status(500).json({
       error: errorMessage,
       code: 'REFRESH_ERROR',

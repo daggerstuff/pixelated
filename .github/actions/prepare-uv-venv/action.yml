@@ -36,7 +36,7 @@ runs:
         cd "${{ inputs.service-dir }}"
 
         # Try to create a uv venv. If it fails, return --system as output.
-        if uv venv; then
+        if uv venv --seed; then
           echo "use-system=" >> "$GITHUB_OUTPUT"
           echo "Created uv virtual environment in ${PWD}"
           # Ensure pip is upgraded to secure version in the venv

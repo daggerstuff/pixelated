@@ -87,7 +87,7 @@ This script:
 
 - Ensure `disconnect()` is called in test teardown
 - Use `beforeEach`/`afterEach` to properly setup/teardown Redis
-- Reduce test concurrency with `--poolOptions.threads.maxThreads=3`
+- Reduce test concurrency with `--maxWorkers=3`
 
 ## Mock Implementation
 

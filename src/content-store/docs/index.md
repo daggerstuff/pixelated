@@ -1,10 +1,10 @@
 ---
-title: 'Documentation Index'
-subtitle: 'Tutorial with the Platform'
-description: 'Main documentation index for the platform'
-author: 'Pixelated Team'
-pubDate: 2024-01-15
-lastModDate: 2024-01-15
+title: Documentation Index
+subtitle: Tutorial with the Platform
+description: Main documentation index for the platform
+author: Pixelated Team
+pubDate: '2024-01-15'
+lastModDate: 2024-01-15T00:00:00.000Z
 toc: true
 share: false
 ogImage: false

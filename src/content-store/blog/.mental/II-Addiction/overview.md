@@ -128,6 +128,6 @@ chronic brain disorder that requires comprehensive treatment.
 
 ## Related Resources
 
-- [Assessment Tools](/mental/II-Addiction/assessment)
-- [Intervention Strategies](/mental/II-Addiction/intervention)
-- [Recovery Process](/mental/II-Addiction/recovery)
+- [Assessment Tools](./assessment.md)
+- [Intervention Strategies](./intervention.md)
+- [Recovery Process](./recovery.md)

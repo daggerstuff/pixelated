@@ -112,7 +112,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   // ... existing props
   private redis: Redis
   private mongoClient: MongoClient
-  private config: MonitoringConfig
+  private readonly config: MonitoringConfig
   private anomalyDetectionModel: tf.Sequential | null = null
   private metricsBuffer: SecurityMetrics[] = []
   private alertBuffer: Alert[] = []
@@ -132,37 +132,37 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     this.config = {
       enabled: config.enabled ?? true,
       aiInsightsEnabled: config.aiInsightsEnabled ?? true,
-      alertThresholds: config.alertThresholds || {
+      alertThresholds: config.alertThresholds ?? {
         critical: 0.9,
         high: 0.7,
         medium: 0.5,
         low: 0.3,
       },
-      monitoringIntervals: config.monitoringIntervals || {
+      monitoringIntervals: config.monitoringIntervals ?? {
         realTime: 1000,
         batch: 5000,
         anomalyDetection: 10000,
       },
-      notificationChannels: config.notificationChannels || [],
-      aiModelConfig: config.aiModelConfig || {
+      notificationChannels: config.notificationChannels ?? [],
+      aiModelConfig: config.aiModelConfig ?? {
         modelPath: '',
         confidenceThreshold: 0.8,
         predictionWindow: 10,
       },
-      escalationRules: config.escalationRules || {
+      escalationRules: config.escalationRules ?? {
         critical: { minutes: 5, levels: ['admin', 'security'] },
         high: { minutes: 15, levels: ['security'] },
         medium: { minutes: 30, levels: ['operations'] },
         low: { minutes: 60, levels: ['monitoring'] },
       },
-      maxAlertHistory: config.maxAlertHistory || 1000,
-      metricsRetention: config.metricsRetention || 86400000,
+      maxAlertHistory: config.maxAlertHistory ?? 1000,
+      metricsRetention: config.metricsRetention ?? 86400000,
       enableRealTimeAlerting: config.enableRealTimeAlerting ?? true,
       enableAIInsights: config.enableAIInsights ?? true,
     } as MonitoringConfig
 
     this.redis = redis as Redis
-    this.mongoClient = mongoClient as MongoClient
+    this.mongoClient = mongoClient!
     this.aiService = aiService
     this.orchestrator = orchestrator
     if (!this.redis || !this.mongoClient) {
@@ -172,9 +172,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
   private async initializeServices(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection',
+        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_detection',
       )
 
       await this.mongoClient.connect()
@@ -185,7 +185,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       logger.info('AI-enhanced monitoring service initialized')
       this.emit('monitoring_initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize monitoring service:', { error })
       throw error
     }
@@ -211,7 +211,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       })
 
       logger.info('AI anomaly detection model initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize AI model:', { error })
       // Continue without AI model if initialization fails
       this.anomalyDetectionModel = null
@@ -243,7 +243,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       logger.info('AI-enhanced monitoring started')
       this.emit('monitoring_started')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to start monitoring:', { error })
       throw error
     }
@@ -267,7 +267,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       logger.info('AI-enhanced monitoring stopped')
       this.emit('monitoring_stopped')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to stop monitoring:', { error })
       throw error
     }
@@ -299,7 +299,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       this.emit('metrics_collected', { metrics: processedMetrics, aiInsights })
 
       return processedMetrics
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect security metrics:', { error })
       throw error
     }
@@ -326,7 +326,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         threats: threatMetrics,
         timestamp: new Date(),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect raw metrics:', { error })
       throw error
     }
@@ -341,18 +341,18 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return {
         connectedClients: parseInt(
-          info.match(/connected_clients:(\d+)/)?.[1] || '0',
+          info.match(/connected_clients:(\d+)/)?.[1] ?? '0',
         ),
-        usedMemory: parseInt(info.match(/used_memory:(\d+)/)?.[1] || '0'),
-        keyspaceHits: parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] || '0'),
+        usedMemory: parseInt(info.match(/used_memory:(\d+)/)?.[1] ?? '0'),
+        keyspaceHits: parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] ?? '0'),
         keyspaceMisses: parseInt(
-          info.match(/keyspace_misses:(\d+)/)?.[1] || '0',
+          info.match(/keyspace_misses:(\d+)/)?.[1] ?? '0',
         ),
         commandsProcessed: parseInt(
-          info.match(/total_commands_processed:(\d+)/)?.[1] || '0',
+          info.match(/total_commands_processed:(\d+)/)?.[1] ?? '0',
         ),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect Redis metrics:', { error })
       return {}
     }
@@ -388,7 +388,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         blockedRequests,
         databaseSize: await db.stats().then((stats) => stats.dataSize),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect database metrics:', { error })
       return {}
     }
@@ -406,7 +406,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         uptime: process.uptime(),
         nodeVersion: process.version,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect system metrics:', { error })
       return {}
     }
@@ -452,7 +452,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           0,
         ),
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to collect threat metrics:', { error })
       return {}
     }
@@ -489,7 +489,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           errorRate: this.calculateErrorRate(threats),
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process metrics:', { error })
       throw error
     }
@@ -517,7 +517,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       } finally {
         inputTensor.dispose()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to calculate anomaly score:', { error })
       return 0
     }
@@ -607,7 +607,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       }
 
       return insights
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate AI insights:', { error })
       return []
     }
@@ -652,7 +652,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       }
 
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate trend insight:', { error })
       return null
     }
@@ -685,7 +685,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       }
 
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate prediction insight:', { error })
       return null
     }
@@ -714,7 +714,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       if (this.metricsBuffer.length > 100) {
         this.metricsBuffer = this.metricsBuffer.slice(-100)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store metrics:', { error })
       throw error
     }
@@ -786,7 +786,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       for (const alert of alerts) {
         await this.processAlert(alert)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to check for alerts:', { error })
     }
   }
@@ -838,8 +838,14 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       })
       // Add error to alert object so caller knows?
       // Alert is reference.
-      alert.errors = alert.errors || []
-      alert.errors.push((error as Error).message || 'Processing failed')
+      alert.errors = alert.errors ?? []
+      alert.errors.push(
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : 'Processing failed',
+      )
     }
   }
 
@@ -870,7 +876,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       if (this.alertBuffer.length > 100) {
         this.alertBuffer = this.alertBuffer.slice(-100)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to store alert:', { error, alertId: alert.id })
       throw error
     }
@@ -891,7 +897,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       // Update alert with notified channels
       await this.saveAlertToDb(alert)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send alert notifications:', {
         error,
         alertId: alert.id,
@@ -936,7 +942,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           await this.updateDashboard(channel, alert)
           break
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to send ${channel.type} notification:`, {
         error,
         alertId: alert.id,
@@ -1000,7 +1006,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       alert.updatedAt = new Date()
 
       await db.collection('alerts').updateOne({ id: alert.id }, { $set: alert })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update alert:', { error, alertId: alert.id })
       throw error
     }
@@ -1012,7 +1018,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   async getCurrentMetrics(): Promise<SecurityMetrics> {
     try {
       return await this.collectSecurityMetrics()
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get current metrics:', { error })
       throw error
     }
@@ -1032,7 +1038,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         .toArray()
 
       return alerts as Alert[]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent alerts:', { error })
       return []
     }
@@ -1052,7 +1058,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         .toArray()
 
       return insights as AIInsight[]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get AI insights:', { error })
       return []
     }
@@ -1080,7 +1086,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       )
 
       return result.modifiedCount > 0
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to acknowledge alert:', { error, alertId })
       return false
     }
@@ -1114,7 +1120,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         alertsGenerated: alertsCount,
         lastMetricsTimestamp: lastMetric?.timestamp,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get health status:', { error })
       return {
         healthy: false,
@@ -1133,7 +1139,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       try {
         await this.collectSecurityMetrics()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Real-time monitoring error:', { error })
       }
     }, this.config.monitoringIntervals.realTime)
@@ -1150,7 +1156,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       try {
         // Perform batch analysis and reporting
         await this.performBatchAnalysis()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Batch monitoring error:', { error })
       }
     }, this.config.monitoringIntervals.batch)
@@ -1167,7 +1173,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       try {
         // Perform anomaly detection on recent metrics
         await this.performAnomalyDetection()
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Anomaly detection error:', { error })
       }
     }, this.config.monitoringIntervals.anomalyDetection)
@@ -1192,7 +1198,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           performanceReport,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Batch analysis error:', { error })
     }
   }
@@ -1224,7 +1230,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Anomaly detection error:', { error })
     }
   }
@@ -1240,7 +1246,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         .toArray()
 
       return metrics as SecurityMetrics[]
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get recent metrics:', { error })
       return []
     }
@@ -1304,7 +1310,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       logger.info('AI-enhanced monitoring service shutdown completed')
       this.emit('monitoring_shutdown')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to shutdown monitoring service:', { error })
       throw error
     }
@@ -1324,10 +1330,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       // Return dummy alert with errors
       return {
         id: '',
-        title: alertData.title || '',
-        description: alertData.description || '',
-        type: alertData.type || 'system',
-        severity: alertData.severity || 'low',
+        title: alertData.title ?? '',
+        description: alertData.description ?? '',
+        type: alertData.type ?? 'system',
+        severity: alertData.severity ?? 'low',
         source: 'system',
         metrics: {} as SecurityMetrics,
         notifiedChannels: [],
@@ -1340,11 +1346,11 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
     try {
       const alert = this.createAlertInternal(
-        alertData.type || 'system',
-        alertData.severity || 'medium',
+        alertData.type ?? 'system',
+        alertData.severity ?? 'medium',
         alertData.title,
         alertData.description,
-        alertData.metrics || {},
+        alertData.metrics ?? {},
         [],
         alertData.metadata,
       )
@@ -1373,10 +1379,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       // I should update processAlert to add errors to alert if it fails.
       return {
         id: '',
-        title: alertData.title || '',
-        description: alertData.description || '',
-        type: alertData.type || 'system',
-        severity: alertData.severity || 'low',
+        title: alertData.title ?? '',
+        description: alertData.description ?? '',
+        type: alertData.type ?? 'system',
+        severity: alertData.severity ?? 'low',
         source: 'system',
         metrics: {
           timestamp: new Date(),
@@ -1421,7 +1427,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     if (alert) {
       alert.severity = 'critical'
       alert.status = 'escalated'
-      alert.escalationCount = (alert.escalationCount || 0) + 1
+      alert.escalationCount = (alert.escalationCount ?? 0) + 1
       alert.escalatedAt = new Date()
       await this.updateAlert(alertId, alert)
       return alert
@@ -1454,7 +1460,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const result = await db
         .collection<Alert>('alerts')
         .findOne({ id: alertId })
-      return result || null
+      return result ?? null
     } catch {
       return null
     }
@@ -1507,7 +1513,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         'EX',
         86400,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to track metric:', { error })
     }
   }
@@ -1581,7 +1587,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     if (this.aiService) {
       try {
         // Add timeout for AI service
-        const aiPromise = this.aiService.generateInsights(data.metrics || [])
+        const aiPromise = this.aiService.generateInsights(data.metrics ?? [])
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('AI analysis timeout')), 1000),
         )
@@ -1597,7 +1603,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       } catch (error: unknown) {
         result.errors = [(error as Error).message]
         result.healthStatus = 'degraded' // or unknown
-        if (error.message === 'AI analysis timeout') {
+        if (
+          (error instanceof Error ? error.message : 'Unknown error') ===
+          'AI analysis timeout'
+        ) {
           result.healthStatus = 'unknown' // Match test expectation if any
         }
       }
