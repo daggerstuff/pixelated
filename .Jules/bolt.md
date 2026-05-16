@@ -16,3 +16,5 @@
   during React renders when rendering filter lists
 - Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for
   filter option arrays
+
+## 2024-05-18 - Stable Reference for Checkbox Toggles | Learning: Functions passed to looped DOM elements cause unnecessary allocations | Action: Wrapped handleDimensionToggle in useCallback
