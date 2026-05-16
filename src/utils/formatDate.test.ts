@@ -33,9 +33,29 @@ describe('formatDate', () => {
       expect(formatDate(date, { relative: true })).toBe('1 day ago');
     });
 
+    it('formats "3 days ago" correctly', () => {
+      const date = new Date('2023-05-12T10:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('3 days ago');
+    });
+
     it('formats "1 week ago" correctly', () => {
       const date = new Date('2023-05-08T10:00:00Z');
       expect(formatDate(date, { relative: true })).toBe('1 week ago');
+    });
+
+    it('formats "2 weeks ago" correctly', () => {
+      const date = new Date('2023-05-01T10:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('2 weeks ago');
+    });
+
+    it('formats "1 month ago" correctly', () => {
+      const date = new Date('2023-04-15T10:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('1 month ago');
+    });
+
+    it('formats "1 year ago" correctly', () => {
+      const date = new Date('2022-05-15T10:00:00Z');
+      expect(formatDate(date, { relative: true })).toBe('1 year ago');
     });
   });
 
