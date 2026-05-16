@@ -255,11 +255,7 @@
     "date-fns": "latest",
     "dayjs": "latest",
     "devalue": "^5.8.1",
-<<<<<<< HEAD
     "dompurify": "^3.4.2",
-=======
-    "dompurify": "^3.4.3",
->>>>>>> origin/staging
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
     "events": "latest",
@@ -547,35 +543,18 @@
       "libpg-query"
     ],
     "overrides": {
-<<<<<<< HEAD
-      "path-to-regexp@6.1.0": "8.4.2",
-      "path-to-regexp": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils>path-to-regexp": "8.4.2",
-=======
       "@vercel/routing-utils": "npm:@vercel/routing-utils@6.2.0",
       "path-to-regexp@6.1.0": "npm:path-to-regexp@6.3.0",
       "path-to-regexp": "6.3.0",
       "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0": "npm:path-to-regexp@6.3.0",
       "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp": "npm:path-to-regexp@6.3.0",
       "@astrojs/vercel>@vercel/routing-utils>path-to-regexp": "npm:path-to-regexp@6.3.0",
-<<<<<<< HEAD
-      "@vercel/routing-utils>path-to-regexp": "6.3.0",
-=======
       "@vercel/routing-utils>path-to-regexp": "^6.3.0",
->>>>>>> origin/staging
->>>>>>> origin/staging
       "yaml": "npm:yaml@2.8.4",
       "yaml@2.7.1": "npm:yaml@2.8.4",
       "openai": "npm:openai@6.37.0",
       "@astrojs/vercel>@vercel/routing-utils@5.3.3": "npm:@vercel/routing-utils@6.2.0",
-<<<<<<< HEAD
-      "@vercel/routing-utils>path-to-regexp@<6.3.0": "8.4.2",
-      "@supermemory/tools@2.0.0(@ai-sdk/provider@3.0.10)(ws@8.20.0(utf-8-validate@6.0.6))>openai": "npm:openai@6.37.0",
-=======
       "@vercel/routing-utils>path-to-regexp@<6.3.0": "6.3.0",
->>>>>>> origin/staging
       "follow-redirects": ">=1.16.0",
       "@opentelemetry/api": "^1.9.0",
       "scmp": "2.1.0",
@@ -600,12 +579,8 @@
       "node-domexception": "^2.0.1",
       "sitemap": "^9.0.0",
       "jws": ">=4.0.1",
-<<<<<<< HEAD
-      "protobufjs": ">=8.0.2",
-=======
       "@opentelemetry/otlp-transformer>protobufjs": "8.0.2",
       "protobufjs": "8.0.2",
->>>>>>> origin/staging
       "vite": "7.3.2",
       "unocss": "^66.5.12",
       "@unocss/reset": "^66.5.12",
@@ -617,11 +592,7 @@
       "fast-xml-parser": "5.7.0",
       "axios": ">=1.15.1",
       "cookie": ">=1.0.3",
-<<<<<<< HEAD
       "devalue": "^5.8.1",
-=======
-      "devalue": ">=5.8.1",
->>>>>>> origin/staging
       "yauzl": "^3.2.1",
       "minimatch": "^10.2.3",
       "@tootallnate/once": "^3.0.1",
@@ -645,29 +616,7 @@
       "kysely": ">=0.28.14",
       "effect": ">=3.20.0",
       "teeny-request": "10.1.2",
-<<<<<<< HEAD
       "path-to-regexp@<6.3.0": "6.3.0"
-=======
-      "@grpc/proto-loader>protobufjs": ">=8.0.2",
-      "@opentelemetry/otlp-transformer>protobufjs": ">=8.0.2",
-      "astro>devalue": ">=5.8.1",
-      "@astrojs/node>astro>devalue": ">=5.8.1",
-      "path-to-regexp@0.1.13": "npm:path-to-regexp@0.1.13",
-      "express>path-to-regexp": "npm:path-to-regexp@0.1.13",
-      "mcp-remote>express>path-to-regexp": "npm:path-to-regexp@0.1.13",
-      "@opentelemetry/exporter-metrics-otlp-http>@opentelemetry/otlp-exporter-base>@opentelemetry/otlp-transformer>protobufjs": ">=8.0.2",
-      "protobufjs@7.5.6": ">=8.0.2",
-      "protobufjs@8.0.1": ">=8.0.2",
-      "protobufjs@7.5.8": ">=8.0.2",
-      "@vercel/routing-utils>path-to-regexp": "8.4.2",
-      "@astrojs/react>devalue": ">=5.8.1",
-      "@astrojs/vercel>@vercel/routing-utils": "npm:@vercel/routing-utils@6.2.0",
-      "@astrojs/vercel>path-to-regexp": "6.3.0",
-      "@vercel/routing-utils": "npm:@vercel/routing-utils@6.2.0",
-      "path-to-regexp-updated": "8.4.2",
-      "@astrojs/vercel>@vercel/routing-utils@5.3.3>path-to-regexp-updated": "8.4.2",
-      "@vercel/routing-utils>path-to-regexp-updated": "8.4.2"
->>>>>>> origin/staging
     }
   },
   "trustedDependencies": [

@@ -1,15 +1,6 @@
 ---
 import DOMPurify from 'isomorphic-dompurify'
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/staging
->>>>>>> origin/staging
 import Link from '~/components/base/Link.astro'
 import { formatDate } from '~/utils/datetime'
 import { VERSION_COLOR } from '~/utils/data'
@@ -50,9 +41,7 @@ const secondLinkText = collectionType === 'prs' ? item.repository?.nameWithOwner
 // Time and content handling
 const time = collectionType === 'releases' ? item.publishedAt : item.createdAt
 const content = collectionType === 'releases' ? item.desc : item.bodyHTML
-<<<<<<< HEAD
 
-<<<<<<< HEAD
 const sanitizedContent = content
   ? DOMPurify.sanitize(content, {
       ALLOWED_TAGS: [
@@ -90,16 +79,6 @@ const sanitizedContent = content
       ]
     })
   : undefined
-=======
-const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : undefined
->>>>>>> origin/staging
-=======
-<<<<<<< HEAD
-const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : undefined
-=======
-const sanitizedContent = content ? DOMPurify.sanitize(content as string) : ''
->>>>>>> origin/staging
->>>>>>> origin/staging
 ---
 
 <details
@@ -183,10 +162,5 @@ const sanitizedContent = content ? DOMPurify.sanitize(content as string) : ''
       </div>
     </div>
   </summary>
-<<<<<<< HEAD
   <div class="prose github-item-prose" set:html={sanitizedContent || ''} />
 </details>
-=======
-  <div class="prose github-item-prose" set:html={sanitizedContent} />
-</details>
->>>>>>> origin/staging
