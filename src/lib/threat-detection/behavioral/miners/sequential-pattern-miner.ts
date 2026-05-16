@@ -13,14 +13,14 @@ interface FrequentPattern {
 }
 
 export class SequentialPatternMiner implements PatternMiner {
-  private minSupport = 0.1
-  private maxPatternLength = 10
-  private minPatternLength = 2
-  private maxInputSequences = 5000
-  private maxRecursionDepth = 8
-  private maxCandidatesPerIteration = 5000
-  private spadeSequenceLimit = 1000
-  private spadeAverageLengthLimit = 15
+  private readonly minSupport = 0.1
+  private readonly maxPatternLength = 10
+  private readonly minPatternLength = 2
+  private readonly maxInputSequences = 5000
+  private readonly maxRecursionDepth = 8
+  private readonly maxCandidatesPerIteration = 5000
+  private readonly spadeSequenceLimit = 1000
+  private readonly spadeAverageLengthLimit = 15
 
   async minePatterns(
     sequences: BehavioralSequence[],

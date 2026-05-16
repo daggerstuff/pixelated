@@ -91,7 +91,7 @@ export default function SearchFilters({
               placeholder='From'
               aria-label='Year From'
               className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
-              value={localFilters.yearFrom || ''}
+              value={localFilters.yearFrom ?? ''}
               onChange={(e) =>
                 setLocalFilters({
                   ...localFilters,
@@ -109,7 +109,7 @@ export default function SearchFilters({
               placeholder='To'
               aria-label='Year To'
               className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
-              value={localFilters.yearTo || ''}
+              value={localFilters.yearTo ?? ''}
               onChange={(e) =>
                 setLocalFilters({
                   ...localFilters,

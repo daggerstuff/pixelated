@@ -33,8 +33,8 @@ export class MentalLLaMAPythonBridge {
   private pythonProcess: ChildProcessWithoutNullStreams | null = null
   private isInitialized = false
   private isFunctional = false
-  private pythonScriptPath: string
-  private requestQueue: Map<
+  private readonly pythonScriptPath: string
+  private readonly requestQueue: Map<
     string,
     {
       resolve: (value: unknown) => void
@@ -47,7 +47,7 @@ export class MentalLLaMAPythonBridge {
 
   constructor(pythonScriptPath?: string) {
     this.pythonScriptPath =
-      pythonScriptPath || './scripts/mental_llama_python_handler.py'
+      pythonScriptPath ?? './scripts/mental_llama_python_handler.py'
     this.pythonBridgeDisabled = false
     logger.info('MentalLLaMAPythonBridge instance created.', {
       scriptPath: this.pythonScriptPath,
@@ -83,8 +83,7 @@ export class MentalLLaMAPythonBridge {
               const response: PythonBridgeResponse & { id?: string } =
                 JSON.parse(line) as unknown
               if (
-                response &&
-                response.id &&
+                response?.id &&
                 this.requestQueue.has(response.id)
               ) {
                 const { resolve, timeout } = this.requestQueue.get(response.id)!
@@ -226,7 +225,7 @@ export class MentalLLaMAPythonBridge {
    * @param payload Payload object
    * @returns {Promise<unknown>} The response from the Python process.
    */
-  private sendRequest(
+  private  async sendRequest(
     command: string,
     payload: Record<string, unknown>,
   ): Promise<unknown> {

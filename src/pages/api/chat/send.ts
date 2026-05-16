@@ -27,8 +27,8 @@ export const POST = async ({ request }: APIContext) => {
     content: body.message,
     timestamp: Date.now(),
     metadata: {
-      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
+      ipAddress: request.headers.get('x-forwarded-for') ?? 'unknown',
+      userAgent: request.headers.get('user-agent') ?? 'unknown',
     },
   }
 

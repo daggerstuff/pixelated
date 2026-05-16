@@ -81,7 +81,7 @@ declare global {
 }
 
 export class ThreatDetectionMiddleware {
-  private config: ApiMiddlewareConfig
+  private readonly config: ApiMiddlewareConfig
 
   constructor(config: ApiMiddlewareConfig) {
     this.config = {
@@ -169,7 +169,7 @@ export class ThreatDetectionMiddleware {
     return (
       this.config.skipPaths?.some(
         (skipPath) => path.startsWith(skipPath) || path === skipPath,
-      ) || false
+      ) ?? false
     )
   }
 
@@ -227,7 +227,7 @@ export class ThreatDetectionMiddleware {
         .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(',') : value || '',
+          Array.isArray(value) ? value.join(',') : value ?? '',
         ]),
     )
 
@@ -264,7 +264,7 @@ export class ThreatDetectionMiddleware {
       'X-RateLimit-Limit': rateLimitResult.limit.toString(),
       'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
       'X-RateLimit-Reset': rateLimitResult.resetTime.toISOString(),
-      'X-RateLimit-Retry-After': rateLimitResult.retryAfter?.toString() || '0',
+      'X-RateLimit-Retry-After': rateLimitResult.retryAfter?.toString() ?? '0',
       'X-Threat-Detected': threatResponse ? 'true' : 'false',
     })
 

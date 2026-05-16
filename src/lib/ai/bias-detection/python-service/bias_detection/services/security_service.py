@@ -42,11 +42,13 @@ class SecurityManager:
             pbkdf2_iterations: PBKDF2 iterations (default: 100000, recommend 600000+)
         """
         self.pbkdf2_iterations = pbkdf2_iterations
+        encryption_password = encryption_password or os.getenv("ENCRYPTION_PASSWORD")
+        encryption_salt = encryption_salt or os.getenv("ENCRYPTION_SALT")
         self.encryption_key = self._generate_encryption_key(
             encryption_password, encryption_salt
         )
         self.fernet = Fernet(self.encryption_key)
-        self.jwt_secret_key = jwt_secret_key
+        self.jwt_secret_key = jwt_secret_key or os.getenv("JWT_SECRET_KEY")
 
     def _generate_encryption_key(self, password: str | None, salt: str | None) -> bytes:
         """

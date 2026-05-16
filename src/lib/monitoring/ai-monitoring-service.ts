@@ -49,11 +49,11 @@ export interface MonitoringConfig {
 }
 
 export class AIMonitoringService extends EventEmitter {
-  private redis: Redis
-  private openai: OpenAI
+  private readonly redis: Redis
+  private readonly openai: OpenAI
   private config: MonitoringConfig
-  private activeAlerts: Map<string, Alert> = new Map()
-  private metricsHistory: Map<string, number[]> = new Map()
+  private readonly activeAlerts: Map<string, Alert> = new Map()
+  private readonly metricsHistory: Map<string, number[]> = new Map()
   private isRunning = false
 
   constructor(redis: Redis, openai: OpenAI, config: MonitoringConfig) {
@@ -72,7 +72,7 @@ export class AIMonitoringService extends EventEmitter {
     this.emit('started')
 
     // Start monitoring loop
-    this.monitoringLoop()
+    void this.monitoringLoop()
 
     // Subscribe to Redis pub/sub for real-time metrics
     this.redis.subscribe('metrics:updates', (err) => {
@@ -83,7 +83,7 @@ export class AIMonitoringService extends EventEmitter {
 
     this.redis.on('message', (channel, message) => {
       if (channel === 'metrics:updates') {
-        this.handleMetricUpdate(JSON.parse(message))
+        void this.handleMetricUpdate(JSON.parse(message))
       }
     })
   }
@@ -332,7 +332,7 @@ export class AIMonitoringService extends EventEmitter {
 
       const insights =
         (response as { choices: Array<{ message?: { content?: string } }> })
-          .choices[0]?.message?.content || 'No insights generated'
+          .choices[0]?.message?.content ?? 'No insights generated'
 
       // Update alerts with AI insights
       for (const alert of recentAlerts) {
@@ -437,7 +437,7 @@ export class AIMonitoringService extends EventEmitter {
   }
 
   getMetricsHistory(metric: string): number[] {
-    return this.metricsHistory.get(metric) || []
+    return this.metricsHistory.get(metric) ?? []
   }
 
   updateConfig(newConfig: Partial<MonitoringConfig>): void {

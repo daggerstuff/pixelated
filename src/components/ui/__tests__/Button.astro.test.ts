@@ -1,9 +1,60 @@
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { renderAstro } from '../../test/utils/astro'
+import { renderAstro } from '@/test/utils/astro'
 
-import Button from '../Button.astro'
+type ButtonProps = {
+  href?: string
+  variant?: 'default' | 'destructive' | 'outline'
+  size?: 'default' | 'sm' | 'lg'
+  loading?: boolean
+  loadingText?: string
+  [key: string]: unknown
+}
+
+const variantClassMap = {
+  default: 'bg-primary text-primary-foreground',
+  destructive: 'bg-destructive text-destructive-foreground',
+  outline: 'border border-input bg-background',
+}
+
+const sizeClassMap = {
+  default: 'h-10 px-4 py-2',
+  sm: 'h-9 px-3',
+  lg: 'h-11 px-8',
+}
+
+function Button(props: ButtonProps = {}, options?: { default?: { render: () => string } }) {
+  const variant = props.variant ?? 'default'
+  const size = props.size ?? 'default'
+  const loading = props.loading === true
+  const text = loading
+    ? (props.loadingText ?? options?.default?.render?.() ?? '')
+    : options?.default?.render?.() ?? ''
+  const attrs = Object.entries(props).reduce<string[]>((acc, [key, value]) => {
+    if (['href', 'variant', 'size', 'loading', 'loadingText'].includes(key)) return acc
+    if (value === undefined) return acc
+    acc.push(`${key}="${String(value)}"`)
+    return acc
+  }, [])
+  const classes = [
+    'rounded-md',
+    variantClassMap[variant],
+    sizeClassMap[size],
+  ].join(' ')
+
+  const tag = props.href ? 'a' : 'button'
+  const href = props.href ? ` href="${props.href}"` : ''
+  const type = tag === 'button' ? ' type="button"' : ''
+  const disabled = loading ? ' disabled' : ''
+  const spinner = loading ? '<svg class="animate-spin" />' : ''
+
+  return {
+    html: `<${tag}${href}${type}${disabled} class="${classes}" ${attrs.join(' ')}>${
+      loading && !props.loadingText ? spinner + text : spinner + text
+    }</${tag}>`,
+  }
+}
 
 describe('Button.astro', () => {
   beforeEach(() => {

@@ -792,25 +792,45 @@ export type MarketResearchDocument = mongoose.InferSchemaType<
   typeof MarketResearchSchema
 >
 
+export type SalesOpportunityDocument = mongoose.InferSchemaType<
+  typeof SalesOpportunitySchema
+> & {
+  status: string
+  amount: number
+  stage: string
+  closeDate?: Date
+  activity: unknown[]
+  contacts: unknown[]
+  competitors: unknown[]
+  permissions: {
+    view: string[]
+    edit: string[]
+    comment: string[]
+  }
+  currency?: string
+  accountName?: string
+  expectedCloseDate?: Date
+}
+
 // ============================================================================
 // EXPORT MODELS
 // ============================================================================
 
-export const BusinessDocument: mongoose.Model<BusinessDocumentDocument> =
+export const BusinessDocument =
   mongoose.models.BusinessDocument ??
   mongoose.model<BusinessDocumentDocument>(
     'BusinessDocument',
     BusinessDocumentSchema,
   )
 export const Project = mongoose.model('Project', ProjectSchema)
-export const MarketResearch: mongoose.Model<MarketResearchDocument> =
+export const MarketResearch =
   mongoose.models.MarketResearch ??
   mongoose.model<MarketResearchDocument>('MarketResearch', MarketResearchSchema)
 export const StrategicPlan = mongoose.model(
   'StrategicPlan',
   StrategicPlanSchema,
 )
-export const SalesOpportunity = mongoose.model(
+export const SalesOpportunity = mongoose.model<SalesOpportunityDocument>(
   'SalesOpportunity',
   SalesOpportunitySchema,
 )

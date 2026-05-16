@@ -27,13 +27,13 @@ const hasSentryDSN =
   !!process.env.SENTRY_PUBLIC_DSN ||
   !!process.env.VITE_SENTRY_DSN // Only enable if DSN is actually present
 const sentryRelease =
-  process.env.SENTRY_RELEASE || process.env.npm_package_version || undefined
+  (process.env.SENTRY_RELEASE ?? process.env.npm_package_version) ?? undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
 
 function createScopedSentryVitePlugins({ ssr, assets, filesToDeleteAfterUpload }) {
   return sentryVitePlugin({
-    org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-    project: process.env.SENTRY_PROJECT || 'pixel-astro',
+    org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
     authToken: process.env.SENTRY_AUTH_TOKEN,
     telemetry: false,
     release: sentryRelease ? { name: sentryRelease } : undefined,
@@ -164,7 +164,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
+  site: process.env.PUBLIC_SITE_URL ?? 'https://pixelatedempathy.com',
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -265,8 +265,7 @@ export default defineConfig({
         onwarn(warning, warn) {
           if (
             warning.code === 'SOURCEMAP_ERROR' ||
-            (warning.message &&
-              warning.message.includes("didn't generate a sourcemap"))
+            (warning.message?.includes("didn't generate a sourcemap"))
           ) {
             return
           }

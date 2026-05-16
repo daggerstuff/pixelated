@@ -3,6 +3,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="${SCRIPT_DIR}/lib"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 if [[ ! -f "${LIB_DIR}/persona-regeneration-helpers.sh" ]]; then
   echo "ERROR: missing helper library at ${LIB_DIR}/persona-regeneration-helpers.sh" >&2

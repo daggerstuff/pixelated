@@ -56,7 +56,7 @@ export const options = {
 }
 
 // WebSocket configuration
-const WS_URL = __ENV.WS_URL || 'ws://localhost:5173/ws/pixel-multimodal'
+const WS_URL = __ENV.WS_URL ?? 'ws://localhost:5173/ws/pixel-multimodal'
 
 // Test messages
 const testMessages = [

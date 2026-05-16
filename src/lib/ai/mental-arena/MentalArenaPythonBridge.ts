@@ -76,8 +76,8 @@ export interface SymptomAnalysisOptions {
  * Production-grade Python bridge for MentalArena integration
  */
 export class MentalArenaPythonBridge {
-  private config: Required<PythonBridgeConfig>
-  private pythonProcess?: ChildProcess
+  private readonly config: Required<PythonBridgeConfig>
+  private readonly pythonProcess?: ChildProcess
   private isInitialized: boolean = false
   private processQueue: Array<{
     id: string
@@ -88,7 +88,7 @@ export class MentalArenaPythonBridge {
     timestamp: number
   }> = []
   private isProcessing: boolean = false
-  private performanceMetrics: BridgePerformanceMetrics
+  private readonly performanceMetrics: BridgePerformanceMetrics
 
   constructor(config: PythonBridgeConfig) {
     this.config = {
@@ -246,7 +246,7 @@ export class MentalArenaPythonBridge {
         JSON.stringify({
           text: options.text,
           analysisType: options.analysisType,
-          context: options.context || {},
+          context: options.context ?? {},
         }),
         'utf-8',
       )
@@ -645,7 +645,7 @@ export class MentalArenaPythonBridge {
     })
 
     // Validate all packages concurrently
-    const validationPromises = requiredPackages.map((pkg) =>
+    const validationPromises = requiredPackages.map( async (pkg) =>
       this.executeSecure(
         this.config.pythonPath,
         ['-c', `import ${pkg}; print("${pkg} OK")`],
@@ -863,12 +863,12 @@ export class MentalArenaPythonBridge {
           success,
           output: success ? stdout.trim() : undefined,
           error: success ? undefined : stderr.trim(),
-          exitCode: code || undefined,
+          exitCode: code ?? undefined,
           executionTime,
           metadata: {
             command: `${command} ${args.join(' ')}`,
             timestamp: new Date(startTime).toISOString(),
-            processId: process.pid || 0,
+            processId: process.pid ?? 0,
           },
         }
 

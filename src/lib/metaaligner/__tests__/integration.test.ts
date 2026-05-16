@@ -42,14 +42,14 @@ const createMockAIService = (enhancedResponse?: string): AIService => {
           {
             message: {
               role: 'assistant',
-              content: enhancedResponse || 'Enhanced response...',
+              content: enhancedResponse ?? 'Enhanced response...',
             },
             finishReason: 'stop',
           },
         ],
         usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
         provider: 'test',
-        content: enhancedResponse || 'Enhanced response...',
+        content: enhancedResponse ?? 'Enhanced response...',
       } as AICompletion),
     createStreamingChatCompletion: vi.fn<() => Promise<unknown>>(),
     getModelInfo: vi.fn<() => Promise<unknown>>(),
@@ -448,7 +448,7 @@ describe('MetaAligner Integration Tests', () => {
       }))
 
       const evaluations = await Promise.all(
-        requests.map((request) => metaAligner.evaluateResponse(request)),
+        requests.map( async (request) => metaAligner.evaluateResponse(request)),
       )
 
       expect(evaluations).toHaveLength(5)
@@ -484,7 +484,7 @@ describe('MetaAligner Integration Tests', () => {
 
       for (const response of malformedResponses) {
         const evaluation = await metaAligner.evaluateResponse({
-          response: response as string,
+          response: response!,
           context: {
             userQuery: 'Test query',
             detectedContext: ContextType.GENERAL,

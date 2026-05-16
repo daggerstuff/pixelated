@@ -24,12 +24,12 @@ export interface PooledConnection {
 }
 
 export class ConnectionPool {
-  private connections: Map<string, PooledConnection> = new Map()
-  private queue: Array<{
+  private readonly connections: Map<string, PooledConnection> = new Map()
+  private readonly queue: Array<{
     resolve: (connection: PooledConnection) => void
     reject: (error: Error) => void
   }> = []
-  private config: ConnectionPoolConfig
+  private readonly config: ConnectionPoolConfig
   private cleanupIntervalId?: ReturnType<typeof setInterval>
   private disposed: boolean = false
 

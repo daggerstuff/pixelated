@@ -44,13 +44,13 @@ const DEFAULT_CONFIG: Partial<EmbeddingAgentClientConfig> = {
 /**
  * Transform snake_case keys to camelCase.
  */
-function toCamelCase<T>(obj: unknown): T {
+function toCamelCase(obj: unknown): unknown {
   if (obj === null || obj === undefined) {
-    return obj as T
+    return obj as unknown
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => toCamelCase(item)) as T
+    return obj.map((item) => toCamelCase(item)) as unknown
   }
 
   if (typeof obj === 'object') {
@@ -61,22 +61,22 @@ function toCamelCase<T>(obj: unknown): T {
       )
       newObj[camelKey] = toCamelCase(value)
     }
-    return newObj as T
+    return newObj as unknown
   }
 
-  return obj as T
+  return obj as unknown
 }
 
 /**
  * Transform camelCase keys to snake_case.
  */
-function toSnakeCase<T>(obj: unknown): T {
+function toSnakeCase(obj: unknown): unknown {
   if (obj === null || obj === undefined) {
-    return obj as T
+    return obj as unknown
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => toSnakeCase(item)) as T
+    return obj.map((item) => toSnakeCase(item)) as unknown
   }
 
   if (typeof obj === 'object') {
@@ -88,10 +88,10 @@ function toSnakeCase<T>(obj: unknown): T {
       )
       newObj[snakeKey] = toSnakeCase(value)
     }
-    return newObj as T
+    return newObj as unknown
   }
 
-  return obj as T
+  return obj as unknown
 }
 
 /**
@@ -166,7 +166,7 @@ export class EmbeddingAgentClient {
           // Not JSON
         }
         throw new EmbeddingAgentError(
-          errorData.message || errorData.error || `HTTP ${response.status}`,
+          (errorData.message ?? errorData.error) ?? `HTTP ${response.status}`,
           response.status,
           errorData,
         )
@@ -360,9 +360,9 @@ export function createEmbeddingAgentClient(
  */
 function getDefaultEmbeddingAgentUrl(): string {
   // Check for environment variable - works in Node.js
-  if (typeof process !== 'undefined' && process.env) {
+  if (process?.env) {
     const envUrl =
-      process.env['EMBEDDING_AGENT_URL'] ||
+      process.env['EMBEDDING_AGENT_URL'] ??
       process.env['PUBLIC_EMBEDDING_AGENT_URL']
     if (envUrl) {
       return envUrl

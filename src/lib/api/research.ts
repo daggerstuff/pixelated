@@ -71,13 +71,13 @@ export interface DatasetResponse {
 }
 
 export class ResearchAPI {
-  private baseURL: string
+  private readonly baseURL: string
 
   constructor() {
     // Use environment variable if available, otherwise default to localhost:8000 for dev
     // In production, this should be set to the actual API URL
     this.baseURL =
-      import.meta.env.PUBLIC_ACADEMIC_API_URL || 'http://localhost:8000/api'
+      import.meta.env.PUBLIC_ACADEMIC_API_URL ?? 'http://localhost:8000/api'
   }
 
   private async fetchWithTimeout(

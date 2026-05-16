@@ -49,9 +49,9 @@ interface PostInfo {
  * - Provide insights into content pipeline
  */
 export class BlogPublishingService {
-  private contentDir: string
-  private scheduledJobs: Map<string, cron.ScheduledTask> = new Map()
-  private posts: Map<string, PostInfo> = new Map()
+  private readonly contentDir: string
+  private readonly scheduledJobs: Map<string, cron.ScheduledTask> = new Map()
+  private readonly posts: Map<string, PostInfo> = new Map()
 
   constructor(contentDir = 'src/content/blog') {
     this.contentDir = validatePath(contentDir, ALLOWED_DIRECTORIES.PROJECT_ROOT)
@@ -273,7 +273,7 @@ export class BlogPublishingService {
       // Extract frontmatter between --- markers
       const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/)
 
-      if (frontmatterMatch && frontmatterMatch[1]) {
+      if (frontmatterMatch?.[1]) {
         const frontmatter = frontmatterMatch[1]
 
         // Parse YAML frontmatter
@@ -306,14 +306,14 @@ export class BlogPublishingService {
 
       for (const line of lines) {
         const match = line.match(/^\s*(\w+):\s*(.+)$/)
-        if (match && match[1] && match[2]) {
+        if (match?.[1] && match[2]) {
           const key = match[1]
           const value = match[2]
 
           if (key === 'tags' || key === 'categories') {
             // Parse array values
             const arrayMatch = value.match(/\[(.*)\]/)
-            if (arrayMatch && arrayMatch[1]) {
+            if (arrayMatch?.[1]) {
               data[key] = arrayMatch[1].split(',').map((item) => item.trim())
             } else {
               data[key] = [value.trim()]

@@ -7,7 +7,7 @@ const evaluations = new Map<
 export async function getEvaluations(
   sessionId: string,
 ): Promise<Array<{ sessionId: string; feedback: string }>> {
-  return evaluations.get(sessionId) || []
+  return evaluations.get(sessionId) ?? []
 }
 
 export async function saveEvaluation(

@@ -124,9 +124,9 @@ class ExportError extends Error {
 export class ExportService {
   private static instance: ExportService
 
-  private fheService: FHEServiceInterface
+  private readonly fheService: FHEServiceInterface
   private initialized = false
-  private options: ExportOptions
+  private readonly options: ExportOptions
 
   /**
    * Private constructor to enforce singleton pattern

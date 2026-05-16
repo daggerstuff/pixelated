@@ -56,8 +56,8 @@ export interface AlignmentImprovement {
  * Enhances LLM responses to better align with mental health objectives
  */
 export class EnhancementPipeline {
-  private config: EnhancementPipelineConfig
-  private metaAligner: MetaAlignerAPI
+  private readonly config: EnhancementPipelineConfig
+  private readonly metaAligner: MetaAlignerAPI
 
   constructor(
     config: EnhancementPipelineConfig = {},
@@ -74,7 +74,7 @@ export class EnhancementPipeline {
 
     // Use provided MetaAlignerAPI or create a new one
     this.metaAligner =
-      metaAligner ||
+      metaAligner ??
       new MetaAlignerAPI({
         enableResponseEnhancement: true,
         enhancementThreshold: this.config.enhancementThreshold,
@@ -111,7 +111,7 @@ export class EnhancementPipeline {
       // Check if enhancement is needed
       const needsEnhancement =
         initialEvaluation.overallScore <
-        (this.config.enhancementThreshold || 0.7)
+        (this.config.enhancementThreshold ?? 0.7)
 
       if (!needsEnhancement) {
         logger.info('Response quality sufficient, skipping enhancement', {
@@ -257,7 +257,7 @@ export class EnhancementPipeline {
     let currentResponse = originalResponse
     let currentEvaluation = evaluation
     let attempts = 0
-    const maxAttempts = this.config.maxRetries || 2
+    const maxAttempts = this.config.maxRetries ?? 2
     let enhanced = false
 
     logger.info('Applying enhancements', {
@@ -291,7 +291,7 @@ export class EnhancementPipeline {
 
           const stillNeedsEnhancement =
             currentEvaluation.overallScore <
-            (this.config.enhancementThreshold || 0.7)
+            (this.config.enhancementThreshold ?? 0.7)
 
           if (!stillNeedsEnhancement) {
             break

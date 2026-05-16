@@ -107,7 +107,7 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
 
   async dispose(): Promise<void> {
     try {
-      if (this._tf && this._tf.dispose) {
+      if (this._tf?.dispose) {
         this._tf.dispose()
       }
     } catch (error: unknown) {
@@ -120,21 +120,17 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
 let tensorflowInstance: TensorFlowCompatibilityImpl | null = null
 
 export function getTensorFlowCompatibility(): TensorFlowCompatibility {
-  if (!tensorflowInstance) {
-    tensorflowInstance = new TensorFlowCompatibilityImpl()
-  }
+  tensorflowInstance ??= new TensorFlowCompatibilityImpl();
   return tensorflowInstance
 }
 
 export async function initializeTensorFlowCompatibility(): Promise<void> {
-  if (!tensorflowInstance) {
-    tensorflowInstance = new TensorFlowCompatibilityImpl()
-  }
+  tensorflowInstance ??= new TensorFlowCompatibilityImpl();
   // Wait for initialization to complete
   await new Promise((resolve) => setTimeout(resolve, 100))
 }
 
-export function disposeTensorFlowCompatibility(): Promise<void> {
+export async function disposeTensorFlowCompatibility(): Promise<void> {
   if (tensorflowInstance) {
     return tensorflowInstance.dispose()
   }

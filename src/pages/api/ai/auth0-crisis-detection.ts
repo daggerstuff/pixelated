@@ -105,7 +105,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     // Perform crisis detection
     const crisisOptions: CrisisDetectionOptions = {
       sensitivityLevel: 'medium',
-      userId: userId!,
+      userId: userId,
       source: 'auth0-api',
       metadata: { sessionId, context },
     }
@@ -125,7 +125,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       // Execute crisis protocol
       await crisisProtocolInstance.handleCrisis(
         userId || 'anonymous',
-        sessionId || 'unknown',
+        sessionId ?? 'unknown',
         text,
         detectionResult.confidence,
         detectionResult.detectedTerms,
@@ -165,7 +165,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     })
 
     // Create audit log for the error
-    const errorUserId = userId || 'anonymous'
+    const errorUserId = userId ?? 'anonymous'
     await createAuditLog(
       AuditEventType.SYSTEM,
       'crisis_detection_error',

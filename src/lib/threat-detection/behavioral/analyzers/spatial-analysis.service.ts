@@ -66,7 +66,7 @@ export class SpatialAnalysisService {
     ) {
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
-        userId: events[0]?.userId || 'unknown',
+        userId: events[0]?.userId ?? 'unknown',
         patternId: 'spatial_location',
         anomalyType: 'novelty',
         severity: 'high',

@@ -1,6 +1,15 @@
 #!/bin/bash
 # hetzner-run-stage1.sh - Launch Stage 1 (Foundation) SFT on Hetzner AI
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
+
 HETZNER_AI_CLI="${HETZNER_AI_CLI:-ovhai}"
 
 # 1. Environment Check

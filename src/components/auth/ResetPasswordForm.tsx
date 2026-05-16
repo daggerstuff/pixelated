@@ -44,7 +44,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         document.dispatchEvent(event)
       } else {
         throw new Error(
-          (response as { error?: { message?: string } }).error?.message ||
+          (response as { error?: { message?: string } }).error?.message ??
             'Password reset failed',
         )
       }

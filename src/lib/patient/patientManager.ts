@@ -41,8 +41,8 @@ export interface PatientTransferRequest {
  * Advanced Patient Management System
  */
 class PatientManager {
-  private patientCache = new Map<string, PatientProfile>()
-  private searchIndex = new Map<string, Set<string>>() // field -> patient IDs
+  private readonly patientCache = new Map<string, PatientProfile>()
+  private readonly searchIndex = new Map<string, Set<string>>() // field -> patient IDs
 
   constructor() {
     this.initializeSearchIndex()
@@ -121,7 +121,7 @@ class PatientManager {
 
     // Get patients matching each criterion
     if (criteria.name) {
-      const nameMatches = this.searchIndex.get('name') || new Set()
+      const nameMatches = this.searchIndex.get('name') ?? new Set()
       matchingPatients =
         matchingPatients.size === 0
           ? nameMatches
@@ -129,7 +129,7 @@ class PatientManager {
     }
 
     if (criteria.therapistId) {
-      const therapistMatches = this.searchIndex.get('therapistId') || new Set()
+      const therapistMatches = this.searchIndex.get('therapistId') ?? new Set()
       matchingPatients =
         matchingPatients.size === 0
           ? therapistMatches
@@ -139,7 +139,7 @@ class PatientManager {
     }
 
     if (criteria.riskLevel) {
-      const riskMatches = this.searchIndex.get('riskLevel') || new Set()
+      const riskMatches = this.searchIndex.get('riskLevel') ?? new Set()
       matchingPatients =
         matchingPatients.size === 0
           ? riskMatches
@@ -147,7 +147,7 @@ class PatientManager {
     }
 
     if (criteria.treatmentStatus) {
-      const statusMatches = this.searchIndex.get('treatmentStatus') || new Set()
+      const statusMatches = this.searchIndex.get('treatmentStatus') ?? new Set()
       matchingPatients =
         matchingPatients.size === 0
           ? statusMatches
@@ -396,9 +396,9 @@ class PatientManager {
         type: 'treatment_summary',
         content: {
           therapist: patient.therapistId,
-          sessionsCompleted: patient.sessionHistory?.length || 0,
+          sessionsCompleted: patient.sessionHistory?.length ?? 0,
           currentRiskLevel: patient.riskLevel,
-          treatmentGoals: patient.treatmentPlan?.goals || [],
+          treatmentGoals: patient.treatmentPlan?.goals ?? [],
         },
       },
       {
@@ -407,7 +407,7 @@ class PatientManager {
         content: {
           lastSession: patient.lastSeen,
           progressScore: patient.progress,
-          keyMilestones: patient.milestones || [],
+          keyMilestones: patient.milestones ?? [],
         },
       },
     ]
@@ -422,8 +422,8 @@ class PatientManager {
         title: 'Session History',
         type: 'session_history',
         content: {
-          sessions: patient.sessionHistory || [],
-          patterns: this.analyzeSessionPatterns(patient.sessionHistory || []),
+          sessions: patient.sessionHistory ?? [],
+          patterns: this.analyzeSessionPatterns(patient.sessionHistory ?? []),
         },
       },
       {
@@ -431,7 +431,7 @@ class PatientManager {
         type: 'clinical_notes',
         content: {
           notes: patient.notes,
-          observations: patient.observations || [],
+          observations: patient.observations ?? [],
         },
       },
     ]
@@ -450,9 +450,9 @@ class PatientManager {
         title: 'Goal Achievement',
         type: 'goal_achievement',
         content: {
-          goals: patient.treatmentPlan?.goals || [],
-          achievements: patient.achievements || [],
-          barriers: patient.barriers || [],
+          goals: patient.treatmentPlan?.goals ?? [],
+          achievements: patient.achievements ?? [],
+          barriers: patient.barriers ?? [],
         },
       },
       {
@@ -486,9 +486,9 @@ class PatientManager {
         title: 'Aftercare Plan',
         type: 'aftercare_plan',
         content: {
-          followUpSchedule: patient.followUpSchedule || [],
-          supportResources: patient.supportResources || [],
-          warningSigns: patient.warningSigns || [],
+          followUpSchedule: patient.followUpSchedule ?? [],
+          supportResources: patient.supportResources ?? [],
+          warningSigns: patient.warningSigns ?? [],
         },
       },
     ]
@@ -545,7 +545,7 @@ class PatientManager {
 
   private analyzeTreatmentEffectiveness(patient: PatientProfile): any {
     // Analyze how effective the current treatment approach is
-    const sessions = patient.sessionHistory || []
+    const sessions = patient.sessionHistory ?? []
     const recentSessions = sessions.slice(-10) // Last 10 sessions
 
     return {
@@ -571,12 +571,12 @@ class PatientManager {
 
     const firstHalfAvg =
       firstHalf.reduce(
-        (sum, s) => sum + (s.emotionAnalysis?.moodScore || 0.5),
+        (sum, s) => sum + (s.emotionAnalysis?.moodScore ?? 0.5),
         0,
       ) / firstHalf.length
     const secondHalfAvg =
       secondHalf.reduce(
-        (sum, s) => sum + (s.emotionAnalysis?.moodScore || 0.5),
+        (sum, s) => sum + (s.emotionAnalysis?.moodScore ?? 0.5),
         0,
       ) / secondHalf.length
 
@@ -588,7 +588,7 @@ class PatientManager {
   ): 'excellent' | 'good' | 'fair' | 'poor' {
     // Simple prediction based on current progress and engagement
     const progress = patient.progress
-    const sessionsCount = patient.sessionHistory?.length || 0
+    const sessionsCount = patient.sessionHistory?.length ?? 0
 
     if (progress > 80 && sessionsCount > 10) return 'excellent'
     if (progress > 60 && sessionsCount > 5) return 'good'
@@ -647,7 +647,7 @@ class PatientManager {
       patient = await this.decryptPatientData(patient)
     }
 
-    return patient || null
+    return patient ?? null
   }
 
   private async decryptPatientData(

@@ -237,7 +237,7 @@ export function PixelMultimodalChat({
 
           {streaming ? (
             <div className='text-emerald-600 text-xs'>
-              {streamStatus || 'Streaming audio…'}
+              {streamStatus ?? 'Streaming audio…'}
             </div>
           ) : streamStatus ? (
             <div className='text-slate-500 text-xs'>{streamStatus}</div>
@@ -299,7 +299,7 @@ export function PixelMultimodalChat({
             ) : null}
           </div>
           <div className='text-slate-700 mt-2 text-sm'>
-            {transcription || 'No transcript yet.'}
+            {transcription ?? 'No transcript yet.'}
           </div>
         </div>
 
@@ -313,7 +313,7 @@ export function PixelMultimodalChat({
             ) : null}
           </div>
           <div className='text-slate-700 mt-2 text-sm'>
-            {audioEmotion?.primary_emotion || 'Not available'}
+            {audioEmotion?.primary_emotion ?? 'Not available'}
           </div>
           {audioEmotion ? (
             <div className='text-slate-600 mt-2 grid grid-cols-3 gap-2 text-xs'>
@@ -336,7 +336,7 @@ export function PixelMultimodalChat({
             ) : null}
           </div>
           <div className='text-slate-700 mt-2 text-sm'>
-            {fusedSummary || 'Not available'}
+            {fusedSummary ?? 'Not available'}
           </div>
           {fusedEmotion ? (
             <div className='text-slate-600 mt-2 grid grid-cols-3 gap-2 text-xs'>

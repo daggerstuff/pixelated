@@ -211,7 +211,7 @@ function getFirstInputDelay() {
                 : {},
       n = new e.Error().stack
     n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      ((e._sentryDebugIds = e._sentryDebugIds ?? {}),
       (e._sentryDebugIds[n] = '2cc628ec-2a7b-516a-8129-de92553dbdb7'))
   } catch (e) {}
 })()

@@ -1,6 +1,14 @@
 #!/bin/bash
 # Rollback deployment script for GKE
 set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 echo "🔄 Starting deployment rollback..."
 echo "Deployment: $GKE_DEPLOYMENT_NAME"

@@ -211,8 +211,8 @@ test.describe('Regression Test Suite', () => {
       // Check memory usage doesn't spike excessively
       const metrics = await page.evaluate(() => {
         return {
-          usedJSHeapSize: performance.memory?.usedJSHeapSize || 0,
-          totalJSHeapSize: performance.memory?.totalJSHeapSize || 0,
+          usedJSHeapSize: performance.memory?.usedJSHeapSize ?? 0,
+          totalJSHeapSize: performance.memory?.totalJSHeapSize ?? 0,
         }
       })
 
@@ -254,7 +254,7 @@ test.describe('Regression Test Suite', () => {
       await page.fill('[data-testid="message-input"]', message)
 
       // Simulate network interruption
-      await page.route('**/api/**', (route) => route.abort())
+      await page.route('**/api/**',  async (route) => route.abort())
 
       // Try to send message
       await page.click('[data-testid="send-button"]')

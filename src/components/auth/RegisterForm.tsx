@@ -106,7 +106,7 @@ export function RegisterForm({
         return
       }
 
-      if (response.data?.user) {
+      if (response.data?.user || response.success) {
         setIsSuccessful(true)
       }
     } catch (error: unknown) {
@@ -127,7 +127,7 @@ export function RegisterForm({
 
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: redirectTo || '/dashboard',
+        callbackURL: redirectTo ?? '/dashboard',
       })
       // OAuth redirects automatically, so no need to handle redirect here
     } catch (error: unknown) {

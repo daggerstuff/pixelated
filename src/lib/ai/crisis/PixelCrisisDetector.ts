@@ -33,14 +33,14 @@ export interface PixelCrisisDetectorConfig {
 }
 
 export class PixelCrisisDetector {
-  private config: Required<PixelCrisisDetectorConfig>
+  private readonly config: Required<PixelCrisisDetectorConfig>
   private conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
   constructor(config: PixelCrisisDetectorConfig = {}) {
     this.config = {
-      pixelApiUrl: config.pixelApiUrl || 'http://localhost:8001',
-      pixelApiKey: config.pixelApiKey || '',
-      timeoutMs: config.timeoutMs || 5000,
+      pixelApiUrl: config.pixelApiUrl ?? 'http://localhost:8001',
+      pixelApiKey: config.pixelApiKey ?? '',
+      timeoutMs: config.timeoutMs ?? 5000,
       fallbackToKeywords: config.fallbackToKeywords ?? true,
     }
   }
@@ -130,7 +130,7 @@ export class PixelCrisisDetector {
       if (!response.ok) {
         const error = await response.json()
         throw new Error(
-          `Pixel API error: ${error.detail || response.statusText}`,
+          `Pixel API error: ${error.detail ?? response.statusText}`,
         )
       }
 
@@ -200,7 +200,7 @@ export class PixelCrisisDetector {
       expertGuided: true,
       scores: {
         riskLevel,
-        crisisSignals: metadata?.crisis_signals?.length || 0,
+        crisisSignals: metadata?.crisis_signals?.length ?? 0,
       },
       summary: `Crisis analysis completed with ${riskLevel} risk.`,
       supportingEvidence: indicators.flatMap((indicator) => indicator.evidence),

@@ -17,15 +17,8 @@ export function Header({
   className,
   position = 'fixed',
 }: HeaderProps) {
-  // Use null as initial state for safe hydration
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean | null>(null)
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean | null>(null)
-
-  // Initialize state on client-side only
-  useEffect(() => {
-    setMobileMenuOpen(false)
-    setIsSearchOpen(false)
-  }, [])
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false)
 
   // Handle keyboard shortcut for search (Cmd+K)
   useEffect(() => {
@@ -39,44 +32,6 @@ export function Header({
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
-
-  // Safe check for client-side rendering
-  const isBrowser = typeof window !== 'undefined'
-
-  // Only render full interactive content on client-side
-  if (!isBrowser || mobileMenuOpen === null || isSearchOpen === null) {
-    return (
-      <header
-        className={cn(
-          'z-30 w-full bg-card border-b border-border',
-          position === 'fixed'
-            ? 'fixed'
-            : position === 'sticky'
-              ? 'sticky top-0'
-              : 'static',
-          className,
-        )}
-      >
-        <div className='px-3 py-3 lg:px-5 lg:pl-3'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center justify-start'>
-              <a href='/' className='ml-2 flex md:mr-24'>
-                <img
-                  src='/favicon.svg'
-                  className='mr-3 h-8'
-                  alt='Pixelated Empathy Logo'
-                />
-
-                <span className='brand-title self-center whitespace-nowrap text-xl font-semibold sm:text-2xl'>
-                  Pixelated Empathy
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-    )
-  }
 
   return (
     <header

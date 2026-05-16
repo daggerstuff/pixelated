@@ -73,8 +73,8 @@ test('login form shows validation errors', async ({ page }) => {
     () => {
       const emailErrorEl = document.getElementById('email-error')
       const passwordErrorEl = document.getElementById('password-error')
-      const emailText = emailErrorEl?.textContent?.trim() || ''
-      const passwordText = passwordErrorEl?.textContent?.trim() || ''
+      const emailText = emailErrorEl?.textContent?.trim() ?? ''
+      const passwordText = passwordErrorEl?.textContent?.trim() ?? ''
       return (
         emailText.length > 0 &&
         /required|email/i.test(emailText) &&

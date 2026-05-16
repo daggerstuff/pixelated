@@ -571,7 +571,10 @@ export const ALL_BIAS_TEST_CASES: BiasTestCase[] = [
 /**
  * Ground truth annotations for validation
  */
-export const GROUND_TRUTH_LABELS = ALL_BIAS_TEST_CASES.reduce(
+export const GROUND_TRUTH_LABELS = ALL_BIAS_TEST_CASES.reduce< Record<
+    string,
+    { category: string; severity: string; biasScore: number; hasBias: boolean }
+  >>(
   (acc, testCase) => {
     acc[testCase.id] = {
       category: testCase.category,
@@ -581,10 +584,7 @@ export const GROUND_TRUTH_LABELS = ALL_BIAS_TEST_CASES.reduce(
     }
     return acc
   },
-  {} as Record<
-    string,
-    { category: string; severity: string; biasScore: number; hasBias: boolean }
-  >,
+  {},
 )
 
 /**

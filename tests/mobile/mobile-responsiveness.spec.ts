@@ -49,7 +49,7 @@ test.describe('Mobile Responsiveness All Devices', () => {
       const mainContent = page.locator('[data-testid="main-content"]')
       if (await mainContent.isVisible()) {
         const contentBox = await mainContent.boundingBox()
-        expect(contentBox?.width).toBeLessThanOrEqual(viewport?.width || 0)
+        expect(contentBox?.width).toBeLessThanOrEqual(viewport?.width ?? 0)
       }
 
       // Navigation adapts to mobile
@@ -174,7 +174,7 @@ test.describe('Mobile Responsiveness All Devices', () => {
           const cardBox = await card.boundingBox()
           if (cardBox) {
             expect(cardBox.width).toBeLessThanOrEqual(
-              (page.viewportSize()?.width || 0) - 20,
+              (page.viewportSize()?.width ?? 0) - 20,
             )
           }
         }
@@ -471,7 +471,7 @@ test.describe('Mobile Edge Cases and Error Handling', () => {
 
     // Simulate slow network
     await page.route('**/*', (route) => {
-      setTimeout(() => route.continue(), 1000) // Add 1s delay
+      setTimeout( async () => route.continue(), 1000) // Add 1s delay
     })
 
     await page.goto('/demo')

@@ -13,7 +13,13 @@ const router = Router()
 router.get('/login', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
+<<<<<<< HEAD
   const redirectUri = process.env.AUTH0_CALLBACK_URL
+=======
+  const redirectUri =
+    process.env.AUTH0_CALLBACK_URL ??
+    `${req.protocol}://${req.get('host')}/api/auth/callback`
+>>>>>>> origin/staging
 
   if (!auth0Domain || !clientId || !redirectUri) {
     res.status(500).json({
@@ -59,7 +65,13 @@ router.get('/callback', async (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const clientSecret = process.env.AUTH0_CLIENT_SECRET
+<<<<<<< HEAD
   const redirectUri = process.env.AUTH0_CALLBACK_URL
+=======
+  const redirectUri =
+    process.env.AUTH0_CALLBACK_URL ??
+    `${req.protocol}://${req.get('host')}/api/auth/callback`
+>>>>>>> origin/staging
 
   if (!auth0Domain || !clientId || !clientSecret || !redirectUri) {
     res.status(500).json({
@@ -206,7 +218,7 @@ router.post('/logout', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const returnTo =
-    process.env.AUTH0_LOGOUT_URL || `${req.protocol}://${req.get('host')}`
+    process.env.AUTH0_LOGOUT_URL ?? `${req.protocol}://${req.get('host')}`
 
   if (!auth0Domain || !clientId) {
     res.status(500).json({
@@ -254,8 +266,8 @@ router.get('/me', (req: Request, res: Response) => {
       picture: user.picture,
       emailVerified: user.emailVerified,
       role: user.role,
-      roles: user.roles || [user.role].filter(Boolean),
-      permissions: user.permissions || [],
+      roles: user.roles ?? [user.role].filter(Boolean),
+      permissions: user.permissions ?? [],
     },
   })
 })

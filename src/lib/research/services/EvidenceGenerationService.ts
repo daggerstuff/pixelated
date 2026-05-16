@@ -36,9 +36,9 @@ export interface EvidenceRequest {
 }
 
 export class EvidenceGenerationService {
-  private config: EvidenceConfig
-  private patternService: PatternDiscoveryService
-  private queryEngine: ResearchQueryEngine
+  private readonly config: EvidenceConfig
+  private readonly patternService: PatternDiscoveryService
+  private readonly queryEngine: ResearchQueryEngine
 
   constructor(
     config: EvidenceConfig = {
@@ -701,7 +701,7 @@ export class EvidenceGenerationService {
     return sign * y
   }
 
-  private generatePDFReport(report: EvidenceReport): Promise<string> {
+  private  async generatePDFReport(report: EvidenceReport): Promise<string> {
     // In real implementation, use PDF generation library
     return Promise.resolve(`PDF Report: ${report.title}`)
   }

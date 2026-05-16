@@ -93,16 +93,14 @@ export function ConversionDashboard() {
     // Group by conversion ID
     const conversionTypes = {} as Record<string, ConversionEvent[]>
     conversionEvents.forEach((event) => {
-      if (!conversionTypes[event.conversionId]) {
-        conversionTypes[event.conversionId] = []
-      }
+      conversionTypes[event.conversionId] ??= [];
       conversionTypes[event.conversionId]!.push(event)
     })
 
     // Generate summary for each conversion type
     return Object.entries(conversionTypes).map(([id, events]) => {
       const totalValue = events.reduce(
-        (sum, event) => sum + (event.value || 0),
+        (sum, event) => sum + (event.value ?? 0),
         0,
       )
 
@@ -134,12 +132,10 @@ export function ConversionDashboard() {
     const sources = {} as Record<string, { count: number; value: number }>
 
     conversionEvents.forEach((event) => {
-      const source = event.source || 'direct'
-      if (!sources[source]) {
-        sources[source] = { count: 0, value: 0 }
-      }
+      const source = event.source ?? 'direct'
+      sources[source] ??= { count: 0, value: 0 };
       sources[source].count++
-      sources[source].value += event.value || 0
+      sources[source].value += event.value ?? 0
     })
 
     const totalCount = conversionEvents.length
@@ -157,12 +153,10 @@ export function ConversionDashboard() {
     const pages = {} as Record<string, { count: number; value: number }>
 
     conversionEvents.forEach((event) => {
-      const path = event.path || '(not set)'
-      if (!pages[path]) {
-        pages[path] = { count: 0, value: 0 }
-      }
+      const path = event.path ?? '(not set)'
+      pages[path] ??= { count: 0, value: 0 };
       pages[path].count++
-      pages[path].value += event.value || 0
+      pages[path].value += event.value ?? 0
     })
 
     // Page views would come from analytics in a real implementation
@@ -273,10 +267,10 @@ export function ConversionDashboard() {
       ...conversionEvents.map((event) =>
         [
           event.conversionId,
-          event.value || 0,
+          event.value ?? 0,
           new Date(event.timestamp).toISOString(),
-          event.source || 'direct',
-          event.path || '(not set)',
+          event.source ?? 'direct',
+          event.path ?? '(not set)',
         ].join(','),
       ),
     ]
@@ -670,10 +664,10 @@ export function ConversionDashboard() {
                                     : '-'}
                                 </td>
                                 <td className='px-6 py-4'>
-                                  {event.source || 'direct'}
+                                  {event.source ?? 'direct'}
                                 </td>
                                 <td className='px-6 py-4'>
-                                  {event.path || '(not set)'}
+                                  {event.path ?? '(not set)'}
                                 </td>
                               </tr>
                             ))}

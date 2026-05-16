@@ -25,9 +25,9 @@ export interface PlatformHealth {
 }
 
 export class PlatformStatusMonitor {
-  private components: Map<string, ComponentStatus> = new Map()
-  private startTime: Date = new Date()
-  private checkInterval: number = 30000 // 30 seconds
+  private readonly components: Map<string, ComponentStatus> = new Map()
+  private readonly startTime: Date = new Date()
+  private readonly checkInterval: number = 30000 // 30 seconds
   private isRunning: boolean = false
 
   constructor() {
@@ -399,7 +399,7 @@ export class PlatformStatusMonitor {
 
   async checkAllComponents(): Promise<ComponentStatus[]> {
     const componentNames = Array.from(this.components.keys())
-    const promises = componentNames.map((name) => this.checkComponent(name))
+    const promises = componentNames.map( async (name) => this.checkComponent(name))
 
     return Promise.all(promises)
   }
@@ -425,7 +425,7 @@ export class PlatformStatusMonitor {
       components,
       lastUpdated: new Date(),
       uptime: Date.now() - this.startTime.getTime(),
-      version: process.env.APP_VERSION || '1.0.0',
+      version: process.env.APP_VERSION ?? '1.0.0',
     }
   }
 
@@ -464,9 +464,7 @@ export class PlatformStatusMonitor {
 let statusMonitor: PlatformStatusMonitor | null = null
 
 export function getPlatformStatusMonitor(): PlatformStatusMonitor {
-  if (!statusMonitor) {
-    statusMonitor = new PlatformStatusMonitor()
-  }
+  statusMonitor ??= new PlatformStatusMonitor();
   return statusMonitor
 }
 

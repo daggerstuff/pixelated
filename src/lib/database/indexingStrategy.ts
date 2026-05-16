@@ -42,9 +42,9 @@ export interface IndexingPlan {
  * Intelligent Database Indexing Manager
  */
 class IndexingStrategy {
-  private config: DatabaseConfig
+  private readonly config: DatabaseConfig
   private queryPatterns: QueryPattern[] = []
-  private indexHistory = new Map<
+  private readonly indexHistory = new Map<
     string,
     { created: Date; performance: number }
   >()
