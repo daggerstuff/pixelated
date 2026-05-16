@@ -2,9 +2,9 @@ const BLOOM_FILTER_DEFAULT_THRESHOLD = 500000
 const BLOOM_FILTER_DEFAULT_FPR = 0.01
 
 export class BloomFilter {
-  private size: number
-  private hashCount: number
-  private bitArray: Uint8Array
+  private readonly size: number
+  private readonly hashCount: number
+  private readonly bitArray: Uint8Array
 
   constructor(
     expectedItems: number,
@@ -59,7 +59,7 @@ export interface DeduplicationStrategy {
 }
 
 export class SetDeduplication implements DeduplicationStrategy {
-  private _seenIds = new Set<string>()
+  private readonly _seenIds = new Set<string>()
 
   has(id: string): boolean {
     return this._seenIds.has(id)
@@ -83,9 +83,9 @@ export class SetDeduplication implements DeduplicationStrategy {
 }
 
 export class BloomFilterDeduplication implements DeduplicationStrategy {
-  private bloomFilter: BloomFilter
+  private readonly bloomFilter: BloomFilter
   private itemCount: number = 0
-  private capacity: number
+  private readonly capacity: number
 
   constructor(expectedItems: number) {
     this.bloomFilter = new BloomFilter(expectedItems)
@@ -122,10 +122,10 @@ export class HybridDeduplication implements DeduplicationStrategy {
   private setDedup: SetDeduplication | null = null
   private bloomDedup: BloomFilterDeduplication | null = null
   private switchedToBloom = false
-  private threshold: number
+  private readonly threshold: number
   private uniqueCount: number = 0
   private estimatedCapacity: number = 0
-  private onCapacityWarning?: (message: string) => void
+  private readonly onCapacityWarning?: (message: string) => void
 
   constructor(
     threshold: number = BLOOM_FILTER_DEFAULT_THRESHOLD,

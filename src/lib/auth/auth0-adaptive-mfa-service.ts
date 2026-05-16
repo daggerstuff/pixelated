@@ -14,27 +14,12 @@ export type ManagementClientOptionsWithClientCredentials = {
 }
 
 import { auth0UserService } from '../../services/auth0.service'
-
-declare module 'auth0' {
-  interface ManagementClient {
-    getLogs(params: { per_page: number; q: string }): Promise<unknown[]>
-    getGuardianEnrollments(params: { id: string }): Promise<unknown>
-    getGuardianFactors(): Promise<unknown>
-    createGuardianEnrollmentTicket(params: {
-      user_id: string
-      send_mail: boolean
-    }): Promise<unknown>
-    deleteGuardianEnrollment(params: { id: string }): Promise<void>
-    getRoles(params: { per_page?: number; page?: number }): Promise<unknown[]>
-    assignRolestoUser(params: { id: string; roles: string[] }): Promise<void>
-    removeRolesFromUser(params: { id: string; roles: string[] }): Promise<void>
-    getUserRoles(params: { id: string }): Promise<unknown[]>
-  }
-}
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
+
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
 
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
@@ -48,7 +33,9 @@ function initializeAuth0Management() {
     !auth0Config.managementClientId ||
     !auth0Config.managementClientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
@@ -140,7 +127,9 @@ export class Auth0AdaptiveMFAService {
 
   constructor() {
     if (!auth0Config.domain) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
 
     // Default configuration

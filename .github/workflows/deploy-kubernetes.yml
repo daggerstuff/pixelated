@@ -24,8 +24,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    if:
-      github.event_name == 'workflow_dispatch' || (github.event_name ==
+    if: github.event_name == 'workflow_dispatch' || (github.event_name ==
       'workflow_run' && github.event.workflow_run.conclusion == 'success')
     env:
       ARTIFACT_REGISTRY_LOCATION: us-west1
@@ -37,13 +36,12 @@ jobs:
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets['UPSTASH_REDIS_REST_TOKEN'] }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
           submodules: false
-          ref:
-            ${{ github.event_name == 'workflow_run' &&
+          ref: ${{ github.event_name == 'workflow_run' &&
             github.event.workflow_run.head_sha || github.sha }}
 
       - name: Authenticate to Google Cloud (OIDC)
@@ -98,6 +96,17 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
           echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_ENV"
 
+      - name: Validate image exists before rollout
+        run: |
+          set -euo pipefail
+          if ! gcloud artifacts docker images describe "$IMAGE_URI" >/tmp/image-describe.out 2>&1; then
+            echo "::error title=Missing image tag::Image ${IMAGE_URI} does not exist in Artifact Registry."
+            echo "Inspecting available image tags for repository ${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/api."
+            gcloud artifacts docker images list "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/api" --include-tags --format="table(name, tags)" | head -n 40
+            exit 1
+          fi
+          echo "Validated image exists: ${IMAGE_URI}"
+
       - name: Validate workflow inputs
         env:
           GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
@@ -120,6 +129,10 @@ jobs:
           [[ -n "$JWT_SECRET" ]] || { echo "Missing secret: JWT_SECRET"; exit 1; }
           [[ -n "$API_KEY" ]] || { echo "Missing secret: API_KEY"; exit 1; }
 
+      - name: Run pre-deployment Redis hardening audit
+        run: |
+          bash ./scripts/check-redis-hardening.sh
+
       - name: Validate deployment kustomize overlay
         run: |
           KUSTOMIZATION_DIR="k8s/overlays/staging"
@@ -137,8 +150,7 @@ jobs:
         run: kubectl apply -k k8s/overlays/staging
 
       - name: Update k8s deployment image
-        run:
-          kubectl set image deployment/pixelated-empathy-api
+        run: kubectl set image deployment/pixelated-empathy-api
           "pixelated-empathy-api=$IMAGE_URI" -n pixelated-empathy
 
       - name: Render and apply runtime secrets
@@ -153,8 +165,7 @@ jobs:
             ./scripts/render-k8s-secrets.sh
 
       - name: Restart to apply updated runtime secrets
-        run:
-          kubectl rollout restart deployment/pixelated-empathy-api -n
+        run: kubectl rollout restart deployment/pixelated-empathy-api -n
           pixelated-empathy
 
       - name: Wait for rollout

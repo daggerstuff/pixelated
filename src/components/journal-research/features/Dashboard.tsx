@@ -7,7 +7,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import {
   useSessionListQuery,
   useSessionQuery,

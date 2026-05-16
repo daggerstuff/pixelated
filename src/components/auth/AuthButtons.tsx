@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 // Remove AuthProvider wrapper dependency if possible, but keep structure for now if needed
 
 const AuthButtonsInner = () => {
@@ -21,14 +21,14 @@ const AuthButtonsInner = () => {
           {user?.avatarUrl ? (
             <img
               src={user.avatarUrl}
-              alt={user.fullName || user.email}
+              alt={user.fullName ?? user.email}
               className='mr-2 inline-block h-8 w-8 rounded-full'
             />
           ) : null}
-          {user?.fullName || user?.email}
+          {user?.fullName ?? user?.email}
         </div>
         <button
-          onClick={() => authClient.signOut()}
+          onClick={ async () => authClient.signOut()}
           className='text-slate-300 hover:text-white text-sm font-medium transition-colors'
         >
           Log out

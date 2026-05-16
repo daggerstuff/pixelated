@@ -2,9 +2,14 @@
 # Install or update the backup-home-vivi systemd service/timer and restart the timer.
 
 set -euo pipefail
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+ 
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 SYSTEMD_SOURCE_DIR="$PROJECT_ROOT/scripts/systemd"
 SYSTEMD_TARGET_DIR="/etc/systemd/system"
 SERVICE_NAME="backup-home-vivi.service"
@@ -15,6 +20,7 @@ BACKUP_SERVICE_TARGET="$SYSTEMD_TARGET_DIR/$SERVICE_NAME"
 BACKUP_TIMER_TARGET="$SYSTEMD_TARGET_DIR/$TIMER_NAME"
 BACKUP_OVERRIDES_DIR="$SYSTEMD_TARGET_DIR/${SERVICE_NAME}.d"
 BACKUP_OVERRIDES_FILE="$BACKUP_OVERRIDES_DIR/10-local-env.conf"
+BACKUP_LEGACY_OVERRIDE_FILE="$BACKUP_OVERRIDES_DIR/override.conf"
 
 usage() {
   cat <<'USAGE'
@@ -156,6 +162,11 @@ echo "[info] Copying systemd service/timer files..."
 "${SUDO[@]}" install -m 0644 "$BACKUP_SERVICE_SOURCE" "$BACKUP_SERVICE_TARGET"
 "${SUDO[@]}" install -m 0644 "$BACKUP_TIMER_SOURCE" "$BACKUP_TIMER_TARGET"
 
+if [[ -f "$BACKUP_LEGACY_OVERRIDE_FILE" ]]; then
+  echo "[info] Removing legacy override drop-in: $BACKUP_LEGACY_OVERRIDE_FILE"
+  "${SUDO[@]}" rm -f "$BACKUP_LEGACY_OVERRIDE_FILE"
+fi
+
 echo "[info] Applying optional environment overrides..."
 build_override_file
 
@@ -174,3 +185,8 @@ echo "[info] Current timer status:"
 
 echo
 echo "[success] Backup service update complete."
+echo
+echo "[help] To run a one-off backup without blocking this terminal:"
+echo "  sudo /home/vivi/pixelated/scripts/backup/run-backup-home-vivi-now.sh"
+echo "  # add a second argument of 0 to skip live tail"
+echo "  sudo /home/vivi/pixelated/scripts/backup/run-backup-home-vivi-now.sh backup-home-vivi.service 0"

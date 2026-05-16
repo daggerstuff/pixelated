@@ -101,19 +101,29 @@ vi.mock('bcryptjs', () => ({
   genSalt: vi.fn(),
 }))
 
+
 // Mock Node.js built-in modules with node: prefix
+const { mockRandomBytes, mockRandomUUID } = vi.hoisted(() => ({
+  mockRandomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
+  mockRandomUUID: vi.fn().mockReturnValue('test-uuid'),
+}))
+
 vi.mock('node:buffer', () => ({
   Buffer: globalThis.Buffer,
 }))
 
 vi.mock('node:crypto', () => ({
-  default: {
-    randomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
-    randomUUID: vi.fn().mockReturnValue('test-uuid'),
-  },
-  randomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
-  randomUUID: vi.fn().mockReturnValue('test-uuid'),
+  Buffer: globalThis.Buffer,
+  createHash: vi.fn(),
+  createHmac: vi.fn(),
+  randomBytes: mockRandomBytes,
+  randomUUID: mockRandomUUID,
+  randomFillSync: vi.fn(),
+  pbkdf2Sync: vi.fn(),
+  randomFill: vi.fn(),
+  randomInt: vi.fn(),
 }))
+
 
 import {
   GET as profileGetHandler,
@@ -686,9 +696,13 @@ describe('Authentication System Integration', () => {
         },
       )
 
-      await refreshHandler({
+      const refreshContext = {
         request: refreshRequest,
-      } as Parameters<typeof refreshHandler>[0])
+        clientAddress: mockClientInfo.ip,
+      }
+
+      // @ts-expect-error APIRoute context type requires full Astro API context in tests.
+      await refreshHandler(refreshContext)
 
       expect(
         mockPhase6.updatePhase6AuthenticationProgress,

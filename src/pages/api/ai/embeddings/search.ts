@@ -141,7 +141,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     const searchRequest: SimilaritySearchRequest = validation.data
 
     const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+      import.meta.env['EMBEDDING_AGENT_URL'] ?? 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {

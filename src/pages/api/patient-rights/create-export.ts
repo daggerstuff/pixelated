@@ -20,7 +20,7 @@ async function therapistHasSessionWithPatient(
   patientId: string,
 ): Promise<boolean> {
   try {
-    await initializeDatabase()
+     initializeDatabase()
     const result = await query<{ exists: boolean }>(
       `SELECT EXISTS (
         SELECT 1 FROM sessions

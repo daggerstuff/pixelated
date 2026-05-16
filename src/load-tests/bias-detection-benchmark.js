@@ -116,11 +116,11 @@ export const options = {
 }
 
 // Base configuration
-const BASE_URL = globalThis.__ENV?.BASE_URL || 'http://localhost:3000'
+const BASE_URL = globalThis.__ENV?.BASE_URL ?? 'http://localhost:3000'
 const API_BASE = `${BASE_URL}/api/bias-detection`
 
 // Authentication token (in real scenario, this would be dynamic)
-const AUTH_TOKEN = globalThis.__ENV?.AUTH_TOKEN || 'test-token-123'
+const AUTH_TOKEN = globalThis.__ENV?.AUTH_TOKEN ?? 'test-token-123'
 
 // Sample therapeutic session data for testing
 const SAMPLE_SESSIONS = [
@@ -244,7 +244,7 @@ function generatePatientPresentation(scenarioType) {
   }
 
   return (
-    presentations[scenarioType] ||
+    presentations[scenarioType] ??
     'Patient presents with general mental health concerns.'
   )
 }
@@ -325,8 +325,7 @@ export default function () {
           const body = JSON.parse(r.body)
           return (
             body.success &&
-            body.data &&
-            body.data.overallBiasScore !== undefined
+            body.data?.overallBiasScore !== undefined
           )
         } catch {
           return false

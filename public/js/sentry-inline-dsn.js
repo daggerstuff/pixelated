@@ -6,5 +6,5 @@
     ? sentryDsnElement.getAttribute('data-dsn')
     : null
 
-  window.PUBLIC_SENTRY_DSN = sentryDsn || null
+  window.PUBLIC_SENTRY_DSN = sentryDsn ?? null
 })()

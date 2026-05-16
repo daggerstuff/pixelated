@@ -289,7 +289,7 @@ scripts/run-simple-integrated-pipeline.py
 scripts/run-standalone-integrated-pipeline.py
 scripts/*.ipynb
 tests/scripts/
-# Beads / Dolt files (added by bd init)
+# Beads: local-only cache (Linear is source of truth; see .beads/config.yaml)
 .beads-credential-key
 .beads/
 .scannerwork
@@ -341,3 +341,6 @@ ai/.moderne
 HANDOFF.md
 
 .omc
+.foresight
+job.md
+test.md

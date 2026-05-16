@@ -68,7 +68,7 @@ export function useBiasDashboardWebSocket({
       try {
         setWsConnectionStatus('connecting')
         const wsUrl =
-          process.env['NEXT_PUBLIC_WS_URL'] ||
+          process.env['NEXT_PUBLIC_WS_URL'] ??
           'ws://localhost:8000/bias-detection'
 
         const ws = new WebSocket(wsUrl) as ExtendedWebSocket

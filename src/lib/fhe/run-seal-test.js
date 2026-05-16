@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/// <reference path="./run-seal-test.d.ts" />
 
 /**
  * SEAL Integration Test Runner
@@ -9,25 +10,50 @@
  * Usage: node run-seal-test.js
  */
 
+
+import { execSync } from 'node:child_process'
+import path from 'node:path'
+import fs from 'node:fs'
+import process from 'node:process'
+
+const toErrorMessage = (error) => {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  try {
+    const serialized = JSON.stringify(error)
+    return serialized || 'Unknown error'
+  } catch {
+    return String(error)
+  }
+}
+
 // First, compile the TypeScript file
-const { execSync } = require('child_process')
-const path = require('path')
-const fs = require('fs')
 
 console.log('SEAL FHE Integration Test Runner')
 console.log('================================')
 
 // Determine if we're running from the repo root or from the fhe directory
+/** @type {string} */
 const currentDir = process.cwd()
 const isInFheDir = currentDir.endsWith('fhe')
+/** @type {string} */
 const repoRoot = isInFheDir ? path.resolve('../../') : currentDir
+/** @type {string} */
 const fheDir = isInFheDir
   ? currentDir
   : path.join(currentDir, 'src', 'lib', 'fhe')
 
 // Path to the test file
+/** @type {string} */
 const testFilePath = path.join(fheDir, 'test-seal-integration.ts')
+/** @type {string} */
 const outputDir = path.join(fheDir, '.test-output')
+/** @type {string} */
+const compiledTestPath = path.join(outputDir, 'test-seal-integration.js')
 
 // Ensure output directory exists
 if (!fs.existsSync(outputDir)) {
@@ -52,7 +78,7 @@ try {
   console.log('\nRunning SEAL integration test...')
   console.log('--------------------------------')
 
-  execSync(`node ${path.join(outputDir, 'test-seal-integration.js')}`, {
+  execSync(`node ${compiledTestPath}`, {
     stdio: 'inherit',
     cwd: repoRoot,
   })
@@ -60,7 +86,8 @@ try {
   console.log('\nSEAL integration test completed successfully')
 } catch (error) {
   console.error('\nError running SEAL integration test:')
-  console.error(error.message)
+  const errorMessage = toErrorMessage(error)
+  console.error(errorMessage)
   process.exit(1)
 } finally {
   // Clean up the output directory

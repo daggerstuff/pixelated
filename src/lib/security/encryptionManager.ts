@@ -38,10 +38,10 @@ export interface KeyMetadata {
  * Advanced Encryption Manager
  */
 class EncryptionManager {
-  private config: EncryptionConfig
+  private readonly config: EncryptionConfig
   private currentKeyId: string | null = null
-  private keyStore = new Map<string, CryptoKey>()
-  private keyMetadata = new Map<string, KeyMetadata>()
+  private readonly keyStore = new Map<string, CryptoKey>()
+  private readonly keyMetadata = new Map<string, KeyMetadata>()
 
   constructor(config: EncryptionConfig) {
     this.config = {
@@ -160,7 +160,7 @@ class EncryptionManager {
    * Encrypt data with perfect forward secrecy
    */
   async encrypt(data: string, keyId?: string): Promise<EncryptedData> {
-    const targetKeyId = keyId || this.currentKeyId
+    const targetKeyId = keyId ?? this.currentKeyId
     if (!targetKeyId) {
       throw new Error('No encryption key available')
     }
@@ -381,7 +381,7 @@ class EncryptionManager {
    */
   getCurrentKeyInfo(): KeyMetadata | null {
     if (!this.currentKeyId) return null
-    return this.keyMetadata.get(this.currentKeyId) || null
+    return this.keyMetadata.get(this.currentKeyId) ?? null
   }
 
   /**

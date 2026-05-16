@@ -82,8 +82,8 @@ export interface ConversationContext {
  */
 export class PromptOptimizerService {
   private static instance: PromptOptimizerService
-  private optimizationHistory: Map<string, PromptOptimization[]> = new Map()
-  private summaryCache: Map<string, ConversationSummary> = new Map()
+  private readonly optimizationHistory: Map<string, PromptOptimization[]> = new Map()
+  private readonly summaryCache: Map<string, ConversationSummary> = new Map()
 
   private constructor() {
     logger.info('PromptOptimizerService initialized')
@@ -507,7 +507,7 @@ export class PromptOptimizerService {
 
     // Intervention recommendations
     const effectiveInterventions = context.interventions.filter(
-      (i) => i.outcome && i.outcome.toLowerCase().includes('helpful'),
+      (i) => i.outcome?.toLowerCase().includes('helpful'),
     )
 
     if (effectiveInterventions.length > 0) {

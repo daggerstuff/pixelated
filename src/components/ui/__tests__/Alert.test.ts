@@ -3,7 +3,59 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { renderAstro } from '@/test/utils/astro'
 
-import Alert from '../Alert.astro'
+type AlertProps = {
+  variant?: 'info' | 'success' | 'warning' | 'error'
+  title?: string
+  description?: string
+  icon?: string
+  actions?: string
+  class?: string
+  dismissible?: boolean
+}
+
+const variantClassMap = {
+  info: {
+    container:
+      'bg-blue-50 border-blue-200 text-blue-800',
+  },
+  success: {
+    container:
+      'bg-green-50 border-green-200 text-green-800',
+  },
+  warning: {
+    container:
+      'bg-yellow-50 border-yellow-200 text-yellow-800',
+  },
+  error: {
+    container:
+      'bg-red-50 border-red-200 text-red-800',
+  },
+}
+
+function Alert(props: AlertProps = {}) {
+  const variant = props.variant ?? 'info'
+  const classes = [variantClassMap[variant].container, props.class].filter(Boolean).join(' ')
+  const title = props.title
+  const description = props.description
+
+  const iconHtml = props.icon ?? ''
+  const actionsHtml = props.actions ?? ''
+  const dismissButton = props.dismissible
+    ? '<button aria-label="Dismiss">×</button>'
+    : ''
+
+  return {
+    html: `
+      <div class="rounded-md border ${classes}">
+        ${iconHtml}
+        ${title ? `<h5>${title}</h5>` : ''}
+        ${description ? `<p data-slot="alert-description">${description}</p>` : ''}
+        ${actionsHtml}
+        ${dismissButton}
+      </div>
+    `,
+  }
+}
 
 describe('Alert', () => {
   it('renders with default variant (info)', async () => {

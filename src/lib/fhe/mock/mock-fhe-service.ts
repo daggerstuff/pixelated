@@ -18,6 +18,31 @@ import type {
   FHEService,
 } from '../types'
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isMockEncryptedData = (value: unknown): value is MockEncryptedData => {
+  return isRecord(value) && typeof value.originalValue === 'string'
+}
+
+const isStringRecord = (value: unknown): value is Record<string, string[]> => {
+  if (!isRecord(value)) {
+    return false
+  }
+  return Object.values(value).every((entry) => Array.isArray(entry))
+}
+
+const operationValues = new Set<string>()
+for (const operation of Object.values(FHEOperation)) {
+  if (typeof operation === 'string') {
+    operationValues.add(operation)
+  }
+}
+
+const isFHEOperation = (value: string): value is FHEOperation => {
+  return operationValues.has(value)
+}
+
 const logger = createBuildSafeLogger('mock-fhe')
 
 /**
@@ -133,8 +158,8 @@ export class MockFHEService implements FHEService {
    * Mock encrypt data
    * Implements the encrypt method from FHEService interface
    */
-  public async encrypt<T>(
-    value: T,
+  public async encrypt(
+    value: unknown,
     _options?: unknown,
   ): Promise<EncryptedData> {
     this.checkInitialized()
@@ -153,7 +178,7 @@ export class MockFHEService implements FHEService {
     }
 
     // Create mock encrypted data
-    const encrypted: MockEncryptedData<T> = {
+    const encrypted: MockEncryptedData = {
       id: nanoid(),
       mockId: nanoid(6),
       data: value,
@@ -176,35 +201,21 @@ export class MockFHEService implements FHEService {
    * Implements the decrypt method from FHEService interface
    */
   public async decrypt<T>(
-    encryptedData: EncryptedData,
+    encryptedData: EncryptedData<T>,
     _options?: unknown,
   ): Promise<T> {
     this.checkInitialized()
 
-    // Handle both MockEncryptedData and standard EncryptedData
-    const mockData = encryptedData as unknown as MockEncryptedData<T>
-
-    if (!mockData || !mockData.originalValue) {
+    if (!isMockEncryptedData(encryptedData)) {
       // Try to extract data from standard EncryptedData
-      if (encryptedData && encryptedData.data) {
-        try {
-          return encryptedData.data as T
-        } catch {
-          throw new Error('Invalid encrypted data format')
-        }
+      if (isRecord(encryptedData) && encryptedData.data !== undefined) {
+        return encryptedData.data
       }
       throw new Error('Invalid mock encrypted data')
     }
 
     logger.info('Mock decrypting data')
-
-    // Parse the original value
-    try {
-      // Use the mockData which has been cast to MockEncryptedData<T>
-      return JSON.parse(mockData.originalValue) as unknown as T
-    } catch {
-      throw new Error('Failed to decrypt data')
-    }
+    return encryptedData.data
   }
 
   /**
@@ -222,27 +233,27 @@ export class MockFHEService implements FHEService {
     // Parse the encrypted data
     let data: MockEncryptedData
     try {
-      data = JSON.parse(encryptedData) as unknown as MockEncryptedData
+      const parsedData: unknown = JSON.parse(encryptedData)
+      if (!isMockEncryptedData(parsedData)) {
+        throw new Error('Invalid encrypted data format')
+      }
+      data = parsedData
     } catch {
       throw new Error('Invalid encrypted data format')
     }
 
     // Process based on operation
-    switch (operation) {
-      case FHEOperation.SENTIMENT:
-        return this.mockSentimentAnalysis(data)
-
-      case FHEOperation.CATEGORIZE:
-        return this.mockCategorization(data, params)
-
-      case FHEOperation.ANALYZE:
-        return this.mockPIIDetection(data, params)
-
-      default:
-        throw new Error(
-          `Operation ${operation} not implemented in mock service`,
-        )
+    const normalizedOperation = isFHEOperation(operation) ? operation : FHEOperation.CUSTOM
+    if (normalizedOperation === FHEOperation.SENTIMENT) {
+      return this.mockSentimentAnalysis(data)
     }
+    if (normalizedOperation === FHEOperation.CATEGORIZE) {
+      return this.mockCategorization(data, params)
+    }
+    if (normalizedOperation === FHEOperation.ANALYZE) {
+      return this.mockPIIDetection(data, params)
+    }
+    throw new Error(`Operation ${normalizedOperation} not implemented in mock service`)
   }
 
   /**
@@ -390,8 +401,11 @@ export class MockFHEService implements FHEService {
     }
 
     // Use provided categories if available
-    const categoryMap =
-      (params?.['categories'] as Record<string, string[]>) || categories
+    const categoryMap: Record<string, string[]> = isStringRecord(
+      params?.categories,
+    )
+      ? params.categories
+      : categories
 
     try {
       const originalText = JSON.parse(data.originalValue) as unknown
@@ -404,6 +418,9 @@ export class MockFHEService implements FHEService {
         for (const [category, keywords] of Object.entries(categoryMap)) {
           let count = 0
           for (const keyword of keywords) {
+            if (typeof keyword !== 'string') {
+              continue
+            }
             if (text.includes(keyword.toLowerCase())) {
               count++
             }

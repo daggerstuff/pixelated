@@ -4,7 +4,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 // Supabase import removed - migrated to MongoDB
 // Create our own audit logging service since the actual one has different signature
 class AuditLoggingService {
-  private context: string
+  private readonly context: string
 
   constructor(context: string) {
     this.context = context
@@ -362,6 +362,8 @@ export async function getDataExportDetails(
       case 'failed':
         progress = 100
         break
+      case "cancelled": { throw new Error('Not implemented yet: "cancelled" case') }
+      case "expired": { throw new Error('Not implemented yet: "expired" case') }
       default:
         progress = 0
     }
@@ -780,7 +782,7 @@ export async function cancelDataExportRequest(
 
     // Update the export request status to 'cancelled'
     await updateExportStatus(params.exportId, 'failed', {
-      errorMessage: `Cancelled by user: ${params.reason || 'No reason provided'}`,
+      errorMessage: `Cancelled by user: ${params.reason ?? 'No reason provided'}`,
     })
 
     // Audit log the cancellation
@@ -791,7 +793,7 @@ export async function cancelDataExportRequest(
       userId: params.cancelledBy,
       details: {
         exportId: params.exportId,
-        reason: params.reason || 'No reason provided',
+        reason: params.reason ?? 'No reason provided',
       },
     })
 
@@ -917,6 +919,9 @@ export async function downloadDataExport(
         case 'processing':
           progress = 50
           break
+        case "cancelled": { throw new Error('Not implemented yet: "cancelled" case') }
+        case "expired": { throw new Error('Not implemented yet: "expired" case') }
+        case "failed": { throw new Error('Not implemented yet: "failed" case') }
         default:
           progress = 0
       }
@@ -975,7 +980,7 @@ export async function downloadDataExport(
         userId,
         details: {
           exportId,
-          format: format || typedExportRequest.dataFormat,
+          format: format ?? typedExportRequest.dataFormat,
         },
       })
 
@@ -984,12 +989,12 @@ export async function downloadDataExport(
       logger.info('Export download URL provided', {
         exportId,
         userId,
-        format: format || typedExportRequest.dataFormat,
+        format: format ?? typedExportRequest.dataFormat,
       })
 
       return {
         success: true,
-        format: format || typedExportRequest.dataFormat,
+        format: format ?? typedExportRequest.dataFormat,
         downloadUrl: typedExportRequest.downloadUrl,
         expiresAt: expirationDate.toISOString(),
       }
@@ -1050,7 +1055,7 @@ const mockDb = {
   ...db,
   // Add mock implementations for missing models
   patient: {
-    findUnique: (_params: MockDbFindParams): Promise<Patient | null> => {
+    findUnique:  async (_params: MockDbFindParams): Promise<Patient | null> => {
       return Promise.resolve({
         id: _params.where['id'] as string,
         name: 'Test Patient',
@@ -1059,19 +1064,19 @@ const mockDb = {
   },
   // dataExport and exportFile removed - now using dataExportDAO
   patientUser: {
-    findFirst: (_params: { where: unknown }): Promise<PatientUser | null> => {
+    findFirst:  async (_params: { where: unknown }): Promise<PatientUser | null> => {
       return Promise.resolve(null)
     },
   },
   providerPatientAccess: {
-    findFirst: (_params: {
+    findFirst:  async (_params: {
       where: unknown
     }): Promise<ProviderPatientAccess | null> => {
       return Promise.resolve(null)
     },
   },
   user: {
-    findUnique: (_params: MockDbFindParams): Promise<User | null> => {
+    findUnique:  async (_params: MockDbFindParams): Promise<User | null> => {
       return Promise.resolve({
         id: _params.where['id'] as string,
         roles: [{ name: 'user' }],

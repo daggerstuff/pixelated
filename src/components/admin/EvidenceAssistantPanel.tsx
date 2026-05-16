@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { useEvidenceAssistant } from '@/hooks/useEvidenceAssistant'
-import type { EvidenceCollection } from '@/lib/evidence-assistant/types'
+import { useEvidenceAssistant } from '../../hooks/useEvidenceAssistant'
+import type { EvidenceCollection } from '../../lib/evidence-assistant/types'
 
 const COLLECTION_OPTIONS: Array<{
   label: string

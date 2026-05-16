@@ -42,15 +42,15 @@ class SecurityManager:
             pbkdf2_iterations: PBKDF2 iterations (default: 100000, recommend 600000+)
         """
         self.pbkdf2_iterations = pbkdf2_iterations
+        encryption_password = encryption_password or os.getenv("ENCRYPTION_PASSWORD")
+        encryption_salt = encryption_salt or os.getenv("ENCRYPTION_SALT")
         self.encryption_key = self._generate_encryption_key(
             encryption_password, encryption_salt
         )
         self.fernet = Fernet(self.encryption_key)
-        self.jwt_secret_key = jwt_secret_key
+        self.jwt_secret_key = jwt_secret_key or os.getenv("JWT_SECRET_KEY")
 
-    def _generate_encryption_key(
-        self, password: str | None, salt: str | None
-    ) -> bytes:
+    def _generate_encryption_key(self, password: str | None, salt: str | None) -> bytes:
         """
         Generate encryption key using PBKDF2.
 
@@ -95,7 +95,9 @@ class SecurityManager:
         """Create a cryptographic hash of a session ID."""
         return hashlib.sha256(session_id.encode()).hexdigest()
 
-    def verify_jwt_token(self, token: str, secret_key: str | None = None) -> dict[str, Any]:
+    def verify_jwt_token(
+        self, token: str, secret_key: str | None = None
+    ) -> dict[str, Any]:
         """Verify JWT token and return payload."""
         effective_secret = secret_key or self.jwt_secret_key
         if not effective_secret:
@@ -119,12 +121,14 @@ class AuditLogger:
     service (e.g., AWS CloudWatch Logs, Splunk, ELK stack).
     """
 
-    def __init__(self, security_manager: SecurityManager, audit_log_path: str | None = None):
+    def __init__(
+        self, security_manager: SecurityManager, audit_log_path: str | None = None
+    ):
         self.security_manager = security_manager
         # Use environment variable for production path, default to /var/log/ for HIPAA compliance
         self.audit_log_path = audit_log_path or os.environ.get(
             "AUDIT_LOG_PATH",
-            "/tmp/bias_detection_audit.log"  # Temporary default - change for production
+            "/tmp/bias_detection_audit.log",  # Temporary default - change for production
         )
 
     async def log_event(
@@ -159,8 +163,7 @@ class AuditLogger:
             # Use run_in_executor to avoid blocking the event loop
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
-                None,
-                partial(self._write_audit_log, audit_entry)
+                None, partial(self._write_audit_log, audit_entry)
             )
             logger.info("Audit event logged: %s for user: %s", event_type, user_id)
         except Exception as e:
@@ -177,4 +180,3 @@ class AuditLogger:
         """
         with open(self.audit_log_path, "a") as f:
             f.write(json.dumps(audit_entry) + "\n")
-

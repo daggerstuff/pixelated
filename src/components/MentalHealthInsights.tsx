@@ -1,7 +1,7 @@
 import { AlertTriangle, Heart, Brain, Shield, Zap } from 'lucide-react'
 import { FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge/index.ts'
 import { type EnhancedMentalHealthAnalysis } from '@/lib/mental-health/types'
 
 interface MentalHealthInsightsProps {

@@ -13,8 +13,8 @@ const logger = createBuildSafeLogger('threat-detection-system')
 
 // Production-ready threat detection service
 class ProductionThreatDetectionService {
-  private enabled: boolean
-  private riskThresholds: {
+  private readonly enabled: boolean
+  private readonly riskThresholds: {
     low: number
     medium: number
     high: number
@@ -81,7 +81,7 @@ class ProductionThreatDetectionService {
 
     // Payload analysis
     if (request.body || request.query) {
-      score += await this.analyzePayload(request.body || request.query)
+      score += await this.analyzePayload(request.body ?? request.query)
     }
 
     // User agent analysis
@@ -280,7 +280,7 @@ class ProductionThreatDetectionService {
         .toArray()
 
       return (
-        stats[0] || {
+        stats[0] ?? {
           totalThreats: 0,
           blockedRequests: 0,
           averageRiskScore: 0,
@@ -301,14 +301,14 @@ class ProductionThreatDetectionService {
 
 // Production-ready monitoring service
 class ProductionMonitoringService extends EventEmitter {
-  private enabled: boolean
+  private readonly enabled: boolean
   private metrics: Array<{
     name: string
     value: number
     timestamp: Date
     tags?: Record<string, string>
   }> = []
-  private alerts: Array<{
+  private readonly alerts: Array<{
     id: string
     severity: string
     metric: string
@@ -484,9 +484,9 @@ class ProductionMonitoringService extends EventEmitter {
 
 // Production-ready hunting service
 class ProductionHuntingService extends EventEmitter {
-  private enabled: boolean
+  private readonly enabled: boolean
   private running = false
-  private investigations: Map<string, any> = new Map()
+  private readonly investigations: Map<string, any> = new Map()
 
   constructor(config: any = {}) {
     super()
@@ -539,7 +539,7 @@ class ProductionHuntingService extends EventEmitter {
       threatId: sanitize(params.threatId),
       userId: sanitize(params.userId),
       severity: params.severity,
-      templateId: params.templateId || 'default',
+      templateId: params.templateId ?? 'default',
       description: params.description ? sanitize(params.description) : '',
       status: 'running',
       startedAt: new Date(),
@@ -555,7 +555,7 @@ class ProductionHuntingService extends EventEmitter {
 
     setTimeout(() => {
       const inv = this.investigations.get(investigation.id)
-      if (inv && inv.status === 'running') {
+      if (inv?.status === 'running') {
         inv.status = 'completed'
         inv.result = {
           findings: [],
@@ -569,7 +569,7 @@ class ProductionHuntingService extends EventEmitter {
   }
 
   async getInvestigationResult(investigationId: string): Promise<any> {
-    return this.investigations.get(investigationId) || null
+    return this.investigations.get(investigationId) ?? null
   }
 
   async getActiveInvestigations(): Promise<any[]> {
@@ -619,10 +619,10 @@ class ProductionHuntingService extends EventEmitter {
 
 // Production-ready intelligence service
 class ProductionIntelligenceService extends EventEmitter {
-  private enabled: boolean
+  private readonly enabled: boolean
   private running = false
-  private iocs: Array<any> = []
-  private cache: Map<string, any> = new Map()
+  private readonly iocs: Array<any> = []
+  private readonly cache: Map<string, any> = new Map()
   private intervals: NodeJS.Timeout[] = []
 
   constructor(config: any = {}) {
@@ -698,7 +698,7 @@ class ProductionIntelligenceService extends EventEmitter {
           throw new Error(`Feed ${feed.name} returned HTTP ${response.status}`)
         }
         const data = await response.json()
-        const indicators = data.data || data.results || []
+        const indicators = (data.data ?? data.results) ?? []
         for (const indicator of indicators) {
           this.iocs.push({
             ...indicator,
@@ -757,7 +757,7 @@ class ProductionIntelligenceService extends EventEmitter {
         return {
           found: true,
           intelligence: [intelligence],
-          sources: [intelligence.source || 'internal'],
+          sources: [intelligence.source ?? 'internal'],
         }
       }
 
@@ -821,32 +821,32 @@ export function createCompleteThreatDetectionSystem(
       // Security events → monitoring
       if (orchestrator && typeof (orchestrator as any).on === 'function') {
         ;(orchestrator as any).on('security:event', (event: any) => {
-          monitoringService.recordMetric({
-            name: event.type || 'security_event',
+          void monitoringService.recordMetric({
+            name: event.type ?? 'security_event',
             value: event.success === false ? 1 : 0,
-            timestamp: new Date(event.timestamp || Date.now()),
-            tags: { userId: event.userId || '', ip: event.ip || '' },
+            timestamp: new Date(event.timestamp ?? Date.now()),
+            tags: { userId: event.userId ?? '', ip: event.ip ?? '' },
           })
         })
 
         // Threat detected → hunting
         ;(orchestrator as any).on('threat:detected', async (threat: any) => {
-          monitoringService.recordMetric({
+          void monitoringService.recordMetric({
             name: 'threats_detected',
             value: 1,
-            timestamp: new Date(threat.timestamp || Date.now()),
+            timestamp: new Date(threat.timestamp ?? Date.now()),
             tags: {
-              severity: threat.severity || '',
-              threatId: threat.threatId || '',
+              severity: threat.severity ?? '',
+              threatId: threat.threatId ?? '',
             },
           })
 
           if (threat.severity === 'high' || threat.severity === 'critical') {
-            huntingService.startInvestigation({
+            void huntingService.startInvestigation({
               threatId: threat.threatId,
               userId: threat.userId,
               severity: threat.severity,
-              description: `Auto-investigation for ${threat.type || 'threat'}`,
+              description: `Auto-investigation for ${threat.type ?? 'threat'}`,
             })
           }
         })
@@ -953,8 +953,8 @@ export function createCompleteThreatDetectionSystem(
         threats: {
           total: threatStats.totalThreats,
           blocked: threatStats.blockedRequests,
-          averageResponseTime: threatStats.averageResponseTime || 0,
-          distribution: threatStats.threatDistribution || {},
+          averageResponseTime: threatStats.averageResponseTime ?? 0,
+          distribution: threatStats.threatDistribution ?? {},
         },
         monitoring: {
           insights: monitoringStats.totalInsights,

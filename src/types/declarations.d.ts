@@ -31,7 +31,7 @@ declare module 'k6/http' {
   export interface Response {
     status: number
     body: string
-    json<T>(): T
+    json(): unknown
   }
   export default http
 }
@@ -115,13 +115,25 @@ declare module 'aws-sdk' {
     constructor(config?: unknown)
     invoke(params: unknown): Promise<unknown>
   }
+  export class KMS {
+    constructor(config?: unknown)
+    generateDataKey(params: unknown): { promise(): Promise<unknown> }
+    decrypt(params: unknown): { promise(): Promise<unknown> }
+  }
   export class CloudWatchLogs {
     constructor(config?: unknown)
     putLogEvents(params: unknown): Promise<unknown>
   }
+  export class CloudWatch {
+    constructor(config?: unknown)
+    putMetricData(params: unknown): { promise(): Promise<unknown> }
+  }
   export class SecretsManager {
     constructor(config?: unknown)
-    getSecretValue(params: unknown): Promise<unknown>
+    getSecretValue(params: unknown): { promise(): Promise<unknown> }
+    createSecret(params: unknown): { promise(): Promise<unknown> }
+    rotateSecret(params: unknown): { promise(): Promise<unknown> }
+    listSecrets(params: unknown): { promise(): Promise<unknown> }
   }
   export namespace config {
     export function update(config: unknown): void

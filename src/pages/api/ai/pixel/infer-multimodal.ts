@@ -15,8 +15,8 @@ import { getSessionFromRequest } from '@/utils/auth'
 
 const logger = createBuildSafeLogger('pixel-infer-multimodal')
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL || 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY || ''
+const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
 const REQUEST_TIMEOUT_MS = 45000
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024 // 25MB safety cap
 
@@ -63,11 +63,11 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     const inbound = await request.formData()
-    const text = (inbound.get('text') || '').toString().trim()
+    const text = (inbound.get('text') ?? '').toString().trim()
     const contextType = (
-      inbound.get('context_type') || 'therapeutic'
+      inbound.get('context_type') ?? 'therapeutic'
     ).toString()
-    const sessionId = (inbound.get('session_id') || '').toString() || undefined
+    const sessionId = (inbound.get('session_id') ?? '').toString() || undefined
     const audio = inbound.get('audio')
 
     if (!text && !audio) {
@@ -139,7 +139,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         ...pixelResponse,
-        latency_ms: pixelResponse['latency_ms'] || latencyMs,
+        latency_ms: pixelResponse['latency_ms'] ?? latencyMs,
       }),
       {
         status: 200,

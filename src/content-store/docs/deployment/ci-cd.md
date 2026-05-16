@@ -47,20 +47,20 @@ The build job performs the following tasks:
 build:
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v5
-    - uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v6.0.2
+    - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 10
-    - uses: actions/setup-node@v6
+        version: 11.1.2
+    - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 22
+        node-version: 24.14.1
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
     - name: Build application
       run: pnpm build
     - name: Upload build artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7.0.1
       with:
         name: build-files
         path: dist/
@@ -87,18 +87,18 @@ deploy:
   environment:
     name: ${{ github.event.inputs.environment || 'staging' }}
   steps:
-    - uses: actions/checkout@v5
-    - uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v6.0.2
+    - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 10
-    - uses: actions/setup-node@v6
+        version: 11.1.2
+    - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 22
+        node-version: 24.14.1
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
     - name: Download build artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8.0.1
       with:
         name: build-files
         path: dist/
@@ -163,13 +163,13 @@ rollback:
   environment:
     name: ${{ github.event.inputs.environment || 'staging' }}
   steps:
-    - uses: actions/checkout@v5
-    - uses: pnpm/action-setup@v4
+    - uses: actions/checkout@v6.0.2
+    - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 10
-    - uses: actions/setup-node@v6
+        version: 11.1.2
+    - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 22
+        node-version: 24.14.1
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile

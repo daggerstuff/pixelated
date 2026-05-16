@@ -90,11 +90,11 @@ export interface DeploymentPhaseResult {
 }
 
 export class DeploymentOrchestrator extends EventEmitter {
-  private config: DeploymentOrchestratorConfig
-  private cloudProviderManager: CloudProviderManager
-  private deploymentPlans: Map<string, DeploymentPlan> = new Map()
-  private activeExecutions: Map<string, DeploymentExecution> = new Map()
-  private rollbackPoints: Map<string, RollbackPoint> = new Map()
+  private readonly config: DeploymentOrchestratorConfig
+  private readonly cloudProviderManager: CloudProviderManager
+  private readonly deploymentPlans: Map<string, DeploymentPlan> = new Map()
+  private readonly activeExecutions: Map<string, DeploymentExecution> = new Map()
+  private readonly rollbackPoints: Map<string, RollbackPoint> = new Map()
   private isInitialized = false
 
   constructor(
@@ -130,12 +130,10 @@ export class DeploymentOrchestrator extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Failed to initialize Deployment Orchestrator', { error })
-      throw new Error(
-        `Initialization failed: ${error instanceof Error ? (error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error') : 'Unknown error'}`,
-        {
-          cause: error instanceof Error ? error : undefined,
-        },
-      )
+      if (error instanceof Error) {
+        throw new Error('Initialization failed', { cause: error })
+      }
+      throw error
     }
   }
 
@@ -307,14 +305,8 @@ export class DeploymentOrchestrator extends EventEmitter {
    * Setup event listeners
    */
   private setupEventListeners(): void {
-    this.cloudProviderManager.on('deployment-complete', (data) => {
-      logger.info('Cloud provider deployment completed', data)
-    })
-
-    this.cloudProviderManager.on('deployment-failed', (data) => {
-      logger.error('Cloud provider deployment failed', data)
-      this.handleDeploymentFailure(data)
-    })
+    // Cloud provider manager events are not currently exposed in this implementation.
+    // Keep this method for future extension without failing initialization.
   }
 
   /**
@@ -514,7 +506,7 @@ export class DeploymentOrchestrator extends EventEmitter {
 
     try {
       let phaseResults: (DeploymentResult | Record<string, unknown>)[] = []
-      let phaseErrors: string[] = []
+      const phaseErrors: string[] = []
 
       switch (phase.type) {
         case 'infrastructure':
@@ -577,7 +569,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         regions: regions.length,
       })
 
-      const deploymentPromises = regions.map((region) =>
+      const deploymentPromises = regions.map( async (region) =>
         this.cloudProviderManager.deployRegion(region),
       )
 
@@ -747,7 +739,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         (r) => r.phaseId === dependencyId,
       )
 
-      if (!dependencyResult || dependencyResult.status !== 'success') {
+      if (dependencyResult?.status !== 'success') {
         logger.warn(
           `Phase dependency not met: ${dependencyId} for phase: ${phase.id}`,
         )
@@ -993,7 +985,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       const minHealthScore =
         (typeof step.successCriteria.minHealthScore === 'number'
           ? step.successCriteria.minHealthScore
-          : undefined) || 80
+          : undefined) ?? 80
 
       // Simulate health check validation
       const simulatedHealthScore = 85 + Math.random() * 10 // 85-95 range
@@ -1031,11 +1023,11 @@ export class DeploymentOrchestrator extends EventEmitter {
       const maxResponseTime =
         (typeof step.successCriteria.maxResponseTime === 'number'
           ? step.successCriteria.maxResponseTime
-          : undefined) || 200
+          : undefined) ?? 200
       const minThroughput =
         (typeof step.successCriteria.minThroughput === 'number'
           ? step.successCriteria.minThroughput
-          : undefined) || 100
+          : undefined) ?? 100
 
       // Simulate performance test results
       const responseTime = 150 + Math.random() * 50 // 150-200ms range
@@ -1044,7 +1036,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       if (responseTime <= maxResponseTime && throughput >= minThroughput) {
         return { success: true }
       } else {
-        const errors = []
+        const errors: string[] = []
         if (responseTime > maxResponseTime) {
           errors.push(
             `Response time ${responseTime.toFixed(0)}ms exceeds maximum ${maxResponseTime}ms`,

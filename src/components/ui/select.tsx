@@ -60,7 +60,7 @@ export function Select({
 
   // Initialize with controlled value or defaultValue
   const [internalValue, setInternalValue] = useState<string>(
-    value !== undefined ? value : defaultValue || '',
+    value ?? (defaultValue ?? ''),
   )
 
   // Dropdown state
@@ -71,7 +71,7 @@ export function Select({
   const contentRef = useRef<HTMLDivElement>(null!)
 
   // If this is a controlled component, use the provided value
-  const currentValue = value !== undefined ? value : internalValue
+  const currentValue = value ?? internalValue
 
   // Update internal value when controlled value changes
   useEffect(() => {
@@ -134,7 +134,7 @@ export function Select({
 
   // Get the selected label
   const selectedOption = options.find((o) => o.value === currentValue)
-  const selectedLabel = selectedOption?.label || placeholder
+  const selectedLabel = selectedOption?.label ?? placeholder
 
   return (
     <SelectContext.Provider
@@ -200,7 +200,7 @@ export function SelectTrigger({
       role='combobox'
       aria-expanded={isOpen}
       aria-controls='select-listbox'
-      aria-label={ariaLabel || 'Select option'}
+      aria-label={ariaLabel ?? 'Select option'}
       className={`select-trigger ${isOpen ? 'select-trigger-open' : ''} ${className}`}
       ref={triggerRef}
       onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -208,7 +208,7 @@ export function SelectTrigger({
       disabled={disabled}
       id={id}
     >
-      {children || selectedLabel}
+      {children ?? selectedLabel}
       <span className='select-trigger-icon'>
         {/* Custom downward chevron icon */}
         <svg

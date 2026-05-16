@@ -51,9 +51,9 @@ export function createEnhancedRateLimiter(
     customConfig,
   }: EnhancedRateLimiterConfig): Promise<RateLimitResult> => {
     const now = Date.now()
-    const effectiveWindowMs = customConfig?.windowMs || windowMs
+    const effectiveWindowMs = customConfig?.windowMs ?? windowMs
     const limit =
-      customConfig?.limits?.[role] || userLimits[role] || defaultLimit
+      (customConfig?.limits?.[role] ?? userLimits[role]) || defaultLimit
 
     // Create Redis key with path and role information
     const key = `ratelimit:${identifier}:${path}:${role}`

@@ -45,12 +45,12 @@ export const get = async ({ request, cookies }) => {
     // Parse query parameters
     const url = new URL(request.url)
     const params: Partial<ComparativeProgressParams> = {
-      anonymizedUserId: url.searchParams.get('anonymizedUserId') || '',
-      metricName: url.searchParams.get('metric') || '',
-      cohortId: url.searchParams.get('cohort') || '',
+      anonymizedUserId: url.searchParams.get('anonymizedUserId') ?? '',
+      metricName: url.searchParams.get('metric') ?? '',
+      cohortId: url.searchParams.get('cohort') ?? '',
       dateRange: {
-        startDate: url.searchParams.get('startDate') || '',
-        endDate: url.searchParams.get('endDate') || '',
+        startDate: url.searchParams.get('startDate') ?? '',
+        endDate: url.searchParams.get('endDate') ?? '',
       },
     }
 

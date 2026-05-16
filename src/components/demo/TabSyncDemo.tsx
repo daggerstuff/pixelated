@@ -15,6 +15,17 @@ interface SyncedPreferences {
   fontSize: 'small' | 'medium' | 'large'
   notifications: boolean
   language: string
+  [key: string]: unknown
+}
+
+const parseThemePreference = (value: string): 'light' | 'dark' => {
+  return value === 'dark' ? 'dark' : 'light'
+}
+
+const parseFontSizePreference = (
+  value: string,
+): 'small' | 'medium' | 'large' => {
+  return value === 'small' ? 'small' : value === 'large' ? 'large' : 'medium'
 }
 
 /**
@@ -29,7 +40,7 @@ export const TabSyncDemo: FC = () => {
       enableSync: true,
       debounceMs: 500,
       onSync: (value, tabId) => {
-        console.log(`Counter synced from tab ${tabId}:`, value)
+        console.info(`Counter synced from tab ${tabId}:`, value)
       },
     })
 
@@ -53,7 +64,7 @@ export const TabSyncDemo: FC = () => {
     debounceMs: 300,
     conflictStrategy: 'merge',
     onSync: (value, tabId) => {
-      console.log(`Preferences synced from tab ${tabId}:`, value)
+      console.info(`Preferences synced from tab ${tabId}:`, value)
     },
   })
 
@@ -256,7 +267,7 @@ export const TabSyncDemo: FC = () => {
                             onChange={(e) =>
                               updatePreference(
                                 'theme',
-                                e.target.value as 'light' | 'dark',
+                                parseThemePreference(e.target.value),
                               )
                             }
                             className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 w-full rounded-lg border px-3 py-2'
@@ -279,7 +290,7 @@ export const TabSyncDemo: FC = () => {
                             onChange={(e) =>
                               updatePreference(
                                 'fontSize',
-                                e.target.value as 'small' | 'medium' | 'large',
+                                parseFontSizePreference(e.target.value),
                               )
                             }
                             className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 w-full rounded-lg border px-3 py-2'

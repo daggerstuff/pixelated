@@ -361,7 +361,7 @@ const BrutalistChatDemo: FC = () => {
                 (m) => m.metadata?.confidenceScore,
               )
               const totalConfidence = messagesWithConfidence.reduce(
-                (acc, m) => acc + (m.metadata?.confidenceScore || 0),
+                (acc, m) => acc + (m.metadata?.confidenceScore ?? 0),
                 0,
               )
               return messagesWithConfidence.length > 0

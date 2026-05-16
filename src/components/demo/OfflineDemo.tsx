@@ -75,7 +75,7 @@ export const OfflineDemo: FC = () => {
         const result = await response.json()
         const newData: DemoData = {
           id: Date.now().toString(),
-          message: `Request succeeded: ${result.message || 'OK'}`,
+          message: `Request succeeded: ${result.message ?? 'OK'}`,
           timestamp: Date.now(),
         }
         setLocalData((prev) => [newData, ...prev])
@@ -156,7 +156,7 @@ export const OfflineDemo: FC = () => {
 
             <div className='flex flex-wrap gap-4'>
               <button
-                onClick={() => simulateApiCall(false)}
+                onClick={ async () => simulateApiCall(false)}
                 disabled={isLoading}
                 className='bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 transition-colors'
               >
@@ -164,7 +164,7 @@ export const OfflineDemo: FC = () => {
               </button>
 
               <button
-                onClick={() => simulateApiCall(true)}
+                onClick={ async () => simulateApiCall(true)}
                 disabled={isLoading}
                 className='bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 transition-colors'
               >

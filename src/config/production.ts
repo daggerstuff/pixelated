@@ -1,12 +1,12 @@
 export const productionConfig = {
   // Server Configuration
   // Business Strategy CMS port - use separate port to avoid conflict with main app
-  port: process.env.CMS_PORT || 5001,
+  port: process.env.CMS_PORT ?? 5001,
   environment: 'production',
 
   // Database Configuration
   database: {
-    url: process.env.DATABASE_URL || '',
+    url: process.env.DATABASE_URL ?? '',
     pool: {
       max: 20,
       min: 5,
@@ -20,7 +20,7 @@ export const productionConfig = {
 
   // Redis Configuration
   redis: {
-    url: process.env.REDIS_URL || '',
+    url: process.env.REDIS_URL ?? '',
     tls: {
       rejectUnauthorized: false,
     },
@@ -28,36 +28,36 @@ export const productionConfig = {
 
   // AWS Configuration
   aws: {
-    region: process.env.AWS_REGION || 'us-east-1',
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
-    s3Bucket: process.env.AWS_S3_BUCKET || 'pixelated-business-docs',
-    cloudfrontDomain: process.env.AWS_CLOUDFRONT_DOMAIN || '',
+    region: process.env.AWS_REGION ?? 'us-east-1',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
+    s3Bucket: process.env.AWS_S3_BUCKET ?? 'pixelated-business-docs',
+    cloudfrontDomain: process.env.AWS_CLOUDFRONT_DOMAIN ?? '',
   },
 
   // Email Configuration
   email: {
-    provider: process.env.EMAIL_PROVIDER || 'sendgrid',
+    provider: process.env.EMAIL_PROVIDER ?? 'sendgrid',
     sendgrid: {
-      apiKey: process.env.SENDGRID_API_KEY || '',
+      apiKey: process.env.SENDGRID_API_KEY ?? '',
     },
     smtp: {
-      host: process.env.SMTP_HOST || '',
-      port: parseInt(process.env.SMTP_PORT || '587'),
+      host: process.env.SMTP_HOST ?? '',
+      port: parseInt(process.env.SMTP_PORT ?? '587'),
       secure: process.env.SMTP_SECURE === 'true',
       auth: {
-        user: process.env.SMTP_USER || '',
-        pass: process.env.SMTP_PASS || '',
+        user: process.env.SMTP_USER ?? '',
+        pass: process.env.SMTP_PASS ?? '',
       },
     },
-    fromEmail: process.env.FROM_EMAIL || 'noreply@pixelated.com',
+    fromEmail: process.env.FROM_EMAIL ?? 'noreply@pixelated.com',
   },
 
   // Security Configuration
   security: {
-    jwtSecret: process.env.JWT_SECRET || '',
-    jwtExpiration: process.env.JWT_EXPIRATION || '7d',
-    refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION || '30d',
+    jwtSecret: process.env.JWT_SECRET ?? '',
+    jwtExpiration: process.env.JWT_EXPIRATION ?? '7d',
+    refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION ?? '30d',
     bcryptRounds: 12,
     rateLimit: {
       windowMs: 15 * 60 * 1000, // 15 minutes
@@ -68,12 +68,12 @@ export const productionConfig = {
   // Monitoring Configuration
   monitoring: {
     sentry: {
-      dsn: process.env.SENTRY_DSN || '',
+      dsn: process.env.SENTRY_DSN ?? '',
       environment: 'production',
     },
     datadog: {
-      apiKey: process.env.DD_API_KEY || '',
-      appKey: process.env.DD_APP_KEY || '',
+      apiKey: process.env.DD_API_KEY ?? '',
+      appKey: process.env.DD_APP_KEY ?? '',
     },
   },
 
@@ -82,7 +82,7 @@ export const productionConfig = {
     origin: [
       'https://pixelated.com',
       'https://www.pixelated.com',
-      ...(process.env.ALLOWED_ORIGINS?.split(',') || []),
+      ...(process.env.ALLOWED_ORIGINS?.split(',') ?? []),
     ],
     credentials: true,
   },

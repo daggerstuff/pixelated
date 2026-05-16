@@ -1,39 +1,46 @@
 /* ================================================
-   TECHNICAL-HUMANIST DESIGN SYSTEM - CORE TOKENS
-   Fusing Opencode.ai Architecture with Mizu Fluidity
-   ================================================ */
+PROFESSIONAL HEALTHCARE SaaS DESIGN SYSTEM
+Dark-first enterprise clinical training platform
+=============================================== */
 
 :root {
-  /* === THE CANVAS (Warm Terminal) === */
-  --bg-primary: #201d1d; /* Warm Near-Black */
-  --bg-secondary: #302c2c; /* Elevated Dark Surface */
-  --bg-glass: rgba(48, 44, 44, 0.74); /* Glassmorphic Base */
-  --text-primary: #f7f3eb; /* Warm Off-White */
-  --text-secondary: #c7bfb7; /* Editorial secondary copy */
-  --text-muted: #a1958b; /* Muted labels */
+  /* === THE CANVAS (Dark Metal - DESIGN.md) === */
+  --bg-primary: #1a1a1e; /* Dark metal background */
+  --bg-secondary: #24242a; /* Elevated gunmetal panel */
+  --bg-glass: rgba(36, 36, 42, 0.8); /* Glassmorphic Base */
+  --text-primary: #f5f5f0; /* Warm off-white */
+  --text-secondary: #a1a1aa; /* Muted pale steel */
+  --text-muted: #71717a; /* Subdued dark-silver grey */
 
-  /* === VIVID ACCENTS === */
-  --accent-primary: #ff6b00; /* Vivid Mizu Orange */
-  --accent-primary-rgb: 255, 107, 0;
-  --accent-secondary: #007aff; /* System Blue */
+  /* === TRUST ACCENTS (Sunset Orange - DESIGN.md) === */
+  --accent-primary: #f97316; /* Sunset orange - vivid and warm */
+  --accent-primary-rgb: 249, 115, 22;
+  --accent-secondary: #fb923c; /* Brighter mandarin orange hover */
+  --accent-success: #10b981; /* Clinical success/green */
 
-  /* === SEMANTIC COLORS (Apple HIG) === */
-  --success: #30d158;
-  --warning: #ff9f0a;
-  --danger: #ff3b30;
+  /* === SEMANTIC COLORS (Accessible) === */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
   /* === STRUCTURAL === */
-  --border-subtle: rgba(253, 252, 252, 0.08); /* Hairline */
-  --divider-dotted: rgba(253, 252, 252, 0.11); /* Dotted lines */
-  --divider-weak: rgba(253, 252, 252, 0.05); /* Very subtle divider */
-  --bg-surface-ghost: rgba(253, 252, 252, 0.02); /* Ghostly background */
-  --radius-sm: 8px; /* Standard components */
-  --radius-md: 10px; /* Inputs */
+  --border-subtle: rgba(255, 255, 255, 0.08); /* Hairline */
+  --border-primary: rgba(255, 255, 255, 0.12);
+  --border-primary-rgb: 255, 255, 255;
+  --divider-dotted: rgba(255, 255, 255, 0.15); /* Dotted lines */
+  --divider-weak: rgba(255, 255, 255, 0.08); /* Very weak divider */
+  --bg-surface-ghost: rgba(255, 255, 255, 0.03); /* Ghostly background */
+  --radius-sm: 6px; /* Standard components */
+  --radius-md: 8px; /* Inputs */
+  --radius-lg: 12px; /* Cards */
+  --radius-xl: 16px; /* Large containers */
+  --radius-button: 8px; /* Buttons */
+  --radius-card: 12px; /* Cards */
 
   /* === ANIMATION === */
   --duration-fast: 0.15s;
-  --duration-normal: 0.25s;
-  --duration-slow: 0.4s;
+  --duration-normal: 0.2s;
+  --duration-slow: 0.3s;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* Apple-style ease-out */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);

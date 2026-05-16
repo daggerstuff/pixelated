@@ -7,8 +7,8 @@ import {
 } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardHeader,
@@ -16,24 +16,24 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/card/index.ts'
+import { Label } from '@/components/ui/label.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from '@/components/ui/select.tsx'
+import { Slider } from '@/components/ui/slider.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from '@/components/ui/tooltip.tsx'
 import { DisorderCategory } from '@/lib/ai/mental-arena/types'
 
 /**
@@ -167,7 +167,7 @@ export default function SyntheticTherapyDemo() {
               severity: symptom.severity / 10, // Convert 1-10 to 0-1
               duration: symptom.duration,
               manifestations: symptom.indicators,
-              cognitions: symptom.cognitivePatterns || [],
+              cognitions: symptom.cognitivePatterns ?? [],
             }),
           ),
           decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map(
@@ -239,7 +239,7 @@ export default function SyntheticTherapyDemo() {
     }
   }
 
-  const selectedConversation = conversations[selectedConversationIndex] || null
+  const selectedConversation = conversations[selectedConversationIndex] ?? null
 
   // ⚡ Bolt: Memoize expensive O(n*m) nested array filtering operations for symptom accuracy to prevent recalculating on every render
   const { correctlyIdentified, missedSymptoms, incorrectlyIdentified } = useMemo(() => {
@@ -640,7 +640,7 @@ export default function SyntheticTherapyDemo() {
                           }
                         >
                           {(
-                            (selectedConversation.accuracyScore || 0) * 100
+                            (selectedConversation.accuracyScore ?? 0) * 100
                           ).toFixed(0)}
                           % Accuracy
                         </Badge>

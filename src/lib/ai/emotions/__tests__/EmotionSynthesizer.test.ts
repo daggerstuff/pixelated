@@ -13,7 +13,7 @@ describe('EmotionSynthesizer', () => {
 
   describe('synthesizeEmotion (Enhanced)', () => {
     it('should return a default neutral profile if no options are provided', async () => {
-      const result = await synthesizer.synthesizeEmotion({})
+      const result = await synthesizer.synthesizeEmotion({ randomFluctuation: 0 })
       expect(result.success).toBe(true)
       expect(result.profile.emotions['neutral']).toBeCloseTo(1.0 * 0.85, 2) // Default decay from default neutral
     })

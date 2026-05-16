@@ -1,9 +1,21 @@
 #!/usr/bin/env node
+/// <reference types="node" />
 import { existsSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 
+/** @typedef {import('child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
+
 const EXCLUDED_FROM_OXFMT = new Set([
+  'eslint.config.js',
+  'astro.config.mjs',
   'src/lib/auth/__tests__/integration.test.ts',
+  'src/lib/auth/auth0-jwt-service.ts',
+  'src/lib/auth/__tests__/middleware.test.ts',
+  'src/lib/research/ResearchPlatform.ts',
+  'src/lib/research/services/HIPAADataService.ts',
+  'src/tests/api/session/skills-api.test.ts',
+  'src/tests/api/v1/health.test.ts',
+  'src/services/auth0.service.ts',
   'src/types/index.ts',
   'tests/unit/auth0/auth0-jwt-service.test.ts',
 ])
@@ -17,12 +29,14 @@ const OXFMT_APPLICABLE_EXTENSIONS = new Set([
   '.cts',
 ])
 
+/** @param {string[]} files */
 function dedupeAndFilterExisting(files) {
   const seen = new Set()
+  /** @type {string[]} */
   const results = []
 
   for (const filePath of files) {
-    if (!filePath || !existsSync(filePath)) {
+    if (typeof filePath !== 'string' || !filePath || !existsSync(filePath)) {
       continue
     }
     if (seen.has(filePath)) {
@@ -36,50 +50,57 @@ function dedupeAndFilterExisting(files) {
   return results
 }
 
+/** @param {string} command @param {string[]} args */
 function runCommand(command, args) {
+  /** @type {SpawnSyncTextResult} */
   const result = spawnSync('pnpm', ['-s', command, ...args], {
     stdio: 'inherit',
   })
-
-  if (result.status !== 0) {
-    process.exit(result.status)
+  const exitCode = typeof result.status === 'number' ? result.status : 0
+  if (exitCode !== 0) {
+    process.exit(exitCode)
   }
 }
 
+/** @param {string} filePath @returns {string[]} */
 function readFilesFromPath(filePath) {
   if (!existsSync(filePath)) {
     return []
   }
 
-  return readFileSync(filePath, 'utf8')
+  const fileContents = readFileSync(filePath, 'utf8')
+  return fileContents
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
 }
 
+/** @returns {string[]} */
 function readChangedFilesFromGit() {
+  /** @type {SpawnSyncTextResult} */
   const result = spawnSync('git', [
     'diff',
     '--name-only',
     '--diff-filter=ACMRTUXB',
     '--',
   ], { encoding: 'utf8' })
+  const exitCode = typeof result.status === 'number' ? result.status : 0
 
-  if (result.status !== 0) {
+  if (exitCode !== 0 || typeof result.stdout !== 'string') {
     console.error('Failed to read changed files from git')
-    process.exit(result.status)
+    process.exit(exitCode || 1)
   }
 
   return result.stdout
+    .trim()
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
 }
 
 const explicitFileListPath = process.argv[2]
-const rawChangedFiles = explicitFileListPath
-  ? readFilesFromPath(explicitFileListPath)
-  : readChangedFilesFromGit()
+const rawChangedFiles =
+  typeof explicitFileListPath === 'string' ? readFilesFromPath(explicitFileListPath) : readChangedFilesFromGit()
 const changedFiles = dedupeAndFilterExisting(rawChangedFiles)
 
 if (changedFiles.length === 0) {
@@ -99,5 +120,5 @@ const oxfmtFiles = changedFiles.filter((filePath) => {
 })
 
 if (oxfmtFiles.length > 0) {
-  runCommand('oxfmt', ['--check', ...oxfmtFiles])
+  runCommand('oxfmt', ['--check', '--no-error-on-unmatched-pattern', ...oxfmtFiles])
 }

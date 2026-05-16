@@ -16,7 +16,7 @@ vi.mock('../Navigation', () => ({
   Navigation: () => <div data-testid='navigation'>Navigation</div>,
 }))
 
-vi.mock('@/lib/auth-client', () => ({
+vi.mock('@/lib/auth-client.ts', () => ({
   authClient: {
     useSession: vi.fn(() => ({ data: null, isPending: false })),
   },

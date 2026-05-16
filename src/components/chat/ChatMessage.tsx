@@ -4,8 +4,8 @@ import { useContext, useState } from 'react'
 
 import { MultiAgentThoughtUI } from '@/components/ai/MultiAgentThoughtUI'
 import { ThemeContext } from '@/components/theme/ThemeProvider'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
 import { formatTimestamp } from '@/lib/dates'
 import { simpleMarkdownToHtml } from '@/lib/markdown'
 import { cn } from '@/lib/utils'
@@ -53,7 +53,7 @@ export function ChatMessage({
       suicidality: 'bg-red-700',
       none: 'bg-gray-500',
     }
-    return colors[category] || 'bg-gray-500'
+    return colors[category] ?? 'bg-gray-500'
   }
 
   const hasAnalysis =

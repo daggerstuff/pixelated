@@ -1,5 +1,5 @@
 import type { AuthRole } from '@/config/auth.config'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 import type { UserRole } from '@/types/auth'
 
 export interface RoleGuardProps {

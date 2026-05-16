@@ -163,21 +163,21 @@ Sample Size Calculation:
 
 ### Secondary Analyses
 
-**1. Subgroup Analysis**
+### 1. Subgroup Analysis
 
 - Experience level effects (novice vs. experienced)
 - Educational background differences
 - Cultural competency baseline effects
 - Age and demographic factors
 
-**2. Skill Domain Analysis**
+### 2. Skill Domain Analysis
 
 - Individual diagnostic category improvements
 - Cultural competency enhancement
 - Risk assessment skill development
 - Treatment planning improvement
 
-**3. Longitudinal Analysis**
+### 3. Longitudinal Analysis
 
 - Retention of skills at 3, 6, and 12 months
 - Transfer to real-world clinical practice

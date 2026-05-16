@@ -54,10 +54,10 @@ export const POST = async ({ request }) => {
       ...eventData,
       server_timestamp: Date.now(),
       ip_address:
-        request.headers.get('x-forwarded-for') ||
-        request.headers.get('x-real-ip') ||
+        (request.headers.get('x-forwarded-for') ??
+        request.headers.get('x-real-ip')) ??
         'unknown',
-      user_agent: request.headers.get('user-agent') || eventData.user_agent,
+      user_agent: request.headers.get('user-agent') ?? eventData.user_agent,
     }
 
     // Store the event (in production, save to database)
@@ -356,7 +356,7 @@ function generateAnalyticsSummary(
   )
   if (ctaEvents.length > 0) {
     summary.avg_time_to_cta =
-      ctaEvents.reduce((sum, e) => sum + (e.time_to_click || 0), 0) /
+      ctaEvents.reduce((sum, e) => sum + (e.time_to_click ?? 0), 0) /
       ctaEvents.length
   }
 
@@ -366,7 +366,7 @@ function generateAnalyticsSummary(
   )
   if (scrollEvents.length > 0) {
     summary.scroll_depth_avg =
-      scrollEvents.reduce((sum, e) => sum + (e.depth_percent || 0), 0) /
+      scrollEvents.reduce((sum, e) => sum + (e.depth_percent ?? 0), 0) /
       scrollEvents.length
   }
 

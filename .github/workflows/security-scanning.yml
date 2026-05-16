@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -136,7 +136,7 @@ jobs:
 
       - name: Upload Trivy diagnostic artifact
         if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: trivy-diagnostic
           path: trivy-missing.txt
@@ -149,7 +149,7 @@ jobs:
           category: trivy-fs
 
       - name: Upload Trivy SARIF as artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         with:
           name: trivy-sarif
@@ -185,20 +185,20 @@ jobs:
         if:
           ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: checkov-diagnostic
           path: checkov-missing.txt
 
       - name: Upload Checkov SARIF as artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: ${{ always() && steps.checkov_infra_sarif.outputs.found == 'true' }}
         with:
           name: checkov-infra-sarif
           path: checkov-infra-results.sarif
 
       - name: Upload Helm/Kubernetes Checkov SARIF as artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: ${{ always() && steps.checkov_helm_sarif.outputs.found == 'true' }}
         with:
           name: checkov-helm-sarif
@@ -209,13 +209,13 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: 24.14.1
           package-manager-cache: false
@@ -247,7 +247,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Run security audit
         run: |
@@ -266,7 +266,7 @@ jobs:
           node scripts/utils/check-pnpm-audit.js --fail-on high audit-results.json
 
       - name: Upload audit results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: security-audit-results
           path: audit-results.json

@@ -10,7 +10,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from . import app_exceptions, deps, middleware as app_middleware
+from . import app_exceptions, deps
+from . import middleware as app_middleware
 from .bootstrap import configure
 from .config import settings
 from .routers import (

@@ -142,15 +142,15 @@ export const PUT: APIRoute = async ({
       id: planId,
       clientId: user.id,
       therapistId: user.id,
-      title: updates.title || 'Updated Treatment Plan',
-      diagnosis: updates.diagnosis || null,
-      startDate: updates.startDate || new Date().toISOString(),
-      endDate: updates.endDate || null,
-      status: updates.status || 'Draft',
-      generalNotes: updates.generalNotes || null,
+      title: updates.title ?? 'Updated Treatment Plan',
+      diagnosis: updates.diagnosis ?? null,
+      startDate: updates.startDate ?? new Date().toISOString(),
+      endDate: updates.endDate ?? null,
+      status: updates.status ?? 'Draft',
+      generalNotes: updates.generalNotes ?? null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      goals: (updates.goals as any) || [],
+      goals: (updates.goals as any) ?? [],
     }
 
     return new Response(JSON.stringify(updatedPlan), { status: 200 })

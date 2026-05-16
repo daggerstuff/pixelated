@@ -1,6 +1,35 @@
 // Reusable mocking utilities for test suites
 import { vi } from 'vitest'
 
+type MockWebSocketInstance = {
+  send: ReturnType<typeof vi.fn>
+  close: ReturnType<typeof vi.fn>
+  addEventListener: ReturnType<typeof vi.fn>
+  removeEventListener: ReturnType<typeof vi.fn>
+  dispatchEvent: (event: Event) => boolean
+  readyState: WebSocket['readyState']
+  url: string
+  binaryType: BinaryType
+  bufferedAmount: number
+  extensions: string
+  protocol: string
+  onclose: WebSocket['onclose']
+  onerror: WebSocket['onerror']
+  onmessage: WebSocket['onmessage']
+  onopen: WebSocket['onopen']
+}
+
+type MockResponseOptions = {
+  status?: number
+  statusText?: string
+  headers?: HeadersInit
+}
+
+type TimerHandle = {
+  id: number
+  active: boolean
+}
+
 // Type-safe global mocking helper
 export function mockGlobal<T extends keyof typeof globalThis>(
   property: T,
@@ -18,7 +47,7 @@ export function mockGlobal<T extends keyof typeof globalThis>(
 
 // WebSocket mocking with proper typing
 export function createMockWebSocket(): {
-  instance: WebSocket
+  instance: MockWebSocketInstance
   send: ReturnType<typeof vi.fn>
   close: ReturnType<typeof vi.fn>
   addEventListener: ReturnType<typeof vi.fn>
@@ -38,7 +67,7 @@ export function createMockWebSocket(): {
   const removeEventListener =
     vi.fn<(type: string, listener: EventListener) => void>()
 
-  const mockWebSocket = {
+  const mockWebSocket: MockWebSocketInstance = {
     send,
     close,
     addEventListener,
@@ -53,11 +82,7 @@ export function createMockWebSocket(): {
     onmessage: null,
     onopen: null,
     protocol: '',
-  } as WebSocket & {
-    send: typeof send
-    close: typeof close
-    addEventListener: typeof addEventListener
-    removeEventListener: typeof removeEventListener
+    dispatchEvent: () => true,
   }
 
   return {
@@ -72,51 +97,22 @@ export function createMockWebSocket(): {
 // Fetch mocking with proper Response typing
 export function createMockResponse(
   data: unknown,
-  options: Partial<Omit<Response, 'clone' | 'bodyUsed'>> & {
-    status?: number
-  } = {},
+  options: MockResponseOptions = {},
 ): Response {
-  const {
-    status = 200,
-    statusText = 'OK',
-    headers = new Headers({ 'content-type': 'application/json' }),
-    ...rest
-  } = options
-
-  return {
-    ...rest,
+  const { status = 200, statusText = 'OK', headers = new Headers() } = options
+  const content = typeof data === 'string' ? data : JSON.stringify(data)
+  return new Response(content, {
     status,
     statusText,
-    headers:
-      headers instanceof Headers
-        ? headers
-        : new Headers(headers as Record<string, string>),
-    ok: status >= 200 && status < 300,
-    clone: vi.fn<() => Response>(() =>
-      createMockResponse(data, { ...options, status }),
-    ),
-    bodyUsed: false,
-    json: vi.fn<() => Promise<unknown>>().mockResolvedValue(data),
-    text: vi
-      .fn<() => Promise<string>>()
-      .mockResolvedValue(
-        typeof data === 'string' ? data : JSON.stringify(data),
-      ),
-    arrayBuffer: vi
-      .fn<() => Promise<ArrayBuffer>>()
-      .mockResolvedValue(new ArrayBuffer(0)),
-    blob: vi.fn<() => Promise<Blob>>().mockResolvedValue(new Blob()),
-    formData: vi
-      .fn<() => Promise<FormData>>()
-      .mockResolvedValue(new FormData()),
-  } as Response
+    headers,
+  })
 }
 
 // URL mocking utilities
 export function mockURLMethods(): { restore: () => void } {
   const originals = {
-    createObjectURL: URL.createObjectURL,
-    revokeObjectURL: URL.revokeObjectURL,
+    createObjectURL: URL.createObjectURL.bind(URL),
+    revokeObjectURL: URL.revokeObjectURL.bind(URL),
   }
 
   const createObjectURL = vi
@@ -124,8 +120,10 @@ export function mockURLMethods(): { restore: () => void } {
     .mockReturnValue('blob:test-url')
   const revokeObjectURL = vi.fn<(url: string) => void>()
 
-  URL.createObjectURL = createObjectURL
-  URL.revokeObjectURL = revokeObjectURL
+  URL.createObjectURL = ((obj) =>
+    createObjectURL(obj)) as typeof URL.createObjectURL
+  URL.revokeObjectURL = ((url) =>
+    revokeObjectURL(url)) as typeof URL.revokeObjectURL
 
   return {
     restore: () => {
@@ -146,23 +144,27 @@ export function createMockTimer(): {
   let currentTime = 0
 
   const mockSetInterval = vi
-    .fn()
-    .mockImplementation((fn: (...args: any[]) => void, _delay: number) => {
-      const intervalId = { id: Math.random(), active: true }
-      const wrappedFn = () => fn()
+    .fn<
+      (callback: () => void, _delay: number, ..._args: unknown[]) => TimerHandle
+    >()
+    .mockImplementation((callback) => {
+      const intervalId: TimerHandle = { id: Math.random(), active: true }
+      const wrappedFn = () => callback()
       // Simulate immediate execution for testing
       wrappedFn()
       return intervalId
     })
 
   const mockSetTimeout = vi
-    .fn()
-    .mockImplementation((fn: (...args: any[]) => void, delay: number) => {
-      const timeoutId = { id: Math.random(), active: true }
+    .fn<
+      (callback: () => void, delay: number, ..._args: unknown[]) => TimerHandle
+    >()
+    .mockImplementation((callback, delay) => {
+      const timeoutId: TimerHandle = { id: Math.random(), active: true }
       setTimeout(() => {
         if (timeoutId.active) {
           currentTime += delay
-          fn()
+          callback()
         }
       }, 0)
       return timeoutId
@@ -186,16 +188,24 @@ export function createMockTimer(): {
 export function mockCrypto(): { restore: () => void } {
   const originalCrypto = global.crypto
 
-  const mockCrypto = {
-    ...originalCrypto,
-    randomUUID: vi.fn().mockReturnValue('550e8400-e29b-41d4-a716-446655440000'),
-  } as any
+  const randomUUID = vi
+    .fn()
+    .mockReturnValue('550e8400-e29b-41d4-a716-446655440000')
+  const mockCrypto = new Proxy(originalCrypto, {
+    get(target, property): unknown {
+      if (property === 'randomUUID') {
+        return randomUUID
+      }
 
-  Object.assign(global, { crypto: mockCrypto })
+      return Reflect.get(target, property)
+    },
+  })
+
+  global.crypto = mockCrypto
 
   return {
     restore: () => {
-      Object.assign(global, { crypto: originalCrypto })
+      global.crypto = originalCrypto
     },
   }
 }
@@ -232,8 +242,13 @@ export function mockLocalStorage(): {
     key: vi
       .fn<(index: number) => string | null>()
       .mockImplementation((index: number) => Array.from(storage.keys())[index]),
-    length: vi.fn<() => number>().mockImplementation(() => storage.size),
-  } as Storage
+  }
+
+  Object.defineProperty(mocklocalStorage, 'length', {
+    get: () => storage.size,
+    enumerable: false,
+    configurable: true,
+  })
 
   const originalLocalStorage = global.localStorage
   Object.assign(global, { localStorage: mocklocalStorage })

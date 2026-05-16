@@ -3,28 +3,63 @@
  * Comprehensive multi-region deployment system for global scale
  */
 
-export { MultiRegionDeploymentManager } from './MultiRegionDeploymentManager'
-export { CloudProviderManager } from './CloudProviderManager'
-export { EdgeComputingManager } from './EdgeComputingManager'
-export { GlobalTrafficRoutingManager } from './GlobalTrafficRoutingManager'
-export { CrossRegionDataSyncManager } from './CrossRegionDataSyncManager'
-export { AutomatedFailoverOrchestrator } from './AutomatedFailoverOrchestrator'
-export { ServiceDiscoveryManager } from './ServiceDiscoveryManager'
-export { ConfigurationManager } from './ConfigurationManager'
-export { HealthMonitor } from './HealthMonitor'
-export { DeploymentOrchestrator } from './DeploymentOrchestrator'
-
-// Types
-export type {
-  FailoverState,
-  FailoverEvent,
-  CircuitBreakerConfig,
-  RegionMetrics,
-} from './AutomatedFailoverOrchestrator'
-
-export type { SyncStatus, DataDistribution } from './CrossRegionDataSyncManager'
-
-export type {
+import { AutomatedFailoverOrchestrator } from './AutomatedFailoverOrchestrator'
+import {
+  CloudProviderManager,
+  CloudProviderConfig,
+  DeploymentResult,
+} from './CloudProviderManager'
+import {
+  ConfigurationManager,
+  MultiRegionConfig,
+  EnvironmentConfig,
+  FeatureFlags,
+  SecretConfig,
+  MonitoringConfig,
+  ComplianceConfig,
+} from './ConfigurationManager'
+import {
+  CrossRegionDataSyncManager,
+  SyncStatus,
+  DataDistribution,
+} from './CrossRegionDataSyncManager'
+import {
+  DeploymentOrchestrator,
+  DeploymentOrchestratorConfig,
+  DeploymentPlan,
+  DeploymentPhase,
+  RollbackPoint,
+  ValidationStep,
+  DeploymentExecution,
+  DeploymentPhaseResult,
+} from './DeploymentOrchestrator'
+import {
+  EdgeComputingManager,
+  EdgeLocation,
+  EdgeDeploymentConfig,
+  EdgeNodeStatus,
+} from './EdgeComputingManager'
+import {
+  GlobalTrafficRoutingManager,
+  RoutingConfig,
+  RouteTarget,
+  RoutingDecision,
+  TrafficMetrics,
+} from './GlobalTrafficRoutingManager'
+import {
+  HealthMonitor,
+  HealthCheckConfig,
+  HealthMetrics,
+  HealthScore,
+  HealthAlert,
+} from './HealthMonitor'
+import {
+  MultiRegionDeploymentManager,
+  type DeploymentConfig,
+  type RegionConfig,
+} from './MultiRegionDeploymentManager'
+import {
+  ServiceDiscoveryManager,
   ServiceRegistration,
   ServiceInstance,
   DiscoveryOptions,
@@ -32,42 +67,55 @@ export type {
   LoadBalancerConfig,
 } from './ServiceDiscoveryManager'
 
+export {
+  MultiRegionDeploymentManager,
+  CloudProviderManager,
+  EdgeComputingManager,
+  GlobalTrafficRoutingManager,
+  CrossRegionDataSyncManager,
+  AutomatedFailoverOrchestrator,
+  ServiceDiscoveryManager,
+  ConfigurationManager,
+  HealthMonitor,
+  DeploymentOrchestrator,
+}
 export type {
-  DeploymentConfig,
+  CloudProviderConfig,
   DeploymentResult,
-  RollbackConfig,
-} from './DeploymentOrchestrator'
-
-export type {
-  HealthStatus,
-  HealthCheck,
-  HealthCheckResult,
-} from './HealthMonitor'
-
-export type {
-  CloudProvider,
-  RegionConfig,
-  ResourceConfig,
-} from './CloudProviderManager'
-
-export type {
-  EdgeNode,
-  EdgeDeployment,
-  EdgeConfig,
-} from './EdgeComputingManager'
-
-export type {
-  RoutingRule,
-  TrafficPolicy,
-  LatencyTarget,
-} from './GlobalTrafficRoutingManager'
-
-export type {
+  EdgeLocation,
+  EdgeDeploymentConfig,
+  EdgeNodeStatus,
+  RoutingConfig,
+  RouteTarget,
+  RoutingDecision,
+  TrafficMetrics,
+  SyncStatus,
+  DataDistribution,
+  ServiceRegistration,
+  ServiceInstance,
+  DiscoveryOptions,
+  ServiceStats,
+  LoadBalancerConfig,
   MultiRegionConfig,
-  SyncConfig,
-  DatabaseConfig,
-} from './ConfigurationManager'
+  EnvironmentConfig,
+  FeatureFlags,
+  SecretConfig,
+  MonitoringConfig,
+  ComplianceConfig,
+  HealthCheckConfig,
+  HealthMetrics,
+  HealthScore,
+  HealthAlert,
+  DeploymentOrchestratorConfig,
+  DeploymentPlan,
+  DeploymentPhase,
+  RollbackPoint,
+  ValidationStep,
+  DeploymentExecution,
+  DeploymentPhaseResult,
+}
 
+// Types
 /**
  * Multi-Region Deployment System
  *
@@ -306,16 +354,27 @@ export * from './DeploymentOrchestrator'
 export async function createMultiRegionSystem(
   configOverrides?: Partial<import('./ConfigurationManager').MultiRegionConfig>,
 ) {
-  const config = new ConfigurationManager()
+  const config = new ConfigurationManager(buildDefaultConfiguration())
 
   if (configOverrides) {
     await config.updateConfig(configOverrides)
   }
 
   await config.initialize()
+  const deploymentConfig = config.getDeploymentConfig()
+  const regions = deploymentConfig.regions
 
-  const healthMonitor = new HealthMonitor(config)
-  await healthMonitor.initialize()
+  const healthMonitor = new HealthMonitor(buildDefaultHealthCheckConfig())
+  await healthMonitor.initialize(regions)
+
+  const cloudProviderManager = new CloudProviderManager()
+  await cloudProviderManager.initialize(regions)
+
+  const deploymentOrchestrator = new DeploymentOrchestrator(
+    buildDefaultDeploymentOrchestratorConfig(),
+    cloudProviderManager,
+  )
+  await deploymentOrchestrator.initialize()
 
   const dataSyncManager = new CrossRegionDataSyncManager(config, healthMonitor)
   await dataSyncManager.initialize()
@@ -330,22 +389,328 @@ export async function createMultiRegionSystem(
   )
   await failoverOrchestrator.initialize()
 
-  const deploymentManager = new MultiRegionDeploymentManager(
-    config,
-    healthMonitor,
-    dataSyncManager,
-    serviceDiscovery,
-    failoverOrchestrator,
-  )
+  const deploymentManager = new MultiRegionDeploymentManager(deploymentConfig)
   await deploymentManager.initialize()
 
   return {
     config,
+    cloudProviderManager,
     healthMonitor,
     dataSyncManager,
     serviceDiscovery,
     failoverOrchestrator,
+    deploymentOrchestrator,
     deploymentManager,
+  }
+}
+
+function buildDefaultHealthCheckConfig(): HealthCheckConfig {
+  return {
+    interval: 30_000,
+    timeout: 5_000,
+    retries: 3,
+    thresholds: {
+      cpu: 80,
+      memory: 85,
+      disk: 90,
+      responseTime: 500,
+      errorRate: 5,
+      availability: 95,
+    },
+  }
+}
+
+function buildDefaultDeploymentOrchestratorConfig(): DeploymentOrchestratorConfig {
+  return {
+    maxParallelDeployments: 3,
+    rollbackOnFailure: true,
+    healthCheckTimeout: 5_000,
+    deploymentTimeout: 120_000,
+    retryAttempts: 2,
+    retryDelay: 1_000,
+    dependencies: {
+      infrastructure: ['network', 'dns', 'iam'],
+      services: ['api', 'worker'],
+      monitoring: ['metrics', 'alerts'],
+    },
+  }
+}
+
+function buildDefaultDeploymentConfig(): DeploymentConfig {
+  const regions: RegionConfig[] = [
+    {
+      id: 'us-east-1',
+      name: 'US East',
+      provider: 'aws',
+      location: 'us-east-1',
+      availabilityZones: ['us-east-1a', 'us-east-1b', 'us-east-1c'],
+      priority: 1,
+      complianceRequirements: ['HIPAA', 'GDPR'],
+      capacity: {
+        minInstances: 2,
+        maxInstances: 20,
+        desiredInstances: 4,
+      },
+      networking: {
+        vpcCidr: '10.0.0.0/16',
+        subnetCidrs: ['10.0.1.0/24', '10.0.2.0/24'],
+        securityGroups: ['default'],
+      },
+    },
+  ]
+
+  return {
+    regions,
+    globalServices: {
+      trafficManager: true,
+      threatIntelligence: false,
+      complianceManager: false,
+    },
+    edgeComputing: {
+      enabled: true,
+      locations: ['us-east-1-edge'],
+      cacheSize: '4Gi',
+    },
+    dataSync: {
+      strategy: 'active-passive',
+      consistencyLevel: 'eventual',
+      conflictResolution: 'timestamp',
+    },
+    failover: {
+      automatic: true,
+      detectionTime: 30_000,
+      recoveryTime: 120_000,
+      healthCheckInterval: 30_000,
+      maxDataSyncLag: 5000,
+      failoverCooldown: 180_000,
+      snsTopicArn: '',
+      sqsQueueUrl: '',
+    },
+  }
+}
+
+function buildDefaultConfiguration(): MultiRegionConfig {
+  const deployment = buildDefaultDeploymentConfig()
+
+  return {
+    deployment,
+    edgeComputing: {
+      locations: [],
+      services: {
+        threatDetection: false,
+        biasDetection: false,
+        cacheService: false,
+        apiGateway: true,
+        staticContent: true,
+      },
+      aiModels: {
+        threatDetection: 'none',
+        biasDetection: 'none',
+        behavioralAnalysis: 'none',
+      },
+      cacheStrategies: ['LRU'],
+      healthCheck: {
+        interval: 30_000,
+        timeout: 5_000,
+        retries: 3,
+      },
+    },
+    trafficRouting: {
+      strategy: 'health-based',
+      healthThreshold: 95,
+      latencyThreshold: 500,
+      complianceRequirements: ['HIPAA'],
+      weights: {},
+      fallbackRegions: deployment.regions.map((region) => region.id),
+      cacheTtl: 300,
+    },
+    environments: {
+      development: {
+        regions: deployment.regions,
+        scaling: {
+          autoScaling: true,
+          minInstances: 1,
+          maxInstances: 5,
+          targetCpuUtilization: 80,
+          targetMemoryUtilization: 70,
+        },
+        resources: {
+          cpu: '2',
+          memory: '4Gi',
+          storage: '20Gi',
+        },
+        networking: {
+          vpcCidr: '10.0.0.0/16',
+          subnetCidrs: ['10.0.1.0/24'],
+          securityGroups: ['default'],
+          loadBalancers: ['primary'],
+        },
+        monitoring: {
+          enabled: true,
+          samplingRate: 0.5,
+          alertThresholds: {},
+        },
+      },
+      staging: {
+        regions: deployment.regions,
+        scaling: {
+          autoScaling: true,
+          minInstances: 2,
+          maxInstances: 10,
+          targetCpuUtilization: 70,
+          targetMemoryUtilization: 80,
+        },
+        resources: {
+          cpu: '4',
+          memory: '8Gi',
+          storage: '50Gi',
+        },
+        networking: {
+          vpcCidr: '10.1.0.0/16',
+          subnetCidrs: ['10.1.1.0/24'],
+          securityGroups: ['default'],
+          loadBalancers: ['primary'],
+        },
+        monitoring: {
+          enabled: true,
+          samplingRate: 0.25,
+          alertThresholds: {},
+        },
+      },
+      production: {
+        regions: deployment.regions,
+        scaling: {
+          autoScaling: true,
+          minInstances: 3,
+          maxInstances: 20,
+          targetCpuUtilization: 70,
+          targetMemoryUtilization: 80,
+        },
+        resources: {
+          cpu: '8',
+          memory: '16Gi',
+          storage: '100Gi',
+        },
+        networking: {
+          vpcCidr: '10.2.0.0/16',
+          subnetCidrs: ['10.2.1.0/24'],
+          securityGroups: ['default'],
+          loadBalancers: ['primary'],
+        },
+        monitoring: {
+          enabled: true,
+          samplingRate: 0.1,
+          alertThresholds: {},
+        },
+      },
+    },
+    featureFlags: {
+      multiRegionDeployment: true,
+      edgeComputing: true,
+      intelligentRouting: true,
+      autoFailover: true,
+      threatDetection: true,
+      biasDetection: true,
+      complianceChecking: true,
+      performanceMonitoring: true,
+      aiModelServing: true,
+      cacheOptimization: true,
+    },
+    secrets: {
+      cloudProviders: {
+        aws: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
+          region: process.env.AWS_REGION ?? 'us-east-1',
+        },
+        gcp: {
+          projectId: process.env.GOOGLE_CLOUD_PROJECT ?? '',
+          keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '',
+        },
+        azure: {
+          subscriptionId: process.env.AZURE_SUBSCRIPTION_ID ?? '',
+          clientId: process.env.AZURE_CLIENT_ID ?? '',
+          clientSecret: process.env.AZURE_CLIENT_SECRET ?? '',
+          tenantId: process.env.AZURE_TENANT_ID ?? '',
+        },
+      },
+      databases: {
+        cockroachdb: {
+          connectionString:
+            process.env.COCKROACH_CONNECTION_STRING ??
+            'postgres://localhost:26257/defaultdb',
+          sslMode: process.env.COCKROACH_SSL_MODE ?? 'disable',
+        },
+        redis: {
+          url: process.env.REDIS_URL ?? 'redis://localhost:6379',
+          password: process.env.REDIS_PASSWORD ?? '',
+        },
+      },
+      aiServices: {
+        openai: {
+          apiKey: process.env.OPENAI_API_KEY ?? '',
+          organization: process.env.OPENAI_ORGANIZATION ?? '',
+        },
+        google: {
+          apiKey: process.env.GOOGLE_API_KEY ?? '',
+          projectId: process.env.GOOGLE_CLOUD_PROJECT ?? '',
+        },
+      },
+      monitoring: {
+        sentry: {
+          dsn: process.env.SENTRY_DSN ?? '',
+          authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
+        },
+        datadog: {
+          apiKey: process.env.DATADOG_API_KEY ?? '',
+          appKey: process.env.DATADOG_APP_KEY ?? '',
+        },
+      },
+    },
+    monitoring: {
+      metrics: {
+        enabled: true,
+        interval: 30_000,
+        retention: 14,
+        aggregation: 'average',
+      },
+      alerting: {
+        enabled: true,
+        channels: ['console'],
+        severityLevels: ['warning', 'critical'],
+        escalationRules: {},
+      },
+      logging: {
+        level: 'info',
+        format: 'json',
+        destinations: ['console'],
+        sampling: 1.0,
+      },
+    },
+    compliance: {
+      gdpr: {
+        enabled: true,
+        dataResidency: ['US'],
+        retentionPeriods: {},
+        subjectRights: ['access', 'erasure'],
+      },
+      hipaa: {
+        enabled: true,
+        encryptionRequired: true,
+        auditLogging: true,
+        accessControls: ['mfa'],
+      },
+      soc2: {
+        enabled: true,
+        auditFrequency: 'weekly',
+        controls: ['CCM', 'CC7'],
+      },
+      pci: {
+        enabled: false,
+        requirements: [],
+        scanningFrequency: 'monthly',
+      },
+    },
   }
 }
 

@@ -53,10 +53,10 @@ export const useEmotionDetection = () => {
         confidence?: number
       }
       return {
-        primaryEmotion: parsed.primaryEmotion || 'neutral',
-        secondaryEmotions: parsed.secondaryEmotions || [],
-        intensity: parsed.intensity || 0.5,
-        confidence: parsed.confidence || 0.8,
+        primaryEmotion: parsed.primaryEmotion ?? 'neutral',
+        secondaryEmotions: parsed.secondaryEmotions ?? [],
+        intensity: parsed.intensity ?? 0.5,
+        confidence: parsed.confidence ?? 0.8,
       }
     } catch {
       return {

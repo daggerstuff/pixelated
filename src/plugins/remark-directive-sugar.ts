@@ -12,6 +12,7 @@ interface Node {
   type: string
   children?: Node[]
   value?: string
+  name?: string
   data?: {
     hName?: string
     hProperties?: Record<string, unknown>
@@ -19,10 +20,15 @@ interface Node {
 }
 
 interface DirectiveNode extends Node {
-  type: 'textDirective' | 'leafDirective' | 'containerDirective'
   name: string
   attributes?: Record<string, string>
 }
+
+const isDirectiveNode = (node: Node): node is DirectiveNode =>
+  (node.type === 'textDirective' ||
+    node.type === 'leafDirective' ||
+    node.type === 'containerDirective') &&
+  typeof node.name === 'string'
 
 // Simple visit function implementation - local version
 function visit(
@@ -52,16 +58,14 @@ export function remarkDirectiveSugar() {
       () => true,
       (node: Node) => {
         // Process directive nodes
-        if (node.type && node.type.includes('Directive')) {
-          const directiveNode = node as DirectiveNode
-
+        if (isDirectiveNode(node)) {
           // Handle different directive types
-          switch (directiveNode.name) {
+          switch (node.name) {
             case 'note':
               // Transform note directives
-              if (directiveNode.children) {
-                ;(directiveNode as Node).type = 'paragraph'
-                directiveNode.data = {
+              if (node.children) {
+                node.type = 'paragraph'
+                node.data = {
                   hName: 'div',
                   hProperties: {
                     className: ['note', 'directive-note'],
@@ -72,9 +76,9 @@ export function remarkDirectiveSugar() {
 
             case 'warning':
               // Transform warning directives
-              if (directiveNode.children) {
-                ;(directiveNode as Node).type = 'paragraph'
-                directiveNode.data = {
+              if (node.children) {
+                node.type = 'paragraph'
+                node.data = {
                   hName: 'div',
                   hProperties: {
                     className: ['warning', 'directive-warning'],
@@ -85,9 +89,9 @@ export function remarkDirectiveSugar() {
 
             case 'tip':
               // Transform tip directives
-              if (directiveNode.children) {
-                ;(directiveNode as Node).type = 'paragraph'
-                directiveNode.data = {
+              if (node.children) {
+                node.type = 'paragraph'
+                node.data = {
                   hName: 'div',
                   hProperties: {
                     className: ['tip', 'directive-tip'],

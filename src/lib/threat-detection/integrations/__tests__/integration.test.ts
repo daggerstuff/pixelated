@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 /**
  * Integration Tests for Threat Detection Integration Layer
  *
@@ -928,7 +929,14 @@ describe('Threat Detection Integration', () => {
 
     it('should handle missing dependencies gracefully', () => {
       expect(() => {
-        createThreatDetectionIntegration(null, null)
+        createThreatDetectionIntegration(
+          mockOrchestrator as Parameters<
+            typeof createThreatDetectionIntegration
+          >[0],
+          mockRateLimiter as Parameters<
+            typeof createThreatDetectionIntegration
+          >[1],
+        )
       }).not.toThrow()
     })
   })
@@ -947,7 +955,7 @@ describe('Threat Detection Integration', () => {
       const context = { userId: '123', ip: '192.168.1.1' }
 
       // Create multiple concurrent requests
-      const requests = Array.from({ length: 10 }, (_, i) =>
+      const requests = Array.from({ length: 10 },  async (_, i) =>
         threatDetectionService.checkRequest(`${identifier}_${i}`, context),
       )
 

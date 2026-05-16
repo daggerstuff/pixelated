@@ -24,75 +24,6 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-// Extend ManagementClient to include methods that may not be in the TypeScript definitions
-type ExtendedManagementClient = ManagementClient & {
-  // Users
-  users: ManagementClient['users'] & {
-    create: (params: {
-      email: string
-      password: string
-      connection: string
-      email_verified: boolean
-      app_metadata: Record<string, unknown>
-      user_metadata: Record<string, unknown>
-    }) => Promise<{ data: unknown }>
-    get: (params: { id: string }) => Promise<{ data: unknown }>
-    list: (params: { [key: string]: unknown }) => Promise<{ data: unknown[] }>
-    update: (
-      userId: string,
-      data: Record<string, unknown>,
-    ) => Promise<{ data: unknown }>
-    delete: (params: { id: string }) => Promise<void>
-    listUsersByEmail: (params: {
-      email: string
-    }) => Promise<{ data: unknown[] }>
-    getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
-    getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
-  }
-  // Roles
-  getRoles: (params: {
-    per_page?: number
-    page?: number
-    name_filter?: string
-  }) => Promise<unknown[]>
-  createRole: (params: {
-    name: string
-    description?: string
-  }) => Promise<unknown>
-  updateRole: (params: {
-    id: string
-    name?: string
-    description?: string
-  }) => Promise<unknown>
-  deleteRole: (params: { id: string }) => Promise<void>
-  getRoleUsers: (params: { id: string }) => Promise<unknown>
-  assignRolestoUser: (params: { id: string; roles: string[] }) => Promise<void>
-  removeRolesFromUser: (params: {
-    id: string
-    roles: string[]
-  }) => Promise<void>
-  getUserRoles: (params: { id: string }) => Promise<unknown[]>
-  // Guardian
-  getGuardianFactors: () => Promise<unknown>
-  createGuardianEnrollmentTicket: (params: {
-    user_id: string
-    send_mail: boolean
-  }) => Promise<unknown>
-  deleteGuardianEnrollment: (params: { id: string }) => Promise<void>
-  // Logs
-  getLogs: (params: { per_page: number; q: string }) => Promise<unknown[]>
-  // Tickets
-  tickets: ManagementClient['tickets'] & {
-    changePassword: (params: {
-      user_id: string
-      result_url?: string
-      ttl_sec?: number
-      mark_email_as_verified?: boolean
-      includeEmailInRedirect?: boolean
-    }) => Promise<{ data: unknown }>
-  }
-}
-
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 type ExtendedAuthenticationClient = AuthenticationClient & {
   oauth: AuthenticationClient['oauth'] & {
@@ -117,22 +48,25 @@ type ExtendedAuthenticationClient = AuthenticationClient & {
       }
     }>
     revokeRefreshToken: (params: { token: string }) => Promise<void>
-    refreshToken: (params: { [key: string]: unknown }) => Promise<{
-      data: {
-        access_token: string
-        refresh_token?: string
-        expires_in: number
-      }
-    }>
   }
-  refreshToken: (params: { [key: string]: unknown }) => Promise<{
-    data: {
-      access_token: string
-      refresh_token?: string
-      expires_in: number
-    }
-  }>
-  getProfile: (token: string) => Promise<{ data: unknown }>
+}
+
+function isExtendedAuthenticationClient(
+  client: AuthenticationClient,
+): client is ExtendedAuthenticationClient {
+  if (typeof client.oauth !== 'object') {
+    return false
+  }
+
+  const oauthMethods: Array<keyof ExtendedAuthenticationClient['oauth']> = [
+    'passwordGrant',
+    'refreshTokenGrant',
+    'revokeRefreshToken',
+  ]
+
+  return oauthMethods.every(
+    (method) => typeof Reflect.get(client.oauth, method) === 'function',
+  )
 }
 
 // Extend UserInfoClient
@@ -159,6 +93,8 @@ import type {
 } from '../lib/auth/auth0-webauthn-service'
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 function toStringEnvValue(value: unknown): string | undefined {
   return typeof value === 'string' && value !== '' ? value : undefined
 }
@@ -175,16 +111,16 @@ interface Auth0ServiceConfig {
 type UnknownRecord = Record<string, unknown>
 
 type Auth0UserRecord = {
-  sub?: unknown
-  user_id?: unknown
-  email?: unknown
-  email_verified?: unknown
-  name?: unknown
-  picture?: unknown
-  created_at?: unknown
-  last_login?: unknown
-  app_metadata?: unknown
-  user_metadata?: unknown
+  'sub'?: unknown
+  'user_id'?: unknown
+  'email'?: unknown
+  'email_verified'?: unknown
+  'name'?: unknown
+  'picture'?: unknown
+  'created_at'?: unknown
+  'last_login'?: unknown
+  'app_metadata'?: unknown
+  'user_metadata'?: unknown
   'https://pixelated-empathy.com/app_metadata'?: unknown
   'https://pixelated-empathy.com/user_metadata'?: unknown
 }
@@ -221,7 +157,7 @@ type Auth0PasswordGrantResponse = {
 }
 
 // Initialize Auth0 clients
-let auth0Management: ExtendedManagementClient | null = null
+let auth0Management: ManagementClient | null = null
 let auth0Authentication: ExtendedAuthenticationClient | null = null
 let auth0UserInfo: ExtendedUserInfoClient | null = null
 
@@ -260,27 +196,37 @@ function initializeAuth0Clients() {
       domain: config.domain,
       clientId: config.managementClientId,
       clientSecret: config.managementClientSecret,
-    }) as ExtendedManagementClient
+    })
   } else {
-    console.warn(
-      'Auth0 Management configuration is incomplete. User management features may not work.',
-    )
+    if (shouldWarnAuth0Configuration) {
+      console.warn(
+        'Auth0 Management configuration is incomplete. User management features may not work.',
+      )
+    }
   }
 
   // Initialize Authentication Client if config is available
   if (config.domain && config.clientId && config.clientSecret) {
-    auth0Authentication ??= new AuthenticationClient({
+    const authenticationClient = new AuthenticationClient({
       domain: config.domain,
       clientId: config.clientId,
       clientSecret: config.clientSecret,
-    }) as ExtendedAuthenticationClient
+    })
+    if (!isExtendedAuthenticationClient(authenticationClient)) {
+      throw new Error(
+        'Auth0 authentication client is missing required OAuth methods',
+      )
+    }
+    auth0Authentication = authenticationClient
     auth0UserInfo ??= new UserInfoClient({
       domain: config.domain,
     }) as ExtendedUserInfoClient
   } else {
-    console.warn(
-      'Auth0 Authentication configuration is incomplete. Login features will not work.',
-    )
+    if (shouldWarnAuth0Configuration) {
+      console.warn(
+        'Auth0 Authentication configuration is incomplete. Login features will not work.',
+      )
+    }
   }
 
   return config

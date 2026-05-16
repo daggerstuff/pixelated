@@ -17,7 +17,7 @@
   window.__FEATURE_DETECTOR_LOADED = true
 
   // Initialize global feature detection object
-  window.featureDetection = window.featureDetection || {
+  window.featureDetection = window.featureDetection ?? {
     loadedPolyfills: [],
     features: {},
   }
@@ -33,7 +33,7 @@
   }
 
   // Load script helper function
-  function loadScript(src) {
+   async function loadScript(src) {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script')
       script.src = src
@@ -67,7 +67,7 @@
         const canvas = document.createElement('canvas')
         return !!(
           window.WebGLRenderingContext &&
-          (canvas.getContext('webgl') ||
+          (canvas.getContext('webgl') ??
             canvas.getContext('experimental-webgl'))
         )
       } catch {
@@ -129,7 +129,7 @@
     console.log('Loading polyfills for unsupported features:', polyfillsToLoad)
 
     // Send analytics if available
-    if (window.navigator && window.navigator.sendBeacon) {
+    if (window.navigator?.sendBeacon) {
       try {
         const polyfillData = {
           unsupportedFeatures: Object.keys(unsupportedFeatures).filter(
@@ -139,7 +139,7 @@
           timestamp: new Date().toISOString(),
         }
         const analyticsEndpoint =
-          window.ANALYTICS_ENDPOINT || '/api/analytics/polyfill-usage'
+          window.ANALYTICS_ENDPOINT ?? '/api/analytics/polyfill-usage'
         navigator.sendBeacon(analyticsEndpoint, JSON.stringify(polyfillData))
       } catch (error) {
         console.error('Failed to send polyfill analytics', error)

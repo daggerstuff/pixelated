@@ -1,10 +1,10 @@
-import { InternalMemoryServiceClient } from '@/lib/server/internal-memory-service-client'
+import { InternalMemoryServiceClient } from '../server/internal-memory-service-client'
 import {
   ProductMemoryGatewayError,
   type ProductMemoryDeleteInput,
   type ProductMemoryUpdateInput,
   toInternalScope,
-} from '@/lib/services/product-memory-gateway'
+} from './product-memory-gateway'
 
 type InternalMemoryServiceClientLike = Pick<
   InternalMemoryServiceClient,

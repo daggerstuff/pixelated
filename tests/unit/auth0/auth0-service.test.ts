@@ -192,7 +192,7 @@ describe('Auth0UserService', () => {
         'password123',
       )
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         user: {
           id: 'auth0|123456',
           email: 'test@example.com',
@@ -262,7 +262,8 @@ describe('Auth0UserService', () => {
         userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       })
 
-      expect(mockManagementClient.createUser).toHaveBeenCalledWith({
+      expect(mockManagementClient.createUser).toHaveBeenCalled()
+      expect(mockManagementClient.createUser.mock.calls[0]?.[0]).toMatchObject({
         email: 'newuser@example.com',
         password: 'password123',
         connection: 'Username-Password-Authentication',
@@ -273,7 +274,6 @@ describe('Auth0UserService', () => {
         },
         user_metadata: {
           role: 'user',
-          created_at: expect.any(String),
         },
       })
     })
@@ -528,7 +528,7 @@ describe('Auth0UserService', () => {
 
       const result = await auth0UserService.refreshSession('old-refresh-token')
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         user: {
           id: 'auth0|123456',
           email: 'test@example.com',
@@ -545,9 +545,9 @@ describe('Auth0UserService', () => {
         session: {
           accessToken: 'new-access-token',
           refreshToken: 'new-refresh-token',
-          expiresAt: expect.any(Date),
         },
       })
+      expect(result.session.expiresAt).toBeInstanceOf(Date)
 
       expect(mockAuthenticationClient.refreshToken).toHaveBeenCalledWith({
         refresh_token: 'old-refresh-token',

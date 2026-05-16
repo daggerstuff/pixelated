@@ -8,11 +8,11 @@ import type {
 } from './types'
 
 export class MentalHealthService {
-  private analyzer: MentalHealthAnalyzer
-  private therapist: TherapeuticResponseGenerator
+  private readonly analyzer: MentalHealthAnalyzer
+  private readonly therapist: TherapeuticResponseGenerator
   private config: AnalysisConfig
-  private conversationHistory: Map<string, ChatMessage[]> = new Map()
-  private analysisHistory: Map<string, MentalHealthAnalysis[]> = new Map()
+  private readonly conversationHistory: Map<string, ChatMessage[]> = new Map()
+  private readonly analysisHistory: Map<string, MentalHealthAnalysis[]> = new Map()
 
   constructor(config: Partial<AnalysisConfig> = {}) {
     this.analyzer = new MentalHealthAnalyzer()
@@ -32,7 +32,7 @@ export class MentalHealthService {
     message: Omit<ChatMessage, 'analysis'>,
   ): Promise<ChatMessage> {
     // Store message in conversation history
-    const history = this.conversationHistory.get(conversationId) || []
+    const history = this.conversationHistory.get(conversationId) ?? []
 
     let processedMessage: ChatMessage = { ...message }
 
@@ -50,7 +50,7 @@ export class MentalHealthService {
           processedMessage.analysis = analysis
 
           // Store analysis in history
-          const analysisHistory = this.analysisHistory.get(conversationId) || []
+          const analysisHistory = this.analysisHistory.get(conversationId) ?? []
           analysisHistory.push(analysis)
           this.analysisHistory.set(conversationId, analysisHistory.slice(-20)) // Keep last 20
         }
@@ -71,7 +71,7 @@ export class MentalHealthService {
     analysis?: MentalHealthAnalysis,
   ): Promise<TherapeuticResponse> {
     // Use provided analysis or get the most recent one
-    const targetAnalysis = analysis || this.getLatestAnalysis(conversationId)
+    const targetAnalysis = analysis ?? this.getLatestAnalysis(conversationId)
 
     if (!targetAnalysis) {
       // Generate a default supportive response
@@ -91,7 +91,7 @@ export class MentalHealthService {
   }
 
   needsIntervention(conversationId: string): boolean {
-    const analysisHistory = this.analysisHistory.get(conversationId) || []
+    const analysisHistory = this.analysisHistory.get(conversationId) ?? []
     if (analysisHistory.length === 0) {
       return false
     }
@@ -101,30 +101,30 @@ export class MentalHealthService {
 
     return recentAnalyses.some(
       (analysis) =>
-        analysis.requiresIntervention ||
-        analysis.riskLevel === 'critical' ||
+        (analysis.requiresIntervention ??
+        analysis.riskLevel === 'critical') ||
         (analysis.riskLevel === 'high' &&
           analysis.confidence >= this.config.interventionThreshold),
     )
   }
 
   getAnalysisHistory(conversationId: string): MentalHealthAnalysis[] {
-    return this.analysisHistory.get(conversationId) || []
+    return this.analysisHistory.get(conversationId) ?? []
   }
 
   getConversationHistory(conversationId: string): ChatMessage[] {
-    return this.conversationHistory.get(conversationId) || []
+    return this.conversationHistory.get(conversationId) ?? []
   }
 
   getLatestAnalysis(conversationId: string): MentalHealthAnalysis | undefined {
-    const history = this.analysisHistory.get(conversationId) || []
+    const history = this.analysisHistory.get(conversationId) ?? []
     return history[history.length - 1]
   }
 
   getRiskTrend(
     conversationId: string,
   ): 'improving' | 'stable' | 'worsening' | 'insufficient_data' {
-    const history = this.analysisHistory.get(conversationId) || []
+    const history = this.analysisHistory.get(conversationId) ?? []
     if (history.length < 2) {
       return 'insufficient_data'
     }
@@ -177,8 +177,8 @@ export class MentalHealthService {
   }
 
   getStats(conversationId: string) {
-    const messages = this.conversationHistory.get(conversationId) || []
-    const analyses = this.analysisHistory.get(conversationId) || []
+    const messages = this.conversationHistory.get(conversationId) ?? []
+    const analyses = this.analysisHistory.get(conversationId) ?? []
 
     const userMessages = messages.filter((m) => m.role === 'user')
     const analyzedMessages = userMessages.filter((m) => m.analysis)

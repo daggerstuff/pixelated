@@ -202,7 +202,7 @@ export const ScrollReveal: FC<{
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry && entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setIsVisible(true)
           observer.disconnect()
         }

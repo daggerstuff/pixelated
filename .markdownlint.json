@@ -29,12 +29,7 @@
   "MD033": false,
   "MD041": false,
   "MD046": false,
-  "ignores": [
-    "node_modules/@testing-library/dom/README.md",
-    "node_modules/@testing-library/jest-dom/README.md",
-    "node_modules/@testing-library/react/README.md",
-    "node_modules/react-i18next/README.md"
-  ],
+  "ignores": ["node_modules/**/*"],
   "overrides": [
     {
       "files": [

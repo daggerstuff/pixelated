@@ -1,10 +1,10 @@
 import { Send, Brain, User, Bot, Sparkles, Activity } from 'lucide-react'
 import React, { useState, useRef, useEffect, useCallback, type FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Textarea } from '@/components/ui/textarea.tsx'
 import type { MindMirrorAnalysis } from '@/lib/mental-health/types'
 
 import BrainVisualization from './BrainVisualization'
@@ -24,6 +24,8 @@ interface EnhancedMentalHealthChatProps {
   showBrainViz?: boolean
   showAnalysisPanel?: boolean
 }
+
+type Archetype = MindMirrorAnalysis['archetype']['main_archetype']
 
 // Mock analysis function for demo purposes
 const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
@@ -66,34 +68,34 @@ const mockAnalyze = async (text: string): Promise<MindMirrorAnalysis> => {
     confidence = 0.78
   }
 
+  const matchCount = (expression: RegExp): number =>
+    (words.match(expression) ?? []).length
+
   const emotional_intensity = Math.min(
     0.9,
-    (words.match(/feel|emotion|sad|happy|angry|excited/g) || []).length * 0.2 +
-      0.3,
+    matchCount(/feel|emotion|sad|happy|angry|excited/g) * 0.2 + 0.3,
   )
   const cognitive_clarity = Math.min(
     0.9,
-    (words.match(/think|understand|realize|know|clear/g) || []).length * 0.15 +
-      0.4,
+    matchCount(/think|understand|realize|know|clear/g) * 0.15 + 0.4,
   )
   const energy_level = Math.min(
     0.9,
-    (words.match(/energy|tired|excited|motivated|drive/g) || []).length * 0.2 +
-      0.5,
+    matchCount(/energy|tired|excited|motivated|drive/g) * 0.2 + 0.5,
   )
   const social_connection = Math.min(
     0.9,
-    (words.match(/friend|family|people|together|alone/g) || []).length * 0.25 +
-      0.4,
+    matchCount(/friend|family|people|together|alone/g) * 0.25 + 0.4,
   )
   const coherence_index = (cognitive_clarity + energy_level) / 2
   // Use cryptographically secure random if available, otherwise use a deterministic value for demo
   const getRandomValue = () => {
     try {
-      const { crypto } = globalThis
-      if (crypto && typeof crypto.getRandomValues === 'function') {
-        const randomArray = crypto.getRandomValues(new Uint32Array(1))
-        if (Array.isArray(randomArray) && randomArray.length > 0) {
+      if (typeof globalThis.crypto.getRandomValues === 'function') {
+        const randomArray = globalThis.crypto.getRandomValues(
+          new Uint32Array(1),
+        )
+        if (randomArray.length > 0) {
           const randomValue = randomArray[0]
           if (
             typeof randomValue === 'number' &&
@@ -244,7 +246,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
       return "I notice some urgency in your message. It's important that you know support is available. Would you like to talk about what's concerning you most right now?"
     }
 
-    const responses = {
+    const responses: Record<Archetype, string> = {
       wounded_healer:
         'I can sense the depth of your experience. Your ability to transform challenges into wisdom is remarkable. How has this journey shaped your perspective?',
       shadow_strategist:
@@ -262,7 +264,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
     }
 
     return (
-      responses[archetype as keyof typeof responses] ||
+      responses[archetype] ??
       "Thank you for sharing. I can see there's a lot going on for you right now. What would be most helpful to explore together?"
     )
   }
@@ -278,32 +280,32 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
     <div className={`mx-auto flex w-full max-w-7xl gap-6 ${className}`}>
       {/* Main Chat Interface */}
       <div className={`flex-1 ${showAnalysisPanel ? 'max-w-[60%]' : 'w-full'}`}>
-        <Card className="flex h-[700px] flex-col border-0 shadow-lg">
+        <Card className='flex h-[700px] flex-col border-0 shadow-lg'>
           {/* Header */}
-          <CardHeader className="from-purple-50 to-blue-50 border-b bg-gradient-to-r">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="from-purple-500 to-blue-600 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r">
-                  <Brain className="text-white h-5 w-5" />
+          <CardHeader className='from-purple-50 to-blue-50 border-b bg-gradient-to-r'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center space-x-3'>
+                <div className='from-purple-500 to-blue-600 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r'>
+                  <Brain className='text-white h-5 w-5' />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">
+                  <CardTitle className='text-lg'>
                     Enhanced Mental Health Chat
                   </CardTitle>
-                  <p className="text-gray-600 text-sm">
+                  <p className='text-gray-600 text-sm'>
                     Real-time psychological analysis
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className='flex items-center space-x-2'>
                 {isAnalyzing && (
-                  <Badge variant="secondary" className="animate-pulse">
-                    <Activity className="mr-1 h-3 w-3" />
+                  <Badge variant='secondary' className='animate-pulse'>
+                    <Activity className='mr-1 h-3 w-3' />
                     Analyzing...
                   </Badge>
                 )}
-                <Badge variant="outline">
-                  <Sparkles className="mr-1 h-3 w-3" />
+                <Badge variant='outline'>
+                  <Sparkles className='mr-1 h-3 w-3' />
                   AI Enhanced
                 </Badge>
               </div>
@@ -311,7 +313,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
           </CardHeader>
 
           {/* Messages */}
-          <CardContent className="flex-1 space-y-4 overflow-y-auto p-4">
+          <CardContent className='flex-1 space-y-4 overflow-y-auto p-4'>
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -324,15 +326,15 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  <div className="flex items-start space-x-2">
+                  <div className='flex items-start space-x-2'>
                     {message.role === 'assistant' && (
-                      <Bot className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <Bot className='mt-0.5 h-4 w-4 flex-shrink-0' />
                     )}
                     {message.role === 'user' && (
-                      <User className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                      <User className='mt-0.5 h-4 w-4 flex-shrink-0' />
                     )}
-                    <div className="flex-1">
-                      <p className="text-sm">{message.content}</p>
+                    <div className='flex-1'>
+                      <p className='text-sm'>{message.content}</p>
                       <p
                         className={`mt-1 text-xs ${
                           message.role === 'user'
@@ -351,22 +353,22 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
           </CardContent>
 
           {/* Input */}
-          <div className="bg-gray-50 border-t p-4">
-            <div className="flex space-x-2">
+          <div className='bg-gray-50 border-t p-4'>
+            <div className='flex space-x-2'>
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Share your thoughts and feelings..."
-                className="min-h-[60px] flex-1 resize-none"
+                placeholder='Share your thoughts and feelings...'
+                className='min-h-[60px] flex-1 resize-none'
                 disabled={isAnalyzing}
               />
               <Button
                 onClick={handleSend}
                 disabled={!input.trim() || isAnalyzing}
-                className="from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 self-end bg-gradient-to-r"
+                className='from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 self-end bg-gradient-to-r'
               >
-                <Send className="h-4 w-4" />
+                <Send className='h-4 w-4' />
               </Button>
             </div>
           </div>
@@ -375,12 +377,12 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
 
       {/* Analysis Panel */}
       {showAnalysisPanel && (
-        <div className="w-[40%] space-y-6">
+        <div className='w-[40%] space-y-6'>
           {/* Brain Visualization */}
-          {showBrainViz && (
+          {showBrainViz && currentAnalysis && (
             <BrainVisualization
-              moodVector={currentAnalysis?.mood_vector}
-              archetype={currentAnalysis?.archetype.main_archetype}
+              moodVector={currentAnalysis.mood_vector}
+              archetype={currentAnalysis.archetype.main_archetype}
             />
           )}
 

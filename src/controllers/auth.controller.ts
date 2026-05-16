@@ -6,7 +6,7 @@ import { AuthService } from '../services/auth.service'
 import { RegisterDto } from '../validation/register-schema'
 
 export class AuthController {
-  private authService: AuthService
+  private readonly authService: AuthService
 
   constructor(authService: AuthService) {
     this.authService = authService

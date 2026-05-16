@@ -8,6 +8,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { loadEnv } from 'vite'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
 const isRailwayDeploy =
@@ -19,11 +20,16 @@ const isFlyioDeploy =
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
-// Detect if we're running a build command (not dev server)
-const isBuildCommand =
-  process.argv.includes('build') ||
-  process.env.CI === 'true' ||
-  !!process.env.VERCEL
+
+// Explicitly load environment variables from .env files into process.env
+// for use during configuration evaluation (e.g. Sentry DSN check).
+const loadedEnv = loadEnv(
+  process.env.NODE_ENV ?? 'development',
+  process.cwd(),
+  '',
+)
+Object.assign(process.env, loadedEnv)
+
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN =
   !!process.env.SENTRY_DSN ||

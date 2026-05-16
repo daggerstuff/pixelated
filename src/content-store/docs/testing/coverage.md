@@ -174,7 +174,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6.0.2
 
       - name: Install dependencies
         run: npm ci
