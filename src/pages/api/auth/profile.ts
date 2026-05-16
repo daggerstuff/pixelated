@@ -22,11 +22,19 @@ export const GET = async ({
   clientAddress: string
 }) => {
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> origin/staging
   const clientInfo = {
     ip: clientAddress || 'unknown',
     userAgent: request.headers.get('user-agent') ?? 'unknown',
     deviceId: request.headers.get('x-device-id') ?? 'unknown',
   }
+<<<<<<< HEAD
+
+  try {
+    // Extract client info for logging
+=======
 =======
   let clientInfo = {
     ip: clientAddress || 'unknown',
@@ -43,6 +51,7 @@ export const GET = async ({
 >>>>>>> origin/staging
 
   try {
+>>>>>>> origin/staging
     // Rate limit profile reads (e.g. 60 per minute)
     const rateLimitResult = await rateLimitMiddleware(
       request,
@@ -63,6 +72,9 @@ export const GET = async ({
 =======
     if (session?.user) {
 <<<<<<< HEAD
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
       userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
 =======
@@ -79,6 +91,7 @@ export const GET = async ({
 >>>>>>> origin/staging
 =======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
@@ -216,6 +229,9 @@ export const PUT = async ({
 =======
     if (session?.user) {
 <<<<<<< HEAD
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
       userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
 =======
@@ -232,6 +248,7 @@ export const PUT = async ({
 >>>>>>> origin/staging
 =======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
