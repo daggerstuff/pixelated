@@ -111,14 +111,14 @@ export interface PluginAPI {
 }
 
 export interface EventEmitter {
-  on: <T = unknown>(event: string, handler: (data: T) => void) => void
-  off: <T = unknown>(event: string, handler: (data: T) => void) => void
-  emit: <T = unknown>(event: string, data: T) => void
+  on: (event: string, handler: (data: unknown) => void) => void
+  off: (event: string, handler: (data: unknown) => void) => void
+  emit: (event: string, data: unknown) => void
 }
 
 export interface StorageAPI {
   get: <T = unknown>(key: string) => Promise<T>
-  set: <T = unknown>(key: string, value: T) => Promise<void>
+  set: (key: string, value: unknown) => Promise<void>
   delete: (key: string) => Promise<void>
 }
 

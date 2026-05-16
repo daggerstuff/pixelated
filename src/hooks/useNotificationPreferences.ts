@@ -1,6 +1,11 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import { useEffect, useState } from 'react'
 
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+import {
+  fetchJsonWithAuthToken,
+  fetchWithAuthToken,
+} from '../lib/auth/auth0-protected-fetch'
+import { NotificationChannel } from '../lib/services/notification/NotificationService'
 
 export interface NotificationPreferences {
   channels: {
@@ -46,6 +51,7 @@ export function useNotificationPreferences() {
     useState<NotificationPreferences>(defaultPreferences)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const { getAccessTokenSilently } = useAuth0()
 
   useEffect(() => {
     void loadPreferences()
@@ -54,13 +60,12 @@ export function useNotificationPreferences() {
   const loadPreferences = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/user/notification-preferences')
-      if (!response.ok) {
-        throw new Error('Failed to load notification preferences')
-      }
-
-      const data = await response.json()
-      setPreferences(data)
+      const data = await fetchJsonWithAuthToken(
+        '/api/user/notification-preferences',
+        { method: 'GET' },
+        { getAccessTokenSilently },
+      )
+      setPreferences(data as NotificationPreferences)
       setError(null)
     } catch (err: unknown) {
       setError(err instanceof Error ? err : new Error('Unknown error'))
@@ -76,21 +81,25 @@ export function useNotificationPreferences() {
   ) => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/user/notification-preferences', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetchWithAuthToken(
+        '/api/user/notification-preferences',
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...preferences,
+            ...newPreferences,
+          }),
         },
-        body: JSON.stringify({
-          ...preferences,
-          ...newPreferences,
-        }),
-      })
+        { getAccessTokenSilently },
+      )
 
       if (!response.ok) {
-        throw new Error('Failed to update notification preferences')
+        const message = await response.text().catch(() => 'Failed to update')
+        throw new Error(message)
       }
-
       const data = await response.json()
       setPreferences(data)
       setError(null)

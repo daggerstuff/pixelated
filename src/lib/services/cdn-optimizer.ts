@@ -65,13 +65,13 @@ interface CDNResponse {
  * CDN and edge caching service
  */
 export class CDNEdgeOptimizer {
-  private config: CDNConfig
-  private assetCache: Map<string, AssetMetadata> = new Map()
+  private readonly config: CDNConfig
+  private readonly assetCache: Map<string, AssetMetadata> = new Map()
 
   constructor(config: Partial<CDNConfig> = {}) {
     this.config = {
       provider: 'cloudflare',
-      baseUrl: process.env.CDN_BASE_URL || 'https://cdn.pixelatedempathy.com',
+      baseUrl: process.env.CDN_BASE_URL ?? 'https://cdn.pixelatedempathy.com',
       edgeCache: {
         enabled: true,
         defaultTTL: 3600, // 1 hour
@@ -198,7 +198,7 @@ export class CDNEdgeOptimizer {
         format: options.format,
         width: options.width,
         height: options.height,
-        quality: options.quality || this.config.assets.imageQuality,
+        quality: options.quality ?? this.config.assets.imageQuality,
         webp: options.format === 'webp',
         avif: options.format === 'avif',
       })
@@ -212,7 +212,7 @@ export class CDNEdgeOptimizer {
       const metadata: AssetMetadata = {
         url: imagePath,
         originalSize: 0, // Would be populated from actual file
-        format: options.format || 'jpeg',
+        format: options.format ?? 'jpeg',
         hash: cacheKey,
         cdnUrl: optimizedUrl,
         cacheHeaders: this.generateCacheHeaders(),
@@ -300,7 +300,7 @@ export class CDNEdgeOptimizer {
     for (let i = 0; i < assets.length; i += batchSize) {
       const batch = assets.slice(i, i + batchSize)
 
-      const batchPromises = batch.map((asset) =>
+      const batchPromises = batch.map( async (asset) =>
         this.optimizeImage(asset.path, asset.options),
       )
 
@@ -335,10 +335,10 @@ export class CDNEdgeOptimizer {
       formats?: string[]
     } = {},
   ): string {
-    const breakpoints = options.breakpoints || [640, 1024, 1280, 1920]
-    const formats = options.formats || ['avif', 'webp', 'jpeg']
+    const breakpoints = options.breakpoints ?? [640, 1024, 1280, 1920]
+    const formats = options.formats ?? ['avif', 'webp', 'jpeg']
     const sizes =
-      options.sizes ||
+      options.sizes ??
       '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 
     let html = `<!-- Responsive image: ${alt} -->\n`
@@ -466,7 +466,7 @@ export class CDNEdgeOptimizer {
  * CDN utilities and helpers
  */
 export class CDNUtility {
-  private optimizer: CDNEdgeOptimizer
+  private readonly optimizer: CDNEdgeOptimizer
 
   constructor(optimizer: CDNEdgeOptimizer) {
     this.optimizer = optimizer
@@ -586,9 +586,7 @@ let cdnOptimizer: CDNEdgeOptimizer | null = null
  * Get global CDN optimizer instance
  */
 export function getCDNOptimizer(): CDNEdgeOptimizer {
-  if (!cdnOptimizer) {
-    cdnOptimizer = new CDNEdgeOptimizer()
-  }
+  cdnOptimizer ??= new CDNEdgeOptimizer();
   return cdnOptimizer
 }
 
@@ -623,14 +621,14 @@ export const cdnUtils = {
   /**
    * Invalidate CDN cache for specific patterns
    */
-  invalidateCache: (patterns: string[]) => {
+  invalidateCache:  async (patterns: string[]) => {
     return getCDNOptimizer().invalidateCDNCache(patterns)
   },
 
   /**
    * Get CDN performance metrics
    */
-  getMetrics: () => {
+  getMetrics:  async () => {
     return getCDNOptimizer().getCDNMetrics()
   },
 }

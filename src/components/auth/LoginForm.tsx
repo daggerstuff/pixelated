@@ -142,7 +142,7 @@ export function LoginForm({
       if (result.error) {
         const errorMessage =
           typeof result.error === 'object' && result.error !== null
-            ? (result.error as { message?: string }).message ||
+            ? (result.error as { message?: string }).message ??
               'Login failed. Please check your credentials.'
             : 'Login failed. Please check your credentials.'
 
@@ -229,7 +229,7 @@ export function LoginForm({
     try {
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: redirectTo || '/dashboard',
+        callbackURL: redirectTo ?? '/dashboard',
       })
       // OAuth redirect will happen automatically
       toast.info('Redirecting to Google authentication...')

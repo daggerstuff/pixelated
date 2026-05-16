@@ -4,6 +4,28 @@ import type { AIMessage, AIServiceOptions } from '@/lib/ai/models/ai-types'
 import { createLLMService } from '@/lib/ai/services/llm-provider'
 
 const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+const LLM_PROVIDER_API_KEYS: readonly string[] = [
+  'LLM_API_KEY',
+  'NVIDIA_API_KEY',
+  'NIM_API_KEY',
+  'NVIDIA_TOKEN',
+]
+const LLM_PROVIDER_BASE_URLS: readonly string[] = [
+  'LLM_BASE_URL',
+  'LLM_API_URL',
+  'OPENAI_BASE_URL',
+  'NVIDIA_OPENAI_BASE_URL',
+  'NVIDIA_BASE_URL',
+  'NIM_BASE_URL',
+]
+
+function resolveProviderApiKey(): string | undefined {
+  for (const key of LLM_PROVIDER_API_KEYS) {
+    const value = process.env[key]
+    if (value) return value
+  }
+  return undefined
+}
 
 function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
   return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
@@ -11,9 +33,7 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 
 function resolveSafeLlmBaseUrl(): string {
   const baseUrl =
-    process.env['LLM_BASE_URL'] ||
-    process.env['LLM_API_URL'] ||
-    process.env['OPENAI_BASE_URL'] ||
+    LLM_PROVIDER_BASE_URLS.map((key) => process.env[key]).find(Boolean) ??
     ''
 
   if (isOpenRouterBaseUrl(baseUrl)) {
@@ -29,7 +49,7 @@ export function useAIService() {
       try {
         // Create AI service
         const aiService = createLLMService({
-          apiKey: process.env['LLM_API_KEY'] || '',
+          apiKey: resolveProviderApiKey() ?? '',
           baseUrl: resolveSafeLlmBaseUrl(),
         })
 

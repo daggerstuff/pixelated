@@ -98,9 +98,6 @@ export function initializeTracing(): void {
       '@opentelemetry/instrumentation-redis': {
         enabled: config.instrumentation.redis,
       },
-      '@opentelemetry/instrumentation-fastify': {
-        enabled: config.instrumentation.fastify || false,
-      },
     })
 
     // Initialize SDK

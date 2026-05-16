@@ -469,8 +469,11 @@ export class BiasDetectionEngine {
 
   async analyzeSession(session: SessionData): Promise<AnalysisResult> {
     this.ensureInitialized();
-    if (session.sessionId === "") {
-      throw new Error("Session ID cannot be empty");
+    if (
+      typeof session.sessionId !== "string" ||
+      session.sessionId.trim() === ""
+    ) {
+      throw new Error("Session ID is required");
     }
 
     const recs: string[] = [];

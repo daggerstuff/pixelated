@@ -76,7 +76,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     }
 
     // Get query parameters
-    const period = url.searchParams.get('period') || 'daily'
+    const period = url.searchParams.get('period') ?? 'daily'
     const allUsers = url.searchParams.get('allUsers') === 'true'
     const userId = allUsers ? undefined : session?.user?.id
 
@@ -84,7 +84,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.stats.request',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai',
       {
         period,
@@ -104,7 +104,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.stats.response',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai',
       {
         period,
@@ -129,7 +129,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.stats.error',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai',
       {
         error: error instanceof Error ? error?.message : String(error),

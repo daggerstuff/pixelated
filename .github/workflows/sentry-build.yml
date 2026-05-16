@@ -25,7 +25,12 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@a64b8d0
         with:
+<<<<<<< HEAD
           version: 11.1.1
+=======
+          version: 11.1.2
+
+>>>>>>> origin/staging
       - name: Use Node.js
         uses: actions/setup-node@v6.4.0
         with:

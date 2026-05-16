@@ -1,13 +1,13 @@
 import { Bell, Check, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
-import { Card } from '@/components/ui/card/index.ts'
-import { useWebSocket } from '@/hooks/useWebSocket'
-import type { NotificationItem } from '@/lib/services/notification/NotificationService'
-import { NotificationStatus } from '@/lib/services/notification/NotificationService'
-import { cn } from '@/lib/utils'
+import { Badge } from '../ui/badge/index.ts'
+import { Button } from '../ui/button/index.ts'
+import { Card } from '../ui/card/index.ts'
+import { useWebSocket } from '../../hooks/useWebSocket'
+import type { NotificationItem } from '../../lib/services/notification/NotificationService'
+import { NotificationStatus } from '../../lib/services/notification/NotificationService'
+import { cn } from '../../lib/utils'
 
 interface NotificationCenterProps {
   className?: string
@@ -149,7 +149,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         <Button
                           variant='ghost'
                           size='icon'
-                          onClick={() => handleMarkAsRead(notification.id)}
+                          onClick={ async () => handleMarkAsRead(notification.id)}
                         >
                           <Check className='h-4 w-4' />
                         </Button>
@@ -157,7 +157,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                       <Button
                         variant='ghost'
                         size='icon'
-                        onClick={() => handleDismiss(notification.id)}
+                        onClick={ async () => handleDismiss(notification.id)}
                       >
                         <X className='h-4 w-4' />
                       </Button>

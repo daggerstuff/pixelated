@@ -32,7 +32,7 @@ const createMockModelProvider = (): IModelProvider => ({
     version: '1.0.0',
     capabilities: ['text-analysis'],
   }),
-  isAvailable: () => Promise.resolve(true),
+  isAvailable:  async () => Promise.resolve(true),
 })
 
 describe('Evidence Extraction System', () => {

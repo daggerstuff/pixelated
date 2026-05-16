@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test'
 
 export class TestUtils {
-  private page: Page
+  private readonly page: Page
 
   constructor(page: Page) {
     this.page = page
@@ -18,7 +18,7 @@ export class TestUtils {
   }
 
   async loginAsTestUser(page?: Page) {
-    const targetPage = page || this.page
+    const targetPage = page ?? this.page
     await targetPage.goto('/login')
     await targetPage.fill('[data-testid="email-input"]', 'test@example.com')
     await targetPage.fill('[data-testid="password-input"]', 'password123')
@@ -27,7 +27,7 @@ export class TestUtils {
   }
 
   async logout(page?: Page) {
-    const targetPage = page || this.page
+    const targetPage = page ?? this.page
     await targetPage.click('[data-testid="user-menu"]')
     await targetPage.click('[data-testid="logout-button"]')
     await targetPage.waitForURL('/login')

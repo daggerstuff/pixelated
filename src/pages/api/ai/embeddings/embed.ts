@@ -153,7 +153,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     // Try to use the Python embedding agent service
     const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+      import.meta.env['EMBEDDING_AGENT_URL'] ?? 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {

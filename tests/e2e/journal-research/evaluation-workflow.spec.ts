@@ -119,7 +119,7 @@ test.describe('Journal Research Evaluation Workflow', () => {
         for (let i = 0; i < rowCount; i++) {
           const scoreCell = evaluationList.nth(i).locator('td').nth(4) // Assuming score is 5th column
           const scoreText = await scoreCell.textContent()
-          const score = parseFloat(scoreText || '0')
+          const score = parseFloat(scoreText ?? '0')
           scores.push(score)
         }
 

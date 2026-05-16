@@ -48,17 +48,17 @@ export interface MarketSector {
 }
 
 export class YahooFinanceService {
-  private logger: Logger
-  private client: AxiosInstance
-  private cache: Map<string, { data: any; timestamp: number }> = new Map()
+  private readonly logger: Logger
+  private readonly client: AxiosInstance
+  private readonly cache: Map<string, { data: any; timestamp: number }> = new Map()
   private readonly CACHE_TTL =
-    parseInt(process.env['CACHE_TTL_SECONDS'] || '300', 10) * 1000
+    parseInt(process.env['CACHE_TTL_SECONDS'] ?? '300', 10) * 1000
 
   constructor() {
     this.logger = new Logger('YahooFinanceService')
     this.client = axios.create({
       baseURL:
-        process.env['YAHOO_FINANCE_API_URL'] ||
+        process.env['YAHOO_FINANCE_API_URL'] ??
         'https://query1.finance.yahoo.com/v8/finance',
       timeout: 10000,
       headers: {
@@ -144,7 +144,7 @@ export class YahooFinanceService {
       })
 
       const result = response.data.chart?.result?.[0]
-      if (!result || !result.timestamp || !result.indicators?.quote?.[0]) {
+      if (!result?.timestamp || !result.indicators?.quote?.[0]) {
         this.logger.warn('No historical data found', { symbol, period })
         return []
       }
@@ -155,14 +155,14 @@ export class YahooFinanceService {
       const data: YahooFinanceHistoricalData[] = timestamp.map(
         (time: number, index: number) => ({
           date: new Date(time * 1000),
-          open: quote.open?.[index] || 0,
-          high: quote.high?.[index] || 0,
-          low: quote.low?.[index] || 0,
-          close: quote.close?.[index] || 0,
-          volume: quote.volume?.[index] || 0,
+          open: quote.open?.[index] ?? 0,
+          high: quote.high?.[index] ?? 0,
+          low: quote.low?.[index] ?? 0,
+          close: quote.close?.[index] ?? 0,
+          volume: quote.volume?.[index] ?? 0,
           adjustedClose:
-            indicators.adjclose?.[0]?.adjclose?.[index] ||
-            quote.close?.[index] ||
+            (indicators.adjclose?.[0]?.adjclose?.[index] ??
+            quote.close?.[index]) ??
             0,
         }),
       )
@@ -198,16 +198,16 @@ export class YahooFinanceService {
 
       const profile: CompanyProfile = {
         symbol: result.symbol,
-        companyName: result.longName || result.shortName || result.symbol,
-        industry: result.industry || 'Unknown',
-        sector: result.sector || 'Unknown',
-        marketCap: result.marketCap || 0,
-        employees: result.fullTimeEmployees || 0,
-        revenue: result.revenue || 0,
-        profitMargin: result.profitMargins || 0,
-        beta: result.beta || 0,
-        peRatio: result.trailingPE || 0,
-        dividendYield: result.trailingAnnualDividendYield || 0,
+        companyName: (result.longName ?? result.shortName) ?? result.symbol,
+        industry: result.industry ?? 'Unknown',
+        sector: result.sector ?? 'Unknown',
+        marketCap: result.marketCap ?? 0,
+        employees: result.fullTimeEmployees ?? 0,
+        revenue: result.revenue ?? 0,
+        profitMargin: result.profitMargins ?? 0,
+        beta: result.beta ?? 0,
+        peRatio: result.trailingPE ?? 0,
+        dividendYield: result.trailingAnnualDividendYield ?? 0,
       }
 
       this.setCache(cacheKey, profile)
@@ -227,7 +227,7 @@ export class YahooFinanceService {
   async getMarketIndices(): Promise<YahooFinanceQuote[]> {
     const indices = ['^GSPC', '^DJI', '^IXIC', '^RUT', '^VIX']
     const results = await Promise.all(
-      indices.map((symbol) => this.getQuote(symbol)),
+      indices.map( async (symbol) => this.getQuote(symbol)),
     )
     return results.filter(
       (result): result is YahooFinanceQuote => result !== null,

@@ -143,7 +143,7 @@ export function ChartWidget({
             {
               data: dataPoints.map((dp) => dp.value),
               backgroundColor: dataPoints.map(
-                (dp, i) => dp.color || defaultColors[i % defaultColors.length],
+                (dp, i) => dp.color ?? defaultColors[i % defaultColors.length],
               ),
               borderWidth: 1,
             },
@@ -171,10 +171,10 @@ export function ChartWidget({
           label: series.name,
           data: series.data,
           backgroundColor:
-            series.color || defaultColors[i % defaultColors.length],
+            series.color ?? defaultColors[i % defaultColors.length],
           borderColor:
-            series.color ||
-            defaultColors[i % defaultColors.length]?.replace('0.5', '1') ||
+            (series.color ??
+            defaultColors[i % defaultColors.length]?.replace('0.5', '1')) ??
             'rgba(59, 130, 246, 1)',
           borderWidth: type === 'line' ? 2 : 1,
           tension: 0.4,
@@ -285,7 +285,7 @@ export function ChartWidget({
   return (
     <DashboardWidget
       title={title}
-      description={description || ''}
+      description={description ?? ''}
       isLoading={isLoading}
       {...(fetchData && { onRefresh: handleRefresh })}
       className={className}

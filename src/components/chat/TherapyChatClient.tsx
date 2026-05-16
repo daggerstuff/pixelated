@@ -203,7 +203,7 @@ export function TherapyChatClient() {
   return (
     <ChatShell autoScrollDeps={[messages]}>
       {({ containerRef, messagesEndRef, showScrollButton, scrollToBottom }) => (
-        <div className={`${isExpanded ? 'fixed inset-0 z-50' : ''}`}>
+        <div className={isExpanded ? 'fixed inset-0 z-50' : ''}>
           {/* Header */}
           <div className='from-purple-900 via-purple-800 to-purple-900 mb-4 flex items-center justify-between rounded-t-lg bg-gradient-to-r p-3'>
             <h1 className='text-xl font-bold'>
@@ -293,7 +293,7 @@ export function TherapyChatClient() {
                       ...messageProps,
                       encrypted: encryptionEnabled,
                     }
-                    const key = id || `message-${index}`
+                    const key = id ?? `message-${index}`
 
                     return React.createElement(ChatMessage, {
                       key,

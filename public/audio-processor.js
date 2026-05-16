@@ -34,7 +34,7 @@ class AudioProcessor extends AudioWorkletProcessor {
 
   process(inputs, _outputs, _parameters) {
     const input = inputs[0]
-    if (!input || !input.length) {
+    if (!input?.length) {
       return true
     }
 
@@ -135,7 +135,7 @@ registerProcessor('audio-processor', AudioProcessor)
                 : {},
       n = new e.Error().stack
     n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      ((e._sentryDebugIds = e._sentryDebugIds ?? {}),
       (e._sentryDebugIds[n] = 'd4df62f5-8102-57f4-b98f-792553d7d6d1'))
   } catch (e) {}
 })()

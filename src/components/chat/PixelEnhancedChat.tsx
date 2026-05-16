@@ -51,7 +51,7 @@ export function PixelEnhancedChat({
     sessionId,
     userId,
     pixelApiUrl:
-      process.env['REACT_APP_PIXEL_API_URL'] || 'http://localhost:8001',
+      process.env['REACT_APP_PIXEL_API_URL'] ?? 'http://localhost:8001',
   })
 
   // Local state
@@ -225,7 +225,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.emotionalAwareness[
                       eqMetrics.emotionalAwareness.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -233,7 +233,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.empathyRecognition[
                       eqMetrics.empathyRecognition.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -241,7 +241,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.emotionalRegulation[
                       eqMetrics.emotionalRegulation.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -249,7 +249,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.socialCognition[
                       eqMetrics.socialCognition.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
                 <MetricBar
@@ -257,7 +257,7 @@ export function PixelEnhancedChat({
                   value={
                     eqMetrics.interpersonalSkills[
                       eqMetrics.interpersonalSkills.length - 1
-                    ] || 0
+                    ] ?? 0
                   }
                 />
               </CardContent>

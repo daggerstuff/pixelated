@@ -64,7 +64,7 @@ export class TemporalAnalysisService {
     ) {
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
-        userId: events[0]?.userId || 'unknown',
+        userId: events[0]?.userId ?? 'unknown',
         patternId: 'temporal_timing',
         anomalyType: 'deviation',
         severity: 'medium',

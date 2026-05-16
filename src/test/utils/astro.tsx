@@ -111,7 +111,7 @@ function normalizeComponent(component: unknown): AstroComponentWithRender {
   // Handle component with render method
   if (hasRenderMethod(component)) {
     return {
-      render: async (props = {}, slots = undefined) => {
+      render: async (props = {}, slots) => {
         return await component.render(props, slots)
       },
     }
@@ -128,9 +128,9 @@ function normalizeComponent(component: unknown): AstroComponentWithRender {
  * @param slotContent Optional content to pass to the default slot
  * @returns The rendered component
  */
-export async function renderAstro<Props extends Record<string, unknown>>(
+export async function renderAstro(
   Component: unknown,
-  props?: Props,
+  props?: Record<string, unknown>,
   slotContent?: string,
 ): Promise<{
   astroContainer: HTMLDivElement

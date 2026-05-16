@@ -23,8 +23,8 @@ export const POST = async ({
   let clientInfo
   try {
     // Extract client information
-    const userAgent = request.headers.get('user-agent') || 'unknown'
-    const deviceId = request.headers.get('x-device-id') || 'unknown'
+    const userAgent = request.headers.get('user-agent') ?? 'unknown'
+    const deviceId = request.headers.get('x-device-id') ?? 'unknown'
     clientInfo = {
       ip: clientAddress || 'unknown',
       userAgent,
@@ -91,7 +91,7 @@ export const POST = async ({
     }
 
     // Log successful login
-    await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
+     logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
       email: user.email,
       role: user.role,
       clientInfo,
@@ -127,7 +127,7 @@ export const POST = async ({
   } catch (error: any) {
     console.error('Sign in error:', error)
 
-    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+     logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       error: error instanceof Error ? error.message : 'Unknown error',
       clientInfo,
       timestamp: Date.now(),
@@ -155,7 +155,7 @@ export const OPTIONS = async ({ request }: { request: Request }) => {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+      'Access-Control-Allow-Origin': request.headers.get('origin') ?? '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers':
         'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',

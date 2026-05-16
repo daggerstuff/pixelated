@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { createRoot } from 'react-dom/client'
 import { fireEvent } from '@testing-library/dom'
-import { act } from 'react-dom/test-utils'
+import { act } from '@testing-library/react'
 import type { SearchFiltersState } from './SearchFilters'
 import SearchFilters from './SearchFilters'
 
@@ -23,7 +23,7 @@ describe('SearchFilters', () => {
     const container = document.createElement('div')
     const root = createRoot(container)
     document.body.appendChild(container)
-    await act(() => {
+     act(() => {
       root.render(
         <SearchFilters
           filters={defaultFilters}
@@ -38,7 +38,7 @@ describe('SearchFilters', () => {
       container,
       root,
       async cleanup() {
-        await act(() => {
+         act(() => {
           root.unmount()
         })
         container.remove()

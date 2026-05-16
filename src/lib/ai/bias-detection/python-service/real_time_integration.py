@@ -28,11 +28,7 @@ from real_ml_models import (
 from bias_detection.sentry_metrics import bias_metrics
 
 # Import existing bias detection components
-from bias_detection_service import (
-    BiasDetectionConfig,
-    BiasDetectionService,
-    SessionData,
-)
+from bias_detection.compat import BiasDetectionConfig, BiasDetectionService, SessionData
 
 logger = logging.getLogger(__name__)
 

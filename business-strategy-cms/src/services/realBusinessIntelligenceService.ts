@@ -8,9 +8,9 @@ import { DatabaseService } from './databaseService'
 import { YahooFinanceService } from './yahooFinanceService'
 
 export class RealBusinessIntelligenceService {
-  private logger: Logger
-  private yahooService: YahooFinanceService
-  private db: DatabaseService
+  private readonly logger: Logger
+  private readonly yahooService: YahooFinanceService
+  private readonly db: DatabaseService
 
   constructor() {
     this.logger = new Logger('RealBusinessIntelligenceService')
@@ -407,12 +407,12 @@ export class RealBusinessIntelligenceService {
         'DE',
       ],
     }
-    return industryMap[industry.toLowerCase()] || ['SPY']
+    return industryMap[industry.toLowerCase()] ?? ['SPY']
   }
 
   private calculateAverageMetrics(data: any[], metric: string): number {
     const values = data
-      .map((item) => item[metric] || 0)
+      .map((item) => item[metric] ?? 0)
       .filter((val) => val > 0)
     return values.length > 0
       ? values.reduce((sum, val) => sum + val, 0) / values.length
@@ -481,7 +481,7 @@ export class RealBusinessIntelligenceService {
       financial: ['risk', 'compliance', 'trading', 'lending', 'wealth'],
     }
 
-    const industryFeaturesList = industryFeatures[_industry.toLowerCase()] || []
+    const industryFeaturesList = industryFeatures[_industry.toLowerCase()] ?? []
     industryFeaturesList.forEach((feature) => {
       features[feature] = 0.7 + Math.random() * 0.3
     })

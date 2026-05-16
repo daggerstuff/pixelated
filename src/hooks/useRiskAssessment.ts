@@ -46,9 +46,9 @@ export const useRiskAssessment = () => {
             parsed.category === 'high'
               ? parsed.category
               : 'low',
-          factors: parsed.factors || [],
-          requiresExpert: parsed.requiresExpert || false,
-          confidence: parsed.confidence || 0.5,
+          factors: parsed.factors ?? [],
+          requiresExpert: parsed.requiresExpert ?? false,
+          confidence: parsed.confidence ?? 0.5,
         }
       } catch (error: unknown) {
         console.error('Error assessing risk:', error)

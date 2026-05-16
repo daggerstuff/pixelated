@@ -103,8 +103,8 @@ export function validateBlogPost(post: CollectionEntry<'blog'>): {
 export function getBlogPostMetrics(
   post: CollectionEntry<'blog'>,
 ): BlogPostMetrics {
-  const wordCount = calculateWordCount(post.body || '')
-  const readingTime = calculateReadingTime(post.body || '')
+  const wordCount = calculateWordCount(post.body ?? '')
+  const readingTime = calculateReadingTime(post.body ?? '')
 
   return {
     wordCount,
@@ -130,7 +130,7 @@ export function filterBlogPosts(
 
   if (filters.tag) {
     filtered = filtered.filter(
-      (post) => post.data.tags && post.data.tags.includes(filters.tag),
+      (post) => post.data.tags?.includes(filters.tag),
     )
   }
 

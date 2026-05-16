@@ -28,7 +28,7 @@ export async function GET() {
     items: sortedBlogItems.map((item) => ({
       title: `${item.data.title}`,
       link: getUrl(`/blog/${item.slug}`),
-      pubDate: item.data.updatedDate || item.data.pubDate,
+      pubDate: item.data.updatedDate ?? item.data.pubDate,
       description: item.data.description,
     })),
 

@@ -50,7 +50,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) {}
+  constructor(private readonly llmInvoker: LLMInvoker) {}
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()
@@ -109,7 +109,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
         input.context,
       )
       // If LLM returned a meaningful decision, use it
-      if (llmDecision && llmDecision.targetAnalyzer) {
+      if (llmDecision?.targetAnalyzer) {
         return llmDecision
       }
     } catch {
@@ -211,7 +211,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
     if (!content) return null
     // Strip markdown code fences
     const fencedMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/im)
-    if (fencedMatch && fencedMatch[1]) {
+    if (fencedMatch?.[1]) {
       return fencedMatch[1].trim()
     }
     // Sometimes models respond with a JSON-like line or object
@@ -266,7 +266,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
         reason?: string
       }
       const category = parsed.category ?? 'general'
-      const mapped = this.mapLlmCategoryToAnalyzer(String(category))
+      const mapped = this.mapLlmCategoryToAnalyzer(category)
       const confidence = Math.max(
         0,
         Math.min(1, Number(parsed.confidence) || 0.5),
@@ -278,7 +278,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
         isCritical,
         method: 'llm',
         insights: {
-          llmReasoning: parsed.reason || raw,
+          llmReasoning: parsed.reason ?? raw,
           llmCategory: parsed.category,
         },
       }

@@ -31,7 +31,7 @@ export interface CompletionResult {
  * Service class for AI completions
  */
 export class CompletionService {
-  private aiService: ReturnType<typeof createLLMService>
+  private readonly aiService: ReturnType<typeof createLLMService>
 
   constructor(config: CompletionServiceConfig) {
     if (!config.apiKey) {
@@ -39,7 +39,7 @@ export class CompletionService {
     }
 
     this.aiService = createLLMService({
-      apiKey: config.apiKey || config.providerApiKey || '',
+      apiKey: config.apiKey || config.providerApiKey ?? '',
       baseUrl: config.providerBaseUrl,
     })
   }
@@ -51,8 +51,8 @@ export class CompletionService {
     messages: Array<{ role?: string; content?: string; name?: string }>,
   ): AIMessage[] {
     return messages.map((msg) => ({
-      role: (msg.role || 'user') as 'user' | 'assistant' | 'system',
-      content: msg.content || '',
+      role: (msg.role ?? 'user') as 'user' | 'assistant' | 'system',
+      content: msg.content ?? '',
       ...(msg.name && { name: msg.name }),
     }))
   }
@@ -71,6 +71,7 @@ export class CompletionService {
 
     return new ReadableStream<Uint8Array>({
       async start(controller) {
+        let emittedAssistantRole = false
         try {
           const stream = await aiService.createStreamingChatCompletion(messages, {
             model: options.model,
@@ -79,7 +80,19 @@ export class CompletionService {
           })
 
           try {
+            if (!emittedAssistantRole) {
+              const rolePayload = {
+                choices: [{ delta: { role: 'assistant' } }],
+              }
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(rolePayload)}\n\n`))
+              emittedAssistantRole = true
+            }
+
             for await (const chunk of stream) {
+              if (!chunk.content) {
+                continue
+              }
+
               const payload = `data: ${JSON.stringify({
                 choices: [{ delta: { content: chunk.content } }],
               })}\n\n`

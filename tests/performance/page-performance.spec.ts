@@ -122,7 +122,7 @@ test.describe('Page Performance Tests', () => {
         // Fallback: use responseStart relative to navigationStart
         ttfb =
           navigationTiming.responseStart -
-          (navigationTiming.navigationStart || 0)
+          (navigationTiming.navigationStart ?? 0)
       }
 
       // Get final loadTime
@@ -153,7 +153,7 @@ test.describe('Page Performance Tests', () => {
       // Log resource count by type
       const resourcesByType = metrics.resources.reduce(
         (acc: Record<string, number>, resource: any) => {
-          const type = resource.initiatorType || 'other'
+          const type = resource.initiatorType ?? 'other'
           acc[type] = (acc[type] || 0) + 1
           return acc
         },

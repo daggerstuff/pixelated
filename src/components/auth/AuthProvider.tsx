@@ -1,35 +1,79 @@
 import { Auth0Provider } from '@auth0/auth0-react'
 import React from 'react'
 
+const AUTH0_CALLBACK_PATH = '/api/auth/auth0-callback'
+
+type RedirectState = {
+  returnTo?: string
+}
+
+const hasAuth0DomainShape = (value: string): boolean => {
+  return (
+    value.includes('.auth0.com') ||
+    value.includes('.us.auth0.com') ||
+    value.includes('.eu.auth0.com') ||
+    value.includes('.au.auth0.com')
+  )
+}
+
+const sanitizeReturnTo = (returnTo: string): string => {
+  try {
+    const destination = new URL(returnTo, window.location.origin)
+    if (destination.origin !== window.location.origin) {
+      return window.location.pathname
+    }
+    return `${destination.pathname}${destination.search}${destination.hash}`
+  } catch {
+    if (returnTo.startsWith('/')) {
+      return returnTo
+    }
+    return window.location.pathname
+  }
+}
+
 export const PixelatedAuthProvider = ({
   children,
 }: {
   children: React.ReactNode
 }) => {
   const domain =
-    import.meta.env['PUBLIC_AUTH0_DOMAIN'] ||
-    'dev-f3vkhvb6n52y7fre.us.auth0.com'
+    (import.meta.env['PUBLIC_AUTH0_DOMAIN'] ??
+    import.meta.env['AUTH0_DOMAIN']) ??
+    import.meta.env['VITE_AUTH0_DOMAIN']
   const clientId =
-    import.meta.env['PUBLIC_AUTH0_CLIENT_ID'] ||
-    'SqKS5SumZiRoFEVhjw80gr10KkYbZuLn'
+    (import.meta.env['PUBLIC_AUTH0_CLIENT_ID'] ??
+    import.meta.env['AUTH0_CLIENT_ID']) ??
+    import.meta.env['VITE_AUTH0_CLIENT_ID']
+  const audience = import.meta.env['PUBLIC_AUTH0_AUDIENCE']
+  const redirectUri =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}${AUTH0_CALLBACK_PATH}`
+      : ''
 
-  const onRedirectCallback = (appState: any) => {
-    window.history.replaceState(
-      {},
-      document.title,
-      appState?.returnTo || window.location.pathname,
+  const onRedirectCallback = (appState: RedirectState | undefined) => {
+    const returnTo = sanitizeReturnTo(
+      appState?.returnTo ?? window.location.pathname,
+    )
+    window.history.replaceState({}, document.title, returnTo)
+  }
+
+  if (!domain || !clientId || !redirectUri) {
+    return (
+      <section className="border-rose-300 bg-rose-50 text-rose-800 dark:bg-rose-900/25 dark:text-rose-200 rounded-lg border px-4 py-3 text-sm">
+        Auth0 is not fully configured. Set PUBLIC_AUTH0_DOMAIN and
+        PUBLIC_AUTH0_CLIENT_ID in your environment before using social login.
+      </section>
     )
   }
 
-  // Ensure config is valid even during SSR, though this component should be client-only
-  // Use explicit callback URL to ensure correct redirect after Auth0 authentication
-  const redirectUri =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/api/auth/auth0-callback`
-      : ''
-
-  if (!domain || !clientId) {
+  if (typeof window === 'undefined') {
     return null
+  }
+
+  if (!hasAuth0DomainShape(domain)) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('[Auth0] Domain shape looks unusual:', domain)
+    }
   }
 
   return (
@@ -38,8 +82,10 @@ export const PixelatedAuthProvider = ({
       clientId={clientId}
       authorizationParams={{
         redirect_uri: redirectUri,
-        audience: import.meta.env['PUBLIC_AUTH0_AUDIENCE'] || undefined,
+        ...(audience ? { audience } : {}),
       }}
+      useRefreshTokens={true}
+      cacheLocation="localstorage"
       onRedirectCallback={onRedirectCallback}
     >
       {children}

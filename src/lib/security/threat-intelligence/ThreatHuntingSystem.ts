@@ -181,9 +181,9 @@ export class ThreatHuntingSystem extends EventEmitter {
   private isInitialized = false
   private huntQueue: string[] = []
   private isProcessing = false
-  private activeHunts = new Map<string, ThreatHunt>()
+  private readonly activeHunts = new Map<string, ThreatHunt>()
 
-  constructor(private config: ThreatHuntingSystemConfig) {
+  constructor(private readonly config: ThreatHuntingSystemConfig) {
     super()
     this.setMaxListeners(0)
   }
@@ -368,12 +368,12 @@ export class ThreatHuntingSystem extends EventEmitter {
 
       const hunt: ThreatHunt = {
         id: huntId,
-        name: huntData.name || 'Untitled Hunt',
-        description: huntData.description || '',
-        hunt_type: huntData.hunt_type || 'network',
+        name: huntData.name ?? 'Untitled Hunt',
+        description: huntData.description ?? '',
+        hunt_type: huntData.hunt_type ?? 'network',
         status: 'active',
-        priority: huntData.priority || 'medium',
-        scope: huntData.scope || {
+        priority: huntData.priority ?? 'medium',
+        scope: huntData.scope ?? {
           regions: ['global'],
           systems: ['all'],
           time_range: {
@@ -382,14 +382,14 @@ export class ThreatHuntingSystem extends EventEmitter {
           },
           data_sources: ['logs', 'network', 'endpoint'],
         },
-        query: huntData.query || {
+        query: huntData.query ?? {
           type: 'custom',
           query: '',
         },
         schedule: huntData.schedule,
         results: [],
         false_positives: [],
-        created_by: huntData.created_by || 'system',
+        created_by: huntData.created_by ?? 'system',
         created_at: now,
         updated_at: now,
       }
@@ -598,7 +598,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'suspicious_network_connection',
           severity: this.determineNetworkFindingSeverity(connection),
-          confidence: connection.confidence || 0.7,
+          confidence: connection.confidence ?? 0.7,
           description: `Suspicious network connection detected: ${connection.source_ip} -> ${connection.dest_ip}`,
           evidence: [
             {
@@ -606,20 +606,20 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: connection,
               source: 'network_monitoring',
               timestamp: new Date(),
-              confidence: connection.confidence || 0.7,
+              confidence: connection.confidence ?? 0.7,
             },
           ],
           indicators: [
             {
               type: 'ip',
               value: connection.source_ip,
-              confidence: connection.confidence || 0.7,
+              confidence: connection.confidence ?? 0.7,
               source: 'network_hunt',
             },
             {
               type: 'ip',
               value: connection.dest_ip,
-              confidence: connection.confidence || 0.7,
+              confidence: connection.confidence ?? 0.7,
               source: 'network_hunt',
             },
           ],
@@ -685,7 +685,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'suspicious_process',
           severity: this.determineProcessFindingSeverity(process),
-          confidence: process.confidence || 0.8,
+          confidence: process.confidence ?? 0.8,
           description: `Suspicious process detected: ${process.name} (PID: ${process.pid})`,
           evidence: [
             {
@@ -693,14 +693,14 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: process,
               source: 'endpoint_detection',
               timestamp: new Date(),
-              confidence: process.confidence || 0.8,
+              confidence: process.confidence ?? 0.8,
             },
           ],
           indicators: [
             {
               type: 'hash',
               value: process.hash,
-              confidence: process.confidence || 0.8,
+              confidence: process.confidence ?? 0.8,
               source: 'endpoint_hunt',
             },
           ],
@@ -754,7 +754,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'anomalous_user_behavior',
           severity: this.determineBehaviorFindingSeverity(behavior),
-          confidence: behavior.confidence || 0.6,
+          confidence: behavior.confidence ?? 0.6,
           description: `Anomalous user behavior detected for user: ${behavior.user_id}`,
           evidence: [
             {
@@ -762,18 +762,18 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: behavior,
               source: 'user_behavior_analytics',
               timestamp: new Date(),
-              confidence: behavior.confidence || 0.6,
+              confidence: behavior.confidence ?? 0.6,
             },
           ],
           indicators: [
             {
               type: 'behavior',
               value: behavior.activity_type,
-              confidence: behavior.confidence || 0.6,
+              confidence: behavior.confidence ?? 0.6,
               source: 'user_behavior_hunt',
             },
           ],
-          affected_systems: behavior.affected_systems || [],
+          affected_systems: behavior.affected_systems ?? [],
           remediation_suggested: [
             'Review user access permissions',
             'Investigate unusual activity',
@@ -826,7 +826,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'malware_indicator',
           severity: this.determineMalwareFindingSeverity(indicator),
-          confidence: indicator.confidence || 0.9,
+          confidence: indicator.confidence ?? 0.9,
           description: `Malware indicator detected: ${indicator.description}`,
           evidence: [
             {
@@ -834,18 +834,18 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: indicator,
               source: 'malware_detection',
               timestamp: new Date(),
-              confidence: indicator.confidence || 0.9,
+              confidence: indicator.confidence ?? 0.9,
             },
           ],
           indicators: [
             {
               type: 'hash',
               value: indicator.file_hash,
-              confidence: indicator.confidence || 0.9,
+              confidence: indicator.confidence ?? 0.9,
               source: 'malware_hunt',
             },
           ],
-          affected_systems: indicator.affected_systems || [],
+          affected_systems: indicator.affected_systems ?? [],
           remediation_suggested: [
             'Quarantine affected files',
             'Run antivirus scan',
@@ -895,7 +895,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           id: uuidv4(),
           type: 'lateral_movement',
           severity: this.determineLateralMovementSeverity(movement),
-          confidence: movement.confidence || 0.8,
+          confidence: movement.confidence ?? 0.8,
           description: `Potential lateral movement detected: ${movement.user_id} accessing ${movement.target_system}`,
           evidence: [
             {
@@ -903,14 +903,14 @@ export class ThreatHuntingSystem extends EventEmitter {
               data: movement,
               source: 'authentication_logs',
               timestamp: new Date(),
-              confidence: movement.confidence || 0.8,
+              confidence: movement.confidence ?? 0.8,
             },
           ],
           indicators: [
             {
               type: 'behavior',
               value: 'unusual_access_pattern',
-              confidence: movement.confidence || 0.8,
+              confidence: movement.confidence ?? 0.8,
               source: 'lateral_movement_hunt',
             },
           ],
@@ -1204,7 +1204,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     try {
       const hunt = await this.huntsCollection.findOne({ id: huntId })
 
-      if (!hunt || !hunt.schedule?.enabled) {
+      if (!hunt?.schedule?.enabled) {
         return
       }
 

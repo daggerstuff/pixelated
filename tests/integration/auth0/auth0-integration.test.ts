@@ -1,4 +1,5 @@
 /// <reference types="vitest/globals" />
+/* @vitest-environment node */
 /**
  * Integration Tests for Auth0 Authentication Flows
  *

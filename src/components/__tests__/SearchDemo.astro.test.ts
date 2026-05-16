@@ -1,7 +1,7 @@
 import { cleanup } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
-import { renderAstro } from '../../test/utils/astro'
+import { renderAstro } from '@/test/utils/astro'
 
 const SearchDemo = {
   render: async (props: {

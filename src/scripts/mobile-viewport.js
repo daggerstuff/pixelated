@@ -114,7 +114,7 @@ function isIOS() {
 
 // Check if device is Android
 function isAndroid() {
-  return /Android/.test(navigator.userAgent)
+  return navigator.userAgent.includes('Android')
 }
 
 // Enhanced form validation for mobile devices
@@ -186,7 +186,7 @@ function setupMobileFormValidation() {
         input.setAttribute('aria-invalid', hasError ? 'true' : 'false')
       } else if (input.hasAttribute('minlength') && input.value) {
         // Minlength validation
-        const minLength = parseInt(input.getAttribute('minlength') || '0', 10)
+        const minLength = parseInt(input.getAttribute('minlength') ?? '0', 10)
         hasError = input.value.length < minLength
         input.setAttribute('aria-invalid', hasError ? 'true' : 'false')
       } else if (input.value) {

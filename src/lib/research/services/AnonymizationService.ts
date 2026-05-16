@@ -35,7 +35,7 @@ export interface AnonymizationAuditLog {
 }
 
 export class AnonymizationService {
-  private config: AnonymizationConfig
+  private readonly config: AnonymizationConfig
 
   constructor(
     config: AnonymizationConfig = {
@@ -301,7 +301,7 @@ export class AnonymizationService {
       const key = quasiIdentifiers
         .map((field) => this.getFieldValue(record, field))
         .join('|')
-      groups.set(key, (groups.get(key) || 0) + 1)
+      groups.set(key, (groups.get(key) ?? 0) + 1)
     })
 
     const kValue = Math.min(...Array.from(groups.values()))
@@ -456,7 +456,7 @@ export class AnonymizationService {
   private encryptField(value: string): string {
     const algorithm = 'aes-256-cbc'
     const key = crypto.scryptSync(
-      process.env.RESEARCH_ENCRYPTION_KEY || 'default-key',
+      process.env.RESEARCH_ENCRYPTION_KEY ?? 'default-key',
       'salt',
       32,
     )
@@ -488,13 +488,13 @@ export class AnonymizationService {
       const key = quasiIdentifiers
         .map((field) => this.getFieldValue(record, field))
         .join('|')
-      groups.set(key, (groups.get(key) || 0) + 1)
+      groups.set(key, (groups.get(key) ?? 0) + 1)
     })
 
     const minK = Math.min(...Array.from(groups.values()))
     if (minK < this.config.kAnonymity) {
       issues.push(
-        `K-anonymity requirement not met: ${minK} < ${this.config.kAnonymity}`,
+        `k-anonymity requirement not met: ${minK} < ${this.config.kAnonymity}`,
       )
       recommendations.push(
         'Increase generalization or reduce quasi-identifiers',

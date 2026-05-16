@@ -118,8 +118,8 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
             content,
             metadata: {
               ...metadata,
-              role: metadata?.role || 'user',
-              category: metadata?.category || category || 'general',
+              role: metadata?.role ?? 'user',
+              category: (metadata?.category ?? category) ?? 'general',
               userId,
             },
           },
@@ -374,7 +374,7 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          return match && match[1]
+          return match?.[1]
             ? (JSON.parse(match[1]) as
                 | string
                 | number

@@ -46,18 +46,33 @@ vi.mock('recharts', () => {
   }
 })
 
-vi.mock('../../hooks/useAnalyticsDashboard', () => ({
-  useAnalyticsDashboard: vi.fn(() => ({
-    data: null,
-    isLoading: false,
-    error: null,
-    refetch: vi.fn(),
-  })),
+const mockUseAnalyticsDashboard = vi.fn(
+  (): {
+    data: TherapistAnalyticsChartData | null
+    isLoading: boolean
+    error: Error | null
+    refetch: () => Promise<void>
+  } => {
+    return {
+      data: null,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(async () => {}),
+    }
+  },
+)
+
+vi.mock('@/hooks/useAnalyticsDashboard', () => ({
+  useAnalyticsDashboard: () => mockUseAnalyticsDashboard(),
 }))
 
 import TherapyProgressCharts from '../TherapyProgressCharts'
 
 describe('TherapyProgressCharts', () => {
+  const expectAnalyticsChartsToRender = () => {
+    expect(screen.getByText('Analytics Overview')).toBeInTheDocument()
+  }
+
   const mockData: TherapistAnalyticsChartData = {
     sessionMetrics: [
       {
@@ -150,17 +165,23 @@ describe('TherapyProgressCharts', () => {
 
   beforeEach(() => {
     vi.resetModules()
+    mockUseAnalyticsDashboard.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(async () => {}),
+    })
   })
 
   it('renders AnalyticsCharts when data is provided', () => {
     render(<TherapyProgressCharts data={mockData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders chart container with therapy-progress-charts class', () => {
     render(<TherapyProgressCharts data={mockData} />)
     const container = screen
-      .getByTestId('mock-chart')
+      .getByText('Analytics Overview')
       .closest('.therapy-progress-charts')
     expect(container).toBeInTheDocument()
   })
@@ -175,31 +196,31 @@ describe('TherapyProgressCharts', () => {
   it('renders with empty session metrics', () => {
     const emptyData = { ...mockData, sessionMetrics: [] }
     render(<TherapyProgressCharts data={emptyData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with empty skill progress', () => {
     const emptyData = { ...mockData, skillProgress: [] }
     render(<TherapyProgressCharts data={emptyData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with empty summary stats', () => {
     const emptyData = { ...mockData, summaryStats: [] }
     render(<TherapyProgressCharts data={emptyData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with empty progress snapshots', () => {
     const emptyData = { ...mockData, progressSnapshots: [] }
     render(<TherapyProgressCharts data={emptyData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders without comparative data', () => {
     const noComparisonData = { ...mockData, comparativeData: undefined }
     render(<TherapyProgressCharts data={noComparisonData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with single session metric', () => {
@@ -208,7 +229,7 @@ describe('TherapyProgressCharts', () => {
       sessionMetrics: [mockData.sessionMetrics[0]!],
     }
     render(<TherapyProgressCharts data={singleData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with single skill', () => {
@@ -217,7 +238,7 @@ describe('TherapyProgressCharts', () => {
       skillProgress: [mockData.skillProgress[0]!],
     }
     render(<TherapyProgressCharts data={singleData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with improving trend data', () => {
@@ -229,7 +250,7 @@ describe('TherapyProgressCharts', () => {
       },
     }
     render(<TherapyProgressCharts data={improvingData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with declining trend data', () => {
@@ -241,7 +262,7 @@ describe('TherapyProgressCharts', () => {
       },
     }
     render(<TherapyProgressCharts data={decliningData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with stable trend data', () => {
@@ -253,7 +274,7 @@ describe('TherapyProgressCharts', () => {
       },
     }
     render(<TherapyProgressCharts data={stableData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders with multiple session metrics', () => {
@@ -274,7 +295,7 @@ describe('TherapyProgressCharts', () => {
       ],
     }
     render(<TherapyProgressCharts data={multiData} />)
-    expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
   it('renders without data prop (undefined)', () => {

@@ -28,14 +28,14 @@ const logger = getAiServiceLogger("mental-llama");
 // import { CrisisSessionFlaggingService } from '../../crisis/CrisisSessionFlaggingService.ts'
 
 export class MentalLLaMAAdapter {
-  private modelProvider: IModelProvider | undefined;
-  private crisisNotifier: ICrisisNotificationHandler | undefined;
-  private taskRouter: IMentalHealthTaskRouter | undefined;
-  private evidenceService: EvidenceService;
-  private expertGuidanceOrchestrator: ExpertGuidanceOrchestrator;
+  private readonly modelProvider: IModelProvider | undefined;
+  private readonly crisisNotifier: ICrisisNotificationHandler | undefined;
+  private readonly taskRouter: IMentalHealthTaskRouter | undefined;
+  private readonly evidenceService: EvidenceService;
+  private readonly expertGuidanceOrchestrator: ExpertGuidanceOrchestrator;
 
   // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
-  private crisisSessionFlaggingServiceImport?: Promise<unknown>;
+  private readonly crisisSessionFlaggingServiceImport?: Promise<unknown>;
 
   constructor(options: MentalLLaMAAdapterOptions) {
     this.modelProvider = options.modelProvider;
@@ -87,7 +87,7 @@ export class MentalLLaMAAdapter {
       ...(routingContext?.sessionId ? { sessionId: routingContext.sessionId } : {}),
       textSample: text.slice(0, 200),
       timestamp: analysisResult.timestamp,
-      decisionDetails: analysisResult._routingDecision || {},
+      decisionDetails: analysisResult._routingDecision ?? {},
       analysisResult,
       ...(routingContext?.sessionType ? { sessionType: routingContext.sessionType } : {}),
       ...(routingContext?.explicitTaskHint
@@ -259,7 +259,7 @@ export class MentalLLaMAAdapter {
           mentalHealthCategory: "crisis",
           confidence: route.confidence,
           explanation:
-            (route.insights?.llmReasoning as string) ||
+            (route.insights?.llmReasoning) ??
             "Crisis detected by routing rules or preliminary analysis.",
           supportingEvidence: route.insights?.matchedKeyword ? [route.insights.matchedKeyword] : [],
           isCrisis: true,
@@ -390,11 +390,11 @@ export class MentalLLaMAAdapter {
                   : String(analysisConfidence),
               );
         llmAnalysisResult.mentalHealthCategory =
-          parsedLlmResponse.mentalHealthCategory || categoryForPrompt;
+          parsedLlmResponse.mentalHealthCategory ?? categoryForPrompt;
         llmAnalysisResult.confidence = parsedConfidence || analysisConfidence;
         llmAnalysisResult.explanation =
-          parsedLlmResponse.explanation || "No explanation provided by LLM.";
-        llmAnalysisResult.supportingEvidence = parsedLlmResponse.supportingEvidence || [];
+          parsedLlmResponse.explanation ?? "No explanation provided by LLM.";
+        llmAnalysisResult.supportingEvidence = parsedLlmResponse.supportingEvidence ?? [];
         llmAnalysisResult.hasMentalHealthIssue =
           llmAnalysisResult.mentalHealthCategory !== "none" &&
           llmAnalysisResult.mentalHealthCategory !== "wellness" &&
@@ -456,7 +456,7 @@ export class MentalLLaMAAdapter {
     }
     return {
       explanation: llmAnalysisResult.explanation || "",
-      supportingEvidence: llmAnalysisResult.supportingEvidence || [],
+      supportingEvidence: llmAnalysisResult.supportingEvidence ?? [],
       category: llmAnalysisResult.mentalHealthCategory || analysisCategory,
       confidence: llmAnalysisResult.confidence ?? analysisConfidence,
       hasMentalHealthIssue:
@@ -488,7 +488,7 @@ export class MentalLLaMAAdapter {
     let combinedEvidence = existingEvidence || [];
     try {
       const evidence = await this.evidenceService.extractSupportingEvidence(text, category);
-      if (evidence && evidence.evidenceItems) {
+      if (evidence?.evidenceItems) {
         combinedEvidence = [...combinedEvidence, ...evidence.evidenceItems];
       }
     } catch (evidenceError) {
@@ -526,7 +526,7 @@ export class MentalLLaMAAdapter {
         expertGuided: false,
         explanation: `Expert guidance unavailable due to system error: ${(err as Error).message}. Base fallback explanation: ${baseAnalysis.explanation}`,
         _failures: [
-          ...(baseAnalysis._failures || []),
+          ...(baseAnalysis._failures ?? []),
           {
             type: "general", // expert guidance orchestration errors are categorized as 'general'
             message: "Expert guidance orchestration failed",

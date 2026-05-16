@@ -155,7 +155,7 @@ export class DocumentManagementService extends BaseService {
     try {
       const filter = this.buildMongoFilter(search.filters)
       const sort = this.buildMongoSort(search.sort?.field, search.sort?.order)
-      const { page = 1, limit = 20 } = search.pagination || {}
+      const { page = 1, limit = 20 } = search.pagination ?? {}
 
       const documents = await this.db.mongodb.database
         .collection<Document>(this.collectionName)

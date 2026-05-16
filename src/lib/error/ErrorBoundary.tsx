@@ -125,7 +125,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({ errorInfo })
   }
 
-  private handleReset = async () => {
+  private readonly handleReset = async () => {
     if (this.state.retryCount >= MAX_RETRY_COUNT) {
       // Max retries reached, reload page
       window.location.reload()
@@ -152,11 +152,11 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   }
 
-  private handleReload = () => {
+  private readonly handleReload = () => {
     window.location.reload()
   }
 
-  public override render() {
+  public override  async render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback

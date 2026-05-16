@@ -156,7 +156,7 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
               Presenting Problem
             </h3>
             <p className='text-gray-600 bg-gray-50 rounded p-3'>
-              {patientData?.presentingProblem ||
+              {patientData?.presentingProblem ??
                 'Patient reports feeling depressed for the past 3 months, with difficulty sleeping, loss of appetite, and decreased motivation following job loss.'}
             </p>
           </div>
@@ -164,11 +164,11 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           <div>
             <h3 className='text-gray-700 mb-2 font-medium'>Demographics</h3>
             <div className='text-gray-600 bg-gray-50 space-y-1 rounded p-3'>
-              <div>Age: {patientData?.demographics?.age || 32}</div>
-              <div>Gender: {patientData?.demographics?.gender || 'Female'}</div>
+              <div>Age: {patientData?.demographics?.age ?? 32}</div>
+              <div>Gender: {patientData?.demographics?.gender ?? 'Female'}</div>
               <div>
                 Background:{' '}
-                {patientData?.demographics?.culturalBackground?.join(', ') ||
+                {patientData?.demographics?.culturalBackground?.join(', ') ??
                   'Caucasian, Urban'}
               </div>
             </div>

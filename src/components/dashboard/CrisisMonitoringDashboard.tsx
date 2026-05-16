@@ -376,7 +376,7 @@ export const CrisisMonitoringDashboard: React.FC<
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => triggerManualEscalation(patient.id)}
+                          onClick={ async () => triggerManualEscalation(patient.id)}
                         >
                           <Phone className='mr-1 h-4 w-4' />
                           Escalate
@@ -468,7 +468,7 @@ export const CrisisMonitoringDashboard: React.FC<
                     {!alert.acknowledged && (
                       <Button
                         size='sm'
-                        onClick={() => acknowledgeAlert(alert.id)}
+                        onClick={ async () => acknowledgeAlert(alert.id)}
                       >
                         <CheckCircle className='mr-1 h-4 w-4' />
                         Acknowledge

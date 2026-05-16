@@ -29,7 +29,7 @@ function createErrorResponse({
     JSON.stringify({
       success: false,
       error: message,
-      details: errors || error || undefined,
+      details: (errors ?? error) ?? undefined,
     }),
     {
       status,

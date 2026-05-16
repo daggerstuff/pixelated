@@ -41,9 +41,9 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     const url = new URL(context.request.url)
     const clientId = url.searchParams.get('clientId')
     const sessionId = url.searchParams.get('sessionId')
-    const type = url.searchParams.get('type') || 'map'
-    const timeRange = parseInt(url.searchParams.get('timeRange') || '30', 10)
-    const dataPoints = parseInt(url.searchParams.get('dataPoints') || '100', 10)
+    const type = url.searchParams.get('type') ?? 'map'
+    const timeRange = parseInt(url.searchParams.get('timeRange') ?? '30', 10)
+    const dataPoints = parseInt(url.searchParams.get('dataPoints') ?? '100', 10)
 
     // Validate parameters
     if (!clientId && !sessionId) {

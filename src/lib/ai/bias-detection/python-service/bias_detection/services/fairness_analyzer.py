@@ -3,32 +3,80 @@ Advanced fairness analysis service using AIF360, Fairlearn, and statistical meth
 """
 
 import logging
+import importlib.util
 from typing import Any
 
 import numpy as np
 
-# Optional ML toolkit imports
-try:
-    from aif360.datasets import BinaryLabelDataset
-    from aif360.metrics import BinaryLabelDatasetMetric
+# Optional ML toolkit imports (lazy-loaded to avoid module init warnings on optional deps)
+AIF360_AVAILABLE = False
+FAIRLEARN_AVAILABLE = False
+AIF360_IMPORT_ATTEMPTED = False
+FAIRLEARN_IMPORT_ATTEMPTED = False
+BinaryLabelDataset = None
+BinaryLabelDatasetMetric = None
+demographic_parity_difference = None
+equalized_odds_difference = None
 
-    AIF360_AVAILABLE = True
-except ImportError:
-    AIF360_AVAILABLE = False
-    BinaryLabelDataset = None
-    BinaryLabelDatasetMetric = None
 
-try:
-    from fairlearn.metrics import (
-        demographic_parity_difference,
-        equalized_odds_difference,
-    )
+def _load_aif360() -> bool:
+    global AIF360_IMPORT_ATTEMPTED
+    global AIF360_AVAILABLE
+    global BinaryLabelDataset
+    global BinaryLabelDatasetMetric
 
-    # These are used in the analysis functions
-    _ = (demographic_parity_difference, equalized_odds_difference)
-    FAIRLEARN_AVAILABLE = True
-except ImportError:
-    FAIRLEARN_AVAILABLE = False
+    if AIF360_IMPORT_ATTEMPTED:
+        return AIF360_AVAILABLE
+
+    AIF360_IMPORT_ATTEMPTED = True
+    if importlib.util.find_spec("aif360") is None:
+        AIF360_AVAILABLE = False
+        return AIF360_AVAILABLE
+
+    # Avoid importing aif360 when optional dependency inFairness is missing; that import emits
+    # noisy module-missing warnings that are not actionable in this environment.
+    if importlib.util.find_spec("inFairness") is None:
+        AIF360_AVAILABLE = False
+        return AIF360_AVAILABLE
+
+    try:
+        from aif360.datasets import BinaryLabelDataset
+        from aif360.metrics import BinaryLabelDatasetMetric
+
+        AIF360_AVAILABLE = True
+    except ImportError:
+        AIF360_AVAILABLE = False
+        BinaryLabelDataset = None
+        BinaryLabelDatasetMetric = None
+
+    return AIF360_AVAILABLE
+
+
+def _load_fairlearn() -> bool:
+    global FAIRLEARN_IMPORT_ATTEMPTED
+    global FAIRLEARN_AVAILABLE
+    global demographic_parity_difference
+    global equalized_odds_difference
+
+    if FAIRLEARN_IMPORT_ATTEMPTED:
+        return FAIRLEARN_AVAILABLE
+
+    FAIRLEARN_IMPORT_ATTEMPTED = True
+    try:
+        from fairlearn.metrics import (
+            demographic_parity_difference,
+            equalized_odds_difference,
+        )
+
+        # These are used in the analysis functions
+        _ = (demographic_parity_difference, equalized_odds_difference)
+        FAIRLEARN_AVAILABLE = True
+    except ImportError:
+        FAIRLEARN_AVAILABLE = False
+        demographic_parity_difference = None
+        equalized_odds_difference = None
+
+    return FAIRLEARN_AVAILABLE
 
 # Removed unused model and placeholder imports
 
@@ -46,6 +94,7 @@ class FairnessAnalyzer:
     ) -> dict[str, Any]:
         """Run preprocessing layer bias analysis using AIF360 and demographic analysis."""
         try:
+            _load_aif360()
             result = {
                 "layer": "preprocessing",
                 "bias_score": 0.0,
@@ -85,6 +134,7 @@ class FairnessAnalyzer:
     ) -> dict[str, Any]:
         """Run model-level bias analysis using Fairlearn metrics."""
         try:
+            _load_fairlearn()
             result = {
                 "layer": "model_level",
                 "bias_score": 0.0,

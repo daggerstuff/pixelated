@@ -252,7 +252,7 @@ describe('ContextMapperService', () => {
       expect(result.normalized).toBe(true)
 
       const sum = Object.values(result.weights).reduce(
-        (acc, w) => acc + (w || 0),
+        (acc, w) => acc + (w ?? 0),
         0,
       )
       expect(Math.abs(sum - 1.0)).toBeLessThan(0.001)

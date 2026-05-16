@@ -137,7 +137,7 @@ export class TreatmentPlanService {
 
       // Check core beliefs if specified
       if (conditions?.checkCoreBeliefs) {
-        const threshold = conditions.beliefStrengthThreshold || 0.5
+        const threshold = conditions.beliefStrengthThreshold ?? 0.5
         matched = coreBeliefs.some(
           (belief) =>
             belief.strength > threshold &&
@@ -207,7 +207,7 @@ export class TreatmentPlanService {
 
       // Check core beliefs if specified
       if (conditions?.checkCoreBeliefs && !matched) {
-        const threshold = conditions.beliefStrengthThreshold || 0.5
+        const threshold = conditions.beliefStrengthThreshold ?? 0.5
         matched = coreBeliefs.some(
           (belief) =>
             belief.strength > threshold &&
@@ -232,7 +232,7 @@ export class TreatmentPlanService {
    * @returns A string containing the treatment plan in Markdown format.
    */
   public generateTreatmentPlan(profile: PatientProfile): string {
-    if (!profile || !profile.cognitiveModel) {
+    if (!profile?.cognitiveModel) {
       appLogger.warn(
         'generateTreatmentPlan: Invalid profile or cognitive model missing.',
         { profileId: profile?.id },

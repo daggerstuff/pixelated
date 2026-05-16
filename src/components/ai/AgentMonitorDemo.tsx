@@ -116,7 +116,7 @@ export const AgentMonitorDemo: React.FC = () => {
   const resetPerformanceStats = async () => {
     try {
       await fetch('/api/ai/pixel/stats', { method: 'POST' }); // The proxy handles POST as reset
-      fetchStats();
+      void fetchStats();
     } catch (err) {
       console.error('Failed to reset stats');
     }
@@ -153,7 +153,7 @@ export const AgentMonitorDemo: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchStats();
+    void fetchStats();
     const id = setInterval(fetchStats, 5000);
     return () => clearInterval(id);
   }, [fetchStats]);

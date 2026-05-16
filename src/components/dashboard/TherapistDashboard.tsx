@@ -35,7 +35,11 @@ export function TherapistDashboard({
     return latest ?? null
   }, [sessions])
   if (!onSessionControl) {
-    throw new Error('TherapistDashboard requires onSessionControl prop')
+    return (
+      <div role='alert'>
+        TherapistDashboard requires onSessionControl prop
+      </div>
+    )
   }
 
   // Skip link state for accessibility

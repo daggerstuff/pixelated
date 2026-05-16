@@ -105,12 +105,12 @@ function generateCrisisAnalytics(
   }
 
   // Calculate risk distribution
-  const riskCounts = results.reduce(
+  const riskCounts = results.reduce< { [key: string]: number }>(
     (acc, result) => {
-      acc[result.riskLevel] = (acc[result.riskLevel] || 0) + 1
+      acc[result.riskLevel] = (acc[result.riskLevel] ?? 0) + 1
       return acc
     },
-    {} as { [key: string]: number },
+    {},
   )
 
   const riskDistribution = Object.fromEntries(
@@ -123,13 +123,13 @@ function generateCrisisAnalytics(
   // Calculate crisis types
   const crisisTypes = results
     .filter((r) => r.isCrisis && r.category)
-    .reduce(
+    .reduce< { [key: string]: number }>(
       (acc, result) => {
         const type = result.category
-        acc[type] = (acc[type] || 0) + 1
+        acc[type] = (acc[type] ?? 0) + 1
         return acc
       },
-      {} as { [key: string]: number },
+      {},
     )
 
   // Generate temporal patterns
@@ -325,7 +325,7 @@ export function useCrisisDetection({
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error || `API request failed: ${response.status}`,
+            errorData.error ?? `API request failed: ${response.status}`,
           )
         }
 

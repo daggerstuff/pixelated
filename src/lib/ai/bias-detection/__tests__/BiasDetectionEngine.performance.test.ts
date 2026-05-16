@@ -178,7 +178,8 @@ vi.mock('../alerts-system', () => ({
 
 // Allow CI to skip performance-heavy tests
 const SKIP_PERF = process.env['SKIP_PERFORMANCE_TESTS'] === 'true'
-const ddescribe = SKIP_PERF ? describe.skip : describe
+const noopDescribe = (() => undefined) as typeof describe
+const ddescribe = SKIP_PERF ? noopDescribe : describe
 
 // Performance testing utilities
 interface PerformanceMetrics {
@@ -209,7 +210,7 @@ interface BenchmarkResult {
 
 const PerformanceBenchmark = {
   getMemoryUsage(): number {
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (process?.memoryUsage) {
       return process.memoryUsage().heapUsed
     }
     return 0

@@ -3,6 +3,14 @@
 # Performs a more detailed health check on the deployed application.
 
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 HEALTH_URL="${1:-http://localhost:4321/api/health}"
 

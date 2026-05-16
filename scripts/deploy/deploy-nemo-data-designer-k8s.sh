@@ -3,6 +3,15 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
+
 NAMESPACE="${NAMESPACE:-nemo}"
 RELEASE_NAME="${RELEASE_NAME:-nemo-data-designer}"
 CHART_REPO="${CHART_REPO:-https://helm.ngc.nvidia.com/nvidia/nemo-microservices}"
