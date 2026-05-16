@@ -8,7 +8,7 @@ overrides:
   path-to-regexp@>=4.0.0 <6.3.0: ^6.3.0
   yaml@>=2.0.0 <2.8.3: ^2.8.3
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': 8.0.2
-  devalue@<5.8.1: ^5.8.1
+  devalue: 5.8.1
 
 importers:
 
@@ -264,7 +264,7 @@ importers:
         specifier: latest
         version: 1.11.20
       devalue:
-        specifier: ^5.8.1
+        specifier: 5.8.1
         version: 5.8.1
       dompurify:
         specifier: ^3.4.2
@@ -11075,18 +11075,6 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.20.1:
-    resolution: {integrity: sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   wsl-utils@0.1.0:
     resolution: {integrity: sha512-h3Fbisa2nKGPxCpm89Hk33lBLsnaGBvctQopaBSOW/uIs6FTe1ATyAnKFJrzVs9vpGdsTe73WF3V4lIsk4Gacw==}
     engines: {node: '>=18'}
@@ -19052,7 +19040,7 @@ snapshots:
       type-fest: 5.6.0
       widest-line: 6.0.0
       wrap-ansi: 10.0.0
-      ws: 8.20.1(utf-8-validate@6.0.6)
+      ws: 8.20.0(utf-8-validate@6.0.6)
       yoga-layout: 3.2.1
     optionalDependencies:
       '@types/react': 19.2.14
@@ -23133,10 +23121,6 @@ snapshots:
       utf-8-validate: 6.0.6
 
   ws@8.20.0(utf-8-validate@6.0.6):
-    optionalDependencies:
-      utf-8-validate: 6.0.6
-
-  ws@8.20.1(utf-8-validate@6.0.6):
     optionalDependencies:
       utf-8-validate: 6.0.6
 

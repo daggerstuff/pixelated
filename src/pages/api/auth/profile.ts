@@ -21,6 +21,13 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
+<<<<<<< HEAD
+  const clientInfo = {
+    ip: clientAddress || 'unknown',
+    userAgent: request.headers.get('user-agent') ?? 'unknown',
+    deviceId: request.headers.get('x-device-id') ?? 'unknown',
+  }
+=======
   let clientInfo = {
     ip: clientAddress || 'unknown',
     userAgent: 'unknown',
@@ -33,7 +40,9 @@ export const GET = async ({
       userAgent: request.headers.get('user-agent') ?? 'unknown',
       deviceId: request.headers.get('x-device-id') ?? 'unknown',
     }
+>>>>>>> origin/staging
 
+  try {
     // Rate limit profile reads (e.g. 60 per minute)
     const rateLimitResult = await rateLimitMiddleware(
       request,
@@ -54,6 +63,11 @@ export const GET = async ({
 =======
     if (session?.user) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
 =======
 <<<<<<< HEAD
@@ -65,6 +79,7 @@ export const GET = async ({
 >>>>>>> origin/staging
 =======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
     } else {
@@ -201,6 +216,11 @@ export const PUT = async ({
 =======
     if (session?.user) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+=======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
 =======
 <<<<<<< HEAD
@@ -212,6 +232,7 @@ export const PUT = async ({
 >>>>>>> origin/staging
 =======
       userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
     } else {

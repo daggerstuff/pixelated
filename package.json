@@ -618,7 +618,11 @@
       "axios": ">=1.15.1",
       "cookie": ">=1.0.3",
 <<<<<<< HEAD
+<<<<<<< HEAD
+      "devalue": "5.8.1",
+=======
       "devalue": "^5.8.1",
+>>>>>>> origin/staging
 =======
       "devalue": ">=5.8.1",
 >>>>>>> origin/staging
