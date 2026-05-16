@@ -209,7 +209,7 @@
     "@opentelemetry/instrumentation-redis": "latest",
     "@opentelemetry/resources": "latest",
     "@opentelemetry/sdk-metrics": "latest",
-    "@opentelemetry/sdk-node": "^0.218.0",
+    "@opentelemetry/sdk-node": "^0.217.0",
     "@opentelemetry/sdk-trace-base": "latest",
     "@opentelemetry/sdk-trace-node": "latest",
     "@opentelemetry/semantic-conventions": "latest",
@@ -238,7 +238,7 @@
     "ai": "latest",
     "archiver": "latest",
     "astro-icon": "latest",
-    "auth0": "^5.10.0",
+    "auth0": "^5.9.1",
     "axios": "1.16.1",
     "bcryptjs": "latest",
     "better-sqlite3": "latest",
@@ -255,11 +255,7 @@
     "date-fns": "latest",
     "dayjs": "latest",
     "devalue": "^5.8.1",
-<<<<<<< HEAD
-    "dompurify": "^3.4.2",
-=======
     "dompurify": "^3.4.3",
->>>>>>> origin/staging
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
     "events": "latest",
@@ -596,15 +592,7 @@
       "fast-xml-parser": "5.7.0",
       "axios": ">=1.15.1",
       "cookie": ">=1.0.3",
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "devalue": "5.8.1",
-=======
-      "devalue": "^5.8.1",
->>>>>>> origin/staging
-=======
       "devalue": ">=5.8.1",
->>>>>>> origin/staging
       "yauzl": "^3.2.1",
       "minimatch": "^10.2.3",
       "@tootallnate/once": "^3.0.1",
@@ -659,7 +647,6 @@
     "axios": "^1.13.0",
     "jsonwebtoken": "^9.0.0",
     "dompurify": "^3.4.2",
-    "nodemailer": "^8.0.7",
-    "devalue": ">=5.8.1"
+    "nodemailer": "^8.0.7"
   }
 }

@@ -44,6 +44,14 @@ Action: Use loop variables to provide specific, dynamically generated aria-label
 =======
 ## 2026-05-16 - Analytics Dashboard Accessibility
 
+<<<<<<< HEAD
+- Learning: Custom chart bars and progress bars made with `div` elements are
+  invisible to screen readers and keyboard users without explicit ARIA roles,
+  labels, and `tabIndex`.
+- Action: Added `role="img"`, `tabIndex={-1}`, and `aria-label` to chart bars.
+  Added `role="progressbar"` and related ARIA attributes to custom progress
+  elements, and ensured visual icons have screen-reader fallbacks.
+=======
 - Learning: Custom chart bars and progress bars made with `div` elements are invisible to screen readers and keyboard users without explicit ARIA roles, labels, and `tabIndex`.
 - Action: Added `role="img"`, `tabIndex={-1}`, and `aria-label` to chart bars. Added `role="progressbar"` and related ARIA attributes to custom progress elements, and ensured visual icons have screen-reader fallbacks.
 
@@ -53,6 +61,7 @@ Learning: Custom time range buttons visually act as toggle buttons, but without 
 Action: Added `aria-pressed={true/false}` and grouped them with role="group".
 <<<<<<< HEAD
 =======
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
