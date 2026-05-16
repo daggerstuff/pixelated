@@ -4,10 +4,14 @@ import DOMPurify from 'isomorphic-dompurify'
 
 =======
 <<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
 
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 import Link from '~/components/base/Link.astro'
@@ -50,6 +54,9 @@ const secondLinkText = collectionType === 'prs' ? item.repository?.nameWithOwner
 // Time and content handling
 const time = collectionType === 'releases' ? item.publishedAt : item.createdAt
 const content = collectionType === 'releases' ? item.desc : item.bodyHTML
+<<<<<<< HEAD
+const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : undefined
+=======
 <<<<<<< HEAD
 <<<<<<< HEAD
 const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : ''
@@ -101,6 +108,7 @@ const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: {
 const sanitizedContent = content ? DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) : undefined
 =======
 const sanitizedContent = content ? DOMPurify.sanitize(content as string) : ''
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 ---

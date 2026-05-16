@@ -111,6 +111,8 @@ function ensureServer(): WebSocketServer {
           }
           case 'complete': {
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
             const text = ((message.text as string) || state.text) ?? ''
             const contextType =
@@ -132,6 +134,7 @@ function ensureServer(): WebSocketServer {
 =======
 >>>>>>> origin/staging
 >>>>>>> origin/staging
+>>>>>>> origin/staging
             const text = (message.text as string) || (state.text ?? '')
             const contextType =
               (message.contextType as string) ||
@@ -140,6 +143,9 @@ function ensureServer(): WebSocketServer {
 =======
 <<<<<<< HEAD
 =======
+<<<<<<< HEAD
+=======
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
 >>>>>>> origin/staging
