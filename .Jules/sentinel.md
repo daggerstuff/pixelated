@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 MD026 -->
+
 ## 2026-04-11 - Fix XSS in ChatMessage | Vulnerability: Unsanitized markdown-to-html rendered via dangerouslySetInnerHTML | Learning: Custom markdown parsers can have edge cases that bypass XSS protections | Prevention: Always use isomorphic-dompurify or dompurify when setting inner HTML, even after custom markdown parsing
 
 ## 2026-04-11 - Fix XSS in Astro Session Script | Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify | Learning: JSON.stringify is unsafe for inline script blocks without escaping | Prevention: Always use replace(/</g, "\u003c").replace(/>/g, "\u003e") for JSON data within set:html
@@ -27,8 +29,13 @@ sanitized to prevent XSS
 Prevention: Always sanitize HTML strings with DOMPurify before using set:html in
 Astro components
 
-## 2026-04-28 - Fix XSS in GithubItem.astro via unsanitized set:html
+## 2026-05-09 - Fix XSS in GithubItem.astro via unsanitized set:html
 
-Vulnerability: HTML content from PRs or release descriptions was injected directly via set:html without sanitization.
-Learning: Any external data injected via set:html must be sanitized to prevent XSS.
-Prevention: Always sanitize HTML strings with DOMPurify before using set:html in Astro components.
+Vulnerability: HTML content from releases/prs was injected directly
+via set:html without sanitization
+
+Learning: Any external data passed to set:html must be sanitized
+to prevent XSS
+
+Prevention: Always sanitize HTML strings with DOMPurify before using
+set:html in Astro components.
