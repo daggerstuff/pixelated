@@ -13,11 +13,15 @@ const router = Router()
 router.get('/login', (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
+<<<<<<< HEAD
+  const redirectUri = process.env.AUTH0_CALLBACK_URL
+=======
   const redirectUri =
     process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
+>>>>>>> origin/staging
 
-  if (!auth0Domain || !clientId) {
+  if (!auth0Domain || !clientId || !redirectUri) {
     res.status(500).json({
       error: 'Auth0 configuration missing',
       code: 'CONFIG_ERROR',
@@ -61,11 +65,15 @@ router.get('/callback', async (req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const clientSecret = process.env.AUTH0_CLIENT_SECRET
+<<<<<<< HEAD
+  const redirectUri = process.env.AUTH0_CALLBACK_URL
+=======
   const redirectUri =
     process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
+>>>>>>> origin/staging
 
-  if (!auth0Domain || !clientId || !clientSecret) {
+  if (!auth0Domain || !clientId || !clientSecret || !redirectUri) {
     res.status(500).json({
       error: 'Auth0 configuration missing',
       code: 'CONFIG_ERROR',
