@@ -254,7 +254,7 @@
     "crypto-js": "^4.2.0",
     "date-fns": "latest",
     "dayjs": "latest",
-    "devalue": "^5.3.2",
+    "devalue": "^5.8.1",
     "dompurify": "^3.4.2",
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
