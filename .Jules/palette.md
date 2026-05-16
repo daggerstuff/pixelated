@@ -1,6 +1,21 @@
+<<<<<<< HEAD
 <!-- markdownlint-disable MD013 MD026 -->
 
 ## 2026-04-14 - Async Search Accessibility | Learning: Async search needs both visual spinners (which do not shift layout like text does) and invisible live regions for screen readers. | Action: Replaced text with spinner and added sr-only aria-live polite region.
+=======
+<<<<<<< HEAD
+<!-- markdownlint-disable MD013 -->
+
+=======
+<<<<<<< HEAD
+<!-- markdownlint-disable MD013 MD026 -->
+
+## 2026-04-14 - Async Search Accessibility | Learning: Async search needs both visual spinners (which do not shift layout like text does) and invisible live regions for screen readers. | Action: Replaced text with spinner and added sr-only aria-live polite region.
+=======
+>>>>>>> origin/staging
+## 2026-04-14 - Async Search Accessibility
+>>>>>>> origin/staging
+>>>>>>> origin/staging
 
 Learning: Async search needs both visual spinners and invisible live regions for screen readers.
 Action: Replaced text with spinner and added sr-only aria-live polite region.
