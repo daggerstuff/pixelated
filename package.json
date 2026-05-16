@@ -325,7 +325,7 @@
     "@astrojs/markdoc": "latest",
     "@astrojs/rss": "latest",
     "@eslint/css": "latest",
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.4",
     "@eslint/json": "latest",
     "@eslint/markdown": "latest",
     "@fontsource/inter": "latest",
@@ -371,11 +371,10 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "latest",
-    "eslint": "^10.3.0",
+    "eslint": "^9.39.4",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-node": "latest",
-    "eslint-plugin-react": "latest",
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-vitest-globals": "latest",
     "espree": "latest",
@@ -432,7 +431,7 @@
     "tsconfig-paths": "latest",
     "tsx": "latest",
     "tw-animate-css": "latest",
-    "typescript": "^6.0.3",
+    "typescript": "^5.9.3",
     "typescript-eslint": "latest",
     "unocss": "latest",
     "url-polyfill": "latest",
@@ -454,7 +453,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.1.1",
+  "packageManager": "pnpm@11.1.2",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
@@ -463,7 +462,7 @@
       ],
       "allowedVersions": {
         "mongodb": "^6.14.0",
-        "eslint": "^8.57.0 || ^9.0.0",
+        "eslint": "^9.39.4",
         "typescript": "^5.9.3",
         "drizzle-orm": "^0.45.2",
         "zod": "*",
