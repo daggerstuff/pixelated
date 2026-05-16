@@ -87,10 +87,10 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     })
 
     // Mock Pixel API responses with sophisticated crisis pattern detection
-    mockPixelApi = vi.fn((url: string, options: any) => {
+    mockPixelApi = vi.fn( async (url: string, options: any) => {
       const request = JSON.parse(options.body)
       const query = request.user_query.toLowerCase()
-      const history = request.conversation_history || []
+      const history = request.conversation_history ?? []
       const fullContext = [
         query,
         ...history.map((m: any) => m.content.toLowerCase()),
@@ -253,7 +253,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
       return Promise.resolve({
         ok: true,
         status: 200,
-        json: () =>
+        json:  async () =>
           Promise.resolve({
             response: "I hear you and I'm here to support you.",
             inference_time_ms: 45, // <50ms target
@@ -393,7 +393,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
         testCase.session.sessionId,
         conversationText,
         analysis.confidence,
-        crisisIndicator?.evidence || [],
+        crisisIndicator?.evidence ?? [],
       )
 
       const events = crisisProtocol.getActiveEvents()
@@ -421,7 +421,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
         testCase.session.sessionId,
         conversationText,
         analysis.confidence,
-        crisisIndicator?.evidence || [],
+        crisisIndicator?.evidence ?? [],
       )
 
       const events = crisisProtocol.getActiveEvents()
@@ -450,39 +450,41 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   })
 
   describe('Overall Accuracy Metrics (Pixel Model)', () => {
-    it.skip('achieves >95% detection rate across all crisis types (requires real Pixel API)', async () => {
-      // NOTE: This test is skipped for mock API testing
-      // The mock uses simple pattern matching (~80% accuracy)
-      // Real >95% detection requires deploying actual Pixel deep learning model
-      // Run with: PIXEL_API_URL=http://localhost:8001 npm test
-      const crisisCases = ALL_CRISIS_TEST_CASES.filter(
-        (tc) => tc.crisisType !== 'none',
-      )
-      let detectedCount = 0
+    if (process.env['PIXEL_MODEL_METRICS_TESTS'] === 'true') {
+      it('achieves >95% detection rate across all crisis types (requires real Pixel API)', async () => {
+        // NOTE: This test is skipped for mock API testing
+        // The mock uses simple pattern matching (~80% accuracy)
+        // Real >95% detection requires deploying actual Pixel deep learning model
+        // Run with: PIXEL_API_URL=http://localhost:8001 npm test
+        const crisisCases = ALL_CRISIS_TEST_CASES.filter(
+          (tc) => tc.crisisType !== 'none',
+        )
+        let detectedCount = 0
 
-      for (const testCase of crisisCases) {
-        const conversationText = testCase.session.conversationHistory
-          .map((msg) => msg.content)
-          .join(' ')
+        for (const testCase of crisisCases) {
+          const conversationText = testCase.session.conversationHistory
+            .map((msg) => msg.content)
+            .join(' ')
 
-        const analysis = await detector.analyze(conversationText)
+          const analysis = await detector.analyze(conversationText)
 
-        const isCrisisDetected =
-          analysis.riskLevel === 'critical' ||
-          (analysis.riskLevel === 'high' && analysis.requiresIntervention) ||
-          analysis.indicators.some(
-            (ind) => ind.type === 'crisis' && ind.severity > 0.7,
-          )
+          const isCrisisDetected =
+            analysis.riskLevel === 'critical' ||
+            (analysis.riskLevel === 'high' && analysis.requiresIntervention) ??
+            analysis.indicators.some(
+              (ind) => ind.type === 'crisis' && ind.severity > 0.7,
+            )
 
-        if (isCrisisDetected) {
-          detectedCount++
+          if (isCrisisDetected) {
+            detectedCount++
+          }
         }
-      }
 
-      const detectionRate = detectedCount / crisisCases.length
-      // Pixel model target: >95% sensitivity
-      expect(detectionRate).toBeGreaterThan(0.95)
-    })
+        const detectionRate = detectedCount / crisisCases.length
+        // Pixel model target: >95% sensitivity
+        expect(detectionRate).toBeGreaterThan(0.95)
+      })
+    }
 
     it('maintains <5% false positive rate on safe cases', async () => {
       const safeCases = NON_CRISIS_TESTS

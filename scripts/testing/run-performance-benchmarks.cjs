@@ -8,7 +8,7 @@
 // Performance Benchmark Configuration
 const benchmarkConfig = {
   apiEndpoint: '/api/bias-analysis/analyze',
-  baseUrl: process.env['BASE_URL'] || 'http://localhost:3000',
+  baseUrl: process.env['BASE_URL'] ?? 'http://localhost:3000',
   testDuration: 60, // seconds
   concurrentUsers: [1, 5, 10, 25, 50],
   rampUpTime: 10, // seconds
@@ -54,14 +54,14 @@ class MemoryMonitor {
   }
 
   start() {
-    if (typeof performance !== 'undefined' && performance.memory) {
+    if (performance?.memory) {
       this.initialMemory = performance.memory.usedJSHeapSize
       this.peakMemory = this.initialMemory
     }
   }
 
   sample() {
-    if (typeof performance !== 'undefined' && performance.memory) {
+    if (performance?.memory) {
       const currentMemory = performance.memory.usedJSHeapSize
       this.samples.push(currentMemory)
       this.peakMemory = Math.max(this.peakMemory, currentMemory)
@@ -70,7 +70,7 @@ class MemoryMonitor {
 
   getResults() {
     const finalMemory =
-      this.samples[this.samples.length - 1] || this.initialMemory
+      this.samples[this.samples.length - 1] ?? this.initialMemory
     const average =
       this.samples.length > 0
         ? this.samples.reduce((sum, mem) => sum + mem, 0) / this.samples.length
@@ -217,10 +217,10 @@ class PerformanceBenchmarkRunner {
       successfulRequests,
       failedRequests,
       averageResponseTime,
-      minResponseTime: sortedResponseTimes[0] || 0,
-      maxResponseTime: sortedResponseTimes[sortedResponseTimes.length - 1] || 0,
-      p95ResponseTime: sortedResponseTimes[p95Index] || 0,
-      p99ResponseTime: sortedResponseTimes[p99Index] || 0,
+      minResponseTime: sortedResponseTimes[0] ?? 0,
+      maxResponseTime: sortedResponseTimes[sortedResponseTimes.length - 1] ?? 0,
+      p95ResponseTime: sortedResponseTimes[p95Index] ?? 0,
+      p99ResponseTime: sortedResponseTimes[p99Index] ?? 0,
       requestsPerSecond: (successfulRequests / duration) * 1000,
       errorRate: failedRequests / totalRequests,
       memoryUsage: {

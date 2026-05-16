@@ -3,6 +3,9 @@
 # Based on official NeMo Microservices deployment
 
 set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
 
 # Set PATH explicitly to include common installation locations
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
@@ -16,6 +19,11 @@ elif command -v uv &> /dev/null; then
     UV_CMD="uv"
 else
     UV_CMD=""
+fi
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
 fi
 
 REMOTE_PORT="${REMOTE_PORT:-8080}"

@@ -85,6 +85,9 @@ bask in eternal glory.
 - **Automated Security Scans:**
   - We run `pnpm security:scan` and other tools so often, our CI/CD pipeline has
     trust issues.
+  - For production-only vulnerability checks with this repo’s pinned pnpm tooling, use:
+    `pnpm audit --json --prod > audit-results.json && node scripts/utils/check-pnpm-audit.js --fail-on high audit-results.json`
+    (older `pnpm audit production` summaries are not supported by this pnpm version).
 - **Code Reviews:**
   - Every PR is reviewed with the precision of a Gilfoyle roast.
 - **Secrets Management:**

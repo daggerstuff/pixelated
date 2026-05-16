@@ -46,10 +46,10 @@ interface StoredState<T> {
 // ============================================================================
 
 class EncryptedJotaiStorage<Value> {
-  private key: string
-  private options: Required<Omit<PersistenceOptions, 'migration'>> &
+  private readonly key: string
+  private readonly options: Required<Omit<PersistenceOptions, 'migration'>> &
     Pick<PersistenceOptions, 'migration'>
-  private syncListeners: Set<() => void> = new Set()
+  private readonly syncListeners: Set<() => void> = new Set()
 
   constructor(key: string, options: PersistenceOptions = {}) {
     this.key = `jotai_${key}`
@@ -69,7 +69,7 @@ class EncryptedJotaiStorage<Value> {
     }
   }
 
-  private handleStorageChange = (event: StorageEvent) => {
+  private readonly handleStorageChange = (event: StorageEvent) => {
     if (event.key === this.key && event.newValue !== event.oldValue) {
       // Notify all listeners that the state has changed in another tab
       for (const listener of this.syncListeners) {
@@ -78,7 +78,7 @@ class EncryptedJotaiStorage<Value> {
     }
   }
 
-  private cleanup = () => {
+  private readonly cleanup = () => {
     if (typeof window !== 'undefined') {
       window.removeEventListener('storage', this.handleStorageChange)
       window.removeEventListener('beforeunload', this.cleanup)
@@ -292,8 +292,8 @@ export function atomWithTTL<Value>(
 
 export class StatePersistenceManager {
   private static instance: StatePersistenceManager
-  private persistedAtoms: Map<string, unknown> = new Map()
-  private syncSubscriptions: Map<string, () => void> = new Map()
+  private readonly persistedAtoms: Map<string, unknown> = new Map()
+  private readonly syncSubscriptions: Map<string, () => void> = new Map()
 
   static getInstance(): StatePersistenceManager {
     if (!StatePersistenceManager.instance) {
@@ -305,7 +305,7 @@ export class StatePersistenceManager {
   /**
    * Register an atom for persistence management
    */
-  registerAtom<_T>(key: string, atom: unknown): void {
+  registerAtom(key: string, atom: unknown): void {
     this.persistedAtoms.set(key, atom)
   }
 
@@ -344,7 +344,7 @@ export class StatePersistenceManager {
       key.startsWith('jotai_'),
     )
     const totalSize = jotaiKeys.reduce((size, key) => {
-      const value = localStorage.getItem(key) || ''
+      const value = localStorage.getItem(key) ?? ''
       return size + new Blob([value]).size
     }, 0)
 

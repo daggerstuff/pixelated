@@ -33,7 +33,7 @@ export interface StorageProvider {
 }
 
 export class LocalFileSystemProvider implements StorageProvider {
-  private basePath: string
+  private readonly basePath: string
   private fs: FileSystem | null = null
   private path: PathModule | null = null
   private initialized = false

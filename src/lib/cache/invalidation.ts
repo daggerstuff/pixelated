@@ -1,7 +1,7 @@
 import type { Redis } from 'ioredis'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { RedisService } from '../services/redis'
+import { RedisService } from '../services/redis/RedisService'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -20,9 +20,9 @@ interface InvalidationOptions {
 }
 
 export class CacheInvalidation {
-  private redis: Redis
-  private prefix: string
-  private defaultTTL: number
+  private readonly redis: Redis
+  private readonly prefix: string
+  private readonly defaultTTL: number
 
   constructor(options: InvalidationOptions) {
     const redisClient =
@@ -33,8 +33,8 @@ export class CacheInvalidation {
       throw new Error('Redis client is not initialized')
     }
     this.redis = redisClient
-    this.prefix = options.prefix || 'cache:'
-    this.defaultTTL = options.defaultTTL || 3600 // 1 hour
+    this.prefix = options.prefix ?? 'cache:'
+    this.defaultTTL = options.defaultTTL ?? 3600 // 1 hour
   }
 
   private getKey(key: string): string {
@@ -66,7 +66,7 @@ export class CacheInvalidation {
       const multi = this.redis.multi()
 
       // Set the cache value with TTL
-      const ttl = rule?.ttl || this.defaultTTL
+      const ttl = rule?.ttl ?? this.defaultTTL
       multi.setex(cacheKey, ttl, serializedValue)
 
       // Add tags if specified

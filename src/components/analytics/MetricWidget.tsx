@@ -123,6 +123,7 @@ export function MetricWidget({
           return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
         }
         return `${minutes}:${seconds.toString().padStart(2, '0')}`
+      case "number": { throw new Error('Not implemented yet: "number" case') }
       default:
         return numValue.toLocaleString()
     }

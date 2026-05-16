@@ -37,28 +37,29 @@ const BREAKPOINTS = {
 
 // List of devices to test (using Playwright's predefined device presets)
 const DEVICE_PRESETS = [
-  devices['iPhone 13'],
-  devices['iPhone 13 Pro Max'],
-  devices['Pixel 5'],
-  devices['Galaxy S8'],
-  devices['iPad (gen 6)'],
-  devices['iPad (gen 6) landscape'],
-  devices['Galaxy Tab S4'],
-]
+  'iPhone 13',
+  'iPhone 13 Pro Max',
+  'Pixel 5',
+  'Galaxy S8',
+  'iPad (gen 6)',
+  'iPad (gen 6) landscape',
+  'Galaxy Tab S4',
+] satisfies readonly string[]
 
 // Skip mobile compatibility tests in CI environment
 const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
+const describeFn = skipTests ? describe.skip : describe
 
-// Use conditional test execution for describe blocks
-;(skipTests ? describe.skip : describe)('Mobile Device Compatibility', () => {
+describeFn('Mobile Device Compatibility', () => {
   // Test each device preset on the homepage
-  DEVICE_PRESETS.forEach((device) => {
-    test(`Homepage should render properly on ${device['name']}`, async ({
+  DEVICE_PRESETS.forEach((deviceName) => {
+    const device = devices[deviceName]
+    const viewportWidth = device.viewport.width
+
+    test(`Homepage should render properly on ${deviceName}`, async ({
       browser,
     }) => {
-      const context = await browser.newContext({
-        ...device,
-      })
+      const context = await browser.newContext(device)
       const page = await context.newPage()
 
       await page.goto(TEST_URLS.home)
@@ -68,7 +69,10 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
       await expect(page.locator('footer')).toBeVisible()
 
       // Check for mobile navigation
-      const isMobile = device.viewport.width < BREAKPOINTS.md
+      const isMobile =
+        typeof viewportWidth === 'number'
+          ? viewportWidth < BREAKPOINTS.md
+          : true
       if (isMobile) {
         // Mobile menu button should be visible on small screens
         await expect(
@@ -88,7 +92,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
 
       // Take a screenshot for visual verification
       await page.screenshot({
-        path: `./test-results/mobile/${device['name'].replace(/\s+/g, '-')}-home.png`,
+        path: `./test-results/mobile/${deviceName.replace(/\s+/g, '-')}-home.png`,
       })
     })
   })

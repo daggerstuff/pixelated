@@ -81,7 +81,7 @@ class MockPatternRecognitionAdapter implements PatternRecognitionOps {
         confidence: 0.8,
         sessions: ['session1', 'session2'],
         description: 'Mock cross-session pattern',
-        significance: 'Medium significance',
+        significance: 78,
       },
     ]
   }
@@ -111,6 +111,7 @@ class MockPatternRecognitionAdapter implements PatternRecognitionOps {
         correlatedFactors: [{ factor: 'isolation', strength: 0.7 }],
         confidence: 0.75,
         significance: 'Strong correlation detected',
+        severityScore: 72,
       },
     ]
   }

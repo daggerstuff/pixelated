@@ -10,9 +10,7 @@ class MockAuthService {
   private constructor() {}
 
   static getInstance(): MockAuthService {
-    if (!MockAuthService.instance) {
-      MockAuthService.instance = new MockAuthService()
-    }
+    MockAuthService.instance ??= new MockAuthService();
     return MockAuthService.instance
   }
 
@@ -63,7 +61,7 @@ const breachTest = test.extend<BreachTestFixtures>({
   redis: async (_: unknown, use: (r: RedisService) => Promise<void>) => {
     // Initialize services
     const redis = new RedisService({
-      url: process.env['REDIS_URL'] || 'redis://localhost:6379',
+      url: process.env['REDIS_URL'] ?? 'redis://localhost:6379',
       keyPrefix: 'test:breach:',
       maxRetries: 3,
       retryDelay: 100,
@@ -105,9 +103,10 @@ const breachTest = test.extend<BreachTestFixtures>({
 
 // Skip e2e tests in CI environment
 const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
+const noopTestDescribe = (() => undefined) as typeof test.describe
 
 // Use conditional test execution for describe blocks
-;(skipTests ? test.describe.skip : test.describe)(
+;(skipTests ? noopTestDescribe : test.describe)(
   'Breach Notification System',
   () => {
     breachTest.beforeEach(async ({ page }) => {

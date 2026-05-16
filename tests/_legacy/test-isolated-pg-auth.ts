@@ -35,7 +35,7 @@ async function testIsolatedAuth() {
     }
 
     console.log('✅ User authenticated successfully!')
-    console.log('Session ID:', session.session?.id || 'No session ID')
+    console.log('Session ID:', session.session?.id ?? 'No session ID')
 
     console.log('\n🎉 Isolated auth test completed!')
   } catch (error) {

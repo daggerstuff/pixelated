@@ -21,6 +21,8 @@ from scripts.task_sync.tri_sync import (
     find_beads_duplicate_groups,
     merge_body_with_sync_metadata,
     normalize_asana_payload,
+    normalize_linear_payload,
+    normalize_github_payload,
     normalize_jira_payload,
     normalize_status,
     parse_sync_metadata,
@@ -416,9 +418,66 @@ def test_normalize_jira_payload_flattens_adf_description() -> None:
     assert record.sync_key == "tri-sync-rollout"
 
 
+def test_normalize_github_payload_reads_open_closed_status_and_metadata() -> None:
+    payload = {
+        "number": 15,
+        "title": "Track dataset imports",
+        "body": merge_body_with_sync_metadata(
+            "Investigate import pipeline",
+            SyncMetadata(
+                key="modern-dataset-project",
+                status="closed",
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "asana": "A-15"},
+            ),
+        ),
+        "state": "closed",
+        "updated_at": "2026-03-23T00:00:00Z",
+    }
+
+    record = normalize_github_payload(payload)
+
+    assert record is not None
+    assert record.provider == "github"
+    assert record.external_id == "15"
+    assert record.status == "closed"
+    assert record.sync_key == "modern-dataset-project"
+    assert record.provider_ids["asana"] == "A-15"
+
+
+def test_normalize_linear_payload_reads_state_and_metadata() -> None:
+    payload = {
+        "id": "lin-15",
+        "title": "Track dataset imports",
+        "description": merge_body_with_sync_metadata(
+            "Investigate import pipeline",
+            SyncMetadata(
+                key="modern-dataset-project",
+                status="closed",
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "asana": "A-15"},
+            ),
+        ),
+        "state": "completed",
+        "updatedAt": "2026-03-23T00:00:00Z",
+    }
+
+    record = normalize_linear_payload(payload)
+
+    assert record is not None
+    assert record.provider == "linear"
+    assert record.external_id == "lin-15"
+    assert record.status == "closed"
+    assert record.sync_key == "modern-dataset-project"
+    assert record.provider_ids["asana"] == "A-15"
+
+
 def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
     asana_path = tmp_path / "asana.json"
     jira_path = tmp_path / "jira.jsonl"
+    beads_path = tmp_path / "beads.jsonl"
 
     asana_path.write_text(
         """[
@@ -436,10 +495,14 @@ def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
         """{"key":"PIX-1","fields":{"summary":"Tri-sync rollout","description":"Ship the sync bridge","status":{"name":"To Do"},"updated":"2026-03-23T00:00:00Z"}}\n""",
         encoding="utf-8",
     )
+    beads_path.write_text(
+        """{"id":"bd-1","title":"Tri-sync rollout","description":"Ship the sync bridge","status":"open","external_ref":"tri-sync-rollout","updated_at":"2026-03-23T00:00:00Z"}""",
+        encoding="utf-8",
+    )
 
     plan = plan_from_sources(
         enabled_providers=("asana", "jira", "beads"),
-        export_paths={"asana": asana_path, "jira": jira_path},
+        export_paths={"asana": asana_path, "jira": jira_path, "beads": beads_path},
     )
 
     actions = {(action.provider, action.action) for action in plan}
@@ -791,6 +854,49 @@ def test_collect_provider_records_uses_direct_asana_export_when_no_path(monkeypa
     assert records[0].external_id == "A-1"
 
 
+def test_collect_provider_records_uses_direct_github_export_when_no_path(monkeypatch) -> None:
+    monkeypatch.setattr(
+        tri_sync,
+        "export_github_issues",
+        lambda: [
+            {
+                "number": 11,
+                "title": "Track dataset imports",
+                "body": "Investigate import pipeline",
+                "state": "open",
+                "updated_at": "2026-03-23T00:00:00Z",
+            }
+        ],
+    )
+
+    records = collect_provider_records("github", {})
+
+    assert records is not None
+    assert records[0].external_id == "11"
+
+
+def test_collect_provider_records_uses_direct_linear_export_when_no_path(monkeypatch) -> None:
+    monkeypatch.setattr(
+        tri_sync,
+        "export_linear_issues",
+        lambda: [
+            {
+                "id": "lin-21",
+                "title": "Track dataset imports",
+                "description": "Investigate import pipeline",
+                "state": "open",
+                "updatedAt": "2026-03-23T00:00:00Z",
+            }
+        ],
+    )
+
+    records = collect_provider_records("linear", {})
+
+    assert records is not None
+    assert records[0].provider == "linear"
+    assert records[0].external_id == "lin-21"
+
+
 def test_apply_sync_action_uses_direct_asana_bridge_when_command_missing(monkeypatch) -> None:
     monkeypatch.setattr(
         tri_sync,
@@ -802,6 +908,32 @@ def test_apply_sync_action_uses_direct_asana_bridge_when_command_missing(monkeyp
 
     assert result.success is True
     assert result.target_id == "A-99"
+
+
+def test_apply_sync_action_uses_direct_github_bridge_when_command_missing(monkeypatch) -> None:
+    monkeypatch.setattr(
+        tri_sync,
+        "apply_provider_action",
+        lambda provider, payload: {"number": 99} if provider == "github" else {},
+    )
+
+    result = apply_sync_action(make_action("github", "create", None))
+
+    assert result.success is True
+    assert result.target_id == "99"
+
+
+def test_apply_sync_action_uses_direct_linear_bridge_when_command_missing(monkeypatch) -> None:
+    monkeypatch.setattr(
+        tri_sync,
+        "apply_provider_action",
+        lambda provider, payload: {"id": "lin-101"} if provider == "linear" else {},
+    )
+
+    result = apply_sync_action(make_action("linear", "create", None))
+
+    assert result.success is True
+    assert result.target_id == "lin-101"
 
 
 def make_action(provider: str, action: str, target_id: str | None):

@@ -41,10 +41,10 @@ function withLazyLoading<P extends object>(
   return function LazyComponent(props: P) {
     return (
       <ErrorBoundary
-        componentName={Component.displayName || Component.name}
+        componentName={Component.displayName ?? Component.name}
         fallback={<ErrorFallback error={new Error('Component load failed')} />}
       >
-        <Suspense fallback={fallback || <LoadingFallback />}>
+        <Suspense fallback={fallback ?? <LoadingFallback />}>
           <Component {...props} />
         </Suspense>
       </ErrorBoundary>
@@ -54,7 +54,7 @@ function withLazyLoading<P extends object>(
 
 // Lazy load page components
 export const LazyDashboardPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/DashboardPage').then((module) => ({
       default: module.DashboardPage,
     })),
@@ -63,7 +63,7 @@ export const LazyDashboardPage = withLazyLoading(
 )
 
 export const LazySessionsListPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/SessionsListPage').then((module) => ({
       default: module.SessionsListPage,
     })),
@@ -72,7 +72,7 @@ export const LazySessionsListPage = withLazyLoading(
 )
 
 export const LazySessionDetailPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/SessionDetailPage').then((module) => ({
       default: module.SessionDetailPage,
     })),
@@ -81,7 +81,7 @@ export const LazySessionDetailPage = withLazyLoading(
 )
 
 export const LazyDiscoveryPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/DiscoveryPage').then((module) => ({
       default: module.DiscoveryPage,
     })),
@@ -90,7 +90,7 @@ export const LazyDiscoveryPage = withLazyLoading(
 )
 
 export const LazyEvaluationPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/EvaluationPage').then((module) => ({
       default: module.EvaluationPage,
     })),
@@ -99,7 +99,7 @@ export const LazyEvaluationPage = withLazyLoading(
 )
 
 export const LazyAcquisitionPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/AcquisitionPage').then((module) => ({
       default: module.AcquisitionPage,
     })),
@@ -108,7 +108,7 @@ export const LazyAcquisitionPage = withLazyLoading(
 )
 
 export const LazyIntegrationPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/IntegrationPage').then((module) => ({
       default: module.IntegrationPage,
     })),
@@ -117,7 +117,7 @@ export const LazyIntegrationPage = withLazyLoading(
 )
 
 export const LazyReportsPage = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../pages/ReportsPage').then((module) => ({
       default: module.ReportsPage,
     })),
@@ -127,7 +127,7 @@ export const LazyReportsPage = withLazyLoading(
 
 // Lazy load feature components (heavy components)
 export const LazyDashboard = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../features/Dashboard').then((module) => ({
       default: module.Dashboard,
     })),
@@ -136,7 +136,7 @@ export const LazyDashboard = withLazyLoading(
 )
 
 export const LazyProgressCharts = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../charts/ProgressCharts').then((module) => ({
       default: module.ProgressCharts,
     })),
@@ -145,7 +145,7 @@ export const LazyProgressCharts = withLazyLoading(
 )
 
 export const LazyReportGenerator = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../features/ReportGenerator').then((module) => ({
       default: module.ReportGenerator,
     })),
@@ -154,7 +154,7 @@ export const LazyReportGenerator = withLazyLoading(
 )
 
 export const LazyReportViewer = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../features/ReportViewer').then((module) => ({
       default: module.ReportViewer,
     })),
@@ -164,7 +164,7 @@ export const LazyReportViewer = withLazyLoading(
 
 // Lazy load chart components
 export const LazyMetricsChart = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../charts/MetricsChart').then((module) => ({
       default: module.MetricsChart,
     })),
@@ -173,7 +173,7 @@ export const LazyMetricsChart = withLazyLoading(
 )
 
 export const LazyPhaseProgressChart = withLazyLoading(
-  lazy(() =>
+  lazy( async () =>
     import('../charts/PhaseProgressChart').then((module) => ({
       default: module.PhaseProgressChart,
     })),

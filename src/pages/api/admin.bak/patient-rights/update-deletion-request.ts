@@ -81,7 +81,7 @@ export const POST = async ({ request, cookies }) => {
       id: body.id,
       status: body.status,
       processedBy: user.id,
-      processingNotes: body.processingNotes || undefined,
+      processingNotes: body.processingNotes ?? undefined,
     })
 
     // Log the successful update

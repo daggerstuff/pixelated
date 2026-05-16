@@ -204,7 +204,7 @@ export async function calculateOverallRisk(
       try {
         // Handle both synchronous and asynchronous score calculations
         const scores = await Promise.all(
-          breaches.map((breach) =>
+          breaches.map( async (breach) =>
             Promise.resolve(factor.calculateScore(breach)),
           ),
         )

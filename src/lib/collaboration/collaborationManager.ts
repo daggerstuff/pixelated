@@ -47,12 +47,12 @@ export interface SecureMessage {
  * Advanced Collaboration Manager
  */
 class CollaborationManager {
-  private config: CollaborationConfig
-  private activeSessions = new Map<string, CollaborationSession>()
-  private userSessions = new Map<string, Set<string>>() // userId -> sessionIds
-  private invitations = new Map<string, CollaborationInvite>()
-  private messages = new Map<string, SecureMessage[]>()
-  private notifications = new Map<string, Notification[]>()
+  private readonly config: CollaborationConfig
+  private readonly activeSessions = new Map<string, CollaborationSession>()
+  private readonly userSessions = new Map<string, Set<string>>() // userId -> sessionIds
+  private readonly invitations = new Map<string, CollaborationInvite>()
+  private readonly messages = new Map<string, SecureMessage[]>()
+  private readonly notifications = new Map<string, Notification[]>()
 
   constructor() {
     this.config = {
@@ -268,7 +268,7 @@ class CollaborationManager {
       senderId,
       content: processedContent,
       timestamp: new Date(),
-      encrypted: options.encrypt || this.config.encryptionRequired,
+      encrypted: options.encrypt ?? this.config.encryptionRequired,
       readBy: [senderId],
     }
 
@@ -359,7 +359,7 @@ class CollaborationManager {
 
     session.status = 'ended'
     const duration = Date.now() - session.createdAt.getTime()
-    const messageCount = this.messages.get(sessionId)?.length || 0
+    const messageCount = this.messages.get(sessionId)?.length ?? 0
     const participantCount = session.participants.length
 
     // Archive session data
@@ -391,7 +391,7 @@ class CollaborationManager {
     // Archive session data for compliance and analytics
     const archiveData = {
       session,
-      messages: this.messages.get(session.id) || [],
+      messages: this.messages.get(session.id) ?? [],
       archivedAt: new Date(),
     }
 
@@ -415,7 +415,7 @@ class CollaborationManager {
       throw new Error('User not authorized to view messages')
     }
 
-    const sessionMessages = this.messages.get(sessionId) || []
+    const sessionMessages = this.messages.get(sessionId) ?? []
     const recentMessages = sessionMessages.slice(-limit)
 
     // Mark messages as read
@@ -452,7 +452,7 @@ class CollaborationManager {
     userId: string,
     unreadOnly: boolean = false,
   ): Notification[] {
-    const userNotifications = this.notifications.get(userId) || []
+    const userNotifications = this.notifications.get(userId) ?? []
 
     if (unreadOnly) {
       return userNotifications.filter((n) => !n.read)
@@ -465,7 +465,7 @@ class CollaborationManager {
    * Mark notifications as read
    */
   markNotificationsRead(userId: string, notificationIds?: string[]): number {
-    const userNotifications = this.notifications.get(userId) || []
+    const userNotifications = this.notifications.get(userId) ?? []
     let markedCount = 0
 
     userNotifications.forEach((notification) => {
@@ -484,10 +484,10 @@ class CollaborationManager {
    * Get active sessions for user
    */
   getUserSessions(userId: string): CollaborationSession[] {
-    const userSessionIds = this.userSessions.get(userId) || new Set()
+    const userSessionIds = this.userSessions.get(userId) ?? new Set()
     return Array.from(userSessionIds)
       .map((sessionId) => this.activeSessions.get(sessionId))
-      .filter((session) => session !== undefined) as CollaborationSession[]
+      .filter((session) => session !== undefined)
   }
 
   /**
@@ -595,7 +595,7 @@ class CollaborationManager {
       throw new Error(`Session not found: ${sessionId}`)
     }
 
-    const sessionMessages = this.messages.get(sessionId) || []
+    const sessionMessages = this.messages.get(sessionId) ?? []
     const includesPII = sessionMessages.some((msg) => !msg.encrypted)
 
     let exportData: any

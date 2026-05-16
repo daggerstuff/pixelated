@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 global.fetch = vi.fn()
 
 // Mock all dependencies
-vi.mock('@/lib/ai/bias-detection', () => ({
+vi.mock('../..', () => ({
   BiasDetectionEngine: vi.fn(),
 }))
 const { mockLogger } = vi.hoisted(() => ({
@@ -20,12 +20,12 @@ const { mockLogger } = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('@/lib/logging/build-safe-logger', () => ({
+vi.mock('../../../../lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: vi.fn(() => mockLogger),
 }))
 
-import { BiasDetectionEngine } from '@/lib/ai/bias-detection'
-import type { BiasDashboardData } from '@/lib/ai/bias-detection'
+import { BiasDetectionEngine } from '../..'
+import type { BiasDashboardData } from '../..'
 
 // Import the actual handler
 let GET: any
@@ -218,6 +218,8 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     recommendations: [],
   }
 
+  const serializableMockDashboardData = JSON.parse(JSON.stringify(mockDashboardData))
+
   const createMockRequest = (
     searchParams: Record<string, string> = {},
     headers: Record<string, string> = {},
@@ -266,10 +268,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         ])
 
         return {
-          status: init?.status || 200,
+          status: init?.status ?? 200,
           json: vi.fn().mockResolvedValue(responseData),
           headers: {
-            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+            get: vi.fn((key: string) => defaultHeaders.get(key) ?? null),
           },
         }
       }),
@@ -295,7 +297,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual(mockDashboardData)
+      expect(responseData.data).toEqual(serializableMockDashboardData)
       expect(typeof responseData.processingTime).toBe('number')
 
       // Note: Mock API doesn't call engine
@@ -372,7 +374,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         'Response',
         vi.fn(function (body: string, init?: ResponseInit) {
           return {
-            status: init?.status || 500,
+            status: init?.status ?? 500,
             json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
             headers: {
               get: vi.fn((_key: string) => 'application/json'),
@@ -431,7 +433,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual(mockDashboardData) // Mock API returns standard data
+      expect(responseData.data).toEqual(serializableMockDashboardData) // Mock API returns standard data
       expect(responseData.data.summary.totalSessions).toBe(150) // Mock value
       expect(responseData.data.alerts).toHaveLength(2) // Mock has 2 alerts
     })
@@ -489,7 +491,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
     it('should handle network timeout scenarios', async () => {
       mockBiasEngine.getDashboardData.mockImplementation(
-        () =>
+         async () =>
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Request timeout')), 100),
           ),
@@ -501,7 +503,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         'Response',
         vi.fn(function (body: string, init?: ResponseInit) {
           return {
-            status: init?.status || 500,
+            status: init?.status ?? 500,
             json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
             headers: {
               get: vi.fn((_key: string) => 'application/json'),

@@ -7,14 +7,14 @@ import { getEnv } from '../../../src/lib/utils/env'
  * Get the environment (development, staging, production)
  */
 export function getEnvironment(): string {
-  return getEnv('NODE_ENV') || 'development'
+  return getEnv('NODE_ENV') ?? 'development'
 }
 
 /**
  * Get the base URL for security tests
  */
 export function getBaseUrl(): string {
-  return getEnv('BASE_URL') || 'http://localhost:4321'
+  return getEnv('BASE_URL') ?? 'http://localhost:4321'
 }
 
 /**
@@ -36,5 +36,5 @@ export function getSecurityTestTimeout(): number {
  * Get the security test report path
  */
 export function getSecurityReportPath(): string {
-  return getEnv('SECURITY_REPORT_PATH') || './security-reports'
+  return getEnv('SECURITY_REPORT_PATH') ?? './security-reports'
 }

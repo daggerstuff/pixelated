@@ -2,7 +2,7 @@
  * Polyfill for node:fs module
  */
 
-export function readFile() {
+export async function readFile() {
   return Promise.resolve('')
 }
 
@@ -10,7 +10,7 @@ export function readFileSync() {
   return ''
 }
 
-export function writeFile() {
+export async function writeFile() {
   return Promise.resolve()
 }
 
@@ -24,14 +24,14 @@ export function createReadStream() {
   throw new Error('Not implemented')
 }
 
-export function readdir() {
+export async function readdir() {
   return Promise.resolve([])
 }
 
 export const promises = {
-  readFile: () => Promise.resolve(''),
-  writeFile: () => Promise.resolve(),
-  readdir: () => Promise.resolve([]),
+  readFile:  async () => Promise.resolve(''),
+  writeFile:  async () => Promise.resolve(),
+  readdir:  async () => Promise.resolve([]),
 }
 
 export default {

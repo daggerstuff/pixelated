@@ -122,7 +122,7 @@ function remarkGenerateOgImage() {
     }
 
     // check if it need to be skipped
-    if (!title || !title.trim().length) {
+    if (!title?.trim().length) {
       return
     }
     if (pageOgImage === false) {
@@ -160,7 +160,7 @@ function remarkGenerateOgImage() {
     }
 
     // get bgType
-    const bgType = pageBgType || fallbackBgType
+    const bgType = pageBgType ?? fallbackBgType
 
     // generate og images
     await generateOgImage(

@@ -2,13 +2,13 @@ import { format } from 'date-fns'
 import { CheckCircle2, Loader2, Play } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button/button'
-import { Table } from '@/components/ui/table'
+import { Button } from '@/components/ui/button/button.tsx'
+import { Table } from '@/components/ui/table.tsx'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
-} from '@/components/ui/table-types'
+} from '@/components/ui/table-types.ts'
 import type {
   Acquisition,
   AcquisitionList as AcquisitionListType,

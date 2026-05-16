@@ -28,18 +28,18 @@ export class ThreatHuntingService extends EventEmitter {
   private huntingInterval: NodeJS.Timeout | null = null
   private isInitialized: boolean = false
 
-  private mlInference: ThreatMLInferenceManager
-  private investigationManager: ThreatInvestigationManager
-  private reportGenerator: ThreatReportGenerator
-  private repository: ThreatInvestigationRepository
-  private queryProvider: ThreatQueryProvider
+  private readonly mlInference: ThreatMLInferenceManager
+  private readonly investigationManager: ThreatInvestigationManager
+  private readonly reportGenerator: ThreatReportGenerator
+  private readonly repository: ThreatInvestigationRepository
+  private readonly queryProvider: ThreatQueryProvider
 
   constructor(
-    private redis: IRedisClient,
-    private aiService: any,
-    private mongoClient: IMongoClient,
-    private behavioralService: any,
-    private config: ThreatHuntingConfig,
+    private readonly redis: IRedisClient,
+    private readonly aiService: any,
+    private readonly mongoClient: IMongoClient,
+    private readonly behavioralService: any,
+    private readonly config: ThreatHuntingConfig,
     overrides?: {
       mlInference?: ThreatMLInferenceManager
       investigationManager?: ThreatInvestigationManager
@@ -50,17 +50,17 @@ export class ThreatHuntingService extends EventEmitter {
   ) {
     super()
     this.mlInference =
-      overrides?.mlInference || new ThreatMLInferenceManager(this.redis, config)
+      overrides?.mlInference ?? new ThreatMLInferenceManager(this.redis, config)
     this.reportGenerator =
-      overrides?.reportGenerator || new ThreatReportGenerator()
+      overrides?.reportGenerator ?? new ThreatReportGenerator()
     this.repository =
-      overrides?.repository ||
+      overrides?.repository ??
       new ThreatInvestigationRepository(mongoClient, redis)
     this.queryProvider =
-      overrides?.queryProvider || new ThreatQueryProvider(redis, mongoClient)
+      overrides?.queryProvider ?? new ThreatQueryProvider(redis, mongoClient)
 
     this.investigationManager =
-      overrides?.investigationManager ||
+      overrides?.investigationManager ??
       new ThreatInvestigationManager(
         this.repository,
         this.reportGenerator,

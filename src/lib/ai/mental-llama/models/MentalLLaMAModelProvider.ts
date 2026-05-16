@@ -57,8 +57,8 @@ export class MentalLLaMAModelProvider implements IModelProvider {
     }
     return result.content
   }
-  private modelConfig: MentalLLaMAModelConfig
-  private modelTier: string
+  private readonly modelConfig: MentalLLaMAModelConfig
+  private readonly modelTier: string
 
   /**
    * Creates an instance of MentalLLaMAModelProvider.

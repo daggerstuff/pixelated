@@ -19,6 +19,8 @@ DEFAULT_JIRA_PROJECT_NAME = "Pixelated Empathy"
 DEFAULT_JIRA_PROJECT_TYPE = "business"
 DEFAULT_ASANA_EXPORT_WORKERS = 16
 DEFAULT_ASANA_COMPLETED_SINCE = "1970-01-01T00:00:00Z"
+DEFAULT_GITHUB_API_URL = "https://api.github.com"
+DEFAULT_LINEAR_API_URL = "https://api.linear.app/graphql"
 DEFAULT_JIRA_PROJECT_TEMPLATES = (
     "com.atlassian.jira-core-project-templates:jira-core-simplified-project-management",
     "com.atlassian.jira-core-project-templates:jira-core-simplified-process-control",
@@ -457,7 +459,7 @@ def create_jira_project() -> dict[str, str]:
     for payload in jira_project_bootstrap_payloads(project_name, lead_account_id):
         try:
             return attempt_jira_project_create(site_url, headers, payload)
-        except Exception as exc:  # pragma: no cover - exercised via integration path
+        except Exception as exc:
             last_error = exc
 
     if last_error is not None:
@@ -647,11 +649,119 @@ def build_jira_auth_header(user: str, token: str) -> dict[str, str]:
     }
 
 
+def resolve_github_api_url() -> str:
+    return (
+        _strip_env("GITHUB_API_URL")
+        or _strip_env("GITHUB_ENTERPRISE_URL")
+        or DEFAULT_GITHUB_API_URL
+    )
+
+
+def resolve_github_token() -> str:
+    token = _strip_env("GITHUB_TOKEN") or _strip_env("GITHUB_ACCESS_TOKEN")
+    if not token:
+        raise RuntimeError("Missing GitHub token. Set GITHUB_TOKEN.")
+    return token
+
+
+def resolve_github_repo_owner() -> str:
+    owner = _strip_env("GITHUB_OWNER") or _strip_env("GITHUB_REPO_OWNER")
+    if not owner:
+        raise RuntimeError("Missing GitHub repo owner. Set GITHUB_OWNER.")
+    return owner
+
+
+def resolve_github_repo() -> str:
+    repo = _strip_env("GITHUB_REPO") or _strip_env("GITHUB_REPOSITORY_NAME")
+    if not repo:
+        raise RuntimeError("Missing GitHub repository name. Set GITHUB_REPO.")
+    return repo
+
+
+def build_github_headers(token: str) -> dict[str, str]:
+    return {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "pixelated-task-sync",
+    }
+
+
+def resolve_linear_api_url() -> str:
+    return _strip_env("LINEAR_API_URL") or DEFAULT_LINEAR_API_URL
+
+
+def resolve_linear_token() -> str:
+    token = _strip_env("LINEAR_API_KEY") or _strip_env("LINEAR_TOKEN")
+    if not token:
+        raise RuntimeError("Missing Linear API token. Set LINEAR_API_KEY.")
+    return token
+
+
+def resolve_linear_team_id() -> str:
+    return _strip_env("LINEAR_TEAM_ID")
+
+
+def resolve_linear_project_id() -> str:
+    return _strip_env("LINEAR_PROJECT_ID")
+
+
+def resolve_linear_parent_issue_id() -> str:
+    return _strip_env("LINEAR_PARENT_ISSUE_ID")
+
+
+def build_linear_headers(token: str) -> dict[str, str]:
+    return {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+
+
+def _linear_issues_query(filter_by_team: str = "", filter_by_project: str = "") -> str:
+    filter_parts: list[str] = []
+    if filter_by_team:
+        filter_parts.append(f'team: {{ id: {{ eq: "{filter_by_team}" }} }}')
+    if filter_by_project:
+        filter_parts.append(f'project: {{ id: {{ eq: "{filter_by_project}" }} }}')
+    filter_clause = ""
+    if filter_parts:
+        filter_clause = f', filter: {{ {" ".join(filter_parts)} }}'
+    return (
+        "query($after: String) { "
+        "issues(first: 100, after: $after"
+        f"{filter_clause}"
+        ') { nodes { id title description state updatedAt createdAt } pageInfo { hasNextPage endCursor } } }'
+    )
+
+
+def _linear_graphql_query(query: str, variables: Mapping[str, Any] | None = None) -> Any:
+    api_url = resolve_linear_api_url()
+    headers = build_linear_headers(resolve_linear_token())
+    payload = {"query": query}
+    if variables is not None:
+        payload["variables"] = dict(variables)
+    return _json_request("POST", api_url, headers=headers, payload=payload)
+
+
+def _extract_graphql_payload(response: Any) -> Any:
+    if not isinstance(response, Mapping):
+        raise RuntimeError(f"Linear API response was malformed: {response}")
+    if "errors" in response:
+        raise RuntimeError(f"Linear GraphQL reported errors: {response['errors']}")
+    return response.get("data", {})
+
+
 def extract_provider_target_id(provider: str, payload: Mapping[str, Any]) -> str | None:
     if provider == "asana":
         return _coerce_provider_target_id(payload.get("gid") or payload.get("id"))
     if provider == "jira":
         return _coerce_provider_target_id(payload.get("key") or payload.get("id"))
+    if provider == "github":
+        return _coerce_provider_target_id(payload.get("number") or payload.get("id"))
+    if provider == "linear":
+        return _coerce_provider_target_id(payload.get("id"))
     return None
 
 
@@ -900,6 +1010,10 @@ def apply_provider_action(provider: str, action: Mapping[str, Any]) -> dict[str,
         return apply_asana_action(action)
     if provider == "jira":
         return apply_jira_action(action)
+    if provider == "github":
+        return apply_github_action(action)
+    if provider == "linear":
+        return apply_linear_action(action)
     raise RuntimeError(f"Unsupported provider bridge action for '{provider}'.")
 
 
@@ -953,6 +1067,162 @@ def apply_jira_action(action: Mapping[str, Any]) -> dict[str, Any]:
     if issue_key:
         _sync_jira_issue_status(site_url, headers, issue_key, desired_status)
     return response
+
+
+def export_github_issues() -> list[dict[str, Any]]:
+    api_url = resolve_github_api_url().rstrip("/")
+    owner = resolve_github_repo_owner()
+    repo = resolve_github_repo()
+    token = resolve_github_token()
+    headers = build_github_headers(token)
+
+    issues: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        query = parse.urlencode(
+            {
+                "state": "all",
+                "per_page": "100",
+                "page": str(page),
+                "sort": "updated",
+                "direction": "desc",
+            }
+        )
+        payload = _json_request(
+            "GET", f"{api_url}/repos/{owner}/{repo}/issues?{query}", headers=headers
+        )
+        if not isinstance(payload, list) or not payload:
+            break
+        issues.extend(
+            item
+            for item in payload
+            if isinstance(item, Mapping) and "pull_request" not in item
+        )
+        if len(payload) < 100:
+            break
+        page += 1
+    return issues
+
+
+def apply_github_action(action: Mapping[str, Any]) -> dict[str, Any]:
+    api_url = resolve_github_api_url().rstrip("/")
+    owner = resolve_github_repo_owner()
+    repo = resolve_github_repo()
+    token = resolve_github_token()
+    headers = build_github_headers(token)
+
+    action_type = str(action.get("action") or "").strip()
+    target_id = str(action.get("target_id") or "").strip()
+    payload = {
+        "title": str(action.get("title") or ""),
+        "body": str(action.get("body") or ""),
+        "state": "closed" if str(action.get("status") or "").strip() == "closed" else "open",
+    }
+    if action_type == "create":
+        response = _json_request(
+            "POST",
+            f"{api_url}/repos/{owner}/{repo}/issues",
+            headers=headers,
+            payload=payload,
+        )
+        if not isinstance(response, Mapping):
+            return {}
+        return dict(response)
+
+    if not target_id:
+        raise RuntimeError("GitHub update requires target_id.")
+    _json_request(
+        "PATCH",
+        f"{api_url}/repos/{owner}/{repo}/issues/{target_id}",
+        headers=headers,
+        payload=payload,
+    )
+    return {"id": target_id}
+
+
+def export_linear_issues() -> list[dict[str, Any]]:
+    team_id = resolve_linear_team_id()
+    project_id = resolve_linear_project_id()
+    query = _linear_issues_query(team_id, project_id)
+    cursor: str | None = None
+    issues: list[dict[str, Any]] = []
+
+    while True:
+        response = _extract_graphql_payload(
+            _linear_graphql_query(query, {"after": cursor})
+        )
+        issues_payload = response.get("issues")
+        if not isinstance(issues_payload, Mapping):
+            break
+
+        nodes = issues_payload.get("nodes")
+        if isinstance(nodes, list):
+            for node in nodes:
+                if isinstance(node, Mapping):
+                    issues.append(dict(node))
+
+        page_info = issues_payload.get("pageInfo")
+        if not isinstance(page_info, Mapping) or not bool(page_info.get("hasNextPage")):
+            break
+        cursor = _coerce_provider_target_id(page_info.get("endCursor"))
+        if not cursor:
+            break
+
+    return issues
+
+
+def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
+    action_type = str(action.get("action") or "").strip()
+    target_id = _coerce_provider_target_id(action.get("target_id"))
+
+    if action_type != "create" and not target_id:
+        raise RuntimeError("Linear update requires target_id.")
+
+    input_payload: dict[str, Any] = {
+        "title": str(action.get("title") or ""),
+        "description": str(action.get("body") or ""),
+    }
+
+    mutation = (
+        "mutation($input: IssueCreateInput!) { "
+        "issueCreate(input: $input) { success issue { id title } } }"
+    )
+    key = "issueCreate"
+
+    if action_type == "create":
+        team_id = resolve_linear_team_id()
+        if team_id:
+            input_payload["teamId"] = team_id
+        project_id = resolve_linear_project_id()
+        if project_id:
+            input_payload["projectId"] = project_id
+        parent_issue_id = resolve_linear_parent_issue_id()
+        if parent_issue_id:
+            input_payload["parentId"] = parent_issue_id
+    else:
+        input_payload["id"] = target_id
+        mutation = (
+            "mutation($input: IssueUpdateInput!) { "
+            "issueUpdate(input: $input) { success issue { id title } } }"
+        )
+        key = "issueUpdate"
+
+    response = _extract_graphql_payload(
+        _linear_graphql_query(mutation, {"input": input_payload})
+    )
+    container = response.get(key)
+    issue = container.get("issue") if isinstance(container, Mapping) else None
+    if not isinstance(issue, Mapping):
+        if target_id and key == "issueUpdate":
+            return {"id": target_id}
+        return {}
+
+    issue_id = _coerce_provider_target_id(issue.get("id"))
+    if issue_id:
+        return {"id": issue_id}
+    if target_id:
+        return {"id": target_id}
+    return {}
 
 
 def _sync_jira_issue_status(

@@ -18,9 +18,39 @@ export interface DocumentChange {
   id: string
   documentId: string
   userId: string
-  change: any
+  change: unknown
   timestamp: Date
   version: number
+}
+
+interface DocumentRow {
+  id: string
+  title: string
+  content: string
+  owner_id: string
+  collaborators: string[] | null
+  created_at: string | Date
+  updated_at: string | Date
+  version: number
+  is_public: boolean
+}
+
+interface DocumentChangeRow {
+  id: string
+  document_id: string
+  user_id: string
+  change: unknown
+  timestamp: string | Date
+  version: number
+}
+
+interface RawCollaborationSession {
+  id: string
+  documentId: string
+  userId: string
+  socketId: string
+  cursor?: { line: number; column: number }
+  lastActivity: string | Date
 }
 
 export interface CollaborationSession {
@@ -33,8 +63,8 @@ export interface CollaborationSession {
 }
 
 export class DocumentService {
-  private db: Pool
-  private redis: Redis
+  private readonly db: Pool
+  private readonly redis: Redis
 
   constructor(db: Pool, redis: Redis) {
     this.db = db
@@ -56,7 +86,7 @@ export class DocumentService {
       RETURNING *
     `
 
-    const result = await this.db.query(query, [
+    const result = await this.db.query<DocumentRow>(query, [
       id,
       data.title,
       data.content,
@@ -65,7 +95,7 @@ export class DocumentService {
       now,
       now,
       1,
-      data.isPublic || false,
+      data.isPublic ?? false,
     ])
 
     return this.mapDocumentRow(result.rows[0])
@@ -81,7 +111,7 @@ export class DocumentService {
       )
     `
 
-    const result = await this.db.query(query, [id, userId])
+    const result = await this.db.query<DocumentRow>(query, [id, userId])
     return result.rows.length > 0 ? this.mapDocumentRow(result.rows[0]) : null
   }
 
@@ -103,7 +133,7 @@ export class DocumentService {
       RETURNING *
     `
 
-    const result = await this.db.query(query, [
+    const result = await this.db.query<DocumentRow>(query, [
       updates.title,
       updates.content,
       id,
@@ -128,7 +158,7 @@ export class DocumentService {
       documentId,
       ownerId,
     ])
-    return result.rowCount > 0
+    return (result.rowCount ?? 0) > 0
   }
 
   async recordChange(
@@ -160,13 +190,14 @@ export class DocumentService {
       ORDER BY timestamp ASC
     `
 
-    const result = await this.db.query(query, [documentId])
+    const result = await this.db.query<DocumentChangeRow>(query, [documentId])
     return result.rows.map((row) => ({
       id: row.id,
       documentId: row.document_id,
       userId: row.user_id,
       change: row.change,
-      timestamp: row.timestamp,
+      timestamp:
+        row.timestamp instanceof Date ? row.timestamp : new Date(row.timestamp),
       version: row.version,
     }))
   }
@@ -202,7 +233,8 @@ export class DocumentService {
     const sessionData = await this.redis.get(`session:${sessionId}`)
     if (!sessionData) return
 
-    const session: CollaborationSession = JSON.parse(sessionData)
+    const session = parseSession(sessionData)
+    if (!session) return
     session.cursor = cursor
     session.lastActivity = new Date()
 
@@ -222,7 +254,12 @@ export class DocumentService {
     for (const sessionId of sessionIds) {
       const sessionData = await this.redis.get(`session:${sessionId}`)
       if (sessionData) {
-        sessions.push(JSON.parse(sessionData))
+        const session = parseSession(sessionData)
+        if (session) {
+          sessions.push(session)
+        } else {
+          await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
+        }
       } else {
         await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
       }
@@ -235,22 +272,71 @@ export class DocumentService {
     const sessionData = await this.redis.get(`session:${sessionId}`)
     if (!sessionData) return
 
-    const session: CollaborationSession = JSON.parse(sessionData)
+    const session = parseSession(sessionData)
+    if (!session) return
     await this.redis.srem(`doc:${session.documentId}:sessions`, sessionId)
     await this.redis.del(`session:${sessionId}`)
   }
 
-  private mapDocumentRow(row: any): Document {
+  private mapDocumentRow(row: DocumentRow): Document {
+    const collaborators = Array.isArray(row.collaborators)
+      ? row.collaborators
+      : []
+
     return {
       id: row.id,
       title: row.title,
       content: row.content,
       ownerId: row.owner_id,
-      collaborators: row.collaborators || [],
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      collaborators,
+      createdAt:
+        row.created_at instanceof Date
+          ? row.created_at
+          : new Date(row.created_at),
+      updatedAt:
+        row.updated_at instanceof Date
+          ? row.updated_at
+          : new Date(row.updated_at),
       version: row.version,
       isPublic: row.is_public,
     }
   }
+}
+
+function isRawCollaborationSession(
+  value: unknown,
+): value is RawCollaborationSession {
+  if (!isRecord(value)) return false
+
+  return (
+    typeof value.id === 'string' &&
+    typeof value.documentId === 'string' &&
+    typeof value.userId === 'string' &&
+    typeof value.socketId === 'string' &&
+    (typeof value.lastActivity === 'string' ||
+      value.lastActivity instanceof Date)
+  )
+}
+
+function parseSession(sessionData: string): CollaborationSession | null {
+  try {
+    const value = JSON.parse(sessionData) as unknown
+    if (!isRawCollaborationSession(value)) return null
+
+    return {
+      ...value,
+      lastActivity:
+        value.lastActivity instanceof Date
+          ? value.lastActivity
+          : new Date(value.lastActivity),
+    }
+  } catch (error: unknown) {
+    console.error('Failed to parse collaboration session', error)
+  }
+
+  return null
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }

@@ -399,7 +399,7 @@ function printBenchmarkSummary(suite: BenchmarkSuite): void {
   console.log('\n📊 Benchmark Results Summary')
   console.log('═'.repeat(80))
   console.log(
-    `${'Test Name'.padEnd(30)} | ${'Avg (ms)'.padEnd(10)} | ${'P50'.padEnd(8)} | ${'P95'.padEnd(8)} | ${'P99'.padEnd(8)} | ${'Pass'}`,
+    `${'Test Name'.padEnd(30)} | ${'Avg (ms)'.padEnd(10)} | ${'P50'.padEnd(8)} | ${'P95'.padEnd(8)} | ${'P99'.padEnd(8)} | Pass`,
   )
   console.log('─'.repeat(80))
 

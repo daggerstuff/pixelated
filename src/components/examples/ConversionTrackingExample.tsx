@@ -74,7 +74,7 @@ export default function ConversionTrackingExample() {
         {step < funnelConfig.stages.length - 1 ? (
           <div className='step-content'>
             <h3>
-              Step {step + 1}: {funnelConfig.stages[step]?.id || 'Unknown'}
+              Step {step + 1}: {funnelConfig.stages[step]?.id ?? 'Unknown'}
             </h3>
             <p>This is step {step + 1} of the funnel.</p>
             <button onClick={nextStep}>Next Step</button>

@@ -32,7 +32,7 @@ describe('Journal Research API Integration', () => {
 
     global.fetch = vi.fn().mockImplementation(async (url, init) => {
       const urlStr = url.toString()
-      const method = init?.method || 'GET'
+      const method = init?.method ?? 'GET'
 
       // Mock response helper
       const jsonResponse = (data: any, status = 200) =>
@@ -78,9 +78,9 @@ describe('Journal Research API Integration', () => {
           const newSession = {
             session_id: newSessionId,
             start_date: new Date().toISOString(),
-            target_sources: body.target_sources || ['PubMed'],
-            search_keywords: body.search_keywords || {},
-            weekly_targets: body.weekly_targets || {},
+            target_sources: body.target_sources ?? ['PubMed'],
+            search_keywords: body.search_keywords ?? {},
+            weekly_targets: body.weekly_targets ?? {},
             current_phase: 'discovery',
             progress_metrics: {},
           }
@@ -262,7 +262,7 @@ describe('Journal Research API Integration', () => {
           'list',
           { page: 1, pageSize: 10 },
         ],
-        queryFn: () => listSessions({ page: 1, pageSize: 10 }),
+        queryFn:  async () => listSessions({ page: 1, pageSize: 10 }),
       })
 
       expect(sessions).toBeDefined()

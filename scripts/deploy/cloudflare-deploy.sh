@@ -12,6 +12,14 @@ NC='\033[0m' # No Color
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
+
+run_redis_hardening_audit() {
+    if ! "$REDIS_AUDIT"; then
+      echo "Redis hardening audit failed"
+      exit 1
+    fi
+}
 
 # Functions
 log_info() {
@@ -193,6 +201,7 @@ main() {
     
     case $COMMAND in
         deploy)
+            run_redis_hardening_audit
             check_dependencies
             check_auth
             build_project

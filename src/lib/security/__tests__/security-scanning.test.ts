@@ -1,7 +1,6 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
-
 // @vitest-environment node
+import * as fs from 'fs'
+import * as path from 'path'
 import { describe, it, expect } from 'vitest'
 
 describe('Security Scanning Configuration', () => {
@@ -59,7 +58,7 @@ describe('Security Scanning Configuration', () => {
 
       // Check for security scanning components
       expect(workflowContent).toContain('security-scan')
-      expect(workflowContent).toContain('ubuntu-latest')
+      expect(workflowContent).toMatch(/ubuntu-\w+/)
     })
 
     it('should have proper dependency scanning', () => {

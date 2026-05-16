@@ -50,7 +50,7 @@ build:
     - uses: actions/checkout@v6.0.2
     - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 11.0.9
+        version: 11.1.2
     - uses: actions/setup-node@v6.4.0
       with:
         node-version: 24.14.1
@@ -90,7 +90,7 @@ deploy:
     - uses: actions/checkout@v6.0.2
     - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 11.0.9
+        version: 11.1.2
     - uses: actions/setup-node@v6.4.0
       with:
         node-version: 24.14.1
@@ -166,7 +166,7 @@ rollback:
     - uses: actions/checkout@v6.0.2
     - uses: pnpm/action-setup@v6.0.6
       with:
-        version: 11.0.9
+        version: 11.1.2
     - uses: actions/setup-node@v6.4.0
       with:
         node-version: 24.14.1

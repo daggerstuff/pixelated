@@ -1,13 +1,23 @@
+/// <reference types="vitest/node" />
+/** @vitest-environment node */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { withAuth } from './auth'
 
-const mockValidateApiKey = vi.fn()
+const mockValidateApiKey = vi.hoisted(() => vi.fn())
+const mockGetSession = vi.hoisted(() => vi.fn())
+const mockIsSessionValid = vi.hoisted(() => vi.fn())
 
-vi.mock('@/lib/db/developer-api-keys', () => ({
+vi.mock('../lib/db/developer-api-keys', () => ({
   developerApiKeyManager: {
     validateApiKey: mockValidateApiKey,
   },
+}))
+
+vi.mock('../lib/auth/session', () => ({
+  getSession: mockGetSession,
+  isSessionValid: mockIsSessionValid,
 }))
 
 describe('withAuth middleware', () => {
@@ -17,9 +27,12 @@ describe('withAuth middleware', () => {
     .mockResolvedValue(new Response(JSON.stringify({ success: true })))
 
   beforeEach(() => {
+    mockHandler.mockClear()
     mockValidateApiKey
       .mockReset()
       .mockResolvedValue({ valid: false, error: 'Invalid API key' })
+    mockGetSession.mockReset().mockResolvedValue(null)
+    mockIsSessionValid.mockReset().mockReturnValue(false)
   })
 
   it('should allow unauthenticated access to whitelisted paths', async () => {

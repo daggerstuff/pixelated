@@ -7,7 +7,7 @@ export function format(format, ...args) {
     if (match === '%%') {
       return '%'
     }
-    return String(args.shift() || '')
+    return String(args.shift() ?? '')
   })
 }
 
@@ -16,7 +16,7 @@ export function inspect(obj) {
 }
 
 export function promisify(_fn) {
-  return (..._args) => Promise.resolve()
+  return  async (..._args) => Promise.resolve()
 }
 
 export function deprecate(fn, _message) {

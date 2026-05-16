@@ -12,9 +12,11 @@ import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
 
-// Use the actual Redis type from ioredis instead of our custom RedisLike type
-// to avoid type mismatches with the ioredis library
-type RedisLike = typeof Redis
+type RedisLike = {
+  on: (event: string, listener: (...args: unknown[]) => void) => RedisLike
+  connect: () => Promise<unknown>
+  quit: () => Promise<unknown>
+}
 
 type SentryExpressErrorHandler = (app: express.Application) => void
 type SentryErrorHandler = (
@@ -101,7 +103,7 @@ const redisOptions = REDIS_URL.startsWith('rediss://')
     } as RedisOptions)
   : ({ lazyConnect: true } as RedisOptions)
 
-let redis: RedisLike = new Redis(REDIS_URL, redisOptions)
+let redis: RedisLike | Redis = new Redis(REDIS_URL, redisOptions)
 
 redis.on('error', (err: unknown) => {
   // We handle connection errors in the connect().catch() block below
@@ -120,13 +122,14 @@ if (typeof redis.connect === 'function') {
       )
       // Create a simple mock compatible with ioredis interface
       const redisMock: RedisLike = {
-        quit: () => Promise.resolve('OK'),
+        connect: async () => undefined,
+        quit: async () => 'OK',
         on: (event: string, listener: (...args: unknown[]) => void) => {
           if (event === 'connect' || event === 'ready') listener()
           // Return this to allow chaining
-          return redisMock as unknown as RedisLike
+          return redisMock
         },
-      } as RedisLike
+      }
       redis = redisMock
     } else {
       console.error('Failed to connect to Redis:', err)

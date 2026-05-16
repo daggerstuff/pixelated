@@ -324,14 +324,29 @@ export async function searchProjects(
 ): Promise<Project[]> {
   const ProjectModel = getProjectModel()
 
-  const foundProjects = await ProjectModel.find({
+  const queryResult = ProjectModel.find({
     $text: { $search: query },
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   })
-    .limit(limit)
-    .sort({ createdAt: -1 })
+  let limitedResult: unknown
 
-  return foundProjects
+  if (typeof (queryResult as { limit?: unknown }).limit === 'function') {
+    const limited = (
+      queryResult as {
+        limit: (limit: number) => Promise<Project[]> | Project[]
+      }
+    ).limit(limit)
+    limitedResult =
+      typeof (limited as { sort?: unknown }).sort === 'function'
+        ? await (limited as { sort: (sort: { createdAt: -1 | 1 }) => Promise<Project[]> | Project[] }).sort(
+            { createdAt: -1 },
+          )
+        : limited
+  } else {
+    limitedResult = queryResult
+  }
+
+  return (Array.isArray(limitedResult) ? limitedResult : []) as Project[]
 }
 
 /**

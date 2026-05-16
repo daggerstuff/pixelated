@@ -469,9 +469,7 @@ describe('BiasAlertSystem', () => {
 
     it('should provide alert history', async () => {
       // Mock the method if it doesn't exist
-      if (!alertSystem.getAlertHistory) {
-        alertSystem.getAlertHistory = async () => []
-      }
+      alertSystem.getAlertHistory ??= async () => [];
       const history = await alertSystem.getAlertHistory()
       expect(history).toBeDefined()
       expect(Array.isArray(history)).toBe(true)

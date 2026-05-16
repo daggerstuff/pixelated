@@ -58,10 +58,10 @@ export interface DeploymentHealth {
  * Production Deployment Manager
  */
 class ProductionManager {
-  private config: DeploymentConfig
-  private environments = new Map<string, EnvironmentConfig>()
-  private deployments = new Map<string, DeploymentArtifact>()
-  private healthChecks = new Map<string, DeploymentHealth>()
+  private readonly config: DeploymentConfig
+  private readonly environments = new Map<string, EnvironmentConfig>()
+  private readonly deployments = new Map<string, DeploymentArtifact>()
+  private readonly healthChecks = new Map<string, DeploymentHealth>()
 
   constructor() {
     this.config = {

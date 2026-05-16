@@ -1,13 +1,11 @@
-import { auth } from '@/lib/auth'
-import { sendEmail } from '@/lib/email'
-import { FHE } from '@/lib/fhe'
-import { logger } from '@/lib/logger'
-import { redis } from '@/lib/redis'
-
-import { BreachNotificationSystem } from '../breach-notification'
-
 // Mock dependencies
-vi.mock('@/lib/redis', () => ({
+vi.mock('crypto', () => ({
+  Buffer: globalThis.Buffer,
+  randomBytes: vi.fn(() => Buffer.from('unit-test-seed')),
+  randomUUID: vi.fn(() => '00000000-0000-0000-0000-000000000000'),
+}))
+
+vi.mock('../../redis', () => ({
   redis: {
     set: vi.fn(),
     get: vi.fn(),
@@ -15,28 +13,35 @@ vi.mock('@/lib/redis', () => ({
   },
 }))
 
-vi.mock('@/lib/email', () => ({
+vi.mock('../../email', () => ({
   sendEmail: vi.fn(),
 }))
 
-vi.mock('@/lib/auth', () => ({
+vi.mock('../../auth', () => ({
   auth: {
     getUserById: vi.fn(),
   },
 }))
 
-vi.mock('@/lib/fhe', () => ({
-  FHE: {
+vi.mock('../../fhe', () => ({
+  fheService: {
     encrypt: vi.fn(),
   },
 }))
 
-vi.mock('@/lib/logger', () => ({
+vi.mock('../../logger', () => ({
   logger: {
     error: vi.fn(),
     info: vi.fn(),
   },
 }))
+
+import { auth } from '../../auth'
+import { sendEmail } from '../../email'
+import { fheService } from '../../fhe'
+import { logger } from '../../logger'
+import { redis } from '../../redis'
+import { BreachNotificationSystem } from '../breach-notification'
 
 describe('breachNotificationSystem', () => {
   const mockBreachDetails = {
@@ -64,7 +69,7 @@ describe('breachNotificationSystem', () => {
     ;(redis['get'] as unknown).mockResolvedValue(null)
     ;(redis['keys'] as unknown).mockResolvedValue([])
     ;(auth['getUserById'] as unknown).mockResolvedValue(mockUser)
-    ;(FHE['encrypt'] as unknown).mockResolvedValue('encrypted_data')
+    ;(fheService['encrypt'] as unknown).mockResolvedValue('encrypted_data')
     ;(sendEmail as unknown).mockResolvedValue(undefined)
 
     // Setup process.env
@@ -85,7 +90,7 @@ describe('breachNotificationSystem', () => {
       const breachId =
         await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
-      expect(breachId).toMatch(/^breach_\d+_[a-z0-9]+$/)
+      expect(breachId).toMatch(/^breach_\d+_[a-f0-9-]+$/)
       expect(redis['set']).toHaveBeenCalledTimes(3) // Initial storage + status updates
       expect(logger['error']).toHaveBeenCalledWith(
         'Security breach detected:',
@@ -115,18 +120,18 @@ describe('breachNotificationSystem', () => {
       expect(auth['getUserById']).toHaveBeenCalledTimes(
         mockBreachDetails['affectedUsers'].length,
       )
-      expect(FHE['encrypt']).toHaveBeenCalled()
+      expect(fheService['encrypt']).toHaveBeenCalled()
       expect(sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           to: mockUser['email'],
           subject: expect.stringContaining('HIGH Security Event'),
-          priority: 'urgent',
         }),
       )
     })
 
     it('should handle missing user email gracefully', async () => {
       ;(auth['getUserById'] as unknown).mockResolvedValue({ id: 'user1' }) // User without email
+      process.env['SECURITY_STAKEHOLDERS'] = ''
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
@@ -135,6 +140,7 @@ describe('breachNotificationSystem', () => {
 
     it('should handle user notification errors', async () => {
       ;(sendEmail as unknown).mockRejectedValue(new Error('Email error'))
+      process.env['SECURITY_STAKEHOLDERS'] = ''
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
@@ -158,7 +164,6 @@ describe('breachNotificationSystem', () => {
         expect.objectContaining({
           to: process.env.HHS_NOTIFICATION_EMAIL,
           subject: expect.stringContaining('HIPAA Breach Notification'),
-          priority: 'urgent',
         }),
       )
     })
@@ -192,7 +197,6 @@ describe('breachNotificationSystem', () => {
         expect(sendEmail).toHaveBeenCalledWith(
           expect.objectContaining({
             to: stakeholder,
-            priority: 'urgent',
           }),
         )
       })

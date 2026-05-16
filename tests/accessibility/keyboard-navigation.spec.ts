@@ -169,7 +169,7 @@ test.describe('Keyboard Navigation Tests', () => {
             x: rect.x,
             y: rect.y,
             // Use getAttribute to get tabIndex as a safer approach
-            tabIndex: Number(activeElement.getAttribute('tabindex') || 0),
+            tabIndex: Number(activeElement.getAttribute('tabindex') ?? 0),
             role: activeElement.getAttribute('role'),
           }
         })
@@ -194,7 +194,7 @@ test.describe('Keyboard Navigation Tests', () => {
 
       // Check for any focusable elements with a tabindex > 0 (anti-pattern)
       const highTabIndexElements = focusPath.filter(
-        (el) => (el.tabIndex || 0) > 0,
+        (el) => (el.tabIndex ?? 0) > 0,
       )
       if (highTabIndexElements.length > 0) {
         console.warn(

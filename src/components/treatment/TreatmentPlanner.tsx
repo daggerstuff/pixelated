@@ -50,7 +50,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
       })
       const data = await res.json()
       if (!res.ok || !data.success) {
-        setError(data.error || 'Failed to fetch recommendations')
+        setError(data.error ?? 'Failed to fetch recommendations')
         setLoading(false)
         return
       }

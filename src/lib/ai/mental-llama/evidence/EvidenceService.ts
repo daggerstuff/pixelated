@@ -57,10 +57,10 @@ interface EvidenceMetrics {
  * Enhanced Evidence Service
  */
 export class EvidenceService {
-  private extractor: EvidenceExtractor
-  private config: EvidenceServiceConfig
-  private cache: Map<string, CacheEntry> = new Map()
-  private metrics: EvidenceMetrics = {
+  private readonly extractor: EvidenceExtractor
+  private readonly config: EvidenceServiceConfig
+  private readonly cache: Map<string, CacheEntry> = new Map()
+  private readonly metrics: EvidenceMetrics = {
     totalExtractions: 0,
     cacheHits: 0,
     cacheMisses: 0,
@@ -411,7 +411,7 @@ export class EvidenceService {
   ): void {
     // Manage cache size
     if (this.cache.size >= this.config.maxCacheSize) {
-      const oldestKey = this.cache.keys().next().value as string
+      const oldestKey = this.cache.keys().next().value!
       if (oldestKey) {
         this.cache.delete(oldestKey)
       }

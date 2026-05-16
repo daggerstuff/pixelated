@@ -152,10 +152,10 @@ interface QuarterlyEarnings {
 }
 
 export class AlphaVantageService {
-  private logger: Logger
-  private client: AxiosInstance
+  private readonly logger: Logger
+  private readonly client: AxiosInstance
   private readonly API_KEY: string
-  private cache: Map<string, { data: unknown; timestamp: number }> = new Map()
+  private readonly cache: Map<string, { data: unknown; timestamp: number }> = new Map()
   private readonly CACHE_TTL = 15 * 60 * 1000 // 15 minutes
 
   constructor() {
@@ -532,9 +532,9 @@ export class AlphaVantageService {
     news: Record<string, NewsSentiment[]>
   }> {
     try {
-      const quotes = await Promise.all(symbols.map((s) => this.getQuote(s)))
+      const quotes = await Promise.all(symbols.map( async (s) => this.getQuote(s)))
       const fundamentals = await Promise.all(
-        symbols.map((s) => this.getFundamentals(s)),
+        symbols.map( async (s) => this.getFundamentals(s)),
       )
 
       const technical: Record<string, TechnicalIndicator[]> = {}
@@ -573,15 +573,15 @@ export class AlphaVantageService {
     }
   }
 
-  private getFromCache<T>(key: string): T | null {
+  private getFromCache(key: string): unknown | null {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data as T
+      return cached.data
     }
     return null
   }
 
-  private setCache<T>(key: string, data: T): void {
+  private setCache(key: string, data: unknown): void {
     this.cache.set(key, { data, timestamp: Date.now() })
   }
 

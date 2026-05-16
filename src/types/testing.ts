@@ -246,7 +246,7 @@ export interface TestSection<P = any> {
 }
 
 export type TestSections = {
-  [key: string]: TestSection<any>
+  [key: string]: TestSection
 }
 
 export interface LoadingSize {

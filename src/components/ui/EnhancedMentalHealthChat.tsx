@@ -1,10 +1,10 @@
 import { Send, Brain, User, Bot, Sparkles, Activity } from 'lucide-react'
 import React, { useState, useRef, useEffect, useCallback, type FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Textarea } from '@/components/ui/textarea.tsx'
 import type { MindMirrorAnalysis } from '@/lib/mental-health/types'
 
 import BrainVisualization from './BrainVisualization'

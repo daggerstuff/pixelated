@@ -159,7 +159,7 @@ export const defaultBypassRules: RateLimitBypassRule[] = [
       paths: ['/health', '/health/*', '/api/health', '/api/health/*'],
       custom: async (context) => {
         // Check for health check user agents
-        const userAgent = context.userAgent?.toLowerCase() || ''
+        const userAgent = context.userAgent?.toLowerCase() ?? ''
         return userAgent.includes('health') || userAgent.includes('monitor')
       },
     },
@@ -326,7 +326,7 @@ export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
  * Merge default configuration with environment-specific and env var configurations
  */
 export const getMergedConfig = (): RateLimitConfig => {
-  const env = process.env.NODE_ENV || 'development'
+  const env = process.env.NODE_ENV ?? 'development'
   const envConfig = getEnvironmentConfig(env)
   const envVarConfig = getConfigFromEnv()
 

@@ -54,7 +54,7 @@ export function recommend(request: RecommendationRequest): TreatmentForecast[] {
     // Apply confidence threshold if specified
     const filteredForecasts = request.minConfidence
       ? validatedForecasts.filter(
-          (f) => f.confidence >= (request.minConfidence || 0),
+          (f) => f.confidence >= (request.minConfidence ?? 0),
         )
       : validatedForecasts
 
@@ -86,7 +86,7 @@ function generateForecasts(
 
   // Get base interventions based on mental health analysis
   const baseInterventions = context.mentalHealthAnalysis
-    ?.recommendedApproaches || ['CBT', 'Mindfulness', 'Behavioral activation']
+    ?.recommendedApproaches ?? ['CBT', 'Mindfulness', 'Behavioral activation']
 
   // Consider recent emotion state for risk assessment
   const emotionIntensity = context.recentEmotionState.intensity
@@ -113,7 +113,7 @@ function generateForecasts(
     // Adjust risk based on multiple factors
     const riskFactors: Array<'low' | 'moderate' | 'high'> = [
       baseRisk,
-      context.mentalHealthAnalysis?.riskLevel || 'low',
+      context.mentalHealthAnalysis?.riskLevel ?? 'low',
       index > desiredOutcomes.length / 2 ? 'high' : 'low', // Later outcomes are riskier
     ]
     const risk = calculateRisk(riskFactors)

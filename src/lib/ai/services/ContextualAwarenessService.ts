@@ -63,8 +63,8 @@ export function collectContext(
     chatSession: input.chatSession,
     recentEmotionState: input.recentEmotionState,
     recentInterventions: input.recentInterventions,
-    userPreferences: input.userPreferences || {},
-    mentalHealthAnalysis: input.mentalHealthAnalysis || {},
+    userPreferences: input.userPreferences ?? {},
+    mentalHealthAnalysis: input.mentalHealthAnalysis ?? {},
   }
 
   return context
