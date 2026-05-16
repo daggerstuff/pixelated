@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import { useState } from 'react'
 
 import type { ChatOptions } from '@/types/chat'
@@ -17,7 +17,7 @@ export interface UseChatReturn {
   messages: LocalMessage[]
   input: string
   handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void
-  handleSubmit: (e: React.FormEvent) => Promise<void>
+  handleSubmit: (e: FormEvent) => Promise<void>
   isLoading: boolean
   setMessages: React.Dispatch<React.SetStateAction<LocalMessage[]>>
   sendMessage: (content: string) => Promise<string | undefined>
@@ -107,15 +107,15 @@ export function useChat(options: ChatOptions): UseChatReturn {
       if (api.includes('mental-health')) {
         // Mental health API returns { response: { content: "..." } }
         responseContent =
-          responseData.response?.content ||
-          responseData.response?.message ||
+          (responseData.response?.content ??
+          responseData.response?.message) ??
           'No response from therapeutic AI'
       } else {
         // Standard chat API format
         responseContent =
-          responseData.text ||
-          responseData.content ||
-          responseData.message ||
+          ((responseData.text ??
+          responseData.content) ??
+          responseData.message) ??
           'No response content'
       }
 
@@ -154,7 +154,7 @@ export function useChat(options: ChatOptions): UseChatReturn {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault()
     await sendMessage(input)
     setInput('')

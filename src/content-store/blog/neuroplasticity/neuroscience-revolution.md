@@ -1,8 +1,7 @@
 ---
 title: The Neuroscience Revolution in Trauma Treatment
 description: >-
-  Exploring groundbreaking advances in neuroscience that are transforming our
-  understanding and treatment of trauma
+  _This article is part of our Neuroplasticity & Trauma series, exploring
 author: Research & Clinical Team
 pubDate: 2025-05-01T00:00:00.000Z
 draft: false
@@ -13,9 +12,8 @@ tags:
   - treatment
 series: Neuroplasticity & Trauma
 seriesOrder: 1
-category: Research
----
 
+---
 # The Neuroscience Revolution in Trauma Treatment
 
 ## Introduction
@@ -272,15 +270,12 @@ The field continues to advance through:
 - Outcome measurement
 - Quality enhancement
 
----
-
 _Next in our series, we'll explore the fascinating intersection of quantum
 biology and trauma healing._
 
 ## References
 
-[Include detailed references to support the research findings and clinical
-applications discussed]
+Include detailed references to support the research findings and clinical applications discussed.
 
 ---
 

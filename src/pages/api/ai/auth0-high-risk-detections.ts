@@ -63,8 +63,8 @@ export const GET = async ({ request, url }) => {
     }
 
     // Parse query parameters
-    const limit = parseInt(url?.searchParams.get('limit') || '10')
-    const offset = parseInt(url?.searchParams.get('offset') || '0')
+    const limit = parseInt(url?.searchParams.get('limit') ?? '10')
+    const offset = parseInt(url?.searchParams.get('offset') ?? '0')
 
     // Get high-risk detections
     const detections = await aiRepository.getHighRiskCrisisDetections(limit)
@@ -90,11 +90,10 @@ export const GET = async ({ request, url }) => {
     await createAuditLog(
       AuditEventType.SYSTEM,
       'high_risk_detections_error',
-      userId || 'anonymous',
+      userId ?? 'anonymous',
       'ai-high-risk-detections',
       {
         error: error?.message,
-        stack: error?.stack,
       },
       AuditEventStatus.FAILURE,
     )

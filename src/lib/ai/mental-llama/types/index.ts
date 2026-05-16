@@ -133,7 +133,11 @@ export interface MentalLLaMAModelConfig {
   modelId: string // Identifier for the specific model (e.g., 'mentalllama-chat-7b-v1')
   endpointUrl?: string // URL for the model inference API
   apiKey?: string // API key if required
-  providerType: 'azure_openai' | 'together_ai' | 'custom_api' | 'python_bridge' // Type of provider
+  providerType:
+    | 'azure_openai'
+    | 'llm_api'
+    | 'custom_api'
+    | 'python_bridge' // Type of provider
   // Add other model-specific parameters as needed
 }
 

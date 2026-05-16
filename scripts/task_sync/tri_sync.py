@@ -1,4 +1,4 @@
-"""Tri-directional task sync coordinator for beads, Asana, and Jira."""
+"""Tri-directional task sync coordinator for beads, Asana, Jira, GitHub, and Linear."""
 
 from __future__ import annotations
 
@@ -6,10 +6,10 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import shlex
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor
 from collections.abc import Iterable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -17,20 +17,34 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from scripts.task_sync.provider_bridge import (
+    apply_provider_action,
+    export_asana_tasks,
+    export_jira_issues,
+    export_github_issues,
+    export_linear_issues,
+    extract_provider_target_id,
+)
+
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "jira")
+DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "github", "linear", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
     "jira": "PIXELATED_JIRA_EXPORT_PATH",
+    "github": "PIXELATED_GITHUB_EXPORT_PATH",
+    "linear": "PIXELATED_LINEAR_EXPORT_PATH",
 }
 PROVIDER_APPLY_COMMAND_ENV_VARS = {
     "asana": "PIXELATED_ASANA_APPLY_COMMAND",
     "jira": "PIXELATED_JIRA_APPLY_COMMAND",
+    "github": "PIXELATED_GITHUB_APPLY_COMMAND",
+    "linear": "PIXELATED_LINEAR_APPLY_COMMAND",
 }
 DEFAULT_APPLY_MAX_WORKERS = 8
+DEFAULT_APPLY_MAX_PASSES = 2
 
 STATUS_ALIASES = {
     "done": "closed",
@@ -38,17 +52,24 @@ STATUS_ALIASES = {
     "resolved": "closed",
     "complete": "closed",
     "completed": "closed",
+    "cancelled": "closed",
+    "canceled": "closed",
     "in progress": "in_progress",
+    "under review": "in_progress",
+    "review": "in_progress",
     "doing": "in_progress",
     "active": "in_progress",
     "open": "open",
     "todo": "open",
+    "to do": "open",
     "backlog": "open",
 }
 
 PROVIDER_PRIORITY = {
     "beads": 4,
     "asana": 3,
+    "github": 2,
+    "linear": 2,
     "jira": 2,
 }
 
@@ -278,6 +299,17 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
     return max(records, key=sort_key)
 
 
+def select_provider_record(records: Sequence[TaskRecord]) -> TaskRecord:
+    if not records:
+        raise ValueError("Cannot select a provider record from an empty sequence")
+
+    def sort_key(record: TaskRecord) -> tuple[int, datetime, str]:
+        status_rank = 0 if normalize_status(record.status) == "closed" else 1
+        return (status_rank, record.updated_at, record.external_id)
+
+    return max(records, key=sort_key)
+
+
 def record_clean_body(record: TaskRecord) -> str:
     if record.clean_body is not None:
         return record.clean_body
@@ -292,6 +324,10 @@ def group_records_by_key(
         for record in records:
             normalized_record = normalized_group_record(provider, record)
             if not normalized_record.sync_key:
+                print(
+                    f"Skipping {provider} record {record.external_id}: missing sync key",
+                    file=sys.stderr,
+                )
                 continue
             grouped.setdefault(normalized_record.sync_key, []).append(normalized_record)
     return grouped
@@ -366,8 +402,18 @@ def build_sync_plan(
     plan: list[SyncAction] = []
 
     for sync_key, records in sorted(grouped.items()):
-        canonical = select_canonical_record(records)
-        provider_lookup = {record.provider: record for record in records}
+        provider_lookup = {
+            provider: select_provider_record(
+                [record for record in records if record.provider == provider]
+            )
+            for provider in {record.provider for record in records}
+        }
+        canonical_candidates = [
+            record
+            for record in provider_lookup.values()
+            if normalize_status(record.status) != "closed"
+        ]
+        canonical = select_canonical_record(canonical_candidates or list(provider_lookup.values()))
         provider_ids = merged_provider_ids(records)
 
         for provider in enabled:
@@ -389,6 +435,10 @@ def build_sync_plan(
 
 def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
     provider_ids: dict[str, str] = {}
+    selected_by_provider = {
+        provider: select_provider_record([record for record in records if record.provider == provider])
+        for provider in {record.provider for record in records}
+    }
     for record in records:
         provider_ids.update(
             {
@@ -397,24 +447,106 @@ def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
                 if external_id
             }
         )
-        provider_ids[record.provider] = record.external_id
+    for provider, record in selected_by_provider.items():
+        provider_ids[provider] = record.external_id
     return provider_ids
 
 
+def find_beads_duplicate_groups(
+    records: Sequence[TaskRecord],
+) -> list[tuple[str, TaskRecord, list[TaskRecord]]]:
+    duplicates: list[tuple[str, TaskRecord, list[TaskRecord]]] = []
+    grouped: dict[str, list[TaskRecord]] = {}
+    for record in records:
+        if record.provider != "beads":
+            continue
+        normalized = normalized_group_record("beads", record)
+        if not normalized.sync_key:
+            continue
+        grouped.setdefault(normalized.sync_key, []).append(normalized)
+
+    for sync_key, sync_records in sorted(grouped.items()):
+        if len(sync_records) < 2:
+            continue
+        canonical = select_provider_record(sync_records)
+        stale_records = [
+            record for record in sync_records if record.external_id != canonical.external_id
+        ]
+        if stale_records:
+            duplicates.append((sync_key, canonical, stale_records))
+    return duplicates
+
+
+def cleanup_beads_duplicates(
+    records: Sequence[TaskRecord],
+    *,
+    run_process: Any | None = None,
+) -> list[SyncExecutionResult]:
+    run_process = run_process or _run_process
+    results: list[SyncExecutionResult] = []
+    for sync_key, canonical, stale_records in find_beads_duplicate_groups(records):
+        for stale_record in stale_records:
+            close_completed = run_process(["bd", "close", stale_record.external_id])
+            close_success = getattr(close_completed, "returncode", 1) == 0
+            stdout_parts = [(_string_or_empty(getattr(close_completed, "stdout", ""))).strip()]
+            stderr_parts = [(_string_or_empty(getattr(close_completed, "stderr", ""))).strip()]
+
+            if close_success:
+                dep_completed = run_process(
+                    [
+                        "bd",
+                        "dep",
+                        "add",
+                        stale_record.external_id,
+                        canonical.external_id,
+                        "--type",
+                        "related",
+                    ]
+                )
+                close_success = getattr(dep_completed, "returncode", 1) == 0
+                stdout_parts.append((_string_or_empty(getattr(dep_completed, "stdout", ""))).strip())
+                stderr_parts.append((_string_or_empty(getattr(dep_completed, "stderr", ""))).strip())
+
+            results.append(
+                SyncExecutionResult(
+                    provider="beads",
+                    action="dedupe",
+                    sync_key=sync_key,
+                    target_id=canonical.external_id,
+                    success=close_success,
+                    stdout="\n".join(part for part in stdout_parts if part),
+                    stderr="\n".join(part for part in stderr_parts if part),
+                )
+            )
+    return results
+
+
 def _run_command(command: Sequence[str], *, input_text: str | None = None) -> str:
-    completed = subprocess.run(
-        list(command),
-        input=input_text,
-        capture_output=True,
-        check=True,
-        text=True,
-    )
-    return completed.stdout.strip()
+    try:
+        completed = subprocess.run(
+            list(command),
+            input=input_text,
+            capture_output=True,
+            check=True,
+            text=True,
+        )
+        return completed.stdout.strip()
+    except FileNotFoundError as exc:
+        return ""
 
 
 def _run_process(
     command: Sequence[str], *, input_text: str | None = None
 ) -> subprocess.CompletedProcess[str]:
+    executable = command[0] if command else "<unknown>"
+    if not shutil.which(executable):
+        return subprocess.CompletedProcess(
+            args=list(command),
+            returncode=127,
+            stdout="",
+            stderr=f"{executable} command not found",
+        )
+
     return subprocess.run(
         list(command),
         input=input_text,
@@ -507,11 +639,149 @@ def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
     )
 
 
-def _jira_body(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> str:
-    return _string_or_empty(
-        _first_present(payload, "description", "body")
-        or _first_present(field_payload, "description")
+def normalize_github_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
+    body = _string_or_empty(_first_present(payload, "body", "description", "content"))
+    clean_body, metadata = parse_sync_metadata(body)
+    status = normalize_status(_string_or_empty(_first_present(payload, "state")) or "open")
+
+    return TaskRecord(
+        provider="github",
+        external_id=_string_or_empty(_first_present(payload, "number", "id")),
+        title=_string_or_empty(_first_present(payload, "title")),
+        body=body,
+        status=status,
+        updated_at=_parse_updated_at(payload, "updated_at", "updated", "created_at", "created") or datetime.now(timezone.utc),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
+        provider_ids=_parse_provider_ids(metadata),
+        clean_body=clean_body,
+        raw=payload,
     )
+
+
+def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
+    body = _string_or_empty(_first_present(payload, "description", "body", "content"))
+    clean_body, metadata = parse_sync_metadata(body)
+    raw_state = _first_present(payload, "state", "state.name")
+    status = normalize_status(_string_or_empty(raw_state) or "open")
+
+    return TaskRecord(
+        provider="linear",
+        external_id=_string_or_empty(_first_present(payload, "id", "identifier")),
+        title=_string_or_empty(_first_present(payload, "title")),
+        body=body,
+        status=status,
+        updated_at=_parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created") or datetime.now(timezone.utc),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
+        provider_ids=_parse_provider_ids(metadata),
+        clean_body=clean_body,
+        raw=payload,
+    )
+
+
+def _jira_body(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> str:
+    body = _first_present(payload, "description", "body") or _first_present(field_payload, "description")
+    if isinstance(body, Mapping):
+        return _jira_adf_to_text(body)
+    return _string_or_empty(body)
+
+
+def _jira_adf_to_text(node: Mapping[str, Any] | Sequence[Any] | str | None) -> str:
+    if node is None:
+        return ""
+    if isinstance(node, str):
+        return node
+    if isinstance(node, Sequence) and not isinstance(node, (str, bytes, bytearray)):
+        return _jira_adf_sequence_to_text(node)
+    if not isinstance(node, Mapping):
+        return _string_or_empty(node)
+    return _jira_adf_mapping_to_text(node)
+
+
+def _jira_adf_sequence_to_text(nodes: Sequence[Any]) -> str:
+    return "".join(_jira_adf_to_text(item) for item in nodes)
+
+
+def _jira_adf_mapping_to_text(node: Mapping[str, Any]) -> str:
+    handler = _resolve_jira_adf_handler(node)
+    if handler is not None:
+        return handler(node)
+    return _jira_adf_content_to_text(node)
+
+
+def _resolve_jira_adf_handler(node: Mapping[str, Any]) -> Any:
+    node_type = _string_or_empty(node.get("type"))
+    return _JIRA_ADF_NODE_HANDLERS.get(node_type)
+
+
+def _jira_adf_content_to_text(node: Mapping[str, Any]) -> str:
+    return _jira_adf_sequence_to_text(node.get("content", []))
+
+
+def _jira_adf_list_item_text(node: Mapping[str, Any] | Sequence[Any] | str | None) -> str:
+    if node is None:
+        return ""
+    if isinstance(node, str):
+        return node
+    if isinstance(node, Sequence) and not isinstance(node, (str, bytes, bytearray)):
+        return _jira_adf_sequence_to_text(node)
+    if not isinstance(node, Mapping):
+        return _string_or_empty(node)
+
+    parts = []
+    for item in node.get("content", []):
+        if isinstance(item, Mapping) and _string_or_empty(item.get("type")) in {"bulletList", "orderedList"}:
+            nested_text = _jira_adf_to_text(item).strip()
+            if nested_text:
+                parts.append(_indent_multiline_text(nested_text, "  "))
+            continue
+        rendered = _jira_adf_to_text(item).strip()
+        if rendered:
+            parts.append(rendered)
+    return "\n".join(part for part in parts if part)
+
+
+def _indent_multiline_text(text: str, prefix: str) -> str:
+    return "\n".join(f"{prefix}{line}" if line else line for line in text.splitlines())
+
+
+def _jira_adf_text_node(node: Mapping[str, Any]) -> str:
+    return _string_or_empty(node.get("text"))
+
+
+def _jira_adf_block_node(node: Mapping[str, Any]) -> str:
+    text = "".join(_jira_adf_to_text(item) for item in node.get("content", []))
+    return f"{text}\n\n" if text else ""
+
+
+def _jira_adf_hard_break_node(node: Mapping[str, Any]) -> str:
+    _ = node
+    return "\n"
+
+
+def _jira_adf_list_node(node: Mapping[str, Any]) -> str:
+    node_type = _string_or_empty(node.get("type"))
+    rendered_items = []
+    for index, item in enumerate(node.get("content", []), start=1):
+        item_text = _jira_adf_list_item_text(item).strip()
+        prefix = f"{index}. " if node_type == "orderedList" else "- "
+        if item_text:
+            rendered_items.append(prefix + item_text)
+    return "\n".join(item for item in rendered_items if item) + ("\n\n" if rendered_items else "")
+
+
+def _jira_adf_list_item_node(node: Mapping[str, Any]) -> str:
+    return _jira_adf_list_item_text(node)
+
+
+_JIRA_ADF_NODE_HANDLERS: dict[str, Any] = {
+    "text": _jira_adf_text_node,
+    "paragraph": _jira_adf_block_node,
+    "heading": _jira_adf_block_node,
+    "hardBreak": _jira_adf_hard_break_node,
+    "bulletList": _jira_adf_list_node,
+    "orderedList": _jira_adf_list_node,
+    "listItem": _jira_adf_list_item_node,
+}
 
 
 def _jira_status(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> Any:
@@ -543,6 +813,8 @@ def get_provider_normalizer(provider: str):
         "asana": normalize_asana_payload,
         "jira": normalize_jira_payload,
         "beads": normalize_beads_payload,
+        "github": normalize_github_payload,
+        "linear": normalize_linear_payload,
     }
     try:
         return normalizers[provider]
@@ -551,7 +823,7 @@ def get_provider_normalizer(provider: str):
 
 
 def beads_export() -> list[TaskRecord]:
-    output = _run_command(["bd", "export", "--no-memories", "--scrub"])
+    output = _run_command(["bd", "export", "--no-memories"])
     records: list[TaskRecord] = []
     for line in output.splitlines():
         if not line.strip():
@@ -628,10 +900,33 @@ def collect_provider_records(
         return beads_export()
 
     path = resolve_export_path(provider, export_paths)
-    if path is None:
-        return None
+    if path is not None:
+        return export_records_from_path(provider, path)
 
-    return export_records_from_path(provider, path)
+    exporter = _resolve_direct_provider_exporter(provider)
+    if exporter is not None:
+        return _direct_provider_export(provider, exporter())
+    return None
+
+
+def _direct_provider_export(provider: str, payloads: Sequence[Mapping[str, Any]]) -> list[TaskRecord]:
+    normalize_payload = get_provider_normalizer(provider)
+    records: list[TaskRecord] = []
+    for payload in payloads:
+        record = normalize_payload(payload)
+        if record is not None:
+            records.append(record)
+    return records
+
+
+def _resolve_direct_provider_exporter(provider: str) -> Any:
+    exporters: dict[str, Any] = {
+        "asana": export_asana_tasks,
+        "jira": export_jira_issues,
+        "github": export_github_issues,
+        "linear": export_linear_issues,
+    }
+    return exporters.get(provider)
 
 
 def resolve_export_path(
@@ -651,13 +946,86 @@ def resolve_export_path(
 
 def load_sync_state(path: Path = SYNC_STATE_PATH) -> dict[str, Any]:
     if not path.exists():
-        return {}
-    return json.loads(path.read_text())
+        return {"records": {}}
+
+    try:
+        state = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"records": {}}
+
+    if not isinstance(state, dict):
+        return {"records": {}}
+    if not isinstance(state.get("records"), dict):
+        state["records"] = {}
+    return state
 
 
 def save_sync_state(state: Mapping[str, Any], path: Path = SYNC_STATE_PATH) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def update_sync_state(
+    plan: Sequence[SyncAction],
+    results: Sequence[SyncExecutionResult],
+    *,
+    state: Mapping[str, Any] | None = None,
+    applied_at: str | None = None,
+) -> dict[str, Any]:
+    next_state = dict(state or {})
+    records = next_state.get("records")
+    if not isinstance(records, dict):
+        records = {}
+        next_state["records"] = records
+
+    timestamp = applied_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    for action, result in zip(plan, results):
+        existing_record = records.get(action.sync_key)
+        record = dict(existing_record) if isinstance(existing_record, dict) else {}
+
+        provider_ids = record.get("provider_ids")
+        if not isinstance(provider_ids, dict):
+            provider_ids = {}
+        provider_ids.update(
+            {
+                provider: external_id
+                for provider, external_id in action.provider_ids.items()
+                if external_id
+            }
+        )
+        if result.success and result.target_id:
+            provider_ids[action.provider] = result.target_id
+
+        providers = record.get("providers")
+        if not isinstance(providers, dict):
+            providers = {}
+
+        providers[action.provider] = {
+            "action": action.action,
+            "success": result.success,
+            "target_id": result.target_id,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "updated_at": timestamp,
+        }
+
+        record.update(
+            {
+                "sync_key": action.sync_key,
+                "source_provider": action.source_provider,
+                "source_id": action.source_id,
+                "title": action.title,
+                "status": action.status,
+                "provider_ids": provider_ids,
+                "providers": providers,
+                "updated_at": timestamp,
+            }
+        )
+        records[action.sync_key] = record
+
+    next_state["last_applied_at"] = timestamp
+    next_state["record_count"] = len(records)
+    return next_state
 
 
 def summarize_plan(plan: Sequence[SyncAction]) -> dict[str, int]:
@@ -693,8 +1061,6 @@ def _apply_beads_action(
             action.title,
             "--description",
             action.body,
-            "--status",
-            action.status,
             "--external-ref",
             action.sync_key,
             "--silent",
@@ -755,15 +1121,46 @@ def _apply_bridge_action(
         )
 
     completed = run_process(command, input_text=json.dumps(dataclass_to_dict(action)))
+    stdout = (getattr(completed, "stdout", "") or "").strip()
+    payload = _parse_bridge_stdout_payload(stdout)
+    target_id = (
+        extract_provider_target_id(action.provider, payload)
+        if isinstance(payload, Mapping)
+        else None
+    ) or action.target_id
     return SyncExecutionResult(
         provider=action.provider,
         action=action.action,
         sync_key=action.sync_key,
-        target_id=action.target_id,
+        target_id=target_id,
         success=getattr(completed, "returncode", 1) == 0,
-        stdout=(getattr(completed, "stdout", "") or "").strip(),
+        stdout=stdout,
         stderr=(getattr(completed, "stderr", "") or "").strip(),
     )
+
+
+def _apply_direct_provider_action(action: SyncAction) -> SyncExecutionResult:
+    payload = dataclass_to_dict(action)
+    applier = _resolve_direct_provider_applier(action.provider)
+    if applier is None:
+        raise RuntimeError(f"Unsupported direct provider apply for '{action.provider}'.")
+    response = applier(payload)
+
+    return SyncExecutionResult(
+        provider=action.provider,
+        action=action.action,
+        sync_key=action.sync_key,
+        target_id=extract_provider_target_id(action.provider, response) or action.target_id,
+        success=True,
+        stdout=json.dumps(response, sort_keys=True),
+        stderr="",
+    )
+
+
+def _resolve_direct_provider_applier(provider: str) -> Any:
+    if provider in {"asana", "jira", "github", "linear"}:
+        return lambda payload: apply_provider_action(provider, payload)
+    return None
 
 
 def apply_sync_action(
@@ -778,6 +1175,17 @@ def apply_sync_action(
         return _apply_beads_action(
             action,
             run_process=run_process,
+        )
+
+    has_direct_applier = _resolve_direct_provider_applier(action.provider) is not None
+    has_provider_command = action.provider in provider_commands
+
+    if has_direct_applier and not has_provider_command:
+        return _apply_direct_provider_action(action)
+
+    if not has_provider_command:
+        raise RuntimeError(
+            f"No sync execution path configured for provider '{action.provider}'."
         )
 
     return _apply_bridge_action(
@@ -814,6 +1222,72 @@ def apply_sync_plan(
         return [future.result() for future in futures]
 
 
+def build_follow_up_plan(
+    plan: Sequence[SyncAction],
+    results: Sequence[SyncExecutionResult],
+) -> list[SyncAction]:
+    grouped: dict[str, list[tuple[SyncAction, SyncExecutionResult]]] = {}
+    for action, result in zip(plan, results):
+        if not result.success or not result.target_id:
+            continue
+        grouped.setdefault(action.sync_key, []).append((action, result))
+
+    follow_up: list[SyncAction] = []
+    for sync_key, pairs in grouped.items():
+        if not pairs:
+            continue
+        template_action = pairs[0][0]
+        merged_provider_ids = dict(template_action.provider_ids)
+        current_provider_ids: dict[str, str] = {}
+        for action, result in pairs:
+            merged_provider_ids.update(
+                {
+                    provider: external_id
+                    for provider, external_id in action.provider_ids.items()
+                    if external_id
+                }
+            )
+            if result.target_id:
+                merged_provider_ids[action.provider] = result.target_id
+                if action.action == "update":
+                    current_provider_ids[action.provider] = result.target_id
+
+        for provider, target_id in sorted(merged_provider_ids.items()):
+            current_ids = dict(template_action.provider_ids)
+            if provider in current_provider_ids:
+                current_ids[provider] = current_provider_ids[provider]
+            if provider_ids_match(current_ids, merged_provider_ids):
+                continue
+
+            follow_up_body = merge_body_with_sync_metadata(
+                task_body_without_sync_block(template_action.body),
+                SyncMetadata(
+                    key=sync_key,
+                    status=template_action.status,
+                    source_provider=template_action.source_provider,
+                    source_id=template_action.source_id,
+                    provider_ids=merged_provider_ids,
+                ),
+            )
+            follow_up.append(
+                SyncAction(
+                    provider=provider,
+                    action="update",
+                    sync_key=sync_key,
+                    source_provider=template_action.source_provider,
+                    source_id=template_action.source_id,
+                    target_id=target_id,
+                    title=template_action.title,
+                    body=follow_up_body,
+                    status=template_action.status,
+                    provider_ids=merged_provider_ids,
+                )
+            )
+
+    follow_up.sort(key=lambda action: (action.sync_key, action.provider))
+    return follow_up
+
+
 def plan_from_beads_only() -> list[SyncAction]:
     return build_sync_plan({"beads": beads_export()})
 
@@ -829,6 +1303,73 @@ def plan_from_sources(
     )
 
 
+def resolve_enabled_providers_from_env() -> tuple[str, ...]:
+    raw = os.getenv("PIXELATED_TASK_SYNC_PROVIDERS", "").strip()
+    if not raw:
+        return DEFAULT_PROVIDER_ORDER
+
+    providers = tuple(
+        provider.strip().lower()
+        for provider in raw.split(",")
+        if provider.strip().lower() in DEFAULT_PROVIDER_ORDER
+    )
+    return providers or DEFAULT_PROVIDER_ORDER
+
+
+def execute_apply_mode(
+    plan: Sequence[SyncAction],
+) -> tuple[dict[str, Any], int]:
+    provider_commands = resolve_apply_commands_from_env()
+    max_passes = max(
+        1,
+        int(os.getenv("PIXELATED_TASK_SYNC_MAX_PASSES", str(DEFAULT_APPLY_MAX_PASSES))),
+    )
+    state = load_sync_state(path=SYNC_STATE_PATH)
+    all_results: list[SyncExecutionResult] = []
+    pass_summaries: list[dict[str, Any]] = []
+    current_plan = list(plan)
+
+    for pass_index in range(1, max_passes + 1):
+        if not current_plan:
+            break
+        results = apply_sync_plan(current_plan, provider_commands=provider_commands)
+        all_results.extend(results)
+        state = update_sync_state(current_plan, results, state=state)
+        save_sync_state(state, path=SYNC_STATE_PATH)
+        pass_summaries.append(
+            {
+                "pass": pass_index,
+                "summary": summarize_plan(current_plan),
+                "result_count": len(results),
+                "success": all(result.success for result in results),
+            }
+        )
+        if not all(result.success for result in results):
+            break
+        current_plan = build_follow_up_plan(current_plan, results)
+
+    beads_cleanup_results = cleanup_beads_duplicates(beads_export())
+
+    payload: dict[str, Any] = {
+        "passes": pass_summaries,
+        "results": [dataclass_to_dict(result) for result in all_results],
+        "beads_cleanup": {
+            "summary": {
+                "dedupe": len(beads_cleanup_results),
+                "success": sum(1 for result in beads_cleanup_results if result.success),
+                "failure": sum(1 for result in beads_cleanup_results if not result.success),
+            },
+            "results": [dataclass_to_dict(result) for result in beads_cleanup_results],
+        },
+    }
+    exit_code = 0
+    if not all(result.success for result in all_results):
+        exit_code = 1
+    if not all(result.success for result in beads_cleanup_results):
+        exit_code = 1
+    return payload, exit_code
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(argv or sys.argv[1:])
     mode = args[0] if args else "plan"
@@ -836,7 +1377,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if mode not in {"plan", "dry-run", "apply"}:
         raise SystemExit("Usage: tri_sync.py [plan|dry-run|apply]")
 
-    plan = plan_from_sources()
+    enabled_providers = resolve_enabled_providers_from_env()
+    records_by_provider = collect_records(enabled_providers=enabled_providers)
+    plan = build_sync_plan(records_by_provider, enabled_providers=enabled_providers)
     action_payloads = [dataclass_to_dict(action) for action in plan]
     payload: dict[str, Any] = {
         "mode": mode,
@@ -844,11 +1387,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "actions": action_payloads,
     }
     if mode == "apply":
-        results = apply_sync_plan(plan, provider_commands=resolve_apply_commands_from_env())
-        payload["results"] = [dataclass_to_dict(result) for result in results]
-        if not all(result.success for result in results):
+        apply_payload, exit_code = execute_apply_mode(plan)
+        payload.update(apply_payload)
+        if exit_code:
             print(json.dumps(payload, indent=2))
-            return 1
+            return exit_code
 
     print(json.dumps(payload, indent=2))
     return 0
@@ -865,6 +1408,22 @@ def dataclass_to_dict(value: Any) -> Any:
     if isinstance(value, list):
         return [dataclass_to_dict(item) for item in value]
     return value
+
+
+def _parse_bridge_stdout_payload(stdout: str) -> Mapping[str, Any] | None:
+    candidates = [stdout.strip()]
+    lines = [line for line in stdout.splitlines() if line.strip()]
+    if lines:
+        candidates.extend(reversed(lines))
+
+    for candidate in candidates:
+        try:
+            payload = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, Mapping):
+            return payload
+    return None
 
 
 if __name__ == "__main__":

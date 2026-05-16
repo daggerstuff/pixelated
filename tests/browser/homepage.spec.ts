@@ -4,7 +4,9 @@ test('homepage has correct layout on desktop', async ({ page }) => {
   await page.goto('/')
 
   // Check navigation is visible
-  await expect(page.locator('nav')).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: 'Main navigation' }),
+  ).toBeVisible()
 
   // Check main sections of the page
   await expect(page.locator('main')).toBeVisible()

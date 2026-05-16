@@ -1,13 +1,97 @@
 import { v4 as uuid } from 'uuid'
 
-import { slug } from '@/utils/common'
-
 // Projects Service Layer
 import {
   getMongoConnection,
   getPostgresPool,
 } from '../../lib/database/connection'
+import { slug } from '../../utils/common'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
+
+type ProjectPermissions = {
+  view: string[]
+  edit: string[]
+  comment: string[]
+}
+
+type ProjectObjective = {
+  _id: string
+  title: string
+  description: string
+  successCriteria: string[]
+  deadline?: Date
+  status: string
+  progress: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Project = {
+  _id: string
+  name: string
+  slug: string
+  description: string
+  category: string
+  owner: string
+  stakeholders: string[]
+  budget: number
+  status: string
+  objectives: ProjectObjective[]
+  milestones: unknown[]
+  permissions: ProjectPermissions
+  createdAt: Date
+  updatedAt: Date
+  save: () => Promise<Project>
+}
+
+type ProjectListQuery = {
+  page?: number
+  limit?: number
+  category?: string
+  status?: string
+}
+
+type ProjectListResult = {
+  data: Project[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+  }
+}
+
+type ProjectQuery = Record<string, unknown>
+type ProjectQueryChain = {
+  limit: (limit: number) => ProjectQueryChain
+  skip: (count: number) => ProjectQueryChain
+  sort: (sort: { createdAt: -1 | 1 }) => Promise<Project[]>
+}
+type ProjectModelData = Omit<Project, 'save'>
+type ProjectModel = {
+  new (data: ProjectModelData): Project
+  findById(id: string): Promise<Project | null>
+  find(query: ProjectQuery): ProjectQueryChain
+  countDocuments(query: ProjectQuery): Promise<number>
+}
+
+type ProjectUpdates = Partial<{
+  name: string
+  description: string
+  category: string
+  budget: number
+  status: string
+}>
+
+type ObjectiveInput = {
+  title: string
+  description?: string
+  successCriteria?: string[]
+  deadline?: Date
+}
+
+function getProjectModel(): ProjectModel {
+  return getMongoConnection().model<ProjectModelData, ProjectModel>('Project')
+}
 
 /**
  * Create a new project
@@ -19,8 +103,8 @@ export async function createProject(data: {
   ownerId: string
   stakeholders?: string[]
   budget?: number
-}) {
-  const ProjectModel = getMongoConnection().model('Project')
+}): Promise<Project> {
+  const ProjectModel = getProjectModel()
   const pool = getPostgresPool()
 
   const projectId = uuid()
@@ -30,11 +114,11 @@ export async function createProject(data: {
     _id: projectId,
     name: data.name,
     slug: projectSlug,
-    description: data.description || '',
-    category: data.category || 'general',
+    description: data.description ?? '',
+    category: data.category ?? 'general',
     owner: data.ownerId,
-    stakeholders: data.stakeholders || [data.ownerId],
-    budget: data.budget || 0,
+    stakeholders: data.stakeholders ?? [data.ownerId],
+    budget: data.budget ?? 0,
     status: 'active',
     objectives: [],
     milestones: [],
@@ -57,7 +141,7 @@ export async function createProject(data: {
       projectId,
       data.name,
       projectSlug,
-      data.description || '',
+      data.description ?? '',
       data.ownerId,
       'active',
     ],
@@ -69,8 +153,11 @@ export async function createProject(data: {
 /**
  * Get project by ID with permission check
  */
-export async function getProject(projectId: string, userId: string) {
-  const ProjectModel = getMongoConnection().model('Project')
+export async function getProject(
+  projectId: string,
+  userId: string,
+): Promise<Project> {
+  const ProjectModel = getProjectModel()
 
   const project = await ProjectModel.findById(projectId)
 
@@ -92,15 +179,9 @@ export async function getProject(projectId: string, userId: string) {
 export async function updateProject(
   projectId: string,
   userId: string,
-  updates: Partial<{
-    name: string
-    description: string
-    category: string
-    budget: number
-    status: string
-  }>,
-) {
-  const ProjectModel = getMongoConnection().model('Project')
+  updates: ProjectUpdates,
+): Promise<Project> {
+  const ProjectModel = getProjectModel()
   const pool = getPostgresPool()
 
   const project = await ProjectModel.findById(projectId)
@@ -114,7 +195,7 @@ export async function updateProject(
     throw new ForbiddenError('Cannot edit this project')
   }
 
-  const changes: any = {}
+  const changes: Record<string, unknown> = {}
 
   if (updates.name !== undefined) {
     project.name = updates.name
@@ -161,14 +242,9 @@ export async function updateProject(
 export async function addObjective(
   projectId: string,
   userId: string,
-  objective: {
-    title: string
-    description?: string
-    successCriteria?: string[]
-    deadline?: Date
-  },
-) {
-  const ProjectModel = getMongoConnection().model('Project')
+  objective: ObjectiveInput,
+): Promise<Project> {
+  const ProjectModel = getProjectModel()
 
   const project = await ProjectModel.findById(projectId)
 
@@ -186,8 +262,8 @@ export async function addObjective(
   project.objectives.push({
     _id: objectiveId,
     title: objective.title,
-    description: objective.description || '',
-    successCriteria: objective.successCriteria || [],
+    description: objective.description ?? '',
+    successCriteria: objective.successCriteria ?? [],
     deadline: objective.deadline,
     status: 'active',
     progress: 0,
@@ -206,18 +282,14 @@ export async function addObjective(
  */
 export async function listProjects(
   userId: string,
-  options: {
-    page?: number
-    limit?: number
-    category?: string
-    status?: string
-  } = {},
-) {
-  const ProjectModel = getMongoConnection().model('Project')
-  const page = options.page || 1
-  const limit = options.limit || 50
+  options: ProjectListQuery = {},
+): Promise<ProjectListResult> {
+  const ProjectModel = getProjectModel()
+  const page = options.page ?? 1
+  const limit = options.limit ?? 50
+  const skip = (page - 1) * limit
 
-  let query: any = {
+  const query: ProjectQuery = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   }
 
@@ -231,7 +303,7 @@ export async function listProjects(
 
   const projects = await ProjectModel.find(query)
     .limit(limit)
-    .skip((page - 1) * limit)
+    .skip(skip)
     .sort({ createdAt: -1 })
 
   const total = await ProjectModel.countDocuments(query)
@@ -249,13 +321,32 @@ export async function searchProjects(
   query: string,
   userId: string,
   limit: number = 50,
-) {
-  const ProjectModel = getMongoConnection().model('Project')
+): Promise<Project[]> {
+  const ProjectModel = getProjectModel()
 
-  return await ProjectModel.find({
+  const queryResult = ProjectModel.find({
     $text: { $search: query },
     $or: [{ owner: userId }, { 'permissions.view': userId }],
-  }).limit(limit)
+  })
+  let limitedResult: unknown
+
+  if (typeof (queryResult as { limit?: unknown }).limit === 'function') {
+    const limited = (
+      queryResult as {
+        limit: (limit: number) => Promise<Project[]> | Project[]
+      }
+    ).limit(limit)
+    limitedResult =
+      typeof (limited as { sort?: unknown }).sort === 'function'
+        ? await (limited as { sort: (sort: { createdAt: -1 | 1 }) => Promise<Project[]> | Project[] }).sort(
+            { createdAt: -1 },
+          )
+        : limited
+  } else {
+    limitedResult = queryResult
+  }
+
+  return (Array.isArray(limitedResult) ? limitedResult : []) as Project[]
 }
 
 /**
@@ -266,8 +357,8 @@ export async function shareProject(
   ownerId: string,
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
-) {
-  const ProjectModel = getMongoConnection().model('Project')
+): Promise<Project> {
+  const ProjectModel = getProjectModel()
 
   const project = await ProjectModel.findById(projectId)
 

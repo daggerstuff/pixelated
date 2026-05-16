@@ -51,8 +51,8 @@ export function useChartData(params: {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  const loadChartData = useCallback(() => {
-    return execute(() => componentIntegrationService.getChartData(params))
+  const loadChartData = useCallback( async () => {
+    return execute( async () => componentIntegrationService.getChartData(params))
   }, [execute, params])
 
   useEffect(() => {
@@ -90,8 +90,8 @@ export function use3DEmotionData(params: {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const [realTimeData, setRealTimeData] = useState<any[]>([])
 
-  const load3DEmotionData = useCallback(() => {
-    return execute(() => componentIntegrationService.get3DEmotionData(params))
+  const load3DEmotionData = useCallback( async () => {
+    return execute( async () => componentIntegrationService.get3DEmotionData(params))
   }, [execute, params])
 
   const addEmotionPoint = useCallback(
@@ -113,7 +113,7 @@ export function use3DEmotionData(params: {
         }
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error adding emotion point', { error, emotionData })
         throw error
       }
@@ -153,8 +153,8 @@ export function useTreatmentPlans(params: {
   const { data, loading, error, execute } = useAsyncOperation<any[]>()
   const [isDirty, setIsDirty] = useState(false)
 
-  const loadTreatmentPlans = useCallback(() => {
-    return execute(() => componentIntegrationService.getTreatmentPlans(params))
+  const loadTreatmentPlans = useCallback( async () => {
+    return execute( async () => componentIntegrationService.getTreatmentPlans(params))
   }, [execute, params])
 
   const saveTreatmentPlan = useCallback(
@@ -168,7 +168,7 @@ export function useTreatmentPlans(params: {
         await loadTreatmentPlans()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error saving treatment plan', { error, planData })
         throw error
       }
@@ -192,7 +192,7 @@ export function useTreatmentPlans(params: {
         await loadTreatmentPlans()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error updating treatment plan', { error, updates })
         throw error
       }
@@ -245,14 +245,14 @@ export function useParticleSystem(params: {
 }) {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const [currentEmotion, setCurrentEmotion] = useState(
-    params.emotion || 'neutral',
+    params.emotion ?? 'neutral',
   )
   const [currentIntensity, setCurrentIntensity] = useState(
-    params.intensity || 0.5,
+    params.intensity ?? 0.5,
   )
 
-  const loadParticleSystem = useCallback(() => {
-    return execute(() =>
+  const loadParticleSystem = useCallback( async () => {
+    return execute( async () =>
       componentIntegrationService.getParticleSystem({
         ...params,
         emotion: currentEmotion,
@@ -273,11 +273,9 @@ export function useParticleSystem(params: {
           setCurrentIntensity(updates.intensity)
 
         const result = await componentIntegrationService.updateParticleSystem({
-          emotion: updates.emotion || currentEmotion,
+          emotion: updates.emotion ?? currentEmotion,
           intensity:
-            updates.intensity !== undefined
-              ? updates.intensity
-              : currentIntensity,
+            updates.intensity ?? currentIntensity,
           sessionId: params.sessionId,
           particleUpdates: updates.particleUpdates,
         })
@@ -286,7 +284,7 @@ export function useParticleSystem(params: {
         await loadParticleSystem()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error updating particle system', { error, updates })
         throw error
       }
@@ -318,8 +316,8 @@ export function useCarouselContent(params: {
 }) {
   const { data, loading, error, execute } = useAsyncOperation<any>()
 
-  const loadCarouselContent = useCallback(() => {
-    return execute(() => componentIntegrationService.getCarouselContent(params))
+  const loadCarouselContent = useCallback( async () => {
+    return execute( async () => componentIntegrationService.getCarouselContent(params))
   }, [execute, params])
 
   const saveCarouselConfiguration = useCallback(
@@ -335,7 +333,7 @@ export function useCarouselContent(params: {
         await loadCarouselContent()
 
         return result
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error saving carousel configuration', {
           error,
           configData,
@@ -371,8 +369,8 @@ export function useIntegratedDashboard(params: {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  const loadDashboardData = useCallback(() => {
-    return execute(() =>
+  const loadDashboardData = useCallback( async () => {
+    return execute( async () =>
       componentIntegrationService.getIntegratedDashboardData(params),
     )
   }, [execute, params])
@@ -401,7 +399,7 @@ export function useIntegratedDashboard(params: {
     error,
     refresh: loadDashboardData,
     hasErrors: data?.metadata?.errors?.length > 0,
-    errors: data?.metadata?.errors || [],
+    errors: data?.metadata?.errors ?? [],
   }
 }
 
@@ -475,13 +473,18 @@ export function useServiceHealth(checkInterval: number = 60000) {
     try {
       const healthData = await componentIntegrationService.getServiceHealth()
       setHealth(healthData)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Health check failed', { error })
       setHealth({
         overall: 'error',
         services: [],
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
     } finally {
       setLoading(false)

@@ -45,12 +45,12 @@ export const get = async ({ request, cookies }) => {
     // Parse query parameters
     const url = new URL(request.url)
     const params: Partial<ComparativeProgressParams> = {
-      anonymizedUserId: url.searchParams.get('anonymizedUserId') || '',
-      metricName: url.searchParams.get('metric') || '',
-      cohortId: url.searchParams.get('cohort') || '',
+      anonymizedUserId: url.searchParams.get('anonymizedUserId') ?? '',
+      metricName: url.searchParams.get('metric') ?? '',
+      cohortId: url.searchParams.get('cohort') ?? '',
       dateRange: {
-        startDate: url.searchParams.get('startDate') || '',
-        endDate: url.searchParams.get('endDate') || '',
+        startDate: url.searchParams.get('startDate') ?? '',
+        endDate: url.searchParams.get('endDate') ?? '',
       },
     }
 
@@ -112,7 +112,7 @@ export const get = async ({ request, cookies }) => {
     // Log the error
     logger.error('Error processing comparative progress request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error)?.stack : undefined,
+      stack: error instanceof Error ? error?.stack : undefined,
     })
 
     // Return error response

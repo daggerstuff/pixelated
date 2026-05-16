@@ -7,10 +7,10 @@ import { Logger } from '../utils/logger'
 import { DatabaseService } from './databaseService'
 
 export class BusinessIntelligenceService {
-  private logger: Logger
-  private db: DatabaseService
-  private marketDataCache: Map<string, MarketData> = new Map()
-  private competitorCache: Map<string, CompetitorAnalysis> = new Map()
+  private readonly logger: Logger
+  private readonly db: DatabaseService
+  private readonly marketDataCache: Map<string, MarketData> = new Map()
+  private readonly competitorCache: Map<string, CompetitorAnalysis> = new Map()
 
   constructor() {
     this.logger = new Logger('BusinessIntelligenceService')
@@ -31,7 +31,7 @@ export class BusinessIntelligenceService {
       await this.db.storeCompetitorAnalysis(analysis)
 
       return analysis
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to analyze competitive landscape', {
         error,
         industry,
@@ -182,7 +182,7 @@ export class BusinessIntelligenceService {
     const marketData = await this.fetchMarketSegmentData(targetSegments)
 
     const segmentPenetration = targetSegments.map((segment) => {
-      const segmentData = marketData[segment] || { current: 0, total: 1000 }
+      const segmentData = marketData[segment] ?? { current: 0, total: 1000 }
       const penetration = (segmentData.current / segmentData.total) * 100
       const opportunity = segmentData.total - segmentData.current
 
@@ -321,12 +321,12 @@ export class BusinessIntelligenceService {
         0,
       ) / competitors.length
 
-    const marketShareDistribution = competitors.reduce(
+    const marketShareDistribution = competitors.reduce< Record<string, number>>(
       (acc, c) => {
         acc[c.name] = c.marketShare
         return acc
       },
-      {} as Record<string, number>,
+      {},
     )
 
     const featureFrequency = this.analyzeFeatureFrequency(competitors)
@@ -335,7 +335,7 @@ export class BusinessIntelligenceService {
     return {
       competitors: competitors.length,
       marketLeader: competitors.reduce((leader, c) =>
-        c.marketShare > (leader?.marketShare || 0) ? c : leader,
+        c.marketShare > (leader?.marketShare ?? 0) ? c : leader,
       ).name,
       avgPricing,
       marketShareDistribution,
@@ -354,7 +354,7 @@ export class BusinessIntelligenceService {
     competitors.forEach((competitor) => {
       competitor.features.forEach((feature: string) => {
         const normalized = feature.toLowerCase().replace(/\s+/g, '_')
-        featureCounts[normalized] = (featureCounts[normalized] || 0) + 1
+        featureCounts[normalized] = (featureCounts[normalized] ?? 0) + 1
       })
     })
 
@@ -432,7 +432,7 @@ export class BusinessIntelligenceService {
     return Object.fromEntries(
       segments.map((segment) => [
         segment,
-        mockData[segment] || { current: 0, total: 1000 },
+        mockData[segment] ?? { current: 0, total: 1000 },
       ]),
     )
   }

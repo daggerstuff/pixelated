@@ -3,24 +3,24 @@ import { useState, useEffect } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
+import { Button } from '@/components/ui/button/index.ts'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/card/card.tsx'
+import { Label } from '@/components/ui/label.tsx'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+} from '@/components/ui/select.tsx'
+import { Switch } from '@/components/ui/switch.tsx'
 import { cn } from '@/lib/utils'
 
 export type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'never'
@@ -98,6 +98,17 @@ interface NotificationPreferencesProps {
   className?: string
 }
 
+const isNotificationFrequency = (
+  value: string,
+): value is NotificationFrequency => {
+  return (
+    value === 'immediate' ||
+    value === 'batched' ||
+    value === 'daily' ||
+    value === 'never'
+  )
+}
+
 export function NotificationPreferences({
   className,
 }: NotificationPreferencesProps) {
@@ -141,12 +152,12 @@ export function NotificationPreferences({
       }
 
       // Register service worker
-      const registration = await navigator.serviceWorker
-        .register('/sw.js')
-        .catch(() => {
-          // Fallback: try to get existing registration
-          return navigator.serviceWorker.getRegistration()
-        })
+      let registration: ServiceWorkerRegistration | null = null
+      try {
+        registration = await navigator.serviceWorker.register('/sw.js')
+      } catch {
+        registration = (await navigator.serviceWorker.getRegistration()) ?? null
+      }
 
       if (!registration) {
         setError('Failed to register service worker')
@@ -157,7 +168,7 @@ export function NotificationPreferences({
       // Subscribe to push notifications
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        applicationServerKey: process.env['NEXT_PUBLIC_VAPID_PUBLIC_KEY'],
       })
 
       setPushSubscription(subscription)
@@ -219,7 +230,7 @@ export function NotificationPreferences({
       </CardHeader>
       <CardContent className='space-y-6'>
         {error && (
-          <Alert variant='destructive'>
+          <Alert variant='error'>
             <AlertCircle className='h-4 w-4' />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -321,9 +332,11 @@ export function NotificationPreferences({
             <h3 className='mb-3 text-sm font-medium'>Notification Frequency</h3>
             <Select
               value={preferences.frequency}
-              onValueChange={(value: NotificationFrequency) =>
-                setPreferences({ frequency: value })
-              }
+              onValueChange={(value) => {
+                if (isNotificationFrequency(value)) {
+                  setPreferences({ frequency: value })
+                }
+              }}
             >
               <SelectTrigger>
                 <SelectValue />

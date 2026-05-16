@@ -8,7 +8,12 @@ import { performance } from 'node:perf_hooks'
 
 import { BiasDetectionEngine } from '../ai/bias-detection/BiasDetectionEngine'
 import { getCache } from '../cache/redis-cache'
-import { getPool, createContentHash, biasAnalysisManager, initializeDatabase } from '../db'
+import {
+  getPool,
+  createContentHash,
+  biasAnalysisManager,
+  initializeDatabase,
+} from '../db'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('bias-detection-service')
@@ -25,7 +30,7 @@ const PERFORMANCE_CONFIG = {
 
   // Database query timeouts
   QUERY_TIMEOUTS: {
-    ANALYSIS_INSERT: 5000, 
+    ANALYSIS_INSERT: 5000,
     CACHE_LOOKUP: 1000,
     SUMMARY_QUERY: 3000,
   },
@@ -41,13 +46,14 @@ const PERFORMANCE_CONFIG = {
 // Optimized bias detection with caching and connection pooling
 export class OptimizedBiasDetectionService {
   private static instance: OptimizedBiasDetectionService
-  private cache = getCache()
+  private readonly cache = getCache()
 
   private constructor() {}
 
   public static getInstance(): OptimizedBiasDetectionService {
     if (!OptimizedBiasDetectionService.instance) {
-      OptimizedBiasDetectionService.instance = new OptimizedBiasDetectionService()
+      OptimizedBiasDetectionService.instance =
+        new OptimizedBiasDetectionService()
     }
     return OptimizedBiasDetectionService.instance
   }
@@ -89,7 +95,7 @@ export class OptimizedBiasDetectionService {
       // Generate content hash for caching
       const contentHash = createContentHash(
         params.text,
-        params.demographics || {},
+        params.demographics ?? {},
       )
       const cacheKey = `bias:analysis:${contentHash}`
 
@@ -120,11 +126,11 @@ export class OptimizedBiasDetectionService {
       await this.storeAnalysisResults({
         analysisId,
         sessionId,
-        therapistId: params.therapistId || null,
-        clientId: params.clientId || null,
+        therapistId: params.therapistId ?? null,
+        clientId: params.clientId ?? null,
         ...analysisResult,
-        demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual',
+        demographics: params.demographics ?? {},
+        sessionType: params.sessionType ?? 'individual',
         contentHash,
         processingTimeMs: Math.round(performance.now() - startTime),
       })
@@ -132,8 +138,8 @@ export class OptimizedBiasDetectionService {
       // Cache the result
       await this.cacheAnalysisResults(cacheKey, {
         ...analysisResult,
-        demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual',
+        demographics: params.demographics ?? {},
+        sessionType: params.sessionType ?? 'individual',
       })
 
       const totalProcessingTime = Math.round(performance.now() - startTime)
@@ -155,18 +161,23 @@ export class OptimizedBiasDetectionService {
         layerResults: analysisResult.layerResults,
         detectedBiases: analysisResult.detectedBiases,
         recommendations: analysisResult.recommendations,
-        demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual',
+        demographics: params.demographics ?? {},
+        sessionType: params.sessionType ?? 'individual',
         processingTimeMs: totalProcessingTime,
         createdAt: new Date().toISOString(),
         cached: false,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const processingTime = Math.round(performance.now() - startTime)
       logger.error('Bias analysis failed', {
         analysisId,
         processingTime,
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       throw error
     }
@@ -186,7 +197,7 @@ export class OptimizedBiasDetectionService {
       )
 
       return await Promise.race([cachePromise, timeoutPromise])
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Cache lookup failed', { cacheKey, error })
       return null
     }
@@ -258,14 +269,18 @@ export class OptimizedBiasDetectionService {
         detectedBiases: [...new Set(detectedBiases)],
         recommendations: result.recommendations,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Engine analysis failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
       })
       throw error
     }
   }
-
 
   /**
    * Insert (or skip) the session row for this analysis.
@@ -356,7 +371,7 @@ export class OptimizedBiasDetectionService {
     contentHash: string
     processingTimeMs: number
   }): Promise<void> {
-    await initializeDatabase()
+     initializeDatabase()
     const pool = getPool()
     const client = await pool.connect()
     let timeoutHandle: NodeJS.Timeout | undefined
@@ -380,13 +395,17 @@ export class OptimizedBiasDetectionService {
           timeoutPromise,
         ])
         await client.query('COMMIT')
-      } catch (error) {
+      } catch (error: unknown) {
         if ((error as Error).message === 'Database operation timeout') {
           // In-flight queries are still running on this connection — do not
           // attempt ROLLBACK (would cause pg sync errors). Mark for destruction.
           timedOut = true
         } else {
-          try { await client.query('ROLLBACK') } catch { /* best-effort */ }
+          try {
+            await client.query('ROLLBACK')
+          } catch {
+            /* best-effort */
+          }
         }
         throw error
       } finally {
@@ -413,7 +432,7 @@ export class OptimizedBiasDetectionService {
           : PERFORMANCE_CONFIG.CACHE_TTL.ANALYSIS_RESULTS
 
       await this.cache.set(cacheKey, data, ttl)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to cache analysis results', { cacheKey, error })
     }
   }
@@ -447,7 +466,10 @@ export class OptimizedBiasDetectionService {
       }
 
       // Get from database with timeout
-      const summaryPromise = biasAnalysisManager.getBiasSummary(therapistId, days)
+      const summaryPromise = biasAnalysisManager.getBiasSummary(
+        therapistId,
+        days,
+      )
       const timeoutPromise = new Promise<null>((resolve) =>
         setTimeout(
           () => resolve(null),
@@ -477,7 +499,7 @@ export class OptimizedBiasDetectionService {
       )
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get bias summary', { therapistId, days, error })
       throw error
     }
@@ -540,7 +562,7 @@ export class OptimizedBiasDetectionService {
             confidence: result.confidence,
             processingTimeMs: processingTime,
           }
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Batch analysis failed for text', { analysisId, error })
           return {
             id: analysisId,

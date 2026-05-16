@@ -21,10 +21,10 @@ export interface PluginMetadata {
 }
 
 export class PluginRegistry {
-  private plugins: Map<string, Plugin> = new Map()
-  private metadata: Map<string, PluginMetadata> = new Map()
-  private api: PluginAPI
-  private events = new EventEmitter()
+  private readonly plugins: Map<string, Plugin> = new Map()
+  private readonly metadata: Map<string, PluginMetadata> = new Map()
+  private readonly api: PluginAPI
+  private readonly events = new EventEmitter()
 
   constructor(api: PluginAPI) {
     this.api = api
@@ -97,13 +97,13 @@ export class PluginRegistry {
     return Array.from(this.metadata.values())
   }
 
-  on<T extends unknown[]>(event: string, listener: (...args: T) => void): void {
+  on(event: string, listener: (...args: unknown[]) => void): void {
     this.events.on(event, listener as (...args: unknown[]) => void)
   }
 
-  off<T extends unknown[]>(
+  off(
     event: string,
-    listener: (...args: T) => void,
+    listener: (...args: unknown[]) => void,
   ): void {
     this.events.off(event, listener as (...args: unknown[]) => void)
   }

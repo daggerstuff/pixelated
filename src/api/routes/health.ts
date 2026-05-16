@@ -20,7 +20,7 @@ router.get('/', (req: Request, res: Response) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NODE_ENV ?? 'development',
   })
 })
 
@@ -38,13 +38,17 @@ router.get('/detailed', async (req: Request, res: Response) => {
   // Check MongoDB
   try {
     const mongoConn = getMongoConnection()
-    const adminDb = mongoConn.connection.db.admin()
+    const adminDbConnection = mongoConn.db
+    if (!adminDbConnection) {
+      throw new Error('MongoDB admin database is not initialized')
+    }
+    const adminDb = adminDbConnection.admin()
     const serverStatus = await adminDb.serverStatus()
     health.services.mongodb = {
       status: 'connected',
       uptime: serverStatus.uptime,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     health.services.mongodb = {
       status: 'disconnected',
       error: (error as Error).message,
@@ -62,7 +66,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
       status: 'connected',
       timestamp: result.rows[0].now,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     health.services.postgresql = {
       status: 'disconnected',
       error: (error as Error).message,
@@ -78,7 +82,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
       status: 'connected',
       response: pong,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     health.services.redis = {
       status: 'disconnected',
       error: (error as Error).message,
@@ -116,7 +120,7 @@ router.get('/ready', async (req: Request, res: Response): Promise<Response> => {
       ready: true,
       timestamp: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return res.status(503).json({
       ready: false,
       error: (error as Error).message,

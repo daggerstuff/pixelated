@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { AuditLogger } from './logger'
 import { AuditAction, AuditEventType, AuditSeverity } from './events'
+import { AuditLogger } from './logger'
 
 const logger = createBuildSafeLogger('audit-log')
 
@@ -38,7 +38,7 @@ export async function getUserAuditLogs(
     return events.map((event) => ({
       id: event.id,
       userId: event.userId,
-      action: String(event.action),
+      action: event.action,
       resource: {
         id: event.resourceId ?? '',
         type: event.resourceType,

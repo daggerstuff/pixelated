@@ -149,7 +149,7 @@ export const getScenarioById = async (id: string): Promise<Scenario | null> => {
   // In a real implementation, this would fetch a specific scenario from an API
   // For now, we'll find it in our example scenarios
   await new Promise((resolve) => setTimeout(resolve, 300))
-  return exampleScenarios.find((scenario) => scenario.id === id) || null
+  return exampleScenarios.find((scenario) => scenario.id === id) ?? null
 }
 
 /**

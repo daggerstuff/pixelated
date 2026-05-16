@@ -114,11 +114,6 @@ export default function SessionDocumentationComponent({
         'Work performance concerns are primary stressor',
         'Family conflict with spouse about division of household duties',
       ],
-      recommendations: [
-        'Practice PMR daily',
-        'Maintain anxiety log',
-        'Schedule sleep assessment',
-      ],
       emotionSummary:
         'Client presented with moderate anxiety, mild frustration, and occasional sadness throughout the session.',
       interventions: [
@@ -126,6 +121,23 @@ export default function SessionDocumentationComponent({
         'Cognitive restructuring worksheet',
         'Mindfulness breathing practice',
       ],
+      outcomes: [
+        'Reduced self-reported anxiety score from 7 to 5',
+        'Client demonstrated improved breathing technique',
+      ],
+      nextSteps: [
+        'Continue weekly sessions with focus on boundary setting',
+        'Practice 4-7-8 breathing daily',
+      ],
+      riskAssessment: {
+        level: 'low',
+        factors: ['Mild sleep disruption', 'Work-related stress'],
+        recommendations: [
+          'Monitor sleep quality',
+          'Continue current treatment plan',
+        ],
+        requiresImmediateAttention: false,
+      },
       notes:
         'Session focused on identifying stressors and practicing relaxation techniques. Client engaged well and was receptive to interventions.',
       metadata: {},
@@ -163,8 +175,6 @@ export default function SessionDocumentationComponent({
             'Physical manifestation of stress affecting sleep quality',
         },
       ],
-      recommendedFollowUp:
-        'Schedule sleep assessment, continue practicing PMR daily, maintain anxiety log for next session',
       treatmentProgress: {
         goals: [
           {
@@ -248,12 +258,14 @@ export default function SessionDocumentationComponent({
           Error Loading Documentation
         </h3>
         <p className='text-gray-600 max-w-md text-center'>
-          {error?.['message'] ||
+          {error.message ||
             'An error occurred while loading session documentation.'}
         </p>
         <div className='mt-4 flex gap-3'>
           <button
-            onClick={() => loadDocumentation(true)}
+            onClick={() => {
+              void loadDocumentation(true)
+            }}
             className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition'
           >
             Retry
@@ -388,16 +400,14 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation?.['summary'] || ''}
+                  value={editableDocumentation.summary ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('summary', e.target.value)
                   }
                   className='border-gray-300 min-h-[100px] w-full rounded-md border p-2'
                 />
               ) : (
-                <p className='text-gray-700'>
-                  {editableDocumentation?.['summary']}
-                </p>
+                <p className='text-gray-700'>{editableDocumentation.summary}</p>
               )}
             </section>
 
@@ -406,37 +416,47 @@ export default function SessionDocumentationComponent({
                 Key Insights
               </h4>
               <ul className='list-disc space-y-1 pl-5'>
-                {editableDocumentation?.['keyInsights']?.map(
-                  (insight: string, index: number) => (
-                    <li key={`insight-${index}`} className='text-gray-700'>
-                      {!readOnly ? (
-                        <input
-                          type='text'
-                          value={insight}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const newInsights = [
-                              ...(editableDocumentation?.['keyInsights'] || []),
-                            ]
+                {editableDocumentation.keyInsights?.map(
+                  (insight: string, index: number) => {
+                    const key = `insight-${insight
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
 
-                            newInsights[index] = e.target.value
-                            handleChange('keyInsights', newInsights)
-                          }}
-                          className='border-gray-300 w-full rounded-md border p-1'
-                        />
-                      ) : (
-                        insight
-                      )}
-                    </li>
-                  ),
-                ) || []}
+                    return (
+                      <li
+                        key={key || 'insight-empty'}
+                        className='text-gray-700'
+                      >
+                        {!readOnly ? (
+                          <input
+                            type='text'
+                            value={insight}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const newInsights = [
+                                ...(editableDocumentation.keyInsights ?? []),
+                              ]
+
+                              newInsights[index] = e.target.value
+                              handleChange('keyInsights', newInsights)
+                            }}
+                            className='border-gray-300 w-full rounded-md border p-1'
+                          />
+                        ) : (
+                          insight
+                        )}
+                      </li>
+                    )
+                  },
+                ) ?? []}
               </ul>
               {!readOnly && (
                 <button
                   onClick={() => {
                     handleChange('keyInsights', [
-                      ...(editableDocumentation?.['keyInsights'] || []),
+                      ...(editableDocumentation.keyInsights ?? []),
                       '',
                     ])
                   }}
@@ -453,7 +473,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation?.['recommendedFollowUp'] || ''}
+                  value={editableDocumentation.recommendedFollowUp ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('recommendedFollowUp', e.target.value)
                   }
@@ -461,7 +481,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className='text-gray-700'>
-                  {editableDocumentation?.['recommendedFollowUp']}
+                  {editableDocumentation.recommendedFollowUp}
                 </p>
               )}
             </section>
@@ -472,7 +492,7 @@ export default function SessionDocumentationComponent({
               </h4>
               {!readOnly ? (
                 <textarea
-                  value={editableDocumentation?.['nextSessionPlan'] || ''}
+                  value={editableDocumentation.nextSessionPlan ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('nextSessionPlan', e.target.value)
                   }
@@ -480,7 +500,7 @@ export default function SessionDocumentationComponent({
                 />
               ) : (
                 <p className='text-gray-700'>
-                  {editableDocumentation?.['nextSessionPlan']}
+                  {editableDocumentation.nextSessionPlan}
                 </p>
               )}
             </section>
@@ -493,7 +513,7 @@ export default function SessionDocumentationComponent({
               Therapeutic Techniques Used
             </h4>
             <div className='space-y-3'>
-              {editableDocumentation?.['therapeuticTechniques']?.map(
+              {editableDocumentation.therapeuticTechniques?.map(
                 (
                   technique: {
                     name: string
@@ -501,29 +521,62 @@ export default function SessionDocumentationComponent({
                     effectiveness: number
                   },
                   index: number,
-                ) => (
-                  <div
-                    key={`technique-${index}`}
-                    className='border-gray-200 rounded-md border p-3'
-                  >
-                    <div className='mb-2'>
-                      <h5 className='text-gray-800 font-medium'>
+                ) => {
+                  const key = `technique-${technique.name
+                    .trim()
+                    .toLowerCase()
+                    .replace(/\\W+/g, '-')}`
+
+                  return (
+                    <div
+                      key={key || `technique-${technique.description}`}
+                      className='border-gray-200 rounded-md border p-3'
+                    >
+                      <div className='mb-2'>
+                        <h5 className='text-gray-800 font-medium'>
+                          {!readOnly ? (
+                            <input
+                              type='text'
+                              value={technique.name}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => {
+                                const newTechniques = [
+                                  ...(editableDocumentation.therapeuticTechniques ??
+                                    []),
+                                ]
+
+                                newTechniques[index] = {
+                                  ...technique,
+                                  name: e.target.value,
+                                }
+                                handleChange(
+                                  'therapeuticTechniques',
+                                  newTechniques,
+                                )
+                              }}
+                              className='border-gray-300 w-full rounded-md border p-1'
+                            />
+                          ) : (
+                            technique.name
+                          )}
+                        </h5>
+                      </div>
+                      <div className='mb-2'>
                         {!readOnly ? (
-                          <input
-                            type='text'
-                            value={technique?.['name'] || ''}
+                          <textarea
+                            value={technique.description}
                             onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>,
+                              e: React.ChangeEvent<HTMLTextAreaElement>,
                             ) => {
                               const newTechniques = [
-                                ...(editableDocumentation?.[
-                                  'therapeuticTechniques'
-                                ] || []),
+                                ...(editableDocumentation.therapeuticTechniques ??
+                                  []),
                               ]
 
                               newTechniques[index] = {
                                 ...technique,
-                                name: e.target.value,
+                                description: e.target.value,
                               }
                               handleChange(
                                 'therapeuticTechniques',
@@ -533,83 +586,64 @@ export default function SessionDocumentationComponent({
                             className='border-gray-300 w-full rounded-md border p-1'
                           />
                         ) : (
-                          technique?.['name']
+                          <p className='text-gray-700'>
+                            {technique.description}
+                          </p>
                         )}
-                      </h5>
-                    </div>
-                    <div className='mb-2'>
-                      {!readOnly ? (
-                        <textarea
-                          value={technique?.['description'] || ''}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLTextAreaElement>,
-                          ) => {
-                            const newTechniques = [
-                              ...(editableDocumentation?.[
-                                'therapeuticTechniques'
-                              ] || []),
-                            ]
+                      </div>
+                      <div className='flex items-center'>
+                        <span className='text-gray-600 mr-2 text-sm'>
+                          Effectiveness:
+                        </span>
+                        {!readOnly ? (
+                          <input
+                            type='range'
+                            min='1'
+                            max='10'
+                            value={technique.effectiveness}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const newTechniques = [
+                                ...(editableDocumentation.therapeuticTechniques ??
+                                  []),
+                              ]
 
-                            newTechniques[index] = {
-                              ...technique,
-                              description: e.target.value,
-                            }
-                            handleChange('therapeuticTechniques', newTechniques)
-                          }}
-                          className='border-gray-300 w-full rounded-md border p-1'
-                        />
-                      ) : (
-                        <p className='text-gray-700'>{technique.description}</p>
-                      )}
-                    </div>
-                    <div className='flex items-center'>
-                      <span className='text-gray-600 mr-2 text-sm'>
-                        Effectiveness:
-                      </span>
-                      {!readOnly ? (
-                        <input
-                          type='range'
-                          min='1'
-                          max='10'
-                          value={technique.effectiveness}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const newTechniques = [
-                              ...editableDocumentation.therapeuticTechniques,
-                            ]
-
-                            newTechniques[index] = {
-                              ...technique,
-                              effectiveness: parseInt(e.target.value),
-                            }
-                            handleChange('therapeuticTechniques', newTechniques)
-                          }}
-                          className='mr-2 w-32'
-                        />
-                      ) : (
-                        <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
-                          <div
-                            className='bg-blue-600 h-full rounded-full'
-                            style={{
-                              width: `${(technique.effectiveness / 10) * 100}%`,
+                              newTechniques[index] = {
+                                ...technique,
+                                effectiveness: parseInt(e.target.value),
+                              }
+                              handleChange(
+                                'therapeuticTechniques',
+                                newTechniques,
+                              )
                             }}
-                          ></div>
-                        </div>
-                      )}
-                      <span className='text-sm font-medium'>
-                        {technique.effectiveness}/10
-                      </span>
+                            className='mr-2 w-32'
+                          />
+                        ) : (
+                          <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
+                            <div
+                              className='bg-blue-600 h-full rounded-full'
+                              style={{
+                                width: `${(technique.effectiveness / 10) * 100}%`,
+                              }}
+                            ></div>
+                          </div>
+                        )}
+                        <span className='text-sm font-medium'>
+                          {technique.effectiveness}/10
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ),
+                  )
+                },
               )}
             </div>
             {!readOnly && (
               <button
                 onClick={() => {
                   handleChange('therapeuticTechniques', [
-                    ...editableDocumentation.therapeuticTechniques,
+                    ...(editableDocumentation.therapeuticTechniques ?? []),
                     {
                       name: '',
                       description: '',
@@ -644,117 +678,126 @@ export default function SessionDocumentationComponent({
                       notes: string
                     },
                     index: number,
-                  ) => (
-                    <div
-                      key={`goal-${index}`}
-                      className='border-gray-200 rounded-md border p-3'
-                    >
-                      <div className='mb-2'>
-                        {!readOnly ? (
-                          <textarea
-                            value={goal.description}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLTextAreaElement>,
-                            ) => {
-                              const newGoals = [
-                                ...(editableDocumentation.treatmentProgress
-                                  ?.goals || []),
-                              ]
+                  ) => {
+                    const key = `goal-${goal.description
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
 
-                              newGoals[index] = {
-                                ...goal,
-                                description: e.target.value,
-                              }
-                              handleChange('treatmentProgress', {
-                                ...editableDocumentation.treatmentProgress,
-                                goals: newGoals,
-                              })
-                            }}
-                            className='border-gray-300 w-full rounded-md border p-1'
-                          />
-                        ) : (
-                          <p className='text-gray-800 font-medium'>
-                            {goal.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className='mb-2 flex items-center'>
-                        <span className='text-gray-600 mr-2 text-sm'>
-                          Progress:
-                        </span>
-                        {!readOnly ? (
-                          <input
-                            type='range'
-                            min='0'
-                            max='100'
-                            value={goal.progress}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>,
-                            ) => {
-                              const newGoals = [
-                                ...(editableDocumentation.treatmentProgress
-                                  ?.goals || []),
-                              ]
+                    return (
+                      <div
+                        key={key || 'goal-empty'}
+                        className='border-gray-200 rounded-md border p-3'
+                      >
+                        <div className='mb-2'>
+                          {!readOnly ? (
+                            <textarea
+                              value={goal.description}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLTextAreaElement>,
+                              ) => {
+                                const newGoals = [
+                                  ...(editableDocumentation.treatmentProgress
+                                    ?.goals ?? []),
+                                ]
 
-                              newGoals[index] = {
-                                ...goal,
-                                progress: parseInt(e.target.value),
-                              }
-                              handleChange('treatmentProgress', {
-                                ...editableDocumentation.treatmentProgress,
-                                goals: newGoals,
-                              })
-                            }}
-                            className='mr-2 w-32'
-                          />
-                        ) : (
-                          <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
-                            <div
-                              className='bg-blue-600 h-full rounded-full'
-                              style={{ width: `${goal.progress}%` }}
-                            ></div>
-                          </div>
-                        )}
-                        <span className='text-sm font-medium'>
-                          {goal.progress}%
-                        </span>
-                      </div>
-                      <div>
-                        {!readOnly ? (
-                          <textarea
-                            value={goal.notes}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLTextAreaElement>,
-                            ) => {
-                              const newGoals = [
-                                ...(editableDocumentation.treatmentProgress
-                                  ?.goals || []),
-                              ]
+                                newGoals[index] = {
+                                  ...goal,
+                                  description: e.target.value,
+                                }
+                                handleChange('treatmentProgress', {
+                                  ...editableDocumentation.treatmentProgress,
+                                  goals: newGoals,
+                                })
+                              }}
+                              className='border-gray-300 w-full rounded-md border p-1'
+                            />
+                          ) : (
+                            <p className='text-gray-800 font-medium'>
+                              {goal.description}
+                            </p>
+                          )}
+                        </div>
+                        <div className='mb-2 flex items-center'>
+                          <span className='text-gray-600 mr-2 text-sm'>
+                            Progress:
+                          </span>
+                          {!readOnly ? (
+                            <input
+                              type='range'
+                              min='0'
+                              max='100'
+                              value={goal.progress}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => {
+                                const newGoals = [
+                                  ...(editableDocumentation.treatmentProgress
+                                    ?.goals ?? []),
+                                ]
 
-                              newGoals[index] = {
-                                ...goal,
-                                notes: e.target.value,
-                              }
-                              handleChange('treatmentProgress', {
-                                ...editableDocumentation.treatmentProgress,
-                                goals: newGoals,
-                              })
-                            }}
-                            className='border-gray-300 w-full rounded-md border p-1'
-                            placeholder='Notes on goal progress'
-                          />
-                        ) : (
-                          <p className='text-gray-700 text-sm'>{goal.notes}</p>
-                        )}
+                                newGoals[index] = {
+                                  ...goal,
+                                  progress: parseInt(e.target.value),
+                                }
+                                handleChange('treatmentProgress', {
+                                  ...editableDocumentation.treatmentProgress,
+                                  goals: newGoals,
+                                })
+                              }}
+                              className='mr-2 w-32'
+                            />
+                          ) : (
+                            <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
+                              <div
+                                className='bg-blue-600 h-full rounded-full'
+                                style={{ width: `${goal.progress}%` }}
+                              ></div>
+                            </div>
+                          )}
+                          <span className='text-sm font-medium'>
+                            {goal.progress}%
+                          </span>
+                        </div>
+                        <div>
+                          {!readOnly ? (
+                            <textarea
+                              value={goal.notes}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLTextAreaElement>,
+                              ) => {
+                                const newGoals = [
+                                  ...(editableDocumentation.treatmentProgress
+                                    ?.goals ?? []),
+                                ]
+
+                                newGoals[index] = {
+                                  ...goal,
+                                  notes: e.target.value,
+                                }
+                                handleChange('treatmentProgress', {
+                                  ...editableDocumentation.treatmentProgress,
+                                  goals: newGoals,
+                                })
+                              }}
+                              className='border-gray-300 w-full rounded-md border p-1'
+                              placeholder='Notes on goal progress'
+                            />
+                          ) : (
+                            <p className='text-gray-700 text-sm'>
+                              {goal.notes}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ),
+                    )
+                  },
                 )}
                 {!readOnly && (
                   <button
                     onClick={() => {
                       const newGoals = [
-                        ...(editableDocumentation.treatmentProgress?.goals ||
+                        ...(editableDocumentation.treatmentProgress?.goals ??
                           []),
                         {
                           description: '',
@@ -783,7 +826,7 @@ export default function SessionDocumentationComponent({
                   <textarea
                     value={
                       editableDocumentation.treatmentProgress
-                        ?.overallAssessment || ''
+                        ?.overallAssessment ?? ''
                     }
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       handleChange('treatmentProgress', {
@@ -807,36 +850,47 @@ export default function SessionDocumentationComponent({
               </h4>
               <ul className='list-disc space-y-1 pl-5'>
                 {editableDocumentation.clientStrengths?.map(
-                  (strength: string, index: number) => (
-                    <li key={`strength-${index}`} className='text-gray-700'>
-                      {!readOnly ? (
-                        <input
-                          type='text'
-                          value={strength}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const newStrengths = [
-                              ...(editableDocumentation.clientStrengths || []),
-                            ]
+                  (strength: string, index: number) => {
+                    const key = `strength-${strength
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
 
-                            newStrengths[index] = e.target.value
-                            handleChange('clientStrengths', newStrengths)
-                          }}
-                          className='border-gray-300 w-full rounded-md border p-1'
-                        />
-                      ) : (
-                        strength
-                      )}
-                    </li>
-                  ),
+                    return (
+                      <li
+                        key={key || 'strength-empty'}
+                        className='text-gray-700'
+                      >
+                        {!readOnly ? (
+                          <input
+                            type='text'
+                            value={strength}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const newStrengths = [
+                                ...(editableDocumentation.clientStrengths ??
+                                  []),
+                              ]
+
+                              newStrengths[index] = e.target.value
+                              handleChange('clientStrengths', newStrengths)
+                            }}
+                            className='border-gray-300 w-full rounded-md border p-1'
+                          />
+                        ) : (
+                          strength
+                        )}
+                      </li>
+                    )
+                  },
                 )}
               </ul>
               {!readOnly && (
                 <button
                   onClick={() => {
                     handleChange('clientStrengths', [
-                      ...(editableDocumentation.clientStrengths || []),
+                      ...(editableDocumentation.clientStrengths ?? []),
                       '',
                     ])
                   }}
@@ -860,71 +914,79 @@ export default function SessionDocumentationComponent({
                   (
                     pattern: { pattern: string; significance: string },
                     index: number,
-                  ) => (
-                    <div
-                      key={`pattern-${index}`}
-                      className='border-gray-200 rounded-md border p-3'
-                    >
-                      <div className='mb-2'>
-                        <h5 className='text-gray-800 font-medium'>
+                  ) => {
+                    const key = `pattern-${pattern.pattern
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
+                    return (
+                      <div
+                        key={key || 'pattern-empty'}
+                        className='border-gray-200 rounded-md border p-3'
+                      >
+                        <div className='mb-2'>
+                          <h5 className='text-gray-800 font-medium'>
+                            {!readOnly ? (
+                              <input
+                                type='text'
+                                value={pattern.pattern}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>,
+                                ) => {
+                                  const newPatterns = [
+                                    ...(editableDocumentation.emotionalPatterns ??
+                                      []),
+                                  ]
+
+                                  newPatterns[index] = {
+                                    ...pattern,
+                                    pattern: e.target.value,
+                                  }
+                                  handleChange('emotionalPatterns', newPatterns)
+                                }}
+                                className='border-gray-300 w-full rounded-md border p-1'
+                              />
+                            ) : (
+                              pattern.pattern
+                            )}
+                          </h5>
+                        </div>
+                        <div>
                           {!readOnly ? (
-                            <input
-                              type='text'
-                              value={pattern.pattern}
+                            <textarea
+                              value={pattern.significance}
                               onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>,
+                                e: React.ChangeEvent<HTMLTextAreaElement>,
                               ) => {
                                 const newPatterns = [
-                                  ...editableDocumentation.emotionalPatterns,
+                                  ...(editableDocumentation.emotionalPatterns ??
+                                    []),
                                 ]
 
                                 newPatterns[index] = {
                                   ...pattern,
-                                  pattern: e.target.value,
+                                  significance: e.target.value,
                                 }
                                 handleChange('emotionalPatterns', newPatterns)
                               }}
                               className='border-gray-300 w-full rounded-md border p-1'
                             />
                           ) : (
-                            pattern.pattern
+                            <p className='text-gray-700'>
+                              {pattern.significance}
+                            </p>
                           )}
-                        </h5>
+                        </div>
                       </div>
-                      <div>
-                        {!readOnly ? (
-                          <textarea
-                            value={pattern.significance}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLTextAreaElement>,
-                            ) => {
-                              const newPatterns = [
-                                ...editableDocumentation.emotionalPatterns,
-                              ]
-
-                              newPatterns[index] = {
-                                ...pattern,
-                                significance: e.target.value,
-                              }
-                              handleChange('emotionalPatterns', newPatterns)
-                            }}
-                            className='border-gray-300 w-full rounded-md border p-1'
-                          />
-                        ) : (
-                          <p className='text-gray-700'>
-                            {pattern.significance}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ),
+                    )
+                  },
                 )}
             </div>
             {!readOnly && (
               <button
                 onClick={() => {
                   handleChange('emotionalPatterns', [
-                    ...editableDocumentation.emotionalPatterns,
+                    ...(editableDocumentation.emotionalPatterns ?? []),
                     {
                       pattern: '',
                       significance: '',
@@ -943,36 +1005,43 @@ export default function SessionDocumentationComponent({
               </h4>
               <ul className='list-disc space-y-1 pl-5'>
                 {editableDocumentation.emergentIssues?.map(
-                  (issue: string, index: number) => (
-                    <li key={`issue-${index}`} className='text-gray-700'>
-                      {!readOnly ? (
-                        <input
-                          type='text'
-                          value={issue}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const newIssues = [
-                              ...(editableDocumentation.emergentIssues || []),
-                            ]
+                  (issue: string, index: number) => {
+                    const key = `issue-${issue
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
 
-                            newIssues[index] = e.target.value
-                            handleChange('emergentIssues', newIssues)
-                          }}
-                          className='border-gray-300 w-full rounded-md border p-1'
-                        />
-                      ) : (
-                        issue
-                      )}
-                    </li>
-                  ),
+                    return (
+                      <li key={key || 'issue-empty'} className='text-gray-700'>
+                        {!readOnly ? (
+                          <input
+                            type='text'
+                            value={issue}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                              const newIssues = [
+                                ...(editableDocumentation.emergentIssues ?? []),
+                              ]
+
+                              newIssues[index] = e.target.value
+                              handleChange('emergentIssues', newIssues)
+                            }}
+                            className='border-gray-300 w-full rounded-md border p-1'
+                          />
+                        ) : (
+                          issue
+                        )}
+                      </li>
+                    )
+                  },
                 )}
               </ul>
               {!readOnly && (
                 <button
                   onClick={() => {
                     handleChange('emergentIssues', [
-                      ...(editableDocumentation.emergentIssues || []),
+                      ...(editableDocumentation.emergentIssues ?? []),
                       '',
                     ])
                   }}
@@ -1000,16 +1069,21 @@ export default function SessionDocumentationComponent({
               </h5>
               <ul className='mb-4 list-disc space-y-1 pl-5'>
                 {Array.isArray(editableDocumentation.keyInsights) &&
-                  editableDocumentation.keyInsights.map(
-                    (insight: string, index: number) => (
+                  editableDocumentation.keyInsights.map((insight: string) => {
+                    const key = `insight-full-${insight
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
+
+                    return (
                       <li
-                        key={`insight-full-${index}`}
+                        key={key || 'insight-full-empty'}
                         className='text-gray-700'
                       >
                         {insight}
                       </li>
-                    ),
-                  )}
+                    )
+                  })}
               </ul>
             </section>
 
@@ -1018,26 +1092,34 @@ export default function SessionDocumentationComponent({
                 Therapeutic Techniques Used
               </h4>
               <div className='mb-4 space-y-3'>
-                {Array.isArray(editableDocumentation?.therapeuticTechniques) &&
+                {Array.isArray(editableDocumentation.therapeuticTechniques) &&
                   editableDocumentation.therapeuticTechniques.map(
-                    (
-                      technique: {
-                        name: string
-                        description: string
-                        effectiveness: number
-                      },
-                      index: number,
-                    ) => (
-                      <div key={`technique-full-${index}`} className='mb-3'>
-                        <h5 className='text-gray-800 font-medium'>
-                          {technique.name}{' '}
-                          <span className='text-gray-600 text-sm font-normal'>
-                            (Effectiveness: {technique.effectiveness}/10)
-                          </span>
-                        </h5>
-                        <p className='text-gray-700'>{technique.description}</p>
-                      </div>
-                    ),
+                    (technique: {
+                      name: string
+                      description: string
+                      effectiveness: number
+                    }) => {
+                      const key = `technique-full-${technique.name
+                        .trim()
+                        .toLowerCase()
+                        .replace(/\\W+/g, '-')}`
+                      return (
+                        <div
+                          key={key || 'technique-full-empty'}
+                          className='mb-3'
+                        >
+                          <h5 className='text-gray-800 font-medium'>
+                            {technique.name}{' '}
+                            <span className='text-gray-600 text-sm font-normal'>
+                              (Effectiveness: {technique.effectiveness}/10)
+                            </span>
+                          </h5>
+                          <p className='text-gray-700'>
+                            {technique.description}
+                          </p>
+                        </div>
+                      )
+                    },
                   )}
               </div>
             </section>
@@ -1047,19 +1129,27 @@ export default function SessionDocumentationComponent({
                 Emotional Patterns Observed
               </h4>
               <div className='mb-4 space-y-3'>
-                {Array.isArray(editableDocumentation?.emotionalPatterns) &&
+                {Array.isArray(editableDocumentation.emotionalPatterns) &&
                   editableDocumentation.emotionalPatterns.map(
                     (
                       pattern: { pattern: string; significance: string },
-                      index: number,
-                    ) => (
-                      <div key={`pattern-full-${index}`} className='mb-3'>
-                        <h5 className='text-gray-800 font-medium'>
-                          {pattern.pattern}
-                        </h5>
-                        <p className='text-gray-700'>{pattern.significance}</p>
-                      </div>
-                    ),
+                      _index: number,
+                    ) => {
+                      const key = `pattern-full-${pattern.pattern
+                        .trim()
+                        .toLowerCase()
+                        .replace(/\\W+/g, '-')}`
+                      return (
+                        <div key={key || 'pattern-full-empty'} className='mb-3'>
+                          <h5 className='text-gray-800 font-medium'>
+                            {pattern.pattern}
+                          </h5>
+                          <p className='text-gray-700'>
+                            {pattern.significance}
+                          </p>
+                        </div>
+                      )
+                    },
                   )}
               </div>
             </section>
@@ -1072,36 +1162,39 @@ export default function SessionDocumentationComponent({
               <h5 className='text-md text-gray-700 mb-2 font-medium'>
                 Treatment Goals
               </h5>
-              {editableDocumentation.treatmentProgress?.goals?.map(
-                (
-                  goal: {
-                    description: string
-                    progress: number
-                    notes: string
-                  },
-                  index: number,
-                ) => (
-                  <div key={`goal-full-${index}`} className='mb-3'>
-                    <p className='text-gray-800 font-medium'>
-                      {goal.description}
-                    </p>
-                    <div className='mb-1 mt-1 flex items-center'>
-                      <span className='text-gray-600 mr-2 text-sm'>
-                        Progress:
-                      </span>
-                      <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
-                        <div
-                          className='bg-blue-600 h-full rounded-full'
-                          style={{ width: `${goal.progress}%` }}
-                        ></div>
+              {editableDocumentation.treatmentProgress?.goals.map(
+                (goal: {
+                  description: string
+                  progress: number
+                  notes: string
+                }) => {
+                  const key = `goal-full-${goal.description
+                    .trim()
+                    .toLowerCase()
+                    .replace(/\\W+/g, '-')}`
+                  return (
+                    <div key={key || 'goal-full-empty'} className='mb-3'>
+                      <p className='text-gray-800 font-medium'>
+                        {goal.description}
+                      </p>
+                      <div className='mb-1 mt-1 flex items-center'>
+                        <span className='text-gray-600 mr-2 text-sm'>
+                          Progress:
+                        </span>
+                        <div className='bg-gray-200 mr-2 h-2 w-32 rounded-full'>
+                          <div
+                            className='bg-blue-600 h-full rounded-full'
+                            style={{ width: `${goal.progress}%` }}
+                          ></div>
+                        </div>
+                        <span className='text-sm font-medium'>
+                          {goal.progress}%
+                        </span>
                       </div>
-                      <span className='text-sm font-medium'>
-                        {goal.progress}%
-                      </span>
+                      <p className='text-gray-700 text-sm'>{goal.notes}</p>
                     </div>
-                    <p className='text-gray-700 text-sm'>{goal.notes}</p>
-                  </div>
-                ),
+                  )
+                },
               )}
 
               <h5 className='text-md text-gray-700 mb-2 mt-4 font-medium'>
@@ -1118,14 +1211,20 @@ export default function SessionDocumentationComponent({
               </h4>
               <ul className='mb-4 list-disc space-y-1 pl-5'>
                 {editableDocumentation.clientStrengths?.map(
-                  (strength: string, index: number) => (
-                    <li
-                      key={`strength-full-${index}`}
-                      className='text-gray-700'
-                    >
-                      {strength}
-                    </li>
-                  ),
+                  (strength: string) => {
+                    const key = `strength-full-${strength
+                      .trim()
+                      .toLowerCase()
+                      .replace(/\\W+/g, '-')}`
+                    return (
+                      <li
+                        key={key || 'strength-full-empty'}
+                        className='text-gray-700'
+                      >
+                        {strength}
+                      </li>
+                    )
+                  },
                 )}
               </ul>
             </section>
@@ -1135,13 +1234,20 @@ export default function SessionDocumentationComponent({
                 Emergent Issues to Address
               </h4>
               <ul className='mb-4 list-disc space-y-1 pl-5'>
-                {editableDocumentation.emergentIssues?.map(
-                  (issue: string, index: number) => (
-                    <li key={`issue-full-${index}`} className='text-gray-700'>
+                {editableDocumentation.emergentIssues?.map((issue: string) => {
+                  const key = `issue-full-${issue
+                    .trim()
+                    .toLowerCase()
+                    .replace(/\\W+/g, '-')}`
+                  return (
+                    <li
+                      key={key || 'issue-full-empty'}
+                      className='text-gray-700'
+                    >
                       {issue}
                     </li>
-                  ),
-                )}
+                  )
+                })}
               </ul>
             </section>
 
@@ -1167,7 +1273,7 @@ export default function SessionDocumentationComponent({
               </div>
             </section>
 
-            {editableDocumentation?.outcomePredictions &&
+            {editableDocumentation.outcomePredictions &&
               editableDocumentation.outcomePredictions.length > 0 && (
                 <section className='mt-8'>
                   <h4 className='text-blue-800 mb-3 text-lg font-semibold'>
@@ -1193,7 +1299,7 @@ export default function SessionDocumentationComponent({
                       </thead>
                       <tbody>
                         {Array.isArray(
-                          editableDocumentation?.outcomePredictions,
+                          editableDocumentation.outcomePredictions,
                         ) &&
                           editableDocumentation.outcomePredictions.map(
                             (
@@ -1204,25 +1310,34 @@ export default function SessionDocumentationComponent({
                                 rationale: string
                               },
                               idx: number,
-                            ) => (
-                              <tr
-                                key={`prediction-${idx}`}
-                                className='border-gray-100 hover:bg-blue-50 border-t transition-colors'
-                              >
-                                <td className='text-gray-900 px-4 py-2 font-semibold'>
-                                  {pred.technique}
-                                </td>
-                                <td className='px-4 py-2'>
-                                  {(pred.predictedEfficacy * 100).toFixed(1)}%
-                                </td>
-                                <td className='px-4 py-2'>
-                                  {(pred.confidence * 100).toFixed(0)}%
-                                </td>
-                                <td className='text-gray-700 px-4 py-2'>
-                                  {pred.rationale}
-                                </td>
-                              </tr>
-                            ),
+                            ) => {
+                              const key = `prediction-${pred.technique
+                                .trim()
+                                .toLowerCase()
+                                .replace(
+                                  /\\W+/g,
+                                  '-',
+                                )}-${pred.predictedEfficacy}-${pred.confidence}`
+                              return (
+                                <tr
+                                  key={key || `prediction-${idx}`}
+                                  className='border-gray-100 hover:bg-blue-50 border-t transition-colors'
+                                >
+                                  <td className='text-gray-900 px-4 py-2 font-semibold'>
+                                    {pred.technique}
+                                  </td>
+                                  <td className='px-4 py-2'>
+                                    {(pred.predictedEfficacy * 100).toFixed(1)}%
+                                  </td>
+                                  <td className='px-4 py-2'>
+                                    {(pred.confidence * 100).toFixed(0)}%
+                                  </td>
+                                  <td className='text-gray-700 px-4 py-2'>
+                                    {pred.rationale}
+                                  </td>
+                                </tr>
+                              )
+                            },
                           )}
                       </tbody>
                     </table>

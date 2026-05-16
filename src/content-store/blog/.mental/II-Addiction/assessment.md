@@ -143,6 +143,6 @@ various assessment tools and methods used in addiction evaluation.
 
 ## Related Resources
 
-- [Intervention Strategies](/mental/II-Addiction/intervention)
-- [Recovery Process](/mental/II-Addiction/recovery)
-- [Treatment Approaches](/mental/II-Addiction/treatment)
+- [Intervention Strategies](./intervention.md)
+- [Recovery Process](./recovery.md)
+- [Treatment Approaches](./treatment.md)

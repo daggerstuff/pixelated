@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import { useReportQuery } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 

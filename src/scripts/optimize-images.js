@@ -50,7 +50,7 @@ function isInViewport(element) {
 // Set up responsive image loading
 function setupResponsiveImage(img) {
   // Skip if image has no src or is SVG
-  if (!img.src || img.src.endsWith('.svg')) {
+  if (img.src?.endsWith('.svg')) {
     return
   }
 
@@ -60,8 +60,8 @@ function setupResponsiveImage(img) {
   }
 
   // Get image dimensions
-  const imgWidth = img.width || img.clientWidth
-  const imgHeight = img.height || img.clientHeight
+  const imgWidth = img.width ?? img.clientWidth
+  const imgHeight = img.height ?? img.clientHeight
 
   // Skip tiny images or those with no dimensions
   if (imgWidth < 50 || imgHeight < 50 || !imgWidth || !imgHeight) {

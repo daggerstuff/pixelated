@@ -130,7 +130,7 @@ export function checkAccessibility() {
       if (id) {
         const hasLabel = document.querySelector(
           `label[for="${id}"]`,
-        ) as HTMLElement
+        )!
         const hasAriaLabel =
           input.hasAttribute('aria-label') ||
           input.hasAttribute('aria-labelledby')

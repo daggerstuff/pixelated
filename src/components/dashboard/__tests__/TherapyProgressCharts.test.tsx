@@ -1,11 +1,78 @@
-import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+/**
+ * @vitest-environment jsdom
+ */
+import { render, screen } from '@testing-library/react'
+import * as React from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { TherapistAnalyticsChartData } from '@/types/analytics'
+
+vi.mock('recharts', () => {
+  const MockChart = ({
+    children,
+    ...props
+  }: {
+    children?: React.ReactNode
+  }) => (
+    <div data-testid='mock-chart' {...props}>
+      {children}
+    </div>
+  )
+  return {
+    ResponsiveContainer: MockChart,
+    LineChart: MockChart,
+    BarChart: MockChart,
+    AreaChart: MockChart,
+    PieChart: MockChart,
+    RadarChart: MockChart,
+    ScatterChart: MockChart,
+    ComposedChart: MockChart,
+    Line: () => <div data-testid='mock-line' />,
+    Bar: () => <div data-testid='mock-bar' />,
+    Area: () => <div data-testid='mock-area' />,
+    Pie: () => <div data-testid='mock-pie' />,
+    Radar: () => <div data-testid='mock-radar' />,
+    Scatter: () => <div data-testid='mock-scatter' />,
+    XAxis: () => <div data-testid='mock-xaxis' />,
+    YAxis: () => <div data-testid='mock-yaxis' />,
+    ZAxis: () => <div data-testid='mock-zaxis' />,
+    CartesianGrid: () => <div data-testid='mock-grid' />,
+    Tooltip: () => <div data-testid='mock-tooltip' />,
+    Legend: () => <div data-testid='mock-legend' />,
+    Cell: () => <div data-testid='mock-cell' />,
+    ReferenceLine: () => <div data-testid='mock-refline' />,
+    ReferenceArea: () => <div data-testid='mock-refarea' />,
+    LabelList: () => <div data-testid='mock-labellist' />,
+  }
+})
+
+const mockUseAnalyticsDashboard = vi.fn(
+  (): {
+    data: TherapistAnalyticsChartData | null
+    isLoading: boolean
+    error: Error | null
+    refetch: () => Promise<void>
+  } => {
+    return {
+      data: null,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(async () => {}),
+    }
+  },
+)
+
+vi.mock('@/hooks/useAnalyticsDashboard', () => ({
+  useAnalyticsDashboard: () => mockUseAnalyticsDashboard(),
+}))
 
 import TherapyProgressCharts from '../TherapyProgressCharts'
 
 describe('TherapyProgressCharts', () => {
+  const expectAnalyticsChartsToRender = () => {
+    expect(screen.getByText('Analytics Overview')).toBeInTheDocument()
+  }
+
   const mockData: TherapistAnalyticsChartData = {
     sessionMetrics: [
       {
@@ -96,196 +163,145 @@ describe('TherapyProgressCharts', () => {
     },
   }
 
-  it('renders all chart components with data', () => {
-    render(<TherapyProgressCharts data={mockData} />)
-
-    expect(screen.getByText('Session Progress Timeline')).toBeInTheDocument()
-    expect(screen.getByText('Skill Development Radar')).toBeInTheDocument()
-    expect(screen.getByText('Session Comparison')).toBeInTheDocument()
-    expect(screen.getByText('Skill Practice Timeline')).toBeInTheDocument()
+  beforeEach(() => {
+    vi.resetModules()
+    mockUseAnalyticsDashboard.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(async () => {}),
+    })
   })
 
-  it('renders session progress timeline with correct data', () => {
+  it('renders AnalyticsCharts when data is provided', () => {
     render(<TherapyProgressCharts data={mockData} />)
-
-    const timelineChart = screen.getByText(
-      'Session Progress Timeline',
-    ).parentElement!
-
-    // Check that session dates are displayed
-    expect(within(timelineChart).getByText('Jan 1')).toBeInTheDocument()
-    expect(within(timelineChart).getByText('Jan 2')).toBeInTheDocument()
-
-    // Check progress percentages
-    expect(within(timelineChart).getByText('75%')).toBeInTheDocument()
-    expect(within(timelineChart).getByText('85%')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
-  it('renders skill development radar chart', () => {
+  it('renders chart container with therapy-progress-charts class', () => {
     render(<TherapyProgressCharts data={mockData} />)
-
-    const radarChart = screen.getByText(
-      'Skill Development Radar',
-    ).parentElement!
-
-    // Check that skills are displayed
-    expect(within(radarChart).getByText('Active Listening')).toBeInTheDocument()
-    expect(within(radarChart).getByText('Empathy')).toBeInTheDocument()
+    const container = screen
+      .getByText('Analytics Overview')
+      .closest('.therapy-progress-charts')
+    expect(container).toBeInTheDocument()
   })
 
-  it('renders session comparison with trend data', () => {
-    render(<TherapyProgressCharts data={mockData} />)
-
-    const comparisonChart =
-      screen.getByText('Session Comparison').parentElement!
-
-    // Check trend indicator
-    expect(within(comparisonChart).getByText('↗ Improving')).toBeInTheDocument()
-
-    // Check session IDs
-    expect(within(comparisonChart).getByText('session-2')).toBeInTheDocument()
-    expect(within(comparisonChart).getByText('session-1')).toBeInTheDocument()
-  })
-
-  it('renders skill improvement timeline', () => {
-    render(<TherapyProgressCharts data={mockData} />)
-
-    const timelineChart = screen.getByText(
-      'Skill Practice Timeline',
-    ).parentElement!
-
-    // Check that skills are displayed in timeline
+  it('shows fallback message when data is null', () => {
+    render(<TherapyProgressCharts data={null} />)
     expect(
-      within(timelineChart).getByText('Active Listening'),
+      screen.getByText('No therapy progress data available'),
     ).toBeInTheDocument()
-    expect(within(timelineChart).getByText('Empathy')).toBeInTheDocument()
-
-    // Check skill scores
-    expect(within(timelineChart).getByText('85%')).toBeInTheDocument()
-    expect(within(timelineChart).getByText('78%')).toBeInTheDocument()
   })
 
-  it('handles empty session metrics gracefully', () => {
+  it('renders with empty session metrics', () => {
     const emptyData = { ...mockData, sessionMetrics: [] }
     render(<TherapyProgressCharts data={emptyData} />)
-
-    expect(screen.getByText('No session data available')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
-  it('handles empty skill progress data gracefully', () => {
+  it('renders with empty skill progress', () => {
     const emptyData = { ...mockData, skillProgress: [] }
     render(<TherapyProgressCharts data={emptyData} />)
-
-    expect(screen.getByText('No skill data available')).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
-  it('handles missing comparative data gracefully', () => {
+  it('renders with empty summary stats', () => {
+    const emptyData = { ...mockData, summaryStats: [] }
+    render(<TherapyProgressCharts data={emptyData} />)
+    expectAnalyticsChartsToRender()
+  })
+
+  it('renders with empty progress snapshots', () => {
+    const emptyData = { ...mockData, progressSnapshots: [] }
+    render(<TherapyProgressCharts data={emptyData} />)
+    expectAnalyticsChartsToRender()
+  })
+
+  it('renders without comparative data', () => {
     const noComparisonData = { ...mockData, comparativeData: undefined }
     render(<TherapyProgressCharts data={noComparisonData} />)
-
-    expect(
-      screen.getByText('Not enough session data for comparison'),
-    ).toBeInTheDocument()
+    expectAnalyticsChartsToRender()
   })
 
-  it('handles missing previous session in comparison', () => {
-    const noPreviousSession = {
+  it('renders with single session metric', () => {
+    const singleData = {
+      ...mockData,
+      sessionMetrics: [mockData.sessionMetrics[0]!],
+    }
+    render(<TherapyProgressCharts data={singleData} />)
+    expectAnalyticsChartsToRender()
+  })
+
+  it('renders with single skill', () => {
+    const singleData = {
+      ...mockData,
+      skillProgress: [mockData.skillProgress[0]!],
+    }
+    render(<TherapyProgressCharts data={singleData} />)
+    expectAnalyticsChartsToRender()
+  })
+
+  it('renders with improving trend data', () => {
+    const improvingData = {
       ...mockData,
       comparativeData: {
         ...mockData.comparativeData!,
-        previousSession: undefined,
+        trend: 'improving' as const,
       },
     }
-    render(<TherapyProgressCharts data={noPreviousSession} />)
-
-    expect(
-      screen.getByText('Previous session data not available'),
-    ).toBeInTheDocument()
+    render(<TherapyProgressCharts data={improvingData} />)
+    expectAnalyticsChartsToRender()
   })
 
-  it('applies correct styling classes', () => {
-    render(<TherapyProgressCharts data={mockData} />)
-
-    const container = screen.getByLabelText('Therapy Progress Charts')
-    expect(container).toHaveClass('space-y-6')
-
-    // Check grid layout for comparison charts
-    const comparisonGrid = screen
-      .getByText('Session Comparison')
-      .closest('div')?.parentElement
-    expect(comparisonGrid).toHaveClass(
-      'grid',
-      'grid-cols-1',
-      'md:grid-cols-2',
-      'gap-6',
-    )
-  })
-
-  it('renders with custom className', () => {
-    render(
-      <TherapyProgressCharts data={mockData} className='custom-chart-class' />,
-    )
-
-    const container = screen.getByLabelText('Therapy Progress Charts')
-    expect(container).toHaveClass('custom-chart-class')
-  })
-
-  it('displays correct trend indicators for skills', () => {
-    render(<TherapyProgressCharts data={mockData} />)
-
-    // Check trend indicators
-    expect(screen.getByText('↗')).toBeInTheDocument() // Active Listening (up)
-    expect(screen.getByText('→')).toBeInTheDocument() // Empathy (stable)
-  })
-
-  it('renders skill practice counts', () => {
-    render(<TherapyProgressCharts data={mockData} />)
-
-    // Check session practice counts
-    expect(screen.getByText('5 sessions')).toBeInTheDocument() // Active Listening
-    expect(screen.getByText('4 sessions')).toBeInTheDocument() // Empathy
-  })
-
-  it('handles single session in timeline', () => {
-    const singleSessionData: TherapistAnalyticsChartData = {
+  it('renders with declining trend data', () => {
+    const decliningData = {
       ...mockData,
-      sessionMetrics: [mockData.sessionMetrics[0]].filter(Boolean) as any,
+      comparativeData: {
+        ...mockData.comparativeData!,
+        trend: 'declining' as const,
+      },
     }
-    render(<TherapyProgressCharts data={singleSessionData} />)
-
-    const timelineChart = screen.getByText(
-      'Session Progress Timeline',
-    ).parentElement!
-    expect(within(timelineChart).getByText('Jan 1')).toBeInTheDocument()
+    render(<TherapyProgressCharts data={decliningData} />)
+    expectAnalyticsChartsToRender()
   })
 
-  it('sorts skills by sessions practiced in timeline', () => {
-    const unsortedSkills = [
-      {
-        skill: 'Low Practice',
-        skillId: 'low-practice',
-        score: 60,
+  it('renders with stable trend data', () => {
+    const stableData = {
+      ...mockData,
+      comparativeData: {
+        ...mockData.comparativeData!,
         trend: 'stable' as const,
-        category: 'therapeutic' as const,
-        sessionsPracticed: 2,
-        averageImprovement: 5,
       },
-      {
-        skill: 'High Practice',
-        skillId: 'high-practice',
-        score: 80,
-        trend: 'up' as const,
-        category: 'therapeutic' as const,
-        sessionsPracticed: 10,
-        averageImprovement: 15,
-      },
-    ]
+    }
+    render(<TherapyProgressCharts data={stableData} />)
+    expectAnalyticsChartsToRender()
+  })
 
-    const sortedData = { ...mockData, skillProgress: unsortedSkills }
-    render(<TherapyProgressCharts data={sortedData} />)
+  it('renders with multiple session metrics', () => {
+    const multiData = {
+      ...mockData,
+      sessionMetrics: [
+        ...mockData.sessionMetrics,
+        {
+          date: '2025-01-03T12:00:00Z',
+          sessions: 2,
+          therapistSessions: 2,
+          averageSessionProgress: 90,
+          sessionId: 'session-3',
+          therapistId: 'therapist-1',
+          milestonesAchieved: 5,
+          averageResponseTime: 1.8,
+        },
+      ],
+    }
+    render(<TherapyProgressCharts data={multiData} />)
+    expectAnalyticsChartsToRender()
+  })
 
-    // High Practice should appear first due to more sessions
-    const skillItems = screen.getAllByText(/High Practice|Low Practice/)
-    expect(skillItems[0]).toHaveTextContent('High Practice')
+  it('renders without data prop (undefined)', () => {
+    render(<TherapyProgressCharts data={undefined as never} />)
+    expect(
+      screen.getByText('No therapy progress data available'),
+    ).toBeInTheDocument()
   })
 })

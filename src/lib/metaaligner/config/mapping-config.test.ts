@@ -361,7 +361,7 @@ describe('MappingConfiguration', () => {
     it('should have all weights sum to 1.0 when normalization enabled', () => {
       for (const mapping of DEFAULT_MAPPING_CONFIG.mappings) {
         const sum = Object.values(mapping.weights).reduce(
-          (acc, w) => acc + (w || 0),
+          (acc, w) => acc + (w ?? 0),
           0,
         )
         expect(Math.abs(sum - 1.0)).toBeLessThan(0.001) // Allow floating point errors

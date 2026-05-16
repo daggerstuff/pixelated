@@ -33,14 +33,14 @@ export const ERRORS = {
 
 // Helper to synchronously require Node modules in Node-only environments without
 // triggering static bundlers or TypeScript/ESLint `no-require-imports` errors.
-export function tryRequireNode(moduleName: string): unknown | null {
+export function tryRequireNode(moduleName: string): unknown {
   try {
     if (isNodeEnvironment()) {
       // Use global require if available (Node.js environment)
 
-      const globalRequire = (globalThis as { require?: unknown }).require
-      if (typeof globalRequire === 'function') {
-        return (globalRequire as (id: string) => unknown)(moduleName)
+      const globalRequire = globalThis as { require?: (id: string) => unknown }
+      if (typeof globalRequire.require === 'function') {
+        return globalRequire.require(moduleName)
       }
 
       // Try to access via global scope
@@ -50,7 +50,7 @@ export function tryRequireNode(moduleName: string): unknown | null {
   } catch {
     // ignore failures and return null to trigger fallback logic
   }
-  return null
+  return undefined
 }
 
 /**
@@ -68,8 +68,10 @@ function isNodeEnvironment(): boolean {
 }
 
 // Use Node crypto via guarded require when available; fallback to runtime checks for browsers
-const nodeCrypto: typeof import('crypto') | undefined =
-  tryRequireNode('crypto') || undefined
+const nodeCrypto = tryRequireNode('crypto')
+const nodeCryptoRandomBytes = isNonNullObject(nodeCrypto)
+  ? nodeCrypto.randomBytes
+  : undefined
 
 /**
  * Type guard for checking if value is a non-null object
@@ -86,11 +88,7 @@ export function isNonNullObject(
  * @returns Uint8Array of random bytes
  */
 export function getRandomBytes(size: number): Uint8Array {
-  if (
-    typeof window !== 'undefined' &&
-    window.crypto &&
-    window.crypto.getRandomValues
-  ) {
+  if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
     // Browser environment - use Web Crypto API
     const bytes = new Uint8Array(size)
     window.crypto.getRandomValues(bytes)
@@ -98,9 +96,8 @@ export function getRandomBytes(size: number): Uint8Array {
   } else {
     // Node.js environment
     try {
-      const randomBytes = nodeCrypto?.randomBytes
-      if (randomBytes) {
-        return new Uint8Array(randomBytes(size))
+      if (typeof nodeCryptoRandomBytes === 'function') {
+        return new Uint8Array(nodeCryptoRandomBytes(size))
       }
       throw new Error(ERRORS.NODE_CRYPTO_UNAVAILABLE)
     } catch {
@@ -166,11 +163,7 @@ export function cn(...inputs: ClassValue[]): string {
  * @returns A unique UUID string
  */
 export function generateUniqueId(): string {
-  if (
-    typeof window !== 'undefined' &&
-    window.crypto &&
-    window.crypto.randomUUID
-  ) {
+  if (typeof window !== 'undefined' && window.crypto?.randomUUID) {
     // Browser environment with Web Crypto API
     return window.crypto.randomUUID()
   } else if (
@@ -243,7 +236,7 @@ export function generateShortId(length = 8): string {
  * @param ms - Delay in milliseconds
  * @returns Promise that resolves after delay
  */
-export function delay(ms: number): Promise<void> {
+export async function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
@@ -259,13 +252,19 @@ export async function retry<T>(
   maxAttempts = 3,
   baseDelay = 1000,
 ): Promise<T> {
-  let lastError: Error
+  let lastError: Error = new Error('Unknown retry failure')
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn()
-    } catch (error) {
-      lastError = error as Error
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        lastError = error
+      } else {
+        lastError = new Error(
+          typeof error === 'string' ? error : 'Unknown retry failure',
+        )
+      }
 
       if (attempt === maxAttempts) {
         throw lastError
@@ -276,7 +275,7 @@ export async function retry<T>(
     }
   }
 
-  throw lastError!
+  throw lastError
 }
 
 /**
@@ -444,12 +443,12 @@ export function deepClone<T>(obj: T): T {
   }
 
   if (isObject(obj)) {
-    const clonedObj = {} as T
+    const clonedObj = {} as Record<string, unknown>
     const keys = Object.keys(obj)
     for (const key of keys) {
-      clonedObj[key as keyof T] = deepClone(obj[key as keyof T])
+      clonedObj[key] = deepClone((obj as Record<string, unknown>)[key])
     }
-    return clonedObj
+    return clonedObj as T
   }
 
   return obj
@@ -484,15 +483,11 @@ export function getNestedProperty<T>(
   const keys = path.split('.')
   let result: unknown = obj
 
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i]
-    if (
-      !isNonNullObject(result) ||
-      !(key in (result))
-    ) {
+  for (const key of keys) {
+    if (!isNonNullObject(result) || !(key in result)) {
       return defaultValue
     }
-    result = (result)[key]
+    result = result[key]
   }
 
   return result as T
@@ -545,13 +540,13 @@ export function omit<T extends Record<string, unknown>, K extends keyof T>(
  */
 export function escapeHtml(str: string): string {
   const entityMap: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  };
-  return str.replace(/[&<>"']/g, (s) => entityMap[s] || s);
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }
+  return str.replace(/[&<>"']/g, (s) => entityMap[s] || s)
 }
 
 /**
@@ -840,7 +835,7 @@ export async function safeExecute<T>(
   try {
     const data = await fn()
     return { success: true, data }
-  } catch (error) {
+  } catch (error: unknown) {
     return { success: false, error: error as Error }
   }
 }
@@ -922,7 +917,7 @@ export function getStorageItem<T>(key: string, defaultValue: T): T {
  * @param key - Storage key
  * @param value - Value to store
  */
-export function setStorageItem<T>(key: string, value: T): void {
+export function setStorageItem(key: string, value: unknown): void {
   if (typeof window === 'undefined') {
     return
   }
@@ -1067,7 +1062,7 @@ export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
     const key = args.length === 1 ? String(args[0]) : JSON.stringify(args)
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>
+      return cache.get(key)!
     }
 
     const result = fn(...args) as ReturnType<T>

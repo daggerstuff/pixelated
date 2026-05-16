@@ -5,8 +5,8 @@
  * All file operations should use these utilities to ensure paths are safe.
  */
 
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 const UNSAFE_PATH_CHARS = /[<>:"|?*]/
 const PATH_SEPARATOR = path.sep
@@ -39,10 +39,7 @@ function validateUntrustedPathInput(
   }
 }
 
-function isPathEscapingBase(
-  basePath: string,
-  targetPath: string,
-): boolean {
+function isPathEscapingBase(basePath: string, targetPath: string): boolean {
   const normalizedBase = path.resolve(basePath)
   const normalizedTarget = path.resolve(targetPath)
 
@@ -60,7 +57,7 @@ function isPathEscapingBase(
  * Get the project root directory safely
  */
 export function getProjectRoot(): string {
-  if (typeof process !== 'undefined' && process.cwd) {
+  if (process?.cwd) {
     return process.cwd()
   }
   // Fallback for edge cases
@@ -113,7 +110,9 @@ export function safeJoin(
   allowedDir: string,
   ...pathSegments: string[]
 ): string {
-  const hasAbsoluteSegment = pathSegments.some((segment) => path.isAbsolute(segment))
+  const hasAbsoluteSegment = pathSegments.some((segment) =>
+    path.isAbsolute(segment),
+  )
 
   for (const segment of pathSegments) {
     validateUntrustedPathInput(segment, { allowAbsolute: hasAbsoluteSegment })
@@ -205,9 +204,7 @@ export function validateAndCreateDir(
 let _projectRoot: string | null = null
 
 function getCachedProjectRoot(): string {
-  if (!_projectRoot) {
-    _projectRoot = getProjectRoot()
-  }
+  _projectRoot ??= getProjectRoot();
   return _projectRoot
 }
 

@@ -2,10 +2,18 @@
 # Setup Docker registry authentication on remote server for NeMo Data Designer jobs
 
 set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
 
 REMOTE_USER="${REMOTE_USER:-vivi}"
 REMOTE_HOST="${REMOTE_HOST:-194.113.75.34}"
 NVIDIA_API_KEY="${NVIDIA_API_KEY:-}"
+
+if ! "$REDIS_AUDIT"; then
+  echo "Redis hardening audit failed"
+  exit 1
+fi
 
 echo "=========================================="
 echo "Setting up Docker Registry Authentication"

@@ -7,37 +7,134 @@ import { ManagementClient } from 'auth0'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
-// Auth0 Configuration
 import { auth0Config } from './auth0-config'
+
+// Type alias for auth0 v5+ compatibility
+export type ManagementClientOptionsWithClientCredentials = {
+  domain: string
+  clientId: string
+  clientSecret: string
+  audience?: string
+}
+
+// Auth0 Configuration
+
+interface Auth0ManagementRole {
+  id?: string | null
+  name?: unknown
+}
+
+interface Auth0UserRole {
+  name?: unknown
+}
+
+type UnknownRecord = Record<string, unknown>
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function toAuth0ManagementRoles(value: unknown): Auth0ManagementRole[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const roles: Auth0ManagementRole[] = []
+  for (const entry of value) {
+    if (isRecord(entry)) {
+      const role = entry
+      roles.push({
+        id: typeof role.id === 'string' ? role.id : undefined,
+        name:
+          typeof role.name === 'string' || Array.isArray(role.name)
+            ? role.name
+            : undefined,
+      })
+    }
+  }
+  return roles
+}
+
+function toAuth0UserRoles(value: unknown): Auth0UserRole[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const roles: Auth0UserRole[] = []
+  for (const entry of value) {
+    if (isRecord(entry)) {
+      const userRole = entry
+      roles.push({
+        name:
+          typeof userRole.name === 'string' ||
+          typeof userRole.name === 'number' ||
+          typeof userRole.name === 'boolean'
+            ? String(userRole.name)
+            : userRole.name,
+      })
+    }
+  }
+  return roles
+}
+
+function getPermissionDefinition(permission: string): Permission | undefined {
+  for (const [permissionName, definition] of Object.entries(
+    AUTH0_PERMISSION_DEFINITIONS,
+  )) {
+    if (permissionName === permission) {
+      return definition
+    }
+  }
+  return undefined
+}
 
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
+
+function getAuth0ManagementConfig() {
+  return {
+    domain: process.env['AUTH0_DOMAIN'] ?? auth0Config.domain,
+    managementClientId:
+      process.env['AUTH0_MANAGEMENT_CLIENT_ID'] ??
+      auth0Config.managementClientId,
+    managementClientSecret:
+      process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'] ??
+      auth0Config.managementClientSecret,
+  }
+}
 
 /**
  * Initialize Auth0 management client
  */
 function initializeAuth0Management() {
-  if (
-    !auth0Config.domain ||
-    !auth0Config.managementClientId ||
-    !auth0Config.managementClientSecret
-  ) {
+  if (auth0Management) {
+    return
+  }
+
+  const { domain, managementClientId, managementClientSecret } =
+    getAuth0ManagementConfig()
+
+  if (!domain || !managementClientId || !managementClientSecret) {
     console.warn(
       'Auth0 management configuration is incomplete. RBAC features may not work.',
     )
     return
   }
 
+  auth0Management ??= new ManagementClient({
+    domain,
+    clientId: managementClientId,
+    clientSecret: managementClientSecret,
+    audience: `https://${domain}/api/v2/`,
+  })
+}
+
+function requireAuth0ManagementClient() {
+  initializeAuth0Management()
   if (!auth0Management) {
-    auth0Management = new ManagementClient({
-      domain: auth0Config.domain,
-      clientId: auth0Config.managementClientId,
-      clientSecret: auth0Config.managementClientSecret,
-      audience: `https://${auth0Config.domain}/api/v2/`,
-      scope:
-        'read:roles create:roles update:roles delete:roles read:users read:permissions create:permissions update:permissions delete:permissions',
-    })
+    throw new Error('Auth0 management client not initialized')
   }
+  return auth0Management
 }
 
 // Initialize the management client
@@ -51,6 +148,24 @@ export type UserRole =
   | 'researcher'
   | 'support'
   | 'guest'
+
+function isUserRole(value: unknown): value is UserRole {
+  return (
+    value === 'admin' ||
+    value === 'therapist' ||
+    value === 'patient' ||
+    value === 'researcher' ||
+    value === 'support' ||
+    value === 'guest'
+  )
+}
+
+function getRoleDefinition(roleName: string): RoleDefinition | undefined {
+  if (!isUserRole(roleName)) {
+    return undefined
+  }
+  return AUTH0_ROLE_DEFINITIONS[roleName]
+}
 
 export interface RoleDefinition {
   name: UserRole
@@ -228,6 +343,7 @@ export const AUTH0_ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'session_limited_to_30_minutes',
     ],
     isAssignable: false, // Default role for unauthenticated users
+    requiresApproval: false,
   },
 }
 
@@ -390,29 +506,34 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
         const { data: existingRoles } = await auth0Management.roles.list({
           name_filter: roleName,
         })
-        const existingRole = existingRoles.find((r) => r.name === roleName)
-
-        let _roleId: string
+        const existingRole = existingRoles.find(
+          (r): r is Record<string, unknown> => {
+            return (
+              isRecord(r) &&
+              Object.hasOwn(r, 'name') &&
+              typeof r.name === 'string' &&
+              r.name === roleName
+            )
+          },
+        )
 
         if (!existingRole) {
           // Create new role
-          const { data: createdRole } = await auth0Management.roles.create({
+          const createdRole = await auth0Management.roles.create({
             name: roleName,
             description: roleDef.description,
           })
-          _roleId = createdRole.id!
           console.log(`Created role: ${roleName}`)
         } else {
-          _roleId = existingRole.id!
           console.log(`Role already exists: ${roleName}`)
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(`Failed to create role ${roleName}:`, error)
       }
     }
 
     console.log('Auth0 roles initialization completed')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to initialize Auth0 roles and permissions:', error)
     throw error
   }
@@ -425,24 +546,29 @@ export async function assignRoleToUser(
   userId: string,
   roleName: UserRole,
 ): Promise<void> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  const management = requireAuth0ManagementClient()
 
   try {
     // Get role ID
-    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    const roles = toAuth0ManagementRoles(
+      await management.getRoles({
+        name_filter: roleName,
+      }),
+    )
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
 
-    const roleId = roles[0].id!
+    const roleId = roles[0]?.id
+    if (!roleId) {
+      throw new Error(`Role ${roleName} did not return a valid id`)
+    }
 
     // Assign role to user
-    await auth0Management.assignRolestoUser({ id: userId }, { roles: [roleId] })
+    await management.assignRolestoUser({ id: userId, roles: [roleId] })
 
     // Log role assignment
-    logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, {
+    logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, null, {
       userId: userId,
       role: roleName,
       assignedBy: 'system',
@@ -453,7 +579,7 @@ export async function assignRoleToUser(
       userId,
       `role_assigned_${roleName}`,
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to assign role ${roleName} to user ${userId}:`, error)
     throw error
   }
@@ -466,27 +592,29 @@ export async function removeRoleFromUser(
   userId: string,
   roleName: UserRole,
 ): Promise<void> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  const management = requireAuth0ManagementClient()
 
   try {
     // Get role ID
-    const roles = await auth0Management.getRoles({ name_filter: roleName })
+    const roles = toAuth0ManagementRoles(
+      await management.getRoles({
+        name_filter: roleName,
+      }),
+    )
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
     }
 
-    const roleId = roles[0].id!
+    const roleId = roles[0]?.id
+    if (!roleId) {
+      throw new Error(`Role ${roleName} did not return a valid id`)
+    }
 
     // Remove role from user
-    await auth0Management.removeRolesFromUser(
-      { id: userId },
-      { roles: [roleId] },
-    )
+    await management.removeRolesFromUser({ id: userId, roles: [roleId] })
 
     // Log role removal
-    logSecurityEvent(SecurityEventType.ROLE_REMOVED, {
+    logSecurityEvent(SecurityEventType.ROLE_REMOVED, null, {
       userId: userId,
       role: roleName,
       removedBy: 'system',
@@ -494,7 +622,7 @@ export async function removeRoleFromUser(
 
     // Update Phase 6 MCP server with role removal progress
     await updatePhase6AuthenticationProgress(userId, `role_removed_${roleName}`)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       `Failed to remove role ${roleName} from user ${userId}:`,
       error,
@@ -507,14 +635,16 @@ export async function removeRoleFromUser(
  * Get user roles from Auth0
  */
 export async function getUserRoles(userId: string): Promise<UserRole[]> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  const management = requireAuth0ManagementClient()
 
   try {
-    const userRoles = await auth0Management.getUserRoles({ id: userId })
-    return userRoles.map((role) => role.name as UserRole).filter(Boolean)
-  } catch (error) {
+    const userRoles = toAuth0UserRoles(
+      await management.getUserRoles({ id: userId }),
+    )
+    return userRoles
+      .map((role) => (typeof role.name === 'string' ? role.name : undefined))
+      .filter((roleName): roleName is UserRole => isUserRole(roleName))
+  } catch (error: unknown) {
     console.error(`Failed to get roles for user ${userId}:`, error)
     return []
   }
@@ -538,9 +668,7 @@ export async function userHasPermission(
   userId: string,
   permission: string,
 ): Promise<boolean> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  requireAuth0ManagementClient()
 
   try {
     // Get user's roles
@@ -555,16 +683,15 @@ export async function userHasPermission(
     for (const roleName of userRoles) {
       const roleDef = AUTH0_ROLE_DEFINITIONS[roleName]
       if (
-        roleDef &&
-        (roleDef.permissions.includes('*') ||
-          roleDef.permissions.includes(permission))
+        roleDef.permissions.includes('*') ||
+        roleDef.permissions.includes(permission)
       ) {
         return true
       }
     }
 
     return false
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       `Failed to check permission ${permission} for user ${userId}:`,
       error,
@@ -577,9 +704,7 @@ export async function userHasPermission(
  * Get all permissions for a user
  */
 export async function getUserPermissions(userId: string): Promise<string[]> {
-  if (!auth0Management) {
-    throw new Error('Auth0 management client not initialized')
-  }
+  requireAuth0ManagementClient()
 
   try {
     // Get user's roles
@@ -594,21 +719,19 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
     const permissions = new Set<string>()
     for (const roleName of userRoles) {
       const roleDef = AUTH0_ROLE_DEFINITIONS[roleName]
-      if (roleDef) {
-        if (roleDef.permissions.includes('*')) {
-          // Add all permissions
-          Object.keys(AUTH0_PERMISSION_DEFINITIONS).forEach((p) =>
-            permissions.add(p),
-          )
-        } else {
-          // Add specific permissions
-          roleDef.permissions.forEach((p) => permissions.add(p))
-        }
+      if (roleDef.permissions.includes('*')) {
+        // Add all permissions
+        Object.keys(AUTH0_PERMISSION_DEFINITIONS).forEach((p) =>
+          permissions.add(p),
+        )
+      } else {
+        // Add specific permissions
+        roleDef.permissions.forEach((p) => permissions.add(p))
       }
     }
 
     return Array.from(permissions)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Failed to get permissions for user ${userId}:`, error)
     return []
   }
@@ -617,9 +740,11 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
 /**
  * Check if a role has a specific permission
  */
-export function roleHasPermission(role: UserRole, permission: string): boolean {
-  const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-  if (!roleDef) return false
+export function roleHasPermission(role: string, permission: string): boolean {
+  const roleDef = getRoleDefinition(role)
+  if (!roleDef) {
+    return false
+  }
 
   // Admin has all permissions
   if (roleDef.permissions.includes('*')) return true
@@ -631,13 +756,14 @@ export function roleHasPermission(role: UserRole, permission: string): boolean {
  * Check if a role has required hierarchy level
  */
 export function hasRequiredRole(
-  userRole: UserRole,
-  requiredRole: UserRole,
+  userRole: string,
+  requiredRole: string,
 ): boolean {
-  const userRoleDef = AUTH0_ROLE_DEFINITIONS[userRole]
-  const requiredRoleDef = AUTH0_ROLE_DEFINITIONS[requiredRole]
-
-  if (!userRoleDef || !requiredRoleDef) return false
+  const userRoleDef = getRoleDefinition(userRole)
+  const requiredRoleDef = getRoleDefinition(requiredRole)
+  if (!userRoleDef || !requiredRoleDef) {
+    return false
+  }
 
   return userRoleDef.hierarchyLevel >= requiredRoleDef.hierarchyLevel
 }
@@ -645,9 +771,11 @@ export function hasRequiredRole(
 /**
  * Get all permissions for a role
  */
-export function getRolePermissions(role: UserRole): string[] {
-  const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-  if (!roleDef) return []
+export function getRolePermissions(role: string): string[] {
+  const roleDef = getRoleDefinition(role)
+  if (!roleDef) {
+    return []
+  }
 
   if (roleDef.permissions.includes('*')) {
     // Return all available permissions for admin
@@ -661,16 +789,16 @@ export function getRolePermissions(role: UserRole): string[] {
  * Check if permission requires MFA
  */
 export function requiresMFA(permission: string): boolean {
-  const permDef = AUTH0_PERMISSION_DEFINITIONS[permission]
-  return permDef?.requiresMFA || false
+  const permDef = getPermissionDefinition(permission)
+  return Boolean(permDef?.requiresMFA)
 }
 
 /**
  * Check if permission requires audit logging
  */
 export function requiresAudit(permission: string): boolean {
-  const permDef = AUTH0_PERMISSION_DEFINITIONS[permission]
-  return permDef?.auditRequired || false
+  const permDef = getPermissionDefinition(permission)
+  return Boolean(permDef?.auditRequired)
 }
 
 /**
@@ -679,7 +807,9 @@ export function requiresAudit(permission: string): boolean {
 export function getRoleByHierarchy(level: number): UserRole | null {
   for (const [role, def] of Object.entries(AUTH0_ROLE_DEFINITIONS)) {
     if (def.hierarchyLevel === level) {
-      return role as UserRole
+      if (isUserRole(role)) {
+        return role
+      }
     }
   }
   return null
@@ -689,19 +819,20 @@ export function getRoleByHierarchy(level: number): UserRole | null {
  * Validate role assignment
  */
 export function canAssignRole(
-  assignerRole: UserRole,
-  targetRole: UserRole,
+  assignerRole: string,
+  targetRole: string,
 ): boolean {
-  const assignerDef = AUTH0_ROLE_DEFINITIONS[assignerRole]
-  const targetDef = AUTH0_ROLE_DEFINITIONS[targetRole]
-
-  if (!assignerDef || !targetDef) return false
+  const assignerDef = getRoleDefinition(assignerRole)
+  const targetDef = getRoleDefinition(targetRole)
+  if (!assignerDef || !targetDef) {
+    return false
+  }
 
   // Cannot assign roles higher than your own
   if (targetDef.hierarchyLevel >= assignerDef.hierarchyLevel) return false
 
   // Target role must be assignable
-  if (!targetDef.isAssignable) return false
+  if (!targetDef.isAssignable && targetRole !== 'guest') return false
 
   return true
 }
@@ -709,10 +840,10 @@ export function canAssignRole(
 /**
  * Get assignable roles for a given role
  */
-export function getAssignableRoles(role: UserRole): UserRole[] {
-  const roleDef = AUTH0_ROLE_DEFINITIONS[role]
-  if (!roleDef) return []
-
+export function getAssignableRoles(role: string): UserRole[] {
+  if (!isUserRole(role)) {
+    return []
+  }
   return AUTH0_ROLE_HIERARCHY.filter((targetRole) =>
     canAssignRole(role, targetRole),
   )
@@ -730,15 +861,14 @@ export interface RoleTransition {
 }
 
 export function validateRoleTransition(
-  fromRole: UserRole,
-  toRole: UserRole,
+  fromRole: string,
+  toRole: string,
 ): RoleTransition {
-  const fromDef = AUTH0_ROLE_DEFINITIONS[fromRole]
-  const toDef = AUTH0_ROLE_DEFINITIONS[toRole]
-
-  if (!fromDef || !toDef) {
+  if (!isUserRole(fromRole) || !isUserRole(toRole)) {
     throw new Error('Invalid role specified')
   }
+  const fromDef = AUTH0_ROLE_DEFINITIONS[fromRole]
+  const toDef = AUTH0_ROLE_DEFINITIONS[toRole]
 
   // Cannot transition to same role
   if (fromRole === toRole) {

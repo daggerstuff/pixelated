@@ -2,172 +2,183 @@
  * @vitest-environment node
  */
 
-import type { NextFunction, Request, Response } from "express";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { NextFunction } from 'express'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
 
 // Mock Auth0 module
-vi.mock("../../../lib/auth/auth0-middleware", () => ({
-  authenticateRequest: vi.fn(),
-}));
+vi.mock('../../../lib/auth/auth0-middleware', () => ({
+  authenticateRequest: mockAuthenticateRequest,
+}))
 
-import { authenticateRequest } from "../../../lib/auth/auth0-middleware";
-import { authMiddleware, requirePermissions, requireRoles } from "../auth";
+import { authMiddleware, requirePermissions, requireRoles } from '../auth'
+import {
+  createMockAuthRequest,
+  createMockAuthResponse,
+  createMockAuthUser,
+  type MockAuthRequest,
+  type MockAuthResponse,
+} from './auth-test-helpers'
 
-describe("Authentication Middleware", () => {
-  let mockRequest: Partial<Request>;
-  let mockResponse: Partial<Response>;
-  let mockNext: NextFunction;
+describe('Authentication Middleware', () => {
+  let mockRequest: MockAuthRequest
+  let mockResponse: MockAuthResponse
+  let mockNext: NextFunction
+  let statusSpy: ReturnType<typeof vi.fn>
+  let jsonSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.clearAllMocks()
 
-    mockRequest = {
-      protocol: "http",
-      get: vi.fn((header: string) => {
-        const headers: Record<string, string> = {
-          host: "localhost:3000",
-          authorization: "Bearer test-token",
-        };
-        return headers[header] || undefined;
-      }),
-      originalUrl: "/api/users",
-      method: "GET",
-      headers: {
-        authorization: "Bearer test-token",
-      },
-    };
+    const responseMock = createMockAuthResponse()
+    mockRequest = createMockAuthRequest()
+    mockResponse = responseMock.response
+    statusSpy = responseMock.statusSpy
+    jsonSpy = responseMock.jsonSpy
 
-    mockResponse = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn(),
-    };
+    mockNext = vi.fn()
+  })
 
-    mockNext = vi.fn();
-  });
-
-  describe("authMiddleware", () => {
-    it("should call next when authentication succeeds", async () => {
-      (authenticateRequest as any).mockResolvedValue({
+  describe('authMiddleware', () => {
+    it('should call next when authentication succeeds', async () => {
+      mockAuthenticateRequest.mockResolvedValue({
         success: true,
         request: {
           user: {
-            sub: "user123",
-            email: "test@example.com",
-            roles: ["user"],
+            sub: 'user123',
+            email: 'test@example.com',
+            roles: ['user'],
           },
         },
-      });
+      })
 
-      await authMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled();
-      expect((mockRequest as any).user).toEqual({
-        sub: "user123",
-        email: "test@example.com",
-        roles: ["user"],
+      expect(mockNext).toHaveBeenCalled()
+      expect(mockRequest.user).toEqual({
+        sub: 'user123',
+        email: 'test@example.com',
+        roles: ['user'],
         emailVerified: false,
-      });
-    });
+      })
+    })
 
-    it("should return 401 when authentication fails", async () => {
-      (authenticateRequest as any).mockResolvedValue({
+    it('should return 401 when authentication fails', async () => {
+      mockAuthenticateRequest.mockResolvedValue({
         success: false,
-        error: "Invalid token",
-      });
+        error: 'Invalid token',
+      })
 
-      await authMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse?.status).toHaveBeenCalledWith(401);
-      expect(mockResponse?.json).toHaveBeenCalledWith({
-        error: "Invalid token",
-        code: "UNAUTHORIZED",
-      });
-    });
+      expect(statusSpy).toHaveBeenCalledWith(401)
+      expect(jsonSpy).toHaveBeenCalledWith({
+        error: 'Invalid token',
+        code: 'UNAUTHORIZED',
+      })
+    })
 
-    it("should handle authentication error gracefully", async () => {
-      (authenticateRequest as any).mockRejectedValue(new Error("Auth service error"));
+    it('should handle authentication error gracefully', async () => {
+      mockAuthenticateRequest.mockRejectedValue(new Error('Auth service error'))
 
-      await authMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
+      await authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse?.status).toHaveBeenCalledWith(401);
-      expect(mockResponse?.json).toHaveBeenCalledWith({
-        error: "Auth service error",
-        code: "AUTH_ERROR",
-      });
-    });
-  });
+      expect(statusSpy).toHaveBeenCalledWith(401)
+      expect(jsonSpy).toHaveBeenCalledWith({
+        error: 'Auth service error',
+        code: 'AUTH_ERROR',
+      })
+    })
+  })
 
-  describe("requireRoles", () => {
-    it("should call next when user has required role", () => {
-      const middleware = requireRoles(["admin", "moderator"]);
-      (mockRequest as any).user = { roles: ["admin", "user"] };
+  describe('requireRoles', () => {
+    it('should call next when user has required role', () => {
+      const middleware = requireRoles(['admin', 'moderator'])
+      mockRequest.user = createMockAuthUser({
+        roles: ['admin', 'user'],
+        email: 'admin@example.com',
+        emailVerified: true,
+      })
 
-      middleware(mockRequest as Request, mockResponse as Response, mockNext);
+      middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled();
-    });
+      expect(mockNext).toHaveBeenCalled()
+    })
 
-    it("should return 401 when user has no roles", () => {
-      const middleware = requireRoles(["admin"]);
-      (mockRequest as any).user = undefined;
+    it('should return 401 when user has no roles', () => {
+      const middleware = requireRoles(['admin'])
+      mockRequest.user = undefined
 
-      middleware(mockRequest as Request, mockResponse as Response, mockNext);
+      middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse?.status).toHaveBeenCalledWith(401);
-      expect(mockResponse?.json).toHaveBeenCalledWith({
-        error: "Authentication required",
-        code: "UNAUTHORIZED",
-      });
-    });
+      expect(statusSpy).toHaveBeenCalledWith(401)
+      expect(jsonSpy).toHaveBeenCalledWith({
+        error: 'Authentication required',
+        code: 'UNAUTHORIZED',
+      })
+    })
 
-    it("should return 403 when user lacks required role", () => {
-      const middleware = requireRoles(["admin"]);
-      (mockRequest as any).user = { roles: ["user", "editor"] };
+    it('should return 403 when user lacks required role', () => {
+      const middleware = requireRoles(['admin'])
+      mockRequest.user = createMockAuthUser({
+        roles: ['user', 'editor'],
+        email: 'user@example.com',
+        emailVerified: true,
+      })
 
-      middleware(mockRequest as Request, mockResponse as Response, mockNext);
+      middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse?.status).toHaveBeenCalledWith(403);
-      expect(mockResponse?.json).toHaveBeenCalledWith({
-        error: "Insufficient permissions",
-        code: "FORBIDDEN",
-        required: ["admin"],
-      });
-    });
-  });
+      expect(statusSpy).toHaveBeenCalledWith(403)
+      expect(jsonSpy).toHaveBeenCalledWith({
+        error: 'Insufficient permissions',
+        code: 'FORBIDDEN',
+        required: ['admin'],
+      })
+    })
+  })
 
-  describe("requirePermissions", () => {
-    it("should call next when user has required permission", () => {
-      const middleware = requirePermissions(["documents:read"]);
-      (mockRequest as any).user = {
-        permissions: ["documents:read", "documents:write"],
-      };
+  describe('requirePermissions', () => {
+    it('should call next when user has required permission', () => {
+      const middleware = requirePermissions(['documents:read'])
+      mockRequest.user = createMockAuthUser({
+        roles: ['user'],
+        permissions: ['documents:read', 'documents:write'],
+        email: 'user@example.com',
+        emailVerified: true,
+      })
 
-      middleware(mockRequest as Request, mockResponse as Response, mockNext);
+      middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled();
-    });
+      expect(mockNext).toHaveBeenCalled()
+    })
 
-    it("should return 401 when user has no permissions", () => {
-      const middleware = requirePermissions(["documents:read"]);
-      (mockRequest as any).user = undefined;
+    it('should return 401 when user has no permissions', () => {
+      const middleware = requirePermissions(['documents:read'])
+      mockRequest.user = undefined
 
-      middleware(mockRequest as Request, mockResponse as Response, mockNext);
+      middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse?.status).toHaveBeenCalledWith(401);
-    });
+      expect(statusSpy).toHaveBeenCalledWith(401)
+    })
 
-    it("should return 403 when user lacks permission", () => {
-      const middleware = requirePermissions(["admin:delete"]);
-      (mockRequest as any).user = { permissions: ["documents:read"] };
+    it('should return 403 when user lacks permission', () => {
+      const middleware = requirePermissions(['admin:delete'])
+      mockRequest.user = createMockAuthUser({
+        roles: ['user'],
+        permissions: ['documents:read'],
+        email: 'user@example.com',
+        emailVerified: true,
+      })
 
-      middleware(mockRequest as Request, mockResponse as Response, mockNext);
+      middleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse?.status).toHaveBeenCalledWith(403);
-      expect(mockResponse?.json).toHaveBeenCalledWith({
-        error: "Insufficient permissions",
-        code: "FORBIDDEN",
-        required: ["admin:delete"],
-      });
-    });
-  });
-});
+      expect(statusSpy).toHaveBeenCalledWith(403)
+      expect(jsonSpy).toHaveBeenCalledWith({
+        error: 'Insufficient permissions',
+        code: 'FORBIDDEN',
+        required: ['admin:delete'],
+      })
+    })
+  })
+})

@@ -120,17 +120,17 @@ export interface PerformanceMetrics {
 }
 
 export class ModelServingServer extends EventEmitter {
-  private models: Map<string, tf.LayersModel>
-  private modelConfigs: Map<string, ModelConfig>
+  private readonly models: Map<string, tf.LayersModel>
+  private readonly modelConfigs: Map<string, ModelConfig>
   private redis: Redis
   private mongoClient: MongoClient
   private featureStore: FeatureStore
   private modelRegistry: ModelRegistry
   private monitoring: ModelMonitoring
-  private performanceCache: Map<string, PerformanceMetrics>
+  private readonly performanceCache: Map<string, PerformanceMetrics>
 
   constructor(
-    private config: {
+    private readonly config: {
       redisUrl: string
       mongoUrl: string
       modelRegistryUrl: string
@@ -177,7 +177,7 @@ export class ModelServingServer extends EventEmitter {
 
       // Warm up the model
       const warmupInput = tf.zeros([1, ...modelConfig.inputShape])
-       model.predict(warmupInput)
+      model.predict(warmupInput)
       warmupInput.dispose()
 
       // Store model and configuration
@@ -188,7 +188,7 @@ export class ModelServingServer extends EventEmitter {
       await this.modelRegistry.registerModel(modelConfig)
 
       this.emit('model_loaded', { modelId: modelConfig.modelId })
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('model_load_error', { modelId: modelConfig.modelId, error })
       throw error
     }
@@ -213,9 +213,9 @@ export class ModelServingServer extends EventEmitter {
       )
 
       // Run prediction inside tf.tidy so tensors are disposed automatically
-      const output =  tf.tidy(async () => {
+      const output = tf.tidy(async () => {
         const inputTensor = tf.tensor(processedInput, [1, ...config.inputShape])
-        const outputTensor = ( model.predict(inputTensor)) as tf.Tensor
+        const outputTensor = model.predict(inputTensor) as tf.Tensor
         const arr = await outputTensor.array()
         return arr as unknown
       })
@@ -248,7 +248,7 @@ export class ModelServingServer extends EventEmitter {
 
       this.emit('prediction_made', prediction)
       return prediction
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('prediction_error', { predictionId, modelId, error })
       throw error
     }
@@ -264,7 +264,7 @@ export class ModelServingServer extends EventEmitter {
     try {
       // Get individual predictions
       const individualPredictions = await Promise.all(
-        modelIds.map((modelId) => this.predict(modelId, input)),
+        modelIds.map( async (modelId) => this.predict(modelId, input)),
       )
 
       // Aggregate predictions
@@ -287,7 +287,7 @@ export class ModelServingServer extends EventEmitter {
 
       this.emit('ensemble_prediction_made', ensemblePrediction)
       return ensemblePrediction
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('ensemble_prediction_error', { predictionId, modelIds, error })
       throw error
     }
@@ -370,13 +370,14 @@ export class ModelServingServer extends EventEmitter {
     data: unknown,
     config: PreprocessingConfig['normalization'],
   ): unknown {
-    switch (config.method) {
+    switch (config?.method) {
       case 'min-max':
-        return this.minMaxNormalize(data, config.parameters)
+        return this.minMaxNormalize(data, config?.parameters)
       case 'z-score':
-        return this.zScoreNormalize(data, config.parameters)
+        return this.zScoreNormalize(data, config?.parameters)
       case 'robust':
-        return this.robustNormalize(data, config.parameters)
+        return this.robustNormalize(data, config?.parameters)
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return data
     }
@@ -394,7 +395,7 @@ export class ModelServingServer extends EventEmitter {
         case 'polynomial':
           engineered = this.createPolynomialFeatures(
             engineered,
-            config.parameters.degree,
+            config?.parameters.degree,
           )
           break
         case 'interaction':
@@ -403,7 +404,7 @@ export class ModelServingServer extends EventEmitter {
         case 'binning':
           engineered = this.createBinnedFeatures(
             engineered,
-            config.parameters.bins,
+            config?.parameters.bins,
           )
           break
         default:
@@ -421,7 +422,7 @@ export class ModelServingServer extends EventEmitter {
     }
 
     const weights = predictions.map((p) => p.confidence || 0)
-    const totalWeight = weights.reduce((sum, w) => sum + w, 0)
+    const totalWeight = weights.reduce((sum: number, w: number) => sum + w, 0)
 
     // If total weight is zero, fall back to simple averaging to avoid division by zero
     if (totalWeight === 0) {
@@ -444,7 +445,7 @@ export class ModelServingServer extends EventEmitter {
       }
 
       // Scalar outputs: simple mean
-      return outputs.reduce((a, b) => a + b, 0) / outputs.length
+      return outputs.reduce((a: number, b: number) => a + b, 0) / outputs.length
     }
 
     const firstOutput = predictions[0].output
@@ -452,9 +453,9 @@ export class ModelServingServer extends EventEmitter {
       // Weighted average for vector outputs (classification probabilities)
       const { length } = firstOutput as number[]
       const weightedSum = predictions.reduce(
-        (sum, pred, index) => {
+        (sum: number[], pred: ModelPrediction, index: number) => {
           const w = weights[index]
-          ;(pred.output as number[]).forEach((val, i) => {
+          ;(pred.output as number[]).forEach((val: number, i: number) => {
             sum[i] = (sum[i] || 0) + val * w
           })
           return sum
@@ -465,9 +466,12 @@ export class ModelServingServer extends EventEmitter {
       return weightedSum.map((v) => v / totalWeight)
     } else {
       // Weighted average for scalar outputs (regression)
-      const weightedSum = predictions.reduce((sum, pred, index) => {
-        return sum + (pred.output as number) * weights[index]
-      }, 0)
+      const weightedSum = predictions.reduce(
+        (sum: number, pred: ModelPrediction, index: number) => {
+          return sum + (pred.output as number) * weights[index]
+        },
+        0,
+      )
 
       return weightedSum / totalWeight
     }
@@ -476,11 +480,14 @@ export class ModelServingServer extends EventEmitter {
   private calculateUncertainty(predictions: ModelPrediction[]): number {
     const outputs = predictions.map((p) => p.output)
     const mean =
-      outputs.reduce((sum, val) => sum + val, 0).slice(________) /
-      outputs.length
+      outputs
+        .reduce((sum: number, val: number) => sum + val, 0)
+        .slice(________) / outputs.length
     const variance =
-      outputs.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-      outputs.length
+      outputs.reduce(
+        (sum: number, val: number) => sum + Math.pow(val - mean, 2),
+        0,
+      ) / outputs.length
     return Math.sqrt(variance)
   }
 
@@ -489,7 +496,7 @@ export class ModelServingServer extends EventEmitter {
     if (Array.isArray(output)) {
       const arr = output as number[]
       const maxValue = Math.max(...arr)
-      const sum = arr.reduce((acc, val) => acc + val, 0)
+      const sum = arr.reduce((acc: number, val: number) => acc + val, 0)
       return maxValue / sum
     }
     const val = typeof output === 'number' ? output : 0
@@ -503,7 +510,7 @@ export class ModelServingServer extends EventEmitter {
 
   private updatePerformanceCache(modelId: string, latency: number): void {
     const cacheKey = `perf_${modelId}`
-    const existing = this.performanceCache.get(cacheKey) || {
+    const existing = this.performanceCache.get(cacheKey) ?? {
       modelId,
       avgLatency: 0,
       throughput: 0,
@@ -547,7 +554,7 @@ export class ModelServingServer extends EventEmitter {
         return {
           modelId,
           status: metrics ? 'healthy' : 'unknown',
-          metrics: metrics || null,
+          metrics: metrics ?? null,
           drift,
         }
       }),
@@ -578,7 +585,7 @@ export class ModelServingServer extends EventEmitter {
 
 // Helper classes for dependencies
 class RedisFeatureStore implements FeatureStore {
-  constructor(private redis: Redis) {}
+  constructor(private readonly redis: Redis) {}
 
   async getFeatures(featureSetId: string): Promise<FeatureSet> {
     const data = await this.redis.get(`features:${featureSetId}`)
@@ -612,7 +619,7 @@ class RedisFeatureStore implements FeatureStore {
 }
 
 class MongoModelRegistry implements ModelRegistry {
-  constructor(private mongoClient: MongoClient) {}
+  constructor(private readonly mongoClient: MongoClient) {}
 
   async registerModel(config: ModelConfig): Promise<void> {
     const db = this.mongoClient.db('threat_detection')
@@ -667,8 +674,8 @@ class MongoModelRegistry implements ModelRegistry {
 
 class ComprehensiveModelMonitoring implements ModelMonitoring {
   constructor(
-    private redis: Redis,
-    private mongoClient: MongoClient,
+    private readonly redis: Redis,
+    private readonly mongoClient: MongoClient,
   ) {}
 
   async trackPrediction(prediction: ModelPrediction): Promise<void> {

@@ -31,9 +31,9 @@ interface BackupVerificationResult {
 }
 
 export class BackupVerificationService extends EventEmitter {
-  private redis: RedisService
-  private config: BackupConfig
-  private backupDir: string
+  private readonly redis: RedisService
+  private readonly config: BackupConfig
+  private readonly backupDir: string
 
   constructor(redis: RedisService, config: Partial<BackupConfig> = {}) {
     super()
@@ -83,7 +83,7 @@ export class BackupVerificationService extends EventEmitter {
           results.push({
             file,
             isValid: false,
-            error: error?.['message'] || 'Unknown error',
+            error: error?.['message'] ?? 'Unknown error',
           })
         }
       }
@@ -93,8 +93,10 @@ export class BackupVerificationService extends EventEmitter {
       return results
     } catch (error: unknown) {
       throw new Error(
-        `Failed to verify backups: ${error?.['message'] || 'Unknown error'}`,
-        { cause: error },
+        `Failed to verify backups: ${error?.['message'] ?? 'Unknown error'}`,
+        {
+          cause: error,
+        },
       )
     }
   }
@@ -112,7 +114,7 @@ export class BackupVerificationService extends EventEmitter {
       const checksum = this.calculateChecksum(data)
 
       // Parse backup data
-      const backup = JSON.parse(data.toString() as unknown)
+      const backup = JSON.parse(data.toString()) as Record<string, unknown>
 
       // Verify structure
       if (!this.isValidBackupStructure(backup)) {
@@ -170,20 +172,26 @@ export class BackupVerificationService extends EventEmitter {
 
   private isValidBackupStructure(backup: unknown): boolean {
     return (
+      backup !== null &&
       typeof backup === 'object' &&
-      typeof backup.timestamp === 'number' &&
-      typeof backup.version === 'string' &&
-      typeof backup.environment === 'string' &&
-      typeof backup.data === 'object'
+      typeof (backup as Record<string, unknown>).timestamp === 'number' &&
+      typeof (backup as Record<string, unknown>).version === 'string' &&
+      typeof (backup as Record<string, unknown>).environment === 'string' &&
+      typeof (backup as Record<string, unknown>).data === 'object'
     )
   }
 
   private verifyDataIntegrity(data: unknown): boolean {
     try {
+      const typedData = data as {
+        redis?: unknown
+        files?: unknown
+        config?: unknown
+      }
       // Check for required data sections
-      const requiredSections = ['redis', 'files', 'config']
+      const requiredSections = ['redis', 'files', 'config'] as const
       const hasAllSections = requiredSections.every(
-        (section) => typeof data[section] === 'object',
+        (section) => typeof typedData[section] === 'object',
       )
 
       if (!hasAllSections) {
@@ -191,17 +199,17 @@ export class BackupVerificationService extends EventEmitter {
       }
 
       // Verify Redis data
-      if (!this.verifyRedisData(data.redis)) {
+      if (!this.verifyRedisData(typedData.redis)) {
         return false
       }
 
       // Verify file data
-      if (!this.verifyFileData(data.files)) {
+      if (!this.verifyFileData(typedData.files)) {
         return false
       }
 
       // Verify config data
-      if (!this.verifyConfigData(data.config)) {
+      if (!this.verifyConfigData(typedData.config)) {
         return false
       }
 
@@ -236,9 +244,10 @@ export class BackupVerificationService extends EventEmitter {
 
   private verifyConfigData(data: unknown): boolean {
     return (
+      data !== null &&
       typeof data === 'object' &&
-      typeof data.version === 'string' &&
-      typeof data.environment === 'string'
+      typeof (data as Record<string, unknown>).version === 'string' &&
+      typeof (data as Record<string, unknown>).environment === 'string'
     )
   }
 
@@ -246,16 +255,19 @@ export class BackupVerificationService extends EventEmitter {
     try {
       // Read backup file
       const backupData = await fs.readFile(backupPath)
-      const backup = JSON.parse(backupData.toString() as unknown)
+      const backup = JSON.parse(backupData.toString()) as Record<
+        string,
+        unknown
+      >
 
       // Verify backup structure
-      if (!backup.data || !backup.metadata) {
+      if (!(backup).data || !backup.metadata) {
         throw new Error('Invalid backup structure')
       }
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-         this.verifyDataIntegrity(backup.data)
+        this.verifyDataIntegrity((backup).data)
       }
 
       // Verify restoration capability
@@ -280,7 +292,9 @@ export class BackupVerificationService extends EventEmitter {
       await testRedis.connect()
 
       // Test restore a small subset of data
-      const testData = this.extractTestData(backup.data)
+      const testData = this.extractTestData(
+        (backup as Record<string, unknown>).data,
+      )
       await this.restoreTestData(testRedis, testData)
 
       // Verify restored data
@@ -340,7 +354,7 @@ export class BackupVerificationService extends EventEmitter {
       if (user && typeof user === 'object' && 'id' in user) {
         const userId = (user as { id: string }).id
         const restored = await redis.get(`user:${userId}`)
-        if (!restored || (JSON.parse(restored) as unknown.id) !== userId) {
+        if (!restored || (JSON.parse(restored) as { id: unknown }) !== userId) {
           throw new Error(`Restoration verification failed for user: ${userId}`)
         }
       }
@@ -354,7 +368,7 @@ export class BackupVerificationService extends EventEmitter {
     try {
       const metadataPath = path.join(this.backupDir, `${backupFile}.meta`)
       const data = await fs.readFile(metadataPath, 'utf-8')
-      return JSON.parse(data) as unknown
+      return JSON.parse(data) as Record<string, unknown>
     } catch {
       return null
     }

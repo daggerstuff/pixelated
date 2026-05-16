@@ -274,7 +274,7 @@ router.post(
       `INSERT INTO comments (document_id, author_id, content, parent_comment_id, created_at)
        VALUES ($1, $2, $3, $4, NOW())
        RETURNING id, content, author_id, created_at`,
-      [documentId, req.user!.id, content, parentCommentId || null],
+      [documentId, req.user!.id, content, parentCommentId ?? null],
     )
 
     res.status(201).json({
@@ -358,7 +358,11 @@ router.get(
         'Content-Disposition',
         `attachment; filename="${document.slug}.md"`,
       )
-      res.send(document.content.markdown)
+      const markdownContent = document.content?.markdown
+      if (!markdownContent) {
+        throw new NotFoundError('Document content', documentId)
+      }
+      res.send(markdownContent)
     } else {
       res.setHeader('Content-Type', 'application/json')
       res.setHeader(

@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('BiasExportAPI')
 
@@ -12,8 +12,8 @@ export const GET = async ({
   try {
     // Parse URL parameters
     const url = new URL(request.url)
-    const format = url.searchParams.get('format') || 'json'
-    const timeRange = url.searchParams.get('timeRange') || '24h'
+    const format = url.searchParams.get('format') ?? 'json'
+    const timeRange = url.searchParams.get('timeRange') ?? '24h'
     const includeDetails = url.searchParams.get('includeDetails') === 'true'
 
     // Log export request
@@ -114,7 +114,12 @@ export const GET = async ({
       JSON.stringify({
         success: false,
         error: 'Export Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         processingTime,
       }),
       {
@@ -129,7 +134,7 @@ export const GET = async ({
 
 function convertToCSV(data: Record<string, unknown>): string {
   const sessions =
-    (data.sessions as Array<Record<string, unknown>> | undefined) || []
+    (data.sessions as Array<Record<string, unknown>> | undefined) ?? []
   const headers = [
     'sessionId',
     'timestamp',

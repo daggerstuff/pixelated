@@ -47,8 +47,8 @@ export const GET = async ({ request, url }) => {
     }
 
     // Parse query parameters
-    const limit = Number.parseInt(url.searchParams.get('limit') || '20', 10)
-    const offset = Number.parseInt(url.searchParams.get('offset') || '0', 10)
+    const limit = Number.parseInt(url.searchParams.get('limit') ?? '20', 10)
+    const offset = Number.parseInt(url.searchParams.get('offset') ?? '0', 10)
 
     // Log the request
     await createAuditLog(

@@ -64,7 +64,7 @@ export interface CacheClient extends CacheService {
  * This is a compatibility layer to provide CacheClient functionality
  */
 export class EnhancedCacheService implements CacheClient {
-  private baseService: CacheService
+  private readonly baseService: CacheService
 
   constructor(service: CacheService) {
     this.baseService = service
@@ -94,7 +94,7 @@ export class EnhancedCacheService implements CacheClient {
     // For memory cache, we need to implement keys functionality
     if (this.baseService instanceof MemoryCacheService) {
       const memoryService = this.baseService as any
-      const allKeys = Array.from(memoryService.cache.keys())
+      const allKeys = Array.from(memoryService.cache.keys()) as string[]
       // Convert wildcard pattern (with '*') into a safe RegExp.
       // Escape regex special chars except '*' then replace '*' with '.*'
       const escapeExceptStar = (s: string) =>
@@ -124,7 +124,7 @@ export class EnhancedCacheService implements CacheClient {
  * Uses Vercel KV for distributed caching across instances
  */
 class VercelKVCacheService implements CacheService {
-  private redis: RedisClient | null = null
+  private readonly redis: RedisClient | null = null
   public connected = true
   private readonly prefix = 'app:cache:'
 
@@ -250,10 +250,10 @@ class VercelKVCacheService implements CacheService {
  * Uses in-memory Map for local caching (fallback when Redis is unavailable)
  */
 class MemoryCacheService implements CacheService {
-  private cache = new Map<string, CacheEntry<unknown>>()
+  private readonly cache = new Map<string, CacheEntry<unknown>>()
   private readonly maxEntries = 1000
   private readonly prefix = 'memory:'
-  private cleanupInterval: ReturnType<typeof setInterval>
+  private readonly cleanupInterval: ReturnType<typeof setInterval>
 
   constructor() {
     // Periodic cleanup of expired entries
@@ -391,14 +391,10 @@ let memoryCacheService: MemoryCacheService | null = null
  */
 export function getCacheService(): CacheClient {
   // Initialize Vercel KV cache service if not already initialized
-  if (!vercelKVCacheService) {
-    vercelKVCacheService = new VercelKVCacheService()
-  }
+  vercelKVCacheService ??= new VercelKVCacheService();
 
   // Initialize memory cache service if not already initialized
-  if (!memoryCacheService) {
-    memoryCacheService = new MemoryCacheService()
-  }
+  memoryCacheService ??= new MemoryCacheService();
 
   // Use Vercel KV if connected, otherwise fall back to memory cache
   if (vercelKVCacheService.connected) {

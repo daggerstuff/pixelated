@@ -1,8 +1,8 @@
 ---
 title: 'AI Companions: The Future of Emotional Support'
 description: >-
-  Exploring how AI companions are revolutionizing emotional support and mental
-  wellness through advanced emotional intelligence and personalized interactions
+  _Next in our series, we'll explore AI-Enhanced Mental Health Tools and their
+  potential to expand mental health support for everyday people._
 author: AI & Psychology Team
 pubDate: 2024-05-06T00:00:00.000Z
 draft: false
@@ -13,10 +13,9 @@ tags:
   - technology
 series: AI & Emotional Intelligence
 seriesOrder: 1
-category: Technical
 ---
 
-# AI Companions: The Future of Emotional Support
+## AI Companions: The Future of Emotional Support
 
 ## Introduction
 

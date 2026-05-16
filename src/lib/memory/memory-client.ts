@@ -22,7 +22,9 @@ export type MemoryMetadata = {
 export interface MemoryEntry {
   id: string
   content: string
-  metadata?: MemoryMetadata
+  metadata: MemoryMetadata
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface SearchOptions {
@@ -36,7 +38,12 @@ export interface SearchOptions {
 export interface MemoryStats {
   totalMemories: number
   categoryCounts: Record<string, number>
-  recentActivity: Array<{ id: string; timestamp: string; operation: string }>
+  recentActivity?: Array<{
+    id: string
+    timestamp: string
+    operation: string
+    memoryId?: string
+  }>
 }
 
 export interface AddMemoryInput {
@@ -79,15 +86,18 @@ export const memoryManager = {
   async addMemory(input: AddMemoryInput, userId = 'default'): Promise<string> {
     ensureUser(userId)
     const id = cryptoRandomId()
+    const now = nowISO()
     const entry: MemoryEntry = {
       id,
       content: input.content,
       metadata: {
-        timestamp: nowISO(),
+        timestamp: now,
         userId,
         category: 'general',
         ...input.metadata,
       },
+      createdAt: now,
+      updatedAt: now,
     }
     store.get(userId)!.unshift(entry)
     addHistory(userId, 'add', id)
@@ -98,19 +108,42 @@ export const memoryManager = {
     memoryId: string,
     content: string,
     userId = 'default',
-  ): Promise<void> {
+  ): Promise<MemoryEntry | undefined> {
     ensureUser(userId)
     const list = store.get(userId)!
     const idx = list.findIndex((m) => m.id === memoryId)
     if (idx >= 0 && list[idx]) {
       const existingMemory = list[idx]
-      list[idx] = {
-        id: existingMemory.id,
+      const now = nowISO()
+
+      // Create a deep copy of the updated memory
+      const updatedMemory: MemoryEntry = {
+        ...existingMemory,
         content,
-        metadata: { ...existingMemory.metadata, timestamp: nowISO() },
+        metadata: existingMemory.metadata
+          ? { ...existingMemory.metadata, timestamp: now }
+          : { timestamp: now },
+        updatedAt: now,
       }
+
+      // Atomic update of the store by replacing the entire list reference
+      const newList = [...list]
+      newList[idx] = updatedMemory
+      store.set(userId, newList)
+
       addHistory(userId, 'update', memoryId)
+
+      // Return a deep copy to prevent external mutation (addresses Issue #2)
+      // We manually spread because these are simple objects, ensuring compatibility
+      const deepCopiedResult: MemoryEntry = {
+        ...updatedMemory,
+        metadata: updatedMemory.metadata
+          ? { ...updatedMemory.metadata }
+          : undefined,
+      }
+      return deepCopiedResult
     }
+    return undefined
   },
 
   async deleteMemory(memoryId: string, userId = 'default'): Promise<void> {
@@ -118,7 +151,8 @@ export const memoryManager = {
     const list = store.get(userId)!
     const idx = list.findIndex((m) => m.id === memoryId)
     if (idx >= 0) {
-      list.splice(idx, 1)
+      const newList = list.filter((m) => m.id !== memoryId)
+      store.set(userId, newList)
       addHistory(userId, 'delete', memoryId)
     }
   },
@@ -144,7 +178,7 @@ export const memoryManager = {
 
     if (category) {
       results = results.filter(
-        (m) => (m.metadata?.category || 'general') === category,
+        (m) => (m.metadata?.category ?? 'general') === category,
       )
     }
 
@@ -164,7 +198,7 @@ export const memoryManager = {
     ensureUser(userId)
     return store
       .get(userId)!
-      .filter((m) => (m.metadata?.category || 'general') === category)
+      .filter((m) => (m.metadata?.category ?? 'general') === category)
   },
 
   async searchByTags(
@@ -182,13 +216,13 @@ export const memoryManager = {
     const list = store.get(userId)!
     const categoryCounts: Record<string, number> = {}
     for (const m of list) {
-      const cat = m.metadata?.category || 'general'
+      const cat = m.metadata?.category ?? 'general'
       categoryCounts[cat] = (categoryCounts[cat] || 0) + 1
     }
     return {
       totalMemories: list.length,
       categoryCounts,
-      recentActivity: (history.get(userId) || []).slice(-10).reverse(),
+      recentActivity: (history.get(userId) ?? []).slice(-10).reverse(),
     }
   },
 
@@ -240,7 +274,7 @@ export const memoryManager = {
 
   async getMemoryHistory(userId = 'default') {
     ensureUser(userId)
-    return [...(history.get(userId) || [])]
+    return [...(history.get(userId) ?? [])]
   },
 }
 

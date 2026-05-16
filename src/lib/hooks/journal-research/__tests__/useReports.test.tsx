@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type { Report, ReportList } from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 
 import {
@@ -13,9 +14,9 @@ import {
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  listReports: vi.fn(),
-  getReport: vi.fn(),
-  generateReport: vi.fn(),
+  listReports: vi.fn<() => Promise<ReportList>>(),
+  getReport: vi.fn<() => Promise<Report>>(),
+  generateReport: vi.fn<() => Promise<Report>>(),
 }))
 
 const mockReport = {

@@ -19,10 +19,10 @@ interface MongoConfig {
 }
 
 class MongoDB {
-  private static instance: MongoDB
+  private static instance: MongoDB | null = null
   private client: MongoClient | null = null
   private db: Db | null = null
-  private config: MongoConfig
+  private readonly config: MongoConfig
 
   private constructor() {
     // Build MongoDB URI from environment variables
@@ -30,7 +30,7 @@ class MongoDB {
 
     this.config = {
       uri: mongoUri,
-      dbName: process.env['MONGODB_DB_NAME'] || 'pixelated_empathy',
+      dbName: process.env['MONGODB_DB_NAME'] ?? 'pixelated_empathy',
       options: {
         // Connection pool settings
         maxPoolSize: 10,
@@ -57,7 +57,12 @@ class MongoDB {
    * Build MongoDB URI from environment variables
    */
   private buildMongoDBUri(): string {
-    const mongoUri = process.env['MONGODB_URI'] || import.meta.env.MONGODB_URI
+    const metaEnv = import.meta.env?.MONGODB_URI
+
+    if (metaEnv && process.env['MONGODB_URI'] === undefined) {
+      process.env['MONGODB_URI'] = metaEnv
+    }
+    const mongoUri = process.env['MONGODB_URI']
 
     if (mongoUri) {
       return mongoUri
@@ -77,9 +82,7 @@ class MongoDB {
   }
 
   public static getInstance(): MongoDB {
-    if (!MongoDB.instance) {
-      MongoDB.instance = new MongoDB()
-    }
+    MongoDB.instance ??= new MongoDB()
     return MongoDB.instance
   }
 
@@ -122,13 +125,14 @@ class MongoDB {
       if (!this.db) {
         await this.connect()
       }
-      // After connect(), this.db should be non-null.
-      // We perform an explicit check to satisfy TypeScript's strict null checks.
-      if (this.db) {
-        await this.db.admin().ping()
-        return true
+
+      const db = this.db
+      if (!db) {
+        return false
       }
-      return false
+
+      await db.admin().ping()
+      return true
     } catch (error: unknown) {
       console.error('MongoDB health check failed:', error)
       return false

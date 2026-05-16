@@ -4,11 +4,13 @@ import process from 'node:process'
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
-import icon from 'astro-icon'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { loadEnv } from 'vite'
 
+/** @typedef {import("rollup").RollupLog} RollupLog */
 const isRailwayDeploy =
   process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT
 const isHerokuDeploy =
@@ -18,15 +20,75 @@ const isFlyioDeploy =
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
-// Detect if we're running a build command (not dev server)
-const isBuildCommand =
-  process.argv.includes('build') ||
-  process.env.CI === 'true' ||
-  !!process.env.VERCEL
+
+// Explicitly load environment variables from .env files into process.env
+// for use during configuration evaluation (e.g. Sentry DSN check).
+const loadedEnv = loadEnv(
+  process.env.NODE_ENV ?? 'development',
+  process.cwd(),
+  '',
+)
+Object.assign(process.env, loadedEnv)
+
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN =
-  !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN
+  !!process.env.SENTRY_DSN ||
+  !!process.env.PUBLIC_SENTRY_DSN ||
+  !!process.env.SENTRY_PUBLIC_DSN ||
+  !!process.env.VITE_SENTRY_DSN
+const sentryRelease =
+  process.env.SENTRY_RELEASE ?? process.env.npm_package_version ?? undefined
 // const _shouldUseSpotlight = isDevelopment && process.env.SENTRY_SPOTLIGHT === '1';
+
+/**
+ * Astro's `site` config must be a valid absolute URL.
+ * Some CI environments provide hostnames without protocol; normalize safely.
+ * @param {string | undefined} value
+ */
+function normalizeSiteUrl(value) {
+  if (!value) return 'https://pixelatedempathy.com'
+  try {
+    return new URL(value).toString()
+  } catch {
+    try {
+      return new URL(`https://${value}`).toString()
+    } catch {
+      return 'https://pixelatedempathy.com'
+    }
+  }
+}
+
+/**
+ * @param {{ ssr: boolean; assets: string[]; filesToDeleteAfterUpload: string[] }} params
+ */
+function createScopedSentryVitePlugins({
+  ssr,
+  assets,
+  filesToDeleteAfterUpload,
+}) {
+  /** @type {import("vite").Plugin[]} */
+  const plugins = sentryVitePlugin({
+    org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    telemetry: false,
+    release: sentryRelease ? { name: sentryRelease } : undefined,
+    sourcemaps: {
+      assets,
+      ignore: ['**/node_modules/**'],
+      filesToDeleteAfterUpload,
+    },
+  })
+
+  return plugins.map((plugin) => ({
+    ...plugin,
+    /** @param {import("vite").ConfigEnv} env */
+    apply(_, env) {
+      return env.command === 'build' && Boolean(env.isSsrBuild) === ssr
+    },
+  }))
+}
+
 const preferredPort = (() => {
   const candidates = [
     process.env.PORT,
@@ -44,23 +106,170 @@ const preferredPort = (() => {
   return 4321
 })()
 
+/**
+ * @param {string} id
+ */
 function getChunkName(id) {
-  if (id.includes('react') || id.includes('react-dom')) {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (
+    normalizedId.includes('/src/components/analytics/EnhancedChartComponent')
+  ) {
+    return 'feature-enhanced-chart'
+  }
+  if (
+    normalizedId.includes('/src/components/treatment/TreatmentPlanManager') ||
+    normalizedId.includes('/src/components/therapy/TreatmentPlanManager')
+  ) {
+    return 'feature-treatment-plan'
+  }
+  if (normalizedId.includes('/src/components/security/FHEDemo')) {
+    return 'feature-fhe'
+  }
+  if (normalizedId.includes('/src/components/demo/FHEDemo')) {
+    return 'feature-fhe-demo'
+  }
+  if (normalizedId.includes('/src/components/chat/TherapyChatSystem')) {
+    return 'feature-therapy-chat'
+  }
+  if (
+    normalizedId.includes(
+      '/src/components/session/EmotionTemporalAnalysisChart',
+    )
+  ) {
+    return 'feature-emotion-temporal'
+  }
+
+  // Split large vendor libraries into separate chunks for better caching
+  if (
+    normalizedId.includes('/p5/') ||
+    normalizedId.includes('/node_modules/p5/') ||
+    normalizedId.includes('p5/') ||
+    normalizedId.includes('/p5.js/') ||
+    normalizedId.includes('/node_modules/p5.js/') ||
+    normalizedId.includes('p5.js/')
+  ) {
+    return 'p5-vendor'
+  }
+  if (
+    normalizedId.includes('/@azure/') ||
+    normalizedId.includes('/node_modules/@azure/') ||
+    normalizedId.includes('@azure/')
+  ) {
+    return 'azure-vendor'
+  }
+  if (
+    normalizedId.includes('/@google-cloud/') ||
+    normalizedId.includes('/node_modules/@google-cloud/') ||
+    normalizedId.includes('@google-cloud/')
+  ) {
+    return 'google-cloud-vendor'
+  }
+  if (
+    normalizedId.includes('/@opentelemetry/') ||
+    normalizedId.includes('/node_modules/@opentelemetry/') ||
+    normalizedId.includes('@opentelemetry/')
+  ) {
+    return 'opentelemetry-vendor'
+  }
+  if (
+    normalizedId.includes('/express/') ||
+    normalizedId.includes('/node_modules/express/') ||
+    normalizedId.includes('express/')
+  ) {
+    return 'express-vendor'
+  }
+  if (
+    normalizedId.includes('/mongoose/') ||
+    normalizedId.includes('/node_modules/mongoose/') ||
+    normalizedId.includes('mongoose/')
+  ) {
+    return 'mongoose-vendor'
+  }
+  if (
+    normalizedId.includes('/react/') ||
+    normalizedId.includes('/node_modules/react/') ||
+    normalizedId.includes('react/') ||
+    normalizedId.includes('/react-dom/') ||
+    normalizedId.includes('/node_modules/react-dom/') ||
+    normalizedId.includes('react-dom/')
+  ) {
     return 'react-vendor'
   }
-  if (id.includes('framer-motion') || id.includes('lucide-react')) {
+  if (
+    normalizedId.includes('@radix-ui/react-virtualizer') ||
+    normalizedId.includes('/node_modules/@radix-ui/react-virtualizer/') ||
+    normalizedId.includes('@radix-ui/react-virtualizer/') ||
+    normalizedId.includes('lucide-react') ||
+    normalizedId.includes('/node_modules/lucide-react/') ||
+    normalizedId.includes('lucide-react/')
+  ) {
     return 'ui-vendor'
   }
-  if (id.includes('clsx') || id.includes('date-fns') || id.includes('axios')) {
+  if (
+    normalizedId.includes('/clsx/') ||
+    normalizedId.includes('/node_modules/clsx/') ||
+    normalizedId.includes('clsx/') ||
+    normalizedId.includes('/date-fns/') ||
+    normalizedId.includes('/node_modules/date-fns/') ||
+    normalizedId.includes('date-fns/') ||
+    normalizedId.includes('/axios/') ||
+    normalizedId.includes('/node_modules/axios/') ||
+    normalizedId.includes('axios/')
+  ) {
     return 'utils-vendor'
   }
-  if (id.includes('recharts') || id.includes('chart.js')) {
+  if (
+    normalizedId.includes('/recharts/') ||
+    normalizedId.includes('/node_modules/recharts/') ||
+    normalizedId.includes('recharts/') ||
+    normalizedId.includes('/react-chartjs-2/') ||
+    normalizedId.includes('/node_modules/react-chartjs-2/') ||
+    normalizedId.includes('react-chartjs-2/')
+  ) {
     return 'charts-vendor'
   }
-  if (id.includes('three') || id.includes('@react-three')) {
-    return 'three-vendor'
+  if (
+    normalizedId.includes('/chart.js/') ||
+    normalizedId.includes('/node_modules/chart.js/') ||
+    normalizedId.includes('chart.js/') ||
+    normalizedId.includes('/chart.js') ||
+    normalizedId.includes('/node_modules/chart.js') ||
+    normalizedId.includes('chart.js')
+  ) {
+    return 'chartjs-vendor'
   }
-  if (id.includes('node_modules')) {
+  if (
+    normalizedId.includes('/node_modules/@azure/') ||
+    normalizedId.includes('\\node_modules\\@azure\\')
+  ) {
+    return 'azure-vendor'
+  }
+  if (
+    normalizedId.includes('/node_modules/@google-cloud/') ||
+    normalizedId.includes('\\node_modules\\@google-cloud\\')
+  ) {
+    return 'google-cloud-vendor'
+  }
+  if (
+    normalizedId.includes('/node_modules/@opentelemetry/') ||
+    normalizedId.includes('\\node_modules\\@opentelemetry\\')
+  ) {
+    return 'opentelemetry-vendor'
+  }
+  if (
+    normalizedId.includes('/node_modules/express/') ||
+    normalizedId.includes('\\node_modules\\express\\')
+  ) {
+    return 'express-vendor'
+  }
+  if (
+    normalizedId.includes('/node_modules/mongoose/') ||
+    normalizedId.includes('\\node_modules\\mongoose\\')
+  ) {
+    return 'mongoose-vendor'
+  }
+  if (normalizedId.includes('/node_modules/')) {
     return 'vendor'
   }
   return null
@@ -98,7 +307,7 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://pixelatedempathy.com',
+  site: normalizeSiteUrl(process.env.PUBLIC_SITE_URL),
   output: 'server',
   adapter,
   trailingSlash: 'ignore',
@@ -128,6 +337,9 @@ export default defineConfig({
       watch: {
         ignored: [
           // Aggressive node_modules exclusion at Vite level
+          /**
+           * @param {string} p
+           */
           (p) =>
             p.includes('/node_modules/') ||
             p.includes('\\node_modules\\') ||
@@ -147,9 +359,8 @@ export default defineConfig({
       sourcemap: !isProduction || hasSentryDSN ? 'hidden' : false,
       target: 'node24',
       chunkSizeWarningLimit: isProduction ? 500 : 1500,
-      // Temporarily disabled minification to debug build hang
-      minify: false,
-      // minify: isProduction ? 'terser' : false,
+      // Re-enable minification for production to reduce chunk sizes
+      minify: isProduction ? 'terser' : false,
       terserOptions: isProduction
         ? {
             compress: {
@@ -176,47 +387,40 @@ export default defineConfig({
           'mysql2',
           'sqlite3',
           'better-sqlite3',
-          'better-auth',
-          'better-auth/adapters/mongodb',
-          'better-auth/adapters/drizzle',
-          'better-auth/react',
           'axios',
           'bcryptjs',
           'jsonwebtoken',
           'pdfkit',
           '@tensorflow/tfjs',
           '@tensorflow/tfjs-layers',
-          'three',
-          '@react-three/fiber',
-          '@react-three/drei',
           'mongodb',
           'recharts',
           'chart.js',
           '@opentelemetry/api',
-        '@opentelemetry/otlp-exporter-base',
-        '@opentelemetry/exporter-trace-otlp-http',
-        '@opentelemetry/exporter-metrics-otlp-http',
-        '@opentelemetry/otlp-transformer',
-        /^@opentelemetry\//,
+          '@opentelemetry/otlp-exporter-base',
+          '@opentelemetry/exporter-trace-otlp-http',
+          '@opentelemetry/exporter-metrics-otlp-http',
+          '@opentelemetry/otlp-transformer',
+          /^@opentelemetry\//,
         ],
+        /** @param {RollupLog} warning */
+        /** @param {(warning: RollupLog) => void} warn */
         onwarn(warning, warn) {
           if (
             warning.code === 'SOURCEMAP_ERROR' ||
-            (warning.message &&
-              warning.message.includes("didn't generate a sourcemap"))
+            warning.message.includes("didn't generate a sourcemap")
           ) {
             return
           }
           if (
-            warning.message &&
-            (warning.message.includes(
+            warning.message.includes(
               'externalized for browser compatibility',
             ) ||
-              warning.message.includes('experimentalDisableStreaming') ||
-              (warning.message.includes('dynamically imported') &&
-                warning.message.includes('statically imported')) ||
-              warning.message.includes('icon "-"') ||
-              warning.message.includes("failed to load icon '-'"))
+            warning.message.includes('experimentalDisableStreaming') ||
+            (warning.message.includes('dynamically imported') &&
+              warning.message.includes('statically imported')) ||
+            warning.message.includes('icon "-"') ||
+            warning.message.includes("failed to load icon '-'")
           ) {
             return
           }
@@ -225,6 +429,23 @@ export default defineConfig({
       },
     },
     plugins: [
+      ...(hasSentryDSN
+        ? [
+            ...createScopedSentryVitePlugins({
+              ssr: false,
+              assets: [
+                './dist/client/_astro/**/*.js',
+                './dist/client/_astro/**/*.js.map',
+              ],
+              filesToDeleteAfterUpload: ['./dist/client/_astro/**/*.map'],
+            }),
+            ...createScopedSentryVitePlugins({
+              ssr: true,
+              assets: ['./dist/server/**/*.mjs', './dist/server/**/*.mjs.map'],
+              filesToDeleteAfterUpload: ['./dist/server/**/*.map'],
+            }),
+          ]
+        : []),
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
         visualizer({
@@ -242,6 +463,13 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        'framer-motion': path.resolve('./src/lib/shims/framer-motion.tsx'),
+        '@radix-ui/react-tooltip': path.resolve(
+          './src/lib/shims/radix-tooltip.tsx',
+        ),
+        'astro-icon/components': path.resolve(
+          './src/components/ui/astro-icon-components.ts',
+        ),
         stream: 'stream-browserify',
         zlib: 'browserify-zlib',
         buffer: 'buffer',
@@ -272,10 +500,6 @@ export default defineConfig({
         'mysql2',
         'sqlite3',
         'better-sqlite3',
-        'better-auth',
-        'better-auth/adapters/mongodb',
-        'better-auth/adapters/drizzle',
-        'better-auth/react',
         'axios',
         'bcryptjs',
         'jsonwebtoken',
@@ -287,9 +511,6 @@ export default defineConfig({
         '@sentry/profiling-node',
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
-        'three',
-        '@react-three/fiber',
-        '@react-three/drei',
         'mongodb',
         'recharts',
         'chart.js',
@@ -317,10 +538,6 @@ export default defineConfig({
         'playwright',
         '@sentry/profiling-node',
         'pdfkit',
-        'better-auth',
-        'better-auth/adapters/mongodb',
-        'better-auth/adapters/drizzle',
-        'better-auth/react',
         'axios',
         'bcryptjs',
         'jsonwebtoken',
@@ -328,14 +545,10 @@ export default defineConfig({
         'lucide-react',
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
-        'three',
-        '@react-three/fiber',
-        '@react-three/drei',
         'mongodb',
         'recharts',
         'chart.js',
         '@spotlightjs/astro',
-        'framer-motion',
         'zustand',
         'jotai',
         '@tanstack/react-query',
@@ -354,46 +567,14 @@ export default defineConfig({
     return [
       ...base,
       UnoCSS({ injectReset: true }),
-      icon({
-        include: {
-          lucide: [
-            'calendar',
-            'user',
-            'settings',
-            'heart',
-            'brain',
-            'shield-check',
-            'info',
-            'arrow-left',
-            'shield',
-            'user-plus',
-          ],
-        },
-        svgdir: './src/icons',
-      }),
       ...(hasSentryDSN
         ? [
             sentry({
-              sourceMapsUploadOptions: {
-                org: process.env.SENTRY_ORG || 'pixelated-empathy-dq',
-                project: process.env.SENTRY_PROJECT || 'pixel-astro',
-                authToken: process.env.SENTRY_AUTH_TOKEN,
-                // Include release for proper stack trace linking and code mapping
-                release:
-                  process.env.SENTRY_RELEASE ||
-                  process.env.npm_package_version ||
-                  undefined,
-                telemetry: false,
-                sourcemaps: {
-                  assets: [
-                    './.astro/dist/**/*.js',
-                    './.astro/dist/**/*.mjs',
-                    './dist/**/*.js',
-                    './dist/**/*.mjs',
-                  ],
-                  ignore: ['**/node_modules/**'],
-                  filesToDeleteAfterUpload: ['**/*.map', '**/*.js.map'],
-                },
+              telemetry: false,
+              // Upload sourcemaps through the Vite plugin so each Astro build
+              // phase only uploads the files it actually emitted.
+              sourcemaps: {
+                disable: true,
               },
             }),
             // Temporarily disable SpotlightJS due to build issues
@@ -419,6 +600,9 @@ export default defineConfig({
       followSymlinks: false,
       ignored: [
         // Hard guard first: function ignore for node_modules and .venv anywhere
+        /**
+         * @param {string} p
+         */
         (p) =>
           p.includes('/node_modules/') ||
           p.includes('\\node_modules\\') ||

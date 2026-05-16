@@ -1,23 +1,19 @@
 ---
-title: 'The Heart of Codependency'
-description:
-  'Explore the deep connection between trauma and codependent relationships,
-  understanding how early experiences shape our attachment patterns'
+title: heart of codependency
+description: >-
+  Have you ever felt like your entire world revolves around someone else? Like
 author: 'Dr. Sarah Chen'
 pubDate: 2024-02-15
-readingTime: 12
-tags: ['trauma', 'relationships', 'codependency', 'attachment']
+tags:
+  - trauma
+  - relationships
+  - codependency
+  - attachment
 series: 'Understanding Trauma'
 seriesOrder: 1
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt:
-      'Two silhouettes reflecting the complexity of codependent relationships',
-  }
 ---
 
-# The Heart of Codependency
+## The Heart of Codependency
 
 Have you ever felt like your entire world revolves around someone else? Like
 your happiness, your sense of worth, even your very identity is tied to another

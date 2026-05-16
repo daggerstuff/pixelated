@@ -30,8 +30,18 @@ plan/
 .vscode/
 .trunk/
 .serena/
+.agent/
+.agents/
+.beads/
+.claude/
+.cursor/
+.moderne/
+.omx/
+.opencode/
 .roomodes
 .oracle_deployment
+checkpoints/
+business-strategy-cms/
 
 # Environment and config files
 .env*

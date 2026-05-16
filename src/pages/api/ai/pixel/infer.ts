@@ -89,8 +89,8 @@ interface ModelStatusResponse {
 // Configuration
 // ============================================================================
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL || 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY || ''
+const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
 const REQUEST_TIMEOUT_MS = 30000
 const MAX_RETRIES = 3
 
@@ -135,12 +135,12 @@ async function callPixelService(
     }
 
     return await response.json()
-  } catch (error) {
+  } catch (error: unknown) {
     if (retries < MAX_RETRIES) {
       logger.warn(
         `Pixel API call failed, retrying (${retries + 1}/${MAX_RETRIES})`,
         {
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         },
       )
       // Exponential backoff
@@ -152,7 +152,7 @@ async function callPixelService(
 
     logger.error('Pixel API call failed after retries', {
       endpoint,
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
     throw error
   }
@@ -208,13 +208,13 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Failed to get Pixel status', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Failed to get Pixel model status',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -297,13 +297,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     const pixelRequest: PixelInferenceRequest = {
       user_query: body.user_query,
-      conversation_history: body.conversation_history || [],
+      conversation_history: body.conversation_history ?? [],
       context_type: body.context_type,
-      user_id: body.user_id || session.user.id,
+      user_id: body.user_id ?? session.user.id,
       session_id: body.session_id,
       use_eq_awareness: body.use_eq_awareness !== false,
       include_metrics: body.include_metrics !== false,
-      max_tokens: body.max_tokens || 200,
+      max_tokens: body.max_tokens ?? 200,
       plutchik_scores: body.plutchik_scores,
       ocean_scores: body.ocean_scores,
     }
@@ -354,13 +354,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Pixel inference failed', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
     })
 
     return new Response(
       JSON.stringify({
         error: 'Pixel inference failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

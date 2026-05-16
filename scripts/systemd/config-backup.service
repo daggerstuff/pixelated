@@ -1,0 +1,12 @@
+[Unit]
+Description=Create weekly portable config backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=vivi
+ExecStart=/home/vivi/pixelated/scripts/backup/create-config-backup.sh --rclone-remote drive --rclone-path vivi-home-backups/configs
+WorkingDirectory=/home/vivi
+StandardOutput=journal
+StandardError=journal

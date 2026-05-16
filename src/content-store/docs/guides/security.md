@@ -1,11 +1,13 @@
 ---
-title: 'Security Guide'
-description: 'Security Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation', 'security']
+description: Security Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
+  - security
 draft: false
 toc: true
+title: Security Guide
 ---
 
 # Security Guide

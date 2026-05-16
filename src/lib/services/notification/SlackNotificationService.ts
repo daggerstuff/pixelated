@@ -39,10 +39,10 @@ interface SlackMessagePayload {
 }
 
 export class SlackNotificationService implements ICrisisNotificationHandler {
-  private webhookUrl: string
+  private readonly webhookUrl: string
 
   constructor(webhookUrl?: string) {
-    const url = webhookUrl || config.notifications.slackWebhookUrl()
+    const url = webhookUrl ?? config.notifications.slackWebhookUrl()
     if (!url) {
       const errorMsg =
         'Slack webhook URL is not configured. SlackNotificationService cannot operate.'
@@ -180,7 +180,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
     } catch (error: unknown) {
       logger.error('Exception while sending Slack crisis alert:', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        stack: error instanceof Error ? error?.stack : undefined,
         webhookUrl:
           this.webhookUrl.substring(
             0,

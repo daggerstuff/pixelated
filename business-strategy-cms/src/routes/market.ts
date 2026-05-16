@@ -5,6 +5,20 @@ import type { AuthenticatedRequest } from '@/middleware/auth'
 import { MarketDataService } from '@/services/marketDataService'
 import { logger } from '@/utils/logger'
 
+type MarketBulkRequest = AuthenticatedRequest<
+  Record<string, string>,
+  unknown,
+  { symbols?: unknown }
+>
+
+const parseSymbols = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return []
+
+  return value.filter(
+    (item): item is string => typeof item === 'string' && item.length > 0,
+  )
+}
+
 const router = Router()
 
 // All market data endpoints require authentication
@@ -13,13 +27,18 @@ router.use(authenticateToken)
 // Initialize market data service
 const marketDataService = new MarketDataService()
 
+const getRouteParam = (
+  value: string | string[] | undefined,
+): string | undefined =>
+  typeof value === 'string' && value.length > 0 ? value : undefined
+
 /**
  * GET /api/market/quote/:symbol
  * Get comprehensive market data for a symbol
  */
 router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params
+    const symbol = getRouteParam(req.params['symbol'])
 
     if (!symbol) {
       return res.status(400).json({
@@ -41,7 +60,7 @@ router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Quote error:', error)
     return res.status(500).json({
       success: false,
@@ -54,9 +73,9 @@ router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
  * POST /api/market/bulk
  * Get comprehensive market data for multiple symbols
  */
-router.post('/bulk', async (req: AuthenticatedRequest, res) => {
+router.post('/bulk', async (req: MarketBulkRequest, res) => {
   try {
-    const { symbols } = req.body
+    const symbols = parseSymbols(req.body?.symbols)
 
     if (!Array.isArray(symbols) || symbols.length === 0) {
       return res.status(400).json({
@@ -71,7 +90,7 @@ router.post('/bulk', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Bulk data error:', error)
     return res.status(500).json({
       success: false,
@@ -86,7 +105,7 @@ router.post('/bulk', async (req: AuthenticatedRequest, res) => {
  */
 router.get('/technical/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params
+    const symbol = getRouteParam(req.params['symbol'])
 
     if (!symbol) {
       return res.status(400).json({
@@ -108,7 +127,7 @@ router.get('/technical/:symbol', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Technical analysis error:', error)
     return res.status(500).json({
       success: false,
@@ -129,7 +148,7 @@ router.get('/sectors', async (_req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Sectors error:', error)
     return res.status(500).json({
       success: false,
@@ -150,7 +169,7 @@ router.get('/economic', async (_req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Economic indicators error:', error)
     return res.status(500).json({
       success: false,
@@ -165,7 +184,7 @@ router.get('/economic', async (_req: AuthenticatedRequest, res) => {
  */
 router.get('/sentiment/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params
+    const symbol = getRouteParam(req.params['symbol'])
 
     if (!symbol) {
       return res.status(400).json({
@@ -180,7 +199,7 @@ router.get('/sentiment/:symbol', async (req: AuthenticatedRequest, res) => {
       success: true,
       data,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Sentiment error:', error)
     return res.status(500).json({
       success: false,

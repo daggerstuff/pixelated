@@ -392,28 +392,28 @@ participation and thought leadership establishment
 
 ### Annual Partnership Budget ($100,000)
 
-**Association Dues & Memberships (30% - $30,000)**
+### Association Dues & Memberships (30% - $30,000)
 
 - National association memberships and certifications
 - Regional chapter memberships and participation
 - Special interest group memberships
 - Professional development and training
 
-**Conference & Event Participation (40% - $40,000)**
+### Conference & Event Participation (40% - $40,000)
 
 - Exhibition booth costs and materials
 - Speaking fees and travel expenses
 - Sponsorship opportunities and branding
 - Networking events and receptions
 
-**Content Development & Collaboration (20% - $20,000)**
+### Content Development & Collaboration (20% - $20,000)
 
 - Joint research and validation studies
 - Custom training module development
 - Publication and content creation
 - Expert consultation and advisory services
 
-**Technology & Tools (10% - $10,000)**
+### Technology & Tools (10% - $10,000)
 
 - Association platform integrations
 - Member management and tracking systems

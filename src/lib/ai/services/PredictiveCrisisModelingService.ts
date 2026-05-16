@@ -146,7 +146,7 @@ export class PredictiveCrisisModelingService {
         interventionWindow,
         escalationTriggers,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in predictive crisis modeling:', error)
 
       // Fallback to conservative prediction

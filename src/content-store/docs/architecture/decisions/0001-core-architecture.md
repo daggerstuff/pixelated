@@ -1,11 +1,12 @@
 ---
-title: '[ADR-0001] Core Architecture Decisions'
 description: '[ADR-0001] Core Architecture Decisions documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: '[ADR-0001] Core Architecture Decisions'
 ---
 
 # [ADR-0001] Core Architecture Decisions

@@ -50,16 +50,14 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
       })
       const data = await res.json()
       if (!res.ok || !data.success) {
-        setError(data.error || 'Failed to fetch recommendations')
+        setError(data.error ?? 'Failed to fetch recommendations')
         setLoading(false)
         return
       }
       setRecommendations(data.data.recommendations as TreatmentRecommendation[])
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error
-          ? (err)?.message || String(err)
-          : 'Unknown error'
+        err instanceof Error ? err?.message || String(err) : 'Unknown error'
       setError(errorMessage)
     } finally {
       setLoading(false)

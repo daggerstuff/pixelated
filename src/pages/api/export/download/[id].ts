@@ -85,7 +85,7 @@ export const GET = async ({
       headers: {
         'Content-Type': exportData.mimeType,
         'Content-Disposition': `attachment; filename="${exportData.filename}"`,
-        'X-Verification-Token': exportData.verificationToken || '',
+        'X-Verification-Token': exportData.verificationToken ?? '',
       },
     })
   } catch (error: unknown) {

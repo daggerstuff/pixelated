@@ -1,12 +1,15 @@
 ---
-title: 'Redis Service'
-description: 'Core Redis service implementation details and usage examples'
-pubDate: 2025-03-25
+description: Core Redis service implementation details and usage examples
+pubDate: '2025-03-25'
 share: true
 toc: true
-lastModDate: 2025-03-25
-tags: ['redis', 'service', 'implementation']
-author: 'Pixelated Team'
+lastModDate: 2025-03-25T00:00:00.000Z
+tags:
+  - redis
+  - service
+  - implementation
+author: Pixelated Team
+title: Redis Service
 ---
 
 ## Redis Service Documentation

@@ -8,7 +8,7 @@ import type { CognitiveModel } from '../types/CognitiveModel'
 export type ModelIdentifier = string
 
 export class PatientModelService {
-  constructor(private kvStore: KVStore) {}
+  constructor(private readonly kvStore: KVStore) {}
 
   /**
    * Get all available cognitive models
@@ -66,5 +66,57 @@ export class PatientModelService {
       console.error('Failed to delete model:', error)
       throw error
     }
+  }
+
+  /**
+   * Create response context for patient simulation
+   */
+  async createResponseContext(
+    modelId: string,
+    conversationHistory: Array<{ role: 'therapist' | 'patient'; content: string }>,
+    styleConfig: Record<string, unknown>,
+    therapeuticFocus?: string[],
+    sessionNumber?: number,
+  ): Promise<{
+    modelId: string
+    conversationHistory: Array<{ role: 'therapist' | 'patient'; content: string }>
+    styleConfig: Record<string, unknown>
+    therapeuticFocus?: string[]
+    sessionNumber: number
+  } | null> {
+    const model = await this.getModel(modelId)
+    if (!model) return null
+
+    return {
+      modelId,
+      conversationHistory,
+      styleConfig,
+      therapeuticFocus,
+      sessionNumber: sessionNumber ?? 1,
+    }
+  }
+
+  /**
+   * Generate patient prompt from context
+   */
+  generatePatientPrompt(context: {
+    modelId: string
+    conversationHistory: Array<{ role: 'therapist' | 'patient'; content: string }>
+    styleConfig: Record<string, unknown>
+    therapeuticFocus?: string[]
+    sessionNumber: number
+  }): string {
+    const historyText = context.conversationHistory
+      .map((m) => `${m.role}: ${m.content}`)
+      .join('\n')
+
+    return `You are simulating a patient in a therapy session.
+Session: ${context.sessionNumber}
+${context.therapeuticFocus ? `Focus areas: ${context.therapeuticFocus.join(', ')}` : ''}
+
+Conversation history:
+${historyText}
+
+Respond as the patient would, staying in character and showing appropriate emotional responses.`
   }
 }

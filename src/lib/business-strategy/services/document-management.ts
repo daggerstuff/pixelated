@@ -108,7 +108,7 @@ export class DocumentManagementService extends BaseService {
       })
 
       return document
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'createDocument')
     }
   }
@@ -140,7 +140,7 @@ export class DocumentManagementService extends BaseService {
       await this.updateAnalytics(id, 'view', userId)
 
       return document
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'getDocument')
     }
   }
@@ -155,7 +155,7 @@ export class DocumentManagementService extends BaseService {
     try {
       const filter = this.buildMongoFilter(search.filters)
       const sort = this.buildMongoSort(search.sort?.field, search.sort?.order)
-      const { page = 1, limit = 20 } = search.pagination || {}
+      const { page = 1, limit = 20 } = search.pagination ?? {}
 
       const documents = await this.db.mongodb.database
         .collection<Document>(this.collectionName)
@@ -178,7 +178,7 @@ export class DocumentManagementService extends BaseService {
         highlights: [],
         matchedTerms: [],
       }))
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'searchDocuments')
     }
   }
@@ -252,7 +252,7 @@ export class DocumentManagementService extends BaseService {
       }
 
       return result as Document
-    } catch (error) {
+    } catch (error: unknown) {
       return this.handleError(error, 'updateDocument')
     }
   }

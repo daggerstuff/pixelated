@@ -60,7 +60,7 @@ export class MemorySynthesizer {
       };
     } catch (error: unknown) {
       appLogger.error('Synthesis pass failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       });
       return null;
     }
@@ -145,7 +145,7 @@ export class MemorySynthesizer {
     const decay = Math.pow(0.5, age / (7 * dayInMs));
     
     // Intensity boost
-    const intensity = memory.emotional_context?.intensity || 0.2;
+    const intensity = memory.emotional_context?.intensity ?? 0.2;
     
     // Hybrid score
     return (decay * 0.7) + (intensity * 0.3);
@@ -156,8 +156,8 @@ export class MemorySynthesizer {
     if (valid.length === 0) return { reciprocity: 0.5, validation_accuracy: 0.5 };
     
     return {
-      reciprocity: valid.reduce((acc, m) => acc + (m.metrics?.reciprocity || 0), 0) / valid.length,
-      validation_accuracy: valid.reduce((acc, m) => acc + (m.metrics?.validation_accuracy || 0), 0) / valid.length,
+      reciprocity: valid.reduce((acc, m) => acc + (m.metrics?.reciprocity ?? 0), 0) / valid.length,
+      validation_accuracy: valid.reduce((acc, m) => acc + (m.metrics?.validation_accuracy ?? 0), 0) / valid.length,
     };
   }
 
@@ -166,6 +166,6 @@ export class MemorySynthesizer {
    * In a real system, this would call an LLM to "gist" the merged content.
    */
   private generateSynthesizedContent(candidates: MemoryObject[]): string {
-    return `Synthesized context from ${candidates.length} previous observations regarding ${candidates[0]?.gist || 'session flow'}.`;
+    return `Synthesized context from ${candidates.length} previous observations regarding ${candidates[0]?.gist ?? 'session flow'}.`;
   }
 }

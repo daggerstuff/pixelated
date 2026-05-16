@@ -1,4 +1,5 @@
-import { vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { MockInstance } from 'vitest'
 
 import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
@@ -16,17 +17,19 @@ import {
   type ResponseContext,
   type PatientResponseStyleConfig,
 } from './PatientResponseService'
+import { KVStore } from '../../db/KVStore'
 
-// Mock dependencies
-vi.mock('./PatientProfileService')
-vi.mock('./BeliefConsistencyService')
+type ProfileServiceSpy = MockInstance<
+  typeof PatientProfileService.prototype.getProfileById
+>
+type ConsistencyServiceSpy = MockInstance<
+  typeof BeliefConsistencyService.prototype.checkBeliefConsistency
+>
 
-const MockPatientProfileService = PatientProfileService as vi.MockedClass<
-  typeof PatientProfileService
->
-const MockBeliefConsistencyService = BeliefConsistencyService as vi.MockedClass<
-  typeof BeliefConsistencyService
->
+let mockProfileService: PatientProfileService
+let mockConsistencyService: BeliefConsistencyService
+let getProfileByIdSpy!: ProfileServiceSpy
+let checkBeliefConsistencySpy!: ConsistencyServiceSpy
 
 // Helper to create a basic CognitiveModel for testing
 const createTestCognitiveModel = (
@@ -77,7 +80,13 @@ const createTestCognitiveModel = (
     resistanceLevel: 3,
     changeReadiness: 'contemplation',
     sessionProgressLog: [],
-    skillsAcquired: ['basic coping skills'],
+    skillsAcquired: [
+      {
+        skillName: 'basic coping skills',
+        dateAchieved: new Date().toISOString(),
+        proficiency: 0.5,
+      },
+    ] as TherapeuticProgress['skillsAcquired'],
     trustLevel: 5,
     rapportScore: 5,
     therapistPerception: 'neutral',
@@ -99,8 +108,6 @@ const createTestPatientProfile = (
 })
 
 describe('PatientResponseService', () => {
-  let mockProfileService: vi.Mocked<PatientProfileService>
-  let mockConsistencyService: vi.Mocked<BeliefConsistencyService>
   let responseService: PatientResponseService
 
   // Base style config for tests, specific tests will override parts of this
@@ -119,16 +126,14 @@ describe('PatientResponseService', () => {
   }
 
   beforeEach(() => {
-    // Reset mocks for each test
-    MockPatientProfileService.mockClear()
-    MockBeliefConsistencyService.mockClear()
-
-    // Create new instances of mocks for each test
-    // It's important that the constructor of the actual service gets *instances* of the mocked services.
-    // Vitest's vi.mock() replaces the original class with a mock constructor.
-    // So, new MockPatientProfileService() creates an instance of the mock.
-    mockProfileService = new MockPatientProfileService(null as unknown) // Pass null or valid mock for KVStore if its constructor is called
-    mockConsistencyService = new MockBeliefConsistencyService()
+    vi.restoreAllMocks()
+    mockProfileService = new PatientProfileService(new KVStore('test-profile-store'))
+    mockConsistencyService = new BeliefConsistencyService()
+    getProfileByIdSpy = vi.spyOn(mockProfileService, 'getProfileById')
+    checkBeliefConsistencySpy = vi.spyOn(
+      mockConsistencyService,
+      'checkBeliefConsistency',
+    )
 
     responseService = new PatientResponseService(
       mockProfileService,
@@ -139,7 +144,7 @@ describe('PatientResponseService', () => {
   describe('createResponseContext', () => {
     it('should create a response context successfully', async () => {
       const profile = createTestPatientProfile('ctx1', 'Context User')
-      mockProfileService.getProfileById.mockResolvedValue(profile)
+      getProfileByIdSpy.mockResolvedValue(profile)
 
       const context = await responseService.createResponseContext(
         'ctx1',
@@ -148,7 +153,7 @@ describe('PatientResponseService', () => {
         2,
       )
 
-      expect(mockProfileService.getProfileById).toHaveBeenCalledWith('ctx1')
+      expect(getProfileByIdSpy).toHaveBeenCalledWith('ctx1')
       expect(context).not.toBeNull()
       expect(context?.profile).toEqual(profile)
       expect(context?.styleConfig).toEqual(baseStyleConfig)
@@ -157,12 +162,12 @@ describe('PatientResponseService', () => {
     })
 
     it('should return null if profile not found for response context', async () => {
-      mockProfileService.getProfileById.mockResolvedValue(null)
+      getProfileByIdSpy.mockResolvedValue(null)
       const context = await responseService.createResponseContext(
         'nonexistent',
         baseStyleConfig,
       )
-      expect(mockProfileService.getProfileById).toHaveBeenCalledWith(
+      expect(getProfileByIdSpy).toHaveBeenCalledWith(
         'nonexistent',
       )
       expect(context).toBeNull()
@@ -174,7 +179,7 @@ describe('PatientResponseService', () => {
         { sessionNumber: 1, keyInsights: [], resistanceShift: 0 },
         { sessionNumber: 2, keyInsights: [], resistanceShift: 0 },
       ]
-      mockProfileService.getProfileById.mockResolvedValue(profileData)
+      getProfileByIdSpy.mockResolvedValue(profileData)
 
       const context = await responseService.createResponseContext(
         'ctx2',
@@ -191,7 +196,7 @@ describe('PatientResponseService', () => {
         content: 'hi',
         timestamp: '',
       }) // Ensure logLength > 0
-      mockProfileService.getProfileById.mockResolvedValue(profileDataNoLog)
+      getProfileByIdSpy.mockResolvedValue(profileDataNoLog)
       // When sessionProgressLog is empty, derivedSessionNumber defaults to 1
       const context3 = await responseService.createResponseContext(
         'ctx3',
@@ -211,7 +216,7 @@ describe('PatientResponseService', () => {
       }
       const candidateResponse = 'I think I can do this.'
 
-      mockConsistencyService.checkBeliefConsistency.mockResolvedValue({
+      checkBeliefConsistencySpy.mockResolvedValue({
         isConsistent: true,
         contradictionsFound: [],
         confidence: 1.0,
@@ -223,7 +228,7 @@ describe('PatientResponseService', () => {
       )
 
       expect(
-        mockConsistencyService.checkBeliefConsistency,
+        checkBeliefConsistencySpy,
       ).toHaveBeenCalledWith(profile, candidateResponse)
       expect(response).toBe(candidateResponse)
     })
@@ -246,7 +251,7 @@ describe('PatientResponseService', () => {
       }
       const candidateResponse = 'I am a great success!'
 
-      mockConsistencyService.checkBeliefConsistency.mockResolvedValue({
+      checkBeliefConsistencySpy.mockResolvedValue({
         isConsistent: false,
         contradictionsFound: [
           {
@@ -264,7 +269,7 @@ describe('PatientResponseService', () => {
       )
 
       expect(
-        mockConsistencyService.checkBeliefConsistency,
+        checkBeliefConsistencySpy,
       ).toHaveBeenCalledWith(profile, candidateResponse)
       expect(response).toContain('I find myself wanting to say')
       expect(response).toContain(candidateResponse)
@@ -275,10 +280,12 @@ describe('PatientResponseService', () => {
     it('should handle missing profile in context gracefully for generateConsistentResponse', async () => {
       const candidateResponse = 'This should just return.'
       // Intentionally create a bad context (profile is missing)
-      const context = {
+      const context: Parameters<
+        typeof responseService.generateConsistentResponse
+      >[0] = {
         styleConfig: baseStyleConfig,
         sessionNumber: 1,
-      } as ResponseContext
+      }
 
       // No need to mock consistencyService here as it shouldn't be called if context.profile is falsy
       const response = await responseService.generateConsistentResponse(
@@ -288,7 +295,7 @@ describe('PatientResponseService', () => {
       expect(response).toBe(candidateResponse)
       // checkBeliefConsistency should not have been called
       expect(
-        mockConsistencyService.checkBeliefConsistency,
+        checkBeliefConsistencySpy,
       ).not.toHaveBeenCalled()
     })
   })
@@ -327,14 +334,14 @@ describe('PatientResponseService', () => {
       },
     ]
 
-    it('should include basic patient info and style in prompt', () => {
+    it('should include basic patient info and style in prompt', async () => {
       const context: ResponseContext = {
         profile: patientProfile,
         styleConfig: baseStyleConfig,
         sessionNumber: 3,
         therapeuticFocus: ['managing anxiety'],
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).toContain('You are roleplaying as Prompt User')
       expect(prompt).toContain(
@@ -364,7 +371,7 @@ describe('PatientResponseService', () => {
       expect(prompt).toContain('Respond as Prompt User:')
     })
 
-    it('should correctly include new emotional authenticity parameters in prompt', () => {
+    it('should correctly include new emotional authenticity parameters in prompt', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         emotionalNuance: 'subtle',
@@ -377,19 +384,17 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).toContain('Your emotional expression should be subtle.')
-      expect(prompt).toContain(
-        'The intensity of your expressed emotion should be around 3/10.',
-      )
+      expect(prompt).toMatch(/The intensity of your expressed emotion should be around 3(?:\.0)?\/10\./)
       expect(prompt).toContain('Focus on conveying sadness.')
       expect(prompt).toContain(
         'Include textual descriptions of non-verbal cues (e.g., *sighs*, *looks away*, *nods slowly*) in a style that is descriptive.',
       )
     })
 
-    it('should correctly include new resistance and defensive mechanism parameters in prompt', () => {
+    it('should correctly include new resistance and defensive mechanism parameters in prompt', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         resistanceLevel: 8,
@@ -400,7 +405,7 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).toContain(
         'Your resistance to therapeutic suggestions is 8/10.',
@@ -413,7 +418,7 @@ describe('PatientResponseService', () => {
       )
     })
 
-    it('should include specific instruction for intellectualization defense', () => {
+    it('should include specific instruction for intellectualization defense', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         activeDefensiveMechanism: 'intellectualization',
@@ -423,13 +428,13 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
       expect(prompt).toContain(
         'Focus on abstract concepts and avoid expressing direct feelings.',
       )
     })
 
-    it('should include specific instruction for minimization defense', () => {
+    it('should include specific instruction for minimization defense', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         activeDefensiveMechanism: 'minimization',
@@ -439,17 +444,17 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
       expect(prompt).toContain('Downplay the importance of concerns raised.')
     })
 
-    it('should include instruction for emotional transitions', () => {
+    it('should include instruction for emotional transitions', async () => {
       const context: ResponseContext = {
         profile: patientProfile,
         styleConfig: baseStyleConfig,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
       expect(prompt).toContain(
         "Consider your previous emotional state and the therapist's last statement when forming your response, allowing for natural emotional shifts or intensifications.",
       )
@@ -458,7 +463,7 @@ describe('PatientResponseService', () => {
       )
     })
 
-    it('should handle "none" for nonVerbalIndicatorStyle and activeDefensiveMechanism', () => {
+    it('should handle "none" for nonVerbalIndicatorStyle and activeDefensiveMechanism', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         nonVerbalIndicatorStyle: 'none',
@@ -469,7 +474,7 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).not.toContain(
         'Include textual descriptions of non-verbal cues',

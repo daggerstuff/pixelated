@@ -98,10 +98,10 @@ export interface IntegratedResponse extends AIServiceResponse {
  * MetaAligner LLM Integration Service
  */
 export class MetaAlignerAPI {
-  private config: AlignmentIntegrationConfig
-  private objectives: ObjectiveDefinition[]
-  private metricsEngine: ObjectiveMetricsEngine
-  private aiService: AIService | undefined
+  private readonly config: AlignmentIntegrationConfig
+  private readonly objectives: ObjectiveDefinition[]
+  private readonly metricsEngine: ObjectiveMetricsEngine
+  private readonly aiService: AIService | undefined
 
   constructor(config: AlignmentIntegrationConfig = {}) {
     this.config = {
@@ -109,12 +109,12 @@ export class MetaAlignerAPI {
       enableResponseEnhancement: true,
       enhancementThreshold: 0.7,
       maxEnhancementAttempts: 2,
-      model: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      model: 'minimaxai/minimax-m2.7',
       temperature: 0.7,
       ...config,
     }
 
-    this.objectives = config.objectives || CORE_MENTAL_HEALTH_OBJECTIVES
+    this.objectives = config.objectives ?? CORE_MENTAL_HEALTH_OBJECTIVES
     this.aiService = config.aiService
 
     this.metricsEngine = new ObjectiveMetricsEngine({
@@ -239,12 +239,12 @@ export class MetaAlignerAPI {
       const evaluation: AlignmentEvaluationResult = {
         objectiveResults,
         overallScore,
-        weights: objectives.reduce(
+        weights: objectives.reduce< Record<string, number>>(
           (weights, obj) => {
             weights[obj.id] = obj.weight
             return weights
           },
-          {} as Record<string, number>,
+          {},
         ),
         normalizedScores: Object.fromEntries(
           Object.entries(objectiveResults).map(([id, result]) => [
@@ -271,7 +271,7 @@ export class MetaAlignerAPI {
 
       // Determine if enhancement is needed
       const needsEnhancement =
-        overallScore < (this.config.enhancementThreshold || 0.7)
+        overallScore < (this.config.enhancementThreshold ?? 0.7)
 
       logger.info('Response evaluation completed', {
         overallScore: overallScore.toFixed(3),
@@ -351,8 +351,8 @@ export class MetaAlignerAPI {
       // Generate enhanced response
       const aiResponse: AICompletion =
         await this.aiService.createChatCompletion(messages, {
-          model: this.config.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-          temperature: this.config.temperature || 0.7,
+          model: this.config.model ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+          temperature: this.config.temperature ?? 0.7,
           maxTokens: Math.max(originalResponse.length * 1.5, 1024),
         })
 
@@ -483,7 +483,7 @@ export class MetaAlignerAPI {
 
     return {
       userQuery,
-      conversationHistory: conversationHistory?.map((msg) => msg.content) || [],
+      conversationHistory: conversationHistory?.map((msg) => msg.content) ?? [],
       detectedContext,
     }
   }
@@ -705,8 +705,8 @@ Please enhance the response to better meet these objectives while maintaining it
  */
 export class IntegratedAIService {
   constructor(
-    private baseService: AIService,
-    private metaAligner: MetaAlignerAPI,
+    private readonly baseService: AIService,
+    private readonly metaAligner: MetaAlignerAPI,
   ) {}
 
   async createChatCompletion(
@@ -769,7 +769,7 @@ export class IntegratedAIService {
       evaluation.needsEnhancement &&
       this.metaAligner['config'].enableResponseEnhancement
     ) {
-      const maxAttempts = this.metaAligner['config'].maxEnhancementAttempts || 2
+      const maxAttempts = this.metaAligner['config'].maxEnhancementAttempts ?? 2
 
       // Attempt enhancement up to maxAttempts. Count attempts even when an enhancement succeeds
       while (enhancementAttempts < maxAttempts && evaluation.needsEnhancement) {

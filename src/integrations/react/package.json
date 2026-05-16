@@ -49,17 +49,17 @@
     "test": "astro-scripts test \"test/**/*.test.js\""
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^5.1.2",
+    "@vitejs/plugin-react": "^6.0.1",
     "ultrahtml": "^1.6.0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.9",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "astro": "^5.16.15",
+    "astro": "^6.3.1",
     "cheerio": "^1.2.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "vite": "^7.3.1"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "vite": "8.0.12"
   },
   "peerDependencies": {
     "@types/react": "^17.0.50 || ^18.0.21 || ^19.2.5",
@@ -67,15 +67,15 @@
     "react": "^17.0.2 || ^18.0.0",
     "react-dom": "^17.0.2 || ^18.0.0 || ^19.2.0"
   },
+  "engines": {
+    "node": "24.14.1"
+  },
   "pnpm": {
     "overrides": {
       "rollup": "^4.59.0",
       "devalue": "^5.6.4",
       "svgo": "^4.0.1",
-      "undici": "^7.24.0"
+      "undici": "^7.25.0"
     }
-  },
-  "engines": {
-    "node": "24.13.0"
   }
 }

@@ -31,7 +31,7 @@ export interface MCPModelConfig {
 }
 
 export class MCPIntegration {
-  private config: MCPModelConfig
+  private readonly config: MCPModelConfig
   private isInitialized: boolean = false
 
   constructor(config: MCPModelConfig) {
@@ -54,7 +54,7 @@ export class MCPIntegration {
 
       this.isInitialized = true
       logger.info('MCP integration initialized successfully')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize MCP integration', { error })
       throw error
     }
@@ -73,7 +73,7 @@ export class MCPIntegration {
       })
 
       return response.ok
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MCP health check failed', { error })
       return false
     }
@@ -106,11 +106,16 @@ export class MCPIntegration {
 
       const data = await response.json()
       return data as MCPResponse
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('MCP request failed', { error, method: request.method })
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }
     }
   }
@@ -123,8 +128,8 @@ export class MCPIntegration {
       params: {
         messages,
         model_config: {
-          max_tokens: this.config.maxTokens || 1000,
-          temperature: this.config.temperature || 0.7,
+          max_tokens: this.config.maxTokens ?? 1000,
+          temperature: this.config.temperature ?? 0.7,
         },
       },
     })
@@ -159,11 +164,11 @@ let mcpInstance: MCPIntegration | null = null
 export function getMCPIntegration(): MCPIntegration {
   if (!mcpInstance) {
     const config: MCPModelConfig = {
-      modelId: process.env.MCP_MODEL_ID || 'default',
-      endpoint: process.env.MCP_ENDPOINT || 'http://localhost:8000',
+      modelId: process.env.MCP_MODEL_ID ?? 'default',
+      endpoint: process.env.MCP_ENDPOINT ?? 'http://localhost:8000',
       apiKey: process.env.MCP_API_KEY,
-      maxTokens: parseInt(process.env.MCP_MAX_TOKENS || '1000'),
-      temperature: parseFloat(process.env.MCP_TEMPERATURE || '0.7'),
+      maxTokens: parseInt(process.env.MCP_MAX_TOKENS ?? '1000'),
+      temperature: parseFloat(process.env.MCP_TEMPERATURE ?? '0.7'),
     }
 
     mcpInstance = new MCPIntegration(config)
@@ -194,13 +199,18 @@ export async function POST(context: APIContext) {
       status: response.success ? 200 : 400,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('MCP API request failed', { error })
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -225,11 +235,16 @@ export async function GET(_context: APIContext) {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     return new Response(
       JSON.stringify({
         status: 'error',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

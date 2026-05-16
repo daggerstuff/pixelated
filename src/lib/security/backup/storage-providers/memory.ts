@@ -8,7 +8,7 @@
 import type { StorageProvider, StorageProviderConfig } from '../backup-types'
 
 export class InMemoryStorageProvider implements StorageProvider {
-  private storage: Map<string, Uint8Array> = new Map()
+  private readonly storage: Map<string, Uint8Array> = new Map()
   private initialized = false
 
   constructor(config: StorageProviderConfig) {

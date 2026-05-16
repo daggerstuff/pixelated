@@ -9,9 +9,10 @@ import {
 } from '../lib/memory/memory-client'
 
 const memoryManager =
-  process.env.NEXT_PUBLIC_USE_MCP_MEMORY === 'true'
-    ? mcpMemoryManager
-    : localMemoryManager
+  process.env.NEXT_PUBLIC_USE_LOCAL_MEMORY === 'true' ||
+  process.env.NEXT_PUBLIC_USE_MCP_MEMORY === 'false'
+    ? localMemoryManager
+    : mcpMemoryManager
 
 interface UseMemoryOptions {
   userId?: string
@@ -69,7 +70,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   const handleError = useCallback((err: unknown) => {
     const errorMessage =
       err instanceof Error
-        ? (err)?.message || String(err)
+        ? err?.message || String(err)
         : 'An unknown error occurred'
     setError(errorMessage)
     console.error('Memory operation error:', err)
@@ -117,8 +118,8 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
             content,
             metadata: {
               ...metadata,
-              role: metadata?.role || 'user',
-              category: metadata?.category || category || 'general',
+              role: metadata?.role ?? 'user',
+              category: (metadata?.category ?? category) ?? 'general',
               userId,
             },
           },
@@ -373,7 +374,7 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
       if (prefMemory) {
         try {
           const match = prefMemory.content.match(/= (.+)$/)
-          return match && match[1]
+          return match?.[1]
             ? (JSON.parse(match[1]) as
                 | string
                 | number

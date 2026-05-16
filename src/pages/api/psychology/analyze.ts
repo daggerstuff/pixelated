@@ -490,9 +490,9 @@ function calculateProgressMetrics(
   clientContext?: AnalyzeRequest['clientContext'],
 ): ProgressMetrics {
   const positiveIndicators =
-    content.match(/better|good|improved|progress|hopeful/gi)?.length || 0
+    content.match(/better|good|improved|progress|hopeful/gi)?.length ?? 0
   const negativeIndicators =
-    content.match(/worse|bad|difficult|struggling|hard/gi)?.length || 0
+    content.match(/worse|bad|difficult|struggling|hard/gi)?.length ?? 0
 
   const symptomSeverity = Math.max(
     1,
@@ -544,7 +544,7 @@ function calculateProgressMetrics(
           'Goal setting',
           'Strategy development',
         ],
-      })) || [],
+      })) ?? [],
   }
 }
 
@@ -625,7 +625,7 @@ export const POST = async ({ request }: APIContext) => {
     const response: AnalyzeResponse = {
       analysis: {
         type: body.analysisType,
-        summary: `Clinical analysis identified ${observations.length} key observations with ${riskAssessment?.overallRisk || 'unknown'} risk level`,
+        summary: `Clinical analysis identified ${observations.length} key observations with ${riskAssessment?.overallRisk ?? 'unknown'} risk level`,
         keyFindings: observations.slice(0, 5).map((obs) => obs.observation),
         clinicalObservations: observations,
         riskAssessment,

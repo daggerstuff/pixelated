@@ -17,12 +17,12 @@ const testConfig = {
 }
 
 // Ensure directories exist
-mkdirSync(testConfig.outputDir, { recursive: true }).slice()
+mkdirSync(testConfig.outputDir, { recursive: true })
 mkdirSync(testConfig.screenshotsDir, { recursive: true })
 
 // Test results collector
 class TestResultsCollector {
-  private results: any[] = []
+  private readonly results: any[] = []
 
   addResult(result: any) {
     this.results.push({
@@ -52,8 +52,8 @@ class TestResultsCollector {
     ).length
 
     const browserStats = this.results.reduce((acc, result) => {
-      const browser = result.browser || 'unknown'
-      acc[browser] = acc[browser] || { passed: 0, failed: 0, skipped: 0 }
+      const browser = result.browser ?? 'unknown'
+      acc[browser] = acc[browser] ?? { passed: 0, failed: 0, skipped: 0 }
 
       if (result.status === 'passed') acc[browser].passed++
       else if (result.status === 'failed') acc[browser].failed++
@@ -80,12 +80,12 @@ class TestResultsCollector {
       (r) => r.status === 'failed' && r.browser,
     )
     const browserCount = browserIssues.reduce((acc, r) => {
-      acc[r.browser] = (acc[r.browser] || 0) + 1
+      acc[r.browser] = (acc[r.browser] ?? 0) + 1
       return acc
     }, {})
 
     Object.entries(browserCount).forEach(([browser, count]) => {
-      if (count > 5) {
+      if ((count as number) > 5) {
         recommendations.push({
           priority: 'high',
           category: 'browser-compatibility',
@@ -129,7 +129,7 @@ class TestResultsCollector {
 
 // Visual regression testing utilities
 class VisualRegressionTester {
-  private baselineScreenshots: Map<string, string> = new Map()
+  private readonly baselineScreenshots: Map<string, string> = new Map()
 
   async captureScreenshot(page: any, name: string, options = {}) {
     const screenshot = await page.screenshot({
@@ -179,7 +179,7 @@ class VisualRegressionTester {
 
 // Cross-browser compatibility checker
 class CrossBrowserCompatibilityChecker {
-  private browserQuirks = {
+  private readonly browserQuirks = {
     webkit: {
       backdropFilter: '-webkit-backdrop-filter',
       userSelect: '-webkit-user-select',
@@ -291,9 +291,9 @@ class PerformanceAnalyzer {
         domContentLoaded:
           navigation.domContentLoadedEventEnd -
           navigation.domContentLoadedEventStart,
-        firstPaint: paint.find((p) => p.name === 'first-paint')?.startTime || 0,
+        firstPaint: paint.find((p) => p.name === 'first-paint')?.startTime ?? 0,
         firstContentfulPaint:
-          paint.find((p) => p.name === 'first-contentful-paint')?.startTime ||
+          paint.find((p) => p.name === 'first-contentful-paint')?.startTime ??
           0,
       }
     })
@@ -349,10 +349,10 @@ class PerformanceAnalyzer {
 
 // Main test runner
 export class ThemeTestRunner {
-  private resultsCollector: TestResultsCollector
-  private visualTester: VisualRegressionTester
-  private compatibilityChecker: CrossBrowserCompatibilityChecker
-  private performanceAnalyzer: PerformanceAnalyzer
+  private readonly resultsCollector: TestResultsCollector
+  private readonly visualTester: VisualRegressionTester
+  private readonly compatibilityChecker: CrossBrowserCompatibilityChecker
+  private readonly performanceAnalyzer: PerformanceAnalyzer
 
   constructor() {
     this.resultsCollector = new TestResultsCollector()
@@ -416,7 +416,7 @@ export class ThemeTestRunner {
         test: 'test-execution',
         browser,
         status: 'error',
-        error: error.message,
+        error: (error as Error).message,
       })
     }
 

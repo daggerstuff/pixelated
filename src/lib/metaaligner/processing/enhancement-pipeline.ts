@@ -56,8 +56,8 @@ export interface AlignmentImprovement {
  * Enhances LLM responses to better align with mental health objectives
  */
 export class EnhancementPipeline {
-  private config: EnhancementPipelineConfig
-  private metaAligner: MetaAlignerAPI
+  private readonly config: EnhancementPipelineConfig
+  private readonly metaAligner: MetaAlignerAPI
 
   constructor(
     config: EnhancementPipelineConfig = {},
@@ -74,7 +74,7 @@ export class EnhancementPipeline {
 
     // Use provided MetaAlignerAPI or create a new one
     this.metaAligner =
-      metaAligner ||
+      metaAligner ??
       new MetaAlignerAPI({
         enableResponseEnhancement: true,
         enhancementThreshold: this.config.enhancementThreshold,
@@ -111,7 +111,7 @@ export class EnhancementPipeline {
       // Check if enhancement is needed
       const needsEnhancement =
         initialEvaluation.overallScore <
-        (this.config.enhancementThreshold || 0.7)
+        (this.config.enhancementThreshold ?? 0.7)
 
       if (!needsEnhancement) {
         logger.info('Response quality sufficient, skipping enhancement', {
@@ -181,9 +181,14 @@ export class EnhancementPipeline {
           enhanced: enhancementResult.enhanced,
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Enhancement pipeline failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
         action: 'process_error',
       })
 
@@ -212,9 +217,14 @@ export class EnhancementPipeline {
       try {
         const result = await this.process(input)
         results.push(result)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Batch item processing failed', {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           action: 'batch_item_error',
         })
 
@@ -247,7 +257,7 @@ export class EnhancementPipeline {
     let currentResponse = originalResponse
     let currentEvaluation = evaluation
     let attempts = 0
-    const maxAttempts = this.config.maxRetries || 2
+    const maxAttempts = this.config.maxRetries ?? 2
     let enhanced = false
 
     logger.info('Applying enhancements', {
@@ -281,7 +291,7 @@ export class EnhancementPipeline {
 
           const stillNeedsEnhancement =
             currentEvaluation.overallScore <
-            (this.config.enhancementThreshold || 0.7)
+            (this.config.enhancementThreshold ?? 0.7)
 
           if (!stillNeedsEnhancement) {
             break
@@ -290,10 +300,15 @@ export class EnhancementPipeline {
           // No improvement applied, stop iterations
           break
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Enhancement attempt failed', {
           attempt: attempts,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
           action: 'enhancement_attempt_failed',
         })
 
@@ -331,9 +346,9 @@ export class EnhancementPipeline {
     // Compare overall score
 
     // Compare individual objective scores
-    for (const [objectiveId, enhancedResult] of Object.entries(
-      enhanced.objectiveResults,
-    )) {
+    for (const [objectiveId, enhancedResult] of Object.entries<{
+      score: number
+    }>(enhanced.objectiveResults)) {
       const originalResult = original.objectiveResults[objectiveId]
 
       if (originalResult) {

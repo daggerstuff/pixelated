@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import ChartComponent from '@/components/analytics/ChartComponent.tsx'
+import { ChartBar, Search, Target, TrendingUp } from 'lucide-react'
+import { DynamicChartComponent } from '@/lib/utils/dynamic-components'
 ---
 
 <BaseLayout
@@ -25,7 +26,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Progress Tracking Chart -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Patient Progress Tracking</h3>
-          <ChartComponent
+          <DynamicChartComponent
             client:load
             type="line"
             title="Therapy Progress Over Time"
@@ -44,7 +45,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Session Metrics Chart -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Session Metrics</h3>
-          <ChartComponent
+          <DynamicChartComponent
             client:load
             type="bar"
             title="Session Analysis"
@@ -60,7 +61,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Emotion Distribution -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Emotion Distribution</h3>
-          <ChartComponent
+          <DynamicChartComponent
             client:load
             type="pie"
             title="Emotional State Analysis"
@@ -76,7 +77,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <!-- Correlation Analysis -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h3 class="text-xl font-semibold mb-4">Correlation Analysis</h3>
-          <ChartComponent
+          <DynamicChartComponent
             client:load
             type="scatter"
             title="Factor Correlation"
@@ -96,7 +97,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
         <h2 class="text-2xl font-bold mb-4">Key Features</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="flex items-start space-x-3">
-            <div class="text-2xl">📊</div>
+            <div class="text-2xl"><ChartBar className="w-6 h-6" /></div>
             <div>
               <h4 class="font-semibold">Real-time Analytics</h4>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -105,7 +106,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
             </div>
           </div>
           <div class="flex items-start space-x-3">
-            <div class="text-2xl">🎯</div>
+            <div class="text-2xl"><Target className="w-6 h-6" /></div>
             <div>
               <h4 class="font-semibold">Progress Tracking</h4>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -114,7 +115,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
             </div>
           </div>
           <div class="flex items-start space-x-3">
-            <div class="text-2xl">🔍</div>
+            <div class="text-2xl"><Search className="w-6 h-6" /></div>
             <div>
               <h4 class="font-semibold">Pattern Recognition</h4>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -123,7 +124,7 @@ import ChartComponent from '@/components/analytics/ChartComponent.tsx'
             </div>
           </div>
           <div class="flex items-start space-x-3">
-            <div class="text-2xl">📈</div>
+            <div class="text-2xl"><TrendingUp className="w-6 h-6" /></div>
             <div>
               <h4 class="font-semibold">Performance Metrics</h4>
               <p class="text-sm text-gray-600 dark:text-gray-400">

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
+import { indexedDBRequestQueue } from '@/utils/offline/indexedDBRequestQueue'
 import offlineManager from '@/utils/offline/offlineManager'
-import requestQueue from '@/utils/offline/requestQueue'
 
 import { useOfflineDetection } from './useOfflineDetection'
 
@@ -23,12 +23,14 @@ export function useOfflineManager({
   onSyncComplete,
 }: UseOfflineManagerOptions = {}) {
   const networkState = useOfflineDetection()
-  const [queueStats, setQueueStats] = useState(() => requestQueue.getStats())
+  const [queueStats, setQueueStats] = useState(() =>
+    indexedDBRequestQueue.getStats(),
+  )
   const [isSyncing, setIsSyncing] = useState(false)
 
   // Update queue stats
   const updateQueueStats = useCallback(() => {
-    setQueueStats(requestQueue.getStats())
+    setQueueStats(indexedDBRequestQueue.getStats())
   }, [])
 
   // Set up event listeners
@@ -59,11 +61,18 @@ export function useOfflineManager({
   // Enhanced fetch function that handles offline scenarios
   const offlineFetch = useCallback(
     async (url: string, options: RequestInit = {}) => {
+      const isEncryptedTransport = url.startsWith('https://')
+      const isCriticalPath = criticalPaths.some((path) => url.includes(path))
+
+      if (!isEncryptedTransport && isCriticalPath) {
+        throw new Error(
+          'Blocked unencrypted request to critical path — HTTPS required for PHI/EHR data (HIPAA)',
+        )
+      }
+
       if (!enableQueue) {
         return fetch(url, options)
       }
-
-      const isCriticalPath = criticalPaths.some((path) => url.includes(path))
 
       try {
         const response = await fetch(url, options)
@@ -73,14 +82,14 @@ export function useOfflineManager({
         }
 
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      } catch (error) {
+      } catch (error: unknown) {
         if (!networkState.isOnline) {
           // Queue the request for later
           const priority = isCriticalPath ? 'critical' : 'normal'
 
-          const queued = requestQueue.add({
+          const queued = indexedDBRequestQueue.add({
             url,
-            method: (options.method as any) || 'GET',
+            method: (options.method as any) ?? 'GET',
             headers: (options.headers as Record<string, string>) || {},
             body: options.body,
             priority,
@@ -91,7 +100,7 @@ export function useOfflineManager({
             onRequestQueued?.({
               id: `req_${Date.now()}`,
               url,
-              method: (options.method as any) || 'GET',
+              method: (options.method as any) ?? 'GET',
               headers: (options.headers as Record<string, string>) || {},
               body: options.body,
               timestamp: Date.now(),
@@ -136,7 +145,7 @@ export function useOfflineManager({
 
   // Clear all queued requests
   const clearQueue = useCallback(() => {
-    requestQueue.clear()
+    indexedDBRequestQueue.clear()
     updateQueueStats()
   }, [updateQueueStats])
 

@@ -17,7 +17,7 @@ dotenv.config()
 const STRATEGY_DIR = path.resolve(__dirname, '../../business-strategy')
 const WORKSPACE_DIR = path.resolve(__dirname, '..')
 const MONGO_URI =
-  process.env.MONGODB_URI ||
+  process.env.MONGODB_URI ??
   'mongodb://admin:password@127.0.0.1:27017/business-strategy-cms?authSource=admin'
 const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000'
 
@@ -76,7 +76,7 @@ function parseStrategyFile(
         ? titleMatch[1]
         : baseName
 
-  let category = frontmatter.category || DocumentCategory.BUSINESS_PLAN
+  let category = frontmatter.category ?? DocumentCategory.BUSINESS_PLAN
   if (!frontmatter.category) {
     if (sourceFile.startsWith('outreach/') || sourceFile.startsWith('pilot-operations/')) {
       category = DocumentCategory.OPERATIONS_PLAN
@@ -95,13 +95,13 @@ function parseStrategyFile(
   return {
     title,
     content: bodyContent.trim(),
-    summary: frontmatter.summary || `Imported from ${sourceFile}`,
+    summary: frontmatter.summary ?? `Imported from ${sourceFile}`,
     category,
-    tags: frontmatter.tags || ['imported', 'strategy', 'v1'],
-    status: frontmatter.status || DocumentStatus.PUBLISHED,
-    authorId: frontmatter.authorId || SYSTEM_USER_ID,
-    collaborators: frontmatter.collaborators || [],
-    version: frontmatter.version || 1,
+    tags: frontmatter.tags ?? ['imported', 'strategy', 'v1'],
+    status: frontmatter.status ?? DocumentStatus.PUBLISHED,
+    authorId: frontmatter.authorId ?? SYSTEM_USER_ID,
+    collaborators: frontmatter.collaborators ?? [],
+    version: frontmatter.version ?? 1,
     metadata: {
       wordCount,
       readingTime,
@@ -153,29 +153,34 @@ async function persistDocument(
 }
 
 /** Phase 4: Run post-import AI analysis on all documents and update metadata. */
+// ⚡ Bolt: Optimizing N+1 queries by batching documents into chunks and executing AI review and edge case mapping in parallel via Promise.all within each chunk.
 async function runPostImportAnalysis(): Promise<void> {
   console.log('Starting Post-Import AI Analysis...')
   const allDocs = await DocumentModelMongoose.find({})
-  for (const doc of allDocs) {
-    const review = await AIStrategyReviewService.reviewDocument(
-      doc._id.toString(),
-    )
-    const mapping = await EdgeCaseMappingService.mapStrategyToEdgeCases(
-      doc._id.toString(),
-    )
 
-    console.log(`- Reviewed: ${doc.title} (Score: ${review.overallScore})`)
-    console.log(
-      `  - Mapped to ${mapping.mappedEdgeCases.length} technical edge cases.`,
-    )
+  const CHUNK_SIZE = 10;
+  for (let i = 0; i < allDocs.length; i += CHUNK_SIZE) {
+    const chunk = allDocs.slice(i, i + CHUNK_SIZE);
 
-    await DocumentModelMongoose.findByIdAndUpdate(doc._id, {
-      $set: {
-        'metadata.reviewScore': review.overallScore,
-        'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
-        'metadata.aiReview': review,
-      },
-    })
+    await Promise.all(chunk.map(async (doc) => {
+      const docId = doc._id.toString();
+
+      const [review, mapping] = await Promise.all([
+        AIStrategyReviewService.reviewDocument(docId),
+        EdgeCaseMappingService.mapStrategyToEdgeCases(docId)
+      ]);
+
+      console.log(`- Reviewed: ${doc.title} (Score: ${review.overallScore})`);
+      console.log(`  - Mapped to ${mapping.mappedEdgeCases.length} technical edge cases.`);
+
+      await DocumentModelMongoose.findByIdAndUpdate(doc._id, {
+        $set: {
+          'metadata.reviewScore': review.overallScore,
+          'metadata.edgeCaseCount': mapping.mappedEdgeCases.length,
+          'metadata.aiReview': review,
+        },
+      });
+    }));
   }
   console.log('Post-Import Analysis Completed.')
 }
@@ -210,7 +215,7 @@ async function importStrategy() {
     console.log(`Wrote last import metadata to ${lastImportPath}.`)
 
     await runPostImportAnalysis()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Import failed:', error)
   } finally {
     await mongoose.connection.close()

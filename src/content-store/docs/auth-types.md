@@ -1,13 +1,13 @@
 ---
-title: 'Authentication Types and Protected Routes'
-description: 'Authentication Types and Protected Routes documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
+description: Authentication Types and Protected Routes documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
 tags:
   - documentation
   - authentication
 draft: false
 toc: true
+title: Authentication Types and Protected Routes
 ---
 
 # Authentication Types and Protected Routes

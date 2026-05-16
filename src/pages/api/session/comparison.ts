@@ -49,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
       const result = await client.query(query, [
         therapistId,
         currentSessionId,
-        previousSessionId || null,
+        previousSessionId ?? null,
         improvementScore,
         JSON.stringify(metrics),
       ])
@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving session comparison:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -80,7 +80,7 @@ export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url)
     const therapistId = url.searchParams.get('therapistId')
     const sessionId = url.searchParams.get('sessionId')
-    const timeRange = url.searchParams.get('timeRange') || '30d'
+    const timeRange = url.searchParams.get('timeRange') ?? '30d'
 
     if (!therapistId && !sessionId) {
       return new Response(
@@ -170,7 +170,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({
-          therapistId: therapistId || result.rows[0]?.therapist_id,
+          therapistId: therapistId ?? result.rows[0]?.therapist_id,
           sessionId: sessionId,
           comparisons,
         }),
@@ -179,7 +179,7 @@ export const GET: APIRoute = async ({ request }) => {
     } finally {
       client.release()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching session comparisons:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

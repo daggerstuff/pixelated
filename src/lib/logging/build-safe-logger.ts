@@ -6,10 +6,10 @@ export function createBuildSafeLogger(prefix: string = 'app') {
   const tag = `[build-safe-logger][${prefix}]`
 
   return {
-    info: (...args: unknown[]) => (console.info || console.log)(tag, ...args),
-    warn: (...args: unknown[]) => (console.warn || console.log)(tag, ...args),
-    error: (...args: unknown[]) => (console.error || console.log)(tag, ...args),
-    debug: (...args: unknown[]) => (console.debug || console.log)(tag, ...args),
+    info: (...args: unknown[]) => console.info(tag, ...args),
+    warn: (...args: unknown[]) => console.warn(tag, ...args),
+    error: (...args: unknown[]) => console.error(tag, ...args),
+    debug: (...args: unknown[]) => console.debug(tag, ...args),
   }
 }
 

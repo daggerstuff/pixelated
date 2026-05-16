@@ -112,18 +112,18 @@ export class AdvancedResponseOrchestrator
   private notificationManager!: NotificationManager
 
   constructor(
-    private config: OrchestrationConfig,
-    private threatIntelligenceService: ThreatIntelligenceService,
-    private rateLimitingService: RateLimitingService,
+    private readonly config: OrchestrationConfig,
+    private readonly threatIntelligenceService: ThreatIntelligenceService,
+    private readonly rateLimitingService: RateLimitingService,
   ) {
     super()
     void this.initializeServices()
   }
 
   private async initializeServices(): Promise<void> {
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+    this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
     this.mongoClient = new MongoClient(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection',
+      process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_detection',
     )
 
     this.responseExecutor = new ConcurrentResponseExecutor(this.config)
@@ -186,7 +186,7 @@ export class AdvancedResponseOrchestrator
         threatId,
       })
       return response
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('orchestration_error', { threatId, error })
       throw error
     }
@@ -231,7 +231,7 @@ export class AdvancedResponseOrchestrator
       })
 
       return validationResults.success
-    } catch (error) {
+    } catch (error: unknown) {
       response.status = 'failed'
       await this.updateThreatResponse(response)
       this.emit('response_execution_error', {
@@ -271,7 +271,7 @@ export class AdvancedResponseOrchestrator
       })
 
       return rollbackSuccess
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('response_rollback_error', { responseId, error })
       return false
     }
@@ -298,7 +298,7 @@ export class AdvancedResponseOrchestrator
       }
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Action validation error:', error)
       return false
     }
@@ -328,7 +328,7 @@ export class AdvancedResponseOrchestrator
         responseId: escalatedResponse.responseId,
       })
       return escalatedResponse
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('threat_escalation_error', { threatId, reason, error })
       throw error
     }
@@ -353,7 +353,7 @@ export class AdvancedResponseOrchestrator
       this.emit('system_integration_completed', {
         responseId: response.responseId,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       this.emit('system_integration_error', {
         responseId: response.responseId,
         error,
@@ -501,6 +501,8 @@ export class AdvancedResponseOrchestrator
           timeout: 60000,
         }
 
+      case "alert": { throw new Error('Not implemented yet: "alert" case') }
+      case "escalate": { throw new Error('Not implemented yet: "escalate" case') }
       default:
         return null
     }
@@ -573,7 +575,7 @@ export class AdvancedResponseOrchestrator
   ): Promise<void> {
     // Pre-execution validation
     const validationResults = await Promise.all(
-      response.actions.map((action) => this.validateAction(action)),
+      response.actions.map( async (action) => this.validateAction(action)),
     )
 
     if (validationResults.some((result) => !result)) {
@@ -661,7 +663,7 @@ export class AdvancedResponseOrchestrator
     try {
       const c: unknown = crypto
       const { randomUUID, randomBytes } =
-        (c as Record<string, unknown> | undefined) || {}
+        (c as Record<string, unknown> | undefined) ?? {}
       if (randomUUID && typeof randomUUID === 'function') {
         return `${prefix}${randomUUID()}`
       }
@@ -729,7 +731,7 @@ export class AdvancedResponseOrchestrator
 
     return {
       success: failures.length === 0,
-      errors: failures.map((f) => f.error || 'Unknown error'),
+      errors: failures.map((f) => f.error ?? 'Unknown error'),
     }
   }
 
@@ -759,7 +761,7 @@ export class AdvancedResponseOrchestrator
       await this.mongoClient.db('admin').command({ ping: 1 })
 
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Orchestrator health check failed:', error)
       return false
     }
@@ -858,7 +860,7 @@ abstract class NotificationManager {
 
 // Concrete implementations
 class ConcurrentResponseExecutor extends ResponseExecutor {
-  constructor(private config: OrchestrationConfig) {
+  constructor(private readonly config: OrchestrationConfig) {
     super()
   }
 
@@ -871,7 +873,7 @@ class ConcurrentResponseExecutor extends ResponseExecutor {
 
     for (const priorityGroup of priorityGroups) {
       const groupResults = await Promise.all(
-        priorityGroup.map((action) => this.executeSingleAction(action)),
+        priorityGroup.map( async (action) => this.executeSingleAction(action)),
       )
       results.push(...groupResults)
     }
@@ -884,7 +886,7 @@ class ConcurrentResponseExecutor extends ResponseExecutor {
     const reversedActions = [...actions].reverse()
 
     return await Promise.all(
-      reversedActions.map((action) => this.rollbackSingleAction(action)),
+      reversedActions.map( async (action) => this.rollbackSingleAction(action)),
     )
   }
 
@@ -1001,20 +1003,20 @@ class MLDecisionEngine extends DecisionEngine {
     const severityScore =
       typeof data.severity === 'number'
         ? data.severity
-        : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity || 'low'] ||
+        : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity ?? 'low'] ||
           0
 
     return [
-      data.anomalyScore || 0,
-      data.frequency || 0,
+      data.anomalyScore ?? 0,
+      data.frequency ?? 0,
       severityScore,
-      data.impact || 0,
-      data.userRiskScore || 0,
-      data.ipRiskScore || 0,
-      data.behavioralDeviation || 0,
-      data.temporalAnomaly || 0,
-      data.geographicAnomaly || 0,
-      data.patternNovelty || 0,
+      data.impact ?? 0,
+      data.userRiskScore ?? 0,
+      data.ipRiskScore ?? 0,
+      data.behavioralDeviation ?? 0,
+      data.temporalAnomaly ?? 0,
+      data.geographicAnomaly ?? 0,
+      data.patternNovelty ?? 0,
     ]
   }
 
@@ -1046,8 +1048,8 @@ class MLDecisionEngine extends DecisionEngine {
     return {
       userId: data.userId,
       ip: data.sourceIp,
-      anomalyTypes: data.anomalyTypes || [],
-      patternMatches: data.patternMatches || [],
+      anomalyTypes: data.anomalyTypes ?? [],
+      patternMatches: data.patternMatches ?? [],
     }
   }
 
@@ -1068,7 +1070,7 @@ class MLDecisionEngine extends DecisionEngine {
 }
 
 class MultiSystemIntegrationManager extends IntegrationManager {
-  constructor(private endpoints: IntegrationEndpoint[]) {
+  constructor(private readonly endpoints: IntegrationEndpoint[]) {
     super()
   }
 
@@ -1130,7 +1132,7 @@ class MultiSystemIntegrationManager extends IntegrationManager {
 }
 
 class MultiChannelNotificationManager extends NotificationManager {
-  constructor(private channels: NotificationChannel[]) {
+  constructor(private readonly channels: NotificationChannel[]) {
     super()
   }
 

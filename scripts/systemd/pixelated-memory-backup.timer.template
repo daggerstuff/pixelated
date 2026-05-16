@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Pixelated memory DB backup on schedule
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

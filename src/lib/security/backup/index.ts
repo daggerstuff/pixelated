@@ -130,9 +130,7 @@ const getCrypto = async () => {
         encryptedData.set(part2, part1.length)
 
         // Get authentication tag
-        const authTag = new Uint8Array(
-          (cipher).getAuthTag(),
-        )
+        const authTag = new Uint8Array(cipher.getAuthTag())
 
         return { encryptedData, authTag }
       },
@@ -217,9 +215,7 @@ export class BackupSecurityManager {
   private config: BackupConfig
   private encryptionKey!: Uint8Array // MODIFIED: Definite assignment assertion
   private isInitialized = false
-  private storageProviders: Map<StorageLocation, StorageProvider> = new Map()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // private recoveryTestingManager!: RecoveryTestingManager
+  private readonly storageProviders: Map<StorageLocation, StorageProvider> = new Map()
 
   constructor(config?: Partial<BackupConfig>) {
     // Default configuration
@@ -319,7 +315,7 @@ export class BackupSecurityManager {
    * Generate a UUID for backup IDs
    */
   private generateUUID(): string {
-    if (isBrowser && window.crypto && window.crypto.randomUUID) {
+    if (isBrowser && window.crypto?.randomUUID) {
       return window.crypto.randomUUID()
     }
 
@@ -341,7 +337,7 @@ export class BackupSecurityManager {
 
     for (let i = 0; i < 16; i++) {
       const byte = randBytes[i]
-      const hex = (byte !== undefined ? byte : 0).toString(16).padStart(2, '0')
+      const hex = (byte ?? 0).toString(16).padStart(2, '0')
       // Insert dashes at the appropriate positions
       if (i === 4 || i === 6 || i === 8 || i === 10) {
         uuid += '-'
@@ -774,12 +770,7 @@ export class BackupSecurityManager {
   ): Promise<BackupMetadata | null> {
     // Try to find in all configured storage locations
     const storageEntries = Array.from(this.storageProviders.entries())
-    for (let i = 0; i < storageEntries.length; i++) {
-      const entry = storageEntries[i]
-      if (!entry || !Array.isArray(entry) || entry.length < 2) {
-        continue
-      }
-      const [location, provider] = entry
+    for (const [location, provider] of storageEntries) {
       if (!provider) {
         continue
       }
@@ -798,7 +789,7 @@ export class BackupSecurityManager {
         }
       } catch (error: unknown) {
         logger.error(
-          `Error searching for backup metadata in ${location}: ${error instanceof Error ? String(error) : String(error)}`,
+          `Error searching for backup metadata in ${location}: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
         )
       }
     }
@@ -809,16 +800,114 @@ export class BackupSecurityManager {
   /**
    * Get data to backup based on backup type
    */
-  private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    // Implementation would collect app data based on backup type
-    // For now return dummy data for demonstration
-    // [PIX-44] TODO: No more fucking cop-outs
-    const dummyData = {
-      message: `This is a ${type} backup created at ${new Date().toISOString()}`,
+  private async getLastBackupTime(requireFull = false): Promise<Date | null> {
+    let latestTimestamp = 0
+
+    const storageEntries = Array.from(this.storageProviders.entries())
+    for (const [, provider] of storageEntries) {
+      if (!provider) continue
+
+      try {
+        const files = await provider.listFiles('backups/')
+        const metaFiles = files.filter((f) => f.endsWith('.meta.json'))
+        for (const metaFile of metaFiles) {
+          try {
+            const metadataBuffer = await provider.getFile(metaFile)
+            const metadata = JSON.parse(
+              new TextDecoder().decode(metadataBuffer),
+            ) as BackupMetadata
+
+            if (metadata.status === BackupStatus.COMPLETED) {
+              if (requireFull && metadata.type !== BackupType.FULL) continue
+              if (
+                !requireFull &&
+                metadata.type !== BackupType.FULL &&
+                metadata.type !== BackupType.DIFFERENTIAL &&
+                metadata.type !== BackupType.INCREMENTAL
+              )
+                continue
+
+              const timestamp = new Date(metadata.timestamp).getTime()
+              if (timestamp > latestTimestamp) {
+                latestTimestamp = timestamp
+              }
+            }
+          } catch {
+            // Ignore individual file parsing errors
+          }
+        }
+      } catch (error: unknown) {
+        logger.error(
+          `Error searching for latest backup metadata: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+        )
+      }
     }
 
-    // Use TextEncoder for cross-environment compatibility
-    return new TextEncoder().encode(JSON.stringify(dummyData))
+    return latestTimestamp > 0 ? new Date(latestTimestamp) : null
+  }
+
+  private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
+    let appDataJson =
+      '{"timestamp":"' +
+      new Date().toISOString() +
+      '","type":"' +
+      type +
+      '","data":{'
+
+    try {
+      const mongooseModule = 'mongoose'
+      const mongoose =
+        (await import(/* @vite-ignore */ mongooseModule)).default ??
+        (await import(/* @vite-ignore */ mongooseModule))
+      const models = mongoose.modelNames()
+
+      let isFirstModel = true
+
+      let baselineTime: Date | null = null
+      if (type === BackupType.DIFFERENTIAL || type === BackupType.INCREMENTAL) {
+        const requireFull = type === BackupType.DIFFERENTIAL
+        const lastBackupTime = await this.getLastBackupTime(requireFull)
+        baselineTime =
+          lastBackupTime ?? new Date(Date.now() - 24 * 60 * 60 * 1000)
+      }
+
+      for (const modelName of models) {
+        const Model = mongoose.model(modelName)
+        const query: Record<string, unknown> = {}
+
+        if (baselineTime && Model.schema.paths.updatedAt) {
+          query.updatedAt = { $gte: baselineTime }
+        }
+
+        if (!isFirstModel) {
+          appDataJson += ','
+        }
+        appDataJson += '"' + modelName + '":['
+        isFirstModel = false
+
+        const cursor = Model.find(query).lean().cursor()
+        let isFirstDoc = true
+
+        for await (const doc of cursor) {
+          if (!isFirstDoc) {
+            appDataJson += ','
+          }
+          appDataJson += JSON.stringify(doc)
+          isFirstDoc = false
+        }
+
+        appDataJson += ']'
+      }
+
+      appDataJson += '}}'
+    } catch (error: unknown) {
+      logger.error(
+        `Failed to collect data for backup: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+      )
+      throw error // Fail loudly to prevent silent data corruption
+    }
+
+    return new TextEncoder().encode(appDataJson)
   }
 
   /**
@@ -939,7 +1028,7 @@ export class BackupSecurityManager {
 
         const provider = await getStorageProvider(
           locationConfig.provider,
-          locationConfig.providerConfig || locationConfig.config,
+          locationConfig.providerConfig ?? locationConfig.config,
         )
 
         await provider.initialize()
@@ -1047,7 +1136,7 @@ async function getStorageProvider(
   try {
     // Import the storage provider dynamically
     const { getStorageProvider: importedGetStorageProvider } =
-      await import('./storage-providers-wrapper.ts')
+      await import('./storage-providers-wrapper')
     // Convert to unknown first, then ensure it has the required type property
     const providerConfig = {
       type: provider,

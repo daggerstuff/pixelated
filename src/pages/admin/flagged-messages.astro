@@ -65,7 +65,7 @@ function getFlagReason(metadata: unknown): string {
             <tbody>
               {flaggedMessages.map((message) => (
                 <tr>
-                  <td>{new Date(message.created_at).toLocaleString()}</td>
+                  <td>{new Date(message.created_at || '').toLocaleString()}</td>
                   <td>
                     <a href={`/admin/conversations/${message.conversation_id}`}>
                       {message.conversation_id}
@@ -78,7 +78,7 @@ function getFlagReason(metadata: unknown): string {
                       <input
                         type="hidden"
                         name="messageId"
-                        value={message.id}
+                        value={message._id}
                       />
                       <button type="submit" class="btn btn-small btn-success">
                         Approve
@@ -88,7 +88,7 @@ function getFlagReason(metadata: unknown): string {
                       <input
                         type="hidden"
                         name="messageId"
-                        value={message.id}
+                        value={message._id}
                       />
                       <button type="submit" class="btn btn-small btn-danger">
                         Delete

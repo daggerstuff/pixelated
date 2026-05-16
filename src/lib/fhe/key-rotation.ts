@@ -8,7 +8,6 @@
 import crypto from 'crypto'
 import { EventEmitter } from 'node:events'
 
-import type { KMS, CloudWatch } from 'aws-sdk'
 import AWS from 'aws-sdk'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
@@ -26,6 +25,7 @@ interface AuditEvent {
   ipAddress?: string
   success: boolean
   details: Record<string, unknown>
+  metadata?: Record<string, unknown>
   riskLevel: 'low' | 'medium' | 'high' | 'critical'
 }
 
@@ -43,6 +43,84 @@ interface DistributedLock {
   nodeId: string
   expiresAt: number
   operation: string
+}
+
+type AwsRequest<T> = {
+  promise(): Promise<T>
+}
+
+type AwsKmsClient = {
+  generateDataKey: (params: Record<string, unknown>) => AwsRequest<unknown>
+  decrypt: (params: Record<string, unknown>) => AwsRequest<unknown>
+}
+
+type AwsSecretsManagerClient = {
+  createSecret: (params: Record<string, unknown>) => AwsRequest<unknown>
+  rotateSecret: (params: Record<string, unknown>) => AwsRequest<unknown>
+  listSecrets: (params: AwsListSecretsRequest) => AwsRequest<unknown>
+  getSecretValue: (params: Record<string, unknown>) => AwsRequest<unknown>
+}
+
+type AwsCloudWatchClient = {
+  putMetricData: (params: Record<string, unknown>) => AwsRequest<unknown>
+}
+
+type AwsSecretListEntry = {
+  Name?: string
+  [key: string]: unknown
+}
+
+type AwsListSecretsRequest = {
+  Filters?: Array<{
+    Key: string
+    Values: string[]
+  }>
+  NextToken?: string
+}
+
+type AwsListSecretsResponse = {
+  SecretList?: AwsSecretListEntry[]
+  NextToken?: string
+}
+
+type AwsSecretValue = {
+  SecretString?: string
+}
+
+const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null
+}
+
+const isAwsListSecretsResponse = (
+  value: unknown,
+): value is AwsListSecretsResponse => {
+  if (!isObjectRecord(value)) {
+    return false
+  }
+
+  if (value.SecretList !== undefined) {
+    if (!Array.isArray(value.SecretList)) {
+      return false
+    }
+  }
+
+  if (value.NextToken !== undefined) {
+    return typeof value.NextToken === 'string'
+  }
+
+  return true
+}
+
+const isAwsSecretValue = (value: unknown): value is AwsSecretValue => {
+  if (!isObjectRecord(value)) {
+    return false
+  }
+
+  if (value.SecretString === undefined) {
+    return true
+  }
+
+  return typeof value.SecretString === 'string'
 }
 
 interface KeyVersion {
@@ -87,23 +165,23 @@ const SECURITY_CONSTANTS = {
  * HIPAA++ Compliant FHE Key Rotation Service
  */
 export class KeyRotationService extends EventEmitter {
-  private static instance: KeyRotationService
-  private options: KeyManagementOptions
+  private static instance: KeyRotationService | undefined
+  private readonly options: KeyManagementOptions
   private activeKeyId: string | null = null
-  private keyVersions = new Map<string, KeyVersion>()
-  private keyRotationTimers = new Map<string, NodeJS.Timeout>()
-  private distributedLocks = new Map<string, DistributedLock>()
-  private securityMetrics: SecurityMetrics
+  private readonly keyVersions = new Map<string, KeyVersion>()
+  private readonly keyRotationTimers = new Map<string, NodeJS.Timeout>()
+  private readonly distributedLocks = new Map<string, DistributedLock>()
+  private readonly securityMetrics: SecurityMetrics
   private auditEvents: AuditEvent[] = []
-  private isClient = false
-  private isServer = false
-  private nodeId: string
+  private readonly isClient: boolean
+  private readonly isServer: boolean
+  private readonly nodeId: string
   private sealService: SealService | null = null
   private sealInitialized = false
-  private kmsClient: KMS | null = null
-  private secretsManager: AWS.SecretsManager | null = null
-  private cloudWatch: CloudWatch | null = null
-  private keyCache = new Map<string, TFHEKeyPair>()
+  private readonly kmsClient: AwsKmsClient | null = null
+  private readonly secretsManager: AwsSecretsManagerClient | null = null
+  private readonly cloudWatch: AwsCloudWatchClient | null = null
+  private readonly keyCache = new Map<string, TFHEKeyPair>()
   private encryptionKey: Buffer | null = null
   private isInitialized = false
 
@@ -133,12 +211,18 @@ export class KeyRotationService extends EventEmitter {
         this.kmsClient = new AWS.KMS({
           apiVersion: '2014-11-01',
           maxRetries: 3,
-          retryDelayOptions: { customBackoff: this.exponentialBackoff },
+          retryDelayOptions: {
+            customBackoff: (retryCount: number) =>
+              this.exponentialBackoff(retryCount),
+          },
         })
         this.secretsManager = new AWS.SecretsManager({
           apiVersion: '2017-10-17',
           maxRetries: 3,
-          retryDelayOptions: { customBackoff: this.exponentialBackoff },
+          retryDelayOptions: {
+            customBackoff: (retryCount: number) =>
+              this.exponentialBackoff(retryCount),
+          },
         })
         this.cloudWatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' })
 
@@ -180,10 +264,17 @@ export class KeyRotationService extends EventEmitter {
   public static getInstance(
     options?: Partial<KeyManagementOptions>,
   ): KeyRotationService {
-    if (!KeyRotationService.instance) {
-      KeyRotationService.instance = new KeyRotationService(options)
-    }
+    KeyRotationService.instance ??= new KeyRotationService(options)
     return KeyRotationService.instance
+  }
+
+  /**
+   * Reset singleton instance for test environments.
+   */
+  public static resetInstanceForTests(): void {
+    if (process.env['NODE_ENV'] === 'test') {
+      KeyRotationService.instance = undefined
+    }
   }
 
   /**
@@ -252,11 +343,11 @@ export class KeyRotationService extends EventEmitter {
       eventId: this.generateSecureId(),
       timestamp: new Date().toISOString(),
       action,
-      userId: details.userId || 'system',
-      ipAddress: details.ipAddress || 'internal',
+      userId: details.userId ?? 'system',
+      ipAddress: details.ipAddress ?? 'internal',
       success: details.success ?? true,
-      details: details.details || {},
-      riskLevel: details.riskLevel || 'low',
+      details: details.details ?? {},
+      riskLevel: details.riskLevel ?? 'low',
       ...(details.keyId && { keyId: details.keyId }),
     }
 
@@ -555,7 +646,9 @@ export class KeyRotationService extends EventEmitter {
       // For server environments, use normal timeouts
       const timer = setTimeout(() => {
         this.rotateKeys().catch((err) => {
-          logger.error(`Failed to rotate key ${keyId}`, { error: err })
+          logger.error(`Failed to rotate key ${keyId}`, {
+            error: this.getErrorMessage(err),
+          })
         })
       }, timeToExpiry)
 
@@ -580,7 +673,9 @@ export class KeyRotationService extends EventEmitter {
       const now = Date.now()
       if (now >= expiryTime) {
         this.rotateKeys().catch((err) => {
-          logger.error(`Failed to rotate key ${keyId}`, { error: err })
+          logger.error(`Failed to rotate key ${keyId}`, {
+            error: this.getErrorMessage(err),
+          })
         })
 
         // Clear the interval after rotation
@@ -632,11 +727,20 @@ export class KeyRotationService extends EventEmitter {
         // Serialize and store the keys
         const serializedKeys = await this.sealService.serializeKeys()
 
+        const publicKey =
+          typeof serializedKeys.publicKey === 'string'
+            ? serializedKeys.publicKey
+            : ''
+        const privateKeyEncrypted =
+          typeof serializedKeys.secretKey === 'string'
+            ? serializedKeys.secretKey
+            : ''
+
         // Create a key pair record
         const keyPair: TFHEKeyPair = {
           id: keyId,
-          publicKey: serializedKeys.publicKey || '',
-          privateKeyEncrypted: serializedKeys.secretKey || '',
+          publicKey,
+          privateKeyEncrypted,
           created: now,
           expires: expiryTime,
           version: '1.0',
@@ -715,7 +819,10 @@ export class KeyRotationService extends EventEmitter {
         riskLevel: 'critical',
       })
 
-      logger.error('HIPAA++ Key rotation failed', { error, rotationId })
+      logger.error('HIPAA++ Key rotation failed', {
+        error: this.getErrorMessage(error),
+        rotationId,
+      })
       this.emit('rotation-failed', { error: errorMessage, rotationId })
       throw new Error(`HIPAA++ Key rotation error: ${errorMessage}`, {
         cause: error,
@@ -745,7 +852,7 @@ export class KeyRotationService extends EventEmitter {
             this.securelyDestroyKey(keyId).catch((err) => {
               logger.error('Failed to destroy deprecated key', {
                 keyId,
-                error: err,
+                error: this.getErrorMessage(err),
               })
             })
           },
@@ -881,7 +988,9 @@ export class KeyRotationService extends EventEmitter {
         riskLevel: 'critical',
       })
 
-      logger.error(`Failed to store key ${keyPair.id}`, { error })
+      logger.error(`Failed to store key ${keyPair.id}`, {
+        error: this.getErrorMessage(error),
+      })
       throw new Error(`HIPAA++ Key storage error: ${errorMessage}`, {
         cause: error,
       })
@@ -907,7 +1016,7 @@ export class KeyRotationService extends EventEmitter {
       }
 
       logger.info(
-        `Loaded keys successfully. Active key: ${this.activeKeyId || 'none'}`,
+        `Loaded keys successfully. Active key: ${this.activeKeyId ?? 'none'}`,
       )
     } catch (error: unknown) {
       logger.error('Failed to load keys', { error })
@@ -921,7 +1030,7 @@ export class KeyRotationService extends EventEmitter {
   private loadKeysFromLocalStorage() {
     try {
       // Find all key-related items in localStorage
-      const keyPrefix = this.options.storagePrefix || ''
+      const keyPrefix = this.options.storagePrefix ?? ''
       const allKeys: TFHEKeyPair[] = []
 
       // Check if localStorage is available
@@ -933,12 +1042,14 @@ export class KeyRotationService extends EventEmitter {
       // Iterate through localStorage
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i)
-        if (key && key.startsWith(keyPrefix)) {
+        if (key?.startsWith(keyPrefix)) {
           try {
             const value = localStorage.getItem(key)
             if (value) {
-              const keyPair = JSON.parse(value) as unknown as TFHEKeyPair
-              allKeys.push(keyPair)
+              const keyPair = this.parseKeyPair(value)
+              if (keyPair) {
+                allKeys.push(keyPair)
+              }
             }
           } catch (e) {
             const errorMessage = e instanceof Error ? e.message : 'Parse error'
@@ -967,7 +1078,9 @@ export class KeyRotationService extends EventEmitter {
               secretKey: newestKey.privateKeyEncrypted,
             })
             .catch((err) => {
-              logger.error('Failed to load SEAL keys', { error: err })
+              logger.error('Failed to load SEAL keys', {
+                error: this.getErrorMessage(err),
+              })
             })
         }
 
@@ -984,7 +1097,9 @@ export class KeyRotationService extends EventEmitter {
         }
       }
     } catch (error: unknown) {
-      logger.error('Error loading keys from localStorage', { error })
+      logger.error('Error loading keys from localStorage', {
+        error: this.getErrorMessage(error),
+      })
     }
   }
 
@@ -993,7 +1108,7 @@ export class KeyRotationService extends EventEmitter {
    */
   private async loadKeysFromSecureStorage(): Promise<void> {
     try {
-      const keyPrefix = this.options.storagePrefix || ''
+      const keyPrefix = this.options.storagePrefix ?? ''
 
       // In a production environment, load from AWS Secrets Manager
       if (isProd() && this.secretsManager) {
@@ -1001,10 +1116,10 @@ export class KeyRotationService extends EventEmitter {
 
         // List all secrets with our prefix
         let nextToken: string | undefined
-        let allSecrets: AWS.SecretsManager.SecretListEntry[] = []
+        let allSecrets: AwsSecretListEntry[] = []
 
         do {
-          const listParams: AWS.SecretsManager.ListSecretsRequest = {
+          const listParams: AwsListSecretsRequest = {
             Filters: [
               {
                 Key: 'name',
@@ -1020,6 +1135,9 @@ export class KeyRotationService extends EventEmitter {
           const response = await this.secretsManager
             .listSecrets(listParams)
             .promise()
+          if (!isAwsListSecretsResponse(response)) {
+            break
+          }
 
           if (response.SecretList) {
             allSecrets = allSecrets.concat(response.SecretList)
@@ -1032,19 +1150,22 @@ export class KeyRotationService extends EventEmitter {
         const allKeys: TFHEKeyPair[] = []
         for (const secret of allSecrets) {
           try {
-            if (secret.Name && secret.Name.startsWith(keyPrefix)) {
+            if (secret.Name?.startsWith(keyPrefix)) {
               // Get the secret value
               const secretValue = await this.secretsManager
                 .getSecretValue({
                   SecretId: secret.Name,
                 })
                 .promise()
+              if (!isAwsSecretValue(secretValue)) {
+                continue
+              }
 
               if (secretValue.SecretString) {
-                const keyPair = JSON.parse(
-                  secretValue.SecretString,
-                ) as TFHEKeyPair
-                allKeys.push(keyPair)
+                const keyPair = this.parseKeyPair(secretValue.SecretString)
+                if (keyPair) {
+                  allKeys.push(keyPair)
+                }
               }
             }
           } catch (e) {
@@ -1117,7 +1238,9 @@ export class KeyRotationService extends EventEmitter {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
-      logger.error('Failed to load keys from secure storage', { error })
+      logger.error('Failed to load keys from secure storage', {
+        error: this.getErrorMessage(error),
+      })
       throw new Error(`Key loading error: ${errorMessage}`, { cause: error })
     }
   }
@@ -1143,6 +1266,44 @@ export class KeyRotationService extends EventEmitter {
    */
   public getSecurityMetrics(): SecurityMetrics {
     return { ...this.securityMetrics }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error)
+  }
+
+  private parseKeyPair(value: string): TFHEKeyPair | null {
+    const parsed: unknown = JSON.parse(value)
+    if (!isObjectRecord(parsed)) {
+      return null
+    }
+
+    const id = parsed.id
+    const publicKey = parsed.publicKey
+    const privateKeyEncrypted = parsed.privateKeyEncrypted
+    const created = parsed.created
+    const expires = parsed.expires
+    const version = parsed.version
+
+    if (
+      typeof id !== 'string' ||
+      typeof publicKey !== 'string' ||
+      typeof privateKeyEncrypted !== 'string' ||
+      typeof created !== 'number' ||
+      typeof expires !== 'number' ||
+      typeof version !== 'string'
+    ) {
+      return null
+    }
+
+    return {
+      id,
+      publicKey,
+      privateKeyEncrypted,
+      created,
+      expires,
+      version,
+    }
   }
 
   /**

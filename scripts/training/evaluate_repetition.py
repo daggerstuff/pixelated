@@ -20,7 +20,7 @@ import json
 import math
 import re
 from collections import Counter
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 try:
     from peft import PeftModel
-except ImportError:  # pragma: no cover - optional dependency at runtime
+except ImportError:
     PeftModel = None
 
 

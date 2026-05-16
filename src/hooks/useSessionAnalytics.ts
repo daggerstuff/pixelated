@@ -92,7 +92,7 @@ export function useSessionAnalytics(
                       : 0,
               }
               return item.dominantEmotion
-                ? { ...baseData, label: `${item.dominantEmotion}` }
+                ? { ...baseData, label: item.dominantEmotion }
                 : baseData
             })
           : []
@@ -104,7 +104,7 @@ export function useSessionAnalytics(
         if (isMounted) {
           setError(
             err instanceof Error
-              ? (err)?.message || String(err)
+              ? err?.message || String(err)
               : 'An unknown error occurred',
           )
         }

@@ -86,9 +86,9 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
     // Parse query parameters
     const url = new URL(request.url)
     const includePatterns = url.searchParams.get('includePatterns') === 'true'
-    const timeWindow = parseInt(url.searchParams.get('timeWindow') || '90', 10)
-    const emotionTypes = url.searchParams.get('emotionTypes')?.split(',') || []
-    const analysisType = url.searchParams.get('analysisType') || 'full'
+    const timeWindow = parseInt(url.searchParams.get('timeWindow') ?? '90', 10)
+    const emotionTypes = url.searchParams.get('emotionTypes')?.split(',') ?? []
+    const analysisType = url.searchParams.get('analysisType') ?? 'full'
 
     // Validate time window (between 1 and 365 days)
     const validTimeWindow = Math.min(Math.max(timeWindow, 1), 365)
@@ -253,7 +253,12 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
       'anonymous',
       'auth-temporal-emotions',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )

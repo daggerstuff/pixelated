@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react'
+import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { TherapistSession } from '@/types/dashboard'
@@ -7,7 +7,7 @@ import { useTherapistAnalytics } from '../useTherapistAnalytics'
 
 // Mock the logger
 vi.mock('@/lib/logging/build-safe-logger', () => ({
-  createBuildSafeLogger: () => vi.fn(),
+  createBuildSafeLogger: () => vi.fn<() => unknown>(),
 }))
 
 describe('useTherapistAnalytics', () => {
@@ -61,7 +61,7 @@ describe('useTherapistAnalytics', () => {
     },
   ]
 
-  const mockFilters = { timeRange: '30d' as const }
+  const mockFilters = { timeRange: '1y' as const }
 
   it('initializes with loading state', async () => {
     const { result } = renderHook(() =>
@@ -69,8 +69,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for initial load to complete
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
     })
 
     expect(result.current.isLoading).toBe(false)
@@ -84,8 +84,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
     })
 
     expect(result.current.isLoading).toBe(false)
@@ -104,8 +104,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     const sessionMetrics = result.current.data?.sessionMetrics
@@ -121,8 +121,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     const skillProgress = result.current.data?.skillProgress
@@ -142,11 +142,12 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
-    const summaryStats = result.current.data?.summaryStats
+    const summaryData = result.current.data
+    const summaryStats = summaryData?.summaryStats
     expect(summaryStats).toBeDefined()
 
     const totalSessions = summaryStats?.find(
@@ -164,8 +165,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     const comparativeData = result.current.data?.comparativeData
@@ -184,8 +185,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     expect(result.current.isLoading).toBe(false)
@@ -200,12 +201,14 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
-    await act(async () => {
-      await result.current.refetch()
+    await result.current.refetch()
+
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     // Data should be regenerated
@@ -218,8 +221,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     act(() => {
@@ -236,8 +239,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for initial load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     // Rerender with different sessions
@@ -270,8 +273,8 @@ describe('useTherapistAnalytics', () => {
     rerender({ sessions: updatedSessions })
 
     // Wait for re-render to complete
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data?.sessionMetrics).toHaveLength(3)
     })
 
     expect(result.current.data?.sessionMetrics).toHaveLength(3)
@@ -283,8 +286,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     const summaryStats = result.current.data?.summaryStats
@@ -301,16 +304,14 @@ describe('useTherapistAnalytics', () => {
   })
 
   it('handles single session for comparative data', async () => {
-    const singleSession = [mockSessions[0]].filter(
-      Boolean,
-    )
+    const singleSession = [mockSessions[0]].filter(Boolean)
     const { result } = renderHook(() =>
       useTherapistAnalytics(mockFilters, singleSession),
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     const comparativeData = result.current.data?.comparativeData
@@ -324,8 +325,8 @@ describe('useTherapistAnalytics', () => {
     )
 
     // Wait for data to load
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
     })
 
     expect(result.current.data).not.toBeNull()

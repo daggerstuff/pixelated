@@ -3,6 +3,11 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type {
+  DiscoveryResponse,
+  Source,
+  SourceList,
+} from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 import { useDiscoveryStore } from '@/lib/stores/journal-research'
 
@@ -12,11 +17,24 @@ import {
   useDiscoveryInitiateMutation,
 } from '../useDiscovery'
 
+type MockJournalFilters = {
+  openAccessOnly: boolean
+  sourceTypes: string[]
+  keywords: string[]
+  sortBy: 'relevance' | 'publication_date' | 'title' | 'data_availability'
+  sortDirection: 'asc' | 'desc'
+}
+
+const withFilters = (
+  selector: (state: { filters: MockJournalFilters }) => unknown,
+  filters: MockJournalFilters,
+) => selector({ filters })
+
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  listSources: vi.fn(),
-  getSource: vi.fn(),
-  initiateDiscovery: vi.fn(),
+  listSources: vi.fn<() => Promise<SourceList>>(),
+  getSource: vi.fn<() => Promise<Source>>(),
+  initiateDiscovery: vi.fn<() => Promise<DiscoveryResponse>>(),
 }))
 
 // Mock store
@@ -59,14 +77,15 @@ const createWrapper = () => {
 describe('useDiscovery hooks', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useDiscoveryStore.mockReturnValue({
-      filters: {
+    useDiscoveryStore.mockImplementation((selector) => {
+      const defaultFilters: MockJournalFilters = {
         openAccessOnly: false,
         sourceTypes: [],
         keywords: [],
         sortBy: 'relevance',
         sortDirection: 'asc',
-      },
+      }
+      return withFilters(selector, defaultFilters)
     })
   })
 
@@ -91,15 +110,16 @@ describe('useDiscovery hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listSources).mockResolvedValue(mockSourceList)
-      useDiscoveryStore.mockReturnValue({
-        filters: {
-          openAccessOnly: true,
-          sourceTypes: ['journal'],
-          keywords: ['test'],
-          sortBy: 'publication_date',
-          sortDirection: 'desc',
-        },
-      })
+      useDiscoveryStore.mockImplementation((selector) => {
+      const filteredFilters: MockJournalFilters = {
+        openAccessOnly: true,
+        sourceTypes: ['journal'],
+        keywords: ['test'],
+        sortBy: 'publication_date',
+        sortDirection: 'desc',
+      }
+      return withFilters(selector, filteredFilters)
+    })
 
       const { result } = renderHook(() => useDiscoveryListQuery('session-1'), {
         wrapper: createWrapper(),

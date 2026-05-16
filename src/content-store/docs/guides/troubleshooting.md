@@ -1,11 +1,12 @@
 ---
-title: 'Troubleshooting Guide'
-description: 'Troubleshooting Guide documentation'
-pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+description: Troubleshooting Guide documentation
+pubDate: '2024-01-15'
+author: Pixelated Team
+tags:
+  - documentation
 draft: false
 toc: true
+title: Troubleshooting Guide
 ---
 
 # Troubleshooting Guide
@@ -206,18 +207,18 @@ toc: true
 2. Collect Debug Information
 
    ```bash
-   # Get application logs
+# Get application logs
    aws logs get-log-events \
      --log-group-name /aws/ecs/your-app \
      --log-stream-name container-log-stream
 
-   # Get container metrics
+# Get container metrics
    aws cloudwatch get-metric-data \
      --metric-data-queries file://metric-query.json \
      --start-time $(date -u -v-1H +%FT%TZ) \
      --end-time $(date -u +%FT%TZ)
 
-   # Check network connectivity
+# Check network connectivity
    aws ec2 describe-network-interfaces \
      --filters Name=description,Values="ECS task*"
    ```
@@ -233,16 +234,16 @@ toc: true
 1. Check Service Health
 
    ```bash
-   # ECS service status
+# ECS service status
    aws ecs describe-services \
      --cluster your-cluster \
      --services your-service
 
-   # ALB target health
+# ALB target health
    aws elbv2 describe-target-health \
      --target-group-arn your-target-group
 
-   # Container insights
+# Container insights
    aws cloudwatch get-metric-data \
      --metric-data-queries file://container-metrics.json
    ```
@@ -250,15 +251,15 @@ toc: true
 2. Verify Network Configuration
 
    ```bash
-   # Security group rules
+# Security group rules
    aws ec2 describe-security-groups \
      --group-ids your-security-group
 
-   # VPC flow logs
+# VPC flow logs
    aws ec2 describe-flow-logs \
      --filter Name=resource-id,Values=your-vpc
 
-   # Route tables
+# Route tables
    aws ec2 describe-route-tables \
      --filters Name=vpc-id,Values=your-vpc
    ```
@@ -266,13 +267,13 @@ toc: true
 3. Test Connectivity
 
    ```bash
-   # DNS resolution
+# DNS resolution
    dig +short your-domain
 
-   # Load balancer health
+# Load balancer health
    curl -I https://your-alb-dns
 
-   # Internal services
+# Internal services
    aws ssm send-command \
      --document-name AWS-RunShellScript \
      --targets Key=tag:Name,Values=your-instance \
@@ -286,11 +287,11 @@ toc: true
 1. Rollback Deployment
 
    ```bash
-   # Stop current deployment
+# Stop current deployment
    aws deploy stop-deployment \
      --deployment-id deployment-id
 
-   # Create rollback deployment
+# Create rollback deployment
    aws deploy create-deployment \
      --application-name your-app \
      --deployment-group-name your-group \
@@ -300,13 +301,13 @@ toc: true
 2. Scale Services
 
    ```bash
-   # Adjust service count
+# Adjust service count
    aws ecs update-service \
      --cluster your-cluster \
      --service your-service \
      --desired-count 2
 
-   # Update capacity provider
+# Update capacity provider
    aws ecs put-cluster-capacity-providers \
      --cluster your-cluster \
      --capacity-providers FARGATE FARGATE_SPOT
@@ -315,11 +316,11 @@ toc: true
 3. Reset Configuration
 
    ```bash
-   # Update task definition
+# Update task definition
    aws ecs register-task-definition \
      --cli-input-json file://task-definition.json
 
-   # Update service
+# Update service
    aws ecs update-service \
      --cluster your-cluster \
      --service your-service \
@@ -331,11 +332,11 @@ toc: true
 1. Restore Backups
 
    ```bash
-   # List available backups
+# List available backups
    aws backup list-recovery-points-by-backup-vault \
      --backup-vault-name your-vault
 
-   # Start restore job
+# Start restore job
    aws backup start-restore-job \
      --recovery-point-arn arn:aws:backup:region:account:recovery-point:ID
    ```
@@ -343,11 +344,11 @@ toc: true
 2. Verify Data
 
    ```bash
-   # Check database status
+# Check database status
    aws rds describe-db-instances \
      --db-instance-identifier your-db
 
-   # Verify S3 objects
+# Verify S3 objects
    aws s3 ls s3://your-bucket/path/ \
      --recursive \
      --human-readable
@@ -356,10 +357,10 @@ toc: true
 3. Validate Recovery
 
    ```bash
-   # Run health checks
+# Run health checks
    curl https://your-app/health
 
-   # Verify metrics
+# Verify metrics
    aws cloudwatch get-metric-statistics \
      --namespace AWS/RDS \
      --metric-name ReadIOPS \

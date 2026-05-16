@@ -62,12 +62,12 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     const url = new URL(request.url)
     const type =
       (url.searchParams.get('type') as ChartDataRequest['type']) || 'line'
-    const timeRange = parseInt(url.searchParams.get('timeRange') || '30', 10)
+    const timeRange = parseInt(url.searchParams.get('timeRange') ?? '30', 10)
     const clientId = url.searchParams.get('clientId')
     const sessionId = url.searchParams.get('sessionId')
-    const dataPoints = parseInt(url.searchParams.get('dataPoints') || '50', 10)
+    const dataPoints = parseInt(url.searchParams.get('dataPoints') ?? '50', 10)
     const category =
-      (url.searchParams.get('category') as ChartDataRequest['category']) ||
+      (url.searchParams.get('category') as ChartDataRequest['category']) ??
       'progress'
 
     const repository = new AIRepository()
@@ -154,7 +154,12 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,

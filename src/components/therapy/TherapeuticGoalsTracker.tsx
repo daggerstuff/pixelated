@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Dialog, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
-import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card } from '@/components/ui/card/index.ts'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx'
+import { Input } from '@/components/ui/input/index.ts'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Textarea } from '@/components/ui/textarea/index.ts'
 import type { TherapySession } from '@/lib/ai/interfaces/therapy'
 import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
 import { GoalStatus, GoalCategory } from '@/lib/ai/types/TherapeuticGoals'
 import type { TherapeuticGoal } from '@/lib/ai/types/TherapeuticGoals'
+
 interface TherapeuticGoalsTrackerProps {
   patientModel: CognitiveModel
   currentSession: TherapySession
@@ -91,19 +92,51 @@ export function TherapeuticGoalsTracker({
       : 0
 
   // Get interventions related to a specific goal
-  const getRelatedInterventions = (goalId: string) => {
-    return therapistInterventions
-      .filter((intervention) => {
-        const goal = goals.find((g) => g.id === goalId)
-        return goal?.relatedInterventions.includes(intervention.type)
-      })
-      .slice(0, 3) // Show only most recent 3
-  }
+  // ⚡ Bolt: Precompute goal → relatedInterventions map to avoid repeated linear scans
+  const goalInterventionsMap = useMemo(() => {
+    const map = new Map<string, string[]>()
+
+    goals.forEach((goal) => {
+      if (goal.relatedInterventions && goal.relatedInterventions.length > 0) {
+        map.set(goal.id, goal.relatedInterventions)
+      }
+    })
+
+    return map
+  }, [goals])
+
+  // ⚡ Bolt: Precompute the top related therapist interventions for each goal once per render
+  const relatedInterventionsByGoalId = useMemo(() => {
+    const map = new Map<string, typeof therapistInterventions>()
+
+    goalInterventionsMap.forEach((relatedInterventionTypes, goalId) => {
+      const matches: typeof therapistInterventions = []
+      for (const intervention of therapistInterventions) {
+        if (relatedInterventionTypes.includes(intervention.type)) {
+          matches.push(intervention)
+          if (matches.length === 3) break
+        }
+      }
+      map.set(goalId, matches)
+    })
+
+    return map
+  }, [therapistInterventions, goalInterventionsMap])
+
+  // ⚡ Bolt: Keep the helper stable while avoiding repeated filtering work
+  const getRelatedInterventions = useCallback(
+    (goalId: string) => relatedInterventionsByGoalId.get(goalId) ?? [],
+    [relatedInterventionsByGoalId],
+  )
 
   // Handle category tab click
-  const handleCategoryClick = (category: GoalCategory | 'all') => {
-    setActiveTab(category)
-  }
+  // ⚡ Bolt: Memoize category selection handler to prevent unnecessary re-renders
+  const handleCategoryClick = useCallback(
+    (category: GoalCategory | 'all') => {
+      setActiveTab(category)
+    },
+    [setActiveTab],
+  )
 
   // Create a new goal
   async function createGoal(
@@ -125,7 +158,7 @@ export function TherapeuticGoalsTracker({
       setActiveGoalId(newGoal.id)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err)?.message || String(err))
+        setActionError(err?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -153,7 +186,7 @@ export function TherapeuticGoalsTracker({
       )
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err)?.message || String(err))
+        setActionError(err?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -177,7 +210,7 @@ export function TherapeuticGoalsTracker({
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err)?.message || String(err))
+        setActionError(err?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -188,7 +221,7 @@ export function TherapeuticGoalsTracker({
 
   // Open modal for new or edit
   function openModal(goal?: TherapeuticGoal) {
-    setEditGoal(goal || null)
+    setEditGoal(goal ?? null)
     setForm(
       goal
         ? { ...goal }
@@ -226,7 +259,7 @@ export function TherapeuticGoalsTracker({
   async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (editGoal) {
-      await updateGoal({ ...editGoal, ...form })
+      await updateGoal({ ...editGoal, ...form } as TherapeuticGoal)
     } else {
       await createGoal(
         form as Omit<TherapeuticGoal, 'id' | 'createdAt' | 'updatedAt'>,
@@ -238,10 +271,12 @@ export function TherapeuticGoalsTracker({
   return (
     <div className='therapeutic-goals-tracker bg-white rounded-lg p-4 shadow'>
       <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-lg font-semibold'>Therapeutic Goals</h3>
+          <h3 className='text-lg font-semibold'>Therapeutic Goals Tracker</h3>
         <div className='text-gray-600 text-sm'>
           Session #
-          {patientModel.therapeuticProgress.sessionProgressLog.length + 1}
+          {patientModel?.therapeuticProgress?.sessionProgressLog?.length
+              ? patientModel.therapeuticProgress.sessionProgressLog.length + 1
+              : 1}
         </div>
       </div>
 
@@ -333,8 +368,8 @@ export function TherapeuticGoalsTracker({
       </div>
 
       {/* Error and loading states */}
-      {(error || actionError) && (
-        <div className='text-red-600 mb-2'>{error || actionError}</div>
+      {(error ?? actionError) && (
+        <div className='text-red-600 mb-2'>{error ?? actionError}</div>
       )}
       {(loading || actionLoading) && (
         <div className='text-gray-500 mb-2'>Loading...</div>
@@ -348,74 +383,80 @@ export function TherapeuticGoalsTracker({
             if (!open) closeModal()
           }}
         >
-          <form onSubmit={handleFormSubmit} className='space-y-4'>
-            <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
-            <Input
-              name='title'
-              value={form.title || ''}
-              onChange={handleFormChange}
-              placeholder='Goal Title'
-              required
-              maxLength={128}
-            />
+          <DialogContent>
+            {/* Review suggestion: Move DialogTitle outside the form for better semantics */}
+            <DialogHeader>
+              <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
+            </DialogHeader>
 
-            <Textarea
-              name='description'
-              value={form.description || ''}
-              onChange={handleFormChange}
-              placeholder='Description'
-              maxLength={1024}
-            />
+            <form onSubmit={handleFormSubmit} className='space-y-4'>
+              <Input
+                name='title'
+                value={form.title ?? ''}
+                onChange={handleFormChange}
+                placeholder='Goal Title'
+                required
+                maxLength={128}
+              />
 
-            <select
-              name='category'
-              value={form.category || GoalCategory.EMOTIONAL_REGULATION}
-              onChange={handleFormChange}
-              className='w-full rounded border p-2'
-            >
-              {Object.values(GoalCategory).map((cat) => (
-                <option key={cat} value={cat}>
-                  {(() => {
-                    switch (cat) {
-                      case GoalCategory.EMOTIONAL_REGULATION:
-                        return 'Emotional Regulation'
-                      case GoalCategory.COGNITIVE_RESTRUCTURING:
-                        return 'Cognitive Restructuring'
-                      case GoalCategory.BEHAVIORAL_CHANGE:
-                        return 'Behavioral Change'
-                      case GoalCategory.SYMPTOM_REDUCTION:
-                        return 'Symptom Reduction'
-                      case GoalCategory.RELATIONSHIP_IMPROVEMENT:
-                        return 'Relationship Improvement'
-                      case GoalCategory.COPING_SKILLS:
-                        return 'Coping Skills'
-                      case GoalCategory.TRAUMA_RECOVERY:
-                        return 'Trauma Recovery'
-                      case GoalCategory.LIFESTYLE_CHANGES:
-                        return 'Lifestyle Changes'
-                      default:
-                        return cat
-                    }
-                  })()}
-                </option>
-              ))}
-            </select>
-            <select
-              name='status'
-              value={form.status || GoalStatus.NOT_STARTED}
-              onChange={handleFormChange}
-              className='w-full rounded border p-2'
-            >
-              {Object.values(GoalStatus).map((stat) => (
-                <option key={stat} value={stat}>
-                  {stat.replace('_', ' ')}
-                </option>
-              ))}
-            </select>
-            <Button type='submit' disabled={actionLoading} className='w-full'>
-              {editGoal ? 'Update Goal' : 'Create Goal'}
-            </Button>
-          </form>
+              <Textarea
+                name='description'
+                value={form.description ?? ''}
+                onChange={handleFormChange}
+                placeholder='Description'
+                maxLength={1024}
+              />
+
+              <select
+                name='category'
+                value={form.category ?? GoalCategory.EMOTIONAL_REGULATION}
+                onChange={handleFormChange}
+                className='w-full rounded border p-2'
+              >
+                {Object.values(GoalCategory).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {(() => {
+                      switch (cat) {
+                        case GoalCategory.EMOTIONAL_REGULATION:
+                          return 'Emotional Regulation'
+                        case GoalCategory.COGNITIVE_RESTRUCTURING:
+                          return 'Cognitive Restructuring'
+                        case GoalCategory.BEHAVIORAL_CHANGE:
+                          return 'Behavioral Change'
+                        case GoalCategory.SYMPTOM_REDUCTION:
+                          return 'Symptom Reduction'
+                        case GoalCategory.RELATIONSHIP_IMPROVEMENT:
+                          return 'Relationship Improvement'
+                        case GoalCategory.COPING_SKILLS:
+                          return 'Coping Skills'
+                        case GoalCategory.TRAUMA_RECOVERY:
+                          return 'Trauma Recovery'
+                        case GoalCategory.LIFESTYLE_CHANGES:
+                          return 'Lifestyle Changes'
+                        default:
+                          return cat
+                      }
+                    })()}
+                  </option>
+                ))}
+              </select>
+              <select
+                name='status'
+                value={form.status ?? GoalStatus.NOT_STARTED}
+                onChange={handleFormChange}
+                className='w-full rounded border p-2'
+              >
+                {Object.values(GoalStatus).map((stat) => (
+                  <option key={stat} value={stat}>
+                    {stat.replace('_', ' ')}
+                  </option>
+                ))}
+              </select>
+              <Button type='submit' disabled={actionLoading} className='w-full'>
+                {editGoal ? 'Update Goal' : 'Create Goal'}
+              </Button>
+            </form>
+          </DialogContent>
         </Dialog>
       )}
 
@@ -494,7 +535,8 @@ export function TherapeuticGoalsTracker({
                   variant='destructive'
                   onClick={(e) => {
                     e.stopPropagation()
-                    if (window.confirm('Delete this goal?')) void deleteGoal(goal.id)
+                    if (window.confirm('Delete this goal?'))
+                      void deleteGoal(goal.id)
                   }}
                   disabled={actionLoading}
                 >
@@ -636,16 +678,21 @@ export function TherapeuticGoalsTracker({
 }
 
 // Helper function to generate goals from patient model
-// In a real application, these would be stored in the database
 function generateGoalsFromPatientModel(
-  patientModel: CognitiveModel,
+  patientModel: Partial<CognitiveModel> | undefined,
 ): TherapeuticGoal[] {
   const goals: TherapeuticGoal[] = []
   const now = Date.now()
   const sixMonthsFromNow = now + 15768000000 // 6 months in milliseconds
 
+  const presentingIssues = patientModel?.presentingIssues ?? []
+  const goalsForTherapy = patientModel?.goalsForTherapy ?? []
+  const distortionPatterns = patientModel?.distortionPatterns ?? []
+  const sessionProgressLog =
+    patientModel?.therapeuticProgress?.sessionProgressLog ?? []
+
   // Generate goals based on presenting issues
-  patientModel.presentingIssues.forEach((issue, index) => {
+  presentingIssues.forEach((issue, index) => {
     if (index < 3) {
       // Limit to 3 goals from presenting issues
       goals.push({
@@ -661,7 +708,7 @@ function generateGoalsFromPatientModel(
         checkpoints: generateCheckpoints(issue, 4, now),
         progressHistory: generateProgressHistory(now, 3),
         relatedInterventions: generateInterventionTypes(issue),
-        relevantDistortions: patientModel.distortionPatterns
+        relevantDistortions: distortionPatterns
           .slice(0, 2)
           .map((d) => d.type),
         notes:
@@ -673,7 +720,7 @@ function generateGoalsFromPatientModel(
   })
 
   // Generate goals based on therapy goals
-  patientModel.goalsForTherapy.forEach((goal, index) => {
+  goalsForTherapy.forEach((goal, index) => {
     if (index < 2) {
       // Limit to 2 goals from therapy goals
       goals.push({
@@ -698,7 +745,7 @@ function generateGoalsFromPatientModel(
   })
 
   // Add a completed goal if there are enough sessions
-  if (patientModel.therapeuticProgress.sessionProgressLog.length > 5) {
+  if (sessionProgressLog.length > 5) {
     goals.push({
       id: `goal-completed-1`,
       title: 'Develop Emotion Recognition Skills',
@@ -838,7 +885,13 @@ function generateCheckpoints(
   completedAt?: number
   notes?: string
 }> {
-  const checkpoints = []
+  const checkpoints: Array<{
+    id: string
+    description: string
+    isCompleted: boolean
+    completedAt?: number
+    notes?: string
+  }> = []
   const lowerTopic = topic.toLowerCase()
 
   // Common checkpoints based on therapy frameworks
@@ -886,7 +939,11 @@ function generateProgressHistory(
   progressPercent: number
   notes: string
 }> {
-  const history = []
+  const history: Array<{
+    timestamp: number
+    progressPercent: number
+    notes: string
+  }> = []
 
   for (let i = 0; i < count; i++) {
     const weeksAgo = count - i
@@ -921,7 +978,7 @@ function generateInterventionTypes(_topic: string): string[] {
 
   // Pick 2-3 random interventions
   const count = 2 + Math.floor(Math.random() * 2)
-  const interventions = []
+  const interventions: string[] = []
 
   for (let i = 0; i < count; i++) {
     const randomIndex = Math.floor(Math.random() * commonInterventions.length)

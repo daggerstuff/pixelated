@@ -194,7 +194,7 @@ export const GET: APIRoute = async ({ request }) => {
         id: 'plan-1',
         clientName: 'Sarah Johnson',
         therapistName: 'Dr. Emily Chen',
-        clientId: clientId || 'client-1',
+        clientId: clientId ?? 'client-1',
         therapistId: user.id,
         createdDate: new Date(
           Date.now() - 7 * 24 * 60 * 60 * 1000,
@@ -457,7 +457,12 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -465,7 +470,12 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -543,12 +553,12 @@ export const POST: APIRoute = async ({ request }) => {
       totalGoals > 0 ? Math.round(totalProgress / totalGoals) : 0
 
     const newPlan: TreatmentPlanEnhanced = {
-      id: planData.id || `plan-${Date.now()}`,
+      id: planData.id ?? `plan-${Date.now()}`,
       clientName: planData.clientName,
       therapistName: planData.therapistName,
       clientId: planData.clientId,
       therapistId: planData.therapistId,
-      createdDate: planData.createdDate || currentTime,
+      createdDate: planData.createdDate ?? currentTime,
       lastModified: currentTime,
       duration: planData.duration,
       status: planData.status,
@@ -561,12 +571,12 @@ export const POST: APIRoute = async ({ request }) => {
       })),
       notes: planData.notes,
       metadata: {
-        totalSessions: planData.metadata?.totalSessions || 0,
-        completedSessions: planData.metadata?.completedSessions || 0,
+        totalSessions: planData.metadata?.totalSessions ?? 0,
+        completedSessions: planData.metadata?.completedSessions ?? 0,
         overallProgress,
         nextSessionDate: planData.metadata?.nextSessionDate,
-        riskLevel: planData.metadata?.riskLevel || 'low',
-        interventionHistory: planData.metadata?.interventionHistory || [],
+        riskLevel: planData.metadata?.riskLevel ?? 'low',
+        interventionHistory: planData.metadata?.interventionHistory ?? [],
       },
     }
 
@@ -611,7 +621,12 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -619,7 +634,12 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,
@@ -734,7 +754,12 @@ export const PATCH: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -742,7 +767,12 @@ export const PATCH: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       }),
       {
         status: 500,

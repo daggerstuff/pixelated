@@ -1,19 +1,16 @@
 ---
-title: 'Understanding Narcissism and Complex Trauma'
-description:
-  'Exploring the connection between narcissistic behaviors, codependency, and
-  complex trauma'
+title: understanding narcissism
+description: >-
+  At its core, codependency is a symptom of complex trauma. It's not just about
 author: 'Dr. Sarah Chen'
 pubDate: 2024-02-18
-readingTime: 10
-tags: ['narcissism', 'complex trauma', 'codependency', 'relationships']
+tags:
+  - narcissism
+  - complex trauma
+  - codependency
+  - relationships
 series: 'Understanding Trauma'
 seriesOrder: 3
-image:
-  {
-    url: 'https://images.unsplash.com/photo-1541199249251-f713e6145474?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Mirror reflection representing narcissistic patterns',
-  }
 ---
 
 ## The Root of Codependency
@@ -52,29 +49,29 @@ others in the process. This response can be seen as a desperate attempt to fill
 the void left by trauma, often at the expense of healthy relationships and
 emotional intelligence.
 
-**The Three Stages of Codependent Relationships**
+### The Three Stages of Codependent Relationships
 
-**_1. The Idealizing Stage_**
+#### 1. The Idealizing Stage
 
 This is the honeymoon phase, filled with excitement and intensity. It's
 characterized by mirroring (pretending to share the same interests), love
 bombing (showering with affection and gifts), and rushing intimacy. While it
 feels magical, it's often too good to be true.
 
-**_2. The Devaluing Stage_**
+#### 2. The Devaluing Stage
 
 As the fantasy fades, discontentment creeps in. The narcissist, no longer
 feeling superior, begins to devalue their partner. Verbal abuse, emotional
 manipulation, and gaslighting become common. The victim often finds themselves
 walking on eggshells, doubting their own reality.
 
-**_3. The Discard Stage_**
+#### 3. The Discard Stage
 
 Finally, the narcissist discards their partner, often replacing them with
 someone new. This stage is particularly painful for the victim, who is left
 confused, hurt, and often blamed for the relationship's failure.
 
-**The Roles Children Assume**
+### The Roles Children Assume
 
 When children grow up in households with narcissistic parents or caregivers,
 they're often forced to adopt roles to cope with the dysfunction. We've all
@@ -87,7 +84,7 @@ emotional and psychological distress. Children may struggle with anxiety,
 depression, or even addiction as a result of trying to fit into these
 predetermined roles.
 
-**Breaking Free from Codependency**
+### Breaking Free from Codependency
 
 So, how do we break free from this toxic cycle? It starts by recognizing the
 signs of codependency in ourselves and others. We must acknowledge that our
@@ -111,7 +108,7 @@ If you or someone you know is struggling with codependency or addiction, please
 reach out for help. There are resources available to support your journey
 towards healing and recovery. Here is a small few:
 
-**Resources:**
+### Resources
 
 - **_National Alliance on Mental Illness (NAMI) Hotline: 1-800-950-NAMI_**
 - **_Substance Abuse and Mental Health Services Administration (SAMHSA)

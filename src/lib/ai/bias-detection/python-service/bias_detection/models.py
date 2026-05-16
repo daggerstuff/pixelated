@@ -1,13 +1,11 @@
-"""
-Data models for bias detection service
-"""
+"""Data models for bias detection service"""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class BiasType(str, Enum):
@@ -85,21 +83,24 @@ class BiasAnalysisRequest(BaseModel):
         default=None, description="Session ID for request correlation"
     )
 
-    @validator("content")
+    @field_validator("content")
+    @classmethod
     def validate_content(cls, v: str) -> str:
         """Validate content field"""
         if not v.strip():
             raise ValueError("Content cannot be empty or whitespace only")
         return v.strip()
 
-    @validator("language")
+    @field_validator("language")
+    @classmethod
     def validate_language(cls, v: str) -> str:
         """Validate language code"""
         if len(v) != 2:
             raise ValueError("Language must be a 2-letter ISO 639-1 code")
         return v.lower()
 
-    @validator("sensitivity")
+    @field_validator("sensitivity")
+    @classmethod
     def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
@@ -107,11 +108,7 @@ class BiasAnalysisRequest(BaseModel):
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
-        validate_assignment = True
+    model_config = ConfigDict(use_enum_values=True, validate_assignment=True)
 
 
 class BiasScore(BaseModel):
@@ -132,10 +129,7 @@ class BiasScore(BaseModel):
     )
     explanation: str = Field(description="Explanation of why this bias was detected")
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class Recommendation(BaseModel):
@@ -150,7 +144,8 @@ class Recommendation(BaseModel):
         default_factory=list, description="Example implementations"
     )
 
-    @validator("priority", "implementation_difficulty", "estimated_impact")
+    @field_validator("priority", "implementation_difficulty", "estimated_impact")
+    @classmethod
     def validate_priority_fields(cls, v: str) -> str:
         """Validate priority-related fields"""
         valid_values = {"low", "medium", "high"}
@@ -214,17 +209,10 @@ class BiasAnalysisResponse(BaseModel):
     word_count: int = Field(description="Word count of analyzed content")
 
     # Timestamps
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = Field(default=None)
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v),
-        }
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class HealthResponse(BaseModel):
@@ -232,7 +220,7 @@ class HealthResponse(BaseModel):
 
     status: str = Field(description="Service status: healthy, degraded, unhealthy")
     version: str = Field(description="Service version")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     dependencies: dict[str, str] = Field(
         default_factory=dict, description="Status of external dependencies"
     )
@@ -246,4 +234,4 @@ class ErrorResponse(BaseModel):
     message: str = Field(description="Error message")
     details: dict[str, Any] | None = Field(default=None, description="Error details")
     request_id: str | None = Field(default=None, description="Request ID")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))

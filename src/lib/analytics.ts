@@ -95,8 +95,8 @@ export class AnalyticsService {
   private config: AnalyticsConfig
   private eventBuffer: AnalyticsEvent[] = []
   private flushTimer: NodeJS.Timeout | null = null
-  private sessionId: string
-  private anonymousId: string
+  private readonly sessionId: string
+  private readonly anonymousId: string
 
   /**
    * Private constructor (singleton pattern)
@@ -206,7 +206,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to flush analytics events', errorObj)
 
@@ -267,7 +267,7 @@ export class AnalyticsService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] || '',
+          'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] ?? '',
         },
         body: JSON.stringify({
           events,
@@ -285,7 +285,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to send analytics to endpoint', errorObj)
       throw error
@@ -318,7 +318,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to save analytics to local storage', errorObj)
     }
@@ -473,7 +473,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error(`Failed to record analytics event: ${eventName}`, errorObj)
     }
@@ -488,7 +488,7 @@ export class AnalyticsService {
       {
         page,
         referrer:
-          referrer ||
+          referrer ??
           (typeof document !== 'undefined' ? document.referrer : 'unknown'),
         title: typeof document !== 'undefined' ? document.title : 'unknown',
       },
@@ -640,7 +640,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to get analytics events', errorObj)
       return []
@@ -662,7 +662,7 @@ export class AnalyticsService {
     } catch (error: unknown) {
       const errorObj =
         error instanceof Error
-          ? { message: String(error), stack: (error)?.stack }
+          ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
       logger.error('Failed to clear analytics events', errorObj)
     }
@@ -671,7 +671,7 @@ export class AnalyticsService {
   /**
    * Force flush the event buffer
    */
-  public forceFlush(): Promise<void> {
+  public  async forceFlush(): Promise<void> {
     return this.flush()
   }
 }

@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type { Acquisition, AcquisitionList } from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 import { useAcquisitionStore } from '@/lib/stores/journal-research'
 
@@ -16,15 +17,15 @@ import {
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  listAcquisitions: vi.fn(),
-  getAcquisition: vi.fn(),
-  initiateAcquisition: vi.fn(),
-  updateAcquisition: vi.fn(),
+  listAcquisitions: vi.fn<() => Promise<AcquisitionList>>(),
+  getAcquisition: vi.fn<() => Promise<Acquisition>>(),
+  initiateAcquisition: vi.fn<() => Promise<Acquisition>>(),
+  updateAcquisition: vi.fn<() => Promise<Acquisition>>(),
 }))
 
 // Mock store
 vi.mock('@/lib/stores/journal-research', () => ({
-  useAcquisitionStore: vi.fn(),
+  useAcquisitionStore: vi.fn<() => unknown>(),
 }))
 
 const mockAcquisition = {
@@ -61,19 +62,35 @@ const createWrapper = () => {
 }
 
 describe('useAcquisition hooks', () => {
+  const baseStoreState = {
+    filters: {
+      statuses: [],
+      showDownloadFailuresOnly: false,
+    },
+    selectedAcquisitionId: null,
+    setSelectedAcquisitionId: vi.fn<(id: string | null) => void>(),
+    expandedRowIds: [],
+    expandRow: vi.fn<(id: string) => void>(),
+    collapseRow: vi.fn<(id: string) => void>(),
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
-    useAcquisitionStore.mockReturnValue({
-      filters: {
-        statuses: [],
-        showDownloadFailuresOnly: false,
-      },
-      selectedAcquisitionId: null,
-      setSelectedAcquisitionId: vi.fn(),
-      expandedRowIds: [],
-      expandRow: vi.fn(),
-      collapseRow: vi.fn(),
-    })
+    const storeState = {
+      ...baseStoreState,
+      setSelectedAcquisitionId: vi.fn<(id: string | null) => void>(),
+      expandRow: vi.fn<(id: string) => void>(),
+      collapseRow: vi.fn<(id: string) => void>(),
+    }
+    useAcquisitionStore.mockImplementation(
+      (selector?: (state: typeof storeState) => unknown) =>
+        typeof selector === 'function' ? selector(storeState) : storeState,
+    )
+    ;(
+      useAcquisitionStore as typeof useAcquisitionStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
   })
 
   describe('useAcquisitionListQuery', () => {
@@ -100,12 +117,24 @@ describe('useAcquisition hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listAcquisitions).mockResolvedValue(mockAcquisitionList)
-      useAcquisitionStore.mockReturnValue({
+      const filteredStoreState = {
+        ...baseStoreState,
         filters: {
           statuses: ['completed'],
           showDownloadFailuresOnly: false,
         },
-      })
+      }
+      useAcquisitionStore.mockImplementation(
+        (selector?: (state: typeof filteredStoreState) => unknown) =>
+          typeof selector === 'function'
+            ? selector(filteredStoreState)
+            : filteredStoreState,
+      )
+      ;(
+        useAcquisitionStore as typeof useAcquisitionStore & {
+          getState?: () => typeof filteredStoreState
+        }
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(
         () => useAcquisitionListQuery('session-1'),
@@ -199,11 +228,17 @@ describe('useAcquisition hooks', () => {
   describe('useAcquisitionInitiateMutation', () => {
     it('initiates acquisition successfully', async () => {
       vi.mocked(api.initiateAcquisition).mockResolvedValue(mockAcquisition)
-      const setSelectedAcquisitionId = vi.fn()
+      const setSelectedAcquisitionId = vi.fn<(id: string) => void>()
 
-      vi.spyOn(useAcquisitionStore, 'getState').mockReturnValue({
+      ;(
+        useAcquisitionStore as typeof useAcquisitionStore & {
+          getState?: () => {
+            setSelectedAcquisitionId: typeof setSelectedAcquisitionId
+          }
+        }
+      ).getState = () => ({
         setSelectedAcquisitionId,
-      } as any)
+      })
 
       const { result } = renderHook(
         () => useAcquisitionInitiateMutation('session-1'),
@@ -311,10 +346,10 @@ describe('useAcquisition hooks', () => {
     it('returns selection state from store', () => {
       const mockState = {
         selectedAcquisitionId: 'acq-1',
-        setSelectedAcquisitionId: vi.fn(),
+        setSelectedAcquisitionId: vi.fn<(id: string) => void>(),
         expandedRowIds: ['acq-1', 'acq-2'],
-        expandRow: vi.fn(),
-        collapseRow: vi.fn(),
+        expandRow: vi.fn<(id: string) => void>(),
+        collapseRow: vi.fn<(id: string) => void>(),
       }
 
       useAcquisitionStore.mockReturnValue(mockState)

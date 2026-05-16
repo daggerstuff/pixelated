@@ -51,7 +51,7 @@ export function sanitizeMessagesForLogging(
           'content' in msg
         ) {
           const content = typeof msg.content === 'string' ? msg.content : ''
-          return `Message ${index + 1} (Role: ${msg.role || 'unknown'}): ${redactPotentialPhi(content)}`
+          return `Message ${index + 1} (Role: ${msg.role ?? 'unknown'}): ${redactPotentialPhi(content)}`
         }
         return `Message ${index + 1} (Role: unknown): [CONTENT_REDACTED]`
       })

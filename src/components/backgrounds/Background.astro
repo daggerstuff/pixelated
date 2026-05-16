@@ -1,17 +1,30 @@
 ---
 import Plum from '@/components/backgrounds/Plum.astro'
-import Dot from '@/components/backgrounds/Dot.astro'
 import Rose from '@/components/backgrounds/Rose.astro'
-import Particle from '@/components/backgrounds/Particle.astro'
 
 interface Props {
   type: string
 }
 
 const { type } = Astro.props
+
+let BackgroundComponent: any = null
+if (type === 'dot') {
+  const Dot = (await import('./Dot.astro')).default
+  BackgroundComponent = Dot
+}
+if (type === 'particle') {
+  const Particle = (await import('./Particle.astro')).default
+  BackgroundComponent = Particle
+}
+if (type === 'plum') {
+  BackgroundComponent = Plum
+}
+if (type === 'rose') {
+  BackgroundComponent = Rose
+}
+
+// Unknown background types intentionally render no background.
 ---
 
-{type === 'plum' && <Plum />}
-{type === 'dot' && <Dot />}
-{type === 'rose' && <Rose />}
-{type === 'particle' && <Particle />}
+{BackgroundComponent && <BackgroundComponent />}

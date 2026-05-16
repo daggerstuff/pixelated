@@ -21,9 +21,9 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('pixel-multimodal-ws')
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL || 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY || ''
-const WS_PORT = Number(process.env.WS_PIXEL_PORT || 8091)
+const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
+const WS_PORT = Number(process.env.WS_PIXEL_PORT ?? 8091)
 const REQUEST_TIMEOUT_MS = 45000
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024 // 25MB safety cap
 
@@ -110,10 +110,10 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'complete': {
-            const text = (message.text as string) || state.text || ''
+            const text = (message.text as string) || state.text ?? ''
             const contextType =
               (message.contextType as string) ||
-              state.contextType ||
+              state.contextType ??
               'therapeutic'
             const sessionId = (message.sessionId as string) || state.sessionId
             await handleComplete(ws, state, { text, contextType, sessionId })
@@ -130,7 +130,11 @@ function ensureServer(): WebSocketServer {
         }
       } catch (error: unknown) {
         const message =
-          error instanceof Error ? error.message : 'Invalid message'
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Invalid message'
         ws.send(JSON.stringify({ type: 'error', message }))
       }
     })
@@ -201,7 +205,9 @@ async function handleComplete(
     }
 
     const start = performance.now()
-    const pixelResponse = (await forwardToPixel(form)) as MultimodalResultPayload
+    const pixelResponse = (await forwardToPixel(
+      form,
+    )) as MultimodalResultPayload
     const latencyMs = performance.now() - start
 
     ws.send(
@@ -209,7 +215,7 @@ async function handleComplete(
         type: 'result',
         data: {
           ...pixelResponse,
-          latency_ms: pixelResponse['latency_ms'] || latencyMs,
+          latency_ms: pixelResponse['latency_ms'] ?? latencyMs,
         },
       }),
     )
@@ -219,7 +225,12 @@ async function handleComplete(
     state.totalBytes = 0
     state.text = ''
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Inference failed'
+    const message =
+      error instanceof Error
+        ? error instanceof Error
+          ? error.message
+          : 'Unknown error'
+        : 'Inference failed'
     ws.send(JSON.stringify({ type: 'error', message }))
   }
 }

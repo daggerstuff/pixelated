@@ -65,8 +65,8 @@ const defaultConfig: IntegrationTestConfig = {
 }
 
 class IntegrationTestRunner {
-  private config: IntegrationTestConfig
-  private results: TestResult[] = []
+  private readonly config: IntegrationTestConfig
+  private readonly results: TestResult[] = []
   private startTime: number = 0
 
   constructor(config: IntegrationTestConfig = defaultConfig) {
@@ -174,7 +174,7 @@ class IntegrationTestRunner {
       } catch (error) {
         console.warn(
           `⚠️  ${service.name} health check failed (attempt ${attempt}/${maxRetries}):`,
-          error.message,
+          (error as Error).message,
         )
       }
 
@@ -209,7 +209,7 @@ class IntegrationTestRunner {
           console.log(`❌ ${check.name}: HTTP ${response.status}`)
         }
       } catch (error) {
-        console.log(`❌ ${check.name}: ${error.message}`)
+        console.log(`❌ ${check.name}: ${(error as Error).message}`)
       }
     }
   }
@@ -232,8 +232,8 @@ class IntegrationTestRunner {
       const duration = Date.now() - startTime
 
       // Parse results (simplified parsing)
-      const passed = (result.match(/✓/g) || []).length
-      const failed = (result.match(/✗/g) || []).length
+      const passed = (result.match(/✓/g) ?? []).length
+      const failed = (result.match(/✗/g) ?? []).length
 
       this.results.push({
         suite: suiteName,
@@ -256,11 +256,11 @@ class IntegrationTestRunner {
         failed: 1,
         skipped: 0,
         duration,
-        errors: [error.message],
+        errors: [(error as Error).message],
       })
 
       console.log(`❌ ${suiteName}: Failed (${duration}ms)`)
-      console.error('Error:', error.message)
+      console.error('Error:', (error as Error).message)
     }
   }
 
@@ -338,7 +338,7 @@ class IntegrationTestRunner {
           const startTime = Date.now()
 
           const options: any = {
-            method: benchmark.method || 'GET',
+            method: benchmark.method ?? 'GET',
             headers:
               benchmark.method === 'POST'
                 ? { 'Content-Type': 'application/json' }
@@ -384,7 +384,7 @@ class IntegrationTestRunner {
         }
       } catch (error) {
         performanceResults[benchmark.name] = {
-          error: error.message,
+          error: (error as Error).message,
           passed: false,
         }
       }
@@ -402,7 +402,7 @@ class IntegrationTestRunner {
     console.log('✅ Cleanup completed')
   }
 
-  private delay(ms: number): Promise<void> {
+  private  async delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }

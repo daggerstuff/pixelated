@@ -1,7 +1,7 @@
-import { AuthenticationClient } from 'auth0'
-
-const client = new AuthenticationClient({ domain: 'x', clientId: 'x' })
-console.log('getProfile:', typeof client.getProfile)
-console.log('userInfo:', typeof client.userInfo)
-console.log('oauth.userInfo:', client.oauth && typeof client.oauth.userInfo)
-console.log('profile:', client.profile)
+try {
+  const response = await fetch('https://test.auth0.com/.well-known/jwks.json')
+  const payload = await response.json()
+  console.log('keys:', payload.keys?.length ?? 0)
+} catch (e) {
+  console.error(e)
+}

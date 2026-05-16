@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react'
 
 // Lazy load the heavy bias dashboard
-const BiasDashboard = lazy(() =>
+const BiasDashboard = lazy( async () =>
   import('./BiasDashboard').then((module) => ({
     default: module.BiasDashboard,
   })),

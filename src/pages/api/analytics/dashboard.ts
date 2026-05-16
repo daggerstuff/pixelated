@@ -123,13 +123,13 @@ function aggregateSessionData(
         existing.sessions += 1
         // Additional aggregation based on event properties
         if (event.properties?.['isNewUser']) {
-          existing.newUsers = (existing.newUsers || 0) + 1
+          existing.newUsers = (existing.newUsers ?? 0) + 1
         } else {
-          existing.returningUsers = (existing.returningUsers || 0) + 1
+          existing.returningUsers = (existing.returningUsers ?? 0) + 1
         }
         if (typeof event.properties?.['duration'] === 'number') {
           existing.averageDuration =
-            ((existing.averageDuration || 0) + event.properties['duration']) / 2
+            ((existing.averageDuration ?? 0) + event.properties['duration']) / 2
         }
       }
     }

@@ -30,7 +30,7 @@ export default function RUMWidget({
   // Set up refresh interval
   useEffect(() => {
     const intervalId = setInterval(() => {
-      refreshData()
+      void refreshData()
     }, refreshInterval)
 
     return () => clearInterval(intervalId)
@@ -76,9 +76,9 @@ export default function RUMWidget({
             </div>
           ) : (
             <>
-              {renderMetric('LCP', loadingPerformance['lcp'] || 0)}
-              {renderMetric('CLS', visualStability['cls'] || 0, '')}
-              {renderMetric('FID', interactivityMetrics['fid'] || 0)}
+              {renderMetric('LCP', loadingPerformance['lcp'] ?? 0)}
+              {renderMetric('CLS', visualStability['cls'] ?? 0, '')}
+              {renderMetric('FID', interactivityMetrics['fid'] ?? 0)}
             </>
           )}
         </div>
@@ -108,9 +108,9 @@ export default function RUMWidget({
               Loading
             </div>
             <div className='space-y-1'>
-              {renderMetric('TTFB', loadingPerformance['ttfb'] || 0)}
-              {renderMetric('FCP', loadingPerformance['fcp'] || 0)}
-              {renderMetric('LCP', loadingPerformance['lcp'] || 0)}
+              {renderMetric('TTFB', loadingPerformance['ttfb'] ?? 0)}
+              {renderMetric('FCP', loadingPerformance['fcp'] ?? 0)}
+              {renderMetric('LCP', loadingPerformance['lcp'] ?? 0)}
             </div>
           </div>
 
@@ -119,8 +119,8 @@ export default function RUMWidget({
               Interactivity
             </div>
             <div className='space-y-1'>
-              {renderMetric('FID', interactivityMetrics['fid'] || 0)}
-              {renderMetric('TBT', interactivityMetrics['tbt'] || 0)}
+              {renderMetric('FID', interactivityMetrics['fid'] ?? 0)}
+              {renderMetric('TBT', interactivityMetrics['tbt'] ?? 0)}
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export default function RUMWidget({
               Stability
             </div>
             <div className='space-y-1'>
-              {renderMetric('CLS', visualStability['cls'] || 0, '')}
+              {renderMetric('CLS', visualStability['cls'] ?? 0, '')}
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function RUMWidget({
               Updated: {lastUpdated.toLocaleTimeString()}
             </div>
             <button
-              onClick={() => refreshData()}
+              onClick={ async () => refreshData()}
               className='text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 text-xs'
             >
               Refresh

@@ -1,171 +1,105 @@
-<div style="text-align: center;">
+# Pixelated Empathy
 
 ![Pixelated Empathy Logo](public/android-chrome-512x512.png)
 
-## Pixelated Empathy
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=flat-square)](LICENSE)
+[![Focus](https://img.shields.io/badge/Focus-Clinical%20AI-blue.svg?style=flat-square)](https://pixelatedempathy.com)
+[![Status](https://img.shields.io/badge/Status-Early%20Access-green.svg?style=flat-square)](https://pixelatedempathy.com/contact)
 
-_Beyond the screen, lies a deeper connection._
+> We believe every high-stakes conversation should have a safe place to improve.
 
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg?style=flat-square)](LICENSE)
-[![Enterprise](https://img.shields.io/badge/enterprise-ready-blue.svg?style=flat-square)](https://pixelatedempathy.com)
-[![AI](https://img.shields.io/badge/AI-Powered-9cf.svg?style=flat-square)](https://pixelatedempathy.com)
+Pixelated Empathy is a **clinical AI platform** for practicing, analyzing, and
+improving emotionally complex conversations.
 
-> **We don't just process conversations. We understand them.**  
-> Most platforms see _what_ you say. We see _why_ you said it, _how_ you felt
-> when you said it, and _what_ you really needed when you said it.
-
-</div>
-
-<div style="text-align: center;">
-
-In a world where digital interactions generate more noise than connection,
-**Pixelated Empathy** cuts through the static. We've cracked the code on
-translating human emotion into actionable intelligence—not through guesswork,
-but through a sophisticated understanding of the psychological patterns that
-drive genuine connection.
-
-This isn't just another AI tool. This is **empathy, engineered**.
-
-</div>
-
-<div style="text-align: center;">
-
-## The Empathy Gym™: Where Difficult Conversations Become Safe Practice
-
-> _"The hardest conversations are the ones you can't practice with real
-> people."_
-
-We've built something unprecedented: an AI-powered training environment where
-mental health professionals can practice the conversations that matter
-most—without risk, without boundaries, without consequence.
-
-Our platform doesn't just simulate conversations; it _embodies_ them. Through
-our proprietary Emotional Intelligence Engine, we create AI personas that don't
-just _act_ like real clients—they _feel_ like them. From the anxious college
-student to the traumatized veteran, our system creates authentic emotional
-experiences that prepare professionals for the complexity of real human
-suffering.
-
-**This is where empathy gets forged.**
-
-</div>
-
-<div style="text-align: center;">
-
-### Why Professionals Choose Us:
-
-- **Risk-Free Practice:** Master crisis intervention, trauma response, and
-  difficult dialogues in a controlled environment
-- **Edge-Case Mastery:** Encounter rare but critical scenarios that most
-  professionals go years without experiencing
-- **Instant Feedback:** Get real-time analysis of your approach, tone, and
-  effectiveness
-- **Performance Analytics:** Track your growth across dozens of therapeutic
-  competencies
-
-</div>
-
-<div style="text-align: center;">
-
-## The Technology That Sees What Others Miss
-
-We've built more than just software—we've built a new language for understanding
-human connection.
-
-### 🎭 **Emotional Cartography**
-
-We don't just analyze sentiment. We map the emotional journey of every
-conversation, identifying the moments that matter: vulnerability,
-trust-building, emotional shifts, and connection points that traditional
-analytics miss entirely.
-
-### 🌊 **Conversational Dynamics Engine**
-
-Understanding that communication is more than words, our system analyzes the
-_flow_ of dialogue—tone patterns, response timing, emotional reciprocity, and
-the subtle dance of human interaction that builds (or breaks) rapport.
-
-### 🧩 **Persona Intelligence**
-
-People aren't static, and neither are our insights. Our Dual-Persona framework
-recognizes when someone is shifting roles—mentor, peer, or help-seeker—and
-adapts our analysis accordingly.
-
-</div>
-
-<div style="text-align: center;">
-
-## Built for Those Who Build Communities
-
-This technology is exclusively designed for organizations that understand:
-**your community isn't your product—it's your purpose.**
-
-We partner with forward-thinking platforms that refuse to accept "engagement" as
-a substitute for genuine connection.
-
-</div>
-
-<div style="text-align: center;">
-
-## Journal Dataset Research Pipeline
-
-The platform includes a comprehensive **Journal Dataset Research Pipeline** for
-discovering, evaluating, acquiring, and integrating therapeutic datasets from
-academic sources. This integrated system consists of:
-
-- **Web Frontend**: User-friendly interface for managing research operations
-  (`/journal-research`)
-- **MCP Server**: AI agent interface via Model Context Protocol
-- **CLI**: Command-line access for automation
-- **Backend Engine**: Core research automation with discovery, evaluation,
-  acquisition, and integration planning
-
-All components work together as a unified pipeline, sharing session data and
-providing multiple access interfaces. See
-[Journal Research Pipeline Documentation](docs/development/journal-research/journal-research-pipeline.md)
-for complete details.
-
-</div>
-
-<div style="text-align: center;">
-
-## Enterprise-Grade. Enterprise-Focused.
-
-Built with the same technologies that power the world's most demanding
-applications.
-
-![Astro](https://img.shields.io/badge/Astro-5.x-FF5D01?style=for-the-badge&logo=astro)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
-![Node.js](https://img.shields.io/badge/Node.js-24-5FA04E?style=for-the-badge&logo=nodedotjs)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript)
-![MongoDB](https://img.shields.io/badge/MongoDB-4A944A?style=for-the-badge&logo=mongodb)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker)
-![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest)
-![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright)
-
-</div>
-
-<div style="text-align: center;">
-
-## The Future of Human Connection is Here
-
-> **We're not trying to make conversations smarter. We're trying to make humans
-> more understanding.**
-
-If you're building a platform where connection matters more than clicks, where
-empathy drives engagement, and where you believe that technology should bring us
-closer—not further apart—we should talk.
-
-Because while others are building better algorithms, we're building better
-humans.
-
-**Links:** [Request Enterprise Access](https://pixelatedempathy.com/contact) •
-[View Case Studies](https://pixelatedempathy.com/case-studies) •
-[Meet Our Team](https://pixelatedempathy.com/team)
+Our mission is to help organizations and practitioners build stronger, safer,
+more empathic communication through applied AI—especially where outcomes affect
+human wellbeing.
 
 ---
 
-_© 2025 Pixelated Empathy. Engineered with purpose._
+## 🚀 What this repository is
 
-</div>
+This repo is the core workspace for the Pixelated Empathy product direction:
+
+- **AI services** (`ai/`): training, inference, and emotional intelligence
+  models
+- **Product application** (`src/`): Astro + React web and API surfaces
+- **Operational tooling** (`scripts/`): pipelines, automation, and developer
+  workflows
+- **Research workflow interface** (`/journal-research`): dataset discovery and
+  curation
+- **Integration interfaces**: MCP and service connectors used by partner tools
+
+If you are looking for blockchain or on-chain components, those run in separate
+repositories and integrate with this core stack.
+
+## 🎯 What problem we are solving
+
+Most AI tooling can parse text; much less can interpret _why_ a conversation
+changes direction, escalates, calms down, or leaves someone unsupported.
+
+Pixelated Empathy focuses on:
+
+- Simulating and evaluating realistic therapeutic and support scenarios
+- Making emotional dynamics visible without overloading teams with noise
+- Turning difficult conversations into measurable coaching moments
+- Supporting training, review, and iteration before real-world impact
+
+## 🧠 Core principles
+
+- **Human-centered first**: emotional context, timing, and relational cues
+  matter as much as words.
+- **Safe rehearsal**: teams can practice rare, high-impact interactions in a
+  protected environment.
+- **Interpretability over opacity**: outputs are designed to inform decisions,
+  not replace professional judgment.
+- **Modular design**: each layer can evolve independently while sharing a common
+  conversation intelligence foundation.
+
+## 📚 Journal Dataset Research Pipeline
+
+Pixelated Empathy includes a dedicated pipeline for sourcing and evaluating
+research datasets:
+
+- **Web interface** for human-guided review in `/journal-research`
+- **MCP server** for agent-based orchestration
+- **CLI tools** for automation workflows
+- **Backend research engine** for discovery, scoring, and integration planning
+
+Detailed process documentation:
+[Journal Dataset Research Pipeline Documentation](ai/sourcing/journal/docs/README.md)
+
+## 🧱 Repository map
+
+- `ai/` — ML models, inference, and core emotional analysis logic
+- `src/` — frontend, API, and app integration code
+- `public/` — assets and visual identity
+- `scripts/` — operational utilities and repeatable task entry points
+
+## 🔒 Trust and quality commitments
+
+- Clear architectural boundaries between research, runtime, and product surface
+- Emphasis on reliability and operational safety in high-stakes contexts
+- Documentation-first approach for collaborators and reviewers
+- Progressive accessibility and readability updates to keep the repo easy to
+  understand for new contributors
+
+## 🌐 Explore the mission
+
+- [Company website](https://pixelatedempathy.com)
+- [Request enterprise access](https://pixelatedempathy.com/contact)
+- [View case studies](https://pixelatedempathy.com/case-studies)
+- [Meet the team](https://pixelatedempathy.com/team)
+
+## 📝 Notes for readers
+
+This README is intentionally informational and strategic. It is written to
+answer: "Who are we?", "What are we building?", and "Why does this work matter?"
+before you look for implementation details.
+
+---
+
+Built with: Astro, React, Node.js, TypeScript, MongoDB, Redis, and modern test
+and browser tooling.
+
+© 2026 Pixelated Empathy. Engineered with purpose.

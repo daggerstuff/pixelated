@@ -1,13 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { IModelProvider } from '../../types/mentalLLaMATypes'
+import type { Mock } from 'vitest'
 import { EvidenceExtractor } from '../EvidenceExtractor'
 
 // Mock logger
 vi.mock('@/lib/utils/logger', () => ({
-  getLogger: () => ({
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  }),
+  getLogger: vi.fn<() => { info: Mock; warn: Mock; error: Mock }>(() => ({
+    info: vi.fn<() => void>(),
+    warn: vi.fn<() => void>(),
+    error: vi.fn<() => void>(),
+  })),
 }))
 
 describe('EvidenceExtractor Semantic Analysis', () => {
@@ -16,7 +18,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
 
   beforeEach(() => {
     mockModelProvider = {
-      invoke: vi.fn(),
+      invoke: vi.fn<() => Promise<{ content: string; usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number } }>>(),
     } as unknown as IModelProvider
 
     extractor = new EvidenceExtractor(
@@ -243,9 +245,9 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       expect(highConfidenceItem?.confidence).toBe(1) // Clamped to max
 
       // Low confidence item might be filtered out due to threshold, but if present, should be clamped
-      if (lowConfidenceItem) {
-        expect(lowConfidenceItem.confidence).toBe(0) // Clamped to min
-      }
+      expect(lowConfidenceItem === undefined || lowConfidenceItem.confidence === 0).toBe(
+        true,
+      )
     })
 
     it('should validate clinical relevance enum values', async () => {

@@ -112,7 +112,7 @@ export function usePixelInference(options: UsePixelInferenceOptions = {}) {
           session_id: sessionId,
           use_eq_awareness: options.useEQAwareness !== false,
           include_metrics: options.includeMetrics !== false,
-          max_tokens: options.maxTokens || 200,
+          max_tokens: options.maxTokens ?? 200,
         }
 
         const response = await fetch('/api/ai/pixel/infer', {
@@ -126,7 +126,7 @@ export function usePixelInference(options: UsePixelInferenceOptions = {}) {
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.message || `API error: ${response.status}`)
+          throw new Error(errorData.message ?? `API error: ${response.status}`)
         }
 
         const data = (await response.json()) as PixelInferenceResponse

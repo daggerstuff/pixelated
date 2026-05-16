@@ -83,7 +83,7 @@ export function enhanceViolations(violations: Result[]): EnhancedViolation[] {
   return violations.map((violation) => {
     return {
       id: violation.id,
-      impact: violation.impact || 'minor',
+      impact: violation.impact ?? 'minor',
       description: violation.description,
       helpUrl: violation.helpUrl,
       nodes: violation.nodes.map((node) => ({ html: node.html })),
@@ -240,7 +240,7 @@ export function isAccessibleToScreenReaders(element: Element): boolean {
       element.tagName.toLowerCase() === 'a' ||
       (element.hasAttribute('role') &&
         ['button', 'link', 'checkbox', 'radio', 'menuitem', 'tab'].includes(
-          element.getAttribute('role') || '',
+          element.getAttribute('role') ?? '',
         ))) &&
     !element.hasAttribute('aria-label') &&
     !element.hasAttribute('aria-labelledby') &&
@@ -324,7 +324,7 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
     'img:not([alt])',
     (images: Element[]) => {
       return images.map((img) => ({
-        src: (img as HTMLImageElement).getAttribute('src') || '',
+        src: (img as HTMLImageElement).getAttribute('src') ?? '',
         id: img.id || '',
         class: img.className || '',
       }))
@@ -352,16 +352,16 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
 
           // Check if there's a label with a matching 'for' attribute
           const hasLabelFor =
-            (document.querySelector(`label[for="${id}"]`) as HTMLElement) !==
+            (document.querySelector(`label[for="${id}"]`)!) !==
             null
           return !hasLabelFor
         })
         .map((el) => ({
           tagName: el.tagName.toLowerCase(),
-          type: el.getAttribute('type') || '',
+          type: el.getAttribute('type') ?? '',
           id: el.id || '',
-          name: el.getAttribute('name') || '',
-          placeholder: el.getAttribute('placeholder') || '',
+          name: el.getAttribute('name') ?? '',
+          placeholder: el.getAttribute('placeholder') ?? '',
         }))
     },
   )
@@ -403,7 +403,7 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
           tagName: el.tagName.toLowerCase(),
           id: el.id || '',
           class: el.className || '',
-          href: el.getAttribute('href') || '',
+          href: el.getAttribute('href') ?? '',
           innerHtml: el.innerHTML,
         }))
     },
@@ -424,7 +424,7 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
       return elements.map((el) => ({
         tagName: el.tagName.toLowerCase(),
         id: el.id || '',
-        tabindex: el.getAttribute('tabindex') || '',
+        tabindex: el.getAttribute('tabindex') ?? '',
       }))
     },
   )
@@ -518,7 +518,7 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
       })
       .map((el) => ({
         tagName: el.tagName.toLowerCase(),
-        role: el.getAttribute('role') || '',
+        role: el.getAttribute('role') ?? '',
         id: el.id || '',
       }))
   })
@@ -647,7 +647,7 @@ export async function checkHeadingHierarchy(page: Page): Promise<{
 function parseRgb(color: string): [number, number, number] | null {
   // Handle 'rgb(r, g, b)' format
   const rgbMatch = color.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i)
-  if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
+  if (rgbMatch?.[1] && rgbMatch[2] && rgbMatch[3]) {
     return [
       parseInt(rgbMatch[1], 10),
       parseInt(rgbMatch[2], 10),
@@ -659,7 +659,7 @@ function parseRgb(color: string): [number, number, number] | null {
   const rgbaMatch = color.match(
     /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\s*\)/i,
   )
-  if (rgbaMatch && rgbaMatch[1] && rgbaMatch[2] && rgbaMatch[3]) {
+  if (rgbaMatch?.[1] && rgbaMatch[2] && rgbaMatch[3]) {
     return [
       parseInt(rgbaMatch[1], 10),
       parseInt(rgbaMatch[2], 10),

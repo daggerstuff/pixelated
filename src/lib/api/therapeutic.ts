@@ -31,6 +31,7 @@ export const ValidationResultSchema = z.object({
 })
 
 export const CrisisSignalSchema = z.object({
+  id: z.string().optional(),
   category: z.string(),
   severity: z.number(),
   keywords: z.array(z.string()),
@@ -78,7 +79,7 @@ export type BiasResult = z.infer<typeof BiasResultSchema>
 export type PIIScrubResult = z.infer<typeof PIIScrubResultSchema>
 
 export class TherapeuticClient {
-  private baseUrl: string
+  private readonly baseUrl: string
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/$/, '')
@@ -99,7 +100,7 @@ export class TherapeuticClient {
       }
 
       return await response.json()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Therapeutic API Request Failed: ${endpoint}`, error)
       throw error
     }
@@ -135,7 +136,7 @@ export class TherapeuticClient {
     try {
       const response = await fetch(`${this.baseUrl}/health`)
       return await response.json()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Health check failed', error)
       throw error
     }
@@ -146,5 +147,5 @@ export class TherapeuticClient {
 // In production, use env var: import.meta.env.PUBLIC_THERAPEUTIC_API_URL
 // For now, defaulting to the known IP
 export const therapeuticClient = new TherapeuticClient(
-  import.meta.env?.PUBLIC_THERAPEUTIC_API_URL || 'http://3.137.216.156:5000',
+  import.meta.env?.PUBLIC_THERAPEUTIC_API_URL ?? 'http://3.137.216.156:5000',
 )

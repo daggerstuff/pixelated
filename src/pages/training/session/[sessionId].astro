@@ -5,8 +5,37 @@
 import Layout from '@/layouts/Layout.astro'
 import { getSession } from '@/lib/auth'
 
+type TrainingSessionResponse = {
+  clientProfile: {
+    name: string
+    age: number
+    gender: string
+    personalityType: string
+    presentingProblem: string
+    triggers?: string[]
+    strengths?: string[]
+  }
+  difficultyLevel: string | number
+}
+
+const isTrainingSessionResponse = (
+  value: unknown,
+): value is TrainingSessionResponse => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const maybeValue = value as Record<string, unknown>
+  const clientProfile = maybeValue['clientProfile']
+
+  return (
+    typeof maybeValue['difficultyLevel'] === 'string' ||
+    typeof maybeValue['difficultyLevel'] === 'number'
+  ) && typeof clientProfile === 'object' && clientProfile !== null
+}
+
 const { sessionId } = Astro.params
-const session = await getSession()
+const session = await getSession(Astro.request)
 
 if (!session) {
   return Astro.redirect('/auth/login')
@@ -31,15 +60,30 @@ const fetchCookieValue = (cookieName: string): string | undefined => {
 const token =
   authHeader?.replace('Bearer ', '') || fetchCookieValue('auth-token')
 
+const escapeJsonForScriptTag = (value: unknown): string => {
+  const serialized = JSON.stringify(value)
+  if (serialized === undefined) {
+    return 'null'
+  }
+  return serialized.replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
+}
+
 // Get session data from API
-const sessionData = await fetch(
-  `${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`,
-  {
-    headers: { Authorization: `Bearer ${token}` },
-  },
-)
-  .then((res) => res.json())
-  .catch(() => undefined)
+let sessionData: TrainingSessionResponse | undefined
+try {
+  const response = await fetch(
+    `${import.meta.env.API_BASE_URL}/training/sessions/${sessionId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  )
+  const rawSessionData = await response.json()
+  if (isTrainingSessionResponse(rawSessionData)) {
+    sessionData = rawSessionData
+  }
+} catch {
+  sessionData = undefined
+}
 
 if (!sessionData) {
   return Astro.redirect('/training?error=session-not-found')
@@ -354,7 +398,12 @@ const isSupervisor = userRole === 'admin'
                         id="suggestions-button"
                         class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 transition-colors"
                       >
-                        💡 Get Suggestions
+                        <svg
+                          class="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        />{' '}
+                        Get Suggestions
                       </button>
                     </div>
 
@@ -465,9 +514,7 @@ const isSupervisor = userRole === 'admin'
                   Live Feedback
                 </h3>
                 <div id="feedback-messages" class="space-y-2 text-sm">
-                  <p class="text-gray-500">
-                    Feedback will appear here as you interact with the client.
-                  </p>
+                  <p class="text-gray-500">Feedback will appear here.</p>
                 </div>
               </div>
 
@@ -515,14 +562,14 @@ const isSupervisor = userRole === 'admin'
     type="application/json"
     id="session-data"
     is:inline
-    set:html={JSON.stringify(sessionData)}
+    set:html={escapeJsonForScriptTag(sessionData)}
   />
 
   <script
     type="application/json"
     id="user-data"
     is:inline
-    set:html={JSON.stringify({ role: userRole, id: session.user.id })}
+    set:html={escapeJsonForScriptTag({ role: userRole, id: session.user.id })}
   />
 </Layout>
 

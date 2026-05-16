@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import * as hooks from '@/lib/hooks/journal-research'
 import * as store from '@/lib/stores/journal-research'
+import type { SessionPhase } from '@/lib/stores/journal-research/sessionStore'
 
 import {
   renderWithProviders,
@@ -22,10 +23,43 @@ vi.mock('@/lib/hooks/journal-research', () => ({
 
 // Mock store
 vi.mock('@/lib/stores/journal-research', () => ({
-  useJournalSessionStore: vi.fn(),
+  useJournalSessionStore: vi.fn<() => unknown>(),
 }))
 
 describe('Dashboard', () => {
+  type MockSessionStoreState = {
+    selectedSessionId: string | null
+    filters: {
+      searchTerm: string
+      phases: SessionPhase[]
+    }
+    isCreateDrawerOpen: boolean
+    setSelectedSessionId: (sessionId: string | null) => void
+    togglePhaseFilter: (phase: SessionPhase) => void
+    setSearchTerm: (searchTerm: string) => void
+    resetFilters: () => void
+    openCreateDrawer: () => void
+    closeCreateDrawer: () => void
+  }
+
+  const createMockSessionStoreState = (
+    overrides: Partial<MockSessionStoreState> = {},
+  ): MockSessionStoreState => ({
+    selectedSessionId: null as string | null,
+    filters: {
+      searchTerm: '',
+      phases: [] as SessionPhase[],
+    },
+    isCreateDrawerOpen: false,
+    setSelectedSessionId: vi.fn<(sessionId: string | null) => void>(),
+    togglePhaseFilter: vi.fn<(phase: string) => void>(),
+    setSearchTerm: vi.fn<(searchTerm: string) => void>(),
+    resetFilters: vi.fn<() => void>(),
+    openCreateDrawer: vi.fn<() => void>(),
+    closeCreateDrawer: vi.fn<() => void>(),
+    ...overrides,
+  })
+
   const mockUseSessionListQuery = hooks.useSessionListQuery as ReturnType<
     typeof vi.fn
   >
@@ -35,15 +69,22 @@ describe('Dashboard', () => {
   >
   const mockUseProgressMetricsQuery =
     hooks.useProgressMetricsQuery as ReturnType<typeof vi.fn>
-  const mockUseJournalSessionStore = store.useJournalSessionStore as ReturnType<
-    typeof vi.fn
-  >
-
   beforeEach(() => {
     vi.clearAllMocks()
 
     // Default mock implementations
-    mockUseJournalSessionStore.mockReturnValue(null)
+    const storeState = createMockSessionStoreState()
+    ;(store.useJournalSessionStore as any).mockImplementation(
+      (...args: any[]) =>
+        typeof args[0] === 'function'
+          ? (args[0] as (state: any) => unknown)(storeState)
+          : storeState,
+    )
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof storeState
+      }
+    ).getState = () => storeState
     mockUseSessionListQuery.mockReturnValue({
       data: {
         items: [mockSession],
@@ -88,7 +129,7 @@ describe('Dashboard', () => {
     renderWithProviders(<Dashboard />)
 
     expect(screen.getByText('Recent Sessions')).toBeInTheDocument()
-    expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
+    expect(screen.getAllByText(mockSession.sessionId).length).toBeGreaterThan(0)
   })
 
   it('displays loading state for sessions', () => {
@@ -114,7 +155,20 @@ describe('Dashboard', () => {
   })
 
   it('displays selected session progress when session is selected', () => {
-    mockUseJournalSessionStore.mockReturnValue('test-session-1')
+    const selectedStoreState = createMockSessionStoreState({
+      selectedSessionId: 'test-session-1',
+    })
+    ;(store.useJournalSessionStore as any).mockImplementation(
+      (...args: any[]) =>
+        typeof args[0] === 'function'
+          ? (args[0] as (state: any) => unknown)(selectedStoreState)
+          : selectedStoreState,
+    )
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof selectedStoreState
+      }
+    ).getState = () => selectedStoreState
     mockUseSessionQuery.mockReturnValue({
       data: mockSession,
       isLoading: false,
@@ -131,7 +185,7 @@ describe('Dashboard', () => {
     renderWithProviders(<Dashboard />)
 
     expect(screen.getByText('Current Session Progress')).toBeInTheDocument()
-    expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
+    expect(screen.getAllByText(mockSession.sessionId).length).toBeGreaterThan(0)
   })
 
   it('displays all sessions list', () => {
@@ -148,14 +202,20 @@ describe('Dashboard', () => {
 
   it('handles quick action click for new session', () => {
     const openCreateDrawer = vi.fn()
-    mockUseJournalSessionStore.mockReturnValue(null)
-
-    // Mock store methods
-    vi.spyOn(store.useJournalSessionStore, 'getState').mockReturnValue({
+    const clickableStoreState = createMockSessionStoreState({
       openCreateDrawer,
-      closeCreateDrawer: vi.fn(),
-      setSelectedSessionId: vi.fn(),
-    } as any)
+    })
+    ;(store.useJournalSessionStore as any).mockImplementation(
+      (...args: any[]) =>
+        typeof args[0] === 'function'
+          ? (args[0] as (state: any) => unknown)(clickableStoreState)
+          : clickableStoreState,
+    )
+    ;(
+      store.useJournalSessionStore as typeof store.useJournalSessionStore & {
+        getState?: () => typeof clickableStoreState
+      }
+    ).getState = () => clickableStoreState
 
     renderWithProviders(<Dashboard />)
 

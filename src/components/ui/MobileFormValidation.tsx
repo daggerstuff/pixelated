@@ -311,12 +311,19 @@ export function MobileFormValidation({
   }
 
   // Clone the form element and inject our handlers
-  const enhancedForm = React.Children.map(children, (child) => {
+  const enhancedForm = React.Children.map(children,  async (child) => {
     if (React.isValidElement(child) && child.type === 'form') {
       const specificChild = child as React.ReactElement<
         React.FormHTMLAttributes<HTMLFormElement>
       >
       // Set up form props with the right type
+      type FormSubmitEvent =
+        NonNullable<React.ComponentProps<'form'>['onSubmit']> extends (
+          event: infer T,
+        ) => unknown
+          ? T
+          : never
+
       const formProps: React.FormHTMLAttributes<HTMLFormElement> & {
         ref: React.RefObject<HTMLFormElement | null>
       } = {
@@ -326,7 +333,7 @@ export function MobileFormValidation({
           handleSubmit(e)
           // Call the original onSubmit if it exists
           if (specificChild.props.onSubmit) {
-            specificChild.props.onSubmit(e)
+            specificChild.props.onSubmit(e as FormSubmitEvent)
           }
         },
         noValidate: true, // Disable browser validation in favor of our custom validation
@@ -394,11 +401,11 @@ export const ValidationRules = {
   }),
   minLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length >= length,
-    message: message || `Must be at least ${length} characters`,
+    message: message ?? `Must be at least ${length} characters`,
   }),
   maxLength: (length: number, message?: string): ValidationRule => ({
     test: (value) => value.length <= length,
-    message: message || `Must be no more than ${length} characters`,
+    message: message ?? `Must be no more than ${length} characters`,
   }),
   pattern: (regex: RegExp, message: string): ValidationRule => ({
     test: (value) => regex.test(value),
@@ -409,7 +416,7 @@ export const ValidationRules = {
       const matchField = document.querySelector(
         `[name="${fieldName}"]`,
       ) as HTMLInputElement
-      return matchField && matchField.value === value
+      return matchField?.value === value
     },
     message,
   }),

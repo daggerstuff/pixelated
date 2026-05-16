@@ -41,7 +41,7 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
     }
 
     const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+      import.meta.env['EMBEDDING_AGENT_URL'] ?? 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {
@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
           headers: { 'Content-Type': 'application/json' },
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof EmbeddingAgentError && error.statusCode === 0) {
         logger.warn('Embedding agent unavailable')
 
@@ -97,13 +97,13 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
       }
       throw error
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Status endpoint error:', error)
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,
@@ -126,14 +126,6 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       })
     }
 
-    // Check for admin role (optional - depends on your auth setup)
-    // if (session.user.role !== 'admin') {
-    //   return new Response(JSON.stringify({ error: 'Forbidden' }), {
-    //     status: 403,
-    //     headers: { 'Content-Type': 'application/json' },
-    //   })
-    // }
-
     let body: { action?: string } = {}
     try {
       body = await request.json()
@@ -151,7 +143,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+      import.meta.env['EMBEDDING_AGENT_URL'] ?? 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     switch (body.action) {
@@ -173,6 +165,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         })
       }
 
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return new Response(
           JSON.stringify({
@@ -185,14 +178,14 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
           },
         )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Status POST endpoint error:', error)
 
     if (error instanceof EmbeddingAgentError) {
       return new Response(
         JSON.stringify({
           error: 'Embedding service error',
-          message: error.message,
+          message: (error instanceof Error ? error.message : "Unknown error"),
           statusCode: error.statusCode,
         }),
         {
@@ -205,7 +198,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
       }),
       {
         status: 500,

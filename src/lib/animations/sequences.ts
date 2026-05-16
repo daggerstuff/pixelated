@@ -420,11 +420,11 @@ export const modalSequences: Record<string, Variants> = {
  */
 export const interactiveSequences: Record<string, Variants> = {
   buttonHover: {
-    rest: { scale: 1, rotate: 0, brightness: 1 },
+    rest: { scale: 1, rotate: 0, opacity: 0.95 },
     hover: {
       scale: 1.05,
       rotate: 1,
-      brightness: 1.1,
+      opacity: 1,
       transition: {
         duration: TIMING.fast,
         ease: EASING.easeOut,
@@ -665,11 +665,13 @@ export function getReducedMotionVariant(variants: Variants): Variants {
 
   Object.keys(variants).forEach((key) => {
     const variant = variants[key]
-    if (typeof variant === 'object' && variant !== null) {
-      reducedVariants[key] = {
-        opacity: variant.opacity || 1,
-        transition: { duration: 0.1 },
-      }
+    if (typeof variant === 'function') {
+      return
+    }
+
+    reducedVariants[key] = {
+      opacity: variant['opacity'] ?? 1,
+      transition: { duration: 0.1 },
     }
   })
 
@@ -679,7 +681,19 @@ export function getReducedMotionVariant(variants: Variants): Variants {
 /**
  * Animation presets for common use cases
  */
-export const animationPresets = {
+export type AnimationPreset =
+  | 'fadeIn'
+  | 'slideUp'
+  | 'scaleIn'
+  | 'stagger'
+  | 'cascade'
+  | 'button'
+  | 'card'
+  | 'modal'
+  | 'toast'
+  | 'loading'
+
+export const animationPresets: Record<AnimationPreset, Variants> = {
   // Quick access to most commonly used sequences
   fadeIn: pageTransitionSequences.fadeSlide,
   slideUp: pageTransitionSequences.slideUp,
@@ -701,9 +715,7 @@ export const animationPresets = {
 
   // Loading
   loading: loadingSequences.pulse,
-} as const
-
-export type AnimationPreset = keyof typeof animationPresets
+}
 export type SequenceType =
   | 'page'
   | 'list'

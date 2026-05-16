@@ -21,9 +21,42 @@ export interface SimpleMetrics {
   updateMetrics: (event: MetricsEvent) => void
 }
 
+type PersistedMetrics = Omit<SimpleMetrics, 'updateMetrics'>
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+}
+
+function isPersistedMetrics(value: unknown): value is PersistedMetrics {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  if (!('sessionCount' in value) || !('averageScore' in value)) {
+    return false
+  }
+
+  const metrics = value as Record<string, unknown>
+  return (
+    typeof metrics.sessionCount === 'number' &&
+    typeof metrics.averageScore === 'number' &&
+    isStringArray(metrics.skillsImproving) &&
+    isStringArray(metrics.skillsNeeding) &&
+    (metrics.lastSessionDate === null ||
+      typeof metrics.lastSessionDate === 'number')
+  )
+}
+
 /**
- * Simplified hook for anonymized metrics that provides data for the MetricsDialog
- * This implementation is focused on the UI needs rather than the full data model
+ * Simplified hook for anonymized metrics that provides data for the MetricsDialog.
+ *
+ * Why this exists:
+ * This implementation is focused on the immediate UI needs (displaying simple metrics
+ * like session count and average score) rather than maintaining the full complex
+ * data model of all user interactions. It caches data in localStorage to persist
+ * between sessions for demo purposes.
+ *
+ * @returns {SimpleMetrics} An object containing the simplified metrics and an update function.
  */
 export function useAnonymizedMetrics(): SimpleMetrics {
   const [metrics, setMetrics] = useState<Omit<SimpleMetrics, 'updateMetrics'>>({
@@ -41,8 +74,10 @@ export function useAnonymizedMetrics(): SimpleMetrics {
 
       if (storedMetrics) {
         // Use stored metrics if available
-        const parsedMetrics = JSON.parse(storedMetrics) as unknown
-        setMetrics(parsedMetrics)
+        const parsedMetrics: unknown = JSON.parse(storedMetrics)
+        if (isPersistedMetrics(parsedMetrics)) {
+          setMetrics(parsedMetrics)
+        }
       } else {
         // Generate demo data for first-time users
         const demoMetrics = {

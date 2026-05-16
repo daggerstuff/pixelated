@@ -50,7 +50,7 @@ export function useAuditSummary() {
 
   return useQuery<AuditSummary>({
     queryKey: biasAuditKeys.summary(),
-    queryFn: () => service.getAuditSummary(),
+    queryFn:  async () => service.getAuditSummary(),
     staleTime: 30000, // 30 seconds
     refetchInterval: 60000, // Refresh every minute
   })
@@ -71,7 +71,7 @@ export function useDatasetsForAudit(
 
   return useQuery({
     queryKey: biasAuditKeys.datasetsList({ status, page, pageSize }),
-    queryFn: () => service.getDatasetsForAudit({ status, page, pageSize }),
+    queryFn:  async () => service.getDatasetsForAudit({ status, page, pageSize }),
     staleTime: 30000,
   })
 }
@@ -84,7 +84,7 @@ export function useDataset(datasetId: string | null) {
 
   return useQuery<DatasetForAudit | null>({
     queryKey: biasAuditKeys.dataset(datasetId ?? ''),
-    queryFn: () => (datasetId ? service.getDataset(datasetId) : null),
+    queryFn:  async () => (datasetId ? service.getDataset(datasetId) : null),
     enabled: Boolean(datasetId),
     staleTime: 30000,
   })
@@ -98,7 +98,7 @@ export function useAuditResult(auditId: string | null) {
 
   return useQuery<DatasetAuditResult | null>({
     queryKey: biasAuditKeys.auditResult(auditId ?? ''),
-    queryFn: () => (auditId ? service.getAuditResult(auditId) : null),
+    queryFn:  async () => (auditId ? service.getAuditResult(auditId) : null),
     enabled: Boolean(auditId),
     staleTime: 60000,
   })
@@ -112,7 +112,7 @@ export function useAuditResultsForDataset(datasetId: string | null) {
 
   return useQuery<DatasetAuditResult[]>({
     queryKey: biasAuditKeys.auditResultsForDataset(datasetId ?? ''),
-    queryFn: () =>
+    queryFn:  async () =>
       datasetId ? service.getAuditResultsForDataset(datasetId) : [],
     enabled: Boolean(datasetId),
     staleTime: 30000,
@@ -127,7 +127,7 @@ export function useAuditHistory(datasetId: string | null) {
 
   return useQuery<AuditHistoryEntry[]>({
     queryKey: biasAuditKeys.history(datasetId ?? ''),
-    queryFn: () => (datasetId ? service.getAuditHistory(datasetId) : []),
+    queryFn:  async () => (datasetId ? service.getAuditHistory(datasetId) : []),
     enabled: Boolean(datasetId),
     staleTime: 30000,
   })
@@ -141,7 +141,7 @@ export function useRegisterDataset() {
   const service = getBiasAuditService()
 
   return useMutation({
-    mutationFn: (dataset: Omit<DatasetForAudit, 'quarantineStatus'>) =>
+    mutationFn:  async (dataset: Omit<DatasetForAudit, 'quarantineStatus'>) =>
       service.registerDataset(dataset),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
@@ -194,7 +194,9 @@ export function useInitiateAudit() {
       // Invalidate relevant queries
       void queryClient.invalidateQueries({ queryKey: biasAuditKeys.datasets() })
       void queryClient.invalidateQueries({ queryKey: biasAuditKeys.summary() })
-      void queryClient.invalidateQueries({ queryKey: biasAuditKeys.auditResults() })
+      void queryClient.invalidateQueries({
+        queryKey: biasAuditKeys.auditResults(),
+      })
 
       // Set individual results in cache
       for (const result of results) {
@@ -242,7 +244,7 @@ export function useQuarantineAction() {
   const service = getBiasAuditService()
 
   return useMutation({
-    mutationFn: (payload: QuarantineActionPayload) =>
+    mutationFn:  async (payload: QuarantineActionPayload) =>
       service.processQuarantineAction(payload),
     onSuccess: (updatedDataset) => {
       // Update the dataset in cache

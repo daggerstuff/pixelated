@@ -3,19 +3,41 @@
  * Centralized configuration for JWT and Better-Auth settings
  */
 
+/**
+ * Resolves the JWT secret from environment variables with strict validation.
+ * Throws an error if the secret is missing, whitespace-only, or matches the legacy fallback.
+ */
+function ensureJwtSecret(): string {
+  const secret = process.env.JWT_SECRET ?? import.meta.env.JWT_SECRET
+  const legacyFallback = 'fallback-secret-change-in-production'
+
+  if (!secret || secret.trim().length === 0) {
+    throw new Error(
+      'JWT_SECRET environment variable is strictly required. ' +
+        'Please set it in process.env.JWT_SECRET or import.meta.env.JWT_SECRET.',
+    )
+  }
+
+  if (secret === legacyFallback) {
+    throw new Error(
+      'JWT_SECRET matches the insecure legacy fallback value. ' +
+        'Please provide a unique, cryptographically secure secret.',
+    )
+  }
+
+  return secret
+}
+
 // JWT Configuration
 export const JWT_CONFIG = {
-  secret:
-    process.env.JWT_SECRET ||
-    import.meta.env.JWT_SECRET ||
-    'fallback-secret-change-in-production',
+  secret: ensureJwtSecret(),
   audience:
-    process.env.JWT_AUDIENCE ||
-    import.meta.env.JWT_AUDIENCE ||
+    (process.env.JWT_AUDIENCE ??
+    import.meta.env.JWT_AUDIENCE) ??
     'pixelated-empathy',
   issuer:
-    process.env.JWT_ISSUER ||
-    import.meta.env.JWT_ISSUER ||
+    (process.env.JWT_ISSUER ??
+    import.meta.env.JWT_ISSUER) ??
     'pixelated-auth-service',
   accessTokenExpiry: 24 * 60 * 60, // 24 hours - matching original inline config per PR requirements
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
@@ -24,17 +46,17 @@ export const JWT_CONFIG = {
 
 // Auth0 Configuration
 export const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
+  domain: (process.env.AUTH0_DOMAIN ?? import.meta.env.AUTH0_DOMAIN) ?? '',
   clientId:
-    process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
+    (process.env.AUTH0_CLIENT_ID ?? import.meta.env.AUTH0_CLIENT_ID) ?? '',
   clientSecret:
-    process.env.AUTH0_CLIENT_SECRET ||
-    import.meta.env.AUTH0_CLIENT_SECRET ||
+    (process.env.AUTH0_CLIENT_SECRET ??
+    import.meta.env.AUTH0_CLIENT_SECRET) ??
     '',
-  audience: process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
+  audience: (process.env.AUTH0_AUDIENCE ?? import.meta.env.AUTH0_AUDIENCE) ?? '',
   callbackUrl:
-    process.env.AUTH0_CALLBACK_URL ||
-    import.meta.env.AUTH0_CALLBACK_URL ||
+    (process.env.AUTH0_CALLBACK_URL ??
+    import.meta.env.AUTH0_CALLBACK_URL) ??
     'http://localhost:4321/api/auth/callback',
   scope: 'openid profile email offline_access',
 }
@@ -79,9 +101,9 @@ export const RATE_LIMIT_CONFIG = {
 // Security Configuration
 export const SECURITY_CONFIG = {
   cors: {
-    origin: (process.env.CORS_ORIGIN || import.meta.env.CORS_ORIGIN)?.split(
+    origin: (process.env.CORS_ORIGIN ?? import.meta.env.CORS_ORIGIN)?.split(
       ',',
-    ) || ['http://localhost:4321'],
+    ) ?? ['http://localhost:4321'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
@@ -89,8 +111,8 @@ export const SECURITY_CONFIG = {
   csrf: {
     enabled: process.env.NODE_ENV === 'production' || import.meta.env.PROD,
     secret:
-      process.env.CSRF_SECRET ||
-      import.meta.env.CSRF_SECRET ||
+      (process.env.CSRF_SECRET ??
+      import.meta.env.CSRF_SECRET) ??
       'fallback-csrf-secret',
   },
   headers: {
@@ -214,10 +236,11 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
 
   const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD
 
-  // Validate JWT secret
-  const jwtSecret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET
-  if (!jwtSecret && isProd) {
-    errors.push('JWT_SECRET is required in production')
+  // Validate JWT secret (Unify with ensureJwtSecret behavior - Review suggestion)
+  try {
+    ensureJwtSecret()
+  } catch (e: any) {
+    errors.push(e.message)
   }
 
   // Validate Auth0 configuration in production

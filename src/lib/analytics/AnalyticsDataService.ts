@@ -31,9 +31,9 @@ interface CacheEntry<T> {
 
 export class AnalyticsDataService {
   private static instance: AnalyticsDataService
-  private cache = new Map<string, CacheEntry<unknown>>()
-  private analyticsService: AnalyticsService
-  private config: AnalyticsServiceConfig
+  private readonly cache = new Map<string, CacheEntry<unknown>>()
+  private readonly analyticsService: AnalyticsService
+  private readonly config: AnalyticsServiceConfig
 
   private constructor(config?: Partial<AnalyticsServiceConfig>) {
     this.config = {
@@ -175,22 +175,19 @@ export class AnalyticsDataService {
           value: this.calculateTotalSessions(sessionCount),
           label: 'Total Sessions',
           color: 'blue' as const,
-          trend:  this.calculateTrend('total_sessions', filters.timeRange),
+          trend: this.calculateTrend('total_sessions', filters.timeRange),
         },
         {
           value: this.calculateCompletionRate(completionRate),
           label: 'Completion Rate',
           color: 'green' as const,
-          trend:  this.calculateTrend(
-            'completion_rate',
-            filters.timeRange,
-          ),
+          trend: this.calculateTrend('completion_rate', filters.timeRange),
         },
         {
           value: this.calculateAverageRating(avgRating),
           label: 'Avg. Rating',
           color: 'purple' as const,
-          trend:  this.calculateTrend('average_rating', filters.timeRange),
+          trend: this.calculateTrend('average_rating', filters.timeRange),
         },
       ]
     } catch (error: unknown) {
@@ -397,8 +394,8 @@ export class AnalyticsDataService {
   /**
    * Cache management
    */
-  private getCachedData<T>(key: string): T | null {
-    const entry = this.cache.get(key) as CacheEntry<T> | undefined
+  private getCachedData(key: string): unknown | null {
+    const entry = this.cache.get(key)
     if (!entry) {
       return null
     }
@@ -412,7 +409,7 @@ export class AnalyticsDataService {
     return entry.data
   }
 
-  private setCachedData<T>(key: string, data: T, ttl: number): void {
+  private setCachedData(key: string, data: unknown, ttl: number): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -428,7 +425,7 @@ export class AnalyticsDataService {
       return {
         code: 'FETCH_ERROR',
         message: String(error),
-        details: (error)?.stack,
+        details: error?.stack,
       }
     }
 

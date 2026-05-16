@@ -48,7 +48,7 @@ export function FocusTrap({
   className,
 }: FocusTrapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(returnFocusTo || null)
+  const previousFocusRef = useRef(returnFocusTo ?? null)
 
   // Find all focusable elements within the container
   const getFocusableElements = () => {
@@ -100,7 +100,7 @@ export function FocusTrap({
           } else if (containerRef.current) {
             // If no focusable elements, focus the container itself
             containerRef.current.setAttribute('tabindex', '-1')
-            containerRef.current?.focus()
+            containerRef.current.focus()
           }
         }, 50) // Small delay to ensure the DOM is ready
       }

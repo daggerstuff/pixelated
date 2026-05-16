@@ -1,3 +1,4 @@
+import { LightBulbIcon } from '@heroicons/react/24/outline'
 import type { FC } from 'react'
 
 interface EmotionProgressData {
@@ -139,15 +140,15 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
                 Overall Progress
               </h3>
               <p className='text-blue-600 mt-2 text-3xl font-bold'>
-                {latestData?.overallProgress || 0}%
+                {latestData?.overallProgress ?? 0}%
               </p>
             </div>
             <div
-              className={`rounded-full px-3 py-1 text-sm font-medium ${getProgressColor(latestData?.overallProgress || 0)}`}
+              className={`rounded-full px-3 py-1 text-sm font-medium ${getProgressColor(latestData?.overallProgress ?? 0)}`}
             >
-              {(latestData?.overallProgress || 0) >= 80
+              {(latestData?.overallProgress ?? 0) >= 80
                 ? 'Excellent'
-                : (latestData?.overallProgress || 0) >= 60
+                : (latestData?.overallProgress ?? 0) >= 60
                   ? 'Good'
                   : 'Needs Attention'}
             </div>
@@ -161,11 +162,11 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
                 Valence Score
               </h3>
               <p className='text-green-600 mt-2 text-3xl font-bold'>
-                {latestData?.valenceScore || 0}%
+                {latestData?.valenceScore ?? 0}%
               </p>
             </div>
             <div
-              className={`rounded-full px-3 py-1 text-sm font-medium ${getProgressColor(latestData?.valenceScore || 0)}`}
+              className={`rounded-full px-3 py-1 text-sm font-medium ${getProgressColor(latestData?.valenceScore ?? 0)}`}
             >
               Positive Emotions
             </div>
@@ -179,15 +180,15 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
                 Risk Factors
               </h3>
               <p className='text-orange-600 mt-2 text-3xl font-bold'>
-                {latestData?.riskFactors || 0}%
+                {latestData?.riskFactors ?? 0}%
               </p>
             </div>
             <div
-              className={`rounded-full px-3 py-1 text-sm font-medium ${getRiskColor(latestData?.riskFactors || 0)}`}
+              className={`rounded-full px-3 py-1 text-sm font-medium ${getRiskColor(latestData?.riskFactors ?? 0)}`}
             >
-              {(latestData?.riskFactors || 0) <= 20
+              {(latestData?.riskFactors ?? 0) <= 20
                 ? 'Low Risk'
-                : (latestData?.riskFactors || 0) <= 40
+                : (latestData?.riskFactors ?? 0) <= 40
                   ? 'Moderate'
                   : 'High Risk'}
             </div>
@@ -208,11 +209,11 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
                 <div className='bg-gray-200 h-2 w-32 rounded-full'>
                   <div
                     className='bg-blue-600 h-2 rounded-full transition-all duration-300'
-                    style={{ width: `${latestData?.arousalStability || 0}%` }}
+                    style={{ width: `${latestData?.arousalStability ?? 0}%` }}
                   ></div>
                 </div>
                 <span className='text-sm font-medium'>
-                  {latestData?.arousalStability || 0}%
+                  {latestData?.arousalStability ?? 0}%
                 </span>
               </div>
             </div>
@@ -223,11 +224,11 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
                 <div className='bg-gray-200 h-2 w-32 rounded-full'>
                   <div
                     className='bg-purple-600 h-2 rounded-full transition-all duration-300'
-                    style={{ width: `${latestData?.dominanceGains || 0}%` }}
+                    style={{ width: `${latestData?.dominanceGains ?? 0}%` }}
                   ></div>
                 </div>
                 <span className='text-sm font-medium'>
-                  {latestData?.dominanceGains || 0}%
+                  {latestData?.dominanceGains ?? 0}%
                 </span>
               </div>
             </div>
@@ -240,12 +241,12 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
           </h3>
           <div className='text-center'>
             <div className='from-green-400 to-blue-500 text-white mb-4 inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-r text-xl font-bold'>
-              {latestData?.goalProgress || 0}%
+              {latestData?.goalProgress ?? 0}%
             </div>
             <p className='text-gray-600'>
-              {(latestData?.goalProgress || 0) >= 80
+              {(latestData?.goalProgress ?? 0) >= 80
                 ? 'Exceeding expectations!'
-                : (latestData?.goalProgress || 0) >= 60
+                : (latestData?.goalProgress ?? 0) >= 60
                   ? 'Great progress!'
                   : 'Keep working toward your goals'}
             </p>
@@ -326,7 +327,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
           </div>
           <div className='bg-white rounded p-4'>
             <h4 className='text-blue-700 mb-2 font-semibold'>
-              💡 Recommendations
+              <LightBulbIcon className='h-5 w-5' /> Recommendations
             </h4>
             <ul className='text-gray-600 space-y-1'>
               <li>• Continue current coping strategies</li>

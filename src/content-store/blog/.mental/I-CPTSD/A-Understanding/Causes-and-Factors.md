@@ -1,6 +1,7 @@
 ---
 title: Causes and Risk Factors
 description:
+---
   'Comprehensive guide for mental health professionals and individuals in
   recovery'
 author: 'Resource Team'

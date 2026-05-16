@@ -1,8 +1,8 @@
 ---
 title: Integrative Trauma Treatment Across Modern Modalities
 description: >-
-  Exploring how combining neuroscience-informed, somatic, psychedelic, and
-  technology-enhanced approaches creates more effective trauma healing pathways
+  _This concludes our series on Neuroplasticity & Trauma. We hope these articles
+  inspire new possibilities for trauma healing.
 author: Dr. Sara Michaels
 pubDate: 2025-05-15T00:00:00.000Z
 draft: false
@@ -15,7 +15,6 @@ tags:
   - neuroscience
 series: Neuroplasticity & Trauma
 seriesOrder: 5
-category: Research
 ---
 
 ## Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities

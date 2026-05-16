@@ -1,15 +1,30 @@
 import { useCallback, useEffect, useRef } from 'react'
+
+import { createFHESystem } from '@/lib/fhe'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
 import { EmotionLlamaProvider } from '../../lib/ai/providers/EmotionLlamaProvider'
-import { fheService } from '@/lib/fhe'
 import { useSimulatorContext } from '../context/SimulatorContext'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
 
+/**
+ * Hook for initializing and interacting with the EmotionLlamaProvider.
+ *
+ * This hook sets up a connection to the Emotion Llama API (with credentials
+ * injected from the environment) and exposes a `detectEmotions` method. When called,
+ * it runs the provider's emotional analysis on the provided text and then updates
+ * the SimulatorContext's emotion state (for example, via its `updateEmotionState`
+ * helper, which dispatches the `UPDATE_EMOTION_STATE` action) using the
+ * dimension-based PAD (Pleasure-Arousal-Dominance) values returned by the model.
+ * Note that the provider's 'arousal' dimension maps to the simulator's 'energy' state.
+ *
+ * It is primarily used to track real-time emotional shifts during a simulated session.
+ */
 export const useEmotionDetection = () => {
   const providerRef = useRef<EmotionLlamaProvider | null>(null)
-  const { updateEmotionState } = useSimulatorContext()
+  const { dispatch: updateEmotionState } = useSimulatorContext()
 
   // Initialize the provider
   useEffect(() => {
@@ -25,10 +40,12 @@ export const useEmotionDetection = () => {
           return
         }
 
+        const fheSystem = createFHESystem()
+
         providerRef.current = new EmotionLlamaProvider(
           baseUrl,
           apiKey,
-          fheService,
+          fheSystem,
         )
       } catch (error: unknown) {
         logger.error('Failed to initialize EmotionLlamaProvider:', error)
@@ -57,15 +74,16 @@ export const useEmotionDetection = () => {
         const analysis = await providerRef.current.analyzeEmotions(text)
 
         // Update the simulator context with the pre-computed PAD emotion state from dimensions
-        if (analysis.dimensions) {
-          const { valence, energy, dominance } = analysis.dimensions
-          updateEmotionState({
+        const { valence, arousal: energy, dominance } = analysis.dimensions
+        updateEmotionState({
+          type: 'UPDATE_EMOTION_STATE',
+          payload: {
             valence,
             energy,
             dominance,
             timestamp: Date.now(),
-          })
-        }
+          },
+        })
 
         return analysis
       } catch (error: unknown) {

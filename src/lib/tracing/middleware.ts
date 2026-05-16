@@ -87,10 +87,10 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       [ATTR_HTTP_TARGET]: url.pathname + url.search,
       [ATTR_HTTP_ROUTE]: url.pathname,
       'http.user_agent': canAccessHeaders
-        ? req.headers.get('user-agent') || ''
+        ? req.headers.get('user-agent') ?? ''
         : '',
       'http.request_id': canAccessHeaders
-        ? req.headers.get('x-request-id') || ''
+        ? req.headers.get('x-request-id') ?? ''
         : '',
     },
   })
@@ -121,7 +121,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
     span.setAttributes({
       [ATTR_HTTP_STATUS_CODE]: response.status,
       [ATTR_HTTP_RESPONSE_SIZE]: Number(
-        response.headers.get('content-length') || 0,
+        response.headers.get('content-length') ?? 0,
       ),
       'http.response.duration_ms': duration,
     })
@@ -152,14 +152,19 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       statusText: response.statusText,
       headers: responseHeaders,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     // Calculate duration
     const duration = Date.now() - startTime
 
     // Mark span as error
     span.setStatus({
       code: SpanStatusCode.ERROR,
-      message: error instanceof Error ? error.message : String(error),
+      message:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
     })
     span.recordException(
       error instanceof Error ? error : new Error(String(error)),
@@ -167,7 +172,12 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
     span.setAttribute('http.response.duration_ms', duration)
 
     logger.error('Request failed in tracing middleware', {
-      error: error instanceof Error ? error.message : String(error),
+      error:
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
       method,
       pathname: url.pathname,
       duration,

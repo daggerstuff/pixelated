@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
+
 import {
   initializeDatabase,
   sessionManager,
   biasAnalysisManager,
   transaction,
-  createContentHash
+  createContentHash,
 } from '@/lib/db'
 import { getOptimizedBiasDetectionService } from '@/lib/services/bias-detection-optimized'
 
@@ -32,7 +33,7 @@ const AnalyzeRequestSchema = z.object({
   context: z.string().optional(),
   demographics: z.record(z.string(), z.any()).optional(),
   sessionType: z.string().optional(),
-  therapistNotes: z.string().optional()
+  therapistNotes: z.string().optional(),
 })
 
 /**
@@ -43,20 +44,32 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     // 1. Initialize and get connection
-    await initializeDatabase()
+     initializeDatabase()
 
     // 2. Parse request
-    const body = await request.json() as unknown
+    const body = (await request.json()) as unknown
     const validated = AnalyzeRequestSchema.safeParse(body)
 
     if (!validated.success) {
-      return new Response(JSON.stringify({
-        error: 'Invalid request',
-        details: validated.error.format()
-      }), { status: 400 })
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid request',
+          details: validated.error.format(),
+        }),
+        { status: 400 },
+      )
     }
 
-    const { text, sessionId, therapistId, demographics, context, therapistNotes, clientId, sessionType } = validated.data
+    const {
+      text,
+      sessionId,
+      therapistId,
+      demographics,
+      context,
+      therapistNotes,
+      clientId,
+      sessionType,
+    } = validated.data
 
     // 3. Perform analysis using the real AI engine
     const service = getOptimizedBiasDetectionService()
@@ -76,14 +89,12 @@ export const POST: APIRoute = async ({ request }) => {
     const resultId = await transaction(async (_client) => {
       // Create session if not provided
       let finalSessionId = sessionId
-      if (!finalSessionId) {
-        finalSessionId = await sessionManager.createSession({
+      finalSessionId ??= await sessionManager.createSession({
           therapistId,
           clientId,
           sessionType: sessionType ?? 'individual',
-          context: { description: context ?? '', therapistNotes }
-        })
-      }
+          context: { description: context ?? '', therapistNotes },
+        });
 
       // Save analysis
       return biasAnalysisManager.saveAnalysis({
@@ -97,31 +108,35 @@ export const POST: APIRoute = async ({ request }) => {
         recommendations: result.recommendations,
         demographics: (demographics ?? {}) as Record<string, unknown>,
         contentHash,
-        processingTimeMs: Date.now() - startTime
+        processingTimeMs: Date.now() - startTime,
       })
     })
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
-        id: resultId,
-        overallBiasScore: result.overallBiasScore,
-        alertLevel: result.alertLevel,
-        confidence: result.confidence,
-        layerResults: result.layerResults,
-        detectedBiases: result.detectedBiases,
-        recommendations: result.recommendations,
-        processingTimeMs: Date.now() - startTime
-      }
-    }), { status: 200 })
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          id: resultId,
+          overallBiasScore: result.overallBiasScore,
+          alertLevel: result.alertLevel,
+          confidence: result.confidence,
+          layerResults: result.layerResults,
+          detectedBiases: result.detectedBiases,
+          recommendations: result.recommendations,
+          processingTimeMs: Date.now() - startTime,
+        },
+      }),
+      { status: 200 },
+    )
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('Bias analysis failed:', error)
-    return new Response(JSON.stringify({
-      error: 'Analysis failed',
-      message
-    }), { status: 500 })
+    return new Response(
+      JSON.stringify({
+        error: 'Analysis failed',
+        message: 'An internal server error occurred',
+      }),
+      { status: 500 },
+    )
   }
 }
 
@@ -130,20 +145,29 @@ export const POST: APIRoute = async ({ request }) => {
  */
 export const GET: APIRoute = async ({ url }) => {
   const therapistId = url.searchParams.get('therapistId')
-  
+
   if (!therapistId) {
-    return new Response(JSON.stringify({ error: 'therapistId required' }), { status: 400 })
+    return new Response(JSON.stringify({ error: 'therapistId required' }), {
+      status: 400,
+    })
   }
 
   try {
-    await initializeDatabase()
+     initializeDatabase()
     const summary = await biasAnalysisManager.getBiasSummary(therapistId)
-    
-    return new Response(JSON.stringify({
-      success: true,
-      data: summary
-    }), { status: 200 })
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: summary,
+      }),
+      { status: 200 },
+    )
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
+    console.error('Bias analysis summary failed:', error)
+    return new Response(
+      JSON.stringify({ error: 'An internal server error occurred' }),
+      { status: 500 },
+    )
   }
 }

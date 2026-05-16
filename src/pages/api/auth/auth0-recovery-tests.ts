@@ -171,7 +171,12 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-security-backup',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -249,7 +254,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Handle different actions
     if (action === 'run' && backupId) {
       // Run a recovery test on the specified backup
-      const environment = environmentType || TestEnvironmentType.SANDBOX
+      const environment = environmentType ?? TestEnvironmentType.SANDBOX
 
       // In a real implementation, this would call the recovery test manager
       // For now, simulate a test run
@@ -324,7 +329,12 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-security-backup',
       {
-        error: error instanceof Error ? error.message : String(error),
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )

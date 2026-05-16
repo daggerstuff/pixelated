@@ -35,8 +35,6 @@ let repository: EmotionsRepository | null = null
  * @returns EmotionsRepository instance
  */
 export function getEmotionsRepository(): EmotionsRepository {
-  if (!repository) {
-    repository = new EmotionsRepositoryImpl()
-  }
+  repository ??= new EmotionsRepositoryImpl();
   return repository
 }

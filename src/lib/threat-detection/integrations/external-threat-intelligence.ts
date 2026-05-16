@@ -89,8 +89,8 @@ export interface ThreatIntelligenceResult {
 export class ExternalThreatIntelligenceService extends EventEmitter {
   private mongoClient!: MongoClient
   private redis!: Redis
-  private config: ThreatIntelligenceConfig
-  private httpClients: Map<string, AxiosInstance> = new Map()
+  private readonly config: ThreatIntelligenceConfig
+  private readonly httpClients: Map<string, AxiosInstance> = new Map()
   private updateIntervals: NodeJS.Timeout[] = []
   private isRunning: boolean = false
 
@@ -106,15 +106,15 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   private async initializeServices(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        this.config.mongoUrl ||
-          process.env.MONGODB_URI ||
+        (this.config.mongoUrl ??
+          process.env.MONGODB_URI) ??
           'mongodb://localhost:27017/threat_detection',
       )
       await this.mongoClient.connect()
 
       this.redis = new Redis(
-        this.config.redisUrl ||
-          process.env.REDIS_URL ||
+        (this.config.redisUrl ??
+          process.env.REDIS_URL) ??
           'redis://localhost:6379',
       )
 
@@ -123,7 +123,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       logger.info('External threat intelligence service initialized')
       this.emit('intelligence_initialized')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize threat intelligence service:', {
         error,
       })
@@ -180,7 +180,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     client: AxiosInstance,
     feed: ThreatIntelligenceFeed,
   ): void {
-    let requestQueue: (() => Promise<void>)[] = []
+    const requestQueue: (() => Promise<void>)[] = []
     let processing = false
 
     const processQueue = async () => {
@@ -194,7 +194,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       if (request) {
         try {
           await request()
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error('Rate limited request failed:', {
             error,
             feed: feed.name,
@@ -249,7 +249,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         const interval = setInterval(async () => {
           try {
             await this.updateFeed(feed)
-          } catch (error) {
+          } catch (error: unknown) {
             logger.error(`Failed to update feed ${feed.name}:`, { error })
           }
         }, feed.updateFrequency)
@@ -259,7 +259,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       logger.info('External threat intelligence updates started')
       this.emit('intelligence_updates_started')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to start threat intelligence updates:', { error })
       throw error
     }
@@ -292,7 +292,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     for (const feed of enabledFeeds) {
       try {
         await this.updateFeed(feed)
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Failed to update feed ${feed.name}:`, { error })
       }
     }
@@ -319,7 +319,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       logger.info(`Threat intelligence feed updated: ${feed.name}`, {
         intelligenceCount: intelligenceData.length,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to update feed ${feed.name}:`, { error })
       throw error
     }
@@ -372,7 +372,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       // Transform response data based on feed format
       return this.transformIntelligenceData(feed, response.data)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to fetch threat intelligence from ${feed.name}:`, {
         error,
       })
@@ -430,7 +430,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       }
 
       return intelligence
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to transform intelligence data from ${feed.name}:`, {
         error,
       })
@@ -453,13 +453,13 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Extract basic fields
-      const iocValue = String(data.value || data.ioc || data.indicator || '')
-      const iocType = String(data.type || data.ioc_type || 'unknown')
+      const iocValue = String(((data.value ?? data.ioc) ?? data.indicator) ?? '')
+      const iocType = String((data.type ?? data.ioc_type) ?? 'unknown')
       const threatType = String(
-        data.threat_type || data.malware_family || 'unknown',
+        (data.threat_type ?? data.malware_family) ?? 'unknown',
       )
       const severity = this.mapSeverity(
-        String(data.severity || data.confidence || 'medium'),
+        String((data.severity ?? data.confidence) ?? 'medium'),
       )
       const confidence = this.extractConfidence(
         (data.confidence ?? data.score ?? 50) as unknown,
@@ -478,19 +478,19 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         severity,
         confidence,
         firstSeen: new Date(
-          (data.first_seen || data.created || Date.now()) as any,
+          ((data.first_seen ?? data.created) ?? Date.now()) as any,
         ),
         lastSeen: new Date(
-          (data.last_seen || data.updated || Date.now()) as any,
+          ((data.last_seen ?? data.updated) ?? Date.now()) as any,
         ),
         expirationDate: data.expiration_date
           ? new Date(data.expiration_date as string)
           : undefined,
-        source: String(data.source || feed.name),
+        source: String(data.source ?? feed.name),
         tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
         metadata: {
           originalData: data,
-          feedType: String(feed.type),
+          feedType: feed.type,
           transformationDate: new Date(),
         },
         relatedIOCs: Array.isArray(data.related_iocs)
@@ -504,14 +504,12 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
               campaign:
                 ((data.attribution as Record<string, unknown>)
                   .campaign as string) || 'unknown',
-              family: String(
-                ((data.attribution as Record<string, unknown>)
-                  .family as string) || 'unknown',
-              ),
+              family: (((data.attribution as Record<string, unknown>)
+                  .family as string) || 'unknown'),
             }
           : undefined,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to transform intelligence item:', { error })
       return null
     }
@@ -568,19 +566,19 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         iocType,
         iocValue,
         threatType,
-        severity: this.mapSeverity(String(data.confidence || 'medium')),
-        confidence: this.extractConfidence(data.confidence || 50),
-        firstSeen: new Date((data.created || Date.now()) as any),
-        lastSeen: new Date((data.modified || Date.now()) as any),
+        severity: this.mapSeverity(String(data.confidence ?? 'medium')),
+        confidence: this.extractConfidence(data.confidence ?? 50),
+        firstSeen: new Date((data.created ?? Date.now()) as any),
+        lastSeen: new Date((data.modified ?? Date.now()) as any),
         source: (data.created_by_ref as string) || feed.name,
         tags: Array.isArray(data.labels) ? (data.labels as string[]) : [],
         metadata: {
-          stixType: String(data.type || 'unknown'),
+          stixType: (data.type || 'unknown'),
           specVersion: (data.spec_version as string) || '2.0',
           transformationDate: new Date(),
         },
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to transform STIX2 item:', { error })
       return null
     }
@@ -643,8 +641,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
           if (existing) {
             // Update existing intelligence
+            const existingId = existing['_id']
             await db.collection('threat_intelligence').updateOne(
-              { _id: existing._id },
+              { ['_id']: existingId },
               {
                 $set: {
                   lastSeen: intel.lastSeen,
@@ -667,7 +666,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
           // Cache in Redis for fast lookups
           await this.cacheIntelligence(intel)
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(`Failed to process intelligence item:`, { error, intel })
         }
       }
@@ -675,7 +674,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       logger.info(
         `Processed ${intelligence.length} intelligence items from ${feed.name}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(
         `Failed to process and store intelligence from ${feed.name}:`,
         { error },
@@ -705,7 +704,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         Math.floor(this.config.cacheTimeout / 1000),
         JSON.stringify(cacheData),
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cache intelligence:', {
         error,
         intelligenceId: intel.intelligenceId,
@@ -749,7 +748,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to query threat intelligence:', { error })
       return {
         intelligence: [],
@@ -789,7 +788,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           return {
             intelligence: [intel as ThreatIntelligence],
             totalCount: 1,
-            sources: [intel.feedName || 'cache'],
+            sources: [intel.feedName ?? 'cache'],
             queryTime: new Date(),
             cacheHit: true,
           }
@@ -803,7 +802,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         queryTime: new Date(),
         cacheHit: false,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to query cache:', { error })
       return {
         intelligence: [],
@@ -881,7 +880,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         queryTime: new Date(),
         cacheHit: false,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to query database:', { error })
       return {
         intelligence: [],
@@ -913,7 +912,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     }
 
     if (query.tags && query.tags.length > 0) {
-      const intelTags = intel.tags || []
+      const intelTags = intel.tags ?? []
       const hasMatchingTag = query.tags.some((tag) => intelTags.includes(tag))
       if (!hasMatchingTag) {
         return false
@@ -963,7 +962,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         isMalicious: false,
         sources: [],
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to check IOC:', { error, iocType, iocValue })
       return {
         isMalicious: false,
@@ -1013,7 +1012,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       }
 
       return enrichedResponse
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to enrich threat response:', {
         error,
         responseId: threatResponse.responseId,
@@ -1056,7 +1055,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
           value: threatResponse.metadata.userAgent as string,
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to extract IOCs from response:', {
         error,
         responseId: threatResponse.responseId,
@@ -1112,7 +1111,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         topThreatTypes,
         severityDistribution,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to get threat intelligence statistics:', { error })
       return {
         totalIntelligence: 0,
@@ -1161,7 +1160,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       feedStats[feed.name] = {
         total,
         active,
-        lastUpdate: lastUpdate?.lastSeen || new Date(0),
+        lastUpdate: lastUpdate?.lastSeen ?? new Date(0),
       }
     }
 
@@ -1264,7 +1263,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       }
 
       return result.deletedCount
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cleanup expired intelligence:', { error })
       return 0
     }
@@ -1278,7 +1277,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       for (const platform of platforms) {
         await this.syncWithPlatform(platform)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to sync with platforms:', { error, platforms })
       throw error
     }
@@ -1310,7 +1309,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         default:
           logger.warn(`Unknown threat intelligence platform: ${platform}`)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to sync with platform ${platform}:`, { error })
       throw error
     }
@@ -1354,7 +1353,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       logger.info('External threat intelligence service shutdown completed')
       this.emit('intelligence_shutdown')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to shutdown threat intelligence service:', { error })
       throw error
     }

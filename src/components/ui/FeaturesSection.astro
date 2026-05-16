@@ -30,7 +30,7 @@ const features = [
     description:
       'Share insights with peers, participate in group sessions, and learn from expert-led discussions.',
     stats: '24/7 community',
-    color: 'var(--accent-orange)',
+    color: 'var(--accent-primary)',
   },
   {
     icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>`,
@@ -112,7 +112,7 @@ const features = [
 <style>
   /* Mizu-inspired Clean Features Section (More spacious) */
   .features-section {
-    padding: var(--space-40) 0;
+    padding: var(--spacing-40) 0;
     background: var(--bg-primary);
     position: relative;
     overflow: hidden;
@@ -133,14 +133,14 @@ const features = [
   .features-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 var(--space-8);
+    padding: 0 var(--spacing-8);
     position: relative;
     z-index: 1;
   }
 
   .features-header {
     text-align: center;
-    margin-bottom: var(--space-20);
+    margin-bottom: var(--spacing-20);
   }
 
   .section-label {
@@ -149,15 +149,15 @@ const features = [
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--accent-primary);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--spacing-6);
     display: block;
   }
 
   .features-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-6);
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-6);
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.15);
     border-radius: var(--radius-full);
@@ -166,7 +166,7 @@ const features = [
     font-weight: var(--weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--spacing-8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
@@ -177,7 +177,7 @@ const features = [
     line-height: 1.15;
     letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin: 0 0 var(--space-8) 0;
+    margin: 0 0 var(--spacing-8) 0;
   }
 
   .features-description {
@@ -192,7 +192,7 @@ const features = [
   .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: var(--space-8);
+    gap: var(--spacing-8);
   }
 
   @media (max-width: 768px) {
@@ -205,7 +205,7 @@ const features = [
     background: var(--bg-card);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-2xl);
-    padding: var(--space-8);
+    padding: var(--spacing-8);
     transition: all var(--transition-base);
     position: relative;
     overflow: hidden;
@@ -224,7 +224,7 @@ const features = [
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--spacing-8);
     position: relative;
     z-index: 1;
     box-shadow: var(--shadow-sm);
@@ -238,7 +238,7 @@ const features = [
   .feature-content {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--spacing-4);
     position: relative;
     z-index: 1;
   }
@@ -247,7 +247,7 @@ const features = [
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: var(--space-6);
+    gap: var(--spacing-6);
   }
 
   .feature-title {
@@ -260,7 +260,7 @@ const features = [
   }
 
   .feature-badge {
-    padding: var(--space-2) var(--space-4);
+    padding: var(--spacing-2) var(--spacing-4);
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.15);
     border-radius: var(--radius-md);

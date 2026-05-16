@@ -1,98 +1,94 @@
-// Unified monitoring with event aggregation and alerting
+import { getLogger } from '../logging'
+
+const logger = getLogger({ module: 'unified-monitor' })
 
 export interface MonitorEvent {
   source: 'fhe' | 'audit' | 'secrets' | 'governance'
-  type: string
-  status: string
-  timestamp?: number
+  event: string
+  timestamp: string
+  details?: Record<string, unknown>
 }
 
-export interface AlertPayload {
-  source: string
+export type AlertHandler = (alert: {
   type: string
   count: number
-  threshold: number
-}
+  source: string
+}) => void
 
-export type AlertHandler = (payload: AlertPayload) => void
+const ALERT_THRESHOLD = 5
+const MAX_EVENTS_PER_SOURCE = 1000 // Memory limit
 
 export class UnifiedMonitor {
-  private events: Map<string, MonitorEvent[]> = new Map()
-  private failureCounts: Map<string, number> = new Map()
-  private alertHandlers: AlertHandler[] = []
-  private readonly complianceFailureThreshold = 5
+  // Source-keyed storage for O(1) lookups
+  private readonly eventsBySource: Map<string, MonitorEvent[]> = new Map()
+  private readonly alertHandlers: AlertHandler[] = []
+  private readonly failureCounts: Map<string, number> = new Map()
 
-  /**
-   * Record an event from a source module
-   */
-  record(event: MonitorEvent): void {
-    const timestampedEvent: MonitorEvent = {
-      ...event,
-      timestamp: event.timestamp ?? Date.now(),
+  async record(event: MonitorEvent): Promise<void> {
+    // Store event in source-keyed map (O(1) insertion)
+    const sourceEvents = this.eventsBySource.get(event.source) ?? []
+    sourceEvents.push(event)
+
+    // Enforce memory limit - remove oldest events if exceeded
+    if (sourceEvents.length > MAX_EVENTS_PER_SOURCE) {
+      sourceEvents.shift() // Remove oldest
     }
 
-    // Aggregate event by source
-    const sourceEvents = this.events.get(event.source) ?? []
-    sourceEvents.push(timestampedEvent)
-    this.events.set(event.source, sourceEvents)
+    this.eventsBySource.set(event.source, sourceEvents)
 
-    // Track compliance failures
-    if (event.status === 'failure' && event.type === 'compliance_failure') {
-      const currentCount = this.failureCounts.get(event.source) ?? 0
-      const newCount = currentCount + 1
-      this.failureCounts.set(event.source, newCount)
+    logger.info(`Recorded event: ${event.source}/${event.event}`)
 
-      // Trigger alert if threshold breached
-      if (newCount >= this.complianceFailureThreshold) {
+    // Check alert thresholds synchronously before any await
+    if (event.event === 'compliance_failure') {
+      const key = `${event.source}:compliance_failure`
+      const count = (this.failureCounts.get(key) ?? 0) + 1
+      this.failureCounts.set(key, count)
+
+      // Trigger alert synchronously if threshold reached
+      if (count >= ALERT_THRESHOLD) {
+        // Reset counter immediately to prevent duplicate alerts
+        this.failureCounts.set(key, 0)
+        // Log and notify handlers (async but after sync state update)
         this.triggerAlert({
+          type: 'compliance_failure',
+          count,
           source: event.source,
-          type: event.type,
-          count: newCount,
-          threshold: this.complianceFailureThreshold,
         })
       }
     }
   }
 
-  /**
-   * Get events filtered by source
-   */
-  getEvents(source?: string): MonitorEvent[] {
-    if (source) {
-      return this.events.get(source) ?? []
-    }
-    // Return all events if no source specified
-    return Array.from(this.events.values()).flat()
-  }
-
-  /**
-   * Register an alert handler
-   */
   onAlert(handler: AlertHandler): void {
     this.alertHandlers.push(handler)
   }
 
-  /**
-   * Get failure counts (for testing/monitoring)
-   */
-  getFailureCounts(): Map<string, number> {
-    return new Map(this.failureCounts)
+  getEvents(source: string): MonitorEvent[] {
+    return this.eventsBySource.get(source) ?? []
   }
 
-  /**
-   * Clear all events and counts
-   */
-  clear(): void {
-    this.events.clear()
+  getAllEvents(): MonitorEvent[] {
+    const all: MonitorEvent[] = []
+    for (const events of this.eventsBySource.values()) {
+      all.push(...events)
+    }
+    return all
+  }
+
+  clearEvents(): void {
+    this.eventsBySource.clear()
     this.failureCounts.clear()
   }
 
-  /**
-   * Trigger alert to all registered handlers
-   */
-  private triggerAlert(payload: AlertPayload): void {
+  private triggerAlert(alert: {
+    type: string
+    count: number
+    source: string
+  }): void {
     for (const handler of this.alertHandlers) {
-      handler(payload)
+      handler(alert)
     }
+    logger.warn(
+      `ALERT: ${alert.type} (count: ${alert.count}, source: ${alert.source})`,
+    )
   }
 }

@@ -1,20 +1,20 @@
 ---
-/**
- * Homepage - Pixelated Brutalism Design
- * Modern + Minimalist + Brutalist aesthetic
- */
-import BrutalistLayout from '@/layouts/BrutalistLayout.astro'
-import BrutalistHero from '@/components/BrutalistHero.astro'
+import Layout from '@/layouts/Layout.astro'
+import ProfessionalHero from '@/components/ProfessionalHero.astro'
+import IntroSection from '@/components/homepage/IntroSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
+import { homepageContent } from '@/lib/content'
+import '@/styles/homepage.css'
 
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   'name': 'Pixelated Empathy',
   'url': 'https://pixelatedempathy.com',
-  'logo': 'https://pixelatedempathy.com/android-chrome-192x192.png',
-  'description': 'AI-powered training platform for mental health professionals',
+  'logo': 'https://pixelatedempathy.com/favicon.svg',
+  'description':
+    'Clinical simulation and transcript-based review for therapist training and supervision teams.',
   'foundingDate': '2025',
   'address': {
     '@type': 'PostalAddress',
@@ -26,56 +26,60 @@ const organizationSchema = {
     'contactType': 'Customer Service',
   },
   'sameAs': [
-    'https://twitter.com/pixelatedempathy',
+    'https://x.com/pixelatedempathy',
     'https://github.com/nochadisfaction/pixelated',
   ],
 }
 ---
 
-<BrutalistLayout
-  title="Pixelated Empathy | The AI Training Ground for Therapists"
-  description="Practice difficult conversations in a safe space. No pressure, just progress."
+<Layout
+  title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
+  description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
+  keywords="clinical simulation, therapy training, clinical supervision, mental health"
+  fullWidthMain
 >
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema)}
-  />
-  
-  <BrutalistHero 
-    title="The AI Training Ground for Therapists"
-    subtitle="Practice difficult conversations in a safe space. No pressure, just progress."
-    ctaPrimary={{ text: "Start Practice", href: "/auth/signup" }}
-    ctaSecondary={{ text: "Watch Demo", href: "/demo-hub" }}
-    stats={[
-      { value: "10K+", label: "Sessions" },
-      { value: "95%", label: "Accuracy" },
-      { value: "24/7", label: "Available" },
-    ]}
-  />
-  
-  <!-- Features Section -->
-  <section class="section">
-    <div class="container">
-      <span class="label-mono">// Features</span>
-      <h2 class="mt-4 mb-12">Why Professionals Choose Us</h2>
-      
-      <div class="grid gap-8" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-        <div class="card card-lined">
-          <h3 class="mb-3">Risk-Free Practice</h3>
-          <p class="text-muted">Master crisis intervention and trauma response in a controlled environment without real-world consequences.</p>
-        </div>
-        <div class="card card-lined">
-          <h3 class="mb-3">Edge-Case Mastery</h3>
-          <p class="text-muted">Encounter rare but critical scenarios that most professionals go years without experiencing.</p>
-        </div>
-        <div class="card card-lined">
-          <h3 class="mb-3">Instant Feedback</h3>
-          <p class="text-muted">Get real-time analysis of your approach, tone, and effectiveness with detailed metrics.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  <CoreFeatures />
-  <CTA />
-</BrutalistLayout>
+  <div class="pe-homepage">
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')}
+    />
+
+    <ProfessionalHero
+      kicker={homepageContent.hero.kicker}
+      title={homepageContent.hero.title}
+      subtitle={homepageContent.hero.subtitle}
+      helperText={homepageContent.hero.helperText}
+      proofPoints={homepageContent.hero.proofPoints}
+      primaryCTA={homepageContent.hero.primaryCTA}
+      secondaryCTA={homepageContent.hero.secondaryCTA}
+    />
+
+    <IntroSection content={homepageContent.intro} />
+
+    <CoreFeatures
+      label={homepageContent.features.label}
+      title={homepageContent.features.title}
+      copy={homepageContent.features.copy}
+      proofLabel={homepageContent.features.proofLabel}
+      proofItems={homepageContent.features.proofItems}
+      cards={homepageContent.features.cards}
+      comparison={homepageContent.features.comparison}
+    />
+
+    <CTA
+      label={homepageContent.cta.label}
+      title={homepageContent.cta.title}
+      intro={homepageContent.cta.intro}
+      verdictCopy={homepageContent.cta.verdictCopy}
+      proofItems={homepageContent.cta.proofItems}
+      decisionTitle={homepageContent.cta.decisionTitle}
+      rubric={homepageContent.cta.rubric}
+      primaryCTA={homepageContent.cta.primaryCTA}
+      secondaryCTA={homepageContent.cta.secondaryCTA}
+      meta={homepageContent.cta.meta}
+    />
+  </div>
+</Layout>

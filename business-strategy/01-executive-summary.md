@@ -124,5 +124,5 @@ The platform measures success through:
 
 This executive summary represents our commitment to revolutionizing mental
 health training through responsible AI innovation while maintaining the highest
-standards of quality, safety, and ethical practice. Key metrics and sources
-are documented in [METRICS-SOURCES.md](METRICS-SOURCES.md).
+standards of quality, safety, and ethical practice. Key metrics and sources are
+documented in [METRICS-SOURCES.md](METRICS-SOURCES.md).

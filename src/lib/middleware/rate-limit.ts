@@ -57,7 +57,7 @@ export class RateLimiter {
   private readonly defaultLimit: number
   private readonly windowMs: number
   private readonly userLimits: Record<string, number>
-  private storage: Map<string, number>
+  private readonly storage: Map<string, number>
 
   constructor(defaultLimit = 30, windowMs = 60 * 1000) {
     this.defaultLimit = defaultLimit
@@ -90,7 +90,7 @@ export class RateLimiter {
     const resetTime = now + windowMs
 
     // Get current count from storage
-    const currentCount = this.storage.get(key) || 0
+    const currentCount = this.storage.get(key) ?? 0
 
     if (currentCount >= limit) {
       return {
@@ -132,20 +132,20 @@ export const rateLimitMiddleware = defineMiddleware(
     try {
       // Get client IP for rate limiting
       const clientIp =
-        request.headers.get('x-forwarded-for') ||
-        request.headers.get('cf-connecting-ip') ||
+        (request.headers.get('x-forwarded-for') ??
+        request.headers.get('cf-connecting-ip')) ??
         'anonymous'
 
       // Get user role from session
       const session = await getSession(request)
-      const role = session?.user?.role || 'anonymous'
+      const role = session?.user?.role ?? 'anonymous'
 
       // Get the pathname for matching against rate limit configs
       const { pathname } = new URL(request.url)
 
       // Find the most specific rate limit config that matches the path
       const config =
-        rateLimitConfigs.find((cfg) => pathname.startsWith(cfg.path)) ||
+        rateLimitConfigs.find((cfg) => pathname.startsWith(cfg.path)) ??
         rateLimitConfigs[2]
 
       // Check rate limit

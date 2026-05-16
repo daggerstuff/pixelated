@@ -19,9 +19,22 @@ import type {
 
 // Mock dependencies
 const mockAIService: AIService = {
-  getModelInfo: vi.fn(),
-  createChatCompletion: vi.fn(),
-  createChatStream: vi.fn(),
+  getModelInfo:
+    vi.fn<(model: string) => ReturnType<AIService['getModelInfo']>>(),
+  createChatCompletion:
+    vi.fn<
+      (
+        messages: Parameters<AIService['createChatCompletion']>[0],
+        options?: Parameters<AIService['createChatCompletion']>[1],
+      ) => ReturnType<AIService['createChatCompletion']>
+    >(),
+  createChatStream:
+    vi.fn<
+      (
+        messages: Parameters<AIService['createStreamingChatCompletion']>[0],
+        options?: Parameters<AIService['createStreamingChatCompletion']>[1],
+      ) => ReturnType<AIService['createStreamingChatCompletion']>
+    >(),
 }
 
 describe('EducationalContextRecognizer', () => {
@@ -68,7 +81,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Definition question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -89,7 +101,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Explanation question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -110,7 +121,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Comparison question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -131,7 +141,6 @@ describe('EducationalContextRecognizer', () => {
           const result = await recognizer.recognizeEducationalContext(query)
           if (!result.isEducational) {
             // Log actual result for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Symptom question result:', result)
           }
           expect(result.isEducational).toBe(true)
@@ -160,7 +169,6 @@ describe('EducationalContextRecognizer', () => {
           )
           if (result.topicArea !== test.expectedTopic) {
             // Log actual topic area for debugging
-            // eslint-disable-next-line no-console
             console.log('DEBUG FAIL: Topic mapping result:', {
               query: test.query,
               actual: result.topicArea,

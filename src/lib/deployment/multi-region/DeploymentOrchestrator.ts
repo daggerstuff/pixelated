@@ -90,11 +90,11 @@ export interface DeploymentPhaseResult {
 }
 
 export class DeploymentOrchestrator extends EventEmitter {
-  private config: DeploymentOrchestratorConfig
-  private cloudProviderManager: CloudProviderManager
-  private deploymentPlans: Map<string, DeploymentPlan> = new Map()
-  private activeExecutions: Map<string, DeploymentExecution> = new Map()
-  private rollbackPoints: Map<string, RollbackPoint> = new Map()
+  private readonly config: DeploymentOrchestratorConfig
+  private readonly cloudProviderManager: CloudProviderManager
+  private readonly deploymentPlans: Map<string, DeploymentPlan> = new Map()
+  private readonly activeExecutions: Map<string, DeploymentExecution> = new Map()
+  private readonly rollbackPoints: Map<string, RollbackPoint> = new Map()
   private isInitialized = false
 
   constructor(
@@ -128,11 +128,12 @@ export class DeploymentOrchestrator extends EventEmitter {
       this.emit('initialized', {
         maxParallelDeployments: this.config.maxParallelDeployments,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize Deployment Orchestrator', { error })
-      throw new Error(`Initialization failed: ${error.message}`, {
-        cause: error,
-      })
+      if (error instanceof Error) {
+        throw new Error('Initialization failed', { cause: error })
+      }
+      throw error
     }
   }
 
@@ -177,7 +178,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       }
 
       logger.info(`Initialized ${defaultPlans.length} deployment plans`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to initialize deployment plans', { error })
       throw error
     }
@@ -304,14 +305,8 @@ export class DeploymentOrchestrator extends EventEmitter {
    * Setup event listeners
    */
   private setupEventListeners(): void {
-    this.cloudProviderManager.on('deployment-complete', (data) => {
-      logger.info('Cloud provider deployment completed', data)
-    })
-
-    this.cloudProviderManager.on('deployment-failed', (data) => {
-      logger.error('Cloud provider deployment failed', data)
-      this.handleDeploymentFailure(data)
-    })
+    // Cloud provider manager events are not currently exposed in this implementation.
+    // Keep this method for future extension without failing initialization.
   }
 
   /**
@@ -356,14 +351,24 @@ export class DeploymentOrchestrator extends EventEmitter {
       this.emit('deployment-completed', { executionId: execution.id, planId })
 
       return execution
-    } catch (error) {
-      logger.error(`Deployment execution failed for plan: ${planId}`, { error })
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error'
+          : 'Unknown error'
+      logger.error(`Deployment execution failed for plan: ${planId}`, {
+        error: message,
+      })
 
       const execution = this.activeExecutions.get(`exec-${planId}`)
       if (execution) {
         execution.status = 'failed'
         execution.completedAt = new Date()
-        execution.errors.push(error.message)
+        execution.errors.push(message)
 
         // Attempt rollback if enabled
         if (this.config.rollbackOnFailure) {
@@ -371,7 +376,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         }
       }
 
-      this.emit('deployment-failed', { planId, error: error.message })
+      this.emit('deployment-failed', { planId, error: message })
       throw error
     }
   }
@@ -474,8 +479,17 @@ export class DeploymentOrchestrator extends EventEmitter {
           }
         }
       }
-    } catch (error) {
-      logger.error('Deployment phase execution failed', { error })
+    } catch (error: unknown) {
+      logger.error('Deployment phase execution failed', {
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error'
+            : 'Unknown error',
+      })
       throw error
     }
   }
@@ -492,7 +506,7 @@ export class DeploymentOrchestrator extends EventEmitter {
 
     try {
       let phaseResults: (DeploymentResult | Record<string, unknown>)[] = []
-      let phaseErrors: string[] = []
+      const phaseErrors: string[] = []
 
       switch (phase.type) {
         case 'infrastructure':
@@ -523,7 +537,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         results: phaseResults,
         errors: phaseErrors,
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Phase execution failed: ${phase.id}`, { error })
 
       return {
@@ -532,7 +546,13 @@ export class DeploymentOrchestrator extends EventEmitter {
         startedAt: startTime,
         completedAt: new Date(),
         results: [],
-        errors: [error.message],
+        errors: [
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        ],
       }
     }
   }
@@ -549,7 +569,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         regions: regions.length,
       })
 
-      const deploymentPromises = regions.map((region) =>
+      const deploymentPromises = regions.map( async (region) =>
         this.cloudProviderManager.deployRegion(region),
       )
 
@@ -557,14 +577,11 @@ export class DeploymentOrchestrator extends EventEmitter {
 
       const successfulResults = results
         .filter((result) => result.status === 'fulfilled')
-        .map(
-          (result) =>
-            (result).value,
-        )
+        .map((result) => result.value)
 
       const failedResults = results
         .filter((result) => result.status === 'rejected')
-        .map((result) => (result).reason)
+        .map((result) => result.reason)
 
       if (failedResults.length > 0) {
         logger.warn(`Some infrastructure deployments failed`, {
@@ -574,7 +591,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       }
 
       return successfulResults
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Infrastructure deployment failed', { error })
       throw error
     }
@@ -618,7 +635,7 @@ export class DeploymentOrchestrator extends EventEmitter {
           (result) =>
             (result as PromiseFulfilledResult<Record<string, unknown>>).value,
         )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Service deployment failed', { error })
       throw error
     }
@@ -664,7 +681,7 @@ export class DeploymentOrchestrator extends EventEmitter {
           (result) =>
             (result as PromiseFulfilledResult<Record<string, unknown>>).value,
         )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Monitoring setup failed', { error })
       throw error
     }
@@ -700,7 +717,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       }
 
       return validationResults
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Phase validation failed', { error })
       throw error
     }
@@ -722,7 +739,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         (r) => r.phaseId === dependencyId,
       )
 
-      if (!dependencyResult || dependencyResult.status !== 'success') {
+      if (dependencyResult?.status !== 'success') {
         logger.warn(
           `Phase dependency not met: ${dependencyId} for phase: ${phase.id}`,
         )
@@ -761,7 +778,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       logger.info(
         `Created rollback point: ${rollbackPoint.id} for phase: ${phase.id}`,
       )
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Failed to create rollback point for phase: ${phase.id}`, {
         error,
       })
@@ -799,11 +816,16 @@ export class DeploymentOrchestrator extends EventEmitter {
         executionId: execution.id,
         rollbackPointId: rollbackPoint.id,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Rollback failed', { error })
       this.emit('rollback-failed', {
         executionId: execution.id,
-        error: error.message,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
       })
       throw error
     }
@@ -839,7 +861,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       await new Promise((resolve) => setTimeout(resolve, 3000))
 
       logger.info(`Phase rollback completed: ${phase.id}`)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(`Phase rollback failed: ${phase.id}`, { error })
       throw error
     }
@@ -875,8 +897,10 @@ export class DeploymentOrchestrator extends EventEmitter {
             validationResults.push(`✗ ${validationStep.name}: ${result.error}`)
             validationFailed = true
           }
-        } catch (error) {
-          validationResults.push(`✗ ${validationStep.name}: ${error.message}`)
+        } catch (error: unknown) {
+          validationResults.push(
+            `✗ ${validationStep.name}: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
+          )
           validationFailed = true
         }
       }
@@ -897,9 +921,18 @@ export class DeploymentOrchestrator extends EventEmitter {
       })
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Deployment validation failed', { error })
-      return { success: false, errors: [error.message] }
+      return {
+        success: false,
+        errors: [
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        ],
+      }
     }
   }
 
@@ -927,8 +960,16 @@ export class DeploymentOrchestrator extends EventEmitter {
         default:
           throw new Error(`Unknown validation step type: ${step.type}`)
       }
-    } catch (error) {
-      return { success: false, error: error.message }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+      }
     }
   }
 
@@ -944,7 +985,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       const minHealthScore =
         (typeof step.successCriteria.minHealthScore === 'number'
           ? step.successCriteria.minHealthScore
-          : undefined) || 80
+          : undefined) ?? 80
 
       // Simulate health check validation
       const simulatedHealthScore = 85 + Math.random() * 10 // 85-95 range
@@ -957,8 +998,16 @@ export class DeploymentOrchestrator extends EventEmitter {
           error: `Health score ${simulatedHealthScore.toFixed(1)} below minimum ${minHealthScore}`,
         }
       }
-    } catch (error) {
-      return { success: false, error: error.message }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+      }
     }
   }
 
@@ -974,11 +1023,11 @@ export class DeploymentOrchestrator extends EventEmitter {
       const maxResponseTime =
         (typeof step.successCriteria.maxResponseTime === 'number'
           ? step.successCriteria.maxResponseTime
-          : undefined) || 200
+          : undefined) ?? 200
       const minThroughput =
         (typeof step.successCriteria.minThroughput === 'number'
           ? step.successCriteria.minThroughput
-          : undefined) || 100
+          : undefined) ?? 100
 
       // Simulate performance test results
       const responseTime = 150 + Math.random() * 50 // 150-200ms range
@@ -987,7 +1036,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       if (responseTime <= maxResponseTime && throughput >= minThroughput) {
         return { success: true }
       } else {
-        const errors = []
+        const errors: string[] = []
         if (responseTime > maxResponseTime) {
           errors.push(
             `Response time ${responseTime.toFixed(0)}ms exceeds maximum ${maxResponseTime}ms`,
@@ -1000,8 +1049,16 @@ export class DeploymentOrchestrator extends EventEmitter {
         }
         return { success: false, error: errors.join(', ') }
       }
-    } catch (error) {
-      return { success: false, error: error.message }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+      }
     }
   }
 
@@ -1026,8 +1083,16 @@ export class DeploymentOrchestrator extends EventEmitter {
           error: `Security scan score ${securityScore.toFixed(1)} below threshold`,
         }
       }
-    } catch (error) {
-      return { success: false, error: error.message }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+      }
     }
   }
 
@@ -1048,8 +1113,16 @@ export class DeploymentOrchestrator extends EventEmitter {
       } else {
         return { success: false, error: 'Compliance requirements not met' }
       }
-    } catch (error) {
-      return { success: false, error: error.message }
+    } catch (error: unknown) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+      }
     }
   }
 
@@ -1135,7 +1208,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         planId: plan.id,
       })
       this.emit('plan-created', { planId: plan.id, name: plan.name })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create deployment plan', { error })
       throw error
     }
@@ -1212,7 +1285,7 @@ export class DeploymentOrchestrator extends EventEmitter {
       this.isInitialized = false
 
       logger.info('Deployment Orchestrator cleanup completed')
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Deployment Orchestrator cleanup failed', { error })
       throw error
     }

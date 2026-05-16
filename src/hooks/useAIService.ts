@@ -1,16 +1,56 @@
 import { useCallback } from 'react'
 
 import type { AIMessage, AIServiceOptions } from '@/lib/ai/models/ai-types'
-import { createTogetherAIService } from '@/lib/ai/services/together'
+import { createLLMService } from '@/lib/ai/services/llm-provider'
+
+const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
+const LLM_PROVIDER_API_KEYS: readonly string[] = [
+  'LLM_API_KEY',
+  'NVIDIA_API_KEY',
+  'NIM_API_KEY',
+  'NVIDIA_TOKEN',
+]
+const LLM_PROVIDER_BASE_URLS: readonly string[] = [
+  'LLM_BASE_URL',
+  'LLM_API_URL',
+  'OPENAI_BASE_URL',
+  'NVIDIA_OPENAI_BASE_URL',
+  'NVIDIA_BASE_URL',
+  'NIM_BASE_URL',
+]
+
+function resolveProviderApiKey(): string | undefined {
+  for (const key of LLM_PROVIDER_API_KEYS) {
+    const value = process.env[key]
+    if (value) return value
+  }
+  return undefined
+}
+
+function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
+  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
+}
+
+function resolveSafeLlmBaseUrl(): string {
+  const baseUrl =
+    LLM_PROVIDER_BASE_URLS.map((key) => process.env[key]).find(Boolean) ??
+    ''
+
+  if (isOpenRouterBaseUrl(baseUrl)) {
+    return ''
+  }
+
+  return baseUrl
+}
 
 export function useAIService() {
   const getAIResponse = useCallback(
     async (prompt: string, options?: AIServiceOptions) => {
       try {
-        // Create AI service with Together provider
-        const aiService = createTogetherAIService({
-          togetherApiKey: process.env['TOGETHER_API_KEY'] || '',
-          apiKey: process.env['TOGETHER_API_KEY'] || '',
+        // Create AI service
+        const aiService = createLLMService({
+          apiKey: resolveProviderApiKey() ?? '',
+          baseUrl: resolveSafeLlmBaseUrl(),
         })
 
         // Format the prompt as a message

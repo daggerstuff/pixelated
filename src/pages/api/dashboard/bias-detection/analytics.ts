@@ -9,7 +9,7 @@ export const GET: APIRoute = async ({ url }) => {
     initializeDatabase()
 
     const { searchParams } = url
-    const days = parseInt(searchParams.get('days') || '30')
+    const days = parseInt(searchParams.get('days') ?? '30')
     const cache = getCache()
 
     // Try to get cached analytics data first
@@ -111,27 +111,27 @@ export const GET: APIRoute = async ({ url }) => {
     const computedData = {
       historical: historicalResult.rows.map((row) => ({
         date: row.date,
-        biasScore: parseFloat(row.avg_bias_score || '0'),
-        sessionCount: parseInt(row.session_count || '0'),
-        alertCount: parseInt(row.alert_count || '0'),
-        minBias: parseFloat(row.min_bias || '0'),
-        maxBias: parseFloat(row.max_bias || '0'),
+        biasScore: parseFloat(row.avg_bias_score ?? '0'),
+        sessionCount: parseInt(row.session_count ?? '0'),
+        alertCount: parseInt(row.alert_count ?? '0'),
+        minBias: parseFloat(row.min_bias ?? '0'),
+        maxBias: parseFloat(row.max_bias ?? '0'),
       })),
       demographics: demographicResult.rows.map((row) => ({
-        gender: row.gender || 'Unknown',
-        ethnicity: row.ethnicity || 'Unknown',
-        ageGroup: row.age_group || 'Unknown',
-        count: parseInt(row.count || '0'),
-        avgBias: parseFloat(row.avg_bias || '0'),
+        gender: row.gender ?? 'Unknown',
+        ethnicity: row.ethnicity ?? 'Unknown',
+        ageGroup: row.age_group ?? 'Unknown',
+        count: parseInt(row.count ?? '0'),
+        avgBias: parseFloat(row.avg_bias ?? '0'),
       })),
       distribution: distributionResult.rows.map((row) => ({
         range: row.bias_range,
-        count: parseInt(row.count || '0'),
+        count: parseInt(row.count ?? '0'),
       })),
       patterns: patternsResult.rows.map((row) => ({
-        layer: row.layer || 'Unknown',
-        avgScore: parseFloat(row.avg_score || '0'),
-        occurrences: parseInt(row.occurrences || '0'),
+        layer: row.layer ?? 'Unknown',
+        avgScore: parseFloat(row.avg_score ?? '0'),
+        occurrences: parseInt(row.occurrences ?? '0'),
       })),
       metadata: {
         days,
@@ -154,27 +154,27 @@ export const GET: APIRoute = async ({ url }) => {
     const response = {
       historical: historicalResult.rows.map((row) => ({
         date: row.date,
-        biasScore: parseFloat(row.avg_bias_score || '0'),
-        sessionCount: parseInt(row.session_count || '0'),
-        alertCount: parseInt(row.alert_count || '0'),
-        minBias: parseFloat(row.min_bias || '0'),
-        maxBias: parseFloat(row.max_bias || '0'),
+        biasScore: parseFloat(row.avg_bias_score ?? '0'),
+        sessionCount: parseInt(row.session_count ?? '0'),
+        alertCount: parseInt(row.alert_count ?? '0'),
+        minBias: parseFloat(row.min_bias ?? '0'),
+        maxBias: parseFloat(row.max_bias ?? '0'),
       })),
       demographics: demographicResult.rows.map((row) => ({
-        gender: row.gender || 'Unknown',
-        ethnicity: row.ethnicity || 'Unknown',
-        ageGroup: row.age_group || 'Unknown',
-        count: parseInt(row.count || '0'),
-        avgBias: parseFloat(row.avg_bias || '0'),
+        gender: row.gender ?? 'Unknown',
+        ethnicity: row.ethnicity ?? 'Unknown',
+        ageGroup: row.age_group ?? 'Unknown',
+        count: parseInt(row.count ?? '0'),
+        avgBias: parseFloat(row.avg_bias ?? '0'),
       })),
       distribution: distributionResult.rows.map((row) => ({
         range: row.bias_range,
-        count: parseInt(row.count || '0'),
+        count: parseInt(row.count ?? '0'),
       })),
       patterns: patternsResult.rows.map((row) => ({
-        layer: row.layer || 'Unknown',
-        avgScore: parseFloat(row.avg_score || '0'),
-        occurrences: parseInt(row.occurrences || '0'),
+        layer: row.layer ?? 'Unknown',
+        avgScore: parseFloat(row.avg_score ?? '0'),
+        occurrences: parseInt(row.occurrences ?? '0'),
       })),
       metadata: {
         days,
@@ -199,7 +199,11 @@ export const GET: APIRoute = async ({ url }) => {
       JSON.stringify({
         error: 'Failed to fetch analytics data',
         details:
-          process.env['NODE_ENV'] === 'development' ? error.message : undefined,
+          process.env['NODE_ENV'] === 'development'
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : undefined,
       }),
       {
         status: 500,
