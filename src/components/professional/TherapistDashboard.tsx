@@ -48,50 +48,43 @@ export const TherapistDashboard: FC = () => {
     [],
   )
 
-  // Memoize patients data to prevent unnecessary re-renders of child components
-  const patients: PatientSummary[] = React.useMemo(
-    () => [
-      {
-        id: '1',
-        name: 'Sarah Johnson',
-        lastSession: new Date('2024-01-15'),
-        riskLevel: 'medium',
-        progress: 65,
-        nextAppointment: new Date('2024-01-22'),
-        alerts: ['Missed last homework', 'Anxiety spike detected'],
-      },
-      {
-        id: '2',
-        name: 'Michael Chen',
-        lastSession: new Date('2024-01-14'),
-        riskLevel: 'low',
-        progress: 80,
-        nextAppointment: new Date('2024-01-21'),
-        alerts: [],
-      },
-      {
-        id: '3',
-        name: 'Emily Rodriguez',
-        lastSession: new Date('2024-01-13'),
-        riskLevel: 'high',
-        progress: 45,
-        nextAppointment: new Date('2024-01-20'),
-        alerts: ['Requires immediate attention', 'Family session needed'],
-      },
-    ],
-    [],
-  )
+  // Mock data - in real app would come from API
+  const patients: PatientSummary[] = [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      lastSession: new Date('2024-01-15'),
+      riskLevel: 'medium',
+      progress: 65,
+      nextAppointment: new Date('2024-01-22'),
+      alerts: ['Missed last homework', 'Anxiety spike detected'],
+    },
+    {
+      id: '2',
+      name: 'Michael Chen',
+      lastSession: new Date('2024-01-14'),
+      riskLevel: 'low',
+      progress: 80,
+      nextAppointment: new Date('2024-01-21'),
+      alerts: [],
+    },
+    {
+      id: '3',
+      name: 'Emily Rodriguez',
+      lastSession: new Date('2024-01-13'),
+      riskLevel: 'high',
+      progress: 45,
+      nextAppointment: new Date('2024-01-20'),
+      alerts: ['Requires immediate attention', 'Family session needed'],
+    },
+  ]
 
-  // Memoize session metrics to prevent unnecessary re-renders of child components
-  const sessionMetrics: SessionMetrics = React.useMemo(
-    () => ({
-      totalSessions: 47,
-      avgSessionLength: 52, // minutes
-      completionRate: 94,
-      patientSatisfaction: 4.2, // out of 5
-    }),
-    [],
-  )
+  const sessionMetrics: SessionMetrics = {
+    totalSessions: 47,
+    avgSessionLength: 52, // minutes
+    completionRate: 94,
+    patientSatisfaction: 4.2, // out of 5
+  }
 
   // ⚡ Bolt: Memoize the patient selection handler to prevent unnecessary re-renders of child tabs
   const handlePatientSelect = React.useCallback(
@@ -223,7 +216,7 @@ export const TherapistDashboard: FC = () => {
 }
 
 /**
- * Overview Tab Component - Memoized to prevent unnecessary re-renders
+ * Overview Tab Component
  */
 const OverviewTab: FC<{
   patients: PatientSummary[]
@@ -231,7 +224,7 @@ const OverviewTab: FC<{
   onPatientSelect: (patientId: string) => void
   selectedPatients: string[]
   timeRange: 'week' | 'month' | 'quarter' | 'year'
-}> = React.memo(({ patients, metrics, onPatientSelect, selectedPatients, timeRange }) => {
+}> = ({ patients, metrics, onPatientSelect, selectedPatients, timeRange }) => {
   const urgentPatients = patients.filter(
     (p) => p.riskLevel === 'high' || p.riskLevel === 'critical',
   )
@@ -460,16 +453,16 @@ const OverviewTab: FC<{
       </SlideUp>
     </div>
   )
-})
+}
 
 /**
- * Patients Tab Component - Memoized to prevent unnecessary re-renders
+ * Patients Tab Component
  */
 const PatientsTab: FC<{
   patients: PatientSummary[]
   onPatientSelect: (patientId: string) => void
   selectedPatients: string[]
-}> = React.memo(({ patients, onPatientSelect, selectedPatients }) => {
+}> = ({ patients, onPatientSelect, selectedPatients }) => {
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
@@ -567,7 +560,7 @@ const PatientsTab: FC<{
       </div>
     </div>
   )
-})
+}
 
 /**
  * Analytics Tab Component
