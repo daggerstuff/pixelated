@@ -122,9 +122,9 @@ export interface MetricsConfig {
  * Objective evaluation metrics engine
  */
 export class ObjectiveMetricsEngine {
-  private evaluationHistory: EvaluationHistory
-  private config: MetricsConfig
-  private baselines: Map<string, number> = new Map()
+  private readonly evaluationHistory: EvaluationHistory
+  private readonly config: MetricsConfig
+  private readonly baselines: Map<string, number> = new Map()
 
   constructor(config: MetricsConfig) {
     this.config = config
@@ -479,6 +479,13 @@ export class ObjectiveMetricsEngine {
           fit += 0.4
         }
         break
+      case ContextType.CRISIS: { throw new Error('Not implemented yet: ContextType.CRISIS case') }
+      case ContextType.EDUCATIONAL: { throw new Error('Not implemented yet: ContextType.EDUCATIONAL case') }
+      case ContextType.SUPPORT: { throw new Error('Not implemented yet: ContextType.SUPPORT case') }
+      case ContextType.CLINICAL_ASSESSMENT: { throw new Error('Not implemented yet: ContextType.CLINICAL_ASSESSMENT case') }
+      case ContextType.INFORMATIONAL: { throw new Error('Not implemented yet: ContextType.INFORMATIONAL case') }
+      case ContextType.GENERAL: { throw new Error('Not implemented yet: ContextType.GENERAL case') }
+        // TODO: Implement additional ContextType cases – currently covered by string literals above.
     }
 
     return Math.max(0, Math.min(1, fit))

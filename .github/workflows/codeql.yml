@@ -22,8 +22,13 @@ env:
 jobs:
   analyze:
     name: Analyze
+    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
+    # Skip CodeQL on Dependabot PRs to avoid transient GitHub action download rate-limit failures.
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: codeql-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
@@ -57,9 +62,9 @@ jobs:
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v6.0.6
+        uses: pnpm/action-setup@v6.0.8
         with:
-          version: 11.0.9
+          version: 11.1.2
           run_install: false
 
       - name: Get pnpm store directory
@@ -179,7 +184,7 @@ jobs:
           fi
 
       - name: Upload SARIF results as artifact
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@65474929f620d15768caa62e6e497dfe48b7d8e
         if: always() && steps.codeql-sarif.outputs.found == 'true'
         with:
           name: codeql-sarif-${{ matrix.language }}
@@ -187,7 +192,7 @@ jobs:
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@65474929f620d15768caa62e6e497dfe48b7d8e
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}

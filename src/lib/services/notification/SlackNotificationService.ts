@@ -39,10 +39,10 @@ interface SlackMessagePayload {
 }
 
 export class SlackNotificationService implements ICrisisNotificationHandler {
-  private webhookUrl: string
+  private readonly webhookUrl: string
 
   constructor(webhookUrl?: string) {
-    const url = webhookUrl || config.notifications.slackWebhookUrl()
+    const url = webhookUrl ?? config.notifications.slackWebhookUrl()
     if (!url) {
       const errorMsg =
         'Slack webhook URL is not configured. SlackNotificationService cannot operate.'

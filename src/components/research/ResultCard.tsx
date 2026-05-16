@@ -36,9 +36,9 @@ const ResultCardMetadata = ({
 }) => (
   <div className='mb-3 flex gap-2 text-xs'>
     <span className='bg-slate-700 text-slate-300 border-slate-600 rounded border px-2 py-1 capitalize'>
-      {(source || 'unknown').replace('_', ' ')}
+      {(source ?? 'unknown').replace('_', ' ')}
     </span>
-    {(publication_year || 0) > 0 && (
+    {(publication_year ?? 0) > 0 && (
       <span className='bg-slate-700 text-slate-300 border-slate-600 rounded border px-2 py-1'>
         {publication_year}
       </span>

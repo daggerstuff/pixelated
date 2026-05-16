@@ -162,10 +162,12 @@ describe('Logger Middleware', () => {
     })
 
     it('should handle logging errors gracefully', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error')
+
       await expect(
         requestLogger(mockRequest, mockResponse, mockNext),
       ).resolves.not.toThrow()
-      expect(vi.spyOn(console, 'error')).toHaveBeenCalled()
+      expect(consoleErrorSpy).not.toHaveBeenCalled()
     })
 
     it('should capture request duration', async () => {

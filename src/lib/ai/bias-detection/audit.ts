@@ -109,8 +109,8 @@ class InMemoryAuditStorage implements AuditStorage {
     filtered.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 
     // Apply pagination
-    const offset = filters.offset || 0
-    const limit = filters.limit || 100
+    const offset = filters.offset ?? 0
+    const limit = filters.limit ?? 100
     return filtered.slice(offset, offset + limit)
   }
 
@@ -143,16 +143,16 @@ class InMemoryAuditStorage implements AuditStorage {
 // =============================================================================
 
 export class BiasDetectionAuditLogger {
-  private storage: AuditStorage
-  private encryptionEnabled: boolean
-  private retentionPolicies: RetentionPolicy[]
+  private readonly storage: AuditStorage
+  private readonly encryptionEnabled: boolean
+  private readonly retentionPolicies: RetentionPolicy[]
 
   constructor(
     storage?: AuditStorage,
     encryptionEnabled: boolean = true,
     retentionPolicies: RetentionPolicy[] = [],
   ) {
-    this.storage = storage || new InMemoryAuditStorage()
+    this.storage = storage ?? new InMemoryAuditStorage()
     this.encryptionEnabled = encryptionEnabled
     this.retentionPolicies =
       retentionPolicies.length > 0
@@ -772,13 +772,11 @@ export function getAuditLogger(
   encryptionEnabled?: boolean,
   retentionPolicies?: RetentionPolicy[],
 ): BiasDetectionAuditLogger {
-  if (!auditLoggerInstance) {
-    auditLoggerInstance = new BiasDetectionAuditLogger(
+  auditLoggerInstance ??= new BiasDetectionAuditLogger(
       storage,
       encryptionEnabled,
       retentionPolicies,
-    )
-  }
+    );
   return auditLoggerInstance
 }
 

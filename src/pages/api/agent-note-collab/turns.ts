@@ -12,9 +12,9 @@ export const GET: APIRoute = async ({ url, request }) => {
   }
 
   const ledger = getLedger()
-  const artifactId = url.searchParams.get('artifactId') || undefined
+  const artifactId = url.searchParams.get('artifactId') ?? undefined
   const phase = (url.searchParams.get('phase') as TurnPhase) || undefined
-  const role = url.searchParams.get('role') || undefined
+  const role = url.searchParams.get('role') ?? undefined
   const limit = url.searchParams.get('limit')
     ? parseInt(url.searchParams.get('limit')!, 10)
     : undefined

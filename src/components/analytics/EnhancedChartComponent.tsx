@@ -57,7 +57,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   fallbackData,
 }) => {
   const [useBackend, setUseBackend] = useState(
-    dataConfig?.useBackendData || false,
+    dataConfig?.useBackendData ?? false,
   )
   const [error, setError] = useState<string | null>(null)
 
@@ -69,13 +69,13 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     refresh: refreshBackendData,
   } = useChartData({
     type,
-    category: dataConfig?.category || 'progress',
-    timeRange: dataConfig?.timeRange || 30,
+    category: dataConfig?.category ?? 'progress',
+    timeRange: dataConfig?.timeRange ?? 30,
     clientId: dataConfig?.clientId,
     sessionId: dataConfig?.sessionId,
-    dataPoints: dataConfig?.dataPoints || 50,
-    autoRefresh: dataConfig?.autoRefresh || false,
-    refreshInterval: dataConfig?.refreshInterval || 60000,
+    dataPoints: dataConfig?.dataPoints ?? 50,
+    autoRefresh: dataConfig?.autoRefresh ?? false,
+    refreshInterval: dataConfig?.refreshInterval ?? 60000,
   })
 
   // Fallback to default data if backend is not available
@@ -141,7 +141,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   const chartData =
     useBackend && backendData?.data
       ? backendData.data
-      : fallbackData || defaultData[type] || defaultData.line
+      : (fallbackData ?? defaultData[type]) ?? defaultData.line
 
   // Handle backend errors gracefully
   useEffect(() => {
@@ -259,7 +259,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
           {dataConfig?.autoRefresh && (
             <span className='text-gray-500 mt-1 text-xs'>
               Auto-refreshing every{' '}
-              {(dataConfig.refreshInterval || 60000) / 1000}s
+              {(dataConfig.refreshInterval ?? 60000) / 1000}s
             </span>
           )}
         </div>

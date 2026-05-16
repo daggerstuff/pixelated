@@ -1,5 +1,6 @@
 @import './browser-fixes.css';
 @import 'tw-animate-css';
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 /* Use self-hosted KaTeX CSS to avoid font resolution issues */
 @import url('/katex/katex.min.css');
@@ -8,9 +9,6 @@
 .katex {
   font-family: 'KaTeX_Main', 'Times New Roman', serif;
 }
-
-/* Plus Jakarta Sans for professional typography */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 

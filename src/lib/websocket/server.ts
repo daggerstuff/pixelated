@@ -17,9 +17,9 @@ interface WebSocketMessage {
 }
 
 class TherapyChatWebSocketServer {
-  private wss: WebSocketServer
-  private clients: Map<string, WebSocket>
-  private sessions: Map<string, Set<string>>
+  private readonly wss: WebSocketServer
+  private readonly clients: Map<string, WebSocket>
+  private readonly sessions: Map<string, Set<string>>
 
   constructor(server: Server) {
     this.wss = new WebSocketServer({ server })
@@ -48,6 +48,7 @@ class TherapyChatWebSocketServer {
           case 'status':
             this.handleStatusUpdate(clientId, message)
             break
+          case "error": { throw new Error('Not implemented yet: "error" case') }
           default:
             logger.warn(`Unknown message type: ${message.type}`)
         }
@@ -83,9 +84,13 @@ class TherapyChatWebSocketServer {
             data: string,
             operation: string,
           ) => Promise<{ data: string }>
+          initialize?: () => Promise<void> | void
         }
 
         if (typeof fhe.processEncrypted === 'function') {
+          if (typeof fhe.initialize === 'function') {
+            await fhe.initialize()
+          }
           const result = await fhe.processEncrypted(
             message.data as string,
             'CHAT',
@@ -107,6 +112,11 @@ class TherapyChatWebSocketServer {
     }
 
     // Broadcast to all clients in the session
+    if (!this.sessions.has(message.sessionId)) {
+      this.sessions.set(message.sessionId, new Set())
+    }
+    this.sessions.get(message.sessionId)!.add(clientId)
+
     this.broadcastToSession(message.sessionId, {
       type: 'message',
       data: message.data,

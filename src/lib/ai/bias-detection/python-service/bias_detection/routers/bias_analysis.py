@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Response, status
 
 from bias_detection.deps import (
     AuthenticatedUser,
+    require_authenticated_user,
     get_analysis_orchestrator,
     get_database_service,
     require_rate_limit,
@@ -51,8 +52,8 @@ async def analyze_bias(
 async def get_analysis(
     analysis_id: str,
     response: Response,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db=_DEP_DATABASE,
-    current_user: AuthenticatedUser = Depends(AuthenticatedUser),
 ):
     """Get analysis by ID. Authentication required."""
     from fastapi import HTTPException
@@ -83,8 +84,8 @@ async def get_user_analyses(
     response: Response,
     limit: int = 100,
     offset: int = 0,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db=_DEP_DATABASE,
-    current_user: AuthenticatedUser = Depends(AuthenticatedUser),
 ):
     """Get analyses for a user. Authentication required; users can only access their own analyses."""
     from fastapi import HTTPException

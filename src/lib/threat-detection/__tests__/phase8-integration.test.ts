@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import { EventEmitter } from 'events'
 
 import Redis from 'ioredis-mock'
@@ -6,12 +7,36 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createCompleteThreatDetectionSystem } from '../integrations'
 
+type ThreatDetectionSystem = ReturnType<typeof createCompleteThreatDetectionSystem>
+type RateLimiterMock = {
+  checkLimit: ReturnType<typeof vi.fn>
+  consume: ReturnType<typeof vi.fn>
+  reset: ReturnType<typeof vi.fn>
+}
+
+const setMockFetchResponse = (payload: unknown): void => {
+  const fetchMock = vi.fn<
+    (input: URL | RequestInfo, init?: RequestInit) => Promise<Response>
+  >()
+  const response = new Response(
+    typeof payload === 'string' ? payload : JSON.stringify(payload),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  )
+  global.fetch = fetchMock
+  void fetchMock.mockResolvedValue(response)
+}
+
 describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   let mongod: MongoMemoryServer
-  let redis: Redis
-  let mockOrchestrator: any
-  let mockRateLimiter: any
-  let threatDetectionSystem: any
+  let redis: ReturnType<typeof Redis>
+  let mockOrchestrator: EventEmitter
+  let mockRateLimiter: RateLimiterMock
+  let threatDetectionSystem: ThreatDetectionSystem
 
   beforeEach(async () => {
     // Setup in-memory MongoDB
@@ -161,86 +186,65 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   })
 
   describe('Threat Hunting Service', () => {
-    it(
-      'should execute hunting rules automatically',
-      { timeout: 10000 },
-      async () => {
-        const { huntingService } = threatDetectionSystem
-        const investigationSpy =
-          vi.fn<(investigation: { id: string; title: string }) => void>()
+    it('should execute hunting rules automatically', async () => {
+      const { huntingService } = threatDetectionSystem
+      const investigationSpy =
+        vi.fn<(investigation: { id: string; title: string }) => void>()
 
-        huntingService.on('investigation:started', investigationSpy)
+      huntingService.on('investigation:started', investigationSpy)
 
-        // Start hunting
-        await huntingService.start()
+      // Start hunting
+      await huntingService.start()
 
-        // Simulate threat data
-        mockOrchestrator.emit('threat:detected', {
-          threatId: 'threat123',
-          severity: 'high',
-          userId: 'user123',
-          ip: '192.168.1.1',
-          timestamp: new Date(),
-        })
+      // Simulate threat data
+      mockOrchestrator.emit('threat:detected', {
+        threatId: 'threat123',
+        severity: 'high',
+        userId: 'user123',
+        ip: '192.168.1.1',
+        timestamp: new Date(),
+      })
 
-        // Wait for hunting execution
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Wait for hunting execution
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-        expect(investigationSpy).toHaveBeenCalled()
+      expect(investigationSpy).toHaveBeenCalled()
 
-        await huntingService.stop()
-      },
-    )
+      await huntingService.stop()
+    }, 10000)
 
-    it(
-      'should perform manual threat investigation',
-      { timeout: 15000 },
-      async () => {
-        const { huntingService } = threatDetectionSystem
+    it('should perform manual threat investigation', async () => {
+      const { huntingService } = threatDetectionSystem
 
-        const investigation = await huntingService.startInvestigation({
-          threatId: 'threat456',
-          userId: 'user456',
-          severity: 'medium',
-          templateId: 'standard_threat_investigation',
-        })
+      const investigation = await huntingService.startInvestigation({
+        threatId: 'threat456',
+        userId: 'user456',
+        severity: 'medium',
+        templateId: 'standard_threat_investigation',
+      })
 
-        expect(investigation).toBeDefined()
-        expect(investigation.id).toBeDefined()
-        expect(investigation.status).toBe('running')
+      expect(investigation).toBeDefined()
+      expect(investigation.id).toBeDefined()
+      expect(investigation.status).toBe('running')
 
-        // Wait for investigation to complete
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+      // Wait for investigation to complete
+      await new Promise((resolve) => setTimeout(resolve, 5000))
 
-        const result = await huntingService.getInvestigationResult(
-          investigation.id,
-        )
-        expect(result).toBeDefined()
-        expect(result.status).toBe('completed')
-      },
-      { timeout: 15000 },
-    )
+      const result = await huntingService.getInvestigationResult(
+        investigation.id,
+      )
+      expect(result).toBeDefined()
+      expect(result.status).toBe('completed')
+    }, 15000)
 
     it('should update threat intelligence feeds', async () => {
       const { intelligenceService } = threatDetectionSystem
 
       process.env.ALIENVAULT_API_KEY = 'test_valid_api_key'
 
-      global.fetch = vi
-        .fn<
-          () => Promise<{
-            ok: boolean
-            json: () => Promise<{
-              results: Array<{ ip: string; reputation: string }>
-            }>
-          }>
-        >()
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({
-            results: [{ ip: '192.168.1.1', reputation: 'bad' }],
-          }),
-        })
+      setMockFetchResponse({
+        results: [{ ip: '192.168.1.1', reputation: 'bad' }],
+      })
 
       await intelligenceService.updateFeeds()
 
@@ -254,21 +258,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     it('should perform IOC lookups', async () => {
       const { intelligenceService } = threatDetectionSystem
 
-      global.fetch = vi
-        .fn<
-          () => Promise<{
-            ok: boolean
-            json: () => Promise<{
-              data: Array<{ indicator: string; type: string }>
-            }>
-          }>
-        >()
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({
-            data: [{ indicator: 'test.com', type: 'domain' }],
-          }),
-        })
+      setMockFetchResponse({
+        data: [{ indicator: 'test.com', type: 'domain' }],
+      })
 
       const result = await intelligenceService.lookupIOC('test.com', 'domain')
       expect(result).toBeDefined()
@@ -289,66 +281,59 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   })
 
   describe('Integration Tests', () => {
-    it(
-      'should coordinate between all Phase 8 services',
-      { timeout: 30000 },
-      async () => {
-        const { monitoringService, huntingService, intelligenceService } =
-          threatDetectionSystem
+    it('should coordinate between all Phase 8 services', async () => {
+      const { monitoringService, huntingService, intelligenceService } =
+        threatDetectionSystem
 
-        // Start all services
-        await Promise.all([
-          monitoringService.start(),
-          huntingService.start(),
-          intelligenceService.start(),
-        ])
+      // Start all services
+      await Promise.all([
+        monitoringService.start(),
+        huntingService.start(),
+        intelligenceService.start(),
+      ])
 
-        // Simulate a complex threat scenario
-        const threatData = {
-          threatId: 'integrated_threat_001',
-          userId: 'victim_user',
-          ip: 'malicious.ip.address',
-          severity: 'critical',
-          type: 'data_exfiltration',
-          timestamp: new Date(),
-        }
+      // Simulate a complex threat scenario
+      const threatData = {
+        threatId: 'integrated_threat_001',
+        userId: 'victim_user',
+        ip: 'malicious.ip.address',
+        severity: 'critical',
+        type: 'data_exfiltration',
+        timestamp: new Date(),
+      }
 
-        // Emit threat to orchestrator
-        mockOrchestrator.emit('threat:detected', threatData)
+      // Emit threat to orchestrator
+      mockOrchestrator.emit('threat:detected', threatData)
 
-        // Wait briefly for investigation to start (auto-complete happens in 500ms)
-        await new Promise((resolve) => setTimeout(resolve, 100))
+      // Wait briefly for investigation to start (auto-complete happens in 500ms)
+      await new Promise((resolve) => setTimeout(resolve, 100))
 
-        // Verify monitoring captured the event
-        const metrics = await monitoringService.getMetrics()
-        const threatMetric = metrics.find((m) => m.name === 'threats_detected')
-        expect(threatMetric).toBeDefined()
+      // Verify monitoring captured the event
+      const metrics = await monitoringService.getMetrics()
+      const threatMetric = metrics.find((m) => m.name === 'threats_detected')
+      expect(threatMetric).toBeDefined()
 
-        // Verify hunting service initiated investigation (check all, not just active)
-        const allInvestigations = await huntingService.getActiveInvestigations()
-        const completedInvestigations = [
-          ...(huntingService as any).investigations.values(),
-        ]
-        const relatedInvestigation = completedInvestigations.find(
-          (inv) => inv.threatId === threatData.threatId,
-        )
-        expect(relatedInvestigation).toBeDefined()
+      // Verify hunting service initiated investigation (check all, not just active)
+      const allInvestigations = await huntingService.getActiveInvestigations()
+      const relatedInvestigation = allInvestigations.find(
+        (inv) => inv.threatId === threatData.threatId,
+      )
+      expect(relatedInvestigation).toBeDefined()
 
-        // Verify intelligence service checked IOCs
-        const iocResults = await intelligenceService.lookupIOC(
-          threatData.ip,
-          'ip',
-        )
-        expect(iocResults).toBeDefined()
+      // Verify intelligence service checked IOCs
+      const iocResults = await intelligenceService.lookupIOC(
+        threatData.ip,
+        'ip',
+      )
+      expect(iocResults).toBeDefined()
 
-        // Stop all services
-        await Promise.all([
-          monitoringService.stop(),
-          huntingService.stop(),
-          intelligenceService.stop(),
-        ])
-      },
-    )
+      // Stop all services
+      await Promise.all([
+        monitoringService.stop(),
+        huntingService.stop(),
+        intelligenceService.stop(),
+      ])
+    }, 30000)
 
     it('should handle service failures gracefully', async () => {
       const { monitoringService, huntingService } = threatDetectionSystem
@@ -422,17 +407,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       process.env.ALIENVAULT_API_KEY = 'test_valid_api_key'
 
-      global.fetch = vi
-        .fn<
-          () => Promise<{
-            ok: boolean
-            json: () => Promise<{ data: unknown[] }>
-          }>
-        >()
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({ data: [] }),
-        })
+      setMockFetchResponse({
+        data: [],
+      })
 
       const start = Date.now()
       await intelligenceService.lookupIOC('test.com', 'domain')
@@ -483,9 +460,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Verify sensitive operations require proper authorization
       const sensitiveOperations = [
-        () => monitoringService.clearMetrics(),
-        () => monitoringService.getSystemConfig(),
-        () => monitoringService.exportData(),
+         async () => monitoringService.clearMetrics(),
+         async () => monitoringService.getSystemConfig(),
+         async () => monitoringService.exportData(),
       ]
 
       for (const operation of sensitiveOperations) {

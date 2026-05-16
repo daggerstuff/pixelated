@@ -45,15 +45,26 @@ export function SharedProviders({
     securityLevel = 'hipaa',
   } = config
 
+  const content = enableNotifications ? (
+    <NotificationProvider>{children}</NotificationProvider>
+  ) : (
+    children
+  )
+
+  const wrappedChildren =
+    enableAnalytics && enableNotifications ? (
+      <AnalyticsProvider>{content}</AnalyticsProvider>
+    ) : enableAnalytics ? (
+      <AnalyticsProvider>{children}</AnalyticsProvider>
+    ) : (
+      content
+    )
+
   return (
     <ErrorBoundary onError={onError}>
       <ThemeProvider initialState={initialState.theme}>
         <SecurityProvider level={securityLevel}>
-          {enableNotifications && (
-            <NotificationProvider>{children}</NotificationProvider>
-          )}
-          {enableAnalytics && <AnalyticsProvider>{children}</AnalyticsProvider>}
-          {!enableAnalytics && !enableNotifications && children}
+          {wrappedChildren}
         </SecurityProvider>
       </ThemeProvider>
     </ErrorBoundary>

@@ -30,7 +30,7 @@ export interface ConflictResolverConfig {
  * Following Single Responsibility Principle - only handles conflict resolution
  */
 export class ConflictResolver {
-  private config: ConflictResolverConfig
+  private readonly config: ConflictResolverConfig
 
   constructor(config: ConflictResolverConfig) {
     this.config = {
@@ -65,6 +65,7 @@ export class ConflictResolver {
         }
         return remoteValue
 
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return remoteValue
     }
@@ -84,10 +85,10 @@ export class ConflictResolver {
  * Following Single Responsibility Principle - only handles persistence
  */
 export class StorageAdapter {
-  private defaultConfig: Partial<StorageConfig>
+  private readonly defaultConfig: Partial<StorageConfig>
 
   constructor(config?: Partial<StorageConfig>) {
-    this.defaultConfig = config || {}
+    this.defaultConfig = config ?? {}
   }
 
   /**
@@ -108,7 +109,7 @@ export class StorageAdapter {
   /**
    * Set state in storage
    */
-  set<T>(key: string, value: T, options?: Partial<StorageConfig>): boolean {
+  set(key: string, value: unknown, options?: Partial<StorageConfig>): boolean {
     return storageManager.set(key, value, { ...this.defaultConfig, ...options })
   }
 }
@@ -120,11 +121,11 @@ export class StorageAdapter {
  */
 export class MessagingTransport {
   private channel: BroadcastChannel | null = null
-  private channelName: string
-  private heartbeatInterval: number
+  private readonly channelName: string
+  private readonly heartbeatInterval: number
   private heartbeatTimer: NodeJS.Timeout | null = null
-  private tabId: string
-  private messageHandlers = new Map<
+  private readonly tabId: string
+  private readonly messageHandlers = new Map<
     string,
     Set<(message: SyncMessage) => void>
   >()
@@ -335,10 +336,10 @@ export interface TabSyncConfig {
  * Following Single Responsibility Principle - only handles sync logic
  */
 export class SyncOrchestrator {
-  private stateVersions = new Map<string, number>()
-  private stateCache = new Map<string, any>()
-  private enableVersioning: boolean
-  private maxVersions: number
+  private readonly stateVersions = new Map<string, number>()
+  private readonly stateCache = new Map<string, any>()
+  private readonly enableVersioning: boolean
+  private readonly maxVersions: number
 
   constructor(enableVersioning: boolean, maxVersions: number) {
     this.enableVersioning = enableVersioning
@@ -349,7 +350,7 @@ export class SyncOrchestrator {
    * Get current version for a key
    */
   getVersion(key: string): number {
-    return this.stateVersions.get(key) || 0
+    return this.stateVersions.get(key) ?? 0
   }
 
   /**
@@ -507,13 +508,13 @@ function generateChecksum(data: any, serializedData?: string): string | null {
  * - Transport layer: Handles BroadcastChannel communication
  */
 class TabSyncManager {
-  private config: Required<TabSyncConfig>
-  private tabId: string
+  private readonly config: Required<TabSyncConfig>
+  private readonly tabId: string
   private isInitialized = false
-  private conflictResolver: ConflictResolver
-  private storageAdapter: StorageAdapter
-  private transport: MessagingTransport
-  private orchestrator: SyncOrchestrator
+  private readonly conflictResolver: ConflictResolver
+  private readonly storageAdapter: StorageAdapter
+  private readonly transport: MessagingTransport
+  private readonly orchestrator: SyncOrchestrator
 
   constructor(config: TabSyncConfig = {}) {
     this.config = {
@@ -725,16 +726,16 @@ class TabSyncManager {
    * Set state with automatic persistence and cross-tab sync
    * Delegates to StorageAdapter for persistence operations
    */
-  setState<T>(
+  setState(
     key: string,
-    value: T,
+    value: unknown,
     options?: {
       sync?: boolean
       sourceId?: string
       storageConfig?: Partial<StorageConfig>
     },
   ): boolean {
-    const { sync = true, sourceId, storageConfig } = options || {}
+    const { sync = true, sourceId, storageConfig } = options ?? {}
 
     // Persist to storage first (delegated to StorageAdapter) - only if storage is enabled
     if (this.config.enableStorage) {
@@ -773,13 +774,13 @@ class TabSyncManager {
     onConflict?: (key: string, localValue: T, remoteValue: T) => T,
   ): T {
     // Use provided strategy or fall back to resolver's configured strategy
-    const effectiveStrategy = strategy || this.config.conflictStrategy
+    const effectiveStrategy = strategy ?? this.config.conflictStrategy
 
     // If custom onConflict provided or different strategy, create temporary resolver
     if (onConflict || (strategy && strategy !== this.config.conflictStrategy)) {
       const tempResolver = new ConflictResolver({
         strategy: effectiveStrategy,
-        onConflict: onConflict || this.config.onConflict,
+        onConflict: onConflict ?? this.config.onConflict,
       })
       return tempResolver.resolve(key, localValue, remoteValue)
     }
@@ -802,7 +803,7 @@ class TabSyncManager {
       onConflict?: (key: string, localValue: T, remoteValue: T) => T
     },
   ): { value: T; shouldUpdate: boolean } {
-    const { strategy, skipStorage = false, onConflict } = options || {}
+    const { strategy, skipStorage = false, onConflict } = options ?? {}
 
     // If values are identical (using deep equality for objects/arrays), no action needed
     if (this.conflictResolver.areEqual(localValue, remoteValue)) {
@@ -834,7 +835,7 @@ class TabSyncManager {
       localValue,
       remoteValue,
       resolvedValue,
-      strategy: strategy || this.config.conflictStrategy,
+      strategy: strategy ?? this.config.conflictStrategy,
       tabId,
     })
 

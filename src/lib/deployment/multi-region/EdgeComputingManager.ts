@@ -84,8 +84,8 @@ export interface EdgeNodeStatus {
 }
 
 export class EdgeComputingManager extends EventEmitter {
-  private config: EdgeDeploymentConfig
-  private edgeNodes: Map<string, EdgeNodeStatus> = new Map()
+  private readonly config: EdgeDeploymentConfig
+  private readonly edgeNodes: Map<string, EdgeNodeStatus> = new Map()
   private healthCheckInterval: NodeJS.Timeout | null = null
   private isInitialized = false
 
@@ -2206,7 +2206,7 @@ export class EdgeComputingManager extends EventEmitter {
         totalLocations: this.config.locations.length,
       })
 
-      const deploymentPromises = this.config.locations.map((location) =>
+      const deploymentPromises = this.config.locations.map( async (location) =>
         this.deployEdgeNode(location),
       )
 
@@ -3043,7 +3043,7 @@ async function processRequest(req, threatCheck, biasCheck) {
   private async performHealthChecks(): Promise<void> {
     try {
       const healthCheckPromises = Array.from(this.edgeNodes.entries()).map(
-        ([locationId, status]) => this.performHealthCheck(locationId, status),
+         async ([locationId, status]) => this.performHealthCheck(locationId, status),
       )
 
       await Promise.allSettled(healthCheckPromises)
@@ -3151,7 +3151,7 @@ async function processRequest(req, threatCheck, biasCheck) {
         )
 
         const status = this.edgeNodes.get(location.id)
-        if (status && status.status === 'healthy' && distance < minDistance) {
+        if (status?.status === 'healthy' && distance < minDistance) {
           minDistance = distance
           optimalLocation = location
         }

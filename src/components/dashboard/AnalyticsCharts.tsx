@@ -13,13 +13,14 @@ import type {
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className='animate-pulse'>
+  <div className='animate-pulse' role='status'>
     <div className='bg-gray-200 mb-4 h-4 w-3/4 rounded'></div>
     <div className='space-y-2'>
       <div className='bg-gray-200 h-3 rounded'></div>
       <div className='bg-gray-200 h-3 w-5/6 rounded'></div>
       <div className='bg-gray-200 h-3 w-4/6 rounded'></div>
     </div>
+    <span className='sr-only'>Loading data...</span>
   </div>
 )
 
@@ -30,7 +31,7 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div className='bg-red-50 border-red-200 rounded-lg border p-4'>
+  <div className='bg-red-50 border-red-200 rounded-lg border p-4' role='alert' aria-live='assertive'>
     <div className='flex items-center justify-between'>
       <div>
         <h4 className='text-red-800 font-medium'>
@@ -119,7 +120,11 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
         {data.map((day) => (
           <div key={day.date} className='flex flex-1 flex-col items-center'>
             <div
-              className='bg-blue-500 hover:bg-blue-600 w-full rounded-t transition-all duration-300'
+              role='img'
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex={0}
+              aria-label={`${day.sessions} sessions on ${new Date(day.date).toLocaleDateString()}`}
+              className='bg-blue-500 hover:bg-blue-600 focus:ring-blue-400 w-full rounded-t transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1'
               style={{
                 height: `${(day.sessions / maxSessions) * 100}%`,
                 minHeight: '4px',
@@ -183,13 +188,25 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
             <div className='mb-2 flex items-center justify-between'>
               <div className='flex items-center space-x-2'>
                 <span className='text-sm font-medium'>{skill.skill}</span>
-                <span className={`text-sm ${getTrendColor(skill.trend)}`}>
+                <span
+                  className={`text-sm ${getTrendColor(skill.trend)}`}
+                  aria-hidden='true'
+                  title={`Trend: ${skill.trend}`}
+                >
                   {getTrendIcon(skill.trend)}
                 </span>
+                <span className='sr-only'>Trend: {skill.trend}</span>
               </div>
               <span className='text-gray-600 text-sm'>{skill.score}%</span>
             </div>
-            <div className='bg-gray-200 h-2 w-full rounded-full'>
+            <div
+              className='bg-gray-200 h-2 w-full rounded-full'
+              role='progressbar'
+              aria-label={`${skill.skill} progress`}
+              aria-valuenow={skill.score}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
               <div
                 className='bg-green-500 h-2 rounded-full transition-all duration-500'
                 style={{ width: `${skill.score}%` }}
@@ -233,6 +250,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
         return 'text-orange-600'
       case 'red':
         return 'text-red-600'
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return 'text-gray-600'
     }

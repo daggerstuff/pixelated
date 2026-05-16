@@ -46,7 +46,7 @@ const PERFORMANCE_CONFIG = {
 // Optimized bias detection with caching and connection pooling
 export class OptimizedBiasDetectionService {
   private static instance: OptimizedBiasDetectionService
-  private cache = getCache()
+  private readonly cache = getCache()
 
   private constructor() {}
 
@@ -95,7 +95,7 @@ export class OptimizedBiasDetectionService {
       // Generate content hash for caching
       const contentHash = createContentHash(
         params.text,
-        params.demographics || {},
+        params.demographics ?? {},
       )
       const cacheKey = `bias:analysis:${contentHash}`
 
@@ -126,11 +126,11 @@ export class OptimizedBiasDetectionService {
       await this.storeAnalysisResults({
         analysisId,
         sessionId,
-        therapistId: params.therapistId || null,
-        clientId: params.clientId || null,
+        therapistId: params.therapistId ?? null,
+        clientId: params.clientId ?? null,
         ...analysisResult,
-        demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual',
+        demographics: params.demographics ?? {},
+        sessionType: params.sessionType ?? 'individual',
         contentHash,
         processingTimeMs: Math.round(performance.now() - startTime),
       })
@@ -138,8 +138,8 @@ export class OptimizedBiasDetectionService {
       // Cache the result
       await this.cacheAnalysisResults(cacheKey, {
         ...analysisResult,
-        demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual',
+        demographics: params.demographics ?? {},
+        sessionType: params.sessionType ?? 'individual',
       })
 
       const totalProcessingTime = Math.round(performance.now() - startTime)
@@ -161,8 +161,8 @@ export class OptimizedBiasDetectionService {
         layerResults: analysisResult.layerResults,
         detectedBiases: analysisResult.detectedBiases,
         recommendations: analysisResult.recommendations,
-        demographics: params.demographics || {},
-        sessionType: params.sessionType || 'individual',
+        demographics: params.demographics ?? {},
+        sessionType: params.sessionType ?? 'individual',
         processingTimeMs: totalProcessingTime,
         createdAt: new Date().toISOString(),
         cached: false,
@@ -371,7 +371,7 @@ export class OptimizedBiasDetectionService {
     contentHash: string
     processingTimeMs: number
   }): Promise<void> {
-    await initializeDatabase()
+     initializeDatabase()
     const pool = getPool()
     const client = await pool.connect()
     let timeoutHandle: NodeJS.Timeout | undefined

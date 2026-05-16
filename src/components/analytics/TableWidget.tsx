@@ -1,15 +1,15 @@
 import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button/index.ts'
+import { Input } from '@/components/ui/input.tsx'
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/ui/table.tsx'
 
 import { DashboardWidget } from './DashboardWidget'
 import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
@@ -158,7 +158,7 @@ export function TableWidget({
       const searchLower = debouncedSearchTerm.toLowerCase()
       result = result.filter((row) =>
         columns.some((column) => {
-          const value = String(row[column.key] || '').toLowerCase()
+          const value = String(row[column.key] ?? '').toLowerCase()
           return value.includes(searchLower)
         }),
       )
@@ -203,7 +203,7 @@ export function TableWidget({
             .map((col) => {
               const value = row[col.key]
               // Escape quotes and wrap in quotes
-              const escaped = String(value || '').replace(/"/g, '""')
+              const escaped = String(value ?? '').replace(/"/g, '""')
               return `"${escaped}"`
             })
             .join(','),
@@ -306,12 +306,12 @@ export function TableWidget({
                 </TableRow>
               ) : (
                 filteredAndSortedData.map((row, rowIndex) => (
-                  <TableRow key={row.id || `row-${rowIndex}`}>
+                  <TableRow key={row.id ?? `row-${rowIndex}`}>
                     {columns.map((column) => (
                       <TableCell key={`${rowIndex}-${column.key}`}>
                         {column.render
                           ? column.render(row[column.key], row)
-                          : String(row[column.key] || '')}
+                          : String(row[column.key] ?? '')}
                       </TableCell>
                     ))}
                   </TableRow>

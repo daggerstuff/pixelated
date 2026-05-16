@@ -47,7 +47,7 @@ app.use(
 // CORS configuration
 app.use(
   cors({
-    origin: process.env['FRONTEND_URL'] || 'http://localhost:3000',
+    origin: process.env['FRONTEND_URL'] ?? 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -82,7 +82,7 @@ app.get('/health', (_req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
-    version: process.env['npm_package_version'] || '1.0.0',
+    version: process.env['npm_package_version'] ?? '1.0.0',
   })
 })
 
@@ -169,8 +169,8 @@ const gracefulShutdown = async (signal: string) => {
 }
 
 // Handle shutdown signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
-process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+process.on('SIGTERM',  async () => gracefulShutdown('SIGTERM'))
+process.on('SIGINT',  async () => gracefulShutdown('SIGINT'))
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {

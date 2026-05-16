@@ -250,7 +250,7 @@ describe('Refactored Modules Performance Tests', () => {
       }))
 
       const startTime = performance.now()
-      const promises = sessions.map((session) =>
+      const promises = sessions.map( async (session) =>
         pythonBridge.runPreprocessingAnalysis(session),
       )
       const results = await Promise.all(promises)
@@ -503,7 +503,7 @@ describe('Refactored Modules Performance Tests', () => {
 
       // Store all results
       await Promise.all(
-        results.map((result) => metricsCollector.storeAnalysisResult?.(result)),
+        results.map( async (result) => metricsCollector.storeAnalysisResult?.(result)),
       )
 
       const endTime = performance.now()
@@ -588,7 +588,7 @@ describe('Refactored Modules Performance Tests', () => {
 
       // Process all alerts
       await Promise.all(
-        alerts.map((alert) =>
+        alerts.map( async (alert) =>
           alertSystem.processAlert?.({
             sessionId: alert.sessionId,
             level: alert.alertLevel,
@@ -696,7 +696,7 @@ describe('Refactored Modules Performance Tests', () => {
       // Step 2: Create complete analysis result
       const analysisResult: BiasAnalysisResult = {
         sessionId: session.sessionId,
-        timestamp: new Date(session.sessionDate || ''),
+        timestamp: new Date(session.sessionDate ?? ''),
         overallBiasScore:
           (preprocessingResult.biasScore +
             modelResult.biasScore +
@@ -783,7 +783,7 @@ describe('Refactored Modules Performance Tests', () => {
       for (const session of sessions) {
         const analysisResult: BiasAnalysisResult = {
           sessionId: session.sessionId,
-          timestamp: new Date(session.sessionDate || ''),
+          timestamp: new Date(session.sessionDate ?? ''),
           overallBiasScore: 0.2 + Math.random() * 0.6,
           alertLevel: Math.random() > 0.5 ? 'high' : 'medium',
           layerResults: {} as any, // Simplified for load test
@@ -856,7 +856,7 @@ describe('Refactored Modules Performance Tests', () => {
 
         const analysisResult: BiasAnalysisResult = {
           sessionId: session.sessionId,
-          timestamp: new Date(session.sessionDate || ''),
+          timestamp: new Date(session.sessionDate ?? ''),
           overallBiasScore: 0.3,
           alertLevel: 'medium' as const,
           layerResults: {} as any,
@@ -923,7 +923,7 @@ describe('Refactored Modules Performance Tests', () => {
 
       const analysisResult: BiasAnalysisResult = {
         sessionId: session.sessionId,
-        timestamp: new Date(session.sessionDate || ''),
+        timestamp: new Date(session.sessionDate ?? ''),
         overallBiasScore: 0.3,
         alertLevel: 'medium' as const,
         layerResults: {} as any,

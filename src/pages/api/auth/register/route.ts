@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { verifyPassword } from '@/lib/auth/utils'
-import { userManager, initializeDatabase } from '@/lib/db'
+import { verifyPassword } from '../../../../lib/auth/utils'
+import { userManager, initializeDatabase } from '../../../../lib/db'
 
 // Register schema
 const RegisterSchema = z.object({

@@ -102,10 +102,10 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
  * Offline Manager Class
  */
 class OfflineManager {
-  private config: Required<OfflineManagerConfig>
+  private readonly config: Required<OfflineManagerConfig>
   private syncInterval: NodeJS.Timeout | null = null
   private networkState: OfflineState | null = null
-  private listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
+  private readonly listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
 
   constructor(config: OfflineManagerConfig = {}) {
     this.config = {
@@ -157,7 +157,7 @@ class OfflineManager {
     this.emit('online')
 
     // Immediately try to sync when coming back online
-    setTimeout(() => this.sync(), 1000)
+    setTimeout( async () => this.sync(), 1000)
   }
 
   private handleOffline(): void {

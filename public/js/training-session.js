@@ -73,19 +73,19 @@ class TrainingSession {
     if (sessionScript) {
       // use defensive JSON parse
       const parsed = this.safeParseJSON(sessionScript.textContent)
-      this.sessionData = parsed || null
+      this.sessionData = parsed ?? null
     }
 
     if (userScript) {
       const parsed = this.safeParseJSON(userScript.textContent)
-      this.userData = parsed || null
+      this.userData = parsed ?? null
     }
 
     // Validate ids before using them elsewhere (prevents accidental injection of unexpected values)
-    if (this.sessionData && this.sessionData.sessionId) {
+    if (this.sessionData?.sessionId) {
       this.sessionData.sessionId = this.validateId(this.sessionData.sessionId)
     }
-    if (this.userData && this.userData.id) {
+    if (this.userData?.id) {
       this.userData.id = this.validateId(String(this.userData.id))
     }
 
@@ -259,11 +259,11 @@ class TrainingSession {
     const messageInput = document.getElementById('message-input')
     const interventionSelect = document.getElementById('intervention-type')
 
-    if (!messageInput || !messageInput.value.trim()) return
+    if (!messageInput?.value.trim()) return
 
     const message = {
       content: messageInput.value.trim(),
-      interventionType: interventionSelect?.value || 'reflection',
+      interventionType: interventionSelect?.value ?? 'reflection',
       timestamp: new Date().toISOString(),
       sessionId: this.sessionData?.sessionId,
     }
@@ -306,7 +306,7 @@ class TrainingSession {
       emotionalState: data.emotionalState,
       trustLevel: data.therapeuticProgress,
       resistanceLevel: data.resistanceLevel,
-      crisisRisk: data.crisisRisk || 0,
+      crisisRisk: data.crisisRisk ?? 0,
     })
 
     // Update nonverbal cues
@@ -335,7 +335,7 @@ class TrainingSession {
     const crisisPercentage = document.getElementById('crisis-percentage')
 
     if (crisisMeter && crisisPercentage) {
-      const riskLevel = data.riskLevel || 0.8
+      const riskLevel = data.riskLevel ?? 0.8
       crisisMeter.style.width = `${riskLevel * 100}%`
       crisisPercentage.textContent = `${Math.round(riskLevel * 100)}%`
     }
@@ -360,7 +360,7 @@ class TrainingSession {
     const messageDiv = document.createElement('div')
     messageDiv.className = `message-bubble message-${sender}`
 
-    const timestamp = metadata.timestamp || new Date()
+    const timestamp = metadata.timestamp ?? new Date()
     const timeString = timestamp.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
@@ -444,7 +444,7 @@ class TrainingSession {
 
     // Update emotional state display
     if (emotionalState) {
-      this.safeSetText(emotionalState, state.emotionalState || 'Neutral')
+      this.safeSetText(emotionalState, state.emotionalState ?? 'Neutral')
     }
 
     // Update avatar emotion emoji
@@ -461,7 +461,7 @@ class TrainingSession {
         engaged: '😊',
       }
 
-      this.safeSetText(emotionSpan, emotions[state.emotionalState] || '😐')
+      this.safeSetText(emotionSpan, emotions[state.emotionalState] ?? '😐')
     }
 
     // Update avatar border color based on state
@@ -490,7 +490,7 @@ class TrainingSession {
       'resistance-percentage',
       state.resistanceLevel,
     )
-    this.updateMeter('crisis-meter', 'crisis-percentage', state.crisisRisk || 0)
+    this.updateMeter('crisis-meter', 'crisis-percentage', state.crisisRisk ?? 0)
   }
 
   updateMeter(meterId, percentageId, value) {
@@ -565,7 +565,7 @@ class TrainingSession {
     if (!messageInput || !qualitySpan) return
 
     const message = messageInput.value.trim()
-    const interventionType = interventionSelect?.value || 'reflection'
+    const interventionType = interventionSelect?.value ?? 'reflection'
 
     // Simple quality assessment
     let quality = 'Fair'

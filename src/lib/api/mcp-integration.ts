@@ -31,7 +31,7 @@ export interface MCPModelConfig {
 }
 
 export class MCPIntegration {
-  private config: MCPModelConfig
+  private readonly config: MCPModelConfig
   private isInitialized: boolean = false
 
   constructor(config: MCPModelConfig) {
@@ -128,8 +128,8 @@ export class MCPIntegration {
       params: {
         messages,
         model_config: {
-          max_tokens: this.config.maxTokens || 1000,
-          temperature: this.config.temperature || 0.7,
+          max_tokens: this.config.maxTokens ?? 1000,
+          temperature: this.config.temperature ?? 0.7,
         },
       },
     })
@@ -164,11 +164,11 @@ let mcpInstance: MCPIntegration | null = null
 export function getMCPIntegration(): MCPIntegration {
   if (!mcpInstance) {
     const config: MCPModelConfig = {
-      modelId: process.env.MCP_MODEL_ID || 'default',
-      endpoint: process.env.MCP_ENDPOINT || 'http://localhost:8000',
+      modelId: process.env.MCP_MODEL_ID ?? 'default',
+      endpoint: process.env.MCP_ENDPOINT ?? 'http://localhost:8000',
       apiKey: process.env.MCP_API_KEY,
-      maxTokens: parseInt(process.env.MCP_MAX_TOKENS || '1000'),
-      temperature: parseFloat(process.env.MCP_TEMPERATURE || '0.7'),
+      maxTokens: parseInt(process.env.MCP_MAX_TOKENS ?? '1000'),
+      temperature: parseFloat(process.env.MCP_TEMPERATURE ?? '0.7'),
     }
 
     mcpInstance = new MCPIntegration(config)

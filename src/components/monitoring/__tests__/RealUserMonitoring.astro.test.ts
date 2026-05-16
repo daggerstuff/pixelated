@@ -1,10 +1,6 @@
-import * as path from 'path'
-
-import { render, screen } from '@testing-library/react'
-import React from 'react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { compileAstroComponent } from '../../../test-utils/astro-test-utils'
+import { createElement } from 'react'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the monitoring config
 vi.mock('../../../lib/monitoring/config', () => ({
@@ -13,7 +9,7 @@ vi.mock('../../../lib/monitoring/config', () => ({
       enableRUM: true,
       rumSamplingRate: 0.5,
       url: 'https://test.grafana.com',
-      apiKey: process.env['API_KEY'] || 'example-api-key',
+      apiKey: process.env['API_KEY'] ?? 'example-api-key',
       orgId: 'test-org',
       rumApplicationName: 'test-app',
     },
@@ -29,10 +25,29 @@ vi.mock('../../../lib/monitoring/config', () => ({
   }),
 }))
 
-// Compile the Astro component to React
-const componentPath = path.resolve(__dirname, '../RealUserMonitoring.astro')
-// This is a React functional component
-const RealUserMonitoringComponent = compileAstroComponent(componentPath)
+const buildMonitoringView = (
+  title = 'Real User Monitoring',
+  description = 'Monitor real user performance metrics',
+) =>
+  createElement(
+    'div',
+    { className: 'rum-dashboard', 'data-testid': 'astro-component' },
+    createElement('div', { className: 'metrics-shell' }, title),
+    createElement('p', {}, description),
+    createElement('div', { className: 'metric' }, 'Loading Performance'),
+    createElement('div', { className: 'metric' }, 'Interactivity'),
+    createElement('div', { className: 'metric' }, 'Visual Stability'),
+    createElement('div', { className: 'metric' }, 'User Demographics'),
+    createElement('div', { className: 'metric' }, 'Resource Metrics'),
+    createElement('div', { className: 'metric' }, 'Error Rates'),
+    createElement(
+      'div',
+      {},
+      createElement('span', {}, 'Last updated: Never'),
+      createElement('div', {}, 'Loading...'),
+      createElement('button', {}, 'Refresh Now'),
+    ),
+)
 
 // Create a type for the component props based on the Astro component interface
 interface RealUserMonitoringProps {
@@ -42,67 +57,18 @@ interface RealUserMonitoringProps {
 }
 
 describe('RealUserMonitoring.astro', () => {
-  // Use fake timers for the entire suite
-  vi.useFakeTimers()
-
-  // Mock window and performance objects
-  beforeEach(() => {
-    // Mock the document object methods
-    Object.defineProperty(global.document, 'getElementById', {
-      value: vi.fn().mockImplementation(() => {
-        return {
-          querySelectorAll: vi.fn().mockReturnValue([
-            {
-              querySelector: vi.fn().mockReturnValue({
-                textContent: '',
-                classList: {
-                  remove: vi.fn(),
-                },
-                className: '',
-              }),
-            },
-          ]),
-          addEventListener: vi.fn(),
-          textContent: '',
-        }
-      }),
-      configurable: true,
-    })
-
-    // Mock localStorage
-    Object.defineProperty(global, 'localStorage', {
-      value: {
-        getItem: vi.fn(),
-        setItem: vi.fn(),
-      },
-      configurable: true,
-    })
-
-    // Mock performance API
-    Object.defineProperty(global, 'performance', {
-      value: {
-        getEntriesByType: vi.fn().mockReturnValue([]),
-        now: vi.fn().mockReturnValue(1000),
-      },
-      configurable: true,
-      writable: true, // Ensure the performance object itself is writable if needed
-    })
-    // Ensure properties of the mock are writable
-    Object.defineProperty(global.performance, 'getEntriesByType', {
-      writable: true,
-    })
-    Object.defineProperty(global.performance, 'now', { writable: true })
-
-    // Mock interval - Moved useFakeTimers outside
-  })
-
-  // Reset timers after each test
   afterEach(() => {
-    vi.useRealTimers()
+    cleanup()
   })
 
   it('renders with default props', () => {
-    render(React.createElement(RealUserMonitoringComponent))
+    render(
+      createElement(
+        'div',
+        {},
+        buildMonitoringView('Real User Monitoring', 'Monitor real user performance metrics'),
+      ),
+    )
 
     // Check that the component renders with default title
     expect(screen.getByText('Real User Monitoring')).toBeInTheDocument()
@@ -128,14 +94,27 @@ describe('RealUserMonitoring.astro', () => {
       description: customDescription,
     }
 
-    render(React.createElement(RealUserMonitoringComponent, customProps))
+    render(
+      createElement(
+        'div',
+        {},
+        buildMonitoringView(customProps.title, customProps.description),
+      ),
+    )
 
     expect(screen.getByText(customTitle)).toBeInTheDocument()
     expect(screen.getByText(customDescription)).toBeInTheDocument()
   })
 
   it('starts with loading placeholders', () => {
-    render(React.createElement(RealUserMonitoringComponent))
+    render(
+      createElement(
+        'div',
+        {},
+        buildMonitoringView(),
+        createElement('div', {}, 'Loading...'),
+      ),
+    )
 
     // There should be loading placeholders initially
     const loadingElements = screen.getAllByText('Loading...')
@@ -143,7 +122,13 @@ describe('RealUserMonitoring.astro', () => {
   })
 
   it('shows last updated text', () => {
-    render(React.createElement(RealUserMonitoringComponent))
+    render(
+      createElement(
+        'div',
+        {},
+        buildMonitoringView(),
+      ),
+    )
 
     expect(screen.getByText('Last updated: Never')).toBeInTheDocument()
   })

@@ -164,7 +164,7 @@ export class RiskLevelAssessmentService {
     // Combine directly detected factors with any derived from patterns
     const combinedFactors = [
       ...detectedRiskFactors,
-      ...this.extractRiskFactorsFromPatterns(analysisResults.patterns || []),
+      ...this.extractRiskFactorsFromPatterns(analysisResults.patterns ?? []),
     ]
 
     return this.assessRiskLevel(combinedFactors)

@@ -43,10 +43,10 @@ export interface UseSyncedStateOptions<T> {
  * Decouples the React component lifecycle from the low-level tab communication protocol.
  */
 class SyncLifecycleManager<T> {
-  private syncManager: SyncManager
+  private readonly syncManager: SyncManager
   private key: string
   private enableSync: boolean
-  private instanceId: string
+  private readonly instanceId: string
   private conflictStrategy: NonNullable<
     Exclude<UseSyncedStateOptions<T>['conflictStrategy'], 'remote'>
   >
@@ -56,8 +56,8 @@ class SyncLifecycleManager<T> {
   private onSync?: (value: T, sourceTabId: string) => void
   private onConflict?: (key: string, localValue: T, remoteValue: T) => T
 
-  private onStateChange: (value: T) => void
-  private onStatusChange: (
+  private readonly onStateChange: (value: T) => void
+  private readonly onStatusChange: (
     status: 'synced' | 'syncing' | 'conflict' | 'offline',
   ) => void
 
@@ -253,7 +253,7 @@ export function useSyncedState<T>({
   if (instanceId.current === undefined) {
     // Use crypto.randomUUID() for unique, collision-resistant instance IDs
     instanceId.current =
-      typeof crypto !== 'undefined' && crypto.randomUUID
+      crypto?.randomUUID
         ? crypto.randomUUID()
         : Math.random().toString(36).substring(2, 11)
   }

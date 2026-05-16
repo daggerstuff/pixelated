@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useCallback, useEffect, useRef } from 'react'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth-client.ts'
 
 import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
 import type { AIMessage } from '../../lib/ai/models/ai-types'
@@ -236,7 +236,7 @@ export function ChatDemo({
             .map((m) => ({
               role: m.role,
               content: m.content || '',
-              name: m.name || '',
+              name: m.name ?? '',
             }))}
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
@@ -294,7 +294,7 @@ export function ChatDemo({
                     <div className='flex justify-between'>
                       <span className='text-gray-600 text-sm'>Sentiment:</span>
                       <span className='text-sm font-medium'>
-                        {String(sentimentResult.sentiment)}
+                        {sentimentResult.sentiment}
                       </span>
                     </div>
                     <div className='flex justify-between'>
@@ -310,7 +310,7 @@ export function ChatDemo({
                         </p>
                         <div className='space-y-1'>
                           {Object.entries(sentimentResult.emotions)
-                            .sort(([, a], [, b]) => Number(b) - Number(a))
+                            .sort(([, a], [, b]) => b - a)
                             .slice(0, 3)
                             .map(([emotion, score]) => (
                               <div
@@ -321,7 +321,7 @@ export function ChatDemo({
                                   {emotion}:
                                 </span>
                                 <span className='font-medium'>
-                                  {Math.floor(Number(score) * 100)}%
+                                  {Math.floor(score * 100)}%
                                 </span>
                               </div>
                             ))}
@@ -439,10 +439,10 @@ export class ChatDemoErrorBoundary extends React.Component<
     // Log to monitoring service in production
   }
 
-  override render() {
+  override  async render() {
     if (this.state.hasError) {
       return (
-        this.props.fallback || (
+        this.props.fallback ?? (
           <div className='bg-red-50 border-red-200 flex h-64 items-center justify-center rounded-lg border'>
             <div className='text-center'>
               <h3 className='text-red-900 mb-2 text-lg font-medium'>

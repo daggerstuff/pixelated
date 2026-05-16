@@ -17,8 +17,37 @@ from dataclasses import dataclass
 from functools import wraps
 from typing import Any, cast, overload
 
-import sentry_sdk
-from sentry_sdk.types import Hint, Metric
+_sentry_sdk: Any | None = None
+_sentry_sdk_imported = False
+
+
+def _sentry_enabled() -> bool:
+    """Check whether Sentry should be initialized or used."""
+    return os.getenv("BIAS_DETECTION_DISABLE_SENTRY", "").lower().strip() not in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _get_sentry_sdk() -> Any | None:
+    global _sentry_sdk, _sentry_sdk_imported
+    if not _sentry_enabled():
+        return None
+
+    if _sentry_sdk_imported:
+        return _sentry_sdk
+
+    _sentry_sdk_imported = True
+    try:
+        import sentry_sdk
+
+        _sentry_sdk = sentry_sdk
+    except Exception:
+        _sentry_sdk = None
+
+    return _sentry_sdk
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +75,7 @@ class SentrySamplingConfig:
     profiles_sample_rate: float = 0.05
 
 
-def before_send_metric(metric: Metric, _hint: Hint) -> Metric | None:
+def before_send_metric(metric: dict[str, Any], _hint: Any) -> dict[str, Any] | None:
     """
     Filter or modify metrics before they are sent to Sentry.
 
@@ -94,6 +123,11 @@ def init_sentry(
 
     if not effective_dsn:
         logger.warning("Sentry DSN not configured, Sentry will not be initialized")
+        return
+
+    sentry_sdk = _get_sentry_sdk()
+    if sentry_sdk is None:
+        logger.warning("Sentry SDK import failed, skipping initialization")
         return
 
     sentry_sdk.init(
@@ -154,6 +188,10 @@ def count_metric(
     if not SENTRY_ENABLE_METRICS:
         return
 
+    sentry_sdk = _get_sentry_sdk()
+    if sentry_sdk is None:
+        return
+
     try:
         sentry_sdk.metrics.count(name, value, attributes=attributes)
     except Exception as e:
@@ -184,6 +222,10 @@ def gauge_metric(
         gauge_metric("bias.analysis_queue_depth", 15, {"priority": "high"})
     """
     if not SENTRY_ENABLE_METRICS:
+        return
+
+    sentry_sdk = _get_sentry_sdk()
+    if sentry_sdk is None:
         return
 
     try:
@@ -220,6 +262,10 @@ def distribution_metric(
                           {"layer": "model_level"}, unit="millisecond")
     """
     if not SENTRY_ENABLE_METRICS:
+        return
+
+    sentry_sdk = _get_sentry_sdk()
+    if sentry_sdk is None:
         return
 
     try:

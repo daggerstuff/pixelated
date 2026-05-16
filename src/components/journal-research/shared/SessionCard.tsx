@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import type { Session } from '@/lib/api/journal-research/types'
 
 import { ProgressBar } from './ProgressBar'

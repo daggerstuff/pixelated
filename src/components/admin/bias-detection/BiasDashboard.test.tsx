@@ -17,7 +17,9 @@ import '@testing-library/jest-dom'
 let BiasDashboard: (typeof import('./BiasDashboard'))['BiasDashboard']
 
 // Keep original fetch to restore after tests
-const __originalFetch: typeof fetch | undefined = global.fetch
+const __originalFetch: typeof fetch = global.fetch
+const runBiasDashboardWebSocketTests =
+  process.env['RUN_BIAS_DASHBOARD_WS_TESTS'] === 'true'
 
 // Mock the logger
 vi.mock('@/lib/logging/build-safe-logger', () => ({
@@ -87,8 +89,30 @@ interface MockWebSocketInstance {
   removeEventListener: ReturnType<typeof vi.fn>
   dispatchEvent: ReturnType<typeof vi.fn>
   readyState: number
-  heartbeatInterval: number | null
+  heartbeatInterval: ReturnType<typeof setInterval> | null
   // Add any additional properties as needed for new tests
+}
+
+const isMockWebSocketInstance = (
+  value: unknown,
+): value is MockWebSocketInstance => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof Reflect.get(value, 'send') === 'function' &&
+    typeof Reflect.get(value, 'close') === 'function' &&
+    typeof Reflect.get(value, 'addEventListener') === 'function' &&
+    typeof Reflect.get(value, 'removeEventListener') === 'function'
+  )
+}
+
+type MockWebSocketConstructorMock = ReturnType<typeof vi.fn> & {
+  (url: string | URL, protocols?: string | string[]): MockWebSocketInstance
+  prototype: WebSocket
+  CONNECTING?: number
+  OPEN?: number
+  CLOSING?: number
+  CLOSED?: number
 }
 
 // Create a factory function for WebSocket mocks
@@ -107,55 +131,54 @@ const createMockWebSocket = (): MockWebSocketInstance => ({
   heartbeatInterval: null,
 })
 
+const createDashboardResponse = (data: unknown): Response =>
+  new Response(JSON.stringify(data), {
+    status: 200,
+    statusText: 'OK',
+    headers: { 'Content-Type': 'application/json' },
+  })
+
 // Mock WebSocket constructor
-const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
-  typeof vi.fn
-> & {
-  new (url: string | URL, protocols?: string | string[]): MockWebSocketInstance
-  prototype: WebSocket
-  readonly CONNECTING: 0
-  readonly OPEN: 1
-  readonly CLOSING: 2
-  readonly CLOSED: 3
+const MockWebSocketConstructor: MockWebSocketConstructorMock =
+  vi.fn(createMockWebSocket)
+
+const initializeMockWebSocketConstants = (
+  ctor: MockWebSocketConstructorMock,
+): void => {
+  ctor.CONNECTING = 0
+  ctor.OPEN = 1
+  ctor.CLOSING = 2
+  ctor.CLOSED = 3
 }
 
 // Mock WebSocket using Vitest's stubGlobal
 vi.stubGlobal('WebSocket', MockWebSocketConstructor)
 
 // Define standard readyState constants on the mock constructor
-;(MockWebSocketConstructor as any).CONNECTING = 0
-;(MockWebSocketConstructor as any).OPEN = 1
-;(MockWebSocketConstructor as any).CLOSING = 2
-;(MockWebSocketConstructor as any).CLOSED = 3
+initializeMockWebSocketConstants(MockWebSocketConstructor)
 
 // --- GLOBAL MOCKS FOR BROWSER APIS ---
 // Ensure matchMedia is always mocked for all tests
 beforeAll(async () => {
-  if (!window.matchMedia) {
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: vi.fn().mockImplementation((query: string) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    })
-  }
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  })
   // Mock window.alert and window.prompt to prevent test failures
   vi.spyOn(window, 'alert').mockImplementation(() => {})
   vi.spyOn(window, 'prompt').mockImplementation(() => '')
-  // Mock URL.createObjectURL if not present
-  if (!global.URL.createObjectURL) {
-    global.URL.createObjectURL = vi.fn().mockReturnValue('blob:test-url')
-  }
-  if (!global.URL.revokeObjectURL) {
-    global.URL.revokeObjectURL = vi.fn()
-  }
+  global.URL.createObjectURL = vi.fn().mockReturnValue('blob:test-url')
+  global.URL.revokeObjectURL = vi.fn()
   // Import BiasDashboard after stubbing globals so module sees mocks at eval time
   BiasDashboard = (await import('./BiasDashboard')).BiasDashboard
 })
@@ -171,50 +194,41 @@ describe('BiasDashboard', () => {
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
     // Ensure the constructor has a default implementation after reset
     MockWebSocketConstructor.mockImplementation(createMockWebSocket)
-    ;(MockWebSocketConstructor as any).CONNECTING = 0
-    ;(MockWebSocketConstructor as any).OPEN = 1
-    ;(MockWebSocketConstructor as any).CLOSING = 2
-    ;(MockWebSocketConstructor as any).CLOSED = 3
+    initializeMockWebSocketConstants(MockWebSocketConstructor)
     // Default fetch mock for initial dashboard load unless a test overrides it
     global.fetch = vi
       .fn()
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          ok: true,
-          statusText: 'OK',
-          json: vi.fn().mockResolvedValue({
-            summary: {
-              totalSessions: 100,
-              averageBiasScore: 0.5,
-              highBiasSessions: 5,
-              totalAlerts: 10,
-              complianceScore: 0.85,
-              alertsLast24h: 0,
+      .mockResolvedValueOnce(
+        createDashboardResponse({
+          summary: {
+            totalSessions: 100,
+            averageBiasScore: 0.5,
+            highBiasSessions: 5,
+            totalAlerts: 10,
+            complianceScore: 0.85,
+            alertsLast24h: 0,
+          },
+          alerts: [
+            {
+              alertId: '1',
+              type: 'high_bias',
+              message: 'High bias detected',
+              timestamp: new Date().toISOString(),
+              level: 'high',
+              sessionId: 'session-1',
+              acknowledged: false,
+              status: 'active',
             },
-            alerts: [
-              {
-                alertId: '1',
-                type: 'high_bias',
-                message: 'High bias detected',
-                timestamp: new Date().toISOString(),
-                level: 'high',
-                sessionId: 'session-1',
-                acknowledged: false,
-                status: 'active',
-              },
-            ],
-            trends: [],
-            demographics: {},
-            recentAnalyses: [],
-            recommendations: [],
-          }),
+          ],
+          trends: [],
+          demographics: {},
+          recentAnalyses: [],
+          recommendations: [],
         }),
       )
-      .mockImplementation(() =>
-        Promise.resolve({
-          ok: true,
-          statusText: 'OK',
-          json: vi.fn().mockResolvedValue({ success: true }),
+      .mockResolvedValue(
+        createDashboardResponse({
+          success: true,
         }),
       )
   })
@@ -224,11 +238,7 @@ describe('BiasDashboard', () => {
     // Ensure timers restored in case any test used fake timers
     vi.useRealTimers()
     // Restore original fetch for safety
-    if (__originalFetch) {
-      global.fetch = __originalFetch
-    } else {
-      ;(global as any).fetch = undefined
-    }
+    global.fetch = __originalFetch
     // Ensure global WebSocket remains our mock after tests that might override it
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
   })
@@ -253,45 +263,49 @@ describe('BiasDashboard', () => {
 
   // Note: This test relies on Enhanced WebSocket Functionality suite which has more robust setup
   // The basic WebSocket connection test is covered by the Enhanced WebSocket tests below
-  it.skip('handles WebSocket connection', async () => {
-    // Helper to get the latest WebSocket instance from mock results
-    const getCurrentWS = (): MockWebSocketInstance | undefined => {
-      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>)
-        .mock?.results
-      if (!results || results.length === 0) return undefined
-      return results[results.length - 1]?.value as MockWebSocketInstance
-    }
+  it.runIf(runBiasDashboardWebSocketTests)(
+    'handles WebSocket connection',
+    async () => {
+      // Helper to get the latest WebSocket instance from mock results
+      const getCurrentWS = (): MockWebSocketInstance | undefined => {
+        const results = MockWebSocketConstructor.mock.results
+        const lastResult = results.at(-1)
+        return isMockWebSocketInstance(lastResult?.value)
+          ? lastResult.value
+          : undefined
+      }
 
-    // Use the same robust mock setup as Enhanced WebSocket tests
-    MockWebSocketConstructor.mockImplementation(() => {
-      return createMockWebSocket()
-    })
+      // Use the same robust mock setup as Enhanced WebSocket tests
+      MockWebSocketConstructor.mockImplementation(() => {
+        return createMockWebSocket()
+      })
 
-    render(<BiasDashboard enableRealTimeUpdates={true} />)
+      render(<BiasDashboard enableRealTimeUpdates={true} />)
 
-    // Wait for WebSocket to be constructed
-    await waitFor(() => {
-      expect(MockWebSocketConstructor).toHaveBeenCalled()
-    })
+      // Wait for WebSocket to be constructed
+      await waitFor(() => {
+        expect(MockWebSocketConstructor).toHaveBeenCalled()
+      })
 
-    // Wait for the component to attach handlers
-    await waitFor(() => {
-      const ws = getCurrentWS()
-      expect(ws).toBeDefined()
-      expect(typeof ws?.onopen).toBe('function')
-    })
+      // Wait for the component to attach handlers
+      await waitFor(() => {
+        const ws = getCurrentWS()
+        expect(ws).toBeDefined()
+        expect(typeof ws?.onopen).toBe('function')
+      })
 
-    // Simulate WebSocket 'onopen' event
-    const ws = getCurrentWS()!
-    void act(() => {
-      ws.onopen?.(new Event('open'))
-    })
+      // Simulate WebSocket 'onopen' event
+      const ws = getCurrentWS()!
+      void act(() => {
+        ws.onopen?.(new Event('open'))
+      })
 
-    // Wait for the text to appear in the DOM after state update
-    await waitFor(() => {
-      expect(screen.getByText(/live updates connected/i)).toBeInTheDocument()
-    })
-  })
+      // Wait for the text to appear in the DOM after state update
+      await waitFor(() => {
+        expect(screen.getByText(/live updates connected/i)).toBeInTheDocument()
+      })
+    },
+  )
 
   it('handles WebSocket errors gracefully', async () => {
     const mockWebSocket: MockWebSocketInstance = {
@@ -307,8 +321,7 @@ describe('BiasDashboard', () => {
       dispatchEvent: vi.fn(),
       heartbeatInterval: null,
     }
-
-    global.WebSocket = vi.fn(() => mockWebSocket) as any
+    MockWebSocketConstructor.mockImplementation(() => mockWebSocket)
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
 
@@ -318,10 +331,8 @@ describe('BiasDashboard', () => {
 
     // Simulate connection error
     void act(() => {
-      if (mockWebSocket.onerror) {
-        const errorEvent = new Event('error')
-        mockWebSocket.onerror(errorEvent)
-      }
+      const errorEvent = new Event('error')
+      mockWebSocket.onerror?.(errorEvent)
     })
 
     // Should show error status
@@ -331,72 +342,76 @@ describe('BiasDashboard', () => {
   })
 
   // Note: This test is covered by the Enhanced WebSocket Functionality suite which has more robust setup
-  it.skip('updates data when receiving WebSocket messages', async () => {
-    // Helper to get the latest WebSocket instance from mock results
-    const getCurrentWS = (): MockWebSocketInstance | undefined => {
-      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>)
-        .mock?.results
-      if (!results || results.length === 0) return undefined
-      return results[results.length - 1]?.value as MockWebSocketInstance
-    }
+  it.runIf(runBiasDashboardWebSocketTests)(
+    'updates data when receiving WebSocket messages',
+    async () => {
+      // Helper to get the latest WebSocket instance from mock results
+      const getCurrentWS = (): MockWebSocketInstance | undefined => {
+        const results = MockWebSocketConstructor.mock.results
+        const lastResult = results.at(-1)
+        return isMockWebSocketInstance(lastResult?.value)
+          ? lastResult.value
+          : undefined
+      }
 
-    MockWebSocketConstructor.mockImplementation(() => {
-      return createMockWebSocket()
-    })
+      MockWebSocketConstructor.mockImplementation(() => {
+        return createMockWebSocket()
+      })
 
-    render(<BiasDashboard enableRealTimeUpdates={true} />)
+      render(<BiasDashboard enableRealTimeUpdates={true} />)
 
-    await waitFor(() => {
-      expect(MockWebSocketConstructor).toHaveBeenCalled()
-    })
+      await waitFor(() => {
+        expect(MockWebSocketConstructor).toHaveBeenCalled()
+      })
 
-    // Wait for handlers to be attached
-    await waitFor(() => {
-      const ws = getCurrentWS()
-      expect(ws).toBeDefined()
-      expect(typeof ws?.onopen).toBe('function')
-    })
+      // Wait for handlers to be attached
+      await waitFor(() => {
+        const ws = getCurrentWS()
+        expect(ws).toBeDefined()
+        expect(typeof ws?.onopen).toBe('function')
+      })
 
-    // First simulate connection
-    const ws = getCurrentWS()!
-    void act(() => {
-      ws.onopen?.(new Event('open'))
-    })
+      // First simulate connection
+      const ws = getCurrentWS()!
+      void act(() => {
+        ws.onopen?.(new Event('open'))
+      })
 
-    // Wait for dashboard to load
-    await waitFor(() => {
-      expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
-    })
+      // Wait for dashboard to load
+      await waitFor(() => {
+        expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
+      })
 
-    // Simulate WebSocket message with proper alert structure
-    void act(() => {
-      ws.onmessage?.(
-        new MessageEvent('message', {
-          data: JSON.stringify({
-            type: 'bias_alert',
-            alert: {
-              alertId: '2',
-              type: 'high_bias',
-              message: 'New high bias alert',
-              timestamp: new Date().toISOString(),
-              level: 'high',
-              sessionId: 'session-123',
-            },
+      // Simulate WebSocket message with proper alert structure
+      void act(() => {
+        ws.onmessage?.(
+          new MessageEvent('message', {
+            data: JSON.stringify({
+              type: 'bias_alert',
+              alert: {
+                alertId: '2',
+                type: 'high_bias',
+                message: 'New high bias alert',
+                timestamp: new Date().toISOString(),
+                level: 'high',
+                sessionId: 'session-123',
+              },
+            }),
           }),
-        }),
-      )
-    })
+        )
+      })
 
-    // Navigate to alerts tab to see the new alert
-    fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
+      // Navigate to alerts tab to see the new alert
+      fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
-    await waitFor(() => {
-      // Assert on the screen reader announcement, which is specific and deterministic.
-      expect(
-        screen.getByText('New high bias alert: New high bias alert'),
-      ).toBeInTheDocument()
-    })
-  })
+      await waitFor(() => {
+        // Assert on the screen reader announcement, which is specific and deterministic.
+        expect(
+          screen.getByText('New high bias alert: New high bias alert'),
+        ).toBeInTheDocument()
+      })
+    },
+  )
 
   it('handles chart interactions correctly', async () => {
     render(<BiasDashboard />)
@@ -422,14 +437,20 @@ describe('BiasDashboard', () => {
   })
 
   it('handles data updates with animations', async () => {
-    const mockWs = {
+    const mockWs: MockWebSocketInstance = {
       send: vi.fn(),
       close: vi.fn(),
       addEventListener: vi.fn(),
+      onopen: null,
+      onclose: null,
+      onerror: null,
+      onmessage: null,
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      readyState: MockWebSocketConstructor.OPEN ?? WebSocket.OPEN,
+      heartbeatInterval: null,
     }
-    MockWebSocketConstructor.mockImplementation(
-      () => mockWs as MockWebSocketInstance,
-    )
+    MockWebSocketConstructor.mockImplementation(() => mockWs)
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
 
@@ -439,10 +460,11 @@ describe('BiasDashboard', () => {
 
     // Simulate WebSocket message with updated metrics
     const messageCall = mockWs.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'message',
+      (call): call is [string, (event: MessageEvent) => void] =>
+        call[0] === 'message' && typeof call[1] === 'function',
     )
-    if (messageCall && typeof messageCall[1] === 'function') {
-      messageCall[1]({
+    messageCall?.[1]?.(
+      new MessageEvent('message', {
         data: JSON.stringify({
           type: 'metrics_update',
           data: {
@@ -452,8 +474,8 @@ describe('BiasDashboard', () => {
             totalAlerts: 15,
           },
         }),
-      })
-    }
+      }),
+    )
 
     // Check if animations are applied - simplified check
     const chartElements = document.querySelectorAll('.recharts-wrapper')
@@ -461,35 +483,40 @@ describe('BiasDashboard', () => {
   })
 
   // Note: This test is covered by the Enhanced WebSocket Functionality suite which has more robust setup
-  it.skip('cleans up WebSocket connection on unmount', async () => {
-    const mockWs = {
-      send: vi.fn(),
-      close: vi.fn(),
-      addEventListener: vi.fn(),
-      heartbeatInterval: null,
-    }
-    MockWebSocketConstructor.mockImplementation(
-      () => mockWs as MockWebSocketInstance,
-    )
+  it.runIf(runBiasDashboardWebSocketTests)(
+    'cleans up WebSocket connection on unmount',
+    async () => {
+      const mockWs: MockWebSocketInstance = {
+        send: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        onopen: null,
+        onclose: null,
+        onerror: null,
+        onmessage: null,
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        readyState: MockWebSocketConstructor.OPEN ?? WebSocket.OPEN,
+        heartbeatInterval: null,
+      }
+      MockWebSocketConstructor.mockImplementation(() => mockWs)
 
-    const { unmount } = render(<BiasDashboard enableRealTimeUpdates={true} />)
+      const { unmount } = render(<BiasDashboard enableRealTimeUpdates={true} />)
 
-    await waitFor(() => {
-      expect(MockWebSocketConstructor).toHaveBeenCalled()
-    })
+      await waitFor(() => {
+        expect(MockWebSocketConstructor).toHaveBeenCalled()
+      })
 
-    // Simulate connection and heartbeat setup
-    const _openCall = mockWs.addEventListener.mock.calls.find(
-      (call: unknown[]) => call[0] === 'open',
-    )
-    const intervalId = setInterval(() => {}, 30000)
-    mockWs.heartbeatInterval = intervalId as any
+      // Simulate connection and heartbeat setup
+      const intervalId = setInterval(() => {}, 30000)
+      mockWs.heartbeatInterval = intervalId
 
-    unmount()
+      unmount()
 
-    expect(mockWs.close).toHaveBeenCalledWith(1000, 'Component unmounting')
-    clearInterval(intervalId)
-  })
+      expect(mockWs.close).toHaveBeenCalledWith(1000, 'Component unmounting')
+      clearInterval(intervalId)
+    },
+  )
 
   it('renders filtering controls', async () => {
     render(<BiasDashboard />)
@@ -514,7 +541,7 @@ describe('BiasDashboard', () => {
     const timeRangeSelect = screen.getByLabelText(/time range/i)
     fireEvent.change(timeRangeSelect, { target: { value: '7d' } })
 
-    expect((timeRangeSelect as HTMLSelectElement).value).toBe('7d')
+    expect(timeRangeSelect).toHaveValue('7d')
   })
 
   it('shows custom date inputs when custom time range is selected', async () => {
@@ -541,7 +568,7 @@ describe('BiasDashboard', () => {
     const biasScoreSelect = screen.getByLabelText(/bias score level/i)
     fireEvent.change(biasScoreSelect, { target: { value: 'high' } })
 
-    expect((biasScoreSelect as HTMLSelectElement).value).toBe('high')
+    expect(biasScoreSelect).toHaveValue('high')
   })
 
   it('handles alert level filter changes', async () => {
@@ -554,7 +581,7 @@ describe('BiasDashboard', () => {
     const alertLevelSelect = screen.getByLabelText(/alert level/i)
     fireEvent.change(alertLevelSelect, { target: { value: 'critical' } })
 
-    expect((alertLevelSelect as HTMLSelectElement).value).toBe('critical')
+    expect(alertLevelSelect).toHaveValue('critical')
   })
 
   it('clears all filters when clear button is clicked', async () => {
@@ -578,9 +605,9 @@ describe('BiasDashboard', () => {
     fireEvent.click(clearButton)
 
     // Check that filters are reset
-    expect((timeRangeSelect as HTMLSelectElement).value).toBe('24h')
-    expect((biasScoreSelect as HTMLSelectElement).value).toBe('all')
-    expect((alertLevelSelect as HTMLSelectElement).value).toBe('all')
+    expect(timeRangeSelect).toHaveValue('24h')
+    expect(biasScoreSelect).toHaveValue('all')
+    expect(alertLevelSelect).toHaveValue('all')
   })
 
   it('displays filter summary correctly', async () => {
@@ -643,7 +670,7 @@ describe('BiasDashboard', () => {
     const originalFetch = global.fetch
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(emptyMockData),
+      json: async () => emptyMockData,
     })
 
     render(<BiasDashboard />)
@@ -682,8 +709,8 @@ describe('BiasDashboard', () => {
     fireEvent.change(startDateInput, { target: { value: '2024-01-01T00:00' } })
     fireEvent.change(endDateInput, { target: { value: '2024-01-31T23:59' } })
 
-    expect((startDateInput as HTMLInputElement).value).toBe('2024-01-01T00:00')
-    expect((endDateInput as HTMLInputElement).value).toBe('2024-01-31T23:59')
+    expect(startDateInput).toHaveValue('2024-01-01T00:00')
+    expect(endDateInput).toHaveValue('2024-01-31T23:59')
   })
 
   it('renders notification settings panel', async () => {
@@ -721,8 +748,8 @@ describe('BiasDashboard', () => {
     fireEvent.click(criticalAlertsCheckbox)
 
     // Verify changes (in real app, would check API calls)
-    expect((emailCheckbox as HTMLInputElement).checked).toBe(false)
-    expect((criticalAlertsCheckbox as HTMLInputElement).checked).toBe(false)
+    expect(emailCheckbox).not.toBeChecked()
+    expect(criticalAlertsCheckbox).not.toBeChecked()
   })
 
   it('handles test notification sending', async () => {
@@ -730,36 +757,31 @@ describe('BiasDashboard', () => {
     const originalFetch = global.fetch
     global.fetch = vi
       .fn()
-      .mockImplementationOnce(() =>
-        Promise.resolve({
-          // For initial dashboard load
-          ok: true,
-          statusText: 'OK',
-          json: () =>
-            Promise.resolve({
-              summary: {
-                totalSessions: 100,
-                averageBiasScore: 0.5,
-                highBiasSessions: 5,
-                totalAlerts: 10,
-                complianceScore: 0.85,
-                alertsLast24h: 0,
-              },
-              alerts: [],
-              trends: [],
-              demographics: {},
-              recentAnalyses: [],
-              recommendations: [],
-            }),
+      .mockImplementationOnce(async () => ({
+        // For initial dashboard load
+        ok: true,
+        statusText: 'OK',
+        json: async () => ({
+          summary: {
+            totalSessions: 100,
+            averageBiasScore: 0.5,
+            highBiasSessions: 5,
+            totalAlerts: 10,
+            complianceScore: 0.85,
+            alertsLast24h: 0,
+          },
+          alerts: [],
+          trends: [],
+          demographics: {},
+          recentAnalyses: [],
+          recommendations: [],
         }),
-      )
-      .mockImplementation(() =>
-        Promise.resolve({
-          // For test notification
-          ok: true,
-          json: () => Promise.resolve({ success: true }),
-        }),
-      )
+      }))
+      .mockImplementation(async () => ({
+        // For test notification
+        ok: true,
+        json: async () => ({ success: true }),
+      }))
 
     render(<BiasDashboard />)
 
@@ -828,14 +850,14 @@ describe('BiasDashboard', () => {
     // Find acknowledge button and click it (use getAllByText to handle multiple instances)
     const acknowledgeButtons = screen.getAllByText(/acknowledge/i)
     const individualAcknowledgeButton =
-      acknowledgeButtons.find(
-        (button) =>
-          button
-            .closest('button')
-            ?.getAttribute('aria-label')
-            ?.includes('Acknowledge alert') ||
-          !button.closest('button')?.textContent?.includes('Bulk'),
-      ) || acknowledgeButtons[0]
+      acknowledgeButtons.find((button) => {
+        const buttonLabel = button.closest('button')?.getAttribute('aria-label')
+        const buttonText = button.closest('button')?.textContent
+        const hasAcknowledgeLabel =
+          buttonLabel?.includes('Acknowledge alert') ?? false
+        const isBulkButton = buttonText?.includes('Bulk') ?? false
+        return hasAcknowledgeLabel || !isBulkButton
+      }) ?? acknowledgeButtons[0]
 
     const individualAcknowledgeElement =
       individualAcknowledgeButton?.closest('button')
@@ -1060,26 +1082,36 @@ describe('BiasDashboard', () => {
 
     it('handles export data functionality', async () => {
       // Mock URL.createObjectURL and spy on anchor click
-      global.URL.createObjectURL = vi.fn().mockReturnValue('blob:test-url')
-      global.URL.revokeObjectURL = vi.fn()
+      const originalCreateObjectURL = global.URL.createObjectURL.bind(
+        global.URL,
+      )
+      const originalRevokeObjectURL = global.URL.revokeObjectURL.bind(
+        global.URL,
+      )
+      const mockCreateObjectURL = vi.fn(() => 'blob:test-url')
+      const mockRevokeObjectURL = vi.fn()
+      global.URL.createObjectURL = mockCreateObjectURL
+      global.URL.revokeObjectURL = mockRevokeObjectURL
       const clickSpy = vi
         .spyOn(HTMLAnchorElement.prototype, 'click')
         .mockImplementation(() => {})
       const originalFetch = globalThis.fetch
-      globalThis.fetch = vi.fn(async (input: any, init?: any) => {
-        const url = typeof input === 'string' ? input : input?.url
-        if (url && url.includes('/api/bias-detection/export')) {
-          return {
-            ok: true,
-            blob: async () =>
-              new Blob([JSON.stringify({ ok: true })], {
-                type: 'application/json',
-              }),
-          } as Response
-        }
-        // Defer all other requests to the original fetch (handled by MSW)
-        return originalFetch(input, init)
-      }) as any
+      const exportFetchMock: typeof fetch = vi.fn(
+        async (input: string | URL | Request, init?: RequestInit) => {
+          const url =
+            typeof input === 'string'
+              ? input
+              : input instanceof URL
+                ? input.href
+                : input.url
+          if (url.includes('/api/bias-detection/export')) {
+            return createDashboardResponse({ ok: true })
+          }
+          // Defer all other requests to the original fetch (handled by MSW)
+          return originalFetch(input, init)
+        },
+      )
+      globalThis.fetch = exportFetchMock
 
       render(<BiasDashboard />)
 
@@ -1093,14 +1125,14 @@ describe('BiasDashboard', () => {
 
       // Assert a download flow was initiated
       await waitFor(() => {
-        expect(global.URL.createObjectURL).toHaveBeenCalled()
+        expect(mockCreateObjectURL).toHaveBeenCalled()
       })
 
       // Cleanup
       clickSpy.mockRestore()
       globalThis.fetch = originalFetch
-      ;(global.URL.createObjectURL as any) = vi.fn()
-      ;(global.URL.revokeObjectURL as any) = vi.fn()
+      global.URL.createObjectURL = originalCreateObjectURL
+      global.URL.revokeObjectURL = originalRevokeObjectURL
     })
 
     it('closes export dialog when cancel is clicked', async () => {
@@ -1338,9 +1370,7 @@ describe('BiasDashboard', () => {
       })
 
       // Should apply high contrast class on some wrapping container
-      const hc = document.querySelector(
-        '.high-contrast',
-      ) as HTMLElement as HTMLElement | null
+      const hc = document.querySelector<HTMLElement>('.high-contrast')
       expect(hc).not.toBeNull()
     })
 
@@ -1382,9 +1412,9 @@ describe('BiasDashboard', () => {
       })
 
       // Should have aria-live region for announcements
-      const announcements = document.querySelector(
+      const announcements = document.querySelector<HTMLElement>(
         '[aria-live="polite"]',
-      ) as HTMLElement as HTMLElement | null
+      )
       expect(announcements).not.toBeNull()
       if (announcements) {
         expect(announcements).toHaveAttribute('aria-live', 'polite')
@@ -1422,593 +1452,571 @@ describe('BiasDashboard', () => {
   // in the test environment. The component's useEffect assigns handlers after render, but tests
   // can't reliably wait for this. These tests should be re-enabled after fixing the mock setup.
   // See: https://github.com/vitest-dev/vitest/issues/2834 for related timing issues with mocks
-  describe.skip('Enhanced WebSocket Functionality', () => {
-    let mockWebSocket: MockWebSocketInstance
-    let originalFetch: typeof fetch | undefined
-    let container: HTMLDivElement
+  describe.runIf(runBiasDashboardWebSocketTests)(
+    'Enhanced WebSocket Functionality',
+    () => {
+      let mockWebSocket: MockWebSocketInstance
+      let originalFetch: typeof fetch = global.fetch
+      let container: HTMLDivElement
 
-    // Helper to always reference the latest constructed WebSocket instance
-    const getCurrentWS = (): MockWebSocketInstance => {
-      const results = (MockWebSocketConstructor as any).mock?.results || []
-      const last = results.length ? results[results.length - 1] : undefined
-      return (last?.value ?? mockWebSocket) as MockWebSocketInstance
-    }
-
-    // Wait for the component to attach onopen/onmessage handlers
-    const awaitHandlersAttached = async () => {
-      await waitFor(() => {
-        const ws = getCurrentWS()
-        expect(typeof ws.onopen).toBe('function')
-      })
-    }
-
-    beforeEach(() => {
-      // Create explicit container to avoid createRoot target issues
-      container = document.body.appendChild(document.createElement('div'))
-
-      // Mock fetch used by BiasDashboard initial data load
-      originalFetch = global.fetch
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        statusText: 'OK',
-        json: vi.fn().mockResolvedValue({
-          summary: {
-            totalSessions: 100,
-            averageBiasScore: 0.3,
-            highBiasSessions: 5,
-            totalAlerts: 10,
-            complianceScore: 0.85,
-            alertsLast24h: 0,
-          },
-          alerts: [],
-          trends: [],
-          demographics: {},
-          recentAnalyses: [],
-          recommendations: [],
-        }),
-      } as any)
-      // Ensure the component receives the same mock instance we control
-      MockWebSocketConstructor.mockImplementation(() => {
-        const ws = createMockWebSocket()
-        mockWebSocket = ws
-        return ws
-      })
-
-      // Re-stub global WebSocket to our constructor in case previous tests overrode it
-      vi.stubGlobal('WebSocket', MockWebSocketConstructor)
-    })
-
-    afterEach(() => {
-      // Clean up fetch and container
-      if (originalFetch) {
-        global.fetch = originalFetch
-      } else {
-        ;(global as any).fetch = undefined
+      // Helper to always reference the latest constructed WebSocket instance
+      const getCurrentWS = (): MockWebSocketInstance => {
+        const results = MockWebSocketConstructor.mock.results
+        const last = results[results.length - 1]
+        return isMockWebSocketInstance(last?.value) ? last.value : mockWebSocket
       }
-      if (container && container.parentNode) {
-        container.parentNode.removeChild(container)
+
+      // Wait for the component to attach onopen/onmessage handlers
+      const awaitHandlersAttached = async () => {
+        await waitFor(() => {
+          const ws = getCurrentWS()
+          expect(typeof ws.onopen).toBe('function')
+        })
       }
-      // Clear any heartbeat interval that might have been set on the current mock
-      const ws = getCurrentWS()
-      if (ws && ws.heartbeatInterval) {
-        clearInterval(ws.heartbeatInterval as any)
-        ws.heartbeatInterval = null
-      }
-      MockWebSocketConstructor.mockReset()
-    })
 
-    it('shows connection status indicators', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />)
-      // Ensure we operate on the exact instance used by the component
-      mockWebSocket = getCurrentWS()
+      beforeEach(() => {
+        // Create explicit container to avoid createRoot target issues
+        container = document.body.appendChild(document.createElement('div'))
 
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Initially should show connecting
-      expect(
-        screen.getByText(/connecting to live updates/i),
-      ).toBeInTheDocument()
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
-      })
-
-      // Should show connected status
-      await waitFor(() => {
-        expect(screen.getByText(/live updates connected/i)).toBeInTheDocument()
-      })
-    })
-
-    it('handles connection errors with proper status', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate connection error
-      void act(() => {
-        if (mockWebSocket.onerror) {
-          const errorEvent = new Event('error')
-          mockWebSocket.onerror(errorEvent)
-        }
-      })
-
-      // Should show error status
-      await waitFor(() => {
-        expect(screen.getByText(/live updates failed/i)).toBeInTheDocument()
-      })
-
-      // Should show reconnect button
-      expect(screen.getByText(/reconnect live updates/i)).toBeInTheDocument()
-    })
-
-    it('handles reconnection attempts with exponential backoff', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate connection close
-      void act(() => {
-        if (mockWebSocket.onclose) {
-          const closeEvent = new CloseEvent('close', {
-            code: 1006,
-            reason: 'Connection lost',
-            wasClean: false,
-          })
-          mockWebSocket.onclose(closeEvent)
-        }
-      })
-
-      // Ensure the closed socket is observed as CLOSED by the reconnect check
-      mockWebSocket.readyState = WebSocket.CLOSED
-
-      // Should show reconnecting status
-      await waitFor(() => {
-        expect(screen.getByText(/reconnecting/i)).toBeInTheDocument()
-      })
-
-      // Wait for backoff delay to elapse and reconnection attempt to occur
-      await new Promise((r) => setTimeout(r, 1200))
-
-      // Should attempt to create new WebSocket connection
-      expect(global.WebSocket).toHaveBeenCalledTimes(2)
-    })
-
-    it('sends subscription message on connection', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />)
-      mockWebSocket = getCurrentWS()
-
-      // Wait handlers attached
-      await waitFor(() => {
-        expect(typeof mockWebSocket.onopen).toBe('function')
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        mockWebSocket.onopen?.(new Event('open'))
-      })
-
-      // Should send subscription message quickly after open
-      await waitFor(
-        () => {
-          expect(mockWebSocket.send).toHaveBeenCalled()
-          const sent = (mockWebSocket.send as any).mock.calls
-            .map((c: any[]) => c[0])
-            .join('\n')
-          expect(sent).toContain('"type":"subscribe"')
-        },
-        { timeout: 5000 },
-      )
-    })
-
-    it('updates subscription when filters change', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />)
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
-      })
-
-      // Clear previous calls
-      mockWebSocket.send.mockClear()
-
-      // Change a filter
-      const timeRangeSelect = screen.getByLabelText(/time range/i)
-      fireEvent.change(timeRangeSelect, { target: { value: '7d' } })
-
-      // Should send update subscription message
-      await waitFor(() => {
-        expect(mockWebSocket.send).toHaveBeenCalledWith(
-          expect.stringContaining('"type":"update_subscription"'),
-        )
-      })
-    })
-
-    it('handles heartbeat messages', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-
-      // Wait until effect has assigned handlers
-      await waitFor(() => {
-        expect(typeof mockWebSocket.onopen).toBe('function')
-        expect(typeof mockWebSocket.onmessage).toBe('function')
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        mockWebSocket.onopen!(new Event('open'))
-      })
-
-      mockWebSocket.send.mockClear()
-
-      // Simulate heartbeat message from server
-      void act(() => {
-        mockWebSocket.onmessage!(
-          new MessageEvent('message', {
-            data: JSON.stringify({ type: 'heartbeat' }),
+        // Mock fetch used by BiasDashboard initial data load
+        originalFetch = global.fetch
+        global.fetch = vi.fn().mockResolvedValue(
+          createDashboardResponse({
+            summary: {
+              totalSessions: 100,
+              averageBiasScore: 0.3,
+              highBiasSessions: 5,
+              totalAlerts: 10,
+              complianceScore: 0.85,
+              alertsLast24h: 0,
+            },
+            alerts: [],
+            trends: [],
+            demographics: {},
+            recentAnalyses: [],
+            recommendations: [],
           }),
         )
+        // Ensure the component receives the same mock instance we control
+        MockWebSocketConstructor.mockImplementation(() => {
+          const ws = createMockWebSocket()
+          mockWebSocket = ws
+          return ws
+        })
+
+        // Re-stub global WebSocket to our constructor in case previous tests overrode it
+        vi.stubGlobal('WebSocket', MockWebSocketConstructor)
       })
 
-      await waitFor(
-        () => {
-          expect(mockWebSocket.send).toHaveBeenCalledWith(
-            expect.stringContaining('"type":"heartbeat_response"'),
-          )
-        },
-        { timeout: 5000 },
-      )
-    }, 10000)
-
-    it('handles real-time bias alert updates', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
+      afterEach(() => {
+        // Clean up fetch and container
+        global.fetch = originalFetch
+        container.parentNode?.removeChild(container)
+        // Clear any heartbeat interval that might have been set on the current mock
+        const ws = getCurrentWS()
+        if (ws.heartbeatInterval) {
+          clearInterval(ws.heartbeatInterval)
+          ws.heartbeatInterval = null
         }
+        MockWebSocketConstructor.mockReset()
       })
 
-      // Navigate to alerts tab
-      fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
+      it('shows connection status indicators', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />)
+        // Ensure we operate on the exact instance used by the component
+        mockWebSocket = getCurrentWS()
 
-      // Simulate new bias alert
-      void act(() => {
-        if (mockWebSocket.onmessage) {
-          const messageEvent = new MessageEvent('message', {
-            data: JSON.stringify({
-              type: 'bias_alert',
-              alert: {
-                alertId: 'new-alert-1',
-                type: 'high_bias',
-                message: 'Real-time high bias detected',
-                timestamp: new Date().toISOString(),
-                level: 'high',
-                sessionId: 'session-123',
-              },
-            }),
-          })
-          mockWebSocket.onmessage(messageEvent)
-        }
-      })
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
 
-      // Assert on deterministic SR announcement which is always emitted
-      await waitFor(() => {
+        // Initially should show connecting
         expect(
-          screen.getByText('New high bias alert: Real-time high bias detected'),
+          screen.getByText(/connecting to live updates/i),
         ).toBeInTheDocument()
-      })
-    })
 
-    it('handles real-time session updates', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
 
-      await waitFor(() => {
-        expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
+        // Should show connected status
+        await waitFor(() => {
+          expect(
+            screen.getByText(/live updates connected/i),
+          ).toBeInTheDocument()
+        })
       })
 
-      // Simulate session update
-      void act(() => {
-        if (mockWebSocket.onmessage) {
-          const messageEvent = new MessageEvent('message', {
-            data: JSON.stringify({
-              type: 'session_update',
-              session: {
-                sessionId: 'session-1',
-                overallBiasScore: 0.8,
-                timestamp: new Date().toISOString(),
-                alertLevel: 'high',
-              },
-            }),
-          })
-          mockWebSocket.onmessage(messageEvent)
-        }
-      })
+      it('handles connection errors with proper status', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />)
 
-      // Should update session data
-      await waitFor(() => {
-        expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
-      })
-    })
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
 
-    it('handles real-time metrics updates', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
-      })
-
-      // Simulate metrics update
-      void act(() => {
-        if (mockWebSocket.onmessage) {
-          const messageEvent = new MessageEvent('message', {
-            data: JSON.stringify({
-              type: 'metrics_update',
-              metrics: {
-                totalSessions: 150,
-                averageBiasScore: 0.35,
-                totalAlerts: 12,
-              },
-            }),
-          })
-          mockWebSocket.onmessage(messageEvent)
-        }
-      })
-
-      // Should update metrics
-      await waitFor(() => {
-        expect(screen.getByText(/150/)).toBeInTheDocument()
-      })
-    })
-
-    it('handles manual reconnection', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate connection error
-      void act(() => {
-        if (mockWebSocket.onerror) {
+        // Simulate connection error
+        void act(() => {
           const errorEvent = new Event('error')
-          mockWebSocket.onerror(errorEvent)
-        }
-      })
+          mockWebSocket.onerror?.(errorEvent)
+        })
 
-      // Should show reconnect button
-      await waitFor(() => {
+        // Should show error status
+        await waitFor(() => {
+          expect(screen.getByText(/live updates failed/i)).toBeInTheDocument()
+        })
+
+        // Should show reconnect button
         expect(screen.getByText(/reconnect live updates/i)).toBeInTheDocument()
       })
 
-      // Click reconnect button
-      const reconnectButton = screen.getByText(/reconnect live updates/i)
-      fireEvent.click(reconnectButton)
+      it('handles reconnection attempts with exponential backoff', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />)
 
-      // Our mock does not automatically call onclose when close() is invoked.
-      // Trigger onclose to allow the component's reconnect logic to run.
-      const ws = getCurrentWS() || mockWebSocket
-      ws?.onclose?.(
-        new CloseEvent('close', {
-          code: 1000,
-          reason: 'Manual reconnection',
-          wasClean: true,
-        }),
-      )
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
 
-      // Allow the 100ms reconnect timeout to elapse
-      await new Promise((r) => setTimeout(r, 150))
-      // Assert on the SR announcement that always fires on manual reconnect
-      expect(
-        screen.getByText(/manually reconnecting to live updates/i),
-      ).toBeInTheDocument()
-    })
-
-    it('cleans up WebSocket connection properly', async () => {
-      const { unmount } = render(
-        <BiasDashboard enableRealTimeUpdates={true} />,
-        { container },
-      )
-      mockWebSocket = getCurrentWS()
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate successful connection with heartbeat
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
-      })
-
-      // Set up heartbeat interval
-      const intervalId = setInterval(() => {}, 30000)
-      mockWebSocket.heartbeatInterval = intervalId as any
-
-      // Unmount component
-      unmount()
-
-      // Should close connection and clear interval
-      expect(mockWebSocket.close).toHaveBeenCalledWith(
-        1000,
-        'Component unmounting',
-      )
-      clearInterval(intervalId)
-    })
-
-    it('handles unknown message types gracefully', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
-      })
-
-      // Simulate unknown message type
-      void act(() => {
-        if (mockWebSocket.onmessage) {
-          const messageEvent = new MessageEvent('message', {
-            data: JSON.stringify({
-              type: 'unknown_type',
-              data: { some: 'data' },
-            }),
-          })
-          mockWebSocket.onmessage(messageEvent)
-        }
-      })
-
-      // Should handle gracefully without errors
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
-    })
-
-    it('handles malformed WebSocket messages', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate successful connection
-      void act(() => {
-        if (mockWebSocket.onopen) {
-          mockWebSocket.onopen(new Event('open'))
-        }
-      })
-
-      // Simulate malformed message
-      void act(() => {
-        if (mockWebSocket.onmessage) {
-          const messageEvent = new MessageEvent('message', {
-            data: 'invalid json',
-          })
-          mockWebSocket.onmessage(messageEvent)
-        }
-      })
-
-      // Should handle gracefully without crashing
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
-    })
-
-    it('shows correct status during reconnection attempts', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
-      mockWebSocket = getCurrentWS()
-      await awaitHandlersAttached()
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(/bias detection dashboard/i),
-        ).toBeInTheDocument()
-      })
-
-      // Simulate connection close to trigger reconnection
-      void act(() => {
-        if (mockWebSocket.onclose) {
+        // Simulate connection close
+        void act(() => {
           const closeEvent = new CloseEvent('close', {
             code: 1006,
             reason: 'Connection lost',
             wasClean: false,
           })
-          mockWebSocket.onclose(closeEvent)
-        }
+          mockWebSocket.onclose?.(closeEvent)
+        })
+
+        // Ensure the closed socket is observed as CLOSED by the reconnect check
+        mockWebSocket.readyState = WebSocket.CLOSED
+
+        // Should show reconnecting status
+        await waitFor(() => {
+          expect(screen.getByText(/reconnecting/i)).toBeInTheDocument()
+        })
+
+        // Wait for backoff delay to elapse and reconnection attempt to occur
+        await new Promise((r) => setTimeout(r, 1200))
+
+        // Should attempt to create new WebSocket connection
+        expect(global.WebSocket).toHaveBeenCalledTimes(2)
       })
 
-      // Should show reconnecting status with attempt number
-      await waitFor(() => {
-        expect(screen.getByText(/reconnecting.*attempt 1/i)).toBeInTheDocument()
+      it('sends subscription message on connection', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />)
+        mockWebSocket = getCurrentWS()
+
+        // Wait handlers attached
+        await waitFor(() => {
+          expect(typeof mockWebSocket.onopen).toBe('function')
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Should send subscription message quickly after open
+        await waitFor(
+          () => {
+            expect(mockWebSocket.send).toHaveBeenCalled()
+            const sent = mockWebSocket.send.mock.calls
+              .map(([payload]) => String(payload))
+              .join('\n')
+            expect(sent).toContain('"type":"subscribe"')
+          },
+          { timeout: 5000 },
+        )
       })
-    })
 
-    it('disables live updates when enableRealTimeUpdates is false', async () => {
-      render(<BiasDashboard enableRealTimeUpdates={false} />, { container })
-      mockWebSocket = getCurrentWS()
+      it('updates subscription when filters change', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />)
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
 
-      await waitFor(() => {
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Clear previous calls
+        mockWebSocket.send.mockClear()
+
+        // Change a filter
+        const timeRangeSelect = screen.getByLabelText(/time range/i)
+        fireEvent.change(timeRangeSelect, { target: { value: '7d' } })
+
+        // Should send update subscription message
+        await waitFor(() => {
+          expect(mockWebSocket.send).toHaveBeenCalledWith(
+            expect.stringContaining('"type":"update_subscription"'),
+          )
+        })
+      })
+
+      it('handles heartbeat messages', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+
+        // Wait until effect has assigned handlers
+        await waitFor(() => {
+          expect(typeof mockWebSocket.onopen).toBe('function')
+          expect(typeof mockWebSocket.onmessage).toBe('function')
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen!(new Event('open'))
+        })
+
+        mockWebSocket.send.mockClear()
+
+        // Simulate heartbeat message from server
+        void act(() => {
+          mockWebSocket.onmessage!(
+            new MessageEvent('message', {
+              data: JSON.stringify({ type: 'heartbeat' }),
+            }),
+          )
+        })
+
+        await waitFor(
+          () => {
+            expect(mockWebSocket.send).toHaveBeenCalledWith(
+              expect.stringContaining('"type":"heartbeat_response"'),
+            )
+          },
+          { timeout: 5000 },
+        )
+      }, 10000)
+
+      it('handles real-time bias alert updates', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
+
+        await waitFor(() => {
+          expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Navigate to alerts tab
+        fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
+
+        // Simulate new bias alert
+        void act(() => {
+          mockWebSocket.onmessage?.(
+            new MessageEvent('message', {
+              data: JSON.stringify({
+                type: 'bias_alert',
+                alert: {
+                  alertId: 'new-alert-1',
+                  type: 'high_bias',
+                  message: 'Real-time high bias detected',
+                  timestamp: new Date().toISOString(),
+                  level: 'high',
+                  sessionId: 'session-123',
+                },
+              }),
+            }),
+          )
+        })
+
+        // Assert on deterministic SR announcement which is always emitted
+        await waitFor(() => {
+          expect(
+            screen.getByText(
+              'New high bias alert: Real-time high bias detected',
+            ),
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('handles real-time session updates', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
+
+        await waitFor(() => {
+          expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Simulate session update
+        void act(() => {
+          mockWebSocket.onmessage?.(
+            new MessageEvent('message', {
+              data: JSON.stringify({
+                type: 'session_update',
+                session: {
+                  sessionId: 'session-1',
+                  overallBiasScore: 0.8,
+                  timestamp: new Date().toISOString(),
+                  alertLevel: 'high',
+                },
+              }),
+            }),
+          )
+        })
+
+        // Should update session data
+        await waitFor(() => {
+          expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
+        })
+      })
+
+      it('handles real-time metrics updates', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
+
+        await waitFor(() => {
+          expect(screen.getByText(/total sessions/i)).toBeInTheDocument()
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Simulate metrics update
+        void act(() => {
+          mockWebSocket.onmessage?.(
+            new MessageEvent('message', {
+              data: JSON.stringify({
+                type: 'metrics_update',
+                metrics: {
+                  totalSessions: 150,
+                  averageBiasScore: 0.35,
+                  totalAlerts: 12,
+                },
+              }),
+            }),
+          )
+        })
+
+        // Should update metrics
+        await waitFor(() => {
+          expect(screen.getByText(/150/)).toBeInTheDocument()
+        })
+      })
+
+      it('handles manual reconnection', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
+
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Simulate connection error
+        void act(() => {
+          const errorEvent = new Event('error')
+          mockWebSocket.onerror?.(errorEvent)
+        })
+
+        // Should show reconnect button
+        await waitFor(() => {
+          expect(
+            screen.getByText(/reconnect live updates/i),
+          ).toBeInTheDocument()
+        })
+
+        // Click reconnect button
+        const reconnectButton = screen.getByText(/reconnect live updates/i)
+        fireEvent.click(reconnectButton)
+
+        // Our mock does not automatically call onclose when close() is invoked.
+        // Trigger onclose to allow the component's reconnect logic to run.
+        const ws = getCurrentWS()
+        ws.onclose?.(
+          new CloseEvent('close', {
+            code: 1000,
+            reason: 'Manual reconnection',
+            wasClean: true,
+          }),
+        )
+
+        // Allow the 100ms reconnect timeout to elapse
+        await new Promise((r) => setTimeout(r, 150))
+        // Assert on the SR announcement that always fires on manual reconnect
+        expect(
+          screen.getByText(/manually reconnecting to live updates/i),
+        ).toBeInTheDocument()
+      })
+
+      it('cleans up WebSocket connection properly', async () => {
+        const { unmount } = render(
+          <BiasDashboard enableRealTimeUpdates={true} />,
+          { container },
+        )
+        mockWebSocket = getCurrentWS()
+
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Simulate successful connection with heartbeat
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Set up heartbeat interval
+        const intervalId = setInterval(() => {}, 30000)
+        mockWebSocket.heartbeatInterval = intervalId
+
+        // Unmount component
+        unmount()
+
+        // Should close connection and clear interval
+        expect(mockWebSocket.close).toHaveBeenCalledWith(
+          1000,
+          'Component unmounting',
+        )
+        clearInterval(intervalId)
+      })
+
+      it('handles unknown message types gracefully', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
+
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Simulate unknown message type
+        void act(() => {
+          mockWebSocket.onmessage?.(
+            new MessageEvent('message', {
+              data: JSON.stringify({
+                type: 'unknown_type',
+                data: { some: 'data' },
+              }),
+            }),
+          )
+        })
+
+        // Should handle gracefully without errors
         expect(
           screen.getByText(/bias detection dashboard/i),
         ).toBeInTheDocument()
       })
 
-      // Connection status text is not rendered when real-time updates are disabled
-      expect(
-        screen.queryByText(/live updates disabled/i),
-      ).not.toBeInTheDocument()
-      // But the Auto-refresh button should indicate Off
-      expect(screen.getByText(/auto-refresh\s+off/i)).toBeInTheDocument()
+      it('handles malformed WebSocket messages', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
 
-      // Should not create WebSocket connection
-      expect(global.WebSocket).not.toHaveBeenCalled()
-    })
-  })
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Simulate successful connection
+        void act(() => {
+          mockWebSocket.onopen?.(new Event('open'))
+        })
+
+        // Simulate malformed message
+        void act(() => {
+          mockWebSocket.onmessage?.(
+            new MessageEvent('message', {
+              data: 'invalid json',
+            }),
+          )
+        })
+
+        // Should handle gracefully without crashing
+        expect(
+          screen.getByText(/bias detection dashboard/i),
+        ).toBeInTheDocument()
+      })
+
+      it('shows correct status during reconnection attempts', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={true} />, { container })
+        mockWebSocket = getCurrentWS()
+        await awaitHandlersAttached()
+
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Simulate connection close to trigger reconnection
+        void act(() => {
+          const closeEvent = new CloseEvent('close', {
+            code: 1006,
+            reason: 'Connection lost',
+            wasClean: false,
+          })
+          mockWebSocket.onclose?.(closeEvent)
+        })
+
+        // Should show reconnecting status with attempt number
+        await waitFor(() => {
+          expect(
+            screen.getByText(/reconnecting.*attempt 1/i),
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('disables live updates when enableRealTimeUpdates is false', async () => {
+        render(<BiasDashboard enableRealTimeUpdates={false} />, { container })
+        mockWebSocket = getCurrentWS()
+
+        await waitFor(() => {
+          expect(
+            screen.getByText(/bias detection dashboard/i),
+          ).toBeInTheDocument()
+        })
+
+        // Connection status text is not rendered when real-time updates are disabled
+        expect(
+          screen.queryByText(/live updates disabled/i),
+        ).not.toBeInTheDocument()
+        // But the Auto-refresh button should indicate Off
+        expect(screen.getByText(/auto-refresh\s+off/i)).toBeInTheDocument()
+
+        // Should not create WebSocket connection
+        expect(global.WebSocket).not.toHaveBeenCalled()
+      })
+    },
+  )
 
   it('shows error alert if dashboard fetch fails', async () => {
     // Mock fetch to throw an error

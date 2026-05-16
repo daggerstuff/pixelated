@@ -21,7 +21,7 @@ describe('analysis methods', () => {
     ;(global.fetch as any).mockResolvedValue({
       ok: true,
       status: 200,
-      json: () => Promise.resolve({ status: 'healthy', timestamp: Date.now() }),
+      json:  async () => Promise.resolve({ status: 'healthy', timestamp: Date.now() }),
     })
 
     // Create a fresh bridge instance for each test
@@ -168,7 +168,7 @@ describe('analysis methods', () => {
 
       const promises = Array(5)
         .fill(null)
-        .map(() => bridge.runPreprocessingAnalysis(mockSession))
+        .map( async () => bridge.runPreprocessingAnalysis(mockSession))
 
       const results = await Promise.allSettled(promises)
       expect(results.length).toBe(5)

@@ -190,7 +190,7 @@ function redactMetadataValue(value: unknown): unknown {
 export class AuditLogger {
   private static instance: AuditLogger
   private db: Db | null = null
-  private maxRetries = 3
+  private readonly maxRetries = 3
   private readonly persistenceQueue = new AuditPersistenceQueue()
 
   private constructor() {}
@@ -223,7 +223,7 @@ export class AuditLogger {
       timestamp: new Date(),
     })
 
-    this.persistenceQueue.schedule(auditEvent, () =>
+    this.persistenceQueue.schedule(auditEvent,  async () =>
       this.persistEventWithRetry(auditEvent),
     )
 
@@ -303,7 +303,7 @@ export class AuditLogger {
 /**
  * Convenience utility for logging therapeutic events.
  */
-export const logTherapeuticEvent = (
+export const logTherapeuticEvent =  async (
   userId: string,
   action: string,
   resourceId?: string,
@@ -320,7 +320,7 @@ export const logTherapeuticEvent = (
     status: 'success',
   })
 
-export const logSecurityAlert = (
+export const logSecurityAlert =  async (
   userId: string,
   action: AuditAction | string,
   severity: AuditSeverity,

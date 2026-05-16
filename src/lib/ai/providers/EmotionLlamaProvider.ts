@@ -33,10 +33,10 @@ export interface EmotionDetectionResult {
  * EmotionLlamaProvider class for LLaMA-based emotion analysis
  */
 export class EmotionLlamaProvider {
-  private baseUrl: string
-  private apiKey: string
-  private fheService: FHESystem
-  private modelVersion = 'llama-emotion-v1.0'
+  private readonly baseUrl: string
+  private readonly apiKey: string
+  private readonly fheService: FHESystem
+  private readonly modelVersion = 'llama-emotion-v1.0'
 
   constructor(baseUrl: string, apiKey: string, fheService: FHESystem) {
     this.baseUrl = baseUrl.replace(/\/$/, '') // Remove trailing slash
@@ -159,8 +159,8 @@ export class EmotionLlamaProvider {
       return {
         emotions: JSON.parse(decryptedEmotions),
         dimensions: JSON.parse(decryptedDimensions),
-        confidence: encryptedResult.confidence || 0.8,
-        metadata: encryptedResult.metadata || {},
+        confidence: encryptedResult.confidence ?? 0.8,
+        metadata: encryptedResult.metadata ?? {},
       }
     } catch (error: unknown) {
       logger.error('Error processing encrypted response', { error })
@@ -501,7 +501,7 @@ export class EmotionLlamaProvider {
 
     emotions.forEach((emotion) => {
       const normalizedType = emotion.type.toLowerCase()
-      const confidence = emotion.confidence || 0.7
+      const confidence = emotion.confidence ?? 0.7
 
       if (
         normalizedType.includes('joy') ||

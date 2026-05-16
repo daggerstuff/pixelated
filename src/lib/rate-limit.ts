@@ -15,7 +15,7 @@ export function checkRateLimit(
   const windowMs = 60 * 1000 // 1 minute window
 
   // Get user's request timestamps
-  const requests = rateLimits.get(userId) || []
+  const requests = rateLimits.get(userId) ?? []
 
   // Remove old requests outside the window
   const validRequests = requests.filter(

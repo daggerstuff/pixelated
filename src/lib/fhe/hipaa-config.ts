@@ -85,8 +85,8 @@ export function validateHIPAAEnvironment(): {
  * Get HIPAA++ compliant storage prefix
  */
 export function getHIPAAStoragePrefix(): string {
-  const environment = process.env['NODE_ENV'] || 'development'
-  const region = process.env['AWS_REGION'] || 'us-east-1'
+  const environment = process.env['NODE_ENV'] ?? 'development'
+  const region = process.env['AWS_REGION'] ?? 'us-east-1'
   return `hipaa-fhe-${environment}-${region}-`
 }
 

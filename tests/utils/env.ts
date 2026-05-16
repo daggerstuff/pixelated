@@ -15,7 +15,7 @@ export function isCI(): boolean {
  */
 export function getBaseUrl(): string {
   return (
-    getEnv('BASE_URL') ||
+    getEnv('BASE_URL') ??
     (isCI() ? 'http://localhost:3000' : 'http://localhost:4321')
   )
 }

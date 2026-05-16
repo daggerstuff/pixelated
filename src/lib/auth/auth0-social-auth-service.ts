@@ -9,6 +9,8 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
+const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+
 type Auth0RuntimeConfig = {
   domain: string
   clientId: string
@@ -17,28 +19,40 @@ type Auth0RuntimeConfig = {
   managementClientSecret: string
 }
 
+function getFirstDefined(...values: Array<string | undefined>): string {
+  for (const value of values) {
+    if (value !== undefined) {
+      return value
+    }
+  }
+
+  return ''
+}
+
 function getAuth0RuntimeConfig(): Auth0RuntimeConfig {
   return {
-    domain:
-      process.env.AUTH0_DOMAIN ||
-      process.env.PUBLIC_AUTH0_DOMAIN ||
-      auth0Config.domain ||
-      '',
-    clientId:
-      process.env.AUTH0_CLIENT_ID ||
-      process.env.PUBLIC_AUTH0_CLIENT_ID ||
-      auth0Config.clientId ||
-      '',
-    clientSecret:
-      process.env.AUTH0_CLIENT_SECRET || auth0Config.clientSecret || '',
-    managementClientId:
-      process.env.AUTH0_MANAGEMENT_CLIENT_ID ||
-      auth0Config.managementClientId ||
-      '',
-    managementClientSecret:
-      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
-      auth0Config.managementClientSecret ||
-      '',
+    domain: getFirstDefined(
+      process.env.AUTH0_DOMAIN,
+      process.env.PUBLIC_AUTH0_DOMAIN,
+      auth0Config.domain,
+    ),
+    clientId: getFirstDefined(
+      process.env.AUTH0_CLIENT_ID,
+      process.env.PUBLIC_AUTH0_CLIENT_ID,
+      auth0Config.clientId,
+    ),
+    clientSecret: getFirstDefined(
+      process.env.AUTH0_CLIENT_SECRET,
+      auth0Config.clientSecret,
+    ),
+    managementClientId: getFirstDefined(
+      process.env.AUTH0_MANAGEMENT_CLIENT_ID,
+      auth0Config.managementClientId,
+    ),
+    managementClientSecret: getFirstDefined(
+      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET,
+      auth0Config.managementClientSecret,
+    ),
   }
 }
 
@@ -79,7 +93,9 @@ function initializeAuth0Clients() {
     !AUTH0_CONFIG.clientId ||
     !AUTH0_CONFIG.clientSecret
   ) {
-    console.warn('Auth0 configuration incomplete')
+    if (shouldWarnAuth0Configuration) {
+      console.warn('Auth0 configuration incomplete')
+    }
     return
   }
 
@@ -145,7 +161,9 @@ export class Auth0SocialAuthService {
     this.clientId = config.clientId
 
     if (!this.domain || !this.clientId) {
-      console.warn('Auth0 is not properly configured')
+      if (shouldWarnAuth0Configuration) {
+        console.warn('Auth0 is not properly configured')
+      }
     }
     initializeAuth0Clients()
   }
@@ -247,7 +265,7 @@ export class Auth0SocialAuthService {
         givenName: userInfo.given_name,
         familyName: userInfo.family_name,
         picture: userInfo.picture,
-        provider: userInfo.sub?.split('|')[0] ?? 'unknown',
+        provider: userInfo.sub ? userInfo.sub.split('|')[0] : 'unknown',
         emailVerified: userInfo.email_verified ?? false,
         createdAt: new Date().toISOString(),
       }

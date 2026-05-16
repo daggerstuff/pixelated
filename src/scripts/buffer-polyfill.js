@@ -18,7 +18,7 @@ export default function BufferPolyfill(arg, encodingOrOffset, length) {
 }
 
 BufferPolyfill.prototype.toString = function (encoding) {
-  const decoder = new TextDecoder(encoding || 'utf-8')
+  const decoder = new TextDecoder(encoding ?? 'utf-8')
   return decoder.decode(this._data)
 }
 

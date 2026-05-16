@@ -31,14 +31,14 @@ describe('FHEParameterOptimizer', () => {
   })
 
   it('default strategy is BalancedApproach', () => {
-    const strategy = Reflect.get(optimizer, 'strategy')
+    const strategy = optimizer.getStrategy()
     expect(strategy).toBe(OptimizationStrategy.BalancedApproach)
   })
 
   it('setStrategy updates the active strategy', () => {
     optimizer.setStrategy(OptimizationStrategy.SecurityFocused)
 
-    const strategy = Reflect.get(optimizer, 'strategy')
+    const strategy = optimizer.getStrategy()
     expect(strategy).toBe(OptimizationStrategy.SecurityFocused)
   })
 
@@ -48,7 +48,7 @@ describe('FHEParameterOptimizer', () => {
       maximumMemoryMB: 2048,
     })
 
-    const constraints = Reflect.get(optimizer, 'constraints')
+    const constraints = optimizer.getConstraints()
     expect(constraints).toEqual({
       minimumSecurityLevel: SecurityLevel.TC192,
       maximumMemoryMB: 2048,
@@ -156,9 +156,7 @@ describe('FHEParameterOptimizer', () => {
 
     optimizer.recordOperationMetrics(metric)
 
-    // Access private property through reflection for testing
-    const performanceHistory =
-      Reflect.get(optimizer, 'performanceHistory') || []
+    const performanceHistory = optimizer.getPerformanceHistory()
 
     expect(performanceHistory.length).toBe(1)
     expect(performanceHistory[0]).toBe(metric)
@@ -166,7 +164,7 @@ describe('FHEParameterOptimizer', () => {
 
   it('recordOperationMetrics limits history size', () => {
     // Set max history through reflection
-    Reflect.set(optimizer, 'MAX_HISTORY_ENTRIES', 3)
+    optimizer.setMaxHistoryEntries(3)
 
     // Add 5 metrics (should only keep latest 3)
     for (let i = 0; i < 5; i++) {
@@ -183,8 +181,7 @@ describe('FHEParameterOptimizer', () => {
     }
 
     // Access private property through reflection for testing
-    const performanceHistory =
-      Reflect.get(optimizer, 'performanceHistory') || []
+    const performanceHistory = optimizer.getPerformanceHistory()
 
     expect(performanceHistory.length).toBe(3)
     // The most recent operation should be first
@@ -217,18 +214,15 @@ describe('FHEParameterOptimizer', () => {
       },
     }
 
-    // Use function replacement instead of spying
-    const originalMethod = optimizer.recordOperationMetrics
-    const mockFn = vi.fn()
-    optimizer.recordOperationMetrics = mockFn
+    const mockRecordOperationMetrics = vi
+      .spyOn(optimizer, 'recordOperationMetrics')
+      .mockImplementation(vi.fn())
 
     optimizer.optimizeForContext(context, SealSchemeType.BFV)
 
     // Should have recorded the metrics
-    expect(mockFn).toHaveBeenCalledWith(context.metrics)
-
-    // Restore original method
-    optimizer.recordOperationMetrics = originalMethod
+    expect(mockRecordOperationMetrics).toHaveBeenCalledWith(context.metrics)
+    mockRecordOperationMetrics.mockRestore()
   })
 
   it('adaptive optimization with history affects parameters', () => {

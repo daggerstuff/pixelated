@@ -41,7 +41,7 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
     }
 
     const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+      import.meta.env['EMBEDDING_AGENT_URL'] ?? 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {
@@ -143,7 +143,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+      import.meta.env['EMBEDDING_AGENT_URL'] ?? 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     switch (body.action) {
@@ -165,6 +165,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         })
       }
 
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return new Response(
           JSON.stringify({

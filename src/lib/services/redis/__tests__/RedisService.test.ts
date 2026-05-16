@@ -1,3 +1,4 @@
+// @vitest-environment node
 import {
   vi,
   describe,
@@ -47,13 +48,9 @@ const createMockRedis = () => ({
 })
 
 // Mock the ioredis module
-vi.mock('ioredis', async () => {
-  const actual = await vi.importActual('ioredis')
-  return {
-    default: actual,
-    Redis: vi.fn().mockImplementation(() => createMockRedis()),
-  }
-})
+vi.mock('ioredis', () => ({
+  Redis: vi.fn().mockImplementation(() => createMockRedis()),
+}))
 
 // Use built-in vitest matchers instead of custom ones
 // No need to define custom matchers as vitest provides them
@@ -160,7 +157,7 @@ describe('RedisService', () => {
 
     it('should handle disconnection', async () => {
       // Mock the disconnect method
-      redis.disconnect = vi.fn().mockImplementation(() => {
+      redis.disconnect = vi.fn().mockImplementation( async () => {
         // Update isHealthy to return false after disconnect
         redis.isHealthy = vi.fn().mockReturnValue(false)
         return Promise.resolve()
@@ -173,7 +170,7 @@ describe('RedisService', () => {
 
     it('should handle reconnection', async () => {
       // First mock disconnect to set isHealthy to false
-      redis.disconnect = vi.fn().mockImplementation(() => {
+      redis.disconnect = vi.fn().mockImplementation( async () => {
         redis.isHealthy = vi.fn().mockReturnValue(false)
         return Promise.resolve()
       })
@@ -182,7 +179,7 @@ describe('RedisService', () => {
       expect(redis.isHealthy()).toBe(false)
 
       // Then mock reconnect to set isHealthy back to true
-      redis.connect = vi.fn().mockImplementation(() => {
+      redis.connect = vi.fn().mockImplementation( async () => {
         redis.isHealthy = vi.fn().mockReturnValue(true)
         return Promise.resolve()
       })
@@ -391,7 +388,7 @@ describe('RedisService', () => {
 
       // Mock incr to return incrementing values
       let counter = 0
-      redis.incr = vi.fn().mockImplementation(() => Promise.resolve(++counter))
+      redis.incr = vi.fn().mockImplementation( async () => Promise.resolve(++counter))
 
       // Create a simplified version without using runConcurrentOperations
       const promises: Promise<number>[] = []
