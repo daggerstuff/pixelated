@@ -103,6 +103,10 @@ const runProbe = async (request: Request): Promise<Response> => {
     (body.mode as ProbeMode) || (url.searchParams.get('mode') as ProbeMode)
   const eventMessage =
 <<<<<<< HEAD
+    (body.message as string) ||
+    (url.searchParams.get('message') ?? 'Sentry server probe event')
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
     ((body.message as string) ||
     url.searchParams.get('message')) ??
@@ -113,6 +117,7 @@ const runProbe = async (request: Request): Promise<Response> => {
 =======
     (body.message as string) ||
     (url.searchParams.get('message') ?? 'Sentry server probe event')
+>>>>>>> origin/staging
 >>>>>>> origin/staging
 
   const eventId = emitProbeEvent(
