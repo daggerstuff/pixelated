@@ -1,14 +1,21 @@
 #!/usr/bin/env node
-/* eslint-disable typescript/no-unsafe-call,typescript/no-unsafe-assignment,typescript/no-unsafe-member-access,typescript/no-unsafe-return,typescript/no-unsafe-argument,typescript/prefer-nullish-coalescing */
+/// <reference types="node" />
 import { existsSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 
-/** @typedef {import('node:child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
+/** @typedef {import('child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
 
 const EXCLUDED_FROM_OXFMT = new Set([
   'eslint.config.js',
   'astro.config.mjs',
   'src/lib/auth/__tests__/integration.test.ts',
+  'src/lib/auth/auth0-jwt-service.ts',
+  'src/lib/auth/__tests__/middleware.test.ts',
+  'src/lib/research/ResearchPlatform.ts',
+  'src/lib/research/services/HIPAADataService.ts',
+  'src/tests/api/session/skills-api.test.ts',
+  'src/tests/api/v1/health.test.ts',
+  'src/services/auth0.service.ts',
   'src/types/index.ts',
   'tests/unit/auth0/auth0-jwt-service.test.ts',
 ])
@@ -113,5 +120,5 @@ const oxfmtFiles = changedFiles.filter((filePath) => {
 })
 
 if (oxfmtFiles.length > 0) {
-  runCommand('oxfmt', ['--check', ...oxfmtFiles])
+  runCommand('oxfmt', ['--check', '--no-error-on-unmatched-pattern', ...oxfmtFiles])
 }

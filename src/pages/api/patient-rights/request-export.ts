@@ -69,7 +69,7 @@ export const POST = async ({ request }) => {
 
     // Verify user is authenticated
     const sessionData = await getSession(request)
-    if (!sessionData || !sessionData.user) {
+    if (!sessionData?.user) {
       logger.warn('Unauthorized access attempt to request export API')
       return new Response(
         JSON.stringify({

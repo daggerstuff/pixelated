@@ -137,7 +137,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   }
 
   useEffect(() => {
-    setCurrentPlan(plan || defaultPlan)
+    setCurrentPlan(plan ?? defaultPlan)
   }, [plan, defaultPlan])
 
   const getPriorityColor = (priority: TreatmentGoal['priority']) => {
@@ -233,12 +233,12 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
     const goal: TreatmentGoal = {
       id: `goal-${Date.now()}`,
       title: newGoal.title || '',
-      description: newGoal.description || '',
-      targetDate: newGoal.targetDate || addDays(new Date(), 30),
-      priority: newGoal.priority || 'medium',
+      description: newGoal.description ?? '',
+      targetDate: newGoal.targetDate ?? addDays(new Date(), 30),
+      priority: newGoal.priority ?? 'medium',
       status: 'not-started',
       progress: 0,
-      category: newGoal.category || 'behavioral',
+      category: newGoal.category ?? 'behavioral',
       milestones: [],
     }
 
@@ -395,7 +395,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               <input
                 type='text'
                 placeholder='Goal title'
-                value={newGoal.title || ''}
+                value={newGoal.title ?? ''}
                 onChange={(e) =>
                   setNewGoal({ ...newGoal, title: e.target.value })
                 }
@@ -403,7 +403,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               />
               <textarea
                 placeholder='Goal description'
-                value={newGoal.description || ''}
+                value={newGoal.description ?? ''}
                 onChange={(e) =>
                   setNewGoal({ ...newGoal, description: e.target.value })
                 }
@@ -411,7 +411,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               />
               <div className='flex gap-4'>
                 <select
-                  value={newGoal.priority || 'medium'}
+                  value={newGoal.priority ?? 'medium'}
                   onChange={(e) =>
                     setNewGoal({
                       ...newGoal,
@@ -426,7 +426,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                   <option value='urgent'>Urgent</option>
                 </select>
                 <select
-                  value={newGoal.category || 'behavioral'}
+                  value={newGoal.category ?? 'behavioral'}
                   onChange={(e) =>
                     setNewGoal({
                       ...newGoal,

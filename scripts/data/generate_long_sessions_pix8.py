@@ -28,9 +28,8 @@ load_dotenv()
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from ai.common.llm_client import LLMClient  # noqa: E402
-from ai.pipelines.design.service import NeMoDataDesignerService  # noqa: E402
-
+from ai.common.llm_client import LLMClient
+from ai.pipelines.design.service import NeMoDataDesignerService
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )

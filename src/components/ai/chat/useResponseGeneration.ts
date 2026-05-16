@@ -216,7 +216,7 @@ export function useResponseGeneration({
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(
-            errorData.error || `API request failed: ${response.status}`,
+            errorData.error ?? `API request failed: ${response.status}`,
           )
         }
 
@@ -294,8 +294,8 @@ export function useResponseGeneration({
       try {
         const response = await makeRequest(requestData)
         const data = await response.json()
-        const generatedResponse = (data.response ||
-          data.content ||
+        const generatedResponse = ((data.response ??
+          data.content) ??
           '') as string
         setResponse(generatedResponse)
         setProgress(100)
@@ -391,10 +391,10 @@ export function useResponseGeneration({
         const data = await response.json()
 
         const therapeuticResponse: TherapeuticResponse = {
-          content: data.response || data.content || '',
-          confidence: data.confidence || 0.8,
-          intervention: data.intervention || false,
-          techniques: data.techniques || [],
+          content: (data.response ?? data.content) ?? '',
+          confidence: data.confidence ?? 0.8,
+          intervention: data.intervention ?? false,
+          techniques: data.techniques ?? [],
           usage: data.usage,
         }
 

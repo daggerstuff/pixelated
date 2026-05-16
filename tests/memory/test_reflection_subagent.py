@@ -4,8 +4,6 @@ Tests for reflection subagent, prompts, and consolidation rules.
 
 import pytest
 
-pytestmark = pytest.mark.skip(reason="Module ai.memory.unified_memory not implemented")
-
 from unittest.mock import Mock
 
 from ai.memory.consolidation_rules import (

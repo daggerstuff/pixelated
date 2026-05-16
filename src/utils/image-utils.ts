@@ -83,7 +83,7 @@ export function generateSrcSet(
  * @returns The sizes attribute value
  */
 export function generateSizes(breakpoints: number[]): string {
-  if (!breakpoints || !breakpoints.length) {
+  if (!breakpoints?.length) {
     return '100vw'
   }
 
@@ -160,13 +160,13 @@ export function getOptimalFormat(): 'avif' | 'webp' | 'jpg' {
   // Check for AVIF support
   const canUseAvif = () => {
     const canvas = document.createElement('canvas')
-    return canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0
+    return canvas.toDataURL('image/avif').startsWith('data:image/avif')
   }
 
   // Check for WebP support
   const canUseWebP = () => {
     const canvas = document.createElement('canvas')
-    return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0
+    return canvas.toDataURL('image/webp').startsWith('data:image/webp')
   }
 
   if (canUseAvif()) {

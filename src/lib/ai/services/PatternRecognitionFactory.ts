@@ -18,7 +18,7 @@ const logger = createBuildSafeLogger('pattern-recognition')
  * Concrete implementation of PatternRecognitionService that uses FHE
  */
 class ConcretePatternRecognitionService implements PatternRecognitionService {
-  constructor(private fheService: PatternRecognitionOps) {}
+  constructor(private readonly fheService: PatternRecognitionOps) {}
 
   async detectCrossSessionPatterns(
     clientId: string,
@@ -45,7 +45,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
         (pattern) => ({
           patternId: pattern.id,
           type: 'behavioral' as const,
-          frequency: pattern.strength || 0.5,
+          frequency: pattern.strength ?? 0.5,
           confidence: pattern.confidence,
           description: pattern.description,
           sessionIds: pattern.sessions.filter(
@@ -69,7 +69,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
             meanConfidence: pattern.confidence,
             standardDeviation: 0.1,
             outlierCount: 0,
-            correlationStrength: pattern.strength || 0.5,
+            correlationStrength: pattern.strength ?? 0.5,
           },
         }),
       )

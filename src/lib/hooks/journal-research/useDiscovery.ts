@@ -100,7 +100,7 @@ export const useDiscoveryListQuery = (
       pageSize,
       filters,
     }),
-    queryFn: () => listSources(sessionId ?? '', { page, pageSize }),
+    queryFn:  async () => listSources(sessionId ?? '', { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data) => filterSources(data, filters),
   })
@@ -110,7 +110,7 @@ export const useDiscoveryInitiateMutation = (sessionId: string | null) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: journalResearchMutationKeys.discovery.initiate(),
-    mutationFn: (payload: DiscoveryInitiatePayload) =>
+    mutationFn:  async (payload: DiscoveryInitiatePayload) =>
       initiateDiscovery(sessionId ?? '', payload),
     onSuccess: (result: DiscoveryResponse) => {
       void queryClient.invalidateQueries({
@@ -132,7 +132,7 @@ export const useSourceQuery = (
       sessionId ?? 'unknown',
       sourceId ?? 'unknown',
     ),
-    queryFn: () => getSource(sessionId ?? '', sourceId ?? ''),
+    queryFn:  async () => getSource(sessionId ?? '', sourceId ?? ''),
     enabled: Boolean(sessionId && sourceId) && enabled,
   })
 }

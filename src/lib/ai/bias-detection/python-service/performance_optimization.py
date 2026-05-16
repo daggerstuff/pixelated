@@ -25,11 +25,7 @@ import numpy as np
 from bias_detection.sentry_metrics import service_metrics, track_latency
 
 # Import existing components
-from bias_detection_service import (
-    BiasDetectionConfig,
-    BiasDetectionService,
-    SessionData,
-)
+from bias_detection.compat import BiasDetectionConfig, BiasDetectionService, SessionData
 
 logger = logging.getLogger(__name__)
 

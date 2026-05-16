@@ -1,7 +1,9 @@
 import { useState } from 'react'
 
-import { useComparativeProgress } from '../../hooks/useComparativeProgress'
 // import { LineChart } from '../ui/charts/LineChart' // This will be in ProgressChart.tsx
+import type { AuthRequestConfig } from '@/lib/auth/auth0-protected-fetch'
+
+import { useComparativeProgress } from '../../hooks/useComparativeProgress'
 import type { ComparativeProgressResult } from '../../types/analytics'
 import { ComparativeProgressControls } from './ComparativeProgressControls'
 import { InsightMessage } from './InsightMessage'
@@ -13,12 +15,15 @@ interface ComparativeProgressDisplayProps {
   defaultMetric?: string
   defaultCohort?: string
   className?: string
+  authConfig?: Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
+    getAccessTokenSilently?: AuthRequestConfig['getAccessTokenSilently']
+  }
 }
 
 // Helper components for different states. These can be moved to separate files if preferred.
 const LoadingSpinner = () => (
-  <div className='flex items-center justify-center py-12'>
-    <div className='border-indigo-500 h-8 w-8 animate-spin rounded-full border-b-2 border-t-2'></div>
+  <div className="flex items-center justify-center py-12">
+    <div className="border-indigo-500 h-8 w-8 animate-spin rounded-full border-b-2 border-t-2"></div>
   </div>
 )
 
@@ -29,12 +34,12 @@ const ErrorState = ({
   message: string
   retry: () => void
 }) => (
-  <div className='bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300 rounded-md p-4'>
-    <p className='font-medium'>Error loading data</p>
-    <p className='text-sm'>{message}</p>
+  <div className="bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300 rounded-md p-4">
+    <p className="font-medium">Error loading data</p>
+    <p className="text-sm">{message}</p>
     <button
       onClick={retry}
-      className='bg-red-100 hover:bg-red-200 dark:bg-red-800/30 dark:hover:bg-red-800/50 mt-2 rounded-md px-4 py-2 text-sm font-medium'
+      className="bg-red-100 hover:bg-red-200 dark:bg-red-800/30 dark:hover:bg-red-800/50 mt-2 rounded-md px-4 py-2 text-sm font-medium"
     >
       Retry
     </button>
@@ -42,11 +47,11 @@ const ErrorState = ({
 )
 
 const EmptyState = () => (
-  <div className='border-gray-300 dark:border-gray-700 rounded-md border border-dashed p-8 text-center'>
-    <p className='text-gray-500 dark:text-gray-400'>
+  <div className="border-gray-300 dark:border-gray-700 rounded-md border border-dashed p-8 text-center">
+    <p className="text-gray-500 dark:text-gray-400">
       No data available for the selected metric and time period.
     </p>
-    <p className='text-gray-400 dark:text-gray-500 mt-2 text-sm'>
+    <p className="text-gray-400 dark:text-gray-500 mt-2 text-sm">
       Try selecting a different metric or expanding the date range.
     </p>
   </div>
@@ -63,18 +68,18 @@ const availableMetricsForDisplay = [
 
 function getMetricConfig(metricId: string) {
   const config = availableMetricsForDisplay.find((m) => m.id === metricId)
-  return config || { label: metricId, color: '#6366f1' } // Default
+  return config ?? { label: metricId, color: '#6366f1' } // Default
 }
 
 // Helper functions to get default date ranges
 function getDefaultStartDate(): string {
   const date = new Date()
   date.setMonth(date.getMonth() - 3)
-  return date.toISOString().split('T')[0] || ''
+  return date.toISOString().split('T')[0] ?? ''
 }
 
 function getDefaultEndDate(): string {
-  return new Date().toISOString().split('T')[0] || ''
+  return new Date().toISOString().split('T')[0] ?? ''
 }
 
 // Prepares chart data from the API response
@@ -130,6 +135,7 @@ export function ComparativeProgressDisplay({
   defaultMetric = 'phq9_score',
   defaultCohort = 'all_users',
   className = '',
+  authConfig,
 }: ComparativeProgressDisplayProps) {
   const [metric, setMetric] = useState(defaultMetric)
   const [cohort, setCohort] = useState(defaultCohort)
@@ -143,6 +149,7 @@ export function ComparativeProgressDisplay({
     metric,
     cohort,
     dateRange,
+    authConfig,
   )
 
   const {
@@ -187,7 +194,7 @@ export function ComparativeProgressDisplay({
         data &&
         data.userProgressSnapshots &&
         data.userProgressSnapshots.length > 0 && (
-          <div className='space-y-6'>
+          <div className="space-y-6">
             <ProgressDataDisplay
               labels={labels}
               userData={userData}
@@ -195,7 +202,7 @@ export function ComparativeProgressDisplay({
               color={chartColor}
               title={`${metricLabel} Progress`}
               benchmarkLabel={
-                data.benchmarkData?.benchmarkDescription || 'Average'
+                data.benchmarkData?.benchmarkDescription ?? 'Average'
               }
             />
             {data.comparisonInsights?.narrativeSummary && (

@@ -1,4 +1,8 @@
 name: Playwright Tests
+
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main, master, staging]
@@ -18,9 +22,9 @@ jobs:
         with:
           node-version: 24.14.1
 
-      - uses: pnpm/action-setup@v6.0.6
+      - uses: pnpm/action-setup@v6.0.8
         with:
-          version: 11.0.9
+          version: 11.1.2
 
       - name: Install native build dependencies
         run: |
@@ -30,11 +34,14 @@ jobs:
 
       - name: Install dependencies
         run: NODE_OPTIONS="--no-deprecation" pnpm install
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
+
       - name: Run Playwright tests
         run: pnpm exec playwright test
-      - uses: actions/upload-artifact@v7.0.1
+
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report

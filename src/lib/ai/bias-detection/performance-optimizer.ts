@@ -137,8 +137,8 @@ export interface PerformanceStats {
  * Manages multiple connection pools for different services
  */
 export class ConnectionPoolManager {
-  private httpPools = new Map<string, ConnectionPool>()
-  private config: PerformanceOptimizerConfig
+  private readonly httpPools = new Map<string, ConnectionPool>()
+  private readonly config: PerformanceOptimizerConfig
 
   constructor(config: PerformanceOptimizerConfig) {
     this.config = config
@@ -195,7 +195,7 @@ export class ConnectionPoolManager {
    */
   async dispose(): Promise<void> {
     await Promise.all(
-      Array.from(this.httpPools.values()).map((pool) => pool.dispose()),
+      Array.from(this.httpPools.values()).map( async (pool) => pool.dispose()),
     )
     this.httpPools.clear()
     logger.info('All connection pools disposed')
@@ -206,9 +206,9 @@ export class ConnectionPoolManager {
  * Intelligent Cache Manager with Compression
  */
 export class IntelligentCacheManager {
-  private cacheService = getCacheService()
-  private config: PerformanceOptimizerConfig['cache']
-  private stats = {
+  private readonly cacheService = getCacheService()
+  private readonly config: PerformanceOptimizerConfig['cache']
+  private readonly stats = {
     hits: 0,
     misses: 0,
     compressionSaved: 0,
@@ -249,7 +249,7 @@ export class IntelligentCacheManager {
   /**
    * Set value in cache with automatic compression
    */
-  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+  async set(key: string, value: unknown, ttl?: number): Promise<void> {
     try {
       const serialized = JSON.stringify(value)
       const size = Buffer.byteLength(serialized, 'utf8')
@@ -271,7 +271,7 @@ export class IntelligentCacheManager {
       await this.cacheService.set(
         key,
         dataToStore,
-        ttl || this.config.defaultTtl,
+        ttl ?? this.config.defaultTtl,
       )
       this.stats.totalSize += Buffer.byteLength(dataToStore, 'utf8')
     } catch (error: unknown) {
@@ -345,11 +345,11 @@ export class IntelligentCacheManager {
     return `GZIP:${compressed}`
   }
 
-  private decompress<T>(data: string): T {
+  private decompress(data: string): unknown {
     // Simple decompression simulation - in production use zlib
     const compressed = data.replace('GZIP:', '')
     const decompressed = Buffer.from(compressed, 'base64').toString('utf8')
-    return JSON.parse(decompressed) as T
+    return JSON.parse(decompressed) as unknown
   }
 }
 
@@ -357,9 +357,9 @@ export class IntelligentCacheManager {
  * Batch Processing Engine with Concurrency Control
  */
 export class BatchProcessor {
-  private config: PerformanceOptimizerConfig['batchProcessing']
-  private activeJobs = new Map<string, Promise<unknown>>()
-  private stats = {
+  private readonly config: PerformanceOptimizerConfig['batchProcessing']
+  private readonly activeJobs = new Map<string, Promise<unknown>>()
+  private readonly stats = {
     completed: 0,
     failed: 0,
     totalProcessingTime: 0,
@@ -404,7 +404,7 @@ export class BatchProcessor {
 
       try {
         const batchResults = await Promise.allSettled(
-          batch.map((item) =>
+          batch.map( async (item) =>
             this.processItemWithRetry(item, processor, retries, timeout),
           ),
         )
@@ -484,9 +484,7 @@ export class BatchProcessor {
       }
     }
 
-    if (!lastError) {
-      lastError = new Error('Unknown error occurred during processing')
-    }
+    lastError ??= new Error('Unknown error occurred during processing');
     throw lastError
   }
 
@@ -506,9 +504,9 @@ export class BatchProcessor {
  * Background Job Queue for Long-Running Tasks
  */
 export class BackgroundJobQueue {
-  private jobs = new Map<string, BackgroundJob>()
+  private readonly jobs = new Map<string, BackgroundJob>()
   private workers: Array<Promise<void>> = []
-  private config: PerformanceOptimizerConfig['backgroundJobs']
+  private readonly config: PerformanceOptimizerConfig['backgroundJobs']
   private isRunning = false
 
   constructor(config: PerformanceOptimizerConfig['backgroundJobs']) {
@@ -522,9 +520,9 @@ export class BackgroundJobQueue {
   /**
    * Add job to queue
    */
-  async addJob<T>(
+  async addJob(
     type: string,
-    data: T,
+    data: unknown,
     options: {
       priority?: number
       timeout?: number
@@ -535,15 +533,15 @@ export class BackgroundJobQueue {
       throw new Error('Job queue is full')
     }
 
-    const job: BackgroundJob<T> = {
+    const job: BackgroundJob = {
       id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       data,
-      priority: options.priority || 1,
+      priority: options.priority ?? 1,
       createdAt: new Date(),
       attempts: 0,
-      maxAttempts: options.maxAttempts || 3,
-      timeout: options.timeout || this.config.jobTimeout,
+      maxAttempts: options.maxAttempts ?? 3,
+      timeout: options.timeout ?? this.config.jobTimeout,
       status: 'pending',
     }
 
@@ -557,7 +555,7 @@ export class BackgroundJobQueue {
    * Get job status
    */
   getJobStatus(jobId: string): BackgroundJob | null {
-    return this.jobs.get(jobId) || null
+    return this.jobs.get(jobId) ?? null
   }
 
   /**
@@ -659,9 +657,9 @@ export class BackgroundJobQueue {
  * Memory Monitor and Optimizer
  */
 export class MemoryOptimizer {
-  private config: PerformanceOptimizerConfig['memory']
+  private readonly config: PerformanceOptimizerConfig['memory']
   private gcInterval?: ReturnType<typeof setInterval>
-  private stats = {
+  private readonly stats = {
     gcCount: 0,
     lastGcTime: Date.now(),
     peakMemory: 0,
@@ -759,7 +757,7 @@ export class MemoryOptimizer {
  */
 class Semaphore {
   private permits: number
-  private waitQueue: Array<() => void> = []
+  private readonly waitQueue: Array<() => void> = []
 
   constructor(permits: number) {
     this.permits = permits
@@ -790,12 +788,12 @@ class Semaphore {
  * Main Performance Optimizer Class
  */
 export class PerformanceOptimizer {
-  private config: PerformanceOptimizerConfig
-  private connectionManager: ConnectionPoolManager
-  private cacheManager: IntelligentCacheManager
-  private batchProcessor: BatchProcessor
-  private jobQueue: BackgroundJobQueue
-  private memoryOptimizer: MemoryOptimizer
+  private readonly config: PerformanceOptimizerConfig
+  private readonly connectionManager: ConnectionPoolManager
+  private readonly cacheManager: IntelligentCacheManager
+  private readonly batchProcessor: BatchProcessor
+  private readonly jobQueue: BackgroundJobQueue
+  private readonly memoryOptimizer: MemoryOptimizer
   private metricsInterval?: ReturnType<typeof setInterval>
 
   constructor(config: Partial<PerformanceOptimizerConfig> = {}) {
@@ -842,9 +840,9 @@ export class PerformanceOptimizer {
   /**
    * Add background job
    */
-  async addBackgroundJob<T>(
+  async addBackgroundJob(
     type: string,
-    data: T,
+    data: unknown,
     options?: { priority?: number; timeout?: number; maxAttempts?: number },
   ): Promise<string> {
     return this.jobQueue.addJob(type, data, options)
@@ -1023,8 +1021,6 @@ let performanceOptimizer: PerformanceOptimizer | null = null
 export function getPerformanceOptimizer(
   config?: Partial<PerformanceOptimizerConfig>,
 ): PerformanceOptimizer {
-  if (!performanceOptimizer) {
-    performanceOptimizer = new PerformanceOptimizer(config)
-  }
+  performanceOptimizer ??= new PerformanceOptimizer(config);
   return performanceOptimizer
 }

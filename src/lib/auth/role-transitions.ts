@@ -219,7 +219,7 @@ export async function requestRoleTransition(
 
     return transitionRequest
   } catch (error: unknown) {
-    await logSecurityEvent(
+     logSecurityEvent(
       SecurityEventType.ROLE_TRANSITION_REQUEST_FAILED,
       null,
       {
@@ -362,7 +362,7 @@ export async function processRoleTransitionApproval(
 
     return request
   } catch (error: unknown) {
-    await logSecurityEvent(
+     logSecurityEvent(
       SecurityEventType.ROLE_TRANSITION_APPROVAL_FAILED,
       null,
       {
@@ -444,7 +444,7 @@ async function executeRoleTransition(
       'role_transition_completed',
     )
   } catch (error: unknown) {
-    await logSecurityEvent(
+     logSecurityEvent(
       SecurityEventType.ROLE_TRANSITION_EXECUTION_FAILED,
       null,
       {
@@ -540,7 +540,7 @@ export async function cancelRoleTransitionRequest(
       'role_transition_cancelled',
     )
   } catch (error: unknown) {
-    await logSecurityEvent(
+     logSecurityEvent(
       SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
       userId,
       {
@@ -570,7 +570,7 @@ export async function getUserRoleTransitionRequests(
 ): Promise<RoleTransitionRequest[]> {
   try {
     const requestsKey = `user:role_requests:${userId}`
-    const requestIds = (await getFromCache<string[]>(requestsKey)) || []
+    const requestIds = (await getFromCache<string[]>(requestsKey)) ?? []
 
     const requests: RoleTransitionRequest[] = []
 
@@ -602,7 +602,7 @@ export async function getPendingRoleTransitionRequests(
   try {
     // Get all pending request IDs (simplified implementation)
     const pendingKey = 'role_transition:pending'
-    const requestIds = (await getFromCache<string[]>(pendingKey)) || []
+    const requestIds = (await getFromCache<string[]>(pendingKey)) ?? []
 
     const eligibleRequests: RoleTransitionRequest[] = []
 
@@ -611,8 +611,7 @@ export async function getPendingRoleTransitionRequests(
         `role_transition:request:${requestId}`,
       ))!
       if (
-        request &&
-        request.status === 'pending' &&
+        request?.status === 'pending' &&
         Date.now() <= request.expiresAt &&
         canApproveRoleTransition(approverRole, request.requestedRole)
       ) {
@@ -672,7 +671,7 @@ async function addUserPendingRequest(
 ): Promise<void> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    let pendingRequests = (await getFromCache<string[]>(pendingKey)) || []
+    let pendingRequests = (await getFromCache<string[]>(pendingKey)) ?? []
 
     pendingRequests.push(requestId)
 
@@ -691,7 +690,7 @@ async function removeUserPendingRequest(
 ): Promise<void> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    let pendingRequests = (await getFromCache<string[]>(pendingKey)) || []
+    let pendingRequests = (await getFromCache<string[]>(pendingKey)) ?? []
 
     pendingRequests = pendingRequests.filter((id: string) => id !== requestId)
 
@@ -713,7 +712,7 @@ async function getPendingRoleRequests(
 ): Promise<RoleTransitionRequest[]> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    const requestIds = (await getFromCache<string[]>(pendingKey)) || []
+    const requestIds = (await getFromCache<string[]>(pendingKey)) ?? []
 
     const requests: RoleTransitionRequest[] = []
 
@@ -721,7 +720,7 @@ async function getPendingRoleRequests(
       const request = (await getFromCache<RoleTransitionRequest>(
         `role_transition:request:${requestId}`,
       ))!
-      if (request && request.status === 'pending') {
+      if (request?.status === 'pending') {
         requests.push(request)
       }
     }
@@ -791,7 +790,7 @@ async function logRoleTransitionAudit(
 
     // Add to user's audit trail
     const userAuditKey = `user:role_audit:${auditLog.userId}`
-    let userAuditTrail = (await getFromCache<string[]>(userAuditKey)) || []
+    let userAuditTrail = (await getFromCache<string[]>(userAuditKey)) ?? []
 
     userAuditTrail.push(auditLog.id)
 
@@ -807,7 +806,7 @@ async function logRoleTransitionAudit(
     )
 
     // Log security event
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_AUDIT, null, {
+     logSecurityEvent(SecurityEventType.ROLE_TRANSITION_AUDIT, null, {
       userId: auditLog.userId,
       action: auditLog.action,
       roleFrom: auditLog.roleFrom,
@@ -868,7 +867,7 @@ export async function getRoleTransitionAuditTrail(
 ): Promise<RoleTransitionAuditLog[]> {
   try {
     const userAuditKey = `user:role_audit:${userId}`
-    const auditIds = (await getFromCache<string[]>(userAuditKey)) || []
+    const auditIds = (await getFromCache<string[]>(userAuditKey)) ?? []
 
     const auditLogs: RoleTransitionAuditLog[] = []
 

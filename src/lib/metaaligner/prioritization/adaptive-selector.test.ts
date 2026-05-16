@@ -396,13 +396,13 @@ describe('AdaptiveSelector', () => {
     // Verify weights are default weights
     let totalDefaultWeight = 0
     const defaultWeights: Record<string, number> =
-      CORE_MENTAL_HEALTH_OBJECTIVES.reduce(
+      CORE_MENTAL_HEALTH_OBJECTIVES.reduce< Record<string, number>>(
         (acc, obj) => {
           acc[obj.id] = obj.weight
           totalDefaultWeight += obj.weight
           return acc
         },
-        {} as Record<string, number>,
+        {},
       )
 
     // Normalize if they don't sum to 1 (they should)

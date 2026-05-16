@@ -37,7 +37,7 @@ export const POST = async ({ request }: { request: Request }) => {
         'validation-schedule-unauthorized',
         (authResult as unknown as { user?: { id?: string } })?.['user']?.[
           'id'
-        ] || 'unknown',
+        ] ?? 'unknown',
         'validation-api',
         {
           userId: (
@@ -81,7 +81,7 @@ export const POST = async ({ request }: { request: Request }) => {
         'validation-schedule-create',
         (authResult as unknown as { user?: { id?: string } })?.['user']?.[
           'id'
-        ] || 'system',
+        ] ?? 'system',
         'validation-api',
         {
           userId: (authResult as unknown as { user?: { id?: string } })?.[
@@ -115,7 +115,7 @@ export const POST = async ({ request }: { request: Request }) => {
         'validation-schedule-stop',
         (authResult as unknown as { user?: { id?: string } })?.['user']?.[
           'id'
-        ] || 'system',
+        ] ?? 'system',
         'validation-api',
         {
           userId: (authResult as unknown as { user?: { id?: string } })?.[

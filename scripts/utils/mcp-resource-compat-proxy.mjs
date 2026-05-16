@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { spawn } from 'node:child_process'
+import { spawn } from 'child_process'
+import process from 'process'
 import { ReadBuffer, serializeMessage } from '@modelcontextprotocol/sdk/shared/stdio.js'
 
 const passthroughArgs = process.argv.slice(2)

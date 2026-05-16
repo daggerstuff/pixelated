@@ -47,7 +47,7 @@ export const GET: APIRoute = async ({ url }: APIContext) => {
     // Mock metrics data - replace with actual bias detection metrics
     const mockMetrics = {
       timestamp: Date.now(),
-      timeRange: query.timeRange || 300000,
+      timeRange: query.timeRange ?? 300000,
       summary: {
         totalRequests: 1250,
         averageResponseTime: 120,

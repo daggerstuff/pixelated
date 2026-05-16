@@ -27,7 +27,7 @@ const DEFAULT_OPTIONS: LogOptions = {
 
 // Current log level - can be set dynamically
 let currentLogLevel =
-  typeof process !== 'undefined' && process.env['NODE_ENV'] === 'production'
+  process.env['NODE_ENV'] === 'production'
     ? LogLevel.ERROR
     : LogLevel.DEBUG
 
@@ -110,6 +110,7 @@ function logMessage(
     case LogLevel.ERROR:
       console.error(prefix, message, ...args)
       break
+    case LogLevel.NONE: { throw new Error('Not implemented yet: LogLevel.NONE case') }
   }
 }
 

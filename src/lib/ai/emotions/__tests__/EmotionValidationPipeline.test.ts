@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 // EmotionValidationPipeline.test.ts
 import { describe, it, expect } from 'vitest'
 

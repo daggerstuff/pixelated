@@ -6,7 +6,7 @@ export const prerender = false
 
 export const GET: APIRoute = async ({ url, redirect }) => {
   try {
-    const returnTo = url.searchParams.get('returnTo') || '/dashboard'
+    const returnTo = url.searchParams.get('returnTo') ?? '/dashboard'
     const connection = url.searchParams.get('connection')
 
     // Determine redirect URI based on environment
@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ url, redirect }) => {
 
     // Generate Auth0 Authorization URL
     const authorizationUrl = auth0SocialAuth.getAuthorizationUrl({
-      connection: connection || undefined, // undefined lets Auth0 show the Lock widget
+      connection: connection ?? undefined, // undefined lets Auth0 show the Lock widget
       redirectUri: callbackUri,
       state: returnTo, // Pass returnTo as state to persist it through the flow
       scope: 'openid profile email offline_access', // offline_access for refresh token

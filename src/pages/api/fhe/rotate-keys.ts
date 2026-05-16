@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   try {
     // Apply rate limiting (stricter for key rotation)
     const rateLimitResult = rateLimit.check(
-      request.headers.get('x-forwarded-for') || 'anonymous',
+      request.headers.get('x-forwarded-for') ?? 'anonymous',
       'key-rotation',
     )
 

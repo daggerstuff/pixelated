@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 import { describe, it, expect } from 'vitest'
 
 import { roleHasPermission, ROLES, type Role } from '../access-control'

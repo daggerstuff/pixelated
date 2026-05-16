@@ -79,11 +79,11 @@ export class AutomatedThreatResponseOrchestratorCore
   private redis!: Redis
   private mongoClient!: MongoClient
   private db!: Db
-  private responseStrategies: Map<string, ResponseStrategy> = new Map()
-  private activeResponses: Map<string, ThreatResponse> = new Map()
-  private integrationEndpoints: Map<string, IntegrationEndpoint> = new Map()
+  private readonly responseStrategies: Map<string, ResponseStrategy> = new Map()
+  private readonly activeResponses: Map<string, ThreatResponse> = new Map()
+  private readonly integrationEndpoints: Map<string, IntegrationEndpoint> = new Map()
 
-  constructor(private config: OrchestrationConfig) {
+  constructor(private readonly config: OrchestrationConfig) {
     super()
     this.initializeStrategies()
     this.initializeEndpoints()
@@ -136,7 +136,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for response orchestrator')
     } catch (error: unknown) {
@@ -148,7 +148,7 @@ export class AutomatedThreatResponseOrchestratorCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_response',
+        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_response',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_response')
@@ -386,6 +386,8 @@ export class AutomatedThreatResponseOrchestratorCore
         return value < (condition.value as number)
       case 'equals':
         return value === (condition.value as number)
+      case "contains": { throw new Error('Not implemented yet: "contains" case') }
+      case "matches": { throw new Error('Not implemented yet: "matches" case') }
       default:
         return false
     }
@@ -398,11 +400,11 @@ export class AutomatedThreatResponseOrchestratorCore
     const value = this.getThreatValue(threat, condition.condition)
 
     if (condition.operator === 'contains') {
-      return String(value).includes(String(condition.value as unknown))
+      return String(value).includes(String(condition.value))
     }
 
     if (condition.operator === 'matches') {
-      const regex = new RegExp(String(condition.value as unknown))
+      const regex = new RegExp(String(condition.value))
       return regex.test(String(value))
     }
 
@@ -421,6 +423,9 @@ export class AutomatedThreatResponseOrchestratorCore
         return currentTime > conditionTime
       case 'less_than':
         return currentTime < conditionTime
+      case "contains": { throw new Error('Not implemented yet: "contains" case') }
+      case "equals": { throw new Error('Not implemented yet: "equals" case') }
+      case "matches": { throw new Error('Not implemented yet: "matches" case') }
       default:
         return false
     }
@@ -441,6 +446,9 @@ export class AutomatedThreatResponseOrchestratorCore
           regions.length === targetRegions.length &&
           regions.every((region) => targetRegions.includes(region))
         )
+      case "greater_than": { throw new Error('Not implemented yet: "greater_than" case') }
+      case "less_than": { throw new Error('Not implemented yet: "less_than" case') }
+      case "matches": { throw new Error('Not implemented yet: "matches" case') }
       default:
         return false
     }
@@ -632,6 +640,8 @@ export class AutomatedThreatResponseOrchestratorCore
             regions: threat.regions,
           }
           break
+        case "isolate": { throw new Error('Not implemented yet: "isolate" case') }
+        case "mitigate": { throw new Error('Not implemented yet: "mitigate" case') }
       }
 
       return customizedAction
@@ -853,6 +863,7 @@ export class AutomatedThreatResponseOrchestratorCore
         case 'mitigate':
           executionResult = await this.executeMitigateAction(action, response)
           break
+        case "rate_limit": { throw new Error('Not implemented yet: "rate_limit" case') }
         default:
           logger.error('Unknown action type', { actionType: action.actionType })
           executionResult = false
@@ -1243,6 +1254,7 @@ export class AutomatedThreatResponseOrchestratorCore
           return await this.rollbackBlockAction(action, response)
         case 'remove_rate_limit':
           return await this.rollbackRateLimitAction(action, response)
+        case undefined: { throw new Error('Not implemented yet: undefined case') }
         default:
           logger.warn('Unknown rollback strategy', {
             actionId: action.actionId,

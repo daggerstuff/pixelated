@@ -324,7 +324,7 @@ Compliance**: CQC and NHS integration costs included
 
 ### Launch Pricing Strategy
 
-**Phase 1: Market Entry (Months 1-6)**
+### Phase 1: Market Entry (Months 1-6)
 
 - **Introductory Pricing**: 20% discount for first 50 institutional customers
 - **Pilot Program Pricing**: 50% discount for 6-month pilot programs
@@ -332,7 +332,7 @@ Compliance**: CQC and NHS integration costs included
 - **Guarantee Program**: 100% money-back guarantee if 75% improvement target not
   met
 
-**Phase 2: Market Expansion (Months 7-12)**
+### Phase 2: Market Expansion (Months 7-12)
 
 - **Standard Pricing**: Full pricing implementation with proven ROI
 - **Volume Discounts**: Tiered discounts for larger implementations

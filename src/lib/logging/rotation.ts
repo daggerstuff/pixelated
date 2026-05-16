@@ -46,7 +46,7 @@ const defaultConfig: LogRotationConfig = {
  * Log rotation service
  */
 export class LogRotationService {
-  private config: LogRotationConfig
+  private readonly config: LogRotationConfig
 
   constructor(config: Partial<LogRotationConfig> = {}) {
     this.config = { ...defaultConfig, ...config }
@@ -81,6 +81,7 @@ export class LogRotationService {
         break
       }
       case 'daily':
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     }

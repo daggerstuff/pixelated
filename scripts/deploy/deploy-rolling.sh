@@ -2,6 +2,18 @@
 # Rolling deployment script for GKE
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+run_redis_hardening_audit() {
+  if ! "${PROJECT_ROOT}/scripts/check-redis-hardening.sh"; then
+    echo "Redis hardening audit failed"
+    exit 1
+  fi
+}
+
+run_redis_hardening_audit
+
 echo "🚀 Starting rolling deployment to GKE..."
 echo "Image: $CONTAINER_IMAGE"
 echo "Deployment: $GKE_DEPLOYMENT_NAME"

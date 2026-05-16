@@ -3,7 +3,7 @@ import React, { useMemo, useCallback, memo } from 'react'
 
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
 import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
-import { Card } from '@/components/ui/card'
+import { Card } from '@/components/ui/card/index.ts'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { AdvancedVisualization } from '@/lib/analytics/advancedVisualization'
 

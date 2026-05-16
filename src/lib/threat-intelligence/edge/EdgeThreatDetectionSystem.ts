@@ -65,12 +65,12 @@ export class EdgeThreatDetectionSystemCore
   implements EdgeThreatDetectionSystem
 {
   private redis!: Redis
-  private models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
-  private nodeStatus: Map<string, EdgeNodeStatus> = new Map()
+  private readonly models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
+  private readonly nodeStatus: Map<string, EdgeNodeStatus> = new Map()
   private detectionThresholds: DetectionThresholds
-  private modelPerformance: Map<string, ModelPerformance> = new Map()
+  private readonly modelPerformance: Map<string, ModelPerformance> = new Map()
 
-  constructor(private config: EdgeDetectionConfig) {
+  constructor(private readonly config: EdgeDetectionConfig) {
     super()
     this.detectionThresholds = config.detectionThresholds
   }
@@ -104,7 +104,7 @@ export class EdgeThreatDetectionSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for edge detection')
     } catch (error: unknown) {
@@ -135,6 +135,8 @@ export class EdgeThreatDetectionSystemCore
         case 'tensorflow':
           model = await this.loadTensorFlowModel(modelConfig)
           break
+        case "pytorch": { throw new Error('Not implemented yet: "pytorch" case') }
+        case "sklearn": { throw new Error('Not implemented yet: "sklearn" case') }
         default:
           throw new Error(`Unsupported framework: ${modelConfig.framework}`)
       }
@@ -397,8 +399,8 @@ export class EdgeThreatDetectionSystemCore
   private async initializeEdgeNodes(): Promise<void> {
     try {
       // Initialize status for configured edge nodes
-      for (const region of this.config.regions || []) {
-        for (const node of region.edgeNodes || []) {
+      for (const region of this.config.regions ?? []) {
+        for (const node of region.edgeNodes ?? []) {
           this.nodeStatus.set(node.nodeId, {
             nodeId: node.nodeId,
             region: region.regionId,
@@ -406,7 +408,7 @@ export class EdgeThreatDetectionSystemCore
             load: 0,
             memoryUsage: 0,
             cpuUsage: 0,
-            activeModels: node.aiModels || [],
+            activeModels: node.aiModels ?? [],
             lastHeartbeat: new Date(),
           })
         }

@@ -89,8 +89,7 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
   // Attempt to use global LiveRegionSystem if available (created by LiveRegionSystem.astro)
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
-      window.LiveRegionSystem &&
+      window?.LiveRegionSystem &&
       statusMessage
     ) {
       window.LiveRegionSystem.announceStatus(statusMessage)
@@ -99,8 +98,7 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
 
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
-      window.LiveRegionSystem &&
+      window?.LiveRegionSystem &&
       alertMessage
     ) {
       window.LiveRegionSystem.announceAlert(alertMessage)
@@ -109,8 +107,7 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
 
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
-      window.LiveRegionSystem &&
+      window?.LiveRegionSystem &&
       logMessages.length > 0
     ) {
       const latestMessage = logMessages[logMessages.length - 1]
@@ -122,8 +119,7 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
 
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
-      window.LiveRegionSystem &&
+      window?.LiveRegionSystem &&
       progressData
     ) {
       window.LiveRegionSystem.announceProgress(

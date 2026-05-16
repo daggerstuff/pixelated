@@ -66,9 +66,7 @@ export class EmotionSynthesizer {
    * @returns The singleton instance
    */
   public static getInstance(): EmotionSynthesizer {
-    if (!EmotionSynthesizer.instance) {
-      EmotionSynthesizer.instance = new EmotionSynthesizer()
-    }
+    EmotionSynthesizer.instance ??= new EmotionSynthesizer();
     return EmotionSynthesizer.instance
   }
 

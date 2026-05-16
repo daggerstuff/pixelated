@@ -2,15 +2,15 @@
 # Clean, simple, and working pipeline
 
 stages:
-  - validate
-  - test
-  - terraform
-  - build
-  - security
+- validate
+- test
+- terraform
+- build
+- security
 
 variables:
   NODE_VERSION: '24.14.1'
-  PNPM_VERSION: '11.0.9'
+  PNPM_VERSION: '11.1.2'
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   # Terraform configuration - must be set as GitLab CI/CD project variables
   # Required for terraform jobs:
@@ -28,26 +28,25 @@ validate:dependencies:
   cache:
     key:
       files:
-        - pnpm-lock.yaml
+      - pnpm-lock.yaml
     paths:
-      - .pnpm-store
+    - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - corepack enable pnpm
+  - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+  - npm install -g pnpm@$PNPM_VERSION
   script:
-    - echo "Validating dependencies..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    - pnpm audit --audit-level moderate
+  - echo "Validating dependencies..."
+  - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+  - pnpm audit --audit-level moderate
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   timeout: 15m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
 
 validate:lint:
   stage: validate
@@ -56,26 +55,25 @@ validate:lint:
   cache:
     key:
       files:
-        - pnpm-lock.yaml
+      - pnpm-lock.yaml
     paths:
-      - .pnpm-store
+    - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - corepack enable pnpm
+  - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+  - npm install -g pnpm@$PNPM_VERSION
   script:
-    - echo "Running lint validation..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    - pnpm lint:ci
+  - echo "Running lint validation..."
+  - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+  - pnpm lint:ci
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   timeout: 10m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
 
 validate:typecheck:
   stage: validate
@@ -89,30 +87,29 @@ validate:typecheck:
   cache:
     key:
       files:
-        - pnpm-lock.yaml
+      - pnpm-lock.yaml
     paths:
-      - .pnpm-store
+    - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - corepack enable pnpm
+  - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+  - npm install -g pnpm@$PNPM_VERSION
   script:
-    - echo "Running typecheck validation..."
-    - 'echo "Node.js heap size: ${NODE_OPTIONS}"'
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    # Split typecheck into separate commands to reduce peak memory usage
-    # and ensure NODE_OPTIONS is properly applied
-    - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
-    - NODE_OPTIONS="--max-old-space-size=8192" pnpm exec tsc --noEmit
+  - echo "Running typecheck validation..."
+  - 'echo "Node.js heap size: ${NODE_OPTIONS}"'
+  - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+  # Split typecheck into separate commands to reduce peak memory usage
+  # and ensure NODE_OPTIONS is properly applied
+  - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
+  - NODE_OPTIONS="--max-old-space-size=8192" pnpm exec tsc --noEmit
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   timeout: 20m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
 
 # Test jobs
 test:unit:
@@ -121,17 +118,16 @@ test:unit:
   cache:
     key:
       files:
-        - pnpm-lock.yaml
+      - pnpm-lock.yaml
     paths:
-      - .pnpm-store
+    - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - corepack enable pnpm
+  - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+  - npm install -g pnpm@$PNPM_VERSION
   script:
-    - echo "Running unit tests..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    - pnpm test:unit
+  - echo "Running unit tests..."
+  - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+  - pnpm test:unit
   coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
   artifacts:
     reports:
@@ -140,18 +136,18 @@ test:unit:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
     paths:
-      - coverage/
+    - coverage/
     expire_in: 1 week
     when: always
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   timeout: 15m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
 
 test:integration:
   stage: test
@@ -159,31 +155,30 @@ test:integration:
   cache:
     key:
       files:
-        - pnpm-lock.yaml
+      - pnpm-lock.yaml
     paths:
-      - .pnpm-store
+    - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - corepack enable pnpm
+  - apt-get update -qq && apt-get install -y -qq python3 make g++ git > /dev/null
+  - npm install -g pnpm@$PNPM_VERSION
   script:
-    - echo "Running integration tests..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    - pnpm test:integration
+  - echo "Running integration tests..."
+  - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+  - pnpm test:integration
   artifacts:
     reports:
       junit: test-results/junit.xml
     expire_in: 1 week
     when: always
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   timeout: 20m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
   allow_failure: true
 
 # Terraform validation and plan
@@ -191,32 +186,32 @@ terraform:validate:
   stage: terraform
   image: hashicorp/terraform:${TERRAFORM_VERSION}
   before_script:
-    - cd terraform
-    - |
-      if [ ! -f backend.config ]; then
-        echo "ERROR: backend.config file not found"
-        echo "Copy backend.config.example to backend.config and configure it"
-        exit 1
-      fi
-    # Initialize terraform (without backend for validation)
-    - terraform init -backend=false
+  - cd terraform
+  - |
+    if [ ! -f backend.config ]; then
+      echo "ERROR: backend.config file not found"
+      echo "Copy backend.config.example to backend.config and configure it"
+      exit 1
+    fi
+  # Initialize terraform (without backend for validation)
+  - terraform init -backend=false
   script:
-    - terraform fmt -check -recursive
-    - terraform validate
+  - terraform fmt -check -recursive
+  - terraform validate
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - terraform/**/*
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - terraform/**/*
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    changes:
+    - terraform/**/*
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    changes:
+    - terraform/**/*
   allow_failure: true
   timeout: 10m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
 
 terraform:plan:
   stage: terraform
@@ -224,54 +219,54 @@ terraform:plan:
   variables:
     TF_ENVIRONMENT: '${TF_ENVIRONMENT:-staging}'
   before_script:
-    - cd terraform
-    - |
-      if [ ! -f backend.config ]; then
-        echo "ERROR: backend.config file not found"
-        echo "Copy backend.config.example to backend.config and configure it"
-        exit 1
-      fi
-    # Initialize backend
-    # Note: If you see "Backend configuration changed" error, use -reconfigure flag
-    - terraform init -backend-config=backend.config
+  - cd terraform
+  - |
+    if [ ! -f backend.config ]; then
+      echo "ERROR: backend.config file not found"
+      echo "Copy backend.config.example to backend.config and configure it"
+      exit 1
+    fi
+  # Initialize backend
+  # Note: If you see "Backend configuration changed" error, use -reconfigure flag
+  - terraform init -backend-config=backend.config
   script:
-    - |
-      terraform plan \
-        -var-file=environments/${TF_ENVIRONMENT}.tfvars \
-        -out=tfplan-${TF_ENVIRONMENT} \
-        -detailed-exitcode
+  - |
+    terraform plan \
+      -var-file=environments/${TF_ENVIRONMENT}.tfvars \
+      -out=tfplan-${TF_ENVIRONMENT} \
+      -detailed-exitcode
 
-      PLAN_EXIT_CODE=$?
+    PLAN_EXIT_CODE=$?
 
-      # Exit code 0 = no changes, 1 = error, 2 = changes present
-      if [ $PLAN_EXIT_CODE -eq 1 ]; then
-        echo "ERROR: Terraform plan failed"
-        exit 1
-      elif [ $PLAN_EXIT_CODE -eq 2 ]; then
-        echo "Terraform plan shows changes - review output above"
-      else
-        echo "No changes detected"
-      fi
+    # Exit code 0 = no changes, 1 = error, 2 = changes present
+    if [ $PLAN_EXIT_CODE -eq 1 ]; then
+      echo "ERROR: Terraform plan failed"
+      exit 1
+    elif [ $PLAN_EXIT_CODE -eq 2 ]; then
+      echo "Terraform plan shows changes - review output above"
+    else
+      echo "No changes detected"
+    fi
   artifacts:
     paths:
-      - terraform/tfplan-${TF_ENVIRONMENT}
+    - terraform/tfplan-${TF_ENVIRONMENT}
     expire_in: 1 week
     when: always
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $TF_HTTP_PASSWORD
-      changes:
-        - terraform/**/*
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $TF_HTTP_PASSWORD
-      changes:
-        - terraform/**/*
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $TF_HTTP_PASSWORD
+    changes:
+    - terraform/**/*
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $TF_HTTP_PASSWORD
+    changes:
+    - terraform/**/*
   environment:
     name: ${TF_ENVIRONMENT}
   timeout: 15m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
   # Note: TF_HTTP_PASSWORD must be set as a GitLab CI/CD variable (Settings > CI/CD > Variables)
   # Mark it as protected and masked
 
@@ -281,87 +276,82 @@ build:
   image: docker:latest
   # Heavy job: only run on controlled events to preserve CI minutes
   services:
-    - docker:dind
+  - docker:dind
   needs:
-    - job: validate:dependencies
-    - job: test:unit
+  - job: validate:dependencies
+  - job: test:unit
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: '/certs'
   before_script:
-    # Validate Docker registry variables are set
-    - |
-      if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
-        echo "ERROR: Docker registry variables are not set."
-        echo "GitLab CI/CD should provide these automatically, but if missing:"
-        echo "  - CI_REGISTRY_USER"
-        echo "  - CI_REGISTRY_PASSWORD"
-        echo "  - CI_REGISTRY"
-        echo "Check: Settings > CI/CD > Variables"
-        exit 1
-      fi
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  # Validate Docker registry variables are set
+  - |
+    if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
+      echo "ERROR: Docker registry variables are not set."
+      echo "GitLab CI/CD should provide these automatically, but if missing:"
+      echo "  - CI_REGISTRY_USER"
+      echo "  - CI_REGISTRY_PASSWORD"
+      echo "  - CI_REGISTRY"
+      echo "Check: Settings > CI/CD > Variables"
+      exit 1
+    fi
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - echo "Building application..."
-    - docker build --cache-from ${IMAGE_NAME}:latest -t
-      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
-    - docker tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} ${IMAGE_NAME}:latest
-    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
-    - docker push ${IMAGE_NAME}:latest
-    - echo "Build completed"
+  - echo "Building application..."
+  - docker build --cache-from ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+  - docker tag ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} ${IMAGE_NAME}:latest
+  - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+  - docker push ${IMAGE_NAME}:latest
+  - echo "Build completed"
   interruptible: true
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-    - when: never
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  - if: '$CI_COMMIT_TAG'
+  - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  - when: never
   timeout: 30m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
   # Security scanning
 security:scan:
   stage: security
   image: docker:latest
   # Expensive image scan follows the same throttled schedule as build
   services:
-    - docker:dind
+  - docker:dind
   needs:
-    - job: build
+  - job: build
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: '/certs'
   before_script:
-    # Install Trivy (latest version)
-    - apk add --no-cache curl
-    - curl -sfL
-      https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh
-      | sh -s -- -b /usr/local/bin
-    # Validate Docker registry variables are set
-    - |
-      if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
-        echo "ERROR: Docker registry variables are not set."
-        echo "GitLab CI/CD should provide these automatically, but if missing:"
-        echo "  - CI_REGISTRY_USER"
-        echo "  - CI_REGISTRY_PASSWORD"
-        echo "  - CI_REGISTRY"
-        echo "Check: Settings > CI/CD > Variables"
-        exit 1
-      fi
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  # Install Trivy (latest version)
+  - apk add --no-cache curl
+  - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+  # Validate Docker registry variables are set
+  - |
+    if [ -z "$CI_REGISTRY_USER" ] || [ -z "$CI_REGISTRY_PASSWORD" ] || [ -z "$CI_REGISTRY" ]; then
+      echo "ERROR: Docker registry variables are not set."
+      echo "GitLab CI/CD should provide these automatically, but if missing:"
+      echo "  - CI_REGISTRY_USER"
+      echo "  - CI_REGISTRY_PASSWORD"
+      echo "  - CI_REGISTRY"
+      echo "Check: Settings > CI/CD > Variables"
+      exit 1
+    fi
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - echo "Running security scan..."
-    - docker pull ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
-    # Exit code 1 on CRITICAL, 0 on HIGH (warnings only)
-    # Consider changing to --exit-code 1 if you want HIGH severity to fail the pipeline
-    - trivy image --severity CRITICAL --exit-code 1 --format table
-      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
-    - trivy image --severity HIGH --exit-code 0 --format table
-      ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || true
-    - echo "Security scan completed"
+  - echo "Running security scan..."
+  - docker pull ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+  # Exit code 1 on CRITICAL, 0 on HIGH (warnings only)
+  # Consider changing to --exit-code 1 if you want HIGH severity to fail the pipeline
+  - trivy image --severity CRITICAL --exit-code 1 --format table ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+  - trivy image --severity HIGH --exit-code 0 --format table ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} || true
+  - echo "Security scan completed"
   artifacts:
     reports:
       container_scanning: gl-container-scanning-report.json
@@ -369,17 +359,17 @@ security:scan:
     when: always
   interruptible: true
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-    - when: never
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  - if: '$CI_COMMIT_TAG'
+  - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  - when: never
   timeout: 20m
   retry:
     max: 2
     when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+    - runner_system_failure
+    - stuck_or_timeout_failure
 
 # Note: Kubernetes deployment is handled through the Azure AKS deployment system.
 # This GitLab pipeline remains focused on validation, testing, build, and security jobs.

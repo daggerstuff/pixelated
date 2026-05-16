@@ -56,8 +56,8 @@ class MockAuditStorage implements AuditStorage {
 
     filtered.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
-    const offset = filters.offset || 0;
-    const limit = filters.limit || 100;
+    const offset = filters.offset ?? 0;
+    const limit = filters.limit ?? 100;
     return filtered.slice(offset, offset + limit);
   }
 

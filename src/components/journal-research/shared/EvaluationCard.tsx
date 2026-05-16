@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
+} from '@/components/ui/card/card.tsx'
 import type { Evaluation } from '@/lib/api/journal-research/types'
 
 export interface EvaluationCardProps {

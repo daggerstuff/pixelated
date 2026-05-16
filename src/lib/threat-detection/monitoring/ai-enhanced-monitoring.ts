@@ -112,7 +112,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   // ... existing props
   private redis: Redis
   private mongoClient: MongoClient
-  private config: MonitoringConfig
+  private readonly config: MonitoringConfig
   private anomalyDetectionModel: tf.Sequential | null = null
   private metricsBuffer: SecurityMetrics[] = []
   private alertBuffer: Alert[] = []
@@ -132,37 +132,37 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     this.config = {
       enabled: config.enabled ?? true,
       aiInsightsEnabled: config.aiInsightsEnabled ?? true,
-      alertThresholds: config.alertThresholds || {
+      alertThresholds: config.alertThresholds ?? {
         critical: 0.9,
         high: 0.7,
         medium: 0.5,
         low: 0.3,
       },
-      monitoringIntervals: config.monitoringIntervals || {
+      monitoringIntervals: config.monitoringIntervals ?? {
         realTime: 1000,
         batch: 5000,
         anomalyDetection: 10000,
       },
-      notificationChannels: config.notificationChannels || [],
-      aiModelConfig: config.aiModelConfig || {
+      notificationChannels: config.notificationChannels ?? [],
+      aiModelConfig: config.aiModelConfig ?? {
         modelPath: '',
         confidenceThreshold: 0.8,
         predictionWindow: 10,
       },
-      escalationRules: config.escalationRules || {
+      escalationRules: config.escalationRules ?? {
         critical: { minutes: 5, levels: ['admin', 'security'] },
         high: { minutes: 15, levels: ['security'] },
         medium: { minutes: 30, levels: ['operations'] },
         low: { minutes: 60, levels: ['monitoring'] },
       },
-      maxAlertHistory: config.maxAlertHistory || 1000,
-      metricsRetention: config.metricsRetention || 86400000,
+      maxAlertHistory: config.maxAlertHistory ?? 1000,
+      metricsRetention: config.metricsRetention ?? 86400000,
       enableRealTimeAlerting: config.enableRealTimeAlerting ?? true,
       enableAIInsights: config.enableAIInsights ?? true,
     } as MonitoringConfig
 
     this.redis = redis as Redis
-    this.mongoClient = mongoClient as MongoClient
+    this.mongoClient = mongoClient!
     this.aiService = aiService
     this.orchestrator = orchestrator
     if (!this.redis || !this.mongoClient) {
@@ -172,9 +172,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
   private async initializeServices(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection',
+        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_detection',
       )
 
       await this.mongoClient.connect()
@@ -341,15 +341,15 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return {
         connectedClients: parseInt(
-          info.match(/connected_clients:(\d+)/)?.[1] || '0',
+          info.match(/connected_clients:(\d+)/)?.[1] ?? '0',
         ),
-        usedMemory: parseInt(info.match(/used_memory:(\d+)/)?.[1] || '0'),
-        keyspaceHits: parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] || '0'),
+        usedMemory: parseInt(info.match(/used_memory:(\d+)/)?.[1] ?? '0'),
+        keyspaceHits: parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] ?? '0'),
         keyspaceMisses: parseInt(
-          info.match(/keyspace_misses:(\d+)/)?.[1] || '0',
+          info.match(/keyspace_misses:(\d+)/)?.[1] ?? '0',
         ),
         commandsProcessed: parseInt(
-          info.match(/total_commands_processed:(\d+)/)?.[1] || '0',
+          info.match(/total_commands_processed:(\d+)/)?.[1] ?? '0',
         ),
       }
     } catch (error: unknown) {
@@ -838,7 +838,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       })
       // Add error to alert object so caller knows?
       // Alert is reference.
-      alert.errors = alert.errors || []
+      alert.errors = alert.errors ?? []
       alert.errors.push(
         error instanceof Error
           ? error instanceof Error
@@ -1330,10 +1330,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       // Return dummy alert with errors
       return {
         id: '',
-        title: alertData.title || '',
-        description: alertData.description || '',
-        type: alertData.type || 'system',
-        severity: alertData.severity || 'low',
+        title: alertData.title ?? '',
+        description: alertData.description ?? '',
+        type: alertData.type ?? 'system',
+        severity: alertData.severity ?? 'low',
         source: 'system',
         metrics: {} as SecurityMetrics,
         notifiedChannels: [],
@@ -1346,11 +1346,11 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
     try {
       const alert = this.createAlertInternal(
-        alertData.type || 'system',
-        alertData.severity || 'medium',
+        alertData.type ?? 'system',
+        alertData.severity ?? 'medium',
         alertData.title,
         alertData.description,
-        alertData.metrics || {},
+        alertData.metrics ?? {},
         [],
         alertData.metadata,
       )
@@ -1379,10 +1379,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       // I should update processAlert to add errors to alert if it fails.
       return {
         id: '',
-        title: alertData.title || '',
-        description: alertData.description || '',
-        type: alertData.type || 'system',
-        severity: alertData.severity || 'low',
+        title: alertData.title ?? '',
+        description: alertData.description ?? '',
+        type: alertData.type ?? 'system',
+        severity: alertData.severity ?? 'low',
         source: 'system',
         metrics: {
           timestamp: new Date(),
@@ -1427,7 +1427,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     if (alert) {
       alert.severity = 'critical'
       alert.status = 'escalated'
-      alert.escalationCount = (alert.escalationCount || 0) + 1
+      alert.escalationCount = (alert.escalationCount ?? 0) + 1
       alert.escalatedAt = new Date()
       await this.updateAlert(alertId, alert)
       return alert
@@ -1460,7 +1460,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const result = await db
         .collection<Alert>('alerts')
         .findOne({ id: alertId })
-      return result || null
+      return result ?? null
     } catch {
       return null
     }
@@ -1587,7 +1587,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     if (this.aiService) {
       try {
         // Add timeout for AI service
-        const aiPromise = this.aiService.generateInsights(data.metrics || [])
+        const aiPromise = this.aiService.generateInsights(data.metrics ?? [])
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('AI analysis timeout')), 1000),
         )

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { toast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast.tsx'
 import { useNotificationStore } from '@/lib/stores/journal-research/notificationStore'
 
 interface UseNotificationToastsOptions {

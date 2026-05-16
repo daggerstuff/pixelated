@@ -15,7 +15,7 @@ type MongoRuntime = {
 class MockObjectId {
   public id: string
   constructor(id?: string) {
-    this.id = id || 'mock-object-id'
+    this.id = id ?? 'mock-object-id'
   }
   toString() {
     return this.id
@@ -77,7 +77,7 @@ export class DataExportDAO {
   async create(exportRequest: Omit<DataExport, '_id'>): Promise<DataExport> {
     const collection = await this.getCollection()
     // Ensure files is initialized
-    const data = { ...exportRequest, files: exportRequest.files || [] }
+    const data = { ...exportRequest, files: exportRequest.files ?? [] }
     const result = await collection.insertOne(data)
     const created = await collection.findOne({ _id: result.insertedId })
 
@@ -293,7 +293,7 @@ export class AIMetricsDAO {
         }
       | undefined
 
-    return stats || { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
+    return stats ?? { totalRequests: 0, totalTokens: 0, averageResponseTime: 0 }
   }
 }
 

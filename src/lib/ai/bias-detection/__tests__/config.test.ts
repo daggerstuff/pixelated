@@ -379,6 +379,7 @@ describe('BiasDetectionConfigManager', () => {
       expect(summary['mlToolkits']).toEqual({
         aif360: { enabled: true },
         fairlearn: { enabled: true },
+        tensorflow: { enabled: true },
         huggingFace: { enabled: true },
         spacy: { enabled: true },
         interpretability: { enabled: true },

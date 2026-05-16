@@ -21,8 +21,8 @@ export const GET = async ({ request }: APIContext) => {
 
     // Get query parameters
     const { searchParams } = new URL(request.url)
-    const timeRange = searchParams.get('timeRange') || '24h'
-    const modelType = searchParams.get('modelType') || 'all'
+    const timeRange = searchParams.get('timeRange') ?? '24h'
+    const modelType = searchParams.get('modelType') ?? 'all'
 
     // Calculate time bounds
     const now = new Date()
@@ -130,7 +130,7 @@ export const GET = async ({ request }: APIContext) => {
        errorBreakdown: { _id: string, count: number }[]
     }]
 
-    const { metrics = [], modelBreakdown = [], errorBreakdown = [] } = aggregateResult || {}
+    const { metrics, modelBreakdown, errorBreakdown } = aggregateResult || {}
 
     // Return the metrics
     return new Response(
@@ -138,20 +138,20 @@ export const GET = async ({ request }: APIContext) => {
         metrics,
         modelBreakdown:
           modelBreakdown?.map((row) => {
-            const requestCount = Number(row.requestCount);
+            const requestCount = row.requestCount;
             return {
               model: row._id,
               requestCount: requestCount,
-              totalTokens: Number(row.totalTokens),
-              successRate: requestCount > 0 ? Number(row.successCount) / requestCount : 0,
-              cacheHitRate: requestCount > 0 ? Number(row.cachedCount) / requestCount : 0,
-              optimizationRate: requestCount > 0 ? Number(row.optimizedCount) / requestCount : 0,
+              totalTokens: row.totalTokens,
+              successRate: requestCount > 0 ? row.successCount / requestCount : 0,
+              cacheHitRate: requestCount > 0 ? row.cachedCount / requestCount : 0,
+              optimizationRate: requestCount > 0 ? row.optimizedCount / requestCount : 0,
             };
           }) ?? [],
         errorBreakdown:
           errorBreakdown?.map((row) => ({
             errorCode: row._id,
-            count: Number(row.count),
+            count: row.count,
           })) ?? [],
       }),
       {

@@ -57,7 +57,7 @@ function isPathEscapingBase(basePath: string, targetPath: string): boolean {
  * Get the project root directory safely
  */
 export function getProjectRoot(): string {
-  if (typeof process !== 'undefined' && process.cwd) {
+  if (process?.cwd) {
     return process.cwd()
   }
   // Fallback for edge cases
@@ -204,9 +204,7 @@ export function validateAndCreateDir(
 let _projectRoot: string | null = null
 
 function getCachedProjectRoot(): string {
-  if (!_projectRoot) {
-    _projectRoot = getProjectRoot()
-  }
+  _projectRoot ??= getProjectRoot();
   return _projectRoot
 }
 

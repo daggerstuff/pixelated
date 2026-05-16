@@ -42,7 +42,7 @@ services:
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     command:
-      redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+      redis-server --bind 0.0.0.0 --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       --protected-mode yes
     ports:
       - '127.0.0.1:6379:6379'

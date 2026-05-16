@@ -194,7 +194,7 @@ export const GET: APIRoute = async ({ request }) => {
         id: 'plan-1',
         clientName: 'Sarah Johnson',
         therapistName: 'Dr. Emily Chen',
-        clientId: clientId || 'client-1',
+        clientId: clientId ?? 'client-1',
         therapistId: user.id,
         createdDate: new Date(
           Date.now() - 7 * 24 * 60 * 60 * 1000,
@@ -553,12 +553,12 @@ export const POST: APIRoute = async ({ request }) => {
       totalGoals > 0 ? Math.round(totalProgress / totalGoals) : 0
 
     const newPlan: TreatmentPlanEnhanced = {
-      id: planData.id || `plan-${Date.now()}`,
+      id: planData.id ?? `plan-${Date.now()}`,
       clientName: planData.clientName,
       therapistName: planData.therapistName,
       clientId: planData.clientId,
       therapistId: planData.therapistId,
-      createdDate: planData.createdDate || currentTime,
+      createdDate: planData.createdDate ?? currentTime,
       lastModified: currentTime,
       duration: planData.duration,
       status: planData.status,
@@ -571,12 +571,12 @@ export const POST: APIRoute = async ({ request }) => {
       })),
       notes: planData.notes,
       metadata: {
-        totalSessions: planData.metadata?.totalSessions || 0,
-        completedSessions: planData.metadata?.completedSessions || 0,
+        totalSessions: planData.metadata?.totalSessions ?? 0,
+        completedSessions: planData.metadata?.completedSessions ?? 0,
         overallProgress,
         nextSessionDate: planData.metadata?.nextSessionDate,
-        riskLevel: planData.metadata?.riskLevel || 'low',
-        interventionHistory: planData.metadata?.interventionHistory || [],
+        riskLevel: planData.metadata?.riskLevel ?? 'low',
+        interventionHistory: planData.metadata?.interventionHistory ?? [],
       },
     }
 

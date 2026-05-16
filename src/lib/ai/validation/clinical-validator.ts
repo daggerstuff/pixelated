@@ -23,8 +23,8 @@ export interface TherapistFeedback {
 }
 
 export class ClinicalValidator {
-  private feedbackHistory: Map<string, TherapistFeedback[]> = new Map()
-  private validationMetrics: Map<string, ValidationResult> = new Map()
+  private readonly feedbackHistory: Map<string, TherapistFeedback[]> = new Map()
+  private readonly validationMetrics: Map<string, ValidationResult> = new Map()
 
   /**
    * Validate clinical accuracy of AI recommendations
@@ -51,7 +51,7 @@ export class ClinicalValidator {
     sessionId: string,
     feedback: TherapistFeedback,
   ): Promise<void> {
-    const sessionFeedback = this.feedbackHistory.get(sessionId) || []
+    const sessionFeedback = this.feedbackHistory.get(sessionId) ?? []
     sessionFeedback.push(feedback)
     this.feedbackHistory.set(sessionId, sessionFeedback)
   }
@@ -466,7 +466,7 @@ export class ClinicalValidator {
       f.suggestedImprovements.forEach((suggestion) => {
         suggestionCounts.set(
           suggestion,
-          (suggestionCounts.get(suggestion) || 0) + 1,
+          (suggestionCounts.get(suggestion) ?? 0) + 1,
         )
       })
     })

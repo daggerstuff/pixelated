@@ -8,15 +8,111 @@ if [[ $# -eq 0 ]]; then
 fi
 
 COMMAND=("$@")
-DETERMINE_MODELS="${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL:-gpt-5.4}}"
-DETERMINE_PROVIDER_MODELS="${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID:-${COPILOT_MODEL:-gpt-5.4}}}"
+DEFAULT_NEMOTRON_MODEL="nvidia/llama-3.2-90b-instruct"
 
-read -r -a CANDIDATE_MODELS <<< "${DETERMINE_MODELS//,/ }"
-if [[ ${#CANDIDATE_MODELS[@]} -eq 0 || -z "${CANDIDATE_MODELS[0]}" ]]; then
-  CANDIDATE_MODELS=("${COPILOT_MODEL:-gpt-5.4}")
+_copilot_safe_is_forbidden_model() {
+  local candidate="$1"
+  [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
+}
+
+_copilot_safe_sanitize_model() {
+  local candidate="$1"
+  if _copilot_safe_is_forbidden_model "$candidate"; then
+    echo "$DEFAULT_NEMOTRON_MODEL"
+    return
+  fi
+  echo "$candidate"
+}
+
+sanitize_model_flags() {
+  local -n __output_ref="$1"
+  shift
+  local input=("$@")
+  local output=()
+  local arg
+  local skip_next=0
+  local index
+
+  for index in "${!input[@]}"; do
+    arg="${input[$index]}"
+
+    if [[ $skip_next -eq 1 ]]; then
+      skip_next=0
+      output+=("$(_copilot_safe_sanitize_model "$arg")")
+      continue
+    fi
+
+    case "$arg" in
+      --model=*)
+        output+=("--model=$(_copilot_safe_sanitize_model "${arg#--model=}")")
+        ;;
+      --provider-model-id=*)
+        output+=("--provider-model-id=$(_copilot_safe_sanitize_model "${arg#--provider-model-id=}")")
+        ;;
+      --model|--provider-model-id)
+        output+=("$arg")
+        skip_next=1
+        ;;
+      *)
+        output+=("$arg")
+        ;;
+    esac
+  done
+
+  __output_ref=("${output[@]}")
+}
+
+_sanitized_command=()
+sanitize_model_flags _sanitized_command "${COMMAND[@]}"
+COMMAND=("${_sanitized_command[@]}")
+unset _sanitized_command
+
+if [[ ${#COMMAND[@]} -eq 0 ]]; then
+  echo "copilot-safe-run: command contains only model flags; provide a Copilot command to run."
+  exit 1
 fi
 
-read -r -a CANDIDATE_PROVIDER_MODELS <<< "${DETERMINE_PROVIDER_MODELS//,/ }"
+_copilot_safe_sanitize_model_sequence() {
+  local raw_sequence="$1"
+  local token normalized
+  local output=""
+
+  if [[ -z "$raw_sequence" ]]; then
+    echo "$DEFAULT_NEMOTRON_MODEL"
+    return
+  fi
+
+  for token in ${raw_sequence//,/ }; do
+    normalized="$(_copilot_safe_sanitize_model "$token")"
+    if [[ -z "$normalized" ]]; then
+      continue
+    fi
+    if [[ " $output " != *" $normalized "* ]]; then
+      output="${output:+$output }$normalized"
+    fi
+  done
+
+  if [[ -z "${output// }" ]]; then
+    echo "$DEFAULT_NEMOTRON_MODEL"
+    return
+  fi
+
+  echo "$output"
+}
+
+DETERMINE_MODELS="$(_copilot_safe_sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}")"
+DETERMINE_PROVIDER_MODELS="$(_copilot_safe_sanitize_model_sequence "${COPILOT_PROVIDER_MODEL_SEQUENCE:-${COPILOT_PROVIDER_MODEL_ID:-${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}}}")"
+
+for token in ${DETERMINE_MODELS//,/ }; do
+  CANDIDATE_MODELS+=("$token")
+done
+if [[ ${#CANDIDATE_MODELS[@]} -eq 0 || -z "${CANDIDATE_MODELS[0]}" ]]; then
+  CANDIDATE_MODELS=("${COPILOT_MODEL:-$DEFAULT_NEMOTRON_MODEL}")
+fi
+
+for token in ${DETERMINE_PROVIDER_MODELS//,/ }; do
+  CANDIDATE_PROVIDER_MODELS+=("$token")
+done
 if [[ ${#CANDIDATE_PROVIDER_MODELS[@]} -eq 0 || -z "${CANDIDATE_PROVIDER_MODELS[0]}" ]]; then
   CANDIDATE_PROVIDER_MODELS=("${COPILOT_PROVIDER_MODEL_ID:-${CANDIDATE_MODELS[0]}}")
 fi

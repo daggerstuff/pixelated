@@ -13,11 +13,11 @@ import {
 import { useState } from 'react'
 import type { FC } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge/index.ts'
+import { Button } from '@/components/ui/button/index.ts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import { Progress } from '@/components/ui/progress.tsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
 
 interface DemoStep {
   id: string
@@ -262,7 +262,7 @@ const ClientFacingDemo: FC = () => {
       </div>
 
       {/* Demo Content */}
-      <Tabs value={demoSteps[currentStep]?.id || 'upload'} className='w-full'>
+      <Tabs value={demoSteps[currentStep]?.id ?? 'upload'} className='w-full'>
         <TabsList className='bg-slate-800 grid w-full grid-cols-4'>
           {demoSteps.map((step, index) => {
             // Map step IDs to test IDs expected by tests

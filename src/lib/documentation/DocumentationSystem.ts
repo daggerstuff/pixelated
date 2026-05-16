@@ -38,10 +38,10 @@ const logger = createBuildSafeLogger('documentation-system')
  * Connects to session repository and provides real-time updates and NLP-based summary generation
  */
 export class DocumentationSystem extends EventEmitter {
-  private repository: AIRepository
-  private redisService = new RedisService()
+  private readonly repository: AIRepository
+  private readonly redisService = new RedisService()
   private ehrIntegration: EHRIntegration | null = null
-  private activeSessions = new Map<
+  private readonly activeSessions = new Map<
     string,
     {
       sessionId: string
@@ -70,7 +70,7 @@ export class DocumentationSystem extends EventEmitter {
       await this.redisService.subscribe('session:update', (message: string) => {
         try {
           const sessionData = JSON.parse(message) as unknown
-          if (sessionData && sessionData.sessionId) {
+          if (sessionData?.sessionId) {
             void this.handleSessionUpdate(sessionData.sessionId)
           }
         } catch (error: unknown) {
@@ -82,7 +82,7 @@ export class DocumentationSystem extends EventEmitter {
       await this.redisService.subscribe('session:create', (message: string) => {
         try {
           const sessionData = JSON.parse(message) as unknown
-          if (sessionData && sessionData.sessionId) {
+          if (sessionData?.sessionId) {
             void this.trackActiveSession(sessionData.sessionId)
           }
         } catch (error: unknown) {
@@ -96,7 +96,7 @@ export class DocumentationSystem extends EventEmitter {
         (message: string) => {
           try {
             const sessionData = JSON.parse(message) as unknown
-            if (sessionData && sessionData.sessionId) {
+            if (sessionData?.sessionId) {
               void this.handleSessionCompletion(sessionData.sessionId)
             }
           } catch (error: unknown) {
@@ -279,9 +279,9 @@ export class DocumentationSystem extends EventEmitter {
       // Generate documentation using AI service
       // TODO: Implement generateSessionDocumentation method in AIService
       const documentation: SessionDocumentation = {
-        sessionId: session.sessionId || sessionId,
+        sessionId: session.sessionId ?? sessionId,
         clientId: session.clientId || 'unknown',
-        therapistId: session.therapistId || 'unknown',
+        therapistId: session.therapistId ?? 'unknown',
         startTime: session.startTime || new Date(),
         endTime: session.endTime,
         notes: 'Auto-generated documentation',
@@ -298,7 +298,7 @@ export class DocumentationSystem extends EventEmitter {
           version: '1.0',
           createdAt: new Date(),
           updatedAt: new Date(),
-          createdBy: session.therapistId || 'system',
+          createdBy: session.therapistId ?? 'system',
           sessionType: 'individual',
           duration: 60,
           modality: 'in-person',
@@ -337,7 +337,7 @@ export class DocumentationSystem extends EventEmitter {
     try {
       // Check if we have cached documentation for an active session
       const activeSession = this.activeSessions.get(sessionId)
-      if (activeSession && activeSession.documentationData && !forceRefresh) {
+      if (activeSession?.documentationData && !forceRefresh) {
         return activeSession.documentationData
       }
 

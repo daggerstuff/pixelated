@@ -1,12 +1,12 @@
 import { format } from 'date-fns'
 import { useMemo, useState } from 'react'
 
-import { Table } from '@/components/ui/table'
+import { Table } from '@/components/ui/table.tsx'
 import type {
   TableColumn,
   TableDataSource,
   TableState,
-} from '@/components/ui/table-types'
+} from '@/components/ui/table-types.ts'
 import type {
   Evaluation,
   EvaluationList as EvaluationListType,

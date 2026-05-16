@@ -54,7 +54,7 @@ export async function createDocument(
     type: data.type,
     category: data.category,
     description: data.description,
-    content: data.content || { markdown: '' },
+    content: data.content ?? { markdown: '' },
     owner: data.owner,
     contributors: [userId],
     permissions: {
@@ -244,9 +244,7 @@ export async function shareDocument(
   const permissions = getDocumentPermissions(document)
   const sharedWithUserObjectId = toObjectId(sharedWithUserId)
 
-  if (!document.permissions) {
-    document.permissions = permissions
-  }
+  document.permissions ??= permissions;
 
   if (
     permissionLevel === 'view' &&

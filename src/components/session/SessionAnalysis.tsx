@@ -90,7 +90,7 @@ export default function SessionAnalysis({
 
               // Conditionally add label only when it exists
               return item.label
-                ? { ...baseData, label: `${item.label}` }
+                ? { ...baseData, label: item.label }
                 : baseData
             })
           : []

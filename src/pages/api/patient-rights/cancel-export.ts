@@ -46,7 +46,7 @@ export const POST = async ({ request }) => {
 
     if (!authResult.success) {
       logger.warn('Unauthorized attempt to cancel export request', {
-        ip: request.headers.get('x-forwarded-for') || 'unknown',
+        ip: request.headers.get('x-forwarded-for') ?? 'unknown',
       })
 
       return new Response(
@@ -66,8 +66,8 @@ export const POST = async ({ request }) => {
     // Cancel the export request
     const result = await cancelDataExportRequest({
       exportId,
-      cancelledBy: authResult.userId || 'unknown',
-      reason: reason || 'User-initiated cancellation',
+      cancelledBy: authResult.userId ?? 'unknown',
+      reason: reason ?? 'User-initiated cancellation',
     })
 
     if (!result.success) {

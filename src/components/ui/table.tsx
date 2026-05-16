@@ -113,7 +113,7 @@ function Table<T extends TableRowData>({
                   'hidden md:table-cell': column.hideMobile,
                 })}
               >
-                {column.Header || column.header}
+                {column.Header ?? column.header}
               </TableHead>
             ))}
           </TableRow>

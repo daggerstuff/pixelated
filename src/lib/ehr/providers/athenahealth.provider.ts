@@ -51,7 +51,7 @@ export class AthenahealthProvider extends BaseEHRProvider {
     this.baseUrl = baseUrl
     this.clientId = clientId
     this.clientSecret = clientSecret
-    this.scopes = scopes || AthenahealthProvider.DEFAULT_SCOPES
+    this.scopes = scopes ?? AthenahealthProvider.DEFAULT_SCOPES
   }
 
   override async initialize(): Promise<void> {

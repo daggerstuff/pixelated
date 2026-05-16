@@ -93,7 +93,7 @@ function reportLCP() {
 
       if (lastEntry) {
         const lcp = lastEntry.startTime
-        const lcpElement = lastEntry.element?.tagName || 'unknown'
+        const lcpElement = lastEntry.element?.tagName ?? 'unknown'
         const lcpSize = lastEntry.size || 0
 
         console.log('LCP:', {

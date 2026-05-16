@@ -33,12 +33,12 @@ export async function applyRateLimit(
   const url = new URL(request.url)
   const path = url.pathname
   const clientIp =
-    request.headers.get('x-forwarded-for') ||
-    request.headers.get('cf-connecting-ip') ||
-    request.headers.get('x-real-ip') ||
+    ((request.headers.get('x-forwarded-for') ??
+    request.headers.get('cf-connecting-ip')) ??
+    request.headers.get('x-real-ip')) ??
     'unknown'
-  const userAgent = request.headers.get('user-agent') || 'unknown'
-  const referer = request.headers.get('referer') || 'direct'
+  const userAgent = request.headers.get('user-agent') ?? 'unknown'
+  const referer = request.headers.get('referer') ?? 'direct'
 
   // Try to get user from session
   let userId = 'anonymous'
@@ -48,7 +48,7 @@ export async function applyRateLimit(
     const sessionAny = (await getSessionFromRequest(request)) as any
     if (sessionAny?.user?.id) {
       userId = sessionAny.user.id
-      role = sessionAny.user.role || 'user'
+      role = sessionAny.user.role ?? 'user'
     }
   } catch (error: unknown) {
     logger.warn('Error getting session for rate limiting:', { error, path })
