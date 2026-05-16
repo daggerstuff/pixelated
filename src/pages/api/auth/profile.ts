@@ -47,22 +47,12 @@ export const GET = async ({
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
-<<<<<<< HEAD
-    if (session && session.user) {
-      const _id = (session.user as any)._id
-      userId = session.user.id || (_id ? _id.toString() : null) || null
-=======
     if (session?.user) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      userId = session.user.id || (session.user as any)._id?.toString() ?? null
->>>>>>> origin/staging
-=======
-      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
->>>>>>> origin/staging
-=======
-      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
->>>>>>> origin/staging
+      const sessionUser = session.user as {
+        id?: string
+        _id?: { toString(): string }
+      }
+      userId = sessionUser.id || sessionUser._id?.toString() || null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
@@ -190,22 +180,12 @@ export const PUT = async ({
     const session = await getSessionFromRequest(request)
     let userId: string | null = null
 
-<<<<<<< HEAD
-    if (session && session.user) {
-      const _id = (session.user as any)._id
-      userId = session.user.id || (_id ? _id.toString() : null) || null
-=======
     if (session?.user) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      userId = session.user.id || (session.user as any)._id?.toString() ?? null
->>>>>>> origin/staging
-=======
-      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
->>>>>>> origin/staging
-=======
-      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
->>>>>>> origin/staging
+      const sessionUser = session.user as {
+        id?: string
+        _id?: { toString(): string }
+      }
+      userId = sessionUser.id || sessionUser._id?.toString() || null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
