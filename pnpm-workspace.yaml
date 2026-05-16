@@ -21,8 +21,6 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - path-to-regexp@6.3.0
   - yaml@2.8.3
-<<<<<<< HEAD
-=======
   - axios@0.28.0
   - jsonwebtoken@8.5.2
   - jsonwebtoken@9.0.0
@@ -41,4 +39,3 @@ overrides:
   path-to-regexp@>=4.0.0 <6.3.0: ^6.3.0
   yaml@>=2.0.0 <2.8.3: ^2.8.3
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': '8.0.2'
->>>>>>> origin/staging
