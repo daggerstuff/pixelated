@@ -42,7 +42,11 @@ export const GET = async ({
     let userId: string | null = null
 
     if (session?.user) {
+<<<<<<< HEAD
       userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
@@ -171,7 +175,11 @@ export const PUT = async ({
     let userId: string | null = null
 
     if (session?.user) {
+<<<<<<< HEAD
       userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+=======
+      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
+>>>>>>> origin/staging
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {

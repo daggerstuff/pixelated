@@ -42,6 +42,7 @@ import userRoutes from './routes/users'
 dotenv.config()
 
 const app: Express = express()
+app.set('trust proxy', 1)
 const PORT = parseInt(process.env.PORT ?? '5000', 10)
 const NODE_ENV = process.env.NODE_ENV ?? 'development'
 
