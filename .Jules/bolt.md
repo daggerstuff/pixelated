@@ -1,5 +1,10 @@
 <<<<<<< HEAD
 <!-- markdownlint-disable MD013 MD026 -->
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/staging
+=======
 ## 2024-06-01 - Extract Tooltip | Learning: Inline components in Recharts cause unnecessary re-renders | Action: Extracted CustomTooltip to module level
 
 ## 2024-06-03 - O(N^2) React Rendering | Learning: Array.includes() inside .map() loops causes O(N^2) bottlenecks during React renders | Action: Replaced Array.includes() with a Set generated via useMemo for O(1) lookups
@@ -10,6 +15,7 @@
 
 ## 2024-05-18 - Stable Reference for Checkbox Toggles | Learning: Functions passed to looped DOM elements cause unnecessary allocations | Action: Wrapped handleDimensionToggle in useCallback
 =======
+>>>>>>> origin/staging
 ## 2024-06-01 - Extract Tooltip
 
 - Learning: Inline components in Recharts cause unnecessary re-renders
@@ -33,6 +39,10 @@
 
 ## 2025-03-20 - Inline Callback Re-renders
 
+<<<<<<< HEAD
+- Learning: Inline arrow functions passed as props to child components cause unnecessary re-renders. When using useCallback to memoize state updater callbacks, use the functional update pattern to avoid adding state variables to the dependency array.
+- Action: Wrapped inline patient selection handler in useCallback using a functional state update.
+=======
 - Learning: Inline arrow functions passed as props to child components cause
   unnecessary re-renders. When using `useCallback` to memoize state updater
   callbacks, use the functional update pattern to avoid adding state variables
