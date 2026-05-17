@@ -51,20 +51,23 @@ export class YahooFinanceService {
   private readonly logger: Logger
   private readonly client: AxiosInstance
   private readonly cache: Map<string, { data: any; timestamp: number }> = new Map()
-  private readonly CACHE_TTL =
-    parseInt(process.env['CACHE_TTL_SECONDS'] ?? '300', 10) * 1000
+   private readonly CACHE_TTL =
+     (process.env['CACHE_TTL_SECONDS'] && process.env['CACHE_TTL_SECONDS'].length > 0 
+       ? parseInt(process.env['CACHE_TTL_SECONDS'], 10) 
+       : 300) * 1000
 
   constructor() {
     this.logger = new Logger('YahooFinanceService')
-    this.client = axios.create({
-      baseURL:
-        process.env['YAHOO_FINANCE_API_URL'] ??
-        'https://query1.finance.yahoo.com/v8/finance',
-      timeout: 10000,
-      headers: {
-        'User-Agent': 'BusinessStrategyCMS/1.0',
-      },
-    })
+     this.client = axios.create({
+       baseURL:
+         (process.env['YAHOO_FINANCE_API_URL'] && process.env['YAHOO_FINANCE_API_URL'].length > 0
+           ? process.env['YAHOO_FINANCE_API_URL']
+           : 'https://query1.finance.yahoo.com/v8/finance'),
+       timeout: 10000,
+       headers: {
+         'User-Agent': 'BusinessStrategyCMS/1.0',
+       },
+     })
   }
 
   /**
