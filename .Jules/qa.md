@@ -1,63 +1,56 @@
-## 2026-04-14 QA
-Added tests for createPrivacyHash edge case
-Pattern: Using `replace_with_git_merge_diff` to inject tests into pre-existing describe blocks where testing gaps exist
-Action: Ensure edge cases like empty inputs are systematically tested
+<!-- markdownlint-disable MD013 MD026 -->
 
-## 2026-04-15 access-control testing
-Pattern: Mocking internal dependencies to resolve vite config import errors
-Action: Use `vi.mock` with explicit relative path to replace module that has broken aliased imports
+## 2026-04-14 - createPrivacyHash edge case
 
-## 2026-04-17 Add comprehensive test suite for Express error-handler
-Pattern: When testing Express asyncHandler wrappers the wrapped function executes asynchronously but the wrapper itself may return a non-promise or a promise that is not easily awaited in the test
-Action: Use `await new Promise((resolve) => process.nextTick(resolve))` after invoking the wrapped handler to ensure asynchronous errors are caught and passed to next before making assertions
+- Pattern: Using `replace_with_git_merge_diff` to inject tests into pre-existing describe blocks where testing gaps exist.
+- Action: Ensure edge cases like empty inputs are systematically tested.
 
-## 2026-04-18 QA Add test for template edge case
-Pattern: Mocking internal loggers and testing HTML string outputs
-Action: Ensure edge cases like empty objects are systematically tested
+## 2026-04-15 - access-control testing
 
-## 2026-04-19 QA Add test for isPartialBiasDashboardSummary
-Pattern: Finding untested utility functions like type guards and creating new targeted test files specifically for them under `__tests__` directory
-Action: Ensure the new test file fully isolates its test logic covers both positive and negative cases and passes verification using localized execution `npx vitest run <file>`
+- Pattern: Mocking internal dependencies to resolve vite config import errors.
+- Action: Use `vi.mock` with explicit relative path to replace module that has broken aliased imports.
 
-## 2026-04-26 Fix localStorage tests in jsdom
-Pattern: When using jsdom in Vitest spying on window.localStorage may fail to intercept direct localStorage calls
-Action: Use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these methods
+## 2026-04-17 - Express error-handler async tests
 
-## 2026-04-27 QA Add test for analyzeTherapeuticTechniques edge case
-Pattern: Finding untested utility functions lacking a test file and creating isolated tests
-Action: Ensure the new test file fully isolates its test logic covers an edge case and passes verification using localized execution `npx vitest run <file>`
+- Pattern: When testing Express `asyncHandler` wrappers, the wrapped function executes asynchronously but the wrapper itself may return a non-promise that is not easily awaited in the test.
+- Action: Use `await new Promise((resolve) => process.nextTick(resolve))` after invoking the wrapped handler to ensure asynchronous errors are caught and passed to `next` before making assertions.
 
-## 2026-04-28 QA Add test for getRecommendedScenario edge case
-Pattern: Finding untested branches in utility functions and adding targeted tests
-Action: Ensure both positive and negative branches for scenario recommendation are systematically tested
+## 2026-04-18 - template edge case
 
-## 2026-04-29 QA Fix privacy test ts jsdom environment
-Pattern: When a test uses browser globals like window localStorage but the test environment lacks jsdom Vitest will throw ReferenceError window is not defined Furthermore spying on window localStorage may fail to intercept direct localStorage calls
-Action: Add /** `@vitest-environment` jsdom */ at the top of the test file and use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these methods
+- Pattern: Mocking internal loggers and testing HTML string outputs.
+- Action: Ensure edge cases like empty objects are systematically tested.
 
-## 2026-04-30 QA Add test for checkBrowserCompatibility edge case
-Pattern: Mocking navigator properties in Vitest with jsdom
-Action: Use `Object.defineProperty` to temporarily mock and restore navigator mediaDevices
+## 2026-04-19 - isPartialBiasDashboardSummary
 
-<<<<<<< HEAD
-Action: Use `Object.defineProperty` to temporarily mock and restore
-navigator.mediaDevices
-<<<<<<< HEAD
-## 2026-05-13 - QA: Add test for liveRegion edge case
+- Pattern: Finding untested utility functions like type guards and creating new targeted test files specifically for them under `__tests__`.
+- Action: Ensure the new test file fully isolates its test logic, covers both positive and negative cases, and passes verification using localized execution `npx vitest run <file>`.
 
-Pattern: Mocking browser globals (like window.LiveRegionSystem) in Vitest with jsdom
+## 2026-04-26 - localStorage tests in jsdom
 
-Action: Use vi.useFakeTimers() and clear window globals to ensure isolated tests for browser utilities
-=======
+- Pattern: When using jsdom in Vitest, spying on `window.localStorage` may fail to intercept direct `localStorage` calls.
+- Action: Use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these methods.
 
-## 2026-05-11 - QA: Add test for getRecommendedScenario fallback edge case
+## 2026-04-27 - analyzeTherapeuticTechniques edge case
 
-Pattern: Finding untested branches in utility functions and adding targeted tests
+- Pattern: Finding untested utility functions lacking a test file and creating isolated tests.
+- Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
 
-Action: Ensure both positive and negative branches for scenario recommendation are systematically tested
->>>>>>> origin/staging
-=======
-## 2026-05-09 QA Add test for formatDate relative edge case
-Pattern: Use `vi.useFakeTimers()` with a fixed system time to make relative-time assertions deterministic
-Action: Call `vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))` in `beforeAll` then assert `formatDate(date, { relative: true })` returns expected strings like 5 minutes ago or 1 day ago Restore with `vi.useRealTimers()` in `afterAll`
->>>>>>> origin/staging
+## 2026-04-28 - getRecommendedScenario edge case
+
+- Pattern: Finding untested branches in utility functions and adding targeted tests.
+- Action: Ensure both positive and negative branches for scenario recommendation are systematically tested.
+
+## 2026-04-29 - privacy test jsdom environment
+
+- Pattern: When a test uses browser globals like `window.localStorage` but the test environment lacks jsdom, Vitest throws `ReferenceError: window is not defined`. Spying on `window.localStorage` may also fail to intercept direct calls.
+- Action: Add `/** @vitest-environment jsdom */` at the top of the test file and use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these methods.
+
+## 2026-04-30 - checkBrowserCompatibility edge case
+
+- Pattern: Mocking `navigator` properties in Vitest with jsdom.
+- Action: Use `Object.defineProperty` to temporarily mock and restore `navigator.mediaDevices`.
+
+## 2026-05-09 - formatDate relative edge case
+
+- Pattern: Use `vi.useFakeTimers()` with a fixed system time to make relative-time assertions deterministic.
+- Action: Call `vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))` in `beforeAll`, then assert `formatDate(date, { relative: true })` returns expected strings like `5 minutes ago` or `1 day ago`. Restore with `vi.useRealTimers()` in `afterAll`.

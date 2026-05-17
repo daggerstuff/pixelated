@@ -37,7 +37,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.0.8
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
           version: 11.1.2
 
@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload advisory test log
         if: always() && hashFiles('advisory-test.log') != ''
-        uses: actions/upload-artifact@0fd1c5a72d1c9d7c7c6b5a4d3e2f1a0b9c8d7e6f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: advisory-test-log
           path: advisory-test.log
