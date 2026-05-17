@@ -31,25 +31,41 @@ See `docker/docker-compose.local-mongo.yml` and
 
 ### Key commands
 
-- **Lint**: `pnpm lint` (oxlint; pre-existing warnings/errors expected)
+- **Lint**: `pnpm lint` (oxlint; pre-existing warnings expected)
 - **Tests**: `pnpm vitest run -c config/vitest.config.ts`
 - **Dev server**: `pnpm dev` (Astro on port 5173)
 - **Build**: `pnpm build`
 - **Typecheck**: `pnpm typecheck`
 - **All services**: `pnpm dev:all-services`
 
+### Redis in Cloud Agent VMs
+
+The Cloud Agent VM injects `REDIS_URL` and
+`UPSTASH_REDIS_REST_URL` pointing to a remote Upstash
+instance. When running tests locally against the Docker
+Redis container, **override these env vars**:
+
+```bash
+REDIS_URL=redis://localhost:6379/0 \
+UPSTASH_REDIS_REST_URL=redis://localhost:6379/0 \
+pnpm vitest run -c config/vitest.config.ts
+```
+
+Without this override, integration tests that attempt to
+connect to Upstash will hang on DNS lookups.
+
 ### Gotchas
 
-- The full vitest suite can hang because some integration tests
-  attempt to connect to an external Upstash Redis instance.
-  When running tests locally, prefer targeted test runs using
-  the `VITEST_TARGET_TESTS` environment variable.
+- The full vitest suite hangs due to at least one test
+  that consumes 100% CPU. Use `VITEST_TARGET_TESTS` to
+  run targeted test subsets instead.
 - Vite 8 is in `package.json` but Astro 6 expects Vite 7;
   the dev server still works but logs a warning.
-- The `.env` file is created from `.env.example`. For local dev,
-  set `MONGODB_URI=mongodb://localhost:27017/pixelated_empathy`
-  and configure `DATABASE_URL` for local PostgreSQL.
-- Docker must be installed and running for database containers.
-  In Cloud Agent VMs, use `fuse-overlayfs` storage driver and
-  `iptables-legacy`.
-- The `prepare` script installs git hooks on `pnpm install`.
+- The `.env` file is created from `.env.example`. For
+  local dev, set `MONGODB_URI` and `DATABASE_URL` to
+  point to the local Docker containers.
+- Docker must be installed and running for database
+  containers. In Cloud Agent VMs, use `fuse-overlayfs`
+  storage driver and `iptables-legacy`.
+- The `prepare` script installs git hooks on
+  `pnpm install`.
