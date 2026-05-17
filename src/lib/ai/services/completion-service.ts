@@ -39,25 +39,7 @@ export class CompletionService {
     }
 
     this.aiService = createLLMService({
-<<<<<<< HEAD
       apiKey: config.apiKey || (config.providerApiKey ?? ''),
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-      apiKey: (config.apiKey || config.providerApiKey) ?? '',
-=======
-      apiKey: config.apiKey || (config.providerApiKey ?? ''),
-=======
-      apiKey: config.apiKey || (config.providerApiKey ?? ''),
-=======
-<<<<<<< HEAD
-      apiKey: (config.apiKey || config.providerApiKey) ?? '',
-=======
-      apiKey: config.apiKey || (config.providerApiKey ?? ''),
->>>>>>> origin/staging
->>>>>>> origin/staging
->>>>>>> origin/staging
->>>>>>> origin/staging
       baseUrl: config.providerBaseUrl,
     })
   }
