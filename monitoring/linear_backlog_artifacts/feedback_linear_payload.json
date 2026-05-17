@@ -1,0 +1,167 @@
+{
+  "generated_at": "2026-05-17T14:41:51.356113+00:00",
+  "source": {
+    "task": "PIX-535",
+    "task_label": "performance-gap-to-backlog conversion",
+    "metric_count": 5,
+    "change_count": 4
+  },
+  "actions": [
+    {
+      "operation": "create",
+      "title": "Prioritize clinical conversation sources",
+      "description": "Clinical reasoning accuracy is below 85%; prioritize high-quality clinical sources and add targeted source selection.\\n\\nTrigger: clinical_reasoning_accuracy=60.00 (lt 85.0)\\nSOP: Adjust source queue weighting to double-source clinical channels, then run a 2-cycle pilot before broad rollout.\\nExpected Impact: Increase clinical reasoning coverage and reduce clinical failures by 10-20% in next validation batch\\nEvidence: {'metric': 'clinical_reasoning_accuracy', 'measured_value': 60.00000000000001, 'threshold': 85.0, 'operator': 'lt', 'notes': '[medium] Model fails to recall relevant memories in context (freq=0.30); upstream(acquisition, conf=0.66): Source data lacks high-quality memory-context pairs; intervention[acquisition](medium): Adjust source data priorities \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](medium): Update quality thresholds \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](low): Adjust source data priorities \u2192 Improve generation_quality by 10-20%; intervention[acquisition](low): Update quality thresholds \u2192 Improve generation_quality by 10-20%'}\\n\\nExecution checklist:\\n- Raise acquisition priority for sources with clinical-therapy tags\\n- Route source selection to increase clinical reasoning coverage by +20%\\n- Add review gate requiring clinical rationale validation before merge\\n",
+      "priority": "urgent",
+      "labels": [
+        "pix-535",
+        "performance-gap",
+        "acquisition",
+        "critical"
+      ],
+      "area": "acquisition",
+      "project_key": "PIX",
+      "parent_issue": "PIX-535",
+      "change_id": "clinical_reasoning_low:clinical_reasoning_accuracy:c86fff5b4d",
+      "evidence": {
+        "metric": "clinical_reasoning_accuracy",
+        "measured_value": 60.00000000000001,
+        "threshold": 85.0,
+        "operator": "lt",
+        "notes": "[medium] Model fails to recall relevant memories in context (freq=0.30); upstream(acquisition, conf=0.66): Source data lacks high-quality memory-context pairs; intervention[acquisition](medium): Adjust source data priorities \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](medium): Update quality thresholds \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](low): Adjust source data priorities \u2192 Improve generation_quality by 10-20%; intervention[acquisition](low): Update quality thresholds \u2192 Improve generation_quality by 10-20%"
+      },
+      "mcp_payload": {
+        "tool": "mcp__linear__create_issue",
+        "variables": {
+          "title": "Prioritize clinical conversation sources",
+          "description": "Clinical reasoning accuracy is below 85%; prioritize high-quality clinical sources and add targeted source selection.\\n\\nTrigger: clinical_reasoning_accuracy=60.00 (lt 85.0)\\nSOP: Adjust source queue weighting to double-source clinical channels, then run a 2-cycle pilot before broad rollout.\\nExpected Impact: Increase clinical reasoning coverage and reduce clinical failures by 10-20% in next validation batch\\nEvidence: {'metric': 'clinical_reasoning_accuracy', 'measured_value': 60.00000000000001, 'threshold': 85.0, 'operator': 'lt', 'notes': '[medium] Model fails to recall relevant memories in context (freq=0.30); upstream(acquisition, conf=0.66): Source data lacks high-quality memory-context pairs; intervention[acquisition](medium): Adjust source data priorities \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](medium): Update quality thresholds \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](low): Adjust source data priorities \u2192 Improve generation_quality by 10-20%; intervention[acquisition](low): Update quality thresholds \u2192 Improve generation_quality by 10-20%'}\\n\\nExecution checklist:\\n- Raise acquisition priority for sources with clinical-therapy tags\\n- Route source selection to increase clinical reasoning coverage by +20%\\n- Add review gate requiring clinical rationale validation before merge\\n",
+          "projectId": "PIX",
+          "labelIds": [
+            "pix-535",
+            "performance-gap",
+            "acquisition",
+            "critical"
+          ],
+          "priority": "urgent",
+          "parentId": "PIX-535"
+        }
+      }
+    },
+    {
+      "operation": "create",
+      "title": "Tighten curation filters for clinical rationale",
+      "description": "Clinical reasoning is degrading; adjust curation rules to catch weak rationale before training ingestion.\\n\\nTrigger: clinical_reasoning_accuracy=60.00 (lt 92.0)\\nSOP: Apply rule changes to 50% of incoming clinical batches for two days, then compare post-curation gap metrics.\\nExpected Impact: Improve signal quality of clinical content and stabilize reasoning pass rates\\nEvidence: {'metric': 'clinical_reasoning_accuracy', 'measured_value': 60.00000000000001, 'threshold': 92.0, 'operator': 'lt', 'notes': '[medium] Model fails to recall relevant memories in context (freq=0.30); upstream(acquisition, conf=0.66): Source data lacks high-quality memory-context pairs; intervention[acquisition](medium): Adjust source data priorities \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](medium): Update quality thresholds \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](low): Adjust source data priorities \u2192 Improve generation_quality by 10-20%; intervention[acquisition](low): Update quality thresholds \u2192 Improve generation_quality by 10-20%'}\\n\\nExecution checklist:\\n- Introduce curation rule: require clear intervention/plan structure\\n- Add minimum clinical anchor requirement (grounded recommendation or safety signpost)\\n- Increase curator sampling rate for borderline clinical responses\\n",
+      "priority": "high",
+      "labels": [
+        "pix-535",
+        "performance-gap",
+        "curation_rules",
+        "high"
+      ],
+      "area": "curation_rules",
+      "project_key": "PIX",
+      "parent_issue": "PIX-535",
+      "change_id": "clinical_reasoning_medium:clinical_reasoning_accuracy:1ef73c669f",
+      "evidence": {
+        "metric": "clinical_reasoning_accuracy",
+        "measured_value": 60.00000000000001,
+        "threshold": 92.0,
+        "operator": "lt",
+        "notes": "[medium] Model fails to recall relevant memories in context (freq=0.30); upstream(acquisition, conf=0.66): Source data lacks high-quality memory-context pairs; intervention[acquisition](medium): Adjust source data priorities \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](medium): Update quality thresholds \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](low): Adjust source data priorities \u2192 Improve generation_quality by 10-20%; intervention[acquisition](low): Update quality thresholds \u2192 Improve generation_quality by 10-20%"
+      },
+      "mcp_payload": {
+        "tool": "mcp__linear__create_issue",
+        "variables": {
+          "title": "Tighten curation filters for clinical rationale",
+          "description": "Clinical reasoning is degrading; adjust curation rules to catch weak rationale before training ingestion.\\n\\nTrigger: clinical_reasoning_accuracy=60.00 (lt 92.0)\\nSOP: Apply rule changes to 50% of incoming clinical batches for two days, then compare post-curation gap metrics.\\nExpected Impact: Improve signal quality of clinical content and stabilize reasoning pass rates\\nEvidence: {'metric': 'clinical_reasoning_accuracy', 'measured_value': 60.00000000000001, 'threshold': 92.0, 'operator': 'lt', 'notes': '[medium] Model fails to recall relevant memories in context (freq=0.30); upstream(acquisition, conf=0.66): Source data lacks high-quality memory-context pairs; intervention[acquisition](medium): Adjust source data priorities \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](medium): Update quality thresholds \u2192 Improve memory_recall_recall by 10-20%; intervention[acquisition](low): Adjust source data priorities \u2192 Improve generation_quality by 10-20%; intervention[acquisition](low): Update quality thresholds \u2192 Improve generation_quality by 10-20%'}\\n\\nExecution checklist:\\n- Introduce curation rule: require clear intervention/plan structure\\n- Add minimum clinical anchor requirement (grounded recommendation or safety signpost)\\n- Increase curator sampling rate for borderline clinical responses\\n",
+          "projectId": "PIX",
+          "labelIds": [
+            "pix-535",
+            "performance-gap",
+            "curation_rules",
+            "high"
+          ],
+          "priority": "high",
+          "parentId": "PIX-535"
+        }
+      }
+    },
+    {
+      "operation": "create",
+      "title": "Shift dataset weighting toward empathetic style coverage",
+      "description": "Empathy score below threshold indicates low emotional attunement in curated samples.\\n\\nTrigger: empathy_score=71.67 (lt 75.0)\\nSOP: Run a curation rule A/B test for 3k records and compare empathy pass rates before full rollout.\\nExpected Impact: Increase emotional alignment and reduce low-empathy failure clusters\\nEvidence: {'metric': 'empathy_score', 'measured_value': 71.66666666666667, 'threshold': 75.0, 'operator': 'lt', 'notes': '[medium] Generated responses drift from conversation context (freq=0.13); upstream(curation, conf=0.63): Context normalization insufficient or misaligned; intervention[curation](low): Update curation rules \u2192 Improve memory_recall_precision by 10-20%; intervention[curation](low): Add dataset filter \u2192 Improve memory_recall_precision by 10-20%; intervention[curation](medium): Update curation rules \u2192 Improve context_relevance by 10-20%; intervention[curation](medium): Add dataset filter \u2192 Improve context_relevance by 10-20%'}\\n\\nExecution checklist:\\n- Add empathetic response pattern checks to pre-ingestion curation\\n- Lower tolerance for abrupt/flat emotional tone in selected channels\\n- Add source enrichment task for supportive-response-heavy datasets\\n",
+      "priority": "medium",
+      "labels": [
+        "pix-535",
+        "performance-gap",
+        "curation_rules",
+        "medium"
+      ],
+      "area": "curation_rules",
+      "project_key": "PIX",
+      "parent_issue": "PIX-535",
+      "change_id": "empathy_gap_low:empathy_score:1b4ac8c897",
+      "evidence": {
+        "metric": "empathy_score",
+        "measured_value": 71.66666666666667,
+        "threshold": 75.0,
+        "operator": "lt",
+        "notes": "[medium] Generated responses drift from conversation context (freq=0.13); upstream(curation, conf=0.63): Context normalization insufficient or misaligned; intervention[curation](low): Update curation rules \u2192 Improve memory_recall_precision by 10-20%; intervention[curation](low): Add dataset filter \u2192 Improve memory_recall_precision by 10-20%; intervention[curation](medium): Update curation rules \u2192 Improve context_relevance by 10-20%; intervention[curation](medium): Add dataset filter \u2192 Improve context_relevance by 10-20%"
+      },
+      "mcp_payload": {
+        "tool": "mcp__linear__create_issue",
+        "variables": {
+          "title": "Shift dataset weighting toward empathetic style coverage",
+          "description": "Empathy score below threshold indicates low emotional attunement in curated samples.\\n\\nTrigger: empathy_score=71.67 (lt 75.0)\\nSOP: Run a curation rule A/B test for 3k records and compare empathy pass rates before full rollout.\\nExpected Impact: Increase emotional alignment and reduce low-empathy failure clusters\\nEvidence: {'metric': 'empathy_score', 'measured_value': 71.66666666666667, 'threshold': 75.0, 'operator': 'lt', 'notes': '[medium] Generated responses drift from conversation context (freq=0.13); upstream(curation, conf=0.63): Context normalization insufficient or misaligned; intervention[curation](low): Update curation rules \u2192 Improve memory_recall_precision by 10-20%; intervention[curation](low): Add dataset filter \u2192 Improve memory_recall_precision by 10-20%; intervention[curation](medium): Update curation rules \u2192 Improve context_relevance by 10-20%; intervention[curation](medium): Add dataset filter \u2192 Improve context_relevance by 10-20%'}\\n\\nExecution checklist:\\n- Add empathetic response pattern checks to pre-ingestion curation\\n- Lower tolerance for abrupt/flat emotional tone in selected channels\\n- Add source enrichment task for supportive-response-heavy datasets\\n",
+          "projectId": "PIX",
+          "labelIds": [
+            "pix-535",
+            "performance-gap",
+            "curation_rules",
+            "medium"
+          ],
+          "priority": "medium",
+          "parentId": "PIX-535"
+        }
+      }
+    },
+    {
+      "operation": "create",
+      "title": "Escalate crisis detection and harm review capacity",
+      "description": "Safety score under threshold requires immediate reviewer and rule escalation.\\n\\nTrigger: safety_score=71.00 (lt 90.0)\\nSOP: Create a temporary high-risk queue and require dual-pass verification before approval.\\nExpected Impact: Lower risk of unsafe output and reduce safety exceptions post-deploy\\nEvidence: {'metric': 'safety_score', 'measured_value': 71.0, 'threshold': 90.0, 'operator': 'lt', 'notes': '[medium] Lacks reflective or insightful content (freq=0.24); upstream(review, conf=0.65): Human review needed for reflection quality gate; intervention[review](medium): Add human review focus area \u2192 Improve reflection_quality by 10-20%'}\\n\\nExecution checklist:\\n- Increase review rate for crisis-related samples by +30%\\n- Add dedicated safety escalation checklist for high-risk channels\\n- Restrict ambiguous crisis phrasing sources from automatic intake\\n",
+      "priority": "urgent",
+      "labels": [
+        "pix-535",
+        "performance-gap",
+        "review_focus",
+        "critical"
+      ],
+      "area": "review_focus",
+      "project_key": "PIX",
+      "parent_issue": "PIX-535",
+      "change_id": "safety_score_low:safety_score:8b9ece4ce6",
+      "evidence": {
+        "metric": "safety_score",
+        "measured_value": 71.0,
+        "threshold": 90.0,
+        "operator": "lt",
+        "notes": "[medium] Lacks reflective or insightful content (freq=0.24); upstream(review, conf=0.65): Human review needed for reflection quality gate; intervention[review](medium): Add human review focus area \u2192 Improve reflection_quality by 10-20%"
+      },
+      "mcp_payload": {
+        "tool": "mcp__linear__create_issue",
+        "variables": {
+          "title": "Escalate crisis detection and harm review capacity",
+          "description": "Safety score under threshold requires immediate reviewer and rule escalation.\\n\\nTrigger: safety_score=71.00 (lt 90.0)\\nSOP: Create a temporary high-risk queue and require dual-pass verification before approval.\\nExpected Impact: Lower risk of unsafe output and reduce safety exceptions post-deploy\\nEvidence: {'metric': 'safety_score', 'measured_value': 71.0, 'threshold': 90.0, 'operator': 'lt', 'notes': '[medium] Lacks reflective or insightful content (freq=0.24); upstream(review, conf=0.65): Human review needed for reflection quality gate; intervention[review](medium): Add human review focus area \u2192 Improve reflection_quality by 10-20%'}\\n\\nExecution checklist:\\n- Increase review rate for crisis-related samples by +30%\\n- Add dedicated safety escalation checklist for high-risk channels\\n- Restrict ambiguous crisis phrasing sources from automatic intake\\n",
+          "projectId": "PIX",
+          "labelIds": [
+            "pix-535",
+            "performance-gap",
+            "review_focus",
+            "critical"
+          ],
+          "priority": "urgent",
+          "parentId": "PIX-535"
+        }
+      }
+    }
+  ]
+}
