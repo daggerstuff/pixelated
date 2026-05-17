@@ -1,98 +1,37 @@
 <!-- markdownlint-disable MD013 MD026 -->
 
-## 2026-04-11 - Fix XSS in ChatMessage | Vulnerability: Unsanitized markdown-to-html rendered via dangerouslySetInnerHTML | Learning: Custom markdown parsers can have edge cases that bypass XSS protections | Prevention: Always use isomorphic-dompurify or dompurify when setting inner HTML, even after custom markdown parsing
+## 2026-04-11 - XSS in ChatMessage
 
-Vulnerability: Unsanitized markdown-to-html rendered via dangerouslySetInnerHTML
+- Vulnerability: Unsanitized markdown-to-html rendered via `dangerouslySetInnerHTML`.
+- Learning: Custom markdown parsers can have edge cases that bypass XSS protections.
+- Prevention: Always use isomorphic-dompurify or dompurify when setting inner HTML, even after custom markdown parsing.
 
-Learning: Custom markdown parsers can have edge cases that bypass XSS protections
+## 2026-04-11 - XSS in inline JSON-LD and script blocks
 
-Prevention: Always use isomorphic-dompurify or dompurify when setting inner HTML,
-even after custom markdown parsing
+- Vulnerability: Unescaped HTML control characters injected via `set:html` with `JSON.stringify`.
+- Learning: `JSON.stringify` is unsafe for inline script blocks and JSON-LD without escaping `<` and `>`.
+- Prevention: Always escape HTML control characters in serialized JSON before `set:html`, e.g. `replace(/</g, '\\u003c').replace(/>/g, '\\u003e')`.
 
-## 2026-04-11 - Fix XSS in Astro Session Script
+## 2026-04-15 - XSS in Training Session Astro View
 
-Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify
-
-Learning: JSON.stringify is unsafe for inline script blocks without escaping
-
-Prevention: Always use replace(/</g, "\u003c").replace(/>/g, "\u003e") for JSON data
-within set:html
-
-## 2026-04-15 - Fix XSS in Training Session Astro View
-
-Vulnerability: Unsanitized JSON stringification inside script tags using set:html
-
-Learning: JSON.stringify does not escape HTML control characters like < or > which
-can allow breakout of script tags leading to XSS
-
-Prevention: Always escape HTML control characters in JSON.stringify when injecting
-into script tags, e.g., replacing < with \u003c
+- Vulnerability: Unsanitized `JSON.stringify` inside script tags using `set:html`.
+- Learning: Same JSON-in-script breakout risk as other Astro views.
+- Prevention: Escape HTML control characters in `JSON.stringify` output before injecting into script tags.
 
 ## 2026-04-17 - Missing Authentication on Strategy Endpoints
 
-Vulnerability: Unauthenticated access to sensitive business strategy dashboard and
-operations
+- Vulnerability: Unauthenticated access to sensitive business strategy dashboard and operations.
+- Learning: New route files must explicitly import and use authentication middleware if not globally applied in the router.
+- Prevention: Always review endpoint definitions for missing `authenticateToken` middleware.
 
-Learning: New route files must explicitly import and use authentication middleware
-if not globally applied in the router
+## 2026-04-28 - XSS in CardItem.astro via unsanitized set:html
 
-Prevention: Always review endpoint definitions for missing authenticateToken
-middleware
+- Vulnerability: HTML content and details from collections were injected directly via `set:html` without sanitization.
+- Learning: Any user-provided or CMS-sourced HTML passed to `set:html` must be sanitized to prevent XSS.
+- Prevention: Always sanitize HTML strings with DOMPurify before using `set:html` in Astro components.
 
-## 2026-04-18 - Fix XSS in Head.astro JSON-LD
+## 2026-05-11 - XSS in GithubItem
 
-Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify
-
-Learning: JSON.stringify is unsafe for inline script blocks without escaping
-
-Prevention: Always use replace(/</g, '<').replace(/>/g, '>') for JSON data within
-set:html
-
-## 2026-04-26 - Fix XSS in BlogLayout JSON-LD
-
-Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify
-
-Learning: JSON.stringify is unsafe for inline script blocks without escaping
-
-Prevention: Always use replace(/</g, '\u003c').replace(/>/g, '\u003e') for JSON data
-within set:html
-
-## 2026-04-27 - Fix XSS in About.astro
-
-Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify
-
-Learning: JSON.stringify is unsafe for inline script blocks without escaping
-
-Prevention: Always use replace(/</g, '\u003c').replace(/>/g, '\u003e') for JSON data
-within set:html
-
-## 2025-05-18 - Prevent XSS in inline JSON-LD script
-
-Vulnerability: Unsafe injection of JSON using set:html
-
-Learning: JSON.stringify alone is vulnerable to XSS inside <script> tags
-
-Prevention: Always sanitize JSON strings by replacing < and > with Unicode
-equivalents
-
-## 2026-04-28 - Fix XSS in Contact.astro
-
-Vulnerability: Unescaped HTML control chars injected via set:html with JSON.stringify
-
-Learning: JSON.stringify is unsafe for inline script blocks without escaping
-
-Prevention: Always use replace(/</g, "\u003c").replace(/>/g, "\u003e") for JSON data
-within set:html
-
-## 2026-04-28 - Fix XSS in CardItem.astro via unsanitized set:html
-
-Vulnerability: HTML content and details from collections were injected directly
-via set:html without sanitization
-
-Learning: Any user-provided or CMS-sourced HTML passed to set:html must be
-sanitized to prevent XSS
-
-Prevention: Always sanitize HTML strings with DOMPurify before using set:html in
-Astro components
-
-## 2026-05-11 - Fix XSS in GithubItem | Vulnerability: Unsanitized set:html for GitHub release/PR descriptions | Learning: External data sources like GitHub API can contain a malicious payload and must be sanitized before rendering | Prevention: Always use DOMPurify when setting HTML from external sources
+- Vulnerability: Unsanitized `set:html` for GitHub release/PR descriptions.
+- Learning: External data sources like the GitHub API can contain malicious payloads and must be sanitized before rendering.
+- Prevention: Always use DOMPurify when setting HTML from external sources.
