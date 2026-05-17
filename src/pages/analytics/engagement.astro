@@ -82,7 +82,7 @@ const activityTableColumns: Column[] = [
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Sidebar -->
       <div class="w-full lg:w-[350px] space-y-6">
-        <PrivacyDashboard client:load />
+        <PrivacyDashboard client:visible />
 
         <div class="bg-card rounded-lg border p-4">
           <h3 class="text-lg font-semibold mb-3">Analytics Sections</h3>
@@ -159,7 +159,7 @@ const activityTableColumns: Column[] = [
                   format="percentage"
                 />
                 <MetricWidget
-                  client:load
+                  client:visible
                   title="Avg. Session Duration"
                   metricName="avg_session_duration"
                   value={metrics.avgSessionDuration}
@@ -167,7 +167,7 @@ const activityTableColumns: Column[] = [
                   suffix=" min"
                 />
                 <MetricWidget
-                  client:load
+                  client:visible
                   title="Active Users"
                   metricName="active_users"
                   value={metrics.activeUsers}
@@ -176,7 +176,7 @@ const activityTableColumns: Column[] = [
 
                 {/* Charts Row */}
                 <ChartWidget
-                  client:load
+                  client:visible
                   title="Session Trends"
                   description="Daily session count and unique users"
                   chartType="line"
@@ -187,7 +187,7 @@ const activityTableColumns: Column[] = [
                   height={300}
                 />
                 <ChartWidget
-                  client:load
+                  client:visible
                   title="Engagement Rate Trend"
                   description="Daily engagement rate percentage"
                   chartType="line"
@@ -198,7 +198,7 @@ const activityTableColumns: Column[] = [
                   height={300}
                 />
                 <ChartWidget
-                  client:load
+                  client:visible
                   title="Session Duration Trend"
                   description="Average daily session duration in minutes"
                   chartType="line"
@@ -209,7 +209,7 @@ const activityTableColumns: Column[] = [
                   height={300}
                 />
                 <ChartWidget
-                  client:load
+                  client:visible
                   title="Interaction Breakdown"
                   description="Percentage distribution of user interactions"
                   chartType="pie"
@@ -221,7 +221,7 @@ const activityTableColumns: Column[] = [
                 />
                 <div class="col-span-1 lg:col-span-2">
                   <TableWidget
-                    client:load
+                    client:visible
                     title="Recent Activity"
                     description="Latest user engagement events"
                     columns={activityTableColumns}

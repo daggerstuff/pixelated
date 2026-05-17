@@ -25,7 +25,7 @@ if (typeof window.process === 'undefined') {
 }
 
 // Expose Buffer to the window object
-window.Buffer = window.Buffer || Buffer
+window.Buffer = window.Buffer ?? Buffer
 
 // Expose stream to the window object
 window.stream = window.stream ?? streamBrowserify

@@ -107,7 +107,7 @@ function generateCrisisAnalytics(
   // Calculate risk distribution
   const riskCounts = results.reduce< { [key: string]: number }>(
     (acc, result) => {
-      acc[result.riskLevel] = (acc[result.riskLevel] || 0) + 1
+      acc[result.riskLevel] = (acc[result.riskLevel] ?? 0) + 1
       return acc
     },
     {},
@@ -126,7 +126,7 @@ function generateCrisisAnalytics(
     .reduce< { [key: string]: number }>(
       (acc, result) => {
         const type = result.category
-        acc[type] = (acc[type] || 0) + 1
+        acc[type] = (acc[type] ?? 0) + 1
         return acc
       },
       {},

@@ -51,7 +51,7 @@ export const scrypt = () => {}
 export const scryptSync = () => new Uint8Array(32)
 
 // Buffer polyfill
-export const Buffer = globalThis.Buffer || {
+export const Buffer = globalThis.Buffer ?? {
   from: (data) => new Uint8Array(Array.isArray(data) ? data : []),
   alloc: (size) => new Uint8Array(size),
   allocUnsafe: (size) => new Uint8Array(size),
@@ -152,7 +152,7 @@ export class Writable extends EventEmitter {
 }
 
 // Process polyfill
-export const process = globalThis.process || {
+export const process = globalThis.process ?? {
   env: {},
   cwd: () => '/',
   chdir: () => {},

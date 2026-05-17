@@ -95,7 +95,7 @@ function generateSentimentInsights(
   // Calculate sentiment distribution
   const sentimentCounts = results.reduce< { [key: string]: number }>(
     (acc, result) => {
-      acc[result.sentiment] = (acc[result.sentiment] || 0) + 1
+      acc[result.sentiment] = (acc[result.sentiment] ?? 0) + 1
       return acc
     },
     {},

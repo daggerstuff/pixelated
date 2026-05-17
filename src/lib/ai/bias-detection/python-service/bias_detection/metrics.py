@@ -16,9 +16,9 @@ class _NoopMetric:
 
 try:
     from prometheus_client import Counter, Histogram
-except Exception:  # pragma: no cover - optional dependency/environment issue
-    Counter = lambda *_, **__: _NoopMetric()  # type: ignore[assignment]
-    Histogram = lambda *_, **__: _NoopMetric()  # type: ignore[assignment]
+except Exception:
+    Counter = lambda *_, **__: _NoopMetric()
+    Histogram = lambda *_, **__: _NoopMetric()
 
 
 request_count = Counter(
