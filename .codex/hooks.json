@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit.*\\.(ts|tsx)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/vivi/pixelated && oxlint --type-aware"
+          }
+        ]
+      }
+    ]
+  }
+}
