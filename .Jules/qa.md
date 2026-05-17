@@ -54,3 +54,9 @@
 
 - Pattern: Use `vi.useFakeTimers()` with a fixed system time to make relative-time assertions deterministic.
 - Action: Call `vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))` in `beforeAll`, then assert `formatDate(date, { relative: true })` returns expected strings like `5 minutes ago` or `1 day ago`. Restore with `vi.useRealTimers()` in `afterAll`.
+## 2026-05-17 - device edge case\n\n- Pattern: Finding untested utility functions lacking a test file and creating isolated tests.\n- Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
+
+## 2026-05-17 - device edge case
+
+- Pattern: Finding untested utility functions lacking a test file and creating isolated tests.
+- Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
