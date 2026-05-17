@@ -40,6 +40,7 @@ const secondLinkText = collectionType === 'prs' ? item.repository?.nameWithOwner
 // Time and content handling
 const time = collectionType === 'releases' ? item.publishedAt : item.createdAt
 const content = collectionType === 'releases' ? item.desc : item.bodyHTML
+
 const sanitizedContent = content
   ? DOMPurify.sanitize(content, {
       ALLOWED_TAGS: [
@@ -76,7 +77,7 @@ const sanitizedContent = content
         'alt'
       ]
     })
-  : ''
+  : undefined
 ---
 
 <details

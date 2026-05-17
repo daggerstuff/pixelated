@@ -10,14 +10,14 @@ const router = Router()
  * or through frontend-initiated OAuth flows. This is a placeholder
  * for Express-based auth flows if needed.
  */
-router.get('/login', (req: Request, res: Response) => {
+router.get('/login', (_req: Request, res: Response) => {
   const auth0Domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   const redirectUri =
     process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
-  if (!auth0Domain || !clientId || !redirectUri) {
+  if (!auth0Domain || !clientId) {
     res.status(500).json({
       error: 'Auth0 configuration missing',
       code: 'CONFIG_ERROR',
@@ -65,7 +65,7 @@ router.get('/callback', async (req: Request, res: Response) => {
     process.env.AUTH0_CALLBACK_URL ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
-  if (!auth0Domain || !clientId || !clientSecret || !redirectUri) {
+  if (!auth0Domain || !clientId || !clientSecret) {
     res.status(500).json({
       error: 'Auth0 configuration missing',
       code: 'CONFIG_ERROR',
