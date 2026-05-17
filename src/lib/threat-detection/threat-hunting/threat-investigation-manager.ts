@@ -95,9 +95,9 @@ export class ThreatInvestigationManager extends EventEmitter {
           if (this.behavioralService) {
             // Extract userId from params or investigation context
             const userId =
-              ((params.userId ??
-              params.user_id) ??
-              investigation.assignedTo) ??
+              (params.userId ??
+              params.user_id) ||
+              investigation.assignedTo ??
               'unknown'
             // Map timeWindow (ms) to timeframe format or use provided timeframe
             const timeframe =

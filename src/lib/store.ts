@@ -262,7 +262,7 @@ export const useStore = create<StoreState>()(
           initializeMentalHealthChat: () => {
             if (get().fheService) {
               const mentalHealthChat = createMentalHealthChat(
-                get().fheService,
+                get().fheService!,
                 {
                   enableAnalysis: get().mentalHealthAnalysisEnabled,
                   useExpertGuidance: get().expertGuidanceEnabled,

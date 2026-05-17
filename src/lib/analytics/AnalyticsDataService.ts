@@ -395,7 +395,7 @@ export class AnalyticsDataService {
    * Cache management
    */
   private getCachedData(key: string): unknown | null {
-    const entry = this.cache.get(key)
+    const entry = this.cache.get(key) as CacheEntry<unknown> | undefined
     if (!entry) {
       return null
     }
