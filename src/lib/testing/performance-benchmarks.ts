@@ -3,7 +3,7 @@ import {} from './test-helpers.ts'
 // Performance Benchmark Configuration
 export const benchmarkConfig = {
   apiEndpoint: '/api/bias-analysis/analyze',
-  baseUrl: process.env['BASE_URL'] || 'http://localhost:3000',
+  baseUrl: process.env['BASE_URL'] ?? 'http://localhost:3000',
   testDuration: 60, // seconds
   concurrentUsers: [1, 5, 10, 25, 50],
   rampUpTime: 10, // seconds
@@ -67,17 +67,17 @@ export interface PerformanceResults {
 export class MemoryMonitor {
   private initialMemory: number = 0
   private peakMemory: number = 0
-  private samples: number[] = []
+  private readonly samples: number[] = []
 
   start(): void {
-    if (typeof performance !== 'undefined' && (performance as any).memory) {
+    if ((performance as any)?.memory) {
       this.initialMemory = (performance as any).memory.usedJSHeapSize
       this.peakMemory = this.initialMemory
     }
   }
 
   sample(): void {
-    if (typeof performance !== 'undefined' && (performance as any).memory) {
+    if ((performance as any)?.memory) {
       const currentMemory = (performance as any).memory.usedJSHeapSize
       this.samples.push(currentMemory)
       this.peakMemory = Math.max(this.peakMemory, currentMemory)
@@ -108,8 +108,8 @@ export class MemoryMonitor {
 
 // Main Performance Benchmark Runner
 export class PerformanceBenchmarkRunner {
-  private results: PerformanceResults[] = []
-  private memoryMonitor = new MemoryMonitor()
+  private readonly results: PerformanceResults[] = []
+  private readonly memoryMonitor = new MemoryMonitor()
 
   async runFullBenchmark(): Promise<PerformanceResults[]> {
     console.log('🚀 Starting Performance Benchmarks for Bias Analysis API')
@@ -472,14 +472,14 @@ export class PerformanceBenchmarkRunner {
 }
 
 // CLI runner for standalone execution
-if (typeof require !== 'undefined' && require.main === module) {
+if (require.main === module) {
   const runner = new PerformanceBenchmarkRunner()
 
   console.log('🚀 Starting Bias Analysis API Performance Benchmarks...\n')
 
   runner
     .runFullBenchmark()
-    .then((results) => {
+    .then( async (results) => {
       const report = runner.generateReport(results)
       console.log('\n' + report)
 

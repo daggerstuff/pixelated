@@ -42,14 +42,14 @@ export interface Phase3TestResult {
 }
 
 export class Phase3IntegrationTester {
-  private memoryService: MemoryService
-  private biasEngine: BiasDetectionEngine
-  private emotionMapper: MultidimensionalEmotionMapper
-  private analyticsService: AnalyticsService
-  private redisService: RedisService
-  private notificationService: NotificationService
-  private contactService: ContactService
-  private emailService: EmailService
+  private readonly memoryService: MemoryService
+  private readonly biasEngine: BiasDetectionEngine
+  private readonly emotionMapper: MultidimensionalEmotionMapper
+  private readonly analyticsService: AnalyticsService
+  private readonly redisService: RedisService
+  private readonly notificationService: NotificationService
+  private readonly contactService: ContactService
+  private readonly emailService: EmailService
 
   constructor() {
     this.memoryService = new MemoryService()
@@ -57,8 +57,8 @@ export class Phase3IntegrationTester {
     this.emotionMapper = new MultidimensionalEmotionMapper()
     this.analyticsService = new AnalyticsService()
     this.redisService = new RedisService({
-      host: process.env['REDIS_HOST'] || 'localhost',
-      port: parseInt(process.env['REDIS_PORT'] || '6379'),
+      host: process.env['REDIS_HOST'] ?? 'localhost',
+      port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
       retryAttempts: 3,
       retryDelay: 1000,
     })
@@ -191,12 +191,12 @@ export class Phase3IntegrationTester {
 
       // Test core services
       const healthChecks = await Promise.allSettled([
-        this.memoryService.healthCheck?.() || Promise.resolve(true),
+        this.memoryService.healthCheck?.() ?? Promise.resolve(true),
         this.redisService.isHealthy(),
-        this.analyticsService.healthCheck?.() || Promise.resolve(true),
-        this.notificationService.healthCheck?.() || Promise.resolve(true),
-        this.contactService.healthCheck?.() || Promise.resolve(true),
-        this.emailService.healthCheck?.() || Promise.resolve(true),
+        this.analyticsService.healthCheck?.() ?? Promise.resolve(true),
+        this.notificationService.healthCheck?.() ?? Promise.resolve(true),
+        this.contactService.healthCheck?.() ?? Promise.resolve(true),
+        this.emailService.healthCheck?.() ?? Promise.resolve(true),
       ])
 
       const healthResults = healthChecks.map((result) =>
@@ -523,7 +523,7 @@ export class Phase3IntegrationTester {
       logger.info('Testing memory management...')
 
       const getMemoryUsage = () => {
-        if (typeof process !== 'undefined' && process?.['memoryUsage']) {
+        if (process?.['memoryUsage']) {
           return process['memoryUsage']()['heapUsed'] / 1024 / 1024 // MB
         }
         return 0

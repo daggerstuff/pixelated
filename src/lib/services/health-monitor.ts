@@ -33,7 +33,7 @@ export interface SystemHealth {
 }
 
 export class HealthMonitor {
-  private checks: Map<string, () => Promise<HealthCheck>> = new Map()
+  private readonly checks: Map<string, () => Promise<HealthCheck>> = new Map()
 
   constructor() {
     // Register default health checks
@@ -76,9 +76,7 @@ export class HealthMonitor {
             status: 'unhealthy' as const,
             message:
               error instanceof Error
-                ? String(
-                    error instanceof Error ? error.message : 'Unknown error',
-                  )
+                ? (error instanceof Error ? error.message : 'Unknown error')
                 : 'Unknown error',
             responseTime: performance.now() - startTime,
           }

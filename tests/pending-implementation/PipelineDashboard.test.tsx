@@ -29,8 +29,8 @@ jest.mock('@/hooks/usePipelineAPI', () => ({
     error: null,
     startExecution: jest.fn(),
     getExecutionStatus: jest.fn(),
-    getAvailableDatasets: jest.fn(() => Promise.resolve([])),
-    healthCheck: jest.fn(() =>
+    getAvailableDatasets: jest.fn( async () => Promise.resolve([])),
+    healthCheck: jest.fn( async () =>
       Promise.resolve({
         status: 'healthy',
         timestamp: new Date().toISOString(),
@@ -188,8 +188,8 @@ describe('PipelineDashboard', () => {
           error: new Error('API connection failed'),
           startExecution: jest.fn(),
           getExecutionStatus: jest.fn(),
-          getAvailableDatasets: jest.fn(() => Promise.resolve([])),
-          healthCheck: jest.fn(() =>
+          getAvailableDatasets: jest.fn( async () => Promise.resolve([])),
+          healthCheck: jest.fn( async () =>
             Promise.resolve({
               status: 'healthy',
               timestamp: new Date().toISOString(),
@@ -212,8 +212,8 @@ describe('PipelineDashboard', () => {
           error: new Error('Test error'),
           startExecution: jest.fn(),
           getExecutionStatus: jest.fn(),
-          getAvailableDatasets: jest.fn(() => Promise.resolve([])),
-          healthCheck: jest.fn(() =>
+          getAvailableDatasets: jest.fn( async () => Promise.resolve([])),
+          healthCheck: jest.fn( async () =>
             Promise.resolve({
               status: 'healthy',
               timestamp: new Date().toISOString(),
@@ -381,10 +381,10 @@ describe('PipelineDashboard Error Scenarios', () => {
         error: new Error('API service unavailable'),
         startExecution: jest.fn(),
         getExecutionStatus: jest.fn(),
-        getAvailableDatasets: jest.fn(() =>
+        getAvailableDatasets: jest.fn( async () =>
           Promise.reject(new Error('API unavailable')),
         ),
-        healthCheck: jest.fn(() =>
+        healthCheck: jest.fn( async () =>
           Promise.reject(new Error('API unavailable')),
         ),
       })),

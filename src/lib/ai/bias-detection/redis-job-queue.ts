@@ -9,10 +9,10 @@ type JobHandler<T, R> = (
 ) => Promise<R>
 
 export class RedisJobQueue<T = any, R = any> {
-  private redis: RedisClientType
-  private handler: JobHandler<T, R>
-  private queueKey: string
-  private jobsKey: string
+  private readonly redis: RedisClientType
+  private readonly handler: JobHandler<T, R>
+  private readonly queueKey: string
+  private readonly jobsKey: string
   private processing = false
 
   constructor(
@@ -103,7 +103,7 @@ export class RedisJobQueue<T = any, R = any> {
         })
       } catch (err: any) {
         job.status = 'failed'
-        job.error = err?.message || String(err)
+        job.error = err?.message ?? String(err)
         console.error('[RedisJobQueue] Job failed', {
           jobId: job.id,
           error: job.error,
@@ -115,7 +115,7 @@ export class RedisJobQueue<T = any, R = any> {
     } finally {
       this.processing = false
       // Allow distributed workers to process jobs independently
-      setTimeout(() => this.processNext(), 0)
+      setTimeout( async () => this.processNext(), 0)
     }
   }
 

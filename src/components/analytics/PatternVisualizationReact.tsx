@@ -114,10 +114,10 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                       handleSelect(correlation)
                     }
                   }}
-                  aria-label={`Select risk correlation: ${correlation.description || correlation.riskFactor}`}
+                  aria-label={`Select risk correlation: ${correlation.description ?? correlation.riskFactor}`}
                 >
                   <div className='font-medium'>
-                    {correlation.description || correlation.riskFactor}
+                    {correlation.description ?? correlation.riskFactor}
                   </div>
                   <div className='text-gray-500 text-xs'>
                     Strength: {correlation.severityScore.toFixed(2)}

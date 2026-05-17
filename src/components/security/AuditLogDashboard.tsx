@@ -111,7 +111,7 @@ export function AuditLogDashboard() {
       // Optionally handle pagination/limits here if desired
       const res = await fetch('/api/admin/audit-logs?' + params.toString())
       const data = await res.json()
-      let fetchedLogs: AuditLogEntry[] = data.logs || []
+      let fetchedLogs: AuditLogEntry[] = data.logs ?? []
       // Apply date range filter if set
       if (filters.startDate || filters.endDate) {
         fetchedLogs = fetchedLogs.filter((log) => {
@@ -131,10 +131,10 @@ export function AuditLogDashboard() {
         fetchedLogs = fetchedLogs.filter(
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
-            (log.resource.type &&
-              log.resource.type.toLowerCase().includes(searchLower)) ||
+            ((log.resource.type &&
+              log.resource.type.toLowerCase().includes(searchLower)) ??
             (log.resource.id &&
-              log.resource.id.toLowerCase().includes(searchLower)) ||
+              log.resource.id.toLowerCase().includes(searchLower))) ||
             log.userId.toLowerCase().includes(searchLower),
         )
       }
@@ -151,13 +151,13 @@ export function AuditLogDashboard() {
   }, [fetchLogs])
 
   const getEventTypeStats = () => {
-    const stats = logs.reduce(
+    const stats = logs.reduce< Record<string, number>>(
       (acc, log) => {
         const type = log.action
         acc[type] = (acc[type] || 0) + 1
         return acc
       },
-      {} as Record<string, number>,
+      {},
     )
     return Object.entries(stats).map(([name, value]) => ({ name, value }))
   }
@@ -241,7 +241,7 @@ export function AuditLogDashboard() {
                 setFilters({ ...filters, searchTerm: e.target.value })
               }
             />
-            <Button onClick={() => fetchLogs()}>Apply Filters</Button>
+            <Button onClick={ async () => fetchLogs()}>Apply Filters</Button>
           </div>
         </CardContent>
       </Card>

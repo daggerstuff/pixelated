@@ -163,7 +163,7 @@ export class PixelMultimodalChatPage {
    */
   async getLatestMessageContent(): Promise<string> {
     const lastMessage = this.getAllMessages().last()
-    return (await lastMessage.textContent()) || ''
+    return (await lastMessage.textContent()) ?? ''
   }
 
   /**
@@ -221,7 +221,7 @@ export class PixelMultimodalChatPage {
    * Get current recording duration
    */
   async getRecordingDuration(): Promise<string> {
-    return (await this.recordingDuration.textContent()) || '00:00'
+    return (await this.recordingDuration.textContent()) ?? '00:00'
   }
 
   /**
@@ -278,7 +278,7 @@ export class PixelMultimodalChatPage {
    */
   async getErrorMessage(): Promise<string> {
     if (await this.hasError()) {
-      return (await this.errorMessage.textContent()) || ''
+      return (await this.errorMessage.textContent()) ?? ''
     }
     return ''
   }
@@ -369,13 +369,13 @@ export class PixelMultimodalChatPage {
         contentType: 'application/json',
         body: JSON.stringify({
           response: response.text,
-          latency: response.latency || 100,
-          emotions: response.emotions || {
+          latency: response.latency ?? 100,
+          emotions: response.emotions ?? {
             valence: 0.5,
             arousal: 0.5,
             dominance: 0.5,
           },
-          crisis: response.crisis || false,
+          crisis: response.crisis ?? false,
         }),
       })
     })

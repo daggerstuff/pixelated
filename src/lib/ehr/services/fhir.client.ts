@@ -45,7 +45,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
         const bundle = await handleResponse<{ entry?: Array<{ resource: T }> }>(
           response,
         )
-        return bundle.entry?.map((e) => e.resource) || []
+        return bundle.entry?.map((e) => e.resource) ?? []
       } catch (error: unknown) {
         throw new FHIRError(
           'Failed to search resources',

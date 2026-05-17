@@ -610,6 +610,8 @@ export class MultiModalRiskAssessmentService {
           recommendations.immediate.push('Review medication regimen')
           recommendations.shortTerm.push('Intensify therapeutic interventions')
           break
+        case "biometric": { throw new Error('Not implemented yet: "biometric" case') }
+        case "contextual": { throw new Error('Not implemented yet: "contextual" case') }
       }
     })
 
@@ -678,6 +680,7 @@ export class MultiModalRiskAssessmentService {
         case 'biometric':
           focus.push('Physiological stress indicators')
           break
+        case "contextual": { throw new Error('Not implemented yet: "contextual" case') }
       }
     })
 

@@ -55,7 +55,7 @@ export default function DatasetSearch() {
     } catch (err: any) {
       console.error('Dataset search error:', err)
       setError(
-        err.message ||
+        err.message ??
           'Failed to fetch datasets. Please ensure the backend services are running.',
       )
     } finally {

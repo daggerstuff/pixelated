@@ -11,7 +11,7 @@ const optionalIsoDateSchema = z
   .transform((value) => new Date(value))
   .optional()
   .nullable()
-  .transform((value) => value || null)
+  .transform((value) => value ?? null)
 
 export const SearchKeywordMapSchema = z.record(z.string(), z.array(z.string()))
 export type SearchKeywordMap = z.infer<typeof SearchKeywordMapSchema>

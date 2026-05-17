@@ -20,8 +20,8 @@ export const GET = protectRoute({
     const params = new URL(request.url).searchParams
 
     // Parse pagination parameters
-    const page = parseInt(params.get('page') || '1', 10)
-    const limit = Math.min(parseInt(params.get('limit') || '20', 10), 100) // Cap limit to 100
+    const page = parseInt(params.get('page') ?? '1', 10)
+    const limit = Math.min(parseInt(params.get('limit') ?? '20', 10), 100) // Cap limit to 100
     const offset = (page - 1) * limit
 
     // Parse filter parameters

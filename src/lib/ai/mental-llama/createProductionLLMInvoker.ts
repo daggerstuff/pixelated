@@ -129,6 +129,11 @@ export async function createProductionLLMInvoker(
           ? 'Model provider temporarily unavailable, using fallback'
           : 'No model provider configured, using stub response'
         break
+      case LLMInvokerErrorType.INVALID_RESPONSE: { throw new Error('Not implemented yet: LLMInvokerErrorType.INVALID_RESPONSE case') }
+      case LLMInvokerErrorType.PARSING_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.PARSING_ERROR case') }
+      case LLMInvokerErrorType.NETWORK_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.NETWORK_ERROR case') }
+      case LLMInvokerErrorType.VALIDATION_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.VALIDATION_ERROR case') }
+      case LLMInvokerErrorType.UNKNOWN_ERROR: { throw new Error('Not implemented yet: LLMInvokerErrorType.UNKNOWN_ERROR case') }
       default:
         // Keep base response
         break

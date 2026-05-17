@@ -51,7 +51,7 @@ export async function updateInvestigation(
     ? (JSON.parse(raw) as Record<string, unknown>)
     : undefined
   const updated = {
-    ...(existing || {
+    ...(existing ?? {
       id: investigationId,
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -17,7 +17,7 @@ describe('IndexedDBRequestQueue', () => {
   let mockDb: IDBPDatabase<any>
   let mockTransaction: IDBTransaction
   let mockObjectStore: IDBObjectStore
-  let mockRequest: IDBRequest<any>
+  let mockRequest: IDBRequest
 
   beforeEach(() => {
     // Reset mocks
@@ -33,7 +33,7 @@ describe('IndexedDBRequestQueue', () => {
       onsuccess: null,
       onerror: null,
       onupgradeneeded: null,
-    } as unknown as IDBRequest<any>
+    } as unknown as IDBRequest
 
     mockObjectStore = {
       put: vi.fn(),

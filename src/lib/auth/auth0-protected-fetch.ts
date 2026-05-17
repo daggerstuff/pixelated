@@ -17,7 +17,7 @@ export interface AuthRequestConfig {
 
 const readAudience = (): string | undefined => {
   return (
-    import.meta.env.PUBLIC_AUTH0_AUDIENCE || import.meta.env.VITE_AUTH0_AUDIENCE
+    import.meta.env.PUBLIC_AUTH0_AUDIENCE ?? import.meta.env.VITE_AUTH0_AUDIENCE
   )
 }
 
@@ -26,8 +26,8 @@ export const fetchWithAuthToken = async (
   init: AuthRequestOptions = {},
   config: AuthRequestConfig,
 ): Promise<Response> => {
-  const headers = new Headers(init.headers || {})
-  const tokenAudience = config.audience || readAudience()
+  const headers = new Headers(init.headers ?? {})
+  const tokenAudience = config.audience ?? readAudience()
   const token = await config.getAccessTokenSilently(
     tokenAudience || config.scope
       ? {

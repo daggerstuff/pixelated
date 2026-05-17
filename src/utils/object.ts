@@ -73,8 +73,8 @@ const getIdentityKey = (item: any): string => {
     const seen = new Set<object>()
     const safeReplacer = (_: string, val: unknown) => {
       if (val !== null && typeof val === 'object') {
-        if (seen.has(val as object)) return '[Circular]'
-        seen.add(val as object)
+        if (seen.has(val)) return '[Circular]'
+        seen.add(val)
       }
       return val
     }
@@ -96,12 +96,12 @@ const getIdentityKey = (item: any): string => {
  * For large arrays, callers should ensure items carry an explicit `id` property
  * to hit the O(1) fast path in `getIdentityKey` and avoid the hash loop.
  */
-function mergeArrayElements<T>(
+function mergeArrayElements(
   local: any[],
   remote: any[],
   depth: number,
   visited: WeakSet<object>,
-): T {
+): unknown {
   // Phase 1: build result from local items only — indices become stable here.
   const result: any[] = []
   const seenKeys = new Set<string>()
@@ -157,7 +157,7 @@ function mergeArrayElements<T>(
     result.push(item)
   }
 
-  return result as unknown as T
+  return result as unknown as unknown
 }
 
 /**
@@ -236,7 +236,7 @@ export function deepEqual<T>(a: T, b: T, _visited?: WeakSet<object>): boolean {
 
   // For objects, track visited references to detect cycles
   if (typeof a === 'object' && typeof b === 'object') {
-    const visited = _visited || new WeakSet<object>()
+    const visited = _visited ?? new WeakSet<object>()
 
     // Circular reference check - if we've seen this object before, compare by reference
     if (visited.has(a as object) || visited.has(b as object)) {

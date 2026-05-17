@@ -1,6 +1,6 @@
 import React from 'react'
 const { createElement } = React
-const startTransition = React.startTransition || ((cb) => cb())
+const startTransition = React.startTransition || ( async (cb) => cb())
 
 import { createRoot, hydrateRoot } from 'react-dom/client'
 

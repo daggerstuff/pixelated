@@ -49,12 +49,12 @@ export interface BatchProcessorMetrics {
  * The BatchProcessor class.
  */
 export class BatchProcessor implements IBatchProcessor {
-  private queue: UnifiedProcessingRequest[] = []
-  private api: IUnifiedMetaAlignerAPI
-  private config: BatchProcessorConfig
+  private readonly queue: UnifiedProcessingRequest[] = []
+  private readonly api: IUnifiedMetaAlignerAPI
+  private readonly config: BatchProcessorConfig
   private timeoutId: NodeJS.Timeout | null = null
-  private circuitBreaker: CircuitBreaker
-  private metrics: BatchProcessorMetrics = {
+  private readonly circuitBreaker: CircuitBreaker
+  private readonly metrics: BatchProcessorMetrics = {
     requestsProcessed: 0,
     batchesProcessed: 0,
     averageBatchSize: 0,
@@ -79,9 +79,7 @@ export class BatchProcessor implements IBatchProcessor {
       void this.flush()
     }
 
-    if (!this.timeoutId) {
-      this.timeoutId = setTimeout(() => this.flush(), this.config.timeout)
-    }
+    this.timeoutId ??= setTimeout(() => this.flush(), this.config.timeout);
 
     // This is a simplified implementation. In a real-world scenario, you would
     // need to return a promise that resolves with the response for this specific request.
@@ -109,7 +107,7 @@ export class BatchProcessor implements IBatchProcessor {
       this.metrics.requestsProcessed / this.metrics.batchesProcessed
 
     try {
-      await this.circuitBreaker.fire(() => {
+      await this.circuitBreaker.fire( async () => {
         // In a real-world scenario, you would call the API to process the batch.
         // return this.api.processBatch(optimizedBatch);
         return Promise.resolve()

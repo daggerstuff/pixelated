@@ -135,9 +135,9 @@ Focus on accuracy and educational value.`
  * Educational Context Recognition Engine
  */
 export class EducationalContextRecognizer {
-  private aiService: AIService
-  private model: string
-  private adaptToUserLevel: boolean
+  private readonly aiService: AIService
+  private readonly model: string
+  private readonly adaptToUserLevel: boolean
   private lastParseMalformed: boolean = false
 
   // Pattern-based educational indicators for quick detection
@@ -214,7 +214,7 @@ export class EducationalContextRecognizer {
 
   constructor(config: EducationalRecognizerConfig) {
     this.aiService = config.aiService
-    this.model = config.model || 'gpt-4'
+    this.model = config.model ?? 'gpt-4'
     this.adaptToUserLevel = config.adaptToUserLevel ?? true
   }
 
@@ -373,7 +373,7 @@ export class EducationalContextRecognizer {
     }>,
   ): Promise<EducationalContextResult[]> {
     return Promise.all(
-      queries.map(({ query, userProfile, conversationHistory }) =>
+      queries.map( async ({ query, userProfile, conversationHistory }) =>
         this.recognizeEducationalContext(
           query,
           userProfile,
@@ -539,9 +539,9 @@ export class EducationalContextRecognizer {
     // Add user profile context if available
     if (userProfile && this.adaptToUserLevel) {
       contextualPrompt += `\n\nUser Context:
-- Education Level: ${userProfile.educationLevel || 'unknown'}
-- Prior Mental Health Knowledge: ${userProfile.priorMentalHealthKnowledge || 'unknown'}
-- Preferred Learning Style: ${userProfile.preferredLearningStyle || 'unknown'}
+- Education Level: ${userProfile.educationLevel ?? 'unknown'}
+- Prior Mental Health Knowledge: ${userProfile.priorMentalHealthKnowledge ?? 'unknown'}
+- Preferred Learning Style: ${userProfile.preferredLearningStyle ?? 'unknown'}
 
 Adapt complexity and resource recommendations accordingly.`
     }
@@ -598,8 +598,8 @@ Adapt complexity and resource recommendations accordingly.`
       // Prefer fenced JSON
       let jsonStr: string | undefined
       const fencedJson = content.match(/```json\n([\s\S]*?)\n```/)
-      const fenced = fencedJson || content.match(/```\n([\s\S]*?)\n```/)
-      if (fenced && fenced[1]) {
+      const fenced = fencedJson ?? content.match(/```\n([\s\S]*?)\n```/)
+      if (fenced?.[1]) {
         jsonStr = fenced[1]
       }
       // Fall back to extracting the largest JSON-like block by slicing from first '{' to last '}'
@@ -611,16 +611,14 @@ Adapt complexity and resource recommendations accordingly.`
         }
       }
       // Ultimate fallback: try the original content
-      if (!jsonStr) {
-        jsonStr = content
-      }
+      jsonStr ??= content;
       logger.info('Extracted JSON string from AI response', { jsonStr })
-      const parsed = JSON.parse(jsonStr) as any
+      const parsed = JSON.parse(jsonStr)
       logger.info('Parsed AI response JSON', { parsed })
 
       return {
         isEducational: Boolean(parsed.isEducational),
-        confidence: Math.max(0, Math.min(1, parsed.confidence || 0.5)),
+        confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
         educationalType: this.validateEducationalType(parsed.educationalType),
         complexity: this.validateComplexity(parsed.complexity),
         topicArea: this.validateTopicArea(parsed.topicArea),
@@ -638,7 +636,7 @@ Adapt complexity and resource recommendations accordingly.`
         metadata: {
           conceptualDepth: Math.max(
             0,
-            Math.min(1, parsed.metadata?.conceptualDepth || 0.5),
+            Math.min(1, parsed.metadata?.conceptualDepth ?? 0.5),
           ),
           practicalApplications: Array.isArray(
             parsed.metadata?.practicalApplications,
@@ -843,7 +841,7 @@ Adapt complexity and resource recommendations accordingly.`
     }
 
     return (
-      resourceMap[type] || [
+      resourceMap[type] ?? [
         ResourceType.EDUCATIONAL_VIDEOS,
         ResourceType.INFOGRAPHICS,
       ]
@@ -1005,7 +1003,7 @@ Adapt complexity and resource recommendations accordingly.`
     }
 
     return (
-      typeToNextSteps[result.educationalType] || [
+      typeToNextSteps[result.educationalType] ?? [
         'Explore related topics',
         'Seek professional guidance',
       ]

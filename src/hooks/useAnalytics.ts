@@ -13,7 +13,7 @@ export function useAnalytics() {
     try {
       await analyticsService.trackEvent({
         type: data.type as EventType,
-        priority: data.priority || EventPriority.NORMAL,
+        priority: data.priority ?? EventPriority.NORMAL,
         properties: data.properties,
         timestamp: Date.now(),
         metadata: {},
@@ -31,7 +31,7 @@ export function useAnalytics() {
       await analyticsService.trackMetric({
         name: data.name,
         value: data.value,
-        tags: data.tags || {},
+        tags: data.tags ?? {},
         timestamp: Date.now(),
       })
     } catch (error: unknown) {

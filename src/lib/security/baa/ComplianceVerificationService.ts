@@ -19,9 +19,9 @@ const logger = createBuildSafeLogger('phi-audit')
  * Service for managing vendor compliance verification
  */
 export class ComplianceVerificationService {
-  private verifications: Map<string, ComplianceVerification> = new Map()
-  private documents: Map<string, ComplianceDocument> = new Map()
-  private requirements: Map<string, ComplianceRequirement> = new Map()
+  private readonly verifications: Map<string, ComplianceVerification> = new Map()
+  private readonly documents: Map<string, ComplianceDocument> = new Map()
+  private readonly requirements: Map<string, ComplianceRequirement> = new Map()
 
   constructor() {
     // Log initialization for audit trail

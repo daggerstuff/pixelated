@@ -17,7 +17,7 @@ import type {
 const logger = createBuildSafeLogger('multidimensional-emotion-mapper')
 
 export class MultidimensionalEmotionMapper {
-  private config: EmotionMappingConfig
+  private readonly config: EmotionMappingConfig
 
   constructor(config?: Partial<EmotionMappingConfig>) {
     this.config = {
@@ -121,7 +121,7 @@ export class MultidimensionalEmotionMapper {
       const firstKey = Object.keys(this.getDummyEmotionVector())[0] as
         | keyof EmotionVector
         | undefined
-      return firstKey || null
+      return firstKey ?? null
     }
 
     // Initialize with the first emotion in the vector as a baseline

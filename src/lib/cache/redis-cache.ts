@@ -10,18 +10,18 @@ export interface CacheConfig {
 }
 
 export class RedisCache {
-  private client: RedisClientType
-  private config: CacheConfig
+  private readonly client: RedisClientType
+  private readonly config: CacheConfig
   private connected: boolean = false
 
   constructor(config: Partial<CacheConfig> = {}) {
     this.config = {
-      host: process.env['REDIS_HOST'] || 'localhost',
-      port: parseInt(process.env['REDIS_PORT'] || '6379'),
+      host: process.env['REDIS_HOST'] ?? 'localhost',
+      port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
       password: process.env['REDIS_PASSWORD'],
-      db: parseInt(process.env['REDIS_DB'] || '0'),
-      ttl: parseInt(process.env['REDIS_TTL'] || '3600'), // 1 hour default
-      keyPrefix: process.env['REDIS_KEY_PREFIX'] || 'pixelated:',
+      db: parseInt(process.env['REDIS_DB'] ?? '0'),
+      ttl: parseInt(process.env['REDIS_TTL'] ?? '3600'), // 1 hour default
+      keyPrefix: process.env['REDIS_KEY_PREFIX'] ?? 'pixelated:',
       ...config,
     }
 
@@ -89,14 +89,14 @@ export class RedisCache {
     }
   }
 
-  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+  async set(key: string, value: unknown, ttl?: number): Promise<void> {
     try {
       if (!this.connected) {
         await this.connect()
       }
 
       const serializedValue = JSON.stringify(value)
-      const finalTtl = ttl || this.config.ttl
+      const finalTtl = ttl ?? this.config.ttl
 
       await this.client.setEx(this.generateKey(key), finalTtl, serializedValue)
     } catch (error: unknown) {
@@ -234,7 +234,7 @@ export class RedisCache {
     return this.get<T>(cacheKey)
   }
 
-  async setAnalyticsData<T>(key: string, days: number, data: T): Promise<void> {
+  async setAnalyticsData(key: string, days: number, data: unknown): Promise<void> {
     const cacheKey = `analytics:${key}:${days}`
     // Analytics data can be cached for 15 minutes
     await this.set(cacheKey, data, 900)
@@ -249,7 +249,7 @@ export class RedisCache {
     return this.get<T>('dashboard:summary')
   }
 
-  async setDashboardSummary<T>(data: T): Promise<void> {
+  async setDashboardSummary(data: unknown): Promise<void> {
     // Dashboard summary cached for 5 minutes
     await this.set('dashboard:summary', data, 300)
   }
@@ -263,9 +263,7 @@ export class RedisCache {
 let cacheInstance: RedisCache | null = null
 
 export function getCache(): RedisCache {
-  if (!cacheInstance) {
-    cacheInstance = new RedisCache()
-  }
+  cacheInstance ??= new RedisCache();
   return cacheInstance
 }
 

@@ -22,12 +22,12 @@ export class SealContext {
   private seal: unknown
   private context: unknown
   private encryptionParameters: unknown
-  private parameters: SealEncryptionParamsOptions
-  private scheme: SealSchemeType
-  private securityLevel: SealSecurityLevel
+  private readonly parameters: SealEncryptionParamsOptions
+  private readonly scheme: SealSchemeType
+  private readonly securityLevel: SealSecurityLevel
   private initialized = false
   private loadPromise: Promise<void> | null = null
-  private contextOptions: SealContextOptions // To store the options
+  private readonly contextOptions: SealContextOptions // To store the options
 
   /**
    * Create a new SealContext with the specified options
@@ -234,7 +234,7 @@ export class SealContext {
       // Set plain modulus for BFV/BGV
       const plainMod = sealModule.PlainModulus.Batching(
         this.parameters.polyModulusDegree,
-        this.parameters.plainModulus || 20,
+        this.parameters.plainModulus ?? 20,
       )
       parms.setPlainModulus(plainMod)
     }

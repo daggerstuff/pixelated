@@ -35,7 +35,7 @@ async function isMCPServerRunning(url: string): Promise<boolean> {
  */
 async function globalSetup(_config: FullConfig) {
   // Set MCP server URL from environment or use default
-  const mcpServerUrl = process.env['MCP_SERVER_URL'] || 'http://localhost:8033'
+  const mcpServerUrl = process.env['MCP_SERVER_URL'] ?? 'http://localhost:8033'
   process.env['MCP_SERVER_URL'] = mcpServerUrl
 
   // Enable MCP for tests

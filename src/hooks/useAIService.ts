@@ -49,7 +49,7 @@ export function useAIService() {
       try {
         // Create AI service
         const aiService = createLLMService({
-          apiKey: resolveProviderApiKey() || '',
+          apiKey: resolveProviderApiKey() ?? '',
           baseUrl: resolveSafeLlmBaseUrl(),
         })
 

@@ -4,17 +4,16 @@ const logger = createBuildSafeLogger('azure-insights')
 
 // Check if we're in a build environment
 const isBuildTime =
-  typeof process !== 'undefined' &&
   process.env['NODE_ENV'] === 'production' &&
   (process.env['CI'] === 'true' ||
     process.env['GITHUB_ACTIONS'] === 'true' ||
-    process.env['SYSTEM_TEAMFOUNDATIONCOLLECTIONURI'] ||
+    process.env['SYSTEM_TEAMFOUNDATIONCOLLECTIONURI'] ??
     process.env['BUILD_BUILDID'])
 
 // Only import Azure config if not in build environment
 let azureConfig: unknown = null
 if (!isBuildTime) {
-  ;(async () => {
+  ;void (async () => {
     try {
       const module = await import('../../config/azure.config')
       azureConfig = module.azureConfig
@@ -77,9 +76,9 @@ export interface TelemetryMetric {
  * Provides structured logging and monitoring for Azure environments
  */
 export class AzureInsightsTelemetry {
-  private connectionString: string | undefined
-  private instrumentationKey: string | undefined
-  private isConfigured: boolean
+  private readonly connectionString: string | undefined
+  private readonly instrumentationKey: string | undefined
+  private readonly isConfigured: boolean
 
   constructor() {
     if (isBuildTime || !azureConfig) {
@@ -142,11 +141,11 @@ export class AzureInsightsTelemetry {
     try {
       // In a real implementation, this would use the Application Insights SDK
       // For now, we'll log to console and send to a custom endpoint
-      this.sendTelemetry('events', {
+      void this.sendTelemetry('events', {
         name: event.name,
-        properties: event.properties || {},
-        measurements: event.measurements || {},
-        timestamp: event.timestamp || new Date(),
+        properties: event.properties ?? {},
+        measurements: event.measurements ?? {},
+        timestamp: event.timestamp ?? new Date(),
       })
 
       logger.debug('Event tracked', { eventName: event.name })
@@ -174,15 +173,15 @@ export class AzureInsightsTelemetry {
     }
 
     try {
-      this.sendTelemetry('exceptions', {
+      void this.sendTelemetry('exceptions', {
         exception: {
           message: exception.exception.message,
           stack: exception.exception.stack,
           name: exception.exception.name,
         },
-        properties: exception.properties || {},
-        measurements: exception.measurements || {},
-        severityLevel: exception.severityLevel || 'Error',
+        properties: exception.properties ?? {},
+        measurements: exception.measurements ?? {},
+        severityLevel: exception.severityLevel ?? 'Error',
         timestamp: new Date(),
       })
 
@@ -210,16 +209,16 @@ export class AzureInsightsTelemetry {
     }
 
     try {
-      this.sendTelemetry('dependencies', {
+      void this.sendTelemetry('dependencies', {
         name: dependency.name,
         data: dependency.data,
         duration: dependency.duration,
         success: dependency.success,
         resultCode: dependency.resultCode,
-        type: dependency.type || 'HTTP',
+        type: dependency.type ?? 'HTTP',
         target: dependency.target,
-        properties: dependency.properties || {},
-        measurements: dependency.measurements || {},
+        properties: dependency.properties ?? {},
+        measurements: dependency.measurements ?? {},
         timestamp: new Date(),
       })
 
@@ -248,14 +247,14 @@ export class AzureInsightsTelemetry {
     }
 
     try {
-      this.sendTelemetry('requests', {
+      void this.sendTelemetry('requests', {
         name: request.name,
         url: request.url,
         duration: request.duration,
         responseCode: request.responseCode,
         success: request.success,
-        properties: request.properties || {},
-        measurements: request.measurements || {},
+        properties: request.properties ?? {},
+        measurements: request.measurements ?? {},
         timestamp: new Date(),
       })
 
@@ -284,14 +283,14 @@ export class AzureInsightsTelemetry {
     }
 
     try {
-      this.sendTelemetry('metrics', {
+      void this.sendTelemetry('metrics', {
         name: metric.name,
         value: metric.value,
-        count: metric.count || 1,
+        count: metric.count ?? 1,
         min: metric.min,
         max: metric.max,
         stdDev: metric.stdDev,
-        properties: metric.properties || {},
+        properties: metric.properties ?? {},
         timestamp: new Date(),
       })
 
@@ -324,10 +323,10 @@ export class AzureInsightsTelemetry {
     }
 
     try {
-      this.sendTelemetry('pageViews', {
+      void this.sendTelemetry('pageViews', {
         name,
-        url: url || '',
-        properties: properties || {},
+        url: url ?? '',
+        properties: properties ?? {},
         timestamp: new Date(),
       })
 

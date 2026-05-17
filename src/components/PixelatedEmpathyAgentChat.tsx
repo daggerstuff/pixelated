@@ -200,6 +200,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
           experience: extractExperience(userInput),
           specializations: extractSpecializations(userInput),
         })
+      case "general": { throw new Error('Not implemented yet: "general" case') }
       default:
         return await agent.current.sendMessage(userInput, currentContext)
     }

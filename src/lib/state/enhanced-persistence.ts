@@ -137,9 +137,9 @@ interface PersistenceConfig {
 
 class EnhancedStatePersistence {
   private static instance: EnhancedStatePersistence
-  private config: PersistenceConfig
+  private readonly config: PersistenceConfig
   private cleanupTimer: NodeJS.Timeout | null = null
-  private storageChangeListeners: Set<
+  private readonly storageChangeListeners: Set<
     (key: string, newValue: unknown) => void
   > = new Set()
   private static fallbackCounter = 0
@@ -248,7 +248,7 @@ class EnhancedStatePersistence {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       if (key) {
-        const value = localStorage.getItem(key) || ''
+        const value = localStorage.getItem(key) ?? ''
         totalSize += new Blob([key + value]).size
       }
     }
@@ -446,8 +446,7 @@ class EnhancedStatePersistence {
     let secureSuffix: string
     try {
       if (
-        typeof window !== 'undefined' &&
-        window.crypto &&
+        window?.crypto &&
         typeof window.crypto.getRandomValues === 'function'
       ) {
         const arr = new Uint8Array(8)

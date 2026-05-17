@@ -275,8 +275,8 @@ describe('Rate Limiting', () => {
     const requestCounts = new Map<string, number>()
     const ip = '192.168.1.1'
 
-    requestCounts.set(ip, (requestCounts.get(ip) || 0) + 1)
-    requestCounts.set(ip, (requestCounts.get(ip) || 0) + 1)
+    requestCounts.set(ip, (requestCounts.get(ip) ?? 0) + 1)
+    requestCounts.set(ip, (requestCounts.get(ip) ?? 0) + 1)
 
     expect(requestCounts.get(ip)).toBe(2)
   })

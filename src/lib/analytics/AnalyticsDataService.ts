@@ -31,9 +31,9 @@ interface CacheEntry<T> {
 
 export class AnalyticsDataService {
   private static instance: AnalyticsDataService
-  private cache = new Map<string, CacheEntry<unknown>>()
-  private analyticsService: AnalyticsService
-  private config: AnalyticsServiceConfig
+  private readonly cache = new Map<string, CacheEntry<unknown>>()
+  private readonly analyticsService: AnalyticsService
+  private readonly config: AnalyticsServiceConfig
 
   private constructor(config?: Partial<AnalyticsServiceConfig>) {
     this.config = {
@@ -394,8 +394,8 @@ export class AnalyticsDataService {
   /**
    * Cache management
    */
-  private getCachedData<T>(key: string): T | null {
-    const entry = this.cache.get(key) as CacheEntry<T> | undefined
+  private getCachedData(key: string): unknown | null {
+    const entry = this.cache.get(key) as CacheEntry<unknown> | undefined
     if (!entry) {
       return null
     }
@@ -409,7 +409,7 @@ export class AnalyticsDataService {
     return entry.data
   }
 
-  private setCachedData<T>(key: string, data: T, ttl: number): void {
+  private setCachedData(key: string, data: unknown, ttl: number): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),

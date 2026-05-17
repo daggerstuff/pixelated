@@ -74,7 +74,7 @@ test.describe('Pixel Multimodal Chat - Core Flows', () => {
           latency_ms: 145,
         }
         mockedResponse = payload
-        route.fulfill({
+        void route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify(payload),

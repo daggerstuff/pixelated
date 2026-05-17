@@ -139,6 +139,6 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 }
 
 // Export for testing
-if (typeof module !== 'undefined' && module.exports) {
+if (module?.exports) {
   module.exports = { initScrollAnimations }
 }

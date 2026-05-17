@@ -1,0 +1,400 @@
+Type,Key,Assignee,Priority,Status,Summary,Label
+Task,PIX-1,chris@slimshady.me,Medium,To Do,Phase 2A: Route Migration Sprint 2,"architecture, migration"
+Task,PIX-2,chris@slimshady.me,Medium,To Do,AI package Ruff cleanup pass,"AI, ai-tooling, maintenance"
+Task,PIX-3,chris@slimshady.me,Medium,To Do,Phase 2B: Route Migration Sprint 3,"architecture, migration"
+Task,PIX-4,chris@slimshady.me,High,To Do,Hybrid Two-App Architecture Migration,"architecture, migration"
+Task,PIX-5,chris@slimshady.me,Low,To Do,Phase 5: Cleanup & Optimization (Sprint 6),"architecture, migration"
+Task,PIX-6,chris@slimshady.me,High,To Do,Phase 1: Foundation (Sprint 1),"architecture, migration"
+Task,PIX-7,chris@slimshady.me,Medium,To Do,Phase 4: API Extraction (Sprint 5),"architecture, migration"
+Task,PIX-8,chris@slimshady.me,Medium,To Do,Phase 3: Auth Consolidation (Sprint 4),"architecture, migration"
+Task,PIX-9,chris@slimshady.me,High,In Progress,Test Coverage Baseline - Configure Thresholds,"coverage, testing, type:test"
+Task,PIX-10,chris@slimshady.me,High,In Progress,Test Coverage Baseline - Coverage Audit,"coverage, testing, type:test"
+Task,PIX-11,chris@slimshady.me,High,In Progress,Test Coverage Baseline - Fix Import Errors,"coverage, testing, type:test"
+Task,PIX-12,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - HIPAA Tests (Python),"coverage, security, testing, type:test"
+Task,PIX-13,chris@slimshady.me,High,To Do,Test Coverage Baseline (Plan 02),"coverage, security, testing, type:test"
+Task,PIX-14,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - HIPAA Tests (TypeScript),"coverage, security, testing, type:test"
+Task,PIX-15,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Security Tests (Python),"coverage, security, testing, type:test"
+Task,PIX-16,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Security Tests (TypeScript),"coverage, security, testing, type:test"
+Task,PIX-17,chris@slimshady.me,Low,Done,Tri-sync bootstrap sentinel (completed),"historical, platform"
+Task,PIX-18,chris@slimshady.me,Medium,To Do,Consolidate GitLab MR quality lane,"ci-federation, release, release-readiness"
+Task,PIX-19,chris@slimshady.me,Low,To Do,Build CI operations dashboard,"ci-federation, release, release-readiness"
+Task,PIX-20,chris@slimshady.me,High,In Progress,Blocking gaps remediation: training pipeline blockers,"blocking-gap, data-pipeline"
+Task,PIX-21,chris@slimshady.me,High,In Progress,Add branch and path trigger policy,"ci-federation, release, release-readiness"
+Task,PIX-22,chris@slimshady.me,Medium,To Do,Consolidate GitHub security lane,"ci-federation, release, release-readiness"
+Task,PIX-23,chris@slimshady.me,Medium,To Do,Consolidate Bitbucket AI validation lane,"ci-federation, release, release-readiness"
+Task,PIX-24,chris@slimshady.me,High,To Do,Approval checkpoint: ownership and RFC,"ci-federation, release, release-readiness"
+Task,PIX-25,chris@slimshady.me,High,To Do,Implement context optimization architecture,platform
+Task,PIX-26,chris@slimshady.me,High,To Do,Create pipeline inventory across providers,"ci-federation, release, release-readiness"
+Task,PIX-27,chris@slimshady.me,High,To Do,DACT-00: Source Inventory and Licensing Matrix,"acquisition, curation"
+Task,PIX-28,chris@slimshady.me,High,Done,Workstream A: Define acquisition rubric and acceptance gates,"acquisition, curation"
+Task,PIX-29,chris@slimshady.me,Medium,To Do,Create CI failure auto-ticketing rules,"ci-federation, release, release-readiness"
+Task,PIX-30,chris@slimshady.me,High,To Do,DACT-02: Trusted Source Pull v1,"acquisition, curation"
+Task,PIX-31,chris@slimshady.me,Medium,Done,Workstream A: Run public-web acquisition pilot,"acquisition, curation"
+Task,PIX-32,chris@slimshady.me,High,Done,DACT-04: Normalize and Deduplicate Ingested Data,"acquisition, curation"
+Task,PIX-33,chris@slimshady.me,High,Done,DACT-05: PII and Safety Screening,"acquisition, curation"
+Task,PIX-34,chris@slimshady.me,Medium,Done,DACT-08: Freeze v1 Training Slice,"acquisition, curation"
+Task,PIX-35,chris@slimshady.me,Medium,Done,DACT-06: Stage-Based Dataset Slicing,"acquisition, curation"
+Task,PIX-36,chris@slimshady.me,Medium,Done,DACT-07: Human Review and Borderline Decisions,"acquisition, curation"
+Task,PIX-37,chris@slimshady.me,High,In Progress,Data Governance - Task 1.1: Governance directory structure and types,"compliance, governance"
+Task,PIX-38,chris@slimshady.me,Low,In Progress,Workstream A: Consolidate acquisition report and next backlog,"acquisition, curation"
+Task,PIX-39,chris@slimshady.me,High,In Progress,Data Governance - Task 1.2: Core policy engine,"compliance, governance"
+Task,PIX-40,chris@slimshady.me,High,In Progress,Data Governance - Task 1.3: MongoDB policy storage with versioning,"compliance, governance"
+Task,PIX-41,chris@slimshady.me,Medium,To Do,Data Governance - Task 1.4: Hot-reload capability tests,"compliance, governance"
+Task,PIX-42,chris@slimshady.me,Medium,To Do,Data Governance - Task 2.3: Audit integration,"compliance, governance"
+Task,PIX-43,chris@slimshady.me,High,To Do,Data Governance - Task 2.1: Pre-flight HIPAA++ compliance checks,"compliance, governance"
+Task,PIX-44,chris@slimshady.me,Medium,To Do,Data Governance - Task 2.2: FHE integration tests,"compliance, governance"
+Task,PIX-45,chris@slimshady.me,Low,To Do,Data Governance - Task 3.2: Slack webhook notifications,"compliance, governance"
+Task,PIX-46,chris@slimshady.me,Medium,To Do,Data Governance - Task 3.1: Unified event aggregation,"compliance, governance"
+Task,PIX-47,chris@slimshady.me,Low,To Do,Data Governance - Task 4.2: Crypto-shred secure deletion,"compliance, governance"
+Task,PIX-48,chris@slimshady.me,Medium,To Do,Data Governance - Task 4.1: Retention policies,"compliance, governance"
+Task,PIX-49,chris@slimshady.me,High,To Do,Define duplication removal list,"ci-federation, release, release-readiness"
+Task,PIX-50,chris@slimshady.me,Low,To Do,Define weekly operating review,"ci-federation, release, release-readiness"
+Task,PIX-51,chris@slimshady.me,High,In Progress,Design release-readiness schema,"ci-federation, release, release-readiness"
+Task,PIX-52,,Medium,To Do,Discovery: assess VR travel feature opportunity,"backlog-hygiene, discovery"
+Task,PIX-53,chris@slimshady.me,Medium,To Do,Disable duplicate non-owner jobs,"ci-federation, release, release-readiness"
+Task,PIX-54,chris@slimshady.me,Low,To Do,Final acceptance review,"ci-federation, release, release-readiness"
+Task,PIX-55,,Medium,To Do,Discovery: define express checkout scope and rollout path,"backlog-hygiene, discovery"
+Task,PIX-56,chris@slimshady.me,Medium,To Do,FHE Emotional Intelligence Integration - execution backlog,"fhe, privacy"
+Task,PIX-57,chris@slimshady.me,Medium,To Do,Home Directory Backup System Redesign - implementation,platform
+Task,PIX-58,chris@slimshady.me,High,To Do,Kickoff: CI Federation Initiative,"ci-federation, release, release-readiness"
+Task,PIX-59,chris@slimshady.me,High,In Progress,Implement readiness aggregator endpoint/script,"ci-federation, release, release-readiness"
+Task,PIX-60,,Medium,To Do,Discovery: define rewards program concept and rollout criteria,"backlog-hygiene, discovery"
+Task,PIX-61,,Medium,To Do,Discovery: define waiting list experience improvements,"backlog-hygiene, discovery"
+Task,PIX-62,chris@slimshady.me,High,To Do,Map capability ownership matrix,"ci-federation, release, release-readiness"
+Task,PIX-63,chris@slimshady.me,High,In Progress,Promote recovered feeders into live pixel-data source config,data-pipeline
+Task,PIX-64,chris@slimshady.me,Medium,To Do,Publish CI operating model RFC,"ci-federation, release, release-readiness"
+Task,PIX-65,chris@slimshady.me,High,To Do,Refactor user profile data model and migration plan,platform
+Task,PIX-66,chris@slimshady.me,High,To Do,Run controlled pixel-data reconciliation build,data-pipeline
+Task,PIX-67,chris@slimshady.me,Medium,To Do,Run dry-run promotion tests (staging),"ci-federation, release, release-readiness"
+Task,PIX-68,chris@slimshady.me,High,To Do,Standardize command contract,"ci-federation, release, release-readiness"
+Task,PIX-69,,High,To Do,Document idea archival policy and backlog cleanup workflow,"backlog-hygiene, discovery"
+Task,PIX-70,chris@slimshady.me,Medium,To Do,Wire MTGC training tracker sync to live Asana project,data-pipeline
+Task,PIX-71,,High,To Do,Wire readiness check into Azure pre-deploy stage,"ci-federation, release-readiness"
+Task,PIX-72,chris@slimshady.me,Medium,To Do,Write runbook and escalation map,"ci-federation, release, release-readiness"
+Epic,PIX-73,chris@slimshady.me,Medium,To Do,Privacy-Preserving Intelligence & FHE,"epic, fhe, privacy"
+Epic,PIX-74,chris@slimshady.me,High,To Do,Data Pipeline Recovery & External Integrations,"data-pipeline, epic, integration"
+Epic,PIX-75,chris@slimshady.me,Medium,To Do,Platform Foundations & Operations,"epic, operations, platform"
+Epic,PIX-76,chris@slimshady.me,High,To Do,CI Federation & Release Readiness,"ci-federation, epic, release-readiness"
+Epic,PIX-77,,Medium,To Do,Product Discovery & Backlog Hygiene,"backlog-hygiene, discovery, epic"
+Epic,PIX-78,chris@slimshady.me,Medium,To Do,Hybrid App Architecture Migration,"architecture, epic, migration"
+Epic,PIX-79,chris@slimshady.me,High,To Do,Test Coverage & Security Baseline,"coverage, epic, security, testing"
+Epic,PIX-80,chris@slimshady.me,Medium,To Do,Modern Dataset Project,"acquisition, curation, dataset, epic"
+Epic,PIX-81,chris@slimshady.me,High,To Do,Data Governance & Compliance,"compliance, epic, governance"
+Task,PIX-82,,Medium,In Progress,Public Memory Product Transition Program,
+Task,PIX-83,chris@slimshady.me,Medium,To Do,Remove browser-direct internal memory service usage,
+Task,PIX-84,,Medium,In Progress,Build the product memory gateway over the shared service,
+Task,PIX-85,,Medium,To Do,Prepare the developer API and SDK rollout after gateway stabilization,
+Task,PIX-86,,Medium,To Do,Rewrite public memory docs and onboarding around the real product contract,
+Task,PIX-87,,Medium,In Progress,Introduce explicit account and workspace memory scoping,
+Task,PIX-88,,Medium,In Progress,Define the canonical public memory API contract,
+Task,PIX-89,,Medium,In Progress,Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory,
+Task,PIX-90,chris@slimshady.me,Medium,To Do,Blocking gaps remediation: training pipeline blockers,
+Task,PIX-91,chris@slimshady.me,Medium,To Do,AI package Ruff cleanup pass,
+Task,PIX-92,chris@slimshady.me,Medium,To Do,Implement context optimization architecture,
+Task,PIX-93,chris@slimshady.me,Medium,To Do,Explore VR travel features,
+Task,PIX-94,chris@slimshady.me,Medium,To Do,Express checkout,
+Task,PIX-95,chris@slimshady.me,Medium,To Do,Improve waiting list experience,
+Task,PIX-96,chris@slimshady.me,Medium,To Do,New rewards program,
+Task,PIX-97,chris@slimshady.me,Medium,To Do,Refactor user profile data,
+Task,PIX-98,chris@slimshady.me,Medium,Done,Tri-sync bootstrap sentinel,
+Task,PIX-99,chris@slimshady.me,Medium,To Do,What are archived ideas?,
+Task,PIX-100,chris@slimshady.me,Medium,Done,DACT-00: Source Inventory and Licensing Matrix,"acquisition, curation"
+Task,PIX-101,chris@slimshady.me,Medium,Done,DACT-03: Bright Data Public-Web Pilot,"acquisition, curation"
+Task,PIX-102,chris@slimshady.me,Medium,Done,DACT-02: Trusted Source Pull v1,"acquisition, curation"
+Task,PIX-103,chris@slimshady.me,Medium,Done,DACT-01: Acquisition Rubric and Acceptance Gates,"acquisition, curation"
+Task,PIX-104,,Medium,Done,Workstream B/D: Implement stage-based dataset slicing,"acquisition, curation"
+Task,PIX-105,,Medium,Done,Workstream B: Normalize and deduplicate ingested data,"acquisition, curation"
+Task,PIX-106,,Medium,Done,Workstream C: Define privacy and content handling gates,"acquisition, curation"
+Task,PIX-107,,Medium,Done,Workstream B/C: Formalize human review for borderline data,"acquisition, curation"
+Task,PIX-108,chris@slimshady.me,Medium,To Do,Home Directory Backup System Redesign - implementation,
+Task,PIX-109,chris@slimshady.me,Medium,To Do,FHE Emotional Intelligence Integration - execution backlog,
+Task,PIX-110,chris@slimshady.me,Medium,To Do,Hybrid Two-App Architecture Migration,
+Task,PIX-111,chris@slimshady.me,Medium,To Do,Phase 2A: Route Migration Sprint 2,
+Task,PIX-112,chris@slimshady.me,Medium,To Do,Phase 2B: Route Migration Sprint 3,
+Task,PIX-113,chris@slimshady.me,Medium,To Do,Phase 1: Foundation (Sprint 1),
+Task,PIX-114,chris@slimshady.me,Medium,To Do,Wire MTGC training tracker sync to live Asana project,
+Task,PIX-115,chris@slimshady.me,Medium,To Do,Phase 5: Cleanup & Optimization (Sprint 6),
+Task,PIX-116,chris@slimshady.me,Medium,To Do,Phase 3: Auth Consolidation (Sprint 4),
+Task,PIX-117,chris@slimshady.me,Medium,To Do,Phase 4: API Extraction (Sprint 5),
+Task,PIX-118,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Coverage Audit,
+Task,PIX-119,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Fix Import Errors,
+Task,PIX-120,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - HIPAA Tests (TypeScript),
+Task,PIX-121,chris@slimshady.me,Medium,To Do,Test Coverage Baseline (Plan 02),
+Task,PIX-122,chris@slimshady.me,Medium,To Do,Data Governance - Task 1.2: Core policy engine,
+Task,PIX-123,chris@slimshady.me,Medium,To Do,Data Governance - Task 1.3: MongoDB policy storage with versioning,
+Task,PIX-124,chris@slimshady.me,Medium,To Do,Data Governance - Task 1.4: Hot-reload capability tests,
+Task,PIX-125,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Configure Thresholds,
+Task,PIX-126,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - HIPAA Tests (Python),
+Task,PIX-127,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Security Tests (Python),
+Task,PIX-128,chris@slimshady.me,Medium,To Do,Test Coverage Baseline - Security Tests (TypeScript),
+Task,PIX-129,chris@slimshady.me,Medium,To Do,Data Governance - Task 1.1: Governance directory structure and types,
+Task,PIX-130,chris@slimshady.me,Medium,To Do,Data Governance - Task 2.1: Pre-flight HIPAA++ compliance checks,
+Task,PIX-131,chris@slimshady.me,Medium,To Do,Data Governance - Task 2.2: FHE integration tests,
+Task,PIX-132,chris@slimshady.me,Medium,To Do,Data Governance - Task 2.3: Audit integration,
+Task,PIX-133,chris@slimshady.me,Medium,To Do,Data Governance - Task 3.1: Unified event aggregation,
+Task,PIX-134,chris@slimshady.me,Medium,To Do,Data Governance - Task 4.2: Crypto-shred secure deletion,
+Task,PIX-135,chris@slimshady.me,Medium,To Do,Kickoff: CI Federation Initiative,
+Task,PIX-136,chris@slimshady.me,Medium,To Do,Approval checkpoint: ownership and RFC,
+Task,PIX-137,chris@slimshady.me,Medium,In Progress,Create pipeline inventory across providers,
+Task,PIX-138,chris@slimshady.me,Medium,To Do,Data Governance - Task 3.2: Slack webhook notifications,
+Task,PIX-139,chris@slimshady.me,Medium,To Do,Data Governance - Task 4.1: Retention policies,
+Task,PIX-140,chris@slimshady.me,Medium,To Do,Define duplication removal list,
+Task,PIX-141,chris@slimshady.me,Medium,To Do,Map capability ownership matrix,
+Task,PIX-142,chris@slimshady.me,Medium,To Do,Standardize command contract,
+Task,PIX-143,chris@slimshady.me,Medium,To Do,Add branch and path trigger policy,
+Task,PIX-144,chris@slimshady.me,Medium,To Do,Consolidate Bitbucket AI validation lane,
+Task,PIX-145,chris@slimshady.me,Medium,To Do,Consolidate GitHub security lane,
+Task,PIX-146,chris@slimshady.me,Medium,To Do,Consolidate GitLab MR quality lane,
+Task,PIX-147,chris@slimshady.me,Medium,To Do,Design release-readiness schema,
+Task,PIX-148,chris@slimshady.me,Medium,To Do,Implement readiness aggregator endpoint/script,
+Task,PIX-149,chris@slimshady.me,Medium,To Do,Wire readiness check into Azure pre-deploy stage,
+Task,PIX-150,chris@slimshady.me,Medium,To Do,Build CI operations dashboard,
+Task,PIX-151,chris@slimshady.me,Medium,To Do,Define weekly operating review,
+Task,PIX-152,chris@slimshady.me,Medium,To Do,Disable duplicate non-owner jobs,
+Task,PIX-153,chris@slimshady.me,Medium,To Do,Final acceptance review,
+Task,PIX-154,chris@slimshady.me,Medium,To Do,Publish CI operating model RFC,
+Task,PIX-155,chris@slimshady.me,Medium,To Do,Run dry-run promotion tests (staging),
+Task,PIX-156,chris@slimshady.me,Medium,To Do,Write runbook and escalation map,
+Task,PIX-157,,Medium,In Progress,CI Federation & Release Readiness,
+Task,PIX-158,chris@slimshady.me,Medium,To Do,Create CI failure auto-ticketing rules,
+Task,PIX-159,,Medium,In Progress,Data Governance & Compliance,
+Task,PIX-160,,Medium,Done,Workstream D: Define training-ready packaging and automation plan,
+Task,PIX-161,chris@slimshady.me,Medium,To Do,Hybrid App Architecture Migration,
+Task,PIX-162,chris@slimshady.me,Medium,To Do,Privacy-Preserving Intelligence & FHE,
+Task,PIX-163,chris@slimshady.me,Medium,To Do,Product Discovery & Backlog Hygiene,
+Task,PIX-164,chris@slimshady.me,Medium,To Do,AI package Ruff cleanup pass,
+Task,PIX-165,chris@slimshady.me,Medium,To Do,Blocking gaps remediation: training pipeline blockers,
+Task,PIX-166,chris@slimshady.me,Medium,To Do,Blocking gaps remediation: training pipeline blockers,
+Task,PIX-167,chris@slimshady.me,Medium,To Do,Data Pipeline Recovery & External Integrations,
+Task,PIX-168,chris@slimshady.me,Medium,To Do,Platform Foundations & Operations,
+Task,PIX-169,chris@slimshady.me,Medium,To Do,Promote recovered feeders into live pixel-data source config,
+Task,PIX-170,chris@slimshady.me,Medium,To Do,Run controlled pixel-data reconciliation build,
+Task,PIX-171,,Medium,In Progress,Implement context optimization architecture,
+Task,PIX-172,chris@slimshady.me,Medium,To Do,AI package Ruff cleanup pass,
+Task,PIX-173,chris@slimshady.me,Medium,To Do,Define the canonical public memory API contract,
+Task,PIX-174,chris@slimshady.me,Medium,To Do,Introduce explicit account and workspace memory scoping,
+Task,PIX-175,chris@slimshady.me,Medium,In Progress,Prepare the developer API and SDK rollout after gateway stabilization,
+Task,PIX-176,chris@slimshady.me,Medium,To Do,Public Memory Product Transition Program,
+Task,PIX-177,chris@slimshady.me,Medium,To Do,Remove browser-direct internal memory service usage,
+Task,PIX-178,chris@slimshady.me,Medium,To Do,Discovery: assess VR travel feature opportunity,
+Task,PIX-179,chris@slimshady.me,Medium,To Do,Discovery: define express checkout scope and rollout path,
+Task,PIX-180,chris@slimshady.me,Medium,To Do,Discovery: define rewards program concept and rollout criteria,
+Task,PIX-181,chris@slimshady.me,Medium,To Do,Discovery: define waiting list experience improvements,
+Task,PIX-182,chris@slimshady.me,Medium,To Do,Document idea archival policy and backlog cleanup workflow,
+Task,PIX-183,chris@slimshady.me,Medium,To Do,Explore VR travel features,
+Task,PIX-184,chris@slimshady.me,Medium,To Do,Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory,
+Task,PIX-185,chris@slimshady.me,Medium,To Do,Rewrite public memory docs and onboarding around the real product contract,
+Task,PIX-186,chris@slimshady.me,Medium,To Do,Implement ConvApparel-style user-simulator realism evaluation pipeline for Pixelated Empathy,
+Task,PIX-187,chris@slimshady.me,Medium,To Do,"Phase 1: Fix the Bleeding — Auto-rebase, fast-path, commit messages, error recovery",
+Task,PIX-188,chris@slimshady.me,Medium,To Do,"Phase 2: Scale Up — Parallel processing, conflict resolution, test validation, LLM fallback",
+Task,PIX-189,chris@slimshady.me,Medium,To Do,"Phase 3: Automate — Daemon, multi-repo, smart filtering, rate limiting",
+Task,PIX-190,chris@slimshady.me,Medium,To Do,"Phase 4: Enhance — Human escalation, PR reporting, learning loop, dashboard",
+Task,PIX-191,chris@slimshady.me,Medium,To Do,"Phase 5: Expand — Autonomous PR creation, rule engine, external integrations",
+Task,PIX-192,chris@slimshady.me,Medium,To Do,AutoReview AI — Workflow Expansion & Improvement,
+Task,PIX-193,chris@slimshady.me,Medium,To Do,A1: Auto-rebase PRs before processing,
+Task,PIX-194,chris@slimshady.me,Medium,To Do,A3: Fast-path for clean PRs (no actionable comments → immediate merge),
+Task,PIX-195,chris@slimshady.me,Medium,To Do,A5: Use LLM reasoning blocks as commit messages,
+Task,PIX-196,chris@slimshady.me,Medium,To Do,D3: Checkpoint state for crash recovery,
+Task,PIX-197,chris@slimshady.me,Medium,To Do,A2: Parallel PR processing (3-5 concurrent),
+Task,PIX-198,chris@slimshady.me,Medium,To Do,B4: Smart conflict resolution strategy per PR type,
+Task,PIX-199,chris@slimshady.me,Medium,To Do,B1: Test suite validation in E2B sandbox before merge,
+Task,PIX-200,chris@slimshady.me,Medium,To Do,B2: LLM timeout handling and fallback for large files,
+Task,PIX-201,chris@slimshady.me,Medium,To Do,A4: Fix comment resolution — track processed comments locally,
+Task,PIX-202,chris@slimshady.me,Medium,To Do,"B3: Smart bot comment filtering (pattern-based, not hardcoded)",
+Task,PIX-203,chris@slimshady.me,Medium,To Do,C1: Multi-repository orchestration,
+Task,PIX-204,chris@slimshady.me,Medium,To Do,D1: Run workflow as a daemon/scheduled service,
+Task,PIX-205,chris@slimshady.me,Medium,To Do,D2: Rate limiting and cost control,
+Task,PIX-206,chris@slimshady.me,Medium,To Do,C3: Human-in-the-loop escalation,
+Task,PIX-207,chris@slimshady.me,Medium,To Do,C2: Post processing summary comment on each PR,
+Task,PIX-208,chris@slimshady.me,Medium,To Do,C5: Learning loop — improve decisions from historical outcomes,
+Task,PIX-209,chris@slimshady.me,Medium,To Do,C6: Dashboard integration — live workflow status,
+Task,PIX-210,chris@slimshady.me,Medium,To Do,C4: Autonomous PR creation from issues,
+Epic,PIX-211,chris@slimshady.me,Medium,In Progress,Foresight Memory Architecture,
+Task,PIX-212,chris@slimshady.me,Medium,Done,Refactor crisis detection to domain-agnostic anomaly detection,architecture
+Task,PIX-213,chris@slimshady.me,Medium,Done,Implement composable memory block schemas,Feature
+Task,PIX-214,chris@slimshady.me,Medium,To Do,Build event bus for memory operations,architecture
+Task,PIX-215,chris@slimshady.me,Medium,To Do,Implement hook system for memory operations,Feature
+Task,PIX-216,chris@slimshady.me,Medium,Done,Create TypeScript SDK with complete type safety,
+Task,PIX-217,chris@slimshady.me,Medium,Done,Build CLI for memory operations,
+Task,PIX-218,chris@slimshady.me,Medium,To Do,Create VS Code extension for Foresight,
+Task,PIX-219,chris@slimshady.me,Medium,Done,Build documentation site with Docusaurus,
+Task,PIX-220,chris@slimshady.me,Medium,To Do,Build audit trail projections for compliance,compliance
+Task,PIX-221,chris@slimshady.me,Medium,To Do,Implement memory versioning with rollback,Feature
+Task,PIX-222,chris@slimshady.me,Medium,To Do,Implement multi-tenant isolation,
+Task,PIX-223,chris@slimshady.me,Medium,To Do,Integrate with Kafka/Kinesis for stream processing,
+Task,PIX-224,chris@slimshady.me,Medium,To Do,Implement WebSocket subscriptions for real-time updates,
+Task,PIX-225,chris@slimshady.me,Medium,To Do,Implement CRDT-based conflict resolution,
+Task,PIX-226,chris@slimshady.me,Medium,To Do,"Build compliance exporters for HIPAA, SOC2",compliance
+Task,PIX-227,chris@slimshady.me,Medium,To Do,Build offline-first synchronization,
+Task,PIX-228,chris@slimshady.me,Medium,Done,Checkmate: establish a current-truth baseline and launch-ready execution path,
+Task,PIX-229,chris@slimshady.me,Medium,Done,Checkmate: align README with the current multi-chain architecture,
+Task,PIX-230,chris@slimshady.me,Medium,Done,Checkmate: restore clean backend and frontend builds from the current workspace state,
+Task,PIX-231,chris@slimshady.me,Medium,Done,Checkmate: validate devnet deployment path and replace placeholder Solana program IDs,
+Task,PIX-232,chris@slimshady.me,Medium,To Do,Churnmeon: consolidate current truth and execute the reliability-first finish-up plan,
+Task,PIX-233,chris@slimshady.me,Medium,To Do,Churnmeon: stabilize the pytest baseline by fixing shared fixtures and concentrated failure clusters,
+Task,PIX-234,chris@slimshady.me,Medium,To Do,Churnmeon: align README and packaging narrative with the current workflow and plugin architecture,
+Task,PIX-235,chris@slimshady.me,Medium,To Do,"Churnmeon: convert workflow pain points into explicit hardening work for rebasing, large files, and merge validation",
+Task,PIX-236,chris@slimshady.me,Medium,Done,[Checkmate] CM-002: Restore clean backend build,
+Task,PIX-237,chris@slimshady.me,Medium,Done,[Checkmate] CM-001: Establish current-truth baseline,
+Task,PIX-238,chris@slimshady.me,Medium,Done,[Checkmate] CM-003: Restore clean frontend build,
+Task,PIX-239,chris@slimshady.me,Medium,To Do,Review and validate staged CMS/market data/auth updates,
+Epic,PIX-240,chris@slimshady.me,Medium,To Do,Checkmate,
+Task,PIX-241,chris@slimshady.me,Medium,Done,BURN IT DOWN: Foresight MCP Critical Remediation,
+Task,PIX-242,chris@slimshady.me,Medium,Done,[CRIT-2] Fix SQL LIKE injection in query_memories,
+Task,PIX-243,chris@slimshady.me,Medium,Done,[CRIT-3] Fix asyncio.run() crashes in 7 sync MCP tools,
+Task,PIX-244,chris@slimshady.me,Medium,Done,[CRIT-6] Fix delete_memory tenant isolation inconsistency,
+Task,PIX-245,chris@slimshady.me,Medium,Done,[CRIT-8] Add transaction boundary to batch_update_decay,
+Task,PIX-246,chris@slimshady.me,Medium,Done,[CRIT-1] Replace init_db() DROP TABLE with proper schema migrations,
+Task,PIX-247,chris@slimshady.me,Medium,Done,[CRIT-4] Fix LIKE injection in graph_store.find_entities_by_name,
+Task,PIX-248,chris@slimshady.me,Medium,Done,[CRIT-5] Add user_id to memory_entity_links for tenant isolation,
+Task,PIX-249,chris@slimshady.me,Medium,Done,[CRIT-9] Add user/tenant isolation to memory_versions queries,
+Task,PIX-250,chris@slimshady.me,Medium,Done,[CRIT-10] Remove duplicate @mcp.tool() decorator on rollback_memory,
+Task,PIX-251,chris@slimshady.me,Medium,Done,[CRIT-7] Enforce WAL mode consistently across all DB modules,
+Task,PIX-252,chris@slimshady.me,Medium,Done,[SERIOUS-1] Add connection pooling for SQLite,
+Task,PIX-253,chris@slimshady.me,Medium,Done,[SERIOUS-4] Add thread-safe locking to all singleton getters,
+Task,PIX-254,chris@slimshady.me,Medium,Done,[SERIOUS-3] Replace toy entity extraction with real NER or wire up LLM extractor,
+Task,PIX-255,chris@slimshady.me,Medium,Done,[SERIOUS-5] Break circular import via shared config module for DB_PATH,
+Task,PIX-256,chris@slimshady.me,Medium,Done,[SERIOUS-6] Add tenant_id filter to synthesize_memories query,
+Task,PIX-257,chris@slimshady.me,Medium,Done,[SERIOUS-7] Fix topic clustering — substring matching matches wrong words,
+Task,PIX-258,chris@slimshady.me,Medium,Done,[SERIOUS-8] Slim down __init__.py and remove broken stub classes,
+Task,PIX-259,chris@slimshady.me,Medium,Done,[GAP-1] Implement vector search with embeddings,
+Task,PIX-260,chris@slimshady.me,Medium,Done,[GAP-2] Wire transcript processing to automatic memory extraction,
+Task,PIX-261,chris@slimshady.me,Medium,Done,[GAP-3] Implement in-context memory injection,
+Task,PIX-262,chris@slimshady.me,Medium,Done,[GAP-5] Implement real semantic contradiction detection in synthesizer,
+Task,PIX-263,chris@slimshady.me,Medium,Done,[GAP-6] Upgrade reflection engine from statistical summaries to real insights,
+Task,PIX-264,chris@slimshady.me,Medium,Done,[GAP-4] Fix entity extraction quality — graph store filled with garbage,
+Task,PIX-265,chris@slimshady.me,Medium,Done,[GAP-8] Enforce rate limiting in MCP tool execution,
+Task,PIX-266,chris@slimshady.me,Medium,Done,[GAP-7] Implement memory deduplication,
+Task,PIX-267,chris@slimshady.me,Medium,Done,[MEH] Replace __import__('threading') with normal import in reflection_engine,
+Task,PIX-268,chris@slimshady.me,Medium,Done,[SERIOUS-2] Add LIMIT/pagination to synthesize_memories query,
+Task,PIX-269,chris@slimshady.me,Medium,To Do,(deleted) Bulletproof Pixelated Strategy v6 trackable project,
+Task,PIX-270,chris@slimshady.me,Medium,To Do,Bulletproof Scaling: Phase 0 Foundation & Concurrency,
+Task,PIX-271,chris@slimshady.me,Medium,To Do,Bulletproof Scaling: Phase 3 Validation & Portal,
+Task,PIX-272,chris@slimshady.me,Medium,To Do,Wave-5 Promotion Offshoot from Bulletproof Strategy,
+Task,PIX-273,chris@slimshady.me,Medium,To Do,Bulletproof Scaling: Phase 4 Production Cutover,
+Task,PIX-274,chris@slimshady.me,Medium,To Do,Link Strategy Artifact: Master Strategy + Canonical Plan,
+Task,PIX-275,chris@slimshady.me,Medium,To Do,Bulletproof Scaling: Phase 2 Training Infrastructure,
+Task,PIX-276,chris@slimshady.me,Medium,To Do,Risk Register: Bulletproof Strategy v6,
+Task,PIX-277,chris@slimshady.me,Medium,To Do,Bulletproof Scaling: Phase 1 Ingestion & High-Quality Promotion,
+Epic,PIX-278,chris@slimshady.me,Medium,To Do,AutoReview Workflow Improvements,
+Epic,PIX-279,chris@slimshady.me,Medium,To Do,Discovery & Backlog,
+Epic,PIX-280,chris@slimshady.me,Medium,To Do,Churnmeon Reliability,
+Epic,PIX-281,chris@slimshady.me,Medium,In Progress,Training Pipeline Improvements,
+Task,PIX-282,chris@slimshady.me,Medium,Done,1.0 Create shared training infrastructure,"phase-1-infra, safety-critical"
+Task,PIX-283,chris@slimshady.me,Medium,Done,*1.1 Property test — token length stats correctness (Prop 6),"phase-1-infra, safety-critical, type:test"
+Task,PIX-284,chris@slimshady.me,Medium,Done,*1.2 Property test — truncation warning (Prop 7),"phase-1-infra, safety-critical, type:test"
+Task,PIX-285,chris@slimshady.me,Medium,Done,*1.3 Unit tests for shared_config.py,"phase-1-infra, type:test"
+Task,PIX-286,chris@slimshady.me,Medium,Done,2.0 Create MultilingualSafetyChecker,"phase-1-infra, safety-critical"
+Task,PIX-287,chris@slimshady.me,Medium,Done,*2.1 Property test — multilingual crisis detection (Prop 8),"phase-1-infra, safety-critical, type:test"
+Task,PIX-288,chris@slimshady.me,Medium,Done,*2.2 Property test — multilingual negation suppression (Prop 9),"phase-1-infra, safety-critical, type:test"
+Task,PIX-289,chris@slimshady.me,Medium,Done,*2.3 Unit tests for MultilingualSafetyChecker,"phase-1-infra, type:test"
+Task,PIX-290,chris@slimshady.me,Medium,Done,3.0 Extend production SFT script,phase-1-infra
+Task,PIX-291,chris@slimshady.me,Medium,Done,*3.1 Unit tests for SFT script improvements,"phase-1-infra, type:test"
+Task,PIX-292,chris@slimshady.me,Medium,Done,4.0 Update Colab notebook for TRL API parity,phase-1-infra
+Task,PIX-293,chris@slimshady.me,Medium,Done,†6.0 Delete broken pipeline files and garbage data,"phase-2-data, type:cleanup"
+Task,PIX-294,chris@slimshady.me,Medium,Done,5.0 Checkpoint — Phase 1 complete,"phase-1-infra, type:checkpoint"
+Task,PIX-295,chris@slimshady.me,Medium,Done,†7.0 Verify compiled corpus not contaminated by garbage book data,"phase-2-data, safety-critical, type:cleanup"
+Task,PIX-296,chris@slimshady.me,Medium,Done,8.0 Implement YouTube transcript ingestion pipeline,phase-2-data
+Task,PIX-297,chris@slimshady.me,Medium,Done,*8.1 Property test — YouTube language tagging (Prop 15),"phase-2-data, type:test"
+Task,PIX-298,chris@slimshady.me,Medium,Done,*8.2 Property test — YouTube safety filtering (Prop 16),"phase-2-data, safety-critical, type:test"
+Task,PIX-299,chris@slimshady.me,Medium,Done,*8.3 Property test — YouTube dedup (Prop 17),"phase-2-data, type:test"
+Task,PIX-300,chris@slimshady.me,Medium,Done,*8.4 Unit tests for youtube_ingestion.py,"phase-2-data, type:test"
+Task,PIX-301,chris@slimshady.me,Medium,Done,‡9.0 Execute YouTube ingestion — Tier 1 channels,"phase-2-data, type:execution"
+Task,PIX-302,chris@slimshady.me,Medium,To Do,‡10.0 Execute YouTube ingestion — Tier 2 channels,"phase-2-data, type:execution"
+Task,PIX-303,chris@slimshady.me,Medium,To Do,‡11.0 Execute YouTube ingestion — Tier 3 channels,"phase-2-data, type:execution"
+Task,PIX-304,chris@slimshady.me,Medium,Done,12.0 Implement book and PDF conversion pipeline,phase-2-data
+Task,PIX-305,chris@slimshady.me,Medium,Done,*12.1 Property test — book conversion metadata (Prop 18),"phase-2-data, type:test"
+Task,PIX-306,chris@slimshady.me,Medium,Done,*12.2 Property test — book conversion safety filtering (Prop 19),"phase-2-data, safety-critical, type:test"
+Task,PIX-307,chris@slimshady.me,Medium,Done,*12.3 Unit tests for book_pdf_converter.py,"phase-2-data, type:test"
+Task,PIX-308,chris@slimshady.me,Medium,To Do,‡14.0 Execute book conversion — remaining titles,"phase-2-data, type:execution"
+Task,PIX-309,chris@slimshady.me,Medium,To Do,‡13.0 Execute book conversion — priority titles,"phase-2-data, type:execution"
+Task,PIX-310,chris@slimshady.me,Medium,Done,15.0 Implement deduplication and ChatML normalization pipeline,phase-2-data
+Task,PIX-311,chris@slimshady.me,Medium,Done,*15.1 Property test — near-duplicate removal (Prop 20),"phase-2-data, type:test"
+Task,PIX-312,chris@slimshady.me,Medium,Done,*15.2 Property test — ChatML boundary verification (Prop 21),"phase-2-data, type:test"
+Task,PIX-313,chris@slimshady.me,Medium,Done,*15.3 Property test — edge case preservation (Prop 22),"phase-2-data, safety-critical, type:test"
+Task,PIX-314,chris@slimshady.me,Medium,Done,*15.4 Unit tests for dedup_normalize.py,"phase-2-data, type:test"
+Task,PIX-315,chris@slimshady.me,Medium,Done,16.0 Implement data audit script,phase-2-data
+Task,PIX-316,chris@slimshady.me,Medium,Done,*16.1 Unit tests for data_audit.py,"phase-2-data, type:test"
+Task,PIX-317,chris@slimshady.me,Medium,To Do,17.0 Checkpoint — Phase 2 complete,"phase-2-data, type:checkpoint"
+Task,PIX-318,chris@slimshady.me,Medium,Done,18.0 Implement SDG pipeline,phase-3-sdg
+Task,PIX-319,chris@slimshady.me,Medium,Done,*18.1 Property test — DPO output field completeness (Prop 10),"phase-3-sdg, type:test"
+Task,PIX-320,chris@slimshady.me,Medium,Done,*18.2 Property test — nightmare fuel tagging (Prop 11),"phase-3-sdg, safety-critical, type:test"
+Task,PIX-321,chris@slimshady.me,Medium,Done,*18.3 Property test — non-nightmare safety filtering (Prop 12),"phase-3-sdg, safety-critical, type:test"
+Task,PIX-322,chris@slimshady.me,Medium,Done,*18.4 Unit tests for sdg_pipeline.py,"phase-3-sdg, type:test"
+Task,PIX-323,chris@slimshady.me,Medium,To Do,"‡19.0 Generate DPO preference pairs (10,000)","phase-3-sdg, type:execution"
+Task,PIX-324,chris@slimshady.me,Medium,To Do,‡20.0 Generate niche category data (500 × 10 categories),"phase-3-sdg, type:execution"
+Task,PIX-325,chris@slimshady.me,Medium,To Do,"‡21.0 Generate nightmare fuel data (5,000)","phase-3-sdg, safety-critical, type:execution"
+Task,PIX-326,chris@slimshady.me,Medium,Done,24.0 Implement DPO trainer,"phase-4-dpo, safety-critical"
+Task,PIX-327,chris@slimshady.me,Medium,To Do,‡22.0 Run dedup + normalize on full corpus,"phase-3-sdg, type:execution"
+Task,PIX-328,chris@slimshady.me,Medium,Done,*24.1 Property test — DPO safety filter (Prop 1),"phase-4-dpo, safety-critical, type:test"
+Task,PIX-329,chris@slimshady.me,Medium,To Do,23.0 Checkpoint — Phase 3 complete,"phase-3-sdg, type:checkpoint"
+Task,PIX-330,chris@slimshady.me,Medium,Done,*24.2 Unit tests for dpo_trainer.py,"phase-4-dpo, type:test"
+Task,PIX-331,chris@slimshady.me,Medium,To Do,25.0 Integration test — DPO end-to-end,"phase-4-dpo, type:test"
+Task,PIX-332,chris@slimshady.me,Medium,To Do,26.0 Checkpoint — Phase 4 complete,"phase-4-dpo, type:checkpoint"
+Task,PIX-333,chris@slimshady.me,Medium,Done,27.0 Implement GRPO trainer and reward function,"phase-5-grpo, safety-critical"
+Task,PIX-334,chris@slimshady.me,Medium,Done,*27.1 Property test — reward score range (Prop 2),"phase-5-grpo, safety-critical, type:test"
+Task,PIX-335,chris@slimshady.me,Medium,Done,*27.2 Property test — unsafe response safety score (Prop 3),"phase-5-grpo, safety-critical, type:test"
+Task,PIX-336,chris@slimshady.me,Medium,Done,*27.3 Property test — crisis resource score (Prop 4),"phase-5-grpo, safety-critical, type:test"
+Task,PIX-337,chris@slimshady.me,Medium,Done,*27.4 Property test — low-reward exclusion (Prop 5),"phase-5-grpo, safety-critical, type:test"
+Task,PIX-338,chris@slimshady.me,Medium,Done,*27.5 Unit tests for reward function — 100% coverage,"phase-5-grpo, safety-critical, type:test"
+Task,PIX-339,chris@slimshady.me,Medium,To Do,28.0 Integration test — GRPO end-to-end,"phase-5-grpo, type:test"
+Task,PIX-340,chris@slimshady.me,Medium,To Do,29.0 Checkpoint — Phase 5 complete,"phase-5-grpo, type:checkpoint"
+Task,PIX-341,chris@slimshady.me,Medium,Done,30.0 Implement mental health evaluation suite,phase-6-eval
+Task,PIX-342,chris@slimshady.me,Medium,Done,*30.1 Property test — eval metrics completeness (Prop 13),"phase-6-eval, type:test"
+Task,PIX-343,chris@slimshady.me,Medium,Done,*30.2 Property test — crisis safety failure detection (Prop 14),"phase-6-eval, safety-critical, type:test"
+Task,PIX-344,chris@slimshady.me,Medium,Done,*30.3 Unit tests for mental_health_eval.py,"phase-6-eval, type:test"
+Task,PIX-345,chris@slimshady.me,Medium,Done,31.0 Integration test — eval suite end-to-end,"phase-6-eval, type:test"
+Task,PIX-346,chris@slimshady.me,Medium,Done,32.0 Checkpoint — Phase 6 complete,"phase-6-eval, type:checkpoint"
+Task,PIX-347,chris@slimshady.me,Medium,Done,33.0 Full pipeline dry run,"phase-7-integration, type:execution"
+Task,PIX-348,chris@slimshady.me,Medium,To Do,34.0 Full pipeline production run,"phase-7-integration, type:execution"
+Task,PIX-349,chris@slimshady.me,Medium,To Do,35.0 Final checkpoint — All complete,"phase-7-integration, type:checkpoint"
+Task,PIX-350,chris@slimshady.me,Medium,Done,[Checkmate] Set up Sentry for error tracking,
+Task,PIX-351,chris@slimshady.me,Medium,To Do,[Checkmate] Solana devnet smoke tests,
+Task,PIX-352,chris@slimshady.me,Medium,Done,[Checkmate] Write Solana integration tests,
+Task,PIX-353,chris@slimshady.me,Medium,In Progress,[Checkmate] Verify EVM contract on Etherscan,
+Task,PIX-354,chris@slimshady.me,Medium,To Do,[Checkmate] EVM smoke tests on Sepolia,
+Task,PIX-355,chris@slimshady.me,Medium,To Do,[Checkmate] Set up Sentry error tracking,
+Task,PIX-356,chris@slimshady.me,Medium,To Do,[Checkmate] Verify EVM contract on Etherscan/Basescan,
+Task,PIX-357,chris@slimshady.me,Medium,To Do,[Checkmate] Write Solana integration tests on devnet,
+Task,PIX-358,chris@slimshady.me,Medium,To Do,[Checkmate] Smoke test EVM contract on Sepolia,
+Task,PIX-359,chris@slimshady.me,Medium,To Do,[Checkmate] Submit audit package to security auditor,
+Task,PIX-360,chris@slimshady.me,Medium,Done,[Checkmate] Make Phase D feature decisions (CM-016/017/018),
+Task,PIX-361,chris@slimshady.me,Medium,Done,8.5 Implement YouTube transcript fetcher (yt-dlp acquisition step),phase-2-data
+Task,PIX-362,chris@slimshady.me,Medium,To Do,Setup blockchain API keys and testnet funds for contract verification,
+Task,PIX-363,chris@slimshady.me,Medium,To Do,AI Catalyst research,
+Task,PIX-364,chris@slimshady.me,Medium,To Do,Claude Code connectivity sanity check,
+Task,PIX-365,chris@slimshady.me,Medium,To Do,Claude Code linear path hardening validation,
+Task,PIX-366,chris@slimshady.me,Medium,To Do,Linear resilience hardening verification,
+Task,PIX-367,chris@slimshady.me,Medium,To Do,Research & Apply: Alibaba Cloud AI Catalyst Program,
+Task,PIX-368,chris@slimshady.me,Medium,Done,Workstream D: Define training-readiness validation gates,
+Task,PIX-369,chris@slimshady.me,Medium,Done,Workstream D: Add pipeline observability for failures,
+Task,PIX-370,chris@slimshady.me,Medium,In Progress,Workstream E: Build evaluation-to-data feedback loop,
+Task,PIX-371,chris@slimshady.me,Medium,In Progress,Systematic TypeScript Error Resolution - Phase 5 & 6,
+Epic,PIX-372,,Medium,To Do,Memory May-Hem Expansion,
+Task,PIX-373,chris@slimshady.me,Medium,To Do,Sprint 1: Memory Schema & Unification (May 12 – May 25),
+Task,PIX-374,chris@slimshady.me,Medium,To Do,Sprint 2: Gating & Ingestion (May 26 – June 8),
+Task,PIX-375,chris@slimshady.me,Medium,To Do,Design Unified Memory Schema,
+Task,PIX-376,chris@slimshady.me,Medium,To Do,Update AI Repository Memory,
+Task,PIX-377,chris@slimshady.me,Medium,To Do,Update Pixelated Memory Service,
+Task,PIX-378,chris@slimshady.me,Medium,To Do,Sprint 3: Dreaming & Consolidation (June 9 – June 22),
+Task,PIX-379,chris@slimshady.me,Medium,To Do,Design Cross‑Language Memory API,
+Task,PIX-380,chris@slimshady.me,Medium,To Do,Sprint 4: Reflection & Learning (June 23 – July 6),
+Task,PIX-381,chris@slimshady.me,Medium,To Do,"Sprint 5: Fine-Tuning, Evaluation & Deployment (July 7 – July 27)",
+Task,PIX-382,chris@slimshady.me,Medium,To Do,Implement Socratic Gate,
+Task,PIX-383,chris@slimshady.me,Medium,To Do,Integrate Gate into AI Ingestion,
+Task,PIX-384,chris@slimshady.me,Medium,To Do,Integrate Gate into AI Ingestion,
+Task,PIX-385,chris@slimshady.me,Medium,To Do,Integrate Gate into Pixelated Ingestion,
+Task,PIX-386,chris@slimshady.me,Medium,To Do,Write Unit Tests for the Gate,
+Task,PIX-387,chris@slimshady.me,Medium,To Do,Develop Dream Scheduler Service,
+Task,PIX-388,chris@slimshady.me,Medium,To Do,Create Dream Manager Module,
+Task,PIX-389,chris@slimshady.me,Medium,To Do,Wire Dream Manager into AI Memory,
+Task,PIX-390,chris@slimshady.me,Medium,To Do,Extend Pixelated Context Blocks,
+Task,PIX-391,chris@slimshady.me,Medium,To Do,Implement Reflection Tasks,
+Task,PIX-392,chris@slimshady.me,Medium,To Do,Integrate Reflection with Dream Cycles,
+Task,PIX-393,chris@slimshady.me,Medium,To Do,Prepare Fine‑Tuning Dataset,
+Task,PIX-394,chris@slimshady.me,Medium,To Do,Fine‑Tune the Model,
+Task,PIX-395,chris@slimshady.me,Medium,To Do,Evaluate Memory Performance,
+Task,PIX-396,chris@slimshady.me,Medium,To Do,Iterate & Refine,
+Task,PIX-397,,Medium,To Do,Workstream E: Implement performance-gap-to-backlog conversion rules,
+Task,PIX-398,,Medium,To Do,Workstream E: Build evidence-based reprioritization engine,
+Task,PIX-399,,Medium,To Do,Workstream E: Integrate steering with upstream workstreams,

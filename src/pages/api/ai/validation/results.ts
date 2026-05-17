@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
     const userKey =
       authResult['authenticated'] && authResult['user']?.['id']
         ? `user:${authResult['user']['id']}`
-        : `ip:${request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip') || request.headers.get('x-real-ip') || 'unknown'}`
+        : `ip:${(request.headers.get('x-forwarded-for') ?? request.headers.get('cf-connecting-ip')) || request.headers.get('x-real-ip') ?? 'unknown'}`
     const now = Date.now()
     let entry = rateLimitMap.get(userKey)
     if (!entry || now - entry.start > RATE_LIMIT_WINDOW_MS) {
@@ -57,7 +57,7 @@ export const GET: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.SECURITY,
         'validation-pipeline-results-unauthorized',
-        authResult['user']?.['id'] || 'unknown',
+        authResult['user']?.['id'] ?? 'unknown',
         'validation-api',
         {
           userId: authResult['user']?.['id'],
@@ -93,7 +93,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'validation-pipeline-results',
-      authResult['user']?.['id'] || 'system',
+      authResult['user']?.['id'] ?? 'system',
       'validation-api',
       {
         userId: authResult['user']?.['id'],

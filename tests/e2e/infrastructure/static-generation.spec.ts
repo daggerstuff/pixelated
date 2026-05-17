@@ -27,11 +27,11 @@ test.describe('Static Generation Tests', () => {
     await firstArticleLink.click()
 
     // Check that we navigated to the article page
-    await expect(page).toHaveURL(articleHref || '/blog')
+    await expect(page).toHaveURL(articleHref ?? '/blog')
 
     // Check that the article title on the detail page matches
     await expect(page.locator('.blog-post-title')).toContainText(
-      articleTitle || '',
+      articleTitle ?? '',
     )
 
     // Check for MDX rendered content
@@ -53,7 +53,7 @@ test.describe('Static Generation Tests', () => {
     await expect(page).toHaveURL(/\/blog\/tag\//)
 
     // Check that the tag title is displayed
-    await expect(page.locator('h1')).toContainText(tagText || '')
+    await expect(page.locator('h1')).toContainText(tagText ?? '')
 
     // Check that filtered articles are displayed
     await expect(page.locator('.article-card')).toBeVisible()
