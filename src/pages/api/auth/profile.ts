@@ -7,7 +7,7 @@ import {
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { detectAndRedactPHI } from '../../../lib/security/phiDetection'
 import { auth0UserService } from '../../../services/auth0.service'
-import { verifyAuthToken, getSessionFromRequest } from '../../../utils/auth'
+import { resolveUserIdFromRequest } from '../../../utils/auth'
 
 /**
  * User profile endpoint using Auth0
@@ -21,13 +21,14 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
-  const clientInfo = {
-    ip: clientAddress || 'unknown',
-    userAgent: request.headers.get('user-agent') ?? 'unknown',
-    deviceId: request.headers.get('x-device-id') ?? 'unknown',
-  }
-
   try {
+    // Extract client info for logging
+    const clientInfo = {
+      ip: clientAddress || 'unknown',
+      userAgent: request.headers.get('user-agent') ?? 'unknown',
+      deviceId: request.headers.get('x-device-id') ?? 'unknown',
+    }
+
     // Rate limit profile reads (e.g. 60 per minute)
     const rateLimitResult = await rateLimitMiddleware(
       request,
@@ -37,34 +38,10 @@ export const GET = async ({
     )
     if (!rateLimitResult.success) return rateLimitResult.response!
 
-    // Try to get session first (cookie or header)
-    const session = await getSessionFromRequest(request)
-    let userId: string | null = null
-
-    if (session?.user) {
-      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
-    } else {
-      const authHeader = request.headers.get('Authorization')
-      if (!authHeader) {
-        // Fallback to cookie
-        const cookieToken = request.headers
-          .get('cookie')
-          ?.split(';')
-          .find((c) => c.trim().startsWith('auth-token='))
-          ?.split('=')[1]
-
-        if (cookieToken) {
-          const v = await verifyAuthToken(cookieToken)
-          userId = v.userId ?? null
-        }
-      } else {
-        const v = await verifyAuthToken(authHeader)
-        userId = v.userId ?? null
-      }
-    }
+    const userId = await resolveUserIdFromRequest(request)
 
     if (!userId) {
-      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
+       logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
         action: 'get_profile',
         reason: 'No user ID found in session or token',
         clientInfo,
@@ -79,7 +56,7 @@ export const GET = async ({
     const user = await auth0UserService.getUserById(userId)
 
     if (!user) {
-      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
+       logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
         action: 'get_profile',
         reason: 'User not found in database',
         clientInfo,
@@ -117,7 +94,7 @@ export const GET = async ({
   } catch (error: any) {
     console.error('Get profile error:', error)
 
-    logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+     logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
       error: detectAndRedactPHI(
         error instanceof Error ? error.message : 'Unknown error',
@@ -167,18 +144,7 @@ export const PUT = async ({
     )
     if (!rateLimitResult.success) return rateLimitResult.response!
 
-    const session = await getSessionFromRequest(request)
-    let userId: string | null = null
-
-    if (session?.user) {
-      userId = session.user.id || ((session.user as any)._id?.toString() ?? null)
-    } else {
-      const authHeader = request.headers.get('Authorization')
-      if (authHeader) {
-        const v = await verifyAuthToken(authHeader)
-        userId = v.userId ?? null
-      }
-    }
+    const userId = await resolveUserIdFromRequest(request)
 
     if (!userId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -222,14 +188,14 @@ export const PUT = async ({
       })
     }
 
-    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
+     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
       updates: Object.keys(auth0Updates),
       clientInfo,
     })
 
     // Create Audit Log
     await createAuditLog(
-      AuditEventType.MODIFY,
+      AuditEventType.USER_MODIFIED,
       'profile.update',
       userId,
       'user',
@@ -255,11 +221,15 @@ export const PUT = async ({
   } catch (error: unknown) {
     console.error('Update profile error:', error)
 
-    logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
+     logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
       action: 'update_profile',
       success: false,
       error: detectAndRedactPHI(
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error
+          ? error instanceof Error
+            ? error.message
+            : 'Unknown error'
+          : String(error),
       ),
       clientInfo,
     })
