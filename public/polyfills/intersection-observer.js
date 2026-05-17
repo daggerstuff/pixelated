@@ -16,7 +16,7 @@
  */
 function getFrameElement(doc) {
   try {
-    return doc.defaultView && doc.defaultView.frameElement || null;
+    return doc.defaultView?.frameElement ?? null;
   } catch {
     // Ignore the error.
     return null;
@@ -55,7 +55,7 @@ function IntersectionObserverEntry(entry) {
   this.target = entry.target;
   this.rootBounds = ensureDOMRect(entry.rootBounds);
   this.boundingClientRect = ensureDOMRect(entry.boundingClientRect);
-  this.intersectionRect = ensureDOMRect(entry.intersectionRect || getEmptyRect());
+  this.intersectionRect = ensureDOMRect(entry.intersectionRect ?? getEmptyRect());
   this.isIntersecting = !!entry.intersectionRect;
 
   // Calculates the intersection ratio.
@@ -85,7 +85,7 @@ function IntersectionObserverEntry(entry) {
  * @constructor
  */
 function IntersectionObserver(callback, opt_options) {
-  const options = opt_options || {};
+  const options = opt_options ?? {};
 
   if (typeof callback != 'function') {
     throw new Error('callback must be a function');
@@ -111,7 +111,7 @@ function IntersectionObserver(callback, opt_options) {
 
   // Public properties.
   this.thresholds = this._initThresholds(options.threshold);
-  this.root = options.root || null;
+  this.root = options.root ?? null;
   this.rootMargin = this._rootMarginValues.map(function (margin) {
     return margin.value + margin.unit;
   }).join(' ');
@@ -192,7 +192,7 @@ IntersectionObserver.prototype.observe = function (target) {
     return;
   }
 
-  if (!(target && target.nodeType == 1)) {
+  if (!(target?.nodeType == 1)) {
     throw new Error('target must be an Element');
   }
 
@@ -248,7 +248,7 @@ IntersectionObserver.prototype.takeRecords = function () {
  * @return {Array} A sorted list of unique and valid threshold values.
  */
 IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
-  let threshold = opt_threshold || [0];
+  let threshold = opt_threshold ?? [0];
   if (!Array.isArray(threshold)) {
     threshold = [threshold];
   }
@@ -273,7 +273,7 @@ IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
  *     value and unit.
  */
 IntersectionObserver.prototype._parseRootMargin = function (opt_rootMargin) {
-  const marginString = opt_rootMargin || '0px';
+  const marginString = opt_rootMargin ?? '0px';
   const margins = marginString.split(/\s+/).map(function (margin) {
     const parts = /^(-?\d*\.?\d+)(px|%)$/.exec(margin);
     if (!parts) {
@@ -351,7 +351,7 @@ IntersectionObserver.prototype._monitorIntersections = function (doc) {
 
   // Also monitor the parent.
   const rootDoc =
-    (this.root && (this.root.ownerDocument || this.root)) || document;
+    (this.root && (this.root.ownerDocument ?? this.root)) ?? document;
   if (doc != rootDoc) {
     const frame = getFrameElement(doc);
     if (frame) {
@@ -372,7 +372,7 @@ IntersectionObserver.prototype._unmonitorIntersections = function (doc) {
   }
 
   const rootDoc =
-    (this.root && (this.root.ownerDocument || this.root)) || document;
+    (this.root && (this.root.ownerDocument ?? this.root)) ?? document;
 
   // Check if any dependent targets are still remaining.
   const hasDependentTargets =
@@ -385,7 +385,7 @@ IntersectionObserver.prototype._unmonitorIntersections = function (doc) {
       // Target is nested in this context.
       while (itemDoc && itemDoc != rootDoc) {
         const frame = getFrameElement(itemDoc);
-        itemDoc = frame && frame.ownerDocument;
+        itemDoc = frame?.ownerDocument;
         if (itemDoc == doc) {
           return true;
         }
@@ -472,7 +472,7 @@ IntersectionObserver.prototype._checkForIntersections = function () {
         this._queuedEntries.push(newEntry);
       }
     }
-    else if (oldEntry && oldEntry.isIntersecting) {
+    else if (oldEntry?.isIntersecting) {
       this._queuedEntries.push(newEntry);
     }
   }, this);
@@ -588,10 +588,10 @@ IntersectionObserver.prototype._getRootRect = function () {
     rootRect = {
       top: 0,
       left: 0,
-      right: html.clientWidth || body.clientWidth,
-      width: html.clientWidth || body.clientWidth,
-      bottom: html.clientHeight || body.clientHeight,
-      height: html.clientHeight || body.clientHeight
+      right: html.clientWidth ?? body.clientWidth,
+      width: html.clientWidth ?? body.clientWidth,
+      bottom: html.clientHeight ?? body.clientHeight,
+      height: html.clientHeight ?? body.clientHeight
     };
   }
   return this._expandRectByRootMargin(rootRect);
@@ -635,7 +635,7 @@ IntersectionObserver.prototype._hasCrossedThreshold =
 
     // To make comparing easier, an entry that has a ratio of 0
     // but does not actually intersect is given a value of -1
-    const oldRatio = oldEntry && oldEntry.isIntersecting ?
+    const oldRatio = oldEntry?.isIntersecting ?
       oldEntry.intersectionRatio || 0 : -1;
     const newRatio = newEntry.isIntersecting ?
       newEntry.intersectionRatio || 0 : -1;
@@ -673,7 +673,7 @@ IntersectionObserver.prototype._rootIsInDom = function () {
  */
 IntersectionObserver.prototype._rootContainsTarget = function (target) {
   const rootDoc =
-    (this.root && (this.root.ownerDocument || this.root)) || document;
+    (this.root && (this.root.ownerDocument ?? this.root)) ?? document;
   return (
     containsDeep(rootDoc, target) &&
     (!this.root || rootDoc == target.ownerDocument)
@@ -686,7 +686,7 @@ IntersectionObserver.prototype._rootContainsTarget = function (target) {
  * @private
  */
 IntersectionObserver.prototype._registerInstance = function () {
-  if (registry.indexOf(this) < 0) {
+  if (!registry.includes(this)) {
     registry.push(this);
   }
 };
@@ -708,7 +708,7 @@ IntersectionObserver.prototype._unregisterInstance = function () {
  * @return {number} The elapsed time since the page was requested.
  */
 function now() {
-  return window.performance && performance.now && performance.now();
+  return window.performance && performance.now?.();
 }
 
 /**
@@ -722,12 +722,10 @@ function now() {
 function throttle(fn, timeout) {
   let timer = null;
   return function () {
-    if (!timer) {
-      timer = setTimeout(function () {
+    timer ??= setTimeout(function () {
         fn();
         timer = null;
       }, timeout);
-    }
   };
 }
 
@@ -921,11 +919,11 @@ function getParentNode(node) {
   }
 
   // If the parent has element that is assigned through shadow root slot
-  if (parent && parent.assignedSlot) {
+  if (parent?.assignedSlot) {
     parent = parent.assignedSlot.parentNode
   }
 
-  if (parent && parent.nodeType == 11 && parent.host) {
+  if (parent?.nodeType == 11 && parent.host) {
     // If the parent is a shadow root, return the host element.
     return parent.host;
   }
@@ -939,7 +937,7 @@ function getParentNode(node) {
  * @returns {boolean}
  */
 function isDoc(node) {
-  return node && node.nodeType === 9;
+  return node?.nodeType === 9;
 }
 
 // Wrap the entire polyfill in an IIFE to avoid polluting global scope

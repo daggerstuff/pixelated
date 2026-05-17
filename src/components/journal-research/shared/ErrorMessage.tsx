@@ -40,8 +40,8 @@ export function ErrorMessage({
 
   const normalizedError = error ? normalizeError(error) : null
   const displayMessage =
-    message || (normalizedError ? formatErrorForUser(normalizedError) : null)
-  const fieldErrs = fieldErrors || (error ? getFieldErrors(error) : undefined)
+    message ?? (normalizedError ? formatErrorForUser(normalizedError) : null)
+  const fieldErrs = fieldErrors ?? (error ? getFieldErrors(error) : undefined)
 
   if (fallback && !displayMessage && !fieldErrs) {
     return <>{fallback}</>

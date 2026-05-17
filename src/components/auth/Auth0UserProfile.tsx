@@ -15,7 +15,7 @@ const UserProfileInner = () => {
       <div className='py-10 text-center'>
         <h2 className='mb-4 text-xl'>You are not logged in.</h2>
         <button
-          onClick={() => loginWithRedirect()}
+          onClick={ async () => loginWithRedirect()}
           className='bg-white text-slate-950 hover:bg-slate-200 rounded-full px-6 py-3 font-semibold transition-colors'
         >
           Log In to View Profile

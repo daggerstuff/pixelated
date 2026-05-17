@@ -65,9 +65,9 @@ interface SessionState {
 }
 
 export class TrainingWebSocketServer {
-  private wss: WebSocketServer
-  private clients: Map<string, TrainingSessionClient> = new Map()
-  private sessions: Map<string, SessionState> = new Map()
+  private readonly wss: WebSocketServer
+  private readonly clients: Map<string, TrainingSessionClient> = new Map()
+  private readonly sessions: Map<string, SessionState> = new Map()
   private readonly AUTH_TIMEOUT_MS = 10000 // 10 seconds to authenticate
 
   constructor(port: number) {
@@ -87,8 +87,8 @@ export class TrainingWebSocketServer {
     let initialToken: string | null = null
     try {
       const url = new URL(
-        req.url || '',
-        `http://${req.headers.host || 'localhost'}`,
+        req.url ?? '',
+        `http://${req.headers.host ?? 'localhost'}`,
       )
       initialToken = url.searchParams.get('token')
     } catch (err) {
@@ -425,7 +425,7 @@ export class TrainingWebSocketServer {
     payload: { content: string; role: string },
   ) {
     const client = this.clients.get(clientId)
-    if (!client || !client.sessionId || !client.isAuthenticated) {
+    if (!client?.sessionId || !client.isAuthenticated) {
       return
     }
 
@@ -513,7 +513,7 @@ export class TrainingWebSocketServer {
 
   private handleCoachingNote(clientId: string, payload: { content: string }) {
     const client = this.clients.get(clientId)
-    if (!client || !client.sessionId || !client.isAuthenticated) {
+    if (!client?.sessionId || !client.isAuthenticated) {
       return
     }
 
@@ -543,7 +543,7 @@ export class TrainingWebSocketServer {
 
   private handleDisconnect(clientId: string) {
     const client = this.clients.get(clientId)
-    if (client && client.sessionId) {
+    if (client?.sessionId) {
       this.broadcastToSession(client.sessionId, {
         type: 'participant_left',
         payload: { userId: client.userId },

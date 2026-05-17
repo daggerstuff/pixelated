@@ -149,7 +149,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         <Button
                           variant='ghost'
                           size='icon'
-                          onClick={() => handleMarkAsRead(notification.id)}
+                          onClick={ async () => handleMarkAsRead(notification.id)}
                         >
                           <Check className='h-4 w-4' />
                         </Button>
@@ -157,7 +157,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                       <Button
                         variant='ghost'
                         size='icon'
-                        onClick={() => handleDismiss(notification.id)}
+                        onClick={ async () => handleDismiss(notification.id)}
                       >
                         <X className='h-4 w-4' />
                       </Button>

@@ -268,10 +268,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         ])
 
         return {
-          status: init?.status || 200,
+          status: init?.status ?? 200,
           json: vi.fn().mockResolvedValue(responseData),
           headers: {
-            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+            get: vi.fn((key: string) => defaultHeaders.get(key) ?? null),
           },
         }
       }),
@@ -374,7 +374,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         'Response',
         vi.fn(function (body: string, init?: ResponseInit) {
           return {
-            status: init?.status || 500,
+            status: init?.status ?? 500,
             json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
             headers: {
               get: vi.fn((_key: string) => 'application/json'),
@@ -491,7 +491,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
     it('should handle network timeout scenarios', async () => {
       mockBiasEngine.getDashboardData.mockImplementation(
-        () =>
+         async () =>
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Request timeout')), 100),
           ),
@@ -503,7 +503,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         'Response',
         vi.fn(function (body: string, init?: ResponseInit) {
           return {
-            status: init?.status || 500,
+            status: init?.status ?? 500,
             json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
             headers: {
               get: vi.fn((_key: string) => 'application/json'),

@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
       turnId,
       feedback,
       comment,
-      userId: userId || 'anonymous',
+      userId: userId ?? 'anonymous',
       timestamp: Date.now()
     })
 

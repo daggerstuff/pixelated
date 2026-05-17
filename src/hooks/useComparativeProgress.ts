@@ -172,13 +172,13 @@ export function useComparativeProgress(
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to fetch progress data')
+        throw new Error(errorData.error ?? 'Failed to fetch progress data')
       }
 
       const result = await response.json()
 
       if (!result.success) {
-        throw new Error(result.error || 'Failed to process progress data')
+        throw new Error(result.error ?? 'Failed to process progress data')
       }
 
       setData(result.data)

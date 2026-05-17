@@ -44,7 +44,7 @@ export class AuditLoggingService {
     this.logger = logger
   }
 
-  log(entry: {
+   async log(entry: {
     action: string
     resource: string
     resourceId: string

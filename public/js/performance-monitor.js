@@ -16,7 +16,7 @@
 
   // Collect navigation timing
   function collectNavigationTiming() {
-    if (!window.performance || !window.performance.timing) {
+    if (!window.performance?.timing) {
       return
     }
 
@@ -30,7 +30,7 @@
   // Collect Core Web Vitals
   function collectCoreWebVitals() {
     // First Contentful Paint
-    if (window.performance && window.performance.getEntriesByType) {
+    if (window.performance?.getEntriesByType) {
       const paintEntries = window.performance.getEntriesByType('paint')
       const fcpEntry = paintEntries.find(
         (entry) => entry.name === 'first-contentful-paint',
@@ -57,7 +57,7 @@
 
   // Calculate Time to Interactive (simplified)
   function calculateTTI() {
-    if (!window.performance || !window.performance.timing) {
+    if (!window.performance?.timing) {
       return
     }
 

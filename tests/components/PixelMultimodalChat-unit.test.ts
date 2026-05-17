@@ -11,7 +11,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
  * Mock Component Implementation
  */
 class MockPixelMultimodalChat {
-  private state = {
+  private readonly state = {
     messages: [] as any[],
     transcription: '',
     isRecording: false,
@@ -19,7 +19,7 @@ class MockPixelMultimodalChat {
     emotions: null as any,
   }
 
-  private listeners = new Map<string, Function[]>()
+  private readonly listeners = new Map<string, Function[]>()
 
   constructor() {
     this.setupListeners()

@@ -44,14 +44,14 @@ export const GET = protectRoute({
       JSON.stringify({
         profile: {
           id: userProfile.id,
-          fullName: userProfile.fullName || userProfile.email.split('@')[0],
-          avatarUrl: userProfile.avatarUrl || null,
+          fullName: userProfile.fullName ?? userProfile.email.split('@')[0],
+          avatarUrl: userProfile.avatarUrl ?? null,
           email: userProfile.email,
           role: userProfile.role,
           lastLogin: userProfile.lastLogin,
           createdAt: userProfile.createdAt,
-          userMetadata: userProfile.userMetadata || {},
-          appMetadata: userProfile.appMetadata || {},
+          userMetadata: userProfile.userMetadata ?? {},
+          appMetadata: userProfile.appMetadata ?? {},
         },
       }),
       {
@@ -124,13 +124,13 @@ export const PUT = protectRoute({
       JSON.stringify({
         profile: {
           id: updatedUser.id,
-          fullName: updatedUser.fullName || updatedUser.email.split('@')[0],
-          avatarUrl: updatedUser.avatarUrl || null,
+          fullName: updatedUser.fullName ?? updatedUser.email.split('@')[0],
+          avatarUrl: updatedUser.avatarUrl ?? null,
           email: updatedUser.email,
           role: updatedUser.role,
           lastLogin: updatedUser.lastLogin,
           createdAt: updatedUser.createdAt,
-          userMetadata: updatedUser.userMetadata || {},
+          userMetadata: updatedUser.userMetadata ?? {},
         },
       }),
       {

@@ -43,7 +43,7 @@ export class TokenEncryptionService {
       algorithm: 'aes-256-gcm',
       keyLength: 32,
       ivLength: 16,
-      salt: process.env['TOKEN_ENCRYPTION_SALT'] || '',
+      salt: process.env['TOKEN_ENCRYPTION_SALT'] ?? '',
       password: process.env['TOKEN_ENCRYPTION_PASSWORD'],
     },
     logger: Console = console,
@@ -85,7 +85,7 @@ export class TokenEncryptionService {
 
     if (!this.initializationPromise) {
       const password =
-        this.config.password || process.env['TOKEN_ENCRYPTION_PASSWORD']
+        this.config.password ?? process.env['TOKEN_ENCRYPTION_PASSWORD']
       if (password) {
         this.initializationPromise = this.initialize(password)
       } else {
@@ -149,7 +149,7 @@ export class TokenEncryptionService {
         cipher as unknown as { getAuthTag(): Buffer }
       ).getAuthTag()
 
-      const configuredTagLength = this.config.authTagLength || 16
+      const configuredTagLength = this.config.authTagLength ?? 16
       if (authTag.length !== configuredTagLength) {
         throw new SecurityError(
           `Authentication tag length mismatch: expected ${configuredTagLength}, got ${authTag.length}`,
@@ -182,7 +182,7 @@ export class TokenEncryptionService {
       )
 
       const authTagBuffer = Buffer.from(authTag, 'base64')
-      const tagLength = this.config.authTagLength || 16
+      const tagLength = this.config.authTagLength ?? 16
 
       if (authTagBuffer.length !== tagLength) {
         throw new SecurityError(

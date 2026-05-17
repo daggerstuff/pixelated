@@ -20,13 +20,13 @@ const logger = getClinicalAnalysisLogger('general')
  * integrating clinical knowledge, analysis helpers, and evidence services.
  */
 export class ExpertGuidanceOrchestrator {
-  private clinicalKnowledgeBase: ClinicalKnowledgeBase
-  private clinicalAnalysisHelpers: ClinicalAnalysisHelpers
+  private readonly clinicalKnowledgeBase: ClinicalKnowledgeBase
+  private readonly clinicalAnalysisHelpers: ClinicalAnalysisHelpers
 
   constructor(
-    private evidenceService: EvidenceService,
-    private modelProvider?: IModelProvider,
-    private crisisNotifier?: ICrisisNotificationHandler,
+    private readonly evidenceService: EvidenceService,
+    private readonly modelProvider?: IModelProvider,
+    private readonly crisisNotifier?: ICrisisNotificationHandler,
   ) {
     this.clinicalKnowledgeBase = new ClinicalKnowledgeBase()
     this.clinicalAnalysisHelpers = new ClinicalAnalysisHelpers(
@@ -104,12 +104,12 @@ export class ExpertGuidanceOrchestrator {
         : undefined
 
       // Step 7: Extract comprehensive evidence for expert-guided analysis
-      let enhancedEvidence: string[] = baseAnalysis.supportingEvidence || []
+      let enhancedEvidence: string[] = baseAnalysis.supportingEvidence ?? []
       try {
         const enhancedContext = {
           ...routingContextParams,
           explicitTaskHint:
-            routingContextParams?.explicitTaskHint || 'expert_guided_analysis',
+            routingContextParams?.explicitTaskHint ?? 'expert_guided_analysis',
         }
 
         const evidenceResult =
@@ -125,7 +125,7 @@ export class ExpertGuidanceOrchestrator {
         enhancedEvidence = prioritizedEvidence
 
         logger.info('Expert-guided evidence extraction completed', {
-          originalCount: baseAnalysis.supportingEvidence?.length || 0,
+          originalCount: baseAnalysis.supportingEvidence?.length ?? 0,
           enhancedCount: enhancedEvidence.length,
           evidenceStrength: evidenceResult.processingMetadata.evidenceStrength,
           category: baseAnalysis.mentalHealthCategory,
@@ -185,7 +185,7 @@ export class ExpertGuidanceOrchestrator {
         category: result.mentalHealthCategory,
         expertGuided: result.expertGuided,
         overallRisk: result.riskAssessment?.overallRisk,
-        recommendationCount: result.clinicalRecommendations?.length || 0,
+        recommendationCount: result.clinicalRecommendations?.length ?? 0,
       })
 
       return result
@@ -226,9 +226,9 @@ export class ExpertGuidanceOrchestrator {
           explicitTaskHint: routingContextParams.explicitTaskHint,
         }),
         textSample:
-          result.supportingEvidence?.join(' | ') || 'No evidence available',
+          result.supportingEvidence?.join(' | ') ?? 'No evidence available',
         timestamp: result.timestamp,
-        decisionDetails: result._routingDecision || {},
+        decisionDetails: result._routingDecision ?? {},
         analysisResult: {
           ...result,
           explanation: `[EXPERT-GUIDED] ${result.explanation}`,

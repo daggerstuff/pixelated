@@ -508,11 +508,11 @@ function useConfirmDialog<TData>(): ConfirmDialogHookResult<TData> {
   >({
     title: 'Confirm',
     message: '',
-    onConfirm: () => Promise.resolve(),
+    onConfirm:  async () => Promise.resolve(),
   })
 
   const confirm = useCallback(
-    (props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>) => {
+     async (props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>) => {
       setConfirmProps(props)
       setIsOpen(true)
 

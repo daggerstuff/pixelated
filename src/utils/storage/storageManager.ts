@@ -21,8 +21,8 @@ export interface StorageManagerOptions {
 }
 
 class StorageManager {
-  private options: Required<StorageManagerOptions>
-  private memoryStorage = new Map<string, any>()
+  private readonly options: Required<StorageManagerOptions>
+  private readonly memoryStorage = new Map<string, any>()
   private storageQuota: number
 
   constructor(options: StorageManagerOptions = {}) {
@@ -43,7 +43,7 @@ class StorageManager {
           .estimate()
           .then((estimate) => {
             // Use 80% of available quota or default, whichever is smaller
-            const availableQuota = estimate.quota || this.options.maxStorageSize
+            const availableQuota = estimate.quota ?? this.options.maxStorageSize
             this.storageQuota = Math.min(
               availableQuota * 0.8,
               this.options.maxStorageSize,
@@ -233,7 +233,7 @@ class StorageManager {
         const keysToRemove: string[] = []
         for (let i = 0; i < storage.length; i++) {
           const key = storage.key(i)
-          if (key && key.startsWith(this.options.prefix)) {
+          if (key?.startsWith(this.options.prefix)) {
             keysToRemove.push(key)
           }
         }
@@ -260,8 +260,8 @@ class StorageManager {
       if (storage) {
         for (let i = 0; i < storage.length; i++) {
           const storageKey = storage.key(i)
-          if (storageKey && storageKey.startsWith(this.options.prefix)) {
-            const value = storage.getItem(storageKey) || ''
+          if (storageKey?.startsWith(this.options.prefix)) {
+            const value = storage.getItem(storageKey) ?? ''
             totalSize += value.length
           }
         }

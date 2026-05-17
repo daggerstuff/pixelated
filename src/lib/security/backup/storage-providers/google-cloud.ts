@@ -59,10 +59,10 @@ interface GoogleCloudWriteStreamOptions {
 export class GoogleCloudStorageProvider implements StorageProvider {
   private storage: GoogleCloudStorage | null = null
   private bucket: GoogleCloudBucket | null = null
-  private bucketName: string
+  private readonly bucketName: string
   private initialized = false
 
-  constructor(private config: StorageProviderConfig) {
+  constructor(private readonly config: StorageProviderConfig) {
     this.bucketName = (config.bucket as string) || ''
     if (!this.bucketName) {
       throw new Error(
@@ -82,7 +82,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         projectId: (this.config.credentials as GoogleCloudCredentials)
           ?.project_id,
         ...(this.config.options as GoogleCloudStorageOptions),
-      }) as any
+      })
 
       this.bucket = this.storage!.bucket(this.bucketName)
       this.initialized = true
@@ -123,7 +123,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       const fileNames = files.map((file) => file.name)
 
       // Additional filtering for more complex patterns
-      if (pattern && pattern.includes('*')) {
+      if (pattern?.includes('*')) {
         const regexPattern = pattern
           .replace(/\./g, '\\.')
           .replace(/\*/g, '.*')

@@ -13,7 +13,7 @@ const getRedisConfig = () => {
   return {
     // Prioritize REDIS_URL for ioredis connection (rediss://) over REST URL (https://)
     connectionUrl:
-      process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
+      process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL'],
     restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
   }
 }
@@ -95,7 +95,7 @@ function createMockRedisClient(): RedisClient {
   // Return a mock client with all Redis operations needed by the threat detection system
   return {
     // Basic operations
-    get: async (key: string) => mockStore.get(key) || null,
+    get: async (key: string) => mockStore.get(key) ?? null,
     set: async (key: string, value: string, ..._args: (string | number)[]) => {
       mockStore.set(key, value)
       return 'OK'
@@ -116,7 +116,7 @@ function createMockRedisClient(): RedisClient {
     },
     hincrby: async (key: string, field: string, increment: number) => {
       const hashKey = `${key}:${field}`
-      const current = parseInt(mockStore.get(hashKey) || '0')
+      const current = parseInt(mockStore.get(hashKey) ?? '0')
       const newValue = current + increment
       mockStore.set(hashKey, newValue.toString())
       return newValue
@@ -126,7 +126,7 @@ function createMockRedisClient(): RedisClient {
     for (const [k, v] of Array.from(mockStore.entries())) {
         if (k.startsWith(`${key}:`)) {
           const field = k.substring(key.length + 1)
-        result[field] = v as string
+        result[field] = v
         }
       }
       return result
@@ -165,21 +165,21 @@ function createMockRedisClient(): RedisClient {
     // List operations
     lpush: async (key: string, ...values: string[]) => {
       const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      const list = parseJsonArray(mockStore.get(listKey) ?? '[]')
       list.unshift(...values)
       mockStore.set(listKey, JSON.stringify(list))
       return list.length
     },
     lRange: async (key: string, start: number, stop: number) => {
       const listKey = `list:${key}`
-      return parseJsonArray(mockStore.get(listKey) || '[]').slice(
+      return parseJsonArray(mockStore.get(listKey) ?? '[]').slice(
         start,
         stop + 1,
       )
     },
     lrem: async (key: string, count: number, value: string) => {
       const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      const list = parseJsonArray(mockStore.get(listKey) ?? '[]')
       const filtered = list.filter((item: string) => item !== value)
       mockStore.set(listKey, JSON.stringify(filtered))
       return list.length - filtered.length
@@ -187,7 +187,7 @@ function createMockRedisClient(): RedisClient {
     rpoplpush: async (source: string, destination: string) => {
       const sourceKey = `list:${source}`
       const destinationKey = `list:${destination}`
-      const sourceList = parseJsonArray(mockStore.get(sourceKey) || '[]')
+      const sourceList = parseJsonArray(mockStore.get(sourceKey) ?? '[]')
       if (sourceList.length === 0) {
         return null
       }
@@ -197,7 +197,7 @@ function createMockRedisClient(): RedisClient {
       }
       mockStore.set(sourceKey, JSON.stringify(sourceList))
       const destinationList = parseJsonArray(
-        mockStore.get(destinationKey) || '[]',
+        mockStore.get(destinationKey) ?? '[]',
       )
       destinationList.unshift(value)
       mockStore.set(destinationKey, JSON.stringify(destinationList))
@@ -205,28 +205,28 @@ function createMockRedisClient(): RedisClient {
     },
     llen: async (key: string) => {
       const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore.get(listKey) || '[]')
+      const list = parseJsonArray(mockStore.get(listKey) ?? '[]')
       return list.length
     },
 
     // Sorted set operations
     zadd: async (key: string, score: number, member: string) => {
       const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
+      const zset = parseNumberRecord(mockStore.get(zsetKey) ?? '{}')
       zset[member] = score
       mockStore.set(zsetKey, JSON.stringify(zset))
       return 1
     },
     zrangebyscore: async (key: string, min: number, max: number) => {
       const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
+      const zset = parseNumberRecord(mockStore.get(zsetKey) ?? '{}')
       return Object.entries(zset)
         .filter(([, score]) => score >= min && score <= max)
         .map(([member]) => member)
     },
     zremrangebyscore: async (key: string, min: number, max: number) => {
       const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore.get(zsetKey) || '{}')
+      const zset = parseNumberRecord(mockStore.get(zsetKey) ?? '{}')
       let removed = 0
       for (const [member, score] of Object.entries(zset)) {
         if (score >= min && score <= max) {
@@ -263,7 +263,7 @@ function createMockRedisClient(): RedisClient {
 function createRedisClient(): RedisClient {
   const { connectionUrl, restToken } = getRedisConfig()
 
-  if (connectionUrl && connectionUrl.startsWith('redis')) {
+  if (connectionUrl?.startsWith('redis')) {
     try {
       const parsed = new URL(connectionUrl)
       if (!parsed.hostname) {
@@ -300,7 +300,7 @@ function createRedisClient(): RedisClient {
   return createMockRedisClient()
 }
 
-export const redis: RedisClient = createRedisClient() as RedisClient
+export const redis: RedisClient = createRedisClient()
 if (typeof redis.on === 'function') {
   redis.on('error', (error: unknown) => {
     console.warn('Redis connection warning:', error)

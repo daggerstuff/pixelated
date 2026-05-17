@@ -92,7 +92,7 @@ export default function flexsearchIntegration(
           // Write the file to the output directory
           const outDir = path.resolve(dir.pathname)
           const indexFilename = sanitizeFilename(
-            resolvedOptions.indexPath || 'search-index.js',
+            resolvedOptions.indexPath ?? 'search-index.js',
           )
           const indexPath = validatePath(indexFilename, outDir)
 

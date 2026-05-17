@@ -2,7 +2,7 @@ import { Db, MongoClient } from 'mongodb'
 
 // Initialize MongoDB client
 const client = new MongoClient(
-  process.env['DATABASE_URL'] || process.env['MONGODB_URI'] || '',
+  (process.env['DATABASE_URL'] ?? process.env['MONGODB_URI']) ?? '',
 )
 
 export async function up(): Promise<void> {

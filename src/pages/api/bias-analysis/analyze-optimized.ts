@@ -338,7 +338,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Get query parameters
     const url = new URL(request.url)
     const therapistId = url.searchParams.get('therapistId')
-    const days = parseInt(url.searchParams.get('days') || '30')
+    const days = parseInt(url.searchParams.get('days') ?? '30')
 
     if (!therapistId) {
       return new Response(
@@ -503,7 +503,7 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Process all items in parallel with per-item timeouts
     const perItemTimeoutMs = 30000 // 30s per item
-    const analysisPromises = body.items.map((item) =>
+    const analysisPromises = body.items.map( async (item) =>
       Promise.race([
         biasService.analyzeBias({
           text: item.text,

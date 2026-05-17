@@ -63,7 +63,7 @@ export const POST = async ({ request }: APIContext) => {
     const notificationId = await notificationService.queueNotification({
       userId,
       templateId: notificationType,
-      data: testData || {},
+      data: testData ?? {},
       priority: 'normal',
     })
 

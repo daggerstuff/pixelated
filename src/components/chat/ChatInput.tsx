@@ -77,7 +77,7 @@ export function ChatInput({
         placeholder={
           isLoading
             ? 'AI is responding...'
-            : placeholder || 'Type your message...'
+            : placeholder ?? 'Type your message...'
         }
         disabled={isLoading || disabled}
         className={inputClasses}

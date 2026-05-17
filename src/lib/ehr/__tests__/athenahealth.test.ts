@@ -15,7 +15,7 @@ describe('athenahealth Provider', () => {
     name: 'Test Athenahealth Provider',
     baseUrl: 'https://api.athenahealth.com/fhir/r4',
     clientId: testId || 'example-client-id',
-    clientSecret: process.env.CLIENT_SECRET || 'example-client-secret',
+    clientSecret: process.env.CLIENT_SECRET ?? 'example-client-secret',
     scopes: [
       'user/Patient.read',
       'user/Observation.read',
@@ -142,7 +142,7 @@ describe('athenahealth Provider', () => {
       // but fail for endpoint verification
       const mockSearchResources = vi
         .fn()
-        .mockImplementation((resourceType: string) => {
+        .mockImplementation( async (resourceType: string) => {
           if (resourceType === 'CapabilityStatement') {
             return Promise.resolve([
               {

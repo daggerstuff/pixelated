@@ -245,8 +245,8 @@ const EMOTIONAL_MARKERS = {
  * Production-grade Evidence Extractor
  */
 export class EvidenceExtractor {
-  private config: EvidenceExtractionConfig
-  private modelProvider: IModelProvider | undefined
+  private readonly config: EvidenceExtractionConfig
+  private readonly modelProvider: IModelProvider | undefined
 
   constructor(
     config: Partial<EvidenceExtractionConfig> = {},
@@ -687,8 +687,7 @@ export class EvidenceExtractor {
           category: item.source || `${category}_semantic`,
           clinicalRelevance: clinical,
           metadata: {
-            semanticRationale: (item.context &&
-              (item.context)['semanticRationale']) as
+            semanticRationale: (item.context?.['semanticRationale']) as
               | string
               | undefined,
           },
@@ -784,8 +783,8 @@ Extract evidence that is clinically meaningful and specific to mental health ass
         supportive: 2,
         contextual: 1,
       }
-      const aRelevance = relevanceOrder[a.clinicalRelevance || 'supportive']
-      const bRelevance = relevanceOrder[b.clinicalRelevance || 'supportive']
+      const aRelevance = relevanceOrder[a.clinicalRelevance ?? 'supportive']
+      const bRelevance = relevanceOrder[b.clinicalRelevance ?? 'supportive']
       if (aRelevance !== bRelevance) {
         return bRelevance - aRelevance
       }
@@ -856,7 +855,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
     }
     const totalRelevance = evidenceItems.reduce(
       (sum, item) =>
-        sum + (relevanceWeights[item.clinicalRelevance || 'supportive'] || 0.4),
+        sum + (relevanceWeights[item.clinicalRelevance ?? 'supportive'] || 0.4),
       0,
     )
     const clinicalRelevance = totalRelevance / evidenceItems.length

@@ -67,10 +67,10 @@ interface S3DeleteParams {
 
 export class S3StorageProvider implements StorageProvider {
   private s3: S3Client | null = null
-  private bucketName: string
+  private readonly bucketName: string
   private initialized = false
 
-  constructor(private config: StorageProviderConfig) {
+  constructor(private readonly config: StorageProviderConfig) {
     this.bucketName = (config.bucket as string) || ''
     if (!this.bucketName) {
       throw new Error('Bucket name is required for S3 storage provider')
@@ -100,7 +100,7 @@ export class S3StorageProvider implements StorageProvider {
           const result = await s3Instance.send(new ListObjectsCommand(params))
           // Map and coerce the result shape to our type, filtering undefined keys
           return {
-            Contents: (result.Contents || [])
+            Contents: (result.Contents ?? [])
               .filter(
                 (item): item is Required<typeof item> =>
                   !!item.Key &&
@@ -164,7 +164,7 @@ export class S3StorageProvider implements StorageProvider {
       const fileNames = Contents.map((item) => item.Key)
 
       // Additional filtering for more complex patterns
-      if (pattern && pattern.includes('*')) {
+      if (pattern?.includes('*')) {
         const regexPattern = pattern
           .replace(/\./g, '\\.')
           .replace(/\*/g, '.*')

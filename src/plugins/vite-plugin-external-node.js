@@ -51,10 +51,10 @@ export default function externalNodePlugin() {
     name: 'vite-plugin-external-node',
     config(config) {
       // Mark Node.js built-ins as external for SSR builds
-      config.build = config.build || {}
-      config.build.rollupOptions = config.build.rollupOptions || {}
+      config.build = config.build ?? {}
+      config.build.rollupOptions = config.build.rollupOptions ?? {}
 
-      const existingExternal = config.build.rollupOptions.external || []
+      const existingExternal = config.build.rollupOptions.external ?? []
       const externalFn =
         typeof existingExternal === 'function'
           ? existingExternal
@@ -83,7 +83,7 @@ export default function externalNodePlugin() {
                 : {},
       n = new e.Error().stack
     n &&
-      ((e._sentryDebugIds = e._sentryDebugIds || {}),
+      ((e._sentryDebugIds = e._sentryDebugIds ?? {}),
       (e._sentryDebugIds[n] = '997a2ae6-b7d4-509e-9ed0-412733abc2ae'))
   } catch (error) {
     // Intentionally empty - silencing Sentry debug errors

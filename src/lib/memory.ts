@@ -45,8 +45,8 @@ export class MemoryService {
       content,
       createdAt: new Date(),
       updatedAt: new Date(),
-      tags: options.tags || [],
-      metadata: options.metadata || {},
+      tags: options.tags ?? [],
+      metadata: options.metadata ?? {},
     }
     this.memories.push(memory)
 
@@ -86,7 +86,7 @@ export class MemoryService {
   }
 
   async getMemory(id: string, userId: string): Promise<Memory | null> {
-    return this.memories.find((m) => m.id === id && m.userId === userId) || null
+    return this.memories.find((m) => m.id === id && m.userId === userId) ?? null
   }
 
   async listMemories(
@@ -127,8 +127,8 @@ export class MemoryService {
     }
 
     // Apply pagination
-    const offset = options.offset || 0
-    const limit = options.limit || 10
+    const offset = options.offset ?? 0
+    const limit = options.limit ?? 10
     return filtered.slice(offset, offset + limit)
   }
 

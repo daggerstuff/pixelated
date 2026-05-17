@@ -95,13 +95,11 @@ export function ResearchConsentForm({
         })
 
         if (statuses.length > 0) {
-          setConsentStatus(statuses[0] || null)
+          setConsentStatus(statuses[0] ?? null)
 
           // Initialize selected options from user's existing consent if available
           if (
-            statuses[0] &&
-            statuses[0].userConsent &&
-            statuses[0].userConsent.granularOptions
+            statuses[0]?.userConsent?.granularOptions
           ) {
             setSelectedOptions(statuses[0].userConsent.granularOptions)
           } else if (statuses[0]) {
@@ -150,7 +148,7 @@ export function ResearchConsentForm({
       })
 
       if (statuses.length > 0) {
-        setConsentStatus(statuses[0] || null)
+        setConsentStatus(statuses[0] ?? null)
       }
 
       if (onConsentChanged) {
@@ -190,7 +188,7 @@ export function ResearchConsentForm({
       })
 
       if (statuses.length > 0) {
-        setConsentStatus(statuses[0] || null)
+        setConsentStatus(statuses[0] ?? null)
       }
 
       setWithdrawReason('')
@@ -268,7 +266,7 @@ export function ResearchConsentForm({
           {consentStatus.hasActiveConsent
             ? TEXT.consentGranted(
                 new Date(
-                  consentStatus.userConsent?.grantedAt || '',
+                  consentStatus.userConsent?.grantedAt ?? '',
                 ).toLocaleDateString(),
               )
             : TEXT.requestConsent}
@@ -332,7 +330,7 @@ export function ResearchConsentForm({
                     <input
                       type='checkbox'
                       id={option.id}
-                      checked={selectedOptions[option.optionName] || false}
+                      checked={selectedOptions[option.optionName] ?? false}
                       onChange={(e) =>
                         handleOptionChange(option.optionName, e.target.checked)
                       }

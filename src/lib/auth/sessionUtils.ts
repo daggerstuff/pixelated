@@ -6,5 +6,5 @@ import { getSessionFromRequest } from '../../utils/auth'
  */
 export async function getUser(request: Request) {
   const session = await getSessionFromRequest(request)
-  return session?.user || null
+  return session?.user ?? null
 }

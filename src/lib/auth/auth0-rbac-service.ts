@@ -93,12 +93,12 @@ let auth0Management: ManagementClient | null = null
 
 function getAuth0ManagementConfig() {
   return {
-    domain: process.env['AUTH0_DOMAIN'] || auth0Config.domain,
+    domain: process.env['AUTH0_DOMAIN'] ?? auth0Config.domain,
     managementClientId:
-      process.env['AUTH0_MANAGEMENT_CLIENT_ID'] ||
+      process.env['AUTH0_MANAGEMENT_CLIENT_ID'] ??
       auth0Config.managementClientId,
     managementClientSecret:
-      process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'] ||
+      process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'] ??
       auth0Config.managementClientSecret,
   }
 }

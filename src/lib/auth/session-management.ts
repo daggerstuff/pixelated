@@ -79,7 +79,7 @@ export async function createSession(
 
   // Check concurrent session limit
   const existingSessionsRaw =
-    (await getFromCache<SessionCacheRecord[]>(`user:sessions:${userId}`)) || []
+    (await getFromCache<SessionCacheRecord[]>(`user:sessions:${userId}`)) ?? []
   const existingSessions = existingSessionsRaw || []
   if (existingSessions.length >= MAX_CONCURRENT_SESSIONS) {
     // Remove oldest session
@@ -138,7 +138,7 @@ export async function createSession(
   )
 
   // Log security event
-  await logSecurityEvent('SESSION_CREATED', userId, {
+   logSecurityEvent('SESSION_CREATED', userId, {
     sessionId,
     deviceId: deviceInfo.deviceId,
     ipAddress,
@@ -208,7 +208,7 @@ export async function validateSession(
     const userSessions =
       (await getFromCache<SessionCacheRecord[]>(
         `user:sessions:${session.userId}`,
-      )) || []
+      )) ?? []
     const updatedSessions = userSessions.map((s) =>
       s.sessionId === sessionId
         ? { ...s, lastActivity: session.lastActivity }
@@ -221,7 +221,7 @@ export async function validateSession(
     )
 
     // Log security event
-    await logSecurityEvent('SESSION_VALIDATED', session.userId, {
+     logSecurityEvent('SESSION_VALIDATED', session.userId, {
       sessionId,
       deviceId: deviceInfo.deviceId,
     })
@@ -246,14 +246,14 @@ export async function invalidateSession(sessionId: string): Promise<void> {
     const userSessions =
       (await getFromCache<SessionCacheRecord[]>(
         `user:sessions:${session.userId}`,
-      )) || []
+      )) ?? []
     const updatedSessions = userSessions.filter(
       (s) => s.sessionId !== sessionId,
     )
     await setInCache(`user:sessions:${session.userId}`, updatedSessions)
 
     // Log security event
-    await logSecurityEvent('SESSION_INVALIDATED', session.userId, {
+     logSecurityEvent('SESSION_INVALIDATED', session.userId, {
       sessionId,
       reason: 'manual_invalidation',
     })
@@ -265,7 +265,7 @@ export async function invalidateSession(sessionId: string): Promise<void> {
  */
 export async function getUserSessions(userId: string): Promise<SessionData[]> {
   const sessionList =
-    (await getFromCache<SessionCacheRecord[]>(`user:sessions:${userId}`)) || []
+    (await getFromCache<SessionCacheRecord[]>(`user:sessions:${userId}`)) ?? []
   const now = Date.now()
 
   const activeSessions: SessionData[] = []

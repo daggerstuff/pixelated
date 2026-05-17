@@ -53,8 +53,8 @@ export async function getCurrentUser(context: Request | AstroCookies): Promise<{
     // It's AstroCookies
     // Check for Auth0 token first, then fallback to configured name
     token =
-      (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ||
-      (context as AstroCookies).get('auth_token')?.value ||
+      ((context as AstroCookies).get(authConfig.cookies.accessToken)?.value ??
+      (context as AstroCookies).get('auth_token')?.value) ??
       null
   }
 
@@ -70,7 +70,7 @@ export async function getCurrentUser(context: Request | AstroCookies): Promise<{
       if (result.valid && result.userId) {
         return {
           id: result.userId,
-          role: result.role || 'guest',
+          role: result.role ?? 'guest',
           accountId: result.accountId,
           workspaceId: result.workspaceId,
         }

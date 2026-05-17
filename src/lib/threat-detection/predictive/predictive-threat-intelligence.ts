@@ -200,7 +200,7 @@ export class AdvancedPredictiveThreatIntelligence
   private modelRegistry!: ModelRegistry
 
   constructor(
-    private config: {
+    private readonly config: {
       redisUrl: string
       mongoUrl: string
       modelRegistryUrl: string
@@ -1291,13 +1291,13 @@ export class AdvancedPredictiveThreatIntelligence
   private groupByThreatType(
     threats: ThreatData[],
   ): Record<string, ThreatData[]> {
-    return threats.reduce(
+    return threats.reduce< Record<string, ThreatData[]>>(
       (acc, threat) => {
         if (!acc[threat.threatType]) acc[threat.threatType] = []
         acc[threat.threatType].push(threat)
         return acc
       },
-      {} as Record<string, ThreatData[]>,
+      {},
     )
   }
 
@@ -1437,7 +1437,7 @@ interface ModelRegistry {
 }
 
 class ThreatModelRegistry implements ModelRegistry {
-  constructor(private _mongoClient: MongoClient) {}
+  constructor(private readonly _mongoClient: MongoClient) {}
 
   async registerModel(_id: string, _model: unknown): Promise<void> {
     // Implementation placeholder
@@ -1757,7 +1757,7 @@ abstract class RiskAssessor {
 
 // Concrete implementations
 class MLNoveltyDetector extends NoveltyDetector {
-  constructor(private config: NoveltyConfig) {
+  constructor(private readonly config: NoveltyConfig) {
     super()
   }
 
@@ -1774,7 +1774,7 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
   private model: tf.Sequential | null = null
   private isTraining = false
 
-  constructor(private config: ForecastingConfig) {
+  constructor(private readonly config: ForecastingConfig) {
     super()
   }
 
@@ -1952,7 +1952,7 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
 }
 
 class GraphPropagationModeler extends PropagationModeler {
-  constructor(private config: PropagationConfig) {
+  constructor(private readonly config: PropagationConfig) {
     super()
   }
 

@@ -47,7 +47,7 @@ function memoize<T extends (...args: any[]) => any>(fn: T): T {
     const key = JSON.stringify(args)
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>
+      return cache.get(key)!
     }
 
     // Call the function with args and return the result
@@ -324,6 +324,21 @@ export class PresidioPHIDetector {
         return '[PHONE]'
       case PHIEntityType.PERSON:
         return '[NAME]'
+      case PHIEntityType.ADDRESS: { throw new Error('Not implemented yet: PHIEntityType.ADDRESS case') }
+      case PHIEntityType.LOCATION: { throw new Error('Not implemented yet: PHIEntityType.LOCATION case') }
+      case PHIEntityType.MEDICAL_RECORD_NUMBER: { throw new Error('Not implemented yet: PHIEntityType.MEDICAL_RECORD_NUMBER case') }
+      case PHIEntityType.DATE_TIME: { throw new Error('Not implemented yet: PHIEntityType.DATE_TIME case') }
+      case PHIEntityType.AGE: { throw new Error('Not implemented yet: PHIEntityType.AGE case') }
+      case PHIEntityType.IP_ADDRESS: { throw new Error('Not implemented yet: PHIEntityType.IP_ADDRESS case') }
+      case PHIEntityType.URL: { throw new Error('Not implemented yet: PHIEntityType.URL case') }
+      case PHIEntityType.US_PASSPORT: { throw new Error('Not implemented yet: PHIEntityType.US_PASSPORT case') }
+      case PHIEntityType.US_DRIVER_LICENSE: { throw new Error('Not implemented yet: PHIEntityType.US_DRIVER_LICENSE case') }
+      case PHIEntityType.CREDIT_CARD: { throw new Error('Not implemented yet: PHIEntityType.CREDIT_CARD case') }
+      case PHIEntityType.US_BANK_NUMBER: { throw new Error('Not implemented yet: PHIEntityType.US_BANK_NUMBER case') }
+      case PHIEntityType.IBAN_CODE: { throw new Error('Not implemented yet: PHIEntityType.IBAN_CODE case') }
+      case PHIEntityType.US_ITIN: { throw new Error('Not implemented yet: PHIEntityType.US_ITIN case') }
+      case PHIEntityType.MEDICAL_LICENSE: { throw new Error('Not implemented yet: PHIEntityType.MEDICAL_LICENSE case') }
+      case PHIEntityType.ORGANIZATION: { throw new Error('Not implemented yet: PHIEntityType.ORGANIZATION case') }
       default:
         return '[REDACTED]'
     }
@@ -331,7 +346,7 @@ export class PresidioPHIDetector {
   /**
    * Fallback method for detecting PHI entities using regex patterns
    */
-  private fallbackDetection = memoize((text: string): PHIEntity[] => {
+  private readonly fallbackDetection = memoize((text: string): PHIEntity[] => {
     const entities: PHIEntity[] = []
 
     // Common PHI regex patterns
@@ -420,7 +435,7 @@ if (require.main === module) {
 export async function detectAndRedactPHIAsync(text: string): Promise<string> {
   const detector = PresidioPHIDetector.getInstance()
   const result = await detector.detectPHI(text)
-  return result.redactedText || text
+  return result.redactedText ?? text
 }
 
 /**

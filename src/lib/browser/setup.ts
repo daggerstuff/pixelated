@@ -158,9 +158,9 @@ function setupReducedDataDetection() {
     connection?: { saveData?: boolean }
   }
   const saveData =
-    connection?.saveData ||
-    /save-data=on/.test(document.cookie) ||
-    /save-data=on/.test(navigator.userAgent)
+    (connection?.saveData ??
+    /save-data=on/.test(document.cookie)) ||
+    navigator.userAgent.includes('save-data=on')
 
   if (saveData) {
     document.documentElement.classList.add('save-data')
@@ -214,7 +214,7 @@ function setupDeviceSpecificFixes() {
   }
 
   // Safari specific fixes (including macOS)
-  if (/safari/.test(userAgent) && !/chrome/.test(userAgent)) {
+  if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
     document.documentElement.classList.add('safari')
 
     // Fix for position:sticky support
@@ -222,7 +222,7 @@ function setupDeviceSpecificFixes() {
   }
 
   // Firefox specific fixes
-  if (/firefox/.test(userAgent)) {
+  if (userAgent.includes('firefox')) {
     document.documentElement.classList.add('firefox')
   }
 }

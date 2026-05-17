@@ -18,10 +18,10 @@ const logger = createBuildSafeLogger('seal-operations')
  * Homomorphic operations using Microsoft SEAL
  */
 export class SealOperations {
-  private service: SealService
+  private readonly service: SealService
 
   constructor(service?: SealService) {
-    this.service = service || SealService.getInstance()
+    this.service = service ?? SealService.getInstance()
   }
 
   /**

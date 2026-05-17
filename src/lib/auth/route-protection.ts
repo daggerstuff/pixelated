@@ -25,7 +25,7 @@ export async function protectRoute(
   if (options) {
     return await authenticateRequest(request, {
       strategy: options.strategy,
-      requiredScopes: options.requiredScopes || [],
+      requiredScopes: options.requiredScopes ?? [],
     })
   }
 
@@ -47,7 +47,7 @@ export async function protectRoute(
 
   return await authenticateRequest(request, {
     strategy: routeConfig.strategy,
-    requiredScopes: routeConfig.requiredScopes || [],
+    requiredScopes: routeConfig.requiredScopes ?? [],
   })
 }
 

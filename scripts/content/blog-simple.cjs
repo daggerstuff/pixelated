@@ -52,7 +52,7 @@ function isSafeToken(token) {
 
 function runBlogCommand(command) {
   try {
-    const tokens = Array.isArray(command) ? command : parseArgs(command || '')
+    const tokens = Array.isArray(command) ? command : parseArgs(command ?? '')
     if (tokens.length === 0) {
       return { success: false, error: 'Empty command' }
     }

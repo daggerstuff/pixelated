@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 
 import { WebSocketClient } from '../services/websocketClient.js'
 
-interface DocumentChangeEvent {
+interface LocalDocumentChangeEvent {
   type: 'insert' | 'delete' | 'format'
   position: { line: number; column: number }
   content?: string
@@ -36,7 +36,7 @@ interface UseCollaborationReturn {
   updateContent: (newContent: string) => void
   updateCursor: (line: number, column: number) => void
   saveDocument: () => void
-  applyRemoteChange: (change: DocumentChangeEvent) => void
+  applyRemoteChange: (change: LocalDocumentChangeEvent) => void
 }
 
 export function useCollaboration({
@@ -140,13 +140,13 @@ export function useCollaboration({
 
       // Send change to server
       if (socketRef.current && isConnected) {
-        const change: DocumentChangeEvent = {
+        const change: LocalDocumentChangeEvent = {
           type: 'insert',
           position: { line: 0, column: 0 },
           content: newContent,
           userId: 'current', // This will be replaced by server
         }
-        socketRef.current.sendDocumentChange(change, version)
+        socketRef.current.sendDocumentChange(change as any, version)
       }
     },
     [version, isConnected],
@@ -168,7 +168,7 @@ export function useCollaboration({
     }
   }, [content, version, isConnected])
 
-  const applyRemoteChange = useCallback((_change: DocumentChangeEvent) => {
+  const applyRemoteChange = useCallback((_change: LocalDocumentChangeEvent) => {
     // This would be used for more complex change application
     // For now, we'll let the remote change handler do it
   }, [])
@@ -189,7 +189,7 @@ export function useCollaboration({
 }
 
 // Helper function to apply document changes
-function applyChange(content: string, change: DocumentChangeEvent): string {
+function applyChange(content: string, change: LocalDocumentChangeEvent): string {
   const lines = content.split('\n')
 
   switch (change.type) {
