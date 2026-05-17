@@ -2,22 +2,25 @@
 
 ## 2024-06-01 - Extract Tooltip
 
-- Learning: Inline components in Recharts cause unnecessary re-renders
-- Action: Extracted `CustomTooltip` to module level
+Learning: Inline components in Recharts cause unnecessary re-renders.
+Action: Extracted `CustomTooltip` to module level.
 
 ## 2024-06-03 - O(N^2) React Rendering
 
-- Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks
-  during React renders
-- Action: Replaced `Array.includes()` with a `Set` generated via `useMemo` for
-  O(1) lookups
+Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks during React renders.
+Action: Replaced `Array.includes()` with a `Set` generated via `useMemo` for O(1) lookups.
+
+## 2024-05-18 - Stable Reference for Checkbox Toggles
+
+Learning: Functions passed to looped DOM elements cause unnecessary allocations.
+Action: Wrapped handleDimensionToggle in useCallback.
 
 ## 2025-03-20 - Set for Filters
 
-- Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks
-  during React renders when rendering filter lists
-- Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for
-  filter option arrays
+Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks during React renders when rendering filter lists.
+Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for filter option arrays.
+
+## 2025-03-20 - Inline Callback Re-renders
 
 ## 2024-05-18 - Stable Reference for Checkbox Toggles | Learning: Functions passed to looped DOM elements cause unnecessary allocations | Action: Wrapped handleDimensionToggle in useCallback
 

@@ -2,7 +2,7 @@
 
 ## 2026-04-14 - Async Search Accessibility
 
-Learning: Async search needs both visual spinners and invisible live regions for screen readers.
+Learning: Async search needs both visual spinners (which do not shift layout like text does) and invisible live regions for screen readers.
 Action: Replaced text with spinner and added sr-only aria-live polite region.
 
 ## 2026-04-17 - MentalHealthChat Demo A11y
@@ -35,7 +35,7 @@ Action: Use loop variables to provide specific, dynamically generated aria-label
 Learning: Elements with role="group" need an accessible name (aria-label).
 Action: Added aria-label to role="group" and comprehensive styling to SessionControls buttons.
 
-## 2026-05-15 - Time Range Selectors
+## 2026-05-20 - Search Box Accessibility
 
 Learning: Custom time range buttons visually act as toggle buttons, but without aria-pressed state fails.
 Action: Added `aria-pressed={true/false}` and grouped them with role="group".
