@@ -278,7 +278,7 @@ function isRateLimitError(
   }
 
   const normalizedMessage = message.toLowerCase()
-  const normalizedCode = (code ?? '').toLowerCase()
+  const normalizedCode = (code || '').toLowerCase()
 
   return (
     normalizedMessage.includes('rate limit') ||
@@ -336,9 +336,9 @@ export function createLLMService(config: LLMClientConfig): LLMService {
         code?: string
       }
       const fallbackMessage =
-        ((errorData.error?.message ??
-          (errorData as { message?: unknown }).message?.toString()) ??
-          errorData.error?.reason?.toString()) ??
+        (errorData.error?.message ??
+        (errorData as { message?: unknown }).message?.toString()) ||
+        errorData.error?.reason?.toString() ||
         errorData.reason?.toString() ??
         'Unknown error'
       errorMessage = `LLM API error: ${fallbackMessage}`

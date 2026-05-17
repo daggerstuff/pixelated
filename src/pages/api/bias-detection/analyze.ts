@@ -68,7 +68,9 @@ const createResponse = (
   if (typeof Response === 'function') {
     const responsePrototype = (Response as unknown as { prototype?: unknown })
       .prototype
-    const canConstructResponse = (responsePrototype?.constructor === Response)
+    const canConstructResponse = Boolean(
+      responsePrototype?.constructor === Response,
+    )
 
     if (canConstructResponse) {
       try {

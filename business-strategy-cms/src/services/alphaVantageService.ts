@@ -576,7 +576,7 @@ export class AlphaVantageService {
   private getFromCache(key: string): unknown | null {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data
+      return cached.data as unknown
     }
     return null
   }

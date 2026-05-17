@@ -173,14 +173,14 @@ export class BiasDetectionCache {
   ): Promise<void> {
     try {
       const now = new Date()
-      const ttl = options.ttl ?? this.config.defaultTtl
+      const ttl = options.ttl || this.config.defaultTtl
       const ttlSeconds = Math.floor(ttl / 1000)
       const expiresAt = new Date(now.getTime() + ttl)
 
       // Compress data if enabled
       let processedValue = value
       if (this.config.enableCompression && options.compress !== false) {
-        processedValue = (await this.compressData(value))
+        processedValue = (await this.compressData(value)) as unknown
       }
 
       // Store in Redis first (distributed cache)
@@ -195,11 +195,11 @@ export class BiasDetectionCache {
             value: processedValue,
             timestamp: now.toISOString(),
             expiresAt: expiresAt.toISOString(),
-            tags: options.tags ?? [],
+            tags: options.tags || [],
             metadata: {
               biasCache: true,
               version: '1.0',
-              priority: options.priority ?? 'medium',
+              priority: options.priority || 'medium',
             },
           }
 

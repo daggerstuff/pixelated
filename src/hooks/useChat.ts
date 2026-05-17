@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from 'react'
+import React from 'react'
 import { useState } from 'react'
 
 import type { ChatOptions } from '@/types/chat'
@@ -16,8 +16,8 @@ interface LocalMessage {
 export interface UseChatReturn {
   messages: LocalMessage[]
   input: string
-  handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void
-  handleSubmit: (e: FormEvent) => Promise<void>
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleSubmit: (e: React.FormEvent) => Promise<void>
   isLoading: boolean
   setMessages: React.Dispatch<React.SetStateAction<LocalMessage[]>>
   sendMessage: (content: string) => Promise<string | undefined>
@@ -113,9 +113,9 @@ export function useChat(options: ChatOptions): UseChatReturn {
       } else {
         // Standard chat API format
         responseContent =
-          ((responseData.text ??
-          responseData.content) ??
-          responseData.message) ??
+          (responseData.text ??
+          responseData.content) ||
+          responseData.message ??
           'No response content'
       }
 

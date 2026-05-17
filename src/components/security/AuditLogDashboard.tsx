@@ -131,8 +131,10 @@ export function AuditLogDashboard() {
         fetchedLogs = fetchedLogs.filter(
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
-            ((log.resource.type?.toLowerCase().includes(searchLower)) ??
-            (log.resource.id?.toLowerCase().includes(searchLower))) ||
+            ((log.resource.type &&
+              log.resource.type.toLowerCase().includes(searchLower)) ??
+            (log.resource.id &&
+              log.resource.id.toLowerCase().includes(searchLower))) ||
             log.userId.toLowerCase().includes(searchLower),
         )
       }
@@ -152,7 +154,7 @@ export function AuditLogDashboard() {
     const stats = logs.reduce< Record<string, number>>(
       (acc, log) => {
         const type = log.action
-        acc[type] = (acc[type] ?? 0) + 1
+        acc[type] = (acc[type] || 0) + 1
         return acc
       },
       {},

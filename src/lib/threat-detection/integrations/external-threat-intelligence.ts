@@ -180,7 +180,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     client: AxiosInstance,
     feed: ThreatIntelligenceFeed,
   ): void {
-    const requestQueue: (() => Promise<void>)[] = []
+    let requestQueue: (() => Promise<void>)[] = []
     let processing = false
 
     const processQueue = async () => {
@@ -453,7 +453,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Extract basic fields
-      const iocValue = String(((data.value ?? data.ioc) ?? data.indicator) ?? '')
+      const iocValue = String((data.value ?? data.ioc) || data.indicator ?? '')
       const iocType = String((data.type ?? data.ioc_type) ?? 'unknown')
       const threatType = String(
         (data.threat_type ?? data.malware_family) ?? 'unknown',
