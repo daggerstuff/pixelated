@@ -501,8 +501,36 @@ export class AdvancedResponseOrchestrator
           timeout: 60000,
         }
 
-      case "alert": { throw new Error('Not implemented yet: "alert" case') }
-      case "escalate": { throw new Error('Not implemented yet: "escalate" case') }
+       case "alert": {
+         return {
+           actionId: this.generateActionId(),
+           actionType: 'user_notification',
+           target: 'notification_system',
+           parameters: {
+             threatId: analysis.threatId,
+             message: `Low severity threat detected: ${analysis.threatId}`,
+             severity: analysis.severity,
+           },
+           priority: 3,
+           timeout: 5000,
+         }
+       }
+       case "escalate": {
+         return {
+           actionId: this.generateActionId(),
+           actionType: 'escalation_notification',
+           target: 'escalation_system',
+           parameters: {
+             threatId: analysis.threatId,
+             reason: `Threat requires escalation: ${analysis.threatId}`,
+             severity: analysis.severity,
+             estimatedImpact: analysis.estimatedImpact,
+           },
+           priority: 9,
+           timeout: 10000,
+           rollbackStrategy: 'cancel_escalation',
+         }
+       }
       default:
         return null
     }

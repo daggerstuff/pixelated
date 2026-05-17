@@ -8,7 +8,7 @@
 ;(function () {
   // Check if browser supports CSS variables
   const supportsCssVars =
-    window.CSS?.supports?.('(--foo: red)')
+    window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
 
   if (!supportsCssVars) {
     console.log('CSS variables not supported - applying fallbacks')
